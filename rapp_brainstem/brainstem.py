@@ -65,7 +65,16 @@ def _resolve_under_base(value, default_name):
 
 SOUL_PATH   = _resolve_under_base(os.getenv("SOUL_PATH"),   "soul.md")
 AGENTS_PATH = _resolve_under_base(os.getenv("AGENTS_PATH"), "agents")
-MODEL       = os.getenv("GITHUB_MODEL", "gpt-4o")
+# Model selection precedence (see _auto_select_default_model below):
+#   1. .brainstem_model — a model picked in the UI, persisted across restarts
+#   2. GITHUB_MODEL pinned to a specific id (anything other than "auto")
+#   3. GITHUB_MODEL="auto" / unset -> highest Claude Haiku the account can use
+#      (fastest responses), falling back to the highest Sonnet
+#   4. gpt-4o safety net (also the call_copilot fallback)
+MODEL_ENV    = (os.getenv("GITHUB_MODEL") or "").strip()
+MODEL_PINNED = bool(MODEL_ENV) and MODEL_ENV.lower() != "auto"
+MODEL        = MODEL_ENV if MODEL_PINNED else "gpt-4o"  # provisional; resolved below
+_SAFETY_NET_MODEL = "gpt-4o"
 # A blank PORT= in .env yields "" — int("") raises at import and the server never
 # starts. Fall back to the default for anything non-numeric.
 try:
@@ -80,6 +89,9 @@ _version_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "VERSIO
 VERSION = open(_version_file, encoding="utf-8").read().strip() if os.path.exists(_version_file) else "0.0.0"
 
 COPILOT_TOKEN_URL = "https://api.github.com/copilot_internal/v2/token"
+# Where the in-app "Get Help" flow files issues. Users' help requests go to the
+# support repo, keeping the engineering tracker (this repo) clean.
+SUPPORT_REPO = "microsoft/aibast-agents-library"
 
 
 def _atomic_write_json(path, data):
@@ -117,6 +129,216 @@ AVAILABLE_MODELS = [
 # Models that don't support OpenAI-style tool_choice parameter
 _NO_TOOL_CHOICE_MODELS = set()
 _models_fetched = False
+_default_model_selected = False  # one-shot guard for _auto_select_default_model
+
+# ── Sticky model persistence ──────────────────────────────────────────────────
+# A model picked in the web UI is remembered here so it stays the default across
+# browser refreshes, server restarts, and for non-browser clients hitting /chat.
+_model_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".brainstem_model")
+
+def _load_sticky_model():
+    """Return the user's last manually-selected model id (persisted), or None."""
+    try:
+        if os.path.exists(_model_file):
+            with open(_model_file, encoding="utf-8") as f:
+                data = json.load(f)
+            mid = (data.get("model") or "").strip() if isinstance(data, dict) else ""
+            return mid or None
+    except Exception:
+        pass
+    return None
+
+def _save_sticky_model(model_id):
+    """Persist a manual model choice so it stays the default across restarts."""
+    try:
+        _atomic_write_json(_model_file, {"model": model_id})
+    except Exception as e:
+        print(f"[brainstem] Could not persist model choice: {e}")
+
+def _clear_sticky_model():
+    """Forget the persisted pick (return to the env / auto-select default)."""
+    try:
+        if os.path.exists(_model_file):
+            os.remove(_model_file)
+    except Exception:
+        pass
+
+# A persisted manual pick wins over the env default resolved above.
+MODEL = _load_sticky_model() or MODEL
+
+# ── Claude model auto-selection ─────────────────────────────────────────────────────
+# Anthropic "reasoning" variant markers Copilot appends (e.g.
+# claude-3.7-sonnet-thought). Stripped so a reasoning variant ranks identically
+# to its base generation; _auto_select_default_model breaks the tie toward base.
+_REASONING_SUFFIXES = ("thought", "thinking", "reasoning")
+
+_CLAUDE_FAMILIES = ("sonnet", "haiku", "opus")
+
+def _claude_rank(model_id, model_name="", family="sonnet"):
+    """Return a comparable (major, minor) version tuple for a Claude model of
+    the given family (sonnet / haiku / opus), or None if it isn't one.
+
+    Handles both Copilot naming shapes:
+      version-before-name:  claude-3.5-sonnet, claude-3-5-haiku-20241022, claude-3.7-sonnet
+      version-after-name:   claude-sonnet-4, claude-haiku-4.5, claude-sonnet-4-5-20250929
+
+    Robustness contract (adversarially verified):
+      - Only the requested Claude family ranks; gpt-*, gemini-*, and the other
+        two Claude families -> None.
+      - A trailing numeric snapshot of 4+ digits (year/YYYYMM/YYYYMMDD/timestamp)
+        is stripped and never read as a version.
+      - The family word must be a whole word (\\bsonnet\\b), so
+        'claude-personnet-4.5' -> None.
+      - model_name is consulted ONLY as a fallback when model_id is itself a Claude
+        id, so a non-Claude whose display name merely mentions 'Claude Sonnet 4.5'
+        (e.g. id='gpt-5') -> None.
+      - A separator-less multi-digit version is read as the MAJOR
+        (claude-sonnet-10 -> (10, 0)), so a future double-digit generation ranks
+        ABOVE every 3.x/4.x instead of collapsing to (1, 0).
+      - Orders 3 < 3.5 < 3.7 < 4 < 4.5 < 4.6 < 5 < 10 ...
+    """
+    other_families = [f for f in _CLAUDE_FAMILIES if f != family]
+    mid = str(model_id or "").strip().lower()
+    # Only trust model_name when the *id* already marks this as a Claude model;
+    # this stops a non-Claude id (e.g. 'gpt-5') borrowing a Claude rank from prose.
+    candidates = [mid]
+    if "claude" in mid:
+        candidates.append(str(model_name or "").strip().lower())
+
+    for s in candidates:
+        if not s:
+            continue
+        if "claude" not in s or not re.search(rf"\b{family}\b", s):
+            continue
+        if any(other in s for other in other_families):
+            continue
+
+        # Strip reasoning-variant suffixes first ...
+        for suf in _REASONING_SUFFIXES:
+            s = s.replace("-" + suf, "").replace("_" + suf, "")
+        # ... then drop a trailing numeric snapshot/date (run of 4+ digits at the
+        # end). Real version parts are 1-3 digits, so this never eats a major/minor.
+        s = re.sub(r"[-_.]?\d{4,}$", "", s)
+
+        # Shape A -- version BEFORE the family word: claude-3.5-sonnet / claude-3-5-haiku
+        m = re.search(rf"claude[-_ ]+v?(\d+(?:[.\-_]\d+)?)[-_ ]+{family}", s)
+        if not m:
+            # Shape B -- version AFTER the family word: claude-sonnet-4 / claude-haiku-4.5
+            m = re.search(rf"{family}[-_ ]+v?(\d+(?:[.\-_]\d+)?)", s)
+        if not m:
+            continue
+
+        token = m.group(1).replace("_", "-")
+        if "." in token:
+            parts = token.split(".")
+        elif "-" in token:
+            parts = token.split("-")
+        else:
+            # Bare digits, no separator -> the WHOLE number is the major (minor 0):
+            # claude-sonnet-4 -> (4,0), -10 -> (10,0). Real Sonnet ids always
+            # separate a minor (4.5 / 4-5), so a lone number is a whole major.
+            parts = [token]
+
+        try:
+            major = int(parts[0])
+            minor = int(parts[1]) if len(parts) > 1 and parts[1] != "" else 0
+        except (ValueError, IndexError):
+            continue
+        return (major, minor)
+    return None
+
+def _sonnet_rank(model_id, model_name=""):
+    return _claude_rank(model_id, model_name, family="sonnet")
+
+def _haiku_rank(model_id, model_name=""):
+    return _claude_rank(model_id, model_name, family="haiku")
+
+# Policy states that mean the signed-in account is NOT entitled to call the model.
+_POLICY_BAD_STATES = {"unconfigured", "not_configured", "disabled", "blocked", "denied"}
+
+def _model_is_available(model_obj):
+    """Decide whether one RAW model object from the Copilot GET /models response
+    (data["data"][i]) is usable by the signed-in account right now.
+
+    MUST be called on the raw object BEFORE it is reduced to {"id","name"} -- the
+    reduced object drops policy/model_picker_enabled/capabilities, so every reduced
+    object would (wrongly) read as available.
+
+    Conservative by design: a signal may only DISQUALIFY a model when it is
+    unambiguously present and negative. Missing / unknown / malformed signals
+    default to "available" so we never hide a model the account can actually use.
+    """
+    if not isinstance(model_obj, dict):
+        return False
+
+    # 1) policy -- present only on opt-in / gated models. Absent => no opt-in
+    #    required => available. Only documented "not entitled" states disqualify.
+    policy = model_obj.get("policy")
+    if isinstance(policy, dict):
+        state = policy.get("state")
+        if isinstance(state, str) and state.strip().lower() in _POLICY_BAD_STATES:
+            return False
+
+    # 2) model_picker_enabled -- only disqualify when EXPLICITLY False.
+    if model_obj.get("model_picker_enabled") is False:
+        return False
+
+    caps = model_obj.get("capabilities")
+    if isinstance(caps, dict):
+        # 3) type -- only disqualify when explicitly a non-chat type (e.g. embeddings).
+        ctype = caps.get("type")
+        if isinstance(ctype, str) and ctype.strip().lower() not in ("chat", ""):
+            return False
+        # 4) tool_calls -- /chat needs it; disqualify only when explicitly False.
+        supports = caps.get("supports")
+        if isinstance(supports, dict) and supports.get("tool_calls") is False:
+            return False
+
+    return True
+
+def _auto_select_default_model():
+    """Set the module global MODEL to the highest-version Claude HAIKU the account
+    can actually use — Haiku answers noticeably faster than Sonnet, and response
+    latency matters more than raw intelligence for the default chat experience.
+    Falls back to the highest Sonnet when the plan has no Haiku, keeping gpt-4o
+    as the final safety net. A persisted manual pick or an explicit GITHUB_MODEL
+    pin always wins. Idempotent (guard flag) and safe to call before auth is
+    ready or the catalog is fetched.
+    """
+    global MODEL, _default_model_selected
+    if _default_model_selected:
+        return
+    # A persisted manual pick or an explicit env pin both lock out auto-selection.
+    if _load_sticky_model() or MODEL_PINNED:
+        _default_model_selected = True
+        return
+    # Wait for a real catalog fetch -- the bootstrap AVAILABLE_MODELS has no
+    # verified "available" flags, so we never auto-pick from a guess.
+    if not _models_fetched:
+        return
+    try:
+        for family in ("haiku", "sonnet"):  # speed first, capability fallback
+            best = None  # ((rank_tuple, is_base), id)
+            for m in AVAILABLE_MODELS:
+                if not m.get("available"):  # only models confirmed usable by the fetch
+                    continue
+                rank = _claude_rank(m.get("id", ""), m.get("name", ""), family=family)
+                if rank is None:
+                    continue
+                mid = str(m.get("id", "")).lower()
+                # Tie-break: prefer the plain base model over a -thought/-thinking variant.
+                is_base = not any(suf in mid for suf in _REASONING_SUFFIXES)
+                key = (rank, is_base)
+                if best is None or key > best[0]:
+                    best = (key, m["id"])
+            if best is not None:
+                MODEL = best[1]
+                _tlog("model.auto_selected", {"model": MODEL, "family": family})
+                break
+        # else: no usable Haiku or Sonnet -> keep gpt-4o (or whatever MODEL already is).
+    except Exception as e:
+        print(f"[brainstem] Auto-select skipped: {e}")
+    _default_model_selected = True
 
 def _fetch_copilot_models():
     """Fetch available models from Copilot API. Updates AVAILABLE_MODELS in place."""
@@ -140,6 +362,7 @@ def _fetch_copilot_models():
             models_list = data if isinstance(data, list) else data.get("data", data.get("models", []))
             if models_list:
                 new_models = []
+                skipped = []
                 for m in models_list:
                     mid = m.get("id", m.get("model", ""))
                     mname = m.get("name", mid)
@@ -148,10 +371,12 @@ def _fetch_copilot_models():
                     # Skip Copilot's internal utility models that aren't user-pickable
                     # chat models (e.g. trajectory-compaction).
                     if mid.lower() == "trajectory-compaction":
+                        skipped.append(mid)
                         continue
                     caps = m.get("capabilities", {}) or {}
                     # Only chat models — embeddings can't be driven via /chat.
                     if caps.get("type", "chat") != "chat":
+                        skipped.append(mid)
                         continue
                     # Only keep models the Copilot API will actually serve over
                     # /chat/completions. Some listed models (e.g. gpt-5.5,
@@ -163,17 +388,21 @@ def _fetch_copilot_models():
                     # means the model has no chat route -> skip it.
                     endpoints = m.get("supported_endpoints")
                     if endpoints is not None and "/chat/completions" not in endpoints:
+                        skipped.append(mid)
                         continue
-                    new_models.append({"id": mid, "name": mname})
+                    # Capture availability (policy / model_picker_enabled /
+                    # capabilities) from the RAW object before reducing it.
+                    new_models.append({"id": mid, "name": mname, "available": _model_is_available(m)})
                     if "o1" in mid.lower():
                         _NO_TOOL_CHOICE_MODELS.add(mid)
                 if new_models:
                     AVAILABLE_MODELS = new_models
-                    print(f"[brainstem] Fetched {len(new_models)} models from Copilot API")
-        _models_fetched = True
+                    _models_fetched = True  # latch only on a successful catalog fetch
     except Exception as e:
         print(f"[brainstem] Could not fetch models (using defaults): {e}")
-        _models_fetched = True
+    # Settle the default now that a real catalog (with availability) may exist.
+    # No-op until a successful fetch; never recurses back into this function.
+    _auto_select_default_model()
 
 # ── Flight Recorder (book.json telemetry) ─────────────────────────────────────
 
@@ -315,6 +544,12 @@ def save_github_token(token, refresh_token=None):
     _atomic_write_json(_token_file, data)
     _tlog("auth.token_saved", {"prefix": token[:4], "has_refresh": bool(refresh_token)})
     print(f"[brainstem] GitHub token saved (prefix: {token[:4]}...)")
+    # A fresh token may unlock new models — let the next request re-fetch the
+    # catalog and re-run model auto-selection (covers logging in after startup).
+    global _models_fetched, _default_model_selected
+    _models_fetched = False
+    _default_model_selected = False
+    _NO_TOOL_CHOICE_MODELS.clear()
 
 def refresh_github_token():
     """Try to refresh an expired GitHub token using the stored refresh_token."""
@@ -941,7 +1176,12 @@ def call_copilot(messages, tools=None):
         # On 400/429/5xx, cycle through other available models before giving up
         if resp.status_code in (400, 429, 500, 502, 503):
             tried = {MODEL}
-            fallback_ids = [m["id"] for m in AVAILABLE_MODELS if m["id"] != MODEL]
+            fallback_ids = [m["id"] for m in AVAILABLE_MODELS
+                            if m["id"] != MODEL and m.get("available", True)]
+            # Try the universal gpt-4o safety net first.
+            if _SAFETY_NET_MODEL in fallback_ids:
+                fallback_ids.remove(_SAFETY_NET_MODEL)
+                fallback_ids.insert(0, _SAFETY_NET_MODEL)
             for fallback_model in fallback_ids:
                 if fallback_model in tried:
                     continue
@@ -997,7 +1237,10 @@ def call_copilot(messages, tools=None):
     if has_tools:
         print(f"[brainstem]   tool_calls: {[tc.get('function',{}).get('name','?') for tc in msg['tool_calls']]}")
 
-    return result
+    # body["model"] holds whichever model actually produced this 200 — it differs
+    # from MODEL when the fallback loop above had to switch models. Return it so
+    # callers can surface a silent substitution instead of hiding it.
+    return result, body["model"]
 
 # ── Agent execution ───────────────────────────────────────────────────────────
 
@@ -1098,9 +1341,10 @@ def chat():
         messages.append({"role": "user", "content": user_input})
 
         all_logs = []
+        responded_model = MODEL
         # Up to 3 tool-call rounds
         for _ in range(3):
-            response = call_copilot(messages, tools=tools)
+            response, responded_model = call_copilot(messages, tools=tools)
             choice   = response["choices"][0]
             msg      = choice["message"]
             finish   = choice.get("finish_reason", "")
@@ -1124,7 +1368,7 @@ def chat():
         # getting a blank response.
         if not reply and msg.get("tool_calls"):
             try:
-                final_response = call_copilot(messages, tools=None)
+                final_response, responded_model = call_copilot(messages, tools=None)
                 reply = (final_response["choices"][0]["message"].get("content") or "").strip()
             except Exception as e:
                 print(f"[brainstem] Final tool-less completion failed: {e}")
@@ -1137,6 +1381,11 @@ def chat():
             "session_id": session_id,
             "agent_logs": "\n".join(all_logs),
             "voice_mode": VOICE_MODE,
+            # The model that actually answered. Differs from `requested_model`
+            # when call_copilot's fallback loop had to switch models, so clients
+            # can show "answered by X" instead of silently misattributing it.
+            "model": responded_model,
+            "requested_model": MODEL,
         }
         
         if VOICE_MODE and "|||VOICE|||" in reply:
@@ -1250,15 +1499,24 @@ def list_models():
 
 @app.route("/models/set", methods=["POST"])
 def set_model():
-    """Change the active model."""
-    global MODEL
+    """Change the active model. A specific pick is persisted (.brainstem_model) so
+    it stays the default across restarts; "auto" forgets the pick and re-selects
+    the fastest available Claude (highest Haiku, falling back to Sonnet)."""
+    global MODEL, _default_model_selected
     data = request.get_json(force=True) or {}
     new_model = data.get("model", "").strip()
     _fetch_copilot_models()
+    if new_model.lower() == "auto":
+        _clear_sticky_model()
+        _default_model_selected = False
+        _auto_select_default_model()
+        return jsonify({"model": MODEL, "auto": True})
     valid_ids = [m["id"] for m in AVAILABLE_MODELS]
     if new_model not in valid_ids:
         return jsonify({"error": f"Unknown model. Available: {valid_ids}"}), 400
     MODEL = new_model
+    _save_sticky_model(new_model)     # remember across refresh + restart
+    _default_model_selected = True    # a manual pick disables auto-select this run
     return jsonify({"model": MODEL})
 
 @app.route("/voice", methods=["GET"])
@@ -1679,7 +1937,7 @@ def diagnostics_report():
 
     try:
         resp = requests.post(
-            "https://api.github.com/repos/microsoft/aibast-agents-library/issues",
+            f"https://api.github.com/repos/{SUPPORT_REPO}/issues",
             headers={
                 "Authorization": f"Bearer {github_token}",
                 "Accept": "application/vnd.github+json",
@@ -1704,7 +1962,7 @@ def diagnostics_report():
             try:
                 result = subprocess.run(
                     ["gh", "issue", "create",
-                     "--repo", "microsoft/aibast-agents-library",
+                     "--repo", SUPPORT_REPO,
                      "--title", f"🆘 Help request — v{VERSION}",
                      "--body", issue_body],
                     capture_output=True, text=True, timeout=30,
@@ -1730,6 +1988,15 @@ if __name__ == "__main__":
     _tlog_load()  # Restore previous flight log
     _tlog("server.starting", {"version": VERSION, "model": MODEL, "port": PORT})
     print(f"\n🧠 RAPP Brainstem v{VERSION} starting on http://localhost:{PORT}")
+    # If auth is already available (gh CLI / env / cached token), fetch the real
+    # catalog now so MODEL reflects the auto-selected Haiku in the banner below.
+    # get_copilot_token() is non-interactive here (raises instead of prompting),
+    # so this never blocks startup.
+    try:
+        _fetch_copilot_models()
+    except Exception:
+        pass
+    _auto_select_default_model()
     print(f"   Soul:   {SOUL_PATH}")
     print(f"   Agents: {AGENTS_PATH}")
     print(f"   Model:  {MODEL}")
@@ -1740,4 +2007,21 @@ if __name__ == "__main__":
     _tlog("server.agents_loaded", {"agents": list(agents.keys())})
     _load_pending_login()  # Resume any in-progress device code login
     _tlog("server.ready", {"url": f"http://localhost:{PORT}"})
+
+    # HTTPServer.server_bind reverse-DNS-resolves the bind address between bind()
+    # and listen(); on networks whose resolver drops those queries this stalls
+    # startup ~30s with the port bound but not yet accepting, so the installer's
+    # browser tab opens onto a dead port (#14). The looked-up name is only the
+    # WSGI SERVER_NAME default — the bind address itself works fine.
+    import http.server
+    import socketserver
+
+    def _server_bind_no_rdns(self):
+        socketserver.TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name = host
+        self.server_port = port
+
+    http.server.HTTPServer.server_bind = _server_bind_no_rdns
+
     app.run(host="0.0.0.0", port=PORT, debug=False)

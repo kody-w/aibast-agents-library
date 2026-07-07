@@ -183,7 +183,7 @@ Check you have everything:
 
 **Option 1: From GitHub Releases (Recommended)**
 
-1. Visit [CommunityRAPP Releases](https://github.com/kody-w/CommunityRAPP/releases)
+1. Visit [CommunityRAPP Releases](https://github.com/microsoft/aibast-agents-library/releases)
 2. Download `Copilot365_PowerPlatform_Solution.zip`
 
 **Option 2: Create Manually**
@@ -965,8 +965,8 @@ Now that you have Power Platform integration set up:
 
 ## Need Help?
 
-- **Issues**: [GitHub Issues](https://github.com/kody-w/CommunityRAPP/issues)
-- **Discussions**: [Community Forum](https://github.com/kody-w/CommunityRAPP/discussions)
+- **Issues**: [GitHub Issues](https://github.com/microsoft/aibast-agents-library/issues)
+- **Discussions**: [Community Forum](https://github.com/microsoft/aibast-agents-library/issues)
 - **Documentation**: [Back to docs home](index.md)
 
 ---

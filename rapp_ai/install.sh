@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════════════
 #  RAPP Hippocampus — Installer
-#  One-liner: curl -fsSL https://raw.githubusercontent.com/kody-w/m365-agents-for-python/main/CommunityRAPP/install.sh | bash
+#  One-liner: curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/community_rapp/install.sh | bash
 # ═══════════════════════════════════════════════════════════════════════════════
 set -e
 
@@ -21,7 +21,7 @@ REPO_DIR="$INSTALL_DIR/src"
 SOURCE_DIR="$REPO_DIR/CommunityRAPP"
 VENV_DIR="$INSTALL_DIR/venv"
 BIN_DIR="$HOME/.local/bin"
-REPO_URL="https://github.com/kody-w/m365-agents-for-python.git"
+REPO_URL="https://github.com/microsoft/aibast-agents-library.git"
 SERVER_PORT=7071
 SERVER_URL="http://localhost:$SERVER_PORT"
 
@@ -503,7 +503,7 @@ VENV_DIR="$INSTALL_DIR/venv"
 
 if [ ! -d "$SOURCE_DIR" ]; then
     echo "Error: CommunityRAPP not found at $SOURCE_DIR"
-    echo "Run the installer: curl -fsSL https://raw.githubusercontent.com/kody-w/m365-agents-for-python/main/CommunityRAPP/install.sh | bash"
+    echo "Run the installer: curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/community_rapp/install.sh | bash"
     exit 1
 fi
 
@@ -724,7 +724,7 @@ if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
     echo "CommunityRAPP Installer"
     echo ""
     echo "Usage:"
-    echo "  curl -fsSL https://raw.githubusercontent.com/kody-w/m365-agents-for-python/main/CommunityRAPP/install.sh | bash"
+    echo "  curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/community_rapp/install.sh | bash"
     echo "  ./install.sh"
     echo ""
     echo "This script installs RAPP Hippocampus to ~/.communityrapp/"

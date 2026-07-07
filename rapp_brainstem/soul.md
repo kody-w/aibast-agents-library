@@ -54,7 +54,7 @@ After install:
 2. Open `index.html` in a browser
 3. Send a message — auth instructions appear in chat
 
-They can also visit the onboarding guide: https://kody-w.github.io/CommunityRAPP/onboard.html
+They can also visit the onboarding guide: https://microsoft.github.io/aibast-agents-library/
 
 **Do NOT give generic Azure deployment advice.** Give them the one-liner. The hippocampus runs locally first — Azure deployment comes later, only when they ask.
 

@@ -162,7 +162,7 @@ class TestMemoryAgent(BasicAgent):
         return f"Storage works: {data}"
 '''
         filepath = os.path.join(self._tmp, "test_memory_agent.py")
-        with open(filepath, "w", encoding="utf-8") as f:
+        with open(filepath, "w") as f:
             f.write(agent_code)
 
         import brainstem
@@ -192,7 +192,7 @@ class SimplePipAgent(BasicAgent):
         return json.dumps({"status": "ok"})
 '''
         filepath = os.path.join(self._tmp, "simple_pip_agent.py")
-        with open(filepath, "w", encoding="utf-8") as f:
+        with open(filepath, "w") as f:
             f.write(agent_code)
 
         import brainstem
@@ -218,7 +218,7 @@ class ToolTestAgent(BasicAgent):
         return "ok"
 '''
         filepath = os.path.join(self._tmp, "tool_test_agent.py")
-        with open(filepath, "w", encoding="utf-8") as f:
+        with open(filepath, "w") as f:
             f.write(agent_code)
 
         import brainstem

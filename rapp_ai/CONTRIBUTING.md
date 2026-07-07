@@ -1,6 +1,6 @@
 # Contributing to CommunityRAPP
 
-Thanks for your interest in contributing! This project powers the RAPP (Rapid Agent Prototyping Platform) ecosystem and welcomes community participation.
+Thanks for your interest in contributing! This project powers the RAPP (Rapid Agent Prototype Platform) ecosystem and welcomes community participation.
 
 ## Quick Start
 

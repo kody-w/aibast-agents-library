@@ -87,7 +87,7 @@ if (-not (Test-Deps)) {
     Write-Host "ERROR: Python dependencies are missing and could not be installed." -ForegroundColor Red
     Write-Host "       Python at '$py' has no working pip (ensurepip and get-pip.py both failed)." -ForegroundColor Yellow
     Write-Host "       Reinstall Python from https://python.org with 'pip' checked, or run the" -ForegroundColor Yellow
-    Write-Host "       installer one-liner, then try .\start.ps1 again." -ForegroundColor Yellow
+    Write-Host "       RAPP installer one-liner, then try .\start.ps1 again." -ForegroundColor Yellow
     exit 1
 }
 

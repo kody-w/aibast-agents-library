@@ -40,7 +40,7 @@ irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/commu
 
 Creates `~/rapp-projects/my-project/` — isolated project with its own venv, agents, and local storage. Auth happens through the chat UI (GitHub device code flow). No API keys needed to start.
 
-[Onboarding guide](https://kody-w.github.io/CommunityRAPP/onboard.html) | [CommunityRAPP repo](https://github.com/kody-w/CommunityRAPP)
+[Onboarding guide](https://microsoft.github.io/aibast-agents-library/) | [CommunityRAPP repo](https://github.com/microsoft/aibast-agents-library)
 
 ---
 

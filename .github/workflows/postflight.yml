@@ -1,0 +1,53 @@
+name: Postflight — repo hygiene
+
+# Guards the failure modes that shipped to main before: dead advertised
+# one-liners, stale docs/ Pages mirrors, personal-repo references, and the
+# deprecated RAPP naming. Fast, static, no network to third parties.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: docs/ Pages mirrors match root installers
+        run: |
+          fail=0
+          for f in install.sh install.ps1 install.cmd install.command; do
+            if [ -f "$f" ] || [ -f "docs/$f" ]; then
+              if ! diff -q "$f" "docs/$f" >/dev/null 2>&1; then
+                echo "::error file=docs/$f::docs/$f is not a byte-for-byte mirror of root $f (Pages serves docs/)"
+                fail=1
+              fi
+            fi
+          done
+          exit $fail
+
+      - name: No personal kody-w/* references
+        run: |
+          if grep -rn "kody-w" . --exclude-dir=.git --exclude=postflight.yml ; then
+            echo "::error::personal kody-w/* reference found — repoint to microsoft/aibast-agents-library or an in-repo path"
+            exit 1
+          fi
+
+      - name: Canonical RAPP naming (Prototype, not Prototyping)
+        run: |
+          if grep -rn "Prototyping Platform" . --exclude-dir=.git --exclude=postflight.yml ; then
+            echo "::error::use 'Rapid Agent Prototype Platform' — 'Prototyping' is the deprecated form"
+            exit 1
+          fi
+
+      - name: Advertised community_rapp one-liner is not a dead link
+        run: |
+          # If the docs advertise the community_rapp installer, the file must exist.
+          if grep -rq "community_rapp/install.sh" README.md index.html 2>/dev/null; then
+            test -f community_rapp/install.sh || { echo "::error::README/index.html advertise community_rapp/install.sh but the file is missing"; exit 1; }
+          fi
