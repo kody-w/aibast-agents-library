@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="FY27 RAPP partner-training workshop: turn approved documents into a Copilot Studio prototype in 60 minutes.">
+<meta name="description" content="FY27 RAPP partner-training workshop: turn an approved use case into a working local Brainstem agent in 60 minutes.">
 <title>FY27 RAPP Workshop | Partner Training</title>
 <style>
   :root {
@@ -255,7 +255,7 @@
   <div class="hero">
     <p class="eyebrow">Microsoft AIBAST partner training</p>
     <h1>FY27 RAPP Workshop</h1>
-    <p class="hero-lead">Turn approved customer evidence into a reviewable Copilot Studio prototype in 60 minutes.</p>
+    <p class="hero-lead">Turn an approved use case into a working, shareable local Brainstem agent in 60 minutes.</p>
     <div class="badges" aria-label="Workshop attributes">
       <span class="badge">60-minute build-along</span>
       <span class="badge">Synthetic example inputs</span>
@@ -269,6 +269,7 @@
   <div class="inner">
     <a href="#process">Process</a>
     <a href="#agenda">Agenda</a>
+    <a href="facilitator-runbook.html">Facilitator runbook</a>
     <a href="#downloads">Downloads</a>
     <a href="#rehearsal">Rehearsal</a>
     <a href="#customer">Customer cadence</a>
@@ -278,8 +279,8 @@
 
 <main id="main">
   <section>
-    <h2>Use case in. Copilot Studio solution out.</h2>
-    <p class="section-lead">For this workshop, RAPP means a guided Documents to Copilot Studio process with explicit human gates before generation, deployment, and publication.</p>
+    <h2>Use case in. Local agent out.</h2>
+    <p class="section-lead">The required path uses only a GitHub account with Copilot access and the local RAPP Brainstem. Copilot Studio is a separate optional extension.</p>
     <div class="notice">
       <strong>Experimental training content.</strong> This material is maintained by an AIBAST v-team and is not an officially supported Microsoft product or production deployment guide. Generated output may contain errors and requires human review.
     </div>
@@ -289,11 +290,11 @@
     <h2>The five-step RAPP process</h2>
     <p class="section-lead">Participants learn by doing. Nothing is built or deployed without an explicit decision.</p>
     <div class="step-grid">
-      <article class="step"><span class="number">1</span><h3>Sign in</h3><p>Authenticate generation and environment access.</p></article>
-      <article class="step"><span class="number">2</span><h3>Documents</h3><p>Upload focused, approved evidence and name the solution.</p></article>
-      <article class="step"><span class="number">3</span><h3>MVP</h3><p>Read, edit, re-derive, or confirm the use case.</p></article>
-      <article class="step"><span class="number">4</span><h3>Review</h3><p>Inspect agent files plus demo and live solution twins.</p></article>
-      <article class="step"><span class="number">5</span><h3>Deploy</h3><p>Choose an environment, import, test, and publish deliberately.</p></article>
+      <article class="step"><span class="number">1</span><h3>Sign in</h3><p>Authenticate GitHub Copilot. No API key required.</p></article>
+      <article class="step"><span class="number">2</span><h3>Start</h3><p>Run Brainstem and open localhost:7071.</p></article>
+      <article class="step"><span class="number">3</span><h3>Author</h3><p>Create one top-level *_agent.py from the approved source.</p></article>
+      <article class="step"><span class="number">4</span><h3>Run</h3><p>Hot-load, chat, inspect logs, edit, and retest locally.</p></article>
+      <article class="step"><span class="number">5</span><h3>Share</h3><p>Send the passing one-file agent with local evidence.</p></article>
     </div>
   </section>
 
@@ -302,21 +303,22 @@
     <div class="timeline">
       <div class="when">00-10</div><div class="what"><strong>Align.</strong> Set the outcome and explain the five-step mental model.</div>
       <div class="when">10-15</div><div class="what"><strong>Scenario.</strong> Identify the user, problem, outcome, and safety boundary.</div>
-      <div class="when">15-23</div><div class="what"><strong>Sign in + documents.</strong> Authenticate and upload approved inputs.</div>
-      <div class="when">23-31</div><div class="what"><strong>MVP gate.</strong> Read aloud, correct, and confirm.</div>
-      <div class="when">31-41</div><div class="what"><strong>Generate + review.</strong> Inspect capabilities, agent files, and solution twins.</div>
-      <div class="when">41-51</div><div class="what"><strong>Deploy.</strong> Import into the workshop environment.</div>
-      <div class="when">51-57</div><div class="what"><strong>Test.</strong> Run happy, edge, safety, and unknown-value prompts.</div>
-      <div class="when">57-60</div><div class="what"><strong>Teach back.</strong> Explain the process, show one artifact, and name the next change.</div>
+      <div class="when">15-25</div><div class="what"><strong>Install + authenticate.</strong> Start Brainstem and open localhost.</div>
+      <div class="when">25-35</div><div class="what"><strong>Author.</strong> Review the contract and save one *_agent.py.</div>
+      <div class="when">35-45</div><div class="what"><strong>Run.</strong> Hot-load the file, chat locally, and inspect agent logs.</div>
+      <div class="when">45-53</div><div class="what"><strong>Test + refine.</strong> Edit the file; the next request reloads it.</div>
+      <div class="when">53-57</div><div class="what"><strong>Share + teach back.</strong> Send the file and explain the five steps.</div>
+      <div class="when">57-60</div><div class="what"><strong>Optional extension.</strong> Preview static M365 HTML/solution ZIP or connected deployment.</div>
     </div>
   </section>
 
   <section id="downloads">
     <h2>Facilitator package</h2>
-    <p class="section-lead">The package includes the live deck, operating guide, customer communications, BOM, rehearsal answer key, and reusable synthetic inputs.</p>
+    <p class="section-lead">The package includes the deck, step-by-step web runbook, guide, customer communications, BOM, local fallback agent, optional extension agents, scoring tools, and synthetic inputs.</p>
     <table>
       <thead><tr><th>Asset</th><th>Use</th><th>Download</th></tr></thead>
       <tbody>
+        <tr><td>Step-by-step facilitator runbook</td><td>Local-first timing, talk track, and contextual downloads.</td><td><a class="download" href="facilitator-runbook.html">HTML</a></td></tr>
         <tr><td>Workshop deck</td><td>Participant-facing build-along paired with the facilitator guide.</td><td><a class="download" href="downloads/FY27%20RAPP%20Workshop%20Deck.pptx">PPTX</a></td></tr>
         <tr><td>Facilitator guide</td><td>Prepare, rehearse, deliver, recover, and follow up.</td><td><a class="download" href="downloads/FY27%20RAPP%20Facilitator%20Guide.docx">DOCX</a> <a class="download" href="facilitator-guide.html">HTML</a></td></tr>
         <tr><td>Customer communications</td><td>Copy-ready pre-survey, reminders, follow-up, and decision templates.</td><td><a class="download" href="downloads/FY27%20RAPP%20Customer%20Communications%20Pack.docx">DOCX</a> <a class="download" href="customer-communications.html">HTML</a></td></tr>
@@ -325,6 +327,11 @@
         <tr><td>Maintenance FAQ</td><td>Synthetic approved knowledge and urgency rules.</td><td><a class="download" href="downloads/Example%20Inputs/02%20Facilities%20Maintenance%20FAQ.docx">DOCX</a> <a class="download" href="examples.html#faq">HTML</a></td></tr>
         <tr><td>Sample requests</td><td>Synthetic structured records and test prompts.</td><td><a class="download" href="downloads/Example%20Inputs/03%20Sample%20Service%20Requests.xlsx">XLSX</a> <a class="download" href="examples.html">HTML context</a></td></tr>
         <tr><td>Expected MVP and scoring</td><td>Facilitator-only answer key, prompt suite, and rubric.</td><td><a class="download" href="downloads/Facilitator%20Rehearsal/Expected%20MVP%20and%20Scoring%20Guide.docx">DOCX</a> <a class="download" href="scoring-guide.html">HTML</a></td></tr>
+        <tr><td>Fallback local agent</td><td>Known-good Brainstem agent for recovery and practice.</td><td><a class="download" href="downloads/Example%20Inputs/facilities_request_agent.py">PY</a></td></tr>
+        <tr><td>Optional extension agent</td><td>Teams-shareable local HTML/ZIP fallback or connected deployment.</td><td><a class="download" href="downloads/Optional%20Extension/rapp_copilot_studio_extension_agent.py">PY</a></td></tr>
+        <tr><td>Transcript2Prototype agent</td><td>Advanced local prototyping pipeline for facilitators.</td><td><a class="download" href="downloads/Optional%20Extension/transcript2prototype_agent.py">PY</a></td></tr>
+        <tr><td>Optional sample outputs</td><td>Known-good local M365 demo and manual-import solution package.</td><td><a class="download" href="downloads/Optional%20Extension/Sample%20Output/FacilitiesWorkshop_M365_Demo.html">HTML</a> <a class="download" href="downloads/Optional%20Extension/Sample%20Output/FacilitiesWorkshop_CopilotStudio_Solution.zip">ZIP</a></td></tr>
+        <tr><td>Test &amp; Eval seed</td><td>Seed cases for an existing customer evaluation harness and GitHub Actions pipeline.</td><td><a class="download" href="downloads/Test%20%26%20Eval/rapp_evaluation_seed.json">JSON</a></td></tr>
       </tbody>
     </table>
   </section>
@@ -333,8 +340,8 @@
     <h2>Rehearse before you facilitate</h2>
     <div class="grid">
       <article class="card"><h3>1. Technical path</h3><p>Use a clean browser and the included inputs. Generate, review, import, and test in 35 minutes or less.</p></article>
-      <article class="card"><h3>2. Facilitation path</h3><p>Deliver the full deck against a timer. Protect the MVP, deployment, test, and teach-back blocks.</p></article>
-      <article class="card"><h3>3. Contingency path</h3><p>Practice sign-in, wrong-MVP, generation, import, and live-connection failures. Recover within three minutes.</p></article>
+      <article class="card"><h3>2. Facilitation path</h3><p>Deliver the full deck against a timer. Protect author, local run, test, and teach-back blocks.</p></article>
+      <article class="card"><h3>3. Contingency path</h3><p>Practice GitHub auth, port, agent-load, syntax, and model failures. Recover within three minutes.</p></article>
     </div>
   </section>
 
@@ -344,7 +351,7 @@
       <thead><tr><th>Timing</th><th>Send</th><th>Required outcome</th></tr></thead>
       <tbody>
         <tr><td>T-10</td><td>Kickoff, participant nomination, and five-minute survey.</td><td>Scenario owner, participants, and success measure.</td></tr>
-        <tr><td>T-5</td><td>Access and source-readiness check.</td><td>Workshop sign-in, target environment, and source approval.</td></tr>
+        <tr><td>T-5</td><td>Access and source-readiness check.</td><td>GitHub Copilot, local Brainstem, and source approval.</td></tr>
         <tr><td>T-1</td><td>24-hour reminder with URL, roles, and help path.</td><td>Blockers assigned before the session.</td></tr>
         <tr><td>T+0</td><td>Thank-you, artifact location, and pulse survey.</td><td>Evidence stored and immediate feedback captured.</td></tr>
         <tr><td>T+1</td><td>Outcome summary and recommendation.</td><td>Iterate, scale, or stop decision requested.</td></tr>
@@ -357,8 +364,8 @@
     <h2>No-PII and responsible-use posture</h2>
     <div class="grid">
       <article class="card"><h3>Permission</h3><p>Use only information the customer is authorized to process. Never request credentials, secrets, or unauthorized production data.</p></article>
-      <article class="card"><h3>Proof</h3><p>Verify the MVP, capabilities, systems, and generated answers with a human reviewer.</p></article>
-      <article class="card"><h3>Production</h3><p>Complete security, data, connection, DLP, testing, and publication reviews before go-live.</p></article>
+      <article class="card"><h3>Proof</h3><p>Verify the agent contract, local behavior, logs, and test evidence with a human reviewer.</p></article>
+      <article class="card"><h3>Production</h3><p>Enterprise deployment is optional and requires separate security, environment, maker, and publication reviews.</p></article>
     </div>
     <p class="section-lead" style="margin-top:24px">The current workshop uploader supports PDF, DOCX, PPTX, XLSX, TXT, MD, CSV, JSON, RTF, HTML, and agent source/ZIP files. OCR image-only notes or place readable text into a supported document before upload.</p>
   </section>

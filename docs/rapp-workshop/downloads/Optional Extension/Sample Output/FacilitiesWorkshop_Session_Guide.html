@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contoso Assistant - Demo Session Guide</title>
+<style>
+/* Microsoft-branded light tokens - same family as the rapplication shell */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #242424; line-height: 1.65; }
+.page { max-width: 760px; margin: 0 auto; padding: 44px 28px 80px; }
+h1 { font-size: 26px; margin-bottom: 4px; color: #242424; }
+.sub { color: #616161; font-size: 14px; margin-bottom: 26px; }
+h2 { font-size: 18px; color: #0F6CBD; margin: 30px 0 10px; }
+p, li { font-size: 14px; }
+ul, ol { padding-left: 22px; margin: 8px 0; }
+li { margin: 5px 0; }
+code { background: #EBF3FC; color: #0F6CBD; padding: 1px 7px; border-radius: 4px; font-size: 13px; }
+.step { border: 1px solid #d1d1d1; border-left: 4px solid #0F6CBD; border-radius: 8px; padding: 14px 18px; margin: 14px 0; page-break-inside: avoid; }
+.step-n { font-size: 11px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; color: #0F6CBD; margin-bottom: 8px; }
+.lbl { font-size: 11.5px; font-weight: 700; color: #616161; margin: 10px 0 3px; }
+.line { background: #EBF3FC; border-radius: 8px; padding: 10px 14px; font-size: 14.5px; font-weight: 600; }
+.expect { background: #DFF6DD; border-left: 3px solid #107C10; border-radius: 0 6px 6px 0; padding: 8px 12px; font-size: 13px; }
+.say { background: #f5f5f5; border-radius: 6px; padding: 8px 12px; font-size: 13px; color: #616161; }
+.callout { background: #FFF4CE; border: 1px solid #C19C00; border-radius: 8px; padding: 12px 16px; font-size: 13.5px; margin: 12px 0; }
+@media print { .page { padding: 0; } }
+</style>
+</head>
+<body>
+<div class="page">
+<h1>Contoso Assistant - Demo Session Guide</h1>
+<div class="sub">Customer: Contoso. You do not need any technical background to run this session - every step tells you exactly what to press and what to say.</div>
+
+<h2>What you are demoing</h2>
+<p>Prototype agent set for Contoso drawn from the transcript: Facilities Request Intake.</p>
+<ul><li><strong>Facilities Request Intake</strong> - Capture and triage a synthetic facilities issue.</li></ul>
+
+<h2>Before the session - 60 seconds</h2>
+<ol>
+<li>Open the rapplication HTML you were given in a browser.</li>
+<li>The big panel on the left is the demo your customer sees. The chat on the right is YOUR control channel - the customer does not need to see it.</li>
+<li>Click once inside the demo panel so your keyboard talks to it.</li>
+<li>The small DEMO SCRIPT box in the corner of the demo is your teleprompter - it shows you each step. Press Esc to hide or show it.</li>
+</ol>
+
+<h2>Run the session - step by step</h2>
+<p>Each step is the same two keys: <strong>Up arrow</strong> (types the line for you), then <strong>Enter</strong> (sends it). The replies come from the real prototype agents, live.</p>
+<div class="step"><div class="step-n">Step 1 of 3</div><div class="lbl">Press the Up arrow once - it types this line for you - then press Enter:</div><div class="line">What can you help me with?</div><div class="lbl">What you should see in the reply:</div><div class="expect">It should mention: facilities.</div><div class="lbl">What you can say while it answers:</div><div class="say">This opening turn lets the agent introduce everything it covers. Use it to set the agenda for the session.</div></div><div class="step"><div class="step-n">Step 2 of 3</div><div class="lbl">Press the Up arrow once - it types this line for you - then press Enter:</div><div class="line">The lights are out near room 402.</div><div class="lbl">What you should see in the reply:</div><div class="expect">It should mention: report a facilities issue, lights are out.</div><div class="lbl">What you can say while it answers:</div><div class="say">This is the Facilities Request Intake capability: Capture and triage a synthetic facilities issue. The data on screen is synthetic demo data - no customer data was needed to build this.</div></div><div class="step"><div class="step-n">Step 3 of 3</div><div class="lbl">Press the Up arrow once - it types this line for you - then press Enter:</div><div class="line">Summarize what we just set up.</div><div class="lbl">What you should see in the reply:</div><div class="expect">It should mention: prototype.</div><div class="lbl">What you can say while it answers:</div><div class="say">This is a wrap-up beat - the agent summarizes what was shown. Good moment to ask for feedback.</div></div>
+
+<h2>If the customer asks something off the script</h2>
+<p>Go ahead and type it - this is a live agent, not a recording. When you want to get back on script, press the Up arrow and it queues the next step again.</p>
+
+<h2>If something needs to change during or after the session</h2>
+<div class="callout">Use the Prototyping chat on the right side of the page. Say what you want in plain language - for example: "change step 2 to be about refunds", "add a step about invoices", "rebuild and run the tests". The demo updates in place while you watch. You never need to edit a file.</div>
+
+<h2>What the customer walks away with</h2>
+<ul><li><strong>Session guide</strong> (this document) - how to run the session.</li><li><strong>Demo script JSON</strong> - the same script in machine form, for the engineers.</li><li><strong>agent.py files</strong> - the working prototype agents themselves.</li><li><strong>Factory singleton agent.py</strong> - all of the above in ONE file; this is the hand-off artifact the next team deploys.</li></ul>
+<p>All of these are download buttons at the bottom right of the rapplication page.</p>
+
+<p style="margin-top:34px;color:#9a9aa3;font-size:11.5px">Generated by Transcript2Prototype from the cubby 'facilities-workshop'. All example data shown in the demo is synthetic.</p>
+</div>
+</body>
+</html>

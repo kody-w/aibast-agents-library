@@ -1,7 +1,8 @@
 # FY27 RAPP Workshop
 
-Public partner-training materials for a one-hour **Documents to Copilot Studio**
-workshop.
+Public partner-training materials for a one-hour **use case to local Brainstem
+agent** workshop. A GitHub account with Copilot access is the only core
+participant dependency.
 
 > **Experimental training content:** This material is maintained by an AIBAST
 > v-team and is not an officially supported Microsoft product or production
@@ -11,11 +12,16 @@ workshop.
 
 Participants use a synthetic facilities scenario to:
 
-1. Sign in.
-2. Upload approved source documents.
-3. Read, edit, and confirm an MVP.
-4. Review generated agent files plus live and demo solution twins.
-5. Import to a workshop environment and test in Copilot Studio.
+1. Sign in to GitHub Copilot.
+2. Start the local Brainstem.
+3. Author one top-level `*_agent.py`.
+4. Hot-load, run, test, and refine it locally.
+5. Share the passing one-file agent and evidence.
+
+Copilot Studio is an optional facilitator-led extension. Without environment
+access, the extension produces a local M365-style HTML demo and solution ZIP.
+Direct deployment separately requires a licensed instance, target environment,
+and maker/deployment rights.
 
 ## Public package
 
@@ -26,7 +32,11 @@ Participants use a synthetic facilities scenario to:
 - `downloads/Example Inputs/01 Facilities Discovery Transcript.docx`
 - `downloads/Example Inputs/02 Facilities Maintenance FAQ.docx`
 - `downloads/Example Inputs/03 Sample Service Requests.xlsx`
+- `downloads/Example Inputs/facilities_request_agent.py`
 - `downloads/Facilitator Rehearsal/Expected MVP and Scoring Guide.docx`
+- `downloads/Optional Extension/rapp_copilot_studio_extension_agent.py`
+- `downloads/Optional Extension/transcript2prototype_agent.py`
+- `downloads/Test & Eval/rapp_evaluation_seed.json`
 
 Open the [workshop landing page](index.html) for the agenda, rehearsal path,
 safe-use guidance, and downloads.
@@ -34,6 +44,7 @@ safe-use guidance, and downloads.
 Portable browser versions:
 
 - [BOM and readiness](bom.html)
+- [Step-by-step facilitator runbook](facilitator-runbook.html)
 - [Facilitator guide](facilitator-guide.html)
 - [Customer communications](customer-communications.html)
 - [Synthetic example inputs](examples.html)
