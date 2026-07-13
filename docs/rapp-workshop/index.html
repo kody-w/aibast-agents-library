@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FY27 RAPP partner-training workshop: turn approved documents into a Copilot Studio prototype in 60 minutes.">
+<title>FY27 RAPP Workshop | Partner Training</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel-2: #0f1722;
+    --line: #30363d;
+    --text: #e6edf3;
+    --muted: #9ba7b4;
+    --blue: #58a6ff;
+    --blue-strong: #1f6feb;
+    --green: #3fb950;
+    --orange: #f0883e;
+    --purple: #a371f7;
+    --red: #f85149;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.6;
+  }
+  a { color: var(--blue); }
+  a:hover { color: #79c0ff; }
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 8px;
+    padding: 10px 14px;
+    background: #fff;
+    color: #000;
+    border-radius: 6px;
+    z-index: 10;
+  }
+  .skip:focus { left: 8px; }
+  header {
+    background:
+      radial-gradient(circle at 80% 10%, rgba(88,166,255,.22), transparent 40%),
+      linear-gradient(135deg, #0b2a4a, #005a9e 65%, #0078d4);
+    border-bottom: 1px solid #2f81f7;
+  }
+  .hero {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 72px 24px 64px;
+  }
+  .eyebrow {
+    margin: 0 0 14px;
+    color: #bfe6ff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  h1 {
+    max-width: 760px;
+    margin: 0;
+    font-size: clamp(40px, 7vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -.035em;
+  }
+  .hero-lead {
+    max-width: 760px;
+    margin: 24px 0 0;
+    color: #dceeff;
+    font-size: 20px;
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .badge {
+    padding: 7px 12px;
+    background: rgba(13,17,23,.55);
+    border: 1px solid rgba(255,255,255,.32);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 650;
+  }
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: rgba(13,17,23,.94);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(12px);
+  }
+  nav .inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  nav a {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  nav a:hover, nav a:focus { color: var(--text); }
+  main {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 52px 24px 80px;
+  }
+  section { margin-bottom: 72px; }
+  h2 {
+    margin: 0 0 14px;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.15;
+  }
+  h3 { margin-top: 0; }
+  .section-lead {
+    max-width: 780px;
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: 17px;
+  }
+  .notice {
+    padding: 20px 22px;
+    border: 1px solid #9e6a03;
+    border-left: 5px solid #d29922;
+    border-radius: 10px;
+    background: #2b2205;
+    color: #f4e8c1;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .card {
+    padding: 22px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+  .step-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .step {
+    min-height: 190px;
+    padding: 20px 16px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .step .number {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #1f6feb33;
+    border: 1px solid var(--blue-strong);
+    color: var(--blue);
+    font-weight: 800;
+  }
+  .step h3 { margin: 18px 0 8px; font-size: 17px; }
+  .step p { margin: 0; color: var(--muted); font-size: 14px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  th, td {
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #1f2937; color: #fff; }
+  tr:last-child td { border-bottom: none; }
+  td { color: #c9d1d9; }
+  .download {
+    display: inline-block;
+    padding: 7px 11px;
+    border: 1px solid var(--blue-strong);
+    border-radius: 7px;
+    background: #1f6feb22;
+    color: #79c0ff;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .download:hover { background: #1f6feb38; color: #fff; }
+  .timeline {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .timeline div {
+    padding: 13px 15px;
+    border-bottom: 1px solid var(--line);
+  }
+  .timeline div:nth-last-child(-n+2) { border-bottom: none; }
+  .timeline .when {
+    background: var(--panel-2);
+    color: var(--blue);
+    font-weight: 750;
+  }
+  .timeline .what { background: var(--panel); }
+  code {
+    padding: 2px 6px;
+    background: #010409;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  footer {
+    padding: 34px 24px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    text-align: center;
+  }
+  @media (max-width: 880px) {
+    .grid { grid-template-columns: 1fr; }
+    .step-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .step-grid { grid-template-columns: 1fr; }
+    .timeline { grid-template-columns: 92px 1fr; }
+    table { display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to workshop content</a>
+
+<header>
+  <div class="hero">
+    <p class="eyebrow">Microsoft AIBAST partner training</p>
+    <h1>FY27 RAPP Workshop</h1>
+    <p class="hero-lead">Turn approved customer evidence into a reviewable Copilot Studio prototype in 60 minutes.</p>
+    <div class="badges" aria-label="Workshop attributes">
+      <span class="badge">60-minute build-along</span>
+      <span class="badge">Synthetic example inputs</span>
+      <span class="badge">Facilitator-ready package</span>
+      <span class="badge">No PII</span>
+    </div>
+  </div>
+</header>
+
+<nav aria-label="Workshop sections">
+  <div class="inner">
+    <a href="#process">Process</a>
+    <a href="#agenda">Agenda</a>
+    <a href="#downloads">Downloads</a>
+    <a href="#rehearsal">Rehearsal</a>
+    <a href="#customer">Customer cadence</a>
+    <a href="#safe-use">Safe use</a>
+  </div>
+</nav>
+
+<main id="main">
+  <section>
+    <h2>Use case in. Copilot Studio solution out.</h2>
+    <p class="section-lead">For this workshop, RAPP means a guided Documents to Copilot Studio process with explicit human gates before generation, deployment, and publication.</p>
+    <div class="notice">
+      <strong>Experimental training content.</strong> This material is maintained by an AIBAST v-team and is not an officially supported Microsoft product or production deployment guide. Generated output may contain errors and requires human review.
+    </div>
+  </section>
+
+  <section id="process">
+    <h2>The five-step RAPP process</h2>
+    <p class="section-lead">Participants learn by doing. Nothing is built or deployed without an explicit decision.</p>
+    <div class="step-grid">
+      <article class="step"><span class="number">1</span><h3>Sign in</h3><p>Authenticate generation and environment access.</p></article>
+      <article class="step"><span class="number">2</span><h3>Documents</h3><p>Upload focused, approved evidence and name the solution.</p></article>
+      <article class="step"><span class="number">3</span><h3>MVP</h3><p>Read, edit, re-derive, or confirm the use case.</p></article>
+      <article class="step"><span class="number">4</span><h3>Review</h3><p>Inspect agent files plus demo and live solution twins.</p></article>
+      <article class="step"><span class="number">5</span><h3>Deploy</h3><p>Choose an environment, import, test, and publish deliberately.</p></article>
+    </div>
+  </section>
+
+  <section id="agenda">
+    <h2>60-minute run of show</h2>
+    <div class="timeline">
+      <div class="when">00-10</div><div class="what"><strong>Align.</strong> Set the outcome and explain the five-step mental model.</div>
+      <div class="when">10-15</div><div class="what"><strong>Scenario.</strong> Identify the user, problem, outcome, and safety boundary.</div>
+      <div class="when">15-23</div><div class="what"><strong>Sign in + documents.</strong> Authenticate and upload approved inputs.</div>
+      <div class="when">23-31</div><div class="what"><strong>MVP gate.</strong> Read aloud, correct, and confirm.</div>
+      <div class="when">31-41</div><div class="what"><strong>Generate + review.</strong> Inspect capabilities, agent files, and solution twins.</div>
+      <div class="when">41-51</div><div class="what"><strong>Deploy.</strong> Import into the workshop environment.</div>
+      <div class="when">51-57</div><div class="what"><strong>Test.</strong> Run happy, edge, safety, and unknown-value prompts.</div>
+      <div class="when">57-60</div><div class="what"><strong>Teach back.</strong> Explain the process, show one artifact, and name the next change.</div>
+    </div>
+  </section>
+
+  <section id="downloads">
+    <h2>Facilitator package</h2>
+    <p class="section-lead">The package includes the live deck, operating guide, customer communications, BOM, rehearsal answer key, and reusable synthetic inputs.</p>
+    <table>
+      <thead><tr><th>Asset</th><th>Use</th><th>Download</th></tr></thead>
+      <tbody>
+        <tr><td>Workshop deck</td><td>Participant-facing build-along with speaker notes.</td><td><a class="download" href="downloads/FY27%20RAPP%20Workshop%20Deck.pptx">PPTX</a></td></tr>
+        <tr><td>Facilitator guide</td><td>Prepare, rehearse, deliver, recover, and follow up.</td><td><a class="download" href="downloads/FY27%20RAPP%20Facilitator%20Guide.docx">DOCX</a></td></tr>
+        <tr><td>Customer communications</td><td>Copy-ready pre-survey, reminders, follow-up, and decision templates.</td><td><a class="download" href="downloads/FY27%20RAPP%20Customer%20Communications%20Pack.docx">DOCX</a></td></tr>
+        <tr><td>BOM and readiness</td><td>Owners, due dates, acceptance criteria, rehearsal plan, risks, and dashboard.</td><td><a class="download" href="downloads/FY27%20RAPP%20Workshop%20BOM%20and%20Readiness.xlsx">XLSX</a></td></tr>
+        <tr><td>Discovery transcript</td><td>Synthetic end-to-end facilities scenario.</td><td><a class="download" href="downloads/Example%20Inputs/01%20Facilities%20Discovery%20Transcript.docx">DOCX</a></td></tr>
+        <tr><td>Maintenance FAQ</td><td>Synthetic approved knowledge and urgency rules.</td><td><a class="download" href="downloads/Example%20Inputs/02%20Facilities%20Maintenance%20FAQ.docx">DOCX</a></td></tr>
+        <tr><td>Sample requests</td><td>Synthetic structured records and test prompts.</td><td><a class="download" href="downloads/Example%20Inputs/03%20Sample%20Service%20Requests.xlsx">XLSX</a></td></tr>
+        <tr><td>Expected MVP and scoring</td><td>Facilitator-only answer key, prompt suite, and rubric.</td><td><a class="download" href="downloads/Facilitator%20Rehearsal/Expected%20MVP%20and%20Scoring%20Guide.docx">DOCX</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="rehearsal">
+    <h2>Rehearse before you facilitate</h2>
+    <div class="grid">
+      <article class="card"><h3>1. Technical path</h3><p>Use a clean browser and the included inputs. Generate, review, import, and test in 35 minutes or less.</p></article>
+      <article class="card"><h3>2. Facilitation path</h3><p>Deliver the full deck against a timer. Protect the MVP, deployment, test, and teach-back blocks.</p></article>
+      <article class="card"><h3>3. Contingency path</h3><p>Practice sign-in, wrong-MVP, generation, import, and live-connection failures. Recover within three minutes.</p></article>
+    </div>
+  </section>
+
+  <section id="customer">
+    <h2>Customer communication cadence</h2>
+    <table>
+      <thead><tr><th>Timing</th><th>Send</th><th>Required outcome</th></tr></thead>
+      <tbody>
+        <tr><td>T-10</td><td>Kickoff, participant nomination, and five-minute survey.</td><td>Scenario owner, participants, and success measure.</td></tr>
+        <tr><td>T-5</td><td>Access and source-readiness check.</td><td>Workshop sign-in, target environment, and source approval.</td></tr>
+        <tr><td>T-1</td><td>24-hour reminder with URL, roles, and help path.</td><td>Blockers assigned before the session.</td></tr>
+        <tr><td>T+0</td><td>Thank-you, artifact location, and pulse survey.</td><td>Evidence stored and immediate feedback captured.</td></tr>
+        <tr><td>T+1</td><td>Outcome summary and recommendation.</td><td>Iterate, scale, or stop decision requested.</td></tr>
+        <tr><td>T+5</td><td>Decision checkpoint.</td><td>Named owner and target date.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="safe-use">
+    <h2>No-PII and responsible-use posture</h2>
+    <div class="grid">
+      <article class="card"><h3>Permission</h3><p>Use only information the customer is authorized to process. Never request credentials, secrets, or unauthorized production data.</p></article>
+      <article class="card"><h3>Proof</h3><p>Verify the MVP, capabilities, systems, and generated answers with a human reviewer.</p></article>
+      <article class="card"><h3>Production</h3><p>Complete security, data, connection, DLP, testing, and publication reviews before go-live.</p></article>
+    </div>
+    <p class="section-lead" style="margin-top:24px">The current workshop uploader supports PDF, DOCX, PPTX, XLSX, TXT, MD, CSV, JSON, RTF, HTML, and agent source/ZIP files. OCR image-only notes or place readable text into a supported document before upload.</p>
+  </section>
+</main>
+
+<footer>
+  <p>FY27 RAPP Workshop | Public partner-training material | Synthetic examples only</p>
+  <p><a href="../../">Back to RAPP Brainstem</a> | <a href="https://github.com/microsoft/aibast-agents-library">GitHub repository</a></p>
+</footer>
+</body>
+</html>

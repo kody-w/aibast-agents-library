@@ -4,6 +4,8 @@
 
 > **👉 [Get Started at microsoft.github.io/aibast-agents-library](https://microsoft.github.io/aibast-agents-library/)**
 
+> **Partner training:** [FY27 RAPP Documents to Copilot Studio Workshop](https://microsoft.github.io/aibast-agents-library/docs/rapp-workshop/)
+
 A local-first AI agent server powered by GitHub Copilot. No API keys. No cloud setup. Just your GitHub account.
 
 ```
