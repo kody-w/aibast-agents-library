@@ -31,6 +31,14 @@ Participants use a synthetic facilities scenario to:
 Open the [workshop landing page](index.html) for the agenda, rehearsal path,
 safe-use guidance, and downloads.
 
+Portable browser versions:
+
+- [BOM and readiness](bom.html)
+- [Facilitator guide](facilitator-guide.html)
+- [Customer communications](customer-communications.html)
+- [Synthetic example inputs](examples.html)
+- [Expected MVP and scoring guide](scoring-guide.html)
+
 ## No-PII posture
 
 The included scenario and records are fictional and synthetic. Do not add
