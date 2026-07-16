@@ -6,7 +6,7 @@
 
 ## Article I — Purpose
 
-CommunityRAPP is the **Azure Functions backend** for the RAPP (Rapid Agent Prototyping Platform) ecosystem. It is the engine that powers agent creation, execution, and orchestration.
+CommunityRAPP is the **Azure Functions backend** for the RAPP (Rapid Agent Prototype Platform) ecosystem. It is the engine that powers agent creation, execution, and orchestration.
 
 **This repo does ONE thing well:** it takes a transcript, discovery call, or user request and turns it into a production-ready AI agent deployed on Azure — with memory, multi-user support, and Microsoft 365 integration.
 
