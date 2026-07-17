@@ -1,9 +1,9 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-05-27T23:19:16.123720+00:00",
+  "generated_at": "2026-07-17T03:19:01.288899+00:00",
   "stats": {
-    "total_agents": 104,
+    "total_agents": 105,
     "publishers": 1,
     "categories": 14,
     "publisher_list": [
@@ -27,6 +27,33 @@
     ]
   },
   "agents": [
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/art-generator",
+      "version": "1.0.0",
+      "display_name": "ArtGenerator",
+      "description": "Generates original images with an Azure GPT Image deployment and saves them locally.",
+      "author": "AIBAST",
+      "tags": [
+        "art",
+        "azure-openai",
+        "gpt-image",
+        "image-generation",
+        "multimodal"
+      ],
+      "category": "general",
+      "quality_tier": "community",
+      "requires_env": [
+        "AZURE_OPENAI_ENDPOINT",
+        "AZURE_OPENAI_IMAGE_DEPLOYMENT"
+      ],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/art-generator.py",
+      "_size_kb": 10.4,
+      "_lines": 334
+    },
     {
       "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/account-intelligence",
