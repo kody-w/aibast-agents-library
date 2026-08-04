@@ -15,7 +15,7 @@
 library_repo: microsoft/aibast-agents-library (public)
 public_gateway: microsoft/aibast-agents-library (this repo)
 type: agent-library
-compatible_with: microsoft/aibast-agents-library, microsoft/aibast-agents-library
+compatible_with: microsoft/aibast-agents-library
 agent_base_class: BasicAgent
 manifest: manifest.json (auto-generated)
 ```

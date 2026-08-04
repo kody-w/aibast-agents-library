@@ -31,6 +31,7 @@ jobs:
           bash -n install.sh
           bash -n install.command
           bash -n community_rapp/install.sh
+          bash -n rapp_cloud/install.sh
           bash -n rapp_brainstem/start.sh
           bash -n tests/test_installer.sh
           bash -n tests/preflight_local.sh

@@ -227,7 +227,7 @@ function Check-Prerequisites {
 #  Install / Update Repository
 # ═══════════════════════════════════════════════════════════════════════════════
 
-function Install-RAPP Cloud {
+function Install-RappCloud {
     Write-Host ""
     Write-Host "  ── Installing RAPP Cloud ───────────────────────" -ForegroundColor White
 
@@ -276,7 +276,7 @@ function Install-RAPP Cloud {
     }
 
     # Write version marker
-    $Version | Set-Content (Join-Path $SourceDir "VERSION") -NoNewline
+    $Version | Set-Content (Join-Path $InstallDir ".installed_version") -NoNewline
     Write-Ok "RAPP Cloud v$Version ready at $SourceDir"
 }
 
@@ -552,7 +552,7 @@ REM Alias for rappcloud
 #  Launch
 # ═══════════════════════════════════════════════════════════════════════════════
 
-function Launch-RAPP Cloud {
+function Launch-RappCloud {
     Write-Host ""
     Write-Host "  ── Launching RAPP Cloud ────────────────────────" -ForegroundColor White
 
@@ -661,11 +661,11 @@ function Show-Success {
 function Main {
     Show-Banner
     Check-Prerequisites
-    Install-RAPP Cloud
+    Install-RappCloud
     Setup-Venv
     Configure-OpenAI
     Install-CLI
-    Launch-RAPP Cloud
+    Launch-RappCloud
     Show-Success
 }
 

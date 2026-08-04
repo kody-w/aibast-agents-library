@@ -85,7 +85,7 @@ files = (
     "install.ps1",
     "deploy.ps1",
     "community_rapp/install.ps1",
-    "rapp_ai/install.ps1",
+    "rapp_cloud/install.ps1",
 )
 print(" ".join(name for name in files if (root / name).read_bytes().startswith(b"\xef\xbb\xbf")))
 PY
@@ -96,10 +96,13 @@ else
     fail "PowerShell 5.1 irm | iex rejects BOMs in: $BOOTSTRAP_BOMS"
 fi
 
-if grep -q 'read -r PROJECT_NAME </dev/tty' "$REPO_ROOT/community_rapp/install.sh"; then
+# Assert the PROPERTY (prompts read from the terminal, never from the piped
+# script on stdin), not one installer's exact phrasing — rapp_cloud routes all
+# prompts through $INPUT_SOURCE, which it sets to /dev/tty when piped.
+if grep -qE 'read -r [A-Za-z_]+ ?< ?"?(/dev/tty|\$INPUT_SOURCE)"?' "$REPO_ROOT/rapp_cloud/install.sh"; then
     pass "piped CommunityRAPP installer reads prompts from the terminal"
 else
-    fail "community_rapp/install.sh should not consume its piped script as prompt input"
+    fail "rapp_cloud/install.sh should not consume its piped script as prompt input"
 fi
 
 if grep -q 'FRESH_SHIPPED' "$REPO_ROOT/install.sh" \

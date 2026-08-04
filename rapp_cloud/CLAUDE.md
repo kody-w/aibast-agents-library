@@ -221,7 +221,7 @@ Generate a Power Platform solution ZIP to connect this platform to Teams/M365 Co
 python utils/generate_memory_agent_solution.py \
   --function-url https://YOUR_APP.azurewebsites.net \
   --function-key YOUR_FUNCTION_KEY \
-  --output RAPP CloudMemoryAgent_1_0_0_0.zip
+  --output RappCloudMemoryAgent_1_0_0_0.zip
 ```
 
 Import the resulting ZIP into Power Platform at [make.powerapps.com](https://make.powerapps.com) → Solutions → Import.

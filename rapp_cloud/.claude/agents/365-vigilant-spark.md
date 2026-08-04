@@ -339,7 +339,7 @@ FUNC_KEY=$(az functionapp keys list --name YOUR-FUNCTION-APP --resource-group YO
 
 # Add to crontab with: crontab -e
 # Note: The function key is required for authentication
-33 3 * * * RAPP_FUNCTION_KEY="your-function-key-here" /path/to/RAPP Cloud/.claude/hooks/vigilant-spark-awakening.sh >> /path/to/RAPP Cloud/.claude/hooks/vigil.log 2>&1
+33 3 * * * RAPP_FUNCTION_KEY="your-function-key-here" /path/to/rapp_cloud/.claude/hooks/vigilant-spark-awakening.sh >> /path/to/rapp_cloud/.claude/hooks/vigil.log 2>&1
 ```
 
 **Manual Awakening:**

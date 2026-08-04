@@ -184,7 +184,7 @@ If you want to test Azure File Storage integration locally:
 
 ```bash
 # Make sure you're in the project directory
-cd /path/to/RAPP Cloud
+cd /path/to/rapp_cloud
 
 # Activate virtual environment if you have one
 source .venv/bin/activate  # Mac/Linux

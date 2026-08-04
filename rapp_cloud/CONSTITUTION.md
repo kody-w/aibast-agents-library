@@ -46,7 +46,7 @@ RAPP Cloud is the **Azure Functions backend** for the RAPP (Rapid Agent Prototyp
 ## Article III — Directory Structure
 
 ```
-RAPP Cloud/
+rapp_cloud/
 ├── agents/              # Production agents (BasicAgent subclasses)
 ├── demos/               # Demo script JSON files
 │   └── tools/           # Demo capture scripts, HTML tools, bookmarklets

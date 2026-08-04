@@ -269,6 +269,48 @@ hits=[f'{f}: {m.group(0)}' for f in files
 assert not hits, hits[:8]
 PY"
 
+echo "== T-IDENT rename never corrupts an identifier =="
+check "no space-bearing identifier from a display-name substitution" "python3 - <<'PY'
+import re, subprocess
+# 'RAPP Cloud' is correct in prose and fatal in an identifier: a PowerShell or
+# shell function name, a path segment, a filename, a CLI argument value, or an
+# XML unique name. This class of break is invisible to a text-only review.
+PATTERNS = [
+    (r'function\\s+[A-Za-z-]*RAPP Cloud', 'function name'),
+    (r'[A-Za-z_]*RAPP Cloud\\s*\\(\\)',      'shell function name'),
+    (r'[/\\\\]RAPP Cloud',                'path segment'),
+    (r'RAPP Cloud[/\\\\]',                'path segment'),
+    (r'<UniqueName>[^<]*RAPP Cloud',   'XML unique name'),
+    (r'RAPP Cloud[A-Za-z]*\\.(zip|json|py|ps1|sh|cmd)', 'filename'),
+    (r'\\\$[A-Za-z]*RAPP Cloud',           'variable'),
+    (r'--[a-z-]+ RAPP Cloud',          'CLI argument value'),
+]
+EXT = ('.sh','.ps1','.cmd','.command','.py','.js','.json','.xml','.yml','.yaml','.html','.md')
+hits = []
+for f in subprocess.run(['git','ls-files'], capture_output=True, text=True).stdout.splitlines():
+    if not f.endswith(EXT) or f.startswith('tests/'): continue  # this file defines the patterns
+    try: text = open(f, encoding='utf-8', errors='ignore').read()
+    except OSError: continue
+    for pat, label in PATTERNS:
+        for m in re.finditer(pat, text):
+            hits.append(f'{f}:{text[:m.start()].count(chr(10))+1} [{label}] {m.group(0)[:50]}')
+assert not hits, hits[:10]
+PY"
+check "PowerShell installers parse (no space in a function name)" "python3 - <<'PY'
+import re
+for f in ('install.ps1','rapp_cloud/install.ps1','docs/install.ps1'):
+    src = open(f, encoding='utf-8', errors='ignore').read()
+    bad = [m.group(0) for m in re.finditer(r'^\\s*function\\s+[^\\n{]*', src, re.M)
+           if ' ' in m.group(0).split('function',1)[1].strip().rstrip('{').strip()]
+    assert not bad, (f, bad)
+PY"
+check "installer test suite targets paths that exist" "python3 - <<'PY'
+import re, os
+src = open('tests/test_installer.sh', encoding='utf-8').read()
+for path in re.findall(r'\"([a-z_]+/install\\.[a-z]+)\"', src):
+    assert os.path.exists(path), path
+PY"
+
 echo "== T-CLEAN clean break (kody-w refs only in sanctioned places) =="
 check "kody-w refs confined to allowlist (tracked + untracked)" "python3 - <<'PY'
 import re, subprocess

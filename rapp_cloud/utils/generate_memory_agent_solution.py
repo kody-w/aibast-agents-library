@@ -10,8 +10,8 @@ Usage:
     python utils/generate_memory_agent_solution.py \
         --function-url https://rapp-xyz.azurewebsites.net \
         [--function-key YOUR_KEY] \
-        [--output RAPP CloudMemoryAgent_1_0_0_0.zip] \
-        [--solution-name RAPP CloudMemoryAgent] \
+        [--output RappCloudMemoryAgent_1_0_0_0.zip] \
+        [--solution-name RappCloudMemoryAgent] \
         [--publisher-prefix rappc]
 """
 
@@ -69,7 +69,7 @@ def _solution_xml(
         <Version>1.0.0.0</Version>
         <Managed>0</Managed>
         <Publisher>
-          <UniqueName>RAPP Cloud</UniqueName>
+          <UniqueName>RappCloud</UniqueName>
           <LocalizedNames>
             <LocalizedName description="RAPP Cloud" languagecode="1033" />
           </LocalizedNames>
@@ -1479,13 +1479,13 @@ def main() -> int:
     )
     parser.add_argument(
         "--output",
-        default="RAPP CloudMemoryAgent_1_0_0_0.zip",
-        help="Output ZIP path (default: RAPP CloudMemoryAgent_1_0_0_0.zip)",
+        default="RappCloudMemoryAgent_1_0_0_0.zip",
+        help="Output ZIP path (default: RappCloudMemoryAgent_1_0_0_0.zip)",
     )
     parser.add_argument(
         "--solution-name",
-        default="RAPP CloudMemoryAgent",
-        help="Solution unique name (default: RAPP CloudMemoryAgent)",
+        default="RappCloudMemoryAgent",
+        help="Solution unique name (default: RappCloudMemoryAgent)",
     )
     parser.add_argument(
         "--publisher-prefix",

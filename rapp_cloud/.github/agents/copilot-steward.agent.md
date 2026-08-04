@@ -104,7 +104,7 @@ Ask me to run continuously:
 python3 scripts/copilot_steward.py --scan
 
 # Scan specific directory
-python3 scripts/copilot_steward.py --scan --path RAPP Cloud/rappbook
+python3 scripts/copilot_steward.py --scan --path rapp_cloud/rappbook
 
 # Dry run (preview changes)
 python3 scripts/copilot_steward.py --auto --dry-run

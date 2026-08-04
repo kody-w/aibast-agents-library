@@ -249,7 +249,7 @@ This creates a Copilot Studio bot wired to your Azure Function endpoint.
 ## Project Structure
 
 ```
-RAPP Cloud/
+rapp_cloud/
 ├── function_app.py              # Azure Function entry point (the "hippocampus")
 ├── index.html                   # Standalone chat UI (open in browser, no server needed)
 ├── agents/

@@ -33,15 +33,15 @@ Want persistent memory, Azure Functions, and a path to Copilot Studio? Skip the 
 
 **Mac / Linux:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/community_rapp/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_cloud/install.sh | bash
 ```
 
 **Windows:**
 ```powershell
-irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/community_rapp/install.ps1 | iex
+irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_cloud/install.ps1 | iex
 ```
 
-Creates `~/rapp-projects/my-project/` — isolated project with its own venv, agents, and local storage. Auth happens through the chat UI (GitHub device code flow). No API keys needed to start.
+Creates `~/.rappcloud/` with its own venv, agents, and local storage, plus a `rappcloud` CLI. Auth happens through the chat UI (GitHub device code flow). No API keys needed to start.
 
 [Quick start](https://microsoft.github.io/aibast-agents-library/docs/tutorial.html) | [RAPP Cloud (Tier 2)](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_cloud)
 

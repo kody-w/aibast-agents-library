@@ -8,7 +8,7 @@ AIBAST Agents Library is the stable Microsoft downstream for the RAPP stack (see
 2. **Spinal Cord** (`azuredeploy.json`, `deploy.sh`) — Azure deployment. ARM template creates Function App, Azure OpenAI, Storage, App Insights. All Entra ID auth.
 3. **Nervous System** (`MSFTAIBASMultiAgentCopilot_*.zip`) — Power Platform solution for Copilot Studio. Connects the Azure Function to Teams and M365 Copilot.
 
-The repository also owns `agents/@aibast-agents-library/`, `registry.json`, `build_registry.py`, `rapp_cloud/`, the production guide, and Microsoft governance files. These are not upstream upstream stable mirrors.
+The repository also owns `agents/@aibast-agents-library/`, `registry.json`, `build_registry.py`, `rapp_cloud/`, the production guide, and Microsoft governance files. These are not upstream-stable mirrors.
 
 ### Brainstem internals
 

@@ -14,7 +14,7 @@ Philosophy: "engine, not experience" — this is infrastructure, not a consumer 
 - `agents/@aibast-agents-library/` — AIBAST-owned industry templates and stacks; never replace this tree from the upstream stable channel
 - `registry.json`, `build_registry.py` — generated catalog and its AIBAST-owned builder
 - `install.sh`, `install.ps1`, `install.cmd` — One-liner installers (Brainstem path). **These are protected, release-gated files** — any change must be tested end-to-end on a fresh machine.
-- `community_rapp/` — Hippocampus (Tier 2) installer scripts. Parallel path, no dependency on brainstem.
+- `community_rapp/` — legacy compatibility stubs that redirect to `rapp_cloud/`; kept so existing links keep working.
 - `rapp_cloud/` — AIBAST-owned Azure Functions implementation and documentation
 - `azuredeploy.json`, `deploy.sh`, `deploy.ps1` — Azure ARM deployment (Tier 2 cloud)
 - `MSFTAIBASMultiAgentCopilot_*.zip` — Power Platform solution for Copilot Studio (Tier 3)
@@ -104,5 +104,5 @@ Only repository-identity references are rewritten mechanically — the upstream 
 - **Python 3.11** target; venv at `~/.brainstem/venv`
 - **No API keys** for local dev — GitHub Copilot token exchange handles auth
 - **Config via `.env`** in `rapp_brainstem/` — `GITHUB_TOKEN`, `GITHUB_MODEL` (default `auto`), `SOUL_PATH`, `AGENTS_PATH`, `PORT`, `BRAINSTEM_LAN_MODE`, `BRAINSTEM_ALLOWED_HOSTS`, and `VOICE_ZIP_PASSWORD`
-- Two install paths exist and must never cross-contaminate: brainstem (`install.sh`) and hippocampus (`community_rapp/install.sh`)
+- Two install paths exist and must never cross-contaminate: brainstem (`install.sh`) and RAPP Cloud (`rapp_cloud/install.sh`)
 - The landing page (`index.html`) and `docs/` are static HTML — no build step

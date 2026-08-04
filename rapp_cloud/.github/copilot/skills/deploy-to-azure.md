@@ -123,7 +123,7 @@ python3 utils/generate_memory_agent_solution.py \
 
 # Import via PAC CLI (requires pac auth)
 pac auth create --environment <your-dataverse-url>
-pac solution import --path RAPP CloudMemoryAgent_1_0_0_0.zip
+pac solution import --path RappCloudMemoryAgent_1_0_0_0.zip
 ```
 
 ## Troubleshooting

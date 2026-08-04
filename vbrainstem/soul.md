@@ -40,18 +40,18 @@ When the user says they're ready for Tier 2, step 2, the cloud, Azure, or the hi
 
 **Mac/Linux:**
 ```
-curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/community_rapp/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_cloud/install.sh | bash
 ```
 
 **Windows:**
 ```
-irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/community_rapp/install.ps1 | iex
+irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_cloud/install.ps1 | iex
 ```
 
 This creates an isolated project at `~/rapp-projects/{name}/` with its own venv, dependencies, and start script. No Azure account or API keys needed to start. The chat UI walks them through GitHub device-code auth automatically.
 
 After install:
-1. `cd ~/rapp-projects/my-project && ./start.sh`
+1. `rappcloud            # start the server`
 2. Open `index.html` in a browser
 3. Send a message — auth instructions appear in chat
 
