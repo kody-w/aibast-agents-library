@@ -87,6 +87,244 @@
       },
       "url": "https://github.com/kody-w/aibast-agents-library/discussions/6",
       "number": 6
+    },
+    "@aibast-agents-library/action-prioritization": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/7",
+      "number": 7
+    },
+    "@aibast-agents-library/activity-gap": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/8",
+      "number": 8
+    },
+    "@aibast-agents-library/ai-customer-assistant": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/9",
+      "number": 9
+    },
+    "@aibast-agents-library/art-generator": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/10",
+      "number": 10
+    },
+    "@aibast-agents-library/ask-hr": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/11",
+      "number": 11
+    },
+    "@aibast-agents-library/asset-maintenance-forecast": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/12",
+      "number": 12
+    },
+    "@aibast-agents-library/building-permit-processing": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/13",
+      "number": 13
+    },
+    "@aibast-agents-library/bulk-crm-data-generator": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/14",
+      "number": 14
+    },
+    "@aibast-agents-library/care-gap-closure": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/15",
+      "number": 15
+    },
+    "@aibast-agents-library/cart-abandonment-recovery": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/16",
+      "number": 16
+    },
+    "@aibast-agents-library/citizen-service-request": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/17",
+      "number": 17
+    },
+    "@aibast-agents-library/claims-processing": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/18",
+      "number": 18
+    },
+    "@aibast-agents-library/client-health-score": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/19",
+      "number": 19
+    },
+    "@aibast-agents-library/clinical-notes-summarizer": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/20",
+      "number": 20
     }
   }
 }
