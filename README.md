@@ -1,8 +1,12 @@
-# 🧠 RAPP Brainstem
+# AIBAST Agents Library
+
+> ⚠️ **IMPORTANT:** This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product.
 
 > **👉 [Get Started at microsoft.github.io/aibast-agents-library](https://microsoft.github.io/aibast-agents-library/)**
 
-A local-first AI agent server powered by GitHub Copilot. No API keys. No cloud setup. Just your GitHub account.
+Industry agent templates, the RAPP production methodology, and a local-first AI agent server powered by GitHub Copilot. No provider API key or cloud setup is required for core chat beyond a GitHub account with Copilot access.
+
+[Production Guide](https://microsoft.github.io/aibast-agents-library/docs/rapp-guide.html) | [Browse Agent Templates](https://github.com/microsoft/aibast-agents-library/tree/main/agents/%40aibast-agents-library) | [Brainstem API and configuration](rapp_brainstem/README.md)
 
 ```
 curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash
@@ -16,9 +20,10 @@ Auto-installs Python 3.11, Git, and GitHub CLI via winget if missing.
 
 Then:
 ```bash
-gh auth login   # one-time GitHub auth
 brainstem       # start the server → localhost:7071
 ```
+
+The browser walks through GitHub device-code sign-in when no compatible credential is already available.
 
 ---
 
@@ -38,7 +43,7 @@ irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/commu
 
 Creates `~/rapp-projects/my-project/` — isolated project with its own venv, agents, and local storage. Auth happens through the chat UI (GitHub device code flow). No API keys needed to start.
 
-[Onboarding guide](https://microsoft.github.io/aibast-agents-library/docs/tutorial.html) | [Cloud function app](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_cloud)
+[Quick start](https://microsoft.github.io/aibast-agents-library/docs/tutorial.html) | [RAPP Cloud (Tier 2)](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_cloud)
 
 ---
 
@@ -83,9 +88,9 @@ class WeatherAgent(BasicAgent):
         return f"It's sunny in {city}!"
 ```
 
-### Connect Remote Agent Repos
+### Browse the AIBAST Agent Library
 
-The chat UI has a **Sources** panel — paste any GitHub repo URL with an `agents/` folder and the brainstem hot-loads them. Missing pip dependencies are auto-installed.
+Industry templates live under [`agents/@aibast-agents-library/`](agents/@aibast-agents-library/). Review a template, adapt it to your environment, then drag the trusted `*_agent.py` file into the Brainstem chat or place it in the configured agents directory. Agent files are Python code and execute locally, so review them before installation.
 
 ---
 
@@ -131,20 +136,25 @@ All config via `.env` (see `.env.example`):
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `GITHUB_TOKEN` | auto-detected via `gh` | GitHub PAT or Copilot token |
-| `GITHUB_MODEL` | `gpt-4o` | Model ([GitHub Models](https://github.com/marketplace/models)) |
+| `GITHUB_MODEL` | `auto` | Selects the fastest available Claude Haiku, then Sonnet, then `gpt-4o`; a model selected in the UI overrides this value. |
 | `SOUL_PATH` | `./soul.md` | Path to your soul file |
 | `AGENTS_PATH` | `./agents` | Path to your agents directory |
 | `PORT` | `7071` | Server port |
+| `BRAINSTEM_LAN_MODE` | `false` | Opt in to LAN binding; non-loopback capability routes require the per-install secret. |
+| `BRAINSTEM_ALLOWED_HOSTS` | *(empty)* | Optional comma-separated LAN hostnames. |
+| `VOICE_ZIP_PASSWORD` | *(empty)* | Optional password for encrypted Azure Speech or ElevenLabs configuration. |
 
 ## API
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/chat` | POST | `{"user_input": "...", "conversation_history": [], "session_id": "..."}` |
+| `/chat/stream` | POST | Server-sent event stream for chat and agent activity. |
 | `/health` | GET | Status, model, loaded agents, token state |
 | `/login` | POST | Start GitHub device code OAuth flow |
 | `/models` | GET | List available models |
-| `/repos` | GET | List connected agent repos |
+| `/agents` | GET | List installed agent files and loaded tools. |
+| `/diagnostics/report` | POST | Prepare a privacy-scrubbed GitHub issue draft for review. |
 
 ## Requirements
 
@@ -164,14 +174,15 @@ cd ~/.brainstem/src && git pull
 rm -rf ~/.brainstem ~/.local/bin/brainstem
 ```
 
-## License
+---
 
-The AIBAST Agents Library — **ms-rapp/1**, the pinned, gated build of
-the RAPP platform — is licensed under the
-[MIT License](LICENSE) (© Microsoft). Files under [`rapp/`](rapp/README.md)
-that are mirrored from upstream RAPP projects are third-party materials
-under their own upstream licenses — see
-[`rapp/THIRD-PARTY-NOTICES.md`](rapp/THIRD-PARTY-NOTICES.md).
+## Browse and run
+
+- **[Agent Library](https://microsoft.github.io/aibast-agents-library/agents.html)** — every agent by industry and use case, with an in-page code viewer
+- **[vBrainstem](https://microsoft.github.io/aibast-agents-library/vbrainstem/)** — the same engine in your browser, zero install
+- **[Metrics](https://microsoft.github.io/aibast-agents-library/metrics.html)** — public download and engagement numbers
+- **[Static API](docs/API.md)** — `api/v1/` JSON endpoints for integrating the library into your own app
+- **[RAPP/1 corpus](rapp/README.md)** — the pinned protocol standard this distribution implements
 
 ## Contributing
 
@@ -187,6 +198,8 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+Publishing your own agents: [docs/PUBLISHING.md](docs/PUBLISHING.md).
+
 ## Trademarks
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
@@ -195,8 +208,15 @@ trademarks or logos is subject to and must follow
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
 
+## License
+
+This repository is licensed under the [MIT License](LICENSE) (© Microsoft
+Corporation). Files under [`rapp/`](rapp/README.md) mirrored from upstream RAPP
+projects are third-party materials under their own upstream licenses — see
+[`rapp/THIRD-PARTY-NOTICES.md`](rapp/THIRD-PARTY-NOTICES.md).
+
 ## Disclaimer
 
 This is a public preview of frontier AI-acceleration tooling, provided
-"AS IS" — use at your own risk, and review every AI output before
-production use. Full terms: [DISCLAIMER.md](DISCLAIMER.md).
+"AS IS" — use at your own risk, and review every AI output before production
+use. Full terms: [DISCLAIMER.md](DISCLAIMER.md).
