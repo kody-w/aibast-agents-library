@@ -12,7 +12,7 @@ pinned revision, SHA-256, and license are recorded in
 | `spec/RAPP1-SPEC.md` | kody-w/rapp-1 | No upstream LICENSE yet — redistributed under the author's recorded authorization (see manifest entry); upstream LICENSE is a v1-GA blocker | Upstream author |
 | `spec/RAPP1_AUTHORITY.json` | kody-w/rapp-map | MIT | Kody Wildfeuer |
 | `spec/ecosystem-spec.json` | kody-w/rapp-god | MIT | Kody Wildfeuer |
-| `bible/**` | kody-w/RAPP-Bible | BSD-3-Clause ([bible/LICENSE](bible/LICENSE), [bible/NOTICE](bible/NOTICE)) | Upstream author |
+| `handbook/**` | kody-w/RAPP-Bible | BSD-3-Clause ([handbook/LICENSE](handbook/LICENSE), [handbook/NOTICE](handbook/NOTICE)) | Upstream author |
 | `standards/PLAYBOOK.md`, `standards/rapp-train-llms.txt` | kody-w/rapp-train | Apache-2.0 ([standards/LICENSE-APACHE-2.0](standards/LICENSE-APACHE-2.0), [standards/NOTICE](standards/NOTICE)) | Wildhaven Homes LLC |
 | `standards/rapp-holo-SPEC.md` | kody-w/rapp-holo | Apache-2.0 (same texts) | Wildhaven Homes LLC |
 | `standards/rapp-static-api-SPEC.md`, `standards/rapp-static-api-llms.txt` | kody-w/rapp-static-apis | MIT | Kody Wildfeuer |

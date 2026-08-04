@@ -6,7 +6,7 @@ distribution that adopts deliberately. Don't reinvent it; follow it.
 
 ```
   kody-w RAPP kernel                      ms-rapp LTS (this repo)
-  canary → nightly → alpha → beta → GRAIL ──sync PR──▶ main (LTS)
+  canary → nightly → alpha → beta → STABLE ──sync PR──▶ main (LTS)
         ▲                                                │
         └────────── issues / PRs (fixes flow UP) ────────┘
 ```
@@ -14,18 +14,19 @@ distribution that adopts deliberately. Don't reinvent it; follow it.
 ## The two sides
 
 - **Kernel** — the kody-w open-source RAPP ecosystem. Development rides the
-  release train (canary → nightly → alpha → beta → grail). The grail
-  (`kody-w/rapp-installer`) is human-merge-only; its own rule — stated in
+  release train (canary → nightly → alpha → beta → stable). The upstream
+  stable release repo (`kody-w/rapp-installer`) is human-merge-only; its
+  own rule — stated in
   the kernel's machine entry point (`standards/rapp-train-llms.txt`) — is
-  **never push to the grail or to microsoft/aibast-agents-library
-  directly**. The kernel ratifies RAPP/1 protocol revisions.
+  **never push to the upstream stable repo or to
+  microsoft/aibast-agents-library directly**. The kernel ratifies RAPP/1 protocol revisions.
 - **LTS** — this repository. It ships only what is pinned, gated, and
   verified. Enterprise users get stability; the standard guarantees the two
   sides stay interoperable.
 
 ## Flow DOWN (kernel → LTS): the only way changes arrive
 
-1. The kernel cuts a grail release (tagged version).
+1. The kernel cuts a stable release (tagged version).
 2. A **sync PR** into this repo brings the release across. The PR must, in
    the same commit:
    - update the synced kernel content (brainstem, installers),
@@ -37,14 +38,15 @@ distribution that adopts deliberately. Don't reinvent it; follow it.
 
 **Worked example (live today):** the local brainstem's registry browser
 points at a retired upstream catalog URL. The fix is NOT patched here — it
-lands in the kernel via the train, rides a grail release, and arrives in
+lands in the kernel via the train, rides a stable release, and arrives in
 the next sync PR. `rapp/ALIGNMENT.md` tracks it until then.
 
 ## Flow UP (LTS → kernel): fixes and proposals
 
 Bugs found here, features the enterprise needs, protocol clarifications —
 all go upstream as **issues or PRs against the kernel repos** (entering at
-canary like everything else). Never as direct grail pushes, never as
+canary like everything else). Never as direct pushes to the stable branch,
+never as
 downstream-only forks of kernel behavior. A divergence the kernel refuses
 becomes a documented distro patch in `ALIGNMENT.md` — enumerated, minimal,
 and re-proposed upstream at each sync.
@@ -67,7 +69,7 @@ it is not allowed to chase it.
 ## Version policy
 
 - `rapp_brainstem/VERSION` — the kernel engine version (locked; moves only
-  by sync PR). Both grails read `0.6.16` today.
+  by sync PR). Both stable channels read `0.6.16` today.
 - RAPP/1 revision — from `rapp/spec/RAPP1_AUTHORITY.json` (rev-5 today).
 - Library releases (gallery, metrics, API surface) — tagged here per
   `rapp/ALM.md`; they never imply a protocol or engine change.

@@ -38,7 +38,7 @@ irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/commu
 
 Creates `~/rapp-projects/my-project/` — isolated project with its own venv, agents, and local storage. Auth happens through the chat UI (GitHub device code flow). No API keys needed to start.
 
-[Onboarding guide](https://microsoft.github.io/aibast-agents-library/docs/tutorial.html) | [Cloud function app](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_ai)
+[Onboarding guide](https://microsoft.github.io/aibast-agents-library/docs/tutorial.html) | [Cloud function app](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_cloud)
 
 ---
 
@@ -163,3 +163,18 @@ cd ~/.brainstem/src && git pull
 ```bash
 rm -rf ~/.brainstem ~/.local/bin/brainstem
 ```
+
+## License
+
+The AIBAST Agents Library — **ms-rapp/1**, the long-term-support (LTS)
+distribution of the RAPP platform — is licensed under the
+[MIT License](LICENSE) (© Microsoft). Files under [`rapp/`](rapp/README.md)
+that are mirrored from upstream RAPP projects are third-party materials
+under their own upstream licenses — see
+[`rapp/THIRD-PARTY-NOTICES.md`](rapp/THIRD-PARTY-NOTICES.md).
+
+## Disclaimer
+
+This is a public preview of frontier AI-acceleration tooling, provided
+"AS IS" — use at your own risk, and review every AI output before
+production use. Full terms: [DISCLAIMER.md](DISCLAIMER.md).

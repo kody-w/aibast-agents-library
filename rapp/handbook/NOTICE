@@ -1,0 +1,9 @@
+This directory (the RAPP Handbook) mirrors documentation from the upstream
+RAPP-Bible project
+(https://github.com/kody-w/RAPP-Bible), pinned at upstream commit 9e74bed4,
+under the BSD-3-Clause license reproduced in ./LICENSE.
+
+The mirror is byte-exact and unmodified. Provenance, revisions, and hashes
+for every file are recorded in ../MIRROR-MANIFEST.json and verified by
+scripts/corpus_sync.py. Upstream remains the authoritative source; this
+mirror advances only through the pin-bump process in ../SUCCESSION.md.

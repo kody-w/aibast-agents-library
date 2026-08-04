@@ -7,17 +7,17 @@ reviewers, findings verified against live upstream). Re-verify at any time:
 ## 1. Brainstem shape lock — SYNCED AND VERIFIED ✅
 
 This tree's `rapp_brainstem/` and installers were **synced from the
-enterprise grail (microsoft main) in this change** — the staging tree had
-lagged at engine 0.6.0 and now carries the grail state exactly:
+enterprise stable channel (microsoft main) in this change** — the staging
+tree had lagged at engine 0.6.0 and now carries the stable state exactly:
 
-- `rapp_brainstem/VERSION`: **0.6.16** — matching both the upstream kernel
-  grail (kody-w/rapp-installer, `5fbde17`) and the enterprise grail
+- `rapp_brainstem/VERSION`: **0.6.16** — matching both the upstream stable
+  repo (kody-w/rapp-installer, `5fbde17`) and the enterprise stable channel
   (microsoft main, `682c050`).
-- File shape: the grails carry an identical 17-entry `rapp_brainstem/` file
+- File shape: both stable channels carry an identical 17-entry `rapp_brainstem/` file
   list (verified — nothing present in one and absent in the other); this
   tree now mirrors it, including `requirements-dev.txt` and the `tests/`
   directory.
-- Between the two grails, byte deltas are confined to a handful of small
+- Between the two stable channels, byte deltas are confined to a handful of small
   attribution/rebrand differences (~3–30 bytes in CONSTITUTION.md,
   README.md, brainstem.py, soul.md, start.\*); `install.sh` differs by 334
   bytes (0.9%). No structural fork.
@@ -48,7 +48,8 @@ bumped in the same change (a worked pin-bump):
 
 ## 3. Ecosystem-spec mirrors — quarantine understood, no contradiction ✅
 
-The historical premise "ecosystem-spec.json mirrored at rapp-god + rapp-map
+The historical premise "ecosystem-spec.json mirrored at the upstream version
+registry (rapp-god) + rapp-map
 roots" is retired upstream: `rapp-map/ecosystem-spec.json` is a deliberate
 ~1 KB quarantine tombstone whose own text refuses registry authority. The
 live full spec is `rapp-god/src/runtime/RAPP/specs/ecosystem-spec.json`
@@ -61,10 +62,10 @@ moved to rapp-1 (§2).
 | Upstream | License | Mirror handling |
 |---|---|---|
 | rapp-map, rapp-god, rapp-static-apis | MIT | copyright recorded in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) |
-| RAPP-Bible | BSD-3-Clause | `bible/LICENSE` + `bible/NOTICE` (byte-exact, attributed) |
+| RAPP-Bible | BSD-3-Clause | `handbook/LICENSE` + `handbook/NOTICE` (byte-exact, attributed) |
 | rapp-train, rapp-holo | Apache-2.0 | `standards/LICENSE-APACHE-2.0` + `standards/NOTICE` |
 | **rapp-1** | **no LICENSE file upstream** | mirrored under the author's recorded authorization (manifest entry carries grantor/date/scope). **An upstream LICENSE on rapp-1 is a v1-GA blocker.** |
-| rapp-installer | no LICENSE file upstream | not mirrored (grail; shape-locked reference only) — same upstream action applies |
+| rapp-installer | no LICENSE file upstream | not mirrored (stable engine repo; shape-locked reference only) — same upstream action applies |
 
 Upstream trademark documents are **not** mirrored — naming posture lives in
 [ATTRIBUTION.md](ATTRIBUTION.md); this distribution claims no marks.
