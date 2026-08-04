@@ -797,6 +797,13 @@
       var params = new URLSearchParams(location.search);
       var summons = params.getAll('agent');
       if (summons.length) {
+        // Summoning installs and runs code. A link must never do that silently —
+        // same consent bar as the #a= install path.
+        var okSummon = window.confirm(
+          'This link wants to install and run ' + summons.length + ' agent(s) from the ' +
+          'AIBAST library:\n\n  ' + summons.join('\n  ') +
+          '\n\nInstalling an agent is code execution. Continue?');
+        if (!okSummon) { summons = []; }
         for (var i = 0; i < summons.length; i++) {
           try { await window.rapp.summon(summons[i]); } catch (e) { console.warn('summon failed', summons[i], e); }
         }

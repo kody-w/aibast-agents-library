@@ -123,6 +123,17 @@ def build_registry():
         "agents": agents
     }
 
+    # Stable-write: if the only difference from the committed registry is the
+    # timestamp, keep the old one. Otherwise every scheduled rebuild commits
+    # noise and a "generated artifacts are current" CI gate can never pass.
+    try:
+        previous = json.loads(REGISTRY_FILE.read_text(encoding="utf-8"))
+        if {k: v for k, v in previous.items() if k != "generated_at"} == \
+           {k: v for k, v in registry.items() if k != "generated_at"}:
+            registry["generated_at"] = previous["generated_at"]
+    except (OSError, json.JSONDecodeError, KeyError):
+        pass
+
     with open(REGISTRY_FILE, "w", encoding="utf-8") as f:
         json.dump(registry, f, indent=2)
 

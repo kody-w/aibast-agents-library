@@ -905,6 +905,14 @@ def _get_copilot_token_locked():
     data = resp.json()
     copilot_token = data.get("token")
     endpoint = data.get("endpoints", {}).get("api", "https://api.individual.githubcopilot.com")
+    # The token exchange may be brokered by a CORS proxy, so the endpoint it
+    # returns is untrusted input: only accept GitHub-owned hosts.
+    _host = urlparse(endpoint).hostname or ""
+    if not (_host == "githubcopilot.com" or _host.endswith(".githubcopilot.com")
+            or _host.endswith(".github.com")):
+        _tlog("auth.copilot_endpoint_rejected", level="error")
+        raise RuntimeError(
+            f"Refusing a non-GitHub Copilot endpoint returned by the auth broker: {endpoint!r}")
     expires_at = data.get("expires_at", time.time() + 600)
 
     if not copilot_token:
@@ -2401,6 +2409,10 @@ def route_agents_import(files, form):
     source_revision = ((form or {}).get("source_revision") or "").strip().lower()
     if source_revision and source_revision != RAR_REVISION:
         return {"error": "Library source revision is not trusted by this brainstem release."}, 400
+    # Fail closed: anything that names a library source must carry a digest, or
+    # the check is decorative — an attacker simply omits the field.
+    if source_revision and not expected_sha256:
+        return {"error": "Agent integrity check requires a sha256 digest from the library catalog."}, 400
     if expected_sha256:
         if not re.fullmatch(r"[0-9a-f]{64}", expected_sha256):
             return {"error": "Invalid SHA-256 digest."}, 400
