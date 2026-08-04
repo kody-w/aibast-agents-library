@@ -50,6 +50,12 @@ if [ "$MODE" = "live" ]; then
     "curl -fsSL '$BASE/rapp/handbook/README.md' -o /dev/null"
   check "disclaimer serves" \
     "curl -fsSL '$BASE/DISCLAIMER.md' | grep -qi 'AS IS'"
+  check "aka.ms/RAPP target serves (docs/installer.html)" \
+    "curl -fsSL -o /dev/null '$BASE/docs/installer.html'"
+  check "aka.ms/RAPPworkshop target serves (docs/rapp-guide.html)" \
+    "curl -fsSL -o /dev/null '$BASE/docs/rapp-guide.html'"
+  check "legacy community_rapp installer path still serves (compat stub)" \
+    "curl -fsSL '$BASE/community_rapp/install.sh' | grep -q rapp_cloud"
   echo; echo "live: $PASS passed, $FAIL failed"; exit $((FAIL>0))
 fi
 
