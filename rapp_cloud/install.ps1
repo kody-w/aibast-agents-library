@@ -526,15 +526,15 @@ endlocal
     Set-Content -Path $launcherCmd -Value $launcherContent -Encoding ASCII
     Write-Ok "Created: rappcloud.cmd"
 
-    # ── crapp.cmd (alias) ─────────────────────────────────────────────────────
-    $aliasCmd = Join-Path $BinDir "crapp.cmd"
+    # ── rcloud.cmd (alias) ─────────────────────────────────────────────────────
+    $aliasCmd = Join-Path $BinDir "rcloud.cmd"
     $aliasContent = @"
 @echo off
 REM Alias for rappcloud
 "%USERPROFILE%\.local\bin\rappcloud.cmd" %*
 "@
     Set-Content -Path $aliasCmd -Value $aliasContent -Encoding ASCII
-    Write-Ok "Created: crapp.cmd (alias)"
+    Write-Ok "Created: rcloud.cmd (alias)"
 
     # ── Add to User PATH ─────────────────────────────────────────────────────
     $currentPath = [System.Environment]::GetEnvironmentVariable("Path", "User")
@@ -642,7 +642,7 @@ function Show-Success {
     Write-Host "    rappcloud status" -ForegroundColor Cyan -NoNewline; Write-Host "   — Check server health"
     Write-Host "    rappcloud test" -ForegroundColor Cyan -NoNewline; Write-Host "     — Send a test message"
     Write-Host "    rappcloud update" -ForegroundColor Cyan -NoNewline; Write-Host "   — Pull latest version"
-    Write-Host "    crapp" -ForegroundColor Cyan -NoNewline; Write-Host "                  — Short alias"
+    Write-Host "    rcloud" -ForegroundColor Cyan -NoNewline; Write-Host "                  — Short alias"
     Write-Host ""
     Write-Host "  Next steps:" -ForegroundColor White
     Write-Host "    • " -NoNewline; Write-Host "Deploy to Azure:" -ForegroundColor Green -NoNewline; Write-Host " see docs/DEPLOYMENT.md"
@@ -678,7 +678,7 @@ if ($args -contains "--help" -or $args -contains "-h") {
     Write-Host "  .\install.ps1"
     Write-Host ""
     Write-Host "This script installs RAPP Hippocampus to ~/.rappcloud/"
-    Write-Host "and creates CLI commands: rappcloud, crapp"
+    Write-Host "and creates CLI commands: rappcloud, rcloud"
     exit 0
 }
 

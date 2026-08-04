@@ -563,15 +563,15 @@ LAUNCHER_EOF
     chmod +x "$BIN_DIR/rappcloud"
     success "Created: rappcloud"
 
-    # ── Alias: crapp ──────────────────────────────────────────────────────────
-    cat > "$BIN_DIR/crapp" << 'ALIAS_EOF'
+    # ── Alias: rcloud ──────────────────────────────────────────────────────────
+    cat > "$BIN_DIR/rcloud" << 'ALIAS_EOF'
 #!/usr/bin/env bash
 # Alias for rappcloud
 exec "$HOME/.local/bin/rappcloud" "$@"
 ALIAS_EOF
 
-    chmod +x "$BIN_DIR/crapp"
-    success "Created: crapp (alias)"
+    chmod +x "$BIN_DIR/rcloud"
+    success "Created: rcloud (alias)"
 
     # ── Add ~/.local/bin to PATH if not already there ─────────────────────────
     add_to_path() {
@@ -694,7 +694,7 @@ print_success() {
     echo -e "    ${CYAN}rappcloud status${NC}   — Check server health"
     echo -e "    ${CYAN}rappcloud test${NC}     — Send a test message"
     echo -e "    ${CYAN}rappcloud update${NC}   — Pull latest version"
-    echo -e "    ${CYAN}crapp${NC}                  — Short alias"
+    echo -e "    ${CYAN}rcloud${NC}                  — Short alias"
     echo ""
     echo -e "  ${BOLD}Next steps:${NC}"
     echo -e "    • ${GREEN}Deploy to Azure:${NC} see docs/DEPLOYMENT.md"
@@ -730,7 +730,7 @@ if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
     echo "  ./install.sh"
     echo ""
     echo "This script installs RAPP Hippocampus to ~/.rappcloud/"
-    echo "and creates CLI commands: rappcloud, crapp"
+    echo "and creates CLI commands: rappcloud, rcloud"
     exit 0
 fi
 

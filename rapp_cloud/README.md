@@ -46,7 +46,7 @@ Then:
 rappcloud        # start the server → localhost:7071
 rappcloud test   # send a test message
 rappcloud status # check health
-crapp                # short alias
+rcloud                # short alias
 ```
 
 ### Manual Install

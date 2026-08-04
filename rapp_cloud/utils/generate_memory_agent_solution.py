@@ -12,7 +12,7 @@ Usage:
         [--function-key YOUR_KEY] \
         [--output RAPP CloudMemoryAgent_1_0_0_0.zip] \
         [--solution-name RAPP CloudMemoryAgent] \
-        [--publisher-prefix crapp]
+        [--publisher-prefix rappc]
 """
 
 import argparse
@@ -1266,7 +1266,7 @@ def _bot_configuration_json() -> str:
         "publishOnImport": True,
         "gPTSettings": {
             "$kind": "GPTSettings",
-            "defaultSchemaName": "crapp_memoryagent.gpt.default"
+            "defaultSchemaName": "rappc_memoryagent.gpt.default"
         },
         "aISettings": {
             "$kind": "AISettings",
@@ -1489,8 +1489,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--publisher-prefix",
-        default="crapp",
-        help="Publisher customization prefix (default: crapp)",
+        default="rappc",
+        help="Publisher customization prefix (default: rappc)",
     )
 
     args = parser.parse_args()

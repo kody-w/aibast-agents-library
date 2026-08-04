@@ -393,7 +393,7 @@ EXEMPT_FILES = {
     'rapp_cloud/CONSTITUTION.md', # historical record
 }
 TEXT = ('.md','.html','.txt','.py','.js','.json','.yml','.yaml','.sh','.ps1','.cmd','.command')
-BANNED = re.compile(r'\b(grail|bible|sacred|incantation|CommunityRAPP|rapp_ai)\b', re.I)
+BANNED = re.compile(r'\b(grail|bible|sacred|incantation|CommunityRAPP|rapp_ai|crapp)\b', re.I)
 # Factual upstream project/repo names are provenance, not our vocabulary.
 PROVENANCE = re.compile(r'RAPP-Bible|rapp-god|kody-w/[A-Za-z0-9._-]+|community_rapp')
 r = subprocess.run(['git','ls-files'], capture_output=True, text=True)

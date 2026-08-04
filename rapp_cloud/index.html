@@ -395,10 +395,10 @@
   let thinkingTimer = null;
 
   // Persistent user GUID
-  let userGuid = localStorage.getItem('crapp_user_guid');
+  let userGuid = localStorage.getItem('rappcloud_user_guid');
   if (!userGuid) {
     userGuid = crypto.randomUUID();
-    localStorage.setItem('crapp_user_guid', userGuid);
+    localStorage.setItem('rappcloud_user_guid', userGuid);
   }
 
   // DOM refs
