@@ -1,14 +1,14 @@
 # ALM — application lifecycle for a worldwide-stable ms-rapp/1
 
 The kernel already proved the ring model (canary → nightly → alpha → beta →
-grail). The LTS runs a smaller train with harder gates. This is the full
+stable). The LTS runs a smaller train with harder gates. This is the full
 blueprint: what runs today, what the admin turns on, and the planned
 topology.
 
 ## 1. Ring topology
 
 ```
-kernel grail (kody-w) ──weekly sync PR──▶ LTS canary ──▶ LTS nightly ──▶ LTS main (public)
+kernel stable (kody-w) ──weekly sync PR──▶ LTS canary ──▶ LTS nightly ──▶ LTS main (public)
                                           (branch/repo)   (scheduled)      microsoft.github.io
 ```
 
@@ -45,7 +45,7 @@ serves as the de-facto canary until the canary repo decision lands.
 | `build-registry.yml` (live) | push touching agents | registry + static API rebuild, stable-write commit |
 | `metrics.yml` (live) | daily 05:40 UTC + dispatch | skill-source crawl, Discussions seed/tally/fetch, metrics snapshot, API mirror |
 | `corpus-check.yml` (live) | weekly + dispatch + corpus PRs | `corpus_sync.py --check`: local integrity, upstream pin immutability (404/410/451 = failure), and authority freshness (kernel re-pin = failure, "pin-bump PR needed"); scheduled failures open a `corpus-drift` issue — observe, never auto-bump |
-| upstream sync (add, admin) | weekly | diff the kernel grail tag vs LTS; open the upstream sync PR skeleton for human review |
+| upstream sync (add, admin) | weekly | diff the kernel stable release tag vs LTS; open the upstream sync PR skeleton for human review |
 
 ## 4. Repository protections (admin, microsoft repo)
 

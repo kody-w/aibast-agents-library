@@ -1,7 +1,7 @@
 {
  "schema": "aibast-brainstem-lock/1.0",
- "baseline": "microsoft/aibast-agents-library main @ 682c050 (enterprise grail), engine 0.6.16",
- "policy": "The grail brainstem and installers are kernel content, locked at the fork point. Changes arrive ONLY via a sanctioned kernel sync (see rapp/SUCCESSION.md), which regenerates this lock in the same commit. T-LOCK also fails on ANY added file in the locked tree.",
+ "baseline": "microsoft/aibast-agents-library main @ 682c050 (enterprise stable channel), engine 0.6.16",
+ "policy": "The stable brainstem and installers are kernel content, locked at the fork point. Changes arrive ONLY via a sanctioned kernel sync (see rapp/SUCCESSION.md), which regenerates this lock in the same commit. T-LOCK also fails on ANY added file in the locked tree.",
  "files": {
   "rapp_brainstem/.env.example": "2c43b8d99b823c3e865cc8d9ee6e2ed55016e742378aac30201a915947530607",
   "rapp_brainstem/.gitignore": "8199ac2d7eb258f8360c64db4ddd9ff43c41740126dc414c1a2d99aeb337b94d",

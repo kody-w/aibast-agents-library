@@ -75,7 +75,7 @@
    "bytes": 3701,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/README.md": {
+  "rapp/handbook/README.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "README.md",
@@ -84,7 +84,7 @@
    "bytes": 7849,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/OVERVIEW.md": {
+  "rapp/handbook/OVERVIEW.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "OVERVIEW.md",
@@ -93,7 +93,7 @@
    "bytes": 14825,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/CAPABILITIES.md": {
+  "rapp/handbook/CAPABILITIES.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "CAPABILITIES.md",
@@ -102,7 +102,7 @@
    "bytes": 15244,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/THE_ONE_AGENT.md": {
+  "rapp/handbook/THE_ONE_AGENT.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "THE_ONE_AGENT.md",
@@ -111,7 +111,7 @@
    "bytes": 10990,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SCHEMAS.md": {
+  "rapp/handbook/SCHEMAS.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SCHEMAS.md",
@@ -120,7 +120,7 @@
    "bytes": 8406,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/REAL-WORLD-USE-CASES.md": {
+  "rapp/handbook/REAL-WORLD-USE-CASES.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "REAL-WORLD-USE-CASES.md",
@@ -129,7 +129,7 @@
    "bytes": 6034,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/DRIFT_TRIANGLE.md": {
+  "rapp/handbook/DRIFT_TRIANGLE.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "DRIFT_TRIANGLE.md",
@@ -138,7 +138,7 @@
    "bytes": 5195,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/CONTRIBUTING.md": {
+  "rapp/handbook/CONTRIBUTING.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "CONTRIBUTING.md",
@@ -147,7 +147,7 @@
    "bytes": 2487,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/LICENSE": {
+  "rapp/handbook/LICENSE": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "LICENSE",
@@ -156,7 +156,7 @@
    "bytes": 1522,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/_index.md": {
+  "rapp/handbook/SPEC/_index.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/_index.md",
@@ -165,7 +165,7 @@
    "bytes": 293,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/kernel/SPEC.md": {
+  "rapp/handbook/SPEC/kernel/SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/kernel/SPEC.md",
@@ -174,7 +174,7 @@
    "bytes": 76414,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/kernel/ESTATE_SPEC.md": {
+  "rapp/handbook/SPEC/kernel/ESTATE_SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/kernel/ESTATE_SPEC.md",
@@ -183,7 +183,7 @@
    "bytes": 30490,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/catalog/SPEC.md": {
+  "rapp/handbook/SPEC/catalog/SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/catalog/SPEC.md",
@@ -192,7 +192,7 @@
    "bytes": 42175,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/eternity/SPEC.md": {
+  "rapp/handbook/SPEC/eternity/SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/eternity/SPEC.md",
@@ -201,7 +201,7 @@
    "bytes": 2051,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/mcp/SPEC.md": {
+  "rapp/handbook/SPEC/mcp/SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/mcp/SPEC.md",
@@ -210,7 +210,7 @@
    "bytes": 23531,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/moment/SPEC.md": {
+  "rapp/handbook/SPEC/moment/SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/moment/SPEC.md",
@@ -219,7 +219,7 @@
    "bytes": 19340,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/network/SPEC.md": {
+  "rapp/handbook/SPEC/network/SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/network/SPEC.md",
@@ -228,7 +228,7 @@
    "bytes": 16054,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/registry/SPEC.md": {
+  "rapp/handbook/SPEC/registry/SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/registry/SPEC.md",
@@ -237,7 +237,7 @@
    "bytes": 6703,
    "fetched_at": "2026-08-04T21:53:58.881768+00:00"
   },
-  "rapp/bible/SPEC/senses/SPEC.md": {
+  "rapp/handbook/SPEC/senses/SPEC.md": {
    "repo": "kody-w/RAPP-Bible",
    "revision": "9e74bed4",
    "path": "SPEC/senses/SPEC.md",

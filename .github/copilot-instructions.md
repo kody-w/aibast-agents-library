@@ -8,7 +8,7 @@ RAPP Brainstem is a progressive AI agent platform using a biological metaphor (s
 2. **Spinal Cord** (`azuredeploy.json`, `deploy.sh`) — Azure deployment. ARM template creates Function App, Azure OpenAI, Storage, App Insights. All Entra ID auth.
 3. **Nervous System** (`MSFTAIBASMultiAgentCopilot_*.zip`) — Power Platform solution for Copilot Studio. Connects the Azure Function to Teams and M365 Copilot.
 
-Everything else in the repo root (install scripts, index.html, docs/) is onboarding infrastructure. `community_rapp/` contains public skill gateways for private backend repos.
+Everything else in the repo root (install scripts, index.html, docs/) is onboarding infrastructure. `rapp_cloud/` is the Azure Functions tier (RAPP Cloud).
 
 ### Brainstem internals
 
@@ -18,7 +18,7 @@ Everything else in the repo root (install scripts, index.html, docs/) is onboard
 
 **Agent auto-discovery**: `load_agents()` globs `*_agent.py` in `AGENTS_PATH`, dynamically imports each file, finds classes with a `perform` method (excluding `BasicAgent` itself), and instantiates them. Each agent's `to_tool()` generates its OpenAI function-calling schema.
 
-**Import shims**: `_register_shims()` injects fake `sys.modules` so agents written for the cloud (CommunityRAPP) work locally:
+**Import shims**: `_register_shims()` injects fake `sys.modules` so agents written for the cloud tier (RAPP Cloud) work locally:
 - `utils.azure_file_storage` → `local_storage.AzureFileStorageManager`
 - `utils.dynamics_storage` → same local shim (aliased as `DynamicsStorageManager`)
 - `utils.storage_factory` → returns a `LocalStorageManager` instance
@@ -121,7 +121,7 @@ class MyAgent(BasicAgent):
 - **Python 3.11** target runtime; venv at `~/.brainstem/venv`
 - **No API keys** for local dev — GitHub Copilot token exchange handles auth
 - **Config via `.env`** — `GITHUB_TOKEN`, `GITHUB_MODEL`, `SOUL_PATH`, `AGENTS_PATH`, `PORT`, `VOICE_ZIP_PASSWORD` (see `.env.example`)
-- **Local-first storage**: `local_storage.py` stores to `.brainstem_data/` on disk, mirroring the CommunityRAPP Azure File Storage layout (`shared_memories/memory.json` for shared, `memory/{guid}/user_memory.json` for per-user)
+- **Local-first storage**: `local_storage.py` stores to `.brainstem_data/` on disk, mirroring the RAPP Cloud Azure File Storage layout (`shared_memories/memory.json` for shared, `memory/{guid}/user_memory.json` for per-user)
 - **Soul file** (`soul.md`): System prompt loaded as the first message in every conversation. Users customize by editing it or pointing `SOUL_PATH` to their own
 - **Skill-based onboarding**: `skill.md` uses the Moltbook pattern — YAML frontmatter, autonomous execution steps, ⏸️ pause points for user input, state saved to `~/.config/brainstem/state.json`
 - **Single-file server**: All server logic lives in `brainstem.py` — auth, routing, LLM calls, agent orchestration. Keep it that way.

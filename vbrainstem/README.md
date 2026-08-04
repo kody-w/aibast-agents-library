@@ -33,6 +33,11 @@ What's different here:
 | `soul.md` | Default personality — edit in-app, survives reloads |
 | `burrow-tether.js`, `surgeon.js`, `pair-crypto.js` | Optional device-pairing layer |
 
+## Disclaimer
+
+Public preview, provided "AS IS" — see the repository
+[DISCLAIMER](../DISCLAIMER.md). AI outputs require human review.
+
 ## Auth
 
 GitHub device-code sign-in uses a CORS proxy only for the two github.com

@@ -11,8 +11,8 @@ Philosophy: "engine, not experience" — this is infrastructure, not a consumer 
 ## Repository Layout
 
 - `rapp_brainstem/` — The core brainstem server (see `rapp_brainstem/CLAUDE.md` for deep internals)
-- `install.sh`, `install.ps1`, `install.cmd` — One-liner installers (Brainstem path). **These are sacred** — any change must be tested end-to-end on a fresh machine.
-- `community_rapp/` — Hippocampus (Tier 2) installer scripts. Parallel path, no dependency on brainstem.
+- `install.sh`, `install.ps1`, `install.cmd` — One-liner installers (Brainstem path). **These are protected, release-gated files** — any change must be tested end-to-end on a fresh machine.
+- `rapp_cloud/` — RAPP Cloud, the Hippocampus (Tier 2) Azure Functions app + installer scripts. Parallel path, no dependency on brainstem.
 - `azuredeploy.json`, `deploy.sh`, `deploy.ps1` — Azure ARM deployment (Tier 2 cloud)
 - `MSFTAIBASMultiAgentCopilot_*.zip` — Power Platform solution for Copilot Studio (Tier 3)
 - `index.html` — Landing page served at microsoft.github.io/aibast-agents-library
@@ -66,7 +66,7 @@ Each tier is self-contained. Users advance when they choose to.
 
 **Auth chain** (priority order): `GITHUB_TOKEN` env var -> `.copilot_token` file -> `gh auth token` CLI -> device code OAuth via `/login`. Copilot API tokens are short-lived with auto-refresh.
 
-**Import shims**: `_register_shims()` injects `sys.modules` so agents written for CommunityRAPP (cloud) work locally — `utils.azure_file_storage` maps to `local_storage.py`.
+**Import shims**: `_register_shims()` injects `sys.modules` so agents written for RAPP Cloud (the Azure tier) work locally — `utils.azure_file_storage` maps to `local_storage.py`.
 
 **Memory agents**: `ManageMemory` and `ContextMemory` get special handling — `user_guid` arg is stripped, and `/chat` auto-injects `<memory>` context if ContextMemory is loaded.
 
@@ -81,12 +81,12 @@ Each tier is self-contained. Users advance when they choose to.
 2. When ready to release, merge to `main` with a `release: vX.Y.Z` commit
 3. Bump `rapp_brainstem/VERSION` as part of the release commit
 
-**Do not push directly to `main`** except via a merge at release time. The one-liner install is sacred — `main` must always be in a working state.
+**Do not push directly to `main`** except via a merge at release time. The one-liner install is release-critical — `main` must always be in a working state.
 
 ## Key Conventions
 
 - **Python 3.11** target; venv at `~/.brainstem/venv`
 - **No API keys** for local dev — GitHub Copilot token exchange handles auth
 - **Config via `.env`** in `rapp_brainstem/` — `GITHUB_TOKEN`, `GITHUB_MODEL` (default `gpt-4o`), `SOUL_PATH`, `AGENTS_PATH`, `PORT` (default 7071)
-- Two install paths exist and must never cross-contaminate: brainstem (`install.sh`) and hippocampus (`community_rapp/install.sh`)
+- Two install paths exist and must never cross-contaminate: brainstem (`install.sh`) and RAPP Cloud (`rapp_cloud/install.sh`)
 - The landing page (`index.html`) and `docs/` are static HTML — no build step

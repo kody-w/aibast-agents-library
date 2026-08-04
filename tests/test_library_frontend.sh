@@ -46,6 +46,10 @@ if [ "$MODE" = "live" ]; then
     "curl -fsSL '$BASE/rapp/spec/RAPP1-SPEC.md' | head -5 | grep -qi 'RAPP'"
   check "corpus mirror manifest serves" \
     "curl -fsSL '$BASE/rapp/MIRROR-MANIFEST.json' | grep -q 'aibast-corpus-mirror'"
+  check "handbook mirror serves" \
+    "curl -fsSL '$BASE/rapp/handbook/README.md' -o /dev/null"
+  check "disclaimer serves" \
+    "curl -fsSL '$BASE/DISCLAIMER.md' | grep -qi 'AS IS'"
   echo; echo "live: $PASS passed, $FAIL failed"; exit $((FAIL>0))
 fi
 
@@ -216,22 +220,37 @@ check "brainstem_web.py parses" \
 
 echo "== T-CLEAN clean break (kody-w refs only in sanctioned places) =="
 check "kody-w refs confined to allowlist (tracked + untracked)" "python3 - <<'PY'
-import subprocess
+import re, subprocess
 r=subprocess.run(['git','grep','--untracked','-l','-E','kody-w|kwildfeuer|billwhalen'],
                  capture_output=True,text=True)
 assert r.returncode in (0,1), r.stderr   # 0=hits, 1=no hits; anything else = grep itself failed
 out=r.stdout.splitlines()
-ALLOW_DIRS=('rapp_brainstem/',  # kernel-locked grail content — fixes flow from upstream
+ALLOW_DIRS=('rapp_brainstem/',  # kernel-locked stable content — fixes flow from upstream
             'rapp/',            # pinned corpus mirrors + governance docs discuss upstream by name
             'tests/')           # negative guards in this suite
 ALLOW_FILES={'vbrainstem/brainstem_web.py',  # auth CORS proxy, env-overridable (VB_AUTH_WORKER)
              'docs/CLEAN-BREAK.md',          # the audit record itself
              'scripts/corpus_sync.py'}       # addresses the kernel authority file by name
-bad=[f for f in out if f not in ALLOW_FILES and not f.startswith(ALLOW_DIRS)]
+# The staging fork's own identity (kody-w/aibast-agents-library) is a sanctioned
+# self-reference: the daily CI stamps whichever repo generated the snapshot, and
+# it self-heals to microsoft/* when the workflow runs upstream.
+SELF=re.compile(r'kody-w/aibast-agents-library|kody-w\.github\.io/aibast-agents-library')
+STRAY=re.compile(r'kody-w|kwildfeuer|billwhalen')
+def stray(path):
+    t=SELF.sub('', open(path, encoding='utf-8', errors='ignore').read())
+    return bool(STRAY.search(t))
+bad=[f for f in out if f not in ALLOW_FILES and not f.startswith(ALLOW_DIRS) and stray(f)]
 assert not bad, bad
 PY"
-check "generated state/ and api/ carry zero kody-w refs" \
-  "! git grep --untracked -q 'kody-w' -- state/ api/"
+check "generated state/ and api/ carry no kody-w refs beyond the staging self-reference" "python3 - <<'PY'
+import re, subprocess
+r=subprocess.run(['git','grep','--untracked','-l','kody-w','--','state/','api/'],capture_output=True,text=True)
+assert r.returncode in (0,1), r.stderr
+SELF=re.compile(r'kody-w/aibast-agents-library|kody-w\.github\.io/aibast-agents-library')
+bad=[f for f in r.stdout.splitlines()
+     if 'kody-w' in SELF.sub('', open(f, encoding='utf-8', errors='ignore').read())]
+assert not bad, bad
+PY"
 
 echo "== T-LOCK brainstem + installers locked =="
 check "locked files match BRAINSTEM-LOCK.json and no unlocked file exists in the kernel tree" "python3 - <<'PY'
@@ -272,13 +291,13 @@ assert hashlib.sha256(open('rapp/spec/RAPP1-SPEC.md','rb').read()).hexdigest()==
 PY"
 check "corpus_sync --check passes (local integrity mode)" \
   "python3 scripts/corpus_sync.py --check --local-only"
-check "bible carries upstream LICENSE and NOTICE" \
-  "test -f rapp/bible/LICENSE && test -f rapp/bible/NOTICE && grep -qi 'BSD' rapp/bible/LICENSE"
+check "handbook carries upstream LICENSE and NOTICE" \
+  "test -f rapp/handbook/LICENSE && test -f rapp/handbook/NOTICE && grep -qi 'BSD' rapp/handbook/LICENSE"
 
 echo "== T-DOCS2 governance + ALM =="
 check "SUCCESSION.md covers the kernel→LTS flow" "python3 - <<'PY'
 d=open('rapp/SUCCESSION.md').read().lower()
-for k in ('kernel','lts','grail','pin bump','flow down','flow up','never push'):
+for k in ('kernel','lts','stable release','pin bump','flow down','flow up','never push'):
     assert k in d, k
 PY"
 check "ALM.md covers rings, builds, gates" "python3 - <<'PY'
@@ -296,6 +315,52 @@ for k in ('pin','license','rapp-1','shape','0.6.16','freshness'):
 PY"
 check "CLEAN-BREAK.md documents the auth-worker exception" \
   "grep -q 'VB_AUTH_WORKER' docs/CLEAN-BREAK.md"
+
+echo "== T-TERMS enterprise vocabulary in authored surfaces =="
+check "no informal kernel vocabulary in authored prose (provenance names excepted)" "python3 - <<'PY'
+import re, glob
+AUTHORED = (glob.glob('rapp/*.md') + glob.glob('docs/*.md')
+            + ['README.md','CLAUDE.md','rapp/BRAINSTEM-LOCK.json','rapp/MIRROR-MANIFEST.json'])
+BAD = re.compile(r'\b(grail|bible|sacred|incantation)\b', re.I)
+# factual upstream repo/project names are provenance, not vocabulary
+PROVENANCE = re.compile(r'RAPP-Bible|rapp-god|kody-w/[A-Za-z0-9._-]+')
+offenders = []
+for f in AUTHORED:
+    text = PROVENANCE.sub('', open(f, encoding='utf-8').read())
+    for m in BAD.finditer(text):
+        offenders.append(f'{f}: {m.group(0)}')
+assert not offenders, offenders[:12]
+PY"
+
+echo "== T-DISCLAIMER frontier-tool posture =="
+check "DISCLAIMER.md exists with AS-IS / preview / human-review posture" "python3 - <<'PY'
+d=open('DISCLAIMER.md').read()
+for k in ('AS IS','public preview','human review','at your own risk','requires_env'):
+    assert k.lower() in d.lower(), k
+PY"
+check "README states MIT for the LTS + third-party carve-out + links disclaimer" "python3 - <<'PY'
+d=open('README.md').read()
+assert 'MIT' in d and 'THIRD-PARTY-NOTICES' in d and 'DISCLAIMER.md' in d
+PY"
+check "gallery, metrics, installer, vbrainstem link the disclaimer" "python3 - <<'PY'
+for f in ('agents.html','metrics.html','index.html','vbrainstem/README.md'):
+    assert 'DISCLAIMER' in open(f).read(), f
+PY"
+
+echo "== T-CAT microsoft OSS compliance set (mcscatblog parity) =="
+check "standard Microsoft SECURITY.md block present" \
+  "grep -q 'BEGIN MICROSOFT SECURITY.MD' SECURITY.md && grep -q 'aka.ms/SECURITY.md' SECURITY.md"
+check "Code of Conduct + SUPPORT with canonical Microsoft links" "python3 - <<'PY'
+c=open('CODE_OF_CONDUCT.md').read()
+assert 'opensource.microsoft.com/codeofconduct' in c and 'opencode@microsoft.com' in c
+s=open('SUPPORT.md').read()
+assert 'GitHub Issues' in s and 'Discussions' in s and 'Support Policy' in s
+PY"
+check "CAT footer formula on all three pages" "python3 - <<'PY'
+for f in ('index.html','agents.html','metrics.html'):
+    t=open(f).read()
+    assert 'Microsoft AIBAST. Some rights reserved.' in t, f
+PY"
 
 echo "== T-TELEMETRY aibast.tooling.v1 contract =="
 check "schema parses, closed contract, all 13 fields" "python3 - <<'PY'

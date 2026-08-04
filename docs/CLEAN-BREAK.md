@@ -8,21 +8,21 @@ estate exist only where the succession model requires them.
 ## Fixed (now self-contained)
 
 - **Tier-2 (Hippocampus)**: installer pages, README, docs → the in-repo
-  cloud function app `rapp_ai/` (one-liners, guide links, footer links).
-- **ARM templates** (`azuredeploy.json`, `rapp_ai/azuredeploy.json`): the
-  generated setup scripts clone THIS repository and run from `rapp_ai/`
+  cloud function app `rapp_cloud/` (one-liners, guide links, footer links).
+- **ARM templates** (`azuredeploy.json`, `rapp_cloud/azuredeploy.json`): the
+  generated setup scripts clone THIS repository and run from `rapp_cloud/`
   (were: kody-w/CommunityRAPP, kody-w/EntraCopilotAgent365 — the latter a
   404, i.e. deploys were broken).
-- **`rapp_ai` installers**: self-source from this repo (were: 404 raw URLs
+- **`rapp_cloud` installers**: self-source from this repo (were: 404 raw URLs
   on kody-w/m365-agents-for-python).
-- **`rapp_ai/agents/agent_library_manager.py`**: discovers/installs from
+- **`rapp_cloud/agents/agent_library_manager.py`**: discovers/installs from
   this library's registry (was: a third-party personal repo).
 - **Deploy-to-Azure buttons**: this repo's `azuredeploy.json` (were:
   kody-w/rapp-installer).
 - **vBrainstem**: tether scripts ported in-repo and repointed to this
   repo's installers; soul/onboarding links in-family; library panel +
   ratings on this repo (zero RAR references).
-- **rapp_ai docs sweep**: every kody-w/CommunityRAPP issues/discussions/
+- **rapp_cloud docs sweep**: every kody-w/CommunityRAPP issues/discussions/
   releases/security link → this repository; dead fork links de-linked.
 - **docs pages internal links** → valid targets (GitHub blob URLs where the
   file isn't served as HTML).
@@ -31,7 +31,7 @@ estate exist only where the succession model requires them.
 
 ## Kernel-locked (intentionally NOT patched here)
 
-`rapp_brainstem/**` and the root installers are grail kernel content,
+`rapp_brainstem/**` and the root installers are stable kernel content,
 shape-locked at the fork point (`rapp/BRAINSTEM-LOCK.json`, test T-LOCK).
 Their remaining upstream references (support-issue URLs, the retired
 registry-browser URL, soul onboarding link) are kernel bugs/content: the
