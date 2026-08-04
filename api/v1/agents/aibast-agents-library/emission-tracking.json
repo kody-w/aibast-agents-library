@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/emission-tracking",
+    "version": "1.0.0",
+    "display_name": "Emission Tracking Agent",
+    "description": "Monitors GHG emissions by facility, tracks regulatory compliance, develops reduction plans, and analyzes carbon offset opportunities.",
+    "author": "AIBAST",
+    "tags": [
+      "emissions",
+      "carbon",
+      "compliance",
+      "ghg",
+      "sustainability",
+      "energy"
+    ],
+    "category": "energy",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py",
+  "size_kb": 13.8,
+  "lines": 328,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py",
+  "engagement": null
+}

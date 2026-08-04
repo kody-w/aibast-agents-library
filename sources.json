@@ -1,0 +1,34 @@
+{
+  "schema": "aibast-sources/1.0",
+  "_comment": [
+    "Outside skill/agent libraries the AIBAST Agents Library aggregates.",
+    "Adding a source is a config edit, not a code change — scripts/crawl_skills.py",
+    "reads this file on the daily metrics run.",
+    "",
+    "THE LIBRARY INDEXES, IT DOES NOT MIRROR. Only catalog metadata is stored:",
+    "name, description, tags, author, a link back to the origin, and any counts",
+    "the source itself publishes. Skill bodies and source files are never copied",
+    "into this repo by the crawler. An aggregated skill enters the library proper",
+    "only through the conversion pipeline (docs/AGGREGATION.md): converted to a",
+    "RAPP-compliant single-file skill.md or agent.py, passed through the quality",
+    "gates, and submitted as a normal publisher PR with attribution and a",
+    "compatible license. `license_verified: false` means treat the origin as",
+    "all-rights-reserved: index and link only, never convert without permission."
+  ],
+  "sources": [
+    {
+      "id": "cat-agent-skills",
+      "namespace": "@cat-agent-skills",
+      "display_name": "CAT Agent Skills",
+      "publisher": "microsoft",
+      "home_url": "https://microsoft.github.io/cat-agent-skills/",
+      "index_url": "https://microsoft.github.io/cat-agent-skills/skills.json",
+      "item_url_template": "https://microsoft.github.io/cat-agent-skills/#{slug}",
+      "format": "cat-skills/1",
+      "license": "unverified",
+      "license_verified": false,
+      "license_note": "Pages site and skills.json are publicly served; repository LICENSE not programmatically readable. Index-only until verified.",
+      "enabled": true
+    }
+  ]
+}

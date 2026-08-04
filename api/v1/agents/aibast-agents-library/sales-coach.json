@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/sales-coach",
+    "version": "1.0.0",
+    "display_name": "Sales Coach",
+    "description": "AI-powered sales coaching with call reviews, skill assessments, coaching plans, and performance dashboards.",
+    "author": "AIBAST",
+    "tags": [
+      "sales",
+      "coaching",
+      "training",
+      "performance",
+      "call-review"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/sales_coach_stack/sales_coach_agent.py",
+  "size_kb": 15.9,
+  "lines": 283,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/sales_coach_stack/sales_coach_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/sales_coach_stack/sales_coach_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/sales_coach_stack/sales_coach_agent.py",
+  "engagement": null
+}

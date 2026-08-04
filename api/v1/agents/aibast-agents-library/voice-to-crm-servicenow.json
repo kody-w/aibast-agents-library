@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/voice-to-crm-servicenow",
+    "version": "1.0.0",
+    "display_name": "Voice to CRM (ServiceNow)",
+    "description": "ServiceNow integration for incident creation, knowledge search, assignment routing, and status updates.",
+    "author": "AIBAST",
+    "tags": [
+      "servicenow",
+      "itsm",
+      "incidents",
+      "knowledge-base",
+      "routing"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/servicenow_agent.py",
+  "size_kb": 14.5,
+  "lines": 264,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/servicenow_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/servicenow_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/servicenow_agent.py",
+  "engagement": null
+}

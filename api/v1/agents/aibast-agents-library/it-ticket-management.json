@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/it-ticket-management",
+    "version": "1.0.0",
+    "display_name": "IT Ticket Management",
+    "description": "IT ticket management with dashboards, priority assignment, SLA tracking, and resolution reporting.",
+    "author": "AIBAST",
+    "tags": [
+      "it",
+      "tickets",
+      "helpdesk",
+      "sla",
+      "priority",
+      "resolution"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/it_ticket_management_stack/it_ticket_management_agent.py",
+  "size_kb": 15.8,
+  "lines": 258,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/it_ticket_management_stack/it_ticket_management_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/it_ticket_management_stack/it_ticket_management_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/it_ticket_management_stack/it_ticket_management_agent.py",
+  "engagement": null
+}

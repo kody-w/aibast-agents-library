@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/ask-hr",
+    "version": "1.0.0",
+    "display_name": "Ask HR",
+    "description": "AI-powered HR assistant for time-off requests, benefits inquiries, parental leave, and policy lookups.",
+    "author": "AIBAST",
+    "tags": [
+      "hr",
+      "human-resources",
+      "benefits",
+      "time-off",
+      "employee-self-service"
+    ],
+    "category": "human_resources",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/human_resources_stacks/ask_hr_stack/ask_hr_agent.py",
+  "size_kb": 17.3,
+  "lines": 390,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/human_resources_stacks/ask_hr_stack/ask_hr_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/human_resources_stacks/ask_hr_stack/ask_hr_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/human_resources_stacks/ask_hr_stack/ask_hr_agent.py",
+  "engagement": null
+}
