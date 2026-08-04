@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://microsoft.github.io/aibast-agents-library/schemas/tool-interaction-event.schema.json",
+  "title": "ToolInteractionEvent",
+  "description": "aibast.tooling.v1 — the minimum event contract every AIBAST TA tool emits. Six event verbs (created, started, completed, failed, deployed, shared) with uniform fields so one query serves all tools. The correlation ID is the spine: issued at first touch, carried through the whole engagement. PROHIBITED in any payload: prompts, responses, customer data, document contents, individual user identity — additionalProperties is false precisely so prohibited content has nowhere to hide.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId", "eventName", "toolId", "toolVersion", "correlationId",
+    "actorRole", "actorRegion", "programId", "outcome", "durationMs",
+    "timestampUtc"
+  ],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique id of this event"
+    },
+    "eventName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+\\.(created|started|completed|failed|deployed|shared|generated)$",
+      "description": "Dotted verb, e.g. rapp.prototype.generated — uniform verbs across every tool"
+    },
+    "toolId": {
+      "type": "string",
+      "enum": ["RAPP", "AIDEATE", "LIBRARY", "DMT", "SOWAGENT"]
+    },
+    "toolVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$",
+      "description": "semver"
+    },
+    "correlationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "One per engagement, end to end — issued at first touch"
+    },
+    "msxOpportunityId": {
+      "type": ["string", "null"],
+      "description": "MANDATORY for L3/L4 credit; null otherwise"
+    },
+    "tpid": {
+      "type": ["string", "null"],
+      "description": "Consumption joins here"
+    },
+    "actorRole": {
+      "type": "string",
+      "enum": ["TA", "SE", "GBB", "PARTNER", "ISD"],
+      "description": "Role, never person"
+    },
+    "actorRegion": {
+      "type": "string",
+      "enum": ["AMER", "EMEA", "APAC", "LATAM"]
+    },
+    "programId": {
+      "type": "string",
+      "enum": ["SFRC", "ERP", "CCAS", "AGENTS", "LOWCODE"]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "abandoned"]
+    },
+    "durationMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Powers every speed KPI"
+    },
+    "timestampUtc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

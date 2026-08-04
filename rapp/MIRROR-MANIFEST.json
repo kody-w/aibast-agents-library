@@ -1,0 +1,259 @@
+{
+ "schema": "aibast-corpus-mirror/1.0",
+ "purpose": "Pinned mirrors of the canonical RAPP/1 corpus from the kody-w kernel. Pins move only by human PR (rapp/SUCCESSION.md). Verified by scripts/corpus_sync.py.",
+ "authority": "rapp/spec/RAPP1_AUTHORITY.json pins the protocol; rapp/spec/RAPP1-SPEC.md must always hash-match that pin.",
+ "files": {
+  "rapp/spec/RAPP1-SPEC.md": {
+   "repo": "kody-w/rapp-1",
+   "revision": "d2cd5abed48d3f52b86bbb975ac3558286d1db41",
+   "path": "SPEC.md",
+   "license": "UNLICENSED-upstream. Redistribution here authorized by the upstream author/maintainer (grant recorded 2026-08-04; scope: verbatim mirror at pinned revisions within microsoft/aibast-agents-library). Upstream LICENSE file is a v1-GA blocker \u2014 rapp/ALIGNMENT.md.",
+   "sha256": "cea7847f98f9751734995f46fd4e1bde211c8eb9d03dbbb477934213865bb91a",
+   "bytes": 41952,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/spec/RAPP1_AUTHORITY.json": {
+   "repo": "kody-w/rapp-map",
+   "revision": "150f8c255f807f56eb65a9e0fe4ab80e86c574ef",
+   "path": "RAPP1_AUTHORITY.json",
+   "license": "MIT",
+   "sha256": "16c63fc58c392437ceb844eefdf85a911cbdd3a76de2c55ca3668f39cbee0007",
+   "bytes": 547,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/spec/ecosystem-spec.json": {
+   "repo": "kody-w/rapp-god",
+   "revision": "5c648875",
+   "path": "src/runtime/RAPP/specs/ecosystem-spec.json",
+   "license": "MIT",
+   "sha256": "0eb8146b62af8e8473d2ca8944ed8aff69e18e41a143eb1ef466f3c3fc153616",
+   "bytes": 60479,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/standards/rapp-holo-SPEC.md": {
+   "repo": "kody-w/rapp-holo",
+   "revision": "ff296524",
+   "path": "SPEC.md",
+   "license": "Apache-2.0",
+   "sha256": "08638f9c303af003653c20b6f51d11d9445bd7793f25e3b1f16f13acb02aed5c",
+   "bytes": 4554,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/standards/rapp-static-api-SPEC.md": {
+   "repo": "kody-w/rapp-static-apis",
+   "revision": "1f854a94",
+   "path": "SPEC.md",
+   "license": "MIT",
+   "sha256": "24dceeef40305d702b88650f5dda299db605b6d0f6248878def536aa4cd4d2f4",
+   "bytes": 7225,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/standards/rapp-static-api-llms.txt": {
+   "repo": "kody-w/rapp-static-apis",
+   "revision": "1f854a94",
+   "path": "llms.txt",
+   "license": "MIT",
+   "sha256": "cfed4fdc9e8b54de0a32da00aae8e59f50e169f10c62242833b80e861162017b",
+   "bytes": 5565,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/standards/PLAYBOOK.md": {
+   "repo": "kody-w/rapp-train",
+   "revision": "267708f3",
+   "path": "PLAYBOOK.md",
+   "license": "Apache-2.0",
+   "sha256": "e04a304f6cc92453518da6dfdfec94877edee3a01c37b524fa708e2ac53ebb2d",
+   "bytes": 11343,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/standards/rapp-train-llms.txt": {
+   "repo": "kody-w/rapp-train",
+   "revision": "267708f3",
+   "path": "llms.txt",
+   "license": "Apache-2.0",
+   "sha256": "6566a3213f7e523e0c64a5c5c87b12bfc383c86569ce821980ea27a3dbf23984",
+   "bytes": 3701,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/README.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "README.md",
+   "license": "BSD-3-Clause",
+   "sha256": "4cf848f19e930170a064a7b42a3614038120fd33de6fdf8d7a911fd8fe7eb38b",
+   "bytes": 7849,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/OVERVIEW.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "OVERVIEW.md",
+   "license": "BSD-3-Clause",
+   "sha256": "5921a41f12ae9953fa682566253832b0d467414766c31f6dca0c0d1d9943f256",
+   "bytes": 14825,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/CAPABILITIES.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "CAPABILITIES.md",
+   "license": "BSD-3-Clause",
+   "sha256": "e056af64269a5fd18abd09313ab183d495e607b8760d1d6040677e3a3775441c",
+   "bytes": 15244,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/THE_ONE_AGENT.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "THE_ONE_AGENT.md",
+   "license": "BSD-3-Clause",
+   "sha256": "ff2cdf3a561e629d6b7d0d3ff40059fcb93c3ea4b999617b93443c7467542776",
+   "bytes": 10990,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SCHEMAS.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SCHEMAS.md",
+   "license": "BSD-3-Clause",
+   "sha256": "7374fd0bc99aec0cd41c6d66dac8f1ad8db2e8ea67f17be53cbd15827ec14055",
+   "bytes": 8406,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/REAL-WORLD-USE-CASES.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "REAL-WORLD-USE-CASES.md",
+   "license": "BSD-3-Clause",
+   "sha256": "e51a079377830af00cc8fb72f9ca2d77e5ed682e6b4e649cf209cc2846947f47",
+   "bytes": 6034,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/DRIFT_TRIANGLE.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "DRIFT_TRIANGLE.md",
+   "license": "BSD-3-Clause",
+   "sha256": "dab9007ac55774e139af87f050bcfc99c9cfd0f9c578a039a253fe276e27dbb0",
+   "bytes": 5195,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/CONTRIBUTING.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "CONTRIBUTING.md",
+   "license": "BSD-3-Clause",
+   "sha256": "bf41f10b9a4d419ee482a57c87bb79cb6fcfd6a6ef59a325681cb005f43b3876",
+   "bytes": 2487,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/LICENSE": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "LICENSE",
+   "license": "BSD-3-Clause",
+   "sha256": "5b4ac3957eb8a97b132c992ef344703bf80f3fabf4998235c68d7ba5461fe699",
+   "bytes": 1522,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/_index.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/_index.md",
+   "license": "BSD-3-Clause",
+   "sha256": "a363a97c1e48dc42ac01a98f0e955a801cf26eb99e19e79c633c2cab4a079009",
+   "bytes": 293,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/kernel/SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/kernel/SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "51c1689c0dda62ee4869b8b11ddb5e1b706d08da1b870fa2f45ed99d7ddc6caf",
+   "bytes": 76414,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/kernel/ESTATE_SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/kernel/ESTATE_SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "08b29d5d5944ac8e9ce68c3050ccdd41cd0e7ffcdd497bae589464aeb03f52d1",
+   "bytes": 30490,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/catalog/SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/catalog/SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "635e8dced0f2dc2df9c5aa1f02f655b8f08f25ffe18badda9d1ab1df5aee18bd",
+   "bytes": 42175,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/eternity/SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/eternity/SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "a7c72673c006e11cdfc033f12a4918b3328a158da7e603e9946d0654ab53e6f8",
+   "bytes": 2051,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/mcp/SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/mcp/SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "54825c21847f4be5054cbddb50e52a20578ce012854eaf3902ff225d0f3e0cd1",
+   "bytes": 23531,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/moment/SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/moment/SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "c23a48f79f868c18df1ae4662338e71ae562d7e19162ccd70044c3561479ee28",
+   "bytes": 19340,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/network/SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/network/SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "65be6b3849d201a6c8cc2f3568235d21c86e7e021430225f0a60366a6be1c7d2",
+   "bytes": 16054,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/registry/SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/registry/SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "b677b10400978529260d17b790c8d44fda23e7f8790684f323eecb32a11e8f5e",
+   "bytes": 6703,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/bible/SPEC/senses/SPEC.md": {
+   "repo": "kody-w/RAPP-Bible",
+   "revision": "9e74bed4",
+   "path": "SPEC/senses/SPEC.md",
+   "license": "BSD-3-Clause",
+   "sha256": "7f23b6e5474118c6b661559c12218e338c9de6a3fa07eb306b0f750e503a24ca",
+   "bytes": 2811,
+   "fetched_at": "2026-08-04T21:53:58.881768+00:00"
+  },
+  "rapp/standards/LICENSE-APACHE-2.0": {
+   "repo": "kody-w/rapp-train",
+   "revision": "267708f3",
+   "path": "LICENSE",
+   "license": "Apache-2.0",
+   "sha256": "948db54488e4a3a5f87a102f2bd83c8dfdcf7421b02bc9c6c15461de8b5e23b9",
+   "bytes": 900,
+   "fetched_at": "2026-08-04T21:55:02.152147+00:00"
+  }
+ }
+}

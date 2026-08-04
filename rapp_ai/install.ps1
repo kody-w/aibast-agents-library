@@ -1,6 +1,6 @@
 # ═══════════════════════════════════════════════════════════════════════════════
 #  RAPP Hippocampus — Windows Installer (PowerShell)
-#  Usage: irm https://raw.githubusercontent.com/kody-w/m365-agents-for-python/main/CommunityRAPP/install.ps1 | iex
+#  Usage: irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/install.ps1 | iex
 #  Or:    .\install.ps1
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -13,7 +13,7 @@ $RepoDir        = Join-Path $InstallDir "src"
 $SourceDir      = Join-Path $RepoDir "CommunityRAPP"
 $VenvDir        = Join-Path $InstallDir "venv"
 $BinDir         = Join-Path $env:USERPROFILE ".local\bin"
-$RepoUrl        = "https://github.com/kody-w/m365-agents-for-python.git"
+$RepoUrl        = "https://github.com/microsoft/aibast-agents-library.git"
 $ServerPort     = 7071
 $ServerUrl      = "http://localhost:$ServerPort"
 
@@ -674,7 +674,7 @@ if ($args -contains "--help" -or $args -contains "-h") {
     Write-Host "CommunityRAPP Installer"
     Write-Host ""
     Write-Host "Usage:"
-    Write-Host "  irm https://raw.githubusercontent.com/kody-w/m365-agents-for-python/main/CommunityRAPP/install.ps1 | iex"
+    Write-Host "  irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/install.ps1 | iex"
     Write-Host "  .\install.ps1"
     Write-Host ""
     Write-Host "This script installs RAPP Hippocampus to ~/.communityrapp/"

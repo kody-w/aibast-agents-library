@@ -1,0 +1,17 @@
+This directory mirrors documents from the upstream RAPP kernel projects,
+byte-exact at pinned revisions (provenance: ../MIRROR-MANIFEST.json):
+
+  PLAYBOOK.md, rapp-train-llms.txt
+      from https://github.com/kody-w/rapp-train
+      License: Apache-2.0, Copyright Wildhaven Homes LLC (see LICENSE-APACHE-2.0)
+
+  rapp-holo-SPEC.md
+      from https://github.com/kody-w/rapp-holo
+      License: Apache-2.0, Copyright Wildhaven Homes LLC (see LICENSE-APACHE-2.0)
+
+  rapp-static-api-SPEC.md, rapp-static-api-llms.txt
+      from https://github.com/kody-w/rapp-static-apis
+      License: MIT, Copyright (c) Kody Wildfeuer
+
+The mirrors are unmodified. Upstream remains authoritative; these copies
+advance only through the pin-bump process in ../SUCCESSION.md.

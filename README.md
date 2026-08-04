@@ -38,7 +38,7 @@ irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/commu
 
 Creates `~/rapp-projects/my-project/` — isolated project with its own venv, agents, and local storage. Auth happens through the chat UI (GitHub device code flow). No API keys needed to start.
 
-[Onboarding guide](https://kody-w.github.io/CommunityRAPP/onboard.html) | [CommunityRAPP repo](https://github.com/kody-w/CommunityRAPP)
+[Onboarding guide](https://microsoft.github.io/aibast-agents-library/docs/tutorial.html) | [Cloud function app](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_ai)
 
 ---
 
@@ -108,7 +108,7 @@ Give your brainstem a cloud body. Deploy to Azure so it's always-on with persist
 curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/deploy.sh | bash
 ```
 
-Or click: [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkody-w%2Frapp-installer%2Fmain%2Fazuredeploy.json)
+Or click: [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Faibast-agents-library%2Fmain%2Fazuredeploy.json)
 
 Creates: Function App (Python 3.11), Azure OpenAI (GPT-4o), Storage Account, Application Insights. All Entra ID auth — no API keys.
 

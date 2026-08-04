@@ -65,7 +65,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Dates are UTC.
 
 ### 🤝 Bill Whalen Integration
 
-Integrated contributions from [Bill Whalen's CommunityRAPP fork](https://github.com/billwhalenmsft/CommunityRAPP-BillWhalen). Excluded customer directories, PII, and customer-specific transpiled agents.
+Integrated contributions from Bill Whalen's CommunityRAPP fork. Excluded customer directories, PII, and customer-specific transpiled agents.
 
 #### Added — Agents (11)
 - `agent_generator_agent.py` — Auto-generates agents from configurations

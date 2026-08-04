@@ -162,7 +162,7 @@ cp api-demo/scenarios/<scenario>/overview.json api-demo/responses/<scenario>.jso
 ### Step 5: Commit and Push
 
 ```bash
-cd /Users/kodywildfeuer/Documents/GitHub/CommunityRAPP
+cd <path-to>/aibast-agents-library/rapp_ai
 git add api-demo/
 git commit -m "Generate: <scenario> demo data - <description>"
 git push origin main
@@ -180,11 +180,11 @@ git push origin main
 - api-demo/responses/<scenario>.json
 
 🔗 Test endpoints:
-- Overview: https://raw.githubusercontent.com/kody-w/CommunityRAPP/main/api-demo/responses/<scenario>.json
-- List: https://raw.githubusercontent.com/kody-w/CommunityRAPP/main/api-demo/scenarios/<scenario>/list.json
+- Overview: https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/api-demo/responses/<scenario>.json
+- List: https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/api-demo/scenarios/<scenario>/list.json
 
 💡 Use in your app:
-fetch('https://raw.githubusercontent.com/kody-w/CommunityRAPP/main/api-demo/responses/<scenario>.json')
+fetch('https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/api-demo/responses/<scenario>.json')
 ```
 
 ## Tips
@@ -201,6 +201,6 @@ Apps can simulate different states by fetching different scenario files:
 ```javascript
 // Fetch based on user action
 const scenario = userAction === 'view_pipeline' ? 'overview' : 'list';
-const url = `https://raw.githubusercontent.com/kody-w/CommunityRAPP/main/api-demo/scenarios/crm/${scenario}.json`;
+const url = `https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/api-demo/scenarios/crm/${scenario}.json`;
 const response = await fetch(url);
 ```

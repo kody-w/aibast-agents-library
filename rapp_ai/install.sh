@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════════════
 #  RAPP Hippocampus — Installer
-#  One-liner: curl -fsSL https://raw.githubusercontent.com/kody-w/m365-agents-for-python/main/CommunityRAPP/install.sh | bash
+#  One-liner: curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/install.sh | bash
 # ═══════════════════════════════════════════════════════════════════════════════
 set -e
 
@@ -18,10 +18,10 @@ NC='\033[0m' # No Color
 VERSION="1.0.0"
 INSTALL_DIR="$HOME/.communityrapp"
 REPO_DIR="$INSTALL_DIR/src"
-SOURCE_DIR="$REPO_DIR/CommunityRAPP"
+SOURCE_DIR="$REPO_DIR/rapp_ai"
 VENV_DIR="$INSTALL_DIR/venv"
 BIN_DIR="$HOME/.local/bin"
-REPO_URL="https://github.com/kody-w/m365-agents-for-python.git"
+REPO_URL="https://github.com/microsoft/aibast-agents-library.git"
 SERVER_PORT=7071
 SERVER_URL="http://localhost:$SERVER_PORT"
 
@@ -295,7 +295,7 @@ install_communityrapp() {
         git fetch origin main --quiet 2>/dev/null || true
 
         local remote_version
-        remote_version=$(git show origin/main:CommunityRAPP/VERSION 2>/dev/null | tr -d '[:space:]' || echo "$local_version")
+        remote_version=$(git show origin/main:rapp_ai/VERSION 2>/dev/null | tr -d '[:space:]' || echo "$local_version")
 
         if [ "$local_version" != "$remote_version" ]; then
             info "Upgrading: v${local_version} → v${remote_version}"
@@ -318,8 +318,10 @@ install_communityrapp() {
         fail "Installation failed — CommunityRAPP source not found at $SOURCE_DIR"
     fi
 
-    # Write local version marker
-    echo "$VERSION" > "$SOURCE_DIR/VERSION"
+    # Write local version marker to an untracked sidecar — never clobber the
+    # git-tracked VERSION file, or the next `git pull` upgrade aborts on a
+    # dirty tree
+    echo "$VERSION" > "$INSTALL_DIR/.installed_version"
     success "CommunityRAPP v${VERSION} ready at $SOURCE_DIR"
 }
 
@@ -444,7 +446,7 @@ configure_openai() {
             ;;
         3|*)
             info "Skipping Azure OpenAI configuration"
-            info "Edit ~/.communityrapp/src/CommunityRAPP/local.settings.json later"
+            info "Edit ~/.communityrapp/src/rapp_ai/local.settings.json later"
             api_key="<your-openai-api-key>"
             endpoint="https://<your-openai-resource>.openai.azure.com/"
             ;;
@@ -498,12 +500,12 @@ install_cli() {
 set -e
 
 INSTALL_DIR="$HOME/.communityrapp"
-SOURCE_DIR="$INSTALL_DIR/src/CommunityRAPP"
+SOURCE_DIR="$INSTALL_DIR/src/rapp_ai"
 VENV_DIR="$INSTALL_DIR/venv"
 
 if [ ! -d "$SOURCE_DIR" ]; then
     echo "Error: CommunityRAPP not found at $SOURCE_DIR"
-    echo "Run the installer: curl -fsSL https://raw.githubusercontent.com/kody-w/m365-agents-for-python/main/CommunityRAPP/install.sh | bash"
+    echo "Run the installer: curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/install.sh | bash"
     exit 1
 fi
 
@@ -724,7 +726,7 @@ if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
     echo "CommunityRAPP Installer"
     echo ""
     echo "Usage:"
-    echo "  curl -fsSL https://raw.githubusercontent.com/kody-w/m365-agents-for-python/main/CommunityRAPP/install.sh | bash"
+    echo "  curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_ai/install.sh | bash"
     echo "  ./install.sh"
     echo ""
     echo "This script installs RAPP Hippocampus to ~/.communityrapp/"

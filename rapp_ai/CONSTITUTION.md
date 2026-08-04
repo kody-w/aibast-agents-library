@@ -229,7 +229,7 @@ This repo welcomes contributions from community forks. When integrating external
 
 | Contributor | Fork | Contributions |
 |-------------|------|---------------|
-| **Bill Whalen** | [CommunityRAPP-BillWhalen](https://github.com/billwhalenmsft/CommunityRAPP-BillWhalen) | Agent transpiler, Copilot Studio integration, performance optimizations, trigger system, MCS templates, architecture diagrams |
+| **Bill Whalen** | CommunityRAPP-BillWhalen | Agent transpiler, Copilot Studio integration, performance optimizations, trigger system, MCS templates, architecture diagrams |
 
 ---
 

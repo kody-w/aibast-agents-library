@@ -31,7 +31,7 @@ After being invited to the private beta:
 
 ```bash
 # Clone the private CommunityRAPP repo
-git clone https://github.com/kody-w/CommunityRAPP.git
+git clone https://github.com/microsoft/aibast-agents-library.git
 cd CommunityRAPP
 
 # Install dependencies

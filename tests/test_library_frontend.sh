@@ -42,6 +42,10 @@ if [ "$MODE" = "live" ]; then
     "curl -fsSL '$BASE/vbrainstem/' | grep -q vbrainstem-boot"
   check "vbrainstem reads the aibast library, not RAR" \
     "! curl -fsSL '$BASE/vbrainstem/vbrainstem-boot.js' | grep -q 'kody-w/RAR'"
+  check "RAPP/1 spec mirror serves" \
+    "curl -fsSL '$BASE/rapp/spec/RAPP1-SPEC.md' | head -5 | grep -qi 'RAPP'"
+  check "corpus mirror manifest serves" \
+    "curl -fsSL '$BASE/rapp/MIRROR-MANIFEST.json' | grep -q 'aibast-corpus-mirror'"
   echo; echo "live: $PASS passed, $FAIL failed"; exit $((FAIL>0))
 fi
 
@@ -209,6 +213,133 @@ assert 'cdn.jsdelivr.net/gh/microsoft/aibast-agents-library@' in idx
 PY"
 check "brainstem_web.py parses" \
   "python3 -c \"import ast;ast.parse(open('vbrainstem/brainstem_web.py').read())\""
+
+echo "== T-CLEAN clean break (kody-w refs only in sanctioned places) =="
+check "kody-w refs confined to allowlist (tracked + untracked)" "python3 - <<'PY'
+import subprocess
+r=subprocess.run(['git','grep','--untracked','-l','-E','kody-w|kwildfeuer|billwhalen'],
+                 capture_output=True,text=True)
+assert r.returncode in (0,1), r.stderr   # 0=hits, 1=no hits; anything else = grep itself failed
+out=r.stdout.splitlines()
+ALLOW_DIRS=('rapp_brainstem/',  # kernel-locked grail content — fixes flow from upstream
+            'rapp/',            # pinned corpus mirrors + governance docs discuss upstream by name
+            'tests/')           # negative guards in this suite
+ALLOW_FILES={'vbrainstem/brainstem_web.py',  # auth CORS proxy, env-overridable (VB_AUTH_WORKER)
+             'docs/CLEAN-BREAK.md',          # the audit record itself
+             'scripts/corpus_sync.py'}       # addresses the kernel authority file by name
+bad=[f for f in out if f not in ALLOW_FILES and not f.startswith(ALLOW_DIRS)]
+assert not bad, bad
+PY"
+check "generated state/ and api/ carry zero kody-w refs" \
+  "! git grep --untracked -q 'kody-w' -- state/ api/"
+
+echo "== T-LOCK brainstem + installers locked =="
+check "locked files match BRAINSTEM-LOCK.json and no unlocked file exists in the kernel tree" "python3 - <<'PY'
+import hashlib,json,subprocess
+from pathlib import Path
+lock=json.load(open('rapp/BRAINSTEM-LOCK.json'))
+assert len(lock['files'])>=20
+for f,h in lock['files'].items():
+    assert hashlib.sha256(Path(f).read_bytes()).hexdigest()==h, f
+# two-way: an ADDED file in the locked kernel tree (tracked or not) must fail
+r=subprocess.run(['git','ls-files','--cached','--others','--exclude-standard','rapp_brainstem'],
+                 capture_output=True,text=True)
+assert r.returncode==0, r.stderr
+extra=set(r.stdout.split())-set(lock['files'])
+assert not extra, f'unlocked files in the kernel tree: {sorted(extra)}'
+PY"
+
+echo "== T-CORPUS RAPP/1 corpus mirror =="
+check "manifest complete, every mirror hash-matches, authority pin self-consistent" "python3 - <<'PY'
+import hashlib,json,re
+from pathlib import Path
+m=json.load(open('rapp/MIRROR-MANIFEST.json'))
+assert m['schema']=='aibast-corpus-mirror/1.0'
+assert len(m['files'])>=12
+for local,e in m['files'].items():
+    p=Path(local); assert p.exists(), local
+    assert hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'], local
+    assert re.match(r'^[0-9a-f]{7,40}\Z', e['revision']), f'{local}: revision must be a commit sha, not a branch'
+    assert e.get('license'), local
+# the spec mirror must agree with the mirrored authority pin — the invariant
+# that survives every future pin bump
+auth=json.load(open('rapp/spec/RAPP1_AUTHORITY.json'))
+spec=m['files']['rapp/spec/RAPP1-SPEC.md']
+assert spec['sha256']==auth['sha256'], 'spec mirror != authority pin sha256'
+assert auth['commit'].startswith(spec['revision'][:7]) or spec['revision'].startswith(auth['commit'][:7]), \
+    'spec pin commit != authority commit'
+assert hashlib.sha256(open('rapp/spec/RAPP1-SPEC.md','rb').read()).hexdigest()==auth['sha256']
+PY"
+check "corpus_sync --check passes (local integrity mode)" \
+  "python3 scripts/corpus_sync.py --check --local-only"
+check "bible carries upstream LICENSE and NOTICE" \
+  "test -f rapp/bible/LICENSE && test -f rapp/bible/NOTICE && grep -qi 'BSD' rapp/bible/LICENSE"
+
+echo "== T-DOCS2 governance + ALM =="
+check "SUCCESSION.md covers the kernel→LTS flow" "python3 - <<'PY'
+d=open('rapp/SUCCESSION.md').read().lower()
+for k in ('kernel','lts','grail','pin bump','flow down','flow up','never push'):
+    assert k in d, k
+PY"
+check "ALM.md covers rings, builds, gates" "python3 - <<'PY'
+d=open('rapp/ALM.md').read().lower()
+for k in ('canary','nightly','gate','secret scanning','branch protection','corpus_sync','upstream sync'):
+    assert k in d, k
+PY"
+check "ALIGNMENT.md records current pin + license gaps + shape lock" "python3 - <<'PY'
+import json
+d=open('rapp/ALIGNMENT.md').read().lower()
+auth=json.load(open('rapp/spec/RAPP1_AUTHORITY.json'))
+assert auth['commit'][:8] in d, 'ALIGNMENT must cite the CURRENT authority commit'
+for k in ('pin','license','rapp-1','shape','0.6.16','freshness'):
+    assert k in d, k
+PY"
+check "CLEAN-BREAK.md documents the auth-worker exception" \
+  "grep -q 'VB_AUTH_WORKER' docs/CLEAN-BREAK.md"
+
+echo "== T-TELEMETRY aibast.tooling.v1 contract =="
+check "schema parses, closed contract, all 13 fields" "python3 - <<'PY'
+import json
+s=json.load(open('schemas/tool-interaction-event.schema.json'))
+assert s['additionalProperties'] is False
+assert set(s['properties'])=={'eventId','eventName','toolId','toolVersion','correlationId',
+ 'msxOpportunityId','tpid','actorRole','actorRegion','programId','outcome','durationMs','timestampUtc'}
+assert s['properties']['actorRole']['enum']==['TA','SE','GBB','PARTNER','ISD']
+assert s['properties']['toolId']['enum']==['RAPP','AIDEATE','LIBRARY','DMT','SOWAGENT']
+PY"
+check "emitter builds valid events and validates offline (no endpoint, no disk writes)" "python3 - <<'PY'
+import sys, os, subprocess, json
+sys.path.insert(0,'scripts')
+os.environ.pop('AIBAST_TELEMETRY_ENDPOINT',None)
+from telemetry import emit, build_event, TelemetryError
+before=subprocess.run(['git','status','--porcelain'],capture_output=True,text=True).stdout
+e=emit('rapp.prototype.generated', tool_id='RAPP', tool_version='1.0.0',
+       correlation_id=None, actor_role='TA', actor_region='AMER',
+       program_id='AGENTS', outcome='success', duration_ms=5321)
+assert e['eventId'] and e['correlationId'] and e['timestampUtc'].endswith('+00:00') or 'Z' in e['timestampUtc']
+assert e['msxOpportunityId'] is None and e['tpid'] is None
+after=subprocess.run(['git','status','--porcelain'],capture_output=True,text=True).stdout
+assert before==after, 'emitter wrote something into the repo'
+PY"
+check "emitter rejects prohibited payload fields and bad enums" "python3 - <<'PY'
+import sys, os
+sys.path.insert(0,'scripts'); os.environ.pop('AIBAST_TELEMETRY_ENDPOINT',None)
+from telemetry import build_event, TelemetryError
+base=dict(tool_id='RAPP',tool_version='1.0.0',correlation_id=None,actor_role='TA',
+          actor_region='AMER',program_id='AGENTS',outcome='success',duration_ms=1)
+for bad in ({'prompt':'secret'},{'response':'x'},{'customerData':'x'},{'userEmail':'a@b'},{'documents':'x'}):
+    try: build_event('rapp.prototype.generated', **base, **bad); raise SystemExit(f'accepted {bad}')
+    except TelemetryError: pass
+for field,val in (('actor_role','Kody'),('outcome','meh'),('tool_id','OTHER'),
+                  ('tool_version','v1'),('duration_ms',-5)):
+    try: build_event('rapp.prototype.generated', **{**base,field:val}); raise SystemExit(f'accepted {field}={val}')
+    except TelemetryError: pass
+PY"
+check "TELEMETRY.md documents the prohibition and the internal-only flow" "python3 - <<'PY'
+d=open('docs/TELEMETRY.md').read()
+for k in ('AIBAST_TELEMETRY_ENDPOINT','Role, never person','never written into this repository','additionalProperties'):
+    assert k in d, k
+PY"
 
 echo "== T-docs publisher + aggregation =="
 check "PUBLISHING.md covers @username default + both output formats" "python3 - <<'PY'

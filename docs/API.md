@@ -2,7 +2,7 @@
 
 The whole library is queryable as a static, CORS-open, CDN-cached JSON API —
 no server, no key, no rate-limit anxiety. It conforms to
-[`rapp-static-api/1.0`](https://github.com/kody-w/rapp-static-apis): one build
+the `rapp-static-api/1.0` convention: one build
 step (`scripts/build_api.py`), schema-tagged documents, versioned endpoints,
 stable-write (scheduled rebuilds never commit timestamp noise).
 
@@ -56,6 +56,8 @@ const { agents } = await (await fetch(
 
 The [in-browser vBrainstem](../vbrainstem/) is a first-class consumer of this
 API: its agent-library panel and one-click installs read these endpoints.
+The repository is also the reference for the **ms-rapp/1** distribution —
+the pinned RAPP/1 protocol corpus lives in [`rapp/`](../rapp/README.md).
 
 ## Freshness
 
