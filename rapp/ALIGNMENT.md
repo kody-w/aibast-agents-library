@@ -97,3 +97,4 @@ Mirroring by pin, not by clone, keeps this repo lean and auditable.
 | LTS admin | Enable Discussions + METRICS_TOKEN on the microsoft repo |
 | LTS admin | Stand up an MS-owned auth CORS proxy; set `VB_AUTH_WORKER` |
 | LTS admin | Create the `corpus-drift` label upstream (the corpus-check workflow also self-creates it) |
+| LTS admin (post-release) | Repoint `aka.ms/RAPPrepo` — currently targets the upstream personal registry's virtual brainstem page; move it to this library's `vbrainstem/` (direct equivalent) or `agents.html` (matches its "industry agent templates" description). Deliberately deferred past this release; all other aka.ms targets are preserved and live-gated. |
