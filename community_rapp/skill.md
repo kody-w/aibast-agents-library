@@ -1,6 +1,9 @@
-# CommunityRAPP — Public Skill Interface
+# RAPP Cloud — Public Skill Interface
 
-> **CommunityRAPP (RAPP Hippocampus) is open source.**
+> **Legacy path.** This directory is kept so existing links keep working.
+> The Tier-2 cloud implementation now lives in [`rapp_cloud/`](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_cloud).
+
+> **RAPP Cloud (RAPP Hippocampus) is open source.**
 > Repo: [github.com/microsoft/aibast-agents-library](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_cloud)
 > Onboarding: [microsoft.github.io/aibast-agents-library/docs/tutorial.html](https://microsoft.github.io/aibast-agents-library/docs/tutorial.html)
 
@@ -18,7 +21,7 @@ tier: Hippocampus (Tier 2) — between Brainstem (T1) and Nervous System (T3)
 
 ---
 
-## What CommunityRAPP Is
+## What RAPP Cloud Is
 
 The **Azure Functions backend** for the RAPP ecosystem. It provides persistent memory, auto-discovered agents, and a path from local development to Azure deployment to Copilot Studio / Teams / M365 Copilot.
 

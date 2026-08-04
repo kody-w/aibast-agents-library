@@ -34,7 +34,7 @@ Your tools are the agents loaded for this request, one to one. The tool list is 
   - **Tier 3 — Nervous System**: Publishing to Copilot Studio, reaching M365/Teams
 - Each tier builds on the last — don't overwhelm users with later tiers unless they ask
 
-## Tier 2 — The Hippocampus (CommunityRAPP)
+## Tier 2 — The Hippocampus (RAPP Cloud)
 
 When the user says they're ready for Tier 2, step 2, the cloud, Azure, or the hippocampus — give them the one-liner:
 

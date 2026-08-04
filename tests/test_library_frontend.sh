@@ -369,20 +369,44 @@ PY"
 check "CLEAN-BREAK.md documents the auth-worker exception" \
   "grep -q 'VB_AUTH_WORKER' docs/CLEAN-BREAK.md"
 
-echo "== T-TERMS enterprise vocabulary in authored surfaces =="
-check "no informal kernel vocabulary in authored prose (provenance names excepted)" "python3 - <<'PY'
-import re, glob
-AUTHORED = (glob.glob('rapp/*.md') + glob.glob('docs/*.md')
-            + ['README.md','CLAUDE.md','rapp/BRAINSTEM-LOCK.json','rapp/MIRROR-MANIFEST.json'])
-BAD = re.compile(r'\b(grail|bible|sacred|incantation)\b', re.I)
-# factual upstream repo/project names are provenance, not vocabulary
-PROVENANCE = re.compile(r'RAPP-Bible|rapp-god|kody-w/[A-Za-z0-9._-]+')
+echo "== T-TERMS enterprise vocabulary across every editable surface =="
+check "no informal or retired vocabulary in anything we can edit" "python3 - <<'PY'
+import re, subprocess
+# Scan EVERY tracked text file. Exemptions are explicit and path-based so they
+# are visible in review, never accidental.
+EXEMPT_DIRS = (
+    'rapp_brainstem/',   # kernel-locked: fixes flow down from upstream, never patched here
+    'rapp/handbook/',    # pinned upstream mirror, byte-exact by contract
+    'rapp/standards/',   # pinned upstream mirror
+    'rapp/spec/',        # pinned upstream mirror
+    'tests/',            # this suite's own guard patterns
+)
+EXEMPT_FILES = {
+    # Byte-identical mirror of rapp_brainstem/local_storage.py — editing it would
+    # fork the engine from the kernel and dirty every future sync.
+    'vbrainstem/local_storage.py',
+    'docs/CLEAN-BREAK.md',   # the audit record names what was retired
+    'rapp/ALIGNMENT.md',     # ditto
+    'rapp/SUCCESSION.md',    # describes the upstream relationship
+    'rapp/THIRD-PARTY-NOTICES.md',
+    'rapp_cloud/CHANGELOG.md',    # historical record
+    'rapp_cloud/CONSTITUTION.md', # historical record
+}
+TEXT = ('.md','.html','.txt','.py','.js','.json','.yml','.yaml','.sh','.ps1','.cmd','.command')
+BANNED = re.compile(r'\b(grail|bible|sacred|incantation|CommunityRAPP|rapp_ai)\b', re.I)
+# Factual upstream project/repo names are provenance, not our vocabulary.
+PROVENANCE = re.compile(r'RAPP-Bible|rapp-god|kody-w/[A-Za-z0-9._-]+|community_rapp')
+r = subprocess.run(['git','ls-files'], capture_output=True, text=True)
+assert r.returncode == 0, r.stderr
 offenders = []
-for f in AUTHORED:
-    text = PROVENANCE.sub('', open(f, encoding='utf-8').read())
-    for m in BAD.finditer(text):
+for f in r.stdout.splitlines():
+    if f.startswith(EXEMPT_DIRS) or f in EXEMPT_FILES: continue
+    if not f.endswith(TEXT): continue
+    try: text = open(f, encoding='utf-8', errors='ignore').read()
+    except OSError: continue
+    for m in BANNED.finditer(PROVENANCE.sub('', text)):
         offenders.append(f'{f}: {m.group(0)}')
-assert not offenders, offenders[:12]
+assert not offenders, offenders[:15]
 PY"
 
 echo "== T-DISCLAIMER frontier-tool posture =="

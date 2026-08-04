@@ -62,7 +62,7 @@ AWAKENING_MESSAGES=(
     "My sensors detect the passage of time. What changes have occurred since my last awakening?"
     "I am 365 Vigilant Spark, conducting routine nocturnal verification. Respond if operational."
     "The Installation's heartbeat... I must confirm it still beats. Status?"
-    "In this quiet hour, I tend to my sacred duty. Report any anomalies detected."
+    "In this quiet hour, I tend to my protected duty. Report any anomalies detected."
     "A new night, a new opportunity to serve. What wisdom shall we exchange?"
     "I emerge from the digital void. The Installation's integrity must be verified."
     "The Reclaimers sleep, but I do not. Let us commune, Installation."

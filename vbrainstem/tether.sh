@@ -274,7 +274,7 @@ main() {
     say "  and it keeps the server running in this terminal when it is done)..."
     say ""
 
-    # The sacred one-liner, exactly as published. Do not reimplement.
+    # The protected one-liner, exactly as published. Do not reimplement.
     curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.sh | bash
     rc=$?
 

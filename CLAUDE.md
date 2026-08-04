@@ -71,7 +71,7 @@ Each tier is self-contained. Users advance when they choose to.
 
 **Auth chain** (priority order): `GITHUB_TOKEN` env var -> `.copilot_token` file -> `gh auth token` CLI -> device code OAuth via `/login`. Copilot API tokens are short-lived with auto-refresh.
 
-**Import shims**: `_register_shims()` injects `sys.modules` so agents written for CommunityRAPP (cloud) work locally — `utils.azure_file_storage` maps to `local_storage.py`.
+**Import shims**: `_register_shims()` injects `sys.modules` so agents written for RAPP Cloud (the Azure tier) work locally — `utils.azure_file_storage` maps to `local_storage.py`.
 
 **Memory agents**: `ManageMemory` and `ContextMemory` get special handling — `user_guid` arg is stripped, and `/chat` auto-injects `<memory>` context if ContextMemory is loaded.
 

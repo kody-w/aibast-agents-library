@@ -278,7 +278,7 @@ check_prereqs() {
 #  Install / Update Repository
 # ═══════════════════════════════════════════════════════════════════════════════
 
-install_communityrapp() {
+install_rapp_cloud() {
     echo -e "\n${BOLD}  ── Installing RAPP Cloud ───────────────────────${NC}"
 
     mkdir -p "$INSTALL_DIR"
@@ -493,8 +493,8 @@ install_cli() {
 
     mkdir -p "$BIN_DIR"
 
-    # ── Main launcher: communityrapp ──────────────────────────────────────────
-    cat > "$BIN_DIR/communityrapp" << 'LAUNCHER_EOF'
+    # ── Main launcher: rappcloud ──────────────────────────────────────────
+    cat > "$BIN_DIR/rappcloud" << 'LAUNCHER_EOF'
 #!/usr/bin/env bash
 # RAPP Hippocampus — CLI Launcher
 set -e
@@ -543,7 +543,7 @@ case "${1:-start}" in
     help|--help|-h)
         echo "RAPP Hippocampus"
         echo ""
-        echo "Usage: communityrapp [command]"
+        echo "Usage: rappcloud [command]"
         echo ""
         echo "Commands:"
         echo "  start     Start the server (default)"
@@ -554,20 +554,20 @@ case "${1:-start}" in
         echo "  help      Show this help"
         ;;
     *)
-        echo "Unknown command: $1 (try 'communityrapp help')"
+        echo "Unknown command: $1 (try 'rappcloud help')"
         exit 1
         ;;
 esac
 LAUNCHER_EOF
 
-    chmod +x "$BIN_DIR/communityrapp"
-    success "Created: communityrapp"
+    chmod +x "$BIN_DIR/rappcloud"
+    success "Created: rappcloud"
 
     # ── Alias: crapp ──────────────────────────────────────────────────────────
     cat > "$BIN_DIR/crapp" << 'ALIAS_EOF'
 #!/usr/bin/env bash
-# Alias for communityrapp
-exec "$HOME/.local/bin/communityrapp" "$@"
+# Alias for rappcloud
+exec "$HOME/.local/bin/rappcloud" "$@"
 ALIAS_EOF
 
     chmod +x "$BIN_DIR/crapp"
@@ -618,7 +618,7 @@ ALIAS_EOF
 #  Launch
 # ═══════════════════════════════════════════════════════════════════════════════
 
-launch_communityrapp() {
+launch_rapp_cloud() {
     echo -e "\n${BOLD}  ── Launching RAPP Cloud ────────────────────────${NC}"
 
     cd "$SOURCE_DIR"
@@ -661,7 +661,7 @@ launch_communityrapp() {
         info "PID: $func_pid — check with: curl $SERVER_URL/api/health"
     fi
 
-    # Stop the background server — user will start it themselves with `communityrapp`
+    # Stop the background server — user will start it themselves with `rappcloud`
     kill "$func_pid" 2>/dev/null || true
     wait "$func_pid" 2>/dev/null || true
 
@@ -683,7 +683,7 @@ print_success() {
     echo "  ═══════════════════════════════════════════════════"
     echo -e "${NC}"
     echo -e "  ${BOLD}Start the server:${NC}"
-    echo -e "    ${CYAN}communityrapp${NC}"
+    echo -e "    ${CYAN}rappcloud${NC}"
     echo ""
     echo -e "  ${BOLD}Test memory:${NC}"
     echo -e "    ${DIM}curl -X POST http://localhost:7071/api/businessinsightbot_function \\${NC}"
@@ -691,9 +691,9 @@ print_success() {
     echo -e "    ${DIM}  -d '{\"user_input\": \"Remember that I love coding\", \"conversation_history\": []}'${NC}"
     echo ""
     echo -e "  ${BOLD}Other commands:${NC}"
-    echo -e "    ${CYAN}communityrapp status${NC}   — Check server health"
-    echo -e "    ${CYAN}communityrapp test${NC}     — Send a test message"
-    echo -e "    ${CYAN}communityrapp update${NC}   — Pull latest version"
+    echo -e "    ${CYAN}rappcloud status${NC}   — Check server health"
+    echo -e "    ${CYAN}rappcloud test${NC}     — Send a test message"
+    echo -e "    ${CYAN}rappcloud update${NC}   — Pull latest version"
     echo -e "    ${CYAN}crapp${NC}                  — Short alias"
     echo ""
     echo -e "  ${BOLD}Next steps:${NC}"
@@ -702,7 +702,7 @@ print_success() {
     echo -e "    • ${GREEN}Configure memory:${NC} edit local.settings.json"
     echo ""
     echo -e "  ${DIM}Installation: ~/.rappcloud/${NC}"
-    echo -e "  ${DIM}Need help?  communityrapp help${NC}"
+    echo -e "  ${DIM}Need help?  rappcloud help${NC}"
     echo ""
 }
 
@@ -713,11 +713,11 @@ print_success() {
 main() {
     print_banner
     check_prereqs
-    install_communityrapp
+    install_rapp_cloud
     setup_venv
     configure_openai
     install_cli
-    launch_communityrapp
+    launch_rapp_cloud
     print_success
 }
 
@@ -730,7 +730,7 @@ if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
     echo "  ./install.sh"
     echo ""
     echo "This script installs RAPP Hippocampus to ~/.rappcloud/"
-    echo "and creates CLI commands: communityrapp, crapp"
+    echo "and creates CLI commands: rappcloud, crapp"
     exit 0
 fi
 

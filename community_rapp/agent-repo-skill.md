@@ -1,5 +1,8 @@
 # RAPP Agent Library — Public Skill Interface
 
+> **Legacy path.** This directory is kept so existing links keep working.
+> The Tier-2 cloud implementation now lives in [`rapp_cloud/`](https://github.com/microsoft/aibast-agents-library/tree/main/rapp_cloud).
+
 > **The RAPP Agent Library is open source.**
 > Repo: [github.com/microsoft/aibast-agents-library](https://github.com/microsoft/aibast-agents-library)
 > Browse online: [microsoft.github.io/aibast-agents-library/agents.html](https://microsoft.github.io/aibast-agents-library/agents.html)
@@ -21,7 +24,7 @@ manifest: manifest.json (auto-generated)
 
 ## How It Works
 
-The agent library is a public GitHub repo with a `manifest.json` at the root. CommunityRAPP's `AgentLibraryManager` agent reads this manifest to let users browse, search, and install agents through the chat UI.
+The agent library is a public GitHub repo with a `manifest.json` at the root. RAPP Cloud's `AgentLibraryManager` agent reads this manifest to let users browse, search, and install agents through the chat UI.
 
 ### Install an agent via chat:
 

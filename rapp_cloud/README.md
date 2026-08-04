@@ -43,9 +43,9 @@ Auto-installs Python 3.11, Node.js, Git, and Azure Functions Core Tools if missi
 
 Then:
 ```bash
-communityrapp        # start the server → localhost:7071
-communityrapp test   # send a test message
-communityrapp status # check health
+rappcloud        # start the server → localhost:7071
+rappcloud test   # send a test message
+rappcloud status # check health
 crapp                # short alias
 ```
 

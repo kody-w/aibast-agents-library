@@ -10,7 +10,7 @@ $ErrorActionPreference = "Stop"
 $Version        = "1.0.0"
 $InstallDir     = Join-Path $env:USERPROFILE ".rappcloud"
 $RepoDir        = Join-Path $InstallDir "src"
-$SourceDir      = Join-Path $RepoDir "RAPP Cloud"
+$SourceDir      = Join-Path $RepoDir "rapp_cloud"
 $VenvDir        = Join-Path $InstallDir "venv"
 $BinDir         = Join-Path $env:USERPROFILE ".local\bin"
 $RepoUrl        = "https://github.com/microsoft/aibast-agents-library.git"
@@ -247,7 +247,7 @@ function Install-RAPP Cloud {
         Push-Location $RepoDir
         try {
             git fetch origin main --quiet 2>$null
-            $remoteVersion = git show origin/main:RAPP Cloud/VERSION 2>$null
+            $remoteVersion = git show origin/main:rapp_cloud/VERSION 2>$null
             if (-not $remoteVersion) { $remoteVersion = $localVersion }
             $remoteVersion = $remoteVersion.Trim()
 
@@ -442,15 +442,15 @@ function Install-CLI {
         New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
     }
 
-    # ── communityrapp.cmd ─────────────────────────────────────────────────────
-    $launcherCmd = Join-Path $BinDir "communityrapp.cmd"
+    # ── rappcloud.cmd ─────────────────────────────────────────────────────
+    $launcherCmd = Join-Path $BinDir "rappcloud.cmd"
     $launcherContent = @"
 @echo off
 REM RAPP Hippocampus — CLI Launcher
 setlocal
 
 set INSTALL_DIR=%USERPROFILE%\.rappcloud
-set SOURCE_DIR=%INSTALL_DIR%\src\RAPP Cloud
+set SOURCE_DIR=%INSTALL_DIR%\src\rapp_cloud
 set VENV_DIR=%INSTALL_DIR%\venv
 
 if not exist "%SOURCE_DIR%" (
@@ -471,7 +471,7 @@ if "%1"=="version" goto version
 if "%1"=="help" goto help
 if "%1"=="--help" goto help
 if "%1"=="-h" goto help
-echo Unknown command: %1 (try 'communityrapp help')
+echo Unknown command: %1 (try 'rappcloud help')
 exit /b 1
 
 :start
@@ -509,7 +509,7 @@ goto end
 :help
 echo RAPP Hippocampus
 echo.
-echo Usage: communityrapp [command]
+echo Usage: rappcloud [command]
 echo.
 echo Commands:
 echo   start     Start the server (default)
@@ -524,14 +524,14 @@ goto end
 endlocal
 "@
     Set-Content -Path $launcherCmd -Value $launcherContent -Encoding ASCII
-    Write-Ok "Created: communityrapp.cmd"
+    Write-Ok "Created: rappcloud.cmd"
 
     # ── crapp.cmd (alias) ─────────────────────────────────────────────────────
     $aliasCmd = Join-Path $BinDir "crapp.cmd"
     $aliasContent = @"
 @echo off
-REM Alias for communityrapp
-"%USERPROFILE%\.local\bin\communityrapp.cmd" %*
+REM Alias for rappcloud
+"%USERPROFILE%\.local\bin\rappcloud.cmd" %*
 "@
     Set-Content -Path $aliasCmd -Value $aliasContent -Encoding ASCII
     Write-Ok "Created: crapp.cmd (alias)"
@@ -631,7 +631,7 @@ function Show-Success {
     Write-Host "  ═══════════════════════════════════════════════════" -ForegroundColor Green
     Write-Host ""
     Write-Host "  Start the server:" -ForegroundColor White
-    Write-Host "    communityrapp" -ForegroundColor Cyan
+    Write-Host "    rappcloud" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "  Test memory:" -ForegroundColor White
     Write-Host "    curl -X POST http://localhost:7071/api/businessinsightbot_function \" -ForegroundColor DarkGray
@@ -639,9 +639,9 @@ function Show-Success {
     Write-Host "      -d '{`"user_input`": `"Remember that I love coding`", `"conversation_history`": []}'" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "  Other commands:" -ForegroundColor White
-    Write-Host "    communityrapp status" -ForegroundColor Cyan -NoNewline; Write-Host "   — Check server health"
-    Write-Host "    communityrapp test" -ForegroundColor Cyan -NoNewline; Write-Host "     — Send a test message"
-    Write-Host "    communityrapp update" -ForegroundColor Cyan -NoNewline; Write-Host "   — Pull latest version"
+    Write-Host "    rappcloud status" -ForegroundColor Cyan -NoNewline; Write-Host "   — Check server health"
+    Write-Host "    rappcloud test" -ForegroundColor Cyan -NoNewline; Write-Host "     — Send a test message"
+    Write-Host "    rappcloud update" -ForegroundColor Cyan -NoNewline; Write-Host "   — Pull latest version"
     Write-Host "    crapp" -ForegroundColor Cyan -NoNewline; Write-Host "                  — Short alias"
     Write-Host ""
     Write-Host "  Next steps:" -ForegroundColor White
@@ -650,7 +650,7 @@ function Show-Success {
     Write-Host "    • " -NoNewline; Write-Host "Configure memory:" -ForegroundColor Green -NoNewline; Write-Host " edit local.settings.json"
     Write-Host ""
     Write-Host "  Installation: ~/.rappcloud/" -ForegroundColor DarkGray
-    Write-Host "  Need help?  communityrapp help" -ForegroundColor DarkGray
+    Write-Host "  Need help?  rappcloud help" -ForegroundColor DarkGray
     Write-Host ""
 }
 
@@ -678,7 +678,7 @@ if ($args -contains "--help" -or $args -contains "-h") {
     Write-Host "  .\install.ps1"
     Write-Host ""
     Write-Host "This script installs RAPP Hippocampus to ~/.rappcloud/"
-    Write-Host "and creates CLI commands: communityrapp, crapp"
+    Write-Host "and creates CLI commands: rappcloud, crapp"
     exit 0
 }
 
