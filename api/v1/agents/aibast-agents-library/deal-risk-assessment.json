@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/deal-risk-assessment",
+    "version": "1.0.0",
+    "display_name": "Deal Risk Assessment",
+    "description": "Multi-factor risk scoring, risk matrices, mitigation planning, and risk trend tracking for pipeline deals.",
+    "author": "AIBAST",
+    "tags": [
+      "b2b",
+      "sales",
+      "risk-assessment",
+      "deal-progression",
+      "pipeline"
+    ],
+    "category": "b2b_sales",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_risk_assessment_agent.py",
+  "size_kb": 19.2,
+  "lines": 424,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_risk_assessment_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_risk_assessment_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_risk_assessment_agent.py",
+  "engagement": null
+}

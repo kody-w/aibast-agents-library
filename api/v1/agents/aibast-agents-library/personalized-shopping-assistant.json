@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/personalized-shopping-assistant",
+    "version": "1.0.0",
+    "display_name": "Personalized Shopping Assistant Agent",
+    "description": "Personalized retail shopping with product recommendations, style profiling, inventory checks, and outfit building.",
+    "author": "AIBAST",
+    "tags": [
+      "shopping",
+      "personalization",
+      "recommendations",
+      "style",
+      "inventory",
+      "b2c"
+    ],
+    "category": "b2c_sales",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/b2c_sales_stacks/personalized_shopping_assistant_stack/personalized_shopping_assistant_agent.py",
+  "size_kb": 13.7,
+  "lines": 266,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/b2c_sales_stacks/personalized_shopping_assistant_stack/personalized_shopping_assistant_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2c_sales_stacks/personalized_shopping_assistant_stack/personalized_shopping_assistant_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2c_sales_stacks/personalized_shopping_assistant_stack/personalized_shopping_assistant_agent.py",
+  "engagement": null
+}

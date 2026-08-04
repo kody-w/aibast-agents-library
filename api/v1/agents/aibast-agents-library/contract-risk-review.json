@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/contract-risk-review",
+    "version": "1.0.0",
+    "display_name": "Contract Risk Review Agent",
+    "description": "Scans contracts for risky clauses, evaluates compliance with internal policies, and produces renegotiation briefs with prioritized amendments.",
+    "author": "AIBAST",
+    "tags": [
+      "contract",
+      "risk",
+      "legal",
+      "compliance",
+      "professional-services"
+    ],
+    "category": "professional_services",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/professional_services_stacks/contract_risk_review_stack/contract_risk_review_agent.py",
+  "size_kb": 13.8,
+  "lines": 315,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/professional_services_stacks/contract_risk_review_stack/contract_risk_review_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/professional_services_stacks/contract_risk_review_stack/contract_risk_review_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/professional_services_stacks/contract_risk_review_stack/contract_risk_review_agent.py",
+  "engagement": null
+}

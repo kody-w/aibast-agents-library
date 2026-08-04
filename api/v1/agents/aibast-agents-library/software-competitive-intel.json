@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/software-competitive-intel",
+    "version": "1.0.0",
+    "display_name": "Competitive Intelligence Agent",
+    "description": "AI-powered competitive intelligence for SaaS market landscape analysis, feature comparisons, pricing analysis, and threat assessments.",
+    "author": "AIBAST",
+    "tags": [
+      "competitive-intel",
+      "market-analysis",
+      "saas",
+      "pricing",
+      "threat-assessment"
+    ],
+    "category": "software_digital_products",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
+  "size_kb": 15.8,
+  "lines": 421,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
+  "engagement": null
+}

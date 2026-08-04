@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/loan-origination-assistant",
+    "version": "1.0.0",
+    "display_name": "Loan Origination Assistant Agent",
+    "description": "Loan origination support with application review, credit analysis, document verification, and decision recommendations.",
+    "author": "AIBAST",
+    "tags": [
+      "loan",
+      "origination",
+      "credit",
+      "underwriting",
+      "mortgage",
+      "financial-services"
+    ],
+    "category": "financial_services",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/financial_services_stacks/loan_origination_assistant_stack/loan_origination_assistant_agent.py",
+  "size_kb": 14.0,
+  "lines": 327,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/financial_services_stacks/loan_origination_assistant_stack/loan_origination_assistant_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/financial_services_stacks/loan_origination_assistant_stack/loan_origination_assistant_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/financial_services_stacks/loan_origination_assistant_stack/loan_origination_assistant_agent.py",
+  "engagement": null
+}

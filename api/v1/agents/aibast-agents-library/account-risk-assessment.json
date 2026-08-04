@@ -1,0 +1,37 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:32:00.915894+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/account-risk-assessment",
+    "version": "1.0.0",
+    "display_name": "Account Risk Assessment",
+    "description": "Assesses deal risk, churn probability, and financial health with mitigation recommendations.",
+    "author": "AIBAST",
+    "tags": [
+      "b2b",
+      "sales",
+      "risk-assessment",
+      "churn-prediction",
+      "deal-risk"
+    ],
+    "category": "b2b_sales",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/risk_assessment_agent.py",
+  "size_kb": 23.0,
+  "lines": 495,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/risk_assessment_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/risk_assessment_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/risk_assessment_agent.py",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/5"
+  }
+}

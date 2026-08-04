@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/patient-intake",
+    "version": "1.0.0",
+    "display_name": "Patient Intake Agent",
+    "description": "Manages patient intake forms, insurance verification, appointment scheduling, and pre-visit summary preparation.",
+    "author": "AIBAST",
+    "tags": [
+      "intake",
+      "insurance",
+      "scheduling",
+      "patient",
+      "registration",
+      "healthcare"
+    ],
+    "category": "healthcare",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/healthcare_stacks/patient_intake_stack/patient_intake_agent.py",
+  "size_kb": 14.0,
+  "lines": 369,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/healthcare_stacks/patient_intake_stack/patient_intake_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/healthcare_stacks/patient_intake_stack/patient_intake_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/healthcare_stacks/patient_intake_stack/patient_intake_agent.py",
+  "engagement": null
+}

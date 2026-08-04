@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/identify-discounts",
+    "version": "1.0.0",
+    "display_name": "Identify Discounts",
+    "description": "Discount identification with eligibility checks, savings calculations, and approval workflow management.",
+    "author": "AIBAST",
+    "tags": [
+      "discounts",
+      "pricing",
+      "savings",
+      "eligibility",
+      "approval"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/identify_discounts_stack/identify_discounts_agent.py",
+  "size_kb": 15.8,
+  "lines": 296,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/identify_discounts_stack/identify_discounts_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/identify_discounts_stack/identify_discounts_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/identify_discounts_stack/identify_discounts_agent.py",
+  "engagement": null
+}

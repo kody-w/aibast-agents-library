@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/returns-complaints-resolution",
+    "version": "1.0.0",
+    "display_name": "Returns & Complaints Resolution Agent",
+    "description": "Automates return processing, classifies customer complaints, recommends optimal resolutions, and identifies complaint trends for retail and CPG customer service teams.",
+    "author": "AIBAST",
+    "tags": [
+      "returns",
+      "complaints",
+      "customer-service",
+      "resolution",
+      "retail"
+    ],
+    "category": "retail_cpg",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/retail_cpg_stacks/returns_complaints_resolution_stack/returns_complaints_resolution_agent.py",
+  "size_kb": 20.4,
+  "lines": 506,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/retail_cpg_stacks/returns_complaints_resolution_stack/returns_complaints_resolution_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/retail_cpg_stacks/returns_complaints_resolution_stack/returns_complaints_resolution_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/retail_cpg_stacks/returns_complaints_resolution_stack/returns_complaints_resolution_agent.py",
+  "engagement": null
+}

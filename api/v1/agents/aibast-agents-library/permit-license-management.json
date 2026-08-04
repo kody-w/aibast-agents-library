@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/permit-license-management",
+    "version": "1.0.0",
+    "display_name": "Permit & License Management Agent",
+    "description": "Tracks permits and licenses across energy facilities, manages renewal calendars, identifies compliance gaps, and monitors applications.",
+    "author": "AIBAST",
+    "tags": [
+      "permits",
+      "licenses",
+      "compliance",
+      "regulatory",
+      "energy",
+      "renewals"
+    ],
+    "category": "energy",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/energy_stacks/permit_license_management_stack/permit_license_management_agent.py",
+  "size_kb": 12.9,
+  "lines": 341,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/energy_stacks/permit_license_management_stack/permit_license_management_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/energy_stacks/permit_license_management_stack/permit_license_management_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/energy_stacks/permit_license_management_stack/permit_license_management_agent.py",
+  "engagement": null
+}

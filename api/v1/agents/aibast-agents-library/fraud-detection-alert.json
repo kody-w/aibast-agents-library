@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/fraud-detection-alert",
+    "version": "1.0.0",
+    "display_name": "Fraud Detection & Alert Agent",
+    "description": "Financial fraud detection with alert triage, transaction analysis, pattern recognition, and investigation case management.",
+    "author": "AIBAST",
+    "tags": [
+      "fraud",
+      "detection",
+      "alerts",
+      "transactions",
+      "investigation",
+      "financial-services"
+    ],
+    "category": "financial_services",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/financial_services_stacks/fraud_detection_alert_stack/fraud_detection_alert_agent.py",
+  "size_kb": 14.6,
+  "lines": 272,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/financial_services_stacks/fraud_detection_alert_stack/fraud_detection_alert_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/financial_services_stacks/fraud_detection_alert_stack/fraud_detection_alert_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/financial_services_stacks/fraud_detection_alert_stack/fraud_detection_alert_agent.py",
+  "engagement": null
+}

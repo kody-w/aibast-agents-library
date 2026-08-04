@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/cross-selling",
+    "version": "1.0.0",
+    "display_name": "Cross-Selling Opportunities",
+    "description": "Identifies cross-selling opportunities via product affinity analysis, customer ownership mapping, and revenue impact projections.",
+    "author": "AIBAST",
+    "tags": [
+      "cross-sell",
+      "upsell",
+      "revenue",
+      "product-affinity",
+      "recommendations"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/cross_selling_opportunities_stack/cross_selling_agent.py",
+  "size_kb": 15.2,
+  "lines": 300,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/cross_selling_opportunities_stack/cross_selling_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/cross_selling_opportunities_stack/cross_selling_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/cross_selling_opportunities_stack/cross_selling_agent.py",
+  "engagement": null
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/find-accurate-models",
+    "version": "1.0.0",
+    "display_name": "Find Accurate Models",
+    "description": "AI/ML model search and comparison by accuracy benchmarks, deployment readiness, and cost analysis.",
+    "author": "AIBAST",
+    "tags": [
+      "ai",
+      "ml",
+      "model-selection",
+      "benchmarks",
+      "accuracy",
+      "deployment"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/find_accurate_models_stack/find_accurate_models_agent.py",
+  "size_kb": 14.9,
+  "lines": 285,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/find_accurate_models_stack/find_accurate_models_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/find_accurate_models_stack/find_accurate_models_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/find_accurate_models_stack/find_accurate_models_agent.py",
+  "engagement": null
+}

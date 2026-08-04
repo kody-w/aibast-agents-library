@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/supply-chain-disruption-alert",
+    "version": "1.0.0",
+    "display_name": "Supply Chain Disruption Alert Agent",
+    "description": "Monitors supply chain networks for disruption events, performs risk assessments, generates mitigation playbooks, and identifies qualified alternative suppliers to maintain retail continuity.",
+    "author": "AIBAST",
+    "tags": [
+      "supply-chain",
+      "disruption",
+      "risk-management",
+      "logistics",
+      "retail"
+    ],
+    "category": "retail_cpg",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/retail_cpg_stacks/supply_chain_disruption_alert_stack/supply_chain_disruption_alert_agent.py",
+  "size_kb": 23.8,
+  "lines": 631,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/retail_cpg_stacks/supply_chain_disruption_alert_stack/supply_chain_disruption_alert_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/retail_cpg_stacks/supply_chain_disruption_alert_stack/supply_chain_disruption_alert_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/retail_cpg_stacks/supply_chain_disruption_alert_stack/supply_chain_disruption_alert_agent.py",
+  "engagement": null
+}

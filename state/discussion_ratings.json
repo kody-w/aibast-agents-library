@@ -1,0 +1,92 @@
+{
+  "schema": "aibast-discussion-ratings/1.0",
+  "repo": "kody-w/aibast-agents-library",
+  "category": "Announcements",
+  "agents": {
+    "@aibast-agents-library/account-intelligence": {
+      "upvotes": 0,
+      "downloads": 1,
+      "score": 1,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/2",
+      "number": 2
+    },
+    "@aibast-agents-library/account-intelligence-orchestrator": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/3",
+      "number": 3
+    },
+    "@aibast-agents-library/account-messaging": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/4",
+      "number": 4
+    },
+    "@aibast-agents-library/account-risk-assessment": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/5",
+      "number": 5
+    },
+    "@aibast-agents-library/acquisition-support": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/6",
+      "number": 6
+    }
+  }
+}

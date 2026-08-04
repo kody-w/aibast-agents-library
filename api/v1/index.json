@@ -1,0 +1,22 @@
+{
+  "schema": "aibast-api/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "name": "AIBAST Agents Library API",
+  "spec": "rapp-static-api/1.0",
+  "base_urls": {
+    "pages": "https://microsoft.github.io/aibast-agents-library/api/v1",
+    "raw": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/api/v1"
+  },
+  "docs": "https://github.com/microsoft/aibast-agents-library/blob/main/docs/API.md",
+  "endpoints": {
+    "agents": "agents.json",
+    "agent_detail": "agents/{publisher}/{slug}.json",
+    "categories": "categories.json",
+    "publishers": "publishers.json",
+    "metrics": "metrics.json",
+    "aggregated": "aggregated.json",
+    "status": "status.json",
+    "badge": "badge.json",
+    "registry": "../../registry.json"
+  }
+}

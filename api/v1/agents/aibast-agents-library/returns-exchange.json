@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/returns-exchange",
+    "version": "1.0.0",
+    "display_name": "Returns & Exchange Agent",
+    "description": "Retail returns and exchange management with initiation, eligibility checking, exchange options, and refund tracking.",
+    "author": "AIBAST",
+    "tags": [
+      "returns",
+      "exchange",
+      "refund",
+      "retail",
+      "customer-service",
+      "b2c"
+    ],
+    "category": "b2c_sales",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/b2c_sales_stacks/returns_exchange_stack/returns_exchange_agent.py",
+  "size_kb": 15.3,
+  "lines": 331,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/b2c_sales_stacks/returns_exchange_stack/returns_exchange_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2c_sales_stacks/returns_exchange_stack/returns_exchange_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2c_sales_stacks/returns_exchange_stack/returns_exchange_agent.py",
+  "engagement": null
+}

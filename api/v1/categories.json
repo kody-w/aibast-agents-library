@@ -1,0 +1,616 @@
+{
+  "schema": "aibast-api-categories/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "count": 14,
+  "categories": [
+    {
+      "id": "b2b_sales",
+      "agents": 23,
+      "items": [
+        {
+          "name": "@aibast-agents-library/account-intelligence",
+          "display_name": "Account Intelligence",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/account-intelligence.json"
+        },
+        {
+          "name": "@aibast-agents-library/account-intelligence-orchestrator",
+          "display_name": "Account Intelligence Orchestrator",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/account-intelligence-orchestrator.json"
+        },
+        {
+          "name": "@aibast-agents-library/action-prioritization",
+          "display_name": "Action Prioritization",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/action-prioritization.json"
+        },
+        {
+          "name": "@aibast-agents-library/competitive-intelligence",
+          "display_name": "Competitive Intelligence",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/competitive-intelligence.json"
+        },
+        {
+          "name": "@aibast-agents-library/deal-tracking",
+          "display_name": "Deal Tracking",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/deal-tracking.json"
+        },
+        {
+          "name": "@aibast-agents-library/meeting-prep",
+          "display_name": "Meeting Prep",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/meeting-prep.json"
+        },
+        {
+          "name": "@aibast-agents-library/account-messaging",
+          "display_name": "Account Messaging",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/account-messaging.json"
+        },
+        {
+          "name": "@aibast-agents-library/account-risk-assessment",
+          "display_name": "Account Risk Assessment",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/account-risk-assessment.json"
+        },
+        {
+          "name": "@aibast-agents-library/stakeholder-intelligence",
+          "display_name": "Stakeholder Intelligence",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/stakeholder-intelligence.json"
+        },
+        {
+          "name": "@aibast-agents-library/activity-gap",
+          "display_name": "Activity Gap Analyzer",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/activity-gap.json"
+        },
+        {
+          "name": "@aibast-agents-library/deal-competitor-intel",
+          "display_name": "Deal Competitor Intelligence",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/deal-competitor-intel.json"
+        },
+        {
+          "name": "@aibast-agents-library/deal-health-score",
+          "display_name": "Deal Health Score",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/deal-health-score.json"
+        },
+        {
+          "name": "@aibast-agents-library/deal-progression",
+          "display_name": "Deal Progression",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/deal-progression.json"
+        },
+        {
+          "name": "@aibast-agents-library/deal-risk-assessment",
+          "display_name": "Deal Risk Assessment",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/deal-risk-assessment.json"
+        },
+        {
+          "name": "@aibast-agents-library/next-best-action",
+          "display_name": "Next Best Action",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/next-best-action.json"
+        },
+        {
+          "name": "@aibast-agents-library/pipeline-velocity",
+          "display_name": "Pipeline Velocity",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/pipeline-velocity.json"
+        },
+        {
+          "name": "@aibast-agents-library/revenue-forecast",
+          "display_name": "Revenue Forecast",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/revenue-forecast.json"
+        },
+        {
+          "name": "@aibast-agents-library/deal-stakeholder-engagement",
+          "display_name": "Stakeholder Engagement",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/deal-stakeholder-engagement.json"
+        },
+        {
+          "name": "@aibast-agents-library/stalled-deal-detection",
+          "display_name": "Stalled Deal Detection",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/stalled-deal-detection.json"
+        },
+        {
+          "name": "@aibast-agents-library/win-probability",
+          "display_name": "Win Probability",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/win-probability.json"
+        },
+        {
+          "name": "@aibast-agents-library/proposal-generation",
+          "display_name": "Proposal Generation",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/proposal-generation.json"
+        },
+        {
+          "name": "@aibast-agents-library/sales-qualification",
+          "display_name": "Sales Qualification",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sales-qualification.json"
+        },
+        {
+          "name": "@aibast-agents-library/win-loss-analysis",
+          "display_name": "Win/Loss Analysis",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/win-loss-analysis.json"
+        }
+      ]
+    },
+    {
+      "id": "b2c_sales",
+      "agents": 7,
+      "items": [
+        {
+          "name": "@aibast-agents-library/cart-abandonment-recovery",
+          "display_name": "Cart Abandonment Recovery Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/cart-abandonment-recovery.json"
+        },
+        {
+          "name": "@aibast-agents-library/customer-360-speech",
+          "display_name": "Customer 360 & Speech Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/customer-360-speech.json"
+        },
+        {
+          "name": "@aibast-agents-library/customer-loyalty-rewards",
+          "display_name": "Customer Loyalty & Rewards Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/customer-loyalty-rewards.json"
+        },
+        {
+          "name": "@aibast-agents-library/omnichannel-engagement",
+          "display_name": "Omnichannel Engagement Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/omnichannel-engagement.json"
+        },
+        {
+          "name": "@aibast-agents-library/personalized-shopping-assistant",
+          "display_name": "Personalized Shopping Assistant Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/personalized-shopping-assistant.json"
+        },
+        {
+          "name": "@aibast-agents-library/returns-exchange",
+          "display_name": "Returns & Exchange Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/returns-exchange.json"
+        },
+        {
+          "name": "@aibast-agents-library/sales-chat",
+          "display_name": "Sales Chat Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sales-chat.json"
+        }
+      ]
+    },
+    {
+      "id": "energy",
+      "agents": 5,
+      "items": [
+        {
+          "name": "@aibast-agents-library/asset-maintenance-forecast",
+          "display_name": "Asset Maintenance Forecast Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/asset-maintenance-forecast.json"
+        },
+        {
+          "name": "@aibast-agents-library/emission-tracking",
+          "display_name": "Emission Tracking Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/emission-tracking.json"
+        },
+        {
+          "name": "@aibast-agents-library/field-service-dispatch",
+          "display_name": "Field Service Dispatch Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/field-service-dispatch.json"
+        },
+        {
+          "name": "@aibast-agents-library/permit-license-management",
+          "display_name": "Permit & License Management Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/permit-license-management.json"
+        },
+        {
+          "name": "@aibast-agents-library/energy-regulatory-reporting",
+          "display_name": "Energy Regulatory Reporting Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/energy-regulatory-reporting.json"
+        }
+      ]
+    },
+    {
+      "id": "federal_government",
+      "agents": 5,
+      "items": [
+        {
+          "name": "@aibast-agents-library/acquisition-support",
+          "display_name": "Acquisition Support Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/acquisition-support.json"
+        },
+        {
+          "name": "@aibast-agents-library/federal-grants-oversight",
+          "display_name": "Federal Grants Oversight Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/federal-grants-oversight.json"
+        },
+        {
+          "name": "@aibast-agents-library/mission-reporting-assistant",
+          "display_name": "Mission Reporting Assistant Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/mission-reporting-assistant.json"
+        },
+        {
+          "name": "@aibast-agents-library/regulatory-compliance-fed",
+          "display_name": "Regulatory Compliance (Federal) Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/regulatory-compliance-fed.json"
+        },
+        {
+          "name": "@aibast-agents-library/workforce-clearance-onboarding",
+          "display_name": "Workforce Clearance & Onboarding Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/workforce-clearance-onboarding.json"
+        }
+      ]
+    },
+    {
+      "id": "financial_services",
+      "agents": 10,
+      "items": [
+        {
+          "name": "@aibast-agents-library/claims-processing",
+          "display_name": "Claims Processing Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/claims-processing.json"
+        },
+        {
+          "name": "@aibast-agents-library/fs-customer-onboarding",
+          "display_name": "FS Customer Onboarding Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/fs-customer-onboarding.json"
+        },
+        {
+          "name": "@aibast-agents-library/customer-sentiment-churn",
+          "display_name": "Customer Sentiment & Churn Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/customer-sentiment-churn.json"
+        },
+        {
+          "name": "@aibast-agents-library/financial-advisor-copilot",
+          "display_name": "Financial Advisor Copilot Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/financial-advisor-copilot.json"
+        },
+        {
+          "name": "@aibast-agents-library/fraud-detection-alert",
+          "display_name": "Fraud Detection & Alert Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/fraud-detection-alert.json"
+        },
+        {
+          "name": "@aibast-agents-library/loan-origination-assistant",
+          "display_name": "Loan Origination Assistant Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/loan-origination-assistant.json"
+        },
+        {
+          "name": "@aibast-agents-library/portfolio-rebalancing",
+          "display_name": "Portfolio Rebalancing Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/portfolio-rebalancing.json"
+        },
+        {
+          "name": "@aibast-agents-library/fs-regulatory-compliance",
+          "display_name": "FS Regulatory Compliance Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/fs-regulatory-compliance.json"
+        },
+        {
+          "name": "@aibast-agents-library/underwriting-support",
+          "display_name": "Underwriting Support Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/underwriting-support.json"
+        },
+        {
+          "name": "@aibast-agents-library/wealth-insights-generator",
+          "display_name": "Wealth Insights Generator Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/wealth-insights-generator.json"
+        }
+      ]
+    },
+    {
+      "id": "general",
+      "agents": 23,
+      "items": [
+        {
+          "name": "@aibast-agents-library/art-generator",
+          "display_name": "ArtGenerator",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/art-generator.json"
+        },
+        {
+          "name": "@aibast-agents-library/ai-customer-assistant",
+          "display_name": "AI Customer Assistant",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/ai-customer-assistant.json"
+        },
+        {
+          "name": "@aibast-agents-library/general-ask-hr",
+          "display_name": "General Ask HR",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/general-ask-hr.json"
+        },
+        {
+          "name": "@aibast-agents-library/bulk-crm-data-generator",
+          "display_name": "Bulk CRM Data Generator",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/bulk-crm-data-generator.json"
+        },
+        {
+          "name": "@aibast-agents-library/dynamics-365-connector",
+          "display_name": "Dynamics 365 Connector",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/dynamics-365-connector.json"
+        },
+        {
+          "name": "@aibast-agents-library/one-click-crm-intake",
+          "display_name": "One-Click CRM Intake",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/one-click-crm-intake.json"
+        },
+        {
+          "name": "@aibast-agents-library/cross-selling",
+          "display_name": "Cross-Selling Opportunities",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/cross-selling.json"
+        },
+        {
+          "name": "@aibast-agents-library/customer-360",
+          "display_name": "Customer 360",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/customer-360.json"
+        },
+        {
+          "name": "@aibast-agents-library/email-drafting",
+          "display_name": "Email Drafting",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/email-drafting.json"
+        },
+        {
+          "name": "@aibast-agents-library/find-accurate-models",
+          "display_name": "Find Accurate Models",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/find-accurate-models.json"
+        },
+        {
+          "name": "@aibast-agents-library/identify-discounts",
+          "display_name": "Identify Discounts",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/identify-discounts.json"
+        },
+        {
+          "name": "@aibast-agents-library/it-ticket-management",
+          "display_name": "IT Ticket Management",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/it-ticket-management.json"
+        },
+        {
+          "name": "@aibast-agents-library/procurement-agent",
+          "display_name": "Procurement Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/procurement-agent.json"
+        },
+        {
+          "name": "@aibast-agents-library/procurement-support",
+          "display_name": "Procurement Support",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/procurement-support.json"
+        },
+        {
+          "name": "@aibast-agents-library/product-reference",
+          "display_name": "Product Reference",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/product-reference.json"
+        },
+        {
+          "name": "@aibast-agents-library/sales-coach",
+          "display_name": "Sales Coach",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sales-coach.json"
+        },
+        {
+          "name": "@aibast-agents-library/sales-simulation",
+          "display_name": "Sales Simulation",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sales-simulation.json"
+        },
+        {
+          "name": "@aibast-agents-library/speech-to-crm",
+          "display_name": "Speech to CRM",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/speech-to-crm.json"
+        },
+        {
+          "name": "@aibast-agents-library/triage-bot",
+          "display_name": "Triage Bot",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/triage-bot.json"
+        },
+        {
+          "name": "@aibast-agents-library/voice-to-crm-d365",
+          "display_name": "Voice to CRM (D365)",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/voice-to-crm-d365.json"
+        },
+        {
+          "name": "@aibast-agents-library/voice-to-crm-email",
+          "display_name": "Voice to CRM Email",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/voice-to-crm-email.json"
+        },
+        {
+          "name": "@aibast-agents-library/sharepoint-document-extractor",
+          "display_name": "SharePoint Document Extractor",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sharepoint-document-extractor.json"
+        },
+        {
+          "name": "@aibast-agents-library/voice-to-crm-servicenow",
+          "display_name": "Voice to CRM (ServiceNow)",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/voice-to-crm-servicenow.json"
+        }
+      ]
+    },
+    {
+      "id": "healthcare",
+      "agents": 5,
+      "items": [
+        {
+          "name": "@aibast-agents-library/care-gap-closure",
+          "display_name": "Care Gap Closure Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/care-gap-closure.json"
+        },
+        {
+          "name": "@aibast-agents-library/clinical-notes-summarizer",
+          "display_name": "Clinical Notes Summarizer Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/clinical-notes-summarizer.json"
+        },
+        {
+          "name": "@aibast-agents-library/patient-intake",
+          "display_name": "Patient Intake Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/patient-intake.json"
+        },
+        {
+          "name": "@aibast-agents-library/prior-authorization",
+          "display_name": "Prior Authorization Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/prior-authorization.json"
+        },
+        {
+          "name": "@aibast-agents-library/staff-credentialing",
+          "display_name": "Staff Credentialing Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/staff-credentialing.json"
+        }
+      ]
+    },
+    {
+      "id": "human_resources",
+      "agents": 1,
+      "items": [
+        {
+          "name": "@aibast-agents-library/ask-hr",
+          "display_name": "Ask HR",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/ask-hr.json"
+        }
+      ]
+    },
+    {
+      "id": "it_management",
+      "agents": 1,
+      "items": [
+        {
+          "name": "@aibast-agents-library/it-helpdesk",
+          "display_name": "IT Helpdesk",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/it-helpdesk.json"
+        }
+      ]
+    },
+    {
+      "id": "manufacturing",
+      "agents": 5,
+      "items": [
+        {
+          "name": "@aibast-agents-library/inventory-rebalancing",
+          "display_name": "Inventory Rebalancing Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/inventory-rebalancing.json"
+        },
+        {
+          "name": "@aibast-agents-library/maintenance-scheduling",
+          "display_name": "Maintenance Scheduling Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/maintenance-scheduling.json"
+        },
+        {
+          "name": "@aibast-agents-library/order-status-communication",
+          "display_name": "Order Status Communication Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/order-status-communication.json"
+        },
+        {
+          "name": "@aibast-agents-library/production-line-optimization",
+          "display_name": "Production Line Optimization Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/production-line-optimization.json"
+        },
+        {
+          "name": "@aibast-agents-library/supplier-risk-monitoring",
+          "display_name": "Supplier Risk Monitoring Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/supplier-risk-monitoring.json"
+        }
+      ]
+    },
+    {
+      "id": "professional_services",
+      "agents": 5,
+      "items": [
+        {
+          "name": "@aibast-agents-library/client-health-score",
+          "display_name": "Client Health Score Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/client-health-score.json"
+        },
+        {
+          "name": "@aibast-agents-library/contract-risk-review",
+          "display_name": "Contract Risk Review Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/contract-risk-review.json"
+        },
+        {
+          "name": "@aibast-agents-library/proposal-copilot",
+          "display_name": "Proposal Copilot Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/proposal-copilot.json"
+        },
+        {
+          "name": "@aibast-agents-library/resource-utilization",
+          "display_name": "Resource Utilization Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/resource-utilization.json"
+        },
+        {
+          "name": "@aibast-agents-library/time-entry-billing",
+          "display_name": "Time Entry & Billing Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/time-entry-billing.json"
+        }
+      ]
+    },
+    {
+      "id": "retail_cpg",
+      "agents": 5,
+      "items": [
+        {
+          "name": "@aibast-agents-library/inventory-visibility",
+          "display_name": "Inventory Visibility Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/inventory-visibility.json"
+        },
+        {
+          "name": "@aibast-agents-library/personalized-marketing",
+          "display_name": "Personalized Marketing Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/personalized-marketing.json"
+        },
+        {
+          "name": "@aibast-agents-library/returns-complaints-resolution",
+          "display_name": "Returns & Complaints Resolution Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/returns-complaints-resolution.json"
+        },
+        {
+          "name": "@aibast-agents-library/store-associate-copilot",
+          "display_name": "Store Associate Copilot Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/store-associate-copilot.json"
+        },
+        {
+          "name": "@aibast-agents-library/supply-chain-disruption-alert",
+          "display_name": "Supply Chain Disruption Alert Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/supply-chain-disruption-alert.json"
+        }
+      ]
+    },
+    {
+      "id": "slg_government",
+      "agents": 5,
+      "items": [
+        {
+          "name": "@aibast-agents-library/building-permit-processing",
+          "display_name": "Building Permit Processing Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/building-permit-processing.json"
+        },
+        {
+          "name": "@aibast-agents-library/citizen-service-request",
+          "display_name": "Citizen Service Request Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/citizen-service-request.json"
+        },
+        {
+          "name": "@aibast-agents-library/foia-request-assistant",
+          "display_name": "FOIA Request Assistant Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/foia-request-assistant.json"
+        },
+        {
+          "name": "@aibast-agents-library/slg-grants-management",
+          "display_name": "SLG Grants Management Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/slg-grants-management.json"
+        },
+        {
+          "name": "@aibast-agents-library/utility-billing-assistance",
+          "display_name": "Utility Billing Assistance Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/utility-billing-assistance.json"
+        }
+      ]
+    },
+    {
+      "id": "software_digital_products",
+      "agents": 5,
+      "items": [
+        {
+          "name": "@aibast-agents-library/software-competitive-intel",
+          "display_name": "Competitive Intelligence Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/software-competitive-intel.json"
+        },
+        {
+          "name": "@aibast-agents-library/software-customer-onboarding",
+          "display_name": "Customer Onboarding Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/software-customer-onboarding.json"
+        },
+        {
+          "name": "@aibast-agents-library/license-renewal-expansion",
+          "display_name": "License Renewal & Expansion Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/license-renewal-expansion.json"
+        },
+        {
+          "name": "@aibast-agents-library/product-feedback-synthesizer",
+          "display_name": "Product Feedback Synthesizer Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/product-feedback-synthesizer.json"
+        },
+        {
+          "name": "@aibast-agents-library/support-ticket-resolution",
+          "display_name": "Support Ticket Resolution Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/support-ticket-resolution.json"
+        }
+      ]
+    }
+  ]
+}

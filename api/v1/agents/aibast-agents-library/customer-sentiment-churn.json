@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/customer-sentiment-churn",
+    "version": "1.0.0",
+    "display_name": "Customer Sentiment & Churn Agent",
+    "description": "Customer sentiment analysis, churn prediction, retention action planning, and segment analytics for financial services.",
+    "author": "AIBAST",
+    "tags": [
+      "sentiment",
+      "churn",
+      "retention",
+      "NPS",
+      "analytics",
+      "financial-services"
+    ],
+    "category": "financial_services",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/financial_services_stacks/customer_sentiment_churn_stack/customer_sentiment_churn_agent.py",
+  "size_kb": 15.0,
+  "lines": 327,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/financial_services_stacks/customer_sentiment_churn_stack/customer_sentiment_churn_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/financial_services_stacks/customer_sentiment_churn_stack/customer_sentiment_churn_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/financial_services_stacks/customer_sentiment_churn_stack/customer_sentiment_churn_agent.py",
+  "engagement": null
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "aibast-api-publishers/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "count": 1,
+  "publishers": [
+    {
+      "name": "@aibast-agents-library",
+      "agents": 105,
+      "tree_url": "https://github.com/microsoft/aibast-agents-library/tree/main/agents/@aibast-agents-library"
+    }
+  ]
+}

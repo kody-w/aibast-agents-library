@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/customer-360",
+    "version": "1.0.0",
+    "display_name": "Customer 360",
+    "description": "Unified customer profiles merging CRM, support, and billing data with health scores and next-best-action recommendations.",
+    "author": "AIBAST",
+    "tags": [
+      "customer-360",
+      "unified-profile",
+      "health-score",
+      "next-best-action",
+      "crm"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/customer_360_stack/customer_360_agent.py",
+  "size_kb": 17.7,
+  "lines": 317,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/customer_360_stack/customer_360_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/customer_360_stack/customer_360_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/customer_360_stack/customer_360_agent.py",
+  "engagement": null
+}

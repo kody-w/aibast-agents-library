@@ -1,0 +1,85 @@
+name: Metrics & Aggregation Snapshot
+
+on:
+  schedule:
+    - cron: '40 5 * * *'  # daily, after any overnight registry builds
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build_metrics.py'
+      - 'scripts/discussion_ratings.py'
+      - 'scripts/crawl_skills.py'
+      - 'sources.json'
+      - '.github/workflows/metrics.yml'
+
+permissions:
+  contents: write
+  discussions: write
+
+concurrency:
+  group: metrics-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    env:
+      # Discussions + metrics target the repo the workflow runs in, so the
+      # fork stages against itself and upstream tracks itself after sync.
+      AIBAST_RATINGS_REPO: ${{ github.repository }}
+      AIBAST_METRICS_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Crawl aggregated skill sources
+        # --strict: a source going dark fails THIS job loudly instead of
+        # letting the catalog silently age. The other steps still ran.
+        continue-on-error: true
+        run: python scripts/crawl_skills.py --strict
+
+      - name: Seed missing agent Discussions (capped per run)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/discussion_ratings.py seed --limit 60
+
+      - name: Ensure tally + signal comments exist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/discussion_ratings.py tally --limit 60
+
+      - name: Snapshot Discussion ratings
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/discussion_ratings.py fetch
+
+      - name: Build metrics snapshot
+        # Traffic endpoints (clones, views, paths) need admin-read, which the
+        # Actions GITHUB_TOKEN cannot be granted. Add a fine-grained PAT with
+        # "Administration: read" as METRICS_TOKEN to unlock live clone counts:
+        #     gh secret set METRICS_TOKEN
+        # Without it, build_metrics.py reuses the last authorized traffic read
+        # from state/metrics_history.json — figures never zero out.
+        env:
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: python scripts/build_metrics.py
+
+      - name: Rebuild static API (mirrors metrics + aggregated)
+        run: python scripts/build_api.py
+
+      - name: Commit snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/ api/
+          if git diff --staged --quiet; then
+            echo "No metrics change"
+          else
+            git commit -m "chore: metrics snapshot $(date -u +%Y-%m-%d) [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi

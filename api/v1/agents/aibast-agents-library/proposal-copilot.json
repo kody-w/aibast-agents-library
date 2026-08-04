@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/proposal-copilot",
+    "version": "1.0.0",
+    "display_name": "Proposal Copilot Agent",
+    "description": "Generates competitive proposals with pricing models, win-theme analysis from historical data, and competitive positioning against known bidders.",
+    "author": "AIBAST",
+    "tags": [
+      "proposal",
+      "RFP",
+      "pricing",
+      "competitive-intelligence",
+      "professional-services"
+    ],
+    "category": "professional_services",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/professional_services_stacks/proposal_copilot_stack/proposal_copilot_agent.py",
+  "size_kb": 13.7,
+  "lines": 333,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/professional_services_stacks/proposal_copilot_stack/proposal_copilot_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/professional_services_stacks/proposal_copilot_stack/proposal_copilot_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/professional_services_stacks/proposal_copilot_stack/proposal_copilot_agent.py",
+  "engagement": null
+}
