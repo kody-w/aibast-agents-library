@@ -59,8 +59,11 @@ if [ "$MODE" = "live" ]; then
   # The advertised one-liners must be fetchable, not just mentioned in HTML:
   # a 404 here pipes an error page into every new user's shell.
   for i in install.sh install.ps1 install.cmd install.command; do
-    check "advertised installer /$i is a real script" \
-      "curl -fsSL '$BASE/$i' | head -3 | grep -qiE 'bin/(ba)?sh|powershell|@echo|#!' "
+    # The failure this guards against is Pages serving an HTML 404 page that
+    # then gets piped into a shell — so assert script-shaped, never markup.
+    check "advertised installer /$i is a real script, not an error page" \
+      "curl -fsSL '$BASE/$i' | head -20 | grep -qiE 'brainstem|rapp' && \
+       ! curl -fsSL '$BASE/$i' | head -5 | grep -qi '<!doctype\|<html'"
   done
   check "vbrainstem one-click install integrity hash present in live registry" \
     "curl -fsSL '$BASE/registry.json' | grep -q '_sha256'"
