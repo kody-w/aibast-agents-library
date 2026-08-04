@@ -14,6 +14,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: registry-commit
+  cancel-in-progress: false
+
 jobs:
   build-registry:
     runs-on: ubuntu-latest

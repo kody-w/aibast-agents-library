@@ -37,10 +37,11 @@ jobs:
           python-version: '3.11'
 
       - name: Crawl aggregated skill sources
-        # --strict: a source going dark fails THIS job loudly instead of
-        # letting the catalog silently age. The other steps still ran.
-        continue-on-error: true
-        run: python scripts/crawl_skills.py --strict
+        # Non-strict on the daily job: a source going dark warns and keeps
+        # the existing snapshot rather than killing the metrics run. The
+        # crawler's --strict mode is reserved for a dedicated aggregation
+        # job whose sole purpose is source freshness.
+        run: python scripts/crawl_skills.py
 
       - name: Seed missing agent Discussions (capped per run)
         env:

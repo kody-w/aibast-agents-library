@@ -1,0 +1,50 @@
+# RAPP Static APIs
+
+> A server-free commons of read-only APIs served entirely from GitHub raw (`raw.githubusercontent.com`) — CORS-open, CDN-cached, forkable, durable. This file is the entry point: every sub-API below is an independent `rapp-static-api/1.0` you can fetch, pin, or self-host with zero infrastructure.
+
+The machine-readable index of everything here is the root registry (`rapp-god-registry/1.0`): https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/registry.json
+
+## How to consume (any agent, any language)
+
+```
+RAW=https://raw.githubusercontent.com/kody-w/rapp-static-apis/main
+curl -s $RAW/registry.json               # the index of all APIs
+# each entry carries: registry (its own index), status, raw_base, capabilities
+curl -s $RAW/<api>/registry.json         # drill into one API
+```
+
+Read the full convention: https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/SPEC.md
+
+## APIs
+
+- [companion](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/companion/registry.json): companion — the twin companion: genetics, breeding, and bones — versioned-endpoints
+- [customer360](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/customer360/registry.json): rapp-static-customer360 — versioned-endpoints
+- [dataverse](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/dataverse/registry.json): RAPP static Dataverse — a digital twin on OOTB Dataverse — versioned-endpoints
+- [fabriciq](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/fabriciq/registry.json): rapp-static-fabriciq — versioned-endpoints
+- [fn](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/fn/registry.json): rapp-static-fn — a static file that *runs* — versioned-endpoints, content-addressed
+- [hologram](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/hologram/registry.json): rapp-static-hologram — versioned-endpoints, content-addressed
+- [industry-templates](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/industry-templates/registry.json): RAPP static industry-template APIs — versioned-endpoints
+- [lantern](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/lantern/registry.json): the lantern — the universal .egg loader room; disguises are refused — versioned-endpoints
+- [legal](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/legal/registry.json): legal — the licensing, patent-pledge, and attribution doors — versioned-endpoints
+- [mcp](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/mcp/registry.json): rapp-static-mcp — a static MCP catalog — versioned-endpoints
+- [poi-tiles](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/poi-tiles/registry.json): poi-tiles — the static, ODbL-clean global POI layer — versioned-endpoints
+- [proofs](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/proofs/registry.json): proofs — every claim is a button; your browser is the judge — versioned-endpoints
+- [rapp-go](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/rapp-go/registry.json): rapp-go — the explorer: a quiet, no-backend Pokémon-Go-like PWA — versioned-endpoints
+- [sap](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/sap/registry.json): Synthetic S/4HANA gateway (OData v2 shape) for Meridian Manufacturing Group, a fictional global manufacturer mid-S/4HANA-transformation. Fully synthetic, no real data. — versioned-endpoints
+- [sharepoint](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/sharepoint/registry.json): Synthetic SharePoint program-document library for Project Phoenix, the S/4HANA transformation of a fictional global manufacturer. Graph-flavored listing + raw markdown docs, plus true Microsoft Graph wire shapes (site, paged driveItem children, search response). Fully synthetic, no real data. — versioned-endpoints
+- [shortener](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/shortener/registry.json): rapp-static-shortener — versioned-endpoints, content-addressed
+- [showcase](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/showcase/catalog.json): The Library of Awesome — versioned-endpoints, llms.txt
+- [track](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/track/registry.json): rapp-static-track — a data tracker that runs in your friend's browser — versioned-endpoints, content-addressed
+- [vbrainstem-cell](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/vbrainstem-cell/registry.json): vbrainstem-cell — a headless agent runtime in a sandboxed iframe — versioned-endpoints
+- [workiq](https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/workiq/registry.json): workiq — synthetic Microsoft-Graph-flavored work-insights API (Project Phoenix) — versioned-endpoints
+
+## Discovery
+
+- Root registry (index of indexes): https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/registry.json
+- Status: https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/api/v1/status.json
+- MCP manifest: https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/.well-known/mcp.json
+- AI plugin manifest: https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/.well-known/ai-plugin.json
+- Agent protocol: https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/.well-known/agent-protocol.json
+- Sitemap: https://raw.githubusercontent.com/kody-w/rapp-static-apis/main/sitemap.xml
+
+<!-- generated 2026-08-02T19:24:56Z by build.py — do not hand-edit -->
