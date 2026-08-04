@@ -15,3 +15,7 @@ __pycache__/
 # identities, tenant GUIDs and key material.
 tools/tool_assets/
 snapshot-*.html
+
+# macOS
+.DS_Store
+**/.DS_Store

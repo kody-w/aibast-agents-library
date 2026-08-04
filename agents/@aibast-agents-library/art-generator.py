@@ -43,7 +43,16 @@ from urllib.parse import quote, urlencode, urlparse
 
 import requests
 
-from agents.basic_agent import BasicAgent
+try:  # cloud layout (agents package)
+    from agents.basic_agent import BasicAgent
+except ImportError:  # local brainstem / standalone layout
+    import os
+    import sys
+
+    sys.path.insert(
+        0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+    )
+    from basic_agent import BasicAgent
 
 
 _TOKEN_SCOPE = "https://cognitiveservices.azure.com/.default"

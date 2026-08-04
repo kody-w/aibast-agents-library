@@ -12,6 +12,7 @@ Scans agents/@publisher/slug.py for __manifest__ dicts and builds:
 """
 
 import ast
+import hashlib
 import json
 import os
 import sys
@@ -101,6 +102,10 @@ def build_registry():
             1,
         )
         manifest["_lines"] = len(content.split('\n'))
+        # Integrity hash of the exact bytes served. Clients (the in-browser
+        # runtime's one-click install) verify the download against this before
+        # executing it, so it must be present for every entry.
+        manifest["_sha256"] = hashlib.sha256(content.encode("utf-8")).hexdigest()
 
         agents.append(manifest)
 

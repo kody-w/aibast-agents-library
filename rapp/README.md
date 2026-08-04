@@ -1,4 +1,4 @@
-# ms-rapp/1 — the enterprise distribution of RAPP/1
+# ms-rapp/1 — the pinned, gated distribution of RAPP/1
 
 This directory makes the repository self-contained as the reference for
 **ms-rapp/1**: Microsoft's long-term-support distribution of the RAPP/1

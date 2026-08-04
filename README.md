@@ -166,8 +166,8 @@ rm -rf ~/.brainstem ~/.local/bin/brainstem
 
 ## License
 
-The AIBAST Agents Library — **ms-rapp/1**, the long-term-support (LTS)
-distribution of the RAPP platform — is licensed under the
+The AIBAST Agents Library — **ms-rapp/1**, the pinned, gated build of
+the RAPP platform — is licensed under the
 [MIT License](LICENSE) (© Microsoft). Files under [`rapp/`](rapp/README.md)
 that are mirrored from upstream RAPP projects are third-party materials
 under their own upstream licenses — see

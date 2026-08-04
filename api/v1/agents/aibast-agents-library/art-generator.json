@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-agent/1.0",
-  "generated": "2026-08-04T22:02:17.249827+00:00",
+  "generated": "2026-08-04T23:01:38.120745+00:00",
   "manifest": {
     "schema": "rapp-agent/1.0",
     "name": "@aibast-agents-library/art-generator",
@@ -26,8 +26,8 @@
     ]
   },
   "file": "agents/@aibast-agents-library/art-generator.py",
-  "size_kb": 10.4,
-  "lines": 334,
+  "size_kb": 10.7,
+  "lines": 343,
   "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/art-generator.py",
   "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/art-generator.py",
   "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/art-generator.py",

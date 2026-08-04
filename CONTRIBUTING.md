@@ -104,7 +104,7 @@ class MyAgent(BasicAgent):
 |------|-----|---------|
 | `community` | Anyone | Submitted, basic validation passes |
 | `verified` | Reviewed by maintainer | Tested, follows standards, no security issues |
-| `official` | Core team | Maintained by core team, guaranteed compatibility |
+| `official` | Core team | Maintained by core team, broad compatibility |
 
 New submissions start at `community`. Maintainers upgrade to `verified` after review.
 

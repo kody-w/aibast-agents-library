@@ -30,10 +30,31 @@ and quality-gate signals are community telemetry, not an endorsement or
 certification by Microsoft. Aggregated entries link to their origin; review
 the origin before use.
 
-**Local execution, local data.** The brainstem runs on your machine and the
-vBrainstem runs entirely in your browser. Your GitHub tokens stay in your own
-environment or browser storage, your conversations and memories stay on your
-device, and nothing you run is sent to this repository.
+**Local execution, local data — with one disclosed exception.** The brainstem
+runs on your machine and the vBrainstem runs entirely in your browser. Your
+conversations, agents, and memories stay on your device, and nothing you run
+is sent to this repository.
+
+The exception is browser sign-in: github.com sends no CORS headers for the
+device-code endpoints, so the in-browser runtime brokers that exchange through
+a CORS proxy, and **falls back to the same proxy — passing your GitHub token —
+if the direct call to GitHub is unreachable or rejected.** The default proxy is
+operated by the upstream RAPP maintainer, not by Microsoft. Set
+`VB_AUTH_WORKER` to a proxy you control, or use the on-device brainstem, to
+keep the token inside your own trust boundary.
+
+**Azure costs are yours.** The Tier-2 deployment templates provision billable
+Azure resources in *your* subscription — Azure OpenAI (S0), a Function App,
+Storage, and Application Insights. Cost depends on region and usage; estimate
+with the [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/)
+before deploying, and delete the resource group when you are done. Any dollar
+figures in this repository are illustrative, not quotes.
+
+**Installers change your machine.** The one-liner installers may install
+Python, Git, and the GitHub CLI via your platform package manager (winget,
+Homebrew, apt/dnf — including adding a package source on Linux), create a
+virtual environment under your home directory, and add a line to your shell
+profile and PATH. Read the script before piping it to a shell.
 
 **Telemetry.** The public metrics dashboard shows anonymous aggregates from
 public APIs only. The optional internal event contract never carries

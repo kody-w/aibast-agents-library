@@ -1,4 +1,5 @@
 from agents.basic_agent import BasicAgent
+import os
 import json
 import logging
 import datetime
@@ -38,7 +39,9 @@ class MeetingPrepAgent(BasicAgent):
         self.opportunity_id = None
         self.opportunity_data = None
         self.issues = None
-        self.crm_base_url = "https://orgc62c53e4.crm.dynamics.com/main.aspx?appid=fe67eeca-edd0-ef11-8eea-00224808ff68&pagetype=entityrecord&etn="
+        # Deep-link base for your own Dynamics 365 environment, e.g.
+        # https://<yourorg>.crm.dynamics.com/main.aspx?appid=<appid>&pagetype=entityrecord&etn=
+        self.crm_base_url = os.environ.get("DYNAMICS_CRM_DEEPLINK_BASE", "")
 
     def _get_dynamics_crud_agent(self):
         """

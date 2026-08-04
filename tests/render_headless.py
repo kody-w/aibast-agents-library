@@ -21,9 +21,8 @@ ROOT = Path(__file__).resolve().parent.parent
 
 try:
     from playwright.sync_api import sync_playwright
-except ImportError:
-    print("SKIP: playwright not installed")
-    sys.exit(0)
+except ImportError:  # not a pytest case — run directly by the shell suite
+    sync_playwright = None
 
 
 def free_port() -> int:
@@ -33,6 +32,9 @@ def free_port() -> int:
 
 
 def main() -> int:
+    if sync_playwright is None:
+        print("SKIP: playwright not installed (browser rendering unverified)")
+        return 0
     port = free_port()
     handler = lambda *a, **kw: http.server.SimpleHTTPRequestHandler(
         *a, directory=str(ROOT), **kw)

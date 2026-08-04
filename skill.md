@@ -147,7 +147,7 @@ Tell the user:
 >
 > **Try these next:**
 > - Edit `~/.brainstem/src/rapp_brainstem/soul.md` to change the personality
-> - Look at `agents/hello_agent.py` as a template for your own agents
+> - Look at `agents/basic_agent.py` as a template for your own agents
 > - Open the Sources panel in the chat UI to connect remote agent repos
 >
 > **When you're ready to give this a cloud body, say "deploy to Azure" and I'll walk you through Tier 2.**

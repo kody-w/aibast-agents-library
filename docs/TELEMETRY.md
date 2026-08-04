@@ -12,8 +12,8 @@ minimal, uniform event: **ToolInteractionEvent**. Schema:
   "toolId"          : "RAPP | AIDEATE | LIBRARY | DMT | SOWAGENT",
   "toolVersion"     : "semver",
   "correlationId"   : "guid",         // one per engagement, end to end
-  "msxOpportunityId": "string|null",  // MANDATORY for L3/L4 credit
-  "tpid"            : "string|null",  // consumption joins here
+  "msxOpportunityId": "string|null",  // engagement id, when applicable
+  "tpid"            : "string|null",  // account id, when applicable
   "actorRole"       : "TA | SE | GBB | PARTNER | ISD",  // role, not name
   "actorRegion"     : "AMER | EMEA | APAC | LATAM",
   "programId"       : "SFRC | ERP | CCAS | AGENTS | LOWCODE",
@@ -30,8 +30,9 @@ minimal, uniform event: **ToolInteractionEvent**. Schema:
    Uniform verbs across every tool so one query serves all.
 2. **Correlation ID is the spine** — issued at first touch, carried through
    AIdeate → RAPP → Library → deployment. Without it there is no funnel.
-3. **MSX ID is the price of credit** — no opportunity ID, no L3/L4
-   attribution. Make it the rule everywhere.
+3. **Engagement identifiers are optional and internal** — when present they
+   let internal reporting join an event to an engagement. They are never
+   written to this repository or the public dashboard.
 4. **Role, never person** — `actorRole` + `actorRegion` only. This is the
    guardrail that lets the tooling ship without a trust problem.
 

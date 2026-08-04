@@ -56,6 +56,14 @@ if [ "$MODE" = "live" ]; then
     "curl -fsSL -o /dev/null '$BASE/docs/rapp-guide.html'"
   check "legacy community_rapp installer path still serves (compat stub)" \
     "curl -fsSL '$BASE/community_rapp/install.sh' | grep -q rapp_cloud"
+  # The advertised one-liners must be fetchable, not just mentioned in HTML:
+  # a 404 here pipes an error page into every new user's shell.
+  for i in install.sh install.ps1 install.cmd install.command; do
+    check "advertised installer /$i is a real script" \
+      "curl -fsSL '$BASE/$i' | head -3 | grep -qiE 'bin/(ba)?sh|powershell|@echo|#!' "
+  done
+  check "vbrainstem one-click install integrity hash present in live registry" \
+    "curl -fsSL '$BASE/registry.json' | grep -q '_sha256'"
   echo; echo "live: $PASS passed, $FAIL failed"; exit $((FAIL>0))
 fi
 
@@ -168,7 +176,7 @@ PY"
 
 echo "== T8 headless render =="
 check "agents.html renders cards + search filters; metrics.html renders KPIs" \
-  "python3 tests/test_render_headless.py"
+  "python3 tests/render_headless.py | tee /dev/stderr | grep -q 'headless OK'"
 
 echo "== T9 index.html link integrity (additive only) =="
 check "installer one-liners unchanged" "python3 - <<'PY'
@@ -224,6 +232,40 @@ PY"
 check "brainstem_web.py parses" \
   "python3 -c \"import ast;ast.parse(open('vbrainstem/brainstem_web.py').read())\""
 
+echo "== T-SECRETS no embedded credentials in shippable content =="
+check "no signed trigger URLs, keys, or tokens in tracked source" "python3 - <<'PY'
+import re, subprocess
+# Files a user installs or that we serve. Kernel + pinned mirrors are covered
+# by their own gates; binaries/registry are generated from these sources.
+files=[f for f in subprocess.run(['git','ls-files'],capture_output=True,text=True).stdout.splitlines()
+       if f.split('.')[-1] in ('py','js','sh','ps1','cmd','command','html','md','json','yml','yaml')
+       and not f.startswith(('rapp/','rapp_brainstem/','tests/'))]
+PATTERNS=[
+    (r'[?&]sig=[A-Za-z0-9_\-]{20,}', 'signed trigger URL (bearer credential)'),
+    (r'AccountKey=(?!YOUR|\{|\$)[A-Za-z0-9+/]{30,}', 'storage account key'),
+    (r'\bgh[pousr]_[A-Za-z0-9]{30,}', 'GitHub token'),
+    (r'\bxox[baprs]-[A-Za-z0-9-]{10,}', 'Slack token'),
+    (r'-----BEGIN [A-Z ]*PRIVATE KEY-----', 'private key'),
+]
+hits=[]
+for f in files:
+    try: t=open(f, encoding='utf-8', errors='ignore').read()
+    except OSError: continue
+    for pat,label in PATTERNS:
+        for m in re.finditer(pat,t):
+            hits.append(f'{f}: {label}: {m.group(0)[:40]}')
+assert not hits, hits[:8]
+PY"
+check "no real customer tenant/org endpoints in agent templates" "python3 - <<'PY'
+import re, subprocess
+files=[f for f in subprocess.run(['git','ls-files','agents','rapp_cloud'],capture_output=True,text=True).stdout.splitlines()
+       if f.endswith('.py')]
+BAD=re.compile(r'https://(?!contoso|yourcompany|tenant\.|example|<)[a-z0-9-]+\.(crm[0-9]*\.dynamics\.com|sharepoint\.com)')
+hits=[f'{f}: {m.group(0)}' for f in files
+      for m in BAD.finditer(open(f, encoding='utf-8', errors='ignore').read())]
+assert not hits, hits[:8]
+PY"
+
 echo "== T-CLEAN clean break (kody-w refs only in sanctioned places) =="
 check "kody-w refs confined to allowlist (tracked + untracked)" "python3 - <<'PY'
 import re, subprocess
@@ -235,6 +277,8 @@ ALLOW_DIRS=('rapp_brainstem/',  # kernel-locked stable content — fixes flow fr
             'rapp/',            # pinned corpus mirrors + governance docs discuss upstream by name
             'tests/')           # negative guards in this suite
 ALLOW_FILES={'vbrainstem/brainstem_web.py',  # auth CORS proxy, env-overridable (VB_AUTH_WORKER)
+             'vbrainstem/README.md',         # discloses that proxy to the user (required)
+             'DISCLAIMER.md',                # same disclosure, user-facing
              'docs/CLEAN-BREAK.md',          # the audit record itself
              'scripts/corpus_sync.py'}       # addresses the kernel authority file by name
 # The staging fork's own identity (kody-w/aibast-agents-library) is a sanctioned
@@ -377,7 +421,8 @@ check "CONTRIBUTING certifies provenance + CLA; DISCLAIMER covers local executio
 c=open('CONTRIBUTING.md').read()
 assert 'cla.opensource.microsoft.com' in c and 'provenance' in c
 d=open('DISCLAIMER.md').read()
-assert 'runs on your machine' in d and 'nothing you run is sent to this repository' in d
+assert 'runs on your machine' in d and 'nothing you run\nis sent to this repository' in d
+assert 'VB_AUTH_WORKER' in d and 'Azure Pricing Calculator' in d  # disclosed exceptions
 PY"
 
 echo "== T-TELEMETRY aibast.tooling.v1 contract =="

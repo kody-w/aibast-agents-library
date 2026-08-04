@@ -26,11 +26,9 @@ class SalesforceQueryAgent(BasicAgent):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         
-        # Get the flow URL from environment variables or use a default
-        self.flow_url = os.environ.get(
-            'SALESFORCE_FLOW_URL', 
-            "https://prod-90.westus.logic.azure.com:443/workflows/e6a4ec203d3542dda8391c6778c4b42d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=rKbMzTF7TfAcILp5lh1fzNSpoQJpaMzWsqxH-3P8klo"
-        )
+        # Logic Apps trigger URL. The signature in the query string is a bearer
+        # credential, so it is configuration, never source: set SALESFORCE_FLOW_URL.
+        self.flow_url = os.environ.get('SALESFORCE_FLOW_URL', '')
 
     def perform(self, soql):
         try:

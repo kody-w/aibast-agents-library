@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 import logging
 from agents.basic_agent import BasicAgent
@@ -74,8 +75,9 @@ class AdaptiveCardPowerAutomateAgent(BasicAgent):
                 "required": ["adaptive_card_json", "recipient"]
             }
         }
-        # Power Automate endpoint URL
-        self.power_automate_url = "https://2ecf0a25a2e7eb6a9aec43400e2b67.02.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/074e71740d454fab9bbce0da490bc142/triggers/manual/paths/invoke/?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=euNuozUXGdmpHD4sVRdoxoJy2B0x_vhDFfGzhFnbG7g"
+        # Power Automate endpoint URL. The trigger URL embeds a signature that
+        # acts as a bearer credential, so it is configuration, never source.
+        self.power_automate_url = os.environ.get("POWER_AUTOMATE_FLOW_URL", "")
         super().__init__(name=self.name, metadata=self.metadata)
 
     def perform(self, **kwargs):

@@ -55,13 +55,13 @@ jobs:
             'deploy.ps1',
             'community_rapp/install.ps1',
             'rapp_brainstem/start.ps1',
-            'rapp_ai/install.ps1'
+            'rapp_cloud/install.ps1'
           )
           $bootstrapFiles = @(
             'install.ps1',
             'deploy.ps1',
             'community_rapp/install.ps1',
-            'rapp_ai/install.ps1'
+            'rapp_cloud/install.ps1'
           )
           $bad = $false
           foreach ($file in $bootstrapFiles) {
@@ -136,8 +136,8 @@ jobs:
 
       - name: AIBAST Azure tier tests
         run: |
-          python -m pip install -q -r rapp_ai/requirements.txt
-          python -m pytest rapp_ai/tests -q
+          python -m pip install -q -r rapp_cloud/requirements.txt
+          python -m pytest rapp_cloud/tests -q
 
   e2e:
     needs: static

@@ -40,8 +40,14 @@ Public preview, provided "AS IS" — see the repository
 
 ## Auth
 
-GitHub device-code sign-in uses a CORS proxy only for the two github.com
-endpoints that send no CORS headers; the Copilot token exchange and chat
-completions go **direct** to GitHub. Tokens live in your browser's
-`localStorage` and the worker's in-memory filesystem — they never touch a
-third-party server.
+GitHub device-code sign-in is brokered by a CORS proxy, because github.com
+sends no CORS headers for the device-code endpoints. The Copilot token
+exchange and chat completions are attempted **direct** to GitHub first, and
+**fall back to that same proxy — sending your GitHub token in the request —
+when the direct call is unreachable or rejected.**
+
+The default proxy (`https://rapp-auth.kwildfeuer.workers.dev`) is operated by
+the upstream RAPP maintainer, not by Microsoft. Point `VB_AUTH_WORKER` at a
+proxy you control to keep the token inside your own trust boundary; a
+Microsoft-operated default is a tracked pre-GA action (`rapp/ALIGNMENT.md`).
+Your conversations, agents and memories stay on your device.

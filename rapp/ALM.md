@@ -53,8 +53,7 @@ serves as the de-facto canary until the canary repo decision lands.
   workflows, no force-push, linear history.
 - **CODEOWNERS**: `rapp_brainstem/**`, `install.*`, `rapp/**` require the
   LTS maintainer + (for kernel files) sign-off tied to a sync PR.
-- **Secret scanning + push protection: ON** (the kernel learned this the
-  hard way; it is table stakes here).
+- **Secret scanning + push protection: ON** — required on every ring.
 - **Actions permissions**: default `GITHUB_TOKEN` read-only except the two
   workflows that commit (registry, metrics); `METRICS_TOKEN` fine-grained,
   single-repo, Administration:read only.

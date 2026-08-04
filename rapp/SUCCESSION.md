@@ -21,8 +21,8 @@ distribution that adopts deliberately. Don't reinvent it; follow it.
   **never push to the upstream stable repo or to
   microsoft/aibast-agents-library directly**. The kernel ratifies RAPP/1 protocol revisions.
 - **LTS** — this repository. It ships only what is pinned, gated, and
-  verified. Enterprise users get stability; the standard guarantees the two
-  sides stay interoperable.
+  verified. Users get a build that changes deliberately; the shared standard is
+  what keeps the two sides interoperable.
 
 ## Flow DOWN (kernel → LTS): the only way changes arrive
 

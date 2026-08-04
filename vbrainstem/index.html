@@ -2261,7 +2261,7 @@
       alert('This registry entry has no valid SHA-256 digest and cannot be installed.');
       return;
     }
-    if (!confirm(`Install ${filename}?\n\nThis executes Python code on your machine. The source is pinned to RAR commit ${RAR_REVISION.slice(0, 12)} and its SHA-256 will be verified before installation.`)) {
+    if (!confirm(`Install ${filename}?\n\nThis executes Python code on your machine. The source is fetched from the AIBAST library at ${RAR_REVISION.slice(0, 12)} and its SHA-256 will be verified before installation.`)) {
       return;
     }
     const orig = btn.textContent;
