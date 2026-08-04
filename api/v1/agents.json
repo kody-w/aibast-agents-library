@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-agents/1.0",
-  "generated": "2026-08-04T19:34:16.396867+00:00",
+  "generated": "2026-08-04T21:26:41.988917+00:00",
   "count": 105,
   "agents": [
     {
@@ -29,12 +29,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/art-generator.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/art-generator.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/art-generator.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/10"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/account-intelligence",
@@ -59,12 +54,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/account-intelligence.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 1,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/2"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/account-intelligence-orchestrator",
@@ -89,12 +79,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_orchestrator.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_orchestrator.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/account-intelligence-orchestrator.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/3"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/action-prioritization",
@@ -119,12 +104,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/action_prioritization_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/action_prioritization_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/action-prioritization.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/7"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/competitive-intelligence",
@@ -224,12 +204,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/messaging_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/messaging_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/account-messaging.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/4"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/account-risk-assessment",
@@ -254,12 +229,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/risk_assessment_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/risk_assessment_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/account-risk-assessment.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/5"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/stakeholder-intelligence",
@@ -309,12 +279,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/activity_gap_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/activity_gap_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/activity-gap.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/8"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/deal-competitor-intel",
@@ -667,12 +632,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/b2c_sales_stacks/cart_abandonment_recovery_stack/cart_abandonment_recovery_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2c_sales_stacks/cart_abandonment_recovery_stack/cart_abandonment_recovery_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/cart-abandonment-recovery.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/16"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/customer-360-speech",
@@ -854,12 +814,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/energy_stacks/asset_maintenance_forecast_stack/asset_maintenance_forecast_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/energy_stacks/asset_maintenance_forecast_stack/asset_maintenance_forecast_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/asset-maintenance-forecast.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/12"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/emission-tracking",
@@ -990,12 +945,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/federal_government_stacks/acquisition_support_stack/acquisition_support_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/federal_government_stacks/acquisition_support_stack/acquisition_support_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/acquisition-support.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/6"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/federal-grants-oversight",
@@ -1126,12 +1076,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/financial_services_stacks/claims_processing_stack/claims_processing_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/financial_services_stacks/claims_processing_stack/claims_processing_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/claims-processing.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/18"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/fs-customer-onboarding",
@@ -1389,12 +1334,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/ai_customer_assistant_stack/ai_customer_assistant_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/ai_customer_assistant_stack/ai_customer_assistant_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/ai-customer-assistant.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/9"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/general-ask-hr",
@@ -1446,12 +1386,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/bulk_crm_data_generator.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/bulk_crm_data_generator.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/bulk-crm-data-generator.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/14"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/dynamics-365-connector",
@@ -1958,12 +1893,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/healthcare_stacks/care_gap_closure_stack/care_gap_closure_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/healthcare_stacks/care_gap_closure_stack/care_gap_closure_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/care-gap-closure.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/15"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/clinical-notes-summarizer",
@@ -1989,12 +1919,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/healthcare_stacks/clinical_notes_summarizer_stack/clinical_notes_summarizer_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/healthcare_stacks/clinical_notes_summarizer_stack/clinical_notes_summarizer_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/clinical-notes-summarizer.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/20"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/patient-intake",
@@ -2097,12 +2022,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/human_resources_stacks/ask_hr_stack/ask_hr_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/human_resources_stacks/ask_hr_stack/ask_hr_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/ask-hr.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/11"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/it-helpdesk",
@@ -2277,12 +2197,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/professional_services_stacks/client_health_score_stack/client_health_score_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/professional_services_stacks/client_health_score_stack/client_health_score_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/client-health-score.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/19"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/contract-risk-review",
@@ -2533,12 +2448,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/slg_government_stacks/building_permit_processing_stack/building_permit_processing_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/slg_government_stacks/building_permit_processing_stack/building_permit_processing_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/building-permit-processing.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/13"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/citizen-service-request",
@@ -2564,12 +2474,7 @@
       "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/slg_government_stacks/citizen_service_request_stack/citizen_service_request_agent.py",
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/slg_government_stacks/citizen_service_request_stack/citizen_service_request_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/citizen-service-request.json",
-      "engagement": {
-        "upvotes": 0,
-        "downloads": 0,
-        "comments": 0,
-        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/17"
-      }
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/foia-request-assistant",

@@ -7,8 +7,8 @@ from agents.basic_agent import BasicAgent
 
 logger = logging.getLogger(__name__)
 
-GITHUB_OWNER = "billwhalenmsft"
-GITHUB_REPO = "RAPP-Agent-Repo"
+GITHUB_OWNER = "microsoft"
+GITHUB_REPO = "aibast-agents-library"
 GITHUB_API_BASE = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}"
 MANIFEST_PATH = os.path.join(".local_storage", "installed_agents.json")
 CACHE_TTL = 300  # 5 minutes
@@ -64,7 +64,7 @@ class AgentLibraryManager(BasicAgent):
                     },
                     "agent_name": {
                         "type": "string",
-                        "description": "Fully qualified agent name (e.g. '@billwhalen/dynamics-crud'). Required for install, remove, and info.",
+                        "description": "Fully qualified agent name (e.g. '@aibast-agents-library/art-generator'). Required for install, remove, and info.",
                     },
                     "search_query": {
                         "type": "string",
@@ -184,7 +184,7 @@ class AgentLibraryManager(BasicAgent):
 
     def _install(self, agent_name):
         if not agent_name:
-            return "❌ Please provide agent_name (e.g. '@billwhalen/dynamics-crud'). Use `discover` or `search` first."
+            return "❌ Please provide agent_name (e.g. '@aibast-agents-library/art-generator'). Use `discover` or `search` first."
 
         agent_meta = self._find_agent(agent_name)
         if not agent_meta:
@@ -263,7 +263,7 @@ class AgentLibraryManager(BasicAgent):
 
     def _info(self, agent_name):
         if not agent_name:
-            return "❌ Please provide agent_name (e.g. '@billwhalen/dynamics-crud')."
+            return "❌ Please provide agent_name (e.g. '@aibast-agents-library/art-generator')."
 
         agent = self._find_agent(agent_name)
         if not agent:

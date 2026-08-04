@@ -43,7 +43,7 @@ Usage:
 
 Config (env, with defaults):
   GITHUB_TOKEN / GH_TOKEN   token with discussions read (fetch) / write (seed)
-  AIBAST_RATINGS_REPO          owner/repo        (default: kody-w/RAR)
+  AIBAST_RATINGS_REPO          owner/repo        (default: microsoft/aibast-agents-library)
   AIBAST_RATINGS_CATEGORY      Discussion category (default: Announcements)
 """
 

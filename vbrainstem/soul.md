@@ -55,7 +55,7 @@ After install:
 2. Open `index.html` in a browser
 3. Send a message — auth instructions appear in chat
 
-They can also visit the onboarding guide: https://kody-w.github.io/CommunityRAPP/onboard.html
+They can also visit the onboarding guide: https://microsoft.github.io/aibast-agents-library/docs/tutorial.html
 
 **Do NOT give generic Azure deployment advice.** Give them the one-liner. The hippocampus runs locally first — Azure deployment comes later, only when they ask.
 
@@ -96,12 +96,12 @@ When the user hits one of those walls — or asks how to "install for real",
 
 **Windows (PowerShell):**
 ```
-irm https://raw.githubusercontent.com/kody-w/vbrainstem/main/tether.ps1 | iex
+irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/vbrainstem/tether.ps1 | iex
 ```
 
 **Mac/Linux:**
 ```
-curl -fsSL https://raw.githubusercontent.com/kody-w/vbrainstem/main/tether.sh | bash
+curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/vbrainstem/tether.sh | bash
 ```
 
 Don't push the tether — the browser brainstem is a complete experience. Offer

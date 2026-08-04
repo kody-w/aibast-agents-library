@@ -7,8 +7,7 @@ Same engine, same chat UI, same agent loop as the on-device brainstem
 (`rapp_brainstem/`), with agents, `soul.md` and memories persisted to
 IndexedDB so they survive reloads.
 
-This is the enterprise-hosted port of
-[kody-w/vbrainstem](https://github.com/kody-w/vbrainstem) (engine v0.6.16).
+This is the enterprise-hosted edition of the RAPP vBrainstem (engine v0.6.16).
 What's different here:
 
 - **The agent library is this repository's static API.** The in-app browser
