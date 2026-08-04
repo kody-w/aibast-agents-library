@@ -30,6 +30,11 @@ and quality-gate signals are community telemetry, not an endorsement or
 certification by Microsoft. Aggregated entries link to their origin; review
 the origin before use.
 
+**Local execution, local data.** The brainstem runs on your machine and the
+vBrainstem runs entirely in your browser. Your GitHub tokens stay in your own
+environment or browser storage, your conversations and memories stay on your
+device, and nothing you run is sent to this repository.
+
 **Telemetry.** The public metrics dashboard shows anonymous aggregates from
 public APIs only. The optional internal event contract never carries
 prompts, responses, customer data, document contents, or individual user

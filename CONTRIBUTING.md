@@ -2,6 +2,17 @@
 
 > ⚠️ **IMPORTANT:** This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product. Agent templates are starting points that must be customized before production use. AI-generated output may contain errors or unsupported patterns — human review remains important.
 
+## Licensing of contributions
+
+Most contributions require you to agree to a Contributor License Agreement (CLA)
+declaring that you have the right to, and actually do, grant us the rights to use
+your contribution — visit [Contributor License Agreements](https://cla.opensource.microsoft.com)
+for details; the CLA bot will guide you on your first pull request. By submitting
+a contribution you certify that you have the right to provide it and agree that it
+is licensed under the repository's MIT License. Third-party material must retain
+its original license and attribution; do not add copied code, fonts, media,
+models, or binaries without documenting their provenance and redistribution terms.
+
 ## Quick Version
 
 ```

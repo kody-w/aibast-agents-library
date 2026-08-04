@@ -361,6 +361,18 @@ for f in ('index.html','agents.html','metrics.html'):
     t=open(f).read()
     assert 'Microsoft AIBAST. Some rights reserved.' in t, f
 PY"
+check "README carries standard CLA + Trademarks boilerplate (skill-recorder parity)" "python3 - <<'PY'
+t=open('README.md').read()
+assert 'cla.opensource.microsoft.com' in t
+assert 'Trademark & Brand Guidelines' in t
+assert 'must not cause confusion or imply Microsoft sponsorship' in t
+PY"
+check "CONTRIBUTING certifies provenance + CLA; DISCLAIMER covers local execution" "python3 - <<'PY'
+c=open('CONTRIBUTING.md').read()
+assert 'cla.opensource.microsoft.com' in c and 'provenance' in c
+d=open('DISCLAIMER.md').read()
+assert 'runs on your machine' in d and 'nothing you run is sent to this repository' in d
+PY"
 
 echo "== T-TELEMETRY aibast.tooling.v1 contract =="
 check "schema parses, closed contract, all 13 fields" "python3 - <<'PY'
