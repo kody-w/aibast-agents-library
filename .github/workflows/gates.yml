@@ -41,6 +41,18 @@ jobs:
         # a skipped render test used to pass silently.
         run: python -m playwright install --with-deps chromium
 
+      - name: Generated artifacts are up to date (stable-write)
+        # Runs BEFORE the suite: the suite exercises build_metrics.py, which
+        # legitimately restamps the metrics snapshot the API mirrors.
+        run: |
+          python build_registry.py
+          python scripts/build_api.py
+          if ! git diff --quiet -- registry.json api/v1/agents.json api/v1/agents api/v1/categories.json api/v1/publishers.json api/v1/status.json; then
+            echo "::error::registry.json / api/ are stale — run build_registry.py and scripts/build_api.py and commit the result"
+            git diff --stat -- registry.json api/
+            exit 1
+          fi
+
       - name: Agent contract tests
         run: python -m pytest tests -q
 
@@ -49,12 +61,3 @@ jobs:
         # T-TELEMETRY, data contracts, static page contracts.
         run: bash tests/test_library_frontend.sh
 
-      - name: Generated artifacts are up to date (stable-write)
-        run: |
-          python build_registry.py
-          python scripts/build_api.py
-          if ! git diff --quiet -- registry.json api/; then
-            echo "::error::registry.json / api/ are stale — run build_registry.py and scripts/build_api.py and commit the result"
-            git diff --stat -- registry.json api/
-            exit 1
-          fi
