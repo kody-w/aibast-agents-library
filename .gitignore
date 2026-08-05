@@ -25,3 +25,6 @@ snapshot-*.html
 # web-optimised films that are actually served get committed.
 media/broll/*/
 media/videos/generated/*.mp4
+
+media/plates/base/
+(base tracks stay local — alignment proxies only)

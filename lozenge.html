@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Agent title lozenge</title>
+<!--
+  The gradient title lozenge the professional recordings lay over their opening
+  b-roll, rendered for OUR agent so it can be composited over theirs on the base
+  track. Transparent outside the pill, so only the lozenge lands.
+
+  Sized and placed by align.html; this file only draws it.
+-->
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:transparent;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;
+  font-family:"Segoe UI Semibold","Segoe UI",-apple-system,system-ui,sans-serif}
+.pill{
+  /* Sampled from the reference lozenge: warm pink into violet into indigo. */
+  background:linear-gradient(96deg,#f0699b 0%,#c264cf 42%,#8b6ee8 72%,#6f7cf0 100%);
+  border-radius:2.6cqw;
+  padding:2.6cqh 4cqw;
+  max-width:94%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 1.2cqh 3cqh rgba(0,0,0,.18);
+}
+.pill h1{
+  color:#fff;text-align:center;font-weight:700;letter-spacing:-.01em;
+  line-height:1.16;font-size:5.6cqh;
+  text-shadow:0 .2cqh .6cqh rgba(0,0,0,.14);
+}
+body{container-type:size}
+</style>
+</head>
+<body>
+  <div class="pill"><h1 id="t">Agent</h1></div>
+<script>
+function qs(n){var m=new RegExp("[?&]"+n+"=([^&]*)").exec(location.search);
+  return m?decodeURIComponent(m[1].replace(/\+/g," ")):"";}
+var ref=qs("agent")||qs("skill");
+var kind=qs("skill")?"skill":"agent";
+var slug=ref.split("/").pop();
+var el=document.getElementById("t");
+
+function present(name){
+  // The recordings title the SOLUTION, not the code artifact: "Contract Risk
+  // Review Agent", not "contract-risk-review". Always ends in "Agent".
+  var n=String(name||slug).replace(/[-_]+/g," ").trim();
+  n=n.replace(/\b\w/g,function(c){return c.toUpperCase();});
+  if(!/\bagent$/i.test(n)) n+=" Agent";
+  return n;
+}
+el.textContent=present(slug);
+
+fetch("media/walkthroughs/"+kind+"-"+slug+".json")
+  .then(function(r){return r.ok?r.json():null;})
+  .then(function(d){
+    if(d && d.subject && d.subject.display_name){
+      el.textContent=present(d.subject.display_name);
+    }
+    // Two lines read better than one long one, as in the reference.
+    if(el.textContent.length>26){
+      var w=el.textContent.split(" ");
+      var half=Math.ceil(w.length/2);
+      el.innerHTML=w.slice(0,half).join(" ")+"<br>"+w.slice(half).join(" ");
+    }
+    window.__ready=true;
+  })
+  .catch(function(){ window.__ready=true; });
+</script>
+</body>
+</html>

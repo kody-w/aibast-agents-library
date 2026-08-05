@@ -3,292 +3,341 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Screen alignment — RAPPVision</title>
+<title>Overlay alignment — RAPPVision</title>
 <!--
-  Drag the generated screen over the real laptop plate until it sits inside the
-  bezel, then export the numbers. The export is what the renderer reads, so a
-  visual adjustment here becomes the burned-in framing with no code change.
+  The professional recording is the BASE TRACK. Its cinematography, transitions,
+  Microsoft intro and b-roll all stay; we replace only the boxes that carry
+  agent-specific content — the title lozenge, the overview panels, the laptop
+  screen — by compositing our own over theirs.
 
-  Everything is in PLATE PIXELS (the 1920x1080 frame), not screen pixels, so the
-  exported rect is resolution-independent of whatever browser you calibrate in.
+  This tool is where those boxes get placed. Scrub to the moment a box is on
+  screen, drag ours over theirs, set the time window it lives in, export. The
+  renderer reads the export; nothing here needs a code change to take effect.
+
+  All coordinates are in BASE-TRACK pixels of the 1920x1080 frame, so an export
+  is independent of the browser it was made in.
 -->
 <style>
-:root{
-  --bg:#14161c; --panel:#1e2028; --line:#2e3341; --text:#e9ecf2; --dim:#9aa3b2;
-  --accent:#4f8ef7; --warn:#f5a524; --ok:#2ecc71;
-}
+:root{--bg:#14161c;--panel:#1e2028;--line:#2e3341;--text:#e9ecf2;--dim:#9aa3b2;
+  --accent:#4f8ef7;--ok:#2ecc71;--warn:#f5a524}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,sans-serif;
   display:flex;height:100vh;overflow:hidden}
-
-#stageWrap{flex:1;display:flex;align-items:center;justify-content:center;padding:18px;
-  overflow:auto}
-#stage{position:relative;width:1920px;height:1080px;transform-origin:top left;
+#left{flex:1;display:flex;flex-direction:column;padding:14px;gap:10px;min-width:0}
+#stageWrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;
   background:#000;box-shadow:0 8px 40px rgba(0,0,0,.6);flex:0 0 auto}
-#plate{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  user-select:none;-webkit-user-drag:none}
-#screen{position:absolute;overflow:hidden;outline:2px solid var(--accent);
-  outline-offset:0;background:#fff}
-#screen iframe{border:0;width:1654px;height:973px;transform-origin:top left;
-  pointer-events:none;display:block}
-#screen.grabbing{cursor:grabbing}
-#screen{cursor:grab}
-.h{position:absolute;width:16px;height:16px;background:var(--accent);border:2px solid #fff;
-  border-radius:3px}
-.h.se{right:-9px;bottom:-9px;cursor:nwse-resize}
-.h.ne{right:-9px;top:-9px;cursor:nesw-resize}
-.h.sw{left:-9px;bottom:-9px;cursor:nesw-resize}
-.h.nw{left:-9px;top:-9px;cursor:nwse-resize}
-#screen.locked{outline-color:var(--ok)}
-#screen.locked .h{display:none}
-
-aside{width:340px;flex:0 0 auto;background:var(--panel);border-left:1px solid var(--line);
-  padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
-h1{font-size:16px;font-weight:650}
-p.hint{font-size:12.5px;color:var(--dim);line-height:1.55}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-label{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;
-  letter-spacing:.06em;margin-bottom:4px}
-input[type=number],select,input[type=text]{width:100%;padding:8px 10px;border-radius:7px;
-  border:1px solid var(--line);background:#171a21;color:var(--text);font-family:inherit;
-  font-size:14px;font-variant-numeric:tabular-nums}
-.row{display:flex;gap:8px;flex-wrap:wrap}
+#base{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.reg{position:absolute;outline:2px solid var(--accent);cursor:grab;overflow:hidden;
+  background:#fff}
+.reg.active{outline-color:var(--ok);outline-width:3px;z-index:5}
+.reg.off{display:none}
+.reg iframe{border:0;transform-origin:top left;pointer-events:none;display:block}
+.reg .tag{position:absolute;top:0;left:0;background:var(--accent);color:#fff;
+  font-size:11px;font-weight:700;padding:2px 7px;pointer-events:none;z-index:2}
+.reg.active .tag{background:var(--ok);color:#04331c}
+.h{position:absolute;width:14px;height:14px;background:var(--accent);border:2px solid #fff;
+  border-radius:3px;z-index:3}
+.h.se{right:-8px;bottom:-8px;cursor:nwse-resize}.h.nw{left:-8px;top:-8px;cursor:nwse-resize}
+.h.ne{right:-8px;top:-8px;cursor:nesw-resize}.h.sw{left:-8px;bottom:-8px;cursor:nesw-resize}
+#transport{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+#scrub{flex:1}
 button{border:1px solid var(--line);background:#232734;color:var(--text);border-radius:7px;
-  padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+  padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 button:hover{background:#2b3040}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button.primary:hover{filter:brightness(1.08)}
-.sec{border-top:1px solid var(--line);padding-top:14px}
+button.on{background:var(--ok);border-color:var(--ok);color:#04331c}
+aside{width:330px;flex:0 0 auto;background:var(--panel);border-left:1px solid var(--line);
+  padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+h1{font-size:15px;font-weight:650}
+p.hint{font-size:12px;color:var(--dim);line-height:1.55}
+label{display:block;font-size:10.5px;color:var(--dim);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:3px}
+input,select{width:100%;padding:7px 9px;border-radius:6px;border:1px solid var(--line);
+  background:#171a21;color:var(--text);font-family:inherit;font-size:13px;
+  font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sec{border-top:1px solid var(--line);padding-top:12px}
+.row{display:flex;gap:7px;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font-size:12px;padding:6px 10px;border-radius:20px;border:1px solid var(--line);
+  background:#232734;cursor:pointer;font-weight:600}
+.tab.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+#out{font-family:ui-monospace,Menlo,monospace;font-size:11px;white-space:pre;
+  background:#12141a;border:1px solid var(--line);border-radius:6px;padding:9px;
+  max-height:180px;overflow:auto;color:#c3cbd9}
 kbd{background:#232734;border:1px solid var(--line);border-radius:4px;padding:1px 5px;
-  font-size:11px;font-family:ui-monospace,Menlo,monospace}
-#out{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;white-space:pre;
-  background:#12141a;border:1px solid var(--line);border-radius:7px;padding:10px;
-  max-height:190px;overflow:auto;color:#c3cbd9}
-.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
+  font-size:10.5px;font-family:ui-monospace,Menlo,monospace}
+.badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;
   background:var(--warn);color:#231a00}
-.badge.ok{background:var(--ok);color:#06301a}
+.badge.ok{background:var(--ok);color:#04331c}
 </style>
 </head>
 <body>
 
-<div id="stageWrap">
-  <div id="stage">
-    <img id="plate" alt="laptop plate">
-    <div id="screen">
-      <iframe id="frame" title="generated screen"></iframe>
-      <span class="h nw"></span><span class="h ne"></span>
-      <span class="h sw"></span><span class="h se"></span>
-    </div>
+<div id="left">
+  <div id="stageWrap"><div id="stage"><video id="base" muted playsinline></video></div></div>
+  <div id="transport">
+    <button id="play">▶</button>
+    <input id="scrub" type="range" min="0" max="137" step="0.05" value="3">
+    <span id="clock" style="font-variant-numeric:tabular-nums;font-size:13px">0:03</span>
+    <button id="onlyActive">Solo active</button>
   </div>
 </div>
 
 <aside>
-  <div>
-    <h1>Screen alignment</h1>
-    <p class="hint">Drag the outlined box onto the laptop's display. Corner handles resize it.
-      <kbd>↑↓←→</kbd> nudge 1px, <kbd>Shift</kbd> 10px. <kbd>Alt</kbd>+arrows resize.
-      Numbers are in plate pixels of the 1920×1080 frame.</p>
+  <h1>Overlay alignment</h1>
+  <p class="hint">The professional cut is the base. Scrub to where one of their boxes is on
+    screen, drag ours over it, and set the window it lives in.
+    <kbd>↑↓←→</kbd> nudge, <kbd>Shift</kbd> ×10, <kbd>Alt</kbd> resize.</p>
+
+  <div class="sec">
+    <label for="baseSel">Base track</label>
+    <select id="baseSel"></select>
+    <label for="agent" style="margin-top:8px">Agent content</label>
+    <input id="agent" type="text" value="@aibast-agents-library/inventory-rebalancing">
   </div>
 
   <div class="sec">
-    <label for="agent">Preview content</label>
-    <input id="agent" type="text" value="@aibast-agents-library/inventory-rebalancing">
+    <label>Region</label>
+    <div class="tabs" id="tabs"></div>
     <div class="row" style="margin-top:8px">
-      <label style="flex:1"><span>Time (s)</span>
-        <input id="t" type="number" value="62" min="42" max="120" step="1"></label>
-      <button id="reload">Reload</button>
+      <button id="enable" style="flex:1">Enabled</button>
+      <button id="jump" style="flex:1">Jump to window</button>
     </div>
   </div>
 
   <div class="sec">
     <div class="grid">
-      <div><label for="x">X</label><input id="x" type="number" value="128"></div>
-      <div><label for="y">Y</label><input id="y" type="number" value="51"></div>
-      <div><label for="w">Width</label><input id="w" type="number" value="1654"></div>
-      <div><label for="h">Height</label><input id="h" type="number" value="973"></div>
+      <div><label for="x">X</label><input id="x" type="number"></div>
+      <div><label for="y">Y</label><input id="y" type="number"></div>
+      <div><label for="w">Width</label><input id="w" type="number"></div>
+      <div><label for="h">Height</label><input id="h" type="number"></div>
+      <div><label for="t0">Start (s)</label><input id="t0" type="number" step="0.1"></div>
+      <div><label for="t1">End (s)</label><input id="t1" type="number" step="0.1"></div>
     </div>
-    <div class="row" style="margin-top:10px">
-      <label style="flex:1"><span>Corner radius</span>
-        <input id="r" type="number" value="0" min="0" max="60"></label>
-      <label style="flex:1"><span>Opacity</span>
-        <input id="op" type="number" value="1" min="0.2" max="1" step="0.1"></label>
+    <div class="grid" style="margin-top:8px">
+      <div><label for="r">Radius</label><input id="r" type="number" min="0"></div>
+      <div><label for="fade">Fade (s)</label><input id="fade" type="number" step="0.1" min="0"></div>
     </div>
-    <p class="hint" style="margin-top:8px">Aspect <span id="aspect">1.70</span> ·
-      source render is 1654×973 (<span id="scale">100</span>% scale)</p>
-  </div>
-
-  <div class="sec row">
-    <button id="fit">Fit to bezel</button>
-    <button id="reset">Reset</button>
-    <button id="toggle">Hide overlay</button>
   </div>
 
   <div class="sec">
     <div class="row" style="align-items:center">
       <span class="badge" id="state">unsaved</span>
-      <button class="primary" id="export" style="margin-left:auto">Export calibration.json</button>
+      <button class="primary" id="export" style="margin-left:auto">Export overlays.json</button>
     </div>
-    <p class="hint" style="margin-top:8px">Save the file to
-      <code>media/plates/calibration.json</code> and the renderer picks it up —
-      no code change.</p>
-    <div id="out" style="margin-top:10px"></div>
+    <p class="hint" style="margin-top:7px">Save to
+      <code>media/plates/overlays.json</code>. The renderer composites each region
+      over the base track for its window.</p>
+    <div id="out" style="margin-top:9px"></div>
   </div>
 </aside>
 
 <script>
-var PLATE = "media/plates/laptop-copilot.png";
-var SRC_W = 1654, SRC_H = 973;           // what screen.html renders at
-var st = { x:128, y:51, w:1654, h:973, r:0, op:1 };
+var BASES = [];   // filled from media/plates/base/index.json — every recording
 
-var stage=document.getElementById("stage"), scr=document.getElementById("screen"),
-    frame=document.getElementById("frame"), out=document.getElementById("out"),
-    badge=document.getElementById("state");
+/* One region per box we replace on the base track. Defaults are starting
+   points measured from the reference; the whole purpose of this tool is that
+   they get corrected by eye. */
+var REGIONS = [
+  {id:"title",   label:"Title lozenge", src:"lozenge",
+   x:380, y:400, w:1160, h:280, t0:2.6, t1:6.6, r:28, fade:0.4, on:true},
+  {id:"overview",label:"Overview card", src:"overview",
+   x:0, y:0, w:1920, h:1080, t0:22, t1:42, r:0, fade:0.5, on:true},
+  {id:"screen",  label:"Laptop screen", src:"screen",
+   x:189, y:52, w:1528, h:972, t0:42, t1:120, r:0, fade:0.3, on:true}
+];
 
-function fitStage(){
-  // Scale the 1920x1080 stage to the viewport without distorting it.
-  var wrap=document.getElementById("stageWrap");
-  var s=Math.min((wrap.clientWidth-36)/1920,(wrap.clientHeight-36)/1080);
-  stage.style.transform="scale("+s+")";
-  stage.style.marginRight=(1920*s-1920)+"px";
-  stage.style.marginBottom=(1080*s-1080)+"px";
+var stage=document.getElementById("stage"), base=document.getElementById("base"),
+    scrub=document.getElementById("scrub"), clock=document.getElementById("clock"),
+    out=document.getElementById("out"), badge=document.getElementById("state");
+var sel=0, T=3, solo=false, drag=null;
+
+function agent(){ return document.getElementById("agent").value.trim(); }
+function srcFor(r){
+  var a=encodeURIComponent(agent());
+  if(r.src==="screen")  return "screen.html?agent="+a+"&t="+Math.max(42,T).toFixed(1);
+  if(r.src==="overview")return "vision.html?agent="+a+"&overlay=overview";
+  return "lozenge.html?agent="+a;
 }
-window.addEventListener("resize", fitStage);
+
+function build(){
+  document.querySelectorAll(".reg").forEach(function(n){n.remove();});
+  REGIONS.forEach(function(r,i){
+    var d=document.createElement("div");
+    d.className="reg"; d.dataset.i=i;
+    d.innerHTML='<span class="tag">'+r.label+'</span><iframe></iframe>'+
+      '<span class="h nw"></span><span class="h ne"></span>'+
+      '<span class="h sw"></span><span class="h se"></span>';
+    stage.appendChild(d);
+  });
+  document.getElementById("tabs").innerHTML=REGIONS.map(function(r,i){
+    return '<span class="tab'+(i===sel?" sel":"")+'" data-i="'+i+'">'+r.label+"</span>";
+  }).join("");
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.onclick=function(){ sel=+t.dataset.i; build(); apply(); };
+  });
+  refreshFrames();
+}
+function refreshFrames(){
+  document.querySelectorAll(".reg").forEach(function(d,i){
+    var f=d.querySelector("iframe"), want=srcFor(REGIONS[i]);
+    if(f.dataset.src!==want){ f.dataset.src=want; f.src=want; }
+  });
+}
 
 function apply(){
-  scr.style.left=st.x+"px"; scr.style.top=st.y+"px";
-  scr.style.width=st.w+"px"; scr.style.height=st.h+"px";
-  scr.style.borderRadius=st.r+"px"; scr.style.opacity=st.op;
-  // The iframe renders at its native size; scale it into the chosen rect so
-  // what you see is exactly what the compositor will produce.
-  frame.style.transform="scale("+(st.w/SRC_W)+","+(st.h/SRC_H)+")";
-  ["x","y","w","h","r","op"].forEach(function(k){
-    var el=document.getElementById(k); if(el && document.activeElement!==el) el.value=st[k];
+  REGIONS.forEach(function(r,i){
+    var d=stage.querySelector('.reg[data-i="'+i+'"]'); if(!d) return;
+    var visible = r.on && T>=r.t0 && T<r.t1 && (!solo || i===sel);
+    d.classList.toggle("off", !visible);
+    d.classList.toggle("active", i===sel);
+    d.style.left=r.x+"px"; d.style.top=r.y+"px";
+    d.style.width=r.w+"px"; d.style.height=r.h+"px";
+    d.style.borderRadius=r.r+"px";
+    var f=d.querySelector("iframe");
+    var nat = r.src==="screen" ? [r.w,r.h] : (r.src==="overview" ? [1920,1080] : [r.w,r.h]);
+    f.style.width=nat[0]+"px"; f.style.height=nat[1]+"px";
+    f.style.transform="scale("+(r.w/nat[0])+","+(r.h/nat[1])+")";
   });
-  document.getElementById("aspect").textContent=(st.w/st.h).toFixed(2);
-  document.getElementById("scale").textContent=Math.round(st.w/SRC_W*100);
+  var r=REGIONS[sel];
+  [["x","x"],["y","y"],["w","w"],["h","h"],["t0","t0"],["t1","t1"],["r","r"],["fade","fade"]]
+    .forEach(function(p){
+      var el=document.getElementById(p[0]);
+      if(el && document.activeElement!==el) el.value=r[p[1]];
+    });
+  document.getElementById("enable").textContent=r.on?"Enabled":"Disabled";
+  document.getElementById("enable").className=r.on?"on":"";
+  clock.textContent=Math.floor(T/60)+":"+String(Math.floor(T%60)).padStart(2,"0");
   badge.textContent="unsaved"; badge.className="badge";
   out.textContent=JSON.stringify(payload(),null,2);
 }
 
 function payload(){
   return {
-    schema: "aibast-plate-calibration/1.0",
-    plate: PLATE,
-    frame: { w:1920, h:1080 },
-    render_size: { w:SRC_W, h:SRC_H },
-    screen_rect: { x:Math.round(st.x), y:Math.round(st.y),
-                   w:Math.round(st.w), h:Math.round(st.h) },
-    corner_radius: Math.round(st.r),
-    calibrated_by: "align.html",
-    note: "Set visually against the plate. The renderer composites screen.html at screen_rect; nothing else needs to change."
+    schema:"aibast-overlays/1.0",
+    base_track: document.getElementById("baseSel").value,
+    frame:{w:1920,h:1080},
+    note:"The professional recording is the base; each region composites our content over theirs for its window. Coordinates are base-track pixels.",
+    regions: REGIONS.map(function(r){
+      return { id:r.id, source:r.src, enabled:r.on,
+               rect:{x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.w),h:Math.round(r.h)},
+               window:{start:+r.t0, end:+r.t1}, corner_radius:Math.round(r.r),
+               fade_seconds:+r.fade };
+    })
   };
 }
 
-function loadFrame(){
-  var a=document.getElementById("agent").value.trim();
-  var t=document.getElementById("t").value;
-  frame.src="screen.html?agent="+encodeURIComponent(a)+"&t="+t;
+function fit(){
+  var wrap=document.getElementById("stageWrap");
+  var s=Math.min(wrap.clientWidth/1920, wrap.clientHeight/1080);
+  stage.style.transform="translate(-50%,-50%) scale("+s+")";
+  stage.style.position="absolute"; stage.style.left="50%"; stage.style.top="50%";
 }
+window.addEventListener("resize",fit);
 
-/* ---- drag + resize, all in plate pixels ---- */
-var drag=null;
-function ptInStage(e){
-  var r=stage.getBoundingClientRect();
-  var s=r.width/1920;
-  return { x:(e.clientX-r.left)/s, y:(e.clientY-r.top)/s };
+function pt(e){
+  var b=stage.getBoundingClientRect(), s=b.width/1920;
+  return {x:(e.clientX-b.left)/s, y:(e.clientY-b.top)/s};
 }
-scr.addEventListener("mousedown",function(e){
+stage.addEventListener("mousedown",function(e){
+  var reg=e.target.closest(".reg"); if(!reg) return;
+  sel=+reg.dataset.i;
   var handle=e.target.classList.contains("h")?e.target.className.split(" ")[1]:null;
-  var p=ptInStage(e);
-  drag={ handle:handle, sx:p.x, sy:p.y, o:Object.assign({},st) };
-  scr.classList.add("grabbing");
-  e.preventDefault();
+  var p=pt(e);
+  drag={handle:handle, sx:p.x, sy:p.y, o:Object.assign({},REGIONS[sel])};
+  build(); apply(); e.preventDefault();
 });
 window.addEventListener("mousemove",function(e){
   if(!drag) return;
-  var p=ptInStage(e), dx=p.x-drag.sx, dy=p.y-drag.sy, o=drag.o;
-  if(!drag.handle){ st.x=o.x+dx; st.y=o.y+dy; }
+  var p=pt(e), dx=p.x-drag.sx, dy=p.y-drag.sy, o=drag.o, r=REGIONS[sel];
+  if(!drag.handle){ r.x=o.x+dx; r.y=o.y+dy; }
   else{
-    if(drag.handle==="se"){ st.w=Math.max(120,o.w+dx); st.h=Math.max(80,o.h+dy); }
-    if(drag.handle==="ne"){ st.w=Math.max(120,o.w+dx); st.h=Math.max(80,o.h-dy); st.y=o.y+dy; }
-    if(drag.handle==="sw"){ st.w=Math.max(120,o.w-dx); st.x=o.x+dx; st.h=Math.max(80,o.h+dy); }
-    if(drag.handle==="nw"){ st.w=Math.max(120,o.w-dx); st.x=o.x+dx;
-                            st.h=Math.max(80,o.h-dy); st.y=o.y+dy; }
+    if(drag.handle.indexOf("e")>-1) r.w=Math.max(60,o.w+dx);
+    if(drag.handle.indexOf("s")>-1) r.h=Math.max(40,o.h+dy);
+    if(drag.handle.indexOf("w")>-1){ r.w=Math.max(60,o.w-dx); r.x=o.x+dx; }
+    if(drag.handle.indexOf("n")>-1){ r.h=Math.max(40,o.h-dy); r.y=o.y+dy; }
   }
   apply();
 });
-window.addEventListener("mouseup",function(){ drag=null; scr.classList.remove("grabbing"); });
-
+window.addEventListener("mouseup",function(){ drag=null; });
 window.addEventListener("keydown",function(e){
-  if(/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
-  var k=e.key, step=e.shiftKey?10:1;
-  var map={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
-  if(!map[k]) return;
+  if(/^(INPUT|SELECT)$/.test(document.activeElement.tagName)) return;
+  var m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+  if(!m) return;
   e.preventDefault();
-  if(e.altKey){ st.w=Math.max(120,st.w+map[k][0]*step); st.h=Math.max(80,st.h+map[k][1]*step); }
-  else { st.x+=map[k][0]*step; st.y+=map[k][1]*step; }
+  var r=REGIONS[sel], s=e.shiftKey?10:1;
+  if(e.altKey){ r.w=Math.max(60,r.w+m[0]*s); r.h=Math.max(40,r.h+m[1]*s); }
+  else { r.x+=m[0]*s; r.y+=m[1]*s; }
   apply();
 });
 
-["x","y","w","h","r","op"].forEach(function(k){
+["x","y","w","h","t0","t1","r","fade"].forEach(function(k){
   document.getElementById(k).addEventListener("input",function(){
-    var v=parseFloat(this.value); if(!isNaN(v)){ st[k]=v; apply(); }
+    var v=parseFloat(this.value); if(!isNaN(v)){ REGIONS[sel][k]=v; apply(); }
   });
 });
-
-document.getElementById("reload").onclick=loadFrame;
-document.getElementById("agent").addEventListener("change",loadFrame);
-document.getElementById("t").addEventListener("change",loadFrame);
-document.getElementById("reset").onclick=function(){
-  st={x:128,y:51,w:1654,h:973,r:0,op:1}; apply();
+document.getElementById("enable").onclick=function(){
+  REGIONS[sel].on=!REGIONS[sel].on; apply();
 };
-document.getElementById("fit").onclick=function(){
-  // Detect the bright display region of the plate and snap to it — the same
-  // measurement the pipeline used, offered as a starting point you can correct.
-  var img=document.getElementById("plate");
-  var c=document.createElement("canvas"); c.width=1920; c.height=1080;
-  var g=c.getContext("2d"); g.drawImage(img,0,0,1920,1080);
-  var d=g.getImageData(0,0,1920,1080).data;
-  var minX=1920,minY=1080,maxX=0,maxY=0,found=false;
-  for(var y=0;y<1080;y+=2){
-    for(var x=0;x<1920;x+=2){
-      var i=(y*1920+x)*4;
-      if(d[i]>224&&d[i+1]>224&&d[i+2]>224){
-        found=true;
-        if(x<minX)minX=x; if(x>maxX)maxX=x;
-        if(y<minY)minY=y; if(y>maxY)maxY=y;
-      }
-    }
-  }
-  if(!found){ alert("No bright display region found in this plate."); return; }
-  st.x=minX; st.y=minY; st.w=maxX-minX; st.h=maxY-minY; apply();
+document.getElementById("jump").onclick=function(){
+  T=REGIONS[sel].t0+0.4; base.currentTime=T; scrub.value=T; apply(); refreshFrames();
 };
-document.getElementById("toggle").onclick=function(){
-  var hidden=scr.style.visibility==="hidden";
-  scr.style.visibility=hidden?"visible":"hidden";
-  this.textContent=hidden?"Hide overlay":"Show overlay";
+document.getElementById("onlyActive").onclick=function(){
+  solo=!solo; this.className=solo?"on":""; apply();
 };
+document.getElementById("play").onclick=function(){
+  if(base.paused){ base.play(); this.textContent="⏸"; } else { base.pause(); this.textContent="▶"; }
+};
+base.addEventListener("timeupdate",function(){
+  if(base.paused) return;
+  T=base.currentTime; scrub.value=T; apply();
+});
+scrub.addEventListener("input",function(){
+  T=parseFloat(this.value); base.currentTime=T; apply(); refreshFrames();
+});
+document.getElementById("agent").addEventListener("change",refreshFrames);
+document.getElementById("baseSel").addEventListener("change",function(){
+  base.src="media/plates/base/"+this.value+".mp4"; base.currentTime=T;
+});
 document.getElementById("export").onclick=function(){
-  var blob=new Blob([JSON.stringify(payload(),null,2)],{type:"application/json"});
+  var b=new Blob([JSON.stringify(payload(),null,2)],{type:"application/json"});
   var a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="calibration.json"; a.click();
+  a.href=URL.createObjectURL(b); a.download="overlays.json"; a.click();
   badge.textContent="exported"; badge.className="badge ok";
 };
 
-// Load any existing calibration so you refine rather than restart.
-fetch("media/plates/calibration.json").then(function(r){return r.ok?r.json():null;})
-  .then(function(c){
-    if(c && c.screen_rect){
-      st.x=c.screen_rect.x; st.y=c.screen_rect.y;
-      st.w=c.screen_rect.w; st.h=c.screen_rect.h;
-      st.r=c.corner_radius||0;
-      if(c.plate) PLATE=c.plate;
-    }
+function label(id){
+  return id.replace(/[-_]+/g," ").replace(/\b\w/g,function(c){return c.toUpperCase();});
+}
+fetch("media/plates/base-tracks.json").then(function(r){return r.ok?r.json():null;})
+  .then(function(d){
+    BASES=(d&&d.tracks||[]).map(function(t){return {id:t,label:label(t)};});
+    if(!BASES.length) BASES=[{id:"product-line-optimization-agent",
+                              label:"Product Line Optimization Agent"}];
+    document.getElementById("baseSel").innerHTML=BASES.map(function(b){
+      return '<option value="'+b.id+'">'+b.label+"</option>";
+    }).join("");
   })
   .catch(function(){})
+  .then(function(){ return fetch("media/plates/overlays.json"); }).then(function(r){return r.ok?r.json():null;})
+  .then(function(c){
+    if(c && c.regions){
+      c.regions.forEach(function(saved){
+        var r=REGIONS.filter(function(x){return x.id===saved.id;})[0];
+        if(!r) return;
+        r.x=saved.rect.x; r.y=saved.rect.y; r.w=saved.rect.w; r.h=saved.rect.h;
+        r.t0=saved.window.start; r.t1=saved.window.end;
+        r.r=saved.corner_radius||0; r.fade=saved.fade_seconds||0; r.on=saved.enabled!==false;
+      });
+      if(c.base_track) document.getElementById("baseSel").value=c.base_track;
+    }
+  }).catch(function(){})
   .then(function(){
-    document.getElementById("plate").src=PLATE;
-    loadFrame(); apply(); fitStage();
+    base.src="media/plates/base/"+document.getElementById("baseSel").value+".mp4";
+    base.currentTime=T;
+    build(); apply(); fit();
   });
 </script>
 </body>
