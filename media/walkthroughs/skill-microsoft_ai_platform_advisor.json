@@ -3,38 +3,22 @@
   "format_version": "1.0.0",
   "remix": {
     "placeholder": "[operator supplies]",
-    "slot_count": 6,
+    "slot_count": 2,
     "slots": [
       {
         "path": "scenes[3].turns[0].text",
-        "template": "Guides a customer through a discovery interview, recommends the right Microsoft AI platform (M365 Copilot, Agent Builder, Copilot Studio, Foundry, Foundry Agent Service, Windows AI Foundry, or Agent 365 as the governance layer), scores technical complexity and risk, and plots them on a 2x2 quadrant chart with planning guidance for [operator supplies]."
+        "template": "Guides a customer through a discovery interview, recommends the right Microsoft AI platform (M365 Copilot, Agent for [operator supplies]."
       },
       {
-        "path": "scenes[3].turns[1].body[0]",
-        "template": "Result: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[1].body[1]",
-        "template": "Confidence and sources: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[3].body[0]",
-        "template": "Step 1: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[3].body[1]",
-        "template": "Step 2: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[3].body[2]",
-        "template": "Step 3: [operator supplies]"
+        "path": "scenes[3].turns[1].body[2]",
+        "template": "Verified against the source before reporting \u2014 [operator supplies]"
       }
     ],
     "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
     "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T17:42:23+00:00",
+  "generated": "2026-08-05T19:27:31+00:00",
   "subject": {
     "slug": "microsoft_ai_platform_advisor",
     "kind": "skill",
@@ -84,7 +68,7 @@
           "Recommends the right Microsoft AI platform"
         ]
       },
-      "narration": "microsoft-ai-platform-advisor reads what it needs, works where you already are, and hands back something you can act on."
+      "narration": "microsoft-ai-platform-advisor reads what it needs and works where you already are. It draws on Runs on what the operator already has open \u2014 no additional configuration. and it can recommends the right Microsoft AI platform. Everything it does is grounded in your own systems, under your own permissions. Nothing is copied out, and nothing is cached somewhere you cannot see it."
     },
     {
       "act": "walkthrough",
@@ -94,14 +78,16 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Guides a customer through a discovery interview, recommends the right Microsoft AI platform (M365 Copilot, Agent Builder, Copilot Studio, Foundry, Foundry Agent Service, Windows AI Foundry, or Agent 365 as the governance layer), scores technical complexity and risk, and plots them on a 2x2 quadrant chart with planning guidance for [operator supplies]."
+          "text": "Guides a customer through a discovery interview, recommends the right Microsoft AI platform (M365 Copilot, Agent for [operator supplies]."
         },
         {
           "role": "agent",
           "heading": "microsoft-ai-platform-advisor",
           "body": [
-            "Result: [operator supplies]",
-            "Confidence and sources: [operator supplies]"
+            "Read from the operator's working context",
+            "Recommends the right Microsoft AI platform",
+            "Verified against the source before reporting \u2014 [operator supplies]",
+            "Nothing written back without confirmation"
           ],
           "agent_call": "microsoft_ai_platform_advisor"
         },
@@ -113,26 +99,26 @@
           "role": "agent",
           "heading": "Recommended plan",
           "body": [
-            "Step 1: [operator supplies]",
-            "Step 2: [operator supplies]",
-            "Step 3: [operator supplies]"
+            "1. Recommend the right Microsoft AI platform",
+            "2. Confirm the result against the source system",
+            "3. Hand back the artifact, and the reasoning behind it"
           ],
           "agent_call": "microsoft_ai_platform_advisor"
         }
       ],
-      "narration": "The operator asks in their own words. The agent answers with structure, and names the tool it called."
+      "narration": "Here it is in use. The operator asks in their own words \u2014 no form to fill in and no syntax to learn. microsoft-ai-platform-advisor works out what is being asked, chooses the tools it needs, and calls them. The answer comes back with structure: what it found, what it recommends, and the tool it called to get there. That last part matters, because it is what makes the answer checkable rather than merely convincing. Ask a follow-up and it carries the context forward, so the conversation builds instead of restarting. Notice what is not happening here. Nobody is copying data between systems, and nobody is retyping an answer into a document. The agent is reading the systems of record in place, under the permissions the operator already has. so the answer reflects what is true right now rather than whatever was exported last week. Where a figure has to come from the operator, it is marked rather than invented. That is deliberate \u2014 a demonstration that fabricates a number teaches the room something false. Everything else on screen is generated from this agent's own manifest. which is why it can be produced for every agent in the library, not only the ones that got a film crew. The same manifest drives the one-pager, the architecture diagram and the review you can read alongside this. One source of truth, four surfaces, and none of them can drift from the others. When the agent changes, all of them change with it."
     },
     {
       "act": "close",
       "start": 120.0,
       "end": 137.0,
       "shot": "Dark card, gradient CTA panel",
+      "narration": "microsoft-ai-platform-advisor is one of more than a hundred agents in the AIBAST library. Every one ships as a single file you can read before you run it. with its architecture, its review and this walkthrough alongside it. Start from the library, or bring your own use case.",
       "on_screen": [
         "Get started on your agentic journey today.",
         "Talk to your Microsoft representative to learn more.",
         "@cat-agent-skills/microsoft_ai_platform_advisor \u00b7 MIT"
-      ],
-      "narration": ""
+      ]
     }
   ]
 }

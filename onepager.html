@@ -379,12 +379,17 @@ function renderAgent(agent, review, rating, source) {
     if (params.indexOf(k) === -1 && k !== "type" && k !== "properties") params.push(k);
   });
 
-  var video = agent.video || null;
+  // A generated film, when this agent has one. It is labelled as generated —
+  // the b-roll and the laptop are real footage, everything on screen is not.
+  var video = agent.video || (FILMS[agent.name.split("/").pop()] || null);
   var html = '' +
     (video ? '<div class="video-wrap"><video controls preload="metadata" poster="" src="' + esc(video.src) + '"' +
         ' onplay="track(\'library.video.started\',\'' + esc(agent.name) + '\')"' +
         ' onended="track(\'library.video.completed\',\'' + esc(agent.name) + '\')"></video>' +
-        '<div class="video-meta"><span>Demo recording</span><span>' + esc(video.size_mb || "") + ' MB</span></div></div>' : "") +
+        '<div class="video-meta"><span>' + (video.generated ? "Generated demo" : "Demo recording") +
+        '</span><span>' + esc(video.size_mb || "") + ' MB</span>' +
+        (video.generated ? '<span class="muted">Real b-roll and laptop; screen content and narration generated from the manifest</span>' : "") +
+        "</div></div>" : "") +
     '<article class="sheet"><div class="bar"></div><div class="inner">' +
       '<div class="kicker">' + esc((agent.category || "general").replace(/_/g, " ")) + "</div>" +
       "<h1>" + esc(agent.display_name) + "</h1>" +
@@ -479,6 +484,7 @@ function renderSolution(sol) {
  * demo becomes the one you present. Nothing leaves the browser.
  * ------------------------------------------------------------------------- */
 var STORYBOARD = null;
+var FILMS = {};
 
 function global_mirror_ok() {
   return typeof RAPPMirror !== "undefined" && !!RAPPMirror.exportAgent;
@@ -703,10 +709,14 @@ function fail(msg) {
 
   Promise.all([
     getJSON(["api/v1/agents.json", "registry.json"]),
+    getJSON(["media/videos/generated/index.json"]),
     getJSON(["api/v1/reviews.json", "state/agent_reviews.json"]),
     getJSON(["state/discussion_ratings.json"])
   ]).then(function (r) {
-    var registry = r[0], reviews = r[1], ratings = r[2];
+    var registry = r[0], films = r[1], reviews = r[2], ratings = r[3];
+    (films && films.films || []).forEach(function (f) {
+      FILMS[f.slug] = { src: f.src, size_mb: f.size_mb, generated: true };
+    });
     if (!registry) return fail("The agent registry could not be loaded.");
     var list = registry.agents || registry;
     var agent = list.filter(function (a) {

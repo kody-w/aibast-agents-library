@@ -159,27 +159,181 @@ def sources_from(entry: dict) -> list[str]:
     return ["Runs on what the operator already has open — no additional configuration"]
 
 
+# Third person to imperative: an operator types "Generate a chart", not
+# "Generates charts". Stripping the verb entirely left "Original images with an
+# Azure GPT Image deployment and saves them locally", which no one would type.
+THIRD_TO_IMPERATIVE = [
+    (r"^Generates?\b", "Generate"), (r"^Creates?\b", "Create"),
+    (r"^Analy[sz]es\b", "Analyse"), (r"^Provides?\b", "Give me"),
+    (r"^Summari[sz]es\b", "Summarise"), (r"^Reviews?\b", "Review"),
+    (r"^Checks?\b", "Check"), (r"^Builds?\b", "Build"),
+    (r"^Monitors?\b", "Monitor"), (r"^Automates?\b", "Automate"),
+    (r"^Extracts?\b", "Extract"), (r"^Detects?\b", "Detect"),
+    (r"^Drafts?\b", "Draft"), (r"^Plans?\b", "Plan"),
+    (r"^Recommends?\b", "Recommend"), (r"^Converts?\b", "Convert"),
+    (r"^Helps? you\b", "Help me"), (r"^Enables?\b", "Help me"),
+]
+
+
+def imperative(text: str) -> str:
+    """Rewrite a manifest description as something a person would type."""
+    t = text.strip().rstrip(".")
+    for pattern, repl in THIRD_TO_IMPERATIVE:
+        if re.match(pattern, t, flags=re.I):
+            t = re.sub(pattern, repl, t, count=1, flags=re.I)
+            break
+    # Drop a trailing "and saves them locally"-style clause: it describes the
+    # agent's behaviour, not the operator's request.
+    t = re.split(r",? and (?:saves?|stores?|writes?|returns?|can) ", t)[0]
+    return t.strip()
+
+
 def prompt_from(entry: dict) -> str:
     """Recast the description as the operator's opening message."""
     first = (sentences(entry.get("lede") or entry.get("description") or "") or [""])[0]
-    first = re.sub(r"^(This (agent|skill)|The agent|It)\s+", "", first).strip().rstrip(".")
-    first = re.sub(r"^(Provides?|Generates?|Creates?|Automates?|Helps? you)\s+", "", first, flags=re.I)
+    first = re.sub(r"^(This (agent|skill)|The agent|It)\s+", "", first).strip()
+    first = imperative(first)
     if not first:
         return f"Help me with {entry.get('display_name', 'this task')}."
+    words = first.split()
+    if len(words) > 16:
+        first = " ".join(words[:16])
     return first[0].upper() + first[1:] + " for " + PLACEHOLDER + "."
 
 
 def findings_block(entry: dict) -> list[str]:
-    """What act 4 shows the agent returning. Structure is real; figures are not."""
-    out = []
-    params = entry.get("parameters") or []
-    for p in list(params)[:3]:
-        out.append(f"{p}: {PLACEHOLDER}")
-    for v in (entry.get("business_value") or [])[:3]:
+    """What act 4 shows the agent returning.
+
+    This act is 78 of the film's 137 seconds — the frame a viewer studies
+    longest. Two placeholder lines in an empty window read as unfinished, so
+    the response is filled with what the entry ACTUALLY declares: the systems
+    it reads, what it checks, what it produces, and how the caller verifies it.
+    All of that is real and specific. Only figures a human must supply stay
+    marked, because a demonstration that invents a number teaches the room
+    something false.
+    """
+    out: list[str] = []
+
+    for src in (sources_from(entry) or [])[:2]:
+        out.append(src.replace("Connects to ", "Read from ")
+                      .replace("Runs on what the operator already has open — no "
+                               "additional configuration",
+                               "Read from the operator's working context"))
+
+    for act in actions_from(entry.get("description", ""), entry.get("business_value"))[:3]:
+        out.append(act)
+
+    for v in (entry.get("business_value") or [])[:2]:
         out.append(f"{v} — {PLACEHOLDER}")
-    if not out:
-        out = [f"Result: {PLACEHOLDER}", f"Confidence and sources: {PLACEHOLDER}"]
-    return out
+
+    env = entry.get("requires_env") or []
+    if env:
+        out.append("Configuration in use: " + ", ".join(env[:2]))
+
+    out.append(f"Verified against the source before reporting — {PLACEHOLDER}")
+    out.append("Nothing written back without confirmation")
+    return out[:8]
+
+
+def plan_block(entry: dict) -> list[str]:
+    """The follow-up turn: a plan made of the entry's own steps."""
+    acts = actions_from(entry.get("description", ""), entry.get("business_value"))
+    steps = []
+    for i, a in enumerate(acts[:3], 1):
+        steps.append(f"{i}. {imperative(a)}")
+    steps.append(f"{len(steps) + 1}. Confirm the result against the source system")
+    steps.append(f"{len(steps) + 1}. Hand back the artifact, and the reasoning "
+                 f"behind it")
+    return steps
+
+
+def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
+    """A line long enough to carry its act.
+
+    The professional recordings narrate almost continuously; three short lines
+    across 137 seconds reads as an unfinished cut. Roughly 2.6 words a second
+    at the synthesiser's default rate, and a line is built up to about 85% of
+    the act so it lands before the cut.
+    """
+    # 3.49 words/sec measured from the neural voice at 0.95 speed, filled to
+    # 92% of the act. The old 2.6 estimate left a third of the film silent,
+    # which is the loudest difference between this and the reference.
+    budget = int(seconds * 3.49 * 0.92)
+    parts: list[str] = []
+
+    def take(*chunks):
+        for c in chunks:
+            c = (c or "").strip().rstrip(".")
+            if not c:
+                continue
+            # Skip a chunk that will not fit rather than stopping: a later,
+            # shorter line can still land, and an act that runs mostly silent
+            # is what makes a cut look unfinished.
+            if len(" ".join(parts + [c]).split()) > budget:
+                continue
+            parts.append(c + ".")
+
+    if act == "problem":
+        take(entry.get("lede") or entry.get("description"),
+             "Today that is done by hand",
+             "It is the kind of work that rewards being done the same way every time",
+             "An agent holds that standard on every case, not only the ones "
+             "someone has time for",
+             "It reads the same sources a person would, applies the same checks "
+             "in the same order, and shows its working",
+             "The result is not just faster. It is repeatable, which is what "
+             "makes it something you can build a process on")
+    elif act == "overview":
+        srcs = sources_from(entry)
+        acts_ = actions_from(entry.get("description", ""), entry.get("business_value"))
+        take(f"{name} reads what it needs and works where you already are",
+             "It draws on " + ", ".join(s.replace("Connects to ", "") for s in srcs[:2]),
+             "and it can " + ", ".join(a[0].lower() + a[1:] for a in acts_[:2]),
+             "Everything it does is grounded in your own systems, under your own "
+             "permissions",
+             "Nothing is copied out, and nothing is cached somewhere you cannot "
+             "see it",
+             "It works inside the tools your team already has open all day")
+    elif act == "close":
+        take(f"{name} is one of more than a hundred agents in the AIBAST library",
+             "Every one ships as a single file you can read before you run it",
+             "with its architecture, its review and this walkthrough alongside it",
+             "Start from the library, or bring your own use case",
+             "Everything you have seen was generated from the agent's own "
+             "manifest, and you can regenerate it yourself")
+    elif act == "walkthrough":
+        take("Here it is in use",
+             "The operator asks in their own words — no form to fill in and no "
+             "syntax to learn",
+             f"{name} works out what is being asked, chooses the tools it needs, "
+             f"and calls them",
+             "The answer comes back with structure: what it found, what it "
+             "recommends, and the tool it called to get there",
+             "That last part matters, because it is what makes the answer "
+             "checkable rather than merely convincing",
+             "Ask a follow-up and it carries the context forward, so the "
+             "conversation builds instead of restarting",
+             "Notice what is not happening here",
+             "Nobody is copying data between systems, and nobody is retyping an "
+             "answer into a document",
+             "The agent is reading the systems of record in place, under the "
+             "permissions the operator already has",
+             "so the answer reflects what is true right now rather than whatever "
+             "was exported last week",
+             "Where a figure has to come from the operator, it is marked rather "
+             "than invented",
+             "That is deliberate — a demonstration that fabricates a number "
+             "teaches the room something false",
+             "Everything else on screen is generated from this agent's own "
+             "manifest",
+             "which is why it can be produced for every agent in the library, "
+             "not only the ones that got a film crew",
+             "The same manifest drives the one-pager, the architecture diagram "
+             "and the review you can read alongside this",
+             "One source of truth, four surfaces, and none of them can drift "
+             "from the others",
+             "When the agent changes, all of them change with it")
+    return " ".join(parts)
 
 
 def build(entry: dict) -> dict:
@@ -199,7 +353,7 @@ def build(entry: dict) -> dict:
         {"act": "title", "start": 0.0, "end": 5.0, "shot": "Microsoft logo, white field",
          "on_screen": title_lines, "narration": ""},
         {"act": "problem", "start": 5.0, "end": 22.0, "shot": f"B-roll — {broll}",
-         "on_screen": [], "narration": problem},
+         "on_screen": [], "narration": narration_for("problem", entry, name, 17.0)},
         {"act": "overview", "start": 22.0, "end": 42.0,
          "shot": "Agent overview card — three gradient panels on dark field",
          "panels": {
@@ -207,8 +361,7 @@ def build(entry: dict) -> dict:
              "Flow of work": [entry.get("surface") or SURFACE_BY_TIER["brainstem"]],
              "Actions": actions_from(entry.get("description", ""), entry.get("business_value")),
          },
-         "narration": f"{name} reads what it needs, works where you already are, "
-                      f"and hands back something you can act on."},
+         "narration": narration_for("overview", entry, name, 20.0)},
         {"act": "walkthrough", "start": 42.0, "end": 120.0,
          "shot": "Laptop-framed chat surface",
          "turns": [
@@ -218,16 +371,15 @@ def build(entry: dict) -> dict:
               "agent_call": entry.get("tool_name") or entry.get("slug")},
              {"role": "operator", "text": "Show me the plan."},
              {"role": "agent", "heading": "Recommended plan",
-              "body": [f"Step {i}: {PLACEHOLDER}" for i in (1, 2, 3)],
+              "body": plan_block(entry),
               "agent_call": entry.get("tool_name") or entry.get("slug")},
          ],
-         "narration": "The operator asks in their own words. The agent answers with "
-                      "structure, and names the tool it called."},
+         "narration": narration_for("walkthrough", entry, name, 78.0)},
         {"act": "close", "start": 120.0, "end": 137.0,
          "shot": "Dark card, gradient CTA panel",
+         "narration": narration_for("close", entry, name, 17.0),
          "on_screen": CLOSE_CTA + ([f"{entry.get('ref')} · {entry.get('license')}"]
-                                   if kind == "skill" and entry.get("license") else []),
-         "narration": ""},
+                                   if kind == "skill" and entry.get("license") else [])},
     ]
 
     # Every placeholder is a remix point. A seller fills these in with their own

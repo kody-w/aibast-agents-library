@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RAPPVision screen plate</title>
+<!--
+  The screen interior only, at the exact pixel size of the laptop display in the
+  professional plate (1654x973 at x=128,y=51 of a 1920x1080 frame).
+
+  The laptop, the desk, the lighting and the background gradient are real
+  footage from the AIBAST recordings. Only what is ON the screen is generated,
+  which is why a generated film sits at the same production level as the ones
+  that had a crew: the expensive part of the frame was already shot.
+
+  Driven by the same storyboard JSON as vision.html, seeked with ?t=<seconds>.
+-->
+<style>
+:root{
+  --ink:#1b1a19; --dim:#4b4a49; --faint:#8a8886; --line:#e6e6e6;
+  --op:#eee6fb; --accent:#4f52c9; --ok:#0f7b0f; --mark:#fff3bf;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1654px;height:973px;overflow:hidden;background:#faf9f8}
+body{font-family:"Segoe UI",-apple-system,system-ui,sans-serif;color:var(--ink);
+  display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* top chrome — matches the plate's own bar */
+.bar{flex:0 0 auto;height:78px;display:flex;align-items:center;padding:0 34px;gap:14px}
+.bar .title{font-size:19px;color:#3b3a39;font-weight:400;letter-spacing:-.005em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
+.bar .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.pill{border:1px solid #e0e0e0;border-radius:7px;padding:7px 15px;font-size:16px;
+  font-weight:600;color:#242424;background:#fff}
+.sq{width:34px;height:34px;border-radius:7px;background:#4f52c9}
+.sq.ghost{background:#fff;border:1px solid #e0e0e0}
+
+/* conversation */
+.flow{flex:1;overflow:hidden;padding:12px 60px 0;display:flex;flex-direction:column;gap:26px}
+.op{align-self:flex-end;background:var(--op);border-radius:12px;padding:16px 22px;
+  font-size:21px;line-height:1.42;max-width:64%;overflow-wrap:anywhere}
+.ag{align-self:flex-start;width:88%}
+.ag .who{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;
+  margin-bottom:12px}
+.ag .who i{width:26px;height:26px;border-radius:6px;display:block;
+  background:linear-gradient(135deg,#0f7b7b,#0f7b0f)}
+.ag h4{font-size:25px;font-weight:700;margin-bottom:12px;letter-spacing:-.01em}
+.ag ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.ag li{font-size:20px;line-height:1.45;padding-left:22px;position:relative;color:#2c2c2c;
+  overflow-wrap:anywhere}
+.ag li:before{content:"";position:absolute;left:2px;top:11px;width:7px;height:7px;
+  border-radius:50%;background:#8b5cf6}
+.mark{background:var(--mark);border-radius:3px;padding:0 5px}
+.call{margin-top:16px;font-size:17px;color:#5b5b5b;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.call b{color:#1b1a19;font-weight:700}
+
+/* composer — matches the plate */
+.composer{flex:0 0 auto;padding:0 60px 14px}
+.box{border:1px solid #dcdcdc;border-radius:26px;background:#fff;padding:18px 24px 12px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.box .ph{font-size:20px;color:#9a9a9a;min-height:26px}
+.box .ph.typed{color:#1b1a19}
+.caret{display:inline-block;width:2px;height:22px;background:#1b1a19;vertical-align:-4px;
+  margin-left:1px;animation:b 1s steps(2) infinite}
+@keyframes b{50%{opacity:0}}
+.box .row{display:flex;align-items:center;gap:14px;margin-top:14px}
+.box .row .chip{display:flex;align-items:center;gap:8px;border:1px solid #e2e2e2;
+  border-radius:8px;padding:6px 12px;font-size:16px;font-weight:600}
+.box .row .chip i{width:20px;height:20px;border-radius:5px;
+  background:linear-gradient(135deg,#0f7b7b,#0f7b0f);display:block}
+.box .row .send{margin-left:auto;width:36px;height:36px;border-radius:50%;background:#4f52c9}
+.fine{text-align:center;font-size:15px;color:#8a8886;padding:8px 0 10px}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <div class="title" id="barTitle"></div>
+    <div class="right">
+      <div class="pill" id="model">GPT-5 On</div>
+      <div class="sq"></div><div class="sq ghost"></div>
+    </div>
+  </div>
+  <div class="flow" id="flow"></div>
+  <div class="composer">
+    <div class="box">
+      <div class="ph" id="ph">Message Copilot</div>
+      <div class="row">
+        <div class="chip"><i></i><span id="agentChip">Agent</span></div>
+        <div class="send"></div>
+      </div>
+    </div>
+  </div>
+  <div class="fine">AI-generated content may be incorrect</div>
+
+<script>
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function qs(n){var m=new RegExp("[?&]"+n+"=([^&]*)").exec(location.search);
+  return m?decodeURIComponent(m[1].replace(/\+/g," ")):"";}
+
+var DOC=null, T=0, PH="[operator supplies]";
+function mark(t){ return esc(t).split(esc(PH)).join('<span class="mark">'+esc(PH)+"</span>"); }
+
+/* Same reveal schedule as the player, so the burned film and the live
+   storyboard show the same thing at the same second. */
+function paint(){
+  if(!DOC) return;
+  var scene=DOC.scenes.filter(function(s){return s.act==="walkthrough";})[0];
+  var turns=scene.turns||[], span=scene.end-scene.start, per=span/turns.length;
+  var local=Math.max(0, T-scene.start);
+  var html="", typing=null;
+
+  turns.forEach(function(turn,i){
+    var at=i*per, done=local>=at+per*0.55;
+    if(local<at) return;
+    if(turn.role==="operator"){
+      if(!done){
+        var full=turn.text;
+        typing=full.slice(0, Math.max(0, Math.floor(full.length*((local-at)/(per*0.55)))));
+        return;
+      }
+      html+='<div class="op">'+mark(turn.text)+"</div>";
+    } else {
+      var reveal=Math.min(1,(local-at)/(per*0.6));
+      var body=turn.body||[];
+      var show=Math.max(1,Math.ceil(body.length*reveal));
+      html+='<div class="ag"><div class="who"><i></i>Agent</div><h4>'+esc(turn.heading)+"</h4><ul>"+
+        body.slice(0,show).map(function(b){return "<li>"+mark(b)+"</li>";}).join("")+"</ul>"+
+        (reveal>=1?'<div class="call">↳ <b>Agent Calls:</b> '+esc(turn.agent_call)+"</div>":"")+
+        "</div>";
+    }
+  });
+
+  var flow=document.getElementById("flow");
+  flow.innerHTML=html;
+  // Keep the newest turn in view, the way a real transcript scrolls.
+  flow.scrollTop=flow.scrollHeight;
+
+  var ph=document.getElementById("ph");
+  if(typing!==null){ ph.className="ph typed"; ph.innerHTML=esc(typing)+'<span class="caret"></span>'; }
+  else { ph.className="ph"; ph.textContent="Message Copilot"; }
+}
+
+(function boot(){
+  var agent=qs("agent"), skill=qs("skill");
+  var kind=skill?"skill":"agent", ref=skill||agent, slug=ref.split("/").pop();
+  T=parseFloat(qs("t")||"60");
+  fetch("media/walkthroughs/"+kind+"-"+slug+".json").then(function(r){return r.json();})
+    .then(function(doc){
+      DOC=doc;
+      var first=(doc.scenes.filter(function(s){return s.act==="walkthrough";})[0].turns||[])[0];
+      document.getElementById("barTitle").textContent=(first&&first.text||"").replace(/\.$/,"");
+      document.getElementById("agentChip").textContent=doc.subject.display_name;
+      document.title=doc.subject.display_name;
+      paint();
+      window.__ready=true;
+    });
+})();
+</script>
+</body>
+</html>
