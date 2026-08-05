@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-badge/1.0",
   "schema": "aibast-certified-roster/1.0",
-  "generated": "2026-08-05T19:47:12.999565+00:00",
+  "generated": "2026-08-05T20:07:44.753081+00:00",
   "levels": {
     "certified": "Has published at least one agent to the library that passed review.",
     "maintainer": "Certified, and reviews submissions from other publishers."

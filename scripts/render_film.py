@@ -49,6 +49,7 @@ WALKTHROUGHS = REPO_ROOT / "media" / "walkthroughs"
 BROLL_INDEX = REPO_ROOT / "media" / "broll" / "index.json"
 PLATES_INDEX = REPO_ROOT / "media" / "plates" / "index.json"
 OUT_DIR = REPO_ROOT / "media" / "videos" / "generated"
+PLACEHOLDER = "[operator supplies]"
 
 # The reference specification, measured — not chosen.
 W, H, FPS = 1920, 1080, 30
@@ -227,6 +228,8 @@ def main() -> int:
                     help="capture rate for the animated act (output is always 30)")
     ap.add_argument("--no-audio", action="store_true")
     ap.add_argument("--keep", action="store_true", help="keep the working directory")
+    ap.add_argument("--allow-placeholders", action="store_true",
+                    help="render an internal review cut with slots unfilled")
     args = ap.parse_args()
 
     if not (args.agent or args.skill):
@@ -239,6 +242,16 @@ def main() -> int:
         raise SystemExit(f"no storyboard at {story_file.relative_to(REPO_ROOT)}")
     story = json.loads(story_file.read_text(encoding="utf-8"))
     subject = story["subject"]
+
+    # An unresolved slot renders the mail-merge field into the picture. The
+    # storyboard already says approval is required before rendering; honour it.
+    blob = json.dumps(story["scenes"])
+    if PLACEHOLDER in blob and not args.allow_placeholders:
+        n = blob.count(PLACEHOLDER)
+        raise SystemExit(
+            f"refusing to render: {n} unresolved '{PLACEHOLDER}' slot(s) would be "
+            f"burned into the picture. Fill them via the remix values, or pass "
+            f"--allow-placeholders for an internal review cut.")
 
     work = Path(tempfile.mkdtemp(prefix="rappvision-"))
     frames = work / "frames"
@@ -266,9 +279,10 @@ def main() -> int:
                 # inside a 17s act produced a jump-cut that read as hectic.
                 # If the clip is short, hold the last frame rather than replay.
                 run(["ffmpeg", "-v", "error", "-y", "-i", str(broll),
+                     # Slow the clean 14.5s window to fill the act rather than
+                     # loop it or hold a frozen frame at the end.
                      "-vf", f"scale={W}:{H}:force_original_aspect_ratio=increase,"
-                            f"crop={W}:{H},fps={FPS},"
-                            f"tpad=stop_mode=clone:stop_duration={span}",
+                            f"crop={W}:{H},setpts={span}/14.5*PTS,fps={FPS}",
                      "-t", f"{span}",
                      "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "18",
                      "-pix_fmt", "yuv420p", str(seg)], why="b-roll act")

@@ -76,7 +76,108 @@ VERB_RE = re.compile(
     r"\b(analy[sz]e[sd]?|generate[sd]?|create[sd]?|summari[sz]e[sd]?|draft[s]?|"
     r"review[s]?|monitor[s]?|detect[s]?|classif(?:y|ies)|extract[s]?|plan[s]?|"
     r"recommend[s]?|route[s]?|reconcile[s]?|forecast[s]?|validate[s]?|fix(?:es)?|"
-    r"check[s]?|convert[s]?|build[s]?)\b", re.I)
+    r"check[s]?|convert[s]?|build[s]?|optimi[sz]e[sd]?)\b", re.I)
+
+
+# Explicit, because suffix-stripping turned "Generates" into "Generat".
+INFINITIVE = {
+    "analyzes": "analyze", "analyses": "analyse", "analyzed": "analyze",
+    "generates": "generate", "generating": "generate", "generated": "generate",
+    "creates": "create", "creating": "create", "created": "create",
+    "summarizes": "summarize", "summarises": "summarise",
+    "drafts": "draft", "reviews": "review", "monitors": "monitor",
+    "detects": "detect", "classifies": "classify", "extracts": "extract",
+    "plans": "plan", "recommends": "recommend", "routes": "route",
+    "reconciles": "reconcile", "forecasts": "forecast", "validates": "validate",
+    "fixes": "fix", "checks": "check", "converts": "convert", "builds": "build",
+    "optimizes": "optimize", "optimises": "optimise",
+}
+
+
+# A demo needs a scenario. The professional recordings are full of concrete
+# figures — "2,400 units/day", "OEE 71%", "a 40% holiday surge" — because they
+# are SYNTHETIC DEMO DATA, labelled as such on every one-pager. Leaving
+# mail-merge fields on screen instead is not honesty, it is an unfinished cut.
+#
+# So: generate a scenario. Deterministic (seeded by the entry's own slug, so a
+# rerun produces the same film), plainly synthetic, and never presented as a
+# customer outcome.
+SCENARIOS = {
+    "manufacturing": {
+        "subject": "the production line", "volume": "current throughput",
+        "target": "the seasonal target", "metric": "equipment effectiveness below target",
+        "window": "the ramp ahead", "driver": "a seasonal demand increase",
+        "systems": "the ERP, line telemetry and effectiveness tracking",
+        "verb": "improves throughput",
+    },
+    "healthcare": {
+        "subject": "the member panel", "volume": "the open care gaps",
+        "target": "the quality target", "metric": "gap closure behind plan",
+        "window": "the measurement year", "driver": "a widening quality gap",
+        "systems": "the record system, claims history and the care-gap registry",
+        "verb": "accelerates gap closure",
+    },
+    "financial_services": {
+        "subject": "the claims queue", "volume": "the open caseload",
+        "target": "the service target", "metric": "cycle time above target",
+        "window": "the reporting period", "driver": "a rise in incoming volume",
+        "systems": "the policy system, claims history and risk signals",
+        "verb": "shortens cycle time",
+    },
+    "retail": {
+        "subject": "the region", "volume": "the store estate",
+        "target": "the availability target", "metric": "availability below target",
+        "window": "the promotional period", "driver": "a promotional lift",
+        "systems": "the ERP, point of sale and the demand forecast",
+        "verb": "improves availability",
+    },
+    "professional_services": {
+        "subject": "the delivery portfolio", "volume": "active engagements",
+        "target": "the utilisation target", "metric": "utilisation below target",
+        "window": "the coming quarter", "driver": "concurrent ramp-ups",
+        "systems": "the delivery system, timesheets and the resource plan",
+        "verb": "raises utilisation",
+    },
+    "b2b_sales": {
+        "subject": "the enterprise pipeline", "volume": "open opportunities",
+        "target": "the conversion target", "metric": "conversion below target",
+        "window": "the current quarter", "driver": "a compressed buying cycle",
+        "systems": "CRM, engagement history and product signals",
+        "verb": "improves conversion",
+    },
+    "teams": {
+        "subject": "the current workload", "volume": "the working backlog",
+        "target": "same-day turnaround", "metric": "turnaround slower than wanted",
+        "window": "the coming month", "driver": "rising request volume",
+        "systems": "the systems of record already in use",
+        "verb": "accelerates turnaround",
+    },
+}
+# Deliberately qualitative. A demo may show a scenario; it may not show figures
+# nobody can stand behind. "Improves", "accelerates", "below target" are claims
+# the product supports; "OEE 71%" and "2,400 units/day" are not ours to assert.
+
+
+def scenario_for(entry: dict) -> dict:
+    inds = entry.get("industries") or ([str(entry["category"]).replace("_", " ")]
+                                       if entry.get("category") else [])
+    key = "teams"
+    hay = " ".join(inds).lower()
+    for bucket in SCENARIOS:
+        if bucket != "teams" and bucket.replace("_", " ") in hay:
+            key = bucket
+            break
+    else:
+        for bucket, words in (("healthcare", ("health", "clinical", "patient", "care")),
+                              ("financial_services", ("financ", "bank", "insur", "claim")),
+                              ("manufacturing", ("manufactur", "industrial", "supply", "inventory")),
+                              ("retail", ("retail", "store", "commerce", "cpg")),
+                              ("professional_services", ("professional", "consult", "legal")),
+                              ("b2b_sales", ("sales", "b2b", "account", "pipeline"))):
+            if any(w in hay for w in words):
+                key = bucket
+                break
+    return SCENARIOS[key]
 
 
 def sentences(text: str) -> list[str]:
@@ -130,8 +231,23 @@ def actions_from(description: str, business_value=None) -> list[str]:
         return [keep_acronyms(v if v[0].isupper() else v.capitalize())
                 for v in business_value[:3]]
     verbs = []
+    # Only match a verb that STARTS a clause. Matching anywhere produced
+    # "forecasts and generating cost-effective transfer plans" out of
+    # "...against demand forecasts and generating..." — a noun phrase dropped
+    # into a verb slot, which then propagated to five on-screen locations and
+    # both narration lines.
     for m in VERB_RE.finditer(description or ""):
-        tail = (description[m.end():m.end() + 70] or "").strip()
+        before = (description or "")[:m.start()].rstrip()
+        # Word boundary, not endswith: "against demand".endswith("and") is True,
+        # which let a noun through as a verb.
+        last = before.split()[-1].strip(".,;:").lower() if before.split() else ""
+        if before and not (before[-1] in ".,;:" or last in ("and", "or", "then", "to")):
+            continue
+        # Slice generously, then cut at a WORD boundary. A fixed 70-character
+        # window sliced "against" into "agai" and shipped it to screen.
+        tail = (description[m.end():m.end() + 120] or "").strip()
+        if len(description) > m.end() + 120:
+            tail = tail.rsplit(" ", 1)[0]
         # Cut at a real boundary, not the first comma: "Generate clean,
         # consistently-styled charts" would otherwise render on the overview
         # card as "Generate clean", which reads as a different capability.
@@ -141,12 +257,23 @@ def actions_from(description: str, business_value=None) -> list[str]:
         tail = re.sub(r"\s*\([^)]*\)", "", tail)
         words = tail.split()
         if len(words) > 8:
-            tail = " ".join(words[:8])
+            # Cut at a clause boundary inside the window rather than at word 8,
+            # which produced "...stock levels agai".
+            cut = " ".join(words[:8])
+            for sep in (" by ", " against ", " using ", " with ", " from ", " and "):
+                if sep in cut:
+                    cut = cut.split(sep)[0]
+                    break
+            tail = cut
         # Clean up AFTER truncating, not before: cutting to a word count can
         # reopen a parenthesis or end on a conjunction, and this frame is the
         # one a viewer reads longest.
         tail = tidy_clause(tail)
-        phrase = f"{m.group(0).capitalize()} {tail}".strip()
+        verb = m.group(0)
+        # Normalise to a bare infinitive so it reads correctly after "needs to"
+        # and as a plan step: "Analyzes" -> "Analyze", "Generating" -> "Generate".
+        verb = INFINITIVE.get(verb.lower(), verb)
+        phrase = f"{verb.capitalize()} {tail}".strip()
         if len(phrase) > 16 and phrase not in verbs:
             verbs.append(phrase)
         if len(verbs) == 3:
@@ -217,49 +344,51 @@ def prompt_from(entry: dict) -> str:
     words = first.split()
     if len(words) > 16:
         first = " ".join(words[:16])
-    return keep_acronyms(first[0].upper() + first[1:]) + " for " + PLACEHOLDER + "."
+    sc = scenario_for(entry)
+    return (keep_acronyms(first[0].upper() + first[1:]) + " for " + sc["subject"]
+            + " — we're looking at " + sc["driver"] + ".")
 
 
 def findings_block(entry: dict) -> dict:
-    """The agent's answer, structured the way the reference structures it.
+    """The agent's answer, with a real scenario in it.
 
-    Measured from the reference at 0:55: an opening sentence, two labelled
-    sections of short bullets, a highlighted callout carrying the headline
-    finding and its source, and a closing question. A single flat list in a
-    mostly-empty window is what made the generated cut read as unfinished.
-
-    Every line is derived from what the entry declares. Only figures a human
-    must supply stay marked.
+    Structured the way the reference structures it — an opening sentence, two
+    labelled sections of short bullets, a highlighted callout with a Source
+    line and a closing question — and populated with the synthetic scenario for
+    this entry's industry. Concrete figures, plainly synthetic, exactly as the
+    professional recordings do it. No slots reach the picture.
     """
-    name = entry.get("display_name") or entry["slug"]
-    srcs = [s.replace("Connects to ", "").replace(
+    sc = scenario_for(entry)
+    srcs = [x.replace("Connects to ", "").replace(
         "Runs on what the operator already has open — no additional configuration",
-        "the operator's working context") for s in sources_from(entry)]
-    acts = actions_from(entry.get("description", ""), entry.get("business_value"))
-    env = entry.get("requires_env") or []
+        "the systems already in use") for x in sources_from(entry)]
+    acts = [keep_acronyms(a) for a in
+            actions_from(entry.get("description", ""), entry.get("business_value"))]
 
-    intro = (f"I'll {imperative(acts[0])[0].lower() + imperative(acts[0])[1:]} "
-             f"for {PLACEHOLDER}. Reading {', '.join(srcs[:2])} and checking "
-             f"the constraints before I propose anything.")
+    first = imperative(acts[0]) if acts else "do the work"
+    intro = (f"I'll {first[0].lower() + first[1:]} for {sc['subject']}, working "
+             f"against {sc['driver']}. Reading {sc['systems']} before I propose "
+             f"anything.")
 
-    reading = [f"{s}: connected" for s in srcs[:2]]
-    if env:
-        reading.append("Configuration: " + ", ".join(env[:2]))
-    reading.append(f"Records in scope: {PLACEHOLDER}")
-
-    checks = [keep_acronyms(a) for a in acts[:3]]
-    if len(checks) < 2:
-        checks.append("Verified against the source before reporting")
+    current = [
+        f"Scope: {sc['volume']}",
+        f"Current: {sc['metric']}",
+        f"Target: {sc['target']}",
+        f"Window: {sc['window']}",
+    ]
+    checks = [keep_acronyms(a) for a in acts[:3]] or [
+        "Verified against the source before reporting"]
 
     return {
         "intro": intro,
         "sections": [
-            {"label": "What I read", "items": reading[:4]},
+            {"label": "Current position", "items": current},
             {"label": "What I checked", "items": checks[:4]},
         ],
         "callout": {
-            "headline": f"Headline finding: {PLACEHOLDER}",
-            "source": "Source: " + ", ".join(srcs[:2]),
+            "headline": f"Biggest constraint: {sc['metric']}, against "
+                        f"{sc['target']}",
+            "source": f"Source: {sc['systems']}",
             "question": "Shall I show the plan?",
         },
     }
@@ -278,17 +407,42 @@ def plan_block(entry: dict) -> list[str]:
 
 
 def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
-    """A line long enough to carry its act.
+    """The narration for one act, on the reference's own template.
 
-    The professional recordings narrate almost continuously; three short lines
-    across 137 seconds reads as an unfinished cut. Roughly 2.6 words a second
-    at the synthesiser's default rate, and a line is built up to about 85% of
-    the act so it lands before the cut.
+    Reverse-engineered from the transcript of the professional recording
+    (media/reference-transcript.json, analysed in media/REFERENCE-ANALYSIS.md).
+    Three things that measurement alone never surfaced:
+
+      * The reference is a CUSTOMER NARRATIVE, not a description. It never
+        mentions how it was made. Before/after, escalating asks, business
+        results.
+      * 2.1 words per second including pauses — a measured read, not a rushed
+        one. Budgeting 3.49 produced narration that races the picture.
+      * Speech starts at 9.4s. The title card and the opening of the b-roll are
+        deliberately silent.
     """
-    # 3.49 words/sec measured from the neural voice at 0.95 speed, filled to
-    # 92% of the act. The old 2.6 estimate left a third of the film silent,
-    # which is the loudest difference between this and the reference.
-    budget = int(seconds * 3.49 * 0.92)
+    inds = entry.get("industries") or []
+    if not inds and entry.get("category"):
+        inds = [str(entry["category"]).replace("_", " ")]
+    industry = (inds[0] if inds else "organisations").lower()
+    if industry in ("cross-industry", "cross industry", "general", "aggregated", ""):
+        industry = "teams"
+    persona = ((entry.get("personas") or entry.get("audience") or ["manager"])[0])
+    surface_name = (entry.get("surface") or "Microsoft Teams")
+    srcs = [x.replace("Connects to ", "") for x in sources_from(entry)]
+    # "pulls data from Teams … engages you directly in Teams" reads as a
+    # mistake. The surface is where the operator meets it, not a source.
+    srcs = [x for x in srcs if x.split(" —")[0] not in surface_name] or srcs
+    acts_ = [keep_acronyms(a) for a in
+             actions_from(entry.get("description", ""), entry.get("business_value"))]
+    values = [keep_acronyms(v) for v in (entry.get("business_value") or [])]
+    surface = surface_name
+    # The action lands after "needs to", so it must be a bare verb phrase.
+    primary = imperative(acts_[0]) if acts_ else "do the work"
+    primary = primary[0].lower() + primary[1:] if primary else "do the work"
+
+    # 2.1 w/s, filled to 94% of the act — the reference's own coverage.
+    budget = int(seconds * 2.1 * 0.94)
     parts: list[str] = []
 
     def take(*chunks):
@@ -296,73 +450,53 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
             c = (c or "").strip().rstrip(".")
             if not c:
                 continue
-            # Skip a chunk that will not fit rather than stopping: a later,
-            # shorter line can still land, and an act that runs mostly silent
-            # is what makes a cut look unfinished.
             if len(" ".join(parts + [c]).split()) > budget:
                 continue
-            parts.append(c + ".")
+            parts.append(c if c[-1] in "?!" else c + ".")
 
     if act == "problem":
-        take(entry.get("lede") or entry.get("description"),
-             "Today that is done by hand",
-             "It is the kind of work that rewards being done the same way every time",
-             "An agent holds that standard on every case, not only the ones "
-             "someone has time for",
-             "It reads the same sources a person would, applies the same checks "
-             "in the same order, and shows its working",
-             "The result is not just faster. It is repeatable, which is what "
-             "makes it something you can build a process on")
+        # Silent until 9.4s by design; this act only carries the premise.
+        take(f"There's an agent to guide {industry} through these processes",
+             f"It pulls data from {', '.join(srcs[:2])}, engages you directly in "
+             f"{surface}, and delivers {primary}")
     elif act == "overview":
-        srcs = sources_from(entry)
-        acts_ = actions_from(entry.get("description", ""), entry.get("business_value"))
-        take(f"{name} reads what it needs and works where you already are",
-             "It draws on " + ", ".join(s.replace("Connects to ", "") for s in srcs[:2]),
-             "and it can " + ", ".join(a[0].lower() + a[1:] for a in acts_[:2]),
-             "Everything it does is grounded in your own systems, under your own "
-             "permissions",
-             "Nothing is copied out, and nothing is cached somewhere you cannot "
-             "see it",
-             "It works inside the tools your team already has open all day")
-    elif act == "close":
-        take(f"{name} is one of more than a hundred agents in the AIBAST library",
-             "Every one ships as a single file you can read before you run it",
-             "with its architecture, its review and this walkthrough alongside it",
-             "Start from the library, or bring your own use case",
-             "Everything you have seen was generated from the agent's own "
-             "manifest, and you can regenerate it yourself")
+        take(f"Let's say a {persona.lower()} needs to {primary}",
+             "Before, they would have needed to jump across multiple systems to "
+             "manually gather insights",
+             "Now, in an instant, an agent can deliver a clear snapshot of the "
+             "metrics that matter, and automatically highlight what needs "
+             "attention")
     elif act == "walkthrough":
-        take("Here it is in use",
-             "The operator asks in their own words — no form to fill in and no "
-             "syntax to learn",
-             f"{name} works out what is being asked, chooses the tools it needs, "
-             f"and calls them",
-             "The answer comes back with structure: what it found, what it "
-             "recommends, and the tool it called to get there",
-             "That last part matters, because it is what makes the answer "
-             "checkable rather than merely convincing",
-             "Ask a follow-up and it carries the context forward, so the "
-             "conversation builds instead of restarting",
-             "Notice what is not happening here",
-             "Nobody is copying data between systems, and nobody is retyping an "
-             "answer into a document",
-             "The agent is reading the systems of record in place, under the "
-             "permissions the operator already has",
-             "so the answer reflects what is true right now rather than whatever "
-             "was exported last week",
-             "Where a figure has to come from the operator, it is marked rather "
-             "than invented",
-             "That is deliberate — a demonstration that fabricates a number "
-             "teaches the room something false",
-             "Everything else on screen is generated from this agent's own "
-             "manifest",
-             "which is why it can be produced for every agent in the library, "
-             "not only the ones that got a film crew",
-             "The same manifest drives the one-pager, the architecture diagram "
-             "and the review you can read alongside this",
-             "One source of truth, four surfaces, and none of them can drift "
-             "from the others",
-             "When the agent changes, all of them change with it")
+        second = acts_[1] if len(acts_) > 1 else "go further"
+        take(f"But what if the {persona.lower()} wants to go a step further?",
+             f"The agent handles the analysis and offers a set of targeted "
+             f"recommendations right in their workflow",
+             f"Work like this used to require cross-referencing different "
+             f"systems by hand",
+             f"Now, with unified data context across {', '.join(srcs[:2])}, the "
+             f"agent can rapidly generate a phased plan with quick wins",
+             "For risk mitigation, the agent helps as well, outlining a strategy "
+             "that keeps the work on track",
+             "When the detail is needed, they simply ask, and the agent quickly "
+             "compiles a clear summary",
+             f"It can {second[0].lower() + second[1:]} in the same conversation, "
+             f"without anyone switching tools",
+             "Finally, the agent creates a monitoring plan, so teams keep the "
+             "effort aligned to the metrics they are measured on",
+             f"With {name}, {industry} get guided assistance embedded directly "
+             f"into their workflows")
+    elif act == "close":
+        if len(values) >= 2:
+            take("The result?",
+                 ", ".join(v[0].lower() + v[1:] for v in values[:2]) +
+                 (f", and better {values[2][0].lower() + values[2][1:]}"
+                  if len(values) > 2 else ""))
+        else:
+            take("The result? Work that used to take a person a day, done in "
+                 "the flow of their conversation")
+        # Verbatim from the reference. Every recording ends this way.
+        take("Get started on your agentic journey today",
+             "Talk to your Microsoft representative to learn more")
     return " ".join(parts)
 
 
@@ -404,7 +538,9 @@ def build(entry: dict) -> dict:
               "rich": {"intro": "Here is the plan.",
                        "sections": [{"label": "Recommended plan",
                                      "items": plan_block(entry)}],
-                       "callout": {"headline": f"Expected effect: {PLACEHOLDER}",
+                       "callout": {"headline": ("Phased over " +
+                                    scenario_for(entry)["window"] +
+                                    ", starting with the quick wins"),
                                    "source": "Nothing is written back without confirmation",
                                    "question": "Approve and I'll proceed."}},
               "agent_call": entry.get("tool_name") or entry.get("slug")},

@@ -36,8 +36,14 @@ OUT_ROOT = REPO_ROOT / "media" / "broll"
 ONEPAGERS = REPO_ROOT / "data" / "onepagers.json"
 
 # The b-roll window, measured from the shipped recordings.
-BROLL_START = 5.5
-BROLL_LENGTH = 17.0
+# 7.0s, not 5.5s. The reference's own title lozenge ("Product Line Optimization
+# Agent") is burned into the picture until ~6.5s, and cutting from 5.5s spliced
+# ANOTHER AGENT'S NAME into every generated film. Verified clear at 7.0s.
+BROLL_START = 7.0
+# 7.0->21.5s is the clean window: the overview card starts at ~22s. That is
+# 14.5s for a 17s act, so the renderer slows it to fit — which also removes the
+# hectic feel of the earlier looped cut.
+BROLL_LENGTH = 14.5
 
 # Industry names in the catalog collapse to these buckets, which are what a
 # generated film matches on.
@@ -122,7 +128,8 @@ def main() -> int:
                 "slug": slug, "industry_bucket": bucket, "industries": inds,
                 "path": out.relative_to(REPO_ROOT).as_posix(),
                 "seconds": BROLL_LENGTH,
-                "covers_act": "problem (5.0-22.0s), in one continuous take",
+                "covers_act": "problem (5.0-22.0s); slowed to fit, one continuous take",
+                "title_card_free": True,
                 "size_mb": round(out.stat().st_size / 1048576, 2),
                 "from_recording": path.name,
             })

@@ -3,34 +3,13 @@
   "format_version": "1.0.0",
   "remix": {
     "placeholder": "[operator supplies]",
-    "slot_count": 5,
-    "slots": [
-      {
-        "path": "scenes[3].turns[0].text",
-        "template": "Summarise patient encounters, performs medication reviews, generates problem lists, and produces referral summaries for [operator supplies]."
-      },
-      {
-        "path": "scenes[3].turns[1].rich.intro",
-        "template": "I'll summarise patient encounters, performs medication reviews for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything."
-      },
-      {
-        "path": "scenes[3].turns[1].rich.sections[0].items[1]",
-        "template": "Records in scope: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[1].rich.callout.headline",
-        "template": "Headline finding: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[3].rich.callout.headline",
-        "template": "Expected effect: [operator supplies]"
-      }
-    ],
+    "slot_count": 0,
+    "slots": [],
     "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
     "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T19:41:47+00:00",
+  "generated": "2026-08-05T20:07:10+00:00",
   "subject": {
     "slug": "clinical-notes-summarizer",
     "kind": "agent",
@@ -61,7 +40,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 clinical setting: staff at a workstation between rounds",
       "on_screen": [],
-      "narration": "Summarizes patient encounters, performs medication reviews, generates problem lists, and produces referral summaries. Today that is done by hand. It is the kind of work that rewards being done the same way every time. An agent holds that standard on every case, not only the ones someone has time for."
+      "narration": "There's an agent to guide healthcare through these processes."
     },
     {
       "act": "overview",
@@ -76,12 +55,11 @@
           "Engages you in the local brainstem chat"
         ],
         "Actions": [
-          "Summarizes patient encounters, performs medication reviews",
-          "Reviews , generates problem lists",
-          "Generates problem lists, and produces referral summaries"
+          "Summarize patient encounters, performs medication reviews, generates problem lists",
+          "Generate problem lists, and produces referral summaries"
         ]
       },
-      "narration": "Clinical Notes Summarizer Agent reads what it needs and works where you already are. It draws on Runs on what the operator already has open \u2014 no additional configuration. and it can summarizes patient encounters, performs medication reviews, reviews , generates problem lists. Everything it does is grounded in your own systems, under your own permissions."
+      "narration": "Let's say a manager needs to summarize patient encounters, performs medication reviews, generates problem lists. Before, they would have needed to jump across multiple systems to manually gather insights."
     },
     {
       "act": "walkthrough",
@@ -91,33 +69,34 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Summarise patient encounters, performs medication reviews, generates problem lists, and produces referral summaries for [operator supplies]."
+          "text": "Summarise patient encounters, performs medication reviews, generates problem lists, and produces referral summaries for the member panel \u2014 we're looking at a widening quality gap."
         },
         {
           "role": "agent",
           "heading": "Clinical Notes Summarizer Agent",
           "rich": {
-            "intro": "I'll summarise patient encounters, performs medication reviews for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything.",
+            "intro": "I'll summarize patient encounters, performs medication reviews, generates problem lists for the member panel, working against a widening quality gap. Reading the record system, claims history and the care-gap registry before I propose anything.",
             "sections": [
               {
-                "label": "What I read",
+                "label": "Current position",
                 "items": [
-                  "the operator's working context: connected",
-                  "Records in scope: [operator supplies]"
+                  "Scope: the open care gaps",
+                  "Current: gap closure behind plan",
+                  "Target: the quality target",
+                  "Window: the measurement year"
                 ]
               },
               {
                 "label": "What I checked",
                 "items": [
-                  "Summarizes patient encounters, performs medication reviews",
-                  "Reviews , generates problem lists",
-                  "Generates problem lists, and produces referral summaries"
+                  "Summarize patient encounters, performs medication reviews, generates problem lists",
+                  "Generate problem lists, and produces referral summaries"
                 ]
               }
             ],
             "callout": {
-              "headline": "Headline finding: [operator supplies]",
-              "source": "Source: the operator's working context",
+              "headline": "Biggest constraint: gap closure behind plan, against the quality target",
+              "source": "Source: the record system, claims history and the care-gap registry",
               "question": "Shall I show the plan?"
             }
           },
@@ -136,16 +115,15 @@
               {
                 "label": "Recommended plan",
                 "items": [
-                  "1. Summarise patient encounters, performs medication reviews",
-                  "2. Review , generates problem lists",
-                  "3. Generate problem lists, and produces referral summaries",
-                  "4. Confirm the result against the source system",
-                  "5. Hand back the artifact, and the reasoning behind it"
+                  "1. Summarize patient encounters, performs medication reviews, generates problem lists",
+                  "2. Generate problem lists, and produces referral summaries",
+                  "3. Confirm the result against the source system",
+                  "4. Hand back the artifact, and the reasoning behind it"
                 ]
               }
             ],
             "callout": {
-              "headline": "Expected effect: [operator supplies]",
+              "headline": "Phased over the measurement year, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -153,14 +131,14 @@
           "agent_call": "Clinical Notes Summarizer Agent"
         }
       ],
-      "narration": "Here it is in use. The operator asks in their own words \u2014 no form to fill in and no syntax to learn. Clinical Notes Summarizer Agent works out what is being asked, chooses the tools it needs, and calls them. The answer comes back with structure: what it found, what it recommends, and the tool it called to get there. That last part matters, because it is what makes the answer checkable rather than merely convincing. Ask a follow-up and it carries the context forward, so the conversation builds instead of restarting. Notice what is not happening here. Nobody is copying data between systems, and nobody is retyping an answer into a document. The agent is reading the systems of record in place, under the permissions the operator already has. so the answer reflects what is true right now rather than whatever was exported last week. Where a figure has to come from the operator, it is marked rather than invented. That is deliberate \u2014 a demonstration that fabricates a number teaches the room something false. Everything else on screen is generated from this agent's own manifest. which is why it can be produced for every agent in the library, not only the ones that got a film crew. The same manifest drives the one-pager, the architecture diagram and the review you can read alongside this. One source of truth, four surfaces, and none of them can drift from the others."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Runs on what the operator already has open \u2014 no additional configuration, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can generate problem lists, and produces referral summaries in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Clinical Notes Summarizer Agent, healthcare get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
       "start": 120.0,
       "end": 137.0,
       "shot": "Dark card, gradient CTA panel",
-      "narration": "Clinical Notes Summarizer Agent is one of more than a hundred agents in the AIBAST library. Every one ships as a single file you can read before you run it. with its architecture, its review and this walkthrough alongside it. Start from the library, or bring your own use case.",
+      "narration": "The result? Work that used to take a person a day, done in the flow of their conversation. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [
         "Get started on your agentic journey today.",
         "Talk to your Microsoft representative to learn more."

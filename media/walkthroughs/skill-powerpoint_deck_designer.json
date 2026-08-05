@@ -3,34 +3,13 @@
   "format_version": "1.0.0",
   "remix": {
     "placeholder": "[operator supplies]",
-    "slot_count": 5,
-    "slots": [
-      {
-        "path": "scenes[3].turns[0].text",
-        "template": "Create polished PowerPoint decks from a JSON specification using python-pptx for [operator supplies]."
-      },
-      {
-        "path": "scenes[3].turns[1].rich.intro",
-        "template": "I'll create polished PowerPoint decks from a JSON specification using for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything."
-      },
-      {
-        "path": "scenes[3].turns[1].rich.sections[0].items[1]",
-        "template": "Records in scope: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[1].rich.callout.headline",
-        "template": "Headline finding: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[3].rich.callout.headline",
-        "template": "Expected effect: [operator supplies]"
-      }
-    ],
+    "slot_count": 0,
+    "slots": [],
     "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
     "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T19:41:47+00:00",
+  "generated": "2026-08-05T20:07:10+00:00",
   "subject": {
     "slug": "powerpoint_deck_designer",
     "kind": "skill",
@@ -62,7 +41,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 modern workplace: focused individual work at a laptop",
       "on_screen": [],
-      "narration": "Creates polished PowerPoint decks from a JSON specification using python-pptx. Designed as a Copilot Studio Skill that runs natively inside the agent's Python container (no Azure Function or custom connector required). Supports 8 layouts plus native charts (bar, column, line, pie, donut with stacked / 100% stacked variants). Today that is done by hand."
+      "narration": "There's an agent to guide teams through these processes."
     },
     {
       "act": "overview",
@@ -77,10 +56,10 @@
           "Engages you in the local brainstem chat"
         ],
         "Actions": [
-          "Creates polished PowerPoint decks from a JSON specification using"
+          "Create polished PowerPoint decks"
         ]
       },
-      "narration": "powerpoint-deck-designer reads what it needs and works where you already are. It draws on Runs on what the operator already has open \u2014 no additional configuration. and it can creates polished PowerPoint decks from a JSON specification using. Everything it does is grounded in your own systems, under your own permissions. Nothing is copied out, and nothing is cached somewhere you cannot see it."
+      "narration": "Let's say a manager needs to create polished PowerPoint decks. Before, they would have needed to jump across multiple systems to manually gather insights."
     },
     {
       "act": "walkthrough",
@@ -90,32 +69,33 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Create polished PowerPoint decks from a JSON specification using python-pptx for [operator supplies]."
+          "text": "Create polished PowerPoint decks from a JSON specification using python-pptx for the current workload \u2014 we're looking at rising request volume."
         },
         {
           "role": "agent",
           "heading": "powerpoint-deck-designer",
           "rich": {
-            "intro": "I'll create polished PowerPoint decks from a JSON specification using for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything.",
+            "intro": "I'll create polished PowerPoint decks for the current workload, working against rising request volume. Reading the systems of record already in use before I propose anything.",
             "sections": [
               {
-                "label": "What I read",
+                "label": "Current position",
                 "items": [
-                  "the operator's working context: connected",
-                  "Records in scope: [operator supplies]"
+                  "Scope: the working backlog",
+                  "Current: turnaround slower than wanted",
+                  "Target: same-day turnaround",
+                  "Window: the coming month"
                 ]
               },
               {
                 "label": "What I checked",
                 "items": [
-                  "Creates polished PowerPoint decks from a JSON specification using",
-                  "Verified against the source before reporting"
+                  "Create polished PowerPoint decks"
                 ]
               }
             ],
             "callout": {
-              "headline": "Headline finding: [operator supplies]",
-              "source": "Source: the operator's working context",
+              "headline": "Biggest constraint: turnaround slower than wanted, against same-day turnaround",
+              "source": "Source: the systems of record already in use",
               "question": "Shall I show the plan?"
             }
           },
@@ -134,14 +114,14 @@
               {
                 "label": "Recommended plan",
                 "items": [
-                  "1. Create polished PowerPoint decks from a JSON specification using",
+                  "1. Create polished PowerPoint decks",
                   "2. Confirm the result against the source system",
                   "3. Hand back the artifact, and the reasoning behind it"
                 ]
               }
             ],
             "callout": {
-              "headline": "Expected effect: [operator supplies]",
+              "headline": "Phased over the coming month, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -149,14 +129,14 @@
           "agent_call": "powerpoint_deck_designer"
         }
       ],
-      "narration": "Here it is in use. The operator asks in their own words \u2014 no form to fill in and no syntax to learn. powerpoint-deck-designer works out what is being asked, chooses the tools it needs, and calls them. The answer comes back with structure: what it found, what it recommends, and the tool it called to get there. That last part matters, because it is what makes the answer checkable rather than merely convincing. Ask a follow-up and it carries the context forward, so the conversation builds instead of restarting. Notice what is not happening here. Nobody is copying data between systems, and nobody is retyping an answer into a document. The agent is reading the systems of record in place, under the permissions the operator already has. so the answer reflects what is true right now rather than whatever was exported last week. Where a figure has to come from the operator, it is marked rather than invented. That is deliberate \u2014 a demonstration that fabricates a number teaches the room something false. Everything else on screen is generated from this agent's own manifest. which is why it can be produced for every agent in the library, not only the ones that got a film crew. The same manifest drives the one-pager, the architecture diagram and the review you can read alongside this. One source of truth, four surfaces, and none of them can drift from the others. When the agent changes, all of them change with it."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Runs on what the operator already has open \u2014 no additional configuration, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With powerpoint-deck-designer, teams get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
       "start": 120.0,
       "end": 137.0,
       "shot": "Dark card, gradient CTA panel",
-      "narration": "powerpoint-deck-designer is one of more than a hundred agents in the AIBAST library. Every one ships as a single file you can read before you run it. with its architecture, its review and this walkthrough alongside it. Start from the library, or bring your own use case.",
+      "narration": "The result? Work that used to take a person a day, done in the flow of their conversation. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [
         "Get started on your agentic journey today.",
         "Talk to your Microsoft representative to learn more.",

@@ -3,34 +3,13 @@
   "format_version": "1.0.0",
   "remix": {
     "placeholder": "[operator supplies]",
-    "slot_count": 5,
-    "slots": [
-      {
-        "path": "scenes[3].turns[0].text",
-        "template": "Financial advisor support with client reviews, portfolio summaries, recommendation engine, and compliance checks for [operator supplies]."
-      },
-      {
-        "path": "scenes[3].turns[1].rich.intro",
-        "template": "I'll review , portfolio summaries, recommendation engine for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything."
-      },
-      {
-        "path": "scenes[3].turns[1].rich.sections[0].items[1]",
-        "template": "Records in scope: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[1].rich.callout.headline",
-        "template": "Headline finding: [operator supplies]"
-      },
-      {
-        "path": "scenes[3].turns[3].rich.callout.headline",
-        "template": "Expected effect: [operator supplies]"
-      }
-    ],
+    "slot_count": 0,
+    "slots": [],
     "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
     "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T19:41:47+00:00",
+  "generated": "2026-08-05T20:07:10+00:00",
   "subject": {
     "slug": "financial-advisor-copilot",
     "kind": "agent",
@@ -61,7 +40,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 advisory meeting: adviser and client at a desk",
       "on_screen": [],
-      "narration": "Financial advisor support with client reviews, portfolio summaries, recommendation engine, and compliance checks. Today that is done by hand. It is the kind of work that rewards being done the same way every time. An agent holds that standard on every case, not only the ones someone has time for."
+      "narration": "There's an agent to guide financial services through these processes."
     },
     {
       "act": "overview",
@@ -76,10 +55,10 @@
           "Engages you in the local brainstem chat"
         ],
         "Actions": [
-          "Reviews , portfolio summaries, recommendation engine"
+          "Does the work described above"
         ]
       },
-      "narration": "Financial Advisor Copilot Agent reads what it needs and works where you already are. It draws on Runs on what the operator already has open \u2014 no additional configuration. and it can reviews , portfolio summaries, recommendation engine. Everything it does is grounded in your own systems, under your own permissions. Nothing is copied out, and nothing is cached somewhere you cannot see it."
+      "narration": "Let's say a manager needs to does the work described above. Before, they would have needed to jump across multiple systems to manually gather insights."
     },
     {
       "act": "walkthrough",
@@ -89,32 +68,33 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Financial advisor support with client reviews, portfolio summaries, recommendation engine, and compliance checks for [operator supplies]."
+          "text": "Financial advisor support with client reviews, portfolio summaries, recommendation engine, and compliance checks for the claims queue \u2014 we're looking at a rise in incoming volume."
         },
         {
           "role": "agent",
           "heading": "Financial Advisor Copilot Agent",
           "rich": {
-            "intro": "I'll review , portfolio summaries, recommendation engine for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything.",
+            "intro": "I'll does the work described above for the claims queue, working against a rise in incoming volume. Reading the policy system, claims history and risk signals before I propose anything.",
             "sections": [
               {
-                "label": "What I read",
+                "label": "Current position",
                 "items": [
-                  "the operator's working context: connected",
-                  "Records in scope: [operator supplies]"
+                  "Scope: the open caseload",
+                  "Current: cycle time above target",
+                  "Target: the service target",
+                  "Window: the reporting period"
                 ]
               },
               {
                 "label": "What I checked",
                 "items": [
-                  "Reviews , portfolio summaries, recommendation engine",
-                  "Verified against the source before reporting"
+                  "Does the work described above"
                 ]
               }
             ],
             "callout": {
-              "headline": "Headline finding: [operator supplies]",
-              "source": "Source: the operator's working context",
+              "headline": "Biggest constraint: cycle time above target, against the service target",
+              "source": "Source: the policy system, claims history and risk signals",
               "question": "Shall I show the plan?"
             }
           },
@@ -133,14 +113,14 @@
               {
                 "label": "Recommended plan",
                 "items": [
-                  "1. Review , portfolio summaries, recommendation engine",
+                  "1. Does the work described above",
                   "2. Confirm the result against the source system",
                   "3. Hand back the artifact, and the reasoning behind it"
                 ]
               }
             ],
             "callout": {
-              "headline": "Expected effect: [operator supplies]",
+              "headline": "Phased over the reporting period, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -148,14 +128,14 @@
           "agent_call": "Financial Advisor Copilot Agent"
         }
       ],
-      "narration": "Here it is in use. The operator asks in their own words \u2014 no form to fill in and no syntax to learn. Financial Advisor Copilot Agent works out what is being asked, chooses the tools it needs, and calls them. The answer comes back with structure: what it found, what it recommends, and the tool it called to get there. That last part matters, because it is what makes the answer checkable rather than merely convincing. Ask a follow-up and it carries the context forward, so the conversation builds instead of restarting. Notice what is not happening here. Nobody is copying data between systems, and nobody is retyping an answer into a document. The agent is reading the systems of record in place, under the permissions the operator already has. so the answer reflects what is true right now rather than whatever was exported last week. Where a figure has to come from the operator, it is marked rather than invented. That is deliberate \u2014 a demonstration that fabricates a number teaches the room something false. Everything else on screen is generated from this agent's own manifest. which is why it can be produced for every agent in the library, not only the ones that got a film crew. The same manifest drives the one-pager, the architecture diagram and the review you can read alongside this. One source of truth, four surfaces, and none of them can drift from the others."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Runs on what the operator already has open \u2014 no additional configuration, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Financial Advisor Copilot Agent, financial services get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
       "start": 120.0,
       "end": 137.0,
       "shot": "Dark card, gradient CTA panel",
-      "narration": "Financial Advisor Copilot Agent is one of more than a hundred agents in the AIBAST library. Every one ships as a single file you can read before you run it. with its architecture, its review and this walkthrough alongside it. Start from the library, or bring your own use case.",
+      "narration": "The result? Work that used to take a person a day, done in the flow of their conversation. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [
         "Get started on your agentic journey today.",
         "Talk to your Microsoft representative to learn more."
