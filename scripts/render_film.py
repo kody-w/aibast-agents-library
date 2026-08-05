@@ -38,6 +38,7 @@ import os
 import shutil
 import socketserver
 import subprocess
+import re
 import sys
 import tempfile
 import threading
@@ -146,18 +147,25 @@ with sync_playwright() as p:
 
     stage = None if spec.get("ready") else pg.locator("#stage")
     for i, t in enumerate(spec["times"]):
-        pg.evaluate("(t) => { T = t; paint(); }", t)
+        # Not every overlay page has a timeline: the lozenge is static, the
+        # screen and the overview seek. Drive whichever exists.
+        pg.evaluate("""(t) => {
+            if (typeof paint === 'function') { T = t; paint(); }
+        }""", t)
         pg.wait_for_timeout(spec["settle"])
         if stage is not None:
             stage.screenshot(path=f"{out_dir}/f{i:05d}.png", animations="disabled")
         else:
-            pg.screenshot(path=f"{out_dir}/f{i:05d}.png", animations="disabled")
+            pg.screenshot(path=f"{out_dir}/f{i:05d}.png", animations="disabled",
+                          omit_background=bool(spec.get("transparent")))
     b.close()
 print("captured", len(spec["times"]))
 '''
 
 
 CALIBRATION = REPO_ROOT / "media" / "plates" / "calibration.json"
+OVERLAYS = REPO_ROOT / "media" / "plates" / "overlays.json"
+BASE_SOURCE = Path.home() / "Desktop" / "aibast_bible" / "videos"
 
 
 def load_plate() -> dict | None:
@@ -191,11 +199,12 @@ def load_plate() -> dict | None:
 
 def capture(url: str, times: list[float], out_dir: Path, settle: int = 30,
             width: int | None = None, height: int | None = None,
-            ready: str | None = None) -> int:
+            ready: str | None = None, transparent: bool = False) -> int:
     script = Path(tempfile.mkdtemp()) / "cap.py"
     script.write_text(CAPTURE, encoding="utf-8")
     spec = json.dumps({"w": width or W, "h": height or H, "times": times,
-                       "settle": settle, "ready": ready})
+                       "settle": settle, "ready": ready,
+                       "transparent": bool(transparent)})
     r = run([playwright_python(), str(script), url, str(out_dir), spec])
     if r.returncode != 0:
         raise SystemExit("frame capture failed:\n" + r.stderr.decode()[-1500:])
@@ -255,6 +264,127 @@ def pick_broll(industries: list[str], category: str) -> Path | None:
     return (REPO_ROOT / clips[0]["path"]) if clips else None
 
 
+def load_overlays() -> dict | None:
+    """The base track and the boxes we replace on it.
+
+    This is the architecture that made the films work: keep the professional
+    recording — its cinematography, transitions, Microsoft intro, b-roll and
+    motion — and composite our content only over the boxes that carry
+    agent-specific material. Rects and time windows are set visually in
+    align.html, never guessed here.
+    """
+    if not OVERLAYS.is_file():
+        return None
+    return json.loads(OVERLAYS.read_text(encoding="utf-8"))
+
+
+def find_base(track_id: str) -> Path | None:
+    """The full-resolution recording behind a proxy id."""
+    if not BASE_SOURCE.is_dir():
+        return None
+    want = re.sub(r"[^a-z0-9]+", "", track_id.lower())
+    for f in sorted(BASE_SOURCE.glob("*.mp4")):
+        stem = re.sub(r"^[#0-9-]+", "", f.stem)
+        if re.sub(r"[^a-z0-9]+", "", stem.lower()) == want:
+            return f
+    return None
+
+
+def render_over_base(story: dict, subject: dict, ov: dict, work: Path,
+                     fps: int, out: Path) -> bool:
+    """Composite our regions onto the professional cut."""
+    base = find_base(ov["base_track"])
+    if not base:
+        print(f"  [base] no recording for {ov['base_track']}", file=sys.stderr)
+        return False
+
+    srv, port = serve()
+    kind = subject["kind"]
+    ref = subject["ref"]
+    try:
+        inputs, filters, prev = ["-i", str(base)], [], "[0:v]"
+        idx = 1
+        for region in ov["regions"]:
+            if not region.get("enabled", True):
+                continue
+            r, win = region["rect"], region["window"]
+            span = win["end"] - win["start"]
+            sub = work / f"reg-{region['id']}"
+            sub.mkdir(parents=True, exist_ok=True)
+
+            page = {"lozenge": "lozenge.html", "screen": "screen.html",
+                    "overview": "vision.html"}[region["source"]]
+            q = f"?{'skill' if kind == 'skill' else 'agent'}={ref}"
+            if region["source"] == "overview":
+                q += "&overlay=overview"
+            url = f"http://127.0.0.1:{port}/{page}{q}"
+
+            n = max(2, int(span * fps))
+            times = [win["start"] + (i / fps) for i in range(n)]
+            ready = "window.__ready" if region["source"] == "lozenge" else None
+            if region["source"] == "screen":
+                ready = "window.__ready"
+            capture(url, times, sub, settle=30,
+                    width=r["w"], height=r["h"], ready=ready,
+                    transparent=(region["source"] == "lozenge"))
+
+            inputs += ["-framerate", str(fps), "-i", str(sub / "f%05d.png")]
+            fade = region.get("fade_seconds", 0.3) or 0.01
+            filters.append(
+                f"[{idx}:v]format=rgba,fps={FPS},"
+                f"fade=t=in:st=0:d={fade}:alpha=1,"
+                f"fade=t=out:st={max(0.01, span - fade):.2f}:d={fade}:alpha=1,"
+                f"setpts=PTS-STARTPTS+{win['start']}/TB[r{idx}]")
+            filters.append(
+                f"{prev}[r{idx}]overlay={r['x']}:{r['y']}:"
+                f"enable='between(t,{win['start']},{win['end']})'[v{idx}]")
+            prev = f"[v{idx}]"
+            idx += 1
+
+        picture = work / "picture.mp4"
+        run(["ffmpeg", "-v", "error", "-y", *inputs,
+             "-filter_complex", ";".join(filters),
+             "-map", prev, "-an",
+             "-c:v", "libx264", "-preset", "slow", "-b:v", V_BITRATE,
+             "-maxrate", "8000k", "-bufsize", "12000k",
+             "-pix_fmt", "yuv420p", str(picture)], why="composite over base")
+        if not picture.is_file():
+            return False
+        picture.replace(out)
+        return True
+    finally:
+        srv.shutdown()
+
+
+def mux(picture: Path, audio_parts: list, clock: float, out: Path) -> None:
+    """Lay narration and the bed over a finished picture at reference specs."""
+    if not audio_parts and not BED.is_file():
+        run(["ffmpeg", "-v", "error", "-y", "-i", str(picture),
+             "-c", "copy", str(out)], why="copy picture")
+        return
+    inputs, filters, labels = [], [], []
+    for i, (f, start, _d) in enumerate(audio_parts):
+        inputs += ["-i", str(f)]
+        filters.append(f"[{i + 1}:a]adelay={int(start * 1000)}|{int(start * 1000)}[a{i}]")
+        labels.append(f"[a{i}]")
+    if BED.is_file():
+        bi = len(audio_parts) + 1
+        inputs += ["-i", str(BED)]
+        filters.append(
+            f"[{bi}:a]atrim=0:{clock},volume={BED_GAIN},adelay=3200|3200,"
+            f"afade=t=in:st=3.2:d=1.2,afade=t=out:st={max(1.0, clock - 2.5):.2f}:d=2.5[bed]")
+        labels.append("[bed]")
+    mixf = (";".join(filters) + ";" + "".join(labels) +
+            f"amix=inputs={len(labels)}:dropout_transition=0:normalize=0[m];"
+            f"[m]loudnorm=I={TARGET_LUFS}:TP={TARGET_TP}:LRA=7,"
+            f"apad,atrim=0:{clock},aresample=48000[a]")
+    run(["ffmpeg", "-v", "error", "-y", "-i", str(picture), *inputs,
+         "-filter_complex", mixf, "-map", "0:v", "-map", "[a]",
+         "-c:v", "copy", "-c:a", "aac", "-b:a", A_BITRATE,
+         "-ar", "48000", "-ac", "2", "-movflags", "+faststart", str(out)],
+        why="mux audio")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--agent")
@@ -263,6 +393,8 @@ def main() -> int:
                     help="capture rate for the animated act (output is always 30)")
     ap.add_argument("--no-audio", action="store_true")
     ap.add_argument("--keep", action="store_true", help="keep the working directory")
+    ap.add_argument("--no-base", action="store_true",
+                    help="build the acts instead of compositing over a recording")
     ap.add_argument("--allow-placeholders", action="store_true",
                     help="render an internal review cut with slots unfilled")
     args = ap.parse_args()
@@ -291,6 +423,38 @@ def main() -> int:
     work = Path(tempfile.mkdtemp(prefix="rappvision-"))
     frames = work / "frames"
     frames.mkdir()
+
+    # Preferred path: keep the professional cut and replace only our boxes.
+    ov = load_overlays()
+    if ov and not args.no_base:
+        picture = work / "base-picture.mp4"
+        if render_over_base(story, subject, ov, work, args.fps, picture):
+            OUT_DIR.mkdir(parents=True, exist_ok=True)
+            out = OUT_DIR / f"{kind}-{slug}.mp4"
+            clock = float(subprocess.run(
+                ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                 "-of", "csv=p=0", str(picture)],
+                capture_output=True, text=True).stdout.strip() or 137.0)
+            audio_parts = []
+            if not args.no_audio:
+                for scene in story["scenes"]:
+                    if not scene.get("narration"):
+                        continue
+                    vo = work / f"vo-{scene['act']}.m4a"
+                    dur = narrate(scene["narration"], vo)
+                    if dur:
+                        at = max(scene["start"] + 0.6, VO_ENTRY.get(scene["act"], 0.0))
+                        audio_parts.append((vo, at, dur))
+            mux(picture, audio_parts, clock, out)
+            if out.is_file():
+                print(f"[film] {out.relative_to(REPO_ROOT)} · "
+                      f"{out.stat().st_size / 1048576:.1f} MB · base "
+                      f"{ov['base_track']} · {len(ov['regions'])} regions composited")
+                shutil.rmtree(work, ignore_errors=True)
+                return 0
+        print("  [base] compositing failed — falling back to built acts",
+              file=sys.stderr)
+
     srv, port = serve()
     url = (f"http://127.0.0.1:{port}/vision.html?"
            f"{'skill' if kind == 'skill' else 'agent'}={subject['ref']}")

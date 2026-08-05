@@ -474,6 +474,19 @@ function build(){
 
 (function boot(){
   var agent=qs("agent"), skill=qs("skill");
+  if(qs("overlay")){
+    document.documentElement.classList.add("overlay-only");
+    var css=document.createElement("style");
+    css.textContent=".overlay-only body>header,.overlay-only body>footer,"+
+      ".overlay-only .rail,.overlay-only .transport,.overlay-only .acts,"+
+      ".overlay-only .crumbs{display:none!important}"+
+      ".overlay-only body{margin:0;overflow:hidden;background:#0b1020}"+
+      ".overlay-only .wrap,.overlay-only .layout{max-width:none;padding:0;margin:0;"+
+      "display:block;width:100vw;height:100vh}"+
+      ".overlay-only #stage{width:100vw!important;height:100vh!important;"+
+      "border-radius:0!important;aspect-ratio:auto!important;box-shadow:none!important}";
+    document.head.appendChild(css);
+  }
   var kind = skill?"skill":"agent";
   var ref = skill||agent;
   if(!ref){
