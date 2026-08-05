@@ -32,12 +32,12 @@
       "category": "aggregated",
       "url": "https://microsoft.github.io/cat-agent-skills/#chart-builder",
       "source_signal": {
-        "downloads": 218,
+        "downloads": 255,
         "rating": 3,
         "featured": true
       },
       "gate_verdict": null,
-      "front_page_score": 378
+      "front_page_score": 415
     },
     {
       "ref": "@cat-agent-skills/doc_format_converter",
@@ -57,12 +57,12 @@
       "category": "aggregated",
       "url": "https://microsoft.github.io/cat-agent-skills/#doc-format-converter",
       "source_signal": {
-        "downloads": 152,
+        "downloads": 177,
         "rating": 3,
         "featured": true
       },
       "gate_verdict": null,
-      "front_page_score": 312
+      "front_page_score": 337
     },
     {
       "ref": "@cat-agent-skills/agent_harness_explorer",
@@ -82,12 +82,12 @@
       "category": "aggregated",
       "url": "https://microsoft.github.io/cat-agent-skills/#agent-harness-explorer",
       "source_signal": {
-        "downloads": 87,
+        "downloads": 142,
         "rating": 4,
         "featured": true
       },
       "gate_verdict": null,
-      "front_page_score": 267
+      "front_page_score": 322
     },
     {
       "ref": "@cat-agent-skills/redlining_content",
@@ -103,12 +103,12 @@
       "category": "aggregated",
       "url": "https://microsoft.github.io/cat-agent-skills/#redlining-content",
       "source_signal": {
-        "downloads": 70,
+        "downloads": 81,
         "rating": 2,
         "featured": true
       },
       "gate_verdict": null,
-      "front_page_score": 210
+      "front_page_score": 221
     },
     {
       "ref": "@cat-agent-skills/ai_usecase_assessment",
@@ -130,11 +130,11 @@
       "category": "aggregated",
       "url": "https://microsoft.github.io/cat-agent-skills/#ai-usecase-assessment",
       "source_signal": {
-        "downloads": 101,
+        "downloads": 133,
         "rating": 3
       },
       "gate_verdict": null,
-      "front_page_score": 161
+      "front_page_score": 193
     },
     {
       "ref": "@cat-agent-skills/knowledge_source_router",
@@ -159,6 +159,29 @@
       },
       "gate_verdict": null,
       "front_page_score": 160
+    },
+    {
+      "ref": "@cat-agent-skills/rich_html_presentation",
+      "source_id": "cat-agent-skills",
+      "source_slug": "rich-html-presentation",
+      "display_name": "rich-html-presentation",
+      "description": "Create polished, self-contained HTML slide decks with keynote-style visuals, keyboard navigation, themes, animations, and reusable presentation components.",
+      "tags": [
+        "presentations",
+        "html",
+        "design",
+        "productivity",
+        "writing"
+      ],
+      "author": "Henry Jammes",
+      "category": "aggregated",
+      "url": "https://microsoft.github.io/cat-agent-skills/#rich-html-presentation",
+      "source_signal": {
+        "downloads": 110,
+        "rating": 2
+      },
+      "gate_verdict": null,
+      "front_page_score": 150
     },
     {
       "ref": "@cat-agent-skills/iterative_file_editing",
@@ -209,29 +232,6 @@
       },
       "gate_verdict": null,
       "front_page_score": 140
-    },
-    {
-      "ref": "@cat-agent-skills/rich_html_presentation",
-      "source_id": "cat-agent-skills",
-      "source_slug": "rich-html-presentation",
-      "display_name": "rich-html-presentation",
-      "description": "Create polished, self-contained HTML slide decks with keynote-style visuals, keyboard navigation, themes, animations, and reusable presentation components.",
-      "tags": [
-        "presentations",
-        "html",
-        "design",
-        "productivity",
-        "writing"
-      ],
-      "author": "Henry Jammes",
-      "category": "aggregated",
-      "url": "https://microsoft.github.io/cat-agent-skills/#rich-html-presentation",
-      "source_signal": {
-        "downloads": 92,
-        "rating": 2
-      },
-      "gate_verdict": null,
-      "front_page_score": 132
     },
     {
       "ref": "@cat-agent-skills/conditional_chat_reminder",
@@ -297,11 +297,54 @@
       "category": "aggregated",
       "url": "https://microsoft.github.io/cat-agent-skills/#brand-template-enforcer",
       "source_signal": {
-        "downloads": 87,
+        "downloads": 98,
         "rating": 1
       },
       "gate_verdict": null,
-      "front_page_score": 107
+      "front_page_score": 118
+    },
+    {
+      "ref": "@cat-agent-skills/powerpoint_deck_designer",
+      "source_id": "cat-agent-skills",
+      "source_slug": "powerpoint-deck-designer",
+      "display_name": "powerpoint-deck-designer",
+      "description": "Creates polished PowerPoint decks from a JSON specification using python-pptx. Designed as a Copilot Studio Skill that runs natively inside the agent's Python container (no Azure Function or custom connector required). Supports 8 layouts plus native charts (bar, column, line, pie, donut with stacked / 100% stacked variants).",
+      "tags": [
+        "powerpoint",
+        "presentations",
+        "python",
+        "charts"
+      ],
+      "author": "Ferran Chopo",
+      "category": "aggregated",
+      "url": "https://microsoft.github.io/cat-agent-skills/#powerpoint-deck-designer",
+      "source_signal": {
+        "downloads": 101
+      },
+      "gate_verdict": null,
+      "front_page_score": 101
+    },
+    {
+      "ref": "@cat-agent-skills/skill_authoring_coach",
+      "source_id": "cat-agent-skills",
+      "source_slug": "skill-authoring-coach",
+      "display_name": "skill-authoring-coach",
+      "description": "Help makers design concise, reusable Agent Skills with clear triggers, instructions, resources, and packaging.",
+      "tags": [
+        "skills",
+        "authoring",
+        "documentation",
+        "productivity",
+        "agent"
+      ],
+      "author": "Simon Owen",
+      "category": "aggregated",
+      "url": "https://microsoft.github.io/cat-agent-skills/#skill-authoring-coach",
+      "source_signal": {
+        "downloads": 101
+      },
+      "gate_verdict": null,
+      "front_page_score": 101
     },
     {
       "ref": "@cat-agent-skills/eu_greenwashing_analysis",
@@ -343,54 +386,11 @@
       "category": "aggregated",
       "url": "https://microsoft.github.io/cat-agent-skills/#linkedin-content-writer",
       "source_signal": {
-        "downloads": 56,
+        "downloads": 60,
         "rating": 2
       },
       "gate_verdict": null,
-      "front_page_score": 96
-    },
-    {
-      "ref": "@cat-agent-skills/powerpoint_deck_designer",
-      "source_id": "cat-agent-skills",
-      "source_slug": "powerpoint-deck-designer",
-      "display_name": "powerpoint-deck-designer",
-      "description": "Creates polished PowerPoint decks from a JSON specification using python-pptx. Designed as a Copilot Studio Skill that runs natively inside the agent's Python container (no Azure Function or custom connector required). Supports 8 layouts plus native charts (bar, column, line, pie, donut with stacked / 100% stacked variants).",
-      "tags": [
-        "powerpoint",
-        "presentations",
-        "python",
-        "charts"
-      ],
-      "author": "Ferran Chopo",
-      "category": "aggregated",
-      "url": "https://microsoft.github.io/cat-agent-skills/#powerpoint-deck-designer",
-      "source_signal": {
-        "downloads": 89
-      },
-      "gate_verdict": null,
-      "front_page_score": 89
-    },
-    {
-      "ref": "@cat-agent-skills/skill_authoring_coach",
-      "source_id": "cat-agent-skills",
-      "source_slug": "skill-authoring-coach",
-      "display_name": "skill-authoring-coach",
-      "description": "Help makers design concise, reusable Agent Skills with clear triggers, instructions, resources, and packaging.",
-      "tags": [
-        "skills",
-        "authoring",
-        "documentation",
-        "productivity",
-        "agent"
-      ],
-      "author": "Simon Owen",
-      "category": "aggregated",
-      "url": "https://microsoft.github.io/cat-agent-skills/#skill-authoring-coach",
-      "source_signal": {
-        "downloads": 79
-      },
-      "gate_verdict": null,
-      "front_page_score": 79
+      "front_page_score": 100
     },
     {
       "ref": "@cat-agent-skills/campaign_deck_builder",
