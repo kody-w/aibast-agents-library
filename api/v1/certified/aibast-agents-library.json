@@ -1,6 +1,6 @@
 {
   "schema": "aibast-certified/1.0",
-  "generated": "2026-08-05T00:16:41.279644+00:00",
+  "generated": "2026-08-05T00:20:26.753884+00:00",
   "username": "aibast-agents-library",
   "level": "maintainer",
   "certified": true,
@@ -9,6 +9,20 @@
   "revoked_on": null,
   "reason": null,
   "note": "Library maintainer account \u2014 the reference entry.",
+  "badges": [
+    {
+      "id": "agent-published",
+      "name": "Agent Published",
+      "tier": "builder",
+      "points": 30,
+      "color": "107c10",
+      "awarded_on": "2026-08-04",
+      "discussion": null,
+      "note": "Reference entry.",
+      "badge_url": "https://microsoft.github.io/aibast-agents-library/api/v1/certified/aibast-agents-library/agent-published/badge.json"
+    }
+  ],
+  "points": 30,
   "profile_url": "https://github.com/aibast-agents-library",
   "verify_url": "https://microsoft.github.io/aibast-agents-library/api/v1/certified/aibast-agents-library.json",
   "badge_url": "https://microsoft.github.io/aibast-agents-library/api/v1/certified/aibast-agents-library/badge.json",

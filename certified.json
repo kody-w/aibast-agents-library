@@ -1,22 +1,21 @@
 {
   "schema": "aibast-certified-roster/1.0",
   "_comment": [
-    "THE ROSTER. This is the only hand-edited file in the certification system.",
-    "scripts/build_api.py turns it into the verification endpoints under",
-    "api/v1/certified/, which anyone can query by GitHub username.",
+    "THE ROSTER. This is the only hand-edited file in the awards system besides",
+    "badges.json. scripts/build_api.py turns the two into the public endpoints",
+    "under api/v1/ and the Wall of Fame at wall.html.",
     "",
-    "Adding someone: append an entry with status 'active'.",
-    "Revoking someone: set status to 'revoked' and add revoked_on + reason.",
-    "NEVER delete an entry — the endpoint URL must keep resolving so a badge",
-    "in someone's README flips to 'not certified' instead of breaking. A 404",
-    "is indistinguishable from an outage; an explicit 'revoked' is not.",
+    "Adding an award: append to that member's `badges` with the badge id, the date,",
+    "and the `discussion` URL where it was approved \u2014 that thread is where people",
+    "comment and upvote, so the award has a public record, not just a row here.",
     "",
-    "Usernames are matched case-insensitively (GitHub is), and are stored",
-    "lowercase. Levels: certified (built and shipped a RAPP agent that passed",
-    "review) and maintainer (also reviews others' submissions).",
+    "Revoking: set the member's status to 'revoked' (whole account) or drop the",
+    "single badge and note it. NEVER delete a member entry \u2014 the endpoint URL must",
+    "keep resolving so an embedded badge flips to 'not certified' instead of",
+    "breaking. A 404 is indistinguishable from an outage; an explicit answer is not.",
     "",
-    "Roles, not personal data: keep entries to a username, a level, dates, and",
-    "an optional public org/handle. No emails, no internal identifiers."
+    "Usernames are matched case-insensitively (GitHub is) and stored lowercase.",
+    "Roles, not personal data: username, badges, dates, public links. No emails."
   ],
   "levels": {
     "certified": "Has published at least one agent to the library that passed review.",
@@ -28,7 +27,15 @@
       "level": "maintainer",
       "certified_on": "2026-08-04",
       "status": "active",
-      "note": "Library maintainer account — the reference entry."
+      "note": "Library maintainer account \u2014 the reference entry.",
+      "badges": [
+        {
+          "id": "agent-published",
+          "awarded_on": "2026-08-04",
+          "discussion": null,
+          "note": "Reference entry."
+        }
+      ]
     }
   ]
 }

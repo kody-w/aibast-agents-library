@@ -178,27 +178,44 @@ def main() -> int:
     if aggregated is not None:
         changed += stable_write(API / "aggregated.json", dict(aggregated))
 
-    # ── RAPP Certified: roster -> per-user verification endpoints ──────────
+    # ── Awards: badge catalog + roster -> verification endpoints ───────────
     # A username lookup must answer instantly and truthfully, including "no".
-    # Every roster entry gets a stable URL that keeps resolving after
-    # revocation, so a badge in someone's README flips to "not certified"
-    # rather than breaking — a 404 cannot be told apart from an outage.
+    # Every roster entry keeps a stable URL after revocation, so a badge already
+    # embedded in someone's README flips to "not certified" rather than 404-ing
+    # (a 404 cannot be told apart from an outage).
+    catalog = load("badges.json", {"badges": []})
+    badge_by_id = {b["id"]: b for b in catalog.get("badges", [])}
     roster = load("certified.json", {"members": [], "levels": {}})
+
     members = []
     for m in roster.get("members", []):
         user = str(m.get("username", "")).strip().lower()
         if not user:
             continue
         active = m.get("status", "active") == "active"
+        awards = []
+        for a in m.get("badges", []):
+            meta = badge_by_id.get(a.get("id"))
+            if not meta:
+                continue          # an award naming an unknown badge is ignored, not guessed
+            awards.append({
+                "id": meta["id"], "name": meta["name"], "tier": meta.get("tier"),
+                "points": meta.get("points", 0), "color": meta.get("color", "0078d4"),
+                "awarded_on": a.get("awarded_on"), "discussion": a.get("discussion"),
+                "note": a.get("note"),
+                "badge_url": f"{PAGES_BASE}/api/v1/certified/{user}/{meta['id']}/badge.json",
+            })
         members.append({
             "username": user,
             "level": m.get("level", "certified"),
-            "certified": active,
+            "certified": active and bool(awards),
             "status": m.get("status", "active"),
             "certified_on": m.get("certified_on"),
             "revoked_on": m.get("revoked_on"),
             "reason": m.get("reason"),
             "note": m.get("note"),
+            "badges": awards if active else [],
+            "points": sum(a["points"] for a in awards) if active else 0,
             "profile_url": f"https://github.com/{user}",
             "verify_url": f"{PAGES_BASE}/api/v1/certified/{user}.json",
             "badge_url": f"{PAGES_BASE}/api/v1/certified/{user}/badge.json",
@@ -210,26 +227,80 @@ def main() -> int:
 
     certified_dir = API / "certified"
     kept_certified = set()
+
+    def shields(label, message, color):
+        return {"schemaVersion": 1, "label": label, "message": message, "color": color}
+
     for m in members:
         doc = {"schema": "aibast-certified/1.0", "generated": gen, **m}
         p_user = certified_dir / f"{m['username']}.json"
         kept_certified.add(p_user)
         changed += stable_write(p_user, doc)
-        # shields.io endpoint — green when active, grey when revoked
+
+        # Overall badge: green when the account holds at least one live award.
+        summary = (f"certified · {len(m['badges'])} badge"
+                   f"{'' if len(m['badges']) == 1 else 's'}") if m["certified"] else "not certified"
         p_badge = certified_dir / m["username"] / "badge.json"
         kept_certified.add(p_badge)
-        changed += stable_write(p_badge, {
-            "schemaVersion": 1,
-            "label": "RAPP",
-            "message": ("certified" if m["certified"] else "not certified")
-                       + ("" if m["level"] != "maintainer" or not m["certified"] else " maintainer"),
-            "color": "brightgreen" if m["certified"] else "lightgrey",
-        })
+        changed += stable_write(p_badge, shields(
+            "RAPP", summary, "brightgreen" if m["certified"] else "lightgrey"))
+
+        # One shields endpoint per badge the user holds, so they can display
+        # exactly the achievement they mean.
+        for a in m["badges"]:
+            p_one = certified_dir / m["username"] / a["id"] / "badge.json"
+            kept_certified.add(p_one)
+            changed += stable_write(p_one, shields("RAPP", a["name"], a["color"]))
+
     if certified_dir.exists():
         for p_old in certified_dir.rglob("*.json"):
             if p_old not in kept_certified:
                 p_old.unlink()
                 changed += 1
+
+    holders_by_badge = {}
+    for m in members:
+        for a in m["badges"]:
+            holders_by_badge.setdefault(a["id"], []).append(
+                {"username": m["username"], "awarded_on": a["awarded_on"],
+                 "discussion": a["discussion"]})
+
+    badges_dir = API / "badges"
+    kept_badges = set()
+    for b in catalog.get("badges", []):
+        holders = sorted(holders_by_badge.get(b["id"], []),
+                         key=lambda h: (h["awarded_on"] or "", h["username"]))
+        p_b = badges_dir / f"{b['id']}.json"
+        kept_badges.add(p_b)
+        changed += stable_write(p_b, {
+            "schema": "aibast-badge/1.0", "generated": gen, **b,
+            "holders": holders, "holder_count": len(holders),
+        })
+    if badges_dir.exists():
+        for p_old in badges_dir.glob("*.json"):
+            if p_old not in kept_badges:
+                p_old.unlink()
+                changed += 1
+
+    changed += stable_write(API / "badges.json", {
+        "schema": "aibast-badge-catalog/1.0", "generated": gen,
+        "count": len(catalog.get("badges", [])),
+        "lookup": f"{PAGES_BASE}/api/v1/badges/{{badge_id}}.json",
+        "badges": [{**b, "holder_count": len(holders_by_badge.get(b["id"], []))}
+                   for b in catalog.get("badges", [])],
+    })
+
+    # Wall of Fame: ranked, public, and derived — never hand-edited.
+    wall = sorted((m for m in members if m["certified"]),
+                  key=lambda m: (-m["points"], -len(m["badges"]), m["username"]))
+    changed += stable_write(API / "wall.json", {
+        "schema": "aibast-wall/1.0", "generated": gen,
+        "count": len(wall),
+        "page": f"{PAGES_BASE}/wall.html",
+        "members": [{k: m[k] for k in
+                     ("username", "level", "points", "badges", "profile_url",
+                      "verify_url", "badge_url", "agents")} for m in wall],
+    })
 
     changed += stable_write(API / "certified.json", {
         "schema": "aibast-certified-roster/1.0", "generated": gen,
@@ -249,6 +320,7 @@ def main() -> int:
         "categories": stats.get("categories", len(cats)),
         "aggregated_skills": ((aggregated or {}).get("stats") or {}).get("total", 0),
         "certified_publishers": sum(1 for m in members if m["certified"]),
+        "badges": len(catalog.get("badges", [])),
     })
 
     changed += stable_write(API / "badge.json", {
@@ -274,6 +346,10 @@ def main() -> int:
             "certified_roster": "certified.json",
             "certified_lookup": "certified/{username}.json",
             "certified_badge": "certified/{username}/badge.json",
+            "certified_badge_one": "certified/{username}/{badge_id}/badge.json",
+            "badge_catalog": "badges.json",
+            "badge_holders": "badges/{badge_id}.json",
+            "wall_of_fame": "wall.json",
             "status": "status.json",
             "badge": "badge.json",
             "registry": "../../registry.json",

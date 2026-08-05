@@ -1,0 +1,14 @@
+{
+  "schema": "aibast-badge/1.0",
+  "generated": "2026-08-05T00:20:26.753884+00:00",
+  "id": "reviewer",
+  "name": "Reviewer",
+  "summary": "Reviews submissions from other publishers.",
+  "criteria": "Sustained, substantive review of other people's pull requests, at a maintainer's invitation.",
+  "how": "Awarded by maintainers. Not self-claimable.",
+  "color": "8b5cf6",
+  "points": 50,
+  "tier": "maintainer",
+  "holders": [],
+  "holder_count": 0
+}

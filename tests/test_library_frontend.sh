@@ -191,6 +191,54 @@ PY"
 check "gallery, metrics and installer link the API explorer" \
   "grep -q 'api.html' index.html && grep -q 'api.html' agents.html && grep -q 'api.html' metrics.html"
 
+echo "== T-WALL badge catalog + Wall of Fame =="
+check "catalog builds per-badge holder endpoints and a ranked wall" "python3 - <<'PY'
+import json, subprocess
+subprocess.run(['python3','scripts/build_api.py'],capture_output=True,timeout=60)
+cat=json.load(open('badges.json'))['badges']
+built=json.load(open('api/v1/badges.json'))
+assert built['schema']=='aibast-badge-catalog/1.0'
+assert {b['id'] for b in cat}=={b['id'] for b in built['badges']}
+for b in cat:
+    d=json.load(open(f\"api/v1/badges/{b['id']}.json\"))
+    assert d['schema']=='aibast-badge/1.0'
+    assert d['holder_count']==len(d['holders'])
+w=json.load(open('api/v1/wall.json'))
+assert w['schema']=='aibast-wall/1.0'
+pts=[m['points'] for m in w['members']]
+assert pts==sorted(pts,reverse=True), 'wall must be ranked'
+for m in w['members']:
+    for a in m['badges']:
+        assert json.load(open(f\"api{a['badge_url'].split('/api',1)[1]}\"))['schemaVersion']==1
+PY"
+check "an award naming an unknown badge is ignored, not invented" "python3 - <<'PY'
+import json, subprocess, pathlib
+src=pathlib.Path('certified.json'); backup=src.read_text()
+try:
+    d=json.loads(backup)
+    d['members'][0]['badges'].append({'id':'no-such-badge','awarded_on':'2026-01-01'})
+    src.write_text(json.dumps(d,indent=2))
+    subprocess.run(['python3','scripts/build_api.py'],capture_output=True,timeout=60)
+    u=json.load(open(f\"api/v1/certified/{d['members'][0]['username'].lower()}.json\"))
+    assert all(a['id']!='no-such-badge' for a in u['badges'])
+finally:
+    src.write_text(backup); subprocess.run(['python3','scripts/build_api.py'],capture_output=True,timeout=60)
+PY"
+check "wall.html renders distinct badge art and verifies live" "python3 - <<'PY'
+import re
+h=open('wall.html').read()
+for n in ('id=\"badgeCase\"','id=\"people\"','id=\"result\"','api/v1/wall.json',
+          'api/v1/badges.json','api/v1/certified/','var SHAPES','function art('):
+    assert n in h, n
+# each badge must own its silhouette — the shape is what makes it collectible
+block = h.split('var SHAPES')[1].split('};')[0]
+shapes = re.findall(r'\"(M[^\"]+)\"', block)
+assert len(shapes) >= 5, shapes
+assert len(set(shapes)) == len(shapes), 'duplicate badge silhouette'
+PY"
+check "every surface links the Wall of Fame" \
+  "grep -q 'wall.html' index.html && grep -q 'wall.html' agents.html && grep -q 'wall.html' api.html"
+
 echo "== T-CERT RAPP Certified verification =="
 check "roster builds per-user endpoints, badges, and a roster document" "python3 - <<'PY'
 import json, subprocess

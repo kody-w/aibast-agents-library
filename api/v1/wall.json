@@ -1,23 +1,13 @@
 {
-  "schema": "aibast-certified-roster/1.0",
-  "generated": "2026-08-05T00:24:20.095838+00:00",
-  "levels": {
-    "certified": "Has published at least one agent to the library that passed review.",
-    "maintainer": "Certified, and reviews submissions from other publishers."
-  },
+  "schema": "aibast-wall/1.0",
+  "generated": "2026-08-05T00:20:26.753884+00:00",
   "count": 1,
-  "lookup": "https://microsoft.github.io/aibast-agents-library/api/v1/certified/{username}.json",
-  "note": "Query any GitHub username. A username absent from this roster is not certified; an entry with certified=false was revoked.",
+  "page": "https://microsoft.github.io/aibast-agents-library/wall.html",
   "members": [
     {
       "username": "aibast-agents-library",
       "level": "maintainer",
-      "certified": true,
-      "status": "active",
-      "certified_on": "2026-08-04",
-      "revoked_on": null,
-      "reason": null,
-      "note": "Library maintainer account \u2014 the reference entry.",
+      "points": 30,
       "badges": [
         {
           "id": "agent-published",
@@ -31,7 +21,6 @@
           "badge_url": "https://microsoft.github.io/aibast-agents-library/api/v1/certified/aibast-agents-library/agent-published/badge.json"
         }
       ],
-      "points": 30,
       "profile_url": "https://github.com/aibast-agents-library",
       "verify_url": "https://microsoft.github.io/aibast-agents-library/api/v1/certified/aibast-agents-library.json",
       "badge_url": "https://microsoft.github.io/aibast-agents-library/api/v1/certified/aibast-agents-library/badge.json",

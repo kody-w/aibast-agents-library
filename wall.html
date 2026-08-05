@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAPP Certified — Wall of Fame</title>
+<meta name="description" content="Every RAPP Certified badge and the people who earned them. Verifiable from the static API, displayable anywhere.">
+<meta property="og:title" content="RAPP Certified — Wall of Fame">
+<meta property="og:description" content="Earn badges, verify them from the API, display them anywhere.">
+<meta property="og:type" content="website">
+<style>
+:root {
+  --bg:#faf9f8; --panel:#fff; --panel-2:#f5f4f3; --border:#edebe9;
+  --text:#323130; --text-dim:#605e5c; --text-faint:#a19f9d;
+  --accent:#0078d4; --accent-2:#5b5fc7; --accent-soft:rgba(0,120,212,.08);
+  --ok:#107c10; --warn:#d83b01;
+  --shadow:0 .3px .9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --case:#f0eeec; --case-line:#dedbd8; --radius:8px;
+}
+[data-theme="dark"] {
+  --bg:#1b1a19; --panel:#252423; --panel-2:#2d2c2b; --border:#3b3a39;
+  --text:#f3f2f1; --text-dim:#c8c6c4; --text-faint:#797775;
+  --accent:#2899f5; --accent-2:#7f85f5; --accent-soft:rgba(40,153,245,.14);
+  --ok:#92c353; --warn:#f1707b;
+  --shadow:0 .3px .9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+  --case:#201f1e; --case-line:#3b3a39;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+html, body { max-width:100%; overflow-x:hidden; }
+body { font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.55; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+.wrap { max-width:1180px; margin:0 auto; padding:0 20px; }
+header { position:sticky; top:0; z-index:50; background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--border); }
+.nav { display:flex; align-items:center; gap:18px; padding:12px 0; flex-wrap:wrap; }
+.brand { display:flex; align-items:center; gap:9px; font-weight:700; font-size:15px; color:var(--text); }
+.brand:hover { text-decoration:none; }
+.nav-links { display:flex; gap:4px; flex-wrap:wrap; }
+.nav-links a { color:var(--text-dim); font-size:13.5px; padding:5px 10px; border-radius:8px; }
+.nav-links a:hover { color:var(--text); background:var(--panel-2); text-decoration:none; }
+.nav-actions { margin-left:auto; display:flex; gap:8px; }
+.icon-btn { background:var(--panel); border:1px solid var(--border); color:var(--text-dim);
+  width:32px; height:32px; border-radius:4px; cursor:pointer; display:inline-flex;
+  align-items:center; justify-content:center; }
+.icon-btn:hover { color:var(--text); border-color:var(--text-faint); }
+
+.hero { padding:52px 0 24px; position:relative; }
+.hero::before { content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(620px 300px at 22% 0%, color-mix(in srgb,var(--accent) 14%,transparent), transparent 70%); }
+.hero-inner { position:relative; max-width:760px; }
+.hero h1 { font-size:clamp(28px,5vw,42px); line-height:1.12; letter-spacing:-.02em; font-weight:700; }
+.hero h1 .grad { background:linear-gradient(92deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p.lead { margin-top:14px; font-size:16.5px; color:var(--text-dim); max-width:64ch; }
+section { padding:40px 0 8px; }
+.sec-head { margin-bottom:16px; }
+.sec-head h2 { font-size:23px; font-weight:720; letter-spacing:-.015em; }
+.sec-head p { color:var(--text-dim); font-size:14px; margin-top:6px; max-width:78ch; }
+
+/* ── the badge case ───────────────────────────────────────────── */
+.case {
+  background:var(--case); border:1px solid var(--case-line); border-radius:14px;
+  padding:26px 22px; box-shadow:inset 0 1px 0 rgba(255,255,255,.5), var(--shadow);
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(158px,1fr)); gap:22px 14px;
+}
+[data-theme="dark"] .case { box-shadow:inset 0 1px 0 rgba(255,255,255,.04), var(--shadow); }
+.slot { text-align:center; }
+.slot .emblem { width:104px; height:104px; margin:0 auto; display:block;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.22)); transition:transform .18s ease; cursor:pointer; }
+.slot .emblem:hover { transform:translateY(-3px) scale(1.04); }
+.slot.locked .emblem { filter:grayscale(1) opacity(.32); }
+.slot .bname { font-size:12.5px; font-weight:720; margin-top:8px; letter-spacing:-.01em; }
+.slot .bmeta { font-size:11px; color:var(--text-faint); margin-top:1px; }
+.slot.locked .bname { color:var(--text-faint); }
+
+/* ── people ───────────────────────────────────────────────────── */
+.people { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-top:6px; }
+.person { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:16px; min-width:0; }
+.person .top { display:flex; align-items:center; gap:11px; }
+.person .rank { font-size:12px; font-weight:800; color:var(--text-faint); width:22px; }
+.person .who { font-weight:720; font-size:14.5px; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.person .pts { margin-left:auto; font-size:11.5px; font-weight:700; color:var(--accent);
+  background:var(--accent-soft); padding:2px 9px; border-radius:999px; white-space:nowrap; }
+.person .mini { display:flex; gap:7px; margin-top:12px; flex-wrap:wrap; }
+.person .mini svg { width:40px; height:40px; filter:drop-shadow(0 2px 3px rgba(0,0,0,.2)); }
+.person .links { margin-top:11px; font-size:12.5px; display:flex; gap:12px; flex-wrap:wrap; }
+
+/* ── lookup ───────────────────────────────────────────────────── */
+.lookup { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.lookup input { flex:1 1 240px; min-width:0; padding:9px 12px; font-size:14px; font-family:inherit;
+  background:var(--panel-2); color:var(--text); border:1px solid var(--border); border-radius:6px; outline:none; }
+.btn { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:9px 18px;
+  font-size:13.5px; font-weight:650; cursor:pointer; font-family:inherit; }
+.btn:hover { background:color-mix(in srgb,var(--accent) 85%,#000); }
+.card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:18px; margin-top:14px; }
+.note { font-size:12.5px; color:var(--text-faint); line-height:1.65; }
+.code { position:relative; margin-top:12px; }
+.code code { display:block; background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+  padding:9px 74px 9px 10px; font-family:ui-monospace,"SF Mono",Consolas,monospace;
+  font-size:11.5px; color:var(--text-dim); overflow-x:auto; white-space:nowrap; }
+.copy-btn { position:absolute; top:6px; right:6px; font-size:11.5px; font-weight:650;
+  background:var(--panel); border:1px solid var(--border); color:var(--text-dim);
+  padding:4px 10px; border-radius:5px; cursor:pointer; font-family:inherit; }
+footer { margin-top:52px; border-top:1px solid var(--border); padding:26px 0 40px; }
+.foot { display:flex; gap:22px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--text-faint); }
+.foot a { color:var(--text-dim); }
+dialog.detail { border:1px solid var(--border); border-radius:12px; background:var(--panel);
+  color:var(--text); padding:0; max-width:440px; width:calc(100% - 32px); box-shadow:0 12px 40px rgba(0,0,0,.35); }
+dialog.detail::backdrop { background:rgba(0,0,0,.45); }
+.detail-in { padding:22px; text-align:center; }
+.detail-in svg { width:120px; height:120px; filter:drop-shadow(0 4px 7px rgba(0,0,0,.25)); }
+.detail-in h3 { font-size:18px; font-weight:750; margin-top:10px; }
+.detail-in .tier { font-size:11px; text-transform:uppercase; letter-spacing:.09em;
+  color:var(--text-faint); font-weight:700; margin-top:2px; }
+.detail-in p { font-size:13.5px; color:var(--text-dim); margin-top:10px; text-align:left; }
+.detail-in .crit { font-size:12.5px; color:var(--text-dim); background:var(--panel-2);
+  border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-top:12px; text-align:left; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg>
+      AIBAST Agents Library
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="agents.html">Library</a>
+      <a href="#case">Badges</a>
+      <a href="#wall">Wall of Fame</a>
+      <a href="#verify">Verify</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light/dark" aria-label="Toggle theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-inner">
+        <h1>Earn them. Verify them. <span class="grad">Show them anywhere.</span></h1>
+        <p class="lead">Each badge is awarded for something you actually did, recorded in a public thread you can be congratulated on, and verifiable by anyone straight from the static API — so the badge on your README is live, not a claim.</p>
+      </div>
+    </div>
+
+    <section id="case">
+      <div class="sec-head">
+        <h2>The badge case</h2>
+        <p>Every badge in the catalog. Click one for how to earn it and who holds it.</p>
+      </div>
+      <div class="case" id="badgeCase"></div>
+    </section>
+
+    <section id="wall">
+      <div class="sec-head">
+        <h2>Wall of Fame</h2>
+        <p id="wallHint">Ranked by badges earned. Everyone here is verifiable at <code>api/v1/certified/&lt;username&gt;.json</code>.</p>
+      </div>
+      <div class="people" id="people"></div>
+    </section>
+
+    <section id="verify">
+      <div class="sec-head">
+        <h2>Check anyone</h2>
+        <p>Type a GitHub username. The answer comes from the live API — including "not certified", which is a real answer, not an error.</p>
+      </div>
+      <div class="card">
+        <div class="lookup">
+          <input id="user" type="search" placeholder="github-username" aria-label="GitHub username to verify">
+          <button class="btn" id="go">Verify</button>
+        </div>
+        <div id="result" style="margin-top:16px"></div>
+      </div>
+      <p class="note" style="margin-top:12px">Badges say a person met this library's bar for a specific task. They are not a Microsoft endorsement — see <a href="https://github.com/microsoft/aibast-agents-library/blob/main/docs/CERTIFICATION.md">how certification works</a> and the <a href="https://github.com/microsoft/aibast-agents-library/blob/main/DISCLAIMER.md">disclaimer</a>.</p>
+    </section>
+  </div>
+</main>
+
+<dialog class="detail" id="detail"><div class="detail-in" id="detailIn"></div></dialog>
+
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 Microsoft AIBAST. Some rights reserved.</span>
+    <a href="agents.html">Agent Library</a>
+    <a href="api.html">Static API</a>
+    <a href="metrics.html">Metrics</a>
+    <a href="https://github.com/microsoft/aibast-agents-library/blob/main/docs/CERTIFICATION.md">How to earn a badge</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+"use strict";
+var root = document.documentElement, saved = null;
+try { saved = localStorage.getItem("aibast-theme"); } catch (e) {}
+if (saved === "dark" || (saved === null && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches)) root.setAttribute("data-theme","dark");
+document.getElementById("themeToggle").addEventListener("click", function () {
+  var d = root.getAttribute("data-theme") === "dark";
+  if (d) root.removeAttribute("data-theme"); else root.setAttribute("data-theme","dark");
+  try { localStorage.setItem("aibast-theme", d ? "light" : "dark"); } catch (e) {}
+});
+
+var PAGES = "https://microsoft.github.io/aibast-agents-library";
+var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+  return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]; }); };
+
+/* ── badge art ───────────────────────────────────────────────────────────
+   Each badge gets its own silhouette, so it reads as a distinct collectible
+   at a glance — the shape carries the identity, the colour reinforces it. */
+var SHAPES = {
+  "rapp-ready":        "M50 6 88 27v46L50 94 12 73V27z",                                  /* hexagon */
+  "agent-published":   "M50 5c14 9 26 12 38 12 0 34-9 62-38 78C21 79 12 51 12 17c12 0 24-3 38-12z", /* shield */
+  "brainstem-operator":"M50 4a46 46 0 1 1-.1 0z",                                          /* disc */
+  "skill-converter":   "M50 3 97 50 50 97 3 50z",                                          /* diamond */
+  "reviewer":          "M50 3l12 26 28 4-20 20 5 28-25-14-25 14 5-28L10 33l28-4z",          /* star */
+  /* A badge with no art of its own gets a neutral plaque — it must never be
+     mistaken for a badge that does have an identity. */
+  "_default":          "M22 14h56a8 8 0 0 1 8 8v56a8 8 0 0 1-8 8H22a8 8 0 0 1-8-8V22a8 8 0 0 1 8-8z"
+};
+var GLYPH = {
+  "rapp-ready":        '<path d="M35 51l11 11 20-22" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>',
+  "agent-published":   '<path d="M50 26v34M50 26l-12 12M50 26l12 12M33 66h34" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>',
+  "brainstem-operator":'<circle cx="50" cy="50" r="12" fill="none" stroke="#fff" stroke-width="6.5"/><path d="M50 22v8M50 70v8M22 50h8M70 50h8" stroke="#fff" stroke-width="6.5" stroke-linecap="round"/>',
+  "skill-converter":   '<path d="M34 42h24l-8-9M66 58H42l8 9" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>',
+  "reviewer":          '<path d="M34 47l11 11 21-23" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>',
+  "_default":          '<circle cx="50" cy="50" r="13" fill="#fff" opacity=".9"/>'
+};
+function art(b, size) {
+  var id = b.id, c = "#" + (b.color || "0078d4");
+  var uid = "g" + id.replace(/[^a-z0-9]/gi, "") + Math.floor(Math.random() * 1e6);
+  return '<svg viewBox="0 0 100 100" width="' + size + '" height="' + size + '" role="img" aria-label="' + esc(b.name) + '">' +
+    "<defs>" +
+      '<linearGradient id="' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="' + c + '" stop-opacity=".95"/>' +
+        '<stop offset="1" stop-color="' + c + '" stop-opacity=".62"/>' +
+      "</linearGradient>" +
+      '<linearGradient id="' + uid + 's" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="#fff" stop-opacity=".55"/>' +
+        '<stop offset=".5" stop-color="#fff" stop-opacity="0"/>' +
+      "</linearGradient>" +
+    "</defs>" +
+    '<path d="' + (SHAPES[id] || SHAPES._default) + '" fill="url(#' + uid + ')" stroke="' + c + '" stroke-width="3"/>' +
+    '<path d="' + (SHAPES[id] || SHAPES._default) + '" fill="url(#' + uid + 's)"/>' +
+    (GLYPH[id] || GLYPH._default) +
+    "</svg>";
+}
+
+function getJSON(paths) {
+  var p = Promise.reject();
+  paths.forEach(function (u) {
+    p = p.catch(function () {
+      return fetch(u, { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+    });
+  });
+  return p;
+}
+
+var CATALOG = [], BY_ID = {};
+
+function openDetail(b) {
+  document.getElementById("detailIn").innerHTML =
+    art(b, 120) +
+    "<h3>" + esc(b.name) + "</h3>" +
+    '<div class="tier">' + esc(b.tier || "badge") + " · " + (b.points || 0) + " pts · " +
+      (b.holder_count || 0) + " holder" + (b.holder_count === 1 ? "" : "s") + "</div>" +
+    "<p>" + esc(b.summary || "") + "</p>" +
+    '<div class="crit"><b>How to earn it</b><br>' + esc(b.criteria || "") +
+      (b.how ? "<br><br><b>Next step</b><br>" + esc(b.how) : "") + "</div>" +
+    '<p style="text-align:center;margin-top:14px"><button class="btn" id="closeD">Close</button></p>';
+  var d = document.getElementById("detail");
+  d.showModal();
+  document.getElementById("closeD").addEventListener("click", function () { d.close(); });
+}
+
+getJSON(["api/v1/badges.json", PAGES + "/api/v1/badges.json"]).then(function (cat) {
+  CATALOG = cat.badges || [];
+  CATALOG.forEach(function (b) { BY_ID[b.id] = b; });
+  document.getElementById("badgeCase").innerHTML = CATALOG.map(function (b, i) {
+    return '<div class="slot' + (b.holder_count ? "" : " locked") + '" data-i="' + i + '">' +
+      art(b, 104) +
+      '<div class="bname">' + esc(b.name) + "</div>" +
+      '<div class="bmeta">' + (b.holder_count || 0) + " holder" + (b.holder_count === 1 ? "" : "s") +
+        " · " + (b.points || 0) + " pts</div></div>";
+  }).join("");
+  Array.prototype.forEach.call(document.querySelectorAll(".slot"), function (s) {
+    s.addEventListener("click", function () { openDetail(CATALOG[+s.dataset.i]); });
+  });
+}).catch(function () {
+  document.getElementById("badgeCase").innerHTML = '<div class="note">Badge catalog not published on this host yet.</div>';
+});
+
+getJSON(["api/v1/wall.json", PAGES + "/api/v1/wall.json"]).then(function (w) {
+  var rows = w.members || [];
+  document.getElementById("wallHint").innerHTML = rows.length
+    ? rows.length + " certified " + (rows.length === 1 ? "person" : "people") +
+      ", ranked by badges earned. Everyone here is verifiable at <code>api/v1/certified/&lt;username&gt;.json</code>."
+    : "No badges awarded yet — the first one goes here.";
+  document.getElementById("people").innerHTML = rows.map(function (m, i) {
+    var minis = (m.badges || []).map(function (a) {
+      var b = BY_ID[a.id] || a;
+      return '<span title="' + esc(b.name || a.id) + '">' + art(b, 40) + "</span>";
+    }).join("");
+    var links = '<a href="' + esc(m.profile_url) + '" target="_blank" rel="noopener">GitHub</a>' +
+      '<a href="' + esc(m.verify_url) + '" target="_blank" rel="noopener">Verify</a>';
+    var disc = (m.badges || []).filter(function (a) { return a.discussion; })[0];
+    if (disc) links += '<a href="' + esc(disc.discussion) + '" target="_blank" rel="noopener">Congratulate</a>';
+    return '<div class="person"><div class="top"><span class="rank">' + (i + 1) + "</span>" +
+      '<span class="who">@' + esc(m.username) + "</span>" +
+      '<span class="pts">' + (m.points || 0) + " pts</span></div>" +
+      '<div class="mini">' + minis + "</div>" +
+      '<div class="links">' + links + "</div></div>";
+  }).join("");
+}).catch(function () {
+  document.getElementById("people").innerHTML = '<div class="note">Wall not published on this host yet.</div>';
+});
+
+function verify(u) {
+  u = String(u || "").trim().toLowerCase().replace(/^@/, "");
+  var box = document.getElementById("result");
+  if (!/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/.test(u)) {
+    box.innerHTML = '<div class="note">Enter a valid GitHub username.</div>'; return;
+  }
+  box.innerHTML = '<div class="note">Checking the API…</div>';
+  fetch("api/v1/certified/" + u + ".json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; })
+    .then(function (d) {
+      if (!d || !d.certified) {
+        box.innerHTML = '<div style="border-left:3px solid var(--warn);padding:8px 0 8px 13px">' +
+          '<b style="color:var(--warn)">@' + esc(u) + " holds no badges</b>" +
+          '<div class="note" style="margin-top:4px">' +
+          (d ? "Certification was revoked" + (d.revoked_on ? " on " + esc(d.revoked_on) : "") + "."
+             : "No roster entry. Earning a first badge puts them on the wall.") + "</div></div>";
+        return;
+      }
+      var held = {}; (d.badges || []).forEach(function (a) { held[a.id] = a; });
+      var slots = CATALOG.map(function (b) {
+        var a = held[b.id];
+        return '<div class="slot' + (a ? "" : " locked") + '">' + art(b, 84) +
+          '<div class="bname">' + esc(b.name) + "</div>" +
+          '<div class="bmeta">' + (a ? "earned " + esc(a.awarded_on || "") : "locked") + "</div></div>";
+      }).join("");
+      var md = "[![RAPP Certified](https://img.shields.io/endpoint?url=" +
+        encodeURIComponent(PAGES + "/api/v1/certified/" + u + "/badge.json") + ")](" + PAGES + "/wall.html)";
+      box.innerHTML = '<div style="border-left:3px solid var(--ok);padding:8px 0 8px 13px">' +
+        '<b style="color:var(--ok)">@' + esc(u) + " · " + (d.badges || []).length + " badge" +
+        ((d.badges || []).length === 1 ? "" : "s") + " · " + (d.points || 0) + " pts</b>" +
+        '<div class="note" style="margin-top:3px">Verified live at <a href="' + esc(d.verify_url) +
+        '" target="_blank" rel="noopener">their endpoint</a>.</div></div>' +
+        '<div class="case" style="margin-top:14px">' + slots + "</div>" +
+        '<div class="code"><button class="copy-btn" id="cp">Copy</button><code>' + esc(md) + "</code></div>";
+      document.getElementById("cp").addEventListener("click", function () {
+        navigator.clipboard.writeText(md); this.textContent = "Copied";
+        var b = this; setTimeout(function () { b.textContent = "Copy"; }, 1400);
+      });
+    });
+}
+document.getElementById("go").addEventListener("click", function () { verify(document.getElementById("user").value); });
+document.getElementById("user").addEventListener("keydown", function (e) { if (e.key === "Enter") verify(this.value); });
+if (location.hash.indexOf("#u=") === 0) {
+  var u = decodeURIComponent(location.hash.slice(3));
+  document.getElementById("user").value = u;
+  setTimeout(function () { verify(u); }, 400);
+}
+})();
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api/1.0",
-  "generated": "2026-08-05T00:16:41.279644+00:00",
+  "generated": "2026-08-05T00:20:26.753884+00:00",
   "name": "AIBAST Agents Library API",
   "spec": "rapp-static-api/1.0",
   "base_urls": {
@@ -18,6 +18,10 @@
     "certified_roster": "certified.json",
     "certified_lookup": "certified/{username}.json",
     "certified_badge": "certified/{username}/badge.json",
+    "certified_badge_one": "certified/{username}/{badge_id}/badge.json",
+    "badge_catalog": "badges.json",
+    "badge_holders": "badges/{badge_id}.json",
+    "wall_of_fame": "wall.json",
     "status": "status.json",
     "badge": "badge.json",
     "registry": "../../registry.json"

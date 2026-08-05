@@ -1,10 +1,11 @@
 {
   "schema": "aibast-api-status/1.0",
-  "generated": "2026-08-05T00:16:41.279644+00:00",
+  "generated": "2026-08-05T00:20:26.753884+00:00",
   "ok": true,
   "agents": 105,
   "publishers": 1,
   "categories": 14,
   "aggregated_skills": 78,
-  "certified_publishers": 1
+  "certified_publishers": 1,
+  "badges": 5
 }

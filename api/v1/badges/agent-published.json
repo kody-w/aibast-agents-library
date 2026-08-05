@@ -1,0 +1,20 @@
+{
+  "schema": "aibast-badge/1.0",
+  "generated": "2026-08-05T00:20:26.753884+00:00",
+  "id": "agent-published",
+  "name": "Agent Published",
+  "summary": "Shipped an agent to the library that passed review.",
+  "criteria": "At least one merged agent under agents/@<username>/ with a valid manifest, no secrets, and a stated business use case.",
+  "how": "Follow docs/PUBLISHING.md. Awarded automatically on merge.",
+  "color": "107c10",
+  "points": 30,
+  "tier": "builder",
+  "holders": [
+    {
+      "username": "aibast-agents-library",
+      "awarded_on": "2026-08-04",
+      "discussion": null
+    }
+  ],
+  "holder_count": 1
+}
