@@ -388,6 +388,59 @@ def main() -> int:
             "count": len(index), "walkthroughs": index,
         })
 
+    # Sentinel as a service anyone can drive against their OWN skills. The
+    # rubric is published as data and the runtime is the caller's own — which
+    # is the same portability the neighborhood already has, exposed over HTTP.
+    hood = load("sentinel/NEIGHBORHOOD.json", None)
+    if hood is not None:
+        try:
+            sys.path.insert(0, str(REPO_ROOT / "scripts"))
+            import review_skills as _rs
+            rubric_checks = _rs.PRINCIPLES
+            rubric_version = _rs.RUBRIC_VERSION
+        except Exception:
+            rubric_checks, rubric_version = {}, "unknown"
+
+        changed += stable_write(API / "sentinel" / "service.json", {
+            "schema": "rapp-sentinel-service/1.0", "generated": gen,
+            "summary": (
+                "Run this library's review rubric against your own skills. The "
+                "rubric is data and the runtime is yours: nothing here holds a "
+                "credential, and no content you scan is sent to us."
+            ),
+            "scan_page": f"{PAGES_BASE}/scan.html",
+            "neighborhood_url": f"{PAGES_BASE}/sentinel/NEIGHBORHOOD.json",
+            "rubric": {"version": rubric_version, "principles": rubric_checks,
+                       "reference_implementation":
+                           f"https://github.com/{REPO}/blob/main/scripts/review_skills.py",
+                       "browser_implementation": f"{PAGES_BASE}/sentinel.js"},
+            "mirror": {
+                "summary": ("skill.md and agent.py are two projections of one "
+                            "contract; either can be derived from the other."),
+                "browser_implementation": f"{PAGES_BASE}/mirror.js",
+                "reference_implementation":
+                    f"https://github.com/{REPO}/blob/main/scripts/export_agent.py",
+            },
+            "how_to_run": {
+                "in_a_browser": (f"Load {PAGES_BASE}/sentinel.js and call "
+                                 "RAPPSentinel.review(text) — deterministic residents only."),
+                "locally": ("git clone the repository and run "
+                            "`python3 scripts/sentinel.py run` — no token, no service."),
+                "with_your_own_model": (
+                    "A run with no model attached is DORMANT and yields no verdicts. "
+                    "Point scripts/wake_sentinel.py at any OpenAI-compatible endpoint "
+                    "(SENTINEL_ENDPOINT + SENTINEL_MODEL) to wake the interpretive "
+                    "residents; the answer is recorded with your model attached."
+                ),
+            },
+            "limits": (
+                "Deterministic checks are exact and reproducible. Interpretive "
+                "residents depend on whichever model you attach, so their findings "
+                "carry that attribution and are not expected to reproduce byte for "
+                "byte. Nothing here certifies a skill for use in your tenant."
+            ),
+        })
+
     sentinel_latest = load("sentinel/latest.json", None)
     if sentinel_latest is not None:
         changed += stable_write(API / "sentinel.json", {

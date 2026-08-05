@@ -1341,6 +1341,33 @@ run=json.load(open(os.path.join(d, json.load(open(os.path.join(d,'latest.json'))
 assert run['status']=='dormant' and run['verdicts'] is None
 PY"
 
+echo "== T-SERVICE Sentinel as an outside service =="
+check "the rubric is published as data, with both implementations named" "python3 - <<'PY'
+import json
+d=json.load(open('api/v1/sentinel/service.json'))
+assert d['schema']=='rapp-sentinel-service/1.0'
+assert d['rubric']['principles'] and d['rubric']['version']!='unknown'
+for k in ('browser_implementation','reference_implementation'):
+    assert d['rubric'][k] and d['mirror'][k], k
+assert 'scan.html' in d['scan_page']
+assert 'DORMANT' in d['how_to_run']['with_your_own_model']
+assert 'certifies' in d['limits']
+PY"
+check "the scanner runs entirely client-side — nothing is uploaded" \
+  "python3 tests/check_scan_client_side.py"
+check "the browser rubric matches the Python reference" \
+  "python3 tests/check_rubric_parity.py"
+check "the scanner shows the conversion, not just the complaint" "python3 - <<'PY'
+h=open('scan.html').read()
+for k in ('toRappSkill','RAPPMirror.exportAgent','What RAPP does about it',
+          'Download RAPP skill.md','Download agent.py','dlPacket'):
+    assert k in h, k
+js=open('sentinel.js').read()
+assert 'deterministic layer' in js and 'rapp-skill/1.0' in js
+PY"
+check "every page offers the scanner" \
+  "for f in agents.html solutions.html api.html index.html; do grep -q 'scan.html' \$f || exit 1; done"
+
 echo "== T-RAPPVISION generated demo walkthroughs =="
 check "every entry gets a storyboard in the house format, aggregated included" "python3 - <<'PY'
 import json, pathlib

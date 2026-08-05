@@ -197,6 +197,47 @@ def main() -> int:
             if not pyd.value.suggested_filename.endswith(".py"):
                 failures.append("agent.py download had the wrong extension")
 
+        # ---- scan.html: the rubric as an outside service ----
+        page.goto(f"{base}/scan.html", wait_until="load")
+        page.wait_for_function("() => !!window.RAPPSentinel && !!window.RAPPMirror",
+                               timeout=15000)
+
+        # The browser rubric must agree with the Python reference, or the
+        # service is telling outsiders something we do not believe ourselves.
+        # K15 resolves companion files on disk; a browser cannot, and it says so.
+        import sys as _sys
+        _sys.path.insert(0, "scripts")
+        import review_skills as _rs
+        rubric_drift = []
+        for sk in sorted(_pl.Path("skills/@cat-agent-skills").glob("*.md")):
+            want = {c["id"]: c["passed"] for c in _rs.review_one(sk.resolve())["checks"]
+                    if c["id"] != "K15"}
+            got = page.evaluate("(t) => RAPPSentinel.review(t, 'x')",
+                                sk.read_text(encoding="utf-8"))
+            got = {c["id"]: c["passed"] for c in got["checks"] if c["id"] != "K15"}
+            if want != got:
+                rubric_drift.append(sk.stem)
+        if rubric_drift:
+            failures.append(f"browser rubric disagrees with review_skills.py: {rubric_drift[:3]}")
+        scanned = len(list(_pl.Path("skills/@cat-agent-skills").glob("*.md")))
+
+        # Drive the actual flow a visitor uses.
+        page.click("#loadSample")
+        page.click("#runScan")
+        page.wait_for_selector("[data-result]", timeout=15000)
+        verdict = page.locator("[data-result] .verdict").first.inner_text().lower()
+        if verdict not in ("blocked", "not-ready", "needs-work"):
+            failures.append(f"the deliberately-raw sample scored {verdict}; the rubric is not biting")
+        if not page.locator("[data-result] .finding .teach").count():
+            failures.append("scan produced findings with no teachable notes")
+        with page.expect_download(timeout=10000) as smd:
+            page.locator('[data-dl="md"]').first.click()
+        with page.expect_download(timeout=10000) as spy:
+            page.locator('[data-dl="py"]').first.click()
+        if not smd.value.suggested_filename.endswith(".md") or \
+           not spy.value.suggested_filename.endswith(".py"):
+            failures.append("scan did not offer both converted formats")
+
         browser.close()
     server.shutdown()
 
@@ -205,7 +246,8 @@ def main() -> int:
         return 1
     print(f"headless OK: {cards} cards, search+chip filter, viewer, {kpis} KPIs, "
           f"{sol_cards} solutions, one-pager all modes, "
-          f"{mirrored} skill.md/agent.py pairs re-derived in-browser and matching")
+          f"{mirrored} skill.md/agent.py pairs re-derived in-browser, "
+          f"{scanned} skills rubric-matched against the Python reference")
     return 0
 
 
