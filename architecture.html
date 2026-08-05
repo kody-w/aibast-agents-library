@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reference architecture — AIBAST Agent Library</title>
+<meta name="description" content="A generated reference architecture for any entry in the library: knowledge, processing, user interface and reporting, with the request flow numbered through them.">
+<style>
+:root{
+  --ink:#1a1a1a; --dim:#4a4a4a; --faint:#767676; --line:#e3e3e3;
+  --panel:#f4f4f6; --panel-2:#ebebee; --chip:#e9e9ec;
+  --gold:#c8a41e; --gold-soft:#fdf6d8; --gold-line:#e0bc3a;
+  --accent:#0067b8; --page:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{max-width:100%}
+body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:#f7f7f9;color:var(--ink);line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.bar{background:#fff;border-bottom:1px solid var(--line)}
+.barin{max-width:1500px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px}
+.barin b{font-size:14px;font-weight:650}
+.barin nav{margin-left:auto;display:flex;gap:15px;font-size:13px}
+.barin nav a{color:var(--dim)}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;
+  padding:7px 13px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--panel)}
+
+.sheet{max-width:1500px;margin:20px auto 40px;background:var(--page);
+  border:1px solid var(--line);border-radius:10px;padding:30px 34px 34px;
+  box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.kicker{font-size:11.5px;font-weight:600;letter-spacing:.09em;color:var(--faint);
+  text-transform:uppercase}
+h1{font-size:38px;font-weight:350;letter-spacing:-.01em;margin:4px 0 6px;line-height:1.1}
+.sub{font-size:13px;color:var(--faint);margin-bottom:20px}
+
+.cols{display:grid;grid-template-columns:1fr 1.25fr 1.1fr 1fr;gap:14px;align-items:stretch}
+.col{background:var(--panel);border-radius:8px;padding:14px 14px 16px;display:flex;
+  flex-direction:column;gap:12px;min-width:0}
+.col > h2{font-size:15px;font-weight:650;text-align:center}
+
+.group{border:1.5px dashed var(--gold-line);border-radius:7px;padding:11px;
+  display:flex;flex-direction:column;gap:9px;background:rgba(255,255,255,.5)}
+.group .gl{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.05em;
+  text-transform:uppercase}
+.item{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.35}
+.item .gi{flex:0 0 auto;width:22px;height:22px;border-radius:4px;display:flex;
+  align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#fff}
+.gi.d365{background:linear-gradient(135deg,#3b8de0,#8661c5)}
+.gi.sharepoint{background:#1e8f6e}.gi.teams{background:#5b5fc7}
+.gi.outlook{background:#0f6cbd}.gi.word{background:#185abd}
+.gi.excel{background:#107c41}.gi.powerpoint{background:#c43e1c}
+.gi.powerbi{background:#e9c93a;color:#3b3b00}.gi.azure{background:#0089d6}
+.gi.copilot{background:linear-gradient(135deg,#e8598f,#8b5cf6,#4f7cf7)}
+.gi.purview{background:#0f9ed5}.gi.flow{background:#0066ff}
+.gi.dataverse{background:#742774}.gi.fabric{background:#117865}
+.gi.graph{background:#5c2d91}.gi.powerapps{background:#742774}
+.gi.generic{background:#8a8886}
+
+.chip{background:var(--chip);border-radius:5px;padding:9px 11px;font-size:12.5px;
+  line-height:1.4;color:var(--dim)}
+.chip b{color:var(--ink);font-weight:650}
+.card{background:#fff;border-radius:8px;padding:13px;display:flex;flex-direction:column;
+  gap:11px;flex:1}
+.orch{display:flex;flex-direction:column;align-items:center;gap:7px;padding:8px 0}
+.orch .cube{width:52px;height:44px;border-radius:9px;
+  background:linear-gradient(135deg,#e8598f 0%,#8b5cf6 45%,#4f7cf7 100%);
+  box-shadow:4px -4px 0 -1px #fff,8px -8px 0 -2px rgba(139,92,246,.55)}
+.orch span{font-size:13.5px;font-weight:600;text-align:center}
+ul.acts{list-style:none;display:flex;flex-direction:column;gap:5px}
+ul.acts li{font-size:12.5px;line-height:1.35;padding-left:13px;position:relative;color:var(--dim)}
+ul.acts li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;
+  border:1.5px solid var(--gold);border-radius:1px;transform:rotate(45deg)}
+.actor{display:flex;gap:9px;align-items:center;font-size:13px}
+.actor .av{width:22px;height:22px;border-radius:50%;background:#3b8de0;flex:0 0 auto;
+  position:relative}
+.actor .av:after{content:"";position:absolute;left:50%;top:52%;transform:translateX(-50%);
+  width:14px;height:9px;border-radius:7px 7px 0 0;background:#2a6cb0}
+.hl{background:var(--gold-soft);border:1px solid var(--gold-line);border-radius:6px;
+  padding:10px 12px;font-size:12.5px;line-height:1.4}
+.hl b{display:block;margin-bottom:3px}
+
+.bands{margin-top:14px;display:grid;grid-template-columns:1fr 1.35fr;gap:14px}
+.band{background:var(--panel);border-radius:8px;padding:14px}
+.band .gl{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.05em;
+  text-transform:uppercase;background:var(--gold-soft);display:inline-block;
+  padding:2px 8px;border-radius:4px;margin-bottom:8px}
+.band p{font-size:12.5px;color:var(--dim);line-height:1.45}
+.band.found{display:flex;align-items:center;justify-content:center;gap:16px;text-align:center}
+.band.found .id{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px}
+.band.found .id .gi{width:28px;height:28px}
+.band.found b{font-size:14px;font-weight:650}
+
+.flow{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
+.flow h3{font-size:13px;font-weight:650;margin-bottom:10px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px}
+.step{display:flex;gap:9px;font-size:12.5px;line-height:1.4;color:var(--dim)}
+.step .n{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--ink);
+  color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.foot{margin-top:20px;padding-top:13px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--faint);line-height:1.5}
+
+@media print{
+  body{background:#fff}
+  .bar,.noprint{display:none!important}
+  .sheet{box-shadow:none;border:none;margin:0;max-width:none;padding:0}
+}
+@media(max-width:1100px){.cols{grid-template-columns:1fr 1fr}.bands{grid-template-columns:1fr}}
+@media(max-width:640px){.cols{grid-template-columns:1fr}h1{font-size:26px}}
+</style>
+</head>
+<body>
+
+<div class="bar noprint">
+  <div class="barin">
+    <b>AIBAST Agent Library</b>
+    <button class="btn" onclick="window.print()">Print / save as PDF</button>
+    <nav>
+      <a href="agents.html">Agents</a>
+      <a href="solutions.html">Solutions</a>
+      <a id="opLink" href="solutions.html">One-pager</a>
+      <a href="api.html">API</a>
+    </nav>
+  </div>
+</div>
+
+<div id="host"><p style="padding:40px;color:#767676">Loading the architecture…</p></div>
+
+<script>
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function qs(n){var m=new RegExp("[?&]"+n+"=([^&]*)").exec(location.search);
+  return m?decodeURIComponent(m[1].replace(/\+/g," ")):"";}
+function getJSON(p){var i=0;return (function next(){
+  if(i>=p.length)return Promise.resolve(null);
+  return fetch(p[i++],{cache:"no-cache"}).then(function(r){return r.ok?r.json():next();})
+    .catch(function(){return next();});})();}
+
+function initials(label){
+  var w=label.replace(/[^A-Za-z0-9 ]/g," ").trim().split(/\s+/);
+  return (w[0]||"?").charAt(0).toUpperCase() + (w[1]?w[1].charAt(0).toUpperCase():"");
+}
+function item(x){
+  return '<div class="item"><span class="gi '+esc(x.glyph)+'">'+esc(initials(x.label))+
+    '</span><span>'+esc(x.label)+"</span></div>";
+}
+
+function render(a){
+  var c=a.columns;
+  document.title=a.display_name+" — reference architecture";
+  var op=document.getElementById("opLink");
+  op.href="onepager.html?"+(a.kind==="agent"?"agent=":"solution=")+encodeURIComponent(a.ref||a.slug);
+
+  var html='<div class="sheet">' +
+    '<div class="kicker">Reference architecture · generated</div>' +
+    "<h1>Architecture for "+esc(a.display_name)+"</h1>" +
+    '<div class="sub">'+esc((a.industries||[]).join(" · "))+
+      (a.industries&&a.industries.length?" · ":"")+
+      "derived from what this entry declares — a shape for a working deployment, "+
+      "not a deployment anyone has made.</div>" +
+
+    '<div class="cols">' +
+
+      /* Knowledge */
+      '<div class="col"><h2>'+esc(c.knowledge.title)+"</h2>" +
+        '<div class="group"><div class="gl">Grounding data</div>' +
+          c.knowledge.grounding.map(item).join("") + "</div>" +
+        '<div class="group"><div class="gl">Connectors &amp; actions</div>' +
+          c.knowledge.connectors.map(function(x){
+            return '<div class="item"><span class="gi flow">PP</span><span>'+esc(x)+"</span></div>";
+          }).join("") + "</div>" +
+        '<div class="chip">'+esc(c.knowledge.note)+"</div>" +
+      "</div>" +
+
+      /* Processing */
+      '<div class="col"><h2>'+esc(c.processing.title)+"</h2>" +
+        '<div class="card">' +
+          '<div class="chip"><b>3.</b> '+esc(c.processing.plan)+"</div>" +
+          '<div class="orch"><div class="cube"></div><span>'+
+            esc(c.processing.orchestration)+"</span></div>" +
+          '<ul class="acts">'+c.processing.actions.map(function(x){
+            return "<li>"+esc(x)+"</li>";}).join("")+"</ul>" +
+        "</div>" +
+      "</div>" +
+
+      /* User interface */
+      '<div class="col"><h2>'+esc(c.interface.title)+"</h2>" +
+        '<div class="chip"><b>2.</b> '+esc(c.interface.checks)+"</div>" +
+        '<div class="group"><div class="gl">Microsoft 365</div>' +
+          c.interface.surfaces.map(item).join("") + "</div>" +
+        '<div class="card" style="flex:0">' +
+          c.interface.actors.map(function(x){
+            return '<div class="actor"><span class="av"></span><span>'+esc(x)+"</span></div>";
+          }).join("") +
+          '<div class="chip"><b>1.</b> Natural language input</div>' +
+          '<div class="chip"><b>6.</b> Feedback</div>' +
+        "</div>" +
+      "</div>" +
+
+      /* Reporting */
+      '<div class="col"><h2>'+esc(c.reporting.title)+"</h2>" +
+        '<div class="hl"><b>Governance, risk &amp; compliance</b>'+
+          esc(c.reporting.governance)+"</div>" +
+        '<div class="card" style="flex:0">'+c.reporting.systems.map(item).join("")+"</div>" +
+        '<div class="hl"><b>Insights</b>'+esc(c.reporting.insights)+"</div>" +
+      "</div>" +
+
+    "</div>" +
+
+    '<div class="bands">' +
+      '<div class="band"><span class="gl">Tools</span><p>'+esc(a.tools_band)+"</p></div>" +
+      '<div class="band found"><div class="id"><span class="gi azure">ID</span>' +
+        esc(a.foundation_band.identity)+"</div>" +
+        "<b>"+esc(a.foundation_band.label)+"</b></div>" +
+    "</div>" +
+
+    '<div class="flow"><h3>The request, end to end</h3><div class="steps">' +
+      a.flow.map(function(s){
+        return '<div class="step"><span class="n">'+s.step+"</span><span>"+esc(s.text)+"</span></div>";
+      }).join("") + "</div></div>" +
+
+    '<div class="foot">' +
+      "Generated from the entry's declared systems" +
+      (a.configuration && a.configuration.length
+        ? " · configuration: " + a.configuration.map(esc).join(", ") : "") +
+      (a.derivation.unclassified.length
+        ? " · left unclassified rather than guessed: " +
+          a.derivation.unclassified.map(esc).join(", ")
+        : "") +
+      ". Microsoft AI Business Applications Specialist Team · synthetic data, no PII." +
+    "</div>" +
+  "</div>";
+
+  document.getElementById("host").innerHTML=html;
+}
+
+(function boot(){
+  var sol=qs("solution"), ag=qs("agent"), ref=sol||ag;
+  if(!ref){
+    document.getElementById("host").innerHTML =
+      '<div class="sheet"><b>Nothing to draw.</b><br>Add <code>?solution=&lt;slug&gt;</code> ' +
+      'or <code>?agent=&lt;name&gt;</code>.<br><br><a href="solutions.html">Browse solutions</a></div>';
+    return;
+  }
+  var slug=ref.split("/").pop();
+  getJSON(["api/v1/architectures.json","data/architectures.json"]).then(function(doc){
+    if(!doc){ document.getElementById("host").innerHTML =
+      '<div class="sheet">The architecture catalog could not be loaded.</div>'; return; }
+    var a=(doc.architectures||[]).filter(function(x){
+      return x.slug===slug || x.ref===ref; })[0];
+    if(!a){ document.getElementById("host").innerHTML =
+      '<div class="sheet">No architecture for '+esc(ref)+'.</div>'; return; }
+    render(a);
+  });
+})();
+</script>
+</body>
+</html>

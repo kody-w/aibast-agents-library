@@ -278,6 +278,37 @@ def main() -> int:
             failures.append("the film did not advance when played")
         film_acts = ",".join(acts)
 
+        # No frame may overflow its panel. A long identifier with no break
+        # opportunity silently spills outside the card, and the film looks
+        # broken in exactly the frame a viewer studies longest.
+        page.goto(f"{base}/vision.html?agent=@aibast-agents-library/art-generator",
+                  wait_until="load")
+        page.wait_for_selector("#stage", timeout=15000)
+        page.evaluate("() => { T=30; paint(); }")
+        page.wait_for_timeout(600)
+        spill = page.evaluate("""() => Array.from(document.querySelectorAll('.pcol .pbody div'))
+            .filter(function(el){ var p = el.closest('.pbody');
+                return el.scrollWidth > p.clientWidth + 1; })
+            .map(function(el){ return el.textContent.slice(0, 40); })""")
+        if spill:
+            failures.append(f"overview panels overflow: {spill}")
+
+        # ---- architecture.html: generated, four columns, six numbered steps ----
+        page.goto(f"{base}/architecture.html?solution=contract-review-agent",
+                  wait_until="load")
+        page.wait_for_selector(".sheet h1", timeout=15000)
+        arch_cols = page.locator(".col").count()
+        arch_steps = page.locator(".step").count()
+        if arch_cols != 4:
+            failures.append(f"architecture drew {arch_cols} columns, expected 4")
+        if arch_steps != 6:
+            failures.append(f"architecture drew {arch_steps} flow steps, expected 6")
+        heads = [t.strip() for t in page.locator(".col > h2").all_inner_texts()]
+        if heads != ["Knowledge", "Processing", "User Interface", "Reporting"]:
+            failures.append(f"architecture columns are {heads}")
+        if not page.locator(".hl").count():
+            failures.append("architecture omitted the governance panel")
+
         browser.close()
     server.shutdown()
 
@@ -287,7 +318,8 @@ def main() -> int:
     print(f"headless OK: {cards} cards, search+chip filter, viewer, {kpis} KPIs, "
           f"{sol_cards} solutions, one-pager all modes, "
           f"{mirrored} skill.md/agent.py pairs re-derived in-browser, "
-          f"{scanned} skills rubric-matched, film acts {film_acts}")
+          f"{scanned} skills rubric-matched, film acts {film_acts}, "
+          f"architecture {arch_cols} cols / {arch_steps} steps")
     return 0
 
 

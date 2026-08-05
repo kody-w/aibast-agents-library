@@ -362,6 +362,10 @@ def main() -> int:
                 if p_old not in kept_sr:
                     p_old.unlink(); changed += 1
 
+    architectures = load("data/architectures.json", None)
+    if architectures is not None:
+        changed += stable_write(API / "architectures.json", dict(architectures))
+
     # RAPPVision storyboards: every entry, authored or aggregated, in the house
     # demo format. Published so the storyboard can be reviewed before anything
     # is filmed.

@@ -141,7 +141,21 @@ def sources_from(entry: dict) -> list[str]:
         return list(tools)[:3]
     env = entry.get("requires_env") or []
     if env:
-        return [f"Reads configuration from {e}" for e in env[:3]]
+        # "Reads configuration from AZURE_OPENAI_IMAGE_DEPLOYMENT" is a variable
+        # name, not something a viewer can read off a slide. Name the platform
+        # it points at; the exact variable belongs in the one-pager, not the film.
+        platforms = []
+        for e in env[:4]:
+            low = e.lower()
+            label = ("Azure OpenAI" if "azure_openai" in low or "openai" in low else
+                     "Azure" if low.startswith("azure") else
+                     "Microsoft Graph" if "graph" in low else
+                     "Dynamics 365" if "dynamics" in low or low.startswith("d365") else
+                     "SharePoint" if "sharepoint" in low else
+                     e.replace("_", " ").title())
+            if label not in platforms:
+                platforms.append(label)
+        return [f"Connects to {p}" for p in platforms[:3]]
     return ["Runs on what the operator already has open — no additional configuration"]
 
 

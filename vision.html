@@ -82,7 +82,12 @@ header{border-bottom:1px solid var(--border);background:var(--bg)}
 .pcol .pbody{background:linear-gradient(135deg,var(--grad-a),var(--grad-b) 60%,var(--grad-c));
   border-radius:.8cqw;padding:1.4cqw;flex:1;display:flex;flex-direction:column;
   gap:.9cqw;justify-content:center}
-.pcol .pbody div{font-size:1.35cqw;line-height:1.35;text-align:center;font-weight:500}
+.pcol .pbody div{font-size:1.35cqw;line-height:1.35;text-align:center;font-weight:500;
+  /* Env-var names and long identifiers have no break opportunities and were
+     spilling outside the panel. Break them rather than let a frame look
+     broken — this card is the one a viewer studies longest. */
+  overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
+.pcol .pbody{overflow:hidden}
 .arrow{align-self:center;width:2cqw;height:3cqw;flex:0 0 auto;
   background:linear-gradient(135deg,var(--grad-a),var(--grad-b));
   clip-path:polygon(0 22%,55% 22%,55% 0,100% 50%,55% 100%,55% 78%,0 78%)}
@@ -101,12 +106,12 @@ header{border-bottom:1px solid var(--border);background:var(--bg)}
   gap:1.1cqw;color:#1c1c1c}
 .turn{max-width:88%}
 .turn.op{align-self:flex-end;background:#efe7fb;border-radius:.8cqw;padding:.9cqw 1.2cqw;
-  font-size:1.15cqw;line-height:1.4}
+  font-size:1.15cqw;line-height:1.4;overflow-wrap:anywhere}
 .turn.ag{align-self:flex-start;width:100%}
 .turn.ag .who{font-size:1.05cqw;font-weight:700;color:#107c10;margin-bottom:.4cqw}
 .turn.ag h4{font-size:1.35cqw;font-weight:700;margin-bottom:.5cqw}
 .turn.ag ul{list-style:none;display:flex;flex-direction:column;gap:.35cqw}
-.turn.ag li{font-size:1.1cqw;line-height:1.35;padding-left:1.1cqw;position:relative;color:#333}
+.turn.ag li{font-size:1.1cqw;line-height:1.35;padding-left:1.1cqw;position:relative;color:#333;overflow-wrap:anywhere}
 .turn.ag li:before{content:"•";position:absolute;left:.2cqw;color:#8b5cf6}
 .turn.ag .slot{background:#fff3bf;border-radius:.2cqw;padding:0 .25cqw}
 .agentcall{margin-top:.7cqw;font-size:1cqw;color:#5b5b5b;font-family:ui-monospace,Menlo,monospace}

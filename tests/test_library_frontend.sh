@@ -1344,6 +1344,34 @@ PY"
 check "in-repo downloads resolve on whichever origin serves the page" \
   "python3 tests/check_relative_assets.py"
 
+echo "== T-ARCH generated reference architectures =="
+check "every solution and agent has an architecture derived from its manifest" "python3 - <<'PY'
+import json
+d=json.load(open('data/architectures.json'))
+assert d['schema']=='aibast-architecture/1.0'
+assert d['count']>=140, d['count']
+for a in d['architectures'][:8]:
+    c=a['columns']
+    assert set(c)=={'knowledge','processing','interface','reporting'}, set(c)
+    assert c['knowledge']['grounding'], a['slug']
+    assert c['interface']['surfaces'] and c['interface']['actors'], a['slug']
+    assert len(a['flow'])==6, a['slug']
+PY"
+check "an unrecognised system is reported, never sorted into a guessed column" "python3 - <<'PY'
+import json, sys
+sys.path.insert(0,'scripts')
+from build_architecture import build
+a=build({'slug':'t','display_name':'T','featured_tools':['Wibble Platform 9000'],
+         'personas':['Operator']})
+g=[x['label'] for x in a['columns']['knowledge']['grounding']]
+assert 'Wibble Platform 9000' in g, g
+assert 'Wibble Platform 9000' in a['derivation']['unclassified']
+PY"
+check "the architecture page draws every part of the format" \
+  "python3 tests/check_architecture_page.py"
+check "one-pagers link their architecture" \
+  "grep -q 'architecture.html?solution=' onepager.html && grep -q 'architecture.html?agent=' onepager.html"
+
 echo "== T-SHAPE aggregation is gated on a learned shape =="
 check "the scout picks skills over docs, and never guesses a field" \
   "python3 tests/check_source_scout.py"
