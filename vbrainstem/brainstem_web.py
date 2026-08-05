@@ -16,6 +16,8 @@ Parity contract (matches rapp_brainstem/brainstem.py v0.6.16):
   GET  /voice, POST /voice/toggle, GET/POST /voice/config, /voice/export, /voice/import
   GET  /version, /diagnostics, /diagnostics/book.json, POST /diagnostics/clear,
   POST /diagnostics/report, GET /debug/auth
+  GET  /workspace/list     (browser-only: the workspace as a tree, read-only)
+  GET  /workspace/file     (browser-only: read one workspace file as text)
   GET  /workspace/export   (browser-only: zip of agents + soul + memories for tether)
 
 Browser deltas, all deliberate and minimal:
@@ -2725,6 +2727,81 @@ def route_diagnostics_report(data, form, is_json):
     return {"_redirect": issue_url}, 303
 
 
+# Files the workspace browser will never list or read. Credentials stay in the
+# tab: the same exclusion the export already applies.
+_WORKSPACE_HIDDEN = (".copilot_token", ".brainstem_secret", ".session", ".env")
+
+
+def _workspace_visible(rel):
+    base = os.path.basename(rel)
+    return not (base.startswith(".copilot") or base in _WORKSPACE_HIDDEN)
+
+
+def route_workspace_list():
+    """Browser-only: the workspace as a tree, so a user can see what their
+    brainstem actually remembers. Metadata only — read a file with
+    /workspace/file. Read-only: nothing here writes."""
+    entries = []
+    for root, dirs, files in os.walk(_BASE_DIR):
+        dirs[:] = [d for d in dirs if d not in ("__pycache__", ".git")]
+        for name in sorted(files):
+            full = os.path.join(root, name)
+            rel = os.path.relpath(full, _BASE_DIR).replace(os.sep, "/")
+            if not _workspace_visible(rel):
+                continue
+            try:
+                st = os.stat(full)
+            except OSError:
+                continue
+            entries.append({
+                "path": rel,
+                "dir": os.path.dirname(rel) or "",
+                "name": name,
+                "bytes": st.st_size,
+                "modified": datetime.fromtimestamp(st.st_mtime, timezone.utc).isoformat(),
+                "kind": ("agent" if rel.startswith("agents/") and name.endswith(".py")
+                         else "memory" if ".brainstem_data" in rel
+                         else "soul" if name == "soul.md"
+                         else "engine" if name.endswith(".py")
+                         else "file"),
+            })
+    entries.sort(key=lambda e: e["path"])
+    return {
+        "root": _BASE_DIR,
+        "count": len(entries),
+        "bytes": sum(e["bytes"] for e in entries),
+        "files": entries,
+    }, 200
+
+
+def route_workspace_file(query):
+    """Read one workspace file as text. Path-contained under the workspace
+    root, so a crafted path cannot walk out of it."""
+    rel = (query or {}).get("path") or ""
+    if not rel:
+        return {"error": "path is required"}, 400
+    full = os.path.abspath(os.path.join(_BASE_DIR, rel))
+    base = os.path.abspath(_BASE_DIR)
+    if not (full == base or full.startswith(base + os.sep)):
+        return {"error": "path escapes the workspace"}, 400
+    rel_norm = os.path.relpath(full, base).replace(os.sep, "/")
+    if not _workspace_visible(rel_norm):
+        return {"error": "that file is not readable from here"}, 403
+    if not os.path.isfile(full):
+        return {"error": "no such file"}, 404
+    try:
+        with open(full, "rb") as f:
+            raw = f.read(512 * 1024)          # generous, but bounded
+    except OSError as exc:
+        return {"error": f"could not read: {exc}"}, 500
+    try:
+        text, binary = raw.decode("utf-8"), False
+    except UnicodeDecodeError:
+        text, binary = "", True
+    return {"path": rel_norm, "bytes": os.path.getsize(full),
+            "binary": binary, "content": text}, 200
+
+
 def route_workspace_export():
     """Browser-only: bundle the user's workspace (agents, soul, memories) into
     a zip the tether script can import onto an on-device brainstem. Token and
@@ -2844,6 +2921,10 @@ def dispatch(method, path, query=None, body=None, form=None, files=None, headers
             is_json = "application/json" in (headers.get("content-type") or "") or (
                 body is not None and form is None)
             return _finish(*route_diagnostics_report(body, form, is_json))
+        if method == "GET" and path == "/workspace/list":
+            return _finish(*route_workspace_list())
+        if method == "GET" and path == "/workspace/file":
+            return _finish(*route_workspace_file(query))
         if method == "GET" and path == "/workspace/export":
             return _finish(*route_workspace_export())
         if method == "POST" and path == "/surgeon/complete":

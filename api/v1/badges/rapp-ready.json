@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-badge/1.0",
   "schema": "aibast-badge/1.0",
-  "generated": "2026-08-05T01:30:40.935577+00:00",
+  "generated": "2026-08-05T01:41:17.498685+00:00",
   "id": "rapp-ready",
   "name": "RAPP Ready",
   "summary": "Completed the guided walkthrough and passed the knowledge check.",

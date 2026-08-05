@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-05T01:30:40.935577+00:00",
+  "generated": "2026-08-05T01:41:17.498685+00:00",
   "slug": "decisions/why-static-api",
   "title": "Why a static API",
   "summary": "The failure mode of a documentation API is downtime. Static files have none.",

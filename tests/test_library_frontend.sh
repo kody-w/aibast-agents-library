@@ -665,6 +665,41 @@ for path in re.findall(r'\"([a-z_]+/install\\.[a-z]+)\"', src):
     assert os.path.exists(path), path
 PY"
 
+echo "== T-WORKSPACE the brainstem can show its own memory =="
+check "engine lists and reads the workspace, refusing escapes and credentials" "python3 - <<'PY'
+import importlib.util, os, shutil, sys, tempfile
+from pathlib import Path
+repo=os.getcwd()
+tmp=Path(tempfile.mkdtemp())
+for f in ('brainstem_web.py','local_storage.py'):
+    shutil.copy(f'{repo}/vbrainstem/{f}', tmp/f)
+(tmp/'agents').mkdir(); (tmp/'agents/demo_agent.py').write_text('# demo\n')
+(tmp/'soul.md').write_text('# soul\n')
+(tmp/'.brainstem_data').mkdir(); (tmp/'.brainstem_data/memory.json').write_text('{}')
+(tmp/'.copilot_token').write_text('SECRET')
+sys.path.insert(0, str(tmp)); os.chdir(tmp)
+try:
+    spec=importlib.util.spec_from_file_location('bw', tmp/'brainstem_web.py')
+    bw=importlib.util.module_from_spec(spec); spec.loader.exec_module(bw)
+    listing, code = bw.route_workspace_list()
+    assert code==200 and listing['count']>=4
+    assert not any('copilot' in f['path'] for f in listing['files']), 'credential listed'
+    doc, code = bw.route_workspace_file({'path':'soul.md'})
+    assert code==200 and 'soul' in doc['content']
+    _, code = bw.route_workspace_file({'path':'../../../etc/passwd'})
+    assert code==400, 'path escape must be refused'
+    _, code = bw.route_workspace_file({'path':'.copilot_token'})
+    assert code==403, 'credential read must be refused'
+finally:
+    os.chdir(repo)
+PY"
+check "the brain icon opens the workspace drawer" "python3 - <<'PY'
+h=open('vbrainstem/index.html').read()
+for n in ('id=\"workspace-btn\"','id=\"workspace-drawer\"','toggleWorkspace()',
+          '/workspace/list','/workspace/file?path=','read-only'):
+    assert n in h, n
+PY"
+
 echo "== T-CLEAN clean break (kody-w refs only in sanctioned places) =="
 check "kody-w refs confined to allowlist (tracked + untracked)" "python3 - <<'PY'
 import re, subprocess
