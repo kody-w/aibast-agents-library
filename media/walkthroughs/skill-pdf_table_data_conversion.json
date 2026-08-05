@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:19:21+00:00",
+  "generated": "2026-08-05T20:36:32+00:00",
   "subject": {
     "slug": "pdf_table_data_conversion",
     "kind": "skill",
@@ -71,7 +71,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 modern workplace: focused individual work at a laptop",
       "on_screen": [],
-      "narration": "There's an agent to guide teams through these processes. It pulls data from Runs on what the operator already has open \u2014 no additional configuration."
+      "narration": "There's an agent to guide teams through these processes. It reads the systems you already work in, engages you directly in Microsoft Teams."
     },
     {
       "act": "overview",
@@ -90,7 +90,7 @@
           "Convert them into a clean, workable Excel spreadsheet"
         ]
       },
-      "narration": "Let's say a manager needs to extract tables from a PDF document. Before, they would have needed to jump across multiple systems to manually gather insights. piecing the picture together by hand, and hoping nothing moved while they worked."
+      "narration": "Let's say a manager needs to extract tables from a PDF document. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",
@@ -100,7 +100,7 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Extract tables from a PDF document (e.g for the current workload \u2014 we're looking at rising request volume."
+          "text": "Extract tables from a PDF document for the current workload \u2014 we're looking at rising request volume."
         },
         {
           "role": "agent",
@@ -162,14 +162,14 @@
           "agent_call": "pdf_table_data_conversion"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Runs on what the operator already has open \u2014 no additional configuration, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can convert them into a clean, workable Excel spreadsheet in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With pdf-table-data-conversion, teams get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with one unified data context, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can convert them into a clean, workable Excel spreadsheet in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With pdf-table-data-conversion, teams get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
       "start": 120.0,
       "end": 137.0,
       "shot": "Dark card, gradient CTA panel",
-      "narration": "The result? Work that used to take a person a day, done in the flow of their conversation. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
+      "narration": "The result? Work that moves faster, stays consistent, and holds the same standard every time it runs. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [
         "Get started on your agentic journey today.",
         "Talk to your Microsoft representative to learn more.",

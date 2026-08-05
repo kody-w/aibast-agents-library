@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:18:21+00:00",
+  "generated": "2026-08-05T20:36:32+00:00",
   "subject": {
     "slug": "resource-utilization",
     "kind": "agent",
@@ -70,7 +70,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 consulting team around a laptop in a shared room",
       "on_screen": [],
-      "narration": "There's an agent to guide professional services through these processes. It pulls data from Dynamics 365 ERP. engages you directly in Microsoft Teams."
+      "narration": "There's an agent to guide services firms through these processes. It pulls data from Dynamics 365 ERP and Microsoft Teams, engages you directly in Microsoft Teams."
     },
     {
       "act": "overview",
@@ -90,7 +90,7 @@
           "Reduce costs"
         ]
       },
-      "narration": "Let's say a manager needs to maximize billable utilization. Before, they would have needed to jump across multiple systems to manually gather insights. piecing the picture together by hand, and hoping nothing moved while they worked."
+      "narration": "Let's say a manager needs to maximize billable utilization. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",
@@ -100,7 +100,7 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Give me intelligent resource analysis and recommendations to maximize billable utilization and reduce costs for the delivery portfolio \u2014 we're looking at concurrent ramp-ups."
+          "text": "Give me intelligent resource analysis and recommendations to maximize billable utilization for the delivery portfolio \u2014 we're looking at concurrent ramp-ups."
         },
         {
           "role": "agent",
@@ -162,14 +162,14 @@
           "agent_call": "Resource Utilization Agent"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Dynamics 365 ERP, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can reduce costs in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Resource Utilization Agent, professional services get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Dynamics 365 ERP and Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can reduce costs in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Resource Utilization Agent, services firms get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
       "start": 120.0,
       "end": 137.0,
       "shot": "Dark card, gradient CTA panel",
-      "narration": "The result? maximize billable utilization, reduce costs. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
+      "narration": "The result?, maximize billable utilization, reduce costs. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [
         "Get started on your agentic journey today.",
         "Talk to your Microsoft representative to learn more."

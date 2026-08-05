@@ -281,6 +281,26 @@ def actions_from(description: str, business_value=None) -> list[str]:
     return verbs or ["Does the work described above"]
 
 
+def named_systems(entry: dict) -> list[str]:
+    """Systems that can be NAMED in a sentence — never a prose fallback.
+
+    The reviewer caught "It pulls data from Runs on what the operator already
+    has open — no additional configuration" being spoken aloud. That string is
+    a legitimate panel caption and an illegitimate noun phrase. A slot that
+    feeds a sentence has to be typed: if nothing can be named, the sentence is
+    rewritten, not filled with prose.
+    """
+    out = []
+    for x in sources_from(entry):
+        x = x.replace("Connects to ", "").strip()
+        if x.startswith("Runs on what") or x.startswith("Reads configuration"):
+            continue
+        if len(x.split()) > 6 or "—" in x:
+            continue
+        out.append(x)
+    return out
+
+
 def sources_from(entry: dict) -> list[str]:
     tools = entry.get("featured_tools") or entry.get("requires") or []
     if tools:
@@ -309,6 +329,9 @@ def sources_from(entry: dict) -> list[str]:
 # "Generates charts". Stripping the verb entirely left "Original images with an
 # Azure GPT Image deployment and saves them locally", which no one would type.
 THIRD_TO_IMPERATIVE = [
+    (r"^Optimi[sz]es?\b", "Optimise"), (r"^Coordinates?\b", "Coordinate"),
+    (r"^Manages?\b", "Manage"), (r"^Identifies\b", "Identify"),
+    (r"^Tracks?\b", "Track"), (r"^Delivers?\b", "Deliver"),
     (r"^Generates?\b", "Generate"), (r"^Creates?\b", "Create"),
     (r"^Analy[sz]es\b", "Analyse"), (r"^Provides?\b", "Give me"),
     (r"^Summari[sz]es\b", "Summarise"), (r"^Reviews?\b", "Review"),
@@ -339,11 +362,16 @@ def prompt_from(entry: dict) -> str:
     first = (sentences(entry.get("lede") or entry.get("description") or "") or [""])[0]
     first = re.sub(r"^(This (agent|skill)|The agent|It)\s+", "", first).strip()
     first = imperative(first)
+    # An operator types a request, not a product description. The reference is
+    # "Analyze production line 3 performance and optimize for the upcoming
+    # holiday demand surge" — one clause, no sub-clauses.
+    first = re.split(r"\s+by\s+|\s+using\s+|\s+through\s+|,\s+", first)[0].strip()
+    first = tidy_clause(first)
     if not first:
         return f"Help me with {entry.get('display_name', 'this task')}."
     words = first.split()
-    if len(words) > 16:
-        first = " ".join(words[:16])
+    if len(words) > 11:
+        first = " ".join(words[:11])
     sc = scenario_for(entry)
     return (keep_acronyms(first[0].upper() + first[1:]) + " for " + sc["subject"]
             + " — we're looking at " + sc["driver"] + ".")
@@ -427,6 +455,16 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
     industry = (inds[0] if inds else "organisations").lower()
     if industry in ("cross-industry", "cross industry", "general", "aggregated", ""):
         industry = "teams"
+    # "manufacturing get guided assistance" — a mass noun in a plural-actor
+    # slot. The reference says "manufacturers get".
+    ACTORS = {"manufacturing": "manufacturers", "healthcare": "care teams",
+              "financial services": "financial services teams",
+              "retail": "retailers", "professional services": "services firms",
+              "energy": "energy operators", "b2b sales": "sales teams",
+              "human resources": "HR teams", "it management": "IT teams",
+              "teams": "teams", "organisations": "organisations"}
+    actors = ACTORS.get(industry, industry if industry.endswith("s")
+                        else industry + " teams")
     persona = ((entry.get("personas") or entry.get("audience") or ["manager"])[0])
     surface_name = (entry.get("surface") or "Microsoft Teams")
     srcs = [x.replace("Connects to ", "") for x in sources_from(entry)]
@@ -452,12 +490,21 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
                 continue
             if len(" ".join(parts + [c]).split()) > budget:
                 continue
-            parts.append(c if c[-1] in "?!" else c + ".")
+            # A chunk that begins lower-case is a CONTINUATION of the previous
+            # clause, not a new sentence. Punctuating it as one produced
+            # "…gather insights. piecing the picture together by hand."
+            if parts and c[0].islower():
+                parts[-1] = parts[-1].rstrip(".") + ", " + c + "."
+            else:
+                parts.append(c if c[-1] in "?!" else c + ".")
 
     if act == "problem":
         # Silent until 9.4s by design; this act only carries the premise.
-        take(f"There's an agent to guide {industry} through these processes",
-             f"It pulls data from {srcs[0] if srcs else 'the systems of record'}",
+        named = named_systems(entry)
+        source_clause = (f"It pulls data from {' and '.join(named[:2])}"
+                         if named else "It reads the systems you already work in")
+        take(f"There's an agent to guide {actors} through these processes",
+             source_clause,
              f"engages you directly in {surface}",
              "and delivers targeted recommendations in the flow of the work")
     elif act == "overview":
@@ -476,8 +523,12 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
              f"recommendations right in their workflow",
              f"Work like this used to require cross-referencing different "
              f"systems by hand",
-             f"Now, with unified data context across {', '.join(srcs[:2])}, the "
-             f"agent can rapidly generate a phased plan with quick wins",
+             ("Now, with unified data context across "
+              + " and ".join(named_systems(entry)[:2]) + ", the agent can "
+              "rapidly generate a phased plan with quick wins"
+              if named_systems(entry) else
+              "Now, with one unified data context, the agent can rapidly "
+              "generate a phased plan with quick wins"),
              "For risk mitigation, the agent helps as well, outlining a strategy "
              "that keeps the work on track",
              "When the detail is needed, they simply ask, and the agent quickly "
@@ -486,7 +537,7 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
              f"without anyone switching tools",
              "Finally, the agent creates a monitoring plan, so teams keep the "
              "effort aligned to the metrics they are measured on",
-             f"With {name}, {industry} get guided assistance embedded directly "
+             f"With {name}, {actors} get guided assistance embedded directly "
              f"into their workflows")
     elif act == "close":
         if len(values) >= 2:
@@ -495,8 +546,8 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
                  (f", and better {values[2][0].lower() + values[2][1:]}"
                   if len(values) > 2 else ""))
         else:
-            take("The result? Work that used to take a person a day, done in "
-                 "the flow of their conversation")
+            take("The result? Work that moves faster, stays consistent, and "
+                 "holds the same standard every time it runs")
         # Verbatim from the reference. Every recording ends this way.
         take("Get started on your agentic journey today",
              "Talk to your Microsoft representative to learn more")

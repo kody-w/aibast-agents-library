@@ -54,7 +54,7 @@ PLACEHOLDER = "[operator supplies]"
 # silent while a speech-only cut measures 40%. Without it every gap between
 # narration lines is true digital silence and the film reads as broken.
 BED = REPO_ROOT / "media" / "audio" / "bed.m4a"
-BED_GAIN = "0.16"   # under the voice, present in the gaps
+BED_GAIN = "0.14"   # under the voice, present in the gaps
 # Absolute second each act's narration may begin, measured from the reference.
 VO_ENTRY = {"problem": 9.4}
 
@@ -116,7 +116,11 @@ W, H = spec["w"], spec["h"]
 with sync_playwright() as p:
     b = p.chromium.launch(args=["--force-device-scale-factor=1",
                                 "--hide-scrollbars", "--disable-lcd-text"])
-    pg = b.new_page(viewport={"width": W, "height": H + 260},
+    # vision.html needs headroom for its transport; screen.html is the frame
+    # itself and must be EXACTLY the box, or its composer falls off the bottom
+    # and the capture gets squashed into the plate.
+    pad = 0 if spec.get("ready") else 260
+    pg = b.new_page(viewport={"width": W, "height": H + pad},
                     device_scale_factor=1)
     pg.goto(url, wait_until="load")
     if spec.get("ready"):
@@ -396,7 +400,10 @@ def main() -> int:
                 # Looped, faded in at 3.2s like the reference, and ducked so it
                 # sits under the voice rather than competing with it.
                 bed_idx = len(audio_parts) + 1
-                inputs += ["-stream_loop", "-1", "-i", str(BED)]
+                # The bed is now a continuous 140s cut with no internal
+                # silences, so it is not looped — looping a 6s clip put an
+                # audible dropout in the mix roughly 22 times.
+                inputs += ["-i", str(BED)]
                 filters.append(
                     f"[{bed_idx}:a]atrim=0:{clock},volume={BED_GAIN},"
                     f"adelay=3200|3200,afade=t=in:st=3.2:d=1.2,"

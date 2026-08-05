@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <title>RAPPVision screen plate</title>
 <!--
-  The screen interior only, at the exact pixel size of the laptop display in the
-  professional plate (1654x973 at x=128,y=51 of a 1920x1080 frame).
+  The screen interior only, rendered at whatever size the plate calibration
+  says the laptop display is (media/plates/calibration.json). Fluid on purpose:
+  the framing is set visually in align.html, not hard-coded here.
 
   The laptop, the desk, the lighting and the background gradient are real
   footage from the AIBAST recordings. Only what is ON the screen is generated,
@@ -20,7 +21,9 @@
   --op:#eee6fb; --accent:#4f52c9; --ok:#0f7b0f; --mark:#fff3bf;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:1654px;height:973px;overflow:hidden;background:#faf9f8}
+/* Fluid, not 1654px fixed. The renderer captures at whatever the calibrated
+   rect is, so hard-coding a width would squeeze the type at any other size. */
+html,body{width:100%;height:100vh;overflow:hidden;background:#faf9f8}
 body{font-family:"Segoe UI",-apple-system,system-ui,sans-serif;color:var(--ink);
   display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
 
@@ -179,7 +182,12 @@ function paint(){
     .then(function(doc){
       DOC=doc;
       var first=(doc.scenes.filter(function(s){return s.act==="walkthrough";})[0].turns||[])[0];
-      document.getElementById("barTitle").textContent=(first&&first.text||"").replace(/\.$/,"");
+      // Trim to a WORD boundary; CSS ellipsis was slicing mid-word and the cut
+      // sat on screen for the whole walkthrough act.
+      var title=(first&&first.text||"").replace(/\.$/,"");
+      var w=title.split(" ");
+      if(w.length>9) title=w.slice(0,9).join(" ")+"…";
+      document.getElementById("barTitle").textContent=title;
       document.getElementById("agentChip").textContent=doc.subject.display_name;
       document.title=doc.subject.display_name;
       paint();

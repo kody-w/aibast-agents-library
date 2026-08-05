@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:18:21+00:00",
+  "generated": "2026-08-05T20:36:32+00:00",
   "subject": {
     "slug": "prior-authorization",
     "kind": "agent",
@@ -70,7 +70,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 clinical setting: staff at a workstation between rounds",
       "on_screen": [],
-      "narration": "There's an agent to guide healthcare through these processes. It pulls data from Microsoft Teams. engages you directly in Microsoft Teams."
+      "narration": "There's an agent to guide care teams through these processes. It pulls data from Microsoft Teams, engages you directly in Microsoft Teams."
     },
     {
       "act": "overview",
@@ -90,7 +90,7 @@
           "Reduce care delays"
         ]
       },
-      "narration": "Let's say a manager needs to accelerate authorization processes. Before, they would have needed to jump across multiple systems to manually gather insights. piecing the picture together by hand, and hoping nothing moved while they worked."
+      "narration": "Let's say a manager needs to accelerate authorization processes. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",
@@ -100,7 +100,7 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Automate insurance approval workflows to accelerate authorization processes, improve documentation accuracy, and reduce care delays for the member panel \u2014 we're looking at a widening quality gap."
+          "text": "Automate insurance approval workflows to accelerate authorization processes for the member panel \u2014 we're looking at a widening quality gap."
         },
         {
           "role": "agent",
@@ -164,14 +164,14 @@
           "agent_call": "Prior Authorization Agent"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can improve documentation accuracy in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Prior Authorization Agent, healthcare get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can improve documentation accuracy in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Prior Authorization Agent, care teams get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
       "start": 120.0,
       "end": 137.0,
       "shot": "Dark card, gradient CTA panel",
-      "narration": "The result? accelerate authorization processes, improve documentation accuracy, and better reduce care delays. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
+      "narration": "The result?, accelerate authorization processes, improve documentation accuracy, and better reduce care delays. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [
         "Get started on your agentic journey today.",
         "Talk to your Microsoft representative to learn more."

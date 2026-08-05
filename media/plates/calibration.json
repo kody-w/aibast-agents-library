@@ -1,0 +1,10 @@
+{
+  "schema": "aibast-plate-calibration/1.0",
+  "plate": "media/plates/laptop-copilot.png",
+  "frame": { "w": 1920, "h": 1080 },
+  "render_size": { "w": 1528, "h": 972 },
+  "screen_rect": { "x": 189, "y": 52, "w": 1528, "h": 972 },
+  "corner_radius": 0,
+  "calibrated_by": "align.html (Kody, visual)",
+  "note": "Set visually against the plate. Supersedes the bright-region measurement, which sat 61px left and 126px wide and overflowed the bezel. The renderer composites screen.html at screen_rect and renders it AT that size, so text is never scaled."
+}
