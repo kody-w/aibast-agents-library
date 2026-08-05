@@ -575,6 +575,20 @@ PY"
 check "brainstem_web.py parses" \
   "python3 -c \"import ast;ast.parse(open('vbrainstem/brainstem_web.py').read())\""
 
+echo "== T-PYFLAKES no undefined names in code we ship =="
+check "every Python file we author resolves its names (F821)" "python3 - <<'PY'
+import shutil, subprocess, sys
+if shutil.which('pyflakes') is None and subprocess.run(
+        [sys.executable,'-c','import pyflakes'],capture_output=True).returncode != 0:
+    print('SKIP: pyflakes not installed'); raise SystemExit(0)
+# Kernel-locked and contributed agent trees are upstream's to lint; these are ours.
+files=[f for f in subprocess.run(['git','ls-files','*.py'],capture_output=True,text=True).stdout.splitlines()
+       if not f.startswith(('rapp_brainstem/','agents/','rapp_cloud/'))]
+r=subprocess.run([sys.executable,'-m','pyflakes']+files,capture_output=True,text=True)
+bad=[l for l in (r.stdout+r.stderr).splitlines() if 'undefined name' in l]
+assert not bad, bad[:8]
+PY"
+
 echo "== T-SECRETS no embedded credentials in shippable content =="
 check "no signed trigger URLs, keys, or tokens in tracked source" "python3 - <<'PY'
 import re, subprocess

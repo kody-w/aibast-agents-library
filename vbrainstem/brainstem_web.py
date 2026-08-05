@@ -48,6 +48,7 @@ import importlib
 import importlib.util
 import traceback
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 from urllib.parse import urlencode
 
 import requests

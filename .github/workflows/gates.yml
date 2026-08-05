@@ -33,7 +33,7 @@ jobs:
         # The agent contract tests import and execute every agent, so the
         # engine's runtime deps must be present, not just the test tooling.
         run: |
-          python -m pip install --quiet pytest pyyaml playwright
+          python -m pip install --quiet pytest pyyaml playwright pyflakes
           python -m pip install --quiet -r rapp_brainstem/requirements.txt
 
       - name: Install browser for the render test
