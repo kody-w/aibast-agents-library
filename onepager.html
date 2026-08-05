@@ -518,6 +518,9 @@ function storyboardHTML(doc) {
 
   return '<section class="story">' +
     '<h2>Demo walkthrough <span class="tagline">RAPPVision · storyboard</span></h2>' +
+    '<p style="margin-bottom:10px"><a class="btn primary" href="vision.html?' +
+      (doc.subject.kind === "skill" ? "skill=" : "agent=") +
+      encodeURIComponent(doc.subject.ref) + '">▶ Play the film</a></p>' +
     '<p class="rnote">The house demo format, generated from this entry: five acts, ' +
     Math.round(doc.runtime_seconds) + ' seconds, the same film as every industry ' +
     'recording in the catalog. Figures a human must supply are marked rather than ' +

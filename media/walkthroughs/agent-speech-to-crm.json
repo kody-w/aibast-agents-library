@@ -34,7 +34,7 @@
     "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T15:00:03+00:00",
+  "generated": "2026-08-05T17:42:00+00:00",
   "subject": {
     "slug": "speech-to-crm",
     "kind": "agent",
@@ -80,7 +80,7 @@
           "Engages you in the local brainstem chat"
         ],
         "Actions": [
-          "Extracts entities"
+          "Extracts entities, maps to CRM fields"
         ]
       },
       "narration": "Speech to CRM reads what it needs, works where you already are, and hands back something you can act on."

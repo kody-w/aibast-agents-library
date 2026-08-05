@@ -1453,6 +1453,40 @@ one=json.loads(pathlib.Path('media/walkthroughs/agent-art-generator.json').read_
 assert one['remix']['slot_count']>0
 assert one['approval']['required_before_render'] is True
 PY"
+check "the film plays from generated data — no agent, no connection" "python3 - <<'PY'
+h=open('vision.html').read()
+# The whole point: this must not need a deployed agent or a live channel.
+for banned in ('directline','DirectLine','botframework','token.botframework',
+               'azurewebsites','websocket','WebSocket','EventSource'):
+    assert banned not in h, f'the static player must not reach for {banned}'
+# One fetch only: the storyboard it plays.
+import re
+fetches=re.findall(r'fetch\(([^)]{0,60})', h)
+assert all('walkthroughs' in f or 'paths' in f for f in fetches), fetches
+for k in ('sceneTitle','sceneProblem','sceneOverview','sceneWalkthrough','sceneClose',
+          'agentcall','Agent Calls','requestAnimationFrame'):
+    assert k in h, k
+PY"
+check "every act of the format is drawn, in order" "python3 - <<'PY'
+h=open('vision.html').read()
+order=[h.index(x) for x in ('sceneTitle(s[0])','sceneProblem(s[1])','sceneOverview(s[2])',
+                            'sceneWalkthrough(s[3])','sceneClose(s[4])')]
+assert order==sorted(order), 'acts are composed out of order'
+PY"
+check "no storyboard shows a ragged or fabricated action phrase" "python3 - <<'PY'
+import json, glob
+STOP=('and','or','with','from','for','to','the','a','an','of','in','on','by','that','into')
+bad=[]
+for f in glob.glob('media/walkthroughs/*.json'):
+    d=json.load(open(f))
+    for a in d['scenes'][2]['panels']['Actions']:
+        w=a.split()
+        if a.count('(')!=a.count(')') or (w and w[-1].lower() in STOP) or a.rstrip()[-1:] in ',;:':
+            bad.append((f,a))
+assert not bad, bad[:3]
+PY"
+check "the one-pager offers to play the film" \
+  "grep -q 'vision.html?' onepager.html"
 check "the remix surface is on the page and edits the storyboard client-side" "python3 - <<'PY'
 d=open('onepager.html').read()
 for k in ('storyboardHTML','wireRemix','remixDl','data-slot','my-walkthrough.json'):

@@ -83,15 +83,52 @@ def sentences(text: str) -> list[str]:
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+", (text or "").strip()) if s.strip()]
 
 
+def tidy_clause(text: str) -> str:
+    """Leave a clause that reads as a finished phrase.
+
+    Truncating to a word count reopens parentheses, strands closing ones, and
+    ends on prepositions. This frame is the one a viewer reads longest, so it
+    is worth cleaning until stable rather than once.
+    """
+    STOP = ("and", "or", "with", "from", "for", "to", "the", "a", "an",
+            "of", "in", "on", "by", "that", "into")
+    tail = text.strip()
+    if tail.count("(") > tail.count(")"):
+        tail = tail.split("(")[0]
+    if tail.count(")") > tail.count("("):
+        tail = tail.replace(")", "")
+    previous = None
+    while tail != previous:
+        previous = tail
+        tail = tail.strip().rstrip(",;:.-")
+        words = tail.split()
+        if words and words[-1].lower() in STOP:
+            tail = " ".join(words[:-1])
+    return tail.strip()
+
+
 def actions_from(description: str, business_value=None) -> list[str]:
     if business_value:
         return [v if v[0].isupper() else v.capitalize() for v in business_value[:3]]
     verbs = []
     for m in VERB_RE.finditer(description or ""):
-        tail = (description[m.end():m.end() + 44] or "").strip()
-        tail = re.split(r"[,.;]", tail)[0].strip()
+        tail = (description[m.end():m.end() + 70] or "").strip()
+        # Cut at a real boundary, not the first comma: "Generate clean,
+        # consistently-styled charts" would otherwise render on the overview
+        # card as "Generate clean", which reads as a different capability.
+        tail = re.split(r"[.;]| and then | so that | which ", tail)[0].strip()
+        if "," in tail and len(tail.split(",")[0]) < 22:
+            tail = tail.rsplit(",", 1)[0] if tail.count(",") > 1 else tail
+        tail = re.sub(r"\s*\([^)]*\)", "", tail)
+        words = tail.split()
+        if len(words) > 8:
+            tail = " ".join(words[:8])
+        # Clean up AFTER truncating, not before: cutting to a word count can
+        # reopen a parenthesis or end on a conjunction, and this frame is the
+        # one a viewer reads longest.
+        tail = tidy_clause(tail)
         phrase = f"{m.group(0).capitalize()} {tail}".strip()
-        if len(phrase) > 12 and phrase not in verbs:
+        if len(phrase) > 16 and phrase not in verbs:
             verbs.append(phrase)
         if len(verbs) == 3:
             break

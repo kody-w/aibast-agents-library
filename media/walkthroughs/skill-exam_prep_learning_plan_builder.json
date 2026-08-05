@@ -34,7 +34,7 @@
     "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T15:00:03+00:00",
+  "generated": "2026-08-05T17:42:23+00:00",
   "subject": {
     "slug": "exam_prep_learning_plan_builder",
     "kind": "skill",
@@ -81,8 +81,8 @@
           "Engages you in the local brainstem chat"
         ],
         "Actions": [
-          "Build a personalized study plan app for an exam o",
-          "Plan app for an exam or certification: overview"
+          "Build a personalized study plan app for an exam",
+          "Plan app for an exam or certification: overview timeline"
         ]
       },
       "narration": "exam-prep-learning-plan-builder reads what it needs, works where you already are, and hands back something you can act on."

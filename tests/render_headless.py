@@ -248,6 +248,36 @@ def main() -> int:
            not spy.value.suggested_filename.endswith(".py"):
             failures.append("scan did not offer both converted formats")
 
+        # ---- vision.html: the film plays from the storyboard, statically ----
+        page.goto(f"{base}/vision.html?skill=@cat-agent-skills/chart_builder",
+                  wait_until="load")
+        page.wait_for_selector("#stage", timeout=15000)
+        acts = []
+        for t, expect in [(2, "title"), (12, "problem"), (30, "overview"),
+                          (75, "walkthrough"), (130, "close")]:
+            page.evaluate(f"() => {{ T={t}; paint(); }}")
+            page.wait_for_timeout(80)
+            got = page.locator(".scene.on").first.get_attribute("data-act")
+            acts.append(got)
+            if got != expect:
+                failures.append(f"at t={t}s the film showed {got}, expected {expect}")
+        # Act 4 must actually build the conversation and name the tool called —
+        # that line is the one checkable claim the format makes.
+        page.evaluate("() => { T=110; paint(); }")
+        page.wait_for_timeout(120)
+        if page.locator("#chatFlow .turn").count() < 3:
+            failures.append("the walkthrough act did not build its conversation")
+        call = page.locator(".agentcall").first
+        if not call.count() or "chart_builder" not in call.inner_text():
+            failures.append("the Agent Calls line did not name the tool")
+        # Playing must move the clock without a connection of any kind.
+        page.evaluate("() => { T=0; paint(); }")
+        page.click("#playBtn")
+        page.wait_for_timeout(1300)
+        if page.locator("#clock").inner_text().startswith("0:00"):
+            failures.append("the film did not advance when played")
+        film_acts = ",".join(acts)
+
         browser.close()
     server.shutdown()
 
@@ -257,7 +287,7 @@ def main() -> int:
     print(f"headless OK: {cards} cards, search+chip filter, viewer, {kpis} KPIs, "
           f"{sol_cards} solutions, one-pager all modes, "
           f"{mirrored} skill.md/agent.py pairs re-derived in-browser, "
-          f"{scanned} skills rubric-matched against the Python reference")
+          f"{scanned} skills rubric-matched, film acts {film_acts}")
     return 0
 
 
