@@ -44,6 +44,7 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+SHAPES_DIR = REPO_ROOT / "sentinel" / "sources"
 SOURCES_FILE = REPO_ROOT / "sources.json"
 OUT_FILE = REPO_ROOT / "state" / "aggregated.json"
 GATES_FILE = REPO_ROOT / "state" / "gate_verdicts.json"
@@ -188,6 +189,9 @@ def front_page_score(rec: dict, verdict: dict | None) -> int:
     return score
 
 
+ALLOW_SHRINK = False
+
+
 def crawl(only: str | None, dry_run: bool, strict: bool) -> int:
     if not SOURCES_FILE.exists():
         warn("sources.json missing; nothing to crawl.")
@@ -205,6 +209,23 @@ def crawl(only: str | None, dry_run: bool, strict: bool) -> int:
         if not source.get("enabled", False):
             warn(f"{sid}: disabled, skipping.")
             continue
+        # Aggregation is gated on a locked shape. Every source repository is
+        # laid out differently, and a crawler that guesses fails in the worst
+        # way: it silently returns fewer skills than the repository holds, and
+        # "0 found" looks exactly as plausible as "300 found" from outside. The
+        # scout (scripts/profile_source.py) records the shape with its evidence
+        # before anything is taken from a source.
+        shape_file = SHAPES_DIR / f"{sid}.json"
+        if not shape_file.is_file():
+            fail(f"{sid}: no shape on file; run "
+                 f"`python3 scripts/profile_source.py <owner/repo> --id {sid}` "
+                 "before aggregating from it.")
+            continue
+        shape = json.loads(shape_file.read_text(encoding="utf-8"))
+        if shape.get("status") not in ("locked", "provisional"):
+            fail(f"{sid}: shape status is {shape.get('status')!r}; not usable.")
+            continue
+
         adapter = ADAPTERS.get(source.get("format", ""))
         if adapter is None:
             fail(f"{sid}: no adapter for format '{source.get('format')}'.")
@@ -271,6 +292,25 @@ def crawl(only: str | None, dry_run: bool, strict: bool) -> int:
         warn("no records crawled; keeping existing snapshot.")
         return 0
 
+    # A crawl that suddenly returns far fewer skills is far more likely to be a
+    # source that changed shape, a rate limit, or a partial fetch than a
+    # repository that genuinely deleted most of its content. Overwriting the
+    # snapshot in that state loses the catalog quietly, and the daily job would
+    # look green while doing it. Refuse, and say what to check.
+    if not dry_run and OUT_FILE.exists():
+        try:
+            previous = json.loads(OUT_FILE.read_text(encoding="utf-8"))
+            was = len(previous.get("skills", []))
+        except (OSError, ValueError):
+            was = 0
+        if was and len(records) < was * 0.5:
+            warn(f"refusing to write: {len(records)} skill(s) crawled against "
+                 f"{was} in the existing snapshot. A source has probably changed "
+                 "shape — re-scout it with scripts/profile_source.py, or pass "
+                 "--allow-shrink if the loss is real.")
+            if not ALLOW_SHRINK:
+                return 1
+
     records.sort(key=lambda r: (-r["front_page_score"], r["ref"]))
     snapshot = {
         "schema": SCHEMA,
@@ -297,7 +337,11 @@ def main() -> int:
     parser.add_argument("--only", help="crawl a single source id")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--allow-shrink", action="store_true",
+                        help="permit a snapshot that loses more than half its skills")
     args = parser.parse_args()
+    global ALLOW_SHRINK
+    ALLOW_SHRINK = args.allow_shrink
     return crawl(args.only, args.dry_run, args.strict)
 
 

@@ -149,7 +149,45 @@ visibly older than the rubric.
   return JSON. Write it to be answerable from source alone, and tell the model
   not to praise — a reviewer that hedges produces findings nobody acts on.
 
-## 7. One pipeline, not two
+## 7. Learning a source before aggregating from it
+
+Every skill repository is shaped differently — `skills/`, `src/content/skills/`,
+one file per directory. Aggregating before you know which is guessing, and a
+crawler that guesses fails in the worst way: it silently returns fewer skills
+than the repository holds, and "0 found" looks exactly as plausible as "300
+found" from outside.
+
+So a source is **scouted before it is crawled**. `scripts/profile_source.py`
+walks the repository, clusters its markdown by directory, measures how
+consistently each cluster carries frontmatter, and records the shape with the
+alternatives it rejected:
+
+```bash
+python3 scripts/profile_source.py microsoft/cat-agent-skills --id cat-agent-skills
+```
+
+The result lands in `sentinel/sources/<id>.json`, and `crawl_skills.py` refuses
+to touch a source that has none. Size alone would pick a documentation folder in
+most repositories, so the ranking requires frontmatter: on `cat-agent-skills`
+that chose `src/content/skills` (78 files, frontmatter on every one) over the
+larger `src/content/guides` (53 files, frontmatter on none).
+
+Fields the scout cannot map confidently are **listed, never guessed** — a wrong
+mapping corrupts every skill taken from that source afterwards. Those go to the
+`source-shape` resident, whose packet the scout emits alongside the shape. Until
+a model confirms it the shape is `provisional`, and it says so.
+
+Two more guards, both learned the hard way:
+
+- A crawl returning less than half the previous snapshot **refuses to write**.
+  A source that changed shape, a rate limit, and a partial fetch all look like
+  a smaller catalog, and overwriting quietly would lose it while the job stayed
+  green. `--allow-shrink` is the deliberate override.
+- The shape records `expected_count`, and a gate compares it against what
+  aggregation actually produced. Drift between the two is the signal that the
+  source moved.
+
+## 8. One pipeline, not two
 
 Aggregating and reviewing are the same act in two forms — shaping raw material,
 then judging the shape. `.github/workflows/metrics.yml` runs them as one pass:
@@ -164,7 +202,7 @@ and unreviewed, which is the naked-link problem the library exists to solve. A
 skill is not aggregated here until it has been shaped, mirrored, given a demo,
 and actually reviewed.
 
-## 8. Real-time review of new submissions
+## 9. Real-time review of new submissions
 
 `.github/workflows/sentinel.yml` runs Sentinel on pull requests that touch
 `agents/**`, posts the deterministic findings to the pull request, and uploads

@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-05T16:33:42.368729+00:00",
+  "generated": "2026-08-05T16:49:19.386467+00:00",
   "slug": "concepts/the-three-tiers",
   "title": "The three tiers",
   "summary": "Brainstem, RAPP Cloud, Copilot Studio \u2014 each self-contained.",

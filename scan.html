@@ -141,7 +141,7 @@ footer{border-top:1px solid var(--border);margin-top:36px;padding:22px 0 40px}
     <div id="srcRepo" hidden>
       <label class="f" for="repoBox">owner/repo (public)</label>
       <input id="repoBox" type="text" spellcheck="false" placeholder="microsoft/cat-agent-skills">
-      <p class="hint">Finds every <code>.md</code> under a <code>skills/</code> path and scans them all. Uses the public GitHub API — unauthenticated, so it is rate-limited.</p>
+      <p class="hint">Finds every candidate <code>.md</code> (skipping README and other repository furniture) and scans up to 25 of them. Uses the public GitHub API — unauthenticated, so it is rate-limited.</p>
     </div>
 
     <div class="row">
@@ -395,11 +395,16 @@ document.getElementById("runScan").onclick = function(){
     })
     .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function(tree){
+      // Repositories do not agree on where skills live — skills/, guides/,
+      // agents/, src/content/... Requiring one layout made the scanner report
+      // "none found" on a repository full of them. Instead: take every .md
+      // that is not obviously repository furniture, and let the rubric decide.
+      var FURNITURE = /(^|\/)(readme|contributing|security|support|changelog|license|code_of_conduct|notice)\.md$/i;
       var files = (tree.tree || []).filter(function(n){
         return n.type === "blob" && /\.md$/i.test(n.path) &&
-               /(^|\/)skills?\//i.test(n.path);
+               !FURNITURE.test(n.path) && n.path.indexOf(".github/") !== 0;
       }).slice(0, 25);
-      if (!files.length) throw new Error("no skill .md files found under a skills/ path");
+      if (!files.length) throw new Error("no candidate .md files found in that repository");
       setStatus("Fetching " + files.length + " file(s)…");
       return Promise.all(files.map(function(f){
         return fetch("https://raw.githubusercontent.com/" + repo + "/HEAD/" + f.path)

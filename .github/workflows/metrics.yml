@@ -51,6 +51,12 @@ jobs:
       # let a freshly crawled skill sit in the catalog unshaped and unreviewed
       # — which is the naked-link problem the library exists to solve.
       # ---------------------------------------------------------------
+      - name: Refuse to aggregate a source whose shape is unknown
+        # The scout runs by hand when a source is added — that is the control
+        # point. This only asserts the shape is on file, so the daily job can
+        # never quietly crawl a repository nobody has looked at.
+        run: python scripts/profile_source.py --check
+
       - name: Shape raw skills into the RAPP format
         run: python scripts/convert_skills.py
 

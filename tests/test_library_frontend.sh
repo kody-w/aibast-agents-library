@@ -1341,6 +1341,47 @@ run=json.load(open(os.path.join(d, json.load(open(os.path.join(d,'latest.json'))
 assert run['status']=='dormant' and run['verdicts'] is None
 PY"
 
+echo "== T-SHAPE aggregation is gated on a learned shape =="
+check "the scout picks skills over docs, and never guesses a field" \
+  "python3 tests/check_source_scout.py"
+check "every configured source has a shape on file" \
+  "python3 scripts/profile_source.py --check"
+check "the crawler refuses a source whose shape is unknown" "python3 - <<'PY'
+import re
+s=open('scripts/crawl_skills.py').read()
+assert 'SHAPES_DIR' in s and 'no shape on file' in s
+# The refusal must come BEFORE anything is fetched from that source.
+assert s.index('no shape on file') < s.index('ADAPTERS.get')
+PY"
+check "a collapsed crawl cannot quietly empty the catalog" "python3 - <<'PY'
+s=open('scripts/crawl_skills.py').read()
+assert 'refusing to write' in s and 'ALLOW_SHRINK' in s
+assert 'allow-shrink' in s, 'the guard needs a deliberate override'
+PY"
+check "the locked shape records its evidence, not just its answer" "python3 - <<'PY'
+import json, pathlib
+for f in pathlib.Path('sentinel/sources').glob('*.json'):
+    d=json.loads(f.read_text())
+    assert d['schema']=='rapp-source-shape/1.0', f.name
+    assert d['status'] in ('provisional','locked'), d['status']
+    assert d['shape']['skill_glob'], f.name
+    assert d['evidence']['clusters_considered'], 'a shape with no rejected alternatives is an assertion'
+    assert d['evidence']['why_this_cluster'], f.name
+    assert d['confirmation_packet']['prompt'], 'the scout must emit what confirms it'
+    # Fields it could not map must be listed, never silently dropped.
+    assert isinstance(d['shape']['unmapped_fields'], list), f.name
+    if d['status']=='provisional':
+        assert 'not confirmed' in d['status_note'].lower()
+PY"
+check "the shape matches what was actually aggregated" "python3 - <<'PY'
+import json
+shape=json.load(open('sentinel/sources/cat-agent-skills.json'))
+agg=json.load(open('state/aggregated.json'))
+got=len([s for s in agg['skills'] if s['source_id']=='cat-agent-skills'])
+want=shape['shape']['expected_count']
+assert got==want, f'shape expected {want} skills, aggregation produced {got}'
+PY"
+
 echo "== T-SERVICE Sentinel as an outside service =="
 check "the rubric is published as data, with both implementations named" "python3 - <<'PY'
 import json
