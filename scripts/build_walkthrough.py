@@ -83,6 +83,24 @@ def sentences(text: str) -> list[str]:
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+", (text or "").strip()) if s.strip()]
 
 
+ACRONYMS = ("HEDIS", "ROI", "KPI", "SLA", "ERP", "CRM", "API", "SKU", "OEE",
+            "EBITDA", "CSAT", "NPS", "AR", "AP", "PO", "RFP", "SOW", "IT",
+            "HR", "AI", "ML", "PII", "DLP", "CMK", "SMT", "MES", "B2B", "B2C")
+
+
+def keep_acronyms(text: str) -> str:
+    """Restore acronym casing after any lower-casing rewrite.
+
+    "improve HEDIS performance, campaign ROI" was rendering on the marquee
+    frame as "Improve hedis performance" / "Campaign roi", which reads as a
+    typo to exactly the audience that knows the term.
+    """
+    for a in ACRONYMS:
+        text = re.sub(rf"\b{a.lower()}\b", a, text)
+        text = re.sub(rf"\b{a.capitalize()}\b", a, text)
+    return text
+
+
 def tidy_clause(text: str) -> str:
     """Leave a clause that reads as a finished phrase.
 
@@ -104,12 +122,13 @@ def tidy_clause(text: str) -> str:
         words = tail.split()
         if words and words[-1].lower() in STOP:
             tail = " ".join(words[:-1])
-    return tail.strip()
+    return keep_acronyms(tail.strip())
 
 
 def actions_from(description: str, business_value=None) -> list[str]:
     if business_value:
-        return [v if v[0].isupper() else v.capitalize() for v in business_value[:3]]
+        return [keep_acronyms(v if v[0].isupper() else v.capitalize())
+                for v in business_value[:3]]
     verbs = []
     for m in VERB_RE.finditer(description or ""):
         tail = (description[m.end():m.end() + 70] or "").strip()
@@ -198,41 +217,52 @@ def prompt_from(entry: dict) -> str:
     words = first.split()
     if len(words) > 16:
         first = " ".join(words[:16])
-    return first[0].upper() + first[1:] + " for " + PLACEHOLDER + "."
+    return keep_acronyms(first[0].upper() + first[1:]) + " for " + PLACEHOLDER + "."
 
 
-def findings_block(entry: dict) -> list[str]:
-    """What act 4 shows the agent returning.
+def findings_block(entry: dict) -> dict:
+    """The agent's answer, structured the way the reference structures it.
 
-    This act is 78 of the film's 137 seconds — the frame a viewer studies
-    longest. Two placeholder lines in an empty window read as unfinished, so
-    the response is filled with what the entry ACTUALLY declares: the systems
-    it reads, what it checks, what it produces, and how the caller verifies it.
-    All of that is real and specific. Only figures a human must supply stay
-    marked, because a demonstration that invents a number teaches the room
-    something false.
+    Measured from the reference at 0:55: an opening sentence, two labelled
+    sections of short bullets, a highlighted callout carrying the headline
+    finding and its source, and a closing question. A single flat list in a
+    mostly-empty window is what made the generated cut read as unfinished.
+
+    Every line is derived from what the entry declares. Only figures a human
+    must supply stay marked.
     """
-    out: list[str] = []
-
-    for src in (sources_from(entry) or [])[:2]:
-        out.append(src.replace("Connects to ", "Read from ")
-                      .replace("Runs on what the operator already has open — no "
-                               "additional configuration",
-                               "Read from the operator's working context"))
-
-    for act in actions_from(entry.get("description", ""), entry.get("business_value"))[:3]:
-        out.append(act)
-
-    for v in (entry.get("business_value") or [])[:2]:
-        out.append(f"{v} — {PLACEHOLDER}")
-
+    name = entry.get("display_name") or entry["slug"]
+    srcs = [s.replace("Connects to ", "").replace(
+        "Runs on what the operator already has open — no additional configuration",
+        "the operator's working context") for s in sources_from(entry)]
+    acts = actions_from(entry.get("description", ""), entry.get("business_value"))
     env = entry.get("requires_env") or []
-    if env:
-        out.append("Configuration in use: " + ", ".join(env[:2]))
 
-    out.append(f"Verified against the source before reporting — {PLACEHOLDER}")
-    out.append("Nothing written back without confirmation")
-    return out[:8]
+    intro = (f"I'll {imperative(acts[0])[0].lower() + imperative(acts[0])[1:]} "
+             f"for {PLACEHOLDER}. Reading {', '.join(srcs[:2])} and checking "
+             f"the constraints before I propose anything.")
+
+    reading = [f"{s}: connected" for s in srcs[:2]]
+    if env:
+        reading.append("Configuration: " + ", ".join(env[:2]))
+    reading.append(f"Records in scope: {PLACEHOLDER}")
+
+    checks = [keep_acronyms(a) for a in acts[:3]]
+    if len(checks) < 2:
+        checks.append("Verified against the source before reporting")
+
+    return {
+        "intro": intro,
+        "sections": [
+            {"label": "What I read", "items": reading[:4]},
+            {"label": "What I checked", "items": checks[:4]},
+        ],
+        "callout": {
+            "headline": f"Headline finding: {PLACEHOLDER}",
+            "source": "Source: " + ", ".join(srcs[:2]),
+            "question": "Shall I show the plan?",
+        },
+    }
 
 
 def plan_block(entry: dict) -> list[str]:
@@ -367,11 +397,16 @@ def build(entry: dict) -> dict:
          "turns": [
              {"role": "operator", "text": prompt_from(entry)},
              {"role": "agent", "heading": name,
-              "body": findings_block(entry),
+              "rich": findings_block(entry),
               "agent_call": entry.get("tool_name") or entry.get("slug")},
              {"role": "operator", "text": "Show me the plan."},
              {"role": "agent", "heading": "Recommended plan",
-              "body": plan_block(entry),
+              "rich": {"intro": "Here is the plan.",
+                       "sections": [{"label": "Recommended plan",
+                                     "items": plan_block(entry)}],
+                       "callout": {"headline": f"Expected effect: {PLACEHOLDER}",
+                                   "source": "Nothing is written back without confirmation",
+                                   "question": "Approve and I'll proceed."}},
               "agent_call": entry.get("tool_name") or entry.get("slug")},
          ],
          "narration": narration_for("walkthrough", entry, name, 78.0)},

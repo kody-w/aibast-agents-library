@@ -3,22 +3,34 @@
   "format_version": "1.0.0",
   "remix": {
     "placeholder": "[operator supplies]",
-    "slot_count": 2,
+    "slot_count": 5,
     "slots": [
       {
         "path": "scenes[3].turns[0].text",
         "template": "Review uploaded knowledge-source files for duplication, redundancy, staleness, overlap, and potentially conflicting guidance, then produce an for [operator supplies]."
       },
       {
-        "path": "scenes[3].turns[1].body[2]",
-        "template": "Verified against the source before reporting \u2014 [operator supplies]"
+        "path": "scenes[3].turns[1].rich.intro",
+        "template": "I'll review uploaded knowledge-source files for duplication, redundancy, stalenes for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything."
+      },
+      {
+        "path": "scenes[3].turns[1].rich.sections[0].items[1]",
+        "template": "Records in scope: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[1].rich.callout.headline",
+        "template": "Headline finding: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[3].rich.callout.headline",
+        "template": "Expected effect: [operator supplies]"
       }
     ],
     "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
     "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T19:27:31+00:00",
+  "generated": "2026-08-05T19:41:47+00:00",
   "subject": {
     "slug": "knowledge_corpus_curator",
     "kind": "skill",
@@ -83,12 +95,30 @@
         {
           "role": "agent",
           "heading": "knowledge-corpus-curator",
-          "body": [
-            "Read from the operator's working context",
-            "Review uploaded knowledge-source files for duplication, redundancy, stalenes",
-            "Verified against the source before reporting \u2014 [operator supplies]",
-            "Nothing written back without confirmation"
-          ],
+          "rich": {
+            "intro": "I'll review uploaded knowledge-source files for duplication, redundancy, stalenes for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything.",
+            "sections": [
+              {
+                "label": "What I read",
+                "items": [
+                  "the operator's working context: connected",
+                  "Records in scope: [operator supplies]"
+                ]
+              },
+              {
+                "label": "What I checked",
+                "items": [
+                  "Review uploaded knowledge-source files for duplication, redundancy, stalenes",
+                  "Verified against the source before reporting"
+                ]
+              }
+            ],
+            "callout": {
+              "headline": "Headline finding: [operator supplies]",
+              "source": "Source: the operator's working context",
+              "question": "Shall I show the plan?"
+            }
+          },
           "agent_call": "knowledge_corpus_curator"
         },
         {
@@ -98,11 +128,24 @@
         {
           "role": "agent",
           "heading": "Recommended plan",
-          "body": [
-            "1. Review uploaded knowledge-source files for duplication, redundancy, stalenes",
-            "2. Confirm the result against the source system",
-            "3. Hand back the artifact, and the reasoning behind it"
-          ],
+          "rich": {
+            "intro": "Here is the plan.",
+            "sections": [
+              {
+                "label": "Recommended plan",
+                "items": [
+                  "1. Review uploaded knowledge-source files for duplication, redundancy, stalenes",
+                  "2. Confirm the result against the source system",
+                  "3. Hand back the artifact, and the reasoning behind it"
+                ]
+              }
+            ],
+            "callout": {
+              "headline": "Expected effect: [operator supplies]",
+              "source": "Nothing is written back without confirmation",
+              "question": "Approve and I'll proceed."
+            }
+          },
           "agent_call": "knowledge_corpus_curator"
         }
       ],

@@ -3,22 +3,34 @@
   "format_version": "1.0.0",
   "remix": {
     "placeholder": "[operator supplies]",
-    "slot_count": 2,
+    "slot_count": 5,
     "slots": [
       {
         "path": "scenes[3].turns[0].text",
         "template": "While you're out of office, watches a group chat and answers questions from your local knowledge for [operator supplies]."
       },
       {
-        "path": "scenes[3].turns[1].body[2]",
-        "template": "Verified against the source before reporting \u2014 [operator supplies]"
+        "path": "scenes[3].turns[1].rich.intro",
+        "template": "I'll generated , logs anything IT can't answer for later for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything."
+      },
+      {
+        "path": "scenes[3].turns[1].rich.sections[0].items[1]",
+        "template": "Records in scope: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[1].rich.callout.headline",
+        "template": "Headline finding: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[3].rich.callout.headline",
+        "template": "Expected effect: [operator supplies]"
       }
     ],
     "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
     "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T19:27:31+00:00",
+  "generated": "2026-08-05T19:41:47+00:00",
   "subject": {
     "slug": "spend_more_time_with_friends_and_family",
     "kind": "skill",
@@ -65,10 +77,10 @@
           "Engages you in the local brainstem chat"
         ],
         "Actions": [
-          "Generated , logs anything it can't answer for later"
+          "Generated , logs anything IT can't answer for later"
         ]
       },
-      "narration": "spend-more-time-with-friends-and-family reads what it needs and works where you already are. It draws on Runs on what the operator already has open \u2014 no additional configuration. and it can generated , logs anything it can't answer for later. Everything it does is grounded in your own systems, under your own permissions. Nothing is copied out, and nothing is cached somewhere you cannot see it."
+      "narration": "spend-more-time-with-friends-and-family reads what it needs and works where you already are. It draws on Runs on what the operator already has open \u2014 no additional configuration. and it can generated , logs anything IT can't answer for later. Everything it does is grounded in your own systems, under your own permissions. Nothing is copied out, and nothing is cached somewhere you cannot see it."
     },
     {
       "act": "walkthrough",
@@ -83,12 +95,30 @@
         {
           "role": "agent",
           "heading": "spend-more-time-with-friends-and-family",
-          "body": [
-            "Read from the operator's working context",
-            "Generated , logs anything it can't answer for later",
-            "Verified against the source before reporting \u2014 [operator supplies]",
-            "Nothing written back without confirmation"
-          ],
+          "rich": {
+            "intro": "I'll generated , logs anything IT can't answer for later for [operator supplies]. Reading the operator's working context and checking the constraints before I propose anything.",
+            "sections": [
+              {
+                "label": "What I read",
+                "items": [
+                  "the operator's working context: connected",
+                  "Records in scope: [operator supplies]"
+                ]
+              },
+              {
+                "label": "What I checked",
+                "items": [
+                  "Generated , logs anything IT can't answer for later",
+                  "Verified against the source before reporting"
+                ]
+              }
+            ],
+            "callout": {
+              "headline": "Headline finding: [operator supplies]",
+              "source": "Source: the operator's working context",
+              "question": "Shall I show the plan?"
+            }
+          },
           "agent_call": "spend_more_time_with_friends_and_family"
         },
         {
@@ -98,11 +128,24 @@
         {
           "role": "agent",
           "heading": "Recommended plan",
-          "body": [
-            "1. Generated , logs anything it can't answer for later",
-            "2. Confirm the result against the source system",
-            "3. Hand back the artifact, and the reasoning behind it"
-          ],
+          "rich": {
+            "intro": "Here is the plan.",
+            "sections": [
+              {
+                "label": "Recommended plan",
+                "items": [
+                  "1. Generated , logs anything IT can't answer for later",
+                  "2. Confirm the result against the source system",
+                  "3. Hand back the artifact, and the reasoning behind it"
+                ]
+              }
+            ],
+            "callout": {
+              "headline": "Expected effect: [operator supplies]",
+              "source": "Nothing is written back without confirmation",
+              "question": "Approve and I'll proceed."
+            }
+          },
           "agent_call": "spend_more_time_with_friends_and_family"
         }
       ],

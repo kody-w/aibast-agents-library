@@ -35,7 +35,7 @@ body{font-family:"Segoe UI",-apple-system,system-ui,sans-serif;color:var(--ink);
 .sq.ghost{background:#fff;border:1px solid #e0e0e0}
 
 /* conversation */
-.flow{flex:1;overflow:hidden;padding:12px 60px 0;display:flex;flex-direction:column;gap:26px}
+.flow{flex:1;overflow:hidden;padding:10px 60px 0;display:flex;flex-direction:column;gap:18px}
 .op{align-self:flex-end;background:var(--op);border-radius:12px;padding:16px 22px;
   font-size:21px;line-height:1.42;max-width:64%;overflow-wrap:anywhere}
 .ag{align-self:flex-start;width:88%}
@@ -43,9 +43,17 @@ body{font-family:"Segoe UI",-apple-system,system-ui,sans-serif;color:var(--ink);
   margin-bottom:12px}
 .ag .who i{width:26px;height:26px;border-radius:6px;display:block;
   background:linear-gradient(135deg,#0f7b7b,#0f7b0f)}
-.ag h4{font-size:25px;font-weight:700;margin-bottom:12px;letter-spacing:-.01em}
-.ag ul{list-style:none;display:flex;flex-direction:column;gap:9px}
-.ag li{font-size:20px;line-height:1.45;padding-left:22px;position:relative;color:#2c2c2c;
+.ag h4{font-size:25px;font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
+.ag .intro{font-size:19px;line-height:1.5;color:#2c2c2c;margin-bottom:16px;max-width:94%}
+.ag .sec{margin-bottom:14px}
+.ag .sec>b{display:block;font-size:19px;font-weight:700;margin-bottom:7px}
+.ag .callout{background:#fbe9f7;border-radius:10px;padding:15px 18px;margin-top:4px;
+  display:flex;flex-direction:column;gap:7px;max-width:80%}
+.ag .callout>b{font-size:19px;font-weight:700}
+.ag .callout .src{font-size:17px;color:#5b5b5b}
+.ag .callout .q{font-size:18px;color:#2c2c2c}
+.ag ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.ag li{font-size:18px;line-height:1.5;padding-left:20px;position:relative;color:#2c2c2c;
   overflow-wrap:anywhere}
 .ag li:before{content:"";position:absolute;left:2px;top:11px;width:7px;height:7px;
   border-radius:50%;background:#8b5cf6}
@@ -106,28 +114,50 @@ function mark(t){ return esc(t).split(esc(PH)).join('<span class="mark">'+esc(PH
 function paint(){
   if(!DOC) return;
   var scene=DOC.scenes.filter(function(s){return s.act==="walkthrough";})[0];
-  var turns=scene.turns||[], span=scene.end-scene.start, per=span/turns.length;
+  var turns=scene.turns||[], span=scene.end-scene.start;
   var local=Math.max(0, T-scene.start);
   var html="", typing=null;
 
+  /* An explicit schedule, not an even split.
+     Dividing 78s across four turns pushed the agent's first answer to 19.5s
+     into the act — the screen was empty for the whole first half. The
+     reference puts the answer up fast and then HOLDS it while the narration
+     talks over it, so these are the beats it actually uses. */
+  var TYPE=3.0, REVEAL=8.0;
+  var starts=[0, TYPE+0.4, span*0.46, span*0.46+TYPE+0.4];
+
   turns.forEach(function(turn,i){
-    var at=i*per, done=local>=at+per*0.55;
-    if(local<at) return;
+    var at=starts[i];
+    if(at===undefined || local<at) return;
     if(turn.role==="operator"){
-      if(!done){
-        var full=turn.text;
-        typing=full.slice(0, Math.max(0, Math.floor(full.length*((local-at)/(per*0.55)))));
+      var el=local-at;
+      if(el<TYPE){
+        typing=turn.text.slice(0, Math.max(0, Math.floor(turn.text.length*(el/TYPE))));
         return;
       }
       html+='<div class="op">'+mark(turn.text)+"</div>";
     } else {
-      var reveal=Math.min(1,(local-at)/(per*0.6));
-      var body=turn.body||[];
-      var show=Math.max(1,Math.ceil(body.length*reveal));
-      html+='<div class="ag"><div class="who"><i></i>Agent</div><h4>'+esc(turn.heading)+"</h4><ul>"+
-        body.slice(0,show).map(function(b){return "<li>"+mark(b)+"</li>";}).join("")+"</ul>"+
-        (reveal>=1?'<div class="call">↳ <b>Agent Calls:</b> '+esc(turn.agent_call)+"</div>":"")+
-        "</div>";
+      var reveal=Math.min(1,(local-at)/REVEAL);
+      var r=turn.rich;
+      var body='<div class="ag"><div class="who"><i></i>Agent</div>';
+      body+='<h4>'+esc(turn.heading)+"</h4>";
+      if(r){
+        body+='<p class="intro">'+mark(r.intro)+"</p>";
+        var blocks=[];
+        (r.sections||[]).forEach(function(sec){
+          blocks.push('<div class="sec"><b>'+esc(sec.label)+"</b><ul>"+
+            sec.items.map(function(i){return "<li>"+mark(i)+"</li>";}).join("")+"</ul></div>");
+        });
+        if(r.callout){
+          blocks.push('<div class="callout"><b>'+mark(r.callout.headline)+"</b>"+
+            '<div class="src">'+mark(r.callout.source)+"</div>"+
+            '<div class="q">'+esc(r.callout.question)+"</div></div>");
+        }
+        var show=Math.max(1,Math.ceil(blocks.length*reveal));
+        body+=blocks.slice(0,show).join("");
+      }
+      if(reveal>=1) body+='<div class="call">↳ <b>Agent Calls:</b> '+esc(turn.agent_call)+"</div>";
+      html+=body+"</div>";
     }
   });
 

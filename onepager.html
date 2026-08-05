@@ -381,7 +381,10 @@ function renderAgent(agent, review, rating, source) {
 
   // A generated film, when this agent has one. It is labelled as generated —
   // the b-roll and the laptop are real footage, everything on screen is not.
-  var video = agent.video || (FILMS[agent.name.split("/").pop()] || null);
+  // Generated films are withdrawn until they hit the reference bar recorded in
+  // media/REFERENCE-ANALYSIS.md. Shipping a cut that is visibly below the
+  // professional recordings would devalue the ones that are not.
+  var video = agent.video || null;
   var html = '' +
     (video ? '<div class="video-wrap"><video controls preload="metadata" poster="" src="' + esc(video.src) + '"' +
         ' onplay="track(\'library.video.started\',\'' + esc(agent.name) + '\')"' +

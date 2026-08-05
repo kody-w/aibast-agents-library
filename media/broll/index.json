@@ -1,9 +1,9 @@
 {
   "schema": "aibast-broll/1.0",
-  "generated": "2026-08-05T18:54:51+00:00",
+  "generated": "2026-08-05T19:42:13+00:00",
   "window": {
     "start": 5.5,
-    "length": 15.0,
+    "length": 17.0,
     "note": "measured from act 2 of the shipped recordings"
   },
   "licence_note": "Footage from the AIBAST recordings, reused only within this catalog and only for the industry it was shot for. Audio is stripped \u2014 a generated film carries its own narration.",
@@ -21,7 +21,8 @@
       "industry_bucket": "cross_industry",
       "industries": [],
       "path": "media/broll/cross_industry/contract-risk-review-agent.mp4",
-      "seconds": 15.0,
+      "seconds": 17.0,
+      "covers_act": "problem (5.0-22.0s), in one continuous take",
       "size_mb": 6.83,
       "from_recording": "#2-Contract Risk Review Agent.mp4"
     },
@@ -30,7 +31,8 @@
       "industry_bucket": "cross_industry",
       "industries": [],
       "path": "media/broll/cross_industry/customer-onboarding-agent.mp4",
-      "seconds": 15.0,
+      "seconds": 17.0,
+      "covers_act": "problem (5.0-22.0s), in one continuous take",
       "size_mb": 6.52,
       "from_recording": "#3-Customer Onboarding Agent.mp4"
     },
@@ -41,7 +43,8 @@
         "Capital Markets"
       ],
       "path": "media/broll/financial_services/portfolio-rebalancing-agent.mp4",
-      "seconds": 15.0,
+      "seconds": 17.0,
+      "covers_act": "problem (5.0-22.0s), in one continuous take",
       "size_mb": 9.95,
       "from_recording": "#5-Portfolio Rebalancing Agent.mp4"
     },
@@ -52,7 +55,8 @@
         "Financial Services"
       ],
       "path": "media/broll/financial_services/claims-processing-agent.mp4",
-      "seconds": 15.0,
+      "seconds": 17.0,
+      "covers_act": "problem (5.0-22.0s), in one continuous take",
       "size_mb": 7.02,
       "from_recording": "39-Claims Processing Agent.mp4"
     },
@@ -63,7 +67,8 @@
         "Healthcare"
       ],
       "path": "media/broll/healthcare/care-gap-closure-agent.mp4",
-      "seconds": 15.0,
+      "seconds": 17.0,
+      "covers_act": "problem (5.0-22.0s), in one continuous take",
       "size_mb": 7.02,
       "from_recording": "32-Care Gap Closure Agent.mp4"
     },
@@ -74,7 +79,8 @@
         "Manufacturing"
       ],
       "path": "media/broll/manufacturing/product-line-optimization-agent.mp4",
-      "seconds": 15.0,
+      "seconds": 17.0,
+      "covers_act": "problem (5.0-22.0s), in one continuous take",
       "size_mb": 12.08,
       "from_recording": "#1-Product Line Optimization Agent.mp4"
     },
@@ -85,7 +91,8 @@
         "Professional Services"
       ],
       "path": "media/broll/professional_services/client-health-score-agent.mp4",
-      "seconds": 15.0,
+      "seconds": 17.0,
+      "covers_act": "problem (5.0-22.0s), in one continuous take",
       "size_mb": 5.69,
       "from_recording": "16-Client Health Score Agent.mp4"
     },
@@ -96,7 +103,8 @@
         "Professional Services"
       ],
       "path": "media/broll/professional_services/resource-utilization-agent.mp4",
-      "seconds": 15.0,
+      "seconds": 17.0,
+      "covers_act": "problem (5.0-22.0s), in one continuous take",
       "size_mb": 8.27,
       "from_recording": "17-Resource Utilization Agent.mp4"
     }

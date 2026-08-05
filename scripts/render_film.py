@@ -262,12 +262,16 @@ def main() -> int:
 
             if act == "problem" and broll:
                 # Licensed footage, trimmed or held to the act's exact length.
-                run(["ffmpeg", "-v", "error", "-y", "-stream_loop", "-1",
-                     "-i", str(broll), "-t", f"{span}",
+                # One continuous take, never looped: restarting a 15s clip
+                # inside a 17s act produced a jump-cut that read as hectic.
+                # If the clip is short, hold the last frame rather than replay.
+                run(["ffmpeg", "-v", "error", "-y", "-i", str(broll),
                      "-vf", f"scale={W}:{H}:force_original_aspect_ratio=increase,"
-                            f"crop={W}:{H},fps={FPS}",
+                            f"crop={W}:{H},fps={FPS},"
+                            f"tpad=stop_mode=clone:stop_duration={span}",
+                     "-t", f"{span}",
                      "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "18",
-                     "-pix_fmt", "yuv420p", str(seg)])
+                     "-pix_fmt", "yuv420p", str(seg)], why="b-roll act")
             else:
                 sub = frames / act
                 sub.mkdir()

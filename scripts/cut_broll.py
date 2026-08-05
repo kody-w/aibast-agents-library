@@ -37,7 +37,7 @@ ONEPAGERS = REPO_ROOT / "data" / "onepagers.json"
 
 # The b-roll window, measured from the shipped recordings.
 BROLL_START = 5.5
-BROLL_LENGTH = 15.0
+BROLL_LENGTH = 17.0
 
 # Industry names in the catalog collapse to these buckets, which are what a
 # generated film matches on.
@@ -122,6 +122,7 @@ def main() -> int:
                 "slug": slug, "industry_bucket": bucket, "industries": inds,
                 "path": out.relative_to(REPO_ROOT).as_posix(),
                 "seconds": BROLL_LENGTH,
+                "covers_act": "problem (5.0-22.0s), in one continuous take",
                 "size_mb": round(out.stat().st_size / 1048576, 2),
                 "from_recording": path.name,
             })
