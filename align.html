@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen alignment — RAPPVision</title>
+<!--
+  Drag the generated screen over the real laptop plate until it sits inside the
+  bezel, then export the numbers. The export is what the renderer reads, so a
+  visual adjustment here becomes the burned-in framing with no code change.
+
+  Everything is in PLATE PIXELS (the 1920x1080 frame), not screen pixels, so the
+  exported rect is resolution-independent of whatever browser you calibrate in.
+-->
+<style>
+:root{
+  --bg:#14161c; --panel:#1e2028; --line:#2e3341; --text:#e9ecf2; --dim:#9aa3b2;
+  --accent:#4f8ef7; --warn:#f5a524; --ok:#2ecc71;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,sans-serif;
+  display:flex;height:100vh;overflow:hidden}
+
+#stageWrap{flex:1;display:flex;align-items:center;justify-content:center;padding:18px;
+  overflow:auto}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:top left;
+  background:#000;box-shadow:0 8px 40px rgba(0,0,0,.6);flex:0 0 auto}
+#plate{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  user-select:none;-webkit-user-drag:none}
+#screen{position:absolute;overflow:hidden;outline:2px solid var(--accent);
+  outline-offset:0;background:#fff}
+#screen iframe{border:0;width:1654px;height:973px;transform-origin:top left;
+  pointer-events:none;display:block}
+#screen.grabbing{cursor:grabbing}
+#screen{cursor:grab}
+.h{position:absolute;width:16px;height:16px;background:var(--accent);border:2px solid #fff;
+  border-radius:3px}
+.h.se{right:-9px;bottom:-9px;cursor:nwse-resize}
+.h.ne{right:-9px;top:-9px;cursor:nesw-resize}
+.h.sw{left:-9px;bottom:-9px;cursor:nesw-resize}
+.h.nw{left:-9px;top:-9px;cursor:nwse-resize}
+#screen.locked{outline-color:var(--ok)}
+#screen.locked .h{display:none}
+
+aside{width:340px;flex:0 0 auto;background:var(--panel);border-left:1px solid var(--line);
+  padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+h1{font-size:16px;font-weight:650}
+p.hint{font-size:12.5px;color:var(--dim);line-height:1.55}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+label{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:4px}
+input[type=number],select,input[type=text]{width:100%;padding:8px 10px;border-radius:7px;
+  border:1px solid var(--line);background:#171a21;color:var(--text);font-family:inherit;
+  font-size:14px;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{border:1px solid var(--line);background:#232734;color:var(--text);border-radius:7px;
+  padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+button:hover{background:#2b3040}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary:hover{filter:brightness(1.08)}
+.sec{border-top:1px solid var(--line);padding-top:14px}
+kbd{background:#232734;border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+  font-size:11px;font-family:ui-monospace,Menlo,monospace}
+#out{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;white-space:pre;
+  background:#12141a;border:1px solid var(--line);border-radius:7px;padding:10px;
+  max-height:190px;overflow:auto;color:#c3cbd9}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--warn);color:#231a00}
+.badge.ok{background:var(--ok);color:#06301a}
+</style>
+</head>
+<body>
+
+<div id="stageWrap">
+  <div id="stage">
+    <img id="plate" alt="laptop plate">
+    <div id="screen">
+      <iframe id="frame" title="generated screen"></iframe>
+      <span class="h nw"></span><span class="h ne"></span>
+      <span class="h sw"></span><span class="h se"></span>
+    </div>
+  </div>
+</div>
+
+<aside>
+  <div>
+    <h1>Screen alignment</h1>
+    <p class="hint">Drag the outlined box onto the laptop's display. Corner handles resize it.
+      <kbd>↑↓←→</kbd> nudge 1px, <kbd>Shift</kbd> 10px. <kbd>Alt</kbd>+arrows resize.
+      Numbers are in plate pixels of the 1920×1080 frame.</p>
+  </div>
+
+  <div class="sec">
+    <label for="agent">Preview content</label>
+    <input id="agent" type="text" value="@aibast-agents-library/inventory-rebalancing">
+    <div class="row" style="margin-top:8px">
+      <label style="flex:1"><span>Time (s)</span>
+        <input id="t" type="number" value="62" min="42" max="120" step="1"></label>
+      <button id="reload">Reload</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="grid">
+      <div><label for="x">X</label><input id="x" type="number" value="128"></div>
+      <div><label for="y">Y</label><input id="y" type="number" value="51"></div>
+      <div><label for="w">Width</label><input id="w" type="number" value="1654"></div>
+      <div><label for="h">Height</label><input id="h" type="number" value="973"></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label style="flex:1"><span>Corner radius</span>
+        <input id="r" type="number" value="0" min="0" max="60"></label>
+      <label style="flex:1"><span>Opacity</span>
+        <input id="op" type="number" value="1" min="0.2" max="1" step="0.1"></label>
+    </div>
+    <p class="hint" style="margin-top:8px">Aspect <span id="aspect">1.70</span> ·
+      source render is 1654×973 (<span id="scale">100</span>% scale)</p>
+  </div>
+
+  <div class="sec row">
+    <button id="fit">Fit to bezel</button>
+    <button id="reset">Reset</button>
+    <button id="toggle">Hide overlay</button>
+  </div>
+
+  <div class="sec">
+    <div class="row" style="align-items:center">
+      <span class="badge" id="state">unsaved</span>
+      <button class="primary" id="export" style="margin-left:auto">Export calibration.json</button>
+    </div>
+    <p class="hint" style="margin-top:8px">Save the file to
+      <code>media/plates/calibration.json</code> and the renderer picks it up —
+      no code change.</p>
+    <div id="out" style="margin-top:10px"></div>
+  </div>
+</aside>
+
+<script>
+var PLATE = "media/plates/laptop-copilot.png";
+var SRC_W = 1654, SRC_H = 973;           // what screen.html renders at
+var st = { x:128, y:51, w:1654, h:973, r:0, op:1 };
+
+var stage=document.getElementById("stage"), scr=document.getElementById("screen"),
+    frame=document.getElementById("frame"), out=document.getElementById("out"),
+    badge=document.getElementById("state");
+
+function fitStage(){
+  // Scale the 1920x1080 stage to the viewport without distorting it.
+  var wrap=document.getElementById("stageWrap");
+  var s=Math.min((wrap.clientWidth-36)/1920,(wrap.clientHeight-36)/1080);
+  stage.style.transform="scale("+s+")";
+  stage.style.marginRight=(1920*s-1920)+"px";
+  stage.style.marginBottom=(1080*s-1080)+"px";
+}
+window.addEventListener("resize", fitStage);
+
+function apply(){
+  scr.style.left=st.x+"px"; scr.style.top=st.y+"px";
+  scr.style.width=st.w+"px"; scr.style.height=st.h+"px";
+  scr.style.borderRadius=st.r+"px"; scr.style.opacity=st.op;
+  // The iframe renders at its native size; scale it into the chosen rect so
+  // what you see is exactly what the compositor will produce.
+  frame.style.transform="scale("+(st.w/SRC_W)+","+(st.h/SRC_H)+")";
+  ["x","y","w","h","r","op"].forEach(function(k){
+    var el=document.getElementById(k); if(el && document.activeElement!==el) el.value=st[k];
+  });
+  document.getElementById("aspect").textContent=(st.w/st.h).toFixed(2);
+  document.getElementById("scale").textContent=Math.round(st.w/SRC_W*100);
+  badge.textContent="unsaved"; badge.className="badge";
+  out.textContent=JSON.stringify(payload(),null,2);
+}
+
+function payload(){
+  return {
+    schema: "aibast-plate-calibration/1.0",
+    plate: PLATE,
+    frame: { w:1920, h:1080 },
+    render_size: { w:SRC_W, h:SRC_H },
+    screen_rect: { x:Math.round(st.x), y:Math.round(st.y),
+                   w:Math.round(st.w), h:Math.round(st.h) },
+    corner_radius: Math.round(st.r),
+    calibrated_by: "align.html",
+    note: "Set visually against the plate. The renderer composites screen.html at screen_rect; nothing else needs to change."
+  };
+}
+
+function loadFrame(){
+  var a=document.getElementById("agent").value.trim();
+  var t=document.getElementById("t").value;
+  frame.src="screen.html?agent="+encodeURIComponent(a)+"&t="+t;
+}
+
+/* ---- drag + resize, all in plate pixels ---- */
+var drag=null;
+function ptInStage(e){
+  var r=stage.getBoundingClientRect();
+  var s=r.width/1920;
+  return { x:(e.clientX-r.left)/s, y:(e.clientY-r.top)/s };
+}
+scr.addEventListener("mousedown",function(e){
+  var handle=e.target.classList.contains("h")?e.target.className.split(" ")[1]:null;
+  var p=ptInStage(e);
+  drag={ handle:handle, sx:p.x, sy:p.y, o:Object.assign({},st) };
+  scr.classList.add("grabbing");
+  e.preventDefault();
+});
+window.addEventListener("mousemove",function(e){
+  if(!drag) return;
+  var p=ptInStage(e), dx=p.x-drag.sx, dy=p.y-drag.sy, o=drag.o;
+  if(!drag.handle){ st.x=o.x+dx; st.y=o.y+dy; }
+  else{
+    if(drag.handle==="se"){ st.w=Math.max(120,o.w+dx); st.h=Math.max(80,o.h+dy); }
+    if(drag.handle==="ne"){ st.w=Math.max(120,o.w+dx); st.h=Math.max(80,o.h-dy); st.y=o.y+dy; }
+    if(drag.handle==="sw"){ st.w=Math.max(120,o.w-dx); st.x=o.x+dx; st.h=Math.max(80,o.h+dy); }
+    if(drag.handle==="nw"){ st.w=Math.max(120,o.w-dx); st.x=o.x+dx;
+                            st.h=Math.max(80,o.h-dy); st.y=o.y+dy; }
+  }
+  apply();
+});
+window.addEventListener("mouseup",function(){ drag=null; scr.classList.remove("grabbing"); });
+
+window.addEventListener("keydown",function(e){
+  if(/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+  var k=e.key, step=e.shiftKey?10:1;
+  var map={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
+  if(!map[k]) return;
+  e.preventDefault();
+  if(e.altKey){ st.w=Math.max(120,st.w+map[k][0]*step); st.h=Math.max(80,st.h+map[k][1]*step); }
+  else { st.x+=map[k][0]*step; st.y+=map[k][1]*step; }
+  apply();
+});
+
+["x","y","w","h","r","op"].forEach(function(k){
+  document.getElementById(k).addEventListener("input",function(){
+    var v=parseFloat(this.value); if(!isNaN(v)){ st[k]=v; apply(); }
+  });
+});
+
+document.getElementById("reload").onclick=loadFrame;
+document.getElementById("agent").addEventListener("change",loadFrame);
+document.getElementById("t").addEventListener("change",loadFrame);
+document.getElementById("reset").onclick=function(){
+  st={x:128,y:51,w:1654,h:973,r:0,op:1}; apply();
+};
+document.getElementById("fit").onclick=function(){
+  // Detect the bright display region of the plate and snap to it — the same
+  // measurement the pipeline used, offered as a starting point you can correct.
+  var img=document.getElementById("plate");
+  var c=document.createElement("canvas"); c.width=1920; c.height=1080;
+  var g=c.getContext("2d"); g.drawImage(img,0,0,1920,1080);
+  var d=g.getImageData(0,0,1920,1080).data;
+  var minX=1920,minY=1080,maxX=0,maxY=0,found=false;
+  for(var y=0;y<1080;y+=2){
+    for(var x=0;x<1920;x+=2){
+      var i=(y*1920+x)*4;
+      if(d[i]>224&&d[i+1]>224&&d[i+2]>224){
+        found=true;
+        if(x<minX)minX=x; if(x>maxX)maxX=x;
+        if(y<minY)minY=y; if(y>maxY)maxY=y;
+      }
+    }
+  }
+  if(!found){ alert("No bright display region found in this plate."); return; }
+  st.x=minX; st.y=minY; st.w=maxX-minX; st.h=maxY-minY; apply();
+};
+document.getElementById("toggle").onclick=function(){
+  var hidden=scr.style.visibility==="hidden";
+  scr.style.visibility=hidden?"visible":"hidden";
+  this.textContent=hidden?"Hide overlay":"Show overlay";
+};
+document.getElementById("export").onclick=function(){
+  var blob=new Blob([JSON.stringify(payload(),null,2)],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="calibration.json"; a.click();
+  badge.textContent="exported"; badge.className="badge ok";
+};
+
+// Load any existing calibration so you refine rather than restart.
+fetch("media/plates/calibration.json").then(function(r){return r.ok?r.json():null;})
+  .then(function(c){
+    if(c && c.screen_rect){
+      st.x=c.screen_rect.x; st.y=c.screen_rect.y;
+      st.w=c.screen_rect.w; st.h=c.screen_rect.h;
+      st.r=c.corner_radius||0;
+      if(c.plate) PLATE=c.plate;
+    }
+  })
+  .catch(function(){})
+  .then(function(){
+    document.getElementById("plate").src=PLATE;
+    loadFrame(); apply(); fitStage();
+  });
+</script>
+</body>
+</html>

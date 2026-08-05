@@ -153,14 +153,36 @@ print("captured", len(spec["times"]))
 '''
 
 
+CALIBRATION = REPO_ROOT / "media" / "plates" / "calibration.json"
+
+
 def load_plate() -> dict | None:
-    if not PLATES_INDEX.is_file():
+    """The plate and where the screen sits on it.
+
+    A hand-measured rect was close but not right — the overlay overflowed the
+    bezel. align.html lets the framing be set visually against the plate and
+    exported; when that file is present it WINS, because an eye on the actual
+    frame beats a bright-pixel heuristic.
+    """
+    plate = None
+    if PLATES_INDEX.is_file():
+        for p in json.loads(PLATES_INDEX.read_text(encoding="utf-8")).get("plates", []):
+            if (REPO_ROOT / p["file"]).is_file():
+                plate = dict(p)
+                break
+    if CALIBRATION.is_file():
+        cal = json.loads(CALIBRATION.read_text(encoding="utf-8"))
+        rect = cal.get("screen_rect")
+        if rect:
+            plate = plate or {"file": cal.get("plate", "media/plates/laptop-copilot.png")}
+            if cal.get("plate"):
+                plate["file"] = cal["plate"]
+            plate["screen_rect"] = rect
+            plate["corner_radius"] = cal.get("corner_radius", 0)
+            plate["calibrated"] = True
+    if plate and not (REPO_ROOT / plate["file"]).is_file():
         return None
-    plates = json.loads(PLATES_INDEX.read_text(encoding="utf-8")).get("plates", [])
-    for p in plates:
-        if (REPO_ROOT / p["file"]).is_file():
-            return p
-    return None
+    return plate
 
 
 def capture(url: str, times: list[float], out_dir: Path, settle: int = 30,

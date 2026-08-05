@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api/1.0",
-  "generated": "2026-08-05T20:25:46.794629+00:00",
+  "generated": "2026-08-05T20:31:39.651374+00:00",
   "name": "AIBAST Agents Library API",
   "spec": "rapp-static-api/1.0",
   "base_urls": {
