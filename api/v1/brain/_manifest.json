@@ -1,0 +1,97 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-manifest/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "title": "ms-rapp Vault",
+  "subtitle": "Documentation for the ms-rapp distribution",
+  "github": "https://github.com/microsoft/aibast-agents-library",
+  "entry": "index.md",
+  "index": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/index.json",
+  "raw_base": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain",
+  "notes": [
+    {
+      "path": "concepts/extensions.md",
+      "title": "Extensions",
+      "section": "concepts",
+      "status": "published"
+    },
+    {
+      "path": "concepts/kernel-and-distribution.md",
+      "title": "Kernel and distribution",
+      "section": "concepts",
+      "status": "published"
+    },
+    {
+      "path": "concepts/the-corpus.md",
+      "title": "The corpus",
+      "section": "concepts",
+      "status": "published"
+    },
+    {
+      "path": "concepts/the-three-tiers.md",
+      "title": "The three tiers",
+      "section": "concepts",
+      "status": "published"
+    },
+    {
+      "path": "concepts/the-vault.md",
+      "title": "This vault",
+      "section": "concepts",
+      "status": "published"
+    },
+    {
+      "path": "concepts/what-is-ms-rapp.md",
+      "title": "What ms-rapp is",
+      "section": "concepts",
+      "status": "published"
+    },
+    {
+      "path": "decisions/why-extensions-are-discovered.md",
+      "title": "Why extensions are discovered",
+      "section": "decisions",
+      "status": "published"
+    },
+    {
+      "path": "decisions/why-revocation-retains-the-entry.md",
+      "title": "Why revocation retains the entry",
+      "section": "decisions",
+      "status": "published"
+    },
+    {
+      "path": "decisions/why-static-api.md",
+      "title": "Why a static API",
+      "section": "decisions",
+      "status": "published"
+    },
+    {
+      "path": "how-to/earn-a-badge.md",
+      "title": "Earn a badge",
+      "section": "how-to",
+      "status": "published"
+    },
+    {
+      "path": "how-to/publish-an-agent.md",
+      "title": "Publish an agent",
+      "section": "how-to",
+      "status": "published"
+    },
+    {
+      "path": "how-to/sync-from-the-kernel.md",
+      "title": "Sync from the kernel",
+      "section": "how-to",
+      "status": "published"
+    },
+    {
+      "path": "how-to/use-the-static-api.md",
+      "title": "Use the static API",
+      "section": "how-to",
+      "status": "published"
+    },
+    {
+      "path": "index.md",
+      "title": "ms-rapp \u2014 start here",
+      "section": null,
+      "status": "published"
+    }
+  ]
+}

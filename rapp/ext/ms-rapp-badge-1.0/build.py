@@ -138,6 +138,16 @@ def build(ctx) -> dict:
     return {
         "spec": SPEC,
         "originated_by": "ms-rapp",
+        "human_ui": {"badges": f"{pages}/wall.html"},
+        "llms_lines": [
+            "- [Certification roster]({PAGES}/api/v1/certified.json): verifiable publisher badges, checkable per username.",
+        ],
+        "agent_recipes": [
+            {"goal": "Verify a publisher",
+             "get": "certified/{username}.json",
+             "then": "Lowercase the username first. A 404 and certified=false both mean "
+                     "not certified — neither is an error to retry."},
+        ],
         "endpoints": [
             "badges.json", "badges/{badge_id}.json", "certified.json",
             "certified/{username}.json", "certified/{username}/badge.json",

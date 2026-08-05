@@ -154,6 +154,15 @@ def run_extensions(api_root, agents, generated, pages_base):
     return found, total_changed
 
 
+def stable_write_text(path: Path, text: str) -> bool:
+    """Same stable-write discipline as the JSON writer, for generated text."""
+    if path.exists() and path.read_text(encoding="utf-8") == text:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return True
+
+
 def slim_agent(a: dict, ratings: dict) -> dict:
     name = a.get("name", "")
     pub, _, slug = name.partition("/")
@@ -311,6 +320,113 @@ def main() -> int:
         },
         "extensions": extensions,
     })
+
+    # ── Agent-first entry points ───────────────────────────────────────────
+    # An autonomous reader should be able to answer "what is this and how do I
+    # use it" from one fetch, then follow links — without scraping HTML. The
+    # extension list is consumed generically, so a new extension appears here
+    # with no edit (rapp/ext/PATTERN.md).
+    ext_lines = []
+    for proto, meta in sorted(extensions.items()):
+        for line in meta.get("llms_lines", []):
+            ext_lines.append(line.replace("{PAGES}", PAGES_BASE))
+        ext_lines.append(f"- [{proto} specification]({PAGES_BASE}/{meta.get('spec','')}): "
+                         f"originated by this distribution.")
+
+    changed += stable_write(API / "agent.json", {
+        "schema": "aibast-agent-entry/1.0", "generated": gen,
+        "name": "AIBAST Agents Library (ms-rapp)",
+        "what": ("A catalog of single-file AI agents for the Microsoft AI stack, plus the "
+                 "runtime that executes them. Every surface is a static JSON file: no key, "
+                 "no quota, CORS-open, safe to poll."),
+        "read_this_first": f"{PAGES_BASE}/llms.txt",
+        "full_text": f"{PAGES_BASE}/llms-full.txt",
+        "api_root": f"{PAGES_BASE}/api/v1/index.json",
+        "conventions": {
+            "static_api": "rapp-static-api/1.0 — the repository is the API; pin a commit SHA in a raw URL for an immutable response.",
+            "agent_format": "One file per agent. A __manifest__ dict carries name, version, description, tags, category, requires_env.",
+            "naming": "@publisher/slug — the publisher is a GitHub username.",
+        },
+        # Core recipes, plus whatever the installed extensions contribute.
+        "start_here": [
+            {"goal": "List every agent", "get": "agents.json",
+             "then": "Filter on .category or .tags; each entry carries raw_url."},
+            {"goal": "Read one agent's source", "get": "agents/{publisher}/{slug}.json",
+             "then": "Fetch .raw_url — it is plain Python, meant to be read before it is run."},
+            {"goal": "Find agents for a use case", "get": "categories.json",
+             "then": "Pick a category id, then filter agents.json by it."},
+            {"goal": "Check adoption", "get": "metrics.json",
+             "then": "Read .totals; methodology and caveats are documented on the metrics page."},
+        ] + [r for m in extensions.values() for r in m.get("agent_recipes", [])],
+        "rules_for_agents": [
+            "Read an agent file before executing it. Single-file design exists so this is cheap.",
+            "Never send secrets to this API; it is a public read-only catalog.",
+            "Configuration for an agent comes from the environment via requires_env, never from the file.",
+            "Treat unknown fields as ignorable — documents gain fields without a major version.",
+            "Poll no more than the daily build cadence; nothing here changes faster.",
+        ],
+        "extensions": {p: {"spec": m.get("spec")} for p, m in sorted(extensions.items())},
+        "human_ui": dict({"library": f"{PAGES_BASE}/agents.html",
+                          "api_explorer": f"{PAGES_BASE}/api.html",
+                          "metrics": f"{PAGES_BASE}/metrics.html"},
+                         **{k: v for m in extensions.values()
+                            for k, v in (m.get("human_ui") or {}).items()}),
+        "license": "MIT (© Microsoft Corporation). Mirrored corpus under rapp/ carries upstream licenses.",
+        "disclaimer": f"{PAGES_BASE}/DISCLAIMER.md",
+    })
+
+    cats = sorted({s["category"] for s in slim if s.get("category")})
+    llms = f"""# AIBAST Agents Library (ms-rapp)
+
+> Single-file AI agents for the Microsoft AI stack, the runtime that executes them, and the
+> pinned protocol corpus they implement. Every machine-readable surface is a static JSON
+> file — no key, no quota, CORS-open. {stats.get('total_agents', len(agents))} agents across
+> {len(cats)} industries.
+
+Agents: start at [agent.json]({PAGES_BASE}/api/v1/agent.json) — one fetch gives you what this
+is, the endpoint map, and task recipes. Everything below is a plain fetch away.
+
+## Start here
+- [Agent entry point]({PAGES_BASE}/api/v1/agent.json): what this is, how to use it, task recipes.
+- [API root]({PAGES_BASE}/api/v1/index.json): every endpoint, with base URLs for Pages and raw.
+- [Full text]({PAGES_BASE}/llms-full.txt): this file plus the complete documentation vault inline.
+
+## Catalog
+- [All agents]({PAGES_BASE}/api/v1/agents.json): manifest, size, raw URL and engagement per agent.
+- [Categories]({PAGES_BASE}/api/v1/categories.json): the {len(cats)} industries ({', '.join(cats[:6])}…).
+- [Publishers]({PAGES_BASE}/api/v1/publishers.json): who publishes what.
+- [Registry]({PAGES_BASE}/registry.json): the raw registry the installers read.
+
+## Documentation
+- [Publishing guide]({PAGES_BASE}/docs/PUBLISHING.md): how to contribute an agent.
+- [Static API guide]({PAGES_BASE}/docs/API.md): endpoint reference.
+
+## Protocol and governance
+- [RAPP/1 specification]({PAGES_BASE}/rapp/spec/RAPP1-SPEC.md): the protocol this implements, pinned.
+- [Corpus manifest]({PAGES_BASE}/rapp/MIRROR-MANIFEST.json): provenance and hash for every mirrored document.
+- [Extension pattern]({PAGES_BASE}/rapp/ext/PATTERN.md): how this distribution adds capability.
+
+## Optional
+- [Adoption metrics]({PAGES_BASE}/api/v1/metrics.json): downloads, installs and engagement.
+{chr(10).join(ext_lines)}
+
+## Rules of the road
+- Read an agent before running it. The single-file design exists to make that cheap.
+- This API is read-only and public. Never send it a secret.
+- Unknown fields are ignorable; documents gain fields without a major version bump.
+- Nothing changes faster than the daily build — polling harder gains nothing.
+"""
+    changed += stable_write_text(REPO_ROOT / "llms.txt", llms)
+
+    # llms-full.txt: the same map with the documentation inlined, for a reader
+    # that would rather pay one fetch than forty.
+    parts = [llms, "\n\n---\n\n# Documentation (full text)\n"]
+    vault = REPO_ROOT / "brain"
+    if vault.is_dir():
+        for note in sorted(vault.rglob("*.md")):
+            parts.append(f"\n\n## {note.relative_to(vault).as_posix()[:-3]}\n\n"
+                         + note.read_text(encoding="utf-8"))
+    changed += stable_write_text(REPO_ROOT / "llms-full.txt", "".join(parts))
 
     print(f"[build-api] {len(slim)} agents → api/v1/ ({changed} file(s) changed)")
     return 0

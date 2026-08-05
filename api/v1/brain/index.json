@@ -1,0 +1,299 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-index/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "vault": "brain",
+  "count": 14,
+  "reader": "https://microsoft.github.io/aibast-agents-library/brain.html",
+  "raw_base": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main",
+  "dangling_links": [
+    {
+      "from": "concepts/the-vault",
+      "to": "wikilinks"
+    }
+  ],
+  "notes": [
+    {
+      "slug": "concepts/extensions",
+      "title": "Extensions",
+      "summary": "What this distribution originates, and why it can never block a kernel update.",
+      "tags": [
+        "ms-rapp",
+        "extension",
+        "concept"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/concepts/extensions.md",
+      "bytes": 904,
+      "links": [
+        "how-to/earn-a-badge",
+        "concepts/the-vault",
+        "decisions/why-extensions-are-discovered"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/extensions.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-extensions.json",
+      "backlinks": 5
+    },
+    {
+      "slug": "concepts/kernel-and-distribution",
+      "title": "Kernel and distribution",
+      "summary": "The Linux model \u2014 a fast upstream kernel, a deliberate downstream build.",
+      "tags": [
+        "ms-rapp",
+        "governance",
+        "concept"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/concepts/kernel-and-distribution.md",
+      "bytes": 1027,
+      "links": [
+        "how-to/sync-from-the-kernel",
+        "decisions/why-extensions-are-discovered"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/kernel-and-distribution.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-kernel-and-distribution.json",
+      "backlinks": 5
+    },
+    {
+      "slug": "concepts/the-corpus",
+      "title": "The corpus",
+      "summary": "Pinned, hash-verified mirrors of the protocol documents.",
+      "tags": [
+        "ms-rapp",
+        "governance",
+        "concept"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/concepts/the-corpus.md",
+      "bytes": 1004,
+      "links": [
+        "concepts/kernel-and-distribution",
+        "concepts/extensions"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/the-corpus.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-the-corpus.json",
+      "backlinks": 3
+    },
+    {
+      "slug": "concepts/the-three-tiers",
+      "title": "The three tiers",
+      "summary": "Brainstem, RAPP Cloud, Copilot Studio \u2014 each self-contained.",
+      "tags": [
+        "ms-rapp",
+        "concept",
+        "architecture"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/concepts/the-three-tiers.md",
+      "bytes": 1021,
+      "links": [
+        "how-to/publish-an-agent",
+        "concepts/kernel-and-distribution"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/the-three-tiers.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-the-three-tiers.json",
+      "backlinks": 2
+    },
+    {
+      "slug": "concepts/the-vault",
+      "title": "This vault",
+      "summary": "Markdown notes that are both an Obsidian vault and a published site.",
+      "tags": [
+        "ms-rapp",
+        "extension",
+        "docs"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/concepts/the-vault.md",
+      "bytes": 1000,
+      "links": [
+        "concepts/extensions",
+        "how-to/use-the-static-api"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/the-vault.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-the-vault.json",
+      "backlinks": 2
+    },
+    {
+      "slug": "concepts/what-is-ms-rapp",
+      "title": "What ms-rapp is",
+      "summary": "The enterprise build of RAPP \u2014 same protocol, different cadence.",
+      "tags": [
+        "ms-rapp",
+        "concept"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/concepts/what-is-ms-rapp.md",
+      "bytes": 1053,
+      "links": [
+        "concepts/kernel-and-distribution",
+        "concepts/the-corpus",
+        "concepts/the-three-tiers"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/what-is-ms-rapp.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-what-is-ms-rapp.json",
+      "backlinks": 1
+    },
+    {
+      "slug": "decisions/why-extensions-are-discovered",
+      "title": "Why extensions are discovered",
+      "summary": "If the core knows an extension's name, a kernel sync eventually fights it.",
+      "tags": [
+        "decision",
+        "extension",
+        "governance"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/decisions/why-extensions-are-discovered.md",
+      "bytes": 1289,
+      "links": [
+        "concepts/extensions"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/decisions/why-extensions-are-discovered.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/decisions-why-extensions-are-discovered.json",
+      "backlinks": 3
+    },
+    {
+      "slug": "decisions/why-revocation-retains-the-entry",
+      "title": "Why revocation retains the entry",
+      "summary": "A 404 cannot be told apart from an outage. An explicit \"no\" can.",
+      "tags": [
+        "decision",
+        "certification"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/decisions/why-revocation-retains-the-entry.md",
+      "bytes": 1035,
+      "links": [
+        "how-to/earn-a-badge"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/decisions/why-revocation-retains-the-entry.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/decisions-why-revocation-retains-the-entry.json",
+      "backlinks": 2
+    },
+    {
+      "slug": "decisions/why-static-api",
+      "title": "Why a static API",
+      "summary": "The failure mode of a documentation API is downtime. Static files have none.",
+      "tags": [
+        "decision",
+        "api"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/decisions/why-static-api.md",
+      "bytes": 1059,
+      "links": [
+        "how-to/use-the-static-api"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/decisions/why-static-api.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/decisions-why-static-api.json",
+      "backlinks": 2
+    },
+    {
+      "slug": "how-to/earn-a-badge",
+      "title": "Earn a badge",
+      "summary": "Do the thing, get it approved in public, and it is verifiable by anyone.",
+      "tags": [
+        "how-to",
+        "certification"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/how-to/earn-a-badge.md",
+      "bytes": 982,
+      "links": [
+        "how-to/publish-an-agent",
+        "decisions/why-revocation-retains-the-entry",
+        "concepts/extensions"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/earn-a-badge.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-earn-a-badge.json",
+      "backlinks": 4
+    },
+    {
+      "slug": "how-to/publish-an-agent",
+      "title": "Publish an agent",
+      "summary": "Your GitHub username is your publisher handle. One file, one pull request.",
+      "tags": [
+        "how-to",
+        "publishing"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/how-to/publish-an-agent.md",
+      "bytes": 895,
+      "links": [
+        "how-to/use-the-static-api",
+        "how-to/earn-a-badge"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/publish-an-agent.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-publish-an-agent.json",
+      "backlinks": 3
+    },
+    {
+      "slug": "how-to/sync-from-the-kernel",
+      "title": "Sync from the kernel",
+      "summary": "How an upstream release arrives, and what must move with it.",
+      "tags": [
+        "how-to",
+        "governance"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/how-to/sync-from-the-kernel.md",
+      "bytes": 1008,
+      "links": [
+        "concepts/kernel-and-distribution",
+        "concepts/the-corpus"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/sync-from-the-kernel.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-sync-from-the-kernel.json",
+      "backlinks": 2
+    },
+    {
+      "slug": "how-to/use-the-static-api",
+      "title": "Use the static API",
+      "summary": "Every endpoint is a CDN-cached JSON file. No key, no quota.",
+      "tags": [
+        "how-to",
+        "api"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/how-to/use-the-static-api.md",
+      "bytes": 908,
+      "links": [
+        "decisions/why-static-api"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/use-the-static-api.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-use-the-static-api.json",
+      "backlinks": 4
+    },
+    {
+      "slug": "index",
+      "title": "ms-rapp \u2014 start here",
+      "summary": "The map of this vault. Every other note is one idea, linked from here.",
+      "tags": [
+        "ms-rapp",
+        "moc"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/index.md",
+      "bytes": 1201,
+      "links": [
+        "concepts/what-is-ms-rapp",
+        "concepts/the-three-tiers",
+        "concepts/kernel-and-distribution",
+        "concepts/the-corpus",
+        "concepts/extensions",
+        "how-to/publish-an-agent",
+        "how-to/use-the-static-api",
+        "how-to/earn-a-badge",
+        "how-to/sync-from-the-kernel",
+        "decisions/why-static-api",
+        "decisions/why-revocation-retains-the-entry",
+        "decisions/why-extensions-are-discovered",
+        "concepts/the-vault"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/index.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/index.json",
+      "backlinks": 0
+    }
+  ]
+}

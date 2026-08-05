@@ -1,0 +1,293 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-graph/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "nodes": [
+    {
+      "id": "concepts/extensions",
+      "title": "Extensions",
+      "tags": [
+        "ms-rapp",
+        "extension",
+        "concept"
+      ],
+      "degree": 8
+    },
+    {
+      "id": "concepts/kernel-and-distribution",
+      "title": "Kernel and distribution",
+      "tags": [
+        "ms-rapp",
+        "governance",
+        "concept"
+      ],
+      "degree": 7
+    },
+    {
+      "id": "concepts/the-corpus",
+      "title": "The corpus",
+      "tags": [
+        "ms-rapp",
+        "governance",
+        "concept"
+      ],
+      "degree": 5
+    },
+    {
+      "id": "concepts/the-three-tiers",
+      "title": "The three tiers",
+      "tags": [
+        "ms-rapp",
+        "concept",
+        "architecture"
+      ],
+      "degree": 4
+    },
+    {
+      "id": "concepts/the-vault",
+      "title": "This vault",
+      "tags": [
+        "ms-rapp",
+        "extension",
+        "docs"
+      ],
+      "degree": 4
+    },
+    {
+      "id": "concepts/what-is-ms-rapp",
+      "title": "What ms-rapp is",
+      "tags": [
+        "ms-rapp",
+        "concept"
+      ],
+      "degree": 4
+    },
+    {
+      "id": "decisions/why-extensions-are-discovered",
+      "title": "Why extensions are discovered",
+      "tags": [
+        "decision",
+        "extension",
+        "governance"
+      ],
+      "degree": 4
+    },
+    {
+      "id": "decisions/why-revocation-retains-the-entry",
+      "title": "Why revocation retains the entry",
+      "tags": [
+        "decision",
+        "certification"
+      ],
+      "degree": 3
+    },
+    {
+      "id": "decisions/why-static-api",
+      "title": "Why a static API",
+      "tags": [
+        "decision",
+        "api"
+      ],
+      "degree": 3
+    },
+    {
+      "id": "how-to/earn-a-badge",
+      "title": "Earn a badge",
+      "tags": [
+        "how-to",
+        "certification"
+      ],
+      "degree": 7
+    },
+    {
+      "id": "how-to/publish-an-agent",
+      "title": "Publish an agent",
+      "tags": [
+        "how-to",
+        "publishing"
+      ],
+      "degree": 5
+    },
+    {
+      "id": "how-to/sync-from-the-kernel",
+      "title": "Sync from the kernel",
+      "tags": [
+        "how-to",
+        "governance"
+      ],
+      "degree": 4
+    },
+    {
+      "id": "how-to/use-the-static-api",
+      "title": "Use the static API",
+      "tags": [
+        "how-to",
+        "api"
+      ],
+      "degree": 5
+    },
+    {
+      "id": "index",
+      "title": "ms-rapp \u2014 start here",
+      "tags": [
+        "ms-rapp",
+        "moc"
+      ],
+      "degree": 13
+    }
+  ],
+  "edges": [
+    {
+      "from": "concepts/extensions",
+      "to": "how-to/earn-a-badge"
+    },
+    {
+      "from": "concepts/extensions",
+      "to": "concepts/the-vault"
+    },
+    {
+      "from": "concepts/extensions",
+      "to": "decisions/why-extensions-are-discovered"
+    },
+    {
+      "from": "concepts/kernel-and-distribution",
+      "to": "how-to/sync-from-the-kernel"
+    },
+    {
+      "from": "concepts/kernel-and-distribution",
+      "to": "decisions/why-extensions-are-discovered"
+    },
+    {
+      "from": "concepts/the-corpus",
+      "to": "concepts/kernel-and-distribution"
+    },
+    {
+      "from": "concepts/the-corpus",
+      "to": "concepts/extensions"
+    },
+    {
+      "from": "concepts/the-three-tiers",
+      "to": "how-to/publish-an-agent"
+    },
+    {
+      "from": "concepts/the-three-tiers",
+      "to": "concepts/kernel-and-distribution"
+    },
+    {
+      "from": "concepts/the-vault",
+      "to": "concepts/extensions"
+    },
+    {
+      "from": "concepts/the-vault",
+      "to": "how-to/use-the-static-api"
+    },
+    {
+      "from": "concepts/what-is-ms-rapp",
+      "to": "concepts/kernel-and-distribution"
+    },
+    {
+      "from": "concepts/what-is-ms-rapp",
+      "to": "concepts/the-corpus"
+    },
+    {
+      "from": "concepts/what-is-ms-rapp",
+      "to": "concepts/the-three-tiers"
+    },
+    {
+      "from": "decisions/why-extensions-are-discovered",
+      "to": "concepts/extensions"
+    },
+    {
+      "from": "decisions/why-revocation-retains-the-entry",
+      "to": "how-to/earn-a-badge"
+    },
+    {
+      "from": "decisions/why-static-api",
+      "to": "how-to/use-the-static-api"
+    },
+    {
+      "from": "how-to/earn-a-badge",
+      "to": "how-to/publish-an-agent"
+    },
+    {
+      "from": "how-to/earn-a-badge",
+      "to": "decisions/why-revocation-retains-the-entry"
+    },
+    {
+      "from": "how-to/earn-a-badge",
+      "to": "concepts/extensions"
+    },
+    {
+      "from": "how-to/publish-an-agent",
+      "to": "how-to/use-the-static-api"
+    },
+    {
+      "from": "how-to/publish-an-agent",
+      "to": "how-to/earn-a-badge"
+    },
+    {
+      "from": "how-to/sync-from-the-kernel",
+      "to": "concepts/kernel-and-distribution"
+    },
+    {
+      "from": "how-to/sync-from-the-kernel",
+      "to": "concepts/the-corpus"
+    },
+    {
+      "from": "how-to/use-the-static-api",
+      "to": "decisions/why-static-api"
+    },
+    {
+      "from": "index",
+      "to": "concepts/what-is-ms-rapp"
+    },
+    {
+      "from": "index",
+      "to": "concepts/the-three-tiers"
+    },
+    {
+      "from": "index",
+      "to": "concepts/kernel-and-distribution"
+    },
+    {
+      "from": "index",
+      "to": "concepts/the-corpus"
+    },
+    {
+      "from": "index",
+      "to": "concepts/extensions"
+    },
+    {
+      "from": "index",
+      "to": "how-to/publish-an-agent"
+    },
+    {
+      "from": "index",
+      "to": "how-to/use-the-static-api"
+    },
+    {
+      "from": "index",
+      "to": "how-to/earn-a-badge"
+    },
+    {
+      "from": "index",
+      "to": "how-to/sync-from-the-kernel"
+    },
+    {
+      "from": "index",
+      "to": "decisions/why-static-api"
+    },
+    {
+      "from": "index",
+      "to": "decisions/why-revocation-retains-the-entry"
+    },
+    {
+      "from": "index",
+      "to": "decisions/why-extensions-are-discovered"
+    },
+    {
+      "from": "index",
+      "to": "concepts/the-vault"
+    }
+  ]
+}

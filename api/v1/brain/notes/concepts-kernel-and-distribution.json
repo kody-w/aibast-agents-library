@@ -1,0 +1,32 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "slug": "concepts/kernel-and-distribution",
+  "title": "Kernel and distribution",
+  "summary": "The Linux model \u2014 a fast upstream kernel, a deliberate downstream build.",
+  "tags": [
+    "ms-rapp",
+    "governance",
+    "concept"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/concepts/kernel-and-distribution.md",
+  "bytes": 1027,
+  "links": [
+    "how-to/sync-from-the-kernel",
+    "decisions/why-extensions-are-discovered"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/kernel-and-distribution.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-kernel-and-distribution.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/kernel-and-distribution",
+  "backlinks": [
+    "concepts/the-corpus",
+    "concepts/the-three-tiers",
+    "concepts/what-is-ms-rapp",
+    "how-to/sync-from-the-kernel",
+    "index"
+  ]
+}

@@ -191,6 +191,107 @@ PY"
 check "gallery, metrics and installer link the API explorer" \
   "grep -q 'api.html' index.html && grep -q 'api.html' agents.html && grep -q 'api.html' metrics.html"
 
+echo "== T-AGENTFIRST machine-readable entry points =="
+check "llms.txt follows the convention and links only real targets" "python3 - <<'PY'
+import re, pathlib
+t=open('llms.txt').read()
+assert t.startswith('# '), 'llms.txt starts with an H1 title'
+lines=[l for l in t.splitlines() if l.strip()]
+assert lines[1].startswith('>'), 'a blockquote summary follows the title'
+assert '## ' in t, 'sections are H2'
+links=re.findall(r'\]\((https://microsoft\.github\.io/aibast-agents-library/([^)]+))\)', t)
+assert len(links) >= 10, len(links)
+for full, rel in links:
+    assert pathlib.Path(rel).exists(), f'llms.txt links a missing file: {rel}'
+PY"
+check "agent.json answers what/how in one fetch and stays honest about 404s" "python3 - <<'PY'
+import json, pathlib
+a=json.load(open('api/v1/agent.json'))
+for k in ('what','read_this_first','api_root','start_here','rules_for_agents','conventions','human_ui'):
+    assert a.get(k), k
+assert len(a['start_here'])>=5
+verify=[r for r in a['start_here'] if 'certified' in r['get']][0]
+assert 'not certified' in verify['then'] and 'error' in verify['then']
+assert any('Read an agent file before executing' in r for r in a['rules_for_agents'])
+for url in a['human_ui'].values():
+    rel=url.split('aibast-agents-library/')[1]
+    assert pathlib.Path(rel).exists(), rel
+PY"
+check "llms-full.txt inlines the documentation for a one-fetch reader" "python3 - <<'PY'
+full=open('llms-full.txt').read(); short=open('llms.txt').read()
+assert full.startswith(short.split(chr(10))[0])
+assert len(full) > len(short) * 3
+import pathlib
+for note in pathlib.Path('brain').rglob('*.md'):
+    title=[l for l in note.read_text(encoding='utf-8').splitlines() if l.startswith('# ')]
+    if title: assert title[0][2:] in full, note
+PY"
+check "AGENTS.md tells an agent working on the repo what will fail the build" "python3 - <<'PY'
+d=open('AGENTS.md').read()
+for k in ('BRAINSTEM-LOCK','requires_env','build_api.py','PATTERN.md','pytest'):
+    assert k in d, k
+PY"
+
+echo "== T-BRAIN documentation vault (ms-rapp-brain/1.0) =="
+check "vault notes carry frontmatter and resolve their wikilinks" "python3 - <<'PY'
+import json, re, subprocess, pathlib
+subprocess.run(['python3','scripts/build_api.py'],capture_output=True,timeout=60)
+idx=json.load(open('api/v1/brain/index.json'))
+assert idx['protocol']=='ms-rapp-brain/1.0' and idx['count']>=8
+slugs={n['slug'] for n in idx['notes']}
+for n in idx['notes']:
+    p=pathlib.Path(n['path'])
+    assert p.exists(), n['path']
+    head=p.read_text(encoding='utf-8')
+    assert head.startswith('---'), f'{n[chr(115)+chr(108)+chr(117)+chr(103)]} needs frontmatter'
+    assert n['title'], n['slug']
+# every wikilink either resolves or is reported as dangling — never invented
+dang={(d['from'],d['to']) for d in idx['dangling_links']}
+for n in idx['notes']:
+    for l in n['links']:
+        assert l in slugs, (n['slug'], l)
+assert len(dang) <= 2, sorted(dang)
+PY"
+check "backlinks are computed, and the graph matches the links" "python3 - <<'PY'
+import json, glob
+idx=json.load(open('api/v1/brain/index.json'))
+g=json.load(open('api/v1/brain/graph.json'))
+notes={n['slug']: n for n in idx['notes']}
+assert len(g['nodes'])==len(notes)
+edges={(e['from'],e['to']) for e in g['edges']}
+expected={(s,l) for s,n in notes.items() for l in n['links']}
+assert edges==expected, 'graph must equal the link set'
+for f in glob.glob('api/v1/brain/notes/*.json'):
+    d=json.load(open(f))
+    for b in d['backlinks']:
+        assert d['slug'] in notes[b]['links'], (b, d['slug'])
+    assert 'raw_url' in d and d['protocol']=='ms-rapp-brain/1.0'
+PY"
+check "the API references note bodies rather than duplicating them" "python3 - <<'PY'
+import glob, json, pathlib
+for f in glob.glob('api/v1/brain/notes/*.json'):
+    d=json.load(open(f))
+    assert 'content' not in d and 'body' not in d and 'markdown' not in d
+    assert d['raw_url'].startswith('https://raw.githubusercontent.com/')
+    # metadata only: the endpoint must stay far smaller than the note it points at
+    note_bytes=len(pathlib.Path(d['path']).read_bytes())
+    assert len(json.dumps(d)) < note_bytes + 900, (f, note_bytes)
+PY"
+check "brain.html reads the vault, resolves wikilinks, and offers the Obsidian path" "python3 - <<'PY'
+h=open('brain.html').read()
+for n in ('api/v1/brain/index.json','id=\"tree\"','id=\"graphSvg\"','obsidian://open',
+          'Linked from','function md(','wl dangling','id=\"exportBtn\"'):
+    assert n in h, n
+PY"
+check "vault opens in a notes client with no conversion" "python3 - <<'PY'
+import json, pathlib
+m=json.load(open('api/v1/brain/_manifest.json'))
+assert m['entry']=='index.md' and m['notes']
+for n in m['notes']:
+    assert pathlib.Path('brain')/n['path'], n
+assert (pathlib.Path('brain')/'index.md').exists()
+PY"
+
 echo "== T-EXT-ISOLATION extensions cannot affect the core =="
 check "removing every extension leaves core endpoints byte-identical and the build green" "python3 - <<'PY'
 import hashlib, json, shutil, subprocess, tempfile

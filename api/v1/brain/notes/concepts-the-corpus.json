@@ -1,0 +1,30 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "slug": "concepts/the-corpus",
+  "title": "The corpus",
+  "summary": "Pinned, hash-verified mirrors of the protocol documents.",
+  "tags": [
+    "ms-rapp",
+    "governance",
+    "concept"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/concepts/the-corpus.md",
+  "bytes": 1004,
+  "links": [
+    "concepts/kernel-and-distribution",
+    "concepts/extensions"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/the-corpus.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-the-corpus.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/the-corpus",
+  "backlinks": [
+    "concepts/what-is-ms-rapp",
+    "how-to/sync-from-the-kernel",
+    "index"
+  ]
+}

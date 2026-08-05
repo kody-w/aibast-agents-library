@@ -1,0 +1,29 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "slug": "how-to/publish-an-agent",
+  "title": "Publish an agent",
+  "summary": "Your GitHub username is your publisher handle. One file, one pull request.",
+  "tags": [
+    "how-to",
+    "publishing"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/how-to/publish-an-agent.md",
+  "bytes": 895,
+  "links": [
+    "how-to/use-the-static-api",
+    "how-to/earn-a-badge"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/publish-an-agent.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-publish-an-agent.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#how-to/publish-an-agent",
+  "backlinks": [
+    "concepts/the-three-tiers",
+    "how-to/earn-a-badge",
+    "index"
+  ]
+}

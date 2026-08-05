@@ -1,0 +1,36 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "slug": "index",
+  "title": "ms-rapp \u2014 start here",
+  "summary": "The map of this vault. Every other note is one idea, linked from here.",
+  "tags": [
+    "ms-rapp",
+    "moc"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/index.md",
+  "bytes": 1201,
+  "links": [
+    "concepts/what-is-ms-rapp",
+    "concepts/the-three-tiers",
+    "concepts/kernel-and-distribution",
+    "concepts/the-corpus",
+    "concepts/extensions",
+    "how-to/publish-an-agent",
+    "how-to/use-the-static-api",
+    "how-to/earn-a-badge",
+    "how-to/sync-from-the-kernel",
+    "decisions/why-static-api",
+    "decisions/why-revocation-retains-the-entry",
+    "decisions/why-extensions-are-discovered",
+    "concepts/the-vault"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/index.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/index.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#index",
+  "backlinks": []
+}

@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api/1.0",
-  "generated": "2026-08-05T00:30:51.006910+00:00",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
   "name": "AIBAST Agents Library API",
   "spec": "rapp-static-api/1.0",
   "base_urls": {
@@ -23,6 +23,19 @@
     "ms-rapp-badge/1.0": {
       "spec": "rapp/ext/ms-rapp-badge-1.0/SPEC.md",
       "originated_by": "ms-rapp",
+      "human_ui": {
+        "badges": "https://microsoft.github.io/aibast-agents-library/wall.html"
+      },
+      "llms_lines": [
+        "- [Certification roster]({PAGES}/api/v1/certified.json): verifiable publisher badges, checkable per username."
+      ],
+      "agent_recipes": [
+        {
+          "goal": "Verify a publisher",
+          "get": "certified/{username}.json",
+          "then": "Lowercase the username first. A 404 and certified=false both mean not certified \u2014 neither is an error to retry."
+        }
+      ],
       "endpoints": [
         "badges.json",
         "badges/{badge_id}.json",
@@ -38,6 +51,35 @@
         "certified.json",
         "certified/",
         "wall.json"
+      ]
+    },
+    "ms-rapp-brain/1.0": {
+      "spec": "rapp/ext/ms-rapp-brain-1.0/SPEC.md",
+      "originated_by": "ms-rapp",
+      "reader": "https://microsoft.github.io/aibast-agents-library/brain.html",
+      "human_ui": {
+        "docs": "https://microsoft.github.io/aibast-agents-library/brain.html"
+      },
+      "llms_lines": [
+        "- [Documentation vault index]({PAGES}/api/v1/brain/index.json): every note, with its links and backlinks.",
+        "- [Vault reader]({PAGES}/brain.html): the same notes for humans; the folder also opens in Obsidian."
+      ],
+      "agent_recipes": [
+        {
+          "goal": "Learn how the platform works",
+          "get": "brain/index.json",
+          "then": "Each note carries raw_url; follow .links to traverse the documentation graph, or fetch llms-full.txt for everything inline."
+        }
+      ],
+      "endpoints": [
+        "brain/index.json",
+        "brain/notes/{slug}.json",
+        "brain/tags.json",
+        "brain/graph.json",
+        "brain/_manifest.json"
+      ],
+      "namespaces": [
+        "brain/"
       ]
     }
   }

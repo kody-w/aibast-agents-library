@@ -1,0 +1,114 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-tags/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "count": 12,
+  "tags": [
+    {
+      "tag": "api",
+      "count": 2,
+      "notes": [
+        "decisions/why-static-api",
+        "how-to/use-the-static-api"
+      ]
+    },
+    {
+      "tag": "architecture",
+      "count": 1,
+      "notes": [
+        "concepts/the-three-tiers"
+      ]
+    },
+    {
+      "tag": "certification",
+      "count": 2,
+      "notes": [
+        "decisions/why-revocation-retains-the-entry",
+        "how-to/earn-a-badge"
+      ]
+    },
+    {
+      "tag": "concept",
+      "count": 5,
+      "notes": [
+        "concepts/extensions",
+        "concepts/kernel-and-distribution",
+        "concepts/the-corpus",
+        "concepts/the-three-tiers",
+        "concepts/what-is-ms-rapp"
+      ]
+    },
+    {
+      "tag": "decision",
+      "count": 3,
+      "notes": [
+        "decisions/why-extensions-are-discovered",
+        "decisions/why-revocation-retains-the-entry",
+        "decisions/why-static-api"
+      ]
+    },
+    {
+      "tag": "docs",
+      "count": 1,
+      "notes": [
+        "concepts/the-vault"
+      ]
+    },
+    {
+      "tag": "extension",
+      "count": 3,
+      "notes": [
+        "concepts/extensions",
+        "concepts/the-vault",
+        "decisions/why-extensions-are-discovered"
+      ]
+    },
+    {
+      "tag": "governance",
+      "count": 4,
+      "notes": [
+        "concepts/kernel-and-distribution",
+        "concepts/the-corpus",
+        "decisions/why-extensions-are-discovered",
+        "how-to/sync-from-the-kernel"
+      ]
+    },
+    {
+      "tag": "how-to",
+      "count": 4,
+      "notes": [
+        "how-to/earn-a-badge",
+        "how-to/publish-an-agent",
+        "how-to/sync-from-the-kernel",
+        "how-to/use-the-static-api"
+      ]
+    },
+    {
+      "tag": "moc",
+      "count": 1,
+      "notes": [
+        "index"
+      ]
+    },
+    {
+      "tag": "ms-rapp",
+      "count": 7,
+      "notes": [
+        "concepts/extensions",
+        "concepts/kernel-and-distribution",
+        "concepts/the-corpus",
+        "concepts/the-three-tiers",
+        "concepts/the-vault",
+        "concepts/what-is-ms-rapp",
+        "index"
+      ]
+    },
+    {
+      "tag": "publishing",
+      "count": 1,
+      "notes": [
+        "how-to/publish-an-agent"
+      ]
+    }
+  ]
+}

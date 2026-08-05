@@ -1,0 +1,29 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "slug": "concepts/the-three-tiers",
+  "title": "The three tiers",
+  "summary": "Brainstem, RAPP Cloud, Copilot Studio \u2014 each self-contained.",
+  "tags": [
+    "ms-rapp",
+    "concept",
+    "architecture"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/concepts/the-three-tiers.md",
+  "bytes": 1021,
+  "links": [
+    "how-to/publish-an-agent",
+    "concepts/kernel-and-distribution"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/the-three-tiers.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-the-three-tiers.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/the-three-tiers",
+  "backlinks": [
+    "concepts/what-is-ms-rapp",
+    "index"
+  ]
+}

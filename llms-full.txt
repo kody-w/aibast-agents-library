@@ -1,0 +1,478 @@
+# AIBAST Agents Library (ms-rapp)
+
+> Single-file AI agents for the Microsoft AI stack, the runtime that executes them, and the
+> pinned protocol corpus they implement. Every machine-readable surface is a static JSON
+> file — no key, no quota, CORS-open. 105 agents across
+> 14 industries.
+
+Agents: start at [agent.json](https://microsoft.github.io/aibast-agents-library/api/v1/agent.json) — one fetch gives you what this
+is, the endpoint map, and task recipes. Everything below is a plain fetch away.
+
+## Start here
+- [Agent entry point](https://microsoft.github.io/aibast-agents-library/api/v1/agent.json): what this is, how to use it, task recipes.
+- [API root](https://microsoft.github.io/aibast-agents-library/api/v1/index.json): every endpoint, with base URLs for Pages and raw.
+- [Full text](https://microsoft.github.io/aibast-agents-library/llms-full.txt): this file plus the complete documentation vault inline.
+
+## Catalog
+- [All agents](https://microsoft.github.io/aibast-agents-library/api/v1/agents.json): manifest, size, raw URL and engagement per agent.
+- [Categories](https://microsoft.github.io/aibast-agents-library/api/v1/categories.json): the 14 industries (b2b_sales, b2c_sales, energy, federal_government, financial_services, general…).
+- [Publishers](https://microsoft.github.io/aibast-agents-library/api/v1/publishers.json): who publishes what.
+- [Registry](https://microsoft.github.io/aibast-agents-library/registry.json): the raw registry the installers read.
+
+## Documentation
+- [Publishing guide](https://microsoft.github.io/aibast-agents-library/docs/PUBLISHING.md): how to contribute an agent.
+- [Static API guide](https://microsoft.github.io/aibast-agents-library/docs/API.md): endpoint reference.
+
+## Protocol and governance
+- [RAPP/1 specification](https://microsoft.github.io/aibast-agents-library/rapp/spec/RAPP1-SPEC.md): the protocol this implements, pinned.
+- [Corpus manifest](https://microsoft.github.io/aibast-agents-library/rapp/MIRROR-MANIFEST.json): provenance and hash for every mirrored document.
+- [Extension pattern](https://microsoft.github.io/aibast-agents-library/rapp/ext/PATTERN.md): how this distribution adds capability.
+
+## Optional
+- [Adoption metrics](https://microsoft.github.io/aibast-agents-library/api/v1/metrics.json): downloads, installs and engagement.
+- [Certification roster](https://microsoft.github.io/aibast-agents-library/api/v1/certified.json): verifiable publisher badges, checkable per username.
+- [ms-rapp-badge/1.0 specification](https://microsoft.github.io/aibast-agents-library/rapp/ext/ms-rapp-badge-1.0/SPEC.md): originated by this distribution.
+- [Documentation vault index](https://microsoft.github.io/aibast-agents-library/api/v1/brain/index.json): every note, with its links and backlinks.
+- [Vault reader](https://microsoft.github.io/aibast-agents-library/brain.html): the same notes for humans; the folder also opens in Obsidian.
+- [ms-rapp-brain/1.0 specification](https://microsoft.github.io/aibast-agents-library/rapp/ext/ms-rapp-brain-1.0/SPEC.md): originated by this distribution.
+
+## Rules of the road
+- Read an agent before running it. The single-file design exists to make that cheap.
+- This API is read-only and public. Never send it a secret.
+- Unknown fields are ignorable; documents gain fields without a major version bump.
+- Nothing changes faster than the daily build — polling harder gains nothing.
+
+
+---
+
+# Documentation (full text)
+
+
+## concepts/extensions
+
+---
+title: Extensions
+tags: [ms-rapp, extension, concept]
+summary: What this distribution originates, and why it can never block a kernel update.
+updated: 2026-08-05
+---
+
+# Extensions
+
+Most of `rapp/` is mirrored from the kernel. `rapp/ext/` is the opposite: work
+this distribution **originates** because an enterprise need had no kernel
+answer.
+
+Today:
+
+- **ms-rapp-badge/1.0** — publicly verifiable achievement badges from static
+  files. See [[how-to/earn-a-badge]].
+- **ms-rapp-brain/1.0** — this vault. See [[concepts/the-vault]].
+
+Every extension follows one pattern: it lives in a single directory, declares
+the output namespaces it may write, is **discovered** rather than registered,
+and can be deleted with no edit anywhere else. A gate proves it by removing all
+extensions and checking the core endpoints are byte-identical.
+
+Why that matters: [[decisions/why-extensions-are-discovered]].
+
+
+## concepts/kernel-and-distribution
+
+---
+title: Kernel and distribution
+tags: [ms-rapp, governance, concept]
+summary: The Linux model — a fast upstream kernel, a deliberate downstream build.
+updated: 2026-08-05
+---
+
+# Kernel and distribution
+
+The pattern is the one that has kept Linux healthy: an open-source **kernel**
+that moves fast, and a **distribution** that adopts deliberately.
+
+- The kernel develops on a release train (canary → nightly → alpha → beta →
+  stable) and ratifies RAPP/1 protocol revisions.
+- ms-rapp ships only what is pinned, gated, and verified.
+
+**RAPP/1 is the standard both sides implement.** Neither renames it; the shared
+standard is what keeps them interoperable while their cadences differ.
+
+Changes flow **down** through sync pull requests and **up** as issues and pull
+requests against the kernel — never as a downstream patch that quietly
+diverges. See [[how-to/sync-from-the-kernel]] and
+[[decisions/why-extensions-are-discovered]] for the mechanism that keeps a
+sync from ever colliding with work originated here.
+
+
+## concepts/the-corpus
+
+---
+title: The corpus
+tags: [ms-rapp, governance, concept]
+summary: Pinned, hash-verified mirrors of the protocol documents.
+updated: 2026-08-05
+---
+
+# The corpus
+
+`rapp/` holds byte-exact mirrors of the canonical RAPP documents at **pinned
+commits**: the RAPP/1 specification, the ecosystem specification, the handbook,
+and the companion standards.
+
+Two properties make the mirrors trustworthy rather than decorative:
+
+1. **Every file's provenance is recorded** — upstream repo, pinned commit,
+   SHA-256, license — in the mirror manifest.
+2. **A check verifies all of it**: that local files still match their hashes,
+   that upstream still serves those bytes at the pinned commit, and that the
+   kernel's own authority file still cites the revision we pin. If the kernel
+   re-pins, the check fails with "pin-bump needed" rather than passing quietly.
+
+A pin never moves on its own. Advancing one is a reviewed pull request.
+
+Related: [[concepts/kernel-and-distribution]], [[concepts/extensions]].
+
+
+## concepts/the-three-tiers
+
+---
+title: The three tiers
+tags: [ms-rapp, concept, architecture]
+summary: Brainstem, RAPP Cloud, Copilot Studio — each self-contained.
+updated: 2026-08-05
+---
+
+# The three tiers
+
+The platform layers onto the Microsoft AI stack one tier at a time. Each tier
+is self-contained: you can stop at any of them.
+
+| Tier | What it is | Where it runs |
+|---|---|---|
+| **Brainstem** | The core agent loop: soul, agents, chat | Your machine (or your browser) |
+| **RAPP Cloud** | The same agents with persistent memory and Entra auth | Azure Functions |
+| **Nervous system** | The agents answering in Teams and M365 Copilot | Copilot Studio |
+
+There is also a **tier zero**: the vBrainstem runs the identical engine in the
+browser through Pyodide, so a first look costs nothing to install.
+
+The anatomy metaphor is deliberate — a brainstem keeps you alive, a
+hippocampus remembers, a nervous system extends reach. It also maps to the
+install order.
+
+Related: [[how-to/publish-an-agent]], [[concepts/kernel-and-distribution]].
+
+
+## concepts/the-vault
+
+---
+title: This vault
+tags: [ms-rapp, extension, docs]
+summary: Markdown notes that are both an Obsidian vault and a published site.
+updated: 2026-08-05
+---
+
+# This vault
+
+The documentation you are reading is a folder of plain Markdown notes in
+`brain/`, with YAML frontmatter and `[[wikilinks]]`. That means:
+
+- **Open `brain/` in Obsidian** and it works — no export, no conversion.
+- **Or read it in a browser** at `brain.html`, which fetches the notes from
+  GitHub raw and resolves the same links. No client required.
+
+Indexes, tags, backlinks, and the graph are **derived** by the build, never
+hand-maintained — a hand-written index drifts, and a drifted index is worse
+than none. A note does not know who links to it; the build computes that.
+
+The API endpoints carry metadata and a `raw_url`, never the note body, so
+editing a note makes the change readable without rebuilding anything.
+
+Specification: `ms-rapp-brain/1.0`. Related: [[concepts/extensions]],
+[[how-to/use-the-static-api]].
+
+
+## concepts/what-is-ms-rapp
+
+---
+title: What ms-rapp is
+tags: [ms-rapp, concept]
+summary: The enterprise build of RAPP — same protocol, different cadence.
+updated: 2026-08-05
+---
+
+# What ms-rapp is
+
+RAPP is a platform for building AI agents as **single files**: one `.py` (or
+one `skill.md`), a manifest, no framework. An agent dropped into an agents
+folder self-registers; there is no build step and no plugin registry.
+
+**ms-rapp** is the build of that platform published from
+`microsoft/aibast-agents-library`. It is not a rewrite and not a fork. It
+tracks the open-source kernel and pins what it ships — see
+[[concepts/kernel-and-distribution]].
+
+What that buys a reader of this repository:
+
+- every agent is legible: open the file, read the whole thing
+- every dependency is pinned and hash-verified ([[concepts/the-corpus]])
+- every claim the docs make is checked by a gate, not asserted
+
+What it is not: a supported Microsoft product. It is a public preview provided
+as is — see the repository disclaimer before deploying anything.
+
+Next: [[concepts/the-three-tiers]].
+
+
+## decisions/why-extensions-are-discovered
+
+---
+title: Why extensions are discovered
+tags: [decision, extension, governance]
+summary: If the core knows an extension's name, a kernel sync eventually fights it.
+updated: 2026-08-05
+---
+
+# Why extensions are discovered
+
+**Decision.** The core build discovers `rapp/ext/*/build.py` and names no
+extension anywhere — not in code, not in its docstring.
+
+**Why.** A distribution that adds features by editing shared files slowly
+becomes a fork: each kernel sync turns into a merge negotiation, the cost of
+staying current climbs, and eventually staying current stops happening. The
+fix is not "edit carefully" — care does not survive a busy week. The fix is
+making the intersection **empty by construction**.
+
+So an extension owns its own directory, its own output namespace, and its own
+version line. A kernel sync replaces kernel files; those sets do not overlap.
+
+The pattern follows two rules the kernel already states: capability arrives at
+an established extension point, and unrecognized input is ignored rather than
+refused.
+
+**How we know it holds.** A gate moves every extension aside, rebuilds, and
+requires the core endpoints to be byte-identical — plus proves a broken
+extension cannot fail the build and cannot write outside its namespace.
+
+See [[concepts/extensions]].
+
+
+## decisions/why-revocation-retains-the-entry
+
+---
+title: Why revocation retains the entry
+tags: [decision, certification]
+summary: A 404 cannot be told apart from an outage. An explicit "no" can.
+updated: 2026-08-05
+---
+
+# Why revocation retains the entry
+
+**Decision.** When a badge is withdrawn, the roster entry is kept with
+`status: revoked`. It is never deleted.
+
+**Why.** The obvious implementation deletes the record, so the endpoint 404s.
+But a 404 is indistinguishable from a CDN miss, a rename, or an outage. A
+verification system whose *"no"* cannot be told apart from its *"unreachable"*
+does not verify anything — every consumer has to guess, and consumers guess
+generously.
+
+Retaining the entry makes the negative answer explicit and cacheable. A badge
+already embedded in someone's README flips to *not certified* on the next
+build, with no dead image and no action required from them.
+
+**Consequence.** The roster only grows. That is the intended cost: an audit
+trail you cannot quietly edit.
+
+Specification: `ms-rapp-badge/1.0` §6. See [[how-to/earn-a-badge]].
+
+
+## decisions/why-static-api
+
+---
+title: Why a static API
+tags: [decision, api]
+summary: The failure mode of a documentation API is downtime. Static files have none.
+updated: 2026-08-05
+---
+
+# Why a static API
+
+**Decision.** Serve every machine-readable surface as static JSON generated
+into the repository, rather than running a service.
+
+**Why.** The consumers are installers, agents, dashboards, and READMEs — things
+that must work on someone else's schedule, years from now, without anyone
+paying for uptime. A service adds a dependency whose most likely failure is
+being switched off.
+
+Static files inherit the CDN, are CORS-open, cost nothing, and can be pinned to
+an immutable commit. The repository's history is the audit log.
+
+**What it costs.** Freshness is build-cadence, not real-time; anything needing
+live truth must recompute from the sources the index points at. That trade is
+acceptable for a catalog and unacceptable for, say, a payments API — which is
+why this convention is scoped to catalogs.
+
+Convention: `rapp-static-api/1.0`. See [[how-to/use-the-static-api]].
+
+
+## how-to/earn-a-badge
+
+---
+title: Earn a badge
+tags: [how-to, certification]
+summary: Do the thing, get it approved in public, and it is verifiable by anyone.
+updated: 2026-08-05
+---
+
+# Earn a badge
+
+Badges record something you actually did. Each one names its criteria, and the
+award is approved in a public thread where others can congratulate or contest
+it — not in a private ledger.
+
+1. Do the thing — publish an agent ([[how-to/publish-an-agent]]), run the
+   brainstem end to end, convert an outside skill, and so on.
+2. Open the claim. A maintainer approves it and adds you to the roster.
+3. You are now verifiable: anyone can check your username against the API, and
+   you get a live badge to put in your own README.
+
+The badge reflects your **current** status, because it reads the endpoint every
+time it renders. If an award is withdrawn the badge flips rather than breaking
+— [[decisions/why-revocation-retains-the-entry]].
+
+Specification: `ms-rapp-badge/1.0` ([[concepts/extensions]]).
+
+
+## how-to/publish-an-agent
+
+---
+title: Publish an agent
+tags: [how-to, publishing]
+summary: Your GitHub username is your publisher handle. One file, one pull request.
+updated: 2026-08-05
+---
+
+# Publish an agent
+
+1. **Claim your track.** Open the publisher application. Your GitHub username
+   is your handle; your work lives under `agents/@<your-username>/`.
+2. **Write one file.** A single `.py` extending `BasicAgent` with a
+   `__manifest__`, or a single `skill.md`. No sidecar files.
+3. **Keep secrets out.** Configuration goes through `requires_env`. The file
+   itself must be safe to read in public — a gate enforces this.
+4. **Open a pull request.** CI validates the manifest and runs the contract
+   tests against your agent.
+
+On merge the registry rebuilds, your agent appears in the gallery and the
+[[how-to/use-the-static-api]] endpoints, and a rating thread is seeded for it.
+
+Then: [[how-to/earn-a-badge]].
+
+
+## how-to/sync-from-the-kernel
+
+---
+title: Sync from the kernel
+tags: [how-to, governance]
+summary: How an upstream release arrives, and what must move with it.
+updated: 2026-08-05
+---
+
+# Sync from the kernel
+
+Kernel content in this repository — the brainstem and the installers — is
+**locked**. Its hashes are recorded, and a gate fails on any change, including
+an added file.
+
+That is not a prohibition on updating; it is a requirement that updating be
+deliberate. A sync pull request must, in one commit:
+
+1. bring the kernel release across,
+2. regenerate the lock (the lock moving *is* the record of a sanctioned sync),
+3. pass the full gate suite and the corpus check.
+
+Anything else that touches a locked file is a red gate, and a red gate is the
+system working: fix it upstream, let it ride down.
+
+Worked example: the brainstem ships a registry browser pointed at the kernel's
+own catalog. That is upstream's editorial decision, so it is not patched here.
+
+Related: [[concepts/kernel-and-distribution]], [[concepts/the-corpus]].
+
+
+## how-to/use-the-static-api
+
+---
+title: Use the static API
+tags: [how-to, api]
+summary: Every endpoint is a CDN-cached JSON file. No key, no quota.
+updated: 2026-08-05
+---
+
+# Use the static API
+
+The whole library is queryable as static JSON under `api/v1/`. There is no
+server: the repository *is* the API, so there is nothing to authenticate
+against and nothing to rate-limit.
+
+```bash
+BASE=https://microsoft.github.io/aibast-agents-library/api/v1
+curl -s $BASE/agents.json | jq '.agents[] | select(.category=="healthcare") | .name'
+curl -s $BASE/status.json | jq .
+```
+
+Endpoints are CORS-open on both GitHub Pages and raw, so a browser page can
+call them directly — the API explorer does exactly that, which is why a green
+response there is proof rather than documentation.
+
+Pin what you ship: swap `main` for a commit SHA in a raw URL and the response
+is immutable forever.
+
+Why it is built this way: [[decisions/why-static-api]].
+
+
+## index
+
+---
+title: ms-rapp — start here
+tags: [ms-rapp, moc]
+summary: The map of this vault. Every other note is one idea, linked from here.
+updated: 2026-08-05
+---
+
+# ms-rapp
+
+**ms-rapp** is Microsoft's pinned, gated build of the RAPP platform. It ships
+what the open-source kernel produces, deliberately: pinned to reviewed
+revisions, gated by tests, and documented here.
+
+Start with [[concepts/what-is-ms-rapp]], then follow whichever thread you need.
+
+## The shape of it
+
+- [[concepts/the-three-tiers]] — brainstem, cloud, Copilot Studio
+- [[concepts/kernel-and-distribution]] — who moves fast, who moves deliberately
+- [[concepts/the-corpus]] — what is mirrored, and how it stays honest
+- [[concepts/extensions]] — what this distribution originates
+
+## Doing things
+
+- [[how-to/publish-an-agent]]
+- [[how-to/use-the-static-api]]
+- [[how-to/earn-a-badge]]
+- [[how-to/sync-from-the-kernel]]
+
+## Why things are the way they are
+
+- [[decisions/why-static-api]]
+- [[decisions/why-revocation-retains-the-entry]]
+- [[decisions/why-extensions-are-discovered]]
+
+## This vault
+
+Plain Markdown with wikilinks. Open `brain/` in any notes client, or read it
+at [[concepts/the-vault]] with no client at all.

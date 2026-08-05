@@ -1,0 +1,29 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "slug": "concepts/the-vault",
+  "title": "This vault",
+  "summary": "Markdown notes that are both an Obsidian vault and a published site.",
+  "tags": [
+    "ms-rapp",
+    "extension",
+    "docs"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/concepts/the-vault.md",
+  "bytes": 1000,
+  "links": [
+    "concepts/extensions",
+    "how-to/use-the-static-api"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/the-vault.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-the-vault.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/the-vault",
+  "backlinks": [
+    "concepts/extensions",
+    "index"
+  ]
+}

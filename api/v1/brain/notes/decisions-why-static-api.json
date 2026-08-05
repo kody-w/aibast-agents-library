@@ -1,0 +1,27 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "slug": "decisions/why-static-api",
+  "title": "Why a static API",
+  "summary": "The failure mode of a documentation API is downtime. Static files have none.",
+  "tags": [
+    "decision",
+    "api"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/decisions/why-static-api.md",
+  "bytes": 1059,
+  "links": [
+    "how-to/use-the-static-api"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/decisions/why-static-api.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/decisions-why-static-api.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#decisions/why-static-api",
+  "backlinks": [
+    "how-to/use-the-static-api",
+    "index"
+  ]
+}
