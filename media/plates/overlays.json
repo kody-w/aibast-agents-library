@@ -19,12 +19,12 @@
         "h": 339
       },
       "window": {
-        "start": 5.4,
-        "end": 8.8
+        "start": 2.6,
+        "end": 7.3
       },
       "corner_radius": 28,
-      "fade_seconds": 0.4,
-      "note": "Starts after the base's Microsoft card clears at ~5s. Rect set visually in align.html."
+      "fade_seconds": 0.3,
+      "note": "Matched to the base's OWN title, measured by detecting the lozenge's saturated pink/violet block frame by frame: it fades in 2.6-2.9s, holds, and is gone by 7.3s. Ours must replace theirs, not follow it."
     },
     {
       "id": "overview",
