@@ -66,6 +66,36 @@ def fail(msg: str) -> None:
     warn(msg)
 
 
+# Licenses permissive enough to redistribute a converted single file, provided
+# attribution and the upstream license text travel with it.
+REDISTRIBUTABLE = {"MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "0BSD", "Unlicense"}
+
+
+def resolve_license(repo: str) -> dict:
+    """Ask the origin's own host what the license is. Never trust a
+    hand-written field: it goes stale, and it goes stale in the direction that
+    matters. An unresolvable license is recorded as unknown, which keeps the
+    source index-only."""
+    if not repo:
+        return {"spdx": None, "verified": False, "source": None,
+                "reason": "source declares no repository"}
+    try:
+        doc = fetch_json(f"https://api.github.com/repos/{repo}/license")
+    except Exception as exc:
+        return {"spdx": None, "verified": False, "source": None,
+                "reason": f"license lookup failed ({exc})"}
+    spdx = ((doc.get("license") or {}).get("spdx_id") or "").strip()
+    if not spdx or spdx in ("NOASSERTION", "NONE"):
+        return {"spdx": spdx or None, "verified": False,
+                "source": doc.get("html_url"),
+                "reason": "host could not classify the license"}
+    return {"spdx": spdx, "verified": True,
+            "name": (doc.get("license") or {}).get("name"),
+            "source": doc.get("html_url"),
+            "text_url": doc.get("download_url"),
+            "redistributable": spdx in REDISTRIBUTABLE}
+
+
 def fetch_json(url: str):
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(req, timeout=25) as resp:
@@ -188,7 +218,25 @@ def crawl(only: str | None, dry_run: bool, strict: bool) -> int:
         if not isinstance(items, list) or not items:
             fail(f"{sid}: index had no items; source skipped.")
             continue
+        lic = resolve_license(source.get("repo", ""))
         parsed = adapter(items, source)
+        pages = "https://microsoft.github.io/aibast-agents-library"
+        for rec in parsed:
+            rec["license"] = lic
+            # A converted single file is the point of aggregating at all: an
+            # indexed entry is a link, a converted one is something you can run.
+            slug = rec["ref"].split("/")[-1]
+            local = REPO_ROOT / "skills" / source["namespace"] / f"{slug}.md"
+            if local.is_file():
+                rel = f"skills/{source['namespace']}/{slug}.md"
+                rec["rapp_skill"] = {
+                    "path": rel,
+                    "download_url": f"{pages}/{rel}",
+                    "raw_url": f"https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/{rel}",
+                    "bytes": local.stat().st_size,
+                    "format": "skill.md",
+                    "license": lic.get("spdx"),
+                }
         kept = 0
         for rec in parsed:
             if rec["ref"] in seen_refs:
@@ -204,10 +252,16 @@ def crawl(only: str | None, dry_run: bool, strict: bool) -> int:
             "id": sid,
             "display_name": source.get("display_name", sid),
             "home_url": source.get("home_url", ""),
-            "license": source.get("license", "unverified"),
-            "license_verified": bool(source.get("license_verified", False)),
+            "repo_url": f"https://github.com/{source['repo']}" if source.get("repo") else None,
+            "license": lic,
             "items": kept,
         })
+        if lic["verified"]:
+            print(f"[crawl-skills] {sid}: license resolved as {lic['spdx']} "
+                  f"({'redistributable' if lic.get('redistributable') else 'index-only'})",
+                  file=sys.stderr)
+        else:
+            warn(f"{sid}: license unresolved ({lic['reason']}) — staying index-only")
         warn(f"{sid}: indexed {kept} item(s).")
 
     if strict and FAILURES:
@@ -224,9 +278,7 @@ def crawl(only: str | None, dry_run: bool, strict: bool) -> int:
         "stats": {
             "total": len(records),
             "scored_by_gates": sum(1 for r in records if r["gate_verdict"]),
-            "converted": sum(
-                1 for r in records if (r["gate_verdict"] or {}).get("converted")
-            ),
+            "converted": sum(1 for r in records if r.get("rapp_skill")),
         },
         "skills": records,
     }

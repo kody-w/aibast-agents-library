@@ -278,7 +278,7 @@ footer { margin-top: 64px; border-top: 1px solid var(--border); padding: 28px 0 
     <section id="aggregated">
       <div class="sec-head">
         <h2><span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.3 4 5.2 4 8.5s-1.4 6.2-4 8.5c-2.6-2.3-4-5.2-4-8.5s1.4-6.2 4-8.5z"/></svg></span>Aggregated skills from the wider ecosystem</h2>
-        <p>The library also indexes raw skills from outside repositories — ranked so the best entry for each use case surfaces first. Indexed entries link back to their origin; the strongest are converted into RAPP-compliant <code class="inline">skill.md</code> or <code class="inline">agent.py</code> files, pass the enterprise quality gates, and graduate into the library proper. <a href="https://github.com/microsoft/aibast-agents-library/blob/main/docs/AGGREGATION.md">How aggregation works →</a></p>
+        <p>The library indexes skills from outside repositories and — where the origin's license permits it — converts them into RAPP single files you can download and run. The license is resolved from the origin on every crawl, never asserted here. Converted files carry attribution and the upstream license. <a href="https://github.com/microsoft/aibast-agents-library/blob/main/docs/AGGREGATION.md">How aggregation works →</a></p>
       </div>
       <div id="aggGroups"><div class="empty">Loading aggregated index…</div></div>
     </section>
@@ -592,9 +592,11 @@ function renderAggregated(snap) {
   (snap.sources || []).forEach(function (s) { srcMeta[s.id] = s; });
   host.innerHTML = Object.keys(bySource).map(function (sid) {
     var meta = srcMeta[sid] || { display_name: sid };
-    var lic = meta.license_verified
-      ? '<span class="lic ok">' + esc(meta.license || "licensed") + "</span>"
-      : '<span class="lic">index-only · license unverified</span>';
+    var L = meta.license || {};
+    var lic = L.verified
+      ? '<span class="lic ok">' + esc(L.spdx) + (L.redistributable ? " · redistributable" : " · index-only") + "</span>"
+      : '<span class="lic">index-only · license unresolved</span>';
+    if (L.source) lic = '<a href="' + esc(L.source) + '" target="_blank" rel="noopener" style="text-decoration:none">' + lic + "</a>";
     var head = '<div class="agg-src">' + esc(meta.display_name) + " " + lic +
       (meta.home_url ? ' <a href="' + esc(meta.home_url) + '" target="_blank" rel="noopener" style="font-weight:600;font-size:12.5px">origin ↗</a>' : "") +
       ' <small style="color:var(--text-faint);font-weight:500">' + bySource[sid].length + " skills indexed</small></div>";
@@ -611,13 +613,22 @@ function renderAggregated(snap) {
           if (v.gates[g] && v.gates[g].passed) meta2 += '<span class="sig">' + esc(g) + " ✓</span>";
         });
       }
+      var links = "";
+      if (s.rapp_skill) {
+        // The whole reason to aggregate: a single file you can actually run.
+        links += '<a href="' + esc(s.rapp_skill.download_url) + '" download>⬇ Download skill.md</a>' +
+                 '<a data-view="' + esc(s.rapp_skill.path) + '" data-name="' + esc(s.display_name) + '">View</a>';
+        meta2 += '<span class="sig">RAPP skill.md · ' + Math.round(s.rapp_skill.bytes / 1024) + " KB</span>";
+      }
+      links += '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">Origin</a>';
       return '<div class="card"><h4>' + esc(s.display_name) + '</h4>' +
         '<p class="desc">' + esc(s.description || "") + "</p>" +
         '<div class="meta"><span>' + esc(s.ref) + "</span>" + meta2 + "</div>" +
-        '<div class="links"><a href="' + esc(s.url) + '" target="_blank" rel="noopener">Open at origin</a></div></div>';
+        '<div class="links">' + links + "</div></div>";
     }).join("");
     return head + '<div class="grid">' + cards + "</div>";
   }).join("");
+  wireViewers(document.getElementById("aggGroups"));
 }
 
 /* ---------- load ---------- */

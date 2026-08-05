@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-badge/1.0",
   "schema": "aibast-badge/1.0",
-  "generated": "2026-08-05T14:10:26.793571+00:00",
+  "generated": "2026-08-05T14:18:33.941292+00:00",
   "id": "skill-converter",
   "name": "Skill Converter",
   "summary": "Converted an outside skill into a RAPP-compliant agent or skill.",

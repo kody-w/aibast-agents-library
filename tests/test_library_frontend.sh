@@ -95,6 +95,36 @@ assert not m.is_agent_title('@bad/UPPER Case')
 PY"
 
 echo "== T3 crawl_skills.py (aggregator, index-only) =="
+check "the license is resolved from the origin, never asserted locally" "python3 - <<'PY'
+import json
+cfg=json.load(open('sources.json'))
+for s in cfg['sources']:
+    assert 'license' not in s, 'a hand-written license goes stale — resolve it'
+    assert s.get('repo'), 'a source must name its repo so the license can be resolved'
+agg=json.load(open('state/aggregated.json'))
+lic=agg['sources'][0]['license']
+assert lic['verified'] and lic['spdx'], lic
+assert lic['source'] and lic['source'].startswith('https://github.com/'), 'record where the answer came from'
+PY"
+check "eligible skills convert to a downloadable RAPP single file with attribution" "python3 - <<'PY'
+import json, pathlib, re
+agg=json.load(open('state/aggregated.json'))
+lic=agg['sources'][0]['license']
+converted=[s for s in agg['skills'] if s.get('rapp_skill')]
+if lic.get('redistributable'):
+    assert len(converted) >= 10, f'redistributable source but only {len(converted)} converted'
+else:
+    assert not converted, 'a non-redistributable source must stay index-only'
+for s in converted[:5]:
+    p=pathlib.Path(s['rapp_skill']['path'])
+    assert p.exists(), p
+    body=p.read_text(encoding='utf-8')
+    assert body.startswith('---'), 'a RAPP skill carries frontmatter'
+    for field in ('schema: rapp-skill/1.0','source_url:','source_license:','converted_from:'):
+        assert field in body, (p, field)
+    assert 'redistributed under' in body and 'attribution' in body, 'attribution must travel with it'
+    assert 'deterministic layer' in body, 'the RAPP layer is what we add'
+PY"
 check "dry-run indexes cat-agent-skills, refs normalized, no content mirrored" "python3 - <<'PY'
 import json,subprocess
 p=subprocess.run(['python3','scripts/crawl_skills.py','--dry-run','--only','cat-agent-skills'],
