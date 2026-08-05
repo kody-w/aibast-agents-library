@@ -54,6 +54,18 @@ model. Sentinel emits their work as a **packet** rather than calling anything
 itself, so which model reviewed your agent is recorded on the finding instead
 of assumed.
 
+## Dormant until a model is attached
+
+A Sentinel run with no model configured produces **evidence and no verdicts**.
+The deterministic residents measure; nothing judges. That is deliberate: a
+review pipeline that can approve something with no intelligence in the loop is
+an automated yes, which is worth nothing to whoever relies on it.
+
+Waking a run is a separate, attributed act — `scripts/wake_sentinel.py` injects
+a model, and the answer is recorded with the model that produced it. You can
+run the identical thing locally against your own model; nothing about the
+review depends on our infrastructure.
+
 ## Verdicts
 
 `approved` · `changes-requested` · `advisory-only` · `framework`

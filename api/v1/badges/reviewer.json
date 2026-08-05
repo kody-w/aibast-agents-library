@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-badge/1.0",
   "schema": "aibast-badge/1.0",
-  "generated": "2026-08-05T15:01:24.925860+00:00",
+  "generated": "2026-08-05T16:20:27.280873+00:00",
   "id": "reviewer",
   "name": "Reviewer",
   "summary": "Reviews submissions from other publishers.",

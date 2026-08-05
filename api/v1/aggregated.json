@@ -60,7 +60,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 415
+      "front_page_score": 415,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/chart_builder.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/chart_builder.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/chart_builder.py",
+        "bytes": 9004,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/chart_builder.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/doc_format_converter",
@@ -101,7 +110,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 337
+      "front_page_score": 337,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/doc_format_converter.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/doc_format_converter.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/doc_format_converter.py",
+        "bytes": 11341,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/doc_format_converter.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/agent_harness_explorer",
@@ -142,7 +160,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 322
+      "front_page_score": 322,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/agent_harness_explorer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/agent_harness_explorer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/agent_harness_explorer.py",
+        "bytes": 12521,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/agent_harness_explorer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/redlining_content",
@@ -179,7 +206,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 221
+      "front_page_score": 221,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/redlining_content.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/redlining_content.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/redlining_content.py",
+        "bytes": 10920,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/redlining_content.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/ai_usecase_assessment",
@@ -221,7 +257,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 193
+      "front_page_score": 193,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/ai_usecase_assessment.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/ai_usecase_assessment.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/ai_usecase_assessment.py",
+        "bytes": 26645,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/ai_usecase_assessment.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/knowledge_source_router",
@@ -261,7 +306,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 160
+      "front_page_score": 160,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/knowledge_source_router.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/knowledge_source_router.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/knowledge_source_router.py",
+        "bytes": 7602,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/knowledge_source_router.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/rich_html_presentation",
@@ -300,7 +354,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 150
+      "front_page_score": 150,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/rich_html_presentation.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/rich_html_presentation.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/rich_html_presentation.py",
+        "bytes": 19518,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/rich_html_presentation.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/iterative_file_editing",
@@ -340,7 +403,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 140
+      "front_page_score": 140,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/iterative_file_editing.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/iterative_file_editing.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/iterative_file_editing.py",
+        "bytes": 7806,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/iterative_file_editing.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/work_brief",
@@ -382,7 +454,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 140
+      "front_page_score": 140,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/work_brief.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/work_brief.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/work_brief.py",
+        "bytes": 19327,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/work_brief.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/conditional_chat_reminder",
@@ -422,7 +503,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 120
+      "front_page_score": 120,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/conditional_chat_reminder.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/conditional_chat_reminder.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/conditional_chat_reminder.py",
+        "bytes": 12657,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/conditional_chat_reminder.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/scrollytelling_data",
@@ -460,7 +550,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 120
+      "front_page_score": 120,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/scrollytelling_data.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/scrollytelling_data.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/scrollytelling_data.py",
+        "bytes": 46139,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/scrollytelling_data.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/brand_template_enforcer",
@@ -500,7 +599,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 118
+      "front_page_score": 118,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/brand_template_enforcer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/brand_template_enforcer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/brand_template_enforcer.py",
+        "bytes": 18456,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/brand_template_enforcer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/powerpoint_deck_designer",
@@ -537,7 +645,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 101
+      "front_page_score": 101,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/powerpoint_deck_designer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/powerpoint_deck_designer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/powerpoint_deck_designer.py",
+        "bytes": 10853,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/powerpoint_deck_designer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/skill_authoring_coach",
@@ -575,7 +692,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 101
+      "front_page_score": 101,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/skill_authoring_coach.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/skill_authoring_coach.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/skill_authoring_coach.py",
+        "bytes": 9871,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/skill_authoring_coach.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/eu_greenwashing_analysis",
@@ -615,7 +741,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 100
+      "front_page_score": 100,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/eu_greenwashing_analysis.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/eu_greenwashing_analysis.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/eu_greenwashing_analysis.py",
+        "bytes": 11404,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/eu_greenwashing_analysis.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/linkedin_content_writer",
@@ -653,7 +788,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 100
+      "front_page_score": 100,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/linkedin_content_writer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/linkedin_content_writer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/linkedin_content_writer.py",
+        "bytes": 22097,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/linkedin_content_writer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/campaign_deck_builder",
@@ -692,7 +836,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 40
+      "front_page_score": 40,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/campaign_deck_builder.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/campaign_deck_builder.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/campaign_deck_builder.py",
+        "bytes": 9351,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/campaign_deck_builder.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/classic_text_adventure",
@@ -729,7 +882,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 20
+      "front_page_score": 20,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/classic_text_adventure.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/classic_text_adventure.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/classic_text_adventure.py",
+        "bytes": 11216,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/classic_text_adventure.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/commenting_content",
@@ -765,7 +927,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 20
+      "front_page_score": 20,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/commenting_content.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/commenting_content.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/commenting_content.py",
+        "bytes": 8325,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/commenting_content.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/enterprise_agent_design_authority",
@@ -805,7 +976,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 20
+      "front_page_score": 20,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/enterprise_agent_design_authority.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/enterprise_agent_design_authority.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/enterprise_agent_design_authority.py",
+        "bytes": 10853,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/enterprise_agent_design_authority.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/generating_podcast_script",
@@ -845,7 +1025,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 20
+      "front_page_score": 20,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/generating_podcast_script.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/generating_podcast_script.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/generating_podcast_script.py",
+        "bytes": 16685,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/generating_podcast_script.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/lookup_dataverse_table",
@@ -884,7 +1073,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 20
+      "front_page_score": 20,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/lookup_dataverse_table.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/lookup_dataverse_table.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/lookup_dataverse_table.py",
+        "bytes": 11248,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/lookup_dataverse_table.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/mct_excellence_iq",
@@ -928,7 +1126,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 20
+      "front_page_score": 20,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/mct_excellence_iq.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/mct_excellence_iq.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/mct_excellence_iq.py",
+        "bytes": 13464,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/mct_excellence_iq.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/spend_more_time_with_friends_and_family",
@@ -966,7 +1173,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 20
+      "front_page_score": 20,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/spend_more_time_with_friends_and_family.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/spend_more_time_with_friends_and_family.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/spend_more_time_with_friends_and_family.py",
+        "bytes": 13663,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/spend_more_time_with_friends_and_family.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/wikipedia_human_style_writing",
@@ -1007,7 +1223,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 20
+      "front_page_score": 20,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/wikipedia_human_style_writing.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/wikipedia_human_style_writing.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/wikipedia_human_style_writing.py",
+        "bytes": 10374,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/wikipedia_human_style_writing.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/accessibility_pass",
@@ -1046,7 +1271,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/accessibility_pass.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/accessibility_pass.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/accessibility_pass.py",
+        "bytes": 11735,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/accessibility_pass.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/acroform_writer",
@@ -1084,7 +1318,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/acroform_writer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/acroform_writer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/acroform_writer.py",
+        "bytes": 12545,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/acroform_writer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/agent_evaluation_designer",
@@ -1122,7 +1365,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/agent_evaluation_designer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/agent_evaluation_designer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/agent_evaluation_designer.py",
+        "bytes": 12474,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/agent_evaluation_designer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/ai_demo_assistant",
@@ -1161,7 +1413,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/ai_demo_assistant.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/ai_demo_assistant.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/ai_demo_assistant.py",
+        "bytes": 30415,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/ai_demo_assistant.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/ai_first_process_redesign",
@@ -1197,7 +1458,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/ai_first_process_redesign.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/ai_first_process_redesign.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/ai_first_process_redesign.py",
+        "bytes": 16516,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/ai_first_process_redesign.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/anonymised_case_study_writer",
@@ -1236,7 +1506,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/anonymised_case_study_writer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/anonymised_case_study_writer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/anonymised_case_study_writer.py",
+        "bytes": 10338,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/anonymised_case_study_writer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/awaiting_reply",
@@ -1276,7 +1555,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/awaiting_reply.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/awaiting_reply.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/awaiting_reply.py",
+        "bytes": 13809,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/awaiting_reply.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/b2b_outreach_suite",
@@ -1315,7 +1603,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/b2b_outreach_suite.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/b2b_outreach_suite.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/b2b_outreach_suite.py",
+        "bytes": 10629,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/b2b_outreach_suite.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/blog_content_auditor",
@@ -1354,7 +1651,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/blog_content_auditor.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/blog_content_auditor.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/blog_content_auditor.py",
+        "bytes": 9576,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/blog_content_auditor.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/blog_post_structure_pass",
@@ -1393,7 +1699,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/blog_post_structure_pass.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/blog_post_structure_pass.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/blog_post_structure_pass.py",
+        "bytes": 9076,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/blog_post_structure_pass.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/brand_voice_pass",
@@ -1431,7 +1746,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/brand_voice_pass.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/brand_voice_pass.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/brand_voice_pass.py",
+        "bytes": 9794,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/brand_voice_pass.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/business_os",
@@ -1471,7 +1795,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/business_os.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/business_os.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/business_os.py",
+        "bytes": 13617,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/business_os.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/call_for_speakers_digest",
@@ -1508,7 +1841,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/call_for_speakers_digest.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/call_for_speakers_digest.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/call_for_speakers_digest.py",
+        "bytes": 21732,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/call_for_speakers_digest.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/clt_hr_assistant",
@@ -1551,7 +1893,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/clt_hr_assistant.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/clt_hr_assistant.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/clt_hr_assistant.py",
+        "bytes": 10464,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/clt_hr_assistant.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/competitive_battlecard_builder",
@@ -1587,7 +1938,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/competitive_battlecard_builder.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/competitive_battlecard_builder.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/competitive_battlecard_builder.py",
+        "bytes": 25900,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/competitive_battlecard_builder.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/conference_session_abstract_pack",
@@ -1626,7 +1986,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/conference_session_abstract_pack.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/conference_session_abstract_pack.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/conference_session_abstract_pack.py",
+        "bytes": 9526,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/conference_session_abstract_pack.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/content_quality_auditor",
@@ -1665,7 +2034,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/content_quality_auditor.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/content_quality_auditor.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/content_quality_auditor.py",
+        "bytes": 10455,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/content_quality_auditor.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/copilot_agents_news_scout",
@@ -1705,7 +2083,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/copilot_agents_news_scout.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/copilot_agents_news_scout.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/copilot_agents_news_scout.py",
+        "bytes": 9379,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/copilot_agents_news_scout.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/copilot_studio_test_planner",
@@ -1742,7 +2129,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/copilot_studio_test_planner.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/copilot_studio_test_planner.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/copilot_studio_test_planner.py",
+        "bytes": 8609,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/copilot_studio_test_planner.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/copilot_studio_topic_blueprint",
@@ -1782,7 +2178,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/copilot_studio_topic_blueprint.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/copilot_studio_topic_blueprint.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/copilot_studio_topic_blueprint.py",
+        "bytes": 10375,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/copilot_studio_topic_blueprint.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/exam_prep_learning_plan_builder",
@@ -1818,7 +2223,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/exam_prep_learning_plan_builder.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/exam_prep_learning_plan_builder.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/exam_prep_learning_plan_builder.py",
+        "bytes": 17543,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/exam_prep_learning_plan_builder.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/gantt_chart_generator",
@@ -1857,7 +2271,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/gantt_chart_generator.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/gantt_chart_generator.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/gantt_chart_generator.py",
+        "bytes": 8975,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/gantt_chart_generator.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/global_greenwashing_claim_auditor",
@@ -1900,7 +2323,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/global_greenwashing_claim_auditor.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/global_greenwashing_claim_auditor.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/global_greenwashing_claim_auditor.py",
+        "bytes": 12016,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/global_greenwashing_claim_auditor.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/grab_my_files",
@@ -1938,7 +2370,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/grab_my_files.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/grab_my_files.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/grab_my_files.py",
+        "bytes": 9190,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/grab_my_files.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/idea_refiner",
@@ -1976,7 +2417,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/idea_refiner.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/idea_refiner.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/idea_refiner.py",
+        "bytes": 7357,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/idea_refiner.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/institutional_knowledge",
@@ -2016,7 +2466,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/institutional_knowledge.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/institutional_knowledge.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/institutional_knowledge.py",
+        "bytes": 32285,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/institutional_knowledge.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/knowledge_corpus_curator",
@@ -2056,7 +2515,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/knowledge_corpus_curator.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/knowledge_corpus_curator.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/knowledge_corpus_curator.py",
+        "bytes": 22987,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/knowledge_corpus_curator.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/lab_column_mapper",
@@ -2099,7 +2567,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/lab_column_mapper.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/lab_column_mapper.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/lab_column_mapper.py",
+        "bytes": 13404,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/lab_column_mapper.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/linkedin_content_system",
@@ -2137,7 +2614,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/linkedin_content_system.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/linkedin_content_system.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/linkedin_content_system.py",
+        "bytes": 9400,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/linkedin_content_system.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/meeting_analyzer",
@@ -2177,7 +2663,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/meeting_analyzer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/meeting_analyzer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/meeting_analyzer.py",
+        "bytes": 10423,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/meeting_analyzer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/microsoft_ai_platform_advisor",
@@ -2220,7 +2715,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/microsoft_ai_platform_advisor.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/microsoft_ai_platform_advisor.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/microsoft_ai_platform_advisor.py",
+        "bytes": 21067,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/microsoft_ai_platform_advisor.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/monte_carlo_analysis",
@@ -2261,7 +2765,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/monte_carlo_analysis.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/monte_carlo_analysis.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/monte_carlo_analysis.py",
+        "bytes": 11892,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/monte_carlo_analysis.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/own_voice_builder",
@@ -2300,7 +2813,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/own_voice_builder.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/own_voice_builder.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/own_voice_builder.py",
+        "bytes": 13804,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/own_voice_builder.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/pattern_radar",
@@ -2339,7 +2861,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/pattern_radar.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/pattern_radar.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/pattern_radar.py",
+        "bytes": 11889,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/pattern_radar.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/pattern_radar_automation",
@@ -2378,7 +2909,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/pattern_radar_automation.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/pattern_radar_automation.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/pattern_radar_automation.py",
+        "bytes": 13155,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/pattern_radar_automation.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/pdf_table_data_conversion",
@@ -2418,7 +2958,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/pdf_table_data_conversion.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/pdf_table_data_conversion.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/pdf_table_data_conversion.py",
+        "bytes": 14680,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/pdf_table_data_conversion.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/persona_reaction_panel",
@@ -2456,7 +3005,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/persona_reaction_panel.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/persona_reaction_panel.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/persona_reaction_panel.py",
+        "bytes": 11794,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/persona_reaction_panel.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/phi_deidentifier",
@@ -2497,7 +3055,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/phi_deidentifier.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/phi_deidentifier.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/phi_deidentifier.py",
+        "bytes": 15463,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/phi_deidentifier.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/pov_line_generator",
@@ -2535,7 +3102,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/pov_line_generator.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/pov_line_generator.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/pov_line_generator.py",
+        "bytes": 8515,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/pov_line_generator.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/power_automate_desktop_assessment",
@@ -2573,7 +3149,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/power_automate_desktop_assessment.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/power_automate_desktop_assessment.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/power_automate_desktop_assessment.py",
+        "bytes": 57483,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/power_automate_desktop_assessment.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/power_automate_documentation",
@@ -2610,7 +3195,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/power_automate_documentation.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/power_automate_documentation.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/power_automate_documentation.py",
+        "bytes": 22153,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/power_automate_documentation.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/power_bi_model_review",
@@ -2649,7 +3243,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/power_bi_model_review.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/power_bi_model_review.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/power_bi_model_review.py",
+        "bytes": 11250,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/power_bi_model_review.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/presentation_talk_track_builder",
@@ -2687,7 +3290,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/presentation_talk_track_builder.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/presentation_talk_track_builder.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/presentation_talk_track_builder.py",
+        "bytes": 18272,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/presentation_talk_track_builder.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/process_sop_architect",
@@ -2725,7 +3337,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/process_sop_architect.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/process_sop_architect.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/process_sop_architect.py",
+        "bytes": 11247,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/process_sop_architect.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/regulation_monitor",
@@ -2763,7 +3384,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/regulation_monitor.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/regulation_monitor.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/regulation_monitor.py",
+        "bytes": 22723,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/regulation_monitor.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/sharepoint_list_formatter",
@@ -2801,7 +3431,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/sharepoint_list_formatter.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/sharepoint_list_formatter.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/sharepoint_list_formatter.py",
+        "bytes": 12632,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/sharepoint_list_formatter.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/sharepoint_list_insight_report_generator",
@@ -2839,7 +3478,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/sharepoint_list_insight_report_generator.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/sharepoint_list_insight_report_generator.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/sharepoint_list_insight_report_generator.py",
+        "bytes": 15675,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/sharepoint_list_insight_report_generator.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/style_analyzer",
@@ -2878,7 +3526,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/style_analyzer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/style_analyzer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/style_analyzer.py",
+        "bytes": 10539,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/style_analyzer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/tool_tracer",
@@ -2918,7 +3575,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/tool_tracer.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/tool_tracer.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/tool_tracer.py",
+        "bytes": 13345,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/tool_tracer.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/vacation_urgent_forwarder",
@@ -2955,7 +3621,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/vacation_urgent_forwarder.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/vacation_urgent_forwarder.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/vacation_urgent_forwarder.py",
+        "bytes": 19183,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/vacation_urgent_forwarder.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/vendor_contract_risk_review",
@@ -2994,7 +3669,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/vendor_contract_risk_review.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/vendor_contract_risk_review.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/vendor_contract_risk_review.py",
+        "bytes": 10394,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/vendor_contract_risk_review.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/what_to_use_when",
@@ -3031,7 +3715,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/what_to_use_when.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/what_to_use_when.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/what_to_use_when.py",
+        "bytes": 17741,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/what_to_use_when.md",
+        "derivable_in_browser": true
+      }
     },
     {
       "ref": "@cat-agent-skills/whiteboard_to_infographic",
@@ -3071,7 +3764,16 @@
         "license": "MIT"
       },
       "gate_verdict": null,
-      "front_page_score": 0
+      "front_page_score": 0,
+      "rapp_agent": {
+        "path": "skills/@cat-agent-skills/whiteboard_to_infographic.py",
+        "download_url": "https://microsoft.github.io/aibast-agents-library/skills/@cat-agent-skills/whiteboard_to_infographic.py",
+        "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/@cat-agent-skills/whiteboard_to_infographic.py",
+        "bytes": 14785,
+        "format": "agent.py",
+        "derived_from": "skills/@cat-agent-skills/whiteboard_to_infographic.md",
+        "derivable_in_browser": true
+      }
     }
   ]
 }

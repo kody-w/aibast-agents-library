@@ -287,7 +287,27 @@ def main() -> int:
     if metrics is not None:
         changed += stable_write(API / "metrics.json", dict(metrics))
     if aggregated is not None:
-        changed += stable_write(API / "aggregated.json", dict(aggregated))
+        # Publish BOTH projections of each converted skill. A consumer that
+        # wants instructions takes the .md; one that wants a registrable tool
+        # takes the .py. They are derived from each other, so neither is the
+        # "real" one — see docs/MIRRORING.md.
+        agg_doc = dict(aggregated)
+        for sk in agg_doc.get("skills", []):
+            rapp = sk.get("rapp_skill")
+            if not rapp or not rapp.get("path"):
+                continue
+            mirror = Path(rapp["path"]).with_suffix(".py")
+            if (REPO_ROOT / mirror).is_file():
+                sk["rapp_agent"] = {
+                    "path": mirror.as_posix(),
+                    "download_url": f"{PAGES_BASE}/{mirror.as_posix()}",
+                    "raw_url": f"{RAW_BASE}/{mirror.as_posix()}",
+                    "bytes": (REPO_ROOT / mirror).stat().st_size,
+                    "format": "agent.py",
+                    "derived_from": rapp["path"],
+                    "derivable_in_browser": True,
+                }
+        changed += stable_write(API / "aggregated.json", agg_doc)
 
     # Solution one-pagers: the business framing, its demo, and its engagement.
     onepagers = load("data/onepagers.json", None)

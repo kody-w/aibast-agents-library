@@ -173,6 +173,30 @@ def main() -> int:
             if "my-walkthrough" not in name:
                 failures.append(f"remix download had unexpected name {name}")
 
+        # ---- the mirroring, proved in the browser ----
+        # The page derives agent.py from skill.md client-side. Compare that
+        # output against the committed Python export: two independent
+        # implementations, or the "one contract, two formats" claim is empty.
+        import pathlib as _pl
+        md_files = sorted(_pl.Path("skills/@cat-agent-skills").glob("*.md"))
+        drift = []
+        for sk in md_files:
+            js = page.evaluate("(t) => RAPPMirror.exportAgent(t)",
+                               sk.read_text(encoding="utf-8"))
+            if js != sk.with_suffix(".py").read_text(encoding="utf-8"):
+                drift.append(sk.stem)
+        if drift:
+            failures.append(f"browser export differs from committed agent.py: {drift[:3]}")
+        mirrored = len(md_files)
+
+        if not page.locator("#dlAgentPy").count():
+            failures.append("no agent.py download offered beside skill.md")
+        else:
+            with page.expect_download(timeout=10000) as pyd:
+                page.locator("#dlAgentPy").click()
+            if not pyd.value.suggested_filename.endswith(".py"):
+                failures.append("agent.py download had the wrong extension")
+
         browser.close()
     server.shutdown()
 
@@ -180,7 +204,8 @@ def main() -> int:
         print("FAIL:\n  " + "\n  ".join(failures))
         return 1
     print(f"headless OK: {cards} cards, search+chip filter, viewer, {kpis} KPIs, "
-          f"{sol_cards} solutions, one-pager both modes with separated review panels")
+          f"{sol_cards} solutions, one-pager all modes, "
+          f"{mirrored} skill.md/agent.py pairs re-derived in-browser and matching")
     return 0
 
 

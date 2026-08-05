@@ -78,6 +78,12 @@ ul.vd li:before {
   font-size:12.5px; padding:4px 10px; color:var(--text-dim); white-space:nowrap;
 }
 .chip.mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; }
+.mirror {
+  margin-top:20px; padding:13px 16px; border:1px solid var(--border);
+  border-left:3px solid var(--machine); border-radius:8px; background:var(--machine-soft);
+  font-size:13px; color:var(--text-dim); line-height:1.6;
+}
+.mirror code { font-family:ui-monospace,Menlo,monospace; font-size:12px; }
 .foot-note {
   margin-top:22px; padding-top:14px; border-top:1px solid var(--border);
   font-size:12px; color:var(--text-faint);
@@ -223,6 +229,7 @@ footer { border-top:1px solid var(--border); margin-top:40px; padding:24px 0 40p
   </div>
 </footer>
 
+<script src="mirror.js"></script>
 <script>
 var OWNER_REPO = "microsoft/aibast-agents-library";
 var DISCUSSIONS = "https://github.com/" + OWNER_REPO + "/discussions";
@@ -470,6 +477,10 @@ function renderSolution(sol) {
  * ------------------------------------------------------------------------- */
 var STORYBOARD = null;
 
+function global_mirror_ok() {
+  return typeof RAPPMirror !== "undefined" && !!RAPPMirror.exportAgent;
+}
+
 function storyboardHTML(doc) {
   if (!doc) return "";
   var acts = doc.scenes.map(function (s) {
@@ -589,10 +600,20 @@ function renderSkill(skill, review, body) {
           ? '<a class="btn primary" href="' + esc(rapp.download_url) + '" download ' +
             'onclick="track(\'library.agent.deployed\',\'' + esc(ref) + '\')">Download skill.md</a>'
           : "") +
+        (body ? '<button class="btn primary" id="dlAgentPy">Download agent.py</button>' : "") +
         (skill.url ? '<a class="btn" href="' + esc(skill.url) + '" target="_blank" rel="noopener">Origin</a>' : "") +
         (lic.source ? '<a class="btn" href="' + esc(lic.source) + '" target="_blank" rel="noopener">Upstream licence</a>' : "") +
         '<button class="btn" onclick="window.print()">Print / save as PDF</button>' +
       "</div>" +
+      (body ? '<div class="mirror"><b>One contract, two formats.</b> ' +
+        'This skill arrived as prose with no manifest. Our pipeline gave it a RAPP ' +
+        'manifest and a deterministic layer, and from that the <code>agent.py</code> ' +
+        'is <b>derived, not written</b> — same manifest, same procedure, different ' +
+        'runtime: a model reads the <code>.md</code>, a brainstem registers the ' +
+        '<code>.py</code> and calls it as a tool. The <code>agent.py</code> button ' +
+        'above generates the file <b>in your browser, right now</b>, from the ' +
+        '<code>.md</code> on this page — which is why the two cannot drift.' +
+        '</div>' : "") +
       '<div class="foot-note">Redistributed under ' + esc(lic.spdx || "its upstream licence") +
         " with attribution. This page describes the converted RAPP single file; the " +
         "origin is authoritative for the instructions themselves.</div>" +
@@ -606,6 +627,21 @@ function renderSkill(skill, review, body) {
 
   document.getElementById("content").innerHTML = html;
   wireRemix(STORYBOARD);
+
+  var dlPy = document.getElementById("dlAgentPy");
+  if (dlPy && global_mirror_ok()) {
+    dlPy.onclick = function () {
+      var py = RAPPMirror.exportAgent(body);
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([py], { type: "text/x-python" }));
+      a.download = ref.split("/").pop() + ".py";
+      a.click();
+      track("library.agent.deployed", ref);
+    };
+  } else if (dlPy) {
+    dlPy.disabled = true;
+    dlPy.textContent = "agent.py unavailable";
+  }
   track("library.onepager.completed", ref);
 }
 

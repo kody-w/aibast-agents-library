@@ -53,6 +53,28 @@ anything to the person on the other end.
 
 ## 3. Awakening
 
+**A dormant run has no verdicts.** `sentinel.py run` measures with its
+deterministic residents and stops there, because measurement is not judgment.
+Until a model has answered, the run carries evidence and `verdicts: null`, and
+says so in `dormant_notice`. This is not a limitation to work around — a
+pipeline that could approve a submission with no intelligence in the loop would
+be an automated yes, and an automated yes is worth nothing to whoever relies on
+it.
+
+`scripts/wake_sentinel.py` is the injector, deliberately a separate file:
+`sentinel.py` holds no credential and calls nothing, so the neighborhood stays
+portable data that runs under any runtime. Point the injector at any
+OpenAI-compatible endpoint — Azure OpenAI in CI, a local model on a laptop:
+
+```bash
+SENTINEL_ENDPOINT=http://localhost:11434/v1/chat/completions \
+SENTINEL_MODEL=llama3.1 python3 scripts/wake_sentinel.py
+```
+
+With nothing configured it wakes nothing, exits zero, and reports the run as
+dormant.
+
+
 A neighborhood does nothing on its own. It is a data structure waiting for a
 runtime, and there is more than one:
 
@@ -127,7 +149,22 @@ visibly older than the rubric.
   return JSON. Write it to be answerable from source alone, and tell the model
   not to praise — a reviewer that hedges produces findings nobody acts on.
 
-## 7. Real-time review of new submissions
+## 7. One pipeline, not two
+
+Aggregating and reviewing are the same act in two forms — shaping raw material,
+then judging the shape. `.github/workflows/metrics.yml` runs them as one pass:
+
+```
+crawl → convert to skill.md → mirror to agent.py → storyboard
+      → sentinel run (evidence) → wake (inject the model) → publish
+```
+
+Splitting them would let a freshly crawled skill sit in the catalog unshaped
+and unreviewed, which is the naked-link problem the library exists to solve. A
+skill is not aggregated here until it has been shaped, mirrored, given a demo,
+and actually reviewed.
+
+## 8. Real-time review of new submissions
 
 `.github/workflows/sentinel.yml` runs Sentinel on pull requests that touch
 `agents/**`, posts the deterministic findings to the pull request, and uploads

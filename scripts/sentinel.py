@@ -39,6 +39,7 @@ import argparse
 import hashlib
 import importlib
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -47,8 +48,14 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SENTINEL_DIR = REPO_ROOT / "sentinel"
 NEIGHBORHOOD = SENTINEL_DIR / "NEIGHBORHOOD.json"
-RUNS_DIR = SENTINEL_DIR / "runs"
-LATEST = SENTINEL_DIR / "latest.json"
+# Gates and workflows record runs too. Point them elsewhere with
+# SENTINEL_RUNS_DIR so a test sweep never overwrites the run that describes
+# this commit — evidence you can silently clobber is not evidence.
+_RUNS_OVERRIDE = os.environ.get("SENTINEL_RUNS_DIR")
+RUNS_DIR = Path(_RUNS_OVERRIDE) if _RUNS_OVERRIDE else SENTINEL_DIR / "runs"
+# The pointer travels with the runs it points at, so a redirected sweep never
+# leaves sentinel/latest.json referencing a file that is not there.
+LATEST = (RUNS_DIR / "latest.json") if _RUNS_OVERRIDE else (SENTINEL_DIR / "latest.json")
 AGENTS_ROOT = REPO_ROOT / "agents"
 SKILLS_ROOT = REPO_ROOT / "skills"
 
@@ -137,6 +144,21 @@ def subject_records(paths: list[Path]) -> list[dict]:
     ]
 
 
+def is_awake(findings: list[dict]) -> bool:
+    """Has a model actually been injected into this run?
+
+    The neighborhood is data. The deterministic residents are instruments — they
+    measure, and a measurement is not a judgment. Until an interpretive resident
+    has answered, the run holds evidence and nothing else, exactly as a brainstem
+    with no model attached holds agents it cannot yet call.
+
+    This is why `run` alone cannot approve anything. A pipeline that could rubber
+    stamp a submission with no intelligence in the loop would be an automated
+    yes, and an automated yes is worth nothing to the person relying on it.
+    """
+    return any(f["kind"] == "interpretive" for f in findings)
+
+
 def verdict_for(slug: str, findings: list[dict], policy: dict) -> str:
     blocking_defect, static_score = False, None
     for f in findings:
@@ -197,7 +219,13 @@ def cmd_run(args) -> int:
         "residents_pending": [p["resident"] for p in packets],
         "findings": findings,
         "packets": packets,
-        "verdicts": {p.stem: verdict_for(p.stem, findings, hood.get("verdict_policy", {})) for p in paths},
+        "status": "awake" if is_awake(findings) else "dormant",
+        "verdicts": ({p.stem: verdict_for(p.stem, findings, hood.get("verdict_policy", {}))
+                      for p in paths} if is_awake(findings) else None),
+        "dormant_notice": (None if is_awake(findings) else
+            "DORMANT — evidence only, no verdicts. The deterministic residents "
+            "measured; nothing has judged. Execute the packets below with any "
+            "model and absorb the answers to wake this run."),
         "separation_notice": hood["separation"]["rule"],
         "reproduce": (
             "python3 scripts/sentinel.py verify --run " + run_id +
@@ -213,19 +241,29 @@ def cmd_run(args) -> int:
     LATEST.write_text(json.dumps({
         "schema": "rapp-sentinel-latest/1.0",
         "run_id": run_id, "commit": run["commit"], "started": run["started"],
-        "subject_count": run["subject_count"], "verdicts": run["verdicts"],
+        "subject_count": run["subject_count"], "status": run["status"],
+        "verdicts": run["verdicts"], "dormant_notice": run["dormant_notice"],
         "residents_awake": run["residents_awake"], "residents_pending": run["residents_pending"],
-        "run_file": f"sentinel/runs/{run_id}.json",
+        "run_file": (out.relative_to(REPO_ROOT).as_posix()
+                     if out.is_relative_to(REPO_ROOT) else str(out)),
     }, indent=2) + "\n", encoding="utf-8")
 
-    tally: dict[str, int] = {}
-    for v in run["verdicts"].values():
-        tally[v] = tally.get(v, 0) + 1
-    print(f"[sentinel] run {run_id} · {len(paths)} subjects · "
-          + ", ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+    if run["verdicts"]:
+        tally: dict[str, int] = {}
+        for v in run["verdicts"].values():
+            tally[v] = tally.get(v, 0) + 1
+        print(f"[sentinel] run {run_id} · {len(paths)} subjects · "
+              + ", ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+    else:
+        print(f"[sentinel] run {run_id} · {len(paths)} subjects · DORMANT "
+              "(evidence only — no model attached, so nothing is judged)")
     print(f"[sentinel] awake: {', '.join(run['residents_awake']) or 'none'}"
           f" · asleep (need a model): {', '.join(run['residents_pending']) or 'none'}")
-    print(f"[sentinel] wrote {out.relative_to(REPO_ROOT)}")
+    try:
+        shown = out.relative_to(REPO_ROOT)
+    except ValueError:
+        shown = out  # a redirected runs directory may sit outside the repo
+    print(f"[sentinel] wrote {shown}")
     return 0
 
 
@@ -256,8 +294,11 @@ def cmd_absorb(args) -> int:
     run["residents_pending"] = [p["resident"] for p in run["packets"]]
 
     hood, _ = load_neighborhood()
+    run["status"] = "awake" if is_awake(run["findings"]) else "dormant"
+    run["dormant_notice"] = None
+    slugs = list((run.get("verdicts") or {}).keys()) or [s["slug"] for s in run["subjects"]]
     run["verdicts"] = {slug: verdict_for(slug, run["findings"], hood.get("verdict_policy", {}))
-                       for slug in run["verdicts"]}
+                       for slug in slugs}
     run_file.write_text(json.dumps(run, indent=2) + "\n", encoding="utf-8")
     print(f"[sentinel] absorbed {args.resident} from {args.model} into {args.run}")
     return 0

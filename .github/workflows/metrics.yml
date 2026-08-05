@@ -1,4 +1,4 @@
-name: Metrics & Aggregation Snapshot
+name: Aggregate, Shape, Review
 
 on:
   schedule:
@@ -43,6 +43,60 @@ jobs:
         # job whose sole purpose is source freshness.
         run: python scripts/crawl_skills.py
 
+      # ---------------------------------------------------------------
+      # Aggregating and reviewing are one pipeline, not two. Crawling only
+      # discovers a raw skill; it is not usable until it has been shaped into
+      # the RAPP format, mirrored into both projections, given a demo
+      # storyboard, and reviewed. Splitting these into separate triggers would
+      # let a freshly crawled skill sit in the catalog unshaped and unreviewed
+      # — which is the naked-link problem the library exists to solve.
+      # ---------------------------------------------------------------
+      - name: Shape raw skills into the RAPP format
+        run: python scripts/convert_skills.py
+
+      - name: Mirror every converted skill into its agent.py
+        run: python scripts/export_agent.py
+
+      - name: Prove the mirror is derived, not drifted
+        run: |
+          python scripts/export_agent.py --check
+          python -W error::SyntaxWarning -m py_compile skills/*/*.py
+
+      - name: Generate RAPPVision storyboards
+        run: python scripts/build_walkthrough.py
+
+      - name: Review everything the pipeline just shaped
+        # Deterministic residents only — no model is attached here, so this
+        # records EVIDENCE and deliberately produces no verdicts. Waking the
+        # run is a separate, attributed act; see sentinel/SPEC.md.
+        run: |
+          python scripts/review_agents.py
+          python scripts/review_skills.py
+          python scripts/sentinel.py run
+          python scripts/sentinel.py verify --run \
+            "$(python -c "import json;print(json.load(open('sentinel/latest.json'))['run_id'])")"
+
+      - name: Wake the neighborhood — inject the model
+        # This is the step that makes aggregation worth doing. Without it the
+        # run is dormant: measured but unjudged. With a key configured, the
+        # interpretive residents actually reason about every skill the pipeline
+        # just shaped, and their answers are recorded with the model attached.
+        # No key means the run stays honestly dormant rather than pretending.
+        env:
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_DEPLOYMENT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          SENTINEL_ENDPOINT: ${{ secrets.SENTINEL_ENDPOINT }}
+          SENTINEL_API_KEY: ${{ secrets.SENTINEL_API_KEY }}
+          SENTINEL_MODEL: ${{ vars.SENTINEL_MODEL }}
+        run: python scripts/wake_sentinel.py
+
+      - name: Publish machine reviews to their own Discussions category
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/discussion_ratings.py seed-reviews --limit 40
+        continue-on-error: true
+
       - name: Seed missing agent Discussions (capped per run)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,11 +130,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add state/ api/
+          git add state/ api/ skills/ sentinel/ media/walkthroughs/
           if git diff --staged --quiet; then
             echo "No metrics change"
           else
-            git commit -m "chore: metrics snapshot $(date -u +%Y-%m-%d) [skip ci]"
+            git commit -m "chore: aggregate, shape, review $(date -u +%Y-%m-%d) [skip ci]"
             git pull --rebase origin main
             git push
           fi

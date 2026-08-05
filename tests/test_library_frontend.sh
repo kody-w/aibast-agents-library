@@ -10,6 +10,10 @@
 set -u
 cd "$(dirname "$0")/.."
 PASS=0; FAIL=0
+# Gate runs must not overwrite the run that describes this commit.
+export SENTINEL_RUNS_DIR="${TMPDIR:-/tmp}/aibast-gate-runs"
+rm -rf "$SENTINEL_RUNS_DIR"; mkdir -p "$SENTINEL_RUNS_DIR"
+
 ok()   { PASS=$((PASS+1)); echo "  ✓ $1"; }
 bad()  { FAIL=$((FAIL+1)); echo "  ✗ $1"; }
 check(){ if eval "$2" >/dev/null 2>&1; then ok "$1"; else bad "$1"; fi; }
@@ -1116,15 +1120,25 @@ for banned in ('api.anthropic.com','api.openai.com','OPENAI_API_KEY','ANTHROPIC_
 assert 'build_packet' in s and 'absorb' in s
 PY"
 check "a recorded run reproduces against the working tree" \
-  "python3 scripts/sentinel.py verify --run \$(python3 -c \"import json;print(json.load(open('sentinel/latest.json'))['run_id'])\")"
+  "python3 scripts/sentinel.py run >/dev/null && python3 scripts/sentinel.py verify --run \$(python3 -c \"import json,os;print(json.load(open(os.path.join(os.environ['SENTINEL_RUNS_DIR'],'latest.json')))['run_id'])\")"
 check "every run records what makes it traceable" "python3 - <<'PY'
 import json, pathlib
-latest=json.load(open('sentinel/latest.json'))
-run=json.loads(pathlib.Path(latest['run_file']).read_text())
-for k in ('run_id','commit','inputs_digest','neighborhood','residents_awake','residents_pending','verdicts'):
-    assert run.get(k) is not None, k
-assert run['neighborhood']['digest'], 'no neighborhood digest'
-assert run['review_type']=='machine'
+# Any recorded run, not merely the most recent — traceability is a property of
+# every run on disk, and asserting on 'latest' would make this gate depend on
+# whichever earlier gate ran a scan last.
+runs=sorted(pathlib.Path('sentinel/runs').glob('*.json'))
+assert runs, 'no recorded runs'
+for f in runs:
+    run=json.loads(f.read_text())
+    for k in ('run_id','commit','inputs_digest','neighborhood','residents_awake','status'):
+        assert run.get(k) is not None, (f.name, k)
+    assert run['neighborhood']['digest'], f.name
+    assert run['review_type']=='machine', f.name
+    # Verdicts exist only once a model has been injected.
+    if run['status']=='dormant':
+        assert run['verdicts'] is None, f.name
+    else:
+        assert run['verdicts'], f.name
 PY"
 check "absorbed answers keep their model attribution" "python3 - <<'PY'
 import ast
@@ -1199,9 +1213,14 @@ sets={r['subjects'] for r in h['residents']}
 assert 'agents' in sets and 'skills' in sets, sets
 det=[r for r in h['residents'] if r['kind']=='deterministic']
 assert {r['subjects'] for r in det}=={'agents','skills'}
-latest=json.load(open('sentinel/latest.json'))
-assert latest['subject_count']>150, latest['subject_count']
-assert len(latest['residents_awake'])>=2, latest['residents_awake']
+import subprocess, pathlib
+# Scan the whole library so this gate tests the neighborhood's reach, not
+# whatever scope a previous gate happened to leave behind.
+subprocess.run(['python3','scripts/sentinel.py','run'],check=True,capture_output=True)
+import os
+full=json.load(open(os.path.join(os.environ['SENTINEL_RUNS_DIR'],'latest.json')))
+assert full['subject_count']>150, full['subject_count']
+assert len(full['residents_awake'])>=2, full['residents_awake']
 PY"
 check "skill reviews are served per skill from the static API" "python3 - <<'PY'
 import json, pathlib
@@ -1215,6 +1234,113 @@ for r in idx['reviews'][:5]:
 PY"
 check "every aggregated skill card opens a hosted page, not only an origin link" \
   "grep -q 'onepager.html?skill=' agents.html && grep -q 'renderSkill' onepager.html"
+echo "== T-MIRROR skill.md and agent.py are one contract =="
+check "every converted skill ships both formats" "python3 - <<'PY'
+import json, pathlib
+d=json.load(open('api/v1/aggregated.json'))
+both=[s for s in d['skills'] if s.get('rapp_skill') and s.get('rapp_agent')]
+assert len(both)>=50, len(both)
+for s in both[:6]:
+    md=pathlib.Path(s['rapp_skill']['path']); py=pathlib.Path(s['rapp_agent']['path'])
+    assert md.is_file() and py.is_file(), (md,py)
+    assert py.stem==md.stem and py.parent==md.parent, 'the pair must sit together'
+PY"
+check "the export is derived, never hand-written — no drift from skill.md" \
+  "python3 scripts/export_agent.py --check"
+check "every exported agent.py compiles cleanly" \
+  "python3 -W error::SyntaxWarning -m py_compile skills/@cat-agent-skills/*.py"
+check "the exported agent carries the same manifest as its skill" "python3 - <<'PY'
+import importlib.util, sys, pathlib
+sys.path.insert(0,'agents/@aibast-agents-library/templates')
+sys.dont_write_bytecode=True
+scripts=pathlib.Path('scripts'); sys.path.insert(0,str(scripts))
+from export_agent import split_frontmatter
+for md in sorted(pathlib.Path('skills/@cat-agent-skills').glob('*.md'))[:8]:
+    meta,body=split_frontmatter(md.read_text(encoding='utf-8'))
+    spec=importlib.util.spec_from_file_location('m_'+md.stem, md.with_suffix('.py'))
+    m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    assert m.__manifest__['name']==meta['name'], md.stem
+    assert m.__manifest__['version']==meta['version'], md.stem
+    assert m.__manifest__['source_license']==meta['source_license'], md.stem
+    assert m.__manifest__['mirrors']==md.name, md.stem
+    # the embedded procedure must BE the skill body, not a paraphrase of it
+    assert m.SKILL_PROCEDURE.strip()==body.strip(), md.stem
+PY"
+check "the exported agent is honest about returning a procedure" "python3 - <<'PY'
+import importlib.util, sys, pathlib
+sys.path.insert(0,'agents/@aibast-agents-library/templates')
+p=pathlib.Path('skills/@cat-agent-skills/accessibility_pass.py')
+spec=importlib.util.spec_from_file_location('honest', p)
+m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+d=m.__manifest__['description'].lower()
+assert 'returns the verified rapp procedure' in d, d[:80]
+a=m.AccessibilityPassAgent()
+out=a.perform(context='a 40-slide deck')
+assert 'a 40-slide deck' in out, 'context must be echoed, not dropped'
+assert 'RAPP procedure' in out and 'redistributed under MIT' in out
+PY"
+check "the browser can derive agent.py itself — the logic is not server-side" "python3 - <<'PY'
+d=open('mirror.js').read()
+for k in ('exportAgent','splitFrontmatter','rapp-agent/1.0','__manifest__','SKILL_PROCEDURE'):
+    assert k in d, k
+h=open('onepager.html').read()
+assert 'mirror.js' in h and 'dlAgentPy' in h and 'RAPPMirror.exportAgent' in h
+PY"
+
+echo "== T-DORMANT the neighborhood does nothing without an AI =="
+check "a run with no model attached yields evidence, never a verdict" "python3 - <<'PY'
+import json, subprocess, pathlib
+subprocess.run(['python3','scripts/sentinel.py','run','--agent','accessibility_pass'],
+               check=True, capture_output=True)
+import os
+latest=json.load(open(os.path.join(os.environ['SENTINEL_RUNS_DIR'],'latest.json')))
+assert latest['status']=='dormant', latest['status']
+assert latest['verdicts'] is None, 'a dormant run must not judge anything'
+assert latest['dormant_notice'], 'a dormant run must say so'
+run=json.loads(pathlib.Path(latest['run_file']).read_text())
+assert run['packets'], 'a dormant run must emit the work a model needs'
+assert run['findings'], 'deterministic residents still measure'
+PY"
+check "absorbing a model's answer is what wakes it" "python3 - <<'PY'
+import json, subprocess, pathlib, tempfile, os
+import os
+rd=os.environ['SENTINEL_RUNS_DIR']
+latest=json.load(open(os.path.join(rd,'latest.json'))); rid=latest['run_id']
+ans={'accessibility_pass':{'misrepresents':False,'evidence':'test','teachable':'test'}}
+fd,path=tempfile.mkstemp(suffix='.json'); os.write(fd,json.dumps(ans).encode()); os.close(fd)
+subprocess.run(['python3','scripts/sentinel.py','absorb','--run',rid,'--resident','honesty',
+                '--answers',path,'--model','gate-test'],check=True,capture_output=True)
+run=json.loads(pathlib.Path(rd,rid+'.json').read_text())
+assert run['status']=='awake', run['status']
+assert run['verdicts'], 'an awake run produces verdicts'
+assert any(f.get('answered_by')=='gate-test' for f in run['findings'])
+os.unlink(path)
+PY"
+
+check "the injector holds the credential, the neighborhood never does" "python3 - <<'PY'
+n=open('sentinel/NEIGHBORHOOD.json').read()
+for banned in ('API_KEY','api_key','endpoint','Bearer','secret'):
+    assert banned not in n, f'neighborhood data must stay credential-free: {banned}'
+r=open('scripts/sentinel.py').read()
+assert 'API_KEY' not in r, 'the runner must not read credentials either'
+w=open('scripts/wake_sentinel.py').read()
+assert 'SENTINEL_ENDPOINT' in w and 'AZURE_OPENAI_ENDPOINT' in w
+PY"
+check "no endpoint means dormant, never a rubber stamp" "python3 - <<'PY'
+import subprocess, os, json, tempfile
+env={k:v for k,v in os.environ.items()
+     if k not in ('SENTINEL_ENDPOINT','SENTINEL_API_KEY','AZURE_OPENAI_ENDPOINT',
+                  'AZURE_OPENAI_DEPLOYMENT','AZURE_OPENAI_API_KEY')}
+d=tempfile.mkdtemp(); env['SENTINEL_RUNS_DIR']=d
+subprocess.run(['python3','scripts/sentinel.py','run','--agent','accessibility_pass'],
+               check=True, capture_output=True, env=env)
+out=subprocess.run(['python3','scripts/wake_sentinel.py'],capture_output=True,text=True,env=env)
+assert out.returncode==0, out.stderr
+assert 'DORMANT' in out.stdout, out.stdout
+run=json.load(open(os.path.join(d, json.load(open(os.path.join(d,'latest.json')))['run_id']+'.json')))
+assert run['status']=='dormant' and run['verdicts'] is None
+PY"
+
 echo "== T-RAPPVISION generated demo walkthroughs =="
 check "every entry gets a storyboard in the house format, aggregated included" "python3 - <<'PY'
 import json, pathlib
@@ -1270,6 +1396,19 @@ for k in ('Title card','Agent overview','Sources','Flow of work','Actions',
     assert k in d, k
 PY"
 
+check "aggregating and reviewing are one pipeline, not two triggers" "python3 - <<'PY'
+import yaml
+w=yaml.safe_load(open('.github/workflows/metrics.yml'))
+steps=list(w['jobs'].values())[0]['steps']
+run=' '.join(s.get('run','') for s in steps)
+for script in ('crawl_skills.py','convert_skills.py','export_agent.py',
+               'build_walkthrough.py','review_skills.py','sentinel.py run',
+               'wake_sentinel.py','build_api.py'):
+    assert script in run, script
+# The shaping must happen AFTER the crawl and BEFORE the review.
+order=[run.index(x) for x in ('crawl_skills.py','convert_skills.py','export_agent.py','sentinel.py run')]
+assert order==sorted(order), order
+PY"
 check "the sentinel workflow parses and reviews on submission" \
   "python3 -c \"import yaml;w=yaml.safe_load(open('.github/workflows/sentinel.yml'));assert 'agents/**' in w[True]['pull_request']['paths']\""
 
