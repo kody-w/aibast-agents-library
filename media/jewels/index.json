@@ -1,102 +1,124 @@
 {
-  "schema": "aibast-jewels/1.0",
-  "note": "Product marks for the Agent overview card. Four are official assets from microsoft/PowerBI-Icons; five are renditions drawn to match how the marks appear in the AIBAST recordings. Replace the renditions with official artwork before any release where brand exactness matters \u2014 provenance is recorded per mark so that is checkable.",
-  "count": 9,
+  "schema": "aibast-jewels/2.0",
+  "note": "The real marks, cropped from the Agent overview card in the corpus and keyed by unpremultiplying the bed out, so no mark carries a halo. Header icons (ic-*) and the chevron have no match terms \u2014 they are structural, one per panel.",
+  "source": {
+    "recording": "#3-Customer Onboarding Agent.mp4",
+    "at_seconds": 34.0,
+    "bed": [
+      7,
+      15,
+      38
+    ],
+    "panel": [
+      26,
+      29,
+      63
+    ]
+  },
+  "count": 8,
   "jewels": [
     {
-      "id": "azure-ai-foundry",
-      "file": "media/jewels/azure-ai-foundry.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/azure-ai-foundry.svg",
-      "provenance": "rendition drawn to match the recordings",
-      "match": [
-        "azure",
-        "openai",
-        "foundry",
-        "ai search"
-      ]
-    },
-    {
       "id": "copilot",
-      "file": "media/jewels/copilot.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/copilot.svg",
-      "provenance": "rendition drawn to match the recordings",
+      "file": "media/jewels/copilot.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/copilot.png",
+      "size": {
+        "w": 104,
+        "h": 94
+      },
       "match": [
         "copilot",
         "brainstem",
         "m365 copilot"
-      ]
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
     },
     {
-      "id": "dataverse",
-      "file": "media/jewels/dataverse.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/dataverse.svg",
-      "provenance": "microsoft/PowerBI-Icons (official)",
-      "match": [
-        "dataverse"
-      ]
+      "id": "ic-sources",
+      "file": "media/jewels/ic-sources.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/ic-sources.png",
+      "size": {
+        "w": 53,
+        "h": 50
+      },
+      "match": [],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "ic-flow",
+      "file": "media/jewels/ic-flow.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/ic-flow.png",
+      "size": {
+        "w": 52,
+        "h": 52
+      },
+      "match": [],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "ic-actions",
+      "file": "media/jewels/ic-actions.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/ic-actions.png",
+      "size": {
+        "w": 46,
+        "h": 54
+      },
+      "match": [],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
     },
     {
       "id": "dynamics-365",
-      "file": "media/jewels/dynamics-365.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/dynamics-365.svg",
-      "provenance": "rendition drawn to match the recordings",
+      "file": "media/jewels/dynamics-365.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/dynamics-365.png",
+      "size": {
+        "w": 70,
+        "h": 92
+      },
       "match": [
         "dynamics",
         "d365",
         "erp",
         "crm",
         "ccaas"
-      ]
-    },
-    {
-      "id": "power-apps",
-      "file": "media/jewels/power-apps.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/power-apps.svg",
-      "provenance": "microsoft/PowerBI-Icons (official)",
-      "match": [
-        "power apps",
-        "powerapps"
-      ]
-    },
-    {
-      "id": "power-automate",
-      "file": "media/jewels/power-automate.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/power-automate.svg",
-      "provenance": "microsoft/PowerBI-Icons (official)",
-      "match": [
-        "power automate",
-        "flow",
-        "logic apps"
-      ]
-    },
-    {
-      "id": "power-bi",
-      "file": "media/jewels/power-bi.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/power-bi.svg",
-      "provenance": "microsoft/PowerBI-Icons (official)",
-      "match": [
-        "power bi",
-        "powerbi"
-      ]
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
     },
     {
       "id": "sharepoint",
-      "file": "media/jewels/sharepoint.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/sharepoint.svg",
-      "provenance": "rendition drawn to match the recordings",
+      "file": "media/jewels/sharepoint.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/sharepoint.png",
+      "size": {
+        "w": 88,
+        "h": 84
+      },
       "match": [
         "sharepoint",
         "onedrive"
-      ]
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
     },
     {
       "id": "teams",
-      "file": "media/jewels/teams.svg",
-      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/teams.svg",
-      "provenance": "rendition drawn to match the recordings",
+      "file": "media/jewels/teams.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/teams.png",
+      "size": {
+        "w": 85,
+        "h": 79
+      },
       "match": [
         "teams"
-      ]
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "chevron",
+      "file": "media/jewels/chevron.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/chevron.png",
+      "size": {
+        "w": 102,
+        "h": 160
+      },
+      "match": [],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
     }
   ]
 }

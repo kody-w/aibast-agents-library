@@ -54,14 +54,18 @@ PLACEHOLDER = "[operator supplies]"
 # The reference carries a music bed from 3.3s, which is why it measures 6%
 # silent while a speech-only cut measures 40%. Without it every gap between
 # narration lines is true digital silence and the film reads as broken.
-BED = REPO_ROOT / "media" / "audio" / "bed.m4a"
-BED_GAIN = "0.14"
+BED = REPO_ROOT / "media" / "audio" / "bed.wav"
+BED_GAIN = "1.0"   # the bed is already levelled at -28 LUFS
 # Disabled. The reference carries a scored bed, but it only has ~9s of
 # speech-free music (0->9.37s), and looping that to 132s produced a seam every
 # 5.4s that reads as a second voice competing with the narration. Silence
 # between lines is honest; a stuttering loop is not. Re-enable when a licensed
 # continuous bed exists.
-USE_BED = os.environ.get("RAPPVISION_BED", "0") == "1"
+# Re-enabled. The looped 5.4s corpus clip is gone; the bed is now
+# synthesised continuous by RAPPtranscript2Prototype's score.py — royalty-free,
+# deterministic, deliberately featureless, and written at -28 LUFS so it sits
+# under narration rather than competing with it.
+USE_BED = os.environ.get("RAPPVISION_BED", "1") == "1"
 # Absolute second each act's narration may begin, measured from the reference.
 VO_ENTRY = {"problem": 9.4}
 
@@ -351,8 +355,12 @@ def render_over_base(story: dict, subject: dict, ov: dict, work: Path,
         run(["ffmpeg", "-v", "error", "-y", *inputs,
              "-filter_complex", ";".join(filters),
              "-map", prev, "-an",
-             "-c:v", "libx264", "-preset", "slow", "-b:v", V_BITRATE,
-             "-maxrate", "8000k", "-bufsize", "12000k",
+             "-c:v", "libx264", "-preset", "slow",
+             # True CBR. A bare -b:v undershot to 1.85 Mbps on this mostly
+             # graphic content while the reference sits at 5.95, and mixing a
+             # min/max with nal-hrd=cbr is contradictory so x264 ignored it.
+             "-b:v", V_BITRATE, "-minrate", V_BITRATE, "-maxrate", V_BITRATE,
+             "-bufsize", V_BITRATE, "-x264-params", "nal-hrd=cbr:force-cfr=1",
              "-pix_fmt", "yuv420p", str(picture)], why="composite over base")
         if not picture.is_file():
             return False
@@ -377,8 +385,8 @@ def mux(picture: Path, audio_parts: list, clock: float, out: Path) -> None:
         bi = len(audio_parts) + 1
         inputs += ["-i", str(BED)]
         filters.append(
-            f"[{bi}:a]atrim=0:{clock},volume={BED_GAIN},adelay=3200|3200,"
-            f"afade=t=in:st=3.2:d=1.2,afade=t=out:st={max(1.0, clock - 2.5):.2f}:d=2.5[bed]")
+            f"[{bi}:a]atrim=0:{clock},volume={BED_GAIN},"
+            f"afade=t=in:st=0:d=1.5,afade=t=out:st={max(1.0, clock - 3.0):.2f}:d=3.0[bed]")
         labels.append("[bed]")
     mixf = (";".join(filters) + ";" + "".join(labels) +
             f"amix=inputs={len(labels)}:dropout_transition=0:normalize=0[m];"

@@ -75,22 +75,19 @@ header{border-bottom:1px solid var(--border);background:var(--bg)}
 .scene.overview{background:var(--stage);color:#fff;gap:2.6cqw;justify-content:center;
   padding:3cqw 4cqw 3.5cqw;overflow:hidden}
 .overview h2{font-size:3.4cqw;font-weight:600;display:flex;align-items:center;gap:1.2cqw}
-.overview h2 .mark{width:3cqw;height:3cqw;border-radius:.7cqw;display:inline-block;
-  background:linear-gradient(135deg,#e8598f,#8b5cf6,#4f7cf7)}
+.overview h2 .mark{width:3.4cqw;height:3.4cqw;display:inline-block;object-fit:contain}
 .pgrid{display:flex;align-items:stretch;gap:1.6cqw;width:88%;
   height:60cqh;flex:0 0 auto}
 .pcol{flex:1;background:#1A1D3F;border-radius:1cqw;padding:1.3cqw;display:flex;
   flex-direction:column;gap:1cqw;min-width:0;min-height:0}
-".pcol .ph{font-size:1.9cqw;font-weight:600;text-align:center;display:flex;
-  align-items:center;justify-content:center;gap:.9cqw}
-.ic{width:2cqw;height:2cqw;flex:0 0 auto;opacity:.92;
-  background:no-repeat center/contain}
-.ic-sources{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.4'%3E%3Ccircle cx='12' cy='12' r='2.2'/%3E%3Ccircle cx='4' cy='7' r='1.6'/%3E%3Ccircle cx='4' cy='17' r='1.6'/%3E%3Ccircle cx='20' cy='7' r='1.6'/%3E%3Ccircle cx='20' cy='17' r='1.6'/%3E%3Cpath d='M5.5 8L10 11M5.5 16L10 13M18.5 8L14 11M18.5 16L14 13'/%3E%3C/svg%3E")}
-.ic-flow{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.4'%3E%3Cpath d='M12 4a8 8 0 1 1-5.6 2.3' stroke-dasharray='3 2.4'/%3E%3Ccircle cx='12' cy='4' r='1.7' fill='%23fff'/%3E%3Ccircle cx='6.4' cy='6.3' r='1.5' fill='%23fff'/%3E%3C/svg%3E")}
-.ic-actions{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.4'%3E%3Crect x='4' y='7' width='11' height='9' rx='2'/%3E%3Ccircle cx='7.6' cy='11' r='.9' fill='%23fff'/%3E%3Ccircle cx='11.4' cy='11' r='.9' fill='%23fff'/%3E%3Cpath d='M9.5 4v3M17 10h3v6h-3z'/%3E%3C/svg%3E")}
+".pcol .ph{display:flex;align-items:center;gap:.8cqw;padding:.2cqw .4cqw .6cqw}
+.pcol .ph span.lbl{flex:1;text-align:center;font-size:2cqw;font-weight:700;
+  letter-spacing:-.005em;padding-right:2.9cqw}
+.ic{width:2.9cqw;height:2.9cqw;flex:0 0 auto;object-fit:contain}
 .pcol .pbody{background:linear-gradient(135deg,var(--grad-a),var(--grad-b) 60%,var(--grad-c));
   border-radius:.9cqw;padding:1.6cqw 1.4cqw;flex:1 1 auto;display:flex;
-  flex-direction:column;gap:1cqw;justify-content:flex-start;min-height:0;overflow:hidden}
+  flex-direction:column;gap:1cqw;justify-content:flex-start;min-height:0;overflow:hidden;
+  max-height:74%}
 .jewels{display:flex;gap:.9cqw;justify-content:center;margin-top:1.1cqw}
 .jw{width:3.1cqw;height:3.1cqw;display:block;object-fit:contain}
 .pcol .pbody div{font-size:1.45cqw;line-height:1.4;text-align:center;font-weight:600;
@@ -99,9 +96,7 @@ header{border-bottom:1px solid var(--border);background:var(--bg)}
      broken — this card is the one a viewer studies longest. */
   overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
 .pcol .pbody{overflow:hidden}
-.arrow{align-self:center;width:2cqw;height:3cqw;flex:0 0 auto;
-  background:linear-gradient(135deg,var(--grad-a),var(--grad-b));
-  clip-path:polygon(0 22%,55% 22%,55% 0,100% 50%,55% 100%,55% 78%,0 78%)}
+.arrow{align-self:center;width:3.2cqw;height:5.2cqw;flex:0 0 auto;object-fit:contain}
 
 /* act 4 — the walkthrough, laptop-framed */
 .scene.walkthrough{background:
@@ -287,15 +282,17 @@ function jewelsFor(lines){
 function sceneOverview(s){
   var p=s.panels||{};
   var cols=Object.keys(p).map(function(k,i){
-    return (i?'<div class="arrow" data-stagger="'+i+'"></div>':"") +
+    return (i?'<img class="arrow" data-stagger="'+i+
+              '" src="media/jewels/chevron.png" alt="">':"") +
       '<div class="pcol" data-stagger="'+i+'"><div class="ph">'+
-        '<span class="ic ic-'+(i===0?"sources":i===1?"flow":"actions")+'"></span>'+
-        esc(k)+"</div>" +
+        '<img class="ic" src="media/jewels/ic-'+
+          (i===0?"sources":i===1?"flow":"actions")+'.png" alt="">'+
+        '<span class="lbl">'+esc(k)+"</span></div>" +
       '<div class="pbody">'+p[k].map(function(v){return "<div>"+markup(v)+"</div>";}).join("")+
       "</div>"+jewelsFor(p[k])+"</div>";
   }).join("");
   return '<div class="scene overview" data-act="overview">' +
-    '<h2><span class="mark"></span>Agent overview</h2>' +
+    '<h2><img class="mark" src="media/jewels/copilot.png" alt="">Agent overview</h2>' +
     '<div class="pgrid">'+cols+"</div></div>";
 }
 function sceneWalkthrough(s){
