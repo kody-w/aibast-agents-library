@@ -67,6 +67,9 @@ serves as the de-facto canary until the canary repo decision lands.
 - The engine (`rapp_brainstem/VERSION`) and RAPP/1 revision only move via
   sync/pin-bump PRs (see SUCCESSION.md) — a library release never bumps
   them implicitly.
+- Extension specs (`rapp/ext/`) are versioned in their directory name. A
+  breaking change opens a new directory; the old major keeps its spec and its
+  endpoints, because someone's README renders them.
 - API stability: `api/v1/` is frozen shape; breaking changes open `api/v2/`
   and keep v1 serving (static files cost nothing — the rapp-static-api rule).
 

@@ -66,6 +66,38 @@ adopts a revision by a **pin-bump PR**:
 A pin bump is always a reviewed human PR. `corpus_sync.py` can detect drift;
 it is not allowed to chase it.
 
+## Extensions: work this distribution originates
+
+Not everything flows down. An enterprise need sometimes has no kernel answer,
+and inventing one downstream is legitimate — provided it is honest about what
+it is.
+
+An **extension** is a specification written here, under `rapp/ext/<name>-<major>.<minor>/`.
+Its mechanics — discovery instead of registration, namespaced output, contained
+failure, complete uninstall — are specified once in
+[`rapp/ext/PATTERN.md`](ext/PATTERN.md) and enforced by the
+`T-EXT-ISOLATION` gate, which proves that removing every extension leaves the
+core byte-identical. The rules that keep an extension from becoming a fork:
+
+1. **It extends, it never redefines.** An extension MUST NOT alter RAPP/1
+   semantics or reinterpret a kernel document. If a change belongs in the
+   protocol, it goes upstream as a protocol proposal instead.
+2. **It is independently versioned.** `ms-rapp-badge/1.0` moves on its own
+   line; it does not imply, require, or bump a RAPP/1 revision.
+3. **It ships with a conformance section**, so a second implementation can be
+   checked rather than argued about.
+4. **It is offered upstream.** Once it has run in production here, the
+   extension is proposed to the kernel. If the kernel adopts it, the mirrored
+   copy becomes canonical and `ext/` keeps only a pointer. If the kernel
+   declines, it stays a documented distro extension — enumerated, never
+   silently divergent.
+5. **Adopting it is optional.** Nothing in the kernel or in another
+   distribution is required to implement it.
+
+**First extension:** [`ms-rapp-badge/1.0`](ext/ms-rapp-badge-1.0/SPEC.md) —
+publicly verifiable achievement badges served from static files. It builds on
+the kernel's `rapp-static-api/1.0` and touches no part of RAPP/1.
+
 ## Version policy
 
 - `rapp_brainstem/VERSION` — the kernel engine version (locked; moves only

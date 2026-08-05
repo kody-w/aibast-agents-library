@@ -191,6 +191,91 @@ PY"
 check "gallery, metrics and installer link the API explorer" \
   "grep -q 'api.html' index.html && grep -q 'api.html' agents.html && grep -q 'api.html' metrics.html"
 
+echo "== T-EXT-ISOLATION extensions cannot affect the core =="
+check "removing every extension leaves core endpoints byte-identical and the build green" "python3 - <<'PY'
+import hashlib, json, shutil, subprocess, tempfile
+from pathlib import Path
+CORE=['api/v1/agents.json','api/v1/categories.json','api/v1/publishers.json',
+      'api/v1/status.json','api/v1/badge.json']
+digest=lambda: {f: hashlib.sha256(Path(f).read_bytes()).hexdigest() for f in CORE}
+subprocess.run(['python3','scripts/build_api.py'],capture_output=True)
+before=digest()
+tmp=Path(tempfile.mkdtemp())/'ext'
+shutil.move('rapp/ext', tmp)
+try:
+    r=subprocess.run(['python3','scripts/build_api.py'],capture_output=True,text=True)
+    assert r.returncode==0, 'core build must survive with no extensions installed'
+    assert digest()==before, 'an extension changed a core endpoint'
+    assert json.load(open('api/v1/index.json'))['extensions']=={}
+    assert not Path('api/v1/wall.json').exists(), 'uninstall must sweep extension endpoints'
+finally:
+    shutil.move(str(tmp), 'rapp/ext')
+    subprocess.run(['python3','scripts/build_api.py'],capture_output=True)
+assert Path('api/v1/wall.json').exists(), 'reinstall must restore endpoints'
+PY"
+check "a broken extension is skipped, never fatal" "python3 - <<'PY'
+import json, subprocess, pathlib, shutil
+d=pathlib.Path('rapp/ext/zz-probe-1.0'); d.mkdir(parents=True, exist_ok=True)
+(d/'build.py').write_text('PROTOCOL=\"probe/1.0\"\nNAMESPACES=()\ndef build(ctx):\n    raise RuntimeError(\"boom\")\n')
+try:
+    r=subprocess.run(['python3','scripts/build_api.py'],capture_output=True,text=True)
+    assert r.returncode==0, 'a broken extension must not fail the core build'
+    assert 'SKIPPED' in r.stderr, r.stderr
+    assert 'probe/1.0' not in json.load(open('api/v1/index.json'))['extensions']
+finally:
+    shutil.rmtree(d); subprocess.run(['python3','scripts/build_api.py'],capture_output=True)
+PY"
+check "an extension cannot write outside its declared namespaces" "python3 - <<'PY'
+import json, subprocess, pathlib, shutil, hashlib
+core=pathlib.Path('api/v1/agents.json'); before=hashlib.sha256(core.read_bytes()).hexdigest()
+d=pathlib.Path('rapp/ext/zz-escape-1.0'); d.mkdir(parents=True, exist_ok=True)
+(d/'build.py').write_text(
+ 'PROTOCOL=\"escape/1.0\"\nNAMESPACES=(\"escape.json\",)\n'
+ 'def build(ctx):\n    ctx.write(\"agents.json\", {\"pwned\": True})\n    return {}\n')
+try:
+    r=subprocess.run(['python3','scripts/build_api.py'],capture_output=True,text=True)
+    assert r.returncode==0
+    assert hashlib.sha256(core.read_bytes()).hexdigest()==before, 'namespace guard failed'
+finally:
+    shutil.rmtree(d); subprocess.run(['python3','scripts/build_api.py'],capture_output=True)
+PY"
+check "the pattern is specified and the core names no extension" "python3 - <<'PY'
+d=open('rapp/ext/PATTERN.md').read().lower()
+for k in ('discovery, not registration','namespaced output','failure is contained',
+          'uninstall is complete','conformance','byte-identical'):
+    assert k in d, k
+core=open('scripts/build_api.py').read()
+for forbidden in ('ms-rapp-badge','badges.json','certified','wall.json'):
+    assert forbidden not in core, f'core names an extension detail: {forbidden}'
+PY"
+
+echo "== T-EXT ms-rapp-badge/1.0 extension =="
+check "the extension spec is normative and conformance-checkable" "python3 - <<'PY'
+d=open('rapp/ext/ms-rapp-badge-1.0/SPEC.md').read()
+for k in ('ms-rapp-badge/1.0','rapp-static-api/1.0','MUST NOT be deleted',
+          'Conformance','Revocation','not an endorsement','RFC 2119'):
+    assert k.lower() in d.lower(), k
+# an extension must not claim to change the protocol it extends
+assert 'extension, not a revision' in d.lower() or 'is an **extension**' in d.lower()
+PY"
+check "every generated badge document declares the protocol" "python3 - <<'PY'
+import json, glob
+for f in ['api/v1/badges.json','api/v1/certified.json','api/v1/wall.json'] + \
+         glob.glob('api/v1/badges/*.json') + glob.glob('api/v1/certified/*.json'):
+    d=json.load(open(f))
+    assert d.get('protocol')=='ms-rapp-badge/1.0', f
+idx=json.load(open('api/v1/index.json'))
+ext=idx['extensions']['ms-rapp-badge/1.0']
+assert ext['originated_by']=='ms-rapp' and 'ext/ms-rapp-badge-1.0/SPEC.md' in ext['spec']
+PY"
+check "the corpus registers extensions and governs them" "python3 - <<'PY'
+r=open('rapp/README.md').read()
+assert 'ext/' in r and 'originated' in r.lower()
+s=open('rapp/SUCCESSION.md').read().lower()
+for k in ('extension','independently versioned','offered upstream','never redefines','conformance'):
+    assert k in s, k
+PY"
+
 echo "== T-WALL badge catalog + Wall of Fame =="
 check "catalog builds per-badge holder endpoints and a ranked wall" "python3 - <<'PY'
 import json, subprocess

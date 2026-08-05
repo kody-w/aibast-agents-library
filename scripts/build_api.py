@@ -21,9 +21,9 @@ Endpoints:
   api/v1/publishers.json           — publisher directory
   api/v1/metrics.json              — latest metrics snapshot (mirror of state/)
   api/v1/aggregated.json           — aggregated outside skills (mirror of state/)
-  api/v1/certified.json            — the RAPP Certified roster (public)
-  api/v1/certified/<username>.json — real-time verification for one GitHub user
-  api/v1/certified/<username>/badge.json — shields.io badge for that user
+  api/v1/<extension namespaces>    — contributed by whatever is installed under
+                                     rapp/ext/ (discovered, never named here;
+                                     see rapp/ext/PATTERN.md)
   api/v1/status.json               — aibast-api-status/1.0 heartbeat
   api/v1/badge.json                — shields.io endpoint format
 
@@ -31,6 +31,7 @@ Usage:  python scripts/build_api.py
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 from datetime import datetime, timezone
@@ -44,6 +45,12 @@ RAW_BASE = f"https://raw.githubusercontent.com/{REPO}/main"
 PAGES_BASE = f"https://microsoft.github.io/aibast-agents-library"
 
 SCHEMA = "aibast-api/1.0"
+
+# Extensions are DISCOVERED here, never named. Adding or removing one is a
+# directory under rapp/ext/ plus nothing else — the pattern is specified in
+# rapp/ext/PATTERN.md, and it is what keeps kernel syncs from ever colliding
+# with distribution-originated work.
+EXT_ROOT = REPO_ROOT / "rapp" / "ext"
 
 
 def now_iso() -> str:
@@ -75,6 +82,76 @@ def stable_write(path: Path, doc: dict) -> bool:
         return False
     path.write_text(text, encoding="utf-8")
     return True
+
+
+
+class _ExtContext:
+    """What an extension may touch. Deliberately small: it can read repo files,
+    write inside its declared namespaces, and prune its own directory. It
+    cannot reach core endpoints, and a failure in it cannot fail the core."""
+
+    def __init__(self, api_root, agents, generated, pages_base, namespaces):
+        self._api = api_root
+        self._ns = tuple(namespaces)
+        self.agents = agents
+        self.generated = generated
+        self.pages_base = pages_base
+        self.changed = 0
+        self._written = []
+
+    @staticmethod
+    def load(path, default):
+        return load(path, default)
+
+    def _check(self, rel):
+        if rel.startswith("/") or ".." in Path(rel).parts:
+            raise ValueError(f"extension path escapes the API root: {rel!r}")
+        if not any(rel == n or rel.startswith(n) for n in self._ns):
+            raise ValueError(
+                f"extension wrote {rel!r} outside its declared namespaces {self._ns}")
+        return (self._api / rel).resolve()
+
+    def write(self, rel, doc):
+        p = self._check(rel)
+        self.changed += stable_write(p, doc)
+        self._written.append(p)
+        return p
+
+    def prune(self, rel_dir, keep):
+        d = self._check(rel_dir if rel_dir.endswith("/") else rel_dir + "/")
+        if not d.exists():
+            return
+        for p in d.rglob("*.json"):
+            if p not in keep:
+                p.unlink()
+                self.changed += 1
+
+
+def run_extensions(api_root, agents, generated, pages_base):
+    """Discover rapp/ext/*/build.py and run each. An extension that is absent,
+    broken, or misbehaving is reported and skipped — the core API still builds.
+    That is the whole point: kernel and core work never depend on an extension."""
+    found = {}
+    total_changed = 0
+    if not EXT_ROOT.is_dir():
+        return found, total_changed
+    for build_py in sorted(EXT_ROOT.glob("*/build.py")):
+        name = build_py.parent.name
+        try:
+            spec = importlib.util.spec_from_file_location(f"rapp_ext_{name}", build_py)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            protocol = getattr(mod, "PROTOCOL")
+            ctx = _ExtContext(api_root, agents, generated, pages_base,
+                              getattr(mod, "NAMESPACES", ()))
+            entry = mod.build(ctx)
+            total_changed += ctx.changed
+            entry["namespaces"] = list(getattr(mod, "NAMESPACES", ()))
+            found[protocol] = entry
+            print(f"[build-api] extension {protocol} ({name}): {ctx.changed} file(s) changed")
+        except Exception as exc:
+            print(f"[build-api] extension {name} SKIPPED ({exc}) — core API unaffected", file=sys.stderr)
+    return found, total_changed
 
 
 def slim_agent(a: dict, ratings: dict) -> dict:
@@ -178,139 +255,26 @@ def main() -> int:
     if aggregated is not None:
         changed += stable_write(API / "aggregated.json", dict(aggregated))
 
-    # ── Awards: badge catalog + roster -> verification endpoints ───────────
-    # A username lookup must answer instantly and truthfully, including "no".
-    # Every roster entry keeps a stable URL after revocation, so a badge already
-    # embedded in someone's README flips to "not certified" rather than 404-ing
-    # (a 404 cannot be told apart from an outage).
-    catalog = load("badges.json", {"badges": []})
-    badge_by_id = {b["id"]: b for b in catalog.get("badges", [])}
-    roster = load("certified.json", {"members": [], "levels": {}})
-
-    members = []
-    for m in roster.get("members", []):
-        user = str(m.get("username", "")).strip().lower()
-        if not user:
+    # An UNINSTALLED extension must stop serving. The previous index records
+    # which namespaces each extension claimed, so removing its directory is
+    # enough — the next build sweeps the endpoints it used to own.
+    previous_ext = (load("api/v1/index.json", {}) or {}).get("extensions", {})
+    extensions, ext_changed = run_extensions(API, agents, gen, PAGES_BASE)
+    changed += ext_changed
+    for proto, meta in previous_ext.items():
+        if proto in extensions:
             continue
-        active = m.get("status", "active") == "active"
-        awards = []
-        for a in m.get("badges", []):
-            meta = badge_by_id.get(a.get("id"))
-            if not meta:
-                continue          # an award naming an unknown badge is ignored, not guessed
-            awards.append({
-                "id": meta["id"], "name": meta["name"], "tier": meta.get("tier"),
-                "points": meta.get("points", 0), "color": meta.get("color", "0078d4"),
-                "awarded_on": a.get("awarded_on"), "discussion": a.get("discussion"),
-                "note": a.get("note"),
-                "badge_url": f"{PAGES_BASE}/api/v1/certified/{user}/{meta['id']}/badge.json",
-            })
-        members.append({
-            "username": user,
-            "level": m.get("level", "certified"),
-            "certified": active and bool(awards),
-            "status": m.get("status", "active"),
-            "certified_on": m.get("certified_on"),
-            "revoked_on": m.get("revoked_on"),
-            "reason": m.get("reason"),
-            "note": m.get("note"),
-            "badges": awards if active else [],
-            "points": sum(a["points"] for a in awards) if active else 0,
-            "profile_url": f"https://github.com/{user}",
-            "verify_url": f"{PAGES_BASE}/api/v1/certified/{user}.json",
-            "badge_url": f"{PAGES_BASE}/api/v1/certified/{user}/badge.json",
-            "agents": sorted(
-                a["name"] for a in agents
-                if a.get("name", "").split("/")[0].lstrip("@").lower() == user
-            ),
-        })
-
-    certified_dir = API / "certified"
-    kept_certified = set()
-
-    def shields(label, message, color):
-        return {"schemaVersion": 1, "label": label, "message": message, "color": color}
-
-    for m in members:
-        doc = {"schema": "aibast-certified/1.0", "generated": gen, **m}
-        p_user = certified_dir / f"{m['username']}.json"
-        kept_certified.add(p_user)
-        changed += stable_write(p_user, doc)
-
-        # Overall badge: green when the account holds at least one live award.
-        summary = (f"certified · {len(m['badges'])} badge"
-                   f"{'' if len(m['badges']) == 1 else 's'}") if m["certified"] else "not certified"
-        p_badge = certified_dir / m["username"] / "badge.json"
-        kept_certified.add(p_badge)
-        changed += stable_write(p_badge, shields(
-            "RAPP", summary, "brightgreen" if m["certified"] else "lightgrey"))
-
-        # One shields endpoint per badge the user holds, so they can display
-        # exactly the achievement they mean.
-        for a in m["badges"]:
-            p_one = certified_dir / m["username"] / a["id"] / "badge.json"
-            kept_certified.add(p_one)
-            changed += stable_write(p_one, shields("RAPP", a["name"], a["color"]))
-
-    if certified_dir.exists():
-        for p_old in certified_dir.rglob("*.json"):
-            if p_old not in kept_certified:
-                p_old.unlink()
-                changed += 1
-
-    holders_by_badge = {}
-    for m in members:
-        for a in m["badges"]:
-            holders_by_badge.setdefault(a["id"], []).append(
-                {"username": m["username"], "awarded_on": a["awarded_on"],
-                 "discussion": a["discussion"]})
-
-    badges_dir = API / "badges"
-    kept_badges = set()
-    for b in catalog.get("badges", []):
-        holders = sorted(holders_by_badge.get(b["id"], []),
-                         key=lambda h: (h["awarded_on"] or "", h["username"]))
-        p_b = badges_dir / f"{b['id']}.json"
-        kept_badges.add(p_b)
-        changed += stable_write(p_b, {
-            "schema": "aibast-badge/1.0", "generated": gen, **b,
-            "holders": holders, "holder_count": len(holders),
-        })
-    if badges_dir.exists():
-        for p_old in badges_dir.glob("*.json"):
-            if p_old not in kept_badges:
-                p_old.unlink()
-                changed += 1
-
-    changed += stable_write(API / "badges.json", {
-        "schema": "aibast-badge-catalog/1.0", "generated": gen,
-        "count": len(catalog.get("badges", [])),
-        "lookup": f"{PAGES_BASE}/api/v1/badges/{{badge_id}}.json",
-        "badges": [{**b, "holder_count": len(holders_by_badge.get(b["id"], []))}
-                   for b in catalog.get("badges", [])],
-    })
-
-    # Wall of Fame: ranked, public, and derived — never hand-edited.
-    wall = sorted((m for m in members if m["certified"]),
-                  key=lambda m: (-m["points"], -len(m["badges"]), m["username"]))
-    changed += stable_write(API / "wall.json", {
-        "schema": "aibast-wall/1.0", "generated": gen,
-        "count": len(wall),
-        "page": f"{PAGES_BASE}/wall.html",
-        "members": [{k: m[k] for k in
-                     ("username", "level", "points", "badges", "profile_url",
-                      "verify_url", "badge_url", "agents")} for m in wall],
-    })
-
-    changed += stable_write(API / "certified.json", {
-        "schema": "aibast-certified-roster/1.0", "generated": gen,
-        "levels": roster.get("levels", {}),
-        "count": sum(1 for m in members if m["certified"]),
-        "lookup": f"{PAGES_BASE}/api/v1/certified/{{username}}.json",
-        "note": ("Query any GitHub username. A username absent from this roster is "
-                 "not certified; an entry with certified=false was revoked."),
-        "members": members,
-    })
+        for ns in meta.get("namespaces", []):
+            target = (API / ns).resolve()
+            if not target.is_relative_to(API.resolve()):
+                continue
+            if ns.endswith("/") and target.is_dir():
+                for stale in sorted(target.rglob("*.json"), reverse=True):
+                    stale.unlink(); changed += 1
+            elif target.is_file():
+                target.unlink(); changed += 1
+        print(f"[build-api] extension {proto} uninstalled — its endpoints were removed",
+              file=sys.stderr)
 
     changed += stable_write(API / "status.json", {
         "schema": "aibast-api-status/1.0", "generated": gen,
@@ -319,8 +283,6 @@ def main() -> int:
         "publishers": stats.get("publishers", len(pubs)),
         "categories": stats.get("categories", len(cats)),
         "aggregated_skills": ((aggregated or {}).get("stats") or {}).get("total", 0),
-        "certified_publishers": sum(1 for m in members if m["certified"]),
-        "badges": len(catalog.get("badges", [])),
     })
 
     changed += stable_write(API / "badge.json", {
@@ -343,17 +305,11 @@ def main() -> int:
             "publishers": "publishers.json",
             "metrics": "metrics.json",
             "aggregated": "aggregated.json",
-            "certified_roster": "certified.json",
-            "certified_lookup": "certified/{username}.json",
-            "certified_badge": "certified/{username}/badge.json",
-            "certified_badge_one": "certified/{username}/{badge_id}/badge.json",
-            "badge_catalog": "badges.json",
-            "badge_holders": "badges/{badge_id}.json",
-            "wall_of_fame": "wall.json",
             "status": "status.json",
             "badge": "badge.json",
             "registry": "../../registry.json",
         },
+        "extensions": extensions,
     })
 
     print(f"[build-api] {len(slim)} agents → api/v1/ ({changed} file(s) changed)")

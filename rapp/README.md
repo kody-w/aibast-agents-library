@@ -11,6 +11,11 @@ protocol and platform. The relationship is deliberate and familiar:
 | Moves | fast — canary → nightly → alpha → beta → stable | deliberately — pinned, gated, verified |
 | Protocol | ratifies RAPP/1 revisions | adopts ratified revisions by pin bump |
 
+Everything under `spec/`, `handbook/` and `standards/` is **mirrored** from the
+kernel at a pinned revision. Everything under `ext/` is **originated here** —
+work this distribution contributes, versioned on its own line and offered
+upstream for consideration rather than assumed into the kernel.
+
 **RAPP/1 is the standard; both sides implement it.** Neither renames it,
 both comply with it, and the corpus is verifiable from the documents in
 this directory alone — no external repo required.
@@ -24,6 +29,7 @@ this directory alone — no external repo required.
 | [`spec/ecosystem-spec.json`](spec/ecosystem-spec.json) | The full ecosystem specification (`rapp-ecosystem-spec/1.0`) |
 | [`handbook/`](handbook/) | The RAPP Handbook (mirrored from the upstream RAPP-Bible project): end-to-end explanation of the ecosystem + 9 sub-specs (BSD-3-Clause, see NOTICE) |
 | [`standards/`](standards/) | Companion standards: `rapp-holo/1.0`, `rapp-static-api/1.0`, the ring PLAYBOOK, machine entry points |
+| [`ext/`](ext/) | **Extensions this distribution originated** — the [extension pattern](ext/PATTERN.md) that keeps them isolated from kernel updates, and the first one: [`ms-rapp-badge/1.0`](ext/ms-rapp-badge-1.0/SPEC.md) |
 | [`ATTRIBUTION.md`](ATTRIBUTION.md) | Naming posture — the marks belong upstream; this distribution claims none |
 | [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) | License map for every mirrored file (mirrors ship under their upstream licenses) |
 | [`MIRROR-MANIFEST.json`](MIRROR-MANIFEST.json) | Provenance for every mirrored file: repo, pinned commit, SHA-256, license |
