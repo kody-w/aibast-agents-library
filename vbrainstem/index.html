@@ -654,7 +654,8 @@
   .logo#workspace-btn { cursor: pointer; }
   .logo#workspace-btn:hover { opacity: .85; }
   #workspace-drawer {
-    display: none; position: fixed; inset: 0 auto 0 0; width: 460px; max-width: 92vw;
+    display: none; position: fixed; inset: 0 auto 0 0;
+    width: min(980px, 94vw);            /* a file viewer needs room to breathe */
     background: #0d1117; border-right: 1px solid #30363d; z-index: 200;
     box-shadow: 8px 0 32px rgba(0,0,0,.45); flex-direction: column;
   }
@@ -666,7 +667,9 @@
   #workspace-drawer header h3 { font-size: 14px; font-weight: 650; flex: 1; }
   #workspace-drawer header .sub { font-size: 11px; color: #8b949e; font-weight: 400; display: block; }
   #ws-body { flex: 1; display: flex; min-height: 0; }
-  #ws-tree { width: 190px; overflow-y: auto; border-right: 1px solid #21262d; padding: 8px 6px; flex-shrink: 0; }
+  #ws-tree { width: 210px; overflow-y: auto; border-right: 1px solid #21262d;
+    padding: 8px 6px; flex-shrink: 0; }
+  @media (max-width: 620px) { #ws-tree { width: 150px; } }
   #ws-tree .grp { font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
     color: #6e7681; font-weight: 700; padding: 10px 8px 4px; }
   #ws-tree .f { display: block; padding: 5px 8px; border-radius: 5px; font-size: 12px;
@@ -674,8 +677,18 @@
   #ws-tree .f:hover { background: #161b22; color: #e6edf3; }
   #ws-tree .f.active { background: #1f6feb26; color: #58a6ff; }
   #ws-view { flex: 1; overflow: auto; padding: 12px 14px; min-width: 0; }
+  /* A file viewer preserves the author's lines. Long lines scroll sideways
+     rather than being broken mid-token; "Wrap" opts into soft wrapping. */
   #ws-view pre { margin: 0; font-family: "SF Mono", ui-monospace, Consolas, monospace;
-    font-size: 11.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; color: #e6edf3; }
+    font-size: 12px; line-height: 1.5; white-space: pre; overflow-x: auto;
+    tab-size: 4; color: #e6edf3; }
+  #ws-view.wrap pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  #ws-view { flex: 1; overflow: auto; padding: 12px 14px; min-width: 0; }
+  #ws-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  #ws-head .btn { font-size: 10.5px; font-weight: 650; padding: 3px 9px; border-radius: 5px;
+    border: 1px solid #30363d; background: #161b22; color: #8b949e; cursor: pointer; }
+  #ws-head .btn:hover { color: #e6edf3; border-color: #484f58; }
+  #ws-head .btn.on { color: #58a6ff; border-color: #1f6feb; background: #1f6feb1a; }
   #ws-view .ph { color: #6e7681; font-size: 12px; }
   #ws-meta { font-size: 11px; color: #6e7681; margin-bottom: 8px; }
   body.light-mode #workspace-drawer { background: #fff; border-right-color: #d0d7de; }
@@ -1884,9 +1897,25 @@
       const d = await r.json();
       if (d.error) { view.innerHTML = '<div class="ph">' + d.error + '</div>'; return; }
       const esc = s => String(s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
-      view.innerHTML = '<div id="ws-meta">' + esc(d.path) + ' · ' + d.bytes + ' bytes</div>' +
+      const lines = d.binary ? 0 : d.content.split('\n').length;
+      view.innerHTML =
+        '<div id="ws-head"><span id="ws-meta">' + esc(d.path) + ' · ' + d.bytes +
+          ' bytes' + (lines ? ' · ' + lines + ' lines' : '') + '</span>' +
+          '<button class="btn" id="ws-wrap">Wrap</button>' +
+          '<button class="btn" id="ws-copy">Copy</button></div>' +
         (d.binary ? '<div class="ph">binary file — not shown</div>'
                   : '<pre>' + esc(d.content) + '</pre>');
+      const wrapBtn = document.getElementById('ws-wrap');
+      if (localStorage.getItem('vb_ws_wrap') === '1') { view.classList.add('wrap'); wrapBtn.classList.add('on'); }
+      wrapBtn.onclick = () => {
+        const on = view.classList.toggle('wrap');
+        wrapBtn.classList.toggle('on', on);
+        try { localStorage.setItem('vb_ws_wrap', on ? '1' : '0'); } catch (e) {}
+      };
+      document.getElementById('ws-copy').onclick = (ev) => {
+        navigator.clipboard.writeText(d.content || '');
+        ev.target.textContent = 'Copied'; setTimeout(() => ev.target.textContent = 'Copy', 1400);
+      };
       view.scrollTop = 0;
     } catch (e) { view.innerHTML = '<div class="ph">could not read that file</div>'; }
   }
