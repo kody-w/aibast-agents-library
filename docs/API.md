@@ -28,6 +28,9 @@ Integrate it into any application with a plain `fetch()`.
 | `aggregated.json` | Aggregated outside skills, ranked by `front_page_score` |
 | `status.json` | Heartbeat: counts + generated timestamp |
 | `badge.json` | [shields.io endpoint](https://shields.io/badges/endpoint-badge) format |
+| `certified.json` | RAPP Certified roster — every publisher and their status |
+| `certified/<username>.json` | Real-time verification for one GitHub username (lowercase) |
+| `certified/<username>/badge.json` | shields.io badge reflecting that user's current status |
 | `../../registry.json` | The full raw registry (`rapp-registry/1.0`) |
 
 ## Examples

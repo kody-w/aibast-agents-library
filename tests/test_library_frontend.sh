@@ -169,6 +169,75 @@ PY"
 check "escapes untrusted registry strings before innerHTML" \
   "grep -q 'esc(' agents.html"
 
+echo "== T-APIPAGE explorer + impact page =="
+check "api.html has a live explorer, impact panel and badge section" "python3 - <<'PY'
+h=open('api.html').read()
+for needle in ('id=\"epList\"','id=\"epOut\"','id=\"kpis\"','id=\"spark\"','id=\"badgeList\"',
+               'api/v1/index.json','api/v1/agents.json','img.shields.io/endpoint',
+               'rapp-static-api/1.0','var esc ='):
+    assert needle in h, needle
+# explorer must fetch relatively so it exercises whatever host serves it
+assert 'var url = active.path;' in h, 'explorer must fetch relative paths'
+assert 'fetch(url, { cache:' in h
+PY"
+check "every explorer endpoint exists in the tree" "python3 - <<'PY'
+import re, os
+h=open('api.html').read()
+paths=re.findall(r'\{ path: \"([^\"]+)\"', h)
+assert len(paths)>=8, paths
+for p in paths:
+    assert os.path.exists(p), p
+PY"
+check "gallery, metrics and installer link the API explorer" \
+  "grep -q 'api.html' index.html && grep -q 'api.html' agents.html && grep -q 'api.html' metrics.html"
+
+echo "== T-CERT RAPP Certified verification =="
+check "roster builds per-user endpoints, badges, and a roster document" "python3 - <<'PY'
+import json, subprocess
+subprocess.run(['python3','scripts/build_api.py'],capture_output=True,text=True,timeout=60)
+roster=json.load(open('certified.json'))
+built=json.load(open('api/v1/certified.json'))
+assert built['schema']=='aibast-certified-roster/1.0'
+assert '{username}' in built['lookup']
+names={m['username'] for m in built['members']}
+assert {str(m['username']).lower() for m in roster['members']} == names
+for m in built['members']:
+    d=json.load(open(f\"api/v1/certified/{m['username']}.json\"))
+    assert d['schema']=='aibast-certified/1.0'
+    assert d['certified'] is (m['status']=='active')
+    b=json.load(open(f\"api/v1/certified/{m['username']}/badge.json\"))
+    assert b['schemaVersion']==1 and b['label']=='RAPP'
+    assert (b['color']=='brightgreen') is d['certified']
+PY"
+check "revocation keeps the URL resolving and flips the answer" "python3 - <<'PY'
+import json, shutil, subprocess, pathlib
+src=pathlib.Path('certified.json'); backup=src.read_text()
+try:
+    doc=json.loads(backup)
+    doc['members'].append({'username':'GateProbeUser','level':'certified',
+                           'certified_on':'2026-01-01','status':'revoked',
+                           'revoked_on':'2026-02-01','reason':'gate probe'})
+    src.write_text(json.dumps(doc,indent=2))
+    subprocess.run(['python3','scripts/build_api.py'],capture_output=True,timeout=60)
+    d=json.load(open('api/v1/certified/gateprobeuser.json'))
+    assert d['certified'] is False and d['status']=='revoked'   # URL resolves, answer is no
+    b=json.load(open('api/v1/certified/gateprobeuser/badge.json'))
+    assert b['color']=='lightgrey' and 'not certified' in b['message']
+finally:
+    src.write_text(backup)
+    subprocess.run(['python3','scripts/build_api.py'],capture_output=True,timeout=60)
+assert not pathlib.Path('api/v1/certified/gateprobeuser.json').exists()  # pruned on removal
+PY"
+check "api.html verifies usernames live and links the process" "python3 - <<'PY'
+h=open('api.html').read()
+for n in ('id=\"certUser\"','id=\"certResult\"','id=\"certTable\"',
+          'api/v1/certified/','function verify(','img.shields.io/endpoint'):
+    assert n in h, n
+d=open('docs/CERTIFICATION.md').read()
+for k in ('revoked','never deleted','not** a Microsoft','endorsement','certified.json'):
+    assert k.lower() in d.lower(), k
+PY"
+
 echo "== T7 metrics.html static contract =="
 check "exists, loads state/metrics.json, canonical repo, has KPI+boards containers" "python3 - <<'PY'
 h=open('metrics.html').read()

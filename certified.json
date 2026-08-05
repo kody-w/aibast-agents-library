@@ -1,0 +1,34 @@
+{
+  "schema": "aibast-certified-roster/1.0",
+  "_comment": [
+    "THE ROSTER. This is the only hand-edited file in the certification system.",
+    "scripts/build_api.py turns it into the verification endpoints under",
+    "api/v1/certified/, which anyone can query by GitHub username.",
+    "",
+    "Adding someone: append an entry with status 'active'.",
+    "Revoking someone: set status to 'revoked' and add revoked_on + reason.",
+    "NEVER delete an entry — the endpoint URL must keep resolving so a badge",
+    "in someone's README flips to 'not certified' instead of breaking. A 404",
+    "is indistinguishable from an outage; an explicit 'revoked' is not.",
+    "",
+    "Usernames are matched case-insensitively (GitHub is), and are stored",
+    "lowercase. Levels: certified (built and shipped a RAPP agent that passed",
+    "review) and maintainer (also reviews others' submissions).",
+    "",
+    "Roles, not personal data: keep entries to a username, a level, dates, and",
+    "an optional public org/handle. No emails, no internal identifiers."
+  ],
+  "levels": {
+    "certified": "Has published at least one agent to the library that passed review.",
+    "maintainer": "Certified, and reviews submissions from other publishers."
+  },
+  "members": [
+    {
+      "username": "aibast-agents-library",
+      "level": "maintainer",
+      "certified_on": "2026-08-04",
+      "status": "active",
+      "note": "Library maintainer account — the reference entry."
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schema": "aibast-metrics/1.0",
   "repo_name": "microsoft/aibast-agents-library",
-  "generated_at": "2026-08-04T23:46:35.274817+00:00",
+  "generated_at": "2026-08-05T00:18:44.020039+00:00",
   "totals": {
     "downloads": 40,
     "clones": 39,
@@ -22,7 +22,11 @@
     "tracking_since": "2026-08-04",
     "days_tracked": 14
   },
-  "repo": {},
+  "repo": {
+    "stars": 4,
+    "forks": 2,
+    "open_issues": 5
+  },
   "traffic": {
     "live": false,
     "as_of": "2026-08-04T19:31:53.313902+00:00",

@@ -66,3 +66,10 @@ check with the exact reason. On merge:
 Converting a skill from an outside library into the RAPP ecosystem? Follow
 [AGGREGATION.md](AGGREGATION.md) — conversion lands through this same
 publisher flow, with attribution and a license check on top.
+
+## RAPP Certified
+
+Once an agent of yours is merged, a maintainer adds you to the public
+certification roster and your GitHub username becomes verifiable from the
+static API — with a live badge you can put in your own README. See
+[CERTIFICATION.md](CERTIFICATION.md).

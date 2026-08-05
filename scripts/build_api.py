@@ -21,6 +21,9 @@ Endpoints:
   api/v1/publishers.json           — publisher directory
   api/v1/metrics.json              — latest metrics snapshot (mirror of state/)
   api/v1/aggregated.json           — aggregated outside skills (mirror of state/)
+  api/v1/certified.json            — the RAPP Certified roster (public)
+  api/v1/certified/<username>.json — real-time verification for one GitHub user
+  api/v1/certified/<username>/badge.json — shields.io badge for that user
   api/v1/status.json               — aibast-api-status/1.0 heartbeat
   api/v1/badge.json                — shields.io endpoint format
 
@@ -175,6 +178,69 @@ def main() -> int:
     if aggregated is not None:
         changed += stable_write(API / "aggregated.json", dict(aggregated))
 
+    # ── RAPP Certified: roster -> per-user verification endpoints ──────────
+    # A username lookup must answer instantly and truthfully, including "no".
+    # Every roster entry gets a stable URL that keeps resolving after
+    # revocation, so a badge in someone's README flips to "not certified"
+    # rather than breaking — a 404 cannot be told apart from an outage.
+    roster = load("certified.json", {"members": [], "levels": {}})
+    members = []
+    for m in roster.get("members", []):
+        user = str(m.get("username", "")).strip().lower()
+        if not user:
+            continue
+        active = m.get("status", "active") == "active"
+        members.append({
+            "username": user,
+            "level": m.get("level", "certified"),
+            "certified": active,
+            "status": m.get("status", "active"),
+            "certified_on": m.get("certified_on"),
+            "revoked_on": m.get("revoked_on"),
+            "reason": m.get("reason"),
+            "note": m.get("note"),
+            "profile_url": f"https://github.com/{user}",
+            "verify_url": f"{PAGES_BASE}/api/v1/certified/{user}.json",
+            "badge_url": f"{PAGES_BASE}/api/v1/certified/{user}/badge.json",
+            "agents": sorted(
+                a["name"] for a in agents
+                if a.get("name", "").split("/")[0].lstrip("@").lower() == user
+            ),
+        })
+
+    certified_dir = API / "certified"
+    kept_certified = set()
+    for m in members:
+        doc = {"schema": "aibast-certified/1.0", "generated": gen, **m}
+        p_user = certified_dir / f"{m['username']}.json"
+        kept_certified.add(p_user)
+        changed += stable_write(p_user, doc)
+        # shields.io endpoint — green when active, grey when revoked
+        p_badge = certified_dir / m["username"] / "badge.json"
+        kept_certified.add(p_badge)
+        changed += stable_write(p_badge, {
+            "schemaVersion": 1,
+            "label": "RAPP",
+            "message": ("certified" if m["certified"] else "not certified")
+                       + ("" if m["level"] != "maintainer" or not m["certified"] else " maintainer"),
+            "color": "brightgreen" if m["certified"] else "lightgrey",
+        })
+    if certified_dir.exists():
+        for p_old in certified_dir.rglob("*.json"):
+            if p_old not in kept_certified:
+                p_old.unlink()
+                changed += 1
+
+    changed += stable_write(API / "certified.json", {
+        "schema": "aibast-certified-roster/1.0", "generated": gen,
+        "levels": roster.get("levels", {}),
+        "count": sum(1 for m in members if m["certified"]),
+        "lookup": f"{PAGES_BASE}/api/v1/certified/{{username}}.json",
+        "note": ("Query any GitHub username. A username absent from this roster is "
+                 "not certified; an entry with certified=false was revoked."),
+        "members": members,
+    })
+
     changed += stable_write(API / "status.json", {
         "schema": "aibast-api-status/1.0", "generated": gen,
         "ok": True,
@@ -182,6 +248,7 @@ def main() -> int:
         "publishers": stats.get("publishers", len(pubs)),
         "categories": stats.get("categories", len(cats)),
         "aggregated_skills": ((aggregated or {}).get("stats") or {}).get("total", 0),
+        "certified_publishers": sum(1 for m in members if m["certified"]),
     })
 
     changed += stable_write(API / "badge.json", {
@@ -204,6 +271,9 @@ def main() -> int:
             "publishers": "publishers.json",
             "metrics": "metrics.json",
             "aggregated": "aggregated.json",
+            "certified_roster": "certified.json",
+            "certified_lookup": "certified/{username}.json",
+            "certified_badge": "certified/{username}/badge.json",
             "status": "status.json",
             "badge": "badge.json",
             "registry": "../../registry.json",
