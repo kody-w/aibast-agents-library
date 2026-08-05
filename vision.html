@@ -355,8 +355,9 @@ function build(){
     esc(x.act)+" · "+Math.round(x.start)+"s</button>";}).join("");
 
   var slots=(DOC.remix&&DOC.remix.slots||[]).map(function(sl,i){
-    return '<div class="slotrow"><label>'+esc(sl.template.replace(DOC.remix.placeholder,"…").slice(0,90))+
-      '</label><input data-slot="'+i+'" placeholder="your customer\'s detail"></div>';
+    return '<div class="slotrow"><label>'+esc(sl.label || sl.path)+
+      '</label><input data-slot="'+i+'" value="'+esc(sl.value||"")+
+      '" placeholder="your customer\'s detail"></div>';
   }).join("");
 
   document.getElementById("shell").innerHTML =

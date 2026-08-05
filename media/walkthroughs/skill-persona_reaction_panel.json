@@ -2,14 +2,44 @@
   "schema": "rappvision-walkthrough/1.0",
   "format_version": "1.0.0",
   "remix": {
-    "placeholder": "[operator supplies]",
-    "slot_count": 0,
-    "slots": [],
-    "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
-    "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
+    "slot_count": 4,
+    "slots": [
+      {
+        "path": "scenario.subject",
+        "label": "What the demo is about",
+        "value": "the current workload"
+      },
+      {
+        "path": "scenario.driver",
+        "label": "What is driving the work",
+        "value": "rising request volume"
+      },
+      {
+        "path": "scenario.systems",
+        "label": "Systems it reads",
+        "value": "the systems of record already in use"
+      },
+      {
+        "path": "scenario.window",
+        "label": "Timeframe",
+        "value": "the coming month"
+      }
+    ],
+    "scenario": {
+      "subject": "the current workload",
+      "volume": "the working backlog",
+      "target": "same-day turnaround",
+      "metric": "turnaround slower than wanted",
+      "window": "the coming month",
+      "driver": "rising request volume",
+      "systems": "the systems of record already in use",
+      "verb": "accelerates turnaround"
+    },
+    "how": "Replace the scenario below with your own customer's and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim.",
+    "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:07:10+00:00",
+  "generated": "2026-08-05T20:09:35+00:00",
   "subject": {
     "slug": "persona_reaction_panel",
     "kind": "skill",

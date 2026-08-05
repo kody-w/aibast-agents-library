@@ -523,8 +523,9 @@ function storyboardHTML(doc) {
   }).join("");
 
   var slots = (doc.remix && doc.remix.slots || []).map(function (s, i) {
-    return '<label class="slotrow"><span>' + esc(s.template.replace(doc.remix.placeholder, "…")) +
-      '</span><input data-slot="' + i + '" placeholder="your customer\'s detail"></label>';
+    return '<label class="slotrow"><span>' + esc(s.label || s.path) +
+      '</span><input data-slot="' + i + '" value="' + esc(s.value || "") +
+      '" placeholder="your customer\'s detail"></label>';
   }).join("");
 
   return '<section class="story">' +
@@ -557,12 +558,13 @@ function wireRemix(doc) {
     document.querySelectorAll("[data-slot]").forEach(function (i) {
       if (i.value.trim()) vals[i.getAttribute("data-slot")] = i.value.trim();
     });
+    // The slots are the scenario now, so a remix rewrites the scenario values
+    // the storyboard was built from rather than substituting a marker.
+    copy.remix.scenario = copy.remix.scenario || {};
     (copy.remix.slots || []).forEach(function (s, i) {
       if (!vals[i]) return;
-      var parts = s.path.replace(/\[(\d+)\]/g, ".$1").split(".");
-      var node = copy, last = parts.pop();
-      parts.forEach(function (p) { node = node[p]; });
-      node[last] = s.template.split(copy.remix.placeholder).join(vals[i]);
+      s.value = vals[i];
+      copy.remix.scenario[s.path.split(".").pop()] = vals[i];
     });
     copy.status = "remixed";
     copy.remixed_from = doc.subject.slug;

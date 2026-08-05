@@ -556,34 +556,38 @@ def build(entry: dict) -> dict:
     # Every placeholder is a remix point. A seller fills these in with their own
     # customer's scenario and the generic demo becomes theirs — which is the
     # difference between a video someone watches and a video someone presents.
-    slots = []
-    def collect(node, path):
-        if isinstance(node, str):
-            if PLACEHOLDER in node:
-                slots.append({"path": path, "template": node})
-        elif isinstance(node, list):
-            for i, v in enumerate(node):
-                collect(v, f"{path}[{i}]")
-        elif isinstance(node, dict):
-            for k, v in node.items():
-                collect(v, f"{path}.{k}")
-    collect(scenes, "scenes")
+    # Remix points. Previously these were the [operator supplies] markers; with
+    # those gone the swappable material is the SCENARIO — the subject, the
+    # driver, the systems. That is what a seller replaces to make the demo
+    # their customer's, and it is why the film never needed mail-merge fields
+    # on screen to be customisable.
+    sc = scenario_for(entry)
+    slots = [
+        {"path": "scenario.subject", "label": "What the demo is about",
+         "value": sc["subject"]},
+        {"path": "scenario.driver", "label": "What is driving the work",
+         "value": sc["driver"]},
+        {"path": "scenario.systems", "label": "Systems it reads",
+         "value": sc["systems"]},
+        {"path": "scenario.window", "label": "Timeframe", "value": sc["window"]},
+    ]
 
     return {
         "schema": SCHEMA,
         "format_version": FORMAT_VERSION,
         "remix": {
-            "placeholder": PLACEHOLDER,
             "slot_count": len(slots),
             "slots": slots,
-            "how": ("Replace each placeholder with your own customer's scenario and "
+            "scenario": sc,
+            "how": ("Replace the scenario below with your own customer's and "
                     "this stops being a generic demo and becomes yours. The acts, "
                     "timings, and the Agent Calls line stay fixed — those are the "
-                    "format and the checkable claim. Everything a customer would "
-                    "recognise as their own situation is a slot."),
-            "rule": ("Substitute real figures only if you can stand behind them. A "
-                     "personalised demo carries more weight than a generic one, which "
-                     "is exactly why an invented number in it does more damage."),
+                    "format and the checkable claim."),
+            "rule": ("The shipped film states no figures, because these are "
+                     "demonstrations rather than results. Substitute real numbers "
+                     "only if you can stand behind them — a personalised demo "
+                     "carries more weight, which is exactly why an invented "
+                     "number in one does more damage."),
         },
         "format_doc": "media/RAPPVISION.md",
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
