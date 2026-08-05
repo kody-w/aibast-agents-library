@@ -85,13 +85,7 @@ header{border-bottom:1px solid var(--border);background:var(--bg)}
   border-radius:.9cqw;padding:1.8cqw;flex:1;display:flex;flex-direction:column;
   gap:1.1cqw;justify-content:center}
 .jewels{display:flex;gap:.9cqw;justify-content:center;margin-top:1.1cqw}
-.jw{width:2.6cqw;height:2.6cqw;border-radius:.5cqw;display:flex;align-items:center;
-  justify-content:center;font-size:1.1cqw;font-weight:800;color:#fff}
-.jw.d365{background:linear-gradient(135deg,#3b8de0,#8661c5)}
-.jw.teams{background:#5b5fc7}.jw.sharepoint{background:#1e8f6e}
-.jw.azure{background:#0089d6}.jw.powerbi{background:#e9c93a;color:#3b3b00}
-.jw.copilot{background:linear-gradient(135deg,#e8598f,#8b5cf6,#4f7cf7)}
-.jw.generic{background:#5a6480}
+.jw{width:3.1cqw;height:3.1cqw;display:block;object-fit:contain}
 .pcol .pbody div{font-size:1.55cqw;line-height:1.35;text-align:center;font-weight:500;
   /* Env-var names and long identifiers have no break opportunities and were
      spilling outside the panel. Break them rather than let a frame look
@@ -258,21 +252,29 @@ function sceneProblem(s){
     '<div class="cue">'+esc((s.shot||"").replace(/^B-roll — /,""))+"</div>" +
     '<div class="narr">'+markup(s.narration)+"</div></div>";
 }
-var JEWELS = [
-  [/dynamics|d365|erp|crm/i, "d365", "D"], [/teams/i, "teams", "T"],
-  [/sharepoint|onedrive/i, "sharepoint", "S"], [/power ?bi/i, "powerbi", "P"],
-  [/azure|openai/i, "azure", "A"], [/copilot|brainstem/i, "copilot", "C"]
-];
+/* Real product marks, matched by name against media/jewels/index.json.
+   These were blank grey tiles with a "·" in them — the reviewer counted that
+   as an unfixed defect, correctly. */
+var JEWEL_INDEX = null;
+// Resolved BEFORE the stage is built. Loading it after meant the scene HTML
+// was already constructed and the marks never made it in.
+var JEWELS_READY = fetch("media/jewels/index.json")
+  .then(function(r){ return r.ok ? r.json() : null; })
+  .then(function(d){ if(d) JEWEL_INDEX = d.jewels; })
+  .catch(function(){});
+
 function jewelsFor(lines){
-  var seen = {}, out = [];
-  lines.join(" ").split(/[,;]| and /).forEach(function (part) {
-    JEWELS.forEach(function (j) {
-      if (j[0].test(part) && !seen[j[1]]) { seen[j[1]] = 1; out.push(j); }
-    });
+  if(!JEWEL_INDEX) return "";
+  var hay=lines.join(" ").toLowerCase(), seen={}, out=[];
+  JEWEL_INDEX.forEach(function(j){
+    if(seen[j.id]) return;
+    if((j.match||[]).some(function(m){ return hay.indexOf(m)>-1; })){
+      seen[j.id]=1; out.push(j);
+    }
   });
-  if (!out.length) out = [[null, "generic", "•"]];
-  return '<div class="jewels">' + out.slice(0, 3).map(function (j) {
-    return '<span class="jw ' + j[1] + '">' + j[2] + "</span>";
+  if(!out.length) return "";
+  return '<div class="jewels">' + out.slice(0,3).map(function(j){
+    return '<img class="jw" src="'+j.file+'" alt="">';
   }).join("") + "</div>";
 }
 function sceneOverview(s){
@@ -491,7 +493,7 @@ function build(){
     }
     DOC=doc;
     document.title=doc.subject.display_name+" — RAPPVision";
-    build();
+    JEWELS_READY.then(build);
   });
 })();
 </script>

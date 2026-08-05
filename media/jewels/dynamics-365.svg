@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Microsoft Dynamics 365">
+<defs><linearGradient id="d1" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#3B8DE0"/><stop offset="1" stop-color="#8661C5"/></linearGradient></defs>
+<path d="M10 8l26 8v16l-14 8V22L10 18z" fill="url(#d1)"/>
+<path d="M22 22l14-6v16l-14 8z" fill="#8661C5" opacity=".75"/>
+</svg>

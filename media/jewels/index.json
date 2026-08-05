@@ -1,0 +1,102 @@
+{
+  "schema": "aibast-jewels/1.0",
+  "note": "Product marks for the Agent overview card. Four are official assets from microsoft/PowerBI-Icons; five are renditions drawn to match how the marks appear in the AIBAST recordings. Replace the renditions with official artwork before any release where brand exactness matters \u2014 provenance is recorded per mark so that is checkable.",
+  "count": 9,
+  "jewels": [
+    {
+      "id": "azure-ai-foundry",
+      "file": "media/jewels/azure-ai-foundry.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/azure-ai-foundry.svg",
+      "provenance": "rendition drawn to match the recordings",
+      "match": [
+        "azure",
+        "openai",
+        "foundry",
+        "ai search"
+      ]
+    },
+    {
+      "id": "copilot",
+      "file": "media/jewels/copilot.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/copilot.svg",
+      "provenance": "rendition drawn to match the recordings",
+      "match": [
+        "copilot",
+        "brainstem",
+        "m365 copilot"
+      ]
+    },
+    {
+      "id": "dataverse",
+      "file": "media/jewels/dataverse.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/dataverse.svg",
+      "provenance": "microsoft/PowerBI-Icons (official)",
+      "match": [
+        "dataverse"
+      ]
+    },
+    {
+      "id": "dynamics-365",
+      "file": "media/jewels/dynamics-365.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/dynamics-365.svg",
+      "provenance": "rendition drawn to match the recordings",
+      "match": [
+        "dynamics",
+        "d365",
+        "erp",
+        "crm",
+        "ccaas"
+      ]
+    },
+    {
+      "id": "power-apps",
+      "file": "media/jewels/power-apps.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/power-apps.svg",
+      "provenance": "microsoft/PowerBI-Icons (official)",
+      "match": [
+        "power apps",
+        "powerapps"
+      ]
+    },
+    {
+      "id": "power-automate",
+      "file": "media/jewels/power-automate.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/power-automate.svg",
+      "provenance": "microsoft/PowerBI-Icons (official)",
+      "match": [
+        "power automate",
+        "flow",
+        "logic apps"
+      ]
+    },
+    {
+      "id": "power-bi",
+      "file": "media/jewels/power-bi.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/power-bi.svg",
+      "provenance": "microsoft/PowerBI-Icons (official)",
+      "match": [
+        "power bi",
+        "powerbi"
+      ]
+    },
+    {
+      "id": "sharepoint",
+      "file": "media/jewels/sharepoint.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/sharepoint.svg",
+      "provenance": "rendition drawn to match the recordings",
+      "match": [
+        "sharepoint",
+        "onedrive"
+      ]
+    },
+    {
+      "id": "teams",
+      "file": "media/jewels/teams.svg",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/teams.svg",
+      "provenance": "rendition drawn to match the recordings",
+      "match": [
+        "teams"
+      ]
+    }
+  ]
+}
