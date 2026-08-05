@@ -445,8 +445,8 @@ getJSON(["api/v1/blog/index.json", PAGES + "/api/v1/blog/index.json"]).then(func
     fetch(el.dataset.path, { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.text(); })
       .catch(function () { return fetch(el.dataset.raw).then(function (r) { return r.text(); }); })
       .then(function (text) {
-        var body = text.replace(/^---[\s\S]*?\n---\n/, "");
-        body = body.replace(/^#\s+.*\n/, "");        // the title is already the post header
+        var body = text.replace(/^---[\s\S]*?\n---\n/, "").replace(/^\s+/, "");
+        body = body.replace(/^#\s+.*(\n|$)/, "");     // the title is already the post header
         el.innerHTML = md(body);
         if (location.hash && location.hash.slice(1) === el.parentNode.id) el.parentNode.scrollIntoView();
       }).catch(function () {});
