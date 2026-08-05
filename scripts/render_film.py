@@ -55,7 +55,13 @@ PLACEHOLDER = "[operator supplies]"
 # silent while a speech-only cut measures 40%. Without it every gap between
 # narration lines is true digital silence and the film reads as broken.
 BED = REPO_ROOT / "media" / "audio" / "bed.m4a"
-BED_GAIN = "0.14"   # under the voice, present in the gaps
+BED_GAIN = "0.14"
+# Disabled. The reference carries a scored bed, but it only has ~9s of
+# speech-free music (0->9.37s), and looping that to 132s produced a seam every
+# 5.4s that reads as a second voice competing with the narration. Silence
+# between lines is honest; a stuttering loop is not. Re-enable when a licensed
+# continuous bed exists.
+USE_BED = os.environ.get("RAPPVISION_BED", "0") == "1"
 # Absolute second each act's narration may begin, measured from the reference.
 VO_ENTRY = {"problem": 9.4}
 
@@ -358,7 +364,7 @@ def render_over_base(story: dict, subject: dict, ov: dict, work: Path,
 
 def mux(picture: Path, audio_parts: list, clock: float, out: Path) -> None:
     """Lay narration and the bed over a finished picture at reference specs."""
-    if not audio_parts and not BED.is_file():
+    if not audio_parts and not (USE_BED and BED.is_file()):
         run(["ffmpeg", "-v", "error", "-y", "-i", str(picture),
              "-c", "copy", str(out)], why="copy picture")
         return
@@ -367,7 +373,7 @@ def mux(picture: Path, audio_parts: list, clock: float, out: Path) -> None:
         inputs += ["-i", str(f)]
         filters.append(f"[{i + 1}:a]adelay={int(start * 1000)}|{int(start * 1000)}[a{i}]")
         labels.append(f"[a{i}]")
-    if BED.is_file():
+    if USE_BED and BED.is_file():
         bi = len(audio_parts) + 1
         inputs += ["-i", str(BED)]
         filters.append(

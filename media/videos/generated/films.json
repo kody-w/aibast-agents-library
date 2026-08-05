@@ -1,0 +1,32 @@
+{
+  "schema": "aibast-films/1.0",
+  "note": "Rendered films available in the cutting room (edit.html).",
+  "count": 5,
+  "films": [
+    {
+      "file": "agent-account-intelligence.mp4",
+      "seconds": 132.4,
+      "size_mb": 31.16
+    },
+    {
+      "file": "agent-art-generator.mp4",
+      "seconds": 137.0,
+      "size_mb": 18.39
+    },
+    {
+      "file": "agent-care-gap-closure.mp4",
+      "seconds": 137.0,
+      "size_mb": 19.05
+    },
+    {
+      "file": "agent-claims-processing.mp4",
+      "seconds": 137.0,
+      "size_mb": 19.18
+    },
+    {
+      "file": "agent-inventory-rebalancing.mp4",
+      "seconds": 137.0,
+      "size_mb": 24.59
+    }
+  ]
+}

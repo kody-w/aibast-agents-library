@@ -1,21 +1,64 @@
 {
   "schema": "aibast-overlays/1.0",
   "base_track": "account-intelligence-agent",
-  "frame": { "w": 1920, "h": 1080 },
+  "frame": {
+    "w": 1920,
+    "h": 1080
+  },
   "calibrated_by": "align.html (Kody, visual)",
   "note": "The professional recording is the base; each region composites our content over theirs for its window. Coordinates are base-track pixels.",
   "regions": [
-    { "id": "title", "source": "lozenge", "enabled": true,
-      "rect": { "x": 380, "y": 400, "w": 1160, "h": 280 },
-      "window": { "start": 2.6, "end": 6.6 },
-      "corner_radius": 28, "fade_seconds": 0.4 },
-    { "id": "overview", "source": "overview", "enabled": true,
-      "rect": { "x": 0, "y": 0, "w": 1920, "h": 1080 },
-      "window": { "start": 22, "end": 42 },
-      "corner_radius": 0, "fade_seconds": 0.5 },
-    { "id": "screen", "source": "screen", "enabled": true,
-      "rect": { "x": 189, "y": 52, "w": 1528, "h": 972 },
-      "window": { "start": 42, "end": 120 },
-      "corner_radius": 0, "fade_seconds": 0.3 }
+    {
+      "id": "title",
+      "source": "lozenge",
+      "enabled": true,
+      "rect": {
+        "x": 381,
+        "y": 382,
+        "w": 1160,
+        "h": 339
+      },
+      "window": {
+        "start": 5.4,
+        "end": 8.8
+      },
+      "corner_radius": 28,
+      "fade_seconds": 0.4,
+      "note": "Starts after the base's Microsoft card clears at ~5s. Rect set visually in align.html."
+    },
+    {
+      "id": "overview",
+      "source": "overview",
+      "enabled": true,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1920,
+        "h": 1080
+      },
+      "window": {
+        "start": 22,
+        "end": 42
+      },
+      "corner_radius": 0,
+      "fade_seconds": 0.5
+    },
+    {
+      "id": "screen",
+      "source": "screen",
+      "enabled": true,
+      "rect": {
+        "x": 189,
+        "y": 52,
+        "w": 1528,
+        "h": 972
+      },
+      "window": {
+        "start": 42,
+        "end": 120
+      },
+      "corner_radius": 0,
+      "fade_seconds": 0.3
+    }
   ]
 }

@@ -72,21 +72,22 @@ header{border-bottom:1px solid var(--border);background:var(--bg)}
   text-transform:uppercase}
 
 /* act 3 — agent overview, the load-bearing frame */
-.scene.overview{background:var(--stage);color:#fff;gap:3.2cqw;justify-content:center;
-  padding:4cqw 4cqw 5cqw}
-.overview h2{font-size:3.1cqw;font-weight:600;display:flex;align-items:center;gap:1.2cqw}
+.scene.overview{background:var(--stage);color:#fff;gap:2.6cqw;justify-content:center;
+  padding:3cqw 4cqw 3.5cqw;overflow:hidden}
+.overview h2{font-size:3.4cqw;font-weight:600;display:flex;align-items:center;gap:1.2cqw}
 .overview h2 .mark{width:3cqw;height:3cqw;border-radius:.7cqw;display:inline-block;
   background:linear-gradient(135deg,#e8598f,#8b5cf6,#4f7cf7)}
-.pgrid{display:flex;align-items:stretch;gap:1.4cqw;width:94%;flex:1;max-height:56cqh}
-.pcol{flex:1;background:#161d38;border-radius:1cqw;padding:1.4cqw;display:flex;
-  flex-direction:column;gap:1.2cqw;min-width:0}
-.pcol .ph{font-size:1.75cqw;font-weight:600;text-align:center}
+.pgrid{display:flex;align-items:stretch;gap:1.6cqw;width:88%;
+  height:60cqh;flex:0 0 auto}
+.pcol{flex:1;background:#161d38;border-radius:1cqw;padding:1.3cqw;display:flex;
+  flex-direction:column;gap:1cqw;min-width:0;min-height:0}
+.pcol .ph{font-size:1.9cqw;font-weight:600;text-align:center}
 .pcol .pbody{background:linear-gradient(135deg,var(--grad-a),var(--grad-b) 60%,var(--grad-c));
-  border-radius:.9cqw;padding:1.8cqw;flex:1;display:flex;flex-direction:column;
-  gap:1.1cqw;justify-content:center}
+  border-radius:.9cqw;padding:1.6cqw 1.4cqw;flex:1 1 auto;display:flex;
+  flex-direction:column;gap:1cqw;justify-content:center;min-height:0;overflow:hidden}
 .jewels{display:flex;gap:.9cqw;justify-content:center;margin-top:1.1cqw}
 .jw{width:3.1cqw;height:3.1cqw;display:block;object-fit:contain}
-.pcol .pbody div{font-size:1.55cqw;line-height:1.35;text-align:center;font-weight:500;
+.pcol .pbody div{font-size:1.5cqw;line-height:1.35;text-align:center;font-weight:500;
   /* Env-var names and long identifiers have no break opportunities and were
      spilling outside the panel. Break them rather than let a frame look
      broken — this card is the one a viewer studies longest. */

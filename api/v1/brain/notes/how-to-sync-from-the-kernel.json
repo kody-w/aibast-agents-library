@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-05T21:14:28.839128+00:00",
+  "generated": "2026-08-05T21:27:58.552218+00:00",
   "slug": "how-to/sync-from-the-kernel",
   "title": "Sync from the kernel",
   "summary": "How an upstream release arrives, and what must move with it.",
