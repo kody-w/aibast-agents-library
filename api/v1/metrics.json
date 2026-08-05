@@ -1,7 +1,7 @@
 {
   "schema": "aibast-metrics/1.0",
-  "repo_name": "microsoft/aibast-agents-library",
-  "generated_at": "2026-08-05T16:49:18.227036+00:00",
+  "repo_name": "kody-w/aibast-agents-library",
+  "generated_at": "2026-08-05T16:52:41.584826+00:00",
   "totals": {
     "downloads": 40,
     "clones": 39,
@@ -23,9 +23,9 @@
     "days_tracked": 14
   },
   "repo": {
-    "stars": 4,
-    "forks": 2,
-    "open_issues": 5
+    "stars": 0,
+    "forks": 0,
+    "open_issues": 0
   },
   "traffic": {
     "live": false,
@@ -41,7 +41,15 @@
     "agent_file_hits": 0
   },
   "releases": {
-    "releases": [],
+    "releases": [
+      {
+        "tag": "v1.0.0",
+        "name": "v1.0.0 \u2014 ecosystem snapshot",
+        "published_at": "2026-05-26T17:55:21Z",
+        "assets": [],
+        "downloads": 0
+      }
+    ],
     "total_downloads": 0
   },
   "daily": [
@@ -207,8 +215,16 @@
         "downloads": 0,
         "comments": 0,
         "score": 0,
-        "signals": {},
-        "discussion": ""
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/104"
       },
       {
         "name": "@aibast-agents-library/proposal-generation",
@@ -265,8 +281,16 @@
         "downloads": 0,
         "comments": 0,
         "score": 0,
-        "signals": {},
-        "discussion": ""
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/94"
       },
       {
         "name": "@aibast-agents-library/sales-qualification",
@@ -301,8 +325,16 @@
         "downloads": 0,
         "comments": 0,
         "score": 0,
-        "signals": {},
-        "discussion": ""
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/92"
       },
       {
         "name": "@aibast-agents-library/meeting-prep",
@@ -425,8 +457,16 @@
         "downloads": 0,
         "comments": 0,
         "score": 0,
-        "signals": {},
-        "discussion": ""
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/91"
       },
       {
         "name": "@aibast-agents-library/competitive-intelligence",
@@ -618,22 +658,22 @@
     {
       "name": "GitHub traffic API",
       "metric": "clones, page views, paths, referrers",
-      "url": "https://github.com/microsoft/aibast-agents-library/graphs/traffic"
+      "url": "https://github.com/kody-w/aibast-agents-library/graphs/traffic"
     },
     {
       "name": "jsDelivr CDN",
       "metric": "per-file fetches of agent files",
-      "url": "https://data.jsdelivr.com/v1/stats/packages/gh/microsoft/aibast-agents-library"
+      "url": "https://data.jsdelivr.com/v1/stats/packages/gh/kody-w/aibast-agents-library"
     },
     {
       "name": "GitHub releases",
       "metric": "release asset downloads",
-      "url": "https://github.com/microsoft/aibast-agents-library/releases"
+      "url": "https://github.com/kody-w/aibast-agents-library/releases"
     },
     {
       "name": "GitHub Discussions",
       "metric": "upvotes, tracked installer downloads, comments, signals",
-      "url": "https://github.com/microsoft/aibast-agents-library/discussions"
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions"
     },
     {
       "name": "registry.json",

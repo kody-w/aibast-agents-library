@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-agent/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-05T16:52:41.645660+00:00",
   "manifest": {
     "schema": "rapp-agent/1.0",
     "name": "@aibast-agents-library/voice-to-crm-servicenow",
@@ -29,7 +29,12 @@
   "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/servicenow_agent.py",
   "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/servicenow_agent.py",
   "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/voice-to-crm-servicenow",
-  "engagement": null,
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/102"
+  },
   "machine_review": {
     "review_type": "machine",
     "verdict": "review-ready",
