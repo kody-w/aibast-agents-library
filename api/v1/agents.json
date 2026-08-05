@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-agents/1.0",
-  "generated": "2026-08-05T15:05:09.370041+00:00",
+  "generated": "2026-08-05T16:25:21.213624+00:00",
   "count": 105,
   "agents": [
     {
@@ -309,7 +309,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/stakeholder_intelligence_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/stakeholder-intelligence.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/stakeholder-intelligence",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/90"
+      }
     },
     {
       "name": "@aibast-agents-library/activity-gap",
@@ -552,7 +557,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/revenue_forecast_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/revenue-forecast.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/revenue-forecast",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/79"
+      }
     },
     {
       "name": "@aibast-agents-library/deal-stakeholder-engagement",
@@ -694,7 +704,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/sales_qualification_stack/sales_qualification_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sales-qualification.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/sales-qualification",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/82"
+      }
     },
     {
       "name": "@aibast-agents-library/win-loss-analysis",
@@ -907,7 +922,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2c_sales_stacks/returns_exchange_stack/returns_exchange_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/returns-exchange.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/returns-exchange",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/78"
+      }
     },
     {
       "name": "@aibast-agents-library/sales-chat",
@@ -934,7 +954,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2c_sales_stacks/sales_chat_stack/sales_chat_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sales-chat.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/sales-chat",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/80"
+      }
     },
     {
       "name": "@aibast-agents-library/asset-maintenance-forecast",
@@ -2026,7 +2051,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/sales_coach_stack/sales_coach_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sales-coach.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/sales-coach",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/81"
+      }
     },
     {
       "name": "@aibast-agents-library/sales-simulation",
@@ -2053,7 +2083,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/simulation_sales_stack/sales_simulation_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sales-simulation.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/sales-simulation",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/83"
+      }
     },
     {
       "name": "@aibast-agents-library/speech-to-crm",
@@ -2079,7 +2114,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/speech_to_crm_stack/speech_to_crm_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/speech-to-crm.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/speech-to-crm",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/88"
+      }
     },
     {
       "name": "@aibast-agents-library/triage-bot",
@@ -2184,7 +2224,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/extract_sharepoint_document_url_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/sharepoint-document-extractor.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/sharepoint-document-extractor",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/84"
+      }
     },
     {
       "name": "@aibast-agents-library/voice-to-crm-servicenow",
@@ -2365,7 +2410,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/healthcare_stacks/staff_credentialing_stack/staff_credentialing_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/staff-credentialing.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/staff-credentialing",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/89"
+      }
     },
     {
       "name": "@aibast-agents-library/ask-hr",
@@ -2815,7 +2865,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/retail_cpg_stacks/returns_complaints_resolution_stack/returns_complaints_resolution_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/returns-complaints-resolution.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/returns-complaints-resolution",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/77"
+      }
     },
     {
       "name": "@aibast-agents-library/store-associate-copilot",
@@ -2988,7 +3043,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/slg_government_stacks/grants_management_stack/grants_management_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/slg-grants-management.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/slg-grants-management",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/85"
+      }
     },
     {
       "name": "@aibast-agents-library/utility-billing-assistance",
@@ -3041,7 +3101,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/software-competitive-intel.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/software-competitive-intel",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/86"
+      }
     },
     {
       "name": "@aibast-agents-library/software-customer-onboarding",
@@ -3067,7 +3132,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/software_dp_stacks/customer_onboarding_stack/customer_onboarding_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/software-customer-onboarding.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/software-customer-onboarding",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/87"
+      }
     },
     {
       "name": "@aibast-agents-library/license-renewal-expansion",

@@ -1,7 +1,7 @@
 {
   "schema": "aibast-metrics/1.0",
   "repo_name": "kody-w/aibast-agents-library",
-  "generated_at": "2026-08-05T15:05:09.301366+00:00",
+  "generated_at": "2026-08-05T16:25:21.155630+00:00",
   "totals": {
     "downloads": 40,
     "clones": 39,
@@ -287,8 +287,16 @@
         "downloads": 0,
         "comments": 0,
         "score": 0,
-        "signals": {},
-        "discussion": ""
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/82"
       },
       {
         "name": "@aibast-agents-library/store-associate-copilot",
@@ -337,8 +345,16 @@
         "downloads": 0,
         "comments": 0,
         "score": 0,
-        "signals": {},
-        "discussion": ""
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/77"
       },
       {
         "name": "@aibast-agents-library/account-risk-assessment",
@@ -453,8 +469,16 @@
         "downloads": 0,
         "comments": 0,
         "score": 0,
-        "signals": {},
-        "discussion": ""
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/90"
       },
       {
         "name": "@aibast-agents-library/personalized-marketing",
