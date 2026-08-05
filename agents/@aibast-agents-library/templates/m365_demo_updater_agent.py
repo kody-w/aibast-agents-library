@@ -1170,7 +1170,7 @@ class M365DemoUpdaterAgent:
         """Main execution method for the agent"""
         try:
             # Get parameters
-            target_directory = kwargs.get('directory', '/Users/kodyw/Documents/GitHub/AI-Agent-Templates')
+            target_directory = kwargs.get('directory') or os.environ.get('DEMO_LIBRARY_DIR') or os.getcwd()
             pattern = kwargs.get('pattern', '**/demos/*_demo.html')
             
             # Find all demo files
@@ -1213,7 +1213,7 @@ metadata = {
         'directory': {
             'type': 'string',
             'description': 'Target directory to scan for demo files',
-            'default': '/Users/kodyw/Documents/GitHub/AI-Agent-Templates'
+            'default': 'the DEMO_LIBRARY_DIR environment variable, or the working directory'
         },
         'pattern': {
             'type': 'string',

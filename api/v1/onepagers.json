@@ -1,0 +1,1820 @@
+{
+  "schema": "aibast-onepagers/1.0",
+  "generated": "2026-08-05T14:25:18+00:00",
+  "source": "AIBAST solution catalog (captured); sharing URLs deliberately omitted",
+  "count": 48,
+  "hosted_videos": 7,
+  "onepagers": [
+    {
+      "capture_file": "01-product-line-optimization-agent.html",
+      "industry": "Manufacturing",
+      "display_name": "Product Line Optimization Agent",
+      "lede": "Provide intelligent production capacity analysis and optimization planning to boost throughput and efficiency while maintaining quality.",
+      "audience": [
+        "Plant Manager",
+        "Production Engineer",
+        "Operations Director"
+      ],
+      "business_value": [
+        "Boost throughput",
+        "Efficiency",
+        "Maintaining quality"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "PowerBI",
+        "Azure IoT Hub"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "product-line-optimization-agent",
+      "personas": [
+        "Plant Manager",
+        "Production Engineer",
+        "Operations Director"
+      ],
+      "industries": [
+        "Manufacturing"
+      ],
+      "requires": [
+        "Microsoft Copilot Studio",
+        "Dynamics 365 for ERP",
+        "Power BI",
+        "Azure IoT Hub"
+      ],
+      "summary": "Provide intelligent production capacity analysis and optimization planning to boost throughput and efficiency while maintaining quality.",
+      "listing_file": "product-line-optimization-agent.md",
+      "catalog_number": 1,
+      "video": {
+        "slug": "product-line-optimization-agent",
+        "hosted": true,
+        "src": "media/videos/product-line-optimization-agent.mp4",
+        "size_mb": 3.03
+      }
+    },
+    {
+      "capture_file": "02-contract-review-agent.html",
+      "industry": "Professional Services",
+      "display_name": "Contract Review Agent",
+      "lede": "Automate contract review processes to enable faster, lower-risk, and more successful negotiations.",
+      "audience": [
+        "Legal Operations",
+        "Attorneys",
+        "Executives"
+      ],
+      "business_value": [
+        "Enable faster",
+        "Lower-risk",
+        "More successful negotiations"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "SharePoint",
+        "Microsoft Word"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "contract-review-agent",
+      "industries": [
+        "Professional Services",
+        "Consulting"
+      ],
+      "catalog_number": 2,
+      "video": {
+        "slug": "contract-risk-review-agent",
+        "hosted": true,
+        "src": "media/videos/contract-risk-review-agent.mp4",
+        "size_mb": 2.54
+      }
+    },
+    {
+      "capture_file": "03-client-onboarding-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Client Onboarding Agent",
+      "lede": "Orchestrate client onboarding journeys with unified workflows to accelerate revenue and mitigate compliance risk.",
+      "audience": [
+        "Onboarding Specialist",
+        "Relationship Manager",
+        "Compliance Officer"
+      ],
+      "business_value": [
+        "Accelerate revenue",
+        "Mitigate compliance risk"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "SharePoint",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "client-onboarding-agent",
+      "industries": [
+        "Cross-Industry",
+        "Financial Services"
+      ],
+      "catalog_number": 3,
+      "video": {
+        "slug": "customer-onboarding-agent",
+        "hosted": true,
+        "src": "media/videos/customer-onboarding-agent.mp4",
+        "size_mb": 2.62
+      }
+    },
+    {
+      "capture_file": "04-contact-center-escalation-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Contact Center Escalation Agent",
+      "lede": "Automate back-office contact center escalation workflows to deliver better service outcomes and retention rates.",
+      "audience": [
+        "Back-Office Agent",
+        "Escalation Manager",
+        "Quality Analyst"
+      ],
+      "business_value": [
+        "Deliver better service outcomes",
+        "Retention rates"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CcaaS",
+        "Dynamics 365 CRM",
+        "SharePoint",
+        "Microsoft Teams",
+        "Microsoft Outlook"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "contact-center-escalation-agent",
+      "industries": [
+        "Cross-Industry",
+        "Contact Center"
+      ],
+      "catalog_number": 4,
+      "video": {
+        "slug": "customer-escalations-agent",
+        "hosted": true,
+        "src": "media/videos/customer-escalations-agent.mp4",
+        "size_mb": 2.46
+      }
+    },
+    {
+      "capture_file": "05-portfolio-rebalancing-agent.html",
+      "industry": "Capital Markets",
+      "display_name": "Portfolio Rebalancing Agent",
+      "lede": "Provide intelligent, automated portfolio rebalancing that streamlines manual reviews and improves wealth management outcomes.",
+      "audience": [
+        "Financial Advisor",
+        "Portfolio Manager",
+        "Paraplanner"
+      ],
+      "business_value": [
+        "Provide intelligent",
+        "Automated portfolio rebalancing that streamlines manual reviews",
+        "Improves wealth management outcomes"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Microsoft Teams",
+        "Microsoft PowerPoint"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "portfolio-rebalancing-agent",
+      "personas": [
+        "Financial Advisor",
+        "Portfolio Manager",
+        "Paraplanner"
+      ],
+      "industries": [
+        "Capital Markets"
+      ],
+      "requires": [
+        "Microsoft Copilot Studio",
+        "Dynamics 365 for CRM",
+        "Microsoft Teams",
+        "PowerPoint"
+      ],
+      "summary": "Provide intelligent, automated portfolio rebalancing that streamlines manual reviews and improves wealth management outcomes.",
+      "listing_file": "portfolio-rebalancing-agent.md",
+      "catalog_number": 5,
+      "video": {
+        "slug": "portfolio-rebalancing-agent",
+        "hosted": true,
+        "src": "media/videos/portfolio-rebalancing-agent.mp4",
+        "size_mb": 3.01
+      }
+    },
+    {
+      "capture_file": "06-purchase-order-management-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Purchase Order Management Agent",
+      "lede": "Automate purchase order management and vendor selection to enable faster and more cost-effective purchasing.",
+      "audience": [
+        "Procurement Manager",
+        "Finance Director",
+        "Department Approver"
+      ],
+      "business_value": [
+        "Enable faster",
+        "More cost-effective purchasing"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "purchase-order-management-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 6,
+      "video": {
+        "slug": "procurement-agent",
+        "hosted": true,
+        "src": "media/videos/procurement-agent.mp4",
+        "size_mb": 2.31
+      }
+    },
+    {
+      "capture_file": "07-inventory-optimization-agent.html",
+      "industry": "Manufacturing",
+      "display_name": "Inventory Optimization Agent",
+      "lede": "Intelligently optimize inventory portfolios to improve cash flow and warehouse efficiency while reducing waste.",
+      "audience": [
+        "Supply Chain Managers",
+        "Inventory Managers",
+        "Procurement Manager"
+      ],
+      "business_value": [
+        "Improve cash flow",
+        "Warehouse efficiency",
+        "Reducing waste"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Teams",
+        "Dynamics 365 Commerce"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "inventory-optimization-agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "catalog_number": 7,
+      "video": {
+        "slug": "inventory-rebalancing-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "08-month-end-billing-agent.html",
+      "industry": "Professional Services",
+      "display_name": "Month-End Billing Agent",
+      "lede": "Automate month-end billing cycles to accelerate invoicing, reduce risk, and ensure audit-ready compliance.",
+      "audience": [
+        "Finance VP",
+        "Billing Manager"
+      ],
+      "business_value": [
+        "Accelerate invoicing",
+        "Reduce risk",
+        "Ensure audit-ready compliance"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "SharePoint",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "month-end-billing-agent",
+      "industries": [
+        "Professional Services",
+        "Consulting"
+      ],
+      "catalog_number": 8,
+      "video": {
+        "slug": "time-entry-billing-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "09-resource-utilization-agent.html",
+      "industry": "Professional Services",
+      "display_name": "Resource Utilization Agent",
+      "lede": "Provide intelligent resource analysis and recommendations to maximize billable utilization and reduce costs.",
+      "audience": [
+        "Operations Leader",
+        "Resource Manager",
+        "Finance Director"
+      ],
+      "business_value": [
+        "Maximize billable utilization",
+        "Reduce costs"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "resource-utilization-agent",
+      "personas": [
+        "Operations Leader",
+        "Resource Manager",
+        "Finance Director"
+      ],
+      "industries": [
+        "Professional Services"
+      ],
+      "requires": [
+        "Microsoft Copilot Studio",
+        "Dynamics 365",
+        "Microsoft Teams"
+      ],
+      "summary": "Provide intelligent resource analysis and recommendations to maximize billable utilization and reduce costs.",
+      "listing_file": "resource-utilization-agent.md",
+      "catalog_number": 9,
+      "video": {
+        "slug": "resource-utilization-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "10-energy-operations-agent-a.html",
+      "industry": "Energy & Utilities",
+      "display_name": "Energy Operations Agent (a)",
+      "lede": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+      "audience": [
+        "Plant Manager / Reliability Engineer",
+        "Compliance Manager",
+        "Sustainability Lead",
+        "Data Analyst"
+      ],
+      "business_value": [
+        "Deliver real-time insights",
+        "Automate critical workflows",
+        "Enable guided decision making\u2014boosting efficiency",
+        "Reducing operational"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "SharePoint",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "energy-operations-agent-a",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "catalog_number": 10,
+      "video": {
+        "slug": "energy-operations-suite",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "11-energy-operations-agent-b.html",
+      "industry": "Energy & Utilities",
+      "display_name": "Energy Operations Agent (b)",
+      "lede": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+      "audience": [
+        "Plant Manager / Reliability Engineer",
+        "Compliance Manager",
+        "Sustainability Lead",
+        "Data Analyst"
+      ],
+      "business_value": [
+        "Deliver real-time insights",
+        "Automate critical workflows",
+        "Enable guided decision making\u2014boosting efficiency",
+        "Reducing operational"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "SharePoint",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "energy-operations-agent-b",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "catalog_number": 11,
+      "video": {
+        "slug": "energy-operations-suite",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "12-sales-pipeline-management-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Sales Pipeline Management Agent",
+      "lede": "Automate sales pipeline management to keep deals moving, increase forecast confidence, and improve team productivity.",
+      "audience": [
+        "Account Executive",
+        "Sales Director"
+      ],
+      "business_value": [
+        "Keep deals moving",
+        "Increase forecast confidence",
+        "Improve team productivity"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "SharePoint",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "sales-pipeline-management-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 12,
+      "video": {
+        "slug": "deal-progression-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "13-proposal-creation-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Proposal Creation Agent",
+      "lede": "Automate proposal creation to accelerate deal cycles, improve win rates, and deliver consistent, high-quality responses.",
+      "audience": [
+        "Account Executive",
+        "Sales Leader",
+        "Bid Manager"
+      ],
+      "business_value": [
+        "Accelerate deal cycles",
+        "Improve win rates",
+        "Deliver consistent",
+        "High-quality responses"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Microsoft Teams",
+        "Microsoft Word",
+        "Microsoft PowerPoint"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "proposal-creation-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 13,
+      "video": {
+        "slug": "proposal-generation-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "14-campaign-design-agent.html",
+      "industry": "Retail",
+      "display_name": "Campaign Design Agent",
+      "lede": "Automate personalized campaign design and execution to boost engagement, accelerate revenue, and strengthen customer loyalty.",
+      "audience": [
+        "Marketing Director",
+        "Campaign Manager"
+      ],
+      "business_value": [
+        "Boost engagement",
+        "Accelerate revenue",
+        "Strengthen customer loyalty"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "campaign-design-agent",
+      "industries": [
+        "Retail"
+      ],
+      "catalog_number": 14,
+      "video": {
+        "slug": "personalized-marketing-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "15-predictive-maintenance-agent.html",
+      "industry": "Manufacturing",
+      "display_name": "Predictive Maintenance Agent",
+      "lede": "Perform predictive maintenance analysis and scheduling orchestration to prevent unplanned downtime and protect production capacity.",
+      "audience": [
+        "Maintenance Manager",
+        "Production Supervisor",
+        "Operation Leader"
+      ],
+      "business_value": [
+        "Prevent unplanned downtime",
+        "Protect production capacity"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Dynamics 365 CcaaS",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "predictive-maintenance-agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "catalog_number": 15,
+      "video": {
+        "slug": "maintenance-scheduling-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "16-client-health-score-agent.html",
+      "industry": "Professional Services",
+      "display_name": "Client Health Score Agent",
+      "lede": "Automate client portfolio health monitoring and planning to improve client relationships, protect revenue, and optimize financial performance.",
+      "audience": [
+        "Client Success Leaders",
+        "Account Manager"
+      ],
+      "business_value": [
+        "Improve client relationships",
+        "Protect revenue",
+        "Optimize financial performance"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Microsoft Teams",
+        "Microsoft Outlook"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "client-health-score-agent",
+      "personas": [
+        "Client Success Leaders",
+        "Account Manager"
+      ],
+      "industries": [
+        "Professional Services"
+      ],
+      "requires": [
+        "Microsoft Copilot Studio",
+        "Dynamics 365",
+        "Microsoft Teams",
+        "Outlook"
+      ],
+      "summary": "Automate client portfolio health monitoring and planning to improve client relationships, protect revenue, and optimize financial performance.",
+      "listing_file": "client-health-score-agent.md",
+      "catalog_number": 16,
+      "video": {
+        "slug": "client-health-score-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "17-energy-operations-agent-c.html",
+      "industry": "Energy & Utilities",
+      "display_name": "Energy Operations Agent (c)",
+      "lede": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+      "audience": [
+        "Plant Manager / Reliability Engineer",
+        "Compliance Manager",
+        "Sustainability Lead",
+        "Data Analyst"
+      ],
+      "business_value": [
+        "Deliver real-time insights",
+        "Automate critical workflows",
+        "Enable guided decision making\u2014boosting efficiency",
+        "Reducing operational"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Dynamics 365 CRM",
+        "SharePoint",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "energy-operations-agent-c",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "catalog_number": 17,
+      "video": {
+        "slug": "energy-operations-suite",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "18-energy-operations-agent-d.html",
+      "industry": "Energy & Utilities",
+      "display_name": "Energy Operations Agent (d)",
+      "lede": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+      "audience": [
+        "Plant Manager / Reliability Engineer",
+        "Compliance Manager",
+        "Sustainability Lead",
+        "Data Analyst"
+      ],
+      "business_value": [
+        "Deliver real-time insights",
+        "Automate critical workflows",
+        "Enable guided decision making\u2014boosting efficiency",
+        "Reducing operational"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CcaaS",
+        "Dynamics 365 ERP",
+        "Microsoft Teams",
+        "SharePoint"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "energy-operations-agent-d",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "catalog_number": 18,
+      "video": {
+        "slug": "energy-operations-suite",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "19-account-research-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Account Research Agent",
+      "lede": "Automate account research and strategy planning to help sellers prepare faster, win more, and elevate deal quality.",
+      "audience": [
+        "Account Executive",
+        "Sales Director",
+        "Customer Success Manager"
+      ],
+      "business_value": [
+        "Help sellers prepare faster",
+        "Win more",
+        "Elevate deal quality"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "SharePoint",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "account-research-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 19,
+      "video": {
+        "slug": "account-intelligence-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "20-supply-risk-intelligence-agent.html",
+      "industry": "Manufacturing",
+      "display_name": "Supply Risk Intelligence Agent",
+      "lede": "Deliver real-time risk intelligence and planning to protect production continuity and reduce disruption exposure.",
+      "audience": [
+        "Procurement Manager",
+        "Supply Chain Director"
+      ],
+      "business_value": [
+        "Protect production continuity",
+        "Reduce disruption exposure"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "supply-risk-intelligence-agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "catalog_number": 20,
+      "video": {
+        "slug": "supply-risk-monitoring-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "21-store-associate-agent.html",
+      "industry": "Retail",
+      "display_name": "Store Associate Agent",
+      "lede": "Deliver real-time product intelligence and transaction support to deliver faster service and boost sales performance.",
+      "audience": [
+        "Store Associate",
+        "Sales Manager",
+        "Floor Specialist"
+      ],
+      "business_value": [
+        "Deliver faster service",
+        "Boost sales performance"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 ERP",
+        "Microsoft Teams",
+        "Microsoft Outlook"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "store-associate-agent",
+      "industries": [
+        "Retail"
+      ],
+      "catalog_number": 21,
+      "video": {
+        "slug": "store-associate-copilot",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "22-abandoned-cart-recovery-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Abandoned Cart Recovery Agent",
+      "lede": "Automate abandoned cart analysis and recovery campaigns to convert lost sales, protect margins, and improve customer engagement.",
+      "audience": [
+        "Marketing Manager",
+        "Digital Marketing Lead",
+        "Growth Manager"
+      ],
+      "business_value": [
+        "Convert lost sales",
+        "Protect margins",
+        "Improve customer engagement"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Outlook",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "abandoned-cart-recovery-agent",
+      "industries": [
+        "Cross-Industry",
+        "Software Tech"
+      ],
+      "catalog_number": 22,
+      "video": {
+        "slug": "cart-abandonment-recovery-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "23-product-feedback-insights-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Product Feedback Insights Agent",
+      "lede": "Turn fragmented feedback into actionable insights that accelerate product improvements, prevent churn, and optimize engineering priorities.",
+      "audience": [
+        "Product Manager",
+        "Engineering Lead",
+        "Director of Product"
+      ],
+      "business_value": [
+        "Turn fragmented feedback into actionable insights that accelerate product improvements",
+        "Prevent churn",
+        "Optimize engineering priorities"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Teams",
+        "Dynamics 365 CRM"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "product-feedback-insights-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 23,
+      "video": {
+        "slug": "product-feedback-synthesizer-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "24-utility-leak-detection-billing-agent.html",
+      "industry": "Energy & Utilities",
+      "display_name": "Utility Leak Detection & Billing Agent",
+      "lede": "Automate leak detection and billing processes to improve customer satisfaction, ensure policy compliance, and protect municipal revenue.",
+      "audience": [
+        "Customer Service Rep",
+        "Billing Specialist",
+        "Assistance Coordinator"
+      ],
+      "business_value": [
+        "Improve customer satisfaction",
+        "Ensure policy compliance",
+        "Protect municipal revenue"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Dynamics 365 CRM",
+        "Dynamics 365 CcaaS",
+        "Microsoft Outlook",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "utility-leak-detection-billing-agent",
+      "industries": [
+        "Energy and Utilities",
+        "State and Local Government"
+      ],
+      "catalog_number": 24,
+      "video": {
+        "slug": "utility-billing-and-assistance-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "25-expansion-opportunity-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Expansion Opportunity Agent",
+      "lede": "Identify and prioritize expansion opportunities to drive revenue growth and strengthen customer relationships.",
+      "audience": [
+        "Sales Leader",
+        "Sales Operations Manager",
+        "Enablement Manager"
+      ],
+      "business_value": [
+        "Drive revenue growth",
+        "Strengthen customer relationships"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "expansion-opportunity-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 25,
+      "video": {
+        "slug": "cross-selling-opportunities-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "26-procurement-savings-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Procurement Savings Agent",
+      "lede": "Identify and optimize savings opportunities across vendors, contracts, and purchasing cycles to reduce costs and increase procurement efficiency.",
+      "audience": [
+        "Procurement Manager",
+        "Finance Director",
+        "Category Buyer"
+      ],
+      "business_value": [
+        "Reduce costs",
+        "Increase procurement efficiency"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Dynamics 365 CRM",
+        "Dynamics 365 Commerce",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "procurement-savings-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 26,
+      "video": {
+        "slug": "procurement-agent",
+        "hosted": true,
+        "src": "media/videos/procurement-agent.mp4",
+        "size_mb": 2.31
+      }
+    },
+    {
+      "capture_file": "27-cross-channel-engagement-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Cross-Channel Engagement Agent",
+      "lede": "Deliver a single, unified view of cross-channel interactions for more strategic, streamlined support and stronger engagement.",
+      "audience": [
+        "Customer Experience Leader",
+        "Digital Engagement Manager",
+        "Contact Center Supervisor"
+      ],
+      "business_value": [
+        "Deliver a single",
+        "Unified view of cross-channel interactions for more strategic",
+        "Streamlined support",
+        "Stronger engagement"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 Commerce",
+        "Microsoft Outlook"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "cross-channel-engagement-agent",
+      "industries": [
+        "Cross-Industry",
+        "Retail"
+      ],
+      "catalog_number": 27,
+      "video": {
+        "slug": "omnichannel-engagement-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "28-patient-intake-agent.html",
+      "industry": "Healthcare",
+      "display_name": "Patient Intake Agent",
+      "lede": "Automate patient intake workflows to streamline operations, protect revenue from avoidable losses, and deliver a smoother patient experience.",
+      "audience": [
+        "Front Desk Staff",
+        "Scheduling Coordinators",
+        "Patient Access Reps"
+      ],
+      "business_value": [
+        "Streamline operations",
+        "Protect revenue from avoidable losses",
+        "Deliver a smoother patient experience"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Dynamics 365 CcaaS",
+        "SharePoint"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "patient-intake-agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "catalog_number": 28,
+      "video": {
+        "slug": "patient-intake-and-scheduling-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "29-care-gap-closure-agent.html",
+      "industry": "Healthcare",
+      "display_name": "Care Gap Closure Agent",
+      "lede": "Automate quality gap analysis and targeted outreach to improve HEDIS performance, campaign ROI, and care gap closure efficiency.",
+      "audience": [
+        "Quality Managers",
+        "Care Coordinators",
+        "Clinical Operation Leads"
+      ],
+      "business_value": [
+        "Improve hedis performance",
+        "Campaign roi",
+        "Care gap closure efficiency"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Teams",
+        "Dynamics 365 CcaaS"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "care-gap-closure-agent",
+      "personas": [
+        "Quality Managers",
+        "Care Coordinators",
+        "Clinical Operation Leads"
+      ],
+      "industries": [
+        "Healthcare"
+      ],
+      "requires": [
+        "Microsoft Copilot Studio",
+        "Dynamics 365",
+        "Microsoft Teams"
+      ],
+      "summary": "Automate quality gap analysis and targeted outreach to improve HEDIS performance, campaign ROI, and care gap closure efficiency.",
+      "listing_file": "care-gap-closure-agent.md",
+      "catalog_number": 29,
+      "video": {
+        "slug": "care-gap-closure-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "30-commercial-underwriting-agent.html",
+      "industry": "Financial Services",
+      "display_name": "Commercial Underwriting Agent",
+      "lede": "Automate commercial underwriting analysis to accelerate evaluations, improve pricing accuracy, and maintain full compliance.",
+      "audience": [
+        "Underwriter",
+        "Risk Analyst"
+      ],
+      "business_value": [
+        "Accelerate evaluations",
+        "Improve pricing accuracy",
+        "Maintain full compliance"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Dynamics 365 CRM",
+        "Dynamics 365 Commerce",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "commercial-underwriting-agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "catalog_number": 30,
+      "video": {
+        "slug": "underwriting-support-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "31-omnichannel-inventory-agent.html",
+      "industry": "Retail",
+      "display_name": "Omnichannel Inventory Agent",
+      "lede": "Deliver real-time cross-channel inventory intelligence to prevent stockouts, reduce overstock, and maximize omnichannel retail performance.",
+      "audience": [
+        "Inventory Planners",
+        "Store Managers",
+        "Category Managers"
+      ],
+      "business_value": [
+        "Prevent stockouts",
+        "Reduce overstock",
+        "Maximize omnichannel retail performance"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 Commerce",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "omnichannel-inventory-agent",
+      "industries": [
+        "Retail"
+      ],
+      "catalog_number": 31,
+      "video": {
+        "slug": "inventory-visibility-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "32-supply-chain-risk-agent.html",
+      "industry": "Retail",
+      "display_name": "Supply Chain Risk Agent",
+      "lede": "Detect and manage supply chain risks to defend against disruptions, protect revenue, and maintain operational continuity.",
+      "audience": [
+        "Supply Chain Planner",
+        "Operations Leader",
+        "Procurement Manager"
+      ],
+      "business_value": [
+        "Defend against disruptions",
+        "Protect revenue",
+        "Maintain operational continuity"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "supply-chain-risk-agent",
+      "industries": [
+        "Retail",
+        "Manufacturing"
+      ],
+      "catalog_number": 32,
+      "video": {
+        "slug": "supply-risk-monitoring-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "33-subscription-renewal-agent.html",
+      "industry": "Software & Tech",
+      "display_name": "Subscription Renewal Agent",
+      "lede": "Streamline subscription renewal management and expansion planning, turning risk into growth opportunities while increasing win probability.",
+      "audience": [
+        "Account Executives",
+        "Customer Success Managers",
+        "Sales Leadership"
+      ],
+      "business_value": [
+        "Streamline subscription renewal management",
+        "Expansion planning",
+        "Turning risk into growth opportunities",
+        "Increasing win probability"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "subscription-renewal-agent",
+      "industries": [
+        "Software Tech"
+      ],
+      "catalog_number": 33,
+      "video": {
+        "slug": "license-renewal-and-expansion-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "34-customer-sentiment-churn-agent.html",
+      "industry": "Financial Services",
+      "display_name": "Customer Sentiment & Churn Agent",
+      "lede": "Deliver AI-powered sentiment intelligence that detects churn risk early and enables proactive retention strategies.",
+      "audience": [
+        "Relationship Managers",
+        "Retention Specialists",
+        "Customer Success Teams"
+      ],
+      "business_value": [
+        "Deliver ai-powered sentiment intelligence that detects churn risk early",
+        "Enables proactive retention strategies"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "customer-sentiment-churn-agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "catalog_number": 34,
+      "video": {
+        "slug": "customer-sentiment-and-churn-prediction-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "35-fraud-detection-alert-agent.html",
+      "industry": "Financial Services",
+      "display_name": "Fraud Detection & Alert Agent",
+      "lede": "Deploy AI-driven fraud monitoring and identification to accelerate investigations, enhance detection rates, and improve prevention.",
+      "audience": [
+        "Fraud Analysts",
+        "SIU Investigators",
+        "Risk Leaders"
+      ],
+      "business_value": [
+        "Accelerate investigations",
+        "Enhance detection rates",
+        "Improve prevention"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "fraud-detection-alert-agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "catalog_number": 35,
+      "video": {
+        "slug": "fraud-detection-and-alert-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "36-claims-processing-agent.html",
+      "industry": "Financial Services",
+      "display_name": "Claims Processing Agent",
+      "lede": "Automate claims processing workflows to deliver faster, consistent, and more compliant claim outcomes.",
+      "audience": [
+        "Claims Adjusters / Managers",
+        "SIU Teams",
+        "Operations Leaders"
+      ],
+      "business_value": [
+        "Deliver faster",
+        "Consistent",
+        "More compliant claim outcomes"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 CcaaS"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "claims-processing-agent",
+      "personas": [
+        "Claims Adjusters / Managers",
+        "SIU Teams",
+        "Operations Leaders"
+      ],
+      "industries": [
+        "Financial Services"
+      ],
+      "requires": [
+        "Microsoft Copilot Studio",
+        "Dynamics 365",
+        "Microsoft Teams"
+      ],
+      "summary": "Automate claims processing workflows to deliver faster, consistent, and more compliant claim outcomes.",
+      "listing_file": "claims-processing-agent.md",
+      "catalog_number": 36,
+      "video": {
+        "slug": "claims-processing-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "37-mortgage-origination-agent.html",
+      "industry": "Financial Services",
+      "display_name": "Mortgage Origination Agent",
+      "lede": "Streamline mortgage origination with intelligent automation, enabling faster, more accurate loan decisions.",
+      "audience": [
+        "Loan Officers",
+        "Processors",
+        "Underwriters"
+      ],
+      "business_value": [
+        "Streamline mortgage origination with intelligent automation",
+        "Enabling faster",
+        "More accurate loan decisions"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 ERP",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "mortgage-origination-agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "catalog_number": 37,
+      "video": {
+        "slug": "loan-origination-assistant",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "38-personal-styling-agent.html",
+      "industry": "Retail",
+      "display_name": "Personal Styling Agent",
+      "lede": "Deliver intelligent personal styling to strengthen customer experience, increase revenue, and elevate associate efficiency at scale.",
+      "audience": [
+        "Personal Shoppers",
+        "Clienteling Specialists",
+        "Retail Managers"
+      ],
+      "business_value": [
+        "Strengthen customer experience",
+        "Increase revenue",
+        "Elevate associate efficiency at scale"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Microsoft Outlook"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "personal-styling-agent",
+      "industries": [
+        "Retail"
+      ],
+      "catalog_number": 38,
+      "video": {
+        "slug": "personalized-shopping-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "39-wealth-insights-agent.html",
+      "industry": "Financial Services",
+      "display_name": "Wealth Insights Agent",
+      "lede": "Deliver AI-powered portfolio intelligence to uncover hidden asset opportunities, strengthen client relationships, and drive advisory growth at scale.",
+      "audience": [
+        "Wealth Advisor",
+        "Relationship Managers",
+        "Advisory Directors"
+      ],
+      "business_value": [
+        "Uncover hidden asset opportunities",
+        "Strengthen client relationships",
+        "Drive advisory growth at scale"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 ERP",
+        "Dynamics 365 CcaaS",
+        "Microsoft Outlook"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "wealth-insights-agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "catalog_number": 39,
+      "video": {
+        "slug": "wealth-insights-generator-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "40-regulatory-compliance-agent.html",
+      "industry": "Financial Services",
+      "display_name": "Regulatory Compliance Agent",
+      "lede": "Automate compliance monitoring and regulatory reporting to achieve proactive risk management with real-time surveillance.",
+      "audience": [
+        "Chief Compliance Officers",
+        "Compliance Managers",
+        "Trading Desk Supervisors"
+      ],
+      "business_value": [
+        "Achieve proactive risk management with real-time surveillance"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "regulatory-compliance-agent",
+      "personas": [
+        "Chief Compliance Officers",
+        "Compliance Managers",
+        "Trading Desk Supervisors"
+      ],
+      "industries": [
+        "Financial Services"
+      ],
+      "requires": [
+        "Microsoft Copilot Studio",
+        "Microsoft Teams"
+      ],
+      "summary": "Automates compliance monitoring and regulatory reporting to achieve proactive risk management with real-time surveillance.",
+      "listing_file": "regulatory-compliance-agent.md",
+      "catalog_number": 40,
+      "video": {
+        "slug": "regulatory-compliance-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "41-returns-complaints-agent.html",
+      "industry": "Retail",
+      "display_name": "Returns & Complaints Agent",
+      "lede": "Automate return decisions and complaint handling to speed resolution, reduce fraud, and protect customer loyalty.",
+      "audience": [
+        "Customer Service Agents",
+        "Quality Teams",
+        "Loss Prevention Teams"
+      ],
+      "business_value": [
+        "Speed resolution",
+        "Reduce fraud",
+        "Protect customer loyalty"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 CcaaS",
+        "Dynamics 365 ERP",
+        "Microsoft Outlook",
+        "Microsoft Teams",
+        "SharePoint"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "returns-complaints-agent",
+      "industries": [
+        "Retail",
+        "Consumable Products Industry"
+      ],
+      "catalog_number": 41,
+      "video": {
+        "slug": "returns-and-complaints-resolution-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "42-order-status-delay-agent.html",
+      "industry": "Manufacturing",
+      "display_name": "Order Status & Delay Agent",
+      "lede": "Automate proactive order updates, delay management, and customer communications to protect relationships and revenue.",
+      "audience": [
+        "Customer Service Rep",
+        "Account Manager",
+        "Operations Leader"
+      ],
+      "business_value": [
+        "Protect relationships",
+        "Revenue"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 CcaaS",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "order-status-delay-agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "catalog_number": 42,
+      "video": {
+        "slug": "order-status-communication-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "43-loyalty-insights-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "Loyalty Insights Agent",
+      "lede": "Deliver AI-driven loyalty insights and planning to reduce points liability, improve engagement results, and boost member retention.",
+      "audience": [
+        "Loyalty Program Director",
+        "CRM Manager",
+        "Marketing Leader"
+      ],
+      "business_value": [
+        "Reduce points liability",
+        "Improve engagement results",
+        "Boost member retention"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 ERP",
+        "Microsoft Outlook",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "loyalty-insights-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 43,
+      "video": {
+        "slug": "customer-loyalty-rewards-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "44-building-permit-review-agent.html",
+      "industry": "State & Local Government",
+      "display_name": "Building Permit Review Agent",
+      "lede": "Automate building permit review processes to enable faster service, lower operational costs, and higher citizen satisfaction.",
+      "audience": [
+        "Permit Technicians",
+        "Plan Reviewers",
+        "Inspectors"
+      ],
+      "business_value": [
+        "Enable faster service",
+        "Lower operational costs",
+        "Higher citizen satisfaction"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 CcaaS",
+        "Microsoft Teams",
+        "SharePoint"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "building-permit-review-agent",
+      "industries": [
+        "State and Local Government"
+      ],
+      "catalog_number": 44,
+      "video": {
+        "slug": "building-permit-processing-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "45-prior-authorization-agent.html",
+      "industry": "Healthcare",
+      "display_name": "Prior Authorization Agent",
+      "lede": "Automate insurance approval workflows to accelerate authorization processes, improve documentation accuracy, and reduce care delays.",
+      "audience": [
+        "Utilization Management Coordinators",
+        "Nurse Case Managers",
+        "Radiology Schedulers"
+      ],
+      "business_value": [
+        "Accelerate authorization processes",
+        "Improve documentation accuracy",
+        "Reduce care delays"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "prior-authorization-agent",
+      "industries": [
+        "Healthcare",
+        "Financial Services"
+      ],
+      "catalog_number": 45,
+      "video": {
+        "slug": "prior-authorization-automation-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "46-hr-self-service-agent.html",
+      "industry": "Cross-Industry",
+      "display_name": "HR Self-Service Agent",
+      "lede": "Provide self-service HR inquiry handling that transforms the process from a manual ticket-based system to intelligent, automated resolutions.",
+      "audience": [
+        "Employees",
+        "Managers",
+        "HR Operations Staff"
+      ],
+      "business_value": [
+        "Intelligent",
+        "Automated resolutions"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Microsoft Outlook",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "hr-self-service-agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "catalog_number": 46,
+      "video": {
+        "slug": "ask-hr-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "47-clinical-summary-agent.html",
+      "industry": "Healthcare",
+      "display_name": "Clinical Summary Agent",
+      "lede": "Transform complex clinical histories into clear, actionable summaries for faster decision-making, better coordination, and safer care.",
+      "audience": [
+        "Primary care physicians",
+        "Surgeons",
+        "Anesthesia teams"
+      ],
+      "business_value": [
+        "Transform complex clinical histories into clear",
+        "Actionable summaries for faster decision-making",
+        "Better coordination",
+        "Safer care"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 ERP"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "clinical-summary-agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "catalog_number": 47,
+      "video": {
+        "slug": "clinical-notes-summarizer-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    },
+    {
+      "capture_file": "48-branch-banking-advisory-agent.html",
+      "industry": "Financial Services",
+      "display_name": "Branch Banking Advisory Agent",
+      "lede": "Automate branch banking and advisory workflows to streamline customer interactions, strengthen compliance, and improve financial guidance.",
+      "audience": [
+        "Branch Bankers",
+        "Financial Advisors",
+        "Compliance Officers"
+      ],
+      "business_value": [
+        "Streamline customer interactions",
+        "Strengthen compliance",
+        "Improve financial guidance"
+      ],
+      "built_with": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 CRM",
+        "Dynamics 365 ERP",
+        "Microsoft Teams"
+      ],
+      "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+      "slug": "branch-banking-advisory-agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "catalog_number": 48,
+      "video": {
+        "slug": "financial-advisor-agent",
+        "hosted": false,
+        "src": null,
+        "size_mb": null
+      }
+    }
+  ]
+}

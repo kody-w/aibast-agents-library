@@ -32,6 +32,11 @@ Subcommands:
          state/discussion_ratings.json.
   track  Register one download: add a THUMBS_UP to an agent's tally
          comment (what clients call after downloading the agent.py).
+  seed-reviews
+         Publish MACHINE reviews (from the Sentinel run) into a SEPARATE
+         Discussions category. Human ratings and machine reviews never share
+         a thread, a category, or a number — a reader must be able to tell at
+         a glance which one they are reading.
 
 Both are intentionally NON-FATAL: a missing token, network error, or
 missing category results in a warning and an unchanged snapshot —
@@ -65,6 +70,10 @@ SNAPSHOT_FILE = REPO_ROOT / "state" / "discussion_ratings.json"
 
 REPO = os.environ.get("AIBAST_RATINGS_REPO", "microsoft/aibast-agents-library")
 CATEGORY = os.environ.get("AIBAST_RATINGS_CATEGORY", "Announcements")
+# Machine reviews live in their OWN category. A reader must never have to
+# work out whether a review came from a person or a program.
+REVIEW_CATEGORY = os.environ.get("AIBAST_REVIEW_CATEGORY", "Automated Reviews")
+MACHINE_TITLE_PREFIX = "[machine review] "
 TOKEN = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""
 
 SNAPSHOT_SCHEMA = "aibast-discussion-ratings/1.0"
@@ -451,6 +460,122 @@ def seed_body(agent: dict) -> str:
     return "\n".join(lines)
 
 
+def review_body(agent: dict, review: dict) -> str:
+    """Discussion body for a MACHINE review thread.
+
+    Deliberately a different shape from `seed_body`. There is no upvote
+    instruction and no download tally here, because a reaction on a machine
+    review would mean nothing — you cannot agree a static analysis into being
+    right. This thread is for arguing with the finding.
+    """
+    name = agent.get("name", "")
+    display = agent.get("display_name", name)
+    scores = review.get("scores") or {}
+    failed = [c for c in review.get("checks", []) if not c.get("passed")]
+
+    lines = [
+        f"## Automated review — {display}",
+        "",
+        "> **This is a machine review.** It was produced by static analysis "
+        "against published principles: the source was parsed, never run. It "
+        "measures whether the agent is *built correctly*, not whether it is "
+        "*liked or useful* — that is the community thread, and the two are "
+        "never combined into one number.",
+        "",
+        f"**Verdict:** `{review.get('verdict')}` · **Overall:** "
+        f"{review.get('overall')} · **Rubric:** `{review.get('rubric_version')}`",
+        "",
+        "| Principle | Score |",
+        "|---|---|",
+    ]
+    lines += [f"| {p} | {v} |" for p, v in scores.items()]
+    lines += ["", f"### {len(failed)} open finding(s)" if failed else "### No open findings", ""]
+
+    for c in failed:
+        lines += [
+            f"**{c['title']}** — `{c['id']}` · {c['level']}",
+            "",
+            f"> {c.get('detail', '')}",
+            "",
+            c.get("teachable", ""),
+            "",
+        ]
+
+    lines += [
+        "---",
+        "",
+        "**Disagree with a finding?** Reply here. A rubric check that produces "
+        "false positives is a defect in the rubric, and this thread is where "
+        "that gets argued and fixed — the rubric lives in "
+        f"[`sentinel/NEIGHBORHOOD.json`](https://github.com/{REPO}/blob/main/sentinel/NEIGHBORHOOD.json) "
+        "and anyone can run it locally with `python3 scripts/sentinel.py run`.",
+        "",
+        f"Community thread for `{name}` (opinions, ratings, real-world use): "
+        f"see the **{CATEGORY}** category.",
+    ]
+    return "\n".join(lines)
+
+
+def cmd_seed_reviews(limit: int, delay: float) -> int:
+    """Publish machine reviews to their OWN Discussions category.
+
+    Two categories, never one: a reader must be able to tell at a glance
+    whether they are reading a person or a program.
+    """
+    if not TOKEN:
+        warn("no GITHUB_TOKEN set; cannot seed review threads.")
+        return 0
+    reviews_file = REPO_ROOT / "state" / "agent_reviews.json"
+    if not reviews_file.is_file():
+        warn("no state/agent_reviews.json; run scripts/sentinel.py run first.")
+        return 0
+
+    reviews = {r["file"]: r for r in
+               json.loads(reviews_file.read_text(encoding="utf-8")).get("reviews", [])}
+    agents = load_registry_agents()
+    owner, _, name = REPO.partition("/")
+
+    try:
+        info = graphql(REPO_AND_CATEGORIES_QUERY, {"owner": owner, "name": name})
+    except (OSError, RuntimeError, urllib.error.URLError) as exc:
+        warn(f"cannot read repository categories ({exc}); nothing seeded.")
+        return 0
+    repo = (info.get("repository") or {})
+    repo_id = repo.get("id")
+    category_id = next(
+        (c.get("id") for c in
+         ((repo.get("discussionCategories") or {}).get("nodes") or [])
+         if c.get("name") == REVIEW_CATEGORY), None)
+    if not repo_id or not category_id:
+        warn(f"category '{REVIEW_CATEGORY}' not found in {REPO}; cannot seed "
+             "machine reviews. Create it in repository settings — it must be "
+             f"separate from '{CATEGORY}'.")
+        return 0
+
+    created = 0
+    for agent_name, agent in list(agents.items()):
+        if created >= limit:
+            break
+        review = reviews.get(agent.get("_file"))
+        if not review or review.get("verdict") == "framework":
+            continue
+        try:
+            graphql(CREATE_DISCUSSION_MUTATION, {
+                "repoId": repo_id, "catId": category_id,
+                "title": f"{MACHINE_TITLE_PREFIX}{agent_name}",
+                "body": review_body(agent, review),
+            })
+            created += 1
+        except (OSError, RuntimeError, urllib.error.URLError) as exc:
+            warn(f"stopping after {created} review thread(s): {exc}")
+            break
+        time.sleep(delay)
+
+    print(f"[discussion-ratings] published {created} machine-review thread(s) "
+          f"to '{REVIEW_CATEGORY}'.")
+    return 0
+
+
 def cmd_seed(limit: int, delay: float) -> int:
     if not TOKEN:
         warn("no GITHUB_TOKEN set; cannot seed discussions.")
@@ -626,6 +751,10 @@ def main() -> int:
     tally.add_argument("--only", help="target a single agent name")
     track = sub.add_parser("track", help="register one download (thumbs-up the tally)")
     track.add_argument("agent", help="agent name, e.g. @aibast-agents-library/art-generator")
+    reviews = sub.add_parser("seed-reviews",
+                             help="publish machine reviews to their own category")
+    reviews.add_argument("--limit", type=int, default=80)
+    reviews.add_argument("--delay", type=float, default=1.2)
     sub.add_parser("fetch", help="snapshot ratings to state/")
     args = parser.parse_args()
     if args.command == "seed":
@@ -634,6 +763,8 @@ def main() -> int:
         return cmd_tally(args.limit, args.delay, args.only)
     if args.command == "track":
         return cmd_track(args.agent)
+    if args.command == "seed-reviews":
+        return cmd_seed_reviews(args.limit, args.delay)
     return cmd_fetch()
 
 

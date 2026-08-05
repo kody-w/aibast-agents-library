@@ -1,0 +1,52 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "16-client-health-score-agent.html",
+    "industry": "Professional Services",
+    "display_name": "Client Health Score Agent",
+    "lede": "Automate client portfolio health monitoring and planning to improve client relationships, protect revenue, and optimize financial performance.",
+    "audience": [
+      "Client Success Leaders",
+      "Account Manager"
+    ],
+    "business_value": [
+      "Improve client relationships",
+      "Protect revenue",
+      "Optimize financial performance"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Microsoft Teams",
+      "Microsoft Outlook"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "client-health-score-agent",
+    "personas": [
+      "Client Success Leaders",
+      "Account Manager"
+    ],
+    "industries": [
+      "Professional Services"
+    ],
+    "requires": [
+      "Microsoft Copilot Studio",
+      "Dynamics 365",
+      "Microsoft Teams",
+      "Outlook"
+    ],
+    "summary": "Automate client portfolio health monitoring and planning to improve client relationships, protect revenue, and optimize financial performance.",
+    "listing_file": "client-health-score-agent.md",
+    "catalog_number": 16,
+    "video": {
+      "slug": "client-health-score-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=client-health-score-agent"
+}

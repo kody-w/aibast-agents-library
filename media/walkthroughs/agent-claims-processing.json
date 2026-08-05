@@ -1,0 +1,144 @@
+{
+  "schema": "rappvision-walkthrough/1.0",
+  "format_version": "1.0.0",
+  "remix": {
+    "placeholder": "[operator supplies]",
+    "slot_count": 7,
+    "slots": [
+      {
+        "path": "scenes[3].turns[0].text",
+        "template": "Claims processing workflows to deliver faster, consistent, and more compliant claim outcomes for [operator supplies]."
+      },
+      {
+        "path": "scenes[3].turns[1].body[0]",
+        "template": "Deliver faster \u2014 [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[1].body[1]",
+        "template": "Consistent \u2014 [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[1].body[2]",
+        "template": "More compliant claim outcomes \u2014 [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[3].body[0]",
+        "template": "Step 1: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[3].body[1]",
+        "template": "Step 2: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[3].body[2]",
+        "template": "Step 3: [operator supplies]"
+      }
+    ],
+    "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
+    "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
+  },
+  "format_doc": "media/RAPPVISION.md",
+  "generated": "2026-08-05T15:00:03+00:00",
+  "subject": {
+    "slug": "claims-processing",
+    "kind": "agent",
+    "ref": "@aibast-agents-library/claims-processing",
+    "display_name": "Claims Processing Agent",
+    "category": "financial_services"
+  },
+  "runtime_seconds": 137.0,
+  "status": "storyboard",
+  "approval": {
+    "required_before_render": true,
+    "note": "A storyboard is a script, not footage. Every figure is marked [operator supplies] rather than invented \u2014 a demo that fabricates a metric teaches the viewer something false. A human approves the script before anything is rendered."
+  },
+  "scenes": [
+    {
+      "act": "title",
+      "start": 0.0,
+      "end": 5.0,
+      "shot": "Microsoft logo, white field",
+      "on_screen": [
+        "Claims Processing Agent"
+      ],
+      "narration": ""
+    },
+    {
+      "act": "problem",
+      "start": 5.0,
+      "end": 22.0,
+      "shot": "B-roll \u2014 advisory meeting: adviser and client at a desk",
+      "on_screen": [],
+      "narration": "Automate claims processing workflows to deliver faster, consistent, and more compliant claim outcomes."
+    },
+    {
+      "act": "overview",
+      "start": 22.0,
+      "end": 42.0,
+      "shot": "Agent overview card \u2014 three gradient panels on dark field",
+      "panels": {
+        "Sources": [
+          "Dynamics 365 CRM",
+          "Dynamics 365 CcaaS"
+        ],
+        "Flow of work": [
+          "Engages you in the local brainstem chat"
+        ],
+        "Actions": [
+          "Deliver faster",
+          "Consistent",
+          "More compliant claim outcomes"
+        ]
+      },
+      "narration": "Claims Processing Agent reads what it needs, works where you already are, and hands back something you can act on."
+    },
+    {
+      "act": "walkthrough",
+      "start": 42.0,
+      "end": 120.0,
+      "shot": "Laptop-framed chat surface",
+      "turns": [
+        {
+          "role": "operator",
+          "text": "Claims processing workflows to deliver faster, consistent, and more compliant claim outcomes for [operator supplies]."
+        },
+        {
+          "role": "agent",
+          "heading": "Claims Processing Agent",
+          "body": [
+            "Deliver faster \u2014 [operator supplies]",
+            "Consistent \u2014 [operator supplies]",
+            "More compliant claim outcomes \u2014 [operator supplies]"
+          ],
+          "agent_call": "Claims Processing Agent"
+        },
+        {
+          "role": "operator",
+          "text": "Show me the plan."
+        },
+        {
+          "role": "agent",
+          "heading": "Recommended plan",
+          "body": [
+            "Step 1: [operator supplies]",
+            "Step 2: [operator supplies]",
+            "Step 3: [operator supplies]"
+          ],
+          "agent_call": "Claims Processing Agent"
+        }
+      ],
+      "narration": "The operator asks in their own words. The agent answers with structure, and names the tool it called."
+    },
+    {
+      "act": "close",
+      "start": 120.0,
+      "end": 137.0,
+      "shot": "Dark card, gradient CTA panel",
+      "on_screen": [
+        "Get started on your agentic journey today.",
+        "Talk to your Microsoft representative to learn more."
+      ],
+      "narration": ""
+    }
+  ]
+}

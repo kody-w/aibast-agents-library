@@ -1,0 +1,41 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "19-account-research-agent.html",
+    "industry": "Cross-Industry",
+    "display_name": "Account Research Agent",
+    "lede": "Automate account research and strategy planning to help sellers prepare faster, win more, and elevate deal quality.",
+    "audience": [
+      "Account Executive",
+      "Sales Director",
+      "Customer Success Manager"
+    ],
+    "business_value": [
+      "Help sellers prepare faster",
+      "Win more",
+      "Elevate deal quality"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "SharePoint",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "account-research-agent",
+    "industries": [
+      "Cross-Industry"
+    ],
+    "catalog_number": 19,
+    "video": {
+      "slug": "account-intelligence-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=account-research-agent"
+}

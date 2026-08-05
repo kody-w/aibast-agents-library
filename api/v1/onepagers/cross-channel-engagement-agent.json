@@ -1,0 +1,43 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "27-cross-channel-engagement-agent.html",
+    "industry": "Cross-Industry",
+    "display_name": "Cross-Channel Engagement Agent",
+    "lede": "Deliver a single, unified view of cross-channel interactions for more strategic, streamlined support and stronger engagement.",
+    "audience": [
+      "Customer Experience Leader",
+      "Digital Engagement Manager",
+      "Contact Center Supervisor"
+    ],
+    "business_value": [
+      "Deliver a single",
+      "Unified view of cross-channel interactions for more strategic",
+      "Streamlined support",
+      "Stronger engagement"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Dynamics 365 Commerce",
+      "Microsoft Outlook"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "cross-channel-engagement-agent",
+    "industries": [
+      "Cross-Industry",
+      "Retail"
+    ],
+    "catalog_number": 27,
+    "video": {
+      "slug": "omnichannel-engagement-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=cross-channel-engagement-agent"
+}

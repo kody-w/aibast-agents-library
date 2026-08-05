@@ -1,0 +1,41 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "02-contract-review-agent.html",
+    "industry": "Professional Services",
+    "display_name": "Contract Review Agent",
+    "lede": "Automate contract review processes to enable faster, lower-risk, and more successful negotiations.",
+    "audience": [
+      "Legal Operations",
+      "Attorneys",
+      "Executives"
+    ],
+    "business_value": [
+      "Enable faster",
+      "Lower-risk",
+      "More successful negotiations"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "SharePoint",
+      "Microsoft Word"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "contract-review-agent",
+    "industries": [
+      "Professional Services",
+      "Consulting"
+    ],
+    "catalog_number": 2,
+    "video": {
+      "slug": "contract-risk-review-agent",
+      "hosted": true,
+      "src": "media/videos/contract-risk-review-agent.mp4",
+      "size_mb": 2.54
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=contract-review-agent"
+}

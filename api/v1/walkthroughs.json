@@ -1,0 +1,1657 @@
+{
+  "schema": "aibast-api-walkthroughs/1.0",
+  "generated": "2026-08-05T14:59:42.665765+00:00",
+  "format": "rappvision-walkthrough/1.0",
+  "format_doc": "https://microsoft.github.io/aibast-agents-library/media/RAPPVISION.md",
+  "note": "Storyboards, not footage. Generated deterministically from each entry's manifest; every figure a human must supply is marked rather than invented. Aggregated skills get the same treatment as authored agents \u2014 that is the point of aggregating here.",
+  "count": 183,
+  "walkthroughs": [
+    {
+      "slug": "account-intelligence-orchestrator",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/account-intelligence-orchestrator",
+      "display_name": "Account Intelligence Orchestrator",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-account-intelligence-orchestrator.json"
+    },
+    {
+      "slug": "account-intelligence",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/account-intelligence",
+      "display_name": "Account Intelligence",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-account-intelligence.json"
+    },
+    {
+      "slug": "account-messaging",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/account-messaging",
+      "display_name": "Account Messaging",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-account-messaging.json"
+    },
+    {
+      "slug": "account-risk-assessment",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/account-risk-assessment",
+      "display_name": "Account Risk Assessment",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-account-risk-assessment.json"
+    },
+    {
+      "slug": "acquisition-support",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/acquisition-support",
+      "display_name": "Acquisition Support Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-acquisition-support.json"
+    },
+    {
+      "slug": "action-prioritization",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/action-prioritization",
+      "display_name": "Action Prioritization",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-action-prioritization.json"
+    },
+    {
+      "slug": "activity-gap",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/activity-gap",
+      "display_name": "Activity Gap Analyzer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-activity-gap.json"
+    },
+    {
+      "slug": "ai-customer-assistant",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/ai-customer-assistant",
+      "display_name": "AI Customer Assistant",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-ai-customer-assistant.json"
+    },
+    {
+      "slug": "art-generator",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/art-generator",
+      "display_name": "ArtGenerator",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-art-generator.json"
+    },
+    {
+      "slug": "ask-hr",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/ask-hr",
+      "display_name": "Ask HR",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-ask-hr.json"
+    },
+    {
+      "slug": "asset-maintenance-forecast",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/asset-maintenance-forecast",
+      "display_name": "Asset Maintenance Forecast Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-asset-maintenance-forecast.json"
+    },
+    {
+      "slug": "building-permit-processing",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/building-permit-processing",
+      "display_name": "Building Permit Processing Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-building-permit-processing.json"
+    },
+    {
+      "slug": "bulk-crm-data-generator",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/bulk-crm-data-generator",
+      "display_name": "Bulk CRM Data Generator",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-bulk-crm-data-generator.json"
+    },
+    {
+      "slug": "care-gap-closure",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/care-gap-closure",
+      "display_name": "Care Gap Closure Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-care-gap-closure.json"
+    },
+    {
+      "slug": "cart-abandonment-recovery",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/cart-abandonment-recovery",
+      "display_name": "Cart Abandonment Recovery Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-cart-abandonment-recovery.json"
+    },
+    {
+      "slug": "citizen-service-request",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/citizen-service-request",
+      "display_name": "Citizen Service Request Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-citizen-service-request.json"
+    },
+    {
+      "slug": "claims-processing",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/claims-processing",
+      "display_name": "Claims Processing Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-claims-processing.json"
+    },
+    {
+      "slug": "client-health-score",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/client-health-score",
+      "display_name": "Client Health Score Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-client-health-score.json"
+    },
+    {
+      "slug": "clinical-notes-summarizer",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/clinical-notes-summarizer",
+      "display_name": "Clinical Notes Summarizer Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-clinical-notes-summarizer.json"
+    },
+    {
+      "slug": "competitive-intelligence",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/competitive-intelligence",
+      "display_name": "Competitive Intelligence",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-competitive-intelligence.json"
+    },
+    {
+      "slug": "contract-risk-review",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/contract-risk-review",
+      "display_name": "Contract Risk Review Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-contract-risk-review.json"
+    },
+    {
+      "slug": "cross-selling",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/cross-selling",
+      "display_name": "Cross-Selling Opportunities",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-cross-selling.json"
+    },
+    {
+      "slug": "customer-360-speech",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/customer-360-speech",
+      "display_name": "Customer 360 & Speech Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-customer-360-speech.json"
+    },
+    {
+      "slug": "customer-360",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/customer-360",
+      "display_name": "Customer 360",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-customer-360.json"
+    },
+    {
+      "slug": "customer-loyalty-rewards",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/customer-loyalty-rewards",
+      "display_name": "Customer Loyalty & Rewards Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-customer-loyalty-rewards.json"
+    },
+    {
+      "slug": "customer-sentiment-churn",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/customer-sentiment-churn",
+      "display_name": "Customer Sentiment & Churn Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-customer-sentiment-churn.json"
+    },
+    {
+      "slug": "deal-competitor-intel",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/deal-competitor-intel",
+      "display_name": "Deal Competitor Intelligence",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-deal-competitor-intel.json"
+    },
+    {
+      "slug": "deal-health-score",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/deal-health-score",
+      "display_name": "Deal Health Score",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-deal-health-score.json"
+    },
+    {
+      "slug": "deal-progression",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/deal-progression",
+      "display_name": "Deal Progression",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-deal-progression.json"
+    },
+    {
+      "slug": "deal-risk-assessment",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/deal-risk-assessment",
+      "display_name": "Deal Risk Assessment",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-deal-risk-assessment.json"
+    },
+    {
+      "slug": "deal-stakeholder-engagement",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/deal-stakeholder-engagement",
+      "display_name": "Stakeholder Engagement",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-deal-stakeholder-engagement.json"
+    },
+    {
+      "slug": "deal-tracking",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/deal-tracking",
+      "display_name": "Deal Tracking",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-deal-tracking.json"
+    },
+    {
+      "slug": "dynamics-365-connector",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/dynamics-365-connector",
+      "display_name": "Dynamics 365 Connector",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-dynamics-365-connector.json"
+    },
+    {
+      "slug": "email-drafting",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/email-drafting",
+      "display_name": "Email Drafting",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-email-drafting.json"
+    },
+    {
+      "slug": "emission-tracking",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/emission-tracking",
+      "display_name": "Emission Tracking Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-emission-tracking.json"
+    },
+    {
+      "slug": "energy-regulatory-reporting",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/energy-regulatory-reporting",
+      "display_name": "Energy Regulatory Reporting Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-energy-regulatory-reporting.json"
+    },
+    {
+      "slug": "federal-grants-oversight",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/federal-grants-oversight",
+      "display_name": "Federal Grants Oversight Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-federal-grants-oversight.json"
+    },
+    {
+      "slug": "field-service-dispatch",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/field-service-dispatch",
+      "display_name": "Field Service Dispatch Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-field-service-dispatch.json"
+    },
+    {
+      "slug": "financial-advisor-copilot",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/financial-advisor-copilot",
+      "display_name": "Financial Advisor Copilot Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-financial-advisor-copilot.json"
+    },
+    {
+      "slug": "find-accurate-models",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/find-accurate-models",
+      "display_name": "Find Accurate Models",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-find-accurate-models.json"
+    },
+    {
+      "slug": "foia-request-assistant",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/foia-request-assistant",
+      "display_name": "FOIA Request Assistant Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-foia-request-assistant.json"
+    },
+    {
+      "slug": "fraud-detection-alert",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/fraud-detection-alert",
+      "display_name": "Fraud Detection & Alert Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-fraud-detection-alert.json"
+    },
+    {
+      "slug": "fs-customer-onboarding",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/fs-customer-onboarding",
+      "display_name": "FS Customer Onboarding Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-fs-customer-onboarding.json"
+    },
+    {
+      "slug": "fs-regulatory-compliance",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/fs-regulatory-compliance",
+      "display_name": "FS Regulatory Compliance Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-fs-regulatory-compliance.json"
+    },
+    {
+      "slug": "general-ask-hr",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/general-ask-hr",
+      "display_name": "General Ask HR",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-general-ask-hr.json"
+    },
+    {
+      "slug": "identify-discounts",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/identify-discounts",
+      "display_name": "Identify Discounts",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-identify-discounts.json"
+    },
+    {
+      "slug": "inventory-rebalancing",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/inventory-rebalancing",
+      "display_name": "Inventory Rebalancing Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-inventory-rebalancing.json"
+    },
+    {
+      "slug": "inventory-visibility",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/inventory-visibility",
+      "display_name": "Inventory Visibility Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-inventory-visibility.json"
+    },
+    {
+      "slug": "it-helpdesk",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/it-helpdesk",
+      "display_name": "IT Helpdesk",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-it-helpdesk.json"
+    },
+    {
+      "slug": "it-ticket-management",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/it-ticket-management",
+      "display_name": "IT Ticket Management",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-it-ticket-management.json"
+    },
+    {
+      "slug": "license-renewal-expansion",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/license-renewal-expansion",
+      "display_name": "License Renewal & Expansion Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-license-renewal-expansion.json"
+    },
+    {
+      "slug": "loan-origination-assistant",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/loan-origination-assistant",
+      "display_name": "Loan Origination Assistant Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-loan-origination-assistant.json"
+    },
+    {
+      "slug": "maintenance-scheduling",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/maintenance-scheduling",
+      "display_name": "Maintenance Scheduling Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-maintenance-scheduling.json"
+    },
+    {
+      "slug": "meeting-prep",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/meeting-prep",
+      "display_name": "Meeting Prep",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-meeting-prep.json"
+    },
+    {
+      "slug": "mission-reporting-assistant",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/mission-reporting-assistant",
+      "display_name": "Mission Reporting Assistant Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-mission-reporting-assistant.json"
+    },
+    {
+      "slug": "next-best-action",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/next-best-action",
+      "display_name": "Next Best Action",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-next-best-action.json"
+    },
+    {
+      "slug": "omnichannel-engagement",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/omnichannel-engagement",
+      "display_name": "Omnichannel Engagement Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-omnichannel-engagement.json"
+    },
+    {
+      "slug": "one-click-crm-intake",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/one-click-crm-intake",
+      "display_name": "One-Click CRM Intake",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-one-click-crm-intake.json"
+    },
+    {
+      "slug": "order-status-communication",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/order-status-communication",
+      "display_name": "Order Status Communication Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-order-status-communication.json"
+    },
+    {
+      "slug": "patient-intake",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/patient-intake",
+      "display_name": "Patient Intake Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-patient-intake.json"
+    },
+    {
+      "slug": "permit-license-management",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/permit-license-management",
+      "display_name": "Permit & License Management Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-permit-license-management.json"
+    },
+    {
+      "slug": "personalized-marketing",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/personalized-marketing",
+      "display_name": "Personalized Marketing Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-personalized-marketing.json"
+    },
+    {
+      "slug": "personalized-shopping-assistant",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/personalized-shopping-assistant",
+      "display_name": "Personalized Shopping Assistant Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-personalized-shopping-assistant.json"
+    },
+    {
+      "slug": "pipeline-velocity",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/pipeline-velocity",
+      "display_name": "Pipeline Velocity",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-pipeline-velocity.json"
+    },
+    {
+      "slug": "portfolio-rebalancing",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/portfolio-rebalancing",
+      "display_name": "Portfolio Rebalancing Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-portfolio-rebalancing.json"
+    },
+    {
+      "slug": "prior-authorization",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/prior-authorization",
+      "display_name": "Prior Authorization Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-prior-authorization.json"
+    },
+    {
+      "slug": "procurement-agent",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/procurement-agent",
+      "display_name": "Procurement Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-procurement-agent.json"
+    },
+    {
+      "slug": "procurement-support",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/procurement-support",
+      "display_name": "Procurement Support",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-procurement-support.json"
+    },
+    {
+      "slug": "product-feedback-synthesizer",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/product-feedback-synthesizer",
+      "display_name": "Product Feedback Synthesizer Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-product-feedback-synthesizer.json"
+    },
+    {
+      "slug": "product-reference",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/product-reference",
+      "display_name": "Product Reference",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-product-reference.json"
+    },
+    {
+      "slug": "production-line-optimization",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/production-line-optimization",
+      "display_name": "Production Line Optimization Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-production-line-optimization.json"
+    },
+    {
+      "slug": "proposal-copilot",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/proposal-copilot",
+      "display_name": "Proposal Copilot Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-proposal-copilot.json"
+    },
+    {
+      "slug": "proposal-generation",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/proposal-generation",
+      "display_name": "Proposal Generation",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-proposal-generation.json"
+    },
+    {
+      "slug": "regulatory-compliance-fed",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/regulatory-compliance-fed",
+      "display_name": "Regulatory Compliance (Federal) Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-regulatory-compliance-fed.json"
+    },
+    {
+      "slug": "resource-utilization",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/resource-utilization",
+      "display_name": "Resource Utilization Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-resource-utilization.json"
+    },
+    {
+      "slug": "returns-complaints-resolution",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/returns-complaints-resolution",
+      "display_name": "Returns & Complaints Resolution Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-returns-complaints-resolution.json"
+    },
+    {
+      "slug": "returns-exchange",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/returns-exchange",
+      "display_name": "Returns & Exchange Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-returns-exchange.json"
+    },
+    {
+      "slug": "revenue-forecast",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/revenue-forecast",
+      "display_name": "Revenue Forecast",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-revenue-forecast.json"
+    },
+    {
+      "slug": "sales-chat",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/sales-chat",
+      "display_name": "Sales Chat Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-sales-chat.json"
+    },
+    {
+      "slug": "sales-coach",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/sales-coach",
+      "display_name": "Sales Coach",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-sales-coach.json"
+    },
+    {
+      "slug": "sales-qualification",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/sales-qualification",
+      "display_name": "Sales Qualification",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-sales-qualification.json"
+    },
+    {
+      "slug": "sales-simulation",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/sales-simulation",
+      "display_name": "Sales Simulation",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-sales-simulation.json"
+    },
+    {
+      "slug": "sharepoint-document-extractor",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/sharepoint-document-extractor",
+      "display_name": "SharePoint Document Extractor",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-sharepoint-document-extractor.json"
+    },
+    {
+      "slug": "slg-grants-management",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/slg-grants-management",
+      "display_name": "SLG Grants Management Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-slg-grants-management.json"
+    },
+    {
+      "slug": "software-competitive-intel",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/software-competitive-intel",
+      "display_name": "Competitive Intelligence Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-software-competitive-intel.json"
+    },
+    {
+      "slug": "software-customer-onboarding",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/software-customer-onboarding",
+      "display_name": "Customer Onboarding Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-software-customer-onboarding.json"
+    },
+    {
+      "slug": "speech-to-crm",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/speech-to-crm",
+      "display_name": "Speech to CRM",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-speech-to-crm.json"
+    },
+    {
+      "slug": "staff-credentialing",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/staff-credentialing",
+      "display_name": "Staff Credentialing Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-staff-credentialing.json"
+    },
+    {
+      "slug": "stakeholder-intelligence",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/stakeholder-intelligence",
+      "display_name": "Stakeholder Intelligence",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-stakeholder-intelligence.json"
+    },
+    {
+      "slug": "stalled-deal-detection",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/stalled-deal-detection",
+      "display_name": "Stalled Deal Detection",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-stalled-deal-detection.json"
+    },
+    {
+      "slug": "store-associate-copilot",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/store-associate-copilot",
+      "display_name": "Store Associate Copilot Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-store-associate-copilot.json"
+    },
+    {
+      "slug": "supplier-risk-monitoring",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/supplier-risk-monitoring",
+      "display_name": "Supplier Risk Monitoring Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-supplier-risk-monitoring.json"
+    },
+    {
+      "slug": "supply-chain-disruption-alert",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/supply-chain-disruption-alert",
+      "display_name": "Supply Chain Disruption Alert Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-supply-chain-disruption-alert.json"
+    },
+    {
+      "slug": "support-ticket-resolution",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/support-ticket-resolution",
+      "display_name": "Support Ticket Resolution Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-support-ticket-resolution.json"
+    },
+    {
+      "slug": "time-entry-billing",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/time-entry-billing",
+      "display_name": "Time Entry & Billing Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-time-entry-billing.json"
+    },
+    {
+      "slug": "triage-bot",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/triage-bot",
+      "display_name": "Triage Bot",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-triage-bot.json"
+    },
+    {
+      "slug": "underwriting-support",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/underwriting-support",
+      "display_name": "Underwriting Support Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-underwriting-support.json"
+    },
+    {
+      "slug": "utility-billing-assistance",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/utility-billing-assistance",
+      "display_name": "Utility Billing Assistance Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-utility-billing-assistance.json"
+    },
+    {
+      "slug": "voice-to-crm-d365",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/voice-to-crm-d365",
+      "display_name": "Voice to CRM (D365)",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-voice-to-crm-d365.json"
+    },
+    {
+      "slug": "voice-to-crm-email",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/voice-to-crm-email",
+      "display_name": "Voice to CRM Email",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-voice-to-crm-email.json"
+    },
+    {
+      "slug": "voice-to-crm-servicenow",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/voice-to-crm-servicenow",
+      "display_name": "Voice to CRM (ServiceNow)",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-voice-to-crm-servicenow.json"
+    },
+    {
+      "slug": "wealth-insights-generator",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/wealth-insights-generator",
+      "display_name": "Wealth Insights Generator Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-wealth-insights-generator.json"
+    },
+    {
+      "slug": "win-loss-analysis",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/win-loss-analysis",
+      "display_name": "Win/Loss Analysis",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-win-loss-analysis.json"
+    },
+    {
+      "slug": "win-probability",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/win-probability",
+      "display_name": "Win Probability",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-win-probability.json"
+    },
+    {
+      "slug": "workforce-clearance-onboarding",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/workforce-clearance-onboarding",
+      "display_name": "Workforce Clearance & Onboarding Agent",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-workforce-clearance-onboarding.json"
+    },
+    {
+      "slug": "accessibility_pass",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/accessibility_pass",
+      "display_name": "accessibility-pass",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-accessibility_pass.json"
+    },
+    {
+      "slug": "acroform_writer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/acroform_writer",
+      "display_name": "acroform-writer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-acroform_writer.json"
+    },
+    {
+      "slug": "agent_evaluation_designer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/agent_evaluation_designer",
+      "display_name": "agent-evaluation-designer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-agent_evaluation_designer.json"
+    },
+    {
+      "slug": "agent_harness_explorer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/agent_harness_explorer",
+      "display_name": "agent-harness-explorer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-agent_harness_explorer.json"
+    },
+    {
+      "slug": "ai_demo_assistant",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/ai_demo_assistant",
+      "display_name": "ai-demo-assistant",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-ai_demo_assistant.json"
+    },
+    {
+      "slug": "ai_first_process_redesign",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/ai_first_process_redesign",
+      "display_name": "ai-first-process-redesign",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-ai_first_process_redesign.json"
+    },
+    {
+      "slug": "ai_usecase_assessment",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/ai_usecase_assessment",
+      "display_name": "ai-usecase-assessment",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-ai_usecase_assessment.json"
+    },
+    {
+      "slug": "anonymised_case_study_writer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/anonymised_case_study_writer",
+      "display_name": "anonymised-case-study-writer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-anonymised_case_study_writer.json"
+    },
+    {
+      "slug": "awaiting_reply",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/awaiting_reply",
+      "display_name": "awaiting-reply",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-awaiting_reply.json"
+    },
+    {
+      "slug": "b2b_outreach_suite",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/b2b_outreach_suite",
+      "display_name": "b2b-outreach-suite",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-b2b_outreach_suite.json"
+    },
+    {
+      "slug": "blog_content_auditor",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/blog_content_auditor",
+      "display_name": "blog-content-auditor",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-blog_content_auditor.json"
+    },
+    {
+      "slug": "blog_post_structure_pass",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/blog_post_structure_pass",
+      "display_name": "blog-post-structure-pass",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-blog_post_structure_pass.json"
+    },
+    {
+      "slug": "brand_template_enforcer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/brand_template_enforcer",
+      "display_name": "brand-template-enforcer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-brand_template_enforcer.json"
+    },
+    {
+      "slug": "brand_voice_pass",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/brand_voice_pass",
+      "display_name": "brand-voice-pass",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-brand_voice_pass.json"
+    },
+    {
+      "slug": "business_os",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/business_os",
+      "display_name": "business-os",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-business_os.json"
+    },
+    {
+      "slug": "call_for_speakers_digest",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/call_for_speakers_digest",
+      "display_name": "call-for-speakers-digest",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-call_for_speakers_digest.json"
+    },
+    {
+      "slug": "campaign_deck_builder",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/campaign_deck_builder",
+      "display_name": "campaign-deck-builder",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-campaign_deck_builder.json"
+    },
+    {
+      "slug": "chart_builder",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/chart_builder",
+      "display_name": "chart-builder",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-chart_builder.json"
+    },
+    {
+      "slug": "classic_text_adventure",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/classic_text_adventure",
+      "display_name": "classic-text-adventure",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-classic_text_adventure.json"
+    },
+    {
+      "slug": "clt_hr_assistant",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/clt_hr_assistant",
+      "display_name": "clt-hr-assistant",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-clt_hr_assistant.json"
+    },
+    {
+      "slug": "commenting_content",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/commenting_content",
+      "display_name": "commenting-content",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-commenting_content.json"
+    },
+    {
+      "slug": "competitive_battlecard_builder",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/competitive_battlecard_builder",
+      "display_name": "competitive-battlecard-builder",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-competitive_battlecard_builder.json"
+    },
+    {
+      "slug": "conditional_chat_reminder",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/conditional_chat_reminder",
+      "display_name": "conditional-chat-reminder",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-conditional_chat_reminder.json"
+    },
+    {
+      "slug": "conference_session_abstract_pack",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/conference_session_abstract_pack",
+      "display_name": "conference-session-abstract-pack",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-conference_session_abstract_pack.json"
+    },
+    {
+      "slug": "content_quality_auditor",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/content_quality_auditor",
+      "display_name": "content-quality-auditor",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-content_quality_auditor.json"
+    },
+    {
+      "slug": "copilot_agents_news_scout",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/copilot_agents_news_scout",
+      "display_name": "copilot-agents-news-scout",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-copilot_agents_news_scout.json"
+    },
+    {
+      "slug": "copilot_studio_test_planner",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/copilot_studio_test_planner",
+      "display_name": "copilot-studio-test-planner",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-copilot_studio_test_planner.json"
+    },
+    {
+      "slug": "copilot_studio_topic_blueprint",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/copilot_studio_topic_blueprint",
+      "display_name": "copilot-studio-topic-blueprint",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-copilot_studio_topic_blueprint.json"
+    },
+    {
+      "slug": "doc_format_converter",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/doc_format_converter",
+      "display_name": "doc-format-converter",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-doc_format_converter.json"
+    },
+    {
+      "slug": "enterprise_agent_design_authority",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/enterprise_agent_design_authority",
+      "display_name": "enterprise-agent-design-authority",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-enterprise_agent_design_authority.json"
+    },
+    {
+      "slug": "eu_greenwashing_analysis",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/eu_greenwashing_analysis",
+      "display_name": "eu-greenwashing-analysis",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-eu_greenwashing_analysis.json"
+    },
+    {
+      "slug": "exam_prep_learning_plan_builder",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/exam_prep_learning_plan_builder",
+      "display_name": "exam-prep-learning-plan-builder",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-exam_prep_learning_plan_builder.json"
+    },
+    {
+      "slug": "gantt_chart_generator",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/gantt_chart_generator",
+      "display_name": "gantt-chart-generator",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-gantt_chart_generator.json"
+    },
+    {
+      "slug": "generating_podcast_script",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/generating_podcast_script",
+      "display_name": "generating-podcast-script",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-generating_podcast_script.json"
+    },
+    {
+      "slug": "global_greenwashing_claim_auditor",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/global_greenwashing_claim_auditor",
+      "display_name": "global-greenwashing-claim-auditor",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-global_greenwashing_claim_auditor.json"
+    },
+    {
+      "slug": "grab_my_files",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/grab_my_files",
+      "display_name": "grab-my-files",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-grab_my_files.json"
+    },
+    {
+      "slug": "idea_refiner",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/idea_refiner",
+      "display_name": "idea-refiner",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-idea_refiner.json"
+    },
+    {
+      "slug": "institutional_knowledge",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/institutional_knowledge",
+      "display_name": "institutional-knowledge",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-institutional_knowledge.json"
+    },
+    {
+      "slug": "iterative_file_editing",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/iterative_file_editing",
+      "display_name": "iterative-file-editing",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-iterative_file_editing.json"
+    },
+    {
+      "slug": "knowledge_corpus_curator",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/knowledge_corpus_curator",
+      "display_name": "knowledge-corpus-curator",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-knowledge_corpus_curator.json"
+    },
+    {
+      "slug": "knowledge_source_router",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/knowledge_source_router",
+      "display_name": "knowledge-source-router",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-knowledge_source_router.json"
+    },
+    {
+      "slug": "lab_column_mapper",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/lab_column_mapper",
+      "display_name": "lab-column-mapper",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-lab_column_mapper.json"
+    },
+    {
+      "slug": "linkedin_content_system",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/linkedin_content_system",
+      "display_name": "linkedin-content-system",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-linkedin_content_system.json"
+    },
+    {
+      "slug": "linkedin_content_writer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/linkedin_content_writer",
+      "display_name": "linkedin-content-writer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-linkedin_content_writer.json"
+    },
+    {
+      "slug": "lookup_dataverse_table",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/lookup_dataverse_table",
+      "display_name": "lookup-dataverse-table",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-lookup_dataverse_table.json"
+    },
+    {
+      "slug": "mct_excellence_iq",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/mct_excellence_iq",
+      "display_name": "mct-excellence-iq",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-mct_excellence_iq.json"
+    },
+    {
+      "slug": "meeting_analyzer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/meeting_analyzer",
+      "display_name": "meeting-analyzer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-meeting_analyzer.json"
+    },
+    {
+      "slug": "microsoft_ai_platform_advisor",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/microsoft_ai_platform_advisor",
+      "display_name": "microsoft-ai-platform-advisor",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-microsoft_ai_platform_advisor.json"
+    },
+    {
+      "slug": "monte_carlo_analysis",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/monte_carlo_analysis",
+      "display_name": "monte-carlo-analysis",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-monte_carlo_analysis.json"
+    },
+    {
+      "slug": "own_voice_builder",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/own_voice_builder",
+      "display_name": "own-voice-builder",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-own_voice_builder.json"
+    },
+    {
+      "slug": "pattern_radar",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/pattern_radar",
+      "display_name": "pattern-radar",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-pattern_radar.json"
+    },
+    {
+      "slug": "pattern_radar_automation",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/pattern_radar_automation",
+      "display_name": "pattern-radar-automation",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-pattern_radar_automation.json"
+    },
+    {
+      "slug": "pdf_table_data_conversion",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/pdf_table_data_conversion",
+      "display_name": "pdf-table-data-conversion",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-pdf_table_data_conversion.json"
+    },
+    {
+      "slug": "persona_reaction_panel",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/persona_reaction_panel",
+      "display_name": "persona-reaction-panel",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-persona_reaction_panel.json"
+    },
+    {
+      "slug": "phi_deidentifier",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/phi_deidentifier",
+      "display_name": "phi-deidentifier",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-phi_deidentifier.json"
+    },
+    {
+      "slug": "pov_line_generator",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/pov_line_generator",
+      "display_name": "pov-line-generator",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-pov_line_generator.json"
+    },
+    {
+      "slug": "power_automate_desktop_assessment",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/power_automate_desktop_assessment",
+      "display_name": "power-automate-desktop-assessment",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-power_automate_desktop_assessment.json"
+    },
+    {
+      "slug": "power_automate_documentation",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/power_automate_documentation",
+      "display_name": "power-automate-documentation",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-power_automate_documentation.json"
+    },
+    {
+      "slug": "power_bi_model_review",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/power_bi_model_review",
+      "display_name": "power-bi-model-review",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-power_bi_model_review.json"
+    },
+    {
+      "slug": "powerpoint_deck_designer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/powerpoint_deck_designer",
+      "display_name": "powerpoint-deck-designer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-powerpoint_deck_designer.json"
+    },
+    {
+      "slug": "presentation_talk_track_builder",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/presentation_talk_track_builder",
+      "display_name": "presentation-talk-track-builder",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-presentation_talk_track_builder.json"
+    },
+    {
+      "slug": "process_sop_architect",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/process_sop_architect",
+      "display_name": "process-sop-architect",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-process_sop_architect.json"
+    },
+    {
+      "slug": "redlining_content",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/redlining_content",
+      "display_name": "redlining-content",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-redlining_content.json"
+    },
+    {
+      "slug": "regulation_monitor",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/regulation_monitor",
+      "display_name": "regulation-monitor",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-regulation_monitor.json"
+    },
+    {
+      "slug": "rich_html_presentation",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/rich_html_presentation",
+      "display_name": "rich-html-presentation",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-rich_html_presentation.json"
+    },
+    {
+      "slug": "scrollytelling_data",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/scrollytelling_data",
+      "display_name": "scrollytelling-data",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-scrollytelling_data.json"
+    },
+    {
+      "slug": "sharepoint_list_formatter",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/sharepoint_list_formatter",
+      "display_name": "sharepoint-list-formatter",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-sharepoint_list_formatter.json"
+    },
+    {
+      "slug": "sharepoint_list_insight_report_generator",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/sharepoint_list_insight_report_generator",
+      "display_name": "sharepoint-list-insight-report-generator",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-sharepoint_list_insight_report_generator.json"
+    },
+    {
+      "slug": "skill_authoring_coach",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/skill_authoring_coach",
+      "display_name": "skill-authoring-coach",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-skill_authoring_coach.json"
+    },
+    {
+      "slug": "spend_more_time_with_friends_and_family",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/spend_more_time_with_friends_and_family",
+      "display_name": "spend-more-time-with-friends-and-family",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-spend_more_time_with_friends_and_family.json"
+    },
+    {
+      "slug": "style_analyzer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/style_analyzer",
+      "display_name": "style-analyzer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-style_analyzer.json"
+    },
+    {
+      "slug": "tool_tracer",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/tool_tracer",
+      "display_name": "tool-tracer",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-tool_tracer.json"
+    },
+    {
+      "slug": "vacation_urgent_forwarder",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/vacation_urgent_forwarder",
+      "display_name": "vacation-urgent-forwarder",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-vacation_urgent_forwarder.json"
+    },
+    {
+      "slug": "vendor_contract_risk_review",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/vendor_contract_risk_review",
+      "display_name": "vendor-contract-risk-review",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-vendor_contract_risk_review.json"
+    },
+    {
+      "slug": "what_to_use_when",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/what_to_use_when",
+      "display_name": "what-to-use-when",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-what_to_use_when.json"
+    },
+    {
+      "slug": "whiteboard_to_infographic",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/whiteboard_to_infographic",
+      "display_name": "whiteboard-to-infographic",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-whiteboard_to_infographic.json"
+    },
+    {
+      "slug": "wikipedia_human_style_writing",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/wikipedia_human_style_writing",
+      "display_name": "wikipedia-human-style-writing",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-wikipedia_human_style_writing.json"
+    },
+    {
+      "slug": "work_brief",
+      "kind": "skill",
+      "ref": "@cat-agent-skills/work_brief",
+      "display_name": "work-brief",
+      "runtime_seconds": 137.0,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-work_brief.json"
+    }
+  ]
+}

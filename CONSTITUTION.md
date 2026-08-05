@@ -293,6 +293,46 @@ end to end. Process: [docs/CERTIFICATION.md](docs/CERTIFICATION.md).
 
 ---
 
+## Article XI-A — Review: two channels, never one number
+
+Every entry carries **two independent reviews**, and a reader must always be
+able to tell which one they are reading.
+
+1. **Human review is opinion.** People react and reply on GitHub Discussions.
+   It answers *is this liked and used?*
+2. **Machine review is analysis.** RAPP Sentinel parses source against the
+   published rubric — never importing it, never running it. It answers *is this
+   built correctly?*
+3. **They are never combined.** Not averaged, not blended, not summed into a
+   rank. Separate categories, separate thread titles, separate endpoints,
+   separate panels. The two fail in opposite directions: a popular agent can
+   leak a credential, and a flawless one can be useless. A blended number is
+   wrong about both and reassuring about neither.
+4. **The rubric is data, not code.** `sentinel/NEIGHBORHOOD.json` is a roster of
+   residents, each with one lens. Adding a reviewer is a JSON edit. Anyone can
+   pull the neighborhood and run the identical review locally, with no token and
+   no service — the review a maintainer sees is the review a submitter can run
+   first.
+5. **A run is traceable or it is not a run.** Every run records the commit, the
+   neighborhood digest, the rubric version, and the digest of every input.
+   `verify` re-runs the deterministic residents and compares. When the rubric
+   changes its digest changes, so stale verdicts announce themselves instead of
+   quietly aging into fiction.
+6. **The model is injected, never assumed.** Sentinel holds no API key and calls
+   no model. Interpretive residents emit a packet any model can execute; the
+   answer is recorded with the model that produced it attached.
+7. **Every finding teaches.** A failed check states the principle, why it
+   matters, and what to do instead. A score with no explanation trains nobody
+   and gets argued with instead of acted on.
+8. **A verdict is a queue position, not a judgment.** Nothing here approves an
+   agent for use in anyone's tenant.
+
+*Enforced by:* gates **T-REVIEW**, **T-SENTINEL**, and **T-REVIEW-SEP**, the
+last of which fails any surface that arithmetically mixes the two channels.
+Detail: [docs/REVIEWS.md](docs/REVIEWS.md), [sentinel/SPEC.md](sentinel/SPEC.md).
+
+---
+
 ## Article XII — Aggregation of outside work
 
 The library indexes skills from other libraries so that duplicate solutions can

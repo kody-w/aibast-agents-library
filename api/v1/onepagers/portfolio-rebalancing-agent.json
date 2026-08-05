@@ -1,0 +1,54 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "05-portfolio-rebalancing-agent.html",
+    "industry": "Capital Markets",
+    "display_name": "Portfolio Rebalancing Agent",
+    "lede": "Provide intelligent, automated portfolio rebalancing that streamlines manual reviews and improves wealth management outcomes.",
+    "audience": [
+      "Financial Advisor",
+      "Portfolio Manager",
+      "Paraplanner"
+    ],
+    "business_value": [
+      "Provide intelligent",
+      "Automated portfolio rebalancing that streamlines manual reviews",
+      "Improves wealth management outcomes"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Microsoft Teams",
+      "Microsoft PowerPoint"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "portfolio-rebalancing-agent",
+    "personas": [
+      "Financial Advisor",
+      "Portfolio Manager",
+      "Paraplanner"
+    ],
+    "industries": [
+      "Capital Markets"
+    ],
+    "requires": [
+      "Microsoft Copilot Studio",
+      "Dynamics 365 for CRM",
+      "Microsoft Teams",
+      "PowerPoint"
+    ],
+    "summary": "Provide intelligent, automated portfolio rebalancing that streamlines manual reviews and improves wealth management outcomes.",
+    "listing_file": "portfolio-rebalancing-agent.md",
+    "catalog_number": 5,
+    "video": {
+      "slug": "portfolio-rebalancing-agent",
+      "hosted": true,
+      "src": "media/videos/portfolio-rebalancing-agent.mp4",
+      "size_mb": 3.01
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=portfolio-rebalancing-agent"
+}

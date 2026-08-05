@@ -1,0 +1,41 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "48-branch-banking-advisory-agent.html",
+    "industry": "Financial Services",
+    "display_name": "Branch Banking Advisory Agent",
+    "lede": "Automate branch banking and advisory workflows to streamline customer interactions, strengthen compliance, and improve financial guidance.",
+    "audience": [
+      "Branch Bankers",
+      "Financial Advisors",
+      "Compliance Officers"
+    ],
+    "business_value": [
+      "Streamline customer interactions",
+      "Strengthen compliance",
+      "Improve financial guidance"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Dynamics 365 ERP",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "branch-banking-advisory-agent",
+    "industries": [
+      "Financial Services"
+    ],
+    "catalog_number": 48,
+    "video": {
+      "slug": "financial-advisor-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=branch-banking-advisory-agent"
+}

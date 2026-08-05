@@ -1,0 +1,40 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "45-prior-authorization-agent.html",
+    "industry": "Healthcare",
+    "display_name": "Prior Authorization Agent",
+    "lede": "Automate insurance approval workflows to accelerate authorization processes, improve documentation accuracy, and reduce care delays.",
+    "audience": [
+      "Utilization Management Coordinators",
+      "Nurse Case Managers",
+      "Radiology Schedulers"
+    ],
+    "business_value": [
+      "Accelerate authorization processes",
+      "Improve documentation accuracy",
+      "Reduce care delays"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "prior-authorization-agent",
+    "industries": [
+      "Healthcare",
+      "Financial Services"
+    ],
+    "catalog_number": 45,
+    "video": {
+      "slug": "prior-authorization-automation-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=prior-authorization-agent"
+}

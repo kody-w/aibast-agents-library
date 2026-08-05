@@ -1,0 +1,39 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "34-customer-sentiment-churn-agent.html",
+    "industry": "Financial Services",
+    "display_name": "Customer Sentiment & Churn Agent",
+    "lede": "Deliver AI-powered sentiment intelligence that detects churn risk early and enables proactive retention strategies.",
+    "audience": [
+      "Relationship Managers",
+      "Retention Specialists",
+      "Customer Success Teams"
+    ],
+    "business_value": [
+      "Deliver ai-powered sentiment intelligence that detects churn risk early",
+      "Enables proactive retention strategies"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "customer-sentiment-churn-agent",
+    "industries": [
+      "Financial Services"
+    ],
+    "catalog_number": 34,
+    "video": {
+      "slug": "customer-sentiment-and-churn-prediction-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=customer-sentiment-churn-agent"
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "39-wealth-insights-agent.html",
+    "industry": "Financial Services",
+    "display_name": "Wealth Insights Agent",
+    "lede": "Deliver AI-powered portfolio intelligence to uncover hidden asset opportunities, strengthen client relationships, and drive advisory growth at scale.",
+    "audience": [
+      "Wealth Advisor",
+      "Relationship Managers",
+      "Advisory Directors"
+    ],
+    "business_value": [
+      "Uncover hidden asset opportunities",
+      "Strengthen client relationships",
+      "Drive advisory growth at scale"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Dynamics 365 ERP",
+      "Dynamics 365 CcaaS",
+      "Microsoft Outlook"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "wealth-insights-agent",
+    "industries": [
+      "Financial Services"
+    ],
+    "catalog_number": 39,
+    "video": {
+      "slug": "wealth-insights-generator-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=wealth-insights-agent"
+}

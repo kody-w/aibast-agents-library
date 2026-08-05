@@ -1,0 +1,41 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "33-subscription-renewal-agent.html",
+    "industry": "Software & Tech",
+    "display_name": "Subscription Renewal Agent",
+    "lede": "Streamline subscription renewal management and expansion planning, turning risk into growth opportunities while increasing win probability.",
+    "audience": [
+      "Account Executives",
+      "Customer Success Managers",
+      "Sales Leadership"
+    ],
+    "business_value": [
+      "Streamline subscription renewal management",
+      "Expansion planning",
+      "Turning risk into growth opportunities",
+      "Increasing win probability"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "subscription-renewal-agent",
+    "industries": [
+      "Software Tech"
+    ],
+    "catalog_number": 33,
+    "video": {
+      "slug": "license-renewal-and-expansion-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=subscription-renewal-agent"
+}

@@ -1,0 +1,41 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "23-product-feedback-insights-agent.html",
+    "industry": "Cross-Industry",
+    "display_name": "Product Feedback Insights Agent",
+    "lede": "Turn fragmented feedback into actionable insights that accelerate product improvements, prevent churn, and optimize engineering priorities.",
+    "audience": [
+      "Product Manager",
+      "Engineering Lead",
+      "Director of Product"
+    ],
+    "business_value": [
+      "Turn fragmented feedback into actionable insights that accelerate product improvements",
+      "Prevent churn",
+      "Optimize engineering priorities"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "Microsoft Teams",
+      "Dynamics 365 CRM"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "product-feedback-insights-agent",
+    "industries": [
+      "Cross-Industry"
+    ],
+    "catalog_number": 23,
+    "video": {
+      "slug": "product-feedback-synthesizer-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=product-feedback-insights-agent"
+}

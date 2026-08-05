@@ -1,0 +1,40 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "38-personal-styling-agent.html",
+    "industry": "Retail",
+    "display_name": "Personal Styling Agent",
+    "lede": "Deliver intelligent personal styling to strengthen customer experience, increase revenue, and elevate associate efficiency at scale.",
+    "audience": [
+      "Personal Shoppers",
+      "Clienteling Specialists",
+      "Retail Managers"
+    ],
+    "business_value": [
+      "Strengthen customer experience",
+      "Increase revenue",
+      "Elevate associate efficiency at scale"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Microsoft Outlook"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "personal-styling-agent",
+    "industries": [
+      "Retail"
+    ],
+    "catalog_number": 38,
+    "video": {
+      "slug": "personalized-shopping-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=personal-styling-agent"
+}

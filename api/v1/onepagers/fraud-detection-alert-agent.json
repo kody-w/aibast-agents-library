@@ -1,0 +1,40 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "35-fraud-detection-alert-agent.html",
+    "industry": "Financial Services",
+    "display_name": "Fraud Detection & Alert Agent",
+    "lede": "Deploy AI-driven fraud monitoring and identification to accelerate investigations, enhance detection rates, and improve prevention.",
+    "audience": [
+      "Fraud Analysts",
+      "SIU Investigators",
+      "Risk Leaders"
+    ],
+    "business_value": [
+      "Accelerate investigations",
+      "Enhance detection rates",
+      "Improve prevention"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "fraud-detection-alert-agent",
+    "industries": [
+      "Financial Services"
+    ],
+    "catalog_number": 35,
+    "video": {
+      "slug": "fraud-detection-and-alert-agent",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=fraud-detection-alert-agent"
+}

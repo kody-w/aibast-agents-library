@@ -1021,5 +1021,257 @@ PY"
 check "publisher issue form parses" \
   "python3 -c \"import yaml;yaml.safe_load(open('.github/ISSUE_TEMPLATE/publisher-application.yml'))\""
 
+echo "== T-ONEPAGER solution catalog =="
+check "onepagers data parses and every entry has the visual contract" "python3 - <<'PY'
+import json
+d=json.load(open('data/onepagers.json'))
+assert d['schema']=='aibast-onepagers/1.0'
+assert d['count']>=40, d['count']
+for e in d['onepagers']:
+    for k in ('slug','display_name','lede','business_value','built_with','industries'):
+        assert e.get(k), (e['slug'], k)
+PY"
+check "no SharePoint sharing URL was published (they carry access tokens)" \
+  "! grep -rqiE 'https?://[a-z0-9.-]*sharepoint\.com' data/onepagers.json api/v1/onepagers.json onepager.html solutions.html"
+check "hosted videos exist on disk and are under GitHub's per-file limit" "python3 - <<'PY'
+import json, os
+d=json.load(open('data/onepagers.json'))
+hosted=[e for e in d['onepagers'] if (e.get('video') or {}).get('hosted')]
+assert hosted, 'no hosted demo videos'
+for e in hosted:
+    p=e['video']['src']
+    assert os.path.isfile(p), p
+    assert os.path.getsize(p) < 100*1024*1024, p
+PY"
+check "onepager.html renders both modes and streams source from raw" "python3 - <<'PY'
+d=open('onepager.html').read()
+for k in ('?agent=','?solution=','renderAgent','renderSolution','raw_url','window.print'):
+    assert k in d, k
+PY"
+check "solutions.html lists the catalog from the static API" "python3 - <<'PY'
+d=open('solutions.html').read()
+for k in ('api/v1/onepagers.json','onepager.html?solution=','hosted_videos'):
+    assert k in d, k
+PY"
+check "every agent card links to its one-pager" \
+  "grep -q 'onepager.html?agent=' agents.html"
+check "the static API serves one-pagers per solution" "python3 - <<'PY'
+import json, pathlib
+idx=json.load(open('api/v1/onepagers.json'))
+for e in idx['onepagers'][:5]:
+    p=pathlib.Path('api/v1/onepagers')/f\"{e['slug']}.json\"
+    assert p.is_file(), p
+    assert json.loads(p.read_text())['schema']=='aibast-api-onepager/1.0'
+PY"
+
+echo "== T-REVIEW machine review =="
+check "the rubric reviews every agent and parses source without importing it" "python3 - <<'PY'
+import json
+d=json.load(open('state/agent_reviews.json'))
+assert d['schema']=='aibast-machine-review/1.0'
+assert d['review_type']=='machine'
+assert d['count']>=100, d['count']
+src=open('scripts/review_agents.py').read()
+assert 'ast.parse' in src
+assert 'importlib.import_module(path' not in src and 'exec(' not in src
+PY"
+check "every failed check carries a teachable note, not just a verdict" "python3 - <<'PY'
+import json
+d=json.load(open('state/agent_reviews.json'))
+n=0
+for r in d['reviews']:
+    for c in r['checks']:
+        if not c['passed']:
+            assert c.get('teachable') and len(c['teachable'])>60, (r['slug'], c['id'])
+            assert c.get('detail'), (r['slug'], c['id'])
+            n+=1
+assert n>=10, f'only {n} findings — the rubric is not exercising'
+PY"
+check "no agent ships an author's absolute path or a credential literal" "python3 - <<'PY'
+import json
+d=json.load(open('state/agent_reviews.json'))
+for r in d['reviews']:
+    for c in r['checks']:
+        if c['id'] in ('P1','Q5','S1','S2'):
+            assert c['passed'], f\"{r['slug']}: {c['id']} {c.get('detail')}\"
+PY"
+
+echo "== T-SENTINEL neighborhood =="
+check "the neighborhood is data: no code, residents declare kind and authority" "python3 - <<'PY'
+import json
+h=json.load(open('sentinel/NEIGHBORHOOD.json'))
+assert h['schema']=='rapp-sentinel-neighborhood/1.0'
+kinds={r['kind'] for r in h['residents']}
+assert kinds=={'deterministic','interpretive'}, kinds
+for r in h['residents']:
+    assert r['authority'] in ('blocking','advisory'), r['id']
+    assert ('module' in r) ^ ('prompt' in r), r['id']
+    if 'prompt' in r:
+        assert 'Return JSON' in r['prompt'] or 'return JSON' in r['prompt'], r['id']
+PY"
+check "sentinel never calls a model itself — the packet is the whole contract" "python3 - <<'PY'
+s=open('scripts/sentinel.py').read()
+for banned in ('api.anthropic.com','api.openai.com','OPENAI_API_KEY','ANTHROPIC_API_KEY'):
+    assert banned not in s, banned
+assert 'build_packet' in s and 'absorb' in s
+PY"
+check "a recorded run reproduces against the working tree" \
+  "python3 scripts/sentinel.py verify --run \$(python3 -c \"import json;print(json.load(open('sentinel/latest.json'))['run_id'])\")"
+check "every run records what makes it traceable" "python3 - <<'PY'
+import json, pathlib
+latest=json.load(open('sentinel/latest.json'))
+run=json.loads(pathlib.Path(latest['run_file']).read_text())
+for k in ('run_id','commit','inputs_digest','neighborhood','residents_awake','residents_pending','verdicts'):
+    assert run.get(k) is not None, k
+assert run['neighborhood']['digest'], 'no neighborhood digest'
+assert run['review_type']=='machine'
+PY"
+check "absorbed answers keep their model attribution" "python3 - <<'PY'
+import ast
+src=open('scripts/sentinel.py').read()
+tree=ast.parse(src)
+assert 'answered_by' in src and 'args.model' in src
+assert '--model' in src, 'absorb must record what answered'
+PY"
+
+echo "== T-REVIEW-SEP human and machine review never merge =="
+check "machine reviews are published on their own endpoint and schema" "python3 - <<'PY'
+import json
+r=json.load(open('api/v1/reviews.json'))
+assert r['review_type']=='machine' and 'separation_notice' in r
+a=json.load(open('api/v1/agents/aibast-agents-library/art-generator.json'))
+mr=a.get('machine_review')
+assert mr and mr['review_type']=='machine'
+# The two must not share a field: engagement is human, machine_review is not.
+assert set(mr) & set(a.get('engagement') or {}) == set()
+PY"
+check "no surface computes a blended human+machine score" "python3 - <<'PY'
+import re, pathlib
+pat=re.compile(r'(upvotes|downloads|engagement)[^\n]{0,60}(overall|machine_review|rubric)'
+               r'|(overall|machine_review)[^\n]{0,60}(upvotes|downloads)')
+for f in ('onepager.html','agents.html','solutions.html','metrics.html','scripts/build_api.py'):
+    t=pathlib.Path(f).read_text()
+    for line in t.splitlines():
+        if '+' in line or '/' in line:
+            assert not pat.search(line), f'{f}: {line.strip()[:90]}'
+PY"
+check "the two review channels have separate Discussions categories" "python3 - <<'PY'
+s=open('scripts/discussion_ratings.py').read()
+assert 'REVIEW_CATEGORY' in s and 'MACHINE_TITLE_PREFIX' in s
+assert 'Automated Reviews' in s
+# A machine thread title must not match the human agent-thread pattern.
+import re
+AGENT_TITLE_RE=re.compile(r'^@[A-Za-z0-9][A-Za-z0-9_-]*/[a-z0-9_-]+$')
+assert not AGENT_TITLE_RE.match('[machine review] @pub/slug')
+PY"
+check "the one-pager labels each review panel by who produced it" "python3 - <<'PY'
+d=open('onepager.html').read()
+for k in ('rpanel human','rpanel machine','>People<','>Machine<','never'):
+    assert k in d, k
+assert d.index('humanPanel') != d.index('machinePanel')
+PY"
+check "REVIEWS.md and the Sentinel spec state the separation rule" "python3 - <<'PY'
+import re
+for f in ('docs/REVIEWS.md','sentinel/SPEC.md'):
+    d=re.sub(r'\\s+',' ',open(f).read().lower())
+    assert re.search(r'never (combined|averaged)', d), f
+    for k in ('machine','community','human'):
+        assert k in d, (f,k)
+PY"
+check "aggregated skills get the same review, not just a link" "python3 - <<'PY'
+import json
+d=json.load(open('state/skill_reviews.json'))
+assert d['subject_kind']=='skill' and d['review_type']=='machine'
+assert d['count']>=50, d['count']
+findings=0
+for r in d['reviews']:
+    assert r['ref'].startswith('@'), r['slug']
+    for c in r['checks']:
+        if not c['passed']:
+            assert len(c['teachable'])>60, (r['slug'], c['id'])
+            findings+=1
+assert findings>=5, f'skill rubric found only {findings} things'
+PY"
+check "the neighborhood reviews both agents and skills" "python3 - <<'PY'
+import json
+h=json.load(open('sentinel/NEIGHBORHOOD.json'))
+sets={r['subjects'] for r in h['residents']}
+assert 'agents' in sets and 'skills' in sets, sets
+det=[r for r in h['residents'] if r['kind']=='deterministic']
+assert {r['subjects'] for r in det}=={'agents','skills'}
+latest=json.load(open('sentinel/latest.json'))
+assert latest['subject_count']>150, latest['subject_count']
+assert len(latest['residents_awake'])>=2, latest['residents_awake']
+PY"
+check "skill reviews are served per skill from the static API" "python3 - <<'PY'
+import json, pathlib
+idx=json.load(open('api/v1/reviews-skills.json'))
+for r in idx['reviews'][:5]:
+    p=pathlib.Path('api/v1/reviews/skills')/f\"{r['ref'].split('/')[-1]}.json\"
+    assert p.is_file(), p
+    d=json.loads(p.read_text())
+    assert d['schema']=='aibast-api-skill-review/1.0'
+    assert 'not_an_endorsement' in d
+PY"
+check "every aggregated skill card opens a hosted page, not only an origin link" \
+  "grep -q 'onepager.html?skill=' agents.html && grep -q 'renderSkill' onepager.html"
+echo "== T-RAPPVISION generated demo walkthroughs =="
+check "every entry gets a storyboard in the house format, aggregated included" "python3 - <<'PY'
+import json, pathlib
+idx=json.load(open('api/v1/walkthroughs.json'))
+kinds={w['kind'] for w in idx['walkthroughs']}
+assert kinds=={'agent','skill'}, kinds
+assert idx['count']>=150, idx['count']
+for w in idx['walkthroughs'][:5]:
+    d=json.loads(pathlib.Path('media/walkthroughs')
+                 .joinpath(f\"{w['kind']}-{w['slug']}.json\").read_text())
+    assert d['schema']=='rappvision-walkthrough/1.0'
+    assert [s['act'] for s in d['scenes']]==['title','problem','overview','walkthrough','close']
+    assert abs(d['runtime_seconds']-137.0)<1
+PY"
+check "the format matches the shipped recordings it was derived from" "python3 - <<'PY'
+import json, subprocess, pathlib
+vids=sorted(pathlib.Path('media/videos').glob('*.mp4'))
+assert vids, 'no template recordings'
+durs=[]
+for v in vids:
+    out=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration',
+                        '-of','csv=p=0',str(v)],capture_output=True,text=True)
+    if out.returncode==0 and out.stdout.strip(): durs.append(float(out.stdout))
+if durs:
+    target=json.load(open('media/walkthroughs/agent-art-generator.json'))['runtime_seconds']
+    assert min(durs)*0.7 <= target <= max(durs)*1.3, (target, min(durs), max(durs))
+PY"
+check "storyboards mark figures instead of inventing them" "python3 - <<'PY'
+import json, pathlib, re
+bad=[]
+for f in list(pathlib.Path('media/walkthroughs').glob('*.json'))[:40]:
+    d=json.loads(f.read_text())
+    blob=json.dumps(d['scenes'])
+    # A generated storyboard must not assert a percentage or a currency figure.
+    for m in re.finditer(r'(?<![\w\[])(\d+(?:\.\d+)?%|[\$£€]\s?\d)', blob):
+        bad.append((f.name, m.group(0)))
+assert not bad, bad[:5]
+one=json.loads(pathlib.Path('media/walkthroughs/agent-art-generator.json').read_text())
+assert one['remix']['slot_count']>0
+assert one['approval']['required_before_render'] is True
+PY"
+check "the remix surface is on the page and edits the storyboard client-side" "python3 - <<'PY'
+d=open('onepager.html').read()
+for k in ('storyboardHTML','wireRemix','remixDl','data-slot','my-walkthrough.json'):
+    assert k in d, k
+assert 'RAPPVision' in d
+PY"
+check "RAPPVISION.md states the acts, the honesty rules and the pipeline" "python3 - <<'PY'
+import re
+d=re.sub(r'\\s+',' ',open('media/RAPPVISION.md').read())
+for k in ('Title card','Agent overview','Sources','Flow of work','Actions',
+          'No invented numbers','Storyboard is not footage','Pipeline'):
+    assert k in d, k
+PY"
+
+check "the sentinel workflow parses and reviews on submission" \
+  "python3 -c \"import yaml;w=yaml.safe_load(open('.github/workflows/sentinel.yml'));assert 'agents/**' in w[True]['pull_request']['paths']\""
+
 echo; echo "local: $PASS passed, $FAIL failed"
 exit $((FAIL>0))

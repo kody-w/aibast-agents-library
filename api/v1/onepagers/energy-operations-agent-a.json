@@ -1,0 +1,43 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "onepager": {
+    "capture_file": "10-energy-operations-agent-a.html",
+    "industry": "Energy & Utilities",
+    "display_name": "Energy Operations Agent (a)",
+    "lede": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+    "audience": [
+      "Plant Manager / Reliability Engineer",
+      "Compliance Manager",
+      "Sustainability Lead",
+      "Data Analyst"
+    ],
+    "business_value": [
+      "Deliver real-time insights",
+      "Automate critical workflows",
+      "Enable guided decision making\u2014boosting efficiency",
+      "Reducing operational"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "SharePoint",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "energy-operations-agent-a",
+    "industries": [
+      "Energy and Utilities"
+    ],
+    "catalog_number": 10,
+    "video": {
+      "slug": "energy-operations-suite",
+      "hosted": false,
+      "src": null,
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=energy-operations-agent-a"
+}

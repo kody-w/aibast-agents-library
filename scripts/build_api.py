@@ -184,6 +184,7 @@ def slim_agent(a: dict, ratings: dict) -> dict:
         "pages_url": f"{PAGES_BASE}/{a.get('_file', '')}",
         "github_url": f"https://github.com/{REPO}/blob/main/{a.get('_file', '')}",
         "detail_url": f"{PAGES_BASE}/api/v1/agents/{pub.lstrip('@')}/{slug}.json",
+        "onepager_url": f"{PAGES_BASE}/onepager.html?agent={name}",
         "engagement": {
             "upvotes": r.get("upvotes", 0),
             "downloads": r.get("downloads", 0),
@@ -199,6 +200,9 @@ def main() -> int:
     aggregated = load("state/aggregated.json", None)
     ratings_doc = load("state/discussion_ratings.json", {})
     ratings = ratings_doc.get("agents", {}) if isinstance(ratings_doc, dict) else {}
+
+    reviews_doc = load("state/agent_reviews.json", {}) or {}
+    machine_reviews = {r["file"]: r for r in reviews_doc.get("reviews", [])}
 
     agents = registry.get("agents", [])
     stats = registry.get("stats", {})
@@ -218,8 +222,29 @@ def main() -> int:
             "generated": gen,
             "manifest": {k: v for k, v in a.items() if not k.startswith("_")},
             **{k: s[k] for k in ("file", "size_kb", "lines", "raw_url",
-                                 "pages_url", "github_url", "engagement")},
+                                 "pages_url", "github_url", "onepager_url",
+                                 "engagement")},
         }
+        review = (machine_reviews or {}).get(a.get("_file"))
+        if review:
+            # Machine review rides along under its own key with its own type
+            # marker. A consumer that wants a community rating reads
+            # `engagement`; the two never share a field.
+            doc["machine_review"] = {
+                "review_type": "machine",
+                "verdict": review.get("verdict"),
+                "overall": review.get("overall"),
+                "scores": review.get("scores"),
+                "rubric_version": review.get("rubric_version"),
+                "open_findings": [
+                    {k: c[k] for k in ("id", "principle", "level", "title", "detail", "teachable")}
+                    for c in review.get("checks", []) if not c.get("passed")
+                ],
+                "not_an_endorsement": (
+                    "Static analysis against published principles. Never combined "
+                    "with community ratings."
+                ),
+            }
         changed += stable_write(p, doc)
 
     # Prune per-agent docs for agents no longer in the registry
@@ -263,6 +288,98 @@ def main() -> int:
         changed += stable_write(API / "metrics.json", dict(metrics))
     if aggregated is not None:
         changed += stable_write(API / "aggregated.json", dict(aggregated))
+
+    # Solution one-pagers: the business framing, its demo, and its engagement.
+    onepagers = load("data/onepagers.json", None)
+    if onepagers is not None:
+        changed += stable_write(API / "onepagers.json", dict(onepagers))
+        kept_op = set()
+        for sol in onepagers.get("onepagers", []):
+            p = API / "onepagers" / f"{sol['slug']}.json"
+            kept_op.add(p)
+            changed += stable_write(p, {
+                "schema": "aibast-api-onepager/1.0", "generated": gen,
+                "onepager": sol,
+                "page_url": f"{PAGES_BASE}/onepager.html?solution={sol['slug']}",
+            })
+        op_dir = API / "onepagers"
+        if op_dir.exists():
+            for p in op_dir.glob("*.json"):
+                if p not in kept_op:
+                    p.unlink(); changed += 1
+
+    # Machine review. Published on its own endpoint and under its own schema so
+    # a consumer cannot accidentally read it as a community rating — the two
+    # answer different questions and are never combined.
+    reviews = load("state/agent_reviews.json", None)
+    if reviews is not None:
+        changed += stable_write(API / "reviews.json", dict(reviews))
+
+    # Aggregated skills get the same review treatment as agents we wrote —
+    # that is the value of aggregating into the library instead of linking out.
+    skill_reviews = load("state/skill_reviews.json", None)
+    if skill_reviews is not None:
+        changed += stable_write(API / "reviews-skills.json", dict(skill_reviews))
+        kept_sr = set()
+        for r in skill_reviews.get("reviews", []):
+            slug = r["ref"].split("/")[-1]
+            p_out = API / "reviews" / "skills" / f"{slug}.json"
+            kept_sr.add(p_out)
+            changed += stable_write(p_out, {
+                "schema": "aibast-api-skill-review/1.0", "generated": gen,
+                "review": r,
+                "page_url": f"{PAGES_BASE}/onepager.html?skill={r['ref']}",
+                "not_an_endorsement": (
+                    "Machine review of a redistributed skill. It judges this "
+                    "converted file against our published principles — never the "
+                    "upstream author's wider work, and never combined with a "
+                    "community rating."
+                ),
+            })
+        sr_dir = API / "reviews" / "skills"
+        if sr_dir.exists():
+            for p_old in sr_dir.glob("*.json"):
+                if p_old not in kept_sr:
+                    p_old.unlink(); changed += 1
+
+    # RAPPVision storyboards: every entry, authored or aggregated, in the house
+    # demo format. Published so the storyboard can be reviewed before anything
+    # is filmed.
+    wt_dir = REPO_ROOT / "media" / "walkthroughs"
+    if wt_dir.is_dir():
+        index = []
+        for wt in sorted(wt_dir.glob("*.json")):
+            doc = json.loads(wt.read_text(encoding="utf-8"))
+            subj = doc["subject"]
+            index.append({
+                "slug": subj["slug"], "kind": subj["kind"], "ref": subj.get("ref"),
+                "display_name": subj["display_name"],
+                "runtime_seconds": doc["runtime_seconds"], "status": doc["status"],
+                "storyboard_url": f"{PAGES_BASE}/media/walkthroughs/{wt.name}",
+            })
+        changed += stable_write(API / "walkthroughs.json", {
+            "schema": "aibast-api-walkthroughs/1.0", "generated": gen,
+            "format": "rappvision-walkthrough/1.0",
+            "format_doc": f"{PAGES_BASE}/media/RAPPVISION.md",
+            "note": ("Storyboards, not footage. Generated deterministically from each "
+                     "entry's manifest; every figure a human must supply is marked "
+                     "rather than invented. Aggregated skills get the same treatment "
+                     "as authored agents — that is the point of aggregating here."),
+            "count": len(index), "walkthroughs": index,
+        })
+
+    sentinel_latest = load("sentinel/latest.json", None)
+    if sentinel_latest is not None:
+        changed += stable_write(API / "sentinel.json", {
+            **sentinel_latest,
+            "neighborhood_url": f"{PAGES_BASE}/sentinel/NEIGHBORHOOD.json",
+            "how_to_run": (
+                "Pull sentinel/NEIGHBORHOOD.json and run "
+                "`python3 scripts/sentinel.py run` locally. The deterministic "
+                "residents need no model; the interpretive ones emit packets any "
+                "model can execute."
+            ),
+        })
 
     # An UNINSTALLED extension must stop serving. The previous index records
     # which namespaces each extension claimed, so removing its directory is

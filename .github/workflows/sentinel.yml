@@ -1,0 +1,105 @@
+name: RAPP Sentinel
+
+# Real-time review of new submissions. The deterministic residents run here and
+# report on the pull request; the interpretive residents' work is uploaded as a
+# packet artifact for a maintainer — or a model — to execute and absorb.
+#
+# Submitters get the identical review before opening the pull request by running
+# `python3 scripts/sentinel.py run --agent <name>` locally. Nothing in this loop
+# is a surprise, and nothing in it needs a token to reproduce.
+
+on:
+  pull_request:
+    paths:
+      - "agents/**"
+      - "sentinel/NEIGHBORHOOD.json"
+      - "scripts/review_agents.py"
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: "Review a single agent by file stem (blank = whole library)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Identify what this pull request changed
+        id: scope
+        run: |
+          if [ -n "${{ github.event.inputs.agent }}" ]; then
+            echo "args=--agent ${{ github.event.inputs.agent }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "args=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Wake the neighborhood
+        run: python3 scripts/sentinel.py run ${{ steps.scope.outputs.args }}
+
+      - name: Prove the run reproduces
+        run: |
+          RUN_ID=$(python3 -c "import json;print(json.load(open('sentinel/latest.json'))['run_id'])")
+          python3 scripts/sentinel.py verify --run "$RUN_ID"
+
+      - name: Summarize onto the pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const latest = JSON.parse(fs.readFileSync('sentinel/latest.json', 'utf8'));
+            const run = JSON.parse(fs.readFileSync(latest.run_file, 'utf8'));
+
+            const changed = (await github.rest.pulls.listFiles({
+              owner: context.repo.owner, repo: context.repo.repo,
+              pull_number: context.issue.number, per_page: 100,
+            })).data.filter(f => f.filename.startsWith('agents/')).map(f => f.filename);
+
+            const findings = run.findings.find(f => f.kind === 'deterministic');
+            const touched = Object.values(findings ? findings.results : {})
+              .filter(r => changed.includes(r.file));
+            if (!touched.length) return;
+
+            let body = '## RAPP Sentinel — machine review\n\n' +
+              '> Static analysis against the published rubric. Source was parsed, never run. ' +
+              'This is **not** a community rating and is never combined with one — see ' +
+              '[how reviews work](../blob/main/docs/REVIEWS.md).\n\n' +
+              `Neighborhood \`${run.neighborhood.digest}\` · rubric \`${findings.rubric_version}\` · ` +
+              `run \`${run.run_id}\`\n\n`;
+
+            for (const r of touched) {
+              const open = (r.checks || []).filter(c => !c.passed);
+              body += `### \`${r.slug}\` — **${r.verdict}** (${r.overall})\n\n`;
+              if (!open.length) { body += 'Every check passed.\n\n'; continue; }
+              for (const c of open) {
+                body += `**${c.title}** — \`${c.id}\` · ${c.level}\n\n> ${c.detail}\n\n${c.teachable}\n\n`;
+              }
+            }
+            body += '---\n\nReproduce this locally: `python3 scripts/sentinel.py run --agent <stem>`. ' +
+              'Disagree with a finding? The rubric is [`sentinel/NEIGHBORHOOD.json`](../blob/main/sentinel/NEIGHBORHOOD.json) ' +
+              '— a false positive is a real bug in it.\n';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number, body,
+            });
+
+      - name: Upload the work the interpretive residents need
+        uses: actions/upload-artifact@v4
+        with:
+          name: sentinel-packets
+          path: sentinel/runs/
+          retention-days: 30

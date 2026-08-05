@@ -218,6 +218,7 @@ footer { margin-top: 64px; border-top: 1px solid var(--border); padding: 28px 0 
       <a href="#library">Library</a>
       <a href="#aggregated">Aggregated</a>
       <a href="#publish">Publish</a>
+      <a href="solutions.html">Solutions</a>
       <a href="metrics.html">Metrics</a>
       <a href="#deploy">Deploy</a>
     </nav>
@@ -488,7 +489,8 @@ function agentCard(a) {
   if (r && (r.upvotes || r.downloads)) {
     meta += '<span class="sig">▲ ' + num(r.upvotes) + " · ⇩ " + num(r.downloads) + "</span>";
   }
-  var links = '<a data-view="' + esc(a.file) + '" data-name="' + esc(a.display) + '">View code</a>' +
+  var links = '<a href="onepager.html?agent=' + encodeURIComponent(a.name) + '">One-pager</a>' +
+    '<a data-view="' + esc(a.file) + '" data-name="' + esc(a.display) + '">View code</a>' +
     '<a href="' + esc(GH_BLOB + a.file) + '" target="_blank" rel="noopener">GitHub</a>';
   links += r && r.url
     ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">Rate &amp; discuss</a>'
@@ -613,7 +615,7 @@ function renderAggregated(snap) {
           if (v.gates[g] && v.gates[g].passed) meta2 += '<span class="sig">' + esc(g) + " ✓</span>";
         });
       }
-      var links = "";
+      var links = '<a href="onepager.html?skill=' + encodeURIComponent(s.ref) + '">One-pager &amp; review</a>';
       if (s.rapp_skill) {
         // The whole reason to aggregate: a single file you can actually run.
         links += '<a href="' + esc(s.rapp_skill.download_url) + '" download>⬇ Download skill.md</a>' +

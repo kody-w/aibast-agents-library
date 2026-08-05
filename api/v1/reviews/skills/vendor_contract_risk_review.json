@@ -1,0 +1,135 @@
+{
+  "schema": "aibast-api-skill-review/1.0",
+  "generated": "2026-08-05T14:55:19.163498+00:00",
+  "review": {
+    "file": "skills/@cat-agent-skills/vendor_contract_risk_review.md",
+    "slug": "vendor_contract_risk_review",
+    "ref": "@cat-agent-skills/vendor_contract_risk_review",
+    "source": "CAT Agent Skills",
+    "source_url": "https://microsoft.github.io/cat-agent-skills/#vendor-contract-risk-review",
+    "license": "MIT",
+    "review_type": "machine",
+    "subject_kind": "skill",
+    "rubric_version": "1.0.0",
+    "verdict": "review-ready",
+    "overall": 100,
+    "scores": {
+      "provenance": 100,
+      "usability": 100,
+      "determinism": 100,
+      "safety": 100,
+      "completeness": 100
+    },
+    "error_count": 0,
+    "warn_count": 0,
+    "checks": [
+      {
+        "id": "K1",
+        "principle": "provenance",
+        "level": "error",
+        "title": "Carries a complete RAPP skill manifest",
+        "passed": true
+      },
+      {
+        "id": "K2",
+        "principle": "provenance",
+        "level": "error",
+        "title": "Credits the original author in the body",
+        "passed": true
+      },
+      {
+        "id": "K3",
+        "principle": "provenance",
+        "level": "warn",
+        "title": "Version is a semantic version",
+        "passed": true
+      },
+      {
+        "id": "K4",
+        "principle": "usability",
+        "level": "warn",
+        "title": "Description is specific enough to route on",
+        "passed": true
+      },
+      {
+        "id": "K5",
+        "principle": "usability",
+        "level": "warn",
+        "title": "Says when to use it, not only what it is",
+        "passed": true
+      },
+      {
+        "id": "K6",
+        "principle": "usability",
+        "level": "warn",
+        "title": "Carries tags for discovery",
+        "passed": true
+      },
+      {
+        "id": "K7",
+        "principle": "determinism",
+        "level": "error",
+        "title": "States a deterministic contract",
+        "passed": true
+      },
+      {
+        "id": "K8",
+        "principle": "determinism",
+        "level": "warn",
+        "title": "Gives followable steps",
+        "passed": true
+      },
+      {
+        "id": "K9",
+        "principle": "determinism",
+        "level": "warn",
+        "title": "Names a verification step",
+        "passed": true
+      },
+      {
+        "id": "K10",
+        "principle": "safety",
+        "level": "error",
+        "title": "No credential literals",
+        "passed": true
+      },
+      {
+        "id": "K11",
+        "principle": "safety",
+        "level": "error",
+        "title": "No unguarded destructive command",
+        "passed": true
+      },
+      {
+        "id": "K12",
+        "principle": "safety",
+        "level": "warn",
+        "title": "Sample data uses fictional domains",
+        "passed": true
+      },
+      {
+        "id": "K13",
+        "principle": "completeness",
+        "level": "error",
+        "title": "No absolute path from the author's machine",
+        "passed": true
+      },
+      {
+        "id": "K14",
+        "principle": "completeness",
+        "level": "warn",
+        "title": "Substantial enough to act on",
+        "passed": true
+      },
+      {
+        "id": "K15",
+        "principle": "completeness",
+        "level": "warn",
+        "title": "Self-contained: no unresolvable references",
+        "passed": true
+      }
+    ]
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?skill=@cat-agent-skills/vendor_contract_risk_review",
+  "not_an_endorsement": "Machine review of a redistributed skill. It judges this converted file against our published principles \u2014 never the upstream author's wider work, and never combined with a community rating."
+}

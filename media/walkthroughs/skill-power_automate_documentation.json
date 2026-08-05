@@ -1,0 +1,138 @@
+{
+  "schema": "rappvision-walkthrough/1.0",
+  "format_version": "1.0.0",
+  "remix": {
+    "placeholder": "[operator supplies]",
+    "slot_count": 6,
+    "slots": [
+      {
+        "path": "scenes[3].turns[0].text",
+        "template": "Turns a Power Automate solution .zip into a clean markdown reference for every flow inside it: trigger, plain-English process, connection references, and a read/write/delete table for everything it touches for [operator supplies]."
+      },
+      {
+        "path": "scenes[3].turns[1].body[0]",
+        "template": "Result: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[1].body[1]",
+        "template": "Confidence and sources: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[3].body[0]",
+        "template": "Step 1: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[3].body[1]",
+        "template": "Step 2: [operator supplies]"
+      },
+      {
+        "path": "scenes[3].turns[3].body[2]",
+        "template": "Step 3: [operator supplies]"
+      }
+    ],
+    "how": "Replace each placeholder with your own customer's scenario and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim. Everything a customer would recognise as their own situation is a slot.",
+    "rule": "Substitute real figures only if you can stand behind them. A personalised demo carries more weight than a generic one, which is exactly why an invented number in it does more damage."
+  },
+  "format_doc": "media/RAPPVISION.md",
+  "generated": "2026-08-05T15:00:03+00:00",
+  "subject": {
+    "slug": "power_automate_documentation",
+    "kind": "skill",
+    "ref": "@cat-agent-skills/power_automate_documentation",
+    "display_name": "power-automate-documentation",
+    "category": "aggregated"
+  },
+  "runtime_seconds": 137.0,
+  "status": "storyboard",
+  "approval": {
+    "required_before_render": true,
+    "note": "A storyboard is a script, not footage. Every figure is marked [operator supplies] rather than invented \u2014 a demo that fabricates a metric teaches the viewer something false. A human approves the script before anything is rendered."
+  },
+  "scenes": [
+    {
+      "act": "title",
+      "start": 0.0,
+      "end": 5.0,
+      "shot": "Microsoft logo, white field",
+      "on_screen": [
+        "power-automate-documentation",
+        "Aggregated from Mathias Salomonsen"
+      ],
+      "narration": ""
+    },
+    {
+      "act": "problem",
+      "start": 5.0,
+      "end": 22.0,
+      "shot": "B-roll \u2014 modern workplace: focused individual work at a laptop",
+      "on_screen": [],
+      "narration": "Turns a Power Automate solution .zip into a clean markdown reference for every flow inside it: trigger, plain-English process, connection references, and a read/write/delete table for everything it touches."
+    },
+    {
+      "act": "overview",
+      "start": 22.0,
+      "end": 42.0,
+      "shot": "Agent overview card \u2014 three gradient panels on dark field",
+      "panels": {
+        "Sources": [
+          "Runs on what the operator already has open \u2014 no additional configuration"
+        ],
+        "Flow of work": [
+          "Engages you in the local brainstem chat"
+        ],
+        "Actions": [
+          "Does the work described above"
+        ]
+      },
+      "narration": "power-automate-documentation reads what it needs, works where you already are, and hands back something you can act on."
+    },
+    {
+      "act": "walkthrough",
+      "start": 42.0,
+      "end": 120.0,
+      "shot": "Laptop-framed chat surface",
+      "turns": [
+        {
+          "role": "operator",
+          "text": "Turns a Power Automate solution .zip into a clean markdown reference for every flow inside it: trigger, plain-English process, connection references, and a read/write/delete table for everything it touches for [operator supplies]."
+        },
+        {
+          "role": "agent",
+          "heading": "power-automate-documentation",
+          "body": [
+            "Result: [operator supplies]",
+            "Confidence and sources: [operator supplies]"
+          ],
+          "agent_call": "power_automate_documentation"
+        },
+        {
+          "role": "operator",
+          "text": "Show me the plan."
+        },
+        {
+          "role": "agent",
+          "heading": "Recommended plan",
+          "body": [
+            "Step 1: [operator supplies]",
+            "Step 2: [operator supplies]",
+            "Step 3: [operator supplies]"
+          ],
+          "agent_call": "power_automate_documentation"
+        }
+      ],
+      "narration": "The operator asks in their own words. The agent answers with structure, and names the tool it called."
+    },
+    {
+      "act": "close",
+      "start": 120.0,
+      "end": 137.0,
+      "shot": "Dark card, gradient CTA panel",
+      "on_screen": [
+        "Get started on your agentic journey today.",
+        "Talk to your Microsoft representative to learn more.",
+        "@cat-agent-skills/power_automate_documentation \u00b7 MIT"
+      ],
+      "narration": ""
+    }
+  ]
+}
