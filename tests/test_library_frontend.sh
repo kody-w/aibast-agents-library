@@ -699,6 +699,19 @@ for n in ('id=\"workspace-btn\"','id=\"workspace-drawer\"','toggleWorkspace()',
           '/workspace/list','/workspace/file?path=','read-only'):
     assert n in h, n
 PY"
+check "the workspace panel shrinks the chat instead of covering it" "python3 - <<'PY'
+h=open('vbrainstem/index.html').read()
+# opening the panel must shift the page column by exactly the panel width,
+# and closing it must hand that space back
+assert 'body.ws-open > #chat' in h, 'the chat must move for the panel'
+for sel in ('body.ws-open > header','body.ws-open > footer'):
+    assert sel in h, sel
+assert 'margin-left: var(--ws-w)' in h
+assert \"classList.toggle('ws-open', open)\" in h, 'the body class tracks the panel'
+assert 'function closeWorkspace' in h and 'ws-open' in h
+# on a narrow viewport there is no room to split, so covering is allowed there only
+assert '@media (max-width: 760px)' in h
+PY"
 check "the file viewer preserves lines instead of breaking them mid-token" "python3 - <<'PY'
 h=open('vbrainstem/index.html').read()
 block=h.split('#ws-view pre {')[1].split('}')[0]
@@ -706,7 +719,7 @@ assert 'white-space: pre;' in block, 'default must not soft-wrap code'
 assert 'overflow-x: auto' in block, 'long lines scroll instead of breaking'
 assert 'word-break: break-word' not in block, 'break-word mangles code'
 assert '#ws-view.wrap pre' in h, 'wrapping is opt-in'
-assert 'min(980px, 94vw)' in h, 'the viewer needs usable width'
+assert '--ws-w' in h, 'the drawer width is a variable the layout shares'
 PY"
 
 echo "== T-CLEAN clean break (kody-w refs only in sanctioned places) =="

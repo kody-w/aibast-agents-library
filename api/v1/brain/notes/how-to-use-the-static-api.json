@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-05T01:57:19.538179+00:00",
+  "generated": "2026-08-05T02:05:04.104911+00:00",
   "slug": "how-to/use-the-static-api",
   "title": "Use the static API",
   "summary": "Every endpoint is a CDN-cached JSON file. No key, no quota.",
