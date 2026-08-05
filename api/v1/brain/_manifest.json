@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-manifest/1.0",
-  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "generated": "2026-08-05T01:01:07.622275+00:00",
   "title": "ms-rapp Vault",
   "subtitle": "Documentation for the ms-rapp distribution",
   "github": "https://github.com/microsoft/aibast-agents-library",
@@ -18,6 +18,12 @@
     {
       "path": "concepts/kernel-and-distribution.md",
       "title": "Kernel and distribution",
+      "section": "concepts",
+      "status": "published"
+    },
+    {
+      "path": "concepts/rapp-data-exhaust.md",
+      "title": "RAPP data exhaust",
       "section": "concepts",
       "status": "published"
     },

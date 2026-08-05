@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-graph/1.0",
-  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "generated": "2026-08-05T01:01:07.622275+00:00",
   "nodes": [
     {
       "id": "concepts/extensions",
@@ -11,7 +11,7 @@
         "extension",
         "concept"
       ],
-      "degree": 8
+      "degree": 9
     },
     {
       "id": "concepts/kernel-and-distribution",
@@ -21,7 +21,17 @@
         "governance",
         "concept"
       ],
-      "degree": 7
+      "degree": 8
+    },
+    {
+      "id": "concepts/rapp-data-exhaust",
+      "title": "RAPP data exhaust",
+      "tags": [
+        "ms-rapp",
+        "concept",
+        "method"
+      ],
+      "degree": 4
     },
     {
       "id": "concepts/the-corpus",
@@ -70,7 +80,7 @@
         "extension",
         "governance"
       ],
-      "degree": 4
+      "degree": 5
     },
     {
       "id": "decisions/why-revocation-retains-the-entry",
@@ -79,7 +89,7 @@
         "decision",
         "certification"
       ],
-      "degree": 3
+      "degree": 4
     },
     {
       "id": "decisions/why-static-api",
@@ -156,6 +166,22 @@
     {
       "from": "concepts/kernel-and-distribution",
       "to": "decisions/why-extensions-are-discovered"
+    },
+    {
+      "from": "concepts/rapp-data-exhaust",
+      "to": "decisions/why-extensions-are-discovered"
+    },
+    {
+      "from": "concepts/rapp-data-exhaust",
+      "to": "decisions/why-revocation-retains-the-entry"
+    },
+    {
+      "from": "concepts/rapp-data-exhaust",
+      "to": "concepts/extensions"
+    },
+    {
+      "from": "concepts/rapp-data-exhaust",
+      "to": "concepts/kernel-and-distribution"
     },
     {
       "from": "concepts/the-corpus",

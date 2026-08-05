@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "generated": "2026-08-05T01:01:07.622275+00:00",
   "slug": "how-to/publish-an-agent",
   "title": "Publish an agent",
   "summary": "Your GitHub username is your publisher handle. One file, one pull request.",

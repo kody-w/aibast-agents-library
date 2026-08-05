@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api/1.0",
-  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "generated": "2026-08-05T01:01:07.622275+00:00",
   "name": "AIBAST Agents Library API",
   "spec": "rapp-static-api/1.0",
   "base_urls": {
@@ -51,6 +51,31 @@
         "certified.json",
         "certified/",
         "wall.json"
+      ]
+    },
+    "ms-rapp-blog/1.0": {
+      "spec": "rapp/ext/ms-rapp-blog-1.0/SPEC.md",
+      "originated_by": "ms-rapp",
+      "human_ui": {
+        "blog": "https://microsoft.github.io/aibast-agents-library/blog.html"
+      },
+      "llms_lines": [
+        "- [Field notes index]({PAGES}/api/v1/blog/index.json): posts on how this is built; each carries a raw_url."
+      ],
+      "agent_recipes": [
+        {
+          "goal": "Read how the platform is built and why",
+          "get": "blog/index.json",
+          "then": "Each post carries raw_url for the Markdown, or subscribe to blog/feed.json (JSON Feed 1.1)."
+        }
+      ],
+      "endpoints": [
+        "blog/index.json",
+        "blog/posts/{slug}.json",
+        "blog/feed.json"
+      ],
+      "namespaces": [
+        "blog/"
       ]
     },
     "ms-rapp-brain/1.0": {

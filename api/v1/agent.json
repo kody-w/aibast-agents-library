@@ -1,6 +1,6 @@
 {
   "schema": "aibast-agent-entry/1.0",
-  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "generated": "2026-08-05T01:01:07.622275+00:00",
   "name": "AIBAST Agents Library (ms-rapp)",
   "what": "A catalog of single-file AI agents for the Microsoft AI stack, plus the runtime that executes them. Every surface is a static JSON file: no key, no quota, CORS-open, safe to poll.",
   "read_this_first": "https://microsoft.github.io/aibast-agents-library/llms.txt",
@@ -38,6 +38,11 @@
       "then": "Lowercase the username first. A 404 and certified=false both mean not certified \u2014 neither is an error to retry."
     },
     {
+      "goal": "Read how the platform is built and why",
+      "get": "blog/index.json",
+      "then": "Each post carries raw_url for the Markdown, or subscribe to blog/feed.json (JSON Feed 1.1)."
+    },
+    {
       "goal": "Learn how the platform works",
       "get": "brain/index.json",
       "then": "Each note carries raw_url; follow .links to traverse the documentation graph, or fetch llms-full.txt for everything inline."
@@ -54,6 +59,9 @@
     "ms-rapp-badge/1.0": {
       "spec": "rapp/ext/ms-rapp-badge-1.0/SPEC.md"
     },
+    "ms-rapp-blog/1.0": {
+      "spec": "rapp/ext/ms-rapp-blog-1.0/SPEC.md"
+    },
     "ms-rapp-brain/1.0": {
       "spec": "rapp/ext/ms-rapp-brain-1.0/SPEC.md"
     }
@@ -63,6 +71,7 @@
     "api_explorer": "https://microsoft.github.io/aibast-agents-library/api.html",
     "metrics": "https://microsoft.github.io/aibast-agents-library/metrics.html",
     "badges": "https://microsoft.github.io/aibast-agents-library/wall.html",
+    "blog": "https://microsoft.github.io/aibast-agents-library/blog.html",
     "docs": "https://microsoft.github.io/aibast-agents-library/brain.html"
   },
   "license": "MIT (\u00a9 Microsoft Corporation). Mirrored corpus under rapp/ carries upstream licenses.",

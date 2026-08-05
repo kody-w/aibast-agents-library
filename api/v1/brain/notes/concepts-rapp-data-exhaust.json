@@ -1,0 +1,28 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-05T01:01:07.622275+00:00",
+  "slug": "concepts/rapp-data-exhaust",
+  "title": "RAPP data exhaust",
+  "summary": "The by-product of doing the work holds a negative of the shape that produced it \u2014 read the negative and you recover the shape.",
+  "tags": [
+    "ms-rapp",
+    "concept",
+    "method"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/concepts/rapp-data-exhaust.md",
+  "bytes": 4520,
+  "links": [
+    "decisions/why-extensions-are-discovered",
+    "decisions/why-revocation-retains-the-entry",
+    "concepts/extensions",
+    "concepts/kernel-and-distribution"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/rapp-data-exhaust.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-rapp-data-exhaust.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/rapp-data-exhaust",
+  "backlinks": []
+}

@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-05T00:49:52.105356+00:00",
+  "generated": "2026-08-05T01:01:07.622275+00:00",
   "slug": "concepts/extensions",
   "title": "Extensions",
   "summary": "What this distribution originates, and why it can never block a kernel update.",
@@ -24,6 +24,7 @@
   "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-extensions.json",
   "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/extensions",
   "backlinks": [
+    "concepts/rapp-data-exhaust",
     "concepts/the-corpus",
     "concepts/the-vault",
     "decisions/why-extensions-are-discovered",

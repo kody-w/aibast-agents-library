@@ -101,9 +101,12 @@
   </div>
 
   <div class="page-header">
-    <h1>⚙️ Engineering Blog</h1>
-    <p>Design decisions, architecture deep-dives, and lessons from building the brainstem.</p>
+    <h1>Field Notes from the Frontier</h1>
+    <p>How ms-rapp is actually built — decisions, defects, and the lexicon that comes out of the work. <a href="api/v1/blog/feed.json">Subscribe (JSON Feed)</a> · <a href="api/v1/blog/index.json">API</a></p>
   </div>
+
+  <!-- Posts published as Markdown in blog/ render here automatically. -->
+  <div id="livePosts"></div>
 
   <!-- ── Post: Fixing the Device Code Auth Race ── -->
   <div class="post">
@@ -376,5 +379,80 @@ def login_poll():
   <a href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
 </div>
 
+
+<script>
+(function () {
+"use strict";
+var PAGES = "https://microsoft.github.io/aibast-agents-library";
+var esc = function (s) { return String(s == null ? "" : s)
+  .replace(/[&<>"]/g, function (c) { return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]; }); };
+
+/* Same compact renderer the vault uses: enough Markdown for a post, no dependency. */
+function md(src) {
+  var fences = [];
+  src = src.replace(/```(\w*)\n([\s\S]*?)```/g, function (_, l, c) {
+    fences.push("<pre><code>" + esc(c.replace(/\n$/, "")) + "</code></pre>"); return " FENCE" + (fences.length - 1) + " "; });
+  function inline(s) {
+    s = esc(s);
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    return s;
+  }
+  var lines = src.split("\n"), out = [], i = 0;
+  while (i < lines.length) {
+    var line = lines[i];
+    if (/^ FENCE\d+ $/.test(line.trim())) { out.push(fences[+line.trim().match(/\d+/)[0]]); i++; continue; }
+    if (!line.trim()) { i++; continue; }
+    var h = /^(#{1,4})\s+(.*)$/.exec(line);
+    if (h) { var lv = Math.min(h[1].length + 1, 4); out.push("<h" + lv + ">" + inline(h[2]) + "</h" + lv + ">"); i++; continue; }
+    if (/^(---|\*\*\*)\s*$/.test(line)) { out.push("<hr>"); i++; continue; }
+    if (/^\s*>/.test(line)) { var q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) { q.push(lines[i].replace(/^\s*>\s?/, "")); i++; }
+      out.push("<blockquote>" + inline(q.join(" ")) + "</blockquote>"); continue; }
+    var ol = /^\s*\d+\.\s+/.test(line), ul = /^\s*[-*]\s+/.test(line);
+    if (ol || ul) { var re = ol ? /^\s*\d+\.\s+/ : /^\s*[-*]\s+/, items = [];
+      while (i < lines.length && re.test(lines[i])) { items.push(inline(lines[i].replace(re, ""))); i++; }
+      out.push("<" + (ol ? "ol" : "ul") + ">" + items.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</" + (ol ? "ol" : "ul") + ">");
+      continue; }
+    var para = [];
+    while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|\s*[-*]\s|\s*\d+\.\s|\s*>)/.test(lines[i]) && !/^ FENCE/.test(lines[i].trim())) { para.push(lines[i]); i++; }
+    if (para.length) out.push("<p>" + inline(para.join(" ")) + "</p>");
+  }
+  return out.join("\n");
+}
+
+function getJSON(paths) {
+  var p = Promise.reject();
+  paths.forEach(function (u) { p = p.catch(function () {
+    return fetch(u, { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }); });
+  return p;
+}
+
+getJSON(["api/v1/blog/index.json", PAGES + "/api/v1/blog/index.json"]).then(function (idx) {
+  var host = document.getElementById("livePosts");
+  if (!idx.posts || !idx.posts.length) return;
+  host.innerHTML = idx.posts.map(function (p) {
+    return '<div class="post" id="' + esc(p.slug) + '"><div class="post-header"><h2>' + esc(p.title) + "</h2>" +
+      '<div class="post-meta"><span>' + esc(p.date) + "</span>" +
+      (p.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") +
+      '</div></div><div class="post-body" data-raw="' + esc(p.raw_url) + '" data-path="' + esc(p.path) + '">' +
+      "<p>" + esc(p.summary) + "</p></div></div>";
+  }).join("");
+  // Fetch each body: prefer this deployment, fall back to GitHub raw.
+  Array.prototype.forEach.call(host.querySelectorAll("[data-raw]"), function (el) {
+    fetch(el.dataset.path, { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.text(); })
+      .catch(function () { return fetch(el.dataset.raw).then(function (r) { return r.text(); }); })
+      .then(function (text) {
+        var body = text.replace(/^---[\s\S]*?\n---\n/, "");
+        body = body.replace(/^#\s+.*\n/, "");        // the title is already the post header
+        el.innerHTML = md(body);
+        if (location.hash && location.hash.slice(1) === el.parentNode.id) el.parentNode.scrollIntoView();
+      }).catch(function () {});
+  });
+}).catch(function () {});
+})();
+</script>
 </body>
 </html>

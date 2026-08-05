@@ -32,6 +32,8 @@ is, the endpoint map, and task recipes. Everything below is a plain fetch away.
 - [Adoption metrics](https://microsoft.github.io/aibast-agents-library/api/v1/metrics.json): downloads, installs and engagement.
 - [Certification roster](https://microsoft.github.io/aibast-agents-library/api/v1/certified.json): verifiable publisher badges, checkable per username.
 - [ms-rapp-badge/1.0 specification](https://microsoft.github.io/aibast-agents-library/rapp/ext/ms-rapp-badge-1.0/SPEC.md): originated by this distribution.
+- [Field notes index](https://microsoft.github.io/aibast-agents-library/api/v1/blog/index.json): posts on how this is built; each carries a raw_url.
+- [ms-rapp-blog/1.0 specification](https://microsoft.github.io/aibast-agents-library/rapp/ext/ms-rapp-blog-1.0/SPEC.md): originated by this distribution.
 - [Documentation vault index](https://microsoft.github.io/aibast-agents-library/api/v1/brain/index.json): every note, with its links and backlinks.
 - [Vault reader](https://microsoft.github.io/aibast-agents-library/brain.html): the same notes for humans; the folder also opens in Obsidian.
 - [ms-rapp-brain/1.0 specification](https://microsoft.github.io/aibast-agents-library/rapp/ext/ms-rapp-brain-1.0/SPEC.md): originated by this distribution.

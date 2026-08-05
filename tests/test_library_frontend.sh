@@ -292,6 +292,43 @@ for n in m['notes']:
 assert (pathlib.Path('brain')/'index.md').exists()
 PY"
 
+echo "== T-BLOG field notes publish from Markdown (ms-rapp-blog/1.0) =="
+check "a committed post appears in the index and the feed, drafts do not" "python3 - <<'PY'
+import json, pathlib, subprocess
+subprocess.run(['python3','scripts/build_api.py'],capture_output=True,timeout=60)
+idx=json.load(open('api/v1/blog/index.json'))
+assert idx['protocol']=='ms-rapp-blog/1.0' and idx['count']>=1
+slugs={p['slug'] for p in idx['posts']}
+for p in pathlib.Path('blog').glob('*.md'):
+    head=p.read_text(encoding='utf-8')
+    assert head.startswith('---'), p
+    draft='draft: true' in head.split('---')[1]
+    assert (p.stem.lower() in slugs) != draft, p
+# newest first, deterministic
+dates=[p['date'] for p in idx['posts']]
+assert dates==sorted(dates, reverse=True), dates
+for p in idx['posts']:
+    assert pathlib.Path(p['path']).exists() and p['raw_url'].startswith('https://raw.githubusercontent.com/')
+    assert p['summary'], p['slug']
+PY"
+check "the feed is JSON Feed 1.1 and bodies are not duplicated into the API" "python3 - <<'PY'
+import json, glob, pathlib
+f=json.load(open('api/v1/blog/feed.json'))
+assert f['version']=='https://jsonfeed.org/version/1.1'
+assert f['title'] and f['home_page_url'] and f['feed_url']
+for it in f['items']:
+    assert it['id'] and it['title'] and it['url']
+for g in glob.glob('api/v1/blog/posts/*.json'):
+    d=json.load(open(g))
+    assert 'content' not in d and 'body' not in d
+    assert len(json.dumps(d)) < len(pathlib.Path(d['path']).read_bytes()) + 900
+PY"
+check "blog.html renders published posts from the API" "python3 - <<'PY'
+h=open('blog.html').read()
+for n in ('id=\"livePosts\"','api/v1/blog/index.json','data-raw','function md('):
+    assert n in h, n
+PY"
+
 echo "== T-EXT-ISOLATION extensions cannot affect the core =="
 check "removing every extension leaves core endpoints byte-identical and the build green" "python3 - <<'PY'
 import hashlib, json, shutil, subprocess, tempfile

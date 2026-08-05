@@ -1,8 +1,8 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-tags/1.0",
-  "generated": "2026-08-05T00:49:52.105356+00:00",
-  "count": 12,
+  "generated": "2026-08-05T01:01:07.622275+00:00",
+  "count": 13,
   "tags": [
     {
       "tag": "api",
@@ -29,10 +29,11 @@
     },
     {
       "tag": "concept",
-      "count": 5,
+      "count": 6,
       "notes": [
         "concepts/extensions",
         "concepts/kernel-and-distribution",
+        "concepts/rapp-data-exhaust",
         "concepts/the-corpus",
         "concepts/the-three-tiers",
         "concepts/what-is-ms-rapp"
@@ -84,6 +85,13 @@
       ]
     },
     {
+      "tag": "method",
+      "count": 1,
+      "notes": [
+        "concepts/rapp-data-exhaust"
+      ]
+    },
+    {
       "tag": "moc",
       "count": 1,
       "notes": [
@@ -92,10 +100,11 @@
     },
     {
       "tag": "ms-rapp",
-      "count": 7,
+      "count": 8,
       "notes": [
         "concepts/extensions",
         "concepts/kernel-and-distribution",
+        "concepts/rapp-data-exhaust",
         "concepts/the-corpus",
         "concepts/the-three-tiers",
         "concepts/the-vault",
