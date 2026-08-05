@@ -365,7 +365,7 @@ Tell the user:
 > 1. Open [make.powerapps.com](https://make.powerapps.com)
 > 2. Select your environment (top right)
 > 3. Go to **Solutions** -> **Import solution**
-> 4. Upload `MSFTAIBASMultiAgentCopilot_1_0_0_5.zip` from `~/.brainstem/src/`
+> 4. Upload `MSFTAIBASMultiAgentCopilot_1_0_0_6.zip` from `~/.brainstem/src/`
 > 5. Follow the import wizard -- accept defaults
 >
 > Let me know when the import is done.

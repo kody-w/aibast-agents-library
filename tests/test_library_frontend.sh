@@ -722,6 +722,34 @@ assert '#ws-view.wrap pre' in h, 'wrapping is opt-in'
 assert '--ws-w' in h, 'the drawer width is a variable the layout shares'
 PY"
 
+echo "== T-SOLUTION the shipped Power Platform solution is clean =="
+check "no real address or signed URL in any shipped solution zip" "python3 - <<'PY'
+import glob, json, re, zipfile
+import xml.etree.ElementTree as ET
+BAD=re.compile(r'[A-Za-z0-9._%+-]+@(microsoft\\.com|[A-Za-z0-9-]*\\.onmicrosoft\\.com|gmail\\.com)')
+SIG=re.compile(r'[?&]sig=[A-Za-z0-9_%-]{20,}')
+zips=sorted(glob.glob('MSFTAIBASMultiAgentCopilot_*.zip'))
+assert zips, 'no solution shipped'
+shipped=max(zips)          # the version the pages advertise
+z=zipfile.ZipFile(shipped)
+assert z.testzip() is None, 'zip integrity'
+for n in z.namelist():
+    try: d=z.read(n).decode('utf-8')
+    except Exception: continue
+    assert not BAD.search(d), f'{shipped}:{n} carries a real address'
+    assert not SIG.search(d), f'{shipped}:{n} carries a signed URL'
+    if n.endswith('.json'): json.loads(d)
+    if n.endswith('.xml'):  ET.fromstring(d)
+PY"
+check "every page advertises the shipped solution version" "python3 - <<'PY'
+import glob, re
+shipped=max(glob.glob('MSFTAIBASMultiAgentCopilot_*.zip'))
+for f in ('index.html','agents.html','docs/index.html','docs/installer.html','skill.md'):
+    t=open(f, encoding='utf-8').read()
+    for m in re.finditer(r'MSFTAIBASMultiAgentCopilot_\\d_\\d_\\d_\\d\\.zip', t):
+        assert m.group(0)==shipped, f'{f} advertises {m.group(0)}, shipped is {shipped}'
+PY"
+
 echo "== T-CLEAN clean break (kody-w refs only in sanctioned places) =="
 check "kody-w refs confined to allowlist (tracked + untracked)" "python3 - <<'PY'
 import re, subprocess
