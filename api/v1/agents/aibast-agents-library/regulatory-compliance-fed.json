@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-agent/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-05T15:05:09.370041+00:00",
   "manifest": {
     "schema": "rapp-agent/1.0",
     "name": "@aibast-agents-library/regulatory-compliance-fed",
@@ -31,7 +31,12 @@
   "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/federal_government_stacks/regulatory_compliance_fed_stack/regulatory_compliance_fed_agent.py",
   "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/federal_government_stacks/regulatory_compliance_fed_stack/regulatory_compliance_fed_agent.py",
   "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/regulatory-compliance-fed",
-  "engagement": null,
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/75"
+  },
   "machine_review": {
     "review_type": "machine",
     "verdict": "review-ready",
