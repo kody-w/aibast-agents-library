@@ -194,6 +194,16 @@ def main() -> int:
         else:
             with page.expect_download(timeout=10000) as pyd:
                 page.locator("#dlAgentPy").click()
+            # The skill.md link must actually resolve on THIS origin, not just
+            # exist. A canonical URL would 404 here and nobody would notice.
+            md_href = page.locator('.actions a[download]').first.get_attribute("href")
+            if md_href and md_href.startswith("http"):
+                failures.append(f"skill.md download is absolute ({md_href[:48]}…) "
+                                "and will 404 on any origin but the canonical one")
+            else:
+                resp = page.request.get(f"{base}/{md_href}")
+                if resp.status != 200:
+                    failures.append(f"skill.md download resolved {resp.status} on this origin")
             if not pyd.value.suggested_filename.endswith(".py"):
                 failures.append("agent.py download had the wrong extension")
 

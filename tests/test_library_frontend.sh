@@ -1341,6 +1341,9 @@ run=json.load(open(os.path.join(d, json.load(open(os.path.join(d,'latest.json'))
 assert run['status']=='dormant' and run['verdicts'] is None
 PY"
 
+check "in-repo downloads resolve on whichever origin serves the page" \
+  "python3 tests/check_relative_assets.py"
+
 echo "== T-SHAPE aggregation is gated on a learned shape =="
 check "the scout picks skills over docs, and never guesses a field" \
   "python3 tests/check_source_scout.py"

@@ -619,7 +619,10 @@ function renderAggregated(snap) {
       var links = '<a href="onepager.html?skill=' + encodeURIComponent(s.ref) + '">One-pager &amp; review</a>';
       if (s.rapp_skill) {
         // The whole reason to aggregate: a single file you can actually run.
-        links += '<a href="' + esc(s.rapp_skill.download_url) + '" download>⬇ Download skill.md</a>' +
+        // The repo-relative path, not the canonical absolute URL: a relative
+        // href resolves on whichever origin is serving this page, so the
+        // download works on a fork before the change has merged upstream.
+        links += '<a href="' + esc(s.rapp_skill.path || s.rapp_skill.download_url) + '" download>⬇ Download skill.md</a>' +
                  '<a data-view="' + esc(s.rapp_skill.path) + '" data-name="' + esc(s.display_name) + '">View</a>';
         meta2 += '<span class="sig">RAPP skill.md · ' + Math.round(s.rapp_skill.bytes / 1024) + " KB</span>";
       }

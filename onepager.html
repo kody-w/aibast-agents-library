@@ -408,7 +408,7 @@ function renderAgent(agent, review, rating, source) {
         '<div class="col"><div class="lbl">Parameters</div>' + chips(params.slice(0, 8), true) + "</div>" +
       "</div>" +
       '<div class="actions">' +
-        '<a class="btn primary" href="' + esc(agent.raw_url) + '" download="' + esc(short) + '.py"' +
+        '<a class="btn primary" href="' + esc(agent.file || agent.raw_url) + '" download="' + esc(short) + '.py"' +
           ' onclick="track(\'library.agent.deployed\',\'' + esc(agent.name) + '\')">Download agent.py</a>' +
         '<a class="btn" href="' + esc(agent.github_url) + '" target="_blank" rel="noopener">View on GitHub</a>' +
         '<button class="btn" onclick="window.print()">Print / save as PDF</button>' +
@@ -597,8 +597,8 @@ function renderSkill(skill, review, body) {
           ]) + "</div>" +
       "</div>" +
       '<div class="actions">' +
-        (rapp.download_url
-          ? '<a class="btn primary" href="' + esc(rapp.download_url) + '" download ' +
+        (rapp.path || rapp.download_url
+          ? '<a class="btn primary" href="' + esc(rapp.path || rapp.download_url) + '" download ' +
             'onclick="track(\'library.agent.deployed\',\'' + esc(ref) + '\')">Download skill.md</a>'
           : "") +
         (body ? '<button class="btn primary" id="dlAgentPy">Download agent.py</button>' : "") +

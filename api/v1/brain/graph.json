@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-graph/1.0",
-  "generated": "2026-08-05T16:49:19.386467+00:00",
+  "generated": "2026-08-05T17:36:09.655904+00:00",
   "nodes": [
     {
       "id": "concepts/extensions",
