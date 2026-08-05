@@ -457,15 +457,18 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
     if act == "problem":
         # Silent until 9.4s by design; this act only carries the premise.
         take(f"There's an agent to guide {industry} through these processes",
-             f"It pulls data from {', '.join(srcs[:2])}, engages you directly in "
-             f"{surface}, and delivers {primary}")
+             f"It pulls data from {srcs[0] if srcs else 'the systems of record'}",
+             f"engages you directly in {surface}",
+             "and delivers targeted recommendations in the flow of the work")
     elif act == "overview":
         take(f"Let's say a {persona.lower()} needs to {primary}",
              "Before, they would have needed to jump across multiple systems to "
              "manually gather insights",
+             "piecing the picture together by hand, and hoping nothing moved "
+             "while they worked",
              "Now, in an instant, an agent can deliver a clear snapshot of the "
-             "metrics that matter, and automatically highlight what needs "
-             "attention")
+             "metrics that matter",
+             "and automatically highlight what needs attention first")
     elif act == "walkthrough":
         second = acts_[1] if len(acts_) > 1 else "go further"
         take(f"But what if the {persona.lower()} wants to go a step further?",
@@ -517,7 +520,7 @@ def build(entry: dict) -> dict:
         {"act": "title", "start": 0.0, "end": 5.0, "shot": "Microsoft logo, white field",
          "on_screen": title_lines, "narration": ""},
         {"act": "problem", "start": 5.0, "end": 22.0, "shot": f"B-roll — {broll}",
-         "on_screen": [], "narration": narration_for("problem", entry, name, 17.0)},
+         "on_screen": [], "narration": narration_for("problem", entry, name, 13.5)},
         {"act": "overview", "start": 22.0, "end": 42.0,
          "shot": "Agent overview card — three gradient panels on dark field",
          "panels": {

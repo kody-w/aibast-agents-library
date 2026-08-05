@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:09:35+00:00",
+  "generated": "2026-08-05T20:18:21+00:00",
   "subject": {
     "slug": "portfolio-rebalancing",
     "kind": "agent",
@@ -70,7 +70,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 advisory meeting: adviser and client at a desk",
       "on_screen": [],
-      "narration": "There's an agent to guide financial services through these processes. It pulls data from Dynamics 365 CRM, Microsoft PowerPoint, engages you directly in Microsoft Teams, and delivers give me intelligent."
+      "narration": "There's an agent to guide financial services through these processes. It pulls data from Dynamics 365 CRM. engages you directly in Microsoft Teams."
     },
     {
       "act": "overview",
@@ -92,7 +92,7 @@
           "Improves wealth management outcomes"
         ]
       },
-      "narration": "Let's say a manager needs to give me intelligent. Before, they would have needed to jump across multiple systems to manually gather insights."
+      "narration": "Let's say a manager needs to give me intelligent. Before, they would have needed to jump across multiple systems to manually gather insights. piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",

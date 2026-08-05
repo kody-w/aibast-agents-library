@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:09:35+00:00",
+  "generated": "2026-08-05T20:18:21+00:00",
   "subject": {
     "slug": "care-gap-closure",
     "kind": "agent",
@@ -70,7 +70,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 clinical setting: staff at a workstation between rounds",
       "on_screen": [],
-      "narration": "There's an agent to guide healthcare through these processes. It pulls data from Dynamics 365 ERP, Dynamics 365 CcaaS, engages you directly in Microsoft Teams, and delivers improve HEDIS performance."
+      "narration": "There's an agent to guide healthcare through these processes. It pulls data from Dynamics 365 ERP. engages you directly in Microsoft Teams."
     },
     {
       "act": "overview",
@@ -92,7 +92,7 @@
           "Care gap closure efficiency"
         ]
       },
-      "narration": "Let's say a manager needs to improve HEDIS performance. Before, they would have needed to jump across multiple systems to manually gather insights."
+      "narration": "Let's say a manager needs to improve HEDIS performance. Before, they would have needed to jump across multiple systems to manually gather insights. piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",

@@ -50,6 +50,13 @@ BROLL_INDEX = REPO_ROOT / "media" / "broll" / "index.json"
 PLATES_INDEX = REPO_ROOT / "media" / "plates" / "index.json"
 OUT_DIR = REPO_ROOT / "media" / "videos" / "generated"
 PLACEHOLDER = "[operator supplies]"
+# The reference carries a music bed from 3.3s, which is why it measures 6%
+# silent while a speech-only cut measures 40%. Without it every gap between
+# narration lines is true digital silence and the film reads as broken.
+BED = REPO_ROOT / "media" / "audio" / "bed.m4a"
+BED_GAIN = "0.16"   # under the voice, present in the gaps
+# Absolute second each act's narration may begin, measured from the reference.
+VO_ENTRY = {"problem": 9.4}
 
 # The reference specification, measured — not chosen.
 W, H, FPS = 1920, 1080, 30
@@ -63,7 +70,9 @@ WPM = int(os.environ.get("RAPPVISION_WPM", "168"))
 # Kokoro-82M, via the HyperFrames CLI. af_nova reads as a measured
 # corporate narrator, which is the register the reference recordings use.
 KOKORO_VOICE = os.environ.get("RAPPVISION_KOKORO_VOICE", "af_nova")
-KOKORO_SPEED = os.environ.get("RAPPVISION_KOKORO_SPEED", "0.95")
+# 0.86 delivers 2.10 words/sec, measured against the reference's own rate.
+# 0.95 read at 2.36 and sounded rushed beside it.
+KOKORO_SPEED = os.environ.get("RAPPVISION_KOKORO_SPEED", "0.86")
 
 
 def run(cmd: list[str], why: str = "", check: bool = True, **kw):
@@ -318,12 +327,16 @@ def main() -> int:
                              "-crf", "18", "-pix_fmt", "yuv420p", str(seg)],
                             why="encode walkthrough")
                 else:
-                    mid = scene["start"] + span / 2
-                    capture(url, [mid], sub, settle=250)
-                    run(["ffmpeg", "-v", "error", "-y", "-loop", "1",
-                         "-i", str(sub / "f00000.png"), "-t", f"{span}",
+                    # Every act animates now, so every act is a sequence. A
+                    # single held frame is what made 88% of the cut frozen.
+                    n = max(2, int(span * args.fps))
+                    times = [scene["start"] + (i / args.fps) for i in range(n)]
+                    capture(url, times, sub, settle=25)
+                    run(["ffmpeg", "-v", "error", "-y", "-framerate", str(args.fps),
+                         "-i", str(sub / "f%05d.png"),
                          "-vf", f"fps={FPS}", "-c:v", "libx264", "-preset", "slow",
-                         "-crf", "18", "-pix_fmt", "yuv420p", str(seg)])
+                         "-crf", "18", "-pix_fmt", "yuv420p", str(seg)],
+                        why=f"{act} act")
 
             if not seg.is_file():
                 raise SystemExit(f"act {act} produced no video")
@@ -333,8 +346,11 @@ def main() -> int:
                 vo = work / f"vo-{act}.m4a"
                 dur = narrate(scene["narration"], vo)
                 if dur:
-                    # Start narration a beat into the act so it does not clip the cut.
-                    audio_parts.append((vo, clock + 0.6, dur))
+                    # The reference holds the title card and the opening of the
+                    # b-roll in silence and enters at 9.4s. Starting every act's
+                    # narration 0.6s in put the first line at 5.6s.
+                    at = max(clock + 0.6, VO_ENTRY.get(act, 0.0))
+                    audio_parts.append((vo, at, dur))
             clock += span
 
         concat = work / "list.txt"
@@ -354,6 +370,16 @@ def main() -> int:
                 inputs += ["-i", str(f)]
                 filters.append(f"[{i + 1}:a]adelay={int(start * 1000)}|{int(start * 1000)}[a{i}]")
                 labels.append(f"[a{i}]")
+            if BED.is_file():
+                # Looped, faded in at 3.2s like the reference, and ducked so it
+                # sits under the voice rather than competing with it.
+                bed_idx = len(audio_parts) + 1
+                inputs += ["-stream_loop", "-1", "-i", str(BED)]
+                filters.append(
+                    f"[{bed_idx}:a]atrim=0:{clock},volume={BED_GAIN},"
+                    f"adelay=3200|3200,afade=t=in:st=3.2:d=1.2,"
+                    f"afade=t=out:st={clock - 2.5}:d=2.5[bed]")
+                labels.append("[bed]")
             # Filterchains are ';'-separated. Joining them bare produced one
             # unparseable chain and ffmpeg reported it as "trailing garbage".
             mix = (";".join(filters) + ";" + "".join(labels) +

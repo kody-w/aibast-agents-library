@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:09:35+00:00",
+  "generated": "2026-08-05T20:19:21+00:00",
   "subject": {
     "slug": "generating_podcast_script",
     "kind": "skill",
@@ -71,7 +71,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 modern workplace: focused individual work at a laptop",
       "on_screen": [],
-      "narration": "There's an agent to guide teams through these processes."
+      "narration": "There's an agent to guide teams through these processes. It pulls data from Runs on what the operator already has open \u2014 no additional configuration."
     },
     {
       "act": "overview",
@@ -89,7 +89,7 @@
           "Does the work described above"
         ]
       },
-      "narration": "Let's say a manager needs to does the work described above. Before, they would have needed to jump across multiple systems to manually gather insights."
+      "narration": "Let's say a manager needs to does the work described above. Before, they would have needed to jump across multiple systems to manually gather insights. piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",

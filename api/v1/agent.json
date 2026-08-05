@@ -1,6 +1,6 @@
 {
   "schema": "aibast-agent-entry/1.0",
-  "generated": "2026-08-05T20:12:36.349056+00:00",
+  "generated": "2026-08-05T20:25:46.794629+00:00",
   "name": "AIBAST Agents Library (ms-rapp)",
   "what": "A catalog of single-file AI agents for the Microsoft AI stack, plus the runtime that executes them. Every surface is a static JSON file: no key, no quota, CORS-open, safe to poll.",
   "read_this_first": "https://microsoft.github.io/aibast-agents-library/llms.txt",
