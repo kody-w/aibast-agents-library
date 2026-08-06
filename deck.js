@@ -1070,7 +1070,7 @@
     footer(s, n);
   }
 
-  function guideTitleSlide(pptx, g) {
+  function guideTitleSlide(pptx, g, products) {
     var s = darkSlide(pptx);
     s.addShape(pptx.ShapeType.roundRect, {
       x: 0.62, y: 2.0, w: 0.9, h: 0.09, rectRadius: 0.04,
@@ -1093,7 +1093,7 @@
     var harness = (g.harness || []).slice(0, 3);
     var hx = 0.62;
     harness.forEach(function (h) {
-      var path = markPath(g._products, h.id);
+      var path = markPath(products, h.id);
       var w = 0.42 + 0.105 * txt(h.name).length + 0.5;
       s.addShape(pptx.ShapeType.roundRect, {
         x: hx, y: 4.55, w: w, h: 0.62, rectRadius: 0.1,
@@ -1329,7 +1329,6 @@
 
     return Promise.all(need).then(function (r) {
       var products = r[0] || { products: [] }, arch = r[1];
-      g._products = products;
       var pptx = new PptxGenJS();
       try {
         pptx.defineLayout({ name: "AIBAST_WIDE", width: W, height: H });
@@ -1340,7 +1339,7 @@
         var n = 1;
         (g.slides || []).forEach(function (sl) {
           switch (sl.kind) {
-            case "title":       guideTitleSlide(pptx, sl); break;
+            case "title":       guideTitleSlide(pptx, sl, products); break;
             case "summary":     guideSummarySlide(pptx, sl, n); break;
             case "statement":   guideStatementSlide(pptx, sl, n); break;
             case "products":    guideProductsSlide(pptx, sl, products, n); break;
