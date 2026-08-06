@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-06T00:35:22.075942+00:00",
   "onepager": {
     "capture_file": "39-wealth-insights-agent.html",
     "industry": "Financial Services",
@@ -33,9 +33,9 @@
     "catalog_number": 39,
     "video": {
       "slug": "wealth-insights-generator-agent",
-      "hosted": false,
-      "src": null,
-      "size_mb": null
+      "hosted": true,
+      "src": "media/videos/wealth-insights-generator-agent.mp4",
+      "size_mb": 4.06
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=wealth-insights-agent"

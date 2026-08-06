@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-06T00:35:22.075942+00:00",
   "onepager": {
     "capture_file": "15-predictive-maintenance-agent.html",
     "industry": "Manufacturing",
@@ -31,9 +31,9 @@
     "catalog_number": 15,
     "video": {
       "slug": "maintenance-scheduling-agent",
-      "hosted": false,
-      "src": null,
-      "size_mb": null
+      "hosted": true,
+      "src": "media/videos/maintenance-scheduling-agent.mp4",
+      "size_mb": 3.85
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=predictive-maintenance-agent"

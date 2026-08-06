@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:36:32+00:00",
+  "generated": "2026-08-06T00:12:23+00:00",
   "subject": {
     "slug": "field-service-dispatch",
     "kind": "agent",
@@ -47,17 +47,17 @@
     "display_name": "Field Service Dispatch Agent",
     "category": "energy"
   },
-  "runtime_seconds": 137.0,
+  "runtime_seconds": 132.4,
   "status": "storyboard",
   "approval": {
     "required_before_render": true,
-    "note": "A storyboard is a script, not footage. Every figure is marked [operator supplies] rather than invented \u2014 a demo that fabricates a metric teaches the viewer something false. A human approves the script before anything is rendered."
+    "note": "A storyboard is a script, not footage. Every claim is qualitative rather than invented \u2014 a demo that fabricates a metric teaches the viewer something false, so this script says an agent accelerates a task and never says by how much. A human approves the script before anything is rendered."
   },
   "scenes": [
     {
       "act": "title",
       "start": 0.0,
-      "end": 5.0,
+      "end": 7.3,
       "shot": "Microsoft logo, white field",
       "on_screen": [
         "Field Service Dispatch Agent"
@@ -66,7 +66,7 @@
     },
     {
       "act": "problem",
-      "start": 5.0,
+      "start": 7.3,
       "end": 22.0,
       "shot": "B-roll \u2014 field site: technician with a tablet, equipment behind",
       "on_screen": [],
@@ -75,14 +75,14 @@
     {
       "act": "overview",
       "start": 22.0,
-      "end": 42.0,
+      "end": 42.75,
       "shot": "Agent overview card \u2014 three gradient panels on dark field",
       "panels": {
         "Sources": [
-          "Runs on what the operator already has open \u2014 no additional configuration"
+          "The systems of record already in use"
         ],
         "Flow of work": [
-          "Engages you in the local brainstem chat"
+          "Engages you in Microsoft Teams and Outlook"
         ],
         "Actions": [
           "Route optimization, technician assignment"
@@ -92,8 +92,8 @@
     },
     {
       "act": "walkthrough",
-      "start": 42.0,
-      "end": 120.0,
+      "start": 42.75,
+      "end": 113.5,
       "shot": "Laptop-framed chat surface",
       "turns": [
         {
@@ -111,19 +111,20 @@
                 "items": [
                   "Scope: the working backlog",
                   "Current: turnaround slower than wanted",
-                  "Target: same-day turnaround",
+                  "Goal: close the gap to same-day turnaround",
                   "Window: the coming month"
                 ]
               },
               {
                 "label": "What I checked",
                 "items": [
-                  "Route optimization, technician assignment"
+                  "The systems of record already in use \u2014 read, not assumed",
+                  "Anything I could not verify is called out below"
                 ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: turnaround slower than wanted, against same-day turnaround",
+              "headline": "Biggest constraint: turnaround slower than wanted",
               "source": "Source: the systems of record already in use",
               "question": "Shall I show the plan?"
             }
@@ -138,10 +139,10 @@
           "role": "agent",
           "heading": "Recommended plan",
           "rich": {
-            "intro": "Here is the plan.",
+            "intro": "Phased, quick wins first.",
             "sections": [
               {
-                "label": "Recommended plan",
+                "label": "Steps",
                 "items": [
                   "1. Route optimization, technician assignment",
                   "2. Confirm the result against the source system",
@@ -156,14 +157,49 @@
             }
           },
           "agent_call": "Field Service Dispatch Agent"
+        },
+        {
+          "role": "operator",
+          "text": "What could go wrong?"
+        },
+        {
+          "role": "agent",
+          "heading": "Risks and how I would cover them",
+          "rich": {
+            "intro": "Three things I would watch on the current workload.",
+            "sections": [
+              {
+                "label": "Risks",
+                "items": [
+                  "Stale inputs \u2014 the source systems may lag the working picture",
+                  "Edge cases the source data does not describe",
+                  "A recommendation that reads confident but is thinly evidenced"
+                ]
+              },
+              {
+                "label": "How I cover them",
+                "items": [
+                  "Cite the record behind every line, so it can be checked",
+                  "Flag low-evidence items rather than smoothing over them",
+                  "Stop and ask before anything is written back"
+                ]
+              }
+            ],
+            "callout": {
+              "headline": "You approve each step; nothing changes on its own",
+              "source": "Source: the systems of record already in use",
+              "question": "Want me to start with the quick wins?"
+            }
+          },
+          "agent_call": "Field Service Dispatch Agent"
         }
       ],
       "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with one unified data context, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Field Service Dispatch Agent, energy operators get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
-      "start": 120.0,
-      "end": 137.0,
+      "start": 113.5,
+      "end": 132.4,
       "shot": "Dark card, gradient CTA panel",
       "narration": "The result? Work that moves faster, stays consistent, and holds the same standard every time it runs. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [

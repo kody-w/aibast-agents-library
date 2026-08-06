@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:36:32+00:00",
+  "generated": "2026-08-06T00:12:23+00:00",
   "subject": {
     "slug": "account-intelligence-orchestrator",
     "kind": "agent",
@@ -47,17 +47,17 @@
     "display_name": "Account Intelligence Orchestrator",
     "category": "b2b_sales"
   },
-  "runtime_seconds": 137.0,
+  "runtime_seconds": 132.4,
   "status": "storyboard",
   "approval": {
     "required_before_render": true,
-    "note": "A storyboard is a script, not footage. Every figure is marked [operator supplies] rather than invented \u2014 a demo that fabricates a metric teaches the viewer something false. A human approves the script before anything is rendered."
+    "note": "A storyboard is a script, not footage. Every claim is qualitative rather than invented \u2014 a demo that fabricates a metric teaches the viewer something false, so this script says an agent accelerates a task and never says by how much. A human approves the script before anything is rendered."
   },
   "scenes": [
     {
       "act": "title",
       "start": 0.0,
-      "end": 5.0,
+      "end": 7.3,
       "shot": "Microsoft logo, white field",
       "on_screen": [
         "Account Intelligence Orchestrator"
@@ -66,34 +66,38 @@
     },
     {
       "act": "problem",
-      "start": 5.0,
+      "start": 7.3,
       "end": 22.0,
       "shot": "B-roll \u2014 seller preparing before a customer call",
       "on_screen": [],
-      "narration": "There's an agent to guide sales teams through these processes. It reads the systems you already work in, engages you directly in Microsoft Teams."
+      "narration": "There's an agent to guide sales teams through these processes. It pulls data from CRM and Engagement history, engages you directly in Microsoft Teams."
     },
     {
       "act": "overview",
       "start": 22.0,
-      "end": 42.0,
+      "end": 42.75,
       "shot": "Agent overview card \u2014 three gradient panels on dark field",
       "panels": {
         "Sources": [
-          "Runs on what the operator already has open \u2014 no additional configuration"
+          "CRM",
+          "Engagement history",
+          "Product signals"
         ],
         "Flow of work": [
-          "Engages you in the local brainstem chat"
+          "Engages you in Microsoft Teams and Outlook"
         ],
         "Actions": [
-          "Does the work described above"
+          "Handle account intelligence orchestrator",
+          "Improve conversion",
+          "Report back with my reasoning"
         ]
       },
-      "narration": "Let's say a manager needs to does the work described above. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
+      "narration": "Let's say a manager needs to handle account intelligence orchestrator. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",
-      "start": 42.0,
-      "end": 120.0,
+      "start": 42.75,
+      "end": 113.5,
       "shot": "Laptop-framed chat surface",
       "turns": [
         {
@@ -104,26 +108,29 @@
           "role": "agent",
           "heading": "Account Intelligence Orchestrator",
           "rich": {
-            "intro": "I'll does the work described above for the enterprise pipeline, working against a compressed buying cycle. Reading CRM, engagement history and product signals before I propose anything.",
+            "intro": "I'll handle account intelligence orchestrator for the enterprise pipeline, working against a compressed buying cycle. Reading CRM, engagement history and product signals before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
                 "items": [
                   "Scope: open opportunities",
                   "Current: conversion below target",
-                  "Target: the conversion target",
+                  "Goal: close the gap to the conversion target",
                   "Window: the current quarter"
                 ]
               },
               {
                 "label": "What I checked",
                 "items": [
-                  "Does the work described above"
+                  "CRM \u2014 read, not assumed",
+                  "Engagement history \u2014 read, not assumed",
+                  "Product signals \u2014 read, not assumed",
+                  "Anything I could not verify is called out below"
                 ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: conversion below target, against the conversion target",
+              "headline": "Biggest constraint: conversion below target",
               "source": "Source: CRM, engagement history and product signals",
               "question": "Shall I show the plan?"
             }
@@ -138,14 +145,16 @@
           "role": "agent",
           "heading": "Recommended plan",
           "rich": {
-            "intro": "Here is the plan.",
+            "intro": "Phased, quick wins first.",
             "sections": [
               {
-                "label": "Recommended plan",
+                "label": "Steps",
                 "items": [
-                  "1. Does the work described above",
-                  "2. Confirm the result against the source system",
-                  "3. Hand back the artifact, and the reasoning behind it"
+                  "1. Handle account intelligence orchestrator",
+                  "2. Improve conversion",
+                  "3. Report back with my reasoning",
+                  "4. Confirm the result against the source system",
+                  "5. Hand back the artifact, and the reasoning behind it"
                 ]
               }
             ],
@@ -156,14 +165,49 @@
             }
           },
           "agent_call": "Account Intelligence Orchestrator"
+        },
+        {
+          "role": "operator",
+          "text": "What could go wrong?"
+        },
+        {
+          "role": "agent",
+          "heading": "Risks and how I would cover them",
+          "rich": {
+            "intro": "Three things I would watch on the enterprise pipeline.",
+            "sections": [
+              {
+                "label": "Risks",
+                "items": [
+                  "Stale inputs \u2014 CRM may lag the working picture",
+                  "Edge cases the source data does not describe",
+                  "A recommendation that reads confident but is thinly evidenced"
+                ]
+              },
+              {
+                "label": "How I cover them",
+                "items": [
+                  "Cite the record behind every line, so it can be checked",
+                  "Flag low-evidence items rather than smoothing over them",
+                  "Stop and ask before anything is written back"
+                ]
+              }
+            ],
+            "callout": {
+              "headline": "You approve each step; nothing changes on its own",
+              "source": "Source: CRM, engagement history and product signals",
+              "question": "Want me to start with the quick wins?"
+            }
+          },
+          "agent_call": "Account Intelligence Orchestrator"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with one unified data context, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Account Intelligence Orchestrator, sales teams get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across CRM and Engagement history, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can improve conversion in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Account Intelligence Orchestrator, sales teams get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
-      "start": 120.0,
-      "end": 137.0,
+      "start": 113.5,
+      "end": 132.4,
       "shot": "Dark card, gradient CTA panel",
       "narration": "The result? Work that moves faster, stays consistent, and holds the same standard every time it runs. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [

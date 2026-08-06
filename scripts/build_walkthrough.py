@@ -38,12 +38,15 @@ SCHEMA = "rappvision-walkthrough/1.0"
 FORMAT_VERSION = "1.0.0"
 
 # Act boundaries, in seconds, measured from the shipped recordings.
+# Measured from the recordings these films are composited onto — a 132.4s cut,
+# not the 137s the first draft assumed. The storyboard is the artifact a human
+# approves, so it has to describe the film that actually gets made.
 ACTS = [
-    ("title", 0.0, 5.0),
-    ("problem", 5.0, 22.0),
-    ("overview", 22.0, 42.0),
-    ("walkthrough", 42.0, 120.0),
-    ("close", 120.0, 137.0),
+    ("title", 0.0, 7.3),
+    ("problem", 7.3, 22.0),
+    ("overview", 22.0, 42.75),
+    ("walkthrough", 42.75, 113.5),
+    ("close", 113.5, 132.4),
 ]
 
 CLOSE_CTA = ["Get started on your agentic journey today.",
@@ -53,7 +56,7 @@ PLACEHOLDER = "[operator supplies]"
 
 # Surfaces a RAPP entry can run on, in the order the recordings present them.
 SURFACE_BY_TIER = {
-    "brainstem": "Engages you in the local brainstem chat",
+    "brainstem": "Engages you in Microsoft Teams and Outlook",
     "cloud": "Engages you in Microsoft Teams",
     "copilot": "Engages you in Microsoft Copilot Studio",
 }
@@ -226,10 +229,46 @@ def tidy_clause(text: str) -> str:
     return keep_acronyms(tail.strip())
 
 
-def actions_from(description: str, business_value=None) -> list[str]:
+def to_infinitive(phrase: str) -> str:
+    """Force a phrase to its bare-infinitive form.
+
+    `actions_from` feeds three slots that are all grammatically infinitive —
+    "a manager needs to ...", "I'll ... for the pipeline", "It can ... in the
+    same conversation". A manifest's business_value reads "Improves conversion",
+    third person, and dropping that into any of them yields "It can improves
+    conversion". The conversion belongs here, once, rather than at each slot.
+    """
+    t = phrase.strip()
+    if not t:
+        return t
+    head, _, rest = t.partition(" ")
+    low = head.lower().rstrip(",")
+    if low in INFINITIVE:
+        head = INFINITIVE[low]
+    elif low.endswith("ies") and len(low) > 4:
+        head = low[:-3] + "y"
+    elif low.endswith(("sses", "xes", "ches", "shes", "zzes")):
+        # Only a stem that genuinely ends in a sibilant takes "-es". Testing for
+        # a bare "-ses" instead ate a letter off ordinary verbs: "raises" became
+        # "rais", and "the agent can rais margin" shipped.
+        head = low[:-2]
+    elif low.endswith("s") and not low.endswith("ss"):
+        head = low[:-1]
+    else:
+        head = low
+    return (head + (" " + rest if rest else "")).strip()
+
+
+def as_display(phrase: str) -> str:
+    """Sentence case for a phrase that is stored infinitive but read as a line."""
+    p = phrase.strip()
+    return (p[0].upper() + p[1:]) if p else p
+
+
+def actions_from(description: str, business_value=None, entry=None) -> list[str]:
     if business_value:
-        return [keep_acronyms(v if v[0].isupper() else v.capitalize())
-                for v in business_value[:3]]
+        # Stored infinitive; every consumer inflects for its own slot.
+        return [to_infinitive(keep_acronyms(v)) for v in business_value[:3]]
     verbs = []
     # Only match a verb that STARTS a clause. Matching anywhere produced
     # "forecasts and generating cost-effective transfer plans" out of
@@ -273,12 +312,25 @@ def actions_from(description: str, business_value=None) -> list[str]:
         # Normalise to a bare infinitive so it reads correctly after "needs to"
         # and as a plan step: "Analyzes" -> "Analyze", "Generating" -> "Generate".
         verb = INFINITIVE.get(verb.lower(), verb)
-        phrase = f"{verb.capitalize()} {tail}".strip()
+        phrase = f"{verb.lower()} {tail}".strip()
         if len(phrase) > 16 and phrase not in verbs:
             verbs.append(phrase)
         if len(verbs) == 3:
             break
-    return verbs or ["Does the work described above"]
+    if verbs:
+        return verbs
+    # Derive from the display name rather than admitting defeat on screen.
+    entry = entry or {}
+    name = (entry.get("display_name") or entry.get("slug") or "").replace("-", " ")
+    name = re.sub(r"\bagent\b", "", name, flags=re.I).strip()
+    if name:
+        sc = scenario_for(entry or {})
+        # Infinitive like everything else this returns; the scenario verb is
+        # authored third person ("Improves conversion") and reached "It can
+        # improves conversion" without this.
+        return [f"handle {name.lower()}", to_infinitive(sc["verb"]),
+                "report back with my reasoning"]
+    return ["complete the task end to end", "report back with my reasoning"]
 
 
 def named_systems(entry: dict) -> list[str]:
@@ -322,7 +374,13 @@ def sources_from(entry: dict) -> list[str]:
             if label not in platforms:
                 platforms.append(label)
         return [f"Connects to {p}" for p in platforms[:3]]
-    return ["Runs on what the operator already has open — no additional configuration"]
+    # No declared tools and no env: the scenario names real systems for this
+    # industry, and the reference always NAMES things here. A panel that says
+    # "runs on what the operator already has open" is a placeholder in a
+    # sentence's clothing.
+    sc = scenario_for(entry)
+    named = re.split(r",\s*|\s+and\s+", sc["systems"])
+    return [n.strip()[0].upper() + n.strip()[1:] for n in named if n.strip()][:3]
 
 
 # Third person to imperative: an operator types "Generate a chart", not
@@ -391,7 +449,7 @@ def findings_block(entry: dict) -> dict:
         "Runs on what the operator already has open — no additional configuration",
         "the systems already in use") for x in sources_from(entry)]
     acts = [keep_acronyms(a) for a in
-            actions_from(entry.get("description", ""), entry.get("business_value"))]
+            actions_from(entry.get("description", ""), entry.get("business_value"), entry)]
 
     first = imperative(acts[0]) if acts else "do the work"
     intro = (f"I'll {first[0].lower() + first[1:]} for {sc['subject']}, working "
@@ -401,11 +459,15 @@ def findings_block(entry: dict) -> dict:
     current = [
         f"Scope: {sc['volume']}",
         f"Current: {sc['metric']}",
-        f"Target: {sc['target']}",
+        f"Goal: close the gap to {sc['target']}",
         f"Window: {sc['window']}",
     ]
-    checks = [keep_acronyms(a) for a in acts[:3]] or [
+    # "What I checked" answers where the answer came from. Listing the agent's
+    # own capabilities there — "Handle account intelligence" — restates the
+    # heading instead of grounding it.
+    checks = [f"{keep_acronyms(x)} — read, not assumed" for x in srcs[:3]] or [
         "Verified against the source before reporting"]
+    checks.append("Anything I could not verify is called out below")
 
     return {
         "intro": intro,
@@ -414,20 +476,51 @@ def findings_block(entry: dict) -> dict:
             {"label": "What I checked", "items": checks[:4]},
         ],
         "callout": {
-            "headline": f"Biggest constraint: {sc['metric']}, against "
-                        f"{sc['target']}",
+            # "conversion below target, against the conversion target" said
+            # the same thing twice; the constraint alone is the finding.
+            "headline": f"Biggest constraint: {sc['metric']}",
             "source": f"Source: {sc['systems']}",
             "question": "Shall I show the plan?",
         },
     }
 
 
+def risk_block(entry: dict) -> dict:
+    """The third exchange: what the agent will not do without being told.
+
+    Qualitative like everything else here — the point is the guardrail, not a
+    number we cannot stand behind.
+    """
+    sc = scenario_for(entry)
+    named = named_systems(entry) or ["the source systems"]
+    return {
+        "intro": f"Three things I would watch on {sc['subject']}.",
+        "sections": [
+            {"label": "Risks", "items": [
+                f"Stale inputs — {named[0]} may lag the working picture",
+                "Edge cases the source data does not describe",
+                "A recommendation that reads confident but is thinly evidenced",
+            ]},
+            {"label": "How I cover them", "items": [
+                "Cite the record behind every line, so it can be checked",
+                "Flag low-evidence items rather than smoothing over them",
+                "Stop and ask before anything is written back",
+            ]},
+        ],
+        "callout": {
+            "headline": "You approve each step; nothing changes on its own",
+            "source": f"Source: {sc['systems']}",
+            "question": "Want me to start with the quick wins?",
+        },
+    }
+
+
 def plan_block(entry: dict) -> list[str]:
     """The follow-up turn: a plan made of the entry's own steps."""
-    acts = actions_from(entry.get("description", ""), entry.get("business_value"))
+    acts = actions_from(entry.get("description", ""), entry.get("business_value"), entry)
     steps = []
     for i, a in enumerate(acts[:3], 1):
-        steps.append(f"{i}. {imperative(a)}")
+        steps.append(f"{i}. {as_display(imperative(a))}")
     steps.append(f"{len(steps) + 1}. Confirm the result against the source system")
     steps.append(f"{len(steps) + 1}. Hand back the artifact, and the reasoning "
                  f"behind it")
@@ -472,7 +565,7 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
     # mistake. The surface is where the operator meets it, not a source.
     srcs = [x for x in srcs if x.split(" —")[0] not in surface_name] or srcs
     acts_ = [keep_acronyms(a) for a in
-             actions_from(entry.get("description", ""), entry.get("business_value"))]
+             actions_from(entry.get("description", ""), entry.get("business_value"), entry)]
     values = [keep_acronyms(v) for v in (entry.get("business_value") or [])]
     surface = surface_name
     # The action lands after "needs to", so it must be a bare verb phrase.
@@ -568,19 +661,23 @@ def build(entry: dict) -> dict:
         title_lines.append(f"Aggregated from {entry.get('source') or 'an upstream project'}")
 
     scenes = [
-        {"act": "title", "start": 0.0, "end": 5.0, "shot": "Microsoft logo, white field",
+        {"act": "title", "start": 0.0, "end": 7.3, "shot": "Microsoft logo, white field",
          "on_screen": title_lines, "narration": ""},
-        {"act": "problem", "start": 5.0, "end": 22.0, "shot": f"B-roll — {broll}",
+        {"act": "problem", "start": 7.3, "end": 22.0, "shot": f"B-roll — {broll}",
          "on_screen": [], "narration": narration_for("problem", entry, name, 13.5)},
-        {"act": "overview", "start": 22.0, "end": 42.0,
+        {"act": "overview", "start": 22.0, "end": 42.75,
          "shot": "Agent overview card — three gradient panels on dark field",
          "panels": {
              "Sources": sources_from(entry),
              "Flow of work": [entry.get("surface") or SURFACE_BY_TIER["brainstem"]],
-             "Actions": actions_from(entry.get("description", ""), entry.get("business_value")),
+             # Panel lines are read, not spoken into a clause, so they are
+             # sentence-cased here rather than left in the infinitive form the
+             # narration slots need.
+             "Actions": [as_display(a) for a in actions_from(
+                 entry.get("description", ""), entry.get("business_value"), entry)],
          },
          "narration": narration_for("overview", entry, name, 20.0)},
-        {"act": "walkthrough", "start": 42.0, "end": 120.0,
+        {"act": "walkthrough", "start": 42.75, "end": 113.5,
          "shot": "Laptop-framed chat surface",
          "turns": [
              {"role": "operator", "text": prompt_from(entry)},
@@ -589,8 +686,11 @@ def build(entry: dict) -> dict:
               "agent_call": entry.get("tool_name") or entry.get("slug")},
              {"role": "operator", "text": "Show me the plan."},
              {"role": "agent", "heading": "Recommended plan",
-              "rich": {"intro": "Here is the plan.",
-                       "sections": [{"label": "Recommended plan",
+              # The heading names the message; the section label names what is
+              # inside it. Repeating the heading two lines below itself read as
+              # an unfinished template.
+              "rich": {"intro": "Phased, quick wins first.",
+                       "sections": [{"label": "Steps",
                                      "items": plan_block(entry)}],
                        "callout": {"headline": ("Phased over " +
                                     scenario_for(entry)["window"] +
@@ -598,9 +698,16 @@ def build(entry: dict) -> dict:
                                    "source": "Nothing is written back without confirmation",
                                    "question": "Approve and I'll proceed."}},
               "agent_call": entry.get("tool_name") or entry.get("slug")},
+             # A third exchange, because the laptop shot runs about seventy
+             # seconds and two exchanges left more than half of it on a frozen
+             # frame. The reference plays six; this is the shape of the third.
+             {"role": "operator", "text": "What could go wrong?"},
+             {"role": "agent", "heading": "Risks and how I would cover them",
+              "rich": risk_block(entry),
+              "agent_call": entry.get("tool_name") or entry.get("slug")},
          ],
          "narration": narration_for("walkthrough", entry, name, 78.0)},
-        {"act": "close", "start": 120.0, "end": 137.0,
+        {"act": "close", "start": 113.5, "end": 132.4,
          "shot": "Dark card, gradient CTA panel",
          "narration": narration_for("close", entry, name, 17.0),
          "on_screen": CLOSE_CTA + ([f"{entry.get('ref')} · {entry.get('license')}"]
@@ -651,10 +758,12 @@ def build(entry: dict) -> dict:
         "status": "storyboard",
         "approval": {
             "required_before_render": True,
-            "note": ("A storyboard is a script, not footage. Every figure is marked "
-                     f"{PLACEHOLDER} rather than invented — a demo that fabricates a "
-                     "metric teaches the viewer something false. A human approves the "
-                     "script before anything is rendered."),
+            "note": ("A storyboard is a script, not footage. Every claim is "
+                     "qualitative rather than invented — a demo that fabricates a "
+                     "metric teaches the viewer something false, so this script "
+                     "says an agent accelerates a task and never says by how "
+                     "much. A human approves the script before anything is "
+                     "rendered."),
         },
         "scenes": scenes,
     }

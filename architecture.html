@@ -107,6 +107,8 @@ ul.acts li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6
 }
 @media(max-width:1100px){.cols{grid-template-columns:1fr 1fr}.bands{grid-template-columns:1fr}}
 @media(max-width:640px){.cols{grid-template-columns:1fr}h1{font-size:26px}}
+.deck-status{font-size:13px;color:#6B7280;margin-left:10px;align-self:center;min-height:1em}
+@media print{.deck-status{display:none}}
 </style>
 </head>
 <body>
@@ -114,7 +116,8 @@ ul.acts li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6
 <div class="bar noprint">
   <div class="barin">
     <b>AIBAST Agent Library</b>
-    <button class="btn" onclick="window.print()">Print / save as PDF</button>
+    <button class="btn" id="deckArch">Export as PowerPoint</button>
+    <span class="deck-status" id="deckArchStatus" aria-live="polite"></span>
     <nav>
       <a href="agents.html">Agents</a>
       <a href="solutions.html">Solutions</a>
@@ -126,6 +129,9 @@ ul.acts li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6
 
 <div id="host"><p style="padding:40px;color:#767676">Loading the architecture…</p></div>
 
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/pptxgen.min.js"></script>
+<script src="deck.js"></script>
 <script>
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -251,6 +257,26 @@ function render(a){
     if(!a){ document.getElementById("host").innerHTML =
       '<div class="sheet">No architecture for '+esc(ref)+'.</div>'; return; }
     render(a);
+    // Same data, same deck: the architecture page exports the diagram's own
+    // layers as native slides rather than a printout of the page.
+    var btn=document.getElementById("deckArch"), st=document.getElementById("deckArchStatus");
+    if(btn){ btn.onclick=function(){
+      var say=function(m){ if(st) st.textContent=m; };
+      btn.disabled=true;
+      var kind = a.kind || (a.ref && a.ref.indexOf("skill")>-1 ? "skill" : "agent");
+      var panels={};
+      (a.layers||a.panels||[]).slice(0,3).forEach(function(L){
+        panels[L.label||L.name||"Layer"]=(L.items||L.nodes||[]).map(function(x){
+          return x.label||x.name||String(x); }).slice(0,4);
+      });
+      var story = Object.keys(panels).length
+        ? {scenes:[{act:"overview",panels:panels}],
+           subject:{display_name:a.display_name||a.title||slug}} : null;
+      RappDeck.export({kind:kind, entry:a, story:story, onStatus:say,
+        links:["Library: microsoft.github.io/aibast-agents-library"]})
+        .catch(function(){})
+        .then(function(){ btn.disabled=false; });
+    };}
   });
 })();
 </script>

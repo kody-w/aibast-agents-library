@@ -71,32 +71,44 @@ header{border-bottom:1px solid var(--border);background:var(--bg)}
 .problem .cue{position:relative;font-size:1.15cqw;color:#c8d0e8;letter-spacing:.08em;
   text-transform:uppercase}
 
-/* act 3 — agent overview, the load-bearing frame */
-.scene.overview{background:var(--stage);color:#fff;gap:2.6cqw;justify-content:center;
-  padding:3cqw 4cqw 3.5cqw;overflow:hidden}
-.overview h2{font-size:3.4cqw;font-weight:600;display:flex;align-items:center;gap:1.2cqw}
+/* act 3 — agent overview.
+   Geometry MEASURED off the reference frame at 34s, not composed by flexbox:
+     panel column   x 120..609   y 133..916   (489 x 783)
+     gradient body  inset 4.3% horizontally, starting 38.2% down the panel,
+                    54.3% of the panel's height
+     three columns at 6.25% / 38.5% / 70.8% of frame width
+   Guessing these produced panels that started 200px low and ran off the
+   bottom edge of the frame. */
+.scene.overview{background:var(--stage);color:#fff;padding:0;display:block;
+  overflow:hidden}
+.overview h2{position:absolute;left:0;right:0;top:8.5%;margin:0;
+  font-size:3.15cqw;font-weight:600;display:flex;align-items:center;
+  justify-content:center;gap:1cqw}
 .overview h2 .mark{width:3.4cqw;height:3.4cqw;display:inline-block;object-fit:contain}
-.pgrid{display:flex;align-items:stretch;gap:1.6cqw;width:88%;
-  height:60cqh;flex:0 0 auto}
-.pcol{flex:1;background:#1A1D3F;border-radius:1cqw;padding:1.3cqw;display:flex;
-  flex-direction:column;gap:1cqw;min-width:0;min-height:0}
-".pcol .ph{display:flex;align-items:center;gap:.8cqw;padding:.2cqw .4cqw .6cqw}
-.pcol .ph span.lbl{flex:1;text-align:center;font-size:2cqw;font-weight:700;
-  letter-spacing:-.005em;padding-right:2.9cqw}
-.ic{width:2.9cqw;height:2.9cqw;flex:0 0 auto;object-fit:contain}
-.pcol .pbody{background:linear-gradient(135deg,var(--grad-a),var(--grad-b) 60%,var(--grad-c));
-  border-radius:.9cqw;padding:1.6cqw 1.4cqw;flex:1 1 auto;display:flex;
-  flex-direction:column;gap:1cqw;justify-content:flex-start;min-height:0;overflow:hidden;
-  max-height:74%}
-.jewels{display:flex;gap:.9cqw;justify-content:center;margin-top:1.1cqw}
-.jw{width:3.1cqw;height:3.1cqw;display:block;object-fit:contain}
-.pcol .pbody div{font-size:1.45cqw;line-height:1.4;text-align:center;font-weight:600;
-  /* Env-var names and long identifiers have no break opportunities and were
-     spilling outside the panel. Break them rather than let a frame look
-     broken — this card is the one a viewer studies longest. */
-  overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
-.pcol .pbody{overflow:hidden}
-.arrow{align-self:center;width:3.2cqw;height:5.2cqw;flex:0 0 auto;object-fit:contain}
+.pgrid{position:absolute;left:0;right:0;top:29.17%;height:55.65%;display:block}
+.pcol{position:absolute;top:0;height:100%;width:25.36%;background:#1A1D3F;
+  border-radius:1cqw;display:block}
+.pcol:nth-of-type(1){left:6.25%}
+.pcol:nth-of-type(2){left:37.86%}
+.pcol:nth-of-type(3){left:69.43%}
+.pcol .ph{position:absolute;left:0;right:0;top:4%;height:15%;display:flex;
+  align-items:center;gap:.9cqw;padding:0 1.4cqw}
+.pcol .ph span.lbl{flex:1;text-align:center;font-size:1.95cqw;font-weight:700;
+  letter-spacing:-.005em;padding-right:2.8cqw}
+.ic{width:2.6cqw;height:2.6cqw;flex:0 0 auto;object-fit:contain}
+.pcol .pbody{position:absolute;left:4.3%;right:4.3%;top:19.5%;height:58.9%;
+  background:linear-gradient(140deg,#f36f84 0%,#e266a2 26%,#cc5bc7 55%,
+    #a86ee0 78%,#858afb 100%);
+  border-radius:.8cqw;padding:1.4cqw 1.2cqw;display:flex;flex-direction:column;
+  gap:.9cqw;justify-content:flex-start;overflow:hidden}
+.pcol .pbody div{font-size:1.42cqw;line-height:1.35;text-align:center;
+  font-weight:700;overflow-wrap:anywhere}
+.jewels{position:absolute;left:0;right:0;bottom:3.5%;display:flex;gap:.9cqw;
+  justify-content:center}
+.jw{width:3.4cqw;height:3.4cqw;display:block;object-fit:contain}
+.arrow{position:absolute;top:31%;width:3.6cqw;height:6cqw;object-fit:contain}
+.arrow[data-stagger="1"]{left:32.9%}
+.arrow[data-stagger="2"]{left:64.5%}
 
 /* act 4 — the walkthrough, laptop-framed */
 .scene.walkthrough{background:
@@ -282,18 +294,18 @@ function jewelsFor(lines){
 function sceneOverview(s){
   var p=s.panels||{};
   var cols=Object.keys(p).map(function(k,i){
-    return (i?'<img class="arrow" data-stagger="'+i+
-              '" src="media/jewels/chevron.png" alt="">':"") +
-      '<div class="pcol" data-stagger="'+i+'"><div class="ph">'+
+    return '<div class="pcol" data-stagger="'+i+'"><div class="ph">'+
         '<img class="ic" src="media/jewels/ic-'+
           (i===0?"sources":i===1?"flow":"actions")+'.png" alt="">'+
         '<span class="lbl">'+esc(k)+"</span></div>" +
       '<div class="pbody">'+p[k].map(function(v){return "<div>"+markup(v)+"</div>";}).join("")+
       "</div>"+jewelsFor(p[k])+"</div>";
   }).join("");
+  var chevrons = '<img class="arrow" data-stagger="1" src="media/jewels/chevron.png" alt="">' +
+                 '<img class="arrow" data-stagger="2" src="media/jewels/chevron.png" alt="">';
   return '<div class="scene overview" data-act="overview">' +
     '<h2><img class="mark" src="media/jewels/copilot.png" alt="">Agent overview</h2>' +
-    '<div class="pgrid">'+cols+"</div></div>";
+    '<div class="pgrid">'+cols+chevrons+"</div></div>";
 }
 function sceneWalkthrough(s){
   return '<div class="scene walkthrough" data-act="walkthrough">' +

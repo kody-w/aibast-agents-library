@@ -84,6 +84,9 @@ KOKORO_VOICE = os.environ.get("RAPPVISION_KOKORO_VOICE", "af_nova")
 # 0.86 delivers 2.10 words/sec, measured against the reference's own rate.
 # 0.95 read at 2.36 and sounded rushed beside it.
 KOKORO_SPEED = os.environ.get("RAPPVISION_KOKORO_SPEED", "0.86")
+# The reference reads 254 words across 120.7 seconds of narration. Speed is a
+# knob; this is the thing the knob is turned to reach.
+TARGET_WPS = 2.10
 
 
 def run(cmd: list[str], why: str = "", check: bool = True, **kw):
@@ -130,9 +133,25 @@ with sync_playwright() as p:
     # vision.html needs headroom for its transport; screen.html is the frame
     # itself and must be EXACTLY the box, or its composer falls off the bottom
     # and the capture gets squashed into the plate.
-    pad = 0 if spec.get("ready") else 260
+    pad = 0 if (spec.get("ready") or spec.get("region")) else 260
     pg = b.new_page(viewport={"width": W, "height": H + pad},
                     device_scale_factor=1)
+    if spec.get("radius"):
+        # Round the surface to the screen it replaces. A square patch over a
+        # rounded display fills the bezel's radius and reads as bursting out of
+        # the frame; these corners come out transparent, so the bezel shows.
+        pg.add_init_script("""
+          window.addEventListener('DOMContentLoaded', function(){
+            var st = document.createElement('style');
+            // html transparent, body still WHITE. Making both transparent
+            // rounded the patch and hollowed it out at the same time: every
+            // pixel our own elements did not paint showed the reference's UI
+            // straight through, including its scrollbar at x=1780.
+            st.textContent = 'html{background:transparent!important}' +
+              'body{border-radius:__R__px;overflow:hidden;background:#fff}';
+            document.head.appendChild(st);
+          });
+        """.replace("__R__", str(spec["radius"])))
     pg.goto(url, wait_until="load")
     if spec.get("ready"):
         pg.wait_for_function("() => " + spec["ready"].replace("window.", "window."),
@@ -209,12 +228,15 @@ def load_plate() -> dict | None:
 
 def capture(url: str, times: list[float], out_dir: Path, settle: int = 30,
             width: int | None = None, height: int | None = None,
-            ready: str | None = None, transparent: bool = False) -> int:
+            ready: str | None = None, transparent: bool = False,
+            radius: int = 0) -> int:
     script = Path(tempfile.mkdtemp()) / "cap.py"
     script.write_text(CAPTURE, encoding="utf-8")
     spec = json.dumps({"w": width or W, "h": height or H, "times": times,
                        "settle": settle, "ready": ready,
-                       "transparent": bool(transparent)})
+                       "region": bool(width or height),
+                       "transparent": bool(transparent),
+                       "radius": int(radius)})
     r = run([playwright_python(), str(script), url, str(out_dir), spec])
     if r.returncode != 0:
         raise SystemExit("frame capture failed:\n" + r.stderr.decode()[-1500:])
@@ -235,7 +257,62 @@ def narrate(text: str, out: Path) -> float:
     wav = out.with_suffix(".wav")
     env = {**os.environ, "HYPERFRAMES_PYTHON": os.environ.get(
         "HYPERFRAMES_PYTHON", str(Path.home() / ".playwright-venv" / "bin" / "python"))}
-    r = run(["npx", "hyperframes", "tts", text, "-v", KOKORO_VOICE,
+
+    # A fixed speed constant does not give a fixed speaking RATE. Kokoro shortens
+    # its inter-sentence pauses on longer input, so one setting produced 2.30
+    # words per second on the short line and 2.96 on the long one — and the long
+    # one is the seventy-second walkthrough, which finished thirty-two seconds
+    # early and left the act playing to silence. So aim at the reference's
+    # measured rate and correct against what actually came back.
+    # Pace with PAUSES, never by slowing the voice.
+    #
+    # Reaching the reference's 2.10 words/sec by turning Kokoro's speed knob
+    # down worked arithmetically and sounded drunk — a long line needed 0.61,
+    # which stretches the phonemes themselves. A narrator hitting a slower rate
+    # does not slur; they leave more air between sentences. So: synthesise each
+    # sentence at one natural speed, then space them.
+    sentences = [x.strip() for x in re.split(r"(?<=[.!?])\s+", text.strip()) if x.strip()]
+    words = len(text.split())
+    target = words / TARGET_WPS
+    pieces, spoken = [], 0.0
+    for n, sent in enumerate(sentences):
+        part = out.parent / f"{out.stem}-s{n}.wav"
+        run(["npx", "hyperframes", "tts", sent, "-v", KOKORO_VOICE,
+             "-s", str(KOKORO_SPEED), "-o", str(part)],
+            why="neural narration", check=False, env=env, cwd=str(REPO_ROOT))
+        if not part.is_file():
+            pieces = []
+            break
+        d = run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                 "-of", "csv=p=0", str(part)], check=False)
+        try:
+            spoken += float(d.stdout.decode().strip())
+        except ValueError:
+            pass
+        pieces.append(part)
+
+    if pieces:
+        # Spread the shortfall evenly across the gaps, within what reads as a
+        # breath rather than a stall.
+        gaps = max(1, len(pieces) - 1)
+        gap = min(1.6, max(0.28, (target - spoken) / gaps))
+        sil = out.parent / f"{out.stem}-gap.wav"
+        run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i",
+             f"anullsrc=r=24000:cl=mono:d={gap:.3f}", str(sil)], check=False)
+        listing = out.parent / f"{out.stem}-list.txt"
+        joined = []
+        for n, part in enumerate(pieces):
+            if n:
+                joined.append(sil)
+            joined.append(part)
+        listing.write_text("".join(f"file '{p}'\n" for p in joined), encoding="utf-8")
+        run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0",
+             "-i", str(listing), "-c:a", "pcm_s16le", "-ar", "48000",
+             str(wav)], why="join narration", check=False)
+        for f in pieces + [sil, listing]:
+            f.unlink(missing_ok=True)
+    else:
+        run(["npx", "hyperframes", "tts", text, "-v", KOKORO_VOICE,
              "-s", str(KOKORO_SPEED), "-o", str(wav)],
             why="neural narration", check=False, env=env, cwd=str(REPO_ROOT))
 
@@ -274,18 +351,74 @@ def pick_broll(industries: list[str], category: str) -> Path | None:
     return (REPO_ROOT / clips[0]["path"]) if clips else None
 
 
+GEOMETRY = REPO_ROOT / "media" / "plates" / "base-geometry.json"
+
+
 def load_overlays() -> dict | None:
     """The base track and the boxes we replace on it.
 
     This is the architecture that made the films work: keep the professional
     recording — its cinematography, transitions, Microsoft intro, b-roll and
     motion — and composite our content only over the boxes that carry
-    agent-specific material. Rects and time windows are set visually in
-    align.html, never guessed here.
+    agent-specific material.
+
+    Which boxes, and when, is MEASURED from the base recording itself
+    (scripts/measure_base.py), never hand-set. Hand-set rects are what put a
+    chat panel over a presenter's chest for the last seven seconds of the shot
+    and left 66px of the reference's own nav rail showing down our left edge
+    for seventy-eight. A rect that describes someone else's cut has to be read
+    off that cut.
     """
     if not OVERLAYS.is_file():
         return None
-    return json.loads(OVERLAYS.read_text(encoding="utf-8"))
+    ov = json.loads(OVERLAYS.read_text(encoding="utf-8"))
+    if not GEOMETRY.is_file():
+        print("  [base] no measured geometry — run scripts/measure_base.py",
+              file=sys.stderr)
+        return None
+    tracks = json.loads(GEOMETRY.read_text(encoding="utf-8"))["tracks"]
+    m = tracks.get(ov["base_track"])
+    if not m:
+        print(f"  [base] {ov['base_track']} is not measured", file=sys.stderr)
+        return None
+
+    regions, missing = [], []
+    for rid, source in (("title", "lozenge"), ("overview", "overview"),
+                        ("screen", "screen")):
+        act = m.get(rid)
+        if not act:
+            missing.append(rid)
+            continue
+        # The card replaces the whole frame; the other two replace exactly the
+        # thing they cover, at the extent it actually reaches.
+        # Which rect is right depends on WHICH LAPTOP is underneath.
+        #
+        # calibration.json was set visually against media/plates/laptop-copilot.png
+        # — our own plate. This path composites onto the professional
+        # recording's laptop, which is a different and larger screen. Using the
+        # plate's rect here leaves the reference's own nav rail showing beside
+        # ours, guillotined to single letters. So the base path uses the
+        # measured extent of the screen it is actually covering.
+        #
+        # The measured rect is also why the picture looked like it burst its
+        # frame: it is a square rectangle laid over a screen whose corners are
+        # rounded, so it filled the bezel's radius. That is fixed by rounding
+        # the patch, not by shrinking it — see corner_radius below.
+        rect = ({"x": 0, "y": 0, "w": W, "h": H} if rid == "overview"
+                else act.get("rect") or act["envelope"])
+        regions.append({"id": rid, "source": source, "rect": rect,
+                        "window": {"start": act["start"], "end": act["end"]},
+                        # Matching the base's own dissolve: our patch has to
+                        # leave when the shot under it does, not after.
+                        "fade_seconds": 0.25 if rid == "title" else 0.35,
+                        # Measured off the reference's own screen: its corner
+                        # inset runs 29px over 30px of height.
+                        "corner_radius": 30 if rid == "screen" else 0,
+                        "measured": True})
+    if missing:
+        print(f"  [base] unmeasured acts: {', '.join(missing)}", file=sys.stderr)
+        return None
+    return {**ov, "regions": regions, "geometry_source": "measured"}
 
 
 def find_base(track_id: str) -> Path | None:
@@ -327,18 +460,24 @@ def render_over_base(story: dict, subject: dict, ov: dict, work: Path,
             q = f"?{'skill' if kind == 'skill' else 'agent'}={ref}"
             if region["source"] == "overview":
                 q += "&overlay=overview"
+            if region["source"] == "screen":
+                # The page schedules its exchanges against the act it is
+                # actually laid over, not the storyboard's nominal timeline.
+                q += f"&t0={win['start']}&t1={win['end']}"
             url = f"http://127.0.0.1:{port}/{page}{q}"
 
-            n = max(2, int(span * fps))
-            times = [win["start"] + (i / fps) for i in range(n)]
-            ready = "window.__ready" if region["source"] == "lozenge" else None
-            if region["source"] == "screen":
-                ready = "window.__ready"
+            # A held card needs a handful of frames; a scrolling conversation
+            # needs every one of them, or it plays back as a stutter.
+            rfps = FPS if region["source"] == "screen" else max(fps, 2)
+            n = max(2, int(span * rfps))
+            times = [win["start"] + (i / rfps) for i in range(n)]
+            ready = "window.__ready" if region["source"] in ("lozenge", "screen") else None
             capture(url, times, sub, settle=30,
                     width=r["w"], height=r["h"], ready=ready,
-                    transparent=(region["source"] == "lozenge"))
+                    transparent=region["source"] in ("lozenge", "screen"),
+                    radius=region.get("corner_radius") or 0)
 
-            inputs += ["-framerate", str(fps), "-i", str(sub / "f%05d.png")]
+            inputs += ["-framerate", str(rfps), "-i", str(sub / "f%05d.png")]
             fade = region.get("fade_seconds", 0.3) or 0.01
             filters.append(
                 f"[{idx}:v]format=rgba,fps={FPS},"
@@ -370,7 +509,22 @@ def render_over_base(story: dict, subject: dict, ov: dict, work: Path,
         srv.shutdown()
 
 
-def mux(picture: Path, audio_parts: list, clock: float, out: Path) -> None:
+def base_audio_profile(track_id: str | None) -> dict:
+    """The base recording's own silence and loudness, if it has been measured.
+
+    Constants here were wrong twice — a bed running under the opening and
+    closing Microsoft logos where the professional films are silent, and a
+    loudness target three decibels under the recording it sits beside. Both are
+    properties of the base, so both are read off it.
+    """
+    if not (track_id and GEOMETRY.is_file()):
+        return {}
+    t = json.loads(GEOMETRY.read_text(encoding="utf-8"))["tracks"].get(track_id)
+    return (t or {}).get("audio") or {}
+
+
+def mux(picture: Path, audio_parts: list, clock: float, out: Path,
+        track_id: str | None = None) -> None:
     """Lay narration and the bed over a finished picture at reference specs."""
     if not audio_parts and not (USE_BED and BED.is_file()):
         run(["ffmpeg", "-v", "error", "-y", "-i", str(picture),
@@ -381,16 +535,31 @@ def mux(picture: Path, audio_parts: list, clock: float, out: Path) -> None:
         inputs += ["-i", str(f)]
         filters.append(f"[{i + 1}:a]adelay={int(start * 1000)}|{int(start * 1000)}[a{i}]")
         labels.append(f"[a{i}]")
+    prof = base_audio_profile(track_id)
+    head = float(prof.get("head_silent_until") or 0.0)
+    tail = float(prof.get("tail_silent_from") or clock)
+    target = float(prof.get("integrated_lufs") or TARGET_LUFS)
+
     if USE_BED and BED.is_file():
         bi = len(audio_parts) + 1
         inputs += ["-i", str(BED)]
+        # The bed comes up as the logo clears and is gone before the end card,
+        # which is what the base does. It used to start at zero.
+        bed_in = max(0.0, head - 0.1)
+        bed_out = max(bed_in + 1.0, tail - 1.2)
         filters.append(
             f"[{bi}:a]atrim=0:{clock},volume={BED_GAIN},"
-            f"afade=t=in:st=0:d=1.5,afade=t=out:st={max(1.0, clock - 3.0):.2f}:d=3.0[bed]")
+            f"adelay={int(bed_in * 1000)}|{int(bed_in * 1000)},"
+            f"afade=t=in:st={bed_in:.2f}:d=1.2,"
+            f"afade=t=out:st={bed_out:.2f}:d=1.2[bed]")
         labels.append("[bed]")
+    # loudnorm is gated and will lift a quiet passage, so the silences are
+    # enforced AFTER it rather than assumed to survive it.
+    gate = (f"volume=enable='lt(t,{max(0.0, head - 0.15):.2f})':volume=0,"
+            f"volume=enable='gt(t,{tail:.2f})':volume=0")
     mixf = (";".join(filters) + ";" + "".join(labels) +
             f"amix=inputs={len(labels)}:dropout_transition=0:normalize=0[m];"
-            f"[m]loudnorm=I={TARGET_LUFS}:TP={TARGET_TP}:LRA=7,"
+            f"[m]loudnorm=I={target}:TP={TARGET_TP}:LRA=7,{gate},"
             f"apad,atrim=0:{clock},aresample=48000[a]")
     run(["ffmpeg", "-v", "error", "-y", "-i", str(picture), *inputs,
          "-filter_complex", mixf, "-map", "0:v", "-map", "[a]",
@@ -451,15 +620,30 @@ def main() -> int:
                 capture_output=True, text=True).stdout.strip() or 137.0)
             audio_parts = []
             if not args.no_audio:
+                # The storyboard's act times describe a 137s film we no longer
+                # make; the base is 132.4s and its acts are measured. Speaking
+                # to the storyboard's clock put narration over the wrong shots.
+                acts = {r["id"]: r["window"] for r in ov["regions"]}
                 for scene in story["scenes"]:
                     if not scene.get("narration"):
                         continue
                     vo = work / f"vo-{scene['act']}.m4a"
                     dur = narrate(scene["narration"], vo)
-                    if dur:
-                        at = max(scene["start"] + 0.6, VO_ENTRY.get(scene["act"], 0.0))
-                        audio_parts.append((vo, at, dur))
-            mux(picture, audio_parts, clock, out)
+                    if not dur:
+                        continue
+                    win = acts.get({"overview": "overview",
+                                    "walkthrough": "screen"}.get(scene["act"], ""))
+                    if win:
+                        at = win["start"] + 0.5
+                    elif scene["act"] == "close" and acts.get("screen"):
+                        # The close begins when the laptop shot ends, whatever
+                        # second that is on this cut.
+                        at = acts["screen"]["end"] + 0.4
+                    else:
+                        at = max(scene["start"] + 0.6,
+                                 VO_ENTRY.get(scene["act"], 0.0))
+                    audio_parts.append((vo, at, dur))
+            mux(picture, audio_parts, clock, out, ov["base_track"])
             if out.is_file():
                 print(f"[film] {out.relative_to(REPO_ROOT)} · "
                       f"{out.stat().st_size / 1048576:.1f} MB · base "
@@ -492,10 +676,10 @@ def main() -> int:
                 # inside a 17s act produced a jump-cut that read as hectic.
                 # If the clip is short, hold the last frame rather than replay.
                 run(["ffmpeg", "-v", "error", "-y", "-i", str(broll),
-                     # Slow the clean 14.5s window to fill the act rather than
-                     # loop it or hold a frozen frame at the end.
+                     # Real time, always. Retiming footage to fill an act is
+                     # what made the b-roll read as slow motion.
                      "-vf", f"scale={W}:{H}:force_original_aspect_ratio=increase,"
-                            f"crop={W}:{H},setpts={span}/14.5*PTS,fps={FPS}",
+                            f"crop={W}:{H},fps={FPS}",
                      "-t", f"{span}",
                      "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "18",
                      "-pix_fmt", "yuv420p", str(seg)], why="b-roll act")

@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-06T00:35:22.075942+00:00",
   "onepager": {
     "capture_file": "34-customer-sentiment-churn-agent.html",
     "industry": "Financial Services",
@@ -30,9 +30,9 @@
     "catalog_number": 34,
     "video": {
       "slug": "customer-sentiment-and-churn-prediction-agent",
-      "hosted": false,
-      "src": null,
-      "size_mb": null
+      "hosted": true,
+      "src": "media/videos/customer-sentiment-and-churn-prediction-agent.mp4",
+      "size_mb": 3.81
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=customer-sentiment-churn-agent"

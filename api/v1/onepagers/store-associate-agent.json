@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-06T00:35:22.075942+00:00",
   "onepager": {
     "capture_file": "21-store-associate-agent.html",
     "industry": "Retail",
@@ -32,9 +32,9 @@
     "catalog_number": 21,
     "video": {
       "slug": "store-associate-copilot",
-      "hosted": false,
-      "src": null,
-      "size_mb": null
+      "hosted": true,
+      "src": "media/videos/store-associate-copilot.mp4",
+      "size_mb": 3.44
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=store-associate-agent"

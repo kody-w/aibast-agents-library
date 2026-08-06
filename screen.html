@@ -16,92 +16,169 @@
   Driven by the same storyboard JSON as vision.html, seeked with ?t=<seconds>.
 -->
 <style>
+/* The M365 Copilot surface as the reference films it: a left rail, an empty
+   state that greets and centres its composer, then a conversation view once the
+   prompt is sent. Measured against "10-Account Intelligence Agent.mp4" at 46s
+   (empty state) and 62s (conversation). */
 :root{
   --ink:#1b1a19; --dim:#4b4a49; --faint:#8a8886; --line:#e6e6e6;
-  --op:#eee6fb; --accent:#4f52c9; --ok:#0f7b0f; --mark:#fff3bf;
+  --op:#efe7fb; --accent:#4f52c9; --ok:#0f7b0f; --rail:#f5f5f5;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-/* Fluid, not 1654px fixed. The renderer captures at whatever the calibrated
-   rect is, so hard-coding a width would squeeze the type at any other size. */
-html,body{width:100%;height:100vh;overflow:hidden;background:#faf9f8}
+/* A class that sets display beats the user-agent [hidden] rule, so the empty
+   state stayed on screen behind every exchange of the walkthrough and ate the
+   top half of the laptop for seventy seconds. */
+[hidden]{display:none!important}
+html,body{width:100%;height:100vh;overflow:hidden;background:#fff}
 body{font-family:"Segoe UI",-apple-system,system-ui,sans-serif;color:var(--ink);
-  display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+  display:flex;-webkit-font-smoothing:antialiased}
 
-/* top chrome — matches the plate's own bar */
-.bar{flex:0 0 auto;height:78px;display:flex;align-items:center;padding:0 34px;gap:14px}
-.bar .title{font-size:19px;color:#3b3a39;font-weight:400;letter-spacing:-.005em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
-.bar .right{margin-left:auto;display:flex;align-items:center;gap:12px}
-.pill{border:1px solid #e0e0e0;border-radius:7px;padding:7px 15px;font-size:16px;
-  font-weight:600;color:#242424;background:#fff}
-.sq{width:34px;height:34px;border-radius:7px;background:#4f52c9}
-.sq.ghost{background:#fff;border:1px solid #e0e0e0}
+/* left rail */
+.rail{flex:0 0 13.5%;background:var(--rail);border-right:1px solid #ececec;
+  padding:1.1% 1%;display:flex;flex-direction:column;gap:1.4%}
+.rail .brand{display:flex;align-items:center;gap:.5vw;font-size:.86vw;
+  color:#5b5b5b;margin-bottom:.6vh}
+.rail .brand i{width:1.1vw;height:1.1vw;border-radius:.25vw;
+  background:linear-gradient(135deg,#e8598f,#8b5cf6,#4f7cf7);display:block}
+.rail a{display:flex;align-items:center;gap:.6vw;font-size:.88vw;color:#333;
+  padding:.55vh .5vw;border-radius:.4vw;text-decoration:none}
+.rail a.on{background:#e9e9e9;font-weight:600}
+.rail a b{width:1.15vw;height:1.15vw;border-radius:50%;display:block;flex:0 0 auto;
+  background:#d24;opacity:.85}
+.rail a.g b{background:#9a9a9a;border-radius:.2vw}
+.rail .foot{margin-top:auto;font-size:.73vw;color:#8a8886}
+.topbar .sq{width:1.9vw;height:1.9vw;border-radius:.35vw;background:#f3f2f1;
+  border:1px solid #e6e5e4}
+.topbar .sq.av{border-radius:50%;background:#5b5fc7;border:0}
+.ag .who em{font-style:normal;font-weight:600;color:#5b5b5b;font-size:.92vw;
+  margin-left:.45vw}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.topbar{flex:0 0 auto;height:6.5vh;display:flex;align-items:center;
+  padding:0 1.6vw;gap:.9vw}
+.topbar .t{font-size:.9vw;color:#3b3a39;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:58%}
+.topbar .right{margin-left:auto;display:flex;align-items:center;gap:.7vw}
+.pill{border:1px solid #e0e0e0;border-radius:.45vw;padding:.5vh .9vw;
+  font-size:1.05vw;font-weight:600;background:#fff}
+.sq{width:2vw;height:2vw;border-radius:.4vw;background:#4f52c9}
+.sq.g{background:#fff;border:1px solid #e0e0e0}
+
+/* empty state: greeting and composer centred in the column */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2.6vh;padding-bottom:6vh}
+.empty h1{font-size:2.1vw;font-weight:700;letter-spacing:-.01em}
+.chips{display:flex;gap:.7vw;flex-wrap:wrap;justify-content:center}
+.chips span{border:1px solid #e2e2e2;border-radius:1.4vw;padding:.6vh 1.1vw;
+  font-size:1.05vw;color:#333;background:#fff}
 
 /* conversation */
-.flow{flex:1;overflow:hidden;padding:10px 60px 0;display:flex;flex-direction:column;gap:18px}
-.op{align-self:flex-end;background:var(--op);border-radius:12px;padding:16px 22px;
-  font-size:21px;line-height:1.42;max-width:64%;overflow-wrap:anywhere}
+.flow{flex:1;overflow:hidden;padding:1.4vh 3.4vw 0;display:flex;
+  flex-direction:column;gap:2vh}
+.op{align-self:flex-end;background:var(--op);border-radius:.7vw;padding:1.4vh 1.4vw;
+  font-size:1.05vw;line-height:1.45;max-width:62%;overflow-wrap:anywhere}
 .ag{align-self:flex-start;width:88%}
-.ag .who{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;
-  margin-bottom:12px}
-.ag .who i{width:26px;height:26px;border-radius:6px;display:block;
+.ag .who{display:flex;align-items:center;gap:.5vw;font-size:1.05vw;font-weight:700;
+  margin-bottom:1vh}
+.ag .who i{width:1.4vw;height:1.4vw;border-radius:.3vw;display:block;
   background:linear-gradient(135deg,#0f7b7b,#0f7b0f)}
-.ag h4{font-size:25px;font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
-.ag .intro{font-size:19px;line-height:1.5;color:#2c2c2c;margin-bottom:16px;max-width:94%}
-.ag .sec{margin-bottom:14px}
-.ag .sec>b{display:block;font-size:19px;font-weight:700;margin-bottom:7px}
-.ag .callout{background:#fbe9f7;border-radius:10px;padding:15px 18px;margin-top:4px;
-  display:flex;flex-direction:column;gap:7px;max-width:80%}
-.ag .callout>b{font-size:19px;font-weight:700}
-.ag .callout .src{font-size:17px;color:#5b5b5b}
-.ag .callout .q{font-size:18px;color:#2c2c2c}
-.ag ul{list-style:none;display:flex;flex-direction:column;gap:5px}
-.ag li{font-size:18px;line-height:1.5;padding-left:20px;position:relative;color:#2c2c2c;
-  overflow-wrap:anywhere}
-.ag li:before{content:"";position:absolute;left:2px;top:11px;width:7px;height:7px;
+.ag h4{font-size:1.22vw;font-weight:700;margin-bottom:1vh}
+.ag .intro{font-size:1.0vw;line-height:1.5;color:#2c2c2c;margin-bottom:1.6vh;max-width:94%}
+.ag .sec{margin-bottom:1.4vh}
+.ag .sec>b{display:block;font-size:1.0vw;font-weight:700;margin-bottom:.7vh}
+.ag ul{list-style:none;display:flex;flex-direction:column;gap:.5vh}
+.ag li{font-size:.95vw;line-height:1.5;padding-left:1.2vw;position:relative;color:#2c2c2c}
+.ag li:before{content:"";position:absolute;left:.15vw;top:.85vh;width:.4vw;height:.4vw;
   border-radius:50%;background:#8b5cf6}
-.mark{background:var(--mark);border-radius:3px;padding:0 5px}
-.call{margin-top:16px;font-size:17px;color:#5b5b5b;
+.ag .callout{background:#fbe9f7;border-radius:.55vw;padding:1.4vh 1.2vw;margin-top:.4vh;
+  display:flex;flex-direction:column;gap:.7vh;max-width:80%}
+.ag .callout>b{font-size:1.0vw;font-weight:700}
+.ag .callout .src{font-size:.9vw;color:#5b5b5b}
+.ag .callout .q{font-size:.95vw;color:#2c2c2c}
+.call{margin-top:1.4vh;font-size:1vw;color:#5b5b5b;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .call b{color:#1b1a19;font-weight:700}
 
-/* composer — matches the plate */
-.composer{flex:0 0 auto;padding:0 60px 14px}
-.box{border:1px solid #dcdcdc;border-radius:26px;background:#fff;padding:18px 24px 12px;
-  box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.box .ph{font-size:20px;color:#9a9a9a;min-height:26px}
-.box .ph.typed{color:#1b1a19}
-.caret{display:inline-block;width:2px;height:22px;background:#1b1a19;vertical-align:-4px;
-  margin-left:1px;animation:b 1s steps(2) infinite}
+/* composer — centred while empty, docked once the conversation starts */
+.composer{flex:0 0 auto;padding:0 3.4vw 1.6vh}
+.empty .composer{width:56%;padding:0}
+.box{border:1px solid #dcdcdc;border-radius:1.5vw;background:#fff;
+  padding:1.5vh 1.4vw 1vh;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.box .ph{font-size:1.15vw;color:#9a9a9a;min-height:2.4vh;line-height:1.4}
+.box .ph.typed{color:#1b1a19;background:#efe7fb;border-radius:.3vw;
+  padding:.2vh .35vw;display:inline-block}
+.caret{display:inline-block;width:.12vw;height:1.7vh;background:#1b1a19;
+  vertical-align:-.3vh;margin-left:.05vw;animation:b 1s steps(2) infinite}
 @keyframes b{50%{opacity:0}}
-.box .row{display:flex;align-items:center;gap:14px;margin-top:14px}
-.box .row .chip{display:flex;align-items:center;gap:8px;border:1px solid #e2e2e2;
-  border-radius:8px;padding:6px 12px;font-size:16px;font-weight:600}
-.box .row .chip i{width:20px;height:20px;border-radius:5px;
-  background:linear-gradient(135deg,#0f7b7b,#0f7b0f);display:block}
-.box .row .send{margin-left:auto;width:36px;height:36px;border-radius:50%;background:#4f52c9}
-.fine{text-align:center;font-size:15px;color:#8a8886;padding:8px 0 10px}
+.box .row{display:flex;align-items:center;gap:.8vw;margin-top:1.2vh}
+.box .row .chip{display:flex;align-items:center;gap:.4vw;border:1px solid #e2e2e2;
+  border-radius:.4vw;padding:.4vh .7vw;font-size:1vw;font-weight:600}
+.box .row .chip i{width:1.1vw;height:1.1vw;border-radius:.25vw;display:block;
+  background:linear-gradient(135deg,#0f7b7b,#0f7b0f)}
+.box .row .send{margin-left:auto;width:2.1vw;height:2.1vw;border-radius:50%;
+  background:#4f52c9}
+.fine{text-align:center;font-size:.73vw;color:#8a8886;padding:.6vh 0 1vh}
+/* Chrome traced from the reference: outline glyphs at the weight it uses, a
+   product mark for the brand, and the blue compose control with its divider. */
+.rail a svg.ic{width:1.35vw;height:1.35vw;flex:0 0 auto;color:#3b3a39}
+.rail .brand img.cp{width:1.35vw;height:1.35vw;object-fit:contain}
+.rail .brand svg.panel{width:1.25vw;height:1.25vw;margin-left:auto;color:#605e5c}
+.topbar .right{gap:.55vw}
+.topbar svg.ic{width:1.3vw;height:1.3vw}
+.topbar svg.dim{color:#605e5c}
+.topbar svg.ok{color:#3a9a5c}
+.topbar .cta{display:inline-flex;align-items:center;gap:.35vw;background:#4f52c9;
+  border-radius:.35vw;padding:.45vh .5vw;color:#fff}
+.topbar .cta svg.w{color:#fff}
+.topbar .cta .div{width:1px;height:1.5vh;background:rgba(255,255,255,.55)}
+.topbar .dots{color:#605e5c;font-size:1.15vw;letter-spacing:.05em}
+.ag .who img.cp{width:1.35vw;height:1.35vw;object-fit:contain}
+.box .row .chip img.cp{width:1.05vw;height:1.05vw;object-fit:contain}
+.empty{justify-content:flex-start;padding-top:26%}
 </style>
 </head>
 <body>
-  <div class="bar">
-    <div class="title" id="barTitle"></div>
-    <div class="right">
-      <div class="pill" id="model">GPT-5 On</div>
-      <div class="sq"></div><div class="sq ghost"></div>
-    </div>
+  <div class="rail">
+    <div class="brand"><img class="cp" src="media/jewels/copilot.png" alt="">M365 Copilot<svg class="ic panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M9.5 5v14"/></svg></div>
+    <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5a8.5 8.5 0 1 0-7.4-4.3L3.5 20.5l4.4-1a8.5 8.5 0 0 0 4.1 1Z"/></svg>New chat</a>
+    <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 20.5 20.5"/></svg>Search</a>
+    <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 5.5h2.2v13H4.5zM9.4 5.5h2.2v13H9.4zM14.6 6l2.1.6-3.4 12.4-2.1-.6z"/></svg>Library</a>
+    <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5v15M5 4.5c3.6 0 3.6 4 0 4M13.5 6.5h5.5v5.5h-5.5zM16.2 12v7.5M13 19.5h6.4"/></svg>Create</a>
+    <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 14.6c-2 4 .6 5 4 3l7-7c2.5-2.5 3-5 2.6-6.6-1.6-.4-4.1.1-6.6 2.6l-7 7Z"/><circle cx="13.6" cy="9.4" r="1.6"/><path d="M4 20.5l1.4-1.4M6.6 21l.9-.9"/></svg>Frontier</a>
   </div>
-  <div class="flow" id="flow"></div>
-  <div class="composer">
-    <div class="box">
-      <div class="ph" id="ph">Message Copilot</div>
-      <div class="row">
-        <div class="chip"><i></i><span id="agentChip">Agent</span></div>
-        <div class="send"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="t" id="barTitle"></div>
+      <div class="right"><svg class="ic dim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3"/><path d="M4 18c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="16" r="3.4"/><path d="M17 14.4v3.2M15.4 16h3.2"/></svg><svg class="ic dim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9.5 5 5 5-5"/></svg><span class="cta"><svg class="ic w" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 15l1-3.2 5.2-5.2 2.2 2.2-5.2 5.2Z"/></svg><i class="div"></i><svg class="ic w" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9.5 5 5 5-5"/></svg></span><svg class="ic ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 19 6v6c0 4-3 7-7 8.5C8 19 5 16 5 12V6Z"/><path d="m9 12 2.2 2.2L15.4 10"/></svg><span class="dots">···</span></div>
+    </div>
+
+    <div class="empty" id="emptyState">
+      <h1>Hi, what can I help you with?</h1>
+      <div class="composer">
+        <div class="box">
+          <div class="ph" id="phEmpty">Message Copilot</div>
+          <div class="row">
+            <div class="chip"><img class="cp" src="media/jewels/copilot.png" alt=""><span class="agentName">Agent</span></div>
+            <div class="send"></div>
+          </div>
+        </div>
+      </div>
+      <div class="chips"><span>Learn</span><span>Find</span><span>Summarize</span>
+        <span>Suggest</span><span>&#8943;</span></div>
+    </div>
+
+    <div class="flow" id="flow" hidden></div>
+    <div class="composer" id="dockedComposer" hidden>
+      <div class="box">
+        <div class="ph" id="ph">Message Copilot</div>
+        <div class="row">
+          <div class="chip"><img class="cp" src="media/jewels/copilot.png" alt=""><span class="agentName">Agent</span></div>
+          <div class="send"></div>
+        </div>
       </div>
     </div>
+    <div class="fine">AI-generated content may be incorrect</div>
   </div>
-  <div class="fine">AI-generated content may be incorrect</div>
 
 <script>
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
@@ -117,17 +194,32 @@ function mark(t){ return esc(t).split(esc(PH)).join('<span class="mark">'+esc(PH
 function paint(){
   if(!DOC) return;
   var scene=DOC.scenes.filter(function(s){return s.act==="walkthrough";})[0];
-  var turns=scene.turns||[], span=scene.end-scene.start;
-  var local=Math.max(0, T-scene.start);
+  var turns=scene.turns||[];
+  /* The act's real window, measured off the base recording and handed in by the
+     renderer. The storyboard describes a 137s film we no longer make, and
+     driving the schedule off it started the conversation a second before the
+     laptop shot existed. */
+  var t0=parseFloat(qs("t0"))||scene.start, t1=parseFloat(qs("t1"))||scene.end;
+  var span=Math.max(4,t1-t0);
+  var local=Math.max(0, T-t0);
   var html="", typing=null;
 
-  /* An explicit schedule, not an even split.
-     Dividing 78s across four turns pushed the agent's first answer to 19.5s
-     into the act — the screen was empty for the whole first half. The
-     reference puts the answer up fast and then HOLDS it while the narration
-     talks over it, so these are the beats it actually uses. */
-  var TYPE=3.0, REVEAL=8.0;
-  var starts=[0, TYPE+0.4, span*0.46, span*0.46+TYPE+0.4];
+  /* Derived from the turn count, not a fixed list. The previous schedule named
+     four beats; a third exchange was added and its two turns simply never
+     appeared, because their start times were undefined. */
+  var pairs=Math.max(1,Math.ceil(turns.length/2));
+  var slot=span/pairs;
+  var TYPE=Math.min(3.0, slot*0.14);
+  /* Reveal across most of the slot rather than in one burst. The old 8s reveal
+     left thirteen seconds of held frame after every answer, and a walkthrough
+     that holds a still for half its length reads as a stall next to the
+     reference, which is playing exchanges throughout. */
+  var REVEAL=Math.max(6.0, slot*0.62);
+  var starts=[];
+  for(var pi=0; pi<pairs; pi++){
+    starts.push(pi*slot);
+    starts.push(pi*slot+TYPE+0.4);
+  }
 
   turns.forEach(function(turn,i){
     var at=starts[i];
@@ -142,36 +234,74 @@ function paint(){
     } else {
       var reveal=Math.min(1,(local-at)/REVEAL);
       var r=turn.rich;
-      var body='<div class="ag"><div class="who"><i></i>Agent</div>';
+      var body='<div class="ag"><div class="who"><img class="cp" src="media/jewels/copilot.png" alt=""><span class="agentName">Industry Specialist Agent</span></div>';
       body+='<h4>'+esc(turn.heading)+"</h4>";
       if(r){
-        body+='<p class="intro">'+mark(r.intro)+"</p>";
-        var blocks=[];
+        /* The answer STREAMS in, as the product's does. Revealing whole blocks
+           left the picture identical for seconds at a time — measured against
+           the reference, which carries about twenty distinct frames every eight
+           seconds where a block reveal carries two. Text arriving character by
+           character is both what Copilot actually does and what keeps the frame
+           alive between exchanges. */
+        var units=[];
+        units.push({open:'<p class="intro">',close:"</p>",text:r.intro||""});
         (r.sections||[]).forEach(function(sec){
-          blocks.push('<div class="sec"><b>'+esc(sec.label)+"</b><ul>"+
-            sec.items.map(function(i){return "<li>"+mark(i)+"</li>";}).join("")+"</ul></div>");
+          units.push({open:'<div class="sec"><b>',close:"</b>",text:sec.label});
+          sec.items.forEach(function(i,n){
+            units.push({open:(n?"":"<ul>")+"<li>",close:"</li>"+(n===sec.items.length-1?"</ul></div>":""),text:i});
+          });
         });
         if(r.callout){
-          blocks.push('<div class="callout"><b>'+mark(r.callout.headline)+"</b>"+
-            '<div class="src">'+mark(r.callout.source)+"</div>"+
-            '<div class="q">'+esc(r.callout.question)+"</div></div>");
+          units.push({open:'<div class="callout"><b>',close:"</b>",text:r.callout.headline});
+          units.push({open:'<div class="src">',close:"</div>",text:r.callout.source});
+          units.push({open:'<div class="q">',close:"</div></div>",text:r.callout.question});
         }
-        var show=Math.max(1,Math.ceil(blocks.length*reveal));
-        body+=blocks.slice(0,show).join("");
+        var total=units.reduce(function(a,u){return a+u.text.length;},0);
+        var budget=Math.floor(total*reveal), spent=0;
+        for(var u=0;u<units.length;u++){
+          var un=units[u];
+          if(spent>=budget) break;
+          var take=Math.min(un.text.length, budget-spent);
+          spent+=un.text.length;
+          body+=un.open+mark(un.text.slice(0,take))+un.close;
+        }
       }
       if(reveal>=1) body+='<div class="call">↳ <b>Agent Calls:</b> '+esc(turn.agent_call)+"</div>";
       html+=body+"</div>";
     }
   });
 
+  var started = html.indexOf('class="op"') > -1 || html.indexOf('class="ag"') > -1;
+  document.getElementById("emptyState").hidden = started;
+  // The reference's title bar is blank until a conversation exists; it names
+  // the thread, not the thing being typed.
+  document.getElementById("barTitle").textContent = started ? (window.__title || "") : "";
+  document.getElementById("flow").hidden = !started;
+  document.getElementById("dockedComposer").hidden = !started;
+  // Follow the newest content the way the reference does. A long answer does
+  // not fit the surface, and a panel that never scrolls is a still frame with
+  // text below the fold.
+  var flow=document.getElementById("flow");
+  if(started && flow){
+    // Stay pinned to the newest line. Because the answer streams in, the
+    // content grows every frame and this scroll moves with it — the same
+    // continuous drift the reference has.
+    flow.scrollTop=Math.max(0, flow.scrollHeight-flow.clientHeight);
+  }
+
   var flow=document.getElementById("flow");
   flow.innerHTML=html;
   // Keep the newest turn in view, the way a real transcript scrolls.
   flow.scrollTop=flow.scrollHeight;
 
-  var ph=document.getElementById("ph");
-  if(typing!==null){ ph.className="ph typed"; ph.innerHTML=esc(typing)+'<span class="caret"></span>'; }
-  else { ph.className="ph"; ph.textContent="Message Copilot"; }
+  // While the prompt is being typed it belongs in the CENTRED composer of the
+  // empty state, which is where the reference shows it.
+  var target=document.getElementById(started?"ph":"phEmpty");
+  var other=document.getElementById(started?"phEmpty":"ph");
+  if(other){ other.className="ph"; other.textContent="Message Copilot"; }
+  if(typing!==null){ target.className="ph typed";
+    target.innerHTML=esc(typing)+'<span class="caret"></span>'; }
+  else { target.className="ph"; target.textContent="Message Copilot"; }
 }
 
 (function boot(){
@@ -187,8 +317,9 @@ function paint(){
       var title=(first&&first.text||"").replace(/\.$/,"");
       var w=title.split(" ");
       if(w.length>9) title=w.slice(0,9).join(" ")+"…";
-      document.getElementById("barTitle").textContent=title;
-      document.getElementById("agentChip").textContent=doc.subject.display_name;
+      window.__title=title;
+      Array.prototype.forEach.call(document.querySelectorAll(".agentName"),
+        function(n){ n.textContent=doc.subject.display_name; });
       document.title=doc.subject.display_name;
       paint();
       window.__ready=true;

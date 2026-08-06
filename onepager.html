@@ -186,6 +186,8 @@ footer { border-top:1px solid var(--border); margin-top:40px; padding:24px 0 40p
   body { background:#fff; } .sheet { box-shadow:none; border:none; margin:0; }
   .rpanel { break-inside:avoid; }
 }
+.deck-status{font-size:13px;color:#6B7280;margin-left:10px;align-self:center;min-height:1em}
+@media print{.deck-status{display:none}}
 </style>
 </head>
 <body>
@@ -230,6 +232,9 @@ footer { border-top:1px solid var(--border); margin-top:40px; padding:24px 0 40p
   </div>
 </footer>
 
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/pptxgen.min.js"></script>
+<script src="deck.js"></script>
 <script src="mirror.js"></script>
 <script>
 var OWNER_REPO = "microsoft/aibast-agents-library";
@@ -367,6 +372,38 @@ function machinePanel(name, review) {
 }
 
 /* ------------------------------- agent mode ------------------------------- */
+/* Wire an "Export as PowerPoint" button.
+ *
+ * The deck is built from the same static data this page rendered from — the
+ * manifest entry and, when there is one, the storyboard — so what someone
+ * hands to a customer and what they previewed here cannot disagree. Nothing is
+ * uploaded; the file is assembled in the browser.
+ */
+function wireDeck(id, kind, entry, slug) {
+  var btn = document.getElementById(id);
+  var status = document.getElementById(id + "Status");
+  if (!btn) return;
+  btn.onclick = function () {
+    var say = function (m) { if (status) status.textContent = m; };
+    btn.disabled = true;
+    say("Building the deck…");
+    var story = slug ? loadStoryboard(kind, slug) : Promise.resolve(null);
+    story.catch(function () { return null; }).then(function (doc) {
+      return RappDeck.export({
+        kind: kind, entry: entry, story: doc, onStatus: say,
+        links: [
+          "Library: microsoft.github.io/aibast-agents-library",
+          "Source: github.com/" + OWNER_REPO
+        ]
+      });
+    }).then(function () {
+      track("library.deck.exported", slug || (entry && entry.name) || kind);
+    }).catch(function () {
+      /* RappDeck has already put the reason in the status line. */
+    }).then(function () { btn.disabled = false; });
+  };
+}
+
 function renderAgent(agent, review, rating, source) {
   var short = agent.name.split("/").pop();
   document.title = agent.display_name + " — AIBAST agent one-pager";
@@ -420,7 +457,8 @@ function renderAgent(agent, review, rating, source) {
           ' onclick="track(\'library.agent.deployed\',\'' + esc(agent.name) + '\')">Download agent.py</a>' +
         '<a class="btn" href="architecture.html?agent=' + encodeURIComponent(agent.name) + '">Architecture</a>' +
         '<a class="btn" href="' + esc(agent.github_url) + '" target="_blank" rel="noopener">View on GitHub</a>' +
-        '<button class="btn" onclick="window.print()">Print / save as PDF</button>' +
+        '<button class="btn" id="deckAgent">Export as PowerPoint</button>' +
+        '<span class="deck-status" id="deckAgentStatus" aria-live="polite"></span>' +
         '<a class="btn" href="agents.html#' + esc(short) + '">Back to library</a>' +
       "</div>" +
       '<div class="foot-note">Microsoft AI Business Applications Specialist Team (AIBAST) · ' +
@@ -435,6 +473,7 @@ function renderAgent(agent, review, rating, source) {
       '<pre class="code">' + esc(source) + "</pre></details>" : "");
 
   document.getElementById("content").innerHTML = html;
+  wireDeck("deckAgent", "agent", agent, short);
   wireRemix(STORYBOARD);
   track("library.onepager.completed", agent.name);
 }
@@ -468,7 +507,8 @@ function renderSolution(sol) {
       '<div class="actions">' +
         '<a class="btn primary" href="architecture.html?solution=' + encodeURIComponent(sol.slug) + '">Architecture</a>' +
         '<a class="btn" href="agents.html">Find the agents that build this</a>' +
-        '<button class="btn" onclick="window.print()">Print / save as PDF</button>' +
+        '<button class="btn" id="deckSolution">Export as PowerPoint</button>' +
+        '<span class="deck-status" id="deckSolutionStatus" aria-live="polite"></span>' +
         '<a class="btn" href="solutions.html">All solutions</a>' +
       "</div>" +
       '<div class="foot-note">' + esc(sol.footnote ||
@@ -478,6 +518,7 @@ function renderSolution(sol) {
     '<div class="reviews">' + humanPanel(sol.slug, null) + "</div>";
 
   document.getElementById("content").innerHTML = html;
+  wireDeck("deckSolution", "solution", sol, null);
   track("library.onepager.completed", sol.slug);
 }
 
@@ -620,7 +661,8 @@ function renderSkill(skill, review, body) {
         (body ? '<button class="btn primary" id="dlAgentPy">Download agent.py</button>' : "") +
         (skill.url ? '<a class="btn" href="' + esc(skill.url) + '" target="_blank" rel="noopener">Origin</a>' : "") +
         (lic.source ? '<a class="btn" href="' + esc(lic.source) + '" target="_blank" rel="noopener">Upstream licence</a>' : "") +
-        '<button class="btn" onclick="window.print()">Print / save as PDF</button>' +
+        '<button class="btn" id="deckSkill">Export as PowerPoint</button>' +
+        '<span class="deck-status" id="deckSkillStatus" aria-live="polite"></span>' +
       "</div>" +
       (body ? '<div class="mirror"><b>One contract, two formats.</b> ' +
         'This skill arrived as prose with no manifest. Our pipeline gave it a RAPP ' +
@@ -643,6 +685,24 @@ function renderSkill(skill, review, body) {
       '<pre class="code">' + esc(body) + "</pre></details>" : "");
 
   document.getElementById("content").innerHTML = html;
+  // The skill page already has its storyboard in hand, so the deck uses it
+  // directly rather than fetching it again.
+  wireDeck("deckSkill", "skill", skill, null);
+  var skillBtn = document.getElementById("deckSkill");
+  if (skillBtn) {
+    var skillStatus = document.getElementById("deckSkillStatus");
+    skillBtn.onclick = function () {
+      var say = function (m) { if (skillStatus) skillStatus.textContent = m; };
+      skillBtn.disabled = true;
+      RappDeck.export({
+        kind: "skill", entry: skill, story: STORYBOARD, onStatus: say,
+        links: ["Library: microsoft.github.io/aibast-agents-library",
+                "Source: github.com/" + OWNER_REPO]
+      }).then(function () { track("library.deck.exported", ref); })
+        .catch(function () {})
+        .then(function () { skillBtn.disabled = false; });
+    };
+  }
   wireRemix(STORYBOARD);
 
   var dlPy = document.getElementById("dlAgentPy");

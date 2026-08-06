@@ -15,14 +15,14 @@
       63
     ]
   },
-  "count": 8,
+  "count": 9,
   "jewels": [
     {
       "id": "copilot",
       "file": "media/jewels/copilot.png",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/copilot.png",
       "size": {
-        "w": 104,
+        "w": 102,
         "h": 94
       },
       "match": [
@@ -59,8 +59,8 @@
       "file": "media/jewels/ic-actions.png",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/ic-actions.png",
       "size": {
-        "w": 46,
-        "h": 54
+        "w": 45,
+        "h": 52
       },
       "match": [],
       "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
@@ -70,8 +70,8 @@
       "file": "media/jewels/dynamics-365.png",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/dynamics-365.png",
       "size": {
-        "w": 70,
-        "h": 92
+        "w": 40,
+        "h": 94
       },
       "match": [
         "dynamics",
@@ -87,8 +87,8 @@
       "file": "media/jewels/sharepoint.png",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/sharepoint.png",
       "size": {
-        "w": 88,
-        "h": 84
+        "w": 32,
+        "h": 77
       },
       "match": [
         "sharepoint",
@@ -101,11 +101,27 @@
       "file": "media/jewels/teams.png",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/teams.png",
       "size": {
-        "w": 85,
-        "h": 79
+        "w": 70,
+        "h": 108
       },
       "match": [
         "teams"
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "outlook",
+      "file": "media/jewels/outlook.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/outlook.png",
+      "size": {
+        "w": 90,
+        "h": 110
+      },
+      "match": [
+        "outlook",
+        "exchange",
+        "email",
+        "mail"
       ],
       "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
     },
@@ -114,8 +130,8 @@
       "file": "media/jewels/chevron.png",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/chevron.png",
       "size": {
-        "w": 102,
-        "h": 160
+        "w": 100,
+        "h": 158
       },
       "match": [],
       "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"

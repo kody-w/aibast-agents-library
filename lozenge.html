@@ -14,20 +14,23 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 body{display:flex;align-items:center;justify-content:center;
-  font-family:"Segoe UI Semibold","Segoe UI",-apple-system,system-ui,sans-serif}
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif}
 .pill{
-  /* Sampled from the reference lozenge: warm pink into violet into indigo. */
-  background:linear-gradient(96deg,#f0699b 0%,#c264cf 42%,#8b6ee8 72%,#6f7cf0 100%);
-  border-radius:14vh;
-  padding:9vh 7vw;
+  /* Pixel-sampled from the reference lozenge along its own axis: coral pink
+     through magenta and violet into periwinkle, running slightly downhill. */
+  background:linear-gradient(100deg,
+    #f06e84 0%, #e66698 18%, #d361af 36%, #c458c8 54%,
+    #a86dda 72%, #8a7ce7 90%, #7c82ee 100%);
+  border-radius:9.5vh;
+  padding:5vh 8.5%;
   width:100%;height:100%;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2vh 5vh rgba(0,0,0,.22);
+  box-shadow:0 1.4vh 3.6vh rgba(0,0,0,.18);
 }
 .pill h1{
-  color:#fff;text-align:center;font-weight:700;letter-spacing:-.01em;
-  line-height:1.16;font-size:26vh;
-  text-shadow:0 .4vh 1vh rgba(0,0,0,.16);
+  color:#fff;text-align:center;font-weight:700;letter-spacing:-.005em;
+  line-height:1.06;font-size:30vh;
+  text-shadow:0 .3vh .8vh rgba(0,0,0,.13);
 }
 
 </style>
@@ -58,15 +61,48 @@ fetch("media/walkthroughs/"+kind+"-"+slug+".json")
     if(d && d.subject && d.subject.display_name){
       el.textContent=present(d.subject.display_name);
     }
-    // Two lines read better than one long one, as in the reference.
-    if(el.textContent.length>26){
-      var w=el.textContent.split(" ");
-      var half=Math.ceil(w.length/2);
-      el.innerHTML=w.slice(0,half).join(" ")+"<br>"+w.slice(half).join(" ");
-    }
+    // The reference wraps NATURALLY inside the pill's padding — "Account
+    // Intelligence / Agent", not a forced halfway split. Let the box do it.
     window.__ready=true;
   })
-  .catch(function(){ window.__ready=true; });
+  .catch(function(){ window.__ready=true; })
+  .then(fit);
+
+// The reference sets its title to fill the pill on two balanced lines. A fixed
+// font size cannot do that for 183 different agent names — "Account
+// Intelligence Agent" broke as "Account / Intelligence Agent" where the
+// reference reads "Account Intelligence / Agent". So fit it: find the largest
+// size that still lays out in at most two lines inside the padding, and let
+// the natural wrap land where it lands.
+function layout(){
+  // The reference always breaks before the trailing "Agent" when the name runs
+  // to three or more words — "Account Intelligence / Agent". Relying on natural
+  // wrap made that depend on the font's width, and the face the reference uses
+  // is not installed here, so the break landed a word early every time. State
+  // the rule instead of inferring it from metrics.
+  var w=el.textContent.trim().split(/\s+/);
+  el.innerHTML = w.length>=3
+    ? w.slice(0,-1).join(" ")+"<br>"+w[w.length-1]
+    : w.join(" ");
+}
+
+function fit(){
+  layout();
+  var pill=document.querySelector(".pill");
+  var avail=pill.clientHeight-2*parseFloat(getComputedStyle(pill).paddingTop);
+  var lo=18,hi=46,best=18;
+  for(var i=0;i<12;i++){
+    var mid=(lo+hi)/2;
+    el.style.fontSize=mid+"vh";
+    // Only the width matters now that the break is explicit: the largest size
+    // at which the longest line still fits the padded box.
+    if(el.scrollHeight<=avail && el.scrollWidth<=el.clientWidth+1){
+      best=mid; lo=mid;
+    } else { hi=mid; }
+  }
+  el.style.fontSize=best+"vh";
+  window.__ready=true;
+}
 </script>
 </body>
 </html>

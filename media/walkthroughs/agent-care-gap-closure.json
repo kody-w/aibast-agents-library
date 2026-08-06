@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-05T20:36:32+00:00",
+  "generated": "2026-08-06T00:12:23+00:00",
   "subject": {
     "slug": "care-gap-closure",
     "kind": "agent",
@@ -47,17 +47,17 @@
     "display_name": "Care Gap Closure Agent",
     "category": "healthcare"
   },
-  "runtime_seconds": 137.0,
+  "runtime_seconds": 132.4,
   "status": "storyboard",
   "approval": {
     "required_before_render": true,
-    "note": "A storyboard is a script, not footage. Every figure is marked [operator supplies] rather than invented \u2014 a demo that fabricates a metric teaches the viewer something false. A human approves the script before anything is rendered."
+    "note": "A storyboard is a script, not footage. Every claim is qualitative rather than invented \u2014 a demo that fabricates a metric teaches the viewer something false, so this script says an agent accelerates a task and never says by how much. A human approves the script before anything is rendered."
   },
   "scenes": [
     {
       "act": "title",
       "start": 0.0,
-      "end": 5.0,
+      "end": 7.3,
       "shot": "Microsoft logo, white field",
       "on_screen": [
         "Care Gap Closure Agent"
@@ -66,7 +66,7 @@
     },
     {
       "act": "problem",
-      "start": 5.0,
+      "start": 7.3,
       "end": 22.0,
       "shot": "B-roll \u2014 clinical setting: staff at a workstation between rounds",
       "on_screen": [],
@@ -75,7 +75,7 @@
     {
       "act": "overview",
       "start": 22.0,
-      "end": 42.0,
+      "end": 42.75,
       "shot": "Agent overview card \u2014 three gradient panels on dark field",
       "panels": {
         "Sources": [
@@ -84,7 +84,7 @@
           "Dynamics 365 CcaaS"
         ],
         "Flow of work": [
-          "Engages you in the local brainstem chat"
+          "Engages you in Microsoft Teams and Outlook"
         ],
         "Actions": [
           "Improve HEDIS performance",
@@ -96,8 +96,8 @@
     },
     {
       "act": "walkthrough",
-      "start": 42.0,
-      "end": 120.0,
+      "start": 42.75,
+      "end": 113.5,
       "shot": "Laptop-framed chat surface",
       "turns": [
         {
@@ -115,21 +115,22 @@
                 "items": [
                   "Scope: the open care gaps",
                   "Current: gap closure behind plan",
-                  "Target: the quality target",
+                  "Goal: close the gap to the quality target",
                   "Window: the measurement year"
                 ]
               },
               {
                 "label": "What I checked",
                 "items": [
-                  "Improve HEDIS performance",
-                  "Campaign ROI",
-                  "Care gap closure efficiency"
+                  "Dynamics 365 ERP \u2014 read, not assumed",
+                  "Microsoft Teams \u2014 read, not assumed",
+                  "Dynamics 365 CcaaS \u2014 read, not assumed",
+                  "Anything I could not verify is called out below"
                 ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: gap closure behind plan, against the quality target",
+              "headline": "Biggest constraint: gap closure behind plan",
               "source": "Source: the record system, claims history and the care-gap registry",
               "question": "Shall I show the plan?"
             }
@@ -144,10 +145,10 @@
           "role": "agent",
           "heading": "Recommended plan",
           "rich": {
-            "intro": "Here is the plan.",
+            "intro": "Phased, quick wins first.",
             "sections": [
               {
-                "label": "Recommended plan",
+                "label": "Steps",
                 "items": [
                   "1. Improve HEDIS performance",
                   "2. Campaign ROI",
@@ -164,14 +165,49 @@
             }
           },
           "agent_call": "Care Gap Closure Agent"
+        },
+        {
+          "role": "operator",
+          "text": "What could go wrong?"
+        },
+        {
+          "role": "agent",
+          "heading": "Risks and how I would cover them",
+          "rich": {
+            "intro": "Three things I would watch on the member panel.",
+            "sections": [
+              {
+                "label": "Risks",
+                "items": [
+                  "Stale inputs \u2014 Dynamics 365 ERP may lag the working picture",
+                  "Edge cases the source data does not describe",
+                  "A recommendation that reads confident but is thinly evidenced"
+                ]
+              },
+              {
+                "label": "How I cover them",
+                "items": [
+                  "Cite the record behind every line, so it can be checked",
+                  "Flag low-evidence items rather than smoothing over them",
+                  "Stop and ask before anything is written back"
+                ]
+              }
+            ],
+            "callout": {
+              "headline": "You approve each step; nothing changes on its own",
+              "source": "Source: the record system, claims history and the care-gap registry",
+              "question": "Want me to start with the quick wins?"
+            }
+          },
+          "agent_call": "Care Gap Closure Agent"
         }
       ],
       "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Dynamics 365 ERP and Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can campaign ROI in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Care Gap Closure Agent, care teams get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",
-      "start": 120.0,
-      "end": 137.0,
+      "start": 113.5,
+      "end": 132.4,
       "shot": "Dark card, gradient CTA panel",
       "narration": "The result?, improve HEDIS performance, campaign ROI, and better care gap closure efficiency. Get started on your agentic journey today. Talk to your Microsoft representative to learn more.",
       "on_screen": [

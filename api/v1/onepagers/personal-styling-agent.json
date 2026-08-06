@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-06T00:35:22.075942+00:00",
   "onepager": {
     "capture_file": "38-personal-styling-agent.html",
     "industry": "Retail",
@@ -31,9 +31,9 @@
     "catalog_number": 38,
     "video": {
       "slug": "personalized-shopping-agent",
-      "hosted": false,
-      "src": null,
-      "size_mb": null
+      "hosted": true,
+      "src": "media/videos/personalized-shopping-agent.mp4",
+      "size_mb": 4.05
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=personal-styling-agent"

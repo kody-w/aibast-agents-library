@@ -55,8 +55,13 @@ REGIONS = {
                       "match": ["dynamics", "d365", "erp", "crm", "ccaas"]},
     "sharepoint":    {"box": (360, 800, 470, 895), "bg": PANEL,
                       "match": ["sharepoint", "onedrive"]},
-    "teams":         {"box": (910, 810, 1025, 895), "bg": PANEL,
+    # Teams and Outlook are two marks side by side under "Flow of work"; one
+    # box over both cropped them as a single asset, so the card showed a Teams
+    # mark beside text that named Teams AND Outlook.
+    "teams":         {"box": (880, 812, 950, 924), "bg": PANEL,
                       "match": ["teams"]},
+    "outlook":       {"box": (968, 812, 1058, 924), "bg": PANEL,
+                      "match": ["outlook", "exchange", "email", "mail"]},
     "chevron":       {"box": (620, 500, 722, 670), "bg": BED, "match": []},
 }
 
