@@ -80,7 +80,7 @@
       "kind": "architecture",
       "kicker": "End to end",
       "title": "Where it sits in the estate",
-      "note": "Generated from what this solution declares, not from a template. The four columns are identical across the catalog so any two solutions can be compared side by side.",
+      "note": "Read left to right: where the person starts, what the agent reads, what it does, and where the work lands. The same four columns appear on every solution in the catalog, so any two can be compared.",
       "takeaway": "Nothing here is new infrastructure \u2014 the agent is a layer over systems the tenant already runs."
     },
     {

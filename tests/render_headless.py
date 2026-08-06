@@ -308,9 +308,17 @@ def main() -> int:
             failures.append(f"architecture drew {arch_cols} columns, expected 4")
         if arch_steps != 6:
             failures.append(f"architecture drew {arch_steps} flow steps, expected 6")
+        # THE ORDER IS THE JOURNEY, and it is load-bearing. Grouped by kind the
+        # numbered flow ran 3,4 then 1,2,6 then 5 across the page: every column
+        # correct on its own, the sequence unreadable. Ordered by when each
+        # thing happens, the same four columns read 1 -> 6 left to right. If a
+        # future edit regroups them by taxonomy, the diagram silently stops
+        # being followable, which is exactly the kind of break no other check
+        # can see.
         heads = [t.strip() for t in page.locator(".col > h2").all_inner_texts()]
-        if heads != ["Knowledge", "Processing", "User Interface", "Reporting"]:
-            failures.append(f"architecture columns are {heads}")
+        if heads != ["User Interface", "Knowledge", "Processing", "Reporting"]:
+            failures.append(f"architecture columns are {heads}, "
+                            "which is not the order the flow runs in")
         if not page.locator(".hl").count():
             failures.append("architecture omitted the governance panel")
 

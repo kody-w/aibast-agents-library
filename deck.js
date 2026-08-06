@@ -402,140 +402,106 @@
     var cols = (arch && arch.columns) || {};
     var K = cols.knowledge || {}, P = cols.processing || {};
     var U = cols.interface || {}, R = cols.reporting || {};
+    function flow(i, fallback) {
+      return (arch && arch.flow && arch.flow[i] && arch.flow[i].text) || fallback;
+    }
 
     kicker(s, "End-to-end architecture" + (industry ? " · " + industry : ""));
-    s.addText("Example architecture for " + txt(name), {
-      x: 0.62, y: 0.5, w: W - 1.24, h: 0.55,
-      fontFace: FONT, fontSize: 24, bold: true, color: INK, valign: "middle"
+    s.addText("How " + txt(name) + " works, end to end", {
+      x: 0.62, y: 0.5, w: W - 1.24, h: 0.5,
+      fontFace: FONT, fontSize: 23, bold: true, color: INK, valign: "middle"
+    });
+    s.addText("Read left to right: where the person starts, what it reads, "
+              + "what it does, and where the work lands.", {
+      x: 0.62, y: 1.0, w: W - 1.24, h: 0.28,
+      fontFace: FONT, fontSize: 10.5, color: MUTED
     });
 
-    var top = 1.2, ch = 4.35, gap = 0.14, x0 = 0.62;
-    var ws = [2.85, 3.25, 3.05, 2.52];
+    /* COLUMN ORDER IS THE JOURNEY. Grouped by kind, the numbered flow ran
+       3,4 then 1,2,6 then 5 across the page — each column right, the sequence
+       unreadable. In the order things actually happen it reads 1 to 6. */
+    var top = 1.45, ch = 4.35, gap = 0.13, x0 = 0.62;
+    var ws = [3.05, 2.55, 3.85, 2.63];
     var xs = [x0];
     for (var i = 1; i < 4; i++) xs.push(xs[i - 1] + ws[i - 1] + gap);
-
-    /* 1 — Knowledge: what it reads, and the connectors it reads through. */
-    column(pptx, s, xs[0], top, ws[0], ch, K.title || "Knowledge");
-    chips(pptx, s, xs[0] + 0.12, top + 0.42, ws[0] - 0.24, 2.0,
-          labelsOf(K.grounding, 4),
-          { line: "C9A227", dash: "dash", maxH: 2.0 });
-    s.addText("Power Platform connectors and actions", {
-      x: xs[0] + 0.12, y: top + 2.52, w: ws[0] - 0.24, h: 0.3,
-      fontFace: FONT, fontSize: 9, bold: true, color: BLUE
-    });
-    box(pptx, s, { x: xs[0] + 0.12, y: top + 2.85, w: ws[0] - 0.24, h: 0.72,
-                   text: "Triggers and workflows — the agent acts in the system "
-                         + "of record, it does not just answer", size: 8 });
-    box(pptx, s, { x: xs[0] + 0.12, y: top + ch - 0.72, w: ws[0] - 0.24, h: 0.6,
-                   step: 5, text: "Action taken in the system of record",
-                   size: 8.5, fill: "EEEBFA" });
-
-    /* 2 — Processing: the plan, and who forms it. */
-    column(pptx, s, xs[1], top, ws[1], ch, P.title || "Processing");
-    box(pptx, s, { x: xs[1] + 0.14, y: top + 0.42, w: ws[1] - 0.28, h: 1.5,
-                   step: 3, text: P.plan, size: 8, valign: "top" });
-    s.addShape(pptx.ShapeType.roundRect, {
-      x: xs[1] + ws[1] / 2 - 0.26, y: top + 2.1, w: 0.52, h: 0.52,
-      rectRadius: 0.1, fill: { color: PINK }, line: { type: "none" }
-    });
-    s.addShape(pptx.ShapeType.roundRect, {
-      x: xs[1] + ws[1] / 2 - 0.12, y: top + 2.22, w: 0.4, h: 0.4,
-      rectRadius: 0.08, fill: { color: VIOLET }, line: { type: "none" }
-    });
-    s.addText(txt(P.orchestration || "Multi-agent orchestration"), {
-      x: xs[1] + 0.14, y: top + 2.66, w: ws[1] - 0.28, h: 0.3, align: "center",
-      fontFace: FONT, fontSize: 10.5, bold: true, color: INK
-    });
-    /* The agents the orchestrator actually runs. This slot used to read
-       "Outcome: Enable faster · Lower-risk" — business value printed where the
-       work goes, which looks answered and says nothing. */
-    var agents = (P.agents || []).slice(0, 6);
-    if (agents.length) {
-      /* 3.1–3.6, not 1–6. These are the expansion of step 3, and numbering
-         them as their own sequence put a second "3" and a second "5" on a
-         slide that already had a numbered flow — two sequences, one visual
-         language, and no way to tell which was which. */
-      s.addText(agents.map(function (a, i) {
-        return { text: "3." + (i + 1) + "  " + txt(a.name) + " — " + txt(a.does),
-                 options: { breakLine: true, fontSize: 7.5 } };
-      }), { x: xs[1] + 0.14, y: top + 3.0, w: ws[1] - 0.28, h: 1.32,
-            fontFace: FONT, color: INK, valign: "top", lineSpacingMultiple: 1.1 });
-    } else {
-      var acts = labelsOf(P.actions, 4);
-      if (acts.length) {
-        s.addText(acts.map(function (a, i) {
-          return { text: "3." + (i + 1) + "  " + txt(a),
-                   options: { breakLine: true, fontSize: 8 } };
-        }), { x: xs[1] + 0.14, y: top + 3.0, w: ws[1] - 0.28, h: 1.32,
-              fontFace: FONT, color: INK, valign: "top" });
-      }
+    var caps = ["Where the person starts", "What it reads to answer",
+                "What it actually does", "Where it lands, and what is logged"];
+    var titles = [U.title || "User Interface", K.title || "Knowledge",
+                  P.title || "Processing", R.title || "Reporting"];
+    for (var ci = 0; ci < 4; ci++) {
+      column(pptx, s, xs[ci], top, ws[ci], ch, titles[ci]);
+      s.addText(caps[ci], {
+        x: xs[ci], y: top + 0.3, w: ws[ci], h: 0.24, align: "center",
+        fontFace: FONT, fontSize: 8, color: MUTED
+      });
     }
-    box(pptx, s, { x: xs[1] + 0.14, y: top + ch - 0.62, w: ws[1] - 0.28, h: 0.5,
-                   step: 4, text: "NL response after guideline checks",
-                   size: 8.5, fill: "EEEBFA" });
 
-    /* 3 — User Interface: where the person meets it. */
-    column(pptx, s, xs[2], top, ws[2], ch, U.title || "User Interface");
-    /* Step 1 above step 2, so the numbered flow reads down the column. */
-    box(pptx, s, { x: xs[2] + 0.12, y: top + 0.42, w: ws[2] - 0.24, h: 0.72,
-                   step: 1, text: (arch.flow && arch.flow[0] && arch.flow[0].text)
-                     || "Natural language input", size: 8, valign: "top" });
-    s.addShape(pptx.ShapeType.roundRect, {
-      x: xs[2] + 0.12, y: top + 1.26, w: ws[2] - 0.24, h: 2.35, rectRadius: 0.06,
-      fill: { type: "solid", color: PAPER },
-      line: { color: BLUE, width: 0.75, dashType: "dash" }
-    });
-    s.addText("Microsoft 365", {
-      x: xs[2] + 0.2, y: top + 1.32, w: ws[2] - 0.4, h: 0.26,
-      fontFace: FONT, fontSize: 9, bold: true, color: BLUE
-    });
-    /* The checks run inside the platform boundary, right after the input, so
-       step 2 sits inside the Microsoft 365 panel and step 1 above it. */
-    box(pptx, s, { x: xs[2] + 0.2, y: top + 1.62, w: ws[2] - 0.4, h: 0.4,
-                   step: 2, text: U.checks, size: 7.5, fill: "F4F4F8" });
-    /* Flow the actors line from where the surface chips actually END. Fixing
-       it at a constant put three surfaces straight through it — a collision no
-       text gate can see, because both strings are present and correct. */
-    var afterSurfaces = chips(pptx, s, xs[2] + 0.2, top + 2.1, ws[2] - 0.4, 0.78,
-          labelsOf(U.surfaces, 3), { fill: "F4F4F8", maxH: 0.3, size: 8.5 });
-    var allActors = labelsOf(U.actors, 8);
-    var actors = allActors.slice(0, 2);
-    if (allActors.length > 2) {
-      actors.push("+" + (allActors.length - 2) + " more");
+    /* 1 — where the person starts */
+    var y = chips(pptx, s, xs[0] + 0.12, top + 0.62, ws[0] - 0.24, 1.1,
+                  labelsOf(U.surfaces, 3), { fill: "F4F4F8", maxH: 0.34, size: 8.5 });
+    box(pptx, s, { x: xs[0] + 0.12, y: y + 0.12, w: ws[0] - 0.24, h: 0.62,
+                   step: 1, text: flow(0, "Natural language input"), size: 8.5,
+                   valign: "top" });
+    box(pptx, s, { x: xs[0] + 0.12, y: y + 0.84, w: ws[0] - 0.24, h: 0.86,
+                   step: 2, text: U.checks, size: 8, valign: "top" });
+    var actors = labelsOf(U.actors, 2);
+    if (actors.length) {
+      s.addText("For: " + actors.join(" · "), {
+        x: xs[0] + 0.12, y: top + ch - 0.5, w: ws[0] - 0.24, h: 0.4,
+        fontFace: FONT, fontSize: 8.5, color: MUTED, valign: "top"
+      });
     }
-    var ay = afterSurfaces + 0.04;
-    s.addText("Users: " + (actors.join(" · ") || "the operator"), {
-      x: xs[2] + 0.24, y: ay, w: ws[2] - 0.48,
-      h: Math.max(0.3, (top + 3.6) - ay),
+
+    /* 2 — what it reads */
+    chips(pptx, s, xs[1] + 0.12, top + 0.62, ws[1] - 0.24, 1.9,
+          labelsOf(K.grounding, 4), { line: "C9A227", dash: "dash", maxH: 0.5 });
+    s.addText(txt(K.note || ""), {
+      x: xs[1] + 0.12, y: top + 2.65, w: ws[1] - 0.24, h: 1.5,
       fontFace: FONT, fontSize: 8, color: MUTED, valign: "top"
     });
-    box(pptx, s, { x: xs[2] + 0.12, y: top + 3.74, w: ws[2] - 0.24, h: 0.45,
-                   step: 6, text: "Feedback", size: 8.5, fill: "EEEBFA" });
 
-    /* 4 — Reporting: what it leaves behind. This column is the one that gets
-       the deal through review, so it never gets cut for space. */
-    column(pptx, s, xs[3], top, ws[3], ch, R.title || "Reporting");
-    box(pptx, s, { x: xs[3] + 0.1, y: top + 0.42, w: ws[3] - 0.2, h: 0.95,
+    /* 3 — what it does */
+    box(pptx, s, { x: xs[2] + 0.12, y: top + 0.62, w: ws[2] - 0.24, h: 0.44,
+                   step: 3, text: "Formulates a plan across the agents below",
+                   size: 8.5 });
+    s.addText(txt(P.orchestration || "Multi-agent orchestration"), {
+      x: xs[2] + 0.12, y: top + 1.12, w: ws[2] - 0.24, h: 0.3, align: "center",
+      fontFace: FONT, fontSize: 9.5, bold: true, color: INK
+    });
+    var agents = (P.agents || []).slice(0, 6);
+    if (agents.length) {
+      s.addText(agents.map(function (a, i) {
+        return { text: "3." + (i + 1) + "  " + txt(a.name) + " — " + txt(a.does),
+                 options: { breakLine: true, fontSize: 7 } };
+      }), { x: xs[2] + 0.12, y: top + 1.46, w: ws[2] - 0.24, h: 2.1,
+            fontFace: FONT, color: INK, valign: "top", lineSpacingMultiple: 1.06,
+            shrinkText: true });
+    } else {
+      s.addText(labelsOf(P.actions, 6).map(function (a, i) {
+        return { text: "3." + (i + 1) + "  " + txt(a),
+                 options: { breakLine: true, fontSize: 8 } };
+      }), { x: xs[2] + 0.12, y: top + 1.46, w: ws[2] - 0.24, h: 2.1,
+            fontFace: FONT, color: INK, valign: "top", shrinkText: true });
+    }
+    box(pptx, s, { x: xs[2] + 0.12, y: top + ch - 0.7, w: ws[2] - 0.24, h: 0.55,
+                   step: 4, text: flow(3, "NL response after guideline checks"),
+                   size: 8.5, fill: "EEEBFA" });
+
+    /* 4 — where it lands */
+    box(pptx, s, { x: xs[3] + 0.12, y: top + 0.62, w: ws[3] - 0.24, h: 0.62,
+                   step: 5, text: flow(4, "Action taken in the system of record"),
+                   size: 8.5, fill: "EEEBFA", valign: "top" });
+    box(pptx, s, { x: xs[3] + 0.12, y: top + 1.32, w: ws[3] - 0.24, h: 0.4,
+                   step: 6, text: "Feedback", size: 8.5 });
+    box(pptx, s, { x: xs[3] + 0.12, y: top + 1.82, w: ws[3] - 0.24, h: 0.95,
                    head: "Governance, risk & compliance", text: R.governance,
                    size: 7.5, headSize: 8.5, valign: "top",
-                   line: "C9A227", fill: "FFFDF2" });
-    chips(pptx, s, xs[3] + 0.1, top + 1.5, ws[3] - 0.2, 1.32,
-          labelsOf(R.systems, 3), { fill: "FFFFFF", maxH: 1.32, size: 8.5 });
-    box(pptx, s, { x: xs[3] + 0.1, y: top + 2.95, w: ws[3] - 0.2, h: 0.85,
-                   head: "Insights", text: R.insights, size: 7.5,
-                   headSize: 8.5, valign: "top",
-                   line: "C9A227", fill: "FFFDF2" });
-
-    /* The two bands the four columns stand on. */
-    var by = top + ch + 0.12;
-    box(pptx, s, { x: x0, y: by, w: 8.3, h: 0.72, head: "Tools",
-                   text: arch && arch.tools_band, size: 8, headSize: 9,
-                   valign: "middle", fill: "F4F4F8" });
-    var fb = (arch && arch.foundation_band) || {};
-    box(pptx, s, { x: x0 + 8.44, y: by, w: 12.09 - 8.44, h: 0.72,
-                   head: fb.label || "Supporting features and foundation models",
-                   text: fb.identity || "Entra ID", size: 8, headSize: 9,
-                   valign: "middle", align: "center", fill: "F4F4F8" });
+                   fill: "FBF7EA", line: "E4D9A8" });
+    chips(pptx, s, xs[3] + 0.12, top + 2.87, ws[3] - 0.24, 0.6,
+          labelsOf(R.systems, 2), { maxH: 0.34, size: 8 });
+    box(pptx, s, { x: xs[3] + 0.12, y: top + 3.55, w: ws[3] - 0.24, h: 0.7,
+                   head: "Insights", text: R.insights, size: 7.5, headSize: 8.5,
+                   valign: "top", fill: "FBF7EA", line: "E4D9A8" });
 
     footer(s, n);
     return s;

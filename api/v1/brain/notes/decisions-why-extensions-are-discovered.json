@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-06T22:51:33.379935+00:00",
+  "generated": "2026-08-06T23:37:01.914994+00:00",
   "slug": "decisions/why-extensions-are-discovered",
   "title": "Why extensions are discovered",
   "summary": "If the core knows an extension's name, a kernel sync eventually fights it.",

@@ -330,6 +330,30 @@ function render(a){
 
     '<div class="cols">' +
 
+      /* User interface */
+      /* Ordered so the numbers read down the column: the operator, then what
+         they type (1), then what happens to it (2), then what comes back (6).
+         Step 2 used to sit above step 1, which makes a numbered flow harder to
+         follow than an unnumbered one. */
+      '<div class="col"><h2>'+esc(c.interface.title)+"</h2>" +
+        '<div class="group"><div class="gl">' +
+          (c.interface.surface_declared ? "Where the operator meets it"
+                                        : "Surface — not declared") + "</div>" +
+          c.interface.surfaces.map(item).join("") + "</div>" +
+        '<div class="card" style="flex:0">' +
+          c.interface.actors.map(function(x){
+            var label = x && x.label ? x.label : x;
+            return '<div class="actor"><span class="av"></span><span class="txt">'+
+              esc(label) + (x && x.declared === false
+                ? '<span class="sub">' + esc(x.note || "not declared") + "</span>" : "") +
+              "</span></div>";
+          }).join("") +
+          '<div class="chip"><b>1.</b> '+esc(a.flow[0].text)+"</div>" +
+        "</div>" +
+        '<div class="chip"><b>2.</b> '+esc(c.interface.checks)+"</div>" +
+        '<div class="chip"><b>6.</b> Feedback</div>' +
+      "</div>" +
+
       /* Knowledge */
       '<div class="col"><h2>'+esc(c.knowledge.title)+"</h2>" +
         '<div class="group"><div class="gl">Grounding data</div>' +
@@ -365,30 +389,6 @@ function render(a){
             ? '<div class="group"><div class="gl">Model</div>' +
               c.processing.model.map(item).join("") + "</div>" : "") +
         "</div>" +
-      "</div>" +
-
-      /* User interface */
-      /* Ordered so the numbers read down the column: the operator, then what
-         they type (1), then what happens to it (2), then what comes back (6).
-         Step 2 used to sit above step 1, which makes a numbered flow harder to
-         follow than an unnumbered one. */
-      '<div class="col"><h2>'+esc(c.interface.title)+"</h2>" +
-        '<div class="group"><div class="gl">' +
-          (c.interface.surface_declared ? "Where the operator meets it"
-                                        : "Surface — not declared") + "</div>" +
-          c.interface.surfaces.map(item).join("") + "</div>" +
-        '<div class="card" style="flex:0">' +
-          c.interface.actors.map(function(x){
-            var label = x && x.label ? x.label : x;
-            return '<div class="actor"><span class="av"></span><span class="txt">'+
-              esc(label) + (x && x.declared === false
-                ? '<span class="sub">' + esc(x.note || "not declared") + "</span>" : "") +
-              "</span></div>";
-          }).join("") +
-          '<div class="chip"><b>1.</b> '+esc(a.flow[0].text)+"</div>" +
-        "</div>" +
-        '<div class="chip"><b>2.</b> '+esc(c.interface.checks)+"</div>" +
-        '<div class="chip"><b>6.</b> Feedback</div>' +
       "</div>" +
 
       /* Reporting */

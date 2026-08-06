@@ -185,12 +185,14 @@ ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;backgroun
 /* The architecture, drawn on the slide. It used to be a box saying the real
    one was on another page, which is not a slide — it is a note apologising for
    the absence of one, and it exported as an empty rectangle. */
-.arch{display:grid;grid-template-columns:1fr 1.15fr 1.1fr .95fr;gap:1.2cqh;
-  flex:1;min-height:0;margin-top:1.6cqh}
+.arch{display:grid;grid-template-columns:1.05fr .85fr 1.35fr 1fr;gap:1.1cqh;
+  flex:1;min-height:0;margin-top:1.2cqh}
 .arch .col{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;
   padding:1.2cqh;display:flex;flex-direction:column;gap:.8cqh;min-height:0;overflow:hidden}
-.arch .col h4{font-size:2.3cqh;font-weight:700;text-align:center;letter-spacing:-.01em;
+.arch .col h4{font-size:2.25cqh;font-weight:700;text-align:center;letter-spacing:-.01em;
   padding-bottom:.6cqh;border-bottom:1px solid var(--border)}
+.arch .col h4 em{display:block;font-style:normal;font-weight:500;font-size:1.85cqh;
+  color:var(--text-faint);margin-top:.25cqh}
 .arch .it{display:flex;gap:.9cqh;align-items:flex-start;background:var(--panel);
   border:1px solid var(--border);border-radius:6px;padding:.8cqh .9cqh;font-size:2.1cqh;
   line-height:1.3}
@@ -200,8 +202,9 @@ ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;backgroun
   justify-content:center}
 .arch .note{font-size:1.95cqh;color:var(--text-faint);line-height:1.3}
 .arch .orch{text-align:center;font-size:2.2cqh;font-weight:700;padding:.5cqh 0}
-.arch .agents{display:flex;flex-direction:column;gap:.5cqh;min-height:0;overflow:hidden}
-.arch .agents .a{display:flex;gap:.8cqh;align-items:baseline;font-size:2.05cqh;line-height:1.25}
+.arch .agents{display:flex;flex-direction:column;gap:.45cqh;min-height:0;flex:1;
+  overflow:hidden}
+.arch .agents .a{display:flex;gap:.7cqh;align-items:baseline;font-size:1.95cqh;line-height:1.22}
 /* Sub-steps of step 3, deliberately NOT the same badge as the flow numbers.
    Two independent sequences drawn in one visual language is why "3" appeared
    to mean two different things on the same slide. */
@@ -309,8 +312,8 @@ ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;backgroun
      through the wrong branch rather than an error anyone would notice. -->
 <script src="vendor/jszip.min.js"></script>
 <script src="vendor/pptxgen.min.js"></script>
-<script src="export-signal.js?v=a6d01cb"></script>
-<script src="deck.js?v=a6d01cb"></script>
+<script src="export-signal.js?v=4ccd6bd"></script>
+<script src="deck.js?v=4ccd6bd"></script>
 <script>
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -413,39 +416,45 @@ var R={
       return '<div class="it">'+(n?'<span class="n">'+n+'</span>':m)+
         '<span>'+esc(x&&x.label?x.label:x)+'</span></div>';
     }
+    function f(i,fallback){
+      return (ARCH.flow&&ARCH.flow[i]&&ARCH.flow[i].text)||fallback;
+    }
     var agents=(P.agents||[]);
-    var flow1=(ARCH.flow&&ARCH.flow[0]&&ARCH.flow[0].text)||"Natural language input";
+
+    /* COLUMN ORDER IS THE JOURNEY, not the taxonomy. Grouped by kind, the
+       numbered flow ran 3,4 then 1,2,6 then 5 across the page — every column
+       correct, the sequence unreadable. Ordered by when each thing happens,
+       the same four columns read 1 -> 6 left to right. */
+    var cols=[
+      {t:U.title||"User Interface", cap:"Where the person starts", body:
+        (U.surfaces||[]).slice(0,3).map(function(x){return it(x);}).join("")+
+        it({label:f(0,"Natural language input")},1)+
+        it({label:U.checks||""},2)},
+      {t:K.title||"Knowledge", cap:"What it reads to answer", body:
+        (K.grounding||[]).slice(0,4).map(function(x){return it(x);}).join("")+
+        '<div class="note">'+esc(K.note||"")+'</div>'},
+      {t:P.title||"Processing", cap:"What it actually does", body:
+        it({label:"Formulates a plan across the agents below"},3)+
+        '<div class="orch">'+esc(P.orchestration||"Multi-agent orchestration")+'</div>'+
+        '<div class="agents">'+(agents.length
+          ? agents.map(function(a,i){return '<div class="a"><i>3.'+(i+1)+'</i>'+
+              '<span><b>'+esc(a.name)+'</b> — '+esc(a.does)+'</span></div>';}).join("")
+          : (P.actions||[]).slice(0,6).map(function(a,i){return '<div class="a"><i>3.'+(i+1)+
+              '</i><span>'+esc(a)+'</span></div>';}).join(""))+
+        '</div>'+
+        it({label:f(3,"NL response after guideline checks")},4)},
+      {t:Rp.title||"Reporting", cap:"Where it lands, and what is logged", body:
+        it({label:f(4,"Action taken in the system of record")},5)+
+        it({label:"Feedback"},6)+
+        '<div class="gov"><b>Governance, risk &amp; compliance</b>'+esc(Rp.governance||"")+'</div>'+
+        (Rp.systems||[]).slice(0,2).map(function(x){return it(x);}).join("")+
+        '<div class="gov"><b>Insights</b>'+esc(Rp.insights||"")+'</div>'}
+    ];
     return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
-      (s.note?'<div class="body" style="font-size:2.6cqh;margin-top:1cqh">'+esc(s.note)+'</div>':"")+
-      '<div class="arch">'+
-        '<div class="col"><h4>'+esc(K.title||"Knowledge")+'</h4>'+
-          (K.grounding||[]).slice(0,4).map(function(x){return it(x);}).join("")+
-          '<div class="note">'+esc(K.note||"")+'</div>'+
-          it({label:(ARCH.flow&&ARCH.flow[4]?ARCH.flow[4].text:"Action taken in the system of record")},5)+
-        '</div>'+
-        '<div class="col"><h4>'+esc(P.title||"Processing")+'</h4>'+
-          it({label:(ARCH.flow&&ARCH.flow[2]?"Formulates a plan across the agents below":"Formulates a plan")},3)+
-          '<div class="orch">'+esc(P.orchestration||"Multi-agent orchestration")+'</div>'+
-          '<div class="agents">'+(agents.length
-            ? agents.map(function(a,i){return '<div class="a"><i>3.'+(i+1)+'</i>'+
-                '<span><b>'+esc(a.name)+'</b> — '+esc(a.does)+'</span></div>';}).join("")
-            : (P.actions||[]).slice(0,6).map(function(a,i){return '<div class="a"><i>3.'+(i+1)+
-                '</i><span>'+esc(a)+'</span></div>';}).join(""))+
-          '</div>'+
-          it({label:(ARCH.flow&&ARCH.flow[3]?ARCH.flow[3].text:"NL response after guideline checks")},4)+
-        '</div>'+
-        '<div class="col"><h4>'+esc(U.title||"User Interface")+'</h4>'+
-          (U.surfaces||[]).slice(0,3).map(function(x){return it(x);}).join("")+
-          it({label:flow1},1)+
-          it({label:U.checks||""},2)+
-          it({label:"Feedback"},6)+
-        '</div>'+
-        '<div class="col"><h4>'+esc(Rp.title||"Reporting")+'</h4>'+
-          '<div class="gov"><b>Governance, risk &amp; compliance</b>'+esc(Rp.governance||"")+'</div>'+
-          (Rp.systems||[]).slice(0,2).map(function(x){return it(x);}).join("")+
-          '<div class="gov"><b>Insights</b>'+esc(Rp.insights||"")+'</div>'+
-        '</div>'+
-      '</div>';
+      (s.note?'<div class="body" style="font-size:2.5cqh;margin-top:.8cqh">'+esc(s.note)+'</div>':"")+
+      '<div class="arch">'+cols.map(function(x){
+        return '<div class="col"><h4>'+esc(x.t)+'<em>'+esc(x.cap)+'</em></h4>'+x.body+'</div>';
+      }).join("")+'</div>';
   },
   close:function(s){
     return '<h2>'+esc(s.title)+'</h2><div class="sub">'+esc(s.sub||"")+'</div>';
