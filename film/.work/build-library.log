@@ -1,0 +1,111 @@
+
+=== account-intelligence ===
+  [WARN] narrate    14.4s     vo05: read 23.28s does not fit its 23.34s window (need 0.35s tail) - widen the beat o
+  [OK] plan        0.2s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.5s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      20.4s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/acc
+  [OK] gate        4.8s  PASS - all gates green
+  [OK] watch       1.3s  [OK] 7 sheet(s) - now read them
+
+=== asset-maintenance-forecast ===
+  [OK] narrate    11.0s  [OK] fit gate green
+  [OK] plan        0.2s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      22.1s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/ass
+  [OK] gate        5.2s  PASS - all gates green
+  [OK] watch       1.3s  [OK] 7 sheet(s) - now read them
+
+=== emission-tracking ===
+  [OK] narrate    10.5s  [OK] fit gate green
+  [OK] plan        0.2s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     6 stage(s)  What could go wrong?
+  [OK] build      21.1s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/emi
+  [OK] gate        4.9s  PASS - all gates green
+  [OK] watch       1.3s  [OK] 7 sheet(s) - now read them
+
+=== federal-grants-oversight ===
+  [WARN] narrate    10.8s     vo03: read 14.56s does not fit its 14.57s window (need 0.35s tail) - widen the beat o
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      21.6s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/fed
+  [OK] gate        5.1s  PASS - all gates green
+  [OK] watch       1.4s  [OK] 7 sheet(s) - now read them
+
+=== foia-request-assistant ===
+  [WARN] narrate    10.4s     vo03: read 14.51s does not fit its 14.54s window (need 0.35s tail) - widen the beat o
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      22.5s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/foi
+  [OK] gate        5.2s  PASS - all gates green
+  [OK] watch       1.4s  [OK] 7 sheet(s) - now read them
+
+=== fraud-detection-alert ===
+  [OK] narrate    10.6s  [OK] fit gate green
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      22.5s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/fra
+  [OK] gate        5.3s  PASS - all gates green
+  [OK] watch       1.3s  [OK] 7 sheet(s) - now read them
+
+=== it-helpdesk ===
+  [OK] narrate    10.1s  [OK] fit gate green
+  [OK] plan        0.2s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      19.9s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/it-
+  [WARN] gate        4.7s     film/.work/chain.sh:1: reaches a home directory -> cd /Users/kodywildfeuer/Documents/
+  [OK] watch       1.2s  [OK] 7 sheet(s) - now read them
+
+=== prior-authorization ===
+  [OK] narrate    10.3s  [OK] fit gate green
+  [OK] plan        0.5s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     6 stage(s)  What could go wrong?
+  [OK] build      21.6s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/pri
+  [WARN] gate        4.9s     film/.work/chain.sh:1: reaches a home directory -> cd /Users/kodywildfeuer/Documents/
+  [OK] watch       1.3s  [OK] 7 sheet(s) - now read them
+
+=== proposal-copilot ===
+  [WARN] narrate    11.2s     vo_payoff: read 7.73s does not fit its 6.90s window (need 0.35s tail) - widen the bea
+  [OK] plan        0.3s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      22.9s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/pro
+  [WARN] gate        4.9s     film/.work/chain.sh:1: reaches a home directory -> cd /Users/kodywildfeuer/Documents/
+  [OK] watch       1.3s  [OK] 7 sheet(s) - now read them
+
+=== returns-complaints-resolution ===
+  [OK] narrate    11.6s  [OK] fit gate green
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.4s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     6 stage(s)  What could go wrong?
+  [OK] build      21.3s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/ret
+  [WARN] gate        4.9s     film/.work/chain.sh:1: reaches a home directory -> cd /Users/kodywildfeuer/Documents/
+  [OK] watch       1.5s  [OK] 7 sheet(s) - now read them
+
+=== supplier-risk-monitoring ===
+  [OK] narrate    11.7s  [OK] fit gate green
+  [OK] plan        0.6s  [OK] fit gate green
+  [OK] cards       0.4s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      22.1s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/sup
+  [WARN] gate        5.0s     held one frame for 5.25s at 87.50s - add a build stage or shorten the beat
+  [OK] watch       1.3s  [OK] 7 sheet(s) - now read them
+
+=== support-ticket-resolution ===
+  [OK] narrate    10.0s  [OK] fit gate green
+  [OK] plan        0.3s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong?
+  [OK] build      20.8s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/sup
+  [OK] gate        4.9s  PASS - all gates green
+  [OK] watch       1.5s  [OK] 7 sheet(s) - now read them
+
+[OK] 4/12 clean
+[WARN] needs attention: account-intelligence, federal-grants-oversight, foia-request-assistant, it-helpdesk, prior-authorization, proposal-copilot, returns-complaints-resolution, supplier-risk-monitoring

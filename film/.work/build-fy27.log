@@ -1,0 +1,195 @@
+
+=== customer-service-case-intelligence-d365 ===
+  [OK] narrate    13.9s  [OK] fit gate green
+  [WARN] plan        0.3s     vo06: 3.06 w/s is above 2.9 - shorten the copy, do not speed the read
+[OK] 13 beats, 136.25s, demo 38.8%
+
+  slot     read     window   spare   w/s   verdict
+  vo01     10.18s   11.38s   +1.20  2.75  brisk
+  vo02      5.93s    7.13s   +1.20  3.03  RUSHED
+  vo03     21.29s   22.19s   +0.90  2.16  ok
+  vo04     12.38s   19.63s   +7.25  2.34  ok
+  vo05      9.30s   14.00s   +4.70  3.12  RUSHED
+  vo06      9.47s   15.87s   +6.40  3.06  RUSHED
+  vo_payoff   7.26s    8.46s   +1.20  2.20  ok
+  vo_helps   9.44s   10.34s   +0.90  2.22  ok
+  vo_cta    5.90s    6.70s   +0.80  2.54  ok
+[WARN] 3 fit problem(s):
+   vo02: 3.03 w/s is above 2.9 - shorten the copy, do not speed the read
+   vo05: 3.12 w/s is above 2.9 - shorten the copy, do not speed the read
+   vo06: 3.06 w/s is above 2.9 - shorten the copy, do not speed the read
+
+
+=== editorial-story-discovery-and-market-intelligence ===
+  [OK] narrate    17.3s  [OK] fit gate green
+  [WARN] plan        0.4s     vo_payoff: read 6.39s does not fit its 6.40s window (need 0.35s tail) - widen the bea
+[OK] 13 beats, 139.84s, demo 38.2%
+
+  slot     read     window   spare   w/s   verdict
+  vo01     15.96s   17.16s   +1.20  2.51  ok
+  vo02      5.12s    4.30s   -0.82  2.93  OVERRUNS
+  vo03     22.98s   23.88s   +0.90  2.05  ok
+  vo04      9.84s   17.09s   +7.25  2.95  RUSHED
+  vo05     10.88s   15.58s   +4.70  2.94  RUSHED
+  vo06     11.00s   17.40s   +6.40  2.18  ok
+  vo_payoff   6.39s    6.40s   +0.01  2.66  OVERRUNS
+  vo_helps   9.88s   10.78s   +0.90  2.23  ok
+  vo_cta    5.90s    6.70s   +0.80  2.54  ok
+[WARN] 4 fit problem(s):
+   vo02: read 5.12s does not fit its 4.30s window (need 0.35s tail) - widen the beat or shorten the copy
+   vo04: 2.95 w/s is above 2.9 - shorten the copy, do not speed the read
+   vo05: 2.94 w/s is above 2.9 - shorten the copy, do not speed the read
+   vo_payoff: read 6.39s does not fit its 6.40s window (need 0.35s tail) - widen the beat or shorten the copy
+
+
+=== frontline-coaching-1-1-documentation ===
+  [OK] narrate    15.6s  [OK] fit gate green
+  [WARN] plan        0.5s     vo06: 2.92 w/s is above 2.9 - shorten the copy, do not speed the read
+[OK] 13 beats, 140.02s, demo 36.8%
+
+  slot     read     window   spare   w/s   verdict
+  vo01     13.65s   14.85s   +1.20  2.64  brisk
+  vo02      8.96s   10.16s   +1.20  2.68  brisk
+  vo03     21.81s   22.71s   +0.90  2.20  ok
+  vo04     11.50s   18.75s   +7.25  2.43  ok
+  vo05      9.11s   13.81s   +4.70  2.85  brisk
+  vo06      9.26s   15.66s   +6.40  2.92  RUSHED
+  vo_payoff   5.93s    7.13s   +1.20  2.53  ok
+  vo_helps   8.80s    9.70s   +0.90  2.16  ok
+  vo_cta    5.90s    6.70s   +0.80  2.54  ok
+[WARN] 1 fit problem(s):
+   vo06: 2.92 w/s is above 2.9 - shorten the copy, do not speed the read
+
+
+=== healthcare-clinical-documentation-and-data-ring ===
+  [OK] narrate    14.3s  [OK] fit gate green
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.5s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     4 stage(s)  What could go wrong if I sign this note as written?
+  [OK] build      29.9s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/hea
+  [WARN] gate        5.4s     held one frame for 8.25s at 45.25s - add a build stage or shorten the beat
+  [OK] watch       1.2s  [OK] 6 sheet(s) - now read them
+
+=== industrial-asset-reliability-and-engineering-standards ===
+  [OK] narrate    14.2s  [OK] fit gate green
+  [WARN] plan        0.7s     vo02: read 5.86s does not fit its 5.70s window (need 0.35s tail) - widen the beat or 
+[OK] 13 beats, 144.06s, demo 38.5%
+
+  slot     read     window   spare   w/s   verdict
+  vo01     14.87s   16.07s   +1.20  2.56  ok
+  vo02      5.86s    5.70s   -0.16  2.22  OVERRUNS
+  vo03     25.49s   26.39s   +0.90  1.96  ok
+  vo04     11.88s   19.13s   +7.25  2.44  ok
+  vo05     12.02s   16.72s   +4.70  2.66  brisk
+  vo06      9.93s   16.33s   +6.40  2.62  brisk
+  vo_payoff   6.40s    7.03s   +0.63  2.66  brisk
+  vo_helps   8.54s    9.44s   +0.90  2.34  ok
+  vo_cta    5.90s    6.70s   +0.80  2.54  ok
+[WARN] 1 fit problem(s):
+   vo02: read 5.86s does not fit its 5.70s window (need 0.35s tail) - widen the beat or shorten the copy
+
+
+=== industry-compliance-and-risk-monitoring ===
+  [OK] narrate    14.3s  [OK] fit gate green
+  [WARN] plan        0.9s     vo05: 2.91 w/s is above 2.9 - shorten the copy, do not speed the read
+[OK] 13 beats, 144.76s, demo 38.1%
+
+  slot     read     window   spare   w/s   verdict
+  vo01     12.01s   13.21s   +1.20  2.42  ok
+  vo02      7.20s    8.40s   +1.20  2.78  brisk
+  vo03     24.11s   25.01s   +0.90  2.12  ok
+  vo04     13.35s   20.60s   +7.25  2.47  ok
+  vo05     10.31s   15.01s   +4.70  2.91  RUSHED
+  vo06      9.88s   16.28s   +6.40  2.63  brisk
+  vo_payoff   6.61s    7.81s   +1.20  2.27  ok
+  vo_helps  10.29s   11.19s   +0.90  1.85  ok
+  vo_cta    5.90s    6.70s   +0.80  2.54  ok
+[WARN] 1 fit problem(s):
+   vo05: 2.91 w/s is above 2.9 - shorten the copy, do not speed the read
+
+
+=== industry-specific-finance-operations ===
+  [OK] narrate    14.4s  [OK] fit gate green
+  [OK] plan        0.2s  [OK] fit gate green
+  [OK] cards       0.4s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.3s  [OK] q3     4 stage(s)  What could go wrong if we approve the rest as they stand?
+  [OK] build      31.1s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/ind
+  [WARN] gate        6.2s     held one frame for 12.00s at 44.00s - add a build stage or shorten the beat
+  [OK] watch       1.6s  [OK] 6 sheet(s) - now read them
+
+=== procurement-tender-vendor-spend ===
+  [OK] narrate    15.7s  [OK] fit gate green
+  [OK] plan        0.5s  [OK] fit gate green
+  [OK] cards       0.5s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.4s  [OK] q3     5 stage(s)  What could go wrong in the invoice checks on this vendor?
+  [OK] build      26.3s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/pro
+  [WARN] gate        6.2s     held one frame for 8.50s at 43.00s - add a build stage or shorten the beat
+  [OK] watch       1.2s  [OK] 6 sheet(s) - now read them
+
+=== public-sector-citizen-civil-service ===
+  [OK] narrate    10.3s  [OK] fit gate green
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.4s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.3s  [OK] q3     4 stage(s)  What could go wrong if I apply that answer in a different
+  [OK] build      20.0s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/pub
+  [WARN] gate        4.8s     held one frame for 7.75s at 44.25s - add a build stage or shorten the beat
+  [OK] watch       1.2s  [OK] 6 sheet(s) - now read them
+
+=== rd-scientific-discovery-and-innovation ===
+  [OK] narrate    14.2s  [OK] fit gate green
+  [OK] plan        0.6s  [OK] fit gate green
+  [OK] cards       0.4s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.3s  [OK] q3     5 stage(s)  What could go wrong with that approach, and what does the
+  [OK] build      20.5s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/rd-
+  [WARN] gate        5.0s     held one frame for 8.50s at 46.75s - add a build stage or shorten the beat
+  [OK] watch       1.3s  [OK] 7 sheet(s) - now read them
+
+=== regulated-document-drafting ===
+  [OK] narrate    15.0s  [OK] fit gate green
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.3s  [OK] q3     5 stage(s)  Where might this fall short of the regulatory standard?
+  [OK] build      20.0s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/reg
+  [OK] gate        4.9s  PASS - all gates green
+  [OK] watch       1.2s  [OK] 6 sheet(s) - now read them
+
+=== requirements-and-innovation-authoring ===
+  [OK] narrate    14.0s  [OK] fit gate green
+  [WARN] plan        0.3s     vo05: 3.03 w/s is above 2.9 - shorten the copy, do not speed the read
+[OK] 13 beats, 149.40s, demo 38.7%
+
+  slot     read     window   spare   w/s   verdict
+  vo01     14.93s   16.13s   +1.20  2.34  ok
+  vo02      8.02s    9.22s   +1.20  1.99  ok
+  vo03     24.99s   25.89s   +0.90  1.92  ok
+  vo04     13.09s   20.34s   +7.25  2.22  ok
+  vo05     10.55s   16.95s   +6.40  3.03  RUSHED
+  vo06     10.90s   17.30s   +6.40  2.38  ok
+  vo_payoff   6.30s    6.80s   +0.50  2.54  ok
+  vo_helps   8.62s    9.52s   +0.90  2.55  ok
+  vo_cta    5.90s    6.70s   +0.80  2.54  ok
+[WARN] 1 fit problem(s):
+   vo05: 3.03 w/s is above 2.9 - shorten the copy, do not speed the read
+
+
+=== sales-manager-marketing-ops-analytics ===
+  [OK] narrate    13.5s  [OK] fit gate green
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.3s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.3s  [OK] q3     4 stage(s)  What could go wrong if I act on this read of the data?
+  [OK] build      19.3s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/sal
+  [OK] gate        4.8s  PASS - all gates green
+  [OK] watch       1.1s  [OK] 6 sheet(s) - now read them
+
+=== seller-account-executive-productivity ===
+  [OK] narrate    14.0s  [OK] fit gate green
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.4s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.3s  [OK] q3     4 stage(s)  What could go wrong in this meeting, and what should I avo
+  [OK] build      20.4s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/sel
+  [OK] gate        4.7s  PASS - all gates green
+  [OK] watch       1.2s  [OK] 6 sheet(s) - now read them
+
+[OK] 3/14 clean
+[WARN] needs attention: customer-service-case-intelligence-d365, editorial-story-discovery-and-market-intelligence, frontline-coaching-1-1-documentation, healthcare-clinical-documentation-and-data-ring, industrial-asset-reliability-and-engineering-standards, industry-compliance-and-risk-monitoring, industry-specific-finance-operations, procurement-tender-vendor-spend, public-sector-citizen-civil-service, rd-scientific-discovery-and-innovation, requirements-and-innovation-authoring
+FY27 BUILD DONE

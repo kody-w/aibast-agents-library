@@ -1,0 +1,20 @@
+ask-hr-agent 150.0 logo:0-3 brol:3-34 moti:34-54 demo:54-131 moti:131-147 logo:147-150
+building-permit-processing-agent 164.7 logo:0-3 brol:3-33 moti:33-50 demo:50-144 moti:144-162 logo:162-165
+care-gap-closure-agent 159.6 logo:0-3 brol:3-27 moti:27-46 demo:46-136 brol:136-143 moti:143-157 logo:157-160
+clinical-notes-summarizer-agent 172.9 logo:0-3 brol:3-28 moti:28-48 demo:48-151 brol:151-157 moti:157-170 logo:170-173
+customer-escalations-agent 142.1 logo:0-3 brol:3-25 moti:25-47 demo:47-124 moti:124-139 logo:140-142
+energy-operations-suite 201.6 logo:0-3 brol:3-26 moti:26-46 brol:46-51 moti:51-66 demo:66-86 moti:86-101 demo:101-116 moti:116-132 demo:132-152 moti:152-167 demo:167-184 moti:184-199 logo:199-202
+field-services-dispatch-agent 157.9 logo:0-3 brol:3-7 moti:7-11 demo:11-14 brol:14-24 moti:24-46 demo:46-137 moti:137-145 brol:145-149 moti:149-155 logo:155-158
+financial-advisor-agent 164.7 logo:0-3 brol:3-38 moti:38-61 demo:61-145 moti:145-162 logo:162-165
+fraud-detection-and-alert-agent 178.3 logo:0-3 brol:3-34 moti:34-51 demo:51-158 moti:158-175 logo:176-178
+license-renewal-and-expansion-agent 173.9 logo:0-3 brol:3-32 moti:32-49 demo:49-151 brol:151-157 moti:157-169 logo:169-172 brol:172-174
+patient-intake-and-scheduling-agent 146.3 logo:0-3 brol:3-31 moti:31-47 demo:47-127 moti:127-143 logo:144-146
+personalized-shopping-agent 169.3 logo:0-3 brol:3-32 moti:32-51 demo:51-145 moti:145-166 logo:167-169
+product-feedback-synthesizer-agent 162.6 logo:0-3 brol:3-33 moti:33-50 demo:51-145 moti:145-160 logo:160-163
+proposal-generation-agent 152.6 logo:0-3 brol:3-23 moti:23-45 demo:45-128 brol:128-137 moti:137-150 logo:150-153
+returns-and-complaints-resolution-agent 156.9 logo:0-3 brol:3-30 moti:30-50 demo:50-139 moti:139-154 logo:154-157
+supply-risk-monitoring-agent 145.5 logo:0-3 brol:3-26 moti:26-45 demo:45-126 brol:126-131 moti:131-143 logo:143-146
+time-entry-billing-agent 142.8 logo:0-3 brol:3-22 moti:22-42 demo:42-125 brol:125-129 moti:129-140 logo:140-143
+underwriting-support-agent 157.7 logo:0-3 brol:3-31 moti:31-49 demo:49-137 moti:137-155 logo:155-158
+utility-billing-and-assistance-agent 164.7 logo:0-3 brol:3-31 moti:31-47 demo:47-144 moti:144-162 logo:162-165
+SCAN DONE

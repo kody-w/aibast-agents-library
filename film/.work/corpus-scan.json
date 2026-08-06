@@ -1,0 +1,786 @@
+[
+ {
+  "slug": "ask-hr-agent",
+  "dur": 150.03,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 34
+   },
+   {
+    "k": "motion-graphic",
+    "s": 34,
+    "e": 54
+   },
+   {
+    "k": "demo",
+    "s": 54,
+    "e": 131
+   },
+   {
+    "k": "motion-graphic",
+    "s": 131,
+    "e": 147
+   },
+   {
+    "k": "logo-card",
+    "s": 147,
+    "e": 150
+   }
+  ]
+ },
+ {
+  "slug": "building-permit-processing-agent",
+  "dur": 164.66,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 33
+   },
+   {
+    "k": "motion-graphic",
+    "s": 33,
+    "e": 50
+   },
+   {
+    "k": "demo",
+    "s": 50,
+    "e": 144
+   },
+   {
+    "k": "motion-graphic",
+    "s": 144,
+    "e": 162
+   },
+   {
+    "k": "logo-card",
+    "s": 162,
+    "e": 165
+   }
+  ]
+ },
+ {
+  "slug": "care-gap-closure-agent",
+  "dur": 159.59,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 27
+   },
+   {
+    "k": "motion-graphic",
+    "s": 27,
+    "e": 46
+   },
+   {
+    "k": "demo",
+    "s": 46,
+    "e": 136
+   },
+   {
+    "k": "broll",
+    "s": 136,
+    "e": 143
+   },
+   {
+    "k": "motion-graphic",
+    "s": 143,
+    "e": 157
+   },
+   {
+    "k": "logo-card",
+    "s": 157,
+    "e": 160
+   }
+  ]
+ },
+ {
+  "slug": "clinical-notes-summarizer-agent",
+  "dur": 172.93,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 28
+   },
+   {
+    "k": "motion-graphic",
+    "s": 28,
+    "e": 48
+   },
+   {
+    "k": "demo",
+    "s": 48,
+    "e": 151
+   },
+   {
+    "k": "broll",
+    "s": 151,
+    "e": 157
+   },
+   {
+    "k": "motion-graphic",
+    "s": 157,
+    "e": 170
+   },
+   {
+    "k": "logo-card",
+    "s": 170,
+    "e": 173
+   }
+  ]
+ },
+ {
+  "slug": "customer-escalations-agent",
+  "dur": 142.1,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 25
+   },
+   {
+    "k": "motion-graphic",
+    "s": 25,
+    "e": 47
+   },
+   {
+    "k": "demo",
+    "s": 47,
+    "e": 124
+   },
+   {
+    "k": "motion-graphic",
+    "s": 124,
+    "e": 139
+   },
+   {
+    "k": "logo-card",
+    "s": 140,
+    "e": 142
+   }
+  ]
+ },
+ {
+  "slug": "energy-operations-suite",
+  "dur": 201.6,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 26
+   },
+   {
+    "k": "motion-graphic",
+    "s": 26,
+    "e": 46
+   },
+   {
+    "k": "broll",
+    "s": 46,
+    "e": 51
+   },
+   {
+    "k": "motion-graphic",
+    "s": 51,
+    "e": 66
+   },
+   {
+    "k": "demo",
+    "s": 66,
+    "e": 86
+   },
+   {
+    "k": "motion-graphic",
+    "s": 86,
+    "e": 101
+   },
+   {
+    "k": "demo",
+    "s": 101,
+    "e": 116
+   },
+   {
+    "k": "motion-graphic",
+    "s": 116,
+    "e": 132
+   },
+   {
+    "k": "demo",
+    "s": 132,
+    "e": 152
+   },
+   {
+    "k": "motion-graphic",
+    "s": 152,
+    "e": 167
+   },
+   {
+    "k": "demo",
+    "s": 167,
+    "e": 184
+   },
+   {
+    "k": "motion-graphic",
+    "s": 184,
+    "e": 199
+   },
+   {
+    "k": "logo-card",
+    "s": 199,
+    "e": 202
+   }
+  ]
+ },
+ {
+  "slug": "field-services-dispatch-agent",
+  "dur": 157.89,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 7
+   },
+   {
+    "k": "motion-graphic",
+    "s": 7,
+    "e": 11
+   },
+   {
+    "k": "demo",
+    "s": 11,
+    "e": 14
+   },
+   {
+    "k": "broll",
+    "s": 14,
+    "e": 24
+   },
+   {
+    "k": "motion-graphic",
+    "s": 24,
+    "e": 46
+   },
+   {
+    "k": "demo",
+    "s": 46,
+    "e": 137
+   },
+   {
+    "k": "motion-graphic",
+    "s": 137,
+    "e": 145
+   },
+   {
+    "k": "broll",
+    "s": 145,
+    "e": 149
+   },
+   {
+    "k": "motion-graphic",
+    "s": 149,
+    "e": 155
+   },
+   {
+    "k": "logo-card",
+    "s": 155,
+    "e": 158
+   }
+  ]
+ },
+ {
+  "slug": "financial-advisor-agent",
+  "dur": 164.7,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 38
+   },
+   {
+    "k": "motion-graphic",
+    "s": 38,
+    "e": 61
+   },
+   {
+    "k": "demo",
+    "s": 61,
+    "e": 145
+   },
+   {
+    "k": "motion-graphic",
+    "s": 145,
+    "e": 162
+   },
+   {
+    "k": "logo-card",
+    "s": 162,
+    "e": 165
+   }
+  ]
+ },
+ {
+  "slug": "fraud-detection-and-alert-agent",
+  "dur": 178.31,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 34
+   },
+   {
+    "k": "motion-graphic",
+    "s": 34,
+    "e": 51
+   },
+   {
+    "k": "demo",
+    "s": 51,
+    "e": 158
+   },
+   {
+    "k": "motion-graphic",
+    "s": 158,
+    "e": 175
+   },
+   {
+    "k": "logo-card",
+    "s": 176,
+    "e": 178
+   }
+  ]
+ },
+ {
+  "slug": "license-renewal-and-expansion-agent",
+  "dur": 173.94,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 32
+   },
+   {
+    "k": "motion-graphic",
+    "s": 32,
+    "e": 49
+   },
+   {
+    "k": "demo",
+    "s": 49,
+    "e": 151
+   },
+   {
+    "k": "broll",
+    "s": 151,
+    "e": 157
+   },
+   {
+    "k": "motion-graphic",
+    "s": 157,
+    "e": 169
+   },
+   {
+    "k": "logo-card",
+    "s": 169,
+    "e": 172
+   },
+   {
+    "k": "broll",
+    "s": 172,
+    "e": 174
+   }
+  ]
+ },
+ {
+  "slug": "patient-intake-and-scheduling-agent",
+  "dur": 146.31,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 31
+   },
+   {
+    "k": "motion-graphic",
+    "s": 31,
+    "e": 47
+   },
+   {
+    "k": "demo",
+    "s": 47,
+    "e": 127
+   },
+   {
+    "k": "motion-graphic",
+    "s": 127,
+    "e": 143
+   },
+   {
+    "k": "logo-card",
+    "s": 144,
+    "e": 146
+   }
+  ]
+ },
+ {
+  "slug": "personalized-shopping-agent",
+  "dur": 169.27,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 32
+   },
+   {
+    "k": "motion-graphic",
+    "s": 32,
+    "e": 51
+   },
+   {
+    "k": "demo",
+    "s": 51,
+    "e": 145
+   },
+   {
+    "k": "motion-graphic",
+    "s": 145,
+    "e": 166
+   },
+   {
+    "k": "logo-card",
+    "s": 167,
+    "e": 169
+   }
+  ]
+ },
+ {
+  "slug": "product-feedback-synthesizer-agent",
+  "dur": 162.56,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 33
+   },
+   {
+    "k": "motion-graphic",
+    "s": 33,
+    "e": 50
+   },
+   {
+    "k": "demo",
+    "s": 51,
+    "e": 145
+   },
+   {
+    "k": "motion-graphic",
+    "s": 145,
+    "e": 160
+   },
+   {
+    "k": "logo-card",
+    "s": 160,
+    "e": 163
+   }
+  ]
+ },
+ {
+  "slug": "proposal-generation-agent",
+  "dur": 152.55,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 23
+   },
+   {
+    "k": "motion-graphic",
+    "s": 23,
+    "e": 45
+   },
+   {
+    "k": "demo",
+    "s": 45,
+    "e": 128
+   },
+   {
+    "k": "broll",
+    "s": 128,
+    "e": 137
+   },
+   {
+    "k": "motion-graphic",
+    "s": 137,
+    "e": 150
+   },
+   {
+    "k": "logo-card",
+    "s": 150,
+    "e": 153
+   }
+  ]
+ },
+ {
+  "slug": "returns-and-complaints-resolution-agent",
+  "dur": 156.92,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 30
+   },
+   {
+    "k": "motion-graphic",
+    "s": 30,
+    "e": 50
+   },
+   {
+    "k": "demo",
+    "s": 50,
+    "e": 139
+   },
+   {
+    "k": "motion-graphic",
+    "s": 139,
+    "e": 154
+   },
+   {
+    "k": "logo-card",
+    "s": 154,
+    "e": 157
+   }
+  ]
+ },
+ {
+  "slug": "supply-risk-monitoring-agent",
+  "dur": 145.51,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 26
+   },
+   {
+    "k": "motion-graphic",
+    "s": 26,
+    "e": 45
+   },
+   {
+    "k": "demo",
+    "s": 45,
+    "e": 126
+   },
+   {
+    "k": "broll",
+    "s": 126,
+    "e": 131
+   },
+   {
+    "k": "motion-graphic",
+    "s": 131,
+    "e": 143
+   },
+   {
+    "k": "logo-card",
+    "s": 143,
+    "e": 146
+   }
+  ]
+ },
+ {
+  "slug": "time-entry-billing-agent",
+  "dur": 142.84,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 22
+   },
+   {
+    "k": "motion-graphic",
+    "s": 22,
+    "e": 42
+   },
+   {
+    "k": "demo",
+    "s": 42,
+    "e": 125
+   },
+   {
+    "k": "broll",
+    "s": 125,
+    "e": 129
+   },
+   {
+    "k": "motion-graphic",
+    "s": 129,
+    "e": 140
+   },
+   {
+    "k": "logo-card",
+    "s": 140,
+    "e": 143
+   }
+  ]
+ },
+ {
+  "slug": "underwriting-support-agent",
+  "dur": 157.73,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 31
+   },
+   {
+    "k": "motion-graphic",
+    "s": 31,
+    "e": 49
+   },
+   {
+    "k": "demo",
+    "s": 49,
+    "e": 137
+   },
+   {
+    "k": "motion-graphic",
+    "s": 137,
+    "e": 155
+   },
+   {
+    "k": "logo-card",
+    "s": 155,
+    "e": 158
+   }
+  ]
+ },
+ {
+  "slug": "utility-billing-and-assistance-agent",
+  "dur": 164.7,
+  "segments": [
+   {
+    "k": "logo-card",
+    "s": 0,
+    "e": 3
+   },
+   {
+    "k": "broll",
+    "s": 3,
+    "e": 31
+   },
+   {
+    "k": "motion-graphic",
+    "s": 31,
+    "e": 47
+   },
+   {
+    "k": "demo",
+    "s": 47,
+    "e": 144
+   },
+   {
+    "k": "motion-graphic",
+    "s": 144,
+    "e": 162
+   },
+   {
+    "k": "logo-card",
+    "s": 162,
+    "e": 165
+   }
+  ]
+ }
+]

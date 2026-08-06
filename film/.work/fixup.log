@@ -1,0 +1,59 @@
+=== customer-service-case-intelligence-d365 ===
+
+=== customer-service-case-intelligence-d365 ===
+  [WARN] narrate    21.0s     vo02: read 6.93s does not fit its 7.13s window (need 0.35s tail) - widen the beat or 
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.4s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.6s  [OK] q3     5 stage(s)  What could go wrong if we publish that article as written?
+  [OK] build      25.1s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/cus
+  [WARN] gate        8.8s     held one frame for 9.00s at 33.00s - add a build stage or shorten the beat
+  [OK] watch       2.6s  [OK] 6 sheet(s) - now read them
+
+[OK] 0/1 clean
+[WARN] needs attention: customer-service-case-intelligence-d365
+=== editorial-story-discovery-and-market-intelligence ===
+
+=== editorial-story-discovery-and-market-intelligence ===
+  [WARN] narrate    19.9s     vo_payoff: read 7.02s does not fit its 6.40s window (need 0.35s tail) - widen the bea
+  [OK] plan        0.4s  [OK] fit gate green
+  [OK] cards       0.4s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.7s  [OK] q3     5 stage(s)  What could go wrong if we run with this before the hearing
+  [OK] build      33.0s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/edi
+  [WARN] gate        6.2s     held one frame for 9.25s at 36.75s - add a build stage or shorten the beat
+  [OK] watch       2.4s  [OK] 6 sheet(s) - now read them
+
+[OK] 0/1 clean
+[WARN] needs attention: editorial-story-discovery-and-market-intelligence
+=== frontline-coaching-1-1-documentation ===
+
+=== frontline-coaching-1-1-documentation ===
+  [WARN] narrate    22.1s     vo02: read 9.96s does not fit its 10.16s window (need 0.35s tail) - widen the beat or
+  [OK] plan        0.7s  [OK] fit gate green
+  [OK] cards       0.5s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.9s  [OK] q3     6 stage(s)  What could go wrong if I file this as written?
+  [OK] build      29.9s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/fro
+  [OK] gate        6.2s  PASS - all gates green
+  [OK] watch       1.8s  [OK] 7 sheet(s) - now read them
+
+[OK] 0/1 clean
+[WARN] needs attention: frontline-coaching-1-1-documentation
+=== industrial-asset-reliability-and-engineering-standards ===
+
+=== industrial-asset-reliability-and-engineering-standards ===
+  [WARN] narrate    18.0s     vo_payoff: read 6.98s does not fit its 7.03s window (need 0.35s tail) - widen the bea
+  [WARN] plan        3.0s     vo02: read 5.86s does not fit its 5.70s window (need 0.35s tail) - widen the beat or 
+  [OK] cards       0.7s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     1.5s  [OK] q3     6 stage(s)  What could go wrong with that strategy, and which standard
+  [OK] build      32.4s  [OK] wrote /Users/kodywildfeuer/Documents/GitHub/aibast-agents-library/film/projects/ind
+  [OK] gate        7.5s  PASS - all gates green
+  [OK] watch       1.9s  [OK] 7 sheet(s) - now read them
+
+[OK] 0/1 clean
+[WARN] needs attention: industrial-asset-reliability-and-engineering-standards
+=== industry-compliance-and-risk-monitoring ===
+
+=== industry-compliance-and-risk-monitoring ===
+  [WARN] narrate    24.2s     vo02: read 8.21s does not fit its 8.40s window (need 0.35s tail) - widen the beat or 
+  [OK] plan        1.0s  [OK] fit gate green
+  [OK] cards       0.5s  [OK] c_q3             chyron     1 stage(s)
+  [OK] screens     0.9s  [OK] q3     6 stage(s)  What could go wrong if we treat the remaining suppliers as

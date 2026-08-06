@@ -1,0 +1,390 @@
+{
+  "schema": "rapp-media-renditions/1.0",
+  "note": "One rung today: 1280x720, CRF 21, quality-targeted from the 1920x1080 masters. The previous encode was 960x540 at a fixed 110 kbps \u2014 a fiftyfold reduction from the master, and the softness was baked into the file where no amount of buffering could reach it. A 1080p rung is reproducible with `python3 scripts/host_demos.py --force`; it was left off because it doubles the branch to 1.6 GB.",
+  "videos": {
+    "media/videos/account-intelligence-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/account-intelligence-agent.mp4",
+        "size_mb": 8.69
+      }
+    ],
+    "media/videos/ask-hr-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/ask-hr-agent.mp4",
+        "size_mb": 12.3
+      }
+    ],
+    "media/videos/building-permit-processing-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/building-permit-processing-agent.mp4",
+        "size_mb": 15.26
+      }
+    ],
+    "media/videos/care-gap-closure-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/care-gap-closure-agent.mp4",
+        "size_mb": 13.26
+      }
+    ],
+    "media/videos/cart-abandonment-recovery-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/cart-abandonment-recovery-agent.mp4",
+        "size_mb": 8.78
+      }
+    ],
+    "media/videos/claims-processing-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/claims-processing-agent.mp4",
+        "size_mb": 11.65
+      }
+    ],
+    "media/videos/client-health-score-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/client-health-score-agent.mp4",
+        "size_mb": 9.62
+      }
+    ],
+    "media/videos/clinical-notes-summarizer-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/clinical-notes-summarizer-agent.mp4",
+        "size_mb": 12.63
+      }
+    ],
+    "media/videos/contract-risk-review-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/contract-risk-review-agent.mp4",
+        "size_mb": 10.71
+      }
+    ],
+    "media/videos/cross-selling-opportunities-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/cross-selling-opportunities-agent.mp4",
+        "size_mb": 13.17
+      }
+    ],
+    "media/videos/customer-escalations-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/customer-escalations-agent.mp4",
+        "size_mb": 10.54
+      }
+    ],
+    "media/videos/customer-loyalty-rewards-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/customer-loyalty-rewards-agent.mp4",
+        "size_mb": 11.64
+      }
+    ],
+    "media/videos/customer-onboarding-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/customer-onboarding-agent.mp4",
+        "size_mb": 11.83
+      }
+    ],
+    "media/videos/customer-sentiment-and-churn-prediction-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/customer-sentiment-and-churn-prediction-agent.mp4",
+        "size_mb": 12.23
+      }
+    ],
+    "media/videos/deal-progression-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/deal-progression-agent.mp4",
+        "size_mb": 10.33
+      }
+    ],
+    "media/videos/discount-finder-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/discount-finder-agent.mp4",
+        "size_mb": 12.26
+      }
+    ],
+    "media/videos/energy-operations-suite.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/energy-operations-suite.mp4",
+        "size_mb": 16.46
+      }
+    ],
+    "media/videos/field-services-dispatch-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/field-services-dispatch-agent.mp4",
+        "size_mb": 14.17
+      }
+    ],
+    "media/videos/financial-advisor-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/financial-advisor-agent.mp4",
+        "size_mb": 14.87
+      }
+    ],
+    "media/videos/fraud-detection-and-alert-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/fraud-detection-and-alert-agent.mp4",
+        "size_mb": 13.39
+      }
+    ],
+    "media/videos/inventory-rebalancing-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/inventory-rebalancing-agent.mp4",
+        "size_mb": 13.72
+      }
+    ],
+    "media/videos/inventory-visibility-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/inventory-visibility-agent.mp4",
+        "size_mb": 14.23
+      }
+    ],
+    "media/videos/license-renewal-and-expansion-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/license-renewal-and-expansion-agent.mp4",
+        "size_mb": 13.64
+      }
+    ],
+    "media/videos/loan-origination-assistant.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/loan-origination-assistant.mp4",
+        "size_mb": 13.44
+      }
+    ],
+    "media/videos/maintenance-scheduling-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/maintenance-scheduling-agent.mp4",
+        "size_mb": 16.3
+      }
+    ],
+    "media/videos/omnichannel-engagement-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/omnichannel-engagement-agent.mp4",
+        "size_mb": 13.16
+      }
+    ],
+    "media/videos/order-status-communication-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/order-status-communication-agent.mp4",
+        "size_mb": 17.01
+      }
+    ],
+    "media/videos/patient-intake-and-scheduling-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/patient-intake-and-scheduling-agent.mp4",
+        "size_mb": 12.82
+      }
+    ],
+    "media/videos/personalized-marketing-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/personalized-marketing-agent.mp4",
+        "size_mb": 11.35
+      }
+    ],
+    "media/videos/personalized-shopping-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/personalized-shopping-agent.mp4",
+        "size_mb": 14.31
+      }
+    ],
+    "media/videos/portfolio-rebalancing-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/portfolio-rebalancing-agent.mp4",
+        "size_mb": 14.01
+      }
+    ],
+    "media/videos/prior-authorization-automation-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/prior-authorization-automation-agent.mp4",
+        "size_mb": 13.1
+      }
+    ],
+    "media/videos/procurement-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/procurement-agent.mp4",
+        "size_mb": 10.59
+      }
+    ],
+    "media/videos/product-feedback-synthesizer-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/product-feedback-synthesizer-agent.mp4",
+        "size_mb": 13.11
+      }
+    ],
+    "media/videos/product-line-optimization-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/product-line-optimization-agent.mp4",
+        "size_mb": 14.05
+      }
+    ],
+    "media/videos/proposal-generation-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/proposal-generation-agent.mp4",
+        "size_mb": 13.99
+      }
+    ],
+    "media/videos/regulatory-compliance-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/regulatory-compliance-agent.mp4",
+        "size_mb": 13.66
+      }
+    ],
+    "media/videos/resource-utilization-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/resource-utilization-agent.mp4",
+        "size_mb": 12.29
+      }
+    ],
+    "media/videos/returns-and-complaints-resolution-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/returns-and-complaints-resolution-agent.mp4",
+        "size_mb": 11.9
+      }
+    ],
+    "media/videos/sales-qualification-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/sales-qualification-agent.mp4",
+        "size_mb": 11.18
+      }
+    ],
+    "media/videos/store-associate-copilot.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/store-associate-copilot.mp4",
+        "size_mb": 13.46
+      }
+    ],
+    "media/videos/supply-chain-disruption-alert-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/supply-chain-disruption-alert-agent.mp4",
+        "size_mb": 17.85
+      }
+    ],
+    "media/videos/supply-risk-monitoring-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/supply-risk-monitoring-agent.mp4",
+        "size_mb": 15.01
+      }
+    ],
+    "media/videos/time-entry-billing-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/time-entry-billing-agent.mp4",
+        "size_mb": 11.87
+      }
+    ],
+    "media/videos/underwriting-support-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/underwriting-support-agent.mp4",
+        "size_mb": 11.3
+      }
+    ],
+    "media/videos/utility-billing-and-assistance-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/utility-billing-and-assistance-agent.mp4",
+        "size_mb": 15.39
+      }
+    ],
+    "media/videos/wealth-insights-generator-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/wealth-insights-generator-agent.mp4",
+        "size_mb": 12.86
+      }
+    ],
+    "media/videos/win-loss-analysis-agent.mp4": [
+      {
+        "label": "720p",
+        "height": 720,
+        "path": "media/videos/win-loss-analysis-agent.mp4",
+        "size_mb": 10.92
+      }
+    ]
+  }
+}

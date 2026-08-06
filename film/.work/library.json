@@ -1,0 +1,10 @@
+[["supplier-risk-monitoring","manufacturing"],
+ ["prior-authorization","healthcare"],
+ ["fraud-detection-alert","financial_services"],
+ ["asset-maintenance-forecast","energy"],
+ ["foia-request-assistant","government"],
+ ["federal-grants-oversight","government"],
+ ["returns-complaints-resolution","retail_cpg"],
+ ["support-ticket-resolution","software"],
+ ["proposal-copilot","professional_services"],
+ ["it-helpdesk","cross_industry"]]

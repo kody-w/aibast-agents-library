@@ -1,0 +1,578 @@
+{
+  "schema": "aibast-metrics/1.0",
+  "repo_name": "microsoft/aibast-agents-library",
+  "generated_at": "2026-08-06T16:00:18.410465+00:00",
+  "totals": {
+    "downloads": 1,
+    "clones": 0,
+    "cdn_hits": 0,
+    "agent_file_downloads": 0,
+    "release_downloads": 0,
+    "tracked_downloads": 1,
+    "upvotes": 0,
+    "comments": 0,
+    "agents": 112,
+    "publishers": 1,
+    "categories": 14,
+    "total_lines": 39029,
+    "clones_14d": null,
+    "clone_uniques_14d": null,
+    "page_views": 0,
+    "view_uniques_14d": null,
+    "tracking_since": "2026-08-06",
+    "days_tracked": 0
+  },
+  "repo": {},
+  "traffic": {
+    "live": false,
+    "as_of": null,
+    "paths": [],
+    "referrers": []
+  },
+  "cdn": {
+    "total_hits": 0,
+    "bandwidth": 0,
+    "rank": null,
+    "files": [],
+    "agent_file_hits": 0
+  },
+  "releases": {
+    "releases": [],
+    "total_downloads": 0
+  },
+  "daily": [],
+  "leaderboards": {
+    "most_downloaded": [
+      {
+        "name": "@aibast-agents-library/account-intelligence",
+        "display_name": "Account Intelligence",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_agent.py",
+        "lines": 456,
+        "upvotes": 0,
+        "downloads": 1,
+        "comments": 0,
+        "score": 1,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/2"
+      }
+    ],
+    "most_upvoted": [],
+    "most_discussed": [],
+    "top_score": [
+      {
+        "name": "@aibast-agents-library/account-intelligence",
+        "display_name": "Account Intelligence",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_agent.py",
+        "lines": 456,
+        "upvotes": 0,
+        "downloads": 1,
+        "comments": 0,
+        "score": 1,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/2"
+      }
+    ],
+    "largest": [
+      {
+        "name": "@aibast-agents-library/win-loss-analysis",
+        "display_name": "Win/Loss Analysis",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/win_loss_analysis_stack/win_loss_analysis_agent.py",
+        "lines": 921,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/104"
+      },
+      {
+        "name": "@aibast-agents-library/proposal-generation",
+        "display_name": "Proposal Generation",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/proposal_generation_stack/proposal_generation_agent.py",
+        "lines": 673,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/74"
+      },
+      {
+        "name": "@aibast-agents-library/deal-progression",
+        "display_name": "Deal Progression",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_progression_agent.py",
+        "lines": 643,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/30"
+      },
+      {
+        "name": "@aibast-agents-library/supply-chain-disruption-alert",
+        "display_name": "Supply Chain Disruption Alert Agent",
+        "category": "retail_cpg",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/retail_cpg_stacks/supply_chain_disruption_alert_stack/supply_chain_disruption_alert_agent.py",
+        "lines": 631,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/94"
+      },
+      {
+        "name": "@aibast-agents-library/sales-qualification",
+        "display_name": "Sales Qualification",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/sales_qualification_stack/sales_qualification_agent.py",
+        "lines": 570,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/82"
+      },
+      {
+        "name": "@aibast-agents-library/store-associate-copilot",
+        "display_name": "Store Associate Copilot Agent",
+        "category": "retail_cpg",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/retail_cpg_stacks/store_associate_copilot_stack/store_associate_copilot_agent.py",
+        "lines": 538,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/92"
+      },
+      {
+        "name": "@aibast-agents-library/meeting-prep",
+        "display_name": "Meeting Prep",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/meeting_prep_agent.py",
+        "lines": 521,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/55"
+      },
+      {
+        "name": "@aibast-agents-library/returns-complaints-resolution",
+        "display_name": "Returns & Complaints Resolution Agent",
+        "category": "retail_cpg",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/retail_cpg_stacks/returns_complaints_resolution_stack/returns_complaints_resolution_agent.py",
+        "lines": 506,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/77"
+      },
+      {
+        "name": "@aibast-agents-library/account-risk-assessment",
+        "display_name": "Account Risk Assessment",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/risk_assessment_agent.py",
+        "lines": 495,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/5"
+      },
+      {
+        "name": "@aibast-agents-library/account-intelligence-orchestrator",
+        "display_name": "Account Intelligence Orchestrator",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_orchestrator.py",
+        "lines": 457,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/3"
+      },
+      {
+        "name": "@aibast-agents-library/account-intelligence",
+        "display_name": "Account Intelligence",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_agent.py",
+        "lines": 456,
+        "upvotes": 0,
+        "downloads": 1,
+        "comments": 0,
+        "score": 1,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/2"
+      },
+      {
+        "name": "@aibast-agents-library/stalled-deal-detection",
+        "display_name": "Stalled Deal Detection",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/stalled_deal_detection_agent.py",
+        "lines": 453,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/91"
+      },
+      {
+        "name": "@aibast-agents-library/competitive-intelligence",
+        "display_name": "Competitive Intelligence",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/competitive_intelligence_agent.py",
+        "lines": 441,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/21"
+      },
+      {
+        "name": "@aibast-agents-library/stakeholder-intelligence",
+        "display_name": "Stakeholder Intelligence",
+        "category": "b2b_sales",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/stakeholder_intelligence_agent.py",
+        "lines": 440,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/90"
+      },
+      {
+        "name": "@aibast-agents-library/personalized-marketing",
+        "display_name": "Personalized Marketing Agent",
+        "category": "retail_cpg",
+        "tier": "verified",
+        "file": "agents/@aibast-agents-library/retail_cpg_stacks/personalized_marketing_stack/personalized_marketing_agent.py",
+        "lines": 436,
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "score": 0,
+        "signals": {
+          "worked": 0,
+          "did_not_work": 0,
+          "stuck": 0,
+          "regular_use": 0,
+          "shipped": 0,
+          "want_to_try": 0,
+          "saved_time": 0
+        },
+        "discussion": "https://github.com/kody-w/aibast-agents-library/discussions/63"
+      }
+    ],
+    "categories": [
+      {
+        "name": "general",
+        "agents": 24,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "b2b_sales",
+        "agents": 23,
+        "upvotes": 0,
+        "downloads": 1
+      },
+      {
+        "name": "financial_services",
+        "agents": 11,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "b2c_sales",
+        "agents": 7,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "healthcare",
+        "agents": 6,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "manufacturing",
+        "agents": 6,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "professional_services",
+        "agents": 6,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "slg_government",
+        "agents": 6,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "energy",
+        "agents": 5,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "federal_government",
+        "agents": 5,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "retail_cpg",
+        "agents": 5,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "software_digital_products",
+        "agents": 5,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "human_resources",
+        "agents": 2,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "it_management",
+        "agents": 1,
+        "upvotes": 0,
+        "downloads": 0
+      }
+    ],
+    "publishers": [
+      {
+        "name": "@aibast-agents-library",
+        "agents": 112,
+        "upvotes": 0,
+        "downloads": 1,
+        "comments": 0,
+        "score": 1
+      }
+    ]
+  },
+  "aggregated": {
+    "total": 78,
+    "converted": 78,
+    "scored_by_gates": 0,
+    "sources": [
+      {
+        "id": "cat-agent-skills",
+        "display_name": "CAT Agent Skills",
+        "home_url": "https://microsoft.github.io/cat-agent-skills/",
+        "repo_url": "https://github.com/microsoft/cat-agent-skills",
+        "license": {
+          "spdx": "MIT",
+          "verified": true,
+          "name": "MIT License",
+          "source": "https://github.com/microsoft/cat-agent-skills/blob/main/LICENSE",
+          "text_url": "https://raw.githubusercontent.com/microsoft/cat-agent-skills/main/LICENSE",
+          "redistributable": true
+        },
+        "items": 78
+      }
+    ]
+  },
+  "sources": [
+    {
+      "name": "GitHub traffic API",
+      "metric": "clones, page views, paths, referrers",
+      "url": "https://github.com/microsoft/aibast-agents-library/graphs/traffic"
+    },
+    {
+      "name": "jsDelivr CDN",
+      "metric": "per-file fetches of agent files",
+      "url": "https://data.jsdelivr.com/v1/stats/packages/gh/microsoft/aibast-agents-library"
+    },
+    {
+      "name": "GitHub releases",
+      "metric": "release asset downloads",
+      "url": "https://github.com/microsoft/aibast-agents-library/releases"
+    },
+    {
+      "name": "GitHub Discussions",
+      "metric": "upvotes, tracked installer downloads, comments, signals",
+      "url": "https://github.com/microsoft/aibast-agents-library/discussions"
+    },
+    {
+      "name": "registry.json",
+      "metric": "agents, publishers, categories",
+      "url": "registry.json"
+    },
+    {
+      "name": "state/aggregated.json",
+      "metric": "aggregated outside skills",
+      "url": "state/aggregated.json"
+    }
+  ]
+}

@@ -1,0 +1,707 @@
+{
+  "schema": "fy27-agent-extract/1.0",
+  "source_document": "FY27 priority agents briefing (internal planning artifact)",
+  "agents": [
+    {
+      "slug": "seller-account-executive-productivity",
+      "name": "Seller / Account Executive Productivity Agent",
+      "heading_verbatim": "Seller / Account Executive Productivity Agent",
+      "industry": "Financial Services · Software · Industrial Sales",
+      "industries": [
+        "Financial Services",
+        "Software",
+        "Industrial Sales",
+        "Financial Services - Banking",
+        "Financial Services - Asset Management",
+        "Software - Digital Experience Platform",
+        "Software - Cybersecurity / Endpoint",
+        "Chemicals / Specialty Materials"
+      ],
+      "personas": [
+        "Account Executive",
+        "Salesperson / seller",
+        "Sales professional",
+        "Sales team"
+      ],
+      "problem": "The document describes this as \"the seller's single pane: customer 360, product info, daily revenue signals, NBA commentary, battlecards, campaign lookup, incentives\" — replacing \"the 7-tabs-and-a-spreadsheet morning routine\". Sales professionals must navigate disparate systems to find product information, which leads to underprepared meetings, outdated files, inconsistent information and excessive prep time. Account executives spend time searching for content, and Next Best Action scores arrive as numeric/ranked ML outputs that teams manually interpret into talking points.",
+      "sources": [
+        "Public and internal client information (customer 360)",
+        "Product information spread across disparate systems",
+        "Campaign availability looked up by account ID",
+        "Sales goals / objectives and incentive data",
+        "Next Best Action (NBA) scores from ForwardLane and Salesforce",
+        "Sales battlecard content",
+        "Account signals — intent spikes, whitespace, role-change champions"
+      ],
+      "surface": "",
+      "actions": [
+        "Act as a single point of contact for any sales need of the sales team",
+        "Surface customer 360 — public and internal client information for account executives",
+        "Retrieve product information and battlecard content in one place",
+        "Look up available campaigns for a customer based on account ID",
+        "Turn ranked NBA model scores into written commentary with drafted outreach"
+      ],
+      "value": [
+        "Collapses the multi-tab, multi-system morning routine into one place",
+        "Shortens meeting preparation and reduces reliance on outdated or inconsistent files",
+        "Turns numeric model output into language a seller can actually use in a conversation"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: Banorte DuPont Specialty Products USA Invesco Sitecore (FDE 3) Tanium (CAD)\"",
+        "Customer headcount figure: \"Single point of contact for any sales need of the sales team (~700 PYME sellers).\"",
+        "Customer's third-party stack named: \"NBA scores from ForwardLane and Salesforce are surfaced as numeric/ranked ML outputs\"",
+        "Internal engagement codes appended to customer names: \"Sitecore (FDE 3)\", \"Tanium (CAD)\"",
+        "Customer-internal agent codenames: \"BePyme Agent\", \"Pipeline Pulse\", \"Commercial Excellence Agents\"",
+        "Customer-internal design detail: \"Seller-facing daily Revenue Signal: flags accounts (intent spikes, whitespace, role-change champions) with drafted outreach, ready to send or edit. Pipeline created before 9am standup.\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #1 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "regulated-document-drafting",
+      "name": "Regulated Document Drafting Agent (legal / tender / regulated content)",
+      "heading_verbatim": "Regulated Document Drafting Agent (legal / tender / regulated content)",
+      "industry": "Public Sector · Insurance · Energy · Banking",
+      "industries": [
+        "Public Sector",
+        "Insurance",
+        "Energy",
+        "Banking",
+        "Energy / Utilities",
+        "Financial Services - Banking",
+        "Public Sector (national government)"
+      ],
+      "personas": [
+        "Account Executive",
+        "Business areas responsible for consumer-facing content"
+      ],
+      "problem": "\"Drafting that is industry-regulated, not generic: legislative drafting for parliaments, legal opinions for government, tender/procurement docs for utilities, regulated consumer copy for insurance. Each variant requires industry-specific tone, taxonomies, and compliance guardrails.\" In the underlying customer detail, legal opinions and precedents are difficult to retrieve so requests repeat and research and drafting are slow; document drafting for service requests, tenders and formal documents is time-consuming and inconsistent; and business areas struggle to rewrite content to meet consumer understanding standards, brand tone of voice and regulatory requirements.",
+      "sources": [
+        "Legislation / legislative drafting processes",
+        "Legal opinions and precedents",
+        "Service requests, tenders and formal documents",
+        "Regulatory / normative documents",
+        "Consumer understanding standards, brand tone of voice and regulatory requirements"
+      ],
+      "surface": "",
+      "actions": [
+        "Draft legislation with industry-specific tone and taxonomies",
+        "Retrieve and track legal opinions and precedents",
+        "Draft service requests, tenders and other formal documents consistently",
+        "Rewrite content to meet consumer-understanding, brand-voice and regulatory standards",
+        "Give account executives access to current regulatory / normative documents"
+      ],
+      "value": [
+        "Shortens the time to a first draft in a regulated setting",
+        "Makes drafted output more consistent against the compliance guardrails the industry requires",
+        "Cuts repeated research on legal questions that have already been answered once"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: Admiral Banorte EDF Government of Manitoba Riigikantselei (Government of Estonia)\"",
+        "Customer-internal agent codenames: \"LexAssist (Õigusloome Assistent)\", \"Fleetwood Chat\", \"Informational Agent\", \"Legal Opinion Tracking\"",
+        "Customer compliance exposure stated as a problem: \"Business areas struggle to rewrite content to meet consumer understanding standards, brand TOV, and regulatory requirements.\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #2 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "industrial-asset-reliability-and-engineering-standards",
+      "name": "Industrial Asset Reliability & Engineering Standards Agent",
+      "heading_verbatim": "Industrial Asset Reliability & Engineering Standards Agent",
+      "industry": "Manufacturing · Chemicals · Energy / Utilities",
+      "industries": [
+        "Manufacturing",
+        "Chemicals",
+        "Energy / Utilities",
+        "Manufacturing / Industrial",
+        "Chemicals / Specialty Materials",
+        "Public Sector"
+      ],
+      "personas": [
+        "Engineer",
+        "Design reviewer",
+        "Reliability & maintenance staff",
+        "Plant floor and engineering floor staff"
+      ],
+      "problem": "\"Mine NCRs / lessons-learned, reason over SAP+tribal-knowledge for asset strategy and maintenance, and accelerate engineering standards / design-review compliance. The plant- and engineering-floor advisor.\" Lessons Learned data and NCRs are challenging to mine by hand; engineers need quick access to current standards and specifications for compliance and quality in design work; and design review is time-intensive and may miss compliance issues or inconsistencies.",
+      "sources": [
+        "Lessons Learned data and NCRs (non-conformance reports)",
+        "SAP maintenance history",
+        "Tribal knowledge",
+        "Engineering standards and specifications",
+        "Design review documents",
+        "Operational systems — lighting, elevators, pumps"
+      ],
+      "surface": "Natural-language search over operational systems (stated for the parking-operations variant)",
+      "actions": [
+        "Mine lessons-learned data and NCRs that are hard to search by hand",
+        "Reason over SAP history plus tribal knowledge for reliability and maintenance decisions",
+        "Give engineers fast access to current standards and specs",
+        "Review designs for compliance issues and inconsistencies",
+        "Retrieve contextual data from operational systems via natural language"
+      ],
+      "value": [
+        "Makes hard-won plant experience retrievable instead of trapped in documents and people's heads",
+        "Speeds up design review and makes compliance checks less likely to be missed",
+        "Puts the current standard in front of the engineer at the moment of design"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: ANDRITZ BC Hydro DuPont Specialty Products USA Montgomery County (MCG)\"",
+        "Customer estate size: \"across 20+ parking facilities\"",
+        "Customer-internal agent codenames: \"Fabric Insight Analyst\", \"BCH Engineering Standards Agent\", \"BCH Design Review Assistant\", \"DOT Parking Division Agentic Search\"",
+        "Named internal customer deck: \"Asset strategy decision support (referenced via DuPont AI Use Case 2 deck).\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #3 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "industry-specific-finance-operations",
+      "name": "Industry-Specific Finance Operations Agent (multi-agency / multi-currency / multi-system)",
+      "heading_verbatim": "Industry-Specific Finance Operations Agent (multi-agency / multi-currency / multi-system)",
+      "industry": "Public Sector · Retail · Engineering Services",
+      "industries": [
+        "Public Sector",
+        "Retail",
+        "Engineering Services",
+        "Retail (multi-brand)",
+        "Engineering / Professional Services"
+      ],
+      "personas": [
+        "Finance team",
+        "Employee submitting expenses",
+        "Approver"
+      ],
+      "problem": "\"Cross-system finance ops with industry-specific complexity ... multi-brand retail, Oracle-modular engineering services, multi-currency T&E. Not generic AP — drivers are industry-shaped.\" Audited financial statements are manually extracted and reconciled across a large number of agencies in inconsistent formats; manual invoice handling is slow, error-prone and delays financial operations; expense submissions are fragmented, approvals slow and finance manually reconciles receipts; travel expenses involve complex multi-currency receipts and manual reconciliation.",
+      "sources": [
+        "Audited financial statements submitted by agencies in inconsistent formats",
+        "Invoices",
+        "Employee expense submissions and receipts",
+        "Multi-currency travel receipts",
+        "Oracle Finance module",
+        "Oracle Expense Report module"
+      ],
+      "surface": "",
+      "actions": [
+        "Extract and reconcile financial statements arriving in inconsistent formats",
+        "Process invoices without manual handling",
+        "Route and reconcile fragmented employee expense submissions",
+        "Automate multi-currency travel expense reconciliation",
+        "Bridge finance tasks that today sit outside Copilot in a separate ERP module"
+      ],
+      "value": [
+        "Removes hand-keying and hand-reconciling from routine finance operations",
+        "Makes inconsistent submissions from many sources comparable",
+        "Reduces the delay between a submission and a finance decision"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: Fourlis Government of Manitoba WSP\"",
+        "Customer scale figures: \"250+ government agencies (Manitoba)\" and \"Manual extraction/reconciliation of audited financial statements from 250-300+ agencies; inconsistent formats.\"",
+        "Customer's third-party stack named: \"No integration with Copilot and Oracle Finance module\", \"Oracle-modular engineering services (WSP)\"",
+        "Customer capability gap stated plainly: \"many tasks done old-fashioned way without AI\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #4 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "public-sector-citizen-civil-service",
+      "name": "Public Sector Citizen / Civil Service Agent",
+      "heading_verbatim": "Public Sector Citizen / Civil Service Agent",
+      "industry": "Public Sector · National Government",
+      "industries": [
+        "Public Sector",
+        "National Government",
+        "Public Sector (national government)",
+        "Public Sector / Transportation"
+      ],
+      "personas": [
+        "Public servant / civil servant",
+        "Public-service HR team",
+        "Employee raising an HR or policy question"
+      ],
+      "problem": "\"Civil-service-specific knowledge & service: government policies (often multi-jurisdictional), public-service HR triage at scale (PSC), citizen-facing workplace assistant for public servants, multilingual translation. NOT generic intranet search — these encode government-specific workflows and compliance.\" Government administrative and financial policies are fragmented across intranets, causing wasted time, inconsistent interpretation and compliance risk; a small team handles a high monthly volume of HR inquiries that spikes during major change events; and employees struggle to find clear HR policy answers because information is scattered across PDFs, SharePoint and emails.",
+      "sources": [
+        "Government administrative and financial policies fragmented across intranets",
+        "HR policy documents scattered across PDFs, SharePoint and emails",
+        "Public-service HR inquiry queues"
+      ],
+      "surface": "Described as a centralized, always-available advisor / secure public-sector workplace agent",
+      "actions": [
+        "Answer government policy questions from fragmented intranet sources",
+        "Triage public-service HR inquiries at volume",
+        "Act as a secure workplace assistant for public servants",
+        "Provide multilingual translation services",
+        "Give employees a centralized, always-available HR policy advisor"
+      ],
+      "value": [
+        "Gives civil servants one consistent answer instead of several conflicting intranet ones",
+        "Absorbs repetitive HR inquiry volume so a small team can handle the spikes",
+        "Reduces the compliance risk that comes from inconsistent policy interpretation"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: Government of Manitoba PANYNJ (Port Authority of NY & NJ) Riigikantselei (Government of Estonia)\"",
+        "Customer volume and staffing figure: \"550-800 HR inquiries per month handled by a small team; volume spikes during major change events.\"",
+        "Customer-internal agent codenames: \"AskPSC\", \"RiigiCopilot\"",
+        "Customer risk statement: \"Government administrative/financial policies fragmented across intranets — wasted time, inconsistent interpretation, compliance risk.\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #5 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "customer-service-case-intelligence-d365",
+      "name": "Customer Service / Case Intelligence Agent (D365)",
+      "heading_verbatim": "Customer Service / Case Intelligence Agent (D365)",
+      "industry": "Real Estate · Software · Chemicals · Cybersecurity",
+      "industries": [
+        "Real Estate",
+        "Software",
+        "Chemicals",
+        "Cybersecurity",
+        "Real Estate / Workspace",
+        "Chemicals / Specialty Materials",
+        "Software - Cybersecurity / Endpoint"
+      ],
+      "personas": [
+        "Customer service representative (CSR)",
+        "Knowledge / support team"
+      ],
+      "problem": "\"D365 customer-service case intelligence: auto-summarize cases, classify customer intent for routing, harvest resolved cases into knowledge articles. Replaces manual case wrap-up & knowledge curation in service-heavy industries.\" Case notes and resolution summaries are written by hand as wrap-up effort for CSRs; knowledge articles have to be curated manually from resolved cases; and incoming cases are routed without a reliable read of customer intent.",
+      "sources": [
+        "Dynamics 365 Customer Service cases",
+        "Resolved cases and conversations",
+        "Historical customer interactions",
+        "Support cases and knowledge article templates"
+      ],
+      "surface": "Dynamics 365 Customer Service (case notes and resolution summaries generated via Copilot)",
+      "actions": [
+        "Auto-generate case notes and resolution summaries",
+        "Harvest resolved cases and conversations into proposed knowledge articles",
+        "Classify incoming customer intent to improve routing accuracy",
+        "Extract details from support cases into knowledge article templates"
+      ],
+      "value": [
+        "Takes the wrap-up writing off the representative at the end of every case",
+        "Keeps the knowledge base current as a by-product of resolving cases",
+        "Gets cases to the right place first time more often"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: DuPont Specialty Products USA IWG Tanium (CAD)\"",
+        "Internal engagement code appended to a customer name: \"Tanium (CAD)\"",
+        "Customer-internal agent codename: \"KnowledgeSmith\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #6 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "sales-manager-marketing-ops-analytics",
+      "name": "Sales Manager / Marketing Ops Analytics Agent",
+      "heading_verbatim": "Sales Manager / Marketing Ops Analytics Agent",
+      "industry": "Software / SaaS · Financial Services",
+      "industries": [
+        "Software / SaaS",
+        "Financial Services",
+        "Financial Services - Banking",
+        "Software - Digital Experience Platform",
+        "Insurance"
+      ],
+      "personas": [
+        "Sales manager",
+        "Supervisor",
+        "Product marketing manager (PMM)",
+        "Marketing operations"
+      ],
+      "problem": "\"Manager-tier visibility: rep performance, opportunity progression, ICP drift detection, PMM intelligence loops, event-pipeline analytics. Not generic BI — encodes sales-cycle and B2B-marketing motion specific to SaaS/FS.\" Managers manually filter spreadsheets to view performance, which delays coaching; supervisors have no easy view of executive activity and opportunity progression over time; PMM insights are reactive and manually synthesized; ICP changes are detected too late; and event insights don't scale.",
+      "sources": [
+        "Rep / agent performance data held in spreadsheets",
+        "Executive activity and opportunity progression over time",
+        "ICP (ideal customer profile) signals",
+        "PMM (product marketing) insight sources",
+        "Event data"
+      ],
+      "surface": "",
+      "actions": [
+        "Show supervisors executive activity and opportunity progression over time",
+        "Replace manual spreadsheet filtering for performance views",
+        "Detect ICP drift before it is noticed manually",
+        "Synthesize PMM intelligence continuously rather than reactively",
+        "Scale event insight analysis"
+      ],
+      "value": [
+        "Gets a manager to a coaching conversation sooner because the view is already assembled",
+        "Surfaces market-fit drift while there is still time to respond",
+        "Makes marketing insight a standing loop rather than a manual, occasional exercise"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: Admiral Banorte Sitecore (FDE 3)\"",
+        "Internal engagement code appended to a customer name: \"Sitecore (FDE 3)\"",
+        "Customer-internal agent codenames: \"Supervisor Agent\", \"ICP Drift Detection Agent\", \"PMM Intelligence Loop Agent\", \"Event Intelligence Agent\", \"Agent Performance Overview Agent\"",
+        "Customer's third-party stack referenced in the sibling variant: \"manually downloading data from Looker\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #7 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "procurement-tender-vendor-spend",
+      "name": "Procurement / Tender / Vendor-Spend Agent",
+      "heading_verbatim": "Procurement / Tender / Vendor-Spend Agent",
+      "industry": "Public Sector · Energy · Utilities",
+      "industries": [
+        "Public Sector",
+        "Energy",
+        "Utilities",
+        "Energy / Utilities",
+        "Public Sector (national government)",
+        "Public Sector / Transportation"
+      ],
+      "personas": [],
+      "problem": "\"Procurement document generation, tender drafting, vendor-spend reconciliation. Distinctly different from generic finance ops — encodes public-procurement and utility-tender workflows.\" Document drafting for service requests, tenders and formal documents is time-consuming and inconsistent, and manual cross-checking between invoices and purchase orders is slow, inconsistent and error-prone — amplified when supporting documents are scattered.",
+      "sources": [
+        "Procurement documents",
+        "Tenders, service requests and formal documents",
+        "Vendor invoices and purchase orders",
+        "Scattered supporting documentation"
+      ],
+      "surface": "",
+      "actions": [
+        "Generate and compare procurement documents",
+        "Draft tenders and other formal procurement paperwork",
+        "Cross-check vendor invoices against purchase orders",
+        "Pull together scattered supporting documents for a reconciliation"
+      ],
+      "value": [
+        "Shortens the time to produce a compliant procurement document",
+        "Makes invoice-to-PO checking consistent instead of dependent on who does it",
+        "Reduces the errors that come from reconciling against documents nobody can find"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: EDF PANYNJ (Port Authority of NY & NJ) Riigikantselei (Government of Estonia)\"",
+        "Customer-internal agent codename: \"HankeAssist (Smart Procurement Agent)\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #8 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "industry-compliance-and-risk-monitoring",
+      "name": "Industry Compliance & Risk Monitoring Agent",
+      "heading_verbatim": "Industry Compliance & Risk Monitoring Agent",
+      "industry": "Public Sector · Financial Services",
+      "industries": [
+        "Public Sector",
+        "Financial Services",
+        "Public Sector / Transportation"
+      ],
+      "personas": [
+        "Contract manager",
+        "IT team"
+      ],
+      "problem": "\"Industry-specific regulatory monitoring: PCI DSS for transit/banking contractors, vendor-invoice & PO compliance for public-sector procurement, government financial-statement standardization across agencies. Regulator-grade, not generic compliance.\" Contract managers lack real-time visibility into contractor PCI compliance after new requirements land; IT teams purchase licenses with no way to verify proper use, SKU runout or over-assignment, creating cost, compliance risk and renewal confusion; and financial statements arrive from many agencies in inconsistent formats.",
+      "sources": [
+        "PCI DSS updates and contractor compliance status",
+        "Vendor invoices and purchase orders",
+        "Software license purchase and assignment data (use, SKU runout, over-assignment)",
+        "Audited financial statements from agencies"
+      ],
+      "surface": "",
+      "actions": [
+        "Monitor regulatory updates such as PCI DSS and surface gaps",
+        "Give contract managers real-time visibility into contractor compliance",
+        "Check vendor invoices and purchase orders for compliance",
+        "Verify license use, SKU runout and over-assignment",
+        "Standardize financial statements arriving from many agencies"
+      ],
+      "value": [
+        "Turns compliance from a periodic manual check into continuous monitoring",
+        "Surfaces a gap while there is still time to close it before an audit or renewal",
+        "Makes multi-source financial reporting comparable without hand-standardization"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: Government of Manitoba PANYNJ (Port Authority of NY & NJ)\"",
+        "Named customer's Microsoft licensing exposure: \"MSFT Licensing Compliance Agent — IT teams purchase licenses without a way to verify proper use, SKU runout, or over-assignment — creating cost, compliance risk, renewal confusion.\"",
+        "Named customer's regulatory exposure: \"Contract managers lack real-time visibility into contractor PCI compliance after new requirements\"",
+        "Customer scale figure: \"audited financial statements from 250-300+ agencies\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #9 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "frontline-coaching-1-1-documentation",
+      "name": "Frontline Coaching / 1:1 Documentation Agent",
+      "heading_verbatim": "Frontline Coaching / 1:1 Documentation Agent",
+      "industry": "Insurance · Banking · Contact Center",
+      "industries": [
+        "Insurance",
+        "Banking",
+        "Contact Center",
+        "Financial Services - Banking"
+      ],
+      "personas": [
+        "Manager",
+        "Frontline staff",
+        "Account Executive"
+      ],
+      "problem": "\"Captures 1:1s, coaching sessions, and customer-call summaries — auto-files them in CRM/coaching forms. Industry-specific because coaching forms (insurance call center) and customer-meeting templates (banking AE) carry industry-specific structure.\" Managers and frontline staff spend significant time manually documenting 1:1 meetings, coaching form completion carries an administrative burden at high volume, and customer conversations have to be written up and pushed into CRM by hand.",
+      "sources": [
+        "1:1 meeting content",
+        "Coaching forms",
+        "Recorded / transcribed customer conversations",
+        "CRM (D365)"
+      ],
+      "surface": "Files its output into CRM and coaching forms; the banking variant integrates into CRM (D365)",
+      "actions": [
+        "Capture and document 1:1 meetings automatically",
+        "Complete coaching forms from the session itself",
+        "Record and transcribe customer conversations",
+        "Capture next steps and write them into CRM"
+      ],
+      "value": [
+        "Gives managers their documentation time back and moves it into coaching",
+        "Makes the write-up a by-product of the conversation rather than a second task",
+        "Keeps CRM current without depending on someone remembering to update it"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: Admiral Banorte\"",
+        "Customer time-and-motion figure: \"Coaching form completion takes ~14 minutes per session; high volumes create administrative burden.\"",
+        "Customer time-and-motion figure in the sibling variant: \"Managers and frontline staff spend significant time manually documenting 1:1 meetings.\"",
+        "Customer-internal agent codenames: \"121 Agent\", \"Coaching Session Agent\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #10 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "editorial-story-discovery-and-market-intelligence",
+      "name": "Editorial / Story Discovery & Market Intelligence Agent",
+      "heading_verbatim": "Editorial / Story Discovery & Market Intelligence Agent",
+      "industry": "Media / Broadcasting · B2B SaaS Marketing",
+      "industries": [
+        "Media / Broadcasting",
+        "B2B SaaS Marketing",
+        "Software - Digital Experience Platform"
+      ],
+      "personas": [
+        "Journalist",
+        "B2B marketer"
+      ],
+      "problem": "\"Active monitoring of public-interest sources for journalists (court listings, council minutes, Hansard), and content-supply-chain intelligence for B2B marketers. Industry-specific because the source taxonomies and editorial standards are industry-specific.\" Journalists rely on highly manual processes to monitor primary sources; the market intelligence process is highly manual, reactive and decentralized; and the content lifecycle is slow.",
+      "sources": [
+        "Court listings",
+        "Council minutes",
+        "Hansard",
+        "Public notices",
+        "Market intelligence sources",
+        "Content supply chain"
+      ],
+      "surface": "",
+      "actions": [
+        "Actively monitor primary public-interest sources for journalists",
+        "Flag emerging stories from court listings, council minutes, Hansard and public notices",
+        "Centralize a market intelligence process that is currently decentralized",
+        "Run content-supply-chain intelligence for marketers"
+      ],
+      "value": [
+        "Moves source monitoring from manual sweeps to continuous watching",
+        "Makes market intelligence proactive rather than reactive",
+        "Compresses the path from a public source appearing to someone acting on it"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: BBC Sitecore (FDE 3)\"",
+        "Internal engagement code appended to a customer name: \"Sitecore (FDE 3)\"",
+        "Customer cycle-time figure: \"Content lifecycle takes 7-10 days.\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #11 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "rd-scientific-discovery-and-innovation",
+      "name": "R&D / Scientific Discovery & Innovation Agent",
+      "heading_verbatim": "R&D / Scientific Discovery & Innovation Agent",
+      "industry": "Chemicals · Pharma · Manufacturing",
+      "industries": [
+        "Chemicals",
+        "Pharma",
+        "Manufacturing",
+        "Chemicals / Specialty Materials",
+        "Manufacturing / Industrial"
+      ],
+      "personas": [],
+      "problem": "\"Deep-reasoning agents for R&D discovery and structured innovation-idea coaching. Industry-specific because the underlying knowledge graphs and evaluation criteria are industry-specific.\" The underlying customer detail describes deep-reasoning agents for AI-assisted scientific discovery, and internal startup contest submissions that vary in quality and completeness.",
+      "sources": [
+        "Industry-specific knowledge graphs (referenced, not itemised)",
+        "Internal startup contest submissions"
+      ],
+      "surface": "",
+      "actions": [
+        "Reason deeply over research knowledge for AI-assisted scientific discovery",
+        "Coach innovation ideas into a structured, complete form",
+        "Apply industry-specific evaluation criteria to submissions"
+      ],
+      "value": [
+        "Brings more of the existing research corpus to bear on a discovery question",
+        "Raises the floor on the quality and completeness of submitted ideas",
+        "Applies the same evaluation standard to every submission"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: ANDRITZ DuPont Specialty Products USA\"",
+        "Customer-internal program detail: \"Internal startup contest submissions vary in quality and completeness.\"",
+        "Customer-internal agent codenames: \"Innovation Idea Coach\", \"R&D / Innovation Agents\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #12 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "requirements-and-innovation-authoring",
+      "name": "Requirements & Innovation Authoring Agent",
+      "heading_verbatim": "Requirements & Innovation Authoring Agent",
+      "industry": "Insurance · Industrial",
+      "industries": [
+        "Insurance",
+        "Industrial",
+        "Manufacturing / Industrial"
+      ],
+      "personas": [
+        "Product Owner"
+      ],
+      "problem": "\"Generative authoring inside a structured pipeline: requirements + acceptance criteria for insurance product owners, innovation pitch / business-plan coaching for industrial R&D. Industry-specific because the templates and rubrics are industry-shaped.\" Product Owners spend significant time drafting requirements and acceptance criteria, quality varies and there is no template reuse; innovation contest submissions vary in quality and completeness.",
+      "sources": [
+        "Requirements and acceptance criteria templates",
+        "Innovation pitch / business-plan rubrics",
+        "Internal startup contest submissions"
+      ],
+      "surface": "",
+      "actions": [
+        "Generate requirements and acceptance criteria from a structured template",
+        "Enforce template reuse so quality does not vary by author",
+        "Coach an innovation pitch or business plan toward a complete submission"
+      ],
+      "value": [
+        "Shortens the time a Product Owner spends getting to a usable first draft",
+        "Makes requirement quality consistent across authors",
+        "Turns a blank page into a guided, rubric-shaped one"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customers attached to the cluster: \"Customers: ANDRITZ Admiral\"",
+        "Customer-internal agent codenames: \"StorySmith (Requirements & Acceptance Criteria Generator)\", \"Innovation Idea Coach\"",
+        "Customer capability criticism: \"Product Owners spend significant time drafting requirements/AC; quality varies, no template reuse.\""
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #13 under \"Recommended FY27 priority list — industry-specific\""
+    },
+    {
+      "slug": "healthcare-clinical-documentation-and-data-ring",
+      "name": "Healthcare Clinical Documentation & Data Ring Agent",
+      "heading_verbatim": "Healthcare Clinical Documentation & Data Ring Agent",
+      "industry": "Healthcare · Public Health",
+      "industries": [
+        "Healthcare",
+        "Public Health",
+        "Public Sector (national government)"
+      ],
+      "personas": [
+        "Family doctor",
+        "Emergency medical services (EMS) / ambulance crew"
+      ],
+      "problem": "\"Clinical scribe (family doctors), EMS / ambulance transcription, health data ring across providers. Highest-fidelity industry-specific cluster — only Estonia in this corpus, but a clean-room template if AIBAST wants to lean into healthcare.\" The underlying variants are a clinical documentation agent for family doctors, an emergency medical services transcription agent, and a learning health data ring agent.",
+      "sources": [
+        "Clinical documentation from family-doctor consultations",
+        "EMS / ambulance audio for transcription",
+        "Health data shared across providers (data ring)"
+      ],
+      "surface": "",
+      "actions": [
+        "Scribe clinical documentation for family doctors",
+        "Transcribe emergency medical services encounters",
+        "Connect health data across providers as a learning data ring"
+      ],
+      "value": [
+        "Takes documentation off the clinician during and after the encounter",
+        "Captures the record of an emergency call without a second write-up",
+        "Makes health data usable across providers rather than siloed per provider"
+      ],
+      "example_questions": [],
+      "sensitive_flags": [
+        "Named customer attached to the cluster: \"Customers: Riigikantselei (Government of Estonia)\"",
+        "Internal org name and strategy commentary: \"only Estonia in this corpus, but a clean-room template if AIBAST wants to lean into healthcare\"",
+        "Customer-internal agent codenames: \"Family Doctors Information System PAI\", \"KiirabiScribe\", \"AndmeRing\"",
+        "Clinical/health data handling is inherently regulated content — any customer-facing use needs a privacy review beyond PII scrubbing"
+      ],
+      "doc_section": "Industry clusters (full detail) — also ranked #14 under \"Recommended FY27 priority list — industry-specific\""
+    }
+  ],
+  "sensitive_summary": [
+    "NAMED CUSTOMERS — the document is built entirely on named customer accounts and must be de-identified before any customer-facing use. Examples: \"Customers: Banorte DuPont Specialty Products USA Invesco Sitecore (FDE 3) Tanium (CAD)\"; \"Riigikantselei (Government of Estonia)\"; \"PANYNJ (Port Authority of NY & NJ)\"; \"Government of Manitoba\"; \"Montgomery County (MCG)\"; \"BC Hydro\"; \"Admiral\"; \"BBC\"; \"Fourlis\"; \"IWG\"; \"WSP\"; \"EDF\"; \"Enedis\"; \"Equisoft\"; \"Equitable\"; \"Hearst\"; \"ANDRITZ\".",
+    "NAMED EMPLOYEE / OWNERSHIP — \"Owner: Kody Wildfeuer (AIBAST)\" and \"Microsoft Graph against Kody's tenant.\"",
+    "DEAL VALUES AND CLOSE DATES — \"Rolls-Royce | Active deal (~£20M est.) but worksheet not yet completed; chat full of nomination-process discussion. Target close ~June 25 2026.\" and \"Rolls-Royce deserves fast follow-up: chat content shows ~£20M of agent ideas in flight (target close ~June 2026) but the worksheet wasn't surfaced.\"",
+    "CUSTOMER HEADCOUNT AND VOLUME FIGURES — \"~700 PYME sellers\"; \"~75 team managers each spend up to 1 hour/day manually downloading data from Looker\"; \"550-800 HR inquiries per month handled by a small team\"; \"~10,000 IT tickets per month, ~20% low-impact / self-service\"; \"Scaling Copilot Studio across ~14,000 users\"; \"audited financial statements from 250-300+ agencies\"; \"Moveworks unlocks ~300 accounts/month and resolves 57% autonomously\"; \"Coaching form completion takes ~14 minutes per session\"; \"Content lifecycle takes 7-10 days\"; \"across 20+ parking facilities\"; \"Hundreds of support tickets/day\".",
+    "CUSTOMER-VOICE QUOTES FROM INTERNAL LISTENING SESSIONS, ATTRIBUTED BY NAME — \"Rolls-Royce ... How do we create the new Rolls-Royce that is based on AI and agentic AI? So it's fused throughout.\"; \"Sainsbury's ... Running around 2,000 agents\"; \"Tesco ... Deploying end-to-end agentic AI across operations.\"; \"Burberry ... At an earlier stage of agentic AI adoption — fashion lags grocery in maturity.\"; \"Mayo Clinic ... Healthcare leaders emphasized the need for AI agents that respect clinical governance, auditability, and regulatory constraints.\"; \"Kaiser Permanente\", \"Cleveland Clinic\", \"HCA Healthcare\", \"CommonSpirit Health\", \"Providence Health\"; \"AIB ... Launching a customer-facing Copilot Studio portal; scaling to 2-2.5 million customers, with Accenture support.\"; \"Almac ... About 65% of the population is on Copilot.\"; \"ICON ... moving AI strategy out of IT and into the COO's office\"; \"Perry ... execution from inception to production took 12-14 months\"; \"LSEG ... not wholesale replacement of Salesforce\"; \"Kent & Essex Police | BVA work focused on cashable savings; approved for a case study.\" Source filenames are also named (e.g. \"Retail FY27 Industry Listening Session.docx\", \"PSNS - FY27 Industry Listening Sessions.docx\").",
+    "MICROSOFT-INTERNAL CRITICISM AND COMPETITIVE GAPS — \"Competition has agentic AI use cases already written in demos — Microsoft has a competitive demo gap.\"; \"Not seeing the agent development flywheel we hoped — partner ecosystem is not driving agent building, deployment, and scaling across customers.\"; \"Customers are finding it hard to get past the proof of concept stage and into mass production. Governance, security, and partner-ecosystem gaps are cited.\"; \"Every single one of them wants agents, but not sure how to get there.\"",
+    "INTERNAL ORG NAMES, PROGRAM NAMES AND CODENAMES — \"AIBAST\"; \"AI Agents Triage Chat – <Customer>\"; \"Agent Scenario Worksheet.xlsx\"; \"WorkIQ\"; \"RAPP brainstem\"; \"FDE 3\"; \"(CAD)\"; \"UK PSNS\"; \"BVA\"; \"Agent 365\"; \"FY27 Industry Listening Session\".",
+    "INTERNAL TOOLING / INFRASTRUCTURE DETAIL — \"Tooling — RAPP brainstem (running locally on :7073) → WorkIQ agent → npx -y @microsoft/workiq → Microsoft Graph against Kody's tenant.\"; \"cd rapp_brainstem/docs/agent-scenario-analysis/raw\"; \"Every WorkIQ /chat round saved to raw/batch*.json . Single source of truth: raw/findings.json\"; \"Bucket clustering is opinionated — mapping in raw/aggregate.py is editable.\"",
+    "ACCOUNT STATUS / PIPELINE INTELLIGENCE ON NAMED CUSTOMERS — the whole \"Customers without concrete scenario data this pass\" table, e.g. \"Pfizer Inc | Triage chat exists but no recent (5-month) message activity surfaced in search.\"; \"Edenred | Triage chat active; emphasis on needing defined use cases before proceeding\"; \"Ministry Brands LLC | Worksheet template exists but with no populated rows.\"; \"Kroger | Triage chat exists; not yet pulled.\" Also named: ADP, Scotiabank, Ford Motor Company, Queensland Department of Transport and Main Roads, Marriott International, World Wide Technology (WWT), Deere & Company, Playtika Ltd, Advocate Health, Power Corporation of Canada, Arla Foods amba, TietoEVRY Oyj, Dubai Holding LLC, Metso Outotec, GM Financial.",
+    "COMPETITOR AND THIRD-PARTY PRODUCTS NAMED IN A CUSTOMER CONTEXT — \"Hearst employees rely on Herbie (Moveworks); contract renewal opportunity to consolidate on Microsoft-native platform under existing M365.\"; \"NBA scores from ForwardLane and Salesforce\"; \"manually downloading data from Looker\"; \"Project/task management in Jira\"; \"No integration with Copilot and Oracle Finance module\"; \"with Accenture support\".",
+    "CUSTOMER COMPLIANCE / RISK EXPOSURE STATED AS A PROBLEM — \"IT teams purchase licenses without a way to verify proper use, SKU runout, or over-assignment — creating cost, compliance risk, renewal confusion.\" (a named customer's Microsoft licensing exposure); \"Contract managers lack real-time visibility into contractor PCI compliance after new requirements\"; \"Government administrative/financial policies fragmented across intranets — ... compliance risk.\"",
+    "CUSTOMER-INTERNAL AGENT CODENAMES — \"BePyme Agent\", \"Fleetwood Chat\", \"StorySmith\", \"Pipeline Pulse\", \"KnowledgeSmith\", \"AskPSC\", \"LexAssist (Õigusloome Assistent)\", \"HankeAssist (Smart Procurement Agent)\", \"RiigiCopilot\", \"AndmeRing\", \"KiirabiScribe\", \"TimePilot\", \"0-Level Agent\", \"HTS Knowledge Assistant (Herbie successor)\", \"Fabric Insight Analyst\", \"Family Doctors Information System PAI\".",
+    "REGULATED / CLINICAL DATA — the healthcare cluster involves clinical documentation, EMS transcription and cross-provider health data (\"AndmeRing — Learning health data ring agent.\"), which needs a privacy review beyond name-scrubbing before any external use."
+  ],
+  "structural_headings_ignored": [
+    "FY27 Priority Agent Scenarios — industry-focused (document title)",
+    "Executive summary",
+    "Recommended FY27 priority list — industry-specific (ranking table; the 14 rows are the same agents captured above)",
+    "Industry clusters (full detail) (container for the 14 agent sections)",
+    "Industry voice signals — recorded customer voices",
+    "Manufacturing, Travel & Transport (listening-session voices)",
+    "Insurance & Investments (listening-session voices)",
+    "Financial Services / Capital Markets (listening-session voices)",
+    "Healthcare (listening-session voices)",
+    "Retail (listening-session voices)",
+    "Public Sector / Policing (UK PSNS) (listening-session voices)",
+    "Ireland Industry Roundtable (listening-session voices)",
+    "Customers with named agents (container for per-customer tables)",
+    "ANDRITZ (per-customer table)",
+    "Admiral (per-customer table)",
+    "BBC (per-customer table)",
+    "BC Hydro (per-customer table)",
+    "Banorte (per-customer table)",
+    "DuPont Specialty Products USA (per-customer table)",
+    "EDF (per-customer table)",
+    "Enedis (per-customer table)",
+    "Equisoft (per-customer table)",
+    "Equitable (per-customer table)",
+    "Fourlis (per-customer table)",
+    "Government of Manitoba (per-customer table)",
+    "Hearst (per-customer table)",
+    "IWG (per-customer table)",
+    "Invesco (per-customer table)",
+    "Montgomery County (MCG) (per-customer table)",
+    "PANYNJ (Port Authority of NY & NJ) (per-customer table)",
+    "Riigikantselei (Government of Estonia) (per-customer table)",
+    "Sitecore (FDE 3) (per-customer table)",
+    "Tanium (CAD) (per-customer table)",
+    "WSP (per-customer table)",
+    "Customers without concrete scenario data this pass",
+    "Industry breakdown (container)",
+    "Chemicals / Specialty Materials (industry cut)",
+    "Energy / Utilities (industry cut)",
+    "Engineering / Professional Services (industry cut)",
+    "Financial Services - Asset Management (industry cut)",
+    "Financial Services - Banking (industry cut)",
+    "Insurance (industry cut)",
+    "Manufacturing / Industrial (industry cut)",
+    "Media / Broadcasting (industry cut)",
+    "Public Sector (industry cut)",
+    "Public Sector (national government) (industry cut)",
+    "Public Sector / Transportation (industry cut)",
+    "Real Estate / Workspace (industry cut)",
+    "Retail (multi-brand) (industry cut)",
+    "Software - Cybersecurity / Endpoint (industry cut)",
+    "Software - Digital Experience Platform (industry cut)",
+    "Excluded — horizontal / table-stakes scenarios (container)",
+    "IT Service Desk / L1 Triage (EXPLICITLY EXCLUDED horizontal pattern — not an FY27 priority agent)",
+    "Generic Workflow Orchestration / Task Mgmt (EXPLICITLY EXCLUDED horizontal pattern — not an FY27 priority agent)",
+    "Generic Intranet / Policy Knowledge Lookup (EXPLICITLY EXCLUDED horizontal pattern — not an FY27 priority agent)",
+    "Generic Shared-Mailbox / Email Triage (EXPLICITLY EXCLUDED horizontal pattern — not an FY27 priority agent)",
+    "Raw extracted agents (verbatim source table of 72 per-customer rows feeding the 14 clusters)",
+    "How this report was built",
+    "Why the rebucket",
+    "Known limitations & in-flight work",
+    "How to refresh / extend",
+    "Audit trail"
+  ]
+}

@@ -1,0 +1,35 @@
+# ============================================================
+# .vault gitignore
+# Ship the structure and templates, ignore all user content.
+# ============================================================
+
+# Ignore everything by default
+*
+
+# But allow the structure to be committed:
+!README.md
+!_template_*
+!.gitignore
+!.obsidian/
+!.obsidian/app.json
+!.obsidian/appearance.json
+!.obsidian/graph.json
+
+# Keep subdirectory structure
+!projects/
+!projects/README.md
+!projects/_template_*
+!customers/
+!customers/README.md
+!customers/_template_*
+!transcripts/
+!transcripts/README.md
+!demos/
+!demos/README.md
+!transpiled/
+!transpiled/README.md
+!deployments/
+!deployments/README.md
+!deployments/_template_*
+!scratch/
+!scratch/README.md
