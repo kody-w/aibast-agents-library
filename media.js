@@ -92,6 +92,13 @@
     owner: here.owner || "microsoft",
     repo: here.repo || "aibast-agents-library",
     branch: "media-server",
+    /* Where to look when this repo has no media branch of its own yet.
+       A fork inherits the pages but not the media, and upstream will not have
+       the branch until the migration script has run. Rather than show a broken
+       player in the meantime, fall back to the repo that does have it — and
+       stop using the fallback the moment the local branch answers, so the
+       cutover needs no code change. Set to null once migration is done. */
+    fallback: { owner: "kody-w", repo: "aibast-agents-library", branch: "media-server" },
     /* Above this, an object URL is the wrong tool: it buffers the whole file
        and gives up range requests. Fail loudly rather than hang a page. */
     maxBytes: 25 * 1024 * 1024,
@@ -125,17 +132,31 @@
     return TYPES[ext] || "application/octet-stream";
   }
 
-  function rawURL(path) {
-    return "https://raw.githubusercontent.com/" + CFG.owner + "/" + CFG.repo +
-           "/" + CFG.branch + "/" + String(path).replace(/^\/+/, "");
+  function rawURL(path, o) {
+    o = o || CFG;
+    return "https://raw.githubusercontent.com/" + o.owner + "/" + o.repo +
+           "/" + o.branch + "/" + String(path).replace(/^\/+/, "");
   }
 
   /* jsDelivr serves the same branch with a correct Content-Type and real range
      support, so it is the better source when it has the file. It is a cache in
      front of GitHub, not a different truth. Only used as a first try. */
-  function cdnURL(path) {
-    return "https://cdn.jsdelivr.net/gh/" + CFG.owner + "/" + CFG.repo +
-           "@" + CFG.branch + "/" + String(path).replace(/^\/+/, "");
+  function cdnURL(path, o) {
+    o = o || CFG;
+    return "https://cdn.jsdelivr.net/gh/" + o.owner + "/" + o.repo +
+           "@" + o.branch + "/" + String(path).replace(/^\/+/, "");
+  }
+
+  /* Sources in preference order: this repo's own media branch first, the
+     fallback only if there is one. Returning a list rather than a string is
+     what lets the cutover happen by data instead of by deploy. */
+  function sourcesFor(path) {
+    var out = [cdnURL(path), rawURL(path)];
+    var f = CFG.fallback;
+    if (f && (f.owner !== CFG.owner || f.repo !== CFG.repo || f.branch !== CFG.branch)) {
+      out.push(cdnURL(path, f), rawURL(path, f));
+    }
+    return out;
   }
 
   function fetchBytes(url, onProgress) {
@@ -173,8 +194,12 @@
     if (inflight[path]) return inflight[path];
 
     var mime = opts.type || mimeFor(path);
-    var p = fetchBytes(cdnURL(path), opts.onProgress)
-      .catch(function () { return fetchBytes(rawURL(path), opts.onProgress); })
+    // Walk the source list so a repo without its own media branch still plays.
+    var srcs = sourcesFor(path);
+    var p = srcs.reduce(function (chain, u, i) {
+      return i === 0 ? fetchBytes(u, opts.onProgress)
+                     : chain.catch(function () { return fetchBytes(u, opts.onProgress); });
+    }, null)
       .then(function (buf) {
         // The declared type is ours. This is the whole trick: the response may
         // have arrived as application/octet-stream under nosniff, but a Blob we
@@ -625,15 +650,28 @@
         var done = false;
         function ok() { if (done) return; done = true; cleanup();
           el.setAttribute("data-media-state", "ready"); resolve(el.src); }
-        function bad() { if (done) return; done = true; cleanup();
-          resolve(blobPlay(el, path, opts)); }
+        function bad() {
+          if (done) return;
+          // Try the next source before giving up on streaming altogether.
+          if (el.__rmNext && el.__rmNext()) return;
+          done = true; cleanup();
+          resolve(blobPlay(el, path, opts));
+        }
         function cleanup() {
           el.removeEventListener("loadedmetadata", ok);
           el.removeEventListener("error", bad);
         }
         el.addEventListener("loadedmetadata", ok);
         el.addEventListener("error", bad);
-        el.src = cdnURL(path);
+        // Same order for the direct-stream path: own branch, then fallback.
+        var list = sourcesFor(path), at = 0;
+        el.__rmNext = function () {
+          at += 1;
+          if (at >= list.length) return false;
+          el.src = list[at];
+          return true;
+        };
+        el.src = list[0];
         setTimeout(bad, opts.timeout || 12000);
       });
     }

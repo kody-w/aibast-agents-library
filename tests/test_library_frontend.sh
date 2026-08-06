@@ -792,6 +792,14 @@ for f in ('index.html','agents.html','docs/index.html','docs/installer.html','sk
 PY"
 
 echo "== T-CLEAN clean break (kody-w refs only in sanctioned places) =="
+check "the media fallback is temporary and has a scripted exit" "python3 - <<'PY'
+js=open('media.js').read()
+if 'kody-w' in js:
+    assert 'fallback:' in js, 'a kody-w ref in media.js that is not the media fallback'
+    assert 'Set to null once migration is done' in js, 'the fallback does not say it is temporary'
+    boot=open('scripts/bootstrap_media_branch.py').read()
+    assert 'fallback: null' in boot, 'nothing removes the fallback; it is not temporary'
+PY"
 check "kody-w refs confined to allowlist (tracked + untracked)" "python3 - <<'PY'
 import re, subprocess
 r=subprocess.run(['git','grep','--untracked','-l','-E','kody-w|kwildfeuer|billwhalen'],
@@ -805,7 +813,14 @@ ALLOW_FILES={'vbrainstem/brainstem_web.py',  # auth CORS proxy, env-overridable 
              'vbrainstem/README.md',         # discloses that proxy to the user (required)
              'DISCLAIMER.md',                # same disclosure, user-facing
              'docs/CLEAN-BREAK.md',          # the audit record itself
-             'scripts/corpus_sync.py'}       # addresses the kernel authority file by name
+             'scripts/corpus_sync.py',       # addresses the kernel authority file by name
+             # A TEMPORARY media fallback with a scripted exit. A repo without its
+             # own media-server branch would otherwise show a broken player; this
+             # points at the repo that has one until the branch is stood up here.
+             # scripts/bootstrap_media_branch.py deletes it as its last step, and
+             # the assertion below fails the build if that stops being true.
+             'media.js',
+             'scripts/bootstrap_media_branch.py'}
 # The staging fork's own identity (kody-w/aibast-agents-library) is a sanctioned
 # self-reference: the daily CI stamps whichever repo generated the snapshot, and
 # it self-heals to microsoft/* when the workflow runs upstream.
