@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/conference_session_abstract_pack
 source_url: https://microsoft.github.io/cat-agent-skills/#conference-session-abstract-pack
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Conference Session Abstract Pack

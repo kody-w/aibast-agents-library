@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/copilot_agents_news_scout
 source_url: https://microsoft.github.io/cat-agent-skills/#copilot-agents-news-scout
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Copilot & Agents News Scout

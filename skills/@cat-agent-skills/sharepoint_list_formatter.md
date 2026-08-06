@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/sharepoint_list_formatter
 source_url: https://microsoft.github.io/cat-agent-skills/#sharepoint-list-formatter
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # SharePoint List Formatter

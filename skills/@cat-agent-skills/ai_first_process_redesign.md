@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/ai_first_process_redesign
 source_url: https://microsoft.github.io/cat-agent-skills/#ai-first-process-redesign
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # AI-First Process Redesign

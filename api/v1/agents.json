@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-agents/1.0",
-  "generated": "2026-08-05T16:52:41.645660+00:00",
+  "generated": "2026-08-06T08:06:57.675935+00:00",
   "count": 105,
   "agents": [
     {
@@ -650,7 +650,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/win_probability_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/win-probability.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/win-probability",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/105"
+      }
     },
     {
       "name": "@aibast-agents-library/proposal-generation",
@@ -1286,7 +1291,12 @@
       "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/federal_government_stacks/workforce_clearance_onboarding_stack/workforce_clearance_onboarding_agent.py",
       "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/workforce-clearance-onboarding.json",
       "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/workforce-clearance-onboarding",
-      "engagement": null
+      "engagement": {
+        "upvotes": 0,
+        "downloads": 0,
+        "comments": 0,
+        "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/106"
+      }
     },
     {
       "name": "@aibast-agents-library/claims-processing",

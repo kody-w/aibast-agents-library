@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/microsoft_ai_platform_advisor
 source_url: https://microsoft.github.io/cat-agent-skills/#microsoft-ai-platform-advisor
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Microsoft AI Platform Advisor

@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/power_bi_model_review
 source_url: https://microsoft.github.io/cat-agent-skills/#power-bi-model-review
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Power BI Model Review

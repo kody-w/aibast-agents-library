@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/global_greenwashing_claim_auditor
 source_url: https://microsoft.github.io/cat-agent-skills/#global-greenwashing-claim-auditor
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Global Greenwashing Claim Auditor

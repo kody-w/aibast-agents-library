@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/b2b_outreach_suite
 source_url: https://microsoft.github.io/cat-agent-skills/#b2b-outreach-suite
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # B2B Outreach Suite

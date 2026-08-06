@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/awaiting_reply
 source_url: https://microsoft.github.io/cat-agent-skills/#awaiting-reply
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Awaiting Reply

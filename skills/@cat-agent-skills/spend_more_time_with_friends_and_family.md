@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/spend_more_time_with_friends_and_family
 source_url: https://microsoft.github.io/cat-agent-skills/#spend-more-time-with-friends-and-family
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Spend More Time With Friends & Family

@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/exam_prep_learning_plan_builder
 source_url: https://microsoft.github.io/cat-agent-skills/#exam-prep-learning-plan-builder
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Exam Prep Learning Plan Builder

@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/lab_column_mapper
 source_url: https://microsoft.github.io/cat-agent-skills/#lab-column-mapper
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Lab Column Mapper

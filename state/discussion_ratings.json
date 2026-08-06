@@ -1753,6 +1753,40 @@
       },
       "url": "https://github.com/kody-w/aibast-agents-library/discussions/104",
       "number": 104
+    },
+    "@aibast-agents-library/win-probability": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/105",
+      "number": 105
+    },
+    "@aibast-agents-library/workforce-clearance-onboarding": {
+      "upvotes": 0,
+      "downloads": 0,
+      "score": 0,
+      "comments": 0,
+      "signals": {
+        "worked": 0,
+        "did_not_work": 0,
+        "stuck": 0,
+        "regular_use": 0,
+        "shipped": 0,
+        "want_to_try": 0,
+        "saved_time": 0
+      },
+      "url": "https://github.com/kody-w/aibast-agents-library/discussions/106",
+      "number": 106
     }
   }
 }

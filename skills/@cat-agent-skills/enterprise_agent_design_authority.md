@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/enterprise_agent_design_authority
 source_url: https://microsoft.github.io/cat-agent-skills/#enterprise-agent-design-authority
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Enterprise Agent Design Authority (EADA)

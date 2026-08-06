@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/campaign_deck_builder
 source_url: https://microsoft.github.io/cat-agent-skills/#campaign-deck-builder
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Campaign Deck Builder

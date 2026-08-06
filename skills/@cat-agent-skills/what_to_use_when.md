@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/what_to_use_when
 source_url: https://microsoft.github.io/cat-agent-skills/#what-to-use-when
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # What to Use When

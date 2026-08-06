@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/persona_reaction_panel
 source_url: https://microsoft.github.io/cat-agent-skills/#persona-reaction-panel
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Persona Reaction Panel

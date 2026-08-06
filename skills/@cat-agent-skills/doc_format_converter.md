@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/doc_format_converter
 source_url: https://microsoft.github.io/cat-agent-skills/#doc-format-converter
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Universal Document Converter

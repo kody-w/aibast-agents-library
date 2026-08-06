@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/pdf_table_data_conversion
 source_url: https://microsoft.github.io/cat-agent-skills/#pdf-table-data-conversion
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # PDF Table Data Conversion

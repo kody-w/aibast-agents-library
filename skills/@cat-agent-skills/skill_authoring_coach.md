@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/skill_authoring_coach
 source_url: https://microsoft.github.io/cat-agent-skills/#skill-authoring-coach
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Skill Authoring Coach

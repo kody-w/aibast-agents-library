@@ -12,7 +12,7 @@ source_ref: @cat-agent-skills/business_os
 source_url: https://microsoft.github.io/cat-agent-skills/#business-os
 source_license: MIT
 converted_from: CAT Agent Skills
-converted_on: 2026-08-05
+converted_on: 2026-08-06
 ---
 
 # Business OS
