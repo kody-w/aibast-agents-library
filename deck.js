@@ -518,6 +518,7 @@
                    valign: "middle", align: "center", fill: "F4F4F8" });
 
     footer(s, n);
+    return s;
   }
 
   /* Fallback when the catalog cannot be fetched (opened from disk, say). The
@@ -1299,8 +1300,13 @@
             case "close":       guideCloseSlide(pptx, sl, n); break;
             case "architecture":
               if (arch) {
-                architectureSlide(pptx, arch, g.display_name,
-                                  (g.industries || [])[0], n);
+                /* The catalog's own architecture renderer, reused so the
+                   slide here and the one on architecture.html cannot differ.
+                   It does not know about takeaways, so the strip is added
+                   after — otherwise this is the one slide whose page and deck
+                   disagree, which is the whole claim this export makes. */
+                takeaway(pptx, architectureSlide(pptx, arch, g.display_name,
+                                                 (g.industries || [])[0], n), sl);
               } else {
                 /* Say so on the slide rather than shipping a blank one. */
                 guideStatementSlide(pptx, {
