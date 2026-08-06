@@ -131,14 +131,21 @@ ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;backgroun
   position:relative}
 .synth ul li::before{content:"";position:absolute;left:0;top:1.4cqh;width:1.1cqh;height:1.1cqh;
   border-radius:50%;background:var(--accent-2)}
-.onefile{background:#070f26;border-radius:12px;padding:2.6cqh;display:flex;flex-direction:column;
-  gap:1.4cqh}
-.onefile .fname{font-family:Consolas,ui-monospace,monospace;font-size:3cqh;font-weight:700;
-  color:#e2669a}
-.onefile .part{background:#14203f;border:1px solid #2a3a66;border-radius:8px;padding:1.6cqh}
-.onefile .part b{display:block;color:#fff;font-size:2.7cqh}
-.onefile .part span{color:#9ba3c4;font-size:2.4cqh}
-.onefile .cap{color:#8c93b5;font-size:2.4cqh;font-style:italic;text-align:center;margin-top:auto}
+/* The prompt, ready to copy. This panel used to advertise an internal file
+   format by name — "toasted skill", "brainstem" — to an audience that has
+   never heard either word and does not need to. What they need is the thing
+   they paste. */
+.onefile{background:#070f26;border-radius:12px;padding:2.2cqh;display:flex;flex-direction:column;
+  gap:1.2cqh;min-height:0}
+.onefile .fname{display:flex;align-items:center;gap:1.2cqh;font-size:2.5cqh;font-weight:700;
+  color:#fff}
+.onefile .fname .cp{margin-left:auto;font-size:2.1cqh;font-weight:600;color:#070f26;
+  background:#fff;border:0;border-radius:6px;padding:.7cqh 1.4cqh;cursor:pointer;
+  font-family:inherit}
+.onefile .fname .cp:hover{background:#e2669a;color:#fff}
+.onefile pre{flex:1;min-height:0;overflow:auto;background:#0d1730;border:1px solid #2a3a66;
+  border-radius:8px;padding:1.6cqh;color:#c7cbe6;font-family:Consolas,ui-monospace,monospace;
+  font-size:1.95cqh;line-height:1.45;white-space:pre-wrap}
 
 /* The architecture, drawn on the slide. It used to be a box saying the real
    one was on another page, which is not a slide — it is a note apologising for
@@ -313,11 +320,10 @@ var R={
     return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
       '<div class="synth"><div><div class="body">'+esc(s.body||"")+'</div><ul>'+
       (s.points||[]).map(function(p){return "<li>"+esc(p)+"</li>";}).join("")+
-      '</ul></div><div class="onefile"><div class="fname">blastbox.skill.md</div>'+
-      '<div class="part"><b>Instructions</b><span>what a model reads and follows</span></div>'+
-      '<div class="part"><b>Python</b><span>what a brainstem runs, byte for byte</span></div>'+
-      '<div class="part"><b>Digest</b><span>so an edit in transit fails, not runs</span></div>'+
-      '<div class="cap">One artifact. Nothing to keep in sync.</div></div></div>';
+      '</ul></div><div class="onefile">'+
+      '<div class="fname">'+esc(s.prompt_title||"Paste this into Copilot")+
+        '<button class="cp" data-copy="1">Copy</button></div>'+
+      '<pre>'+esc(s.prompt||"")+'</pre></div></div>';
   },
   architecture:function(s){
     if(!ARCH){
@@ -398,6 +404,15 @@ function go(i){
   document.getElementById("prevBtn").disabled=AT===0;
   document.getElementById("nextBtn").disabled=AT===n-1;
 }
+
+/* Copy the prompt. The whole point of the slide is that they leave with it. */
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-copy]"); if(!b) return;
+  var pre=b.closest(".onefile").querySelector("pre");
+  navigator.clipboard.writeText(pre.textContent).then(function(){
+    var t=b.textContent; b.textContent="Copied"; setTimeout(function(){b.textContent=t;},1600);
+  }).catch(function(){ b.textContent="Select and copy"; });
+});
 
 document.getElementById("prevBtn").onclick=function(){go(AT-1);};
 document.getElementById("nextBtn").onclick=function(){go(AT+1);};

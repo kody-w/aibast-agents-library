@@ -195,14 +195,15 @@
       "id": "synthetic",
       "kind": "synthetic",
       "kicker": "Data you can demo on",
-      "title": "Demo on synthetic contracts — a real one is a risk with no upside",
-      "body": "A demo needs paper that behaves like a real counterparty's and could never be mistaken for one. The BlastBox pattern generates a whole fictional company: its standard paper, its clause library, its negotiated positions — consistent enough to be convincing, invented enough to be safe.",
+      "title": "Never demo on a real contract — generate your own in two minutes",
+      "body": "A demo needs paper that behaves like a real counterparty's and could never be mistaken for one. Paste the prompt into Copilot and it writes the whole set: a fictional company, its standard agreement, and three counterparty versions that each break the standard in a different way.",
       "points": [
-        "One fictional company, consistently named, so nothing can be mistaken for a real counterparty.",
-        "The generator ships as a toasted skill: instructions and Python in one file, extracted byte for byte rather than re-derived.",
-        "Hand the file to an AI and it produces the data end to end; hand it to a brainstem and it registers as a tool. Same file.",
-        "Every generated artifact carries a synthetic-data badge, so no screenshot can later be mistaken for a real review."
+        "Nothing is copied from a customer, so the deck is safe to leave behind.",
+        "The three versions are deliberately different — one you accept, one you negotiate, one you escalate — so the agent has something to actually find.",
+        "Every page is stamped SYNTHETIC, so a screenshot can never be mistaken for a real review."
       ],
+      "prompt_title": "Paste this into Microsoft 365 Copilot",
+      "prompt": "Help me build demo data for a contract-review agent. Everything you write must be fictional — no real company, person, or agreement.\n\n1. Invent a company: name, industry, rough size, and the kind of agreements it signs. Make the name obviously invented.\n\n2. Write that company's STANDARD services agreement, with clauses for: liability cap, indemnity, termination, payment terms, data protection, IP ownership, and warranty.\n\n3. Write THREE counterparty versions of the same agreement. In each, change three or four clauses so they depart from the standard — one set a reviewer would accept, one they would negotiate, and one they would escalate.\n\n4. Add a table listing every departure: the clause, what changed, and why it matters.\n\n5. Put \"SYNTHETIC — DEMO DATA\" at the top of every document.\n\nReturn it as Markdown, one section per document.",
       "takeaway": "The demo that cannot leak is also the demo you can leave behind."
     },
     {

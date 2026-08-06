@@ -1244,41 +1244,30 @@
   function guideSyntheticSlide(pptx, sl, n) {
     var s = lightSlide(pptx);
     kicker(s, sl.kicker || "");
-    heading(s, sl.title, { size: 26 });
+    heading(s, sl.title, { size: 24 });
     s.addText(txt(sl.body), {
-      x: 0.62, y: 1.4, w: 7.2, h: 1.5,
-      fontFace: FONT, fontSize: 14, color: INK, valign: "top",
+      x: 0.62, y: 1.45, w: 6.0, h: 1.5,
+      fontFace: FONT, fontSize: 12.5, color: INK, valign: "top",
       lineSpacingMultiple: 1.25
     });
-    bulletList(s, sl.points, { y: 2.95, w: 7.2, h: 2.55, size: 11.5 });
-    /* The single file, drawn as a single file — the whole point of the
-       pattern is that there is not a second one. */
+    bulletList(s, sl.points, { y: 3.05, w: 6.0, h: 2.4, size: 11 });
+
+    /* The prompt, printed so it survives the export. Someone reading the deck
+       on a plane can retype it; someone on the page can copy it. The panel
+       used to advertise an internal file format by name to an audience that
+       has never heard of it. */
     s.addShape(pptx.ShapeType.roundRect, {
-      x: 8.2, y: 1.5, w: 4.5, h: 3.95, rectRadius: 0.1,
+      x: 7.0, y: 1.4, w: 5.7, h: 4.6, rectRadius: 0.1,
       fill: { color: STAGE }, line: { type: "none" }
     });
-    s.addText("blastbox.skill.md", {
-      x: 8.45, y: 1.75, w: 4.0, h: 0.35,
-      fontFace: "Consolas", fontSize: 13, bold: true, color: PINK
+    s.addText(txt(sl.prompt_title || "Paste this into Copilot"), {
+      x: 7.25, y: 1.6, w: 5.2, h: 0.32,
+      fontFace: FONT, fontSize: 11.5, bold: true, color: PAPER
     });
-    [["Instructions", "what a model reads and follows"],
-     ["Python", "what a brainstem runs, byte for byte"],
-     ["Digest", "so an edit in transit fails, not runs"]
-    ].forEach(function (p, i) {
-      s.addShape(pptx.ShapeType.roundRect, {
-        x: 8.45, y: 2.35 + i * 1.05, w: 4.0, h: 0.85, rectRadius: 0.06,
-        fill: { color: "14203F" }, line: { color: "2A3A66", width: 0.5 }
-      });
-      s.addText([
-        { text: p[0], options: { bold: true, fontSize: 11, color: PAPER,
-                                 breakLine: true } },
-        { text: p[1], options: { fontSize: 9, color: "9BA3C4" } }
-      ], { x: 8.6, y: 2.4 + i * 1.05, w: 3.7, h: 0.75, valign: "middle",
-           fontFace: FONT });
-    });
-    s.addText("One artifact. Nothing to keep in sync.", {
-      x: 8.45, y: 5.05, w: 4.0, h: 0.3, align: "center",
-      fontFace: FONT, fontSize: 10, italic: true, color: "8C93B5"
+    s.addText(txt(sl.prompt), {
+      x: 7.25, y: 2.0, w: 5.2, h: 3.85,
+      fontFace: "Consolas", fontSize: 7.5, color: "C7CBE6",
+      valign: "top", lineSpacingMultiple: 1.15, shrinkText: true
     });
     takeaway(pptx, s, sl);
     footer(s, n);
