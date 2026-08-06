@@ -994,7 +994,11 @@
     for (var i = 0; i < list.length; i++) {
       if (list[i].id === id && list[i].mark_status === "mark") return list[i].mark;
     }
-    return null;
+    /* A harness is not a catalog product — GitHub Copilot has a real mark on
+       disk and no row in products.json, so this used to return null and the
+       title slide drew the name with no logo beside it. */
+    var idx = (products && products._index) || {};
+    return (idx[id] && idx[id].file) || null;
   }
 
   /* A product row: mark if we have one, initial-chip if we do not. */
@@ -1306,7 +1310,14 @@
 
     /* The architecture slide is the one the catalog already knows how to draw;
        reuse it rather than drawing a second, differently-shaped one. */
-    var need = [getJSON(["data/products.json", "api/v1/products.json"])];
+    var need = [Promise.all([
+      getJSON(["data/products.json", "api/v1/products.json"]),
+      getJSON(["assets/products/index.json"])
+    ]).then(function (r) {
+      var p = r[0] || { products: [] };
+      p._index = (r[1] && r[1].marks) || {};
+      return p;
+    })];
     need.push(o.arch ? Promise.resolve(o.arch)
                      : getJSON(["data/architectures.json"]).then(function (d) {
       var list = (d && d.architectures) || [];

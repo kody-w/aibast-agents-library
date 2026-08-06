@@ -232,7 +232,7 @@ SCRIPT = r"""
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 
-var GUIDE=null, PRODUCTS={products:[]}, ARCH=null, AT=0;
+var GUIDE=null, PRODUCTS={products:[]}, ARCH=null, AT=0, MARKINDEX={};
 
 function slug(){
   var m=/[?&]solution=([^&]+)/.exec(location.search);
@@ -244,7 +244,12 @@ function slug(){
 function markOf(id){
   var l=PRODUCTS.products||[];
   for(var i=0;i<l.length;i++){ if(l[i].id===id && l[i].mark_status==="mark") return l[i].mark; }
-  return null;
+  /* Not every mark belongs to a catalog product. GitHub Copilot is a harness,
+     not an entry in the library, so the products list has no row for it and the
+     title slide silently drew nothing. The marks index is the authority on what
+     is on disk; the products list only says which of them a catalog entry uses. */
+  var r=MARKINDEX[id];
+  return r&&r.file?r.file:null;
 }
 function markTag(id,name,cls){
   var p=markOf(id);
@@ -424,9 +429,11 @@ Promise.all([
   fetch("data/products.json",{cache:"no-cache"}).then(function(r){return r.ok?r.json():null;})
     .catch(function(){return null;}),
   fetch("data/architectures.json",{cache:"no-cache"}).then(function(r){return r.ok?r.json():null;})
+    .catch(function(){return null;}),
+  fetch("assets/products/index.json",{cache:"no-cache"}).then(function(r){return r.ok?r.json():null;})
     .catch(function(){return null;})
 ]).then(function(r){
-  GUIDE=r[0]; PRODUCTS=r[1]||{products:[]};
+  GUIDE=r[0]; PRODUCTS=r[1]||{products:[]}; MARKINDEX=(r[3]&&r[3].marks)||{};
   ARCH=((r[2]&&r[2].architectures)||[]).filter(function(a){return a.slug===GUIDE.slug;})[0]||null;
   document.title=GUIDE.display_name+" — configuration guide — AIBAST Agent Library";
   document.getElementById("cCrumb").textContent=
