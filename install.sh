@@ -403,17 +403,16 @@ install_brainstem() {
         # every blob ever committed, and a full clone pulls all of it. Depth 1
         # fetches only the tip, which is the whole point of stripping them.
         # Pinning needs real history, so that path deepens on demand below.
-        # Sparse as well as shallow. The installer only ever reads
-        # rapp_brainstem/ — the agent library, the static API, the docs and the
-        # film kit are never touched, and expanding the whole tree onto a user's
-        # disk to use 1.5 MB of it is space they did not ask to give up.
-        # Falls back to a plain clone on a git too old for sparse-checkout.
-        if git clone --quiet --depth 1 --filter=blob:none --sparse \
-                "$REPO_URL" "$BRAINSTEM_HOME/src" 2>/dev/null; then
-            ( cd "$BRAINSTEM_HOME/src" && git sparse-checkout set rapp_brainstem >/dev/null 2>&1 ) || true
-        else
-            git clone --quiet --depth 1 "$REPO_URL" "$BRAINSTEM_HOME/src"
-        fi
+        # A plain full clone again. Two things made that affordable: the
+        # demo recordings moved to the orphan `media-server` branch, and this
+        # branch was re-rooted, so the pack no longer carries every video ever
+        # committed. Measured: 28 MB with full history.
+        #
+        # `--single-branch` is the one flag that still earns its place. Without
+        # it `git clone` fetches EVERY branch, and that pulls the 620 MB media
+        # branch straight back down — the thing moving it off `main` was meant
+        # to prevent.
+        git clone --quiet --single-branch "$REPO_URL" "$BRAINSTEM_HOME/src"
         # If pinning, checkout the specific tag after clone (accepts every tag form).
         if [ -n "$PIN_VERSION" ]; then
             cd "$BRAINSTEM_HOME/src"

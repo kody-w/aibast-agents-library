@@ -49,10 +49,9 @@ clone_legacy() {   # what a machine installed before this change looks like
     git clone --quiet --no-local --branch "$BRANCH" "$REPO_ROOT" "$1" 2>/dev/null
 }
 
-clone_modern() {   # what install.sh now creates
-    git clone --quiet --no-local --depth 1 --sparse --branch "$BRANCH" \
-        "$REPO_ROOT" "$1" 2>/dev/null || return 1
-    ( cd "$1" && git sparse-checkout set rapp_brainstem >/dev/null 2>&1 ) || true
+clone_modern() {   # what install.sh now creates: a plain single-branch clone
+    git clone --quiet --no-local --single-branch --branch "$BRANCH" \
+        "$REPO_ROOT" "$1" 2>/dev/null
 }
 
 echo "== installer checkout + run shapes =="
@@ -73,18 +72,29 @@ for shape in legacy modern; do
         continue
     fi
 
-    # Size is the whole point of the modern shape; assert it rather than trust it.
+    # Size is the whole point; assert it rather than trust it. A full clone is
+    # affordable again only because the media moved to its own branch AND this
+    # branch was re-rooted — and only if the clone does not fetch every branch.
     if [ "$shape" = modern ]; then
         kb=$(du -sk "$DIR" | cut -f1)
-        if [ "$kb" -lt 40000 ]; then
-            ok "modern · checkout is $((kb/1024)) MB on disk (under 40 MB)"
+        if [ "$kb" -lt 80000 ]; then
+            ok "modern · full checkout is $((kb/1024)) MB on disk (under 80 MB)"
         else
-            bad "modern · checkout is small" "$((kb/1024)) MB on disk"
+            bad "modern · full checkout is small" "$((kb/1024)) MB on disk"
         fi
-        for heavy in agents api docs film media archive; do
-            [ -d "$DIR/$heavy" ] && bad "modern · $heavy is not expanded" "present"
+        # The failure this guards: a plain clone pulls EVERY branch, and the
+        # media branch is 620 MB. Single-branch is what keeps it out.
+        n=$(cd "$DIR" && git branch -r | wc -l | tr -d ' ')
+        if [ "$n" -eq 1 ]; then
+            ok "modern · fetched one branch, so the media branch stayed behind"
+        else
+            bad "modern · fetched one branch" "$n remote branches came down"
+        fi
+        # And the whole tree is really there — this is a full checkout now.
+        for want in agents api docs; do
+            [ -d "$DIR/$want" ] || bad "modern · $want is present" "missing"
         done
-        ok "modern · heavy directories are not expanded"
+        ok "modern · the full working tree is checked out"
     fi
 
     # --- update: an update is available and gets pulled -------------------
@@ -110,17 +120,10 @@ for shape in legacy modern; do
 
     # A sparse checkout must STAY sparse across an update, or the space saving
     # silently evaporates on the first upgrade.
-    if [ "$shape" = modern ]; then
-        if [ -d "$DIR/agents" ]; then
-            bad "modern · stays sparse after an update" "agents/ appeared"
-        else
-            ok "modern · stays sparse after an update"
-        fi
-    fi
+
 
     # --- pinned: needs real history, which a shallow clone does not have ---
-    ( cd "$DIR" && git fetch --unshallow --quiet >/dev/null 2>&1
-      git fetch origin --tags --quiet >/dev/null 2>&1 ) || true
+    ( cd "$DIR" && git fetch origin --tags --quiet >/dev/null 2>&1 ) || true
     tags="$(cd "$DIR" && git tag | wc -l | tr -d ' ')"
     if [ "$tags" -ge 1 ]; then
         ok "$shape · pinning can resolve tags ($tags found)"
@@ -128,9 +131,9 @@ for shape in legacy modern; do
         bad "$shape · pinning can resolve tags" "no tags after unshallow"
     fi
     if err="$(usable "$DIR")"; then
-        ok "$shape · still usable after unshallow"
+        ok "$shape · still usable after fetching tags"
     else
-        bad "$shape · still usable after unshallow" "$err"
+        bad "$shape · still usable after fetching tags" "$err"
     fi
 done
 

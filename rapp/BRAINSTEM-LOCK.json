@@ -33,12 +33,12 @@
     "rapp_brainstem/tests/test_polish.py": "53c936262177da8df82002d8d85a5460f70cd7b01989f5d1f28db718bbb58337",
     "rapp_brainstem/tests/test_security_hardening.py": "d23bf631ace588f9549ebd18d7bb29cb43c88525f3cb9afe60917ce67e6ed5c7",
     "rapp_brainstem/tests/test_streaming.py": "acb60878b92e71642736f20496ce80ede3afb375df1c7d88234cc8318d41a1b5",
-    "install.sh": "07aedb99602ea761f65a0ca7365b5224c05a5bc01987e5f36426077c2a9f9acf",
-    "install.ps1": "863e3bd9f6ef8dd26e40439b19e57c512edd8d11bb2b27d0ee2941ef6a7ae068",
+    "install.sh": "b8497f973e7066d172f5fe4588acaba262b52e48590afb2e4eecd56073825ab5",
+    "install.ps1": "6931fe2b91a1bd7f20db104d06d32686be88887031fbaea4cd052fd3d8659551",
     "install.cmd": "553cee35817c42c6d0ec4ffa0cd83d61e62e11a6749aa47f678ff25bc7f774b5",
     "install.command": "0098b153f3644a6a801b97d244512eb51d61e6245caa72f02b68a3e257e3e156",
-    "docs/install.sh": "07aedb99602ea761f65a0ca7365b5224c05a5bc01987e5f36426077c2a9f9acf",
-    "docs/install.ps1": "863e3bd9f6ef8dd26e40439b19e57c512edd8d11bb2b27d0ee2941ef6a7ae068",
+    "docs/install.sh": "b8497f973e7066d172f5fe4588acaba262b52e48590afb2e4eecd56073825ab5",
+    "docs/install.ps1": "6931fe2b91a1bd7f20db104d06d32686be88887031fbaea4cd052fd3d8659551",
     "docs/install.cmd": "553cee35817c42c6d0ec4ffa0cd83d61e62e11a6749aa47f678ff25bc7f774b5",
     "docs/install.command": "0098b153f3644a6a801b97d244512eb51d61e6245caa72f02b68a3e257e3e156"
   }
