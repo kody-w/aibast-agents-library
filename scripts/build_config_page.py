@@ -1,68 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Configuration guide — AIBAST Agent Library</title>
-<meta name="description" content="How to configure an industry solution on the Copilot Studio and GitHub Copilot harness: the Microsoft path end to end, the alternatives where another system is already in place, and synthetic data to demo on. Slides, exportable to PowerPoint.">
-<style>
-/* ══ ms-rapp shared design language ═════════════════════════════════════
-   These tokens and the header/footer/button/card rules below are identical
-   on every page of this site. Page-specific rules follow after the marker. */
-:root {
-  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
-  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
-  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
-  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
-  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
-  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
-  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
-}
-[data-theme="dark"] {
-  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
-  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
-  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
-  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
-  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
-  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-html,body{max-width:100%;overflow-x:hidden}
-body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-  color:var(--text);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+#!/usr/bin/env python3
+"""Generate config.html — the configuration-guide deck viewer.
 
-header.site{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);
-  backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-.nav{display:flex;align-items:center;gap:18px;padding:12px 0;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--text);white-space:nowrap}
-.brand:hover{text-decoration:none}
-.brand .mark{color:var(--accent);display:inline-flex}
-.brand .mark svg{width:19px;height:19px}
-.nav-links{display:flex;gap:4px;flex-wrap:wrap}
-.nav-links a{color:var(--text-dim);font-size:13.5px;padding:5px 10px;border-radius:8px}
-.nav-links a:hover{color:var(--text);background:var(--panel-2);text-decoration:none}
-.nav-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
-.icon-btn{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
-  width:32px;height:32px;border-radius:6px;cursor:pointer;
-  display:inline-flex;align-items:center;justify-content:center}
-.icon-btn svg{width:15px;height:15px}
-.icon-btn:hover{color:var(--text);border-color:var(--text-faint);text-decoration:none}
-footer.site{margin-top:20px;border-top:1px solid var(--border);padding:26px 0 44px}
-.foot{display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--text-faint)}
-.foot a{color:var(--text-dim)}
-.foot .copy{width:100%;margin-top:4px}
-@media (max-width:560px){.nav-links{order:3;width:100%}}
+The page is GENERATED rather than hand-written for one reason: its header,
+footer and design tokens must be byte-identical to every other page on the
+site. Copying them by hand is how a site ends up with four slightly different
+navs, and nobody can tell which one is right.
 
-.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border:1px solid var(--border);
-  border-radius:6px;background:var(--panel);color:var(--text);text-decoration:none;
-  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
-.btn:hover{border-color:var(--text-faint);text-decoration:none}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
-/* ══ page-specific ══════════════════════════════════════════════════════ */
+So the shared blocks are lifted out of roadmap.html at build time and this file
+only owns what is genuinely this page's own: the slide renderers, the deck
+chrome, and the export button.
+
+Run it after changing the shared theme or the page's own parts:
+    python3 scripts/build_config_page.py
+"""
+import pathlib, re, subprocess, sys
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+# The shared blocks, taken from the page that already carries them, so this
+# page cannot drift from the rest of the site.
+_src = (ROOT / "roadmap.html").read_text(encoding="utf-8")
+CSS = _src[_src.index("/* ══ ms-rapp shared design language"):
+           _src.index("/* ══ page-specific")]
+HEADER = _src[_src.index("<!-- ══ shared site header"):
+              _src.index("</header>") + len("</header>")]
+FOOTER = _src[_src.index('<footer class="site">'):
+              _src.index("</footer>") + len("</footer>")]
+
+PAGE_CSS = """/* ══ page-specific ══════════════════════════════════════════════════════ */
 
 /* The deck is the page. The header names it and gets out of the way — a title
    block repeating what the title slide already says costs a third of the
@@ -188,34 +153,9 @@ ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;backgroun
 @media print{header.site,.controls,.actions,footer.site,.hint{display:none}
   body{background:#fff}.slide{display:flex!important;position:static;page-break-after:always}
   .stage{aspect-ratio:auto;height:auto;border:0;box-shadow:none}}
-</style>
-</head>
-<body>
-<!-- ══ shared site header — identical on every page ══ -->
-<header class="site">
-  <div class="wrap nav">
-    <a class="brand" href="index.html">
-      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
-      AIBAST Agent Library
-    </a>
-    <nav class="nav-links" aria-label="Main">
-      <a href="agents.html">Library</a>
-      <a href="solutions.html">Solutions</a>
-      <a href="roadmap.html">Roadmap</a>
-      <a href="metrics.html">Metrics</a>
-      <a href="api.html">API</a>
-    </nav>
-    <div class="nav-actions">
-      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
-      </button>
-      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
-      </a>
-    </div>
-  </div>
-</header>
+"""
 
+BODY = """
 <main class="wrap">
   <section class="head">
     <div>
@@ -245,33 +185,17 @@ ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;backgroun
      slides away as a PowerPoint file you can edit and present yourself.</p>
   <p class="foot-note" id="cNote"></p>
 </main>
+"""
 
-<footer class="site">
-  <div class="wrap foot">
-    <a href="index.html">Get started</a>
-    <a href="agents.html">Library</a>
-    <a href="solutions.html">Solutions</a>
-    <a href="roadmap.html">Roadmap</a>
-    <a href="metrics.html">Metrics</a>
-    <a href="api.html">Static API</a>
-    <a href="scan.html">Scan</a>
-    <a href="wall.html">Wall of Fame</a>
-    <a href="brain.html">Docs Vault</a>
-    <a href="blog.html">Field Notes</a>
-    <a href="vbrainstem/">Run in your browser</a>
-    <a href="DISCLAIMER.md">Disclaimer</a>
-    <span class="copy">© 2026 Microsoft AIBAST. Some rights reserved. Status is what can be demonstrated today, not what is planned · <span id="rUpdated"></span></span>
-  </div>
-</footer>
-
+SCRIPT = r"""
 <!-- The version stamp is not decoration. GitHub Pages serves these with a
      cache header, so without it a returning visitor keeps yesterday's deck.js
      against today's data — which fails silently, as a slide that renders
      through the wrong branch rather than an error anyone would notice. -->
 <script src="vendor/jszip.min.js"></script>
 <script src="vendor/pptxgen.min.js"></script>
-<script src="export-signal.js?v=9d3366f"></script>
-<script src="deck.js?v=9d3366f"></script>
+<script src="export-signal.js?v=__BUILD__"></script>
+<script src="deck.js?v=__BUILD__"></script>
 <script>
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -461,3 +385,22 @@ Promise.all([
 </script>
 </body>
 </html>
+"""
+
+BUILD = subprocess.run(["git","-C",str(ROOT),"rev-parse","--short","HEAD"],
+                       capture_output=True, text=True).stdout.strip() or "dev"
+SCRIPT = SCRIPT.replace("__BUILD__", BUILD)
+
+html = ('<!DOCTYPE html>\n<html lang="en">\n<head>\n'
+        '<meta charset="UTF-8">\n'
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'
+        '<title>Configuration guide — AIBAST Agent Library</title>\n'
+        '<meta name="description" content="How to configure an industry solution on the '
+        'Copilot Studio and GitHub Copilot harness: the Microsoft path end to end, the '
+        'alternatives where another system is already in place, and synthetic data to '
+        'demo on. Slides, exportable to PowerPoint.">\n'
+        '<style>\n' + CSS + PAGE_CSS + '</style>\n</head>\n<body>\n'
+        + HEADER + '\n' + BODY + '\n' + FOOTER + '\n' + SCRIPT)
+
+(ROOT / "config.html").write_text(html, encoding="utf-8")
+print("config.html", len(html), "bytes")
