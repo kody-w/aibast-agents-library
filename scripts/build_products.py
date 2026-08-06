@@ -52,31 +52,50 @@ FORMAT_VERSION = "1.0.0"
 # `family` means the mark is the family's mark used beside an app's name — the
 # Dynamics 365 mark next to "Dynamics 365 Field Service" is the real Dynamics
 # mark, correctly labelled, not an invented Field Service icon.
-MARKS = {
-    "dynamics-365": ("media/jewels/dynamics-365.png", "exact"),
-    "dynamics-365-sales": ("media/jewels/dynamics-365.png", "family"),
-    "dynamics-365-customer-service": ("media/jewels/dynamics-365.png", "family"),
-    "dynamics-365-field-service": ("media/jewels/dynamics-365.png", "family"),
-    "dynamics-365-finance": ("media/jewels/dynamics-365.png", "family"),
-    "dynamics-365-supply-chain": ("media/jewels/dynamics-365.png", "family"),
-    "dynamics-365-commerce": ("media/jewels/dynamics-365.png", "family"),
-    "microsoft-teams": ("media/jewels/teams.png", "exact"),
-    "outlook": ("media/jewels/outlook.png", "exact"),
-    "sharepoint": ("media/jewels/sharepoint.png", "exact"),
-    "microsoft-365-copilot": ("media/jewels/copilot.png", "exact"),
-    # Official marks lifted at full resolution from the RAPP Overview deck
-    # rather than redrawn — see assets/products/index.json. These were labelled
-    # chips until the real files existed; none of them is an approximation.
-    "microsoft-copilot-studio": ("assets/products/copilot-studio.png", "exact"),
-    "power-bi": ("assets/products/power-bi.png", "exact"),
-    "power-automate": ("assets/products/power-automate.png", "exact"),
-    "power-apps": ("assets/products/power-apps.png", "exact"),
-    "dataverse": ("assets/products/dataverse.png", "exact"),
-    "azure-openai": ("assets/products/azure.png", "family"),
-    "azure-functions": ("assets/products/azure.png", "family"),
-    "azure-ai-foundry": ("assets/products/azure.png", "family"),
-    "azure-ai-search": ("assets/products/azure.png", "family"),
+def _load_marks() -> dict[str, tuple[str, str]]:
+    """The marks on disk, as harvested from Microsoft's own icon sets.
+
+    This used to be a hand-written table, and it was wrong in a way nobody
+    caught: half its entries pointed at media/jewels PNGs that were crops from
+    a VIDEO FRAME — SharePoint was 32x77 pixels. They passed every check
+    because a check can see that a file exists, not that a logo is a smudge.
+
+    Reading scripts/fetch_product_marks.py's index instead means the table
+    cannot disagree with the files, and a mark added by a fetch is available
+    immediately without a second edit here. Provenance for every entry (source
+    URL, date read) lives in assets/products/index.json.
+    """
+    idx = REPO_ROOT / "assets" / "products" / "index.json"
+    out: dict[str, tuple[str, str]] = {}
+    try:
+        doc = json.loads(idx.read_text(encoding="utf-8"))
+        for pid, rec in (doc.get("marks") or {}).items():
+            f = rec.get("file")
+            if f and (REPO_ROOT / f).is_file():
+                out[pid] = (f, "exact")
+    except (OSError, ValueError):
+        pass
+    return out
+
+
+# Family fall-backs: an app that has no mark of its own borrows its family's,
+# correctly labelled. `family` never means an invented app icon — where the
+# official set ships a real app mark (Dynamics 365 Sales, Field Service, and
+# the rest do), _load_marks picks it up as `exact` and this never applies.
+FAMILY_MARKS = {
+    "dynamics-365-sales": "dynamics-365",
+    "dynamics-365-customer-service": "dynamics-365",
+    "dynamics-365-field-service": "dynamics-365",
+    "dynamics-365-finance": "dynamics-365",
+    "dynamics-365-supply-chain": "dynamics-365",
+    "dynamics-365-commerce": "dynamics-365",
+    "azure-sql": "azure-sql",
 }
+
+MARKS = _load_marks()
+for _app, _fam in FAMILY_MARKS.items():
+    if _app not in MARKS and _fam in MARKS:
+        MARKS[_app] = (MARKS[_fam][0], "family")
 
 # id, name, family, app, column, declares, prose names, implying tags,
 # implying categories.

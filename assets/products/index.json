@@ -1,50 +1,380 @@
 {
-  "schema": "aibast-product-marks/1.0",
-  "note": "Official Microsoft product marks, taken at full resolution from the RAPP Overview deck rather than redrawn. A hand-drawn approximation of a Microsoft logo is worse than no logo: it is wrong AND it looks official. A product with no mark here gets a labelled chip instead.",
-  "source": "RAPP-Overview.pptx slide 2",
-  "count": 6,
-  "marks": [
-    {
-      "id": "power-apps",
-      "name": "Power Apps",
-      "file": "assets/products/power-apps.png",
-      "bytes": 24324,
-      "sha256": "76e30e1ecc6bf2f1"
+  "schema": "aibast-product-marks/2.0",
+  "generated": "2026-08-06T22:50:21+00:00",
+  "note": "Official Microsoft product marks, downloaded from Microsoft's own distribution channels by scripts/fetch_product_marks.py. Each entry records the URL it came from and the date it was read. Nothing here is redrawn, traced, recoloured, or taken from a screenshot. A product with no official mark keeps a labelled chip rather than a lookalike.",
+  "sources": {
+    "office": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/<name>_48x1.svg",
+    "azure": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip",
+    "entra": "https://download.microsoft.com/download/3/1/a/31a56038-856a-4489-88e4-ee5a1c4352be/Microsoft%20Entra%20architecture%20icons%20-%20Oct%202023.zip",
+    "power": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip",
+    "d365": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip",
+    "fabric": "https://github.com/microsoft/fabric-samples/raw/main/docs-samples/Icons.zip"
+  },
+  "count": 52,
+  "marks": {
+    "ai-builder": {
+      "file": "assets/products/ai-builder.svg",
+      "source": "power",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip!Power Platform/AIBuilder_scalable.svg",
+      "bytes": 7801,
+      "fetched": "2026-08-06"
     },
-    {
-      "id": "copilot-studio",
-      "name": "Microsoft Copilot Studio",
-      "file": "assets/products/copilot-studio.png",
-      "bytes": 110821,
-      "sha256": "3deb67ec42a89527"
+    "azure-ai-foundry": {
+      "file": "assets/products/azure-ai-foundry.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/ai + machine learning/035746832-icon-service-AI-Foundry.svg",
+      "bytes": 2824,
+      "fetched": "2026-08-06"
     },
-    {
-      "id": "power-automate",
-      "name": "Power Automate",
-      "file": "assets/products/power-automate.png",
-      "bytes": 47790,
-      "sha256": "bb43a7c483ae2b3f"
+    "azure-ai-search": {
+      "file": "assets/products/azure-ai-search.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/web/10044-icon-service-Cognitive-Search.svg",
+      "bytes": 1146,
+      "fetched": "2026-08-06"
     },
-    {
-      "id": "power-bi",
-      "name": "Power BI",
-      "file": "assets/products/power-bi.png",
-      "bytes": 20761,
-      "sha256": "8e1ba645fe1c91d8"
+    "azure-blob-storage": {
+      "file": "assets/products/azure-blob-storage.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/storage/10086-icon-service-Storage-Accounts.svg",
+      "bytes": 1157,
+      "fetched": "2026-08-06"
     },
-    {
-      "id": "dataverse",
-      "name": "Microsoft Dataverse",
-      "file": "assets/products/dataverse.png",
-      "bytes": 52817,
-      "sha256": "d27dc09aa611e937"
+    "azure-bot-service": {
+      "file": "assets/products/azure-bot-service.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/ai + machine learning/10165-icon-service-Bot-Services.svg",
+      "bytes": 1265,
+      "fetched": "2026-08-06"
     },
-    {
-      "id": "azure",
-      "name": "Microsoft Azure",
-      "file": "assets/products/azure.png",
-      "bytes": 34023,
-      "sha256": "d9c0d75fa8a793e9"
+    "azure-cosmos-db": {
+      "file": "assets/products/azure-cosmos-db.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/iot/10121-icon-service-Azure-Cosmos-DB.svg",
+      "bytes": 2599,
+      "fetched": "2026-08-06"
+    },
+    "azure-functions": {
+      "file": "assets/products/azure-functions.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/iot/10029-icon-service-Function-Apps.svg",
+      "bytes": 1747,
+      "fetched": "2026-08-06"
+    },
+    "azure-iot-hub": {
+      "file": "assets/products/azure-iot-hub.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/iot/10182-icon-service-IoT-Hub.svg",
+      "bytes": 1951,
+      "fetched": "2026-08-06"
+    },
+    "azure-key-vault": {
+      "file": "assets/products/azure-key-vault.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/security/10245-icon-service-Key-Vaults.svg",
+      "bytes": 2231,
+      "fetched": "2026-08-06"
+    },
+    "azure-logic-apps": {
+      "file": "assets/products/azure-logic-apps.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/iot/02631-icon-service-Logic-Apps.svg",
+      "bytes": 1655,
+      "fetched": "2026-08-06"
+    },
+    "azure-machine-learning": {
+      "file": "assets/products/azure-machine-learning.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/ai + machine learning/10166-icon-service-Machine-Learning.svg",
+      "bytes": 901,
+      "fetched": "2026-08-06"
+    },
+    "azure-monitor": {
+      "file": "assets/products/azure-monitor.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/monitor/00001-icon-service-Monitor.svg",
+      "bytes": 1934,
+      "fetched": "2026-08-06"
+    },
+    "azure-openai": {
+      "file": "assets/products/azure-openai.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/ai + machine learning/03438-icon-service-Azure-OpenAI.svg",
+      "bytes": 805,
+      "fetched": "2026-08-06"
+    },
+    "azure-sql": {
+      "file": "assets/products/azure-sql.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/databases/10130-icon-service-SQL-Database.svg",
+      "bytes": 2420,
+      "fetched": "2026-08-06"
+    },
+    "dataverse": {
+      "file": "assets/products/dataverse.svg",
+      "source": "power",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip!Power Platform/Dataverse_scalable.svg",
+      "bytes": 5067,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365": {
+      "file": "assets/products/dynamics-365.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 Product Family Icons/Dynamics365_scalable.svg",
+      "bytes": 4317,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-business-central": {
+      "file": "assets/products/dynamics-365-business-central.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/BusinessCentral_scalable.svg",
+      "bytes": 6149,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-commerce": {
+      "file": "assets/products/dynamics-365-commerce.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/Commerce_scalable.svg",
+      "bytes": 1638,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-contact-center": {
+      "file": "assets/products/dynamics-365-contact-center.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/ContactCenter_scalable.svg",
+      "bytes": 4904,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-customer-insights": {
+      "file": "assets/products/dynamics-365-customer-insights.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/CustomerInsights_scalable.svg",
+      "bytes": 5037,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-customer-service": {
+      "file": "assets/products/dynamics-365-customer-service.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/CustomerServices_scalable.svg",
+      "bytes": 2825,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-field-service": {
+      "file": "assets/products/dynamics-365-field-service.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/FieldService_scalable.svg",
+      "bytes": 4246,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-finance": {
+      "file": "assets/products/dynamics-365-finance.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/Finance_scalable.svg",
+      "bytes": 3776,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-human-resources": {
+      "file": "assets/products/dynamics-365-human-resources.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/HumanResources_scalable.svg",
+      "bytes": 3543,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-project-operations": {
+      "file": "assets/products/dynamics-365-project-operations.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/ProjectOperations_scalable.svg",
+      "bytes": 5524,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-sales": {
+      "file": "assets/products/dynamics-365-sales.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/Sales_scalable.svg",
+      "bytes": 4901,
+      "fetched": "2026-08-06"
+    },
+    "dynamics-365-supply-chain": {
+      "file": "assets/products/dynamics-365-supply-chain.svg",
+      "source": "d365",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip!Dynamics 365 App Icons/SupplyChainManagement_scalable.svg",
+      "bytes": 4977,
+      "fetched": "2026-08-06"
+    },
+    "entra-id": {
+      "file": "assets/products/entra-id.svg",
+      "source": "entra",
+      "origin": "https://download.microsoft.com/download/3/1/a/31a56038-856a-4489-88e4-ee5a1c4352be/Microsoft%20Entra%20architecture%20icons%20-%20Oct%202023.zip!Microsoft Entra architecture icons - Oct 2023/Microsoft Entra color icons SVG/Microsoft Entra ID color icon.svg",
+      "bytes": 1301,
+      "fetched": "2026-08-06"
+    },
+    "entra-id-governance": {
+      "file": "assets/products/entra-id-governance.svg",
+      "source": "entra",
+      "origin": "https://download.microsoft.com/download/3/1/a/31a56038-856a-4489-88e4-ee5a1c4352be/Microsoft%20Entra%20architecture%20icons%20-%20Oct%202023.zip!Microsoft Entra architecture icons - Oct 2023/Microsoft Entra color icons SVG/Microsoft Entra ID Governance color icon.svg",
+      "bytes": 2375,
+      "fetched": "2026-08-06"
+    },
+    "entra-verified-id": {
+      "file": "assets/products/entra-verified-id.svg",
+      "source": "entra",
+      "origin": "https://download.microsoft.com/download/3/1/a/31a56038-856a-4489-88e4-ee5a1c4352be/Microsoft%20Entra%20architecture%20icons%20-%20Oct%202023.zip!Microsoft Entra architecture icons - Oct 2023/Microsoft Entra color icons SVG/Microsoft Entra Verified ID color icon.svg",
+      "bytes": 2416,
+      "fetched": "2026-08-06"
+    },
+    "excel": {
+      "file": "assets/products/excel.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/excel_48x1.svg",
+      "bytes": 1485,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-365-copilot": {
+      "file": "assets/products/microsoft-365-copilot.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/copilot_48x1.svg",
+      "bytes": 4028,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-copilot-studio": {
+      "file": "assets/products/microsoft-copilot-studio.svg",
+      "source": "power",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip!CopilotStudio_scalable.svg",
+      "bytes": 9738,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-fabric": {
+      "file": "assets/products/microsoft-fabric.svg",
+      "source": "fabric",
+      "origin": "https://github.com/microsoft/fabric-samples/raw/main/docs-samples/Icons.zip!v6.1.0/package/dist/svg/fabric_48_color.svg",
+      "bytes": 4558,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-forms": {
+      "file": "assets/products/microsoft-forms.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/forms_48x1.svg",
+      "bytes": 1437,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-lists": {
+      "file": "assets/products/microsoft-lists.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/lists_48x1.svg",
+      "bytes": 3205,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-loop": {
+      "file": "assets/products/microsoft-loop.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/loop_48x1.svg",
+      "bytes": 3166,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-project": {
+      "file": "assets/products/microsoft-project.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/project_48x1.svg",
+      "bytes": 1730,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-stream": {
+      "file": "assets/products/microsoft-stream.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/stream_48x1.svg",
+      "bytes": 3948,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-teams": {
+      "file": "assets/products/microsoft-teams.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/teams_48x1.svg",
+      "bytes": 2094,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-visio": {
+      "file": "assets/products/microsoft-visio.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/visio_48x1.svg",
+      "bytes": 2062,
+      "fetched": "2026-08-06"
+    },
+    "onedrive": {
+      "file": "assets/products/onedrive.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/onedrive_48x1.svg",
+      "bytes": 658,
+      "fetched": "2026-08-06"
+    },
+    "onenote": {
+      "file": "assets/products/onenote.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/onenote_48x1.svg",
+      "bytes": 1404,
+      "fetched": "2026-08-06"
+    },
+    "outlook": {
+      "file": "assets/products/outlook.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/outlook_48x1.svg",
+      "bytes": 3935,
+      "fetched": "2026-08-06"
+    },
+    "power-apps": {
+      "file": "assets/products/power-apps.svg",
+      "source": "power",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip!Power Platform/PowerApps_scalable.svg",
+      "bytes": 4398,
+      "fetched": "2026-08-06"
+    },
+    "power-automate": {
+      "file": "assets/products/power-automate.svg",
+      "source": "power",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip!Power Platform/PowerAutomate_scalable.svg",
+      "bytes": 2545,
+      "fetched": "2026-08-06"
+    },
+    "power-bi": {
+      "file": "assets/products/power-bi.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/powerbi_48x1.svg",
+      "bytes": 2716,
+      "fetched": "2026-08-06"
+    },
+    "power-pages": {
+      "file": "assets/products/power-pages.svg",
+      "source": "power",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip!Power Platform/PowerPages_scalable.svg",
+      "bytes": 5922,
+      "fetched": "2026-08-06"
+    },
+    "power-platform": {
+      "file": "assets/products/power-platform.svg",
+      "source": "power",
+      "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip!Power Platform/PowerPlatform_scalable.svg",
+      "bytes": 3680,
+      "fetched": "2026-08-06"
+    },
+    "powerpoint": {
+      "file": "assets/products/powerpoint.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/powerpoint_48x1.svg",
+      "bytes": 1791,
+      "fetched": "2026-08-06"
+    },
+    "sharepoint": {
+      "file": "assets/products/sharepoint.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/sharepoint_48x1.svg",
+      "bytes": 2286,
+      "fetched": "2026-08-06"
+    },
+    "word": {
+      "file": "assets/products/word.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/word_48x1.svg",
+      "bytes": 1594,
+      "fetched": "2026-08-06"
     }
-  ]
+  }
 }
