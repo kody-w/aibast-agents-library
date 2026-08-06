@@ -1,0 +1,111 @@
+{
+  "schema": "aibast-roadmap/1.0",
+  "title": "AIBAST Agents Library — roadmap",
+  "subtitle": "What is shipped, what is in flight, and what is deliberately parked.",
+  "note": "Status here is what the repository can demonstrate, not what is planned. An item is Shipped only when a gate or a live URL proves it.",
+  "updated": "2026-08-06",
+  "lanes": [
+    {
+      "id": "now",
+      "label": "Shipped",
+      "blurb": "Provable today — a gate, a test, or a live page.",
+      "items": [
+        {
+          "title": "112-agent industry library",
+          "detail": "Single-file agents across 14 industries, each with a manifest, a one-pager, an architecture and a machine review.",
+          "evidence": "registry.json · 148 local gates green"
+        },
+        {
+          "title": "FY27 priority agents",
+          "detail": "Seven agents consolidated from 61 customer-named variants; six FY27 clusters dropped as already covered and two merged.",
+          "evidence": "docs/FY27-INTAKE.md"
+        },
+        {
+          "title": "PowerPoint export, not printed PDF",
+          "detail": "Every one-pager and architecture exports native editable slides built from the same static data the page renders.",
+          "evidence": "deck.js · tests/check_deck_export.py · verified on 5 agents"
+        },
+        {
+          "title": "Media served off a branch",
+          "detail": "Demo recordings live on the media-server branch and stream into the site, so they are never in the install clone.",
+          "evidence": "media.js · depth-1 clone measured 3.7 MB .git vs 2.6 GB"
+        },
+        {
+          "title": "Shallow install",
+          "detail": "install.sh and install.ps1 clone at depth 1; only version pinning deepens, because a tag needs history to resolve.",
+          "evidence": "clone measured 3.0 GB to 26 MB"
+        },
+        {
+          "title": "No customer data, enforced",
+          "detail": "A denylist gate sweeps every tracked and untracked text file. It caught its own documentation naming an organisation.",
+          "evidence": "tests/check_no_customer_names.py"
+        }
+      ]
+    },
+    {
+      "id": "next",
+      "label": "In flight",
+      "blurb": "Working, not finished. Named with what is still missing.",
+      "items": [
+        {
+          "title": "Video engagement",
+          "detail": "Plays, likes and comments per demo, using GitHub Discussions as the backend so nothing needs a server. Threads are not seeded yet, so every count reads zero.",
+          "evidence": "scripts/video_engagement.py · api/v1/video-engagement.json"
+        },
+        {
+          "title": "Generated demo films",
+          "detail": "Seven films pass the showcase gate at 159-164s with a neural voice. They are not published: the automation still needs a pass before these sit beside the professional recordings.",
+          "evidence": "film/kit · 7/7 gate PASS"
+        },
+        {
+          "title": "Domain b-roll",
+          "detail": "No footage exists for HR or editorial scenarios, so those films borrow cross-industry footage and say so rather than pretending it argues the scenario.",
+          "evidence": "broll_note on two projects"
+        },
+        {
+          "title": "Duplicate film projects",
+          "detail": "Ten projects were built from the raw un-consolidated FY27 names and duplicate agents that shipped under consolidated ones. Left in place rather than deleted.",
+          "evidence": "film/projects"
+        },
+        {
+          "title": "RAPPedia",
+          "detail": "The library's own encyclopedia: every agent, pattern, decision and term as a linked note, built from what the repository already knows rather than written separately. Sixteen brain notes and a graph exist under api/v1/brain; what is missing is the reading surface, search, and the link from each agent to the concepts it uses.",
+          "evidence": "api/v1/brain · 16 notes, graph.json"
+        }
+      ]
+    },
+    {
+      "id": "later",
+      "label": "Parked",
+      "blurb": "Deliberately not being worked on, with the reason.",
+      "items": [
+        {
+          "title": "RAPPVision compositing pipeline",
+          "detail": "Composited our content onto the professional cut. Archived: the last render passed all 16 of its own gates and an independent frame-by-frame review still returned NOT RELEASABLE.",
+          "evidence": "archive/rappvision-pipeline/README.md"
+        },
+        {
+          "title": "Live-action capture",
+          "detail": "No original filming. The library uses the recordings it already has and generates the rest.",
+          "evidence": "docs/NO-VIDEO.md"
+        },
+        {
+          "title": "Publishing generated films externally",
+          "detail": "Held until the generated cuts are indistinguishable from the professional ones. Shipping a visibly weaker cut devalues the recordings that are not weak.",
+          "evidence": "adversarial review standard"
+        },
+        {
+          "title": "RAPPedia authoring by hand",
+          "detail": "Notes are derived from manifests, decisions and gates. Hand-written encyclopedia entries would drift from the code the moment they were written, which is the failure this library exists to avoid.",
+          "evidence": "generated, not authored"
+        }
+      ]
+    }
+  ],
+  "principles": [
+    "An item is Shipped only when a gate or a live URL proves it.",
+    "A known flaw named is fine; one a customer finds is not.",
+    "No figure the product cannot stand behind reaches a customer surface.",
+    "Large media lives on a branch, never in the clone."
+  ]
+}

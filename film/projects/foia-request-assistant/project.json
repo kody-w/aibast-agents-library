@@ -1,0 +1,431 @@
+{
+ "schema": "aibast-showcase-film/1.0",
+ "batch": "library",
+ "slug": "foia-request-assistant",
+ "title": "FOIA Request Assistant Agent",
+ "kicker": "State and local government - illustrative scenario",
+ "category": "slg_government",
+ "agent_ref": "@aibast-agents-library/foia-request-assistant",
+ "composed_from": "media/walkthroughs/agent-foia-request-assistant.json",
+ "composed_by": "film/kit/compose.py",
+ "approval": {
+  "required_before_publishing": true,
+  "note": "A composed script is a draft. A human reads it before this film is published anywhere."
+ },
+ "output": "foia-request-assistant.mp4",
+ "broll_bucket": "government",
+ "footer_note": "Illustrative - synthetic data",
+ "duration_window": [
+  95,
+  200
+ ],
+ "bed_db": 4.0,
+ "voice": {
+  "azure_voice": "en-US-AndrewMultilingualNeural",
+  "azure_region": "eastus",
+  "azure_resource_id": "",
+  "rate": "-6%",
+  "say_voice": "Daniel",
+  "say_wpm": 132
+ },
+ "script": {
+  "vo01": "There's an agent to guide slg government teams through these processes. It reads the systems you already work in, engages you directly in Microsoft Teams.",
+  "vo02": "Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked.",
+  "vo03": "It reads the systems of record already in use. It engages you in Microsoft Teams and Outlook. And it can handle foia request assistant and accelerate turnaround, showing the reasoning behind every answer.",
+  "vo04": "Let's say a manager needs to handle foia request assistant. But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand.",
+  "vo05": "Now, with one unified data context, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary.",
+  "vo06": "It can accelerate turnaround in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on.",
+  "vo_payoff": "With FOIA Request Assistant Agent, slg government teams get guided assistance embedded directly into their workflows.",
+  "vo_helps": "The result? Work that moves faster, stays consistent, and holds the same standard every time it runs.",
+  "vo_cta": "Get started on your agentic journey today. Talk to your Microsoft representative to learn more."
+ },
+ "cards": {
+  "c_title": {
+   "kind": "title",
+   "title": "FOIA Request Assistant Agent",
+   "kicker": "State and local government - illustrative scenario",
+   "size": 64
+  },
+  "c_overview": {
+   "kind": "tiles",
+   "heading": "What the agent works with",
+   "tiles": [
+    {
+     "label": "Sources",
+     "lines": [
+      "The systems of record already in use"
+     ]
+    },
+    {
+     "label": "Flow of work",
+     "lines": [
+      "Engages you in Microsoft Teams and Outlook"
+     ]
+    },
+    {
+     "label": "Actions",
+     "lines": [
+      "Handle foia request assistant",
+      "Accelerate turnaround",
+      "Report back with my reasoning"
+     ]
+    }
+   ],
+   "icons": [
+    "ic-sources",
+    "ic-flow",
+    "ic-actions"
+   ],
+   "chevrons": true
+  },
+  "c_synthetic": {
+   "kind": "statement",
+   "title": "Everything shown next is synthetic.",
+   "sub": "Illustrative data in an illustrative scenario. No customer, no real record, no real person.",
+   "size": 62,
+   "stages": 1
+  },
+  "c_helps": {
+   "kind": "tiles",
+   "heading": "How the agent helps",
+   "tiles": [
+    {
+     "label": "01",
+     "lines": [
+      "Handle foia request assistant"
+     ]
+    },
+    {
+     "label": "02",
+     "lines": [
+      "Accelerate turnaround"
+     ]
+    },
+    {
+     "label": "03",
+     "lines": [
+      "Report back with my reasoning"
+     ]
+    }
+   ]
+  },
+  "c_cta": {
+   "kind": "statement",
+   "title": "Get started on your agentic journey today.",
+   "sub": "Talk to your Microsoft representative to learn more.",
+   "size": 56,
+   "stages": 2
+  },
+  "c_footer": {
+   "kind": "statement",
+   "title": "All data shown is synthetic and illustrative.",
+   "sub": "This is a demonstration of what the agent does, not a report of results.",
+   "size": 50,
+   "panel": false,
+   "stages": 1
+  },
+  "c_q1": {
+   "kind": "chyron",
+   "text": "FOIA request processing support with request analysis for the current workload \u2014 we're looking at rising request volume.",
+   "tag": "Asked of the agent"
+  },
+  "c_q2": {
+   "kind": "chyron",
+   "text": "Show me the plan.",
+   "tag": "Asked of the agent"
+  },
+  "c_q3": {
+   "kind": "chyron",
+   "text": "What could go wrong?",
+   "tag": "Asked of the agent"
+  }
+ },
+ "demo": {
+  "agent_name": "FOIA Request Assistant Agent",
+  "questions": [
+   {
+    "id": "q1",
+    "vo": "vo04",
+    "prompt": "FOIA request processing support with request analysis for the current workload \u2014 we're looking at rising request volume.",
+    "answer": [
+     {
+      "type": "para",
+      "text": "I'll handle foia request assistant for the current workload, working against rising request volume. Reading the systems of record already in use before I propose anything."
+     },
+     {
+      "type": "list",
+      "label": "Current position",
+      "items": [
+       "Scope: the working backlog",
+       "Current: turnaround slower than wanted",
+       "Goal: close the gap to same-day turnaround",
+       "Window: the coming month"
+      ]
+     },
+     {
+      "type": "list",
+      "label": "What I checked",
+      "items": [
+       "The systems of record already in use \u2014 read, not assumed",
+       "Anything I could not verify is called out below"
+      ]
+     },
+     {
+      "type": "callout",
+      "headline": "Biggest constraint: turnaround slower than wanted",
+      "source": "Source: the systems of record already in use"
+     }
+    ],
+    "citations": [
+     "FOIA Request Assistant Agent"
+    ],
+    "citation_label": "Agent calls"
+   },
+   {
+    "id": "q2",
+    "vo": "vo05",
+    "prompt": "Show me the plan.",
+    "answer": [
+     {
+      "type": "para",
+      "text": "Phased, quick wins first."
+     },
+     {
+      "type": "list",
+      "label": "Steps",
+      "items": [
+       "1. Handle foia request assistant",
+       "2. Accelerate turnaround",
+       "3. Report back with my reasoning",
+       "4. Confirm the result against the source system",
+       "5. Hand back the artifact, and the reasoning behind it"
+      ]
+     },
+     {
+      "type": "callout",
+      "headline": "Phased over the coming month, starting with the quick wins",
+      "source": "Nothing is written back without confirmation"
+     }
+    ],
+    "citations": [
+     "FOIA Request Assistant Agent"
+    ],
+    "citation_label": "Agent calls"
+   },
+   {
+    "id": "q3",
+    "vo": "vo06",
+    "prompt": "What could go wrong?",
+    "answer": [
+     {
+      "type": "para",
+      "text": "Three things I would watch on the current workload."
+     },
+     {
+      "type": "list",
+      "label": "Risks",
+      "items": [
+       "Stale inputs \u2014 the source systems may lag the working picture",
+       "Edge cases the source data does not describe",
+       "A recommendation that reads confident but is thinly evidenced"
+      ]
+     },
+     {
+      "type": "list",
+      "label": "How I cover them",
+      "items": [
+       "Cite the record behind every line, so it can be checked",
+       "Flag low-evidence items rather than smoothing over them",
+       "Stop and ask before anything is written back"
+      ]
+     },
+     {
+      "type": "callout",
+      "headline": "You approve each step; nothing changes on its own",
+      "source": "Source: the systems of record already in use"
+     }
+    ],
+    "citations": [
+     "FOIA Request Assistant Agent"
+    ],
+    "citation_label": "Agent calls"
+   }
+  ]
+ },
+ "beats": [
+  {
+   "id": "b00",
+   "kind": "sting",
+   "clip": "sting-intro-logo.mp4",
+   "dur": 2.4,
+   "note": "Microsoft logo sting"
+  },
+  {
+   "id": "b01",
+   "kind": "title",
+   "clip": "government/building-permit-processing-agent-01.mp4",
+   "card": "c_title",
+   "dur": 5.0,
+   "note": "title over industry b-roll"
+  },
+  {
+   "id": "b02",
+   "kind": "broll",
+   "dur": 12.51,
+   "vo": "vo01",
+   "off": 0.3,
+   "clips": [
+    {
+     "file": "government/building-permit-processing-agent-01.mp4",
+     "dur": 3.8
+    },
+    {
+     "file": "government/building-permit-processing-agent-02.mp4",
+     "dur": 2.3
+    },
+    {
+     "file": "government/building-permit-processing-agent-03.mp4",
+     "dur": 3.5
+    },
+    {
+     "file": "government/building-permit-processing-agent-04.mp4",
+     "dur": 2.91
+    }
+   ],
+   "note": "the job to be done"
+  },
+  {
+   "id": "b03",
+   "kind": "broll",
+   "dur": 12.51,
+   "vo": "vo02",
+   "off": 0.3,
+   "clips": [
+    {
+     "file": "government/building-permit-processing-agent-05.mp4",
+     "dur": 4.1
+    },
+    {
+     "file": "government/building-permit-processing-agent-06.mp4",
+     "dur": 3.71
+    },
+    {
+     "file": "government/utility-billing-and-assistance-agent-01.mp4",
+     "dur": 2.5
+    },
+    {
+     "file": "government/utility-billing-and-assistance-agent-03.mp4",
+     "dur": 2.2
+    }
+   ],
+   "note": "the manual status quo"
+  },
+  {
+   "id": "b04",
+   "kind": "card",
+   "card": "c_overview",
+   "dur": 15.81,
+   "vo": "vo03",
+   "off": 0.4,
+   "stages": 4,
+   "note": "sources, flow of work, actions"
+  },
+  {
+   "id": "b05",
+   "kind": "card",
+   "card": "c_synthetic",
+   "dur": 3.6,
+   "note": "synthetic-data card, before the first data frame"
+  },
+  {
+   "id": "b06",
+   "kind": "demo",
+   "question": "q1",
+   "chyron": "c_q1",
+   "dur": 21.23,
+   "vo": "vo04",
+   "off": 1.1,
+   "stages": 5,
+   "note": "FOIA request processing support with request analysis for th"
+  },
+  {
+   "id": "b07",
+   "kind": "demo",
+   "question": "q2",
+   "chyron": "c_q2",
+   "dur": 23.41,
+   "vo": "vo05",
+   "off": 1.1,
+   "stages": 6,
+   "note": "Show me the plan."
+  },
+  {
+   "id": "b08",
+   "kind": "demo",
+   "question": "q3",
+   "chyron": "c_q3",
+   "dur": 15.58,
+   "vo": "vo06",
+   "off": 1.1,
+   "stages": 4,
+   "note": "What could go wrong?"
+  },
+  {
+   "id": "b09",
+   "kind": "broll",
+   "dur": 9.87,
+   "vo": "vo_payoff",
+   "off": 0.3,
+   "clips": [
+    {
+     "file": "government/utility-billing-and-assistance-agent-04.mp4",
+     "dur": 5.2
+    },
+    {
+     "file": "government/utility-billing-and-assistance-agent-05.mp4",
+     "dur": 2.47
+    },
+    {
+     "file": "government/building-permit-processing-agent-02.mp4",
+     "dur": 2.2
+    }
+   ],
+   "note": "payoff"
+  },
+  {
+   "id": "b10",
+   "kind": "card",
+   "card": "c_helps",
+   "dur": 8.51,
+   "vo": "vo_helps",
+   "off": 0.4,
+   "stages": 3,
+   "note": "how the agent helps"
+  },
+  {
+   "id": "b11",
+   "kind": "card",
+   "card": "c_cta",
+   "dur": 7.25,
+   "vo": "vo_cta",
+   "off": 0.55,
+   "stages": 2,
+   "note": "call to action"
+  },
+  {
+   "id": "b12",
+   "kind": "card",
+   "card": "c_footer",
+   "dur": 4.0,
+   "note": "synthetic-data footer"
+  },
+  {
+   "id": "b13",
+   "kind": "sting",
+   "clip": "sting-outro-logo.mp4",
+   "dur": 3.0,
+   "note": "Microsoft logo outro"
+  }
+ ],
+ "beats_generated_by": "film/kit/plan.py"
+}

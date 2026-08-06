@@ -9,20 +9,24 @@
 <meta property="og:description" content="Try every endpoint live, copy the snippet, and see adoption over time.">
 <meta property="og:type" content="website">
 <style>
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
 :root {
-  --bg: #faf9f8; --panel: #ffffff; --panel-2: #f5f4f3;
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
   --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
-  --accent: #0078d4; --accent-hover: #106ebe; --accent-2: #5b5fc7;
-  --accent-soft: rgba(0,120,212,.08);
-  --ok: #107c10; --warn: #d83b01;
-  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13); --radius: 8px;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
 }
 [data-theme="dark"] {
-  --bg: #1b1a19; --panel: #252423; --panel-2: #2d2c2b;
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
   --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
-  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-2: #7f85f5;
-  --accent-soft: rgba(40,153,245,.14);
-  --ok: #92c353; --warn: #f1707b;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
   --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -34,26 +38,35 @@ body {
 }
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
-.wrap { max-width:1180px; margin:0 auto; padding:0 20px; }
+.wrap { max-width:var(--maxw); margin:0 auto; padding:0 20px; }
 svg { display:inline-block; }
-header {
+header.site {
   position:sticky; top:0; z-index:50;
   background:color-mix(in srgb, var(--bg) 86%, transparent);
   backdrop-filter:blur(10px); border-bottom:1px solid var(--border);
 }
 .nav { display:flex; align-items:center; gap:18px; padding:12px 0; flex-wrap:wrap; }
-.brand { display:flex; align-items:center; gap:9px; font-weight:700; font-size:15px; color:var(--text); }
+.brand { display:flex; align-items:center; gap:9px; font-weight:700; font-size:15px; color:var(--text); white-space:nowrap; }
 .brand:hover { text-decoration:none; }
+.brand .mark { color:var(--accent); display:inline-flex; }
+.brand .mark svg { width:19px; height:19px; }
 .nav-links { display:flex; gap:4px; flex-wrap:wrap; }
 .nav-links a { color:var(--text-dim); font-size:13.5px; padding:5px 10px; border-radius:8px; }
 .nav-links a:hover { color:var(--text); background:var(--panel-2); text-decoration:none; }
-.nav-actions { margin-left:auto; display:flex; gap:8px; }
+.nav-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
 .icon-btn {
   background:var(--panel); border:1px solid var(--border); color:var(--text-dim);
-  width:32px; height:32px; border-radius:4px; cursor:pointer;
-  display:inline-flex; align-items:center; justify-content:center; font-size:15px;
+  width:32px; height:32px; border-radius:6px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
 }
-.icon-btn:hover { color:var(--text); border-color:var(--text-faint); }
+.icon-btn svg { width:15px; height:15px; }
+.icon-btn:hover { color:var(--text); border-color:var(--text-faint); text-decoration:none; }
+footer.site { margin-top:56px; border-top:1px solid var(--border); padding:26px 0 44px; }
+.foot { display:flex; gap:20px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--text-faint); }
+.foot a { color:var(--text-dim); }
+.foot .copy { width:100%; margin-top:4px; }
+@media (max-width:560px) { .nav-links { order:3; width:100%; } }
+/* ══ page-specific ══════════════════════════════════════════════════════ */
 
 .hero { padding:56px 0 28px; position:relative; }
 .hero::before {
@@ -90,7 +103,7 @@ section { padding:44px 0 8px; }
 .ep code { font-family:ui-monospace,"SF Mono",Consolas,monospace; font-size:12.5px; font-weight:600; }
 .ep small { display:block; color:var(--text-faint); font-size:11.5px; margin-top:2px; }
 .panel {
-  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg);
   box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; min-width:0;
 }
 .panel-head {
@@ -126,7 +139,7 @@ pre.out {
 
 /* impact */
 .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-top:8px; }
-.kpi { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:15px 16px; box-shadow:var(--shadow); }
+.kpi { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg); padding:15px 16px; box-shadow:var(--shadow); }
 .kpi.hero-kpi { grid-column:span 2; background:linear-gradient(135deg, var(--accent-soft), transparent); }
 @media (max-width:620px) { .kpi.hero-kpi { grid-column:span 2; } }
 .kpi .label { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; }
@@ -134,7 +147,7 @@ pre.out {
 .kpi.hero-kpi .value { font-size:38px; background:linear-gradient(135deg,var(--accent),var(--accent-2));
   -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 .kpi .sub { font-size:12px; color:var(--text-dim); margin-top:3px; }
-.chart-card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+.chart-card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg);
   box-shadow:var(--shadow); padding:16px 18px; margin-top:14px; }
 .chart-card h3 { font-size:14px; font-weight:700; }
 .chart-card .hint { font-size:12px; color:var(--text-faint); margin-top:2px; }
@@ -161,41 +174,49 @@ td { padding:9px 10px; border-bottom:1px solid var(--border); }
 tr:last-child td { border-bottom:none; }
 td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
 .note { font-size:12.5px; color:var(--text-faint); line-height:1.65; }
-footer { margin-top:56px; border-top:1px solid var(--border); padding:26px 0 40px; }
-.foot { display:flex; gap:22px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--text-faint); }
-.foot a { color:var(--text-dim); }
 </style>
 </head>
 <body>
 
-<header>
+<!-- ══ shared site header — identical on every page ══ -->
+<header class="site">
   <div class="wrap nav">
     <a class="brand" href="index.html">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg>
-      AIBAST Agents Library
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
     </a>
-    <nav class="nav-links" aria-label="Sections">
+    <nav class="nav-links" aria-label="Main">
       <a href="agents.html">Library</a>
-      <a href="#explorer">API explorer</a>
-      <a href="#impact">Impact</a>
-      <a href="brain.html">Docs</a>
-      <a href="wall.html">Wall of Fame</a>
-      <a href="#badges">Badges</a>
       <a href="solutions.html">Solutions</a>
-      <a href="scan.html">Scan</a>
-      <a href="vision.html?agent=@aibast-agents-library/art-generator">Film</a>
+      <a href="roadmap.html">Roadmap</a>
       <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
     </nav>
     <div class="nav-actions">
-      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
-      </a>
-      <button class="icon-btn" id="themeToggle" title="Toggle light/dark" aria-label="Toggle theme">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
       </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
     </div>
   </div>
 </header>
+<script>
+/* Shared theme switch. Light is the default everywhere; dark is opt-in and
+   remembered. Runs inline so the choice applies before the page paints. */
+(function () {
+  var r = document.documentElement, s = null;
+  try { s = localStorage.getItem("aibast-theme"); } catch (e) {}
+  if (s === "dark") r.setAttribute("data-theme", "dark");
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var dark = r.getAttribute("data-theme") === "dark";
+    if (dark) r.removeAttribute("data-theme"); else r.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("aibast-theme", dark ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
 
 <main>
   <div class="wrap">
@@ -288,7 +309,7 @@ footer { margin-top:56px; border-top:1px solid var(--border); padding:26px 0 40p
         <div class="hint" id="certHint">everyone currently certified, straight from the API</div>
         <div style="overflow-x:auto"><table id="certTable"></table></div>
       </div>
-      <p class="note" style="margin-top:12px">Certification says a publisher's submission met the review bar; it is not a Microsoft endorsement of them or their work. How to earn it: <a href="https://github.com/microsoft/aibast-agents-library/blob/main/docs/CERTIFICATION.md">docs/CERTIFICATION.md</a>.</p>
+      <p class="note" style="margin-top:12px">Certification says a publisher's submission met the review bar; it is not a Microsoft endorsement of them or their work. How to earn it: <a href="docs/CERTIFICATION.md">read the certification process</a>.</p>
     </section>
 
     <section id="badges">
@@ -303,7 +324,7 @@ footer { margin-top:56px; border-top:1px solid var(--border); padding:26px 0 40p
     <section id="integrate">
       <div class="sec-head">
         <h2>Integrate it</h2>
-        <p>The contract is documented in <a href="https://github.com/microsoft/aibast-agents-library/blob/main/docs/API.md">docs/API.md</a>: versioned endpoints under <code>api/v1/</code>, a <code>schema</code> and <code>generated</code> stamp on every document, and a stable-write build so a rebuild with no change produces no diff. It follows the <code>rapp-static-api/1.0</code> convention — the repository <em>is</em> the API.</p>
+        <p>The contract is fully <a href="docs/API.md">documented</a>: versioned endpoints under <code>api/v1/</code>, a <code>schema</code> and <code>generated</code> stamp on every document, and a stable build so a rebuild with no change produces no difference. It follows the <code>rapp-static-api/1.0</code> convention — the repository <em>is</em> the API.</p>
       </div>
       <div class="chart-card">
         <div class="badge-row">
@@ -326,14 +347,22 @@ footer { margin-top:56px; border-top:1px solid var(--border); padding:26px 0 40p
   </div>
 </main>
 
-<footer>
+<!-- ══ shared site footer — identical on every page ══ -->
+<footer class="site">
   <div class="wrap foot">
-    <span>© 2026 Microsoft AIBAST. Some rights reserved.</span>
-    <a href="agents.html">Agent Library</a>
+    <a href="index.html">Get started</a>
+    <a href="agents.html">Library</a>
+    <a href="solutions.html">Solutions</a>
+    <a href="roadmap.html">Roadmap</a>
     <a href="metrics.html">Metrics</a>
-    <a href="vbrainstem/">vBrainstem</a>
-    <a href="https://github.com/microsoft/aibast-agents-library/blob/main/docs/API.md">API docs</a>
-    <a href="https://github.com/microsoft/aibast-agents-library/blob/main/DISCLAIMER.md">Disclaimer</a>
+    <a href="api.html">Static API</a>
+    <a href="scan.html">Scan</a>
+    <a href="wall.html">Wall of Fame</a>
+    <a href="brain.html">Docs Vault</a>
+    <a href="blog.html">Field Notes</a>
+    <a href="vbrainstem/">Run in your browser</a>
+    <a href="DISCLAIMER.md">Disclaimer</a>
+    <span class="copy">© 2026 Microsoft AIBAST. Some rights reserved. MIT-licensed, community-driven.</span>
   </div>
 </footer>
 
@@ -341,17 +370,7 @@ footer { margin-top:56px; border-top:1px solid var(--border); padding:26px 0 40p
 (function () {
 "use strict";
 
-/* theme */
-var root = document.documentElement, saved = null;
-try { saved = localStorage.getItem("aibast-theme"); } catch (e) {}
-if (saved === "dark" || (saved === null && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches)) {
-  root.setAttribute("data-theme", "dark");
-}
-document.getElementById("themeToggle").addEventListener("click", function () {
-  var dark = root.getAttribute("data-theme") === "dark";
-  if (dark) root.removeAttribute("data-theme"); else root.setAttribute("data-theme", "dark");
-  try { localStorage.setItem("aibast-theme", dark ? "light" : "dark"); } catch (e) {}
-});
+/* The theme switch lives in the shared header script at the top of the page. */
 
 var REPO = "microsoft/aibast-agents-library";
 var PAGES = "https://microsoft.github.io/aibast-agents-library";
@@ -525,9 +544,11 @@ function renderImpact(m) {
     tbl.innerHTML = '<tbody><tr><td class="note">No installs recorded yet — install tallies begin once agent threads are seeded.</td></tr></tbody>';
     return;
   }
+  // Rows go to the agent's own page on this site, never out to a file or a thread.
   tbl.innerHTML = "<thead><tr><th>Agent</th><th>Industry</th><th class='num'>Installs</th><th class='num'>Upvotes</th></tr></thead><tbody>" +
     rows.slice(0, 10).map(function (r) {
-      return "<tr><td>" + (r.discussion ? '<a href="' + esc(r.discussion) + '" target="_blank" rel="noopener">' + esc(r.display_name || r.name) + "</a>" : esc(r.display_name || r.name)) +
+      return '<tr><td><a href="onepager.html?agent=' + encodeURIComponent(r.name) + '">' +
+        esc(r.display_name || r.name) + "</a>" +
         "</td><td>" + esc(String(r.category || "").replace(/_/g, " ")) +
         "</td><td class='num'>" + num(r.downloads) + "</td><td class='num'>" + num(r.upvotes) + "</td></tr>";
     }).join("") + "</tbody>";
@@ -604,7 +625,7 @@ getJSON(["api/v1/certified.json", PAGES + "/api/v1/certified.json"]).then(functi
   document.getElementById("certTable").innerHTML =
     "<thead><tr><th>Publisher</th><th>Level</th><th>Since</th><th class='num'>Agents</th></tr></thead><tbody>" +
     rows.map(function (m) {
-      return '<tr><td><a href="' + esc(m.profile_url) + '" target="_blank" rel="noopener">@' + esc(m.username) + "</a></td>" +
+      return "<tr><td>@" + esc(m.username) + "</td>" +
         "<td>" + esc(m.level) + "</td><td>" + esc(m.certified_on || "—") + "</td>" +
         "<td class='num'>" + num((m.agents || []).length) + "</td></tr>";
     }).join("") + "</tbody>";

@@ -1,9 +1,9 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-08-04T23:06:59.632373+00:00",
+  "generated_at": "2026-08-06T02:07:01.403369+00:00",
   "stats": {
-    "total_agents": 105,
+    "total_agents": 112,
     "publishers": 1,
     "categories": 14,
     "publisher_list": [
@@ -1232,6 +1232,31 @@
     },
     {
       "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/multi-entity-finance-ops",
+      "version": "1.0.0",
+      "display_name": "Multi-Entity Finance Operations Agent",
+      "description": "Consolidates period-end across multiple entities, currencies and ledgers, reconciles intercompany positions, and reports every balance it could not tie with the reason it could not.",
+      "author": "AIBAST",
+      "tags": [
+        "finance",
+        "consolidation",
+        "multi-currency",
+        "intercompany",
+        "close"
+      ],
+      "category": "financial_services",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+      "_size_kb": 8.2,
+      "_lines": 183,
+      "_sha256": "0d155a4d5a3e210fcf344b6a5cce1f2a3a42000b6543eaa0ebe3644c4527fcc1"
+    },
+    {
+      "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/portfolio-rebalancing",
       "version": "1.0.0",
       "display_name": "Portfolio Rebalancing Agent",
@@ -1512,6 +1537,31 @@
       "_size_kb": 17.7,
       "_lines": 317,
       "_sha256": "3382fb40569be724a1ffc7a8db584c080afac0938403c98b8e8cf6f3d1297141"
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/editorial-market-intelligence",
+      "version": "1.0.0",
+      "display_name": "Editorial & Market Intelligence Agent",
+      "description": "Scans a watched source set for emerging stories and market signals, clusters them by theme, and separates corroborated findings from single-sourced ones before briefing.",
+      "author": "AIBAST",
+      "tags": [
+        "editorial",
+        "research",
+        "market-intelligence",
+        "media",
+        "briefing"
+      ],
+      "category": "general",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+      "_size_kb": 8.1,
+      "_lines": 179,
+      "_sha256": "da2a2644f94060e259b77adbf5cfa0d36ee52296f221e118a9d0142f66af4cfc"
     },
     {
       "schema": "rapp-agent/1.0",
@@ -1921,6 +1971,31 @@
     },
     {
       "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/clinical-documentation-ring",
+      "version": "1.0.0",
+      "display_name": "Clinical Documentation Agent",
+      "description": "Assembles clinical documentation for review, checks each entry against its source in the record, and reports coding and governance gaps rather than filling them.",
+      "author": "AIBAST",
+      "tags": [
+        "clinical",
+        "documentation",
+        "coding",
+        "governance",
+        "healthcare"
+      ],
+      "category": "healthcare",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+      "_size_kb": 7.9,
+      "_lines": 177,
+      "_sha256": "09e1e8356f7d9a0aa6fb33c1d842e73793575175a9bc4ff072a7cf5e8cf644f0"
+    },
+    {
+      "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/clinical-notes-summarizer",
       "version": "1.0.0",
       "display_name": "Clinical Notes Summarizer Agent",
@@ -2050,6 +2125,31 @@
     },
     {
       "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/frontline-coaching",
+      "version": "1.0.0",
+      "display_name": "Frontline Coaching Agent",
+      "description": "Summarises observed frontline interactions against the coaching framework in use, drafts the one-to-one record, and separates what was observed from what was inferred.",
+      "author": "AIBAST",
+      "tags": [
+        "coaching",
+        "one-to-one",
+        "frontline",
+        "quality",
+        "contact-center"
+      ],
+      "category": "human_resources",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+      "_size_kb": 8.2,
+      "_lines": 183,
+      "_sha256": "2749edb3eec1713feabb17aa057ace5939eafc3c47c9c20ab75355b824e18aed"
+    },
+    {
+      "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/it-helpdesk",
       "version": "1.0.0",
       "display_name": "IT Helpdesk",
@@ -2072,6 +2172,31 @@
       "_size_kb": 18.7,
       "_lines": 425,
       "_sha256": "09539b3e1cb09e03067776b9ff82848c845e450e4ec6dd12399ff28e51daa207"
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/asset-reliability-standards",
+      "version": "1.0.0",
+      "display_name": "Asset Reliability & Standards Agent",
+      "description": "Correlates asset condition history with the governing engineering standard, flags where practice has drifted from specification, and sequences the interventions the standard requires.",
+      "author": "AIBAST",
+      "tags": [
+        "reliability",
+        "maintenance",
+        "engineering-standards",
+        "asset",
+        "industrial"
+      ],
+      "category": "manufacturing",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+      "_size_kb": 8.6,
+      "_lines": 187,
+      "_sha256": "2b21980bb25ae4142c7388feaf9cf109d930551faddd1b1a9113d8e80bb74252"
     },
     {
       "schema": "rapp-agent/1.0",
@@ -2272,6 +2397,31 @@
       "_size_kb": 13.7,
       "_lines": 333,
       "_sha256": "16dbf8b9d72673a1b3c9f2c6cbc24cdd9ce91b432afb57961d2d07135ca2c73f"
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/rd-discovery-requirements",
+      "version": "1.0.0",
+      "display_name": "R&D Discovery & Requirements Agent",
+      "description": "Searches prior internal work and published literature for what has already been attempted, then drafts the requirement or innovation record in the structure the review board expects.",
+      "author": "AIBAST",
+      "tags": [
+        "research",
+        "requirements",
+        "innovation",
+        "discovery",
+        "authoring"
+      ],
+      "category": "professional_services",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+      "_size_kb": 8.1,
+      "_lines": 180,
+      "_sha256": "4c3931f6932bc64b72240a7c5e87341f623e4b8b6a3a45031ee7c217b2e37753"
     },
     {
       "schema": "rapp-agent/1.0",
@@ -2549,6 +2699,31 @@
       "_size_kb": 12.9,
       "_lines": 307,
       "_sha256": "45b488ddc28c546458acf273ce896fddb6f427d7949ba0b3f523cfa5920e574b"
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/regulated-document-drafting",
+      "version": "1.0.0",
+      "display_name": "Regulated Document Drafting Agent",
+      "description": "Drafts industry-regulated documents from an approved clause library, checks tone and taxonomy against the governing regime, and reports every clause it could not source.",
+      "author": "AIBAST",
+      "tags": [
+        "drafting",
+        "legal",
+        "tender",
+        "compliance",
+        "public-sector"
+      ],
+      "category": "slg_government",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+      "_size_kb": 8.5,
+      "_lines": 184,
+      "_sha256": "2e07ab28cf4a7ac35f5946604a4136ce911c5d66dc09b78905ffa24b2cdba6e8"
     },
     {
       "schema": "rapp-agent/1.0",

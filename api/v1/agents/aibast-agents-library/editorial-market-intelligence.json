@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/editorial-market-intelligence",
+    "version": "1.0.0",
+    "display_name": "Editorial & Market Intelligence Agent",
+    "description": "Scans a watched source set for emerging stories and market signals, clusters them by theme, and separates corroborated findings from single-sourced ones before briefing.",
+    "author": "AIBAST",
+    "tags": [
+      "editorial",
+      "research",
+      "market-intelligence",
+      "media",
+      "briefing"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+  "size_kb": 8.1,
+  "lines": 179,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/editorial-market-intelligence",
+  "engagement": null
+}

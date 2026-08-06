@@ -7,39 +7,39 @@
       {
         "path": "scenario.subject",
         "label": "What the demo is about",
-        "value": "the delivery portfolio"
+        "value": "the request queue"
       },
       {
         "path": "scenario.driver",
         "label": "What is driving the work",
-        "value": "concurrent ramp-ups"
+        "value": "rising request volume"
       },
       {
         "path": "scenario.systems",
         "label": "Systems it reads",
-        "value": "the delivery system, timesheets and the resource plan"
+        "value": "the ticket system, the knowledge base and asset records"
       },
       {
         "path": "scenario.window",
         "label": "Timeframe",
-        "value": "the coming quarter"
+        "value": "the coming month"
       }
     ],
     "scenario": {
-      "subject": "the delivery portfolio",
-      "volume": "active engagements",
-      "target": "the utilisation target",
-      "metric": "utilisation below target",
-      "window": "the coming quarter",
-      "driver": "concurrent ramp-ups",
-      "systems": "the delivery system, timesheets and the resource plan",
-      "verb": "raises utilisation"
+      "subject": "the request queue",
+      "volume": "the open tickets",
+      "target": "the response target",
+      "metric": "response slower than target",
+      "window": "the coming month",
+      "driver": "rising request volume",
+      "systems": "the ticket system, the knowledge base and asset records",
+      "verb": "shortens time to resolution"
     },
     "how": "Replace the scenario below with your own customer's and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim.",
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:55+00:00",
   "subject": {
     "slug": "client-health-score",
     "kind": "agent",
@@ -102,21 +102,21 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Automate client portfolio health monitoring and planning to improve client relationships for the delivery portfolio \u2014 we're looking at concurrent ramp-ups."
+          "text": "Automate client portfolio health monitoring and planning to improve client relationships for the request queue \u2014 we're looking at rising request volume."
         },
         {
           "role": "agent",
           "heading": "Client Health Score Agent",
           "rich": {
-            "intro": "I'll improve client relationships for the delivery portfolio, working against concurrent ramp-ups. Reading the delivery system, timesheets and the resource plan before I propose anything.",
+            "intro": "I'll improve client relationships for the request queue, working against rising request volume. Reading the ticket system, the knowledge base and asset records before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
                 "items": [
-                  "Scope: active engagements",
-                  "Current: utilisation below target",
-                  "Goal: close the gap to the utilisation target",
-                  "Window: the coming quarter"
+                  "Scope: the open tickets",
+                  "Current: response slower than target",
+                  "Goal: close the gap to the response target",
+                  "Window: the coming month"
                 ]
               },
               {
@@ -127,11 +127,19 @@
                   "Microsoft Outlook \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
                 ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside the ticket system, the knowledge base and asset records",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
+                ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: utilisation below target",
-              "source": "Source: the delivery system, timesheets and the resource plan",
+              "headline": "Biggest constraint: response slower than target",
+              "source": "Source: the ticket system, the knowledge base and asset records",
               "question": "Shall I show the plan?"
             }
           },
@@ -156,10 +164,18 @@
                   "4. Confirm the result against the source system",
                   "5. Hand back the artifact, and the reasoning behind it"
                 ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
+                ]
               }
             ],
             "callout": {
-              "headline": "Phased over the coming quarter, starting with the quick wins",
+              "headline": "Phased over the coming month, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -174,7 +190,7 @@
           "role": "agent",
           "heading": "Risks and how I would cover them",
           "rich": {
-            "intro": "Three things I would watch on the delivery portfolio.",
+            "intro": "Three things I would watch on the request queue.",
             "sections": [
               {
                 "label": "Risks",
@@ -191,18 +207,26 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from Dynamics 365 CRM",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
               "headline": "You approve each step; nothing changes on its own",
-              "source": "Source: the delivery system, timesheets and the resource plan",
+              "source": "Source: the ticket system, the knowledge base and asset records",
               "question": "Want me to start with the quick wins?"
             }
           },
           "agent_call": "Client Health Score Agent"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Dynamics 365 CRM and Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can protect revenue in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Client Health Score Agent, services firms get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Dynamics 365 CRM and Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can protect revenue in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on."
     },
     {
       "act": "close",

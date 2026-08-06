@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/frontline-coaching",
+    "version": "1.0.0",
+    "display_name": "Frontline Coaching Agent",
+    "description": "Summarises observed frontline interactions against the coaching framework in use, drafts the one-to-one record, and separates what was observed from what was inferred.",
+    "author": "AIBAST",
+    "tags": [
+      "coaching",
+      "one-to-one",
+      "frontline",
+      "quality",
+      "contact-center"
+    ],
+    "category": "human_resources",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+  "size_kb": 8.2,
+  "lines": 183,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/frontline-coaching",
+  "engagement": null
+}

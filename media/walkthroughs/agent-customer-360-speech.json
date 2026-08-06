@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:54+00:00",
   "subject": {
     "slug": "customer-360-speech",
     "kind": "agent",
@@ -127,6 +127,14 @@
                   "Product signals \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
                 ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside CRM, engagement history and product signals",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
+                ]
               }
             ],
             "callout": {
@@ -155,6 +163,14 @@
                   "3. Report back with my reasoning",
                   "4. Confirm the result against the source system",
                   "5. Hand back the artifact, and the reasoning behind it"
+                ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
                 ]
               }
             ],
@@ -191,6 +207,14 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from CRM",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
@@ -202,7 +226,7 @@
           "agent_call": "Customer 360 & Speech Agent"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across CRM and Engagement history, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can improve conversion in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Customer 360 & Speech Agent, b2c sales get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across CRM and Engagement history, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can improve conversion in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on."
     },
     {
       "act": "close",

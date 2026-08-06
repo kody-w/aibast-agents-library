@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-06T00:54:22.665960+00:00",
+  "generated": "2026-08-06T21:45:52.509065+00:00",
   "slug": "concepts/the-vault",
   "title": "This vault",
   "summary": "Markdown notes that are both an Obsidian vault and a published site.",
@@ -24,6 +24,7 @@
   "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/the-vault",
   "backlinks": [
     "concepts/extensions",
+    "how-to/make-a-showcase-film",
     "index"
   ]
 }

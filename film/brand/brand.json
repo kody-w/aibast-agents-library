@@ -1,35 +1,162 @@
 {
   "schema": "aibast-showcase-film-brand/1.0",
   "note": "Brand values as data, not prose. Every number here was sampled from the shipped recordings in film/corpus/videos or from the Fluent deck kit. Changing a value here changes every card in every project.",
+  "palette_note": "card_bg, card_panel, the grad_* tile stops and the stage_* demo stops were sampled from film/corpus/videos/ask-hr-agent.mp4 on 2026-08-05 - the overview card at t=50s and the demo at t=130s. Cards in the reference are NAVY (#070E27) carrying pink-to-violet gradient tiles, and the demo pane sits on a violet stage. An earlier kit shipped white paper cards with flat blue tiles: it did not look like the catalog and no gate caught it, which is why these values are recorded here with the frame they came from.",
   "frame": {
     "width": 1920,
     "height": 1080,
     "fps": 30,
     "pix_fmt": "yuv420p",
-    "crf": 18,
+    "crf": 15,
     "preset": "medium"
   },
   "palette": {
-    "paper": [255, 255, 255],
-    "surface": [243, 242, 241],
-    "line": [225, 223, 221],
-    "ink": [27, 26, 25],
-    "muted": [96, 94, 92],
-    "blue": [0, 120, 212],
-    "blue_dark": [0, 90, 158],
-    "navy": [11, 42, 74],
-    "navy_stage": [11, 18, 38],
-    "cyan": [80, 230, 255],
-    "pale_blue": [220, 238, 255],
-    "amber": [202, 128, 8],
-    "red": [168, 45, 42],
-    "green": [16, 124, 16],
-    "white": [255, 255, 255],
+    "paper": [
+      255,
+      255,
+      255
+    ],
+    "surface": [
+      243,
+      242,
+      241
+    ],
+    "line": [
+      225,
+      223,
+      221
+    ],
+    "ink": [
+      27,
+      26,
+      25
+    ],
+    "muted": [
+      96,
+      94,
+      92
+    ],
+    "blue": [
+      0,
+      120,
+      212
+    ],
+    "blue_dark": [
+      0,
+      90,
+      158
+    ],
+    "navy": [
+      11,
+      42,
+      74
+    ],
+    "navy_stage": [
+      11,
+      18,
+      38
+    ],
+    "cyan": [
+      80,
+      230,
+      255
+    ],
+    "pale_blue": [
+      220,
+      238,
+      255
+    ],
+    "amber": [
+      202,
+      128,
+      8
+    ],
+    "red": [
+      168,
+      45,
+      42
+    ],
+    "green": [
+      16,
+      124,
+      16
+    ],
+    "white": [
+      255,
+      255,
+      255
+    ],
+    "card_bg": [
+      7,
+      14,
+      39
+    ],
+    "card_panel": [
+      26,
+      27,
+      61
+    ],
+    "card_ink": [
+      255,
+      255,
+      255
+    ],
+    "card_muted": [
+      163,
+      170,
+      200
+    ],
+    "grad_pink": [
+      233,
+      96,
+      140
+    ],
+    "grad_magenta": [
+      198,
+      75,
+      196
+    ],
+    "grad_violet": [
+      136,
+      128,
+      245
+    ],
+    "stage_violet": [
+      131,
+      0,
+      244
+    ],
+    "stage_indigo": [
+      21,
+      9,
+      81
+    ],
+    "bezel": [
+      22,
+      22,
+      24
+    ],
     "four_square": [
-      [242, 80, 34],
-      [127, 186, 0],
-      [0, 164, 239],
-      [255, 185, 0]
+      [
+        242,
+        80,
+        34
+      ],
+      [
+        127,
+        186,
+        0
+      ],
+      [
+        0,
+        164,
+        239
+      ],
+      [
+        255,
+        185,
+        0
+      ]
     ]
   },
   "type": {
@@ -69,7 +196,16 @@
     "panel_accent_width": 8,
     "chyron_x": 96,
     "chyron_y": 998,
-    "screen_rect": [96, 74, 1728, 872]
+    "screen_rect": [
+      96,
+      74,
+      1728,
+      872
+    ],
+    "bezel_pad": 16,
+    "bezel_radius": 26,
+    "tile_radius": 20,
+    "tile_pad": 26
   },
   "motion": {
     "card_fade_seconds": 0.35,

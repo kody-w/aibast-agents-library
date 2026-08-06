@@ -7,39 +7,39 @@
       {
         "path": "scenario.subject",
         "label": "What the demo is about",
-        "value": "the current workload"
+        "value": "the working brief"
       },
       {
         "path": "scenario.driver",
         "label": "What is driving the work",
-        "value": "rising request volume"
+        "value": "a rise in demand"
       },
       {
         "path": "scenario.systems",
         "label": "Systems it reads",
-        "value": "the systems of record already in use"
+        "value": "the brief, the asset library and brand guidance"
       },
       {
         "path": "scenario.window",
         "label": "Timeframe",
-        "value": "the coming month"
+        "value": "the current sprint"
       }
     ],
     "scenario": {
-      "subject": "the current workload",
-      "volume": "the working backlog",
-      "target": "same-day turnaround",
-      "metric": "turnaround slower than wanted",
-      "window": "the coming month",
-      "driver": "rising request volume",
-      "systems": "the systems of record already in use",
-      "verb": "accelerates turnaround"
+      "subject": "the working brief",
+      "volume": "the requests in hand",
+      "target": "the turnaround expected",
+      "metric": "production slower than wanted",
+      "window": "the current sprint",
+      "driver": "a rise in demand",
+      "systems": "the brief, the asset library and brand guidance",
+      "verb": "accelerates production"
     },
     "how": "Replace the scenario below with your own customer's and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim.",
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:54+00:00",
   "subject": {
     "slug": "art-generator",
     "kind": "agent",
@@ -98,21 +98,21 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Generate original images with an Azure GPT Image deployment for the current workload \u2014 we're looking at rising request volume."
+          "text": "Generate original images with an Azure GPT Image deployment for the working brief \u2014 we're looking at a rise in demand."
         },
         {
           "role": "agent",
           "heading": "ArtGenerator",
           "rich": {
-            "intro": "I'll generate original images for the current workload, working against rising request volume. Reading the systems of record already in use before I propose anything.",
+            "intro": "I'll generate original images for the working brief, working against a rise in demand. Reading the brief, the asset library and brand guidance before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
                 "items": [
-                  "Scope: the working backlog",
-                  "Current: turnaround slower than wanted",
-                  "Goal: close the gap to same-day turnaround",
-                  "Window: the coming month"
+                  "Scope: the requests in hand",
+                  "Current: production slower than wanted",
+                  "Goal: close the gap to the turnaround expected",
+                  "Window: the current sprint"
                 ]
               },
               {
@@ -121,11 +121,19 @@
                   "Azure OpenAI \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
                 ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside the brief, the asset library and brand guidance",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
+                ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: turnaround slower than wanted",
-              "source": "Source: the systems of record already in use",
+              "headline": "Biggest constraint: production slower than wanted",
+              "source": "Source: the brief, the asset library and brand guidance",
               "question": "Shall I show the plan?"
             }
           },
@@ -148,10 +156,18 @@
                   "2. Confirm the result against the source system",
                   "3. Hand back the artifact, and the reasoning behind it"
                 ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
+                ]
               }
             ],
             "callout": {
-              "headline": "Phased over the coming month, starting with the quick wins",
+              "headline": "Phased over the current sprint, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -166,7 +182,7 @@
           "role": "agent",
           "heading": "Risks and how I would cover them",
           "rich": {
-            "intro": "Three things I would watch on the current workload.",
+            "intro": "Three things I would watch on the working brief.",
             "sections": [
               {
                 "label": "Risks",
@@ -183,18 +199,26 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from Azure OpenAI",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
               "headline": "You approve each step; nothing changes on its own",
-              "source": "Source: the systems of record already in use",
+              "source": "Source: the brief, the asset library and brand guidance",
               "question": "Want me to start with the quick wins?"
             }
           },
           "agent_call": "ArtGenerator"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Azure OpenAI, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With ArtGenerator, teams get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Azure OpenAI, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With ArtGenerator, teams get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",

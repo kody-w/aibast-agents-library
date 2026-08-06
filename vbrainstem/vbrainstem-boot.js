@@ -125,11 +125,11 @@
       chip = document.createElement('div');
       chip.id = 'vb-boot-chip';
       chip.style.cssText = 'position:fixed;bottom:14px;left:14px;z-index:9999;' +
-        'background:#161b22;color:#8b949e;border:1px solid #30363d;border-radius:20px;' +
+        'background:var(--panel);color:var(--text-dim);border:1px solid var(--border);border-radius:20px;' +
         'padding:6px 14px;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;' +
         'display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.35)';
       var dot = document.createElement('span');
-      dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:#d29922;' +
+      dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--warn);' +
         'animation:vbpulse 1s ease-in-out infinite';
       var style = document.createElement('style');
       style.textContent = '@keyframes vbpulse{0%,100%{opacity:1}50%{opacity:.3}}';
@@ -488,8 +488,18 @@
 
   // ── window.rapp — SDK/kite/doorman-compatible console API ──────────────────
   var registryCache = null;
-  var REGISTRY_URL = 'https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/registry.json';
-  var RAW_BASE = 'https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/';
+  // Same origin rule as index.html: a fork's brainstem browses the fork's
+  // catalog. Pinned to microsoft only when this is not served from a Pages
+  // site. Hard-coding it made a fork read a registry without integrity hashes
+  // and show "0 agents" with nothing said about why.
+  var RAR_ORIGIN = (function () {
+    var m = /^([^.]+)\.github\.io$/.exec(location.hostname || '');
+    if (!m) return 'microsoft/aibast-agents-library';
+    var seg = (location.pathname || '/').split('/').filter(Boolean);
+    return m[1] + '/' + (seg.length ? seg[0] : 'aibast-agents-library');
+  })();
+  var REGISTRY_URL = 'https://raw.githubusercontent.com/' + RAR_ORIGIN + '/main/registry.json';
+  var RAW_BASE = 'https://raw.githubusercontent.com/' + RAR_ORIGIN + '/main/';
 
   async function loadRegistry() {
     if (registryCache) return registryCache;
@@ -974,14 +984,14 @@
     if (document.getElementById('pair-' + peerId)) return;
     var card = document.createElement('div');
     card.id = 'pair-' + peerId;
-    card.style.cssText = 'position:fixed;top:70px;right:14px;z-index:9998;background:#161b22;' +
-      'color:#e6edf3;border:1px solid #30363d;border-radius:12px;padding:16px;max-width:280px;' +
+    card.style.cssText = 'position:fixed;top:70px;right:14px;z-index:9998;background:var(--panel);' +
+      'color:var(--text);border:1px solid var(--border);border-radius:12px;padding:16px;max-width:280px;' +
       'font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4)';
     card.innerHTML = '<div style="font-weight:600;margin-bottom:6px">🪁 Pairing request</div>' +
-      '<div style="color:#8b949e;margin-bottom:8px">Confirm this PIN matches the joining device:</div>' +
+      '<div style="color:var(--text-dim);margin-bottom:8px">Confirm this PIN matches the joining device:</div>' +
       '<div style="font-family:monospace;font-size:22px;letter-spacing:3px;text-align:center;margin-bottom:12px"></div>' +
-      '<div style="display:flex;gap:8px"><button data-act="ok" style="flex:1;background:#238636;color:#fff;border:0;border-radius:6px;padding:7px;cursor:pointer">Approve</button>' +
-      '<button data-act="no" style="flex:1;background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:7px;cursor:pointer">Reject</button></div>';
+      '<div style="display:flex;gap:8px"><button data-act="ok" style="flex:1;background:var(--ok);color:#fff;border:0;border-radius:6px;padding:7px;cursor:pointer">Approve</button>' +
+      '<button data-act="no" style="flex:1;background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;cursor:pointer">Reject</button></div>';
     card.querySelector('div[style*="monospace"]').textContent = pinFmt(pin);
     card.querySelector('[data-act="ok"]').onclick = function () { _hood.approved[peerId] = true; card.remove(); };
     card.querySelector('[data-act="no"]').onclick = function () {
@@ -1068,17 +1078,17 @@
     if (old) old.remove();
     var panel = document.createElement('div');
     panel.id = 'vb-kite-panel';
-    panel.style.cssText = 'position:fixed;top:70px;right:14px;z-index:9997;background:#161b22;' +
-      'color:#e6edf3;border:1px solid #30363d;border-radius:12px;padding:16px;width:280px;' +
+    panel.style.cssText = 'position:fixed;top:70px;right:14px;z-index:9997;background:var(--panel);' +
+      'color:var(--text);border:1px solid var(--border);border-radius:12px;padding:16px;width:280px;' +
       'font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4)';
     var mark = document.getElementById('vb-kite-mark');
     panel.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
       (mark ? mark.innerHTML : '🪁') +
       '<b>Hosting a kite</b><span style="flex:1"></span>' +
-      '<button id="vb-kite-close" style="background:none;border:0;color:#8b949e;cursor:pointer;font-size:16px">✕</button></div>' +
-      '<div style="color:#8b949e;margin-bottom:8px">Scan to join this brainstem from another device:</div>' +
+      '<button id="vb-kite-close" style="background:none;border:0;color:var(--text-dim);cursor:pointer;font-size:16px">✕</button></div>' +
+      '<div style="color:var(--text-dim);margin-bottom:8px">Scan to join this brainstem from another device:</div>' +
       '<img alt="join QR" style="width:100%;border-radius:8px;background:#fff" src="' + info.qr + '">' +
-      '<button id="vb-kite-copy" style="margin-top:10px;width:100%;background:#1f6feb;color:#fff;border:0;border-radius:6px;padding:8px;cursor:pointer">Copy operator link</button>';
+      '<button id="vb-kite-copy" style="margin-top:10px;width:100%;background:var(--accent);color:#fff;border:0;border-radius:6px;padding:8px;cursor:pointer">Copy operator link</button>';
     document.body.appendChild(panel);
     panel.querySelector('#vb-kite-close').onclick = function () { panel.remove(); };
     panel.querySelector('#vb-kite-copy').onclick = function () {
@@ -1430,7 +1440,7 @@
       wrap.appendChild(bubble);
       if (!isUser && m.logs) {
         var logsEl = document.createElement('div');
-        logsEl.style.cssText = 'font-size:11px;color:#7ee787;background:#161b22;border-radius:6px;padding:6px 9px;max-width:92%;white-space:pre-wrap;overflow-x:auto';
+        logsEl.style.cssText = 'font-size:11px;color:#7ee787;background:var(--panel);border-radius:6px;padding:6px 9px;max-width:92%;white-space:pre-wrap;overflow-x:auto';
         logsEl.textContent = m.logs;
         wrap.appendChild(logsEl);
       }

@@ -1,7 +1,7 @@
 {
   "schema": "aibast-metrics/1.0",
   "repo_name": "microsoft/aibast-agents-library",
-  "generated_at": "2026-08-06T00:54:21.361980+00:00",
+  "generated_at": "2026-08-06T21:45:51.211510+00:00",
   "totals": {
     "downloads": 40,
     "clones": 39,
@@ -11,10 +11,10 @@
     "tracked_downloads": 1,
     "upvotes": 0,
     "comments": 0,
-    "agents": 105,
+    "agents": 112,
     "publishers": 1,
     "categories": 14,
-    "total_lines": 37756,
+    "total_lines": 39029,
     "clones_14d": 39,
     "clone_uniques_14d": 15,
     "page_views": 0,
@@ -530,7 +530,7 @@
     "categories": [
       {
         "name": "general",
-        "agents": 23,
+        "agents": 24,
         "upvotes": 0,
         "downloads": 0
       },
@@ -542,13 +542,37 @@
       },
       {
         "name": "financial_services",
-        "agents": 10,
+        "agents": 11,
         "upvotes": 0,
         "downloads": 0
       },
       {
         "name": "b2c_sales",
         "agents": 7,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "healthcare",
+        "agents": 6,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "manufacturing",
+        "agents": 6,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "professional_services",
+        "agents": 6,
+        "upvotes": 0,
+        "downloads": 0
+      },
+      {
+        "name": "slg_government",
+        "agents": 6,
         "upvotes": 0,
         "downloads": 0
       },
@@ -565,31 +589,7 @@
         "downloads": 0
       },
       {
-        "name": "healthcare",
-        "agents": 5,
-        "upvotes": 0,
-        "downloads": 0
-      },
-      {
-        "name": "manufacturing",
-        "agents": 5,
-        "upvotes": 0,
-        "downloads": 0
-      },
-      {
-        "name": "professional_services",
-        "agents": 5,
-        "upvotes": 0,
-        "downloads": 0
-      },
-      {
         "name": "retail_cpg",
-        "agents": 5,
-        "upvotes": 0,
-        "downloads": 0
-      },
-      {
-        "name": "slg_government",
         "agents": 5,
         "upvotes": 0,
         "downloads": 0
@@ -602,7 +602,7 @@
       },
       {
         "name": "human_resources",
-        "agents": 1,
+        "agents": 2,
         "upvotes": 0,
         "downloads": 0
       },
@@ -616,7 +616,7 @@
     "publishers": [
       {
         "name": "@aibast-agents-library",
-        "agents": 105,
+        "agents": 112,
         "upvotes": 0,
         "downloads": 1,
         "comments": 0,

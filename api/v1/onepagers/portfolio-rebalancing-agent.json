@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
   "onepager": {
     "capture_file": "05-portfolio-rebalancing-agent.html",
     "industry": "Capital Markets",
@@ -47,7 +47,8 @@
       "slug": "portfolio-rebalancing-agent",
       "hosted": true,
       "src": "media/videos/portfolio-rebalancing-agent.mp4",
-      "size_mb": 3.01
+      "source": "branch",
+      "size_mb": null
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=portfolio-rebalancing-agent"

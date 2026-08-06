@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-06T00:54:22.665960+00:00",
+  "generated": "2026-08-06T21:45:52.509065+00:00",
   "slug": "concepts/rapp-data-exhaust",
   "title": "RAPP data exhaust",
   "summary": "The by-product of doing the work holds a negative of the shape that produced it \u2014 read the negative and you recover the shape.",
@@ -24,5 +24,7 @@
   "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/rapp-data-exhaust.md",
   "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-rapp-data-exhaust.json",
   "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/rapp-data-exhaust",
-  "backlinks": []
+  "backlinks": [
+    "how-to/make-a-showcase-film"
+  ]
 }

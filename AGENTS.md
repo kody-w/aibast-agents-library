@@ -48,6 +48,16 @@ instantiate it, and run it, so it must work standalone.
 Write a note in `brain/` with YAML frontmatter and `[[wikilinks]]`. Indexes,
 backlinks, tags, and the graph are derived — never hand-maintain an index.
 
+## Making a showcase film
+
+`film/` produces a demo film at the grammar and audio standard of the 48
+recordings the catalog already ships, from a config and nothing else. Start at
+[`film/README.md`](film/README.md); the working method is
+`.claude/skills/showcase-film/`. It is self-contained — nothing it needs lives
+outside this repository, and `python3 film/kit/gate.py --cold-start` proves it.
+Rendered films are drafts: publishing one requires a human to read the script
+first.
+
 ## Conventions
 
 - Python 3.11, standard library only in build scripts.

@@ -34,7 +34,9 @@ import argparse
 import csv
 import html
 import json
+import os
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -42,6 +44,25 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OUT_FILE = REPO_ROOT / "data" / "onepagers.json"
 MEDIA_DIR = REPO_ROOT / "media" / "videos"
+MEDIA_BRANCH = os.environ.get("AIBAST_MEDIA_BRANCH", "media-server")
+
+
+def branch_media() -> set:
+    """Recordings on the media branch, which is where they live.
+
+    "Hosted" used to mean "the file is in this working tree". It no longer is:
+    the recordings moved to a branch so a depth-1 clone never carries them, and
+    the site streams them at runtime. Keeping the old test would have marked
+    every demo as missing and quietly replaced forty-eight players with
+    "coming soon".
+    """
+    try:
+        out = subprocess.run(
+            ["git", "ls-tree", "-r", "--name-only", MEDIA_BRANCH, "media/videos"],
+            capture_output=True, text=True, cwd=REPO_ROOT, timeout=20)
+        return {Path(x).stem for x in out.stdout.split() if x.endswith(".mp4")}
+    except Exception:
+        return set()
 
 SCHEMA = "aibast-onepagers/1.0"
 
@@ -138,6 +159,8 @@ def build(source: Path) -> dict:
         raise SystemExit(f"no one-pagers under {op_dir}")
 
     listings = {p.stem: parse_listing(p) for p in sorted(listing_dir.glob("*.md"))} if listing_dir.is_dir() else {}
+    ON_BRANCH = branch_media()
+    globals()["ON_BRANCH"] = ON_BRANCH
 
     crosswalk = {}
     cw_file = source / "crosswalk.json"
@@ -181,10 +204,16 @@ def build(source: Path) -> dict:
         if cw.get("video"):
             vslug = video_slug(cw["video"])
             local = MEDIA_DIR / f"{vslug}.mp4"
+            on_branch = vslug in ON_BRANCH
+            hosted = local.is_file() or on_branch
             doc["video"] = {
                 "slug": vslug,
-                "hosted": local.is_file(),
-                "src": f"media/videos/{vslug}.mp4" if local.is_file() else None,
+                "hosted": hosted,
+                # The path is relative to the media branch root; media.js
+                # resolves it against the CDN and raw.
+                "src": f"media/videos/{vslug}.mp4" if hosted else None,
+                "source": "branch" if on_branch and not local.is_file() else
+                          ("worktree" if local.is_file() else None),
                 "size_mb": round(local.stat().st_size / 1048576, 2) if local.is_file() else None,
             }
         entries.append(doc)

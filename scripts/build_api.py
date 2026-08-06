@@ -310,6 +310,22 @@ def main() -> int:
         changed += stable_write(API / "aggregated.json", agg_doc)
 
     # Solution one-pagers: the business framing, its demo, and its engagement.
+    # Video engagement rides the same static-API contract as everything else:
+    # a build-time snapshot the page reads, never a live call from a browser.
+    # First-party product agents: pointers, not downloads. Published so a
+    # scenario can be scoped against what already ships before anyone builds.
+    fp = load("data/first_party_agents.json", None)
+    if fp:
+        changed += stable_write(API / "first-party-agents.json", dict(fp))
+
+    rm = load("data/roadmap.json", None)
+    if rm:
+        changed += stable_write(API / "roadmap.json", dict(rm))
+
+    ve = load("state/video_engagement.json", None)
+    if ve:
+        changed += stable_write(API / "video-engagement.json", dict(ve))
+
     onepagers = load("data/onepagers.json", None)
     if onepagers is not None:
         changed += stable_write(API / "onepagers.json", dict(onepagers))

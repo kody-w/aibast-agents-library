@@ -1,0 +1,806 @@
+{
+ "schema": "aibast-showcase-film-batch/1.0",
+ "batch": "fy27",
+ "generated": "2026-08-06T03:14:38+00:00",
+ "count": 20,
+ "status": "draft",
+ "note": "Rendered drafts. Publishing any of these requires a human to read the script first - see film/README.md.",
+ "films": [
+  {
+   "slug": "asset-reliability-standards",
+   "title": "Asset Reliability & Standards Agent",
+   "industry": "Manufacturing",
+   "category": "manufacturing",
+   "composed_from": "media/walkthroughs/agent-asset-reliability-standards.json",
+   "broll_bucket": "manufacturing",
+   "file": "asset-reliability-standards.mp4",
+   "duration_s": 148.03,
+   "demo_share_pct": 43.3,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.6,
+    -26.8,
+    -28.6,
+    -27.8,
+    -26.2
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "clinical-documentation-ring",
+   "title": "Clinical Documentation Agent",
+   "industry": "Healthcare",
+   "category": "healthcare",
+   "composed_from": "media/walkthroughs/agent-clinical-documentation-ring.json",
+   "broll_bucket": "healthcare",
+   "file": "clinical-documentation-ring.mp4",
+   "duration_s": 145.6,
+   "demo_share_pct": 43.8,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.7,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.5,
+    -26.7,
+    -28.0,
+    -26.5,
+    -27.4,
+    -26.4
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "customer-service-case-intelligence-d365",
+   "title": "Customer Service Case Intelligence Agent",
+   "industry": "Software",
+   "category": "Software",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "software",
+   "file": "customer-service-case-intelligence-d365.mp4",
+   "duration_s": 126.3,
+   "demo_share_pct": 33.7,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.2,
+    -26.7,
+    -26.5,
+    -27.1
+   ],
+   "programme_mean_db": -18.8,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "editorial-market-intelligence",
+   "title": "Editorial & Market Intelligence Agent",
+   "industry": "Cross-industry",
+   "category": "general",
+   "composed_from": "media/walkthroughs/agent-editorial-market-intelligence.json",
+   "broll_bucket": "cross_industry",
+   "file": "editorial-market-intelligence.mp4",
+   "duration_s": 142.3,
+   "demo_share_pct": 42.6,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.2,
+    -26.6,
+    -28.1,
+    -26.9,
+    -28.3
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.5,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "editorial-story-discovery-and-market-intelligence",
+   "title": "Editorial Discovery and Market Intelligence Agent",
+   "industry": "Media",
+   "category": "Media",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "professional_services",
+   "file": "editorial-story-discovery-and-market-intelligence.mp4",
+   "duration_s": 131.73,
+   "demo_share_pct": 33.0,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.2,
+    -28.0,
+    -27.0,
+    -26.4,
+    -26.2
+   ],
+   "programme_mean_db": -18.7,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "frontline-coaching",
+   "title": "Frontline Coaching Agent",
+   "industry": "human_resources",
+   "category": "human_resources",
+   "composed_from": "media/walkthroughs/agent-frontline-coaching.json",
+   "broll_bucket": "cross_industry",
+   "file": "frontline-coaching.mp4",
+   "duration_s": 143.5,
+   "demo_share_pct": 42.7,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.4,
+    -26.8,
+    -28.1,
+    -26.5,
+    -29.4,
+    -28.4
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "frontline-coaching-1-1-documentation",
+   "title": "Frontline Coaching and Session Documentation Agent",
+   "industry": "Financial services",
+   "category": "Financial services",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "financial_services",
+   "file": "frontline-coaching-1-1-documentation.mp4",
+   "duration_s": 129.0,
+   "demo_share_pct": 31.3,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.9,
+    -27.3,
+    -27.6,
+    -26.5
+   ],
+   "programme_mean_db": -18.7,
+   "programme_peak_db": -0.5,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "healthcare-clinical-documentation-and-data-ring",
+   "title": "Clinical Documentation and Shared Care Record Agent",
+   "industry": "Healthcare",
+   "category": "Healthcare",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "healthcare",
+   "file": "healthcare-clinical-documentation-and-data-ring.mp4",
+   "duration_s": 130.27,
+   "demo_share_pct": 32.1,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.7,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.9,
+    -27.7,
+    -27.8,
+    -26.4
+   ],
+   "programme_mean_db": -18.8,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "industrial-asset-reliability-and-engineering-standards",
+   "title": "Industrial Asset Reliability and Engineering Standards Agent",
+   "industry": "Manufacturing",
+   "category": "Manufacturing",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "manufacturing",
+   "file": "industrial-asset-reliability-and-engineering-standards.mp4",
+   "duration_s": 128.8,
+   "demo_share_pct": 33.5,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.7,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.5,
+    -26.4,
+    -28.2,
+    -27.3
+   ],
+   "programme_mean_db": -18.7,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "industry-compliance-and-risk-monitoring",
+   "title": "Compliance and Risk Monitoring Agent",
+   "industry": "Public sector",
+   "category": "Public sector",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "government",
+   "file": "industry-compliance-and-risk-monitoring.mp4",
+   "duration_s": 131.5,
+   "demo_share_pct": 33.1,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -26.4,
+    -28.0,
+    -27.3,
+    -26.7,
+    -26.5,
+    -26.5
+   ],
+   "programme_mean_db": -18.7,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "industry-specific-finance-operations",
+   "title": "Multi-System Finance Operations Agent",
+   "industry": "Professional services",
+   "category": "Professional services",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "cross_industry",
+   "file": "industry-specific-finance-operations.mp4",
+   "duration_s": 130.17,
+   "demo_share_pct": 31.6,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.7,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.5,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.1,
+    -27.3,
+    -28.4,
+    -27.0,
+    -26.5
+   ],
+   "programme_mean_db": -18.7,
+   "programme_peak_db": -0.1,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "multi-entity-finance-ops",
+   "title": "Multi-Entity Finance Operations Agent",
+   "industry": "Financial services",
+   "category": "financial_services",
+   "composed_from": "media/walkthroughs/agent-multi-entity-finance-ops.json",
+   "broll_bucket": "financial_services",
+   "file": "multi-entity-finance-ops.mp4",
+   "duration_s": 143.27,
+   "demo_share_pct": 43.3,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -26.2,
+    -27.1,
+    -27.1,
+    -26.8,
+    -27.8
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "procurement-tender-vendor-spend",
+   "title": "Procurement and Vendor Spend Agent",
+   "industry": "Energy",
+   "category": "Energy",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "energy",
+   "file": "procurement-tender-vendor-spend.mp4",
+   "duration_s": 124.7,
+   "demo_share_pct": 31.4,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -26.2,
+    -27.6,
+    -26.7,
+    -27.0,
+    -28.3
+   ],
+   "programme_mean_db": -18.8,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "public-sector-citizen-civil-service",
+   "title": "Civil Service Policy and Service Agent",
+   "industry": "Public sector",
+   "category": "Public sector",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "government",
+   "file": "public-sector-citizen-civil-service.mp4",
+   "duration_s": 130.9,
+   "demo_share_pct": 32.2,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.5,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -28.0,
+    -27.9,
+    -27.5,
+    -26.7
+   ],
+   "programme_mean_db": -18.7,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "rd-discovery-requirements",
+   "title": "R&D Discovery & Requirements Agent",
+   "industry": "Professional services",
+   "category": "professional_services",
+   "composed_from": "media/walkthroughs/agent-rd-discovery-requirements.json",
+   "broll_bucket": "professional_services",
+   "file": "rd-discovery-requirements.mp4",
+   "duration_s": 146.83,
+   "demo_share_pct": 44.0,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.7,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -26.9,
+    -26.8,
+    -27.2,
+    -28.2
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "rd-scientific-discovery-and-innovation",
+   "title": "Research and Scientific Discovery Agent",
+   "industry": "Manufacturing",
+   "category": "Manufacturing",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "manufacturing",
+   "file": "rd-scientific-discovery-and-innovation.mp4",
+   "duration_s": 132.7,
+   "demo_share_pct": 32.1,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.0,
+    -28.2,
+    -26.4,
+    -27.5,
+    -27.5
+   ],
+   "programme_mean_db": -18.7,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "regulated-document-drafting",
+   "title": "Regulated Document Drafting Agent",
+   "industry": "State and local government",
+   "category": "slg_government",
+   "composed_from": "media/walkthroughs/agent-regulated-document-drafting.json",
+   "broll_bucket": "government",
+   "file": "regulated-document-drafting.mp4",
+   "duration_s": 144.53,
+   "demo_share_pct": 41.8,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.7,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.1,
+    -26.8,
+    -28.2,
+    -26.8,
+    -27.0
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "requirements-and-innovation-authoring",
+   "title": "Requirements and Innovation Authoring Agent",
+   "industry": "Professional services",
+   "category": "Professional services",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "professional_services",
+   "file": "requirements-and-innovation-authoring.mp4",
+   "duration_s": 131.13,
+   "demo_share_pct": 31.8,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.7,
+    -17.6,
+    -17.6,
+    -17.7,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.9,
+    -26.7,
+    -28.1,
+    -26.3
+   ],
+   "programme_mean_db": -18.7,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "sales-manager-marketing-ops-analytics",
+   "title": "Sales Manager and Marketing Operations Analytics Agent",
+   "industry": "Software",
+   "category": "Software",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "software",
+   "file": "sales-manager-marketing-ops-analytics.mp4",
+   "duration_s": 126.27,
+   "demo_share_pct": 31.6,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.7,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -26.6,
+    -27.4,
+    -26.4,
+    -27.7,
+    -28.1
+   ],
+   "programme_mean_db": -18.8,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "seller-account-executive-productivity",
+   "title": "Seller and Account Executive Productivity Agent",
+   "industry": "Financial services",
+   "category": "Financial services",
+   "composed_from": "sanitised brief extract",
+   "broll_bucket": "financial_services",
+   "file": "seller-account-executive-productivity.mp4",
+   "duration_s": 128.2,
+   "demo_share_pct": 31.5,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.7,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.5,
+    -27.4,
+    -26.5,
+    -28.1,
+    -27.3
+   ],
+   "programme_mean_db": -18.8,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  }
+ ]
+}

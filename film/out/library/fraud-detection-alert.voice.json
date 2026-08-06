@@ -1,0 +1,29 @@
+{
+ "provider": "mixed",
+ "voice": "Daniel",
+ "region": null,
+ "slots": 9,
+ "engine_per_slot": {
+  "vo01": "azure",
+  "vo02": "azure",
+  "vo03": "azure",
+  "vo04": "azure",
+  "vo05": "azure",
+  "vo06": "azure",
+  "vo_payoff": "mixed",
+  "vo_helps": "mixed",
+  "vo_cta": "mixed"
+ },
+ "rate_per_slot": {
+  "vo01": null,
+  "vo02": null,
+  "vo03": null,
+  "vo04": null,
+  "vo05": null,
+  "vo06": null,
+  "vo_payoff": null,
+  "vo_helps": null,
+  "vo_cta": null
+ },
+ "written_by": "film/kit/narrate.py"
+}

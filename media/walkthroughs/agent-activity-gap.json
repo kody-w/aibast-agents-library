@@ -7,39 +7,39 @@
       {
         "path": "scenario.subject",
         "label": "What the demo is about",
-        "value": "the enterprise pipeline"
+        "value": "the working brief"
       },
       {
         "path": "scenario.driver",
         "label": "What is driving the work",
-        "value": "a compressed buying cycle"
+        "value": "a rise in demand"
       },
       {
         "path": "scenario.systems",
         "label": "Systems it reads",
-        "value": "CRM, engagement history and product signals"
+        "value": "the brief, the asset library and brand guidance"
       },
       {
         "path": "scenario.window",
         "label": "Timeframe",
-        "value": "the current quarter"
+        "value": "the current sprint"
       }
     ],
     "scenario": {
-      "subject": "the enterprise pipeline",
-      "volume": "open opportunities",
-      "target": "the conversion target",
-      "metric": "conversion below target",
-      "window": "the current quarter",
-      "driver": "a compressed buying cycle",
-      "systems": "CRM, engagement history and product signals",
-      "verb": "improves conversion"
+      "subject": "the working brief",
+      "volume": "the requests in hand",
+      "target": "the turnaround expected",
+      "metric": "production slower than wanted",
+      "window": "the current sprint",
+      "driver": "a rise in demand",
+      "systems": "the brief, the asset library and brand guidance",
+      "verb": "accelerates production"
     },
     "how": "Replace the scenario below with your own customer's and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim.",
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:54+00:00",
   "subject": {
     "slug": "activity-gap",
     "kind": "agent",
@@ -70,7 +70,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 seller preparing before a customer call",
       "on_screen": [],
-      "narration": "There's an agent to guide sales teams through these processes. It pulls data from CRM and Engagement history, engages you directly in Microsoft Teams."
+      "narration": "There's an agent to guide sales teams through these processes. It pulls data from The brief and The asset library, engages you directly in Microsoft Teams."
     },
     {
       "act": "overview",
@@ -79,9 +79,9 @@
       "shot": "Agent overview card \u2014 three gradient panels on dark field",
       "panels": {
         "Sources": [
-          "CRM",
-          "Engagement history",
-          "Product signals"
+          "The brief",
+          "The asset library",
+          "Brand guidance"
         ],
         "Flow of work": [
           "Engages you in Microsoft Teams and Outlook"
@@ -101,36 +101,44 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Identify missing sales activities per stage for the enterprise pipeline \u2014 we're looking at a compressed buying cycle."
+          "text": "Identify missing sales activities per stage for the working brief \u2014 we're looking at a rise in demand."
         },
         {
           "role": "agent",
           "heading": "Activity Gap Analyzer",
           "rich": {
-            "intro": "I'll generate roadmaps, and analyzes gap impact for the enterprise pipeline, working against a compressed buying cycle. Reading CRM, engagement history and product signals before I propose anything.",
+            "intro": "I'll generate roadmaps, and analyzes gap impact for the working brief, working against a rise in demand. Reading the brief, the asset library and brand guidance before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
                 "items": [
-                  "Scope: open opportunities",
-                  "Current: conversion below target",
-                  "Goal: close the gap to the conversion target",
-                  "Window: the current quarter"
+                  "Scope: the requests in hand",
+                  "Current: production slower than wanted",
+                  "Goal: close the gap to the turnaround expected",
+                  "Window: the current sprint"
                 ]
               },
               {
                 "label": "What I checked",
                 "items": [
-                  "CRM \u2014 read, not assumed",
-                  "Engagement history \u2014 read, not assumed",
-                  "Product signals \u2014 read, not assumed",
+                  "The brief \u2014 read, not assumed",
+                  "The asset library \u2014 read, not assumed",
+                  "Brand guidance \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
+                ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside the brief, the asset library and brand guidance",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
                 ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: conversion below target",
-              "source": "Source: CRM, engagement history and product signals",
+              "headline": "Biggest constraint: production slower than wanted",
+              "source": "Source: the brief, the asset library and brand guidance",
               "question": "Shall I show the plan?"
             }
           },
@@ -154,10 +162,18 @@
                   "3. Confirm the result against the source system",
                   "4. Hand back the artifact, and the reasoning behind it"
                 ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
+                ]
               }
             ],
             "callout": {
-              "headline": "Phased over the current quarter, starting with the quick wins",
+              "headline": "Phased over the current sprint, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -172,12 +188,12 @@
           "role": "agent",
           "heading": "Risks and how I would cover them",
           "rich": {
-            "intro": "Three things I would watch on the enterprise pipeline.",
+            "intro": "Three things I would watch on the working brief.",
             "sections": [
               {
                 "label": "Risks",
                 "items": [
-                  "Stale inputs \u2014 CRM may lag the working picture",
+                  "Stale inputs \u2014 The brief may lag the working picture",
                   "Edge cases the source data does not describe",
                   "A recommendation that reads confident but is thinly evidenced"
                 ]
@@ -189,18 +205,26 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from The brief",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
               "headline": "You approve each step; nothing changes on its own",
-              "source": "Source: CRM, engagement history and product signals",
+              "source": "Source: the brief, the asset library and brand guidance",
               "question": "Want me to start with the quick wins?"
             }
           },
           "agent_call": "Activity Gap Analyzer"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across CRM and Engagement history, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can analyze gap impact in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Activity Gap Analyzer, sales teams get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across The brief and The asset library, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can analyze gap impact in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on."
     },
     {
       "act": "close",

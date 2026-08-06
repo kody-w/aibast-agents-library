@@ -1,6 +1,6 @@
 {
   "schema": "aibast-onepagers/1.0",
-  "generated": "2026-08-06T00:34:35+00:00",
+  "generated": "2026-08-06T14:46:03+00:00",
   "source": "AIBAST solution catalog (captured); sharing URLs deliberately omitted",
   "count": 48,
   "hosted_videos": 48,
@@ -51,7 +51,8 @@
         "slug": "product-line-optimization-agent",
         "hosted": true,
         "src": "media/videos/product-line-optimization-agent.mp4",
-        "size_mb": 3.03
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -87,7 +88,8 @@
         "slug": "contract-risk-review-agent",
         "hosted": true,
         "src": "media/videos/contract-risk-review-agent.mp4",
-        "size_mb": 2.54
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -123,7 +125,8 @@
         "slug": "customer-onboarding-agent",
         "hosted": true,
         "src": "media/videos/customer-onboarding-agent.mp4",
-        "size_mb": 2.62
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -161,7 +164,8 @@
         "slug": "customer-escalations-agent",
         "hosted": true,
         "src": "media/videos/customer-escalations-agent.mp4",
-        "size_mb": 2.46
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -210,7 +214,8 @@
         "slug": "portfolio-rebalancing-agent",
         "hosted": true,
         "src": "media/videos/portfolio-rebalancing-agent.mp4",
-        "size_mb": 3.01
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -244,7 +249,8 @@
         "slug": "procurement-agent",
         "hosted": true,
         "src": "media/videos/procurement-agent.mp4",
-        "size_mb": 2.31
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -280,7 +286,8 @@
         "slug": "inventory-rebalancing-agent",
         "hosted": true,
         "src": "media/videos/inventory-rebalancing-agent.mp4",
-        "size_mb": 3.5
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -316,7 +323,8 @@
         "slug": "time-entry-billing-agent",
         "hosted": true,
         "src": "media/videos/time-entry-billing-agent.mp4",
-        "size_mb": 3.38
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -362,7 +370,8 @@
         "slug": "resource-utilization-agent",
         "hosted": true,
         "src": "media/videos/resource-utilization-agent.mp4",
-        "size_mb": 3.44
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -400,7 +409,8 @@
         "slug": "energy-operations-suite",
         "hosted": true,
         "src": "media/videos/energy-operations-suite.mp4",
-        "size_mb": 4.78
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -438,7 +448,8 @@
         "slug": "energy-operations-suite",
         "hosted": true,
         "src": "media/videos/energy-operations-suite.mp4",
-        "size_mb": 4.78
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -473,7 +484,8 @@
         "slug": "deal-progression-agent",
         "hosted": true,
         "src": "media/videos/deal-progression-agent.mp4",
-        "size_mb": 3.22
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -511,7 +523,8 @@
         "slug": "proposal-generation-agent",
         "hosted": true,
         "src": "media/videos/proposal-generation-agent.mp4",
-        "size_mb": 3.64
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -545,7 +558,8 @@
         "slug": "personalized-marketing-agent",
         "hosted": true,
         "src": "media/videos/personalized-marketing-agent.mp4",
-        "size_mb": 3.4
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -580,7 +594,8 @@
         "slug": "maintenance-scheduling-agent",
         "hosted": true,
         "src": "media/videos/maintenance-scheduling-agent.mp4",
-        "size_mb": 3.85
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -627,7 +642,8 @@
         "slug": "client-health-score-agent",
         "hosted": true,
         "src": "media/videos/client-health-score-agent.mp4",
-        "size_mb": 3.03
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -666,7 +682,8 @@
         "slug": "energy-operations-suite",
         "hosted": true,
         "src": "media/videos/energy-operations-suite.mp4",
-        "size_mb": 4.78
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -705,7 +722,8 @@
         "slug": "energy-operations-suite",
         "hosted": true,
         "src": "media/videos/energy-operations-suite.mp4",
-        "size_mb": 4.78
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -741,7 +759,8 @@
         "slug": "account-intelligence-agent",
         "hosted": true,
         "src": "media/videos/account-intelligence-agent.mp4",
-        "size_mb": 3.14
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -774,7 +793,8 @@
         "slug": "supply-risk-monitoring-agent",
         "hosted": true,
         "src": "media/videos/supply-risk-monitoring-agent.mp4",
-        "size_mb": 3.48
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -810,7 +830,8 @@
         "slug": "store-associate-copilot",
         "hosted": true,
         "src": "media/videos/store-associate-copilot.mp4",
-        "size_mb": 3.44
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -847,7 +868,8 @@
         "slug": "cart-abandonment-recovery-agent",
         "hosted": true,
         "src": "media/videos/cart-abandonment-recovery-agent.mp4",
-        "size_mb": 3.48
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -883,7 +905,8 @@
         "slug": "product-feedback-synthesizer-agent",
         "hosted": true,
         "src": "media/videos/product-feedback-synthesizer-agent.mp4",
-        "size_mb": 3.86
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -922,7 +945,8 @@
         "slug": "utility-billing-and-assistance-agent",
         "hosted": true,
         "src": "media/videos/utility-billing-and-assistance-agent.mp4",
-        "size_mb": 3.91
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -956,7 +980,8 @@
         "slug": "cross-selling-opportunities-agent",
         "hosted": true,
         "src": "media/videos/cross-selling-opportunities-agent.mp4",
-        "size_mb": 3.75
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -992,7 +1017,8 @@
         "slug": "procurement-agent",
         "hosted": true,
         "src": "media/videos/procurement-agent.mp4",
-        "size_mb": 2.31
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1030,7 +1056,8 @@
         "slug": "omnichannel-engagement-agent",
         "hosted": true,
         "src": "media/videos/omnichannel-engagement-agent.mp4",
-        "size_mb": 4.07
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1066,7 +1093,8 @@
         "slug": "patient-intake-and-scheduling-agent",
         "hosted": true,
         "src": "media/videos/patient-intake-and-scheduling-agent.mp4",
-        "size_mb": 3.48
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1114,7 +1142,8 @@
         "slug": "care-gap-closure-agent",
         "hosted": true,
         "src": "media/videos/care-gap-closure-agent.mp4",
-        "size_mb": 3.79
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1150,7 +1179,8 @@
         "slug": "underwriting-support-agent",
         "hosted": true,
         "src": "media/videos/underwriting-support-agent.mp4",
-        "size_mb": 3.79
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1185,7 +1215,8 @@
         "slug": "inventory-visibility-agent",
         "hosted": true,
         "src": "media/videos/inventory-visibility-agent.mp4",
-        "size_mb": 3.56
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1221,7 +1252,8 @@
         "slug": "supply-risk-monitoring-agent",
         "hosted": true,
         "src": "media/videos/supply-risk-monitoring-agent.mp4",
-        "size_mb": 3.48
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1257,7 +1289,8 @@
         "slug": "license-renewal-and-expansion-agent",
         "hosted": true,
         "src": "media/videos/license-renewal-and-expansion-agent.mp4",
-        "size_mb": 4.15
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1291,7 +1324,8 @@
         "slug": "customer-sentiment-and-churn-prediction-agent",
         "hosted": true,
         "src": "media/videos/customer-sentiment-and-churn-prediction-agent.mp4",
-        "size_mb": 3.81
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1326,7 +1360,8 @@
         "slug": "fraud-detection-and-alert-agent",
         "hosted": true,
         "src": "media/videos/fraud-detection-and-alert-agent.mp4",
-        "size_mb": 4.27
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1373,7 +1408,8 @@
         "slug": "claims-processing-agent",
         "hosted": true,
         "src": "media/videos/claims-processing-agent.mp4",
-        "size_mb": 4.17
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1409,7 +1445,8 @@
         "slug": "loan-origination-assistant",
         "hosted": true,
         "src": "media/videos/loan-origination-assistant.mp4",
-        "size_mb": 3.41
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1444,7 +1481,8 @@
         "slug": "personalized-shopping-agent",
         "hosted": true,
         "src": "media/videos/personalized-shopping-agent.mp4",
-        "size_mb": 4.05
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1481,7 +1519,8 @@
         "slug": "wealth-insights-generator-agent",
         "hosted": true,
         "src": "media/videos/wealth-insights-generator-agent.mp4",
-        "size_mb": 4.06
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1524,7 +1563,8 @@
         "slug": "regulatory-compliance-agent",
         "hosted": true,
         "src": "media/videos/regulatory-compliance-agent.mp4",
-        "size_mb": 4.21
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1564,7 +1604,8 @@
         "slug": "returns-and-complaints-resolution-agent",
         "hosted": true,
         "src": "media/videos/returns-and-complaints-resolution-agent.mp4",
-        "size_mb": 3.73
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1599,7 +1640,8 @@
         "slug": "order-status-communication-agent",
         "hosted": true,
         "src": "media/videos/order-status-communication-agent.mp4",
-        "size_mb": 4.06
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1636,7 +1678,8 @@
         "slug": "customer-loyalty-rewards-agent",
         "hosted": true,
         "src": "media/videos/customer-loyalty-rewards-agent.mp4",
-        "size_mb": 4.16
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1673,7 +1716,8 @@
         "slug": "building-permit-processing-agent",
         "hosted": true,
         "src": "media/videos/building-permit-processing-agent.mp4",
-        "size_mb": 3.95
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1708,7 +1752,8 @@
         "slug": "prior-authorization-automation-agent",
         "hosted": true,
         "src": "media/videos/prior-authorization-automation-agent.mp4",
-        "size_mb": 3.99
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1742,7 +1787,8 @@
         "slug": "ask-hr-agent",
         "hosted": true,
         "src": "media/videos/ask-hr-agent.mp4",
-        "size_mb": 3.59
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1777,7 +1823,8 @@
         "slug": "clinical-notes-summarizer-agent",
         "hosted": true,
         "src": "media/videos/clinical-notes-summarizer-agent.mp4",
-        "size_mb": 4.11
+        "source": "branch",
+        "size_mb": null
       }
     },
     {
@@ -1813,7 +1860,8 @@
         "slug": "financial-advisor-agent",
         "hosted": true,
         "src": "media/videos/financial-advisor-agent.mp4",
-        "size_mb": 3.93
+        "source": "branch",
+        "size_mb": null
       }
     }
   ]

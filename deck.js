@@ -97,14 +97,16 @@
   function bulletList(s, items, o) {
     o = o || {};
     var rows = (items || []).filter(Boolean).slice(0, o.max || 8).map(function (i) {
-      return { text: txt(i), options: { breakLine: true } };
+      // The bullet belongs to each run. Setting it once on the text call marks
+      // the first line only and leaves the rest hanging.
+      return { text: txt(i), options: { breakLine: true, bullet: { characterCode: "2022" } } };
     });
     if (!rows.length) return;
     s.addText(rows, {
       x: o.x == null ? 0.62 : o.x, y: o.y == null ? 1.6 : o.y,
       w: o.w == null ? W - 1.24 : o.w, h: o.h == null ? 4.4 : o.h,
       fontFace: FONT, fontSize: o.size || 16, color: o.color || INK,
-      bullet: { characterCode: "2022" }, lineSpacingMultiple: 1.25, valign: "top"
+      lineSpacingMultiple: 1.25, valign: "top"
     });
   }
 
@@ -123,11 +125,16 @@
       fill: { type: "solid", color: VIOLET, transparency: 45 },
       line: { type: "none" }
     });
-    s.addText(name + (/agent$/i.test(name) ? "" : (kind === "skill" ? " Skill" : " Agent")), {
+    var full = name + (/agent$/i.test(name) ? ""
+                       : (kind === "skill" ? " Skill" : " Agent"));
+    // "Supplier Risk Monitoring Agent" at 40pt overflowed the lozenge. Step the
+    // size down by length rather than letting it run off the edge.
+    var size = full.length > 34 ? 28 : (full.length > 26 ? 32 : 40);
+    s.addText(full, {
       x: 1.8, y: 2.35, w: W - 3.6, h: 2.1, align: "center", valign: "middle",
-      fontFace: FONT, fontSize: 40, bold: true, color: PAPER
+      fontFace: FONT, fontSize: size, bold: true, color: PAPER, shrinkText: true
     });
-    s.addText("Microsoft AIBAST · RAPP Agents Library", {
+    s.addText("Microsoft AIBAST · Agents Library", {
       x: 0.62, y: 5.05, w: W - 1.24, h: 0.4, align: "center",
       fontFace: FONT, fontSize: 14, color: "C7CBE6"
     });
@@ -140,11 +147,14 @@
     footer(s, null, true);
   }
 
-  function whatItIsSlide(pptx, pptxName, entry, n) {
+  function whatItIsSlide(pptx, pptxName, entry, jewel, arch, n) {
     var s = lightSlide(pptx);
-    kicker(s, "What it is");
+    var j = jewel || {};
+    var ac = (arch && arch.columns) || {};
+    kicker(s, "What it is" + (j.industry ? " · " + j.industry : ""));
     heading(s, pptxName);
-    s.addText(txt(entry && entry.description) || "A single-file RAPP agent.", {
+    s.addText(txt(j.lede || j.summary || (entry && entry.description))
+      || "A single-file RAPP agent.", {
       x: 0.62, y: 1.5, w: W - 1.24, h: 1.1,
       fontFace: FONT, fontSize: 17, color: INK, valign: "top"
     });
@@ -152,18 +162,62 @@
       x: 0.62, y: 2.8, w: 5.6, h: 0.3, fontFace: FONT, fontSize: 12,
       bold: true, color: BLUE
     });
-    bulletList(s, (entry && entry.tags || []).slice(0, 5).length
-      ? (entry.tags || []).slice(0, 5) : ["Any RAPP operator"],
-      { y: 3.15, w: 5.6, h: 2.2, size: 14 });
+    /* Real job titles when the library one-pager has them; tags only as a
+       fallback. "Plant Manager" tells a customer more than "manufacturing". */
+    var who = (j.personas || j.audience || []).slice(0, 5);
+    if (!who.length) {
+      who = (entry && entry.tags || []).slice(0, 6)
+        .map(function (t) { return titleCase(t); });
+    }
+    s.addText(who.length ? who.join(" · ") : "Any team running this workload", {
+      x: 0.62, y: 3.15, w: 5.6, h: 1.0,
+      fontFace: FONT, fontSize: 14, color: INK, valign: "top"
+    });
     s.addText("What you get", {
       x: 6.6, y: 2.8, w: 6.1, h: 0.3, fontFace: FONT, fontSize: 12,
       bold: true, color: BLUE
     });
-    bulletList(s, [
-      "A single file you can drop onto a brainstem",
-      "Registers as a tool automatically — no restart",
-      "Runs on all three tiers: local, Azure Functions, Copilot Studio"
-    ], { x: 6.6, y: 3.15, w: 6.1, h: 2.2, size: 14 });
+    bulletList(s, (j.business_value && j.business_value.length
+      ? j.business_value.slice(0, 4)
+      : ["A single file your team can deploy as-is",
+         "Registers itself as a tool — no restart, no rebuild",
+         "Runs locally, on Azure, or in Microsoft Copilot Studio"]),
+      { x: 6.6, y: 3.15, w: 6.1, h: 2.2, size: 14 });
+    /* The bottom third used to be white. It is the three questions every
+       reviewer asks next, answered from the same derived architecture the
+       slide after this one draws — so the two cannot disagree. */
+    var tiles = [
+      ["What it reads", labelsOf((ac.knowledge || {}).grounding, 3).join(" · ")
+        || (j.requires || []).slice(0, 3).join(" · ")],
+      ["Where the work happens",
+        labelsOf((ac.interface || {}).surfaces, 3).join(" · ")
+        || (j.built_with || []).slice(0, 3).join(" · ")],
+      ["What it leaves behind",
+        labelsOf((ac.reporting || {}).systems, 2).join(" · ")
+        || "Audit logs and telemetry under Purview"]
+    ];
+    tiles.forEach(function (t, i) {
+      if (!t[1]) return;
+      var x = 0.62 + i * 4.25;
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: x, y: 4.35, w: 3.95, h: 1.15, rectRadius: 0.1,
+        fill: { color: "F4F4F8" }, line: { type: "none" }
+      });
+      s.addText([
+        { text: t[0], options: { bold: true, breakLine: true, fontSize: 11,
+                                 color: BLUE } },
+        { text: t[1], options: { fontSize: 11.5 } }
+      ], {
+        x: x + 0.22, y: 4.35, w: 3.51, h: 1.15, valign: "middle",
+        fontFace: FONT, color: INK
+      });
+    });
+    if (j.featured_tools && j.featured_tools.length) {
+      s.addText("Built with " + j.featured_tools.slice(0, 4).join(" · "), {
+        x: 0.62, y: 5.6, w: W - 1.24, h: 0.3,
+        fontFace: FONT, fontSize: 11, color: MUTED
+      });
+    }
     footer(s, n);
   }
 
@@ -266,21 +320,281 @@
     return no;
   }
 
-  function setupSlide(pptx, entry, n) {
+  /* --- the end-to-end architecture, per industry ---------------------------
+
+     REQUIRED in every deck. Nobody buys a chat window; they buy a thing that
+     sits inside their estate, reads systems they already pay for, and leaves an
+     audit trail. That is one slide, and it is the same four columns every time:
+     Knowledge, Processing, User Interface, Reporting, over a Tools band and a
+     Supporting Features band, with the six-step request flow numbered through
+     them.
+
+     Every box is derived from what the entry declares — see
+     scripts/build_architecture.py. Nothing here is invented for the picture.
+  */
+
+  function labelsOf(list, max) {
+    return (list || []).map(function (x) {
+      return txt(x && x.label ? x.label : x);
+    }).filter(function (v, i, a) { return v && a.indexOf(v) === i; })
+      .slice(0, max || 4);
+  }
+
+  /* A titled panel with a rule under the title — one architecture column. */
+  function column(pptx, s, x, y, w, h, title) {
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: x, y: y, w: w, h: h, rectRadius: 0.08,
+      fill: { color: "F4F4F8" }, line: { color: "E3E3EC", width: 0.75 }
+    });
+    s.addText(txt(title), {
+      x: x, y: y + 0.06, w: w, h: 0.3, align: "center",
+      fontFace: FONT, fontSize: 12, bold: true, color: INK
+    });
+  }
+
+  /* A box inside a column. `step` prints the flow number in front of the text
+     so the numbered request path reads without a separate legend. */
+  function box(pptx, s, o) {
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: o.x, y: o.y, w: o.w, h: o.h, rectRadius: 0.06,
+      fill: { color: o.fill || PAPER },
+      line: o.line ? { color: o.line, width: 0.75, dashType: o.dash || "solid" }
+                   : { color: "DDDDE8", width: 0.5 }
+    });
+    var runs = [];
+    if (o.head) {
+      runs.push({ text: txt(o.head),
+                  options: { bold: true, fontSize: o.headSize || 9,
+                             breakLine: !!o.text } });
+    }
+    if (o.text) {
+      runs.push({ text: (o.step ? o.step + ". " : "") + txt(o.text),
+                  options: { fontSize: o.size || 8 } });
+    }
+    if (!runs.length) return;
+    s.addText(runs, {
+      x: o.x + 0.08, y: o.y, w: o.w - 0.16, h: o.h,
+      valign: o.valign || "middle", align: o.align || "left",
+      fontFace: FONT, color: o.color || INK
+    });
+  }
+
+  /* Lay `items` out as evenly-spaced chips filling the band from y to y+span.
+     Bullet lists left columns half empty and indented oddly; chips fill the
+     space and read like the boxes on the reference architecture. */
+  function chips(pptx, s, x, y, w, span, items, o) {
+    o = o || {};
+    var list = (items || []).slice(0, o.max || 4);
+    if (!list.length) return y;
+    var gap = 0.08;
+    var h = Math.min(o.maxH || 0.55, (span - gap * (list.length - 1)) / list.length);
+    list.forEach(function (t, i) {
+      box(pptx, s, {
+        x: x, y: y + i * (h + gap), w: w, h: h, text: t,
+        size: o.size || 8.5, fill: o.fill, line: o.line, dash: o.dash
+      });
+    });
+    return y + list.length * (h + gap);
+  }
+
+  function architectureSlide(pptx, arch, name, industry, n) {
     var s = lightSlide(pptx);
+    var cols = (arch && arch.columns) || {};
+    var K = cols.knowledge || {}, P = cols.processing || {};
+    var U = cols.interface || {}, R = cols.reporting || {};
+
+    kicker(s, "End-to-end architecture" + (industry ? " · " + industry : ""));
+    s.addText("Example architecture for " + txt(name), {
+      x: 0.62, y: 0.5, w: W - 1.24, h: 0.55,
+      fontFace: FONT, fontSize: 24, bold: true, color: INK, valign: "middle"
+    });
+
+    var top = 1.2, ch = 4.35, gap = 0.14, x0 = 0.62;
+    var ws = [2.85, 3.25, 3.05, 2.52];
+    var xs = [x0];
+    for (var i = 1; i < 4; i++) xs.push(xs[i - 1] + ws[i - 1] + gap);
+
+    /* 1 — Knowledge: what it reads, and the connectors it reads through. */
+    column(pptx, s, xs[0], top, ws[0], ch, K.title || "Knowledge");
+    chips(pptx, s, xs[0] + 0.12, top + 0.42, ws[0] - 0.24, 2.0,
+          labelsOf(K.grounding, 4),
+          { line: "C9A227", dash: "dash", maxH: 2.0 });
+    s.addText("Power Platform connectors and actions", {
+      x: xs[0] + 0.12, y: top + 2.52, w: ws[0] - 0.24, h: 0.3,
+      fontFace: FONT, fontSize: 9, bold: true, color: BLUE
+    });
+    box(pptx, s, { x: xs[0] + 0.12, y: top + 2.85, w: ws[0] - 0.24, h: 0.72,
+                   text: "Triggers and workflows — the agent acts in the system "
+                         + "of record, it does not just answer", size: 8 });
+    box(pptx, s, { x: xs[0] + 0.12, y: top + ch - 0.72, w: ws[0] - 0.24, h: 0.6,
+                   step: 5, text: "Action taken in the system of record",
+                   size: 8.5, fill: "EEEBFA" });
+
+    /* 2 — Processing: the plan, and who forms it. */
+    column(pptx, s, xs[1], top, ws[1], ch, P.title || "Processing");
+    box(pptx, s, { x: xs[1] + 0.14, y: top + 0.42, w: ws[1] - 0.28, h: 1.5,
+                   step: 3, text: P.plan, size: 8, valign: "top" });
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: xs[1] + ws[1] / 2 - 0.26, y: top + 2.1, w: 0.52, h: 0.52,
+      rectRadius: 0.1, fill: { color: PINK }, line: { type: "none" }
+    });
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: xs[1] + ws[1] / 2 - 0.12, y: top + 2.22, w: 0.4, h: 0.4,
+      rectRadius: 0.08, fill: { color: VIOLET }, line: { type: "none" }
+    });
+    s.addText(txt(P.orchestration || "Multi-agent orchestration"), {
+      x: xs[1] + 0.14, y: top + 2.7, w: ws[1] - 0.28, h: 0.34, align: "center",
+      fontFace: FONT, fontSize: 11, bold: true, color: INK
+    });
+    box(pptx, s, { x: xs[1] + 0.14, y: top + 3.12, w: ws[1] - 0.28, h: 0.5,
+                   step: 4, text: "NL response after guideline checks",
+                   size: 8.5, fill: "EEEBFA" });
+    var acts = labelsOf(P.actions, 3);
+    if (acts.length) {
+      s.addText("Outcome: " + acts.join(" · "), {
+        x: xs[1] + 0.14, y: top + 3.7, w: ws[1] - 0.28, h: 0.5,
+        fontFace: FONT, fontSize: 8.5, color: MUTED, valign: "top"
+      });
+    }
+
+    /* 3 — User Interface: where the person meets it. */
+    column(pptx, s, xs[2], top, ws[2], ch, U.title || "User Interface");
+    box(pptx, s, { x: xs[2] + 0.12, y: top + 0.42, w: ws[2] - 0.24, h: 0.72,
+                   step: 2, text: U.checks, size: 8, valign: "top" });
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: xs[2] + 0.12, y: top + 1.26, w: ws[2] - 0.24, h: 2.35, rectRadius: 0.06,
+      fill: { type: "solid", color: PAPER },
+      line: { color: BLUE, width: 0.75, dashType: "dash" }
+    });
+    s.addText("Microsoft 365", {
+      x: xs[2] + 0.2, y: top + 1.32, w: ws[2] - 0.4, h: 0.26,
+      fontFace: FONT, fontSize: 9, bold: true, color: BLUE
+    });
+    box(pptx, s, { x: xs[2] + 0.2, y: top + 1.62, w: ws[2] - 0.4, h: 0.4,
+                   step: 1, text: "Natural language input", size: 8.5,
+                   fill: "F4F4F8" });
+    /* Flow the actors line from where the surface chips actually END. Fixing
+       it at a constant put three surfaces straight through it — a collision no
+       text gate can see, because both strings are present and correct. */
+    var afterSurfaces = chips(pptx, s, xs[2] + 0.2, top + 2.1, ws[2] - 0.4, 0.78,
+          labelsOf(U.surfaces, 3), { fill: "F4F4F8", maxH: 0.3, size: 8.5 });
+    var allActors = labelsOf(U.actors, 8);
+    var actors = allActors.slice(0, 2);
+    if (allActors.length > 2) {
+      actors.push("+" + (allActors.length - 2) + " more");
+    }
+    var ay = afterSurfaces + 0.04;
+    s.addText("Users: " + (actors.join(" · ") || "the operator"), {
+      x: xs[2] + 0.24, y: ay, w: ws[2] - 0.48,
+      h: Math.max(0.3, (top + 3.6) - ay),
+      fontFace: FONT, fontSize: 8, color: MUTED, valign: "top"
+    });
+    box(pptx, s, { x: xs[2] + 0.12, y: top + 3.74, w: ws[2] - 0.24, h: 0.45,
+                   step: 6, text: "Feedback", size: 8.5, fill: "EEEBFA" });
+
+    /* 4 — Reporting: what it leaves behind. This column is the one that gets
+       the deal through review, so it never gets cut for space. */
+    column(pptx, s, xs[3], top, ws[3], ch, R.title || "Reporting");
+    box(pptx, s, { x: xs[3] + 0.1, y: top + 0.42, w: ws[3] - 0.2, h: 0.95,
+                   head: "Governance, risk & compliance", text: R.governance,
+                   size: 7.5, headSize: 8.5, valign: "top",
+                   line: "C9A227", fill: "FFFDF2" });
+    chips(pptx, s, xs[3] + 0.1, top + 1.5, ws[3] - 0.2, 1.32,
+          labelsOf(R.systems, 3), { fill: "FFFFFF", maxH: 1.32, size: 8.5 });
+    box(pptx, s, { x: xs[3] + 0.1, y: top + 2.95, w: ws[3] - 0.2, h: 0.85,
+                   head: "Insights", text: R.insights, size: 7.5,
+                   headSize: 8.5, valign: "top",
+                   line: "C9A227", fill: "FFFDF2" });
+
+    /* The two bands the four columns stand on. */
+    var by = top + ch + 0.12;
+    box(pptx, s, { x: x0, y: by, w: 8.3, h: 0.72, head: "Tools",
+                   text: arch && arch.tools_band, size: 8, headSize: 9,
+                   valign: "middle", fill: "F4F4F8" });
+    var fb = (arch && arch.foundation_band) || {};
+    box(pptx, s, { x: x0 + 8.44, y: by, w: 12.09 - 8.44, h: 0.72,
+                   head: fb.label || "Supporting features and foundation models",
+                   text: fb.identity || "Entra ID", size: 8, headSize: 9,
+                   valign: "middle", align: "center", fill: "F4F4F8" });
+
+    footer(s, n);
+  }
+
+  /* Fallback when the catalog cannot be fetched (opened from disk, say). The
+     slide is required, so it is built from what the entry itself declares
+     rather than skipped. Same shape, thinner content, no invention. */
+  function deriveArchitecture(entry, jewel, name) {
+    var e = entry || {}, j = jewel || {};
+    var systems = (j.requires || j.featured_tools || e.systems || []).slice(0, 4);
+    if (!systems.length) systems = ["The operator's own working context"];
+    return {
+      display_name: name,
+      industries: j.industries || e.industries || [],
+      columns: {
+        knowledge: { title: "Knowledge", grounding: systems,
+                     connectors: ["Power Platform connectors and actions"] },
+        processing: { title: "Processing",
+                      orchestration: "Multi-agent orchestration",
+                      plan: "Formulates a plan comprised of multiple actions "
+                            + "including context and tool selection, function "
+                            + "matching and parameter determination, tool "
+                            + "initiation, then result analysis and response "
+                            + "formulation.",
+                      actions: j.business_value || [] },
+        interface: { title: "User Interface",
+                     surfaces: j.built_with || ["Microsoft Copilot Studio"],
+                     actors: j.personas || j.audience || ["Operator"],
+                     checks: "Preliminary checks including responsible AI "
+                             + "checks and security measures" },
+        reporting: { title: "Reporting",
+                     systems: ["Copilot Control System",
+                               "Purview Data Security Posture Management for AI"],
+                     governance: "Reviews audit logs, sensitivity labels, data "
+                                 + "policies, CMK, DLP",
+                     insights: "Logs and telemetry data for analysis and "
+                               + "monitoring" }
+      },
+      tools_band: "Automatic orchestration using prompts, agent flows, computer "
+                  + "use, custom connectors, Model Context Protocol and REST API",
+      foundation_band: { identity: "Entra ID",
+                         label: "Supporting features and foundation models" }
+    };
+  }
+
+  function setupSlide(pptx, entry, arch, jewel, n) {
+    var s = lightSlide(pptx);
+    var cols = (arch && arch.columns) || {};
     kicker(s, "Setup");
     heading(s, "What it needs, and where it runs");
 
+    /* Left: configuration. An empty column here used to print "No
+       configuration" against half a page of white — true, and useless. What
+       someone actually needs to know is what it touches. */
     s.addText("Configuration required", {
-      x: 0.62, y: 1.5, w: 5.9, h: 0.3,
+      x: 0.62, y: 1.45, w: 3.8, h: 0.3,
       fontFace: FONT, fontSize: 12, bold: true, color: BLUE
     });
-    var env = (entry && entry.requires_env || []);
-    bulletList(s, env.length ? env : ["No configuration"],
-      { y: 1.85, w: 5.9, h: 1.9, size: 13 });
+    var env = (entry && entry.requires_env) || (arch && arch.configuration) || [];
+    bulletList(s, env.length ? env
+      : ["No keys or secrets — it runs as the signed-in user",
+         "Permissions come from the caller's own access"],
+      { y: 1.78, w: 3.8, h: 1.5, size: 12 });
+
+    s.addText("Systems it connects to", {
+      x: 4.68, y: 1.45, w: 3.8, h: 0.3,
+      fontFace: FONT, fontSize: 12, bold: true, color: BLUE
+    });
+    var touches = labelsOf((cols.knowledge || {}).grounding, 3)
+      .concat(labelsOf((cols.interface || {}).surfaces, 2))
+      .concat(labelsOf((cols.reporting || {}).systems, 2));
+    touches = touches.filter(function (v, i, a) { return a.indexOf(v) === i; })
+      .slice(0, 5);
+    bulletList(s, touches.length ? touches
+      : (jewel && jewel.requires) || ["Microsoft Copilot Studio"],
+      { x: 4.68, y: 1.78, w: 3.8, h: 1.5, size: 12 });
 
     s.addText("Parameters", {
-      x: 6.8, y: 1.5, w: 5.9, h: 0.3,
+      x: 8.74, y: 1.45, w: 3.97, h: 0.3,
       fontFace: FONT, fontSize: 12, bold: true, color: BLUE
     });
     var params = [];
@@ -289,28 +603,62 @@
         entry.metadata.parameters.properties;
       params = props ? Object.keys(props) : (entry && entry.parameters) || [];
     } catch (e) { params = []; }
-    bulletList(s, params.length ? params : ["None"],
-      { x: 6.8, y: 1.85, w: 5.9, h: 1.9, size: 13 });
+    bulletList(s, params.length ? params
+      : ["None — it is asked in natural language",
+         "Answers cite the record they came from"],
+      { x: 8.74, y: 1.78, w: 3.97, h: 1.5, size: 12 });
+
+    /* Middle band: the jewels. Who it is for and what it is worth, from the
+       library one-pager when there is one. */
+    var who = (jewel && (jewel.personas || jewel.audience)) ||
+      labelsOf((cols.interface || {}).actors, 4);
+    var worth = (jewel && jewel.business_value) ||
+      labelsOf((cols.processing || {}).actions, 3);
+    var band = [
+      { text: "Who it is for  ", options: { bold: true, color: BLUE } },
+      { text: (who || []).slice(0, 4).join(" · ") ||
+              "Any team running this workload", options: { breakLine: true } }
+    ];
+    /* Only print the second line when there is something to print on it. A
+       bold label over nothing is the same empty slide this replaced. */
+    if (worth && worth.length) {
+      band.push({ text: "What it is worth  ",
+                  options: { bold: true, color: BLUE } });
+      band.push({ text: worth.slice(0, 4).join(" · ") });
+    }
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: 0.62, y: 3.3, w: W - 1.24, h: 0.85, rectRadius: 0.1,
+      fill: { color: "FBE9F7" }, line: { type: "none" }
+    });
+    s.addText(band, {
+      x: 0.85, y: 3.3, w: W - 1.7, h: 0.85, valign: "middle",
+      fontFace: FONT, fontSize: 11.5, color: INK
+    });
 
     s.addText("Where it runs", {
-      x: 0.62, y: 3.95, w: W - 1.24, h: 0.3,
+      x: 0.62, y: 4.4, w: W - 1.24, h: 0.3,
       fontFace: FONT, fontSize: 12, bold: true, color: BLUE
     });
-    [["Brainstem", "Local Flask server with GitHub Copilot — no API keys"],
-     ["Spinal cord", "Azure Functions with Azure OpenAI"],
-     ["Nervous system", "Copilot Studio and Teams"]].forEach(function (t, i) {
+    [["Run it locally", "On your own machine, with GitHub Copilot — no API keys"],
+     ["Run it on Azure", "Azure Functions with Azure OpenAI"],
+     ["Run it in Microsoft 365", "Copilot Studio and Microsoft Teams"]].forEach(function (t, i) {
       var x = 0.62 + i * 4.25;
       s.addShape(pptx.ShapeType.roundRect, {
-        x: x, y: 4.35, w: 3.95, h: 1.5, rectRadius: 0.1,
+        x: x, y: 4.76, w: 3.95, h: 1.1, rectRadius: 0.1,
         fill: { color: "F4F4F8" }, line: { type: "none" }
       });
       s.addText([
         { text: t[0], options: { bold: true, breakLine: true, fontSize: 14 } },
         { text: t[1], options: { fontSize: 11, color: MUTED } }
       ], {
-        x: x + 0.22, y: 4.35, w: 3.51, h: 1.5, valign: "middle",
+        x: x + 0.22, y: 4.76, w: 3.51, h: 1.1, valign: "middle",
         fontFace: FONT, color: INK
       });
+    });
+    s.addText("Same single file in all three. The architecture slide shows the "
+      + "estate it sits in.", {
+      x: 0.62, y: 5.95, w: W - 1.24, h: 0.3,
+      fontFace: FONT, fontSize: 10, color: MUTED
     });
     footer(s, n);
   }
@@ -340,18 +688,83 @@
     footer(s, n, true);
   }
 
+  /* --- the jewels: the library's own catalogs ------------------------------
+
+     The deck used to be built from the manifest entry alone, which is why the
+     setup slide could come out as "No configuration / None" over half a page of
+     white. The library already holds the good material — who the agent is for,
+     what it is worth, and the estate it sits in — in two generated catalogs.
+     The deck fetches them itself so every caller gets them without changing.
+  */
+
+  var CATALOGS = null;
+
+  function getJSON(paths) {
+    if (typeof fetch !== "function") return Promise.resolve(null);
+    var i = 0;
+    function next() {
+      if (i >= paths.length) return Promise.resolve(null);
+      return fetch(paths[i++], { cache: "no-store" }).then(function (r) {
+        return r.ok ? r.json() : next();
+      }).catch(next);
+    }
+    return next();
+  }
+
+  function loadCatalogs() {
+    if (CATALOGS) return Promise.resolve(CATALOGS);
+    return Promise.all([
+      getJSON(["api/v1/architectures.json", "data/architectures.json"]),
+      getJSON(["api/v1/onepagers.json", "data/onepagers.json"])
+    ]).then(function (r) {
+      CATALOGS = {
+        architectures: (r[0] && r[0].architectures) || [],
+        onepagers: (r[1] && r[1].onepagers) || []
+      };
+      return CATALOGS;
+    }).catch(function () {
+      CATALOGS = { architectures: [], onepagers: [] };
+      return CATALOGS;
+    });
+  }
+
+  function slugOf(o) {
+    var e = o.entry || {};
+    var raw = o.slug || e.slug || e.ref || e.name || e.id ||
+      (o.story && o.story.subject && o.story.subject.slug) || "";
+    return String(raw).split("/").pop();
+  }
+
+  function findBySlug(list, slug, ref) {
+    var hit = null;
+    (list || []).forEach(function (x) {
+      if (hit) return;
+      if (x.slug === slug || (ref && x.ref === ref)) hit = x;
+    });
+    return hit;
+  }
+
   /* --- entry point -------------------------------------------------------- */
 
   function build(pptx, o) {
     var name = displayName(o.kind, o.entry, o.story);
-    pptx.layout = "LAYOUT_16x9";
+    var cat = o.catalogs || CATALOGS || { architectures: [], onepagers: [] };
+    var slug = slugOf(o);
+    var ref = (o.entry && o.entry.ref) || (o.entry && o.entry.name) || null;
+    var jewel = findBySlug(cat.onepagers, slug, ref);
+    var arch = o.arch || findBySlug(cat.architectures, slug, ref);
+
+    pptx.defineLayout({ name: "AIBAST_WIDE", width: W, height: H });
+    pptx.layout = "AIBAST_WIDE";
     pptx.author = "Microsoft AIBAST";
     pptx.company = "Microsoft";
     pptx.title = name;
-    pptx.subject = "RAPP Agents Library";
+    pptx.subject = "AIBAST Agents Library";
+
+    if (!arch) arch = deriveArchitecture(o.entry, jewel, name);
 
     titleSlide(pptx, name, o.entry, o.kind);
-    whatItIsSlide(pptx, name, o.entry, 2);
+    whatItIsSlide(pptx, name, o.entry, jewel, arch, 2);
 
     var panels = null;
     ((o.story && o.story.scenes) || []).forEach(function (sc) {
@@ -360,7 +773,19 @@
     var n = 3;
     if (panels) { overviewSlide(pptx, panels, n); n += 1; }
     n = walkthroughSlides(pptx, o.story, n);
-    setupSlide(pptx, o.entry, n); n += 1;
+
+    /* REQUIRED: the end-to-end architecture, one slide per industry it serves.
+       Never conditional. If the catalog was unreachable the slide is derived
+       from the entry rather than dropped — a deck without it does not ship. */
+    var industries = (arch.industries && arch.industries.length
+      ? arch.industries
+      : (jewel && jewel.industries) || []).slice(0, 4);
+    if (!industries.length) industries = [null];
+    industries.forEach(function (ind) {
+      architectureSlide(pptx, arch, name, ind, n); n += 1;
+    });
+
+    setupSlide(pptx, o.entry, arch, jewel, n); n += 1;
     closeSlide(pptx, name, o.entry, o.links, n);
     return n;
   }
@@ -373,8 +798,30 @@
       return Promise.reject(new Error("PptxGenJS missing"));
     }
     say("Building the deck…");
+    /* A solution's deck used to come out three slides shorter than an agent's
+       — no overview, no flow of work — only because the caller had no
+       storyboard in hand. Look for one. */
+    var story = o.story ? Promise.resolve(o.story) : (function () {
+      var slug = slugOf(o);
+      if (!slug) return Promise.resolve(null);
+      /* A solution and its registry agent can be the same thing under two
+         slugs — "patient-intake-agent" and "patient-intake". Try both. */
+      var bare = slug.replace(/-agent$/, "");
+      return getJSON(["media/walkthroughs/" + (o.kind || "agent") + "-" + slug + ".json",
+                      "media/walkthroughs/solution-" + slug + ".json",
+                      "media/walkthroughs/agent-" + slug + ".json",
+                      "media/walkthroughs/agent-" + bare + ".json"]);
+    })();
+    return Promise.all([loadCatalogs(), story]).then(function (r) {
+      if (!o.story && r[1]) o.story = r[1];
+      return writeDeck(o, r[0], say);
+    });
+  }
+
+  function writeDeck(o, cat, say) {
     var pptx = new PptxGenJS();
     try {
+      o.catalogs = cat;
       build(pptx, o);
     } catch (e) {
       say("Could not build the deck: " + (e && e.message ? e.message : e));
@@ -391,5 +838,111 @@
     });
   }
 
-  global.RappDeck = { export: exportDeck, build: build, displayName: displayName };
+
+  /* --- the roadmap deck ---------------------------------------------------
+     Built from the same object roadmap.html rendered from, so a slide and a
+     lane cannot disagree. One lane per slide, because a roadmap read in a room
+     is read a lane at a time.
+  */
+
+  function roadmapTitleSlide(pptx, r) {
+    var s = darkSlide(pptx);
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: 1.6, y: 2.35, w: W - 3.2, h: 2.1, rectRadius: 0.42,
+      fill: { type: "solid", color: PINK }, line: { type: "none" }
+    });
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: 1.6, y: 2.35, w: W - 3.2, h: 2.1, rectRadius: 0.42,
+      fill: { type: "solid", color: VIOLET, transparency: 45 }, line: { type: "none" }
+    });
+    s.addText(txt(r.title) || "Roadmap", {
+      x: 1.8, y: 2.35, w: W - 3.6, h: 2.1, align: "center", valign: "middle",
+      fontFace: FONT, fontSize: 36, bold: true, color: PAPER
+    });
+    s.addText(txt(r.subtitle), {
+      x: 0.62, y: 5.05, w: W - 1.24, h: 0.5, align: "center",
+      fontFace: FONT, fontSize: 15, color: "C7CBE6"
+    });
+    if (r.updated) {
+      s.addText("Updated " + txt(r.updated), {
+        x: 0.62, y: 5.6, w: W - 1.24, h: 0.35, align: "center",
+        fontFace: FONT, fontSize: 12, color: "8C93B5"
+      });
+    }
+    footer(s, null, true);
+  }
+
+  function laneSlide(pptx, lane, n) {
+    var s = lightSlide(pptx);
+    kicker(s, lane.label + " — " + (lane.items || []).length + " item"
+              + ((lane.items || []).length === 1 ? "" : "s"));
+    heading(s, txt(lane.blurb) || txt(lane.label));
+
+    var items = (lane.items || []).slice(0, 6);
+    var cols = items.length > 3 ? 2 : 1;
+    var colW = cols === 2 ? (W - 1.24 - 0.5) / 2 : W - 1.24;
+    var perCol = Math.ceil(items.length / cols);
+
+    items.forEach(function (it, i) {
+      var c = Math.floor(i / perCol), row = i % perCol;
+      var x = 0.62 + c * (colW + 0.5);
+      var h = (H - 2.6) / perCol;
+      var y = 1.5 + row * h;
+      s.addText([
+        { text: txt(it.title), options: { bold: true, fontSize: 15, breakLine: true } },
+        { text: txt(it.detail), options: { fontSize: 12, color: "3D3D4D", breakLine: true } },
+        { text: txt(it.evidence), options: { fontSize: 10, color: MUTED, italic: true } }
+      ], {
+        x: x, y: y, w: colW, h: h - 0.18, valign: "top", fontFace: FONT, color: INK
+      });
+    });
+    footer(s, n);
+  }
+
+  function principlesSlide(pptx, r, n) {
+    var s = darkSlide(pptx);
+    kicker(s, "How status is decided", true);
+    heading(s, "The rules this roadmap is held to", { dark: true });
+    bulletList(s, r.principles || [],
+      { y: 1.9, h: 4.2, size: 16, color: "C7CBE6" });
+    footer(s, n, true);
+  }
+
+  function exportRoadmap(o) {
+    o = o || {};
+    var say = o.onStatus || function () {};
+    var r = o.roadmap;
+    if (typeof PptxGenJS === "undefined") {
+      say("PowerPoint export is unavailable — the deck library did not load.");
+      return Promise.reject(new Error("PptxGenJS missing"));
+    }
+    if (!r) { say("No roadmap data."); return Promise.reject(new Error("no roadmap")); }
+    say("Building the deck…");
+    var pptx = new PptxGenJS();
+    try {
+      pptx.defineLayout({ name: "AIBAST_WIDE", width: W, height: H });
+      pptx.layout = "AIBAST_WIDE";
+      pptx.author = "Microsoft AIBAST";
+      pptx.company = "Microsoft";
+      pptx.title = txt(r.title) || "Roadmap";
+      roadmapTitleSlide(pptx, r);
+      var n = 2;
+      (r.lanes || []).forEach(function (lane) { laneSlide(pptx, lane, n++); });
+      principlesSlide(pptx, r, n);
+    } catch (e) {
+      say("Could not build the deck: " + (e && e.message ? e.message : e));
+      return Promise.reject(e);
+    }
+    var file = "AIBAST-Roadmap-" + (txt(r.updated) || "current") + ".pptx";
+    return pptx.writeFile({ fileName: file }).then(function () {
+      say("Saved " + file);
+      return file;
+    }).catch(function (e) {
+      say("Export failed: " + (e && e.message ? e.message : e));
+      throw e;
+    });
+  }
+
+  global.RappDeck = { export: exportDeck, build: build,
+                     exportRoadmap: exportRoadmap, displayName: displayName };
 })(window);

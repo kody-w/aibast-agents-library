@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:55+00:00",
   "subject": {
     "slug": "doc_format_converter",
     "kind": "skill",
@@ -86,10 +86,10 @@
           "Engages you in Microsoft Teams and Outlook"
         ],
         "Actions": [
-          "Convert documents between Markdown, HTML, PDF, Word, PowerPoint, Excel/CSV"
+          "Convert documents between Markdown, HTML, PDF, Word, PowerPoint"
         ]
       },
-      "narration": "Let's say a manager needs to convert documents between Markdown, HTML, PDF, Word, PowerPoint, Excel/CSV. Before, they would have needed to jump across multiple systems to manually gather insights, and automatically highlight what needs attention first."
+      "narration": "Let's say a manager needs to convert documents between Markdown, HTML, PDF, Word, PowerPoint. Before, they would have needed to jump across multiple systems to manually gather insights, and automatically highlight what needs attention first."
     },
     {
       "act": "walkthrough",
@@ -105,7 +105,7 @@
           "role": "agent",
           "heading": "doc-format-converter",
           "rich": {
-            "intro": "I'll convert documents between Markdown, HTML, PDF, Word, PowerPoint, Excel/CSV for the current workload, working against rising request volume. Reading the systems of record already in use before I propose anything.",
+            "intro": "I'll convert documents between Markdown, HTML, PDF, Word, PowerPoint for the current workload, working against rising request volume. Reading the systems of record already in use before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
@@ -121,6 +121,14 @@
                 "items": [
                   "The systems of record already in use \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
+                ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside the systems of record already in use",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
                 ]
               }
             ],
@@ -145,9 +153,17 @@
               {
                 "label": "Steps",
                 "items": [
-                  "1. Convert documents between Markdown, HTML, PDF, Word, PowerPoint, Excel/CSV",
+                  "1. Convert documents between Markdown, HTML, PDF, Word, PowerPoint",
                   "2. Confirm the result against the source system",
                   "3. Hand back the artifact, and the reasoning behind it"
+                ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
                 ]
               }
             ],
@@ -184,6 +200,14 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from the source systems",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
@@ -195,7 +219,7 @@
           "agent_call": "doc_format_converter"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with one unified data context, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With doc-format-converter, teams get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with one unified data context, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With doc-format-converter, teams get guided assistance embedded directly into their workflows."
     },
     {
       "act": "close",

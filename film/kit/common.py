@@ -66,32 +66,75 @@ def require_tools() -> None:
                          "python3 -m pip install --user Pillow")
 
 
+# The one thing the kit cannot carry. Pillow needs a real font file on disk
+# and system faces are not ours to redistribute, so brand.json names families
+# and this list says where to look for them. A missing face degrades to the
+# next candidate; nothing breaks. This is the single deliberate exception to
+# "no path leaves the repository", and film/kit/gate.py exempts it by name.
+FONT_DIRS = [
+    Path("/System/Library/Fonts"),
+    Path("/System/Library/Fonts/Supplemental"),
+    Path("/Library/Fonts"),
+    Path.home() / "Library" / "Fonts",
+    Path("/usr/share/fonts/truetype/dejavu"),
+    Path("/usr/share/fonts/truetype/liberation"),
+    Path("/usr/share/fonts"),
+]
+
+
+def _find_face(candidates: list) -> Path | None:
+    """First candidate that exists. Accepts absolute paths and bare names.
+
+    brand.json states absolute system font paths; joining those onto FONT_DIRS
+    produced paths like ".../fonts//System/Library/Fonts/Avenir Next.ttc",
+    which never exist, so every face silently fell back to PIL's default
+    bitmap font.
+    """
+    for name in candidates:
+        if not name:
+            continue
+        p = Path(name)
+        if p.is_absolute() and p.exists():
+            return p
+        for d in FONT_DIRS:
+            q = d / name
+            if q.exists():
+                return q
+    return None
+
+
 def font(size: int, weight: str = "demi"):
-    """Load the brand face at `size`. Falls back down brand.json's list."""
+    """Load the brand face at `size`, falling down brand.json's candidates."""
     from PIL import ImageFont
     idx = BRAND["type"]["index"][weight]
-    candidates = [BRAND["type"]["family_file"]] + BRAND["type"]["family_fallbacks"]
-    for path in candidates:
-        if Path(path).exists():
-            try:
-                return ImageFont.truetype(path, size, index=idx)
-            except OSError:
-                try:
-                    return ImageFont.truetype(path, size)
-                except OSError:
-                    continue
-    return ImageFont.load_default()
+    # brand.json describes the face as a primary file plus fallbacks; this read
+    # an older "family_candidates" key that no longer exists, so every card
+    # render died on KeyError. Accept both shapes.
+    t = BRAND["type"]
+    path = _find_face(t.get("family_candidates")
+                      or ([t["family_file"]] + list(t.get("family_fallbacks") or [])))
+    if path is None:
+        return ImageFont.load_default()
+    try:
+        return ImageFont.truetype(str(path), size, index=idx)
+    except OSError:
+        try:
+            return ImageFont.truetype(str(path), size)
+        except OSError:
+            return ImageFont.load_default()
 
 
 def mono(size: int):
     from PIL import ImageFont
-    path = BRAND["type"]["mono_file"]
-    if Path(path).exists():
-        try:
-            return ImageFont.truetype(path, size)
-        except OSError:
-            pass
-    return font(size, "regular")
+    t = BRAND["type"]
+    path = _find_face(t.get("mono_candidates")
+                      or ([t["mono_file"]] + list(t.get("family_fallbacks") or [])))
+    if path is None:
+        return font(size, "regular")
+    try:
+        return ImageFont.truetype(str(path), size)
+    except OSError:
+        return font(size, "regular")
 
 
 def run(args) -> subprocess.CompletedProcess:

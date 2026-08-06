@@ -599,12 +599,19 @@ for f in ('index.html','vbrainstem-boot.js','vbrainstem-worker.js','brainstem_we
 PY"
 check "no RAR endpoints remain anywhere in the port" \
   "! grep -rq 'kody-w/RAR' vbrainstem/"
-check "library + tracking point at aibast" "python3 - <<'PY'
+check "library + tracking resolve to the serving fork, defaulting to aibast" "python3 - <<'PY'
+# The catalog origin is derived from the Pages host so a fork browses its own
+# agents; microsoft/ remains the default when it is not a Pages site. It was
+# hard-coded, and a fork then read a registry with no integrity hashes and
+# showed '0 agents' with nothing said about why.
 boot=open('vbrainstem/vbrainstem-boot.js').read()
-assert 'raw.githubusercontent.com/microsoft/aibast-agents-library/main/registry.json' in boot
+assert 'RAR_ORIGIN' in boot, 'boot.js does not derive its origin'
+assert \"'microsoft/aibast-agents-library'\" in boot, 'boot.js lost the default'
 idx=open('vbrainstem/index.html').read()
 assert \"RAR_TRACK_REPO = 'microsoft/aibast-agents-library'\" in idx
-assert 'cdn.jsdelivr.net/gh/microsoft/aibast-agents-library@' in idx
+assert 'RAR_ORIGIN' in idx, 'index.html does not derive its origin'
+assert 'cdn.jsdelivr.net/gh/' in idx, 'CDN mirror missing'
+assert 'no integrity hashes' in idx, 'an empty catalog still fails silently'
 PY"
 check "brainstem_web.py parses" \
   "python3 -c \"import ast;ast.parse(open('vbrainstem/brainstem_web.py').read())\""
@@ -1037,15 +1044,21 @@ for e in d['onepagers']:
 PY"
 check "no SharePoint sharing URL was published (they carry access tokens)" \
   "! grep -rqiE 'https?://[a-z0-9.-]*sharepoint\.com' data/onepagers.json api/v1/onepagers.json onepager.html solutions.html"
-check "hosted videos exist on disk and are under GitHub's per-file limit" "python3 - <<'PY'
-import json, os
-d=json.load(open('data/onepagers.json'))
-hosted=[e for e in d['onepagers'] if (e.get('video') or {}).get('hosted')]
-assert hosted, 'no hosted demo videos'
-for e in hosted:
-    p=e['video']['src']
-    assert os.path.isfile(p), p
-    assert os.path.getsize(p) < 100*1024*1024, p
+check "video streams from the media branch and no video bytes are in this clone" "python3 - <<'PY'
+import json, os, glob
+# The recordings exist; they live on the media-server branch and stream in at
+# runtime, so a depth-1 clone of the code branch never carries them.
+# See docs/NO-VIDEO.md and media.js.
+stray=[f for f in glob.glob('**/*.mp4', recursive=True) if '.git/' not in f]
+assert not stray, f'video bytes back in the clone: {stray[:3]}'
+assert os.path.isfile('media.js'), 'no streaming layer'
+src=open('media.js').read()
+assert 'media-server' in src, 'media.js does not name the media branch'
+assert 'raw.githubusercontent.com' in src and 'cdn.jsdelivr.net' in src, 'no source fallback'
+assert os.path.isfile('docs/NO-VIDEO.md'), 'the decision is undocumented'
+sol=open('solutions.html').read()
+assert 'data-media=' in sol, 'solutions.html does not stream'
+assert 'Video coming soon' in sol, 'no affordance for a missing recording'
 PY"
 check "onepager.html renders both modes and streams source from raw" "python3 - <<'PY'
 d=open('onepager.html').read()
@@ -1054,7 +1067,7 @@ for k in ('?agent=','?solution=','renderAgent','renderSolution','raw_url','Expor
 PY"
 check "solutions.html lists the catalog from the static API" "python3 - <<'PY'
 d=open('solutions.html').read()
-for k in ('api/v1/onepagers.json','onepager.html?solution=','hosted_videos'):
+for k in ('api/v1/onepagers.json','onepager.html?solution='):
     assert k in d, k
 PY"
 check "every agent card links to its one-pager" \
@@ -1445,7 +1458,9 @@ check "every entry gets a storyboard in the house format, aggregated included" "
 import json, pathlib
 idx=json.load(open('api/v1/walkthroughs.json'))
 kinds={w['kind'] for w in idx['walkthroughs']}
-assert kinds=={'agent','skill'}, kinds
+# Solutions get storyboards too now, so the catalog carries three
+# kinds rather than two.
+assert kinds=={'agent','skill','solution'}, kinds
 assert idx['count']>=150, idx['count']
 for w in idx['walkthroughs'][:5]:
     d=json.loads(pathlib.Path('media/walkthroughs')
@@ -1457,18 +1472,12 @@ for w in idx['walkthroughs'][:5]:
     # film that actually gets made, not a 137s one that never existed.
     assert abs(d['runtime_seconds']-132.4)<1, d['runtime_seconds']
 PY"
-check "the format matches the shipped recordings it was derived from" "python3 - <<'PY'
-import json, subprocess, pathlib
-vids=sorted(pathlib.Path('media/videos').glob('*.mp4'))
-assert vids, 'no template recordings'
-durs=[]
-for v in vids:
-    out=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration',
-                        '-of','csv=p=0',str(v)],capture_output=True,text=True)
-    if out.returncode==0 and out.stdout.strip(): durs.append(float(out.stdout))
-if durs:
-    target=json.load(open('media/walkthroughs/agent-art-generator.json'))['runtime_seconds']
-    assert min(durs)*0.7 <= target <= max(durs)*1.3, (target, min(durs), max(durs))
+check "the storyboard runtime matches the recordings it was derived from" "python3 - <<'PY'
+import json
+# The recordings are on the media branch, so this reads the measured grammar
+# rather than probing files that are deliberately absent from this clone.
+target=json.load(open('media/walkthroughs/agent-art-generator.json'))['runtime_seconds']
+assert 120 <= target <= 200, target
 PY"
 check "storyboards state no figures they cannot stand behind" "python3 - <<'PY'
 import json, glob, re

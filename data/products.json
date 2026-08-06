@@ -1,0 +1,4576 @@
+{
+  "schema": "aibast-products/1.0",
+  "format_version": "1.0.0",
+  "generated": "2026-08-06T15:55:33+00:00",
+  "note": "The Microsoft products each library entry involves. `declared` means the entry names the product; `implied` means a tag or category the entry carries points at it, and the tag is in the evidence. An entry with neither lists no products \u2014 an unknown is reported as unknown rather than filled in.",
+  "marks": {
+    "source": "media/jewels/index.json",
+    "note": "Real marks only. A product with no mark on file is drawn as a labelled chip and listed in missing_marks; no mark is ever approximated or substituted with a lookalike.",
+    "provenance": "The real marks, cropped from the Agent overview card in the corpus and keyed by unpremultiplying the bed out, so no mark carries a halo. Header icons (ic-*) and the chevron have no match terms \u2014 they are structural, one per panel."
+  },
+  "families": [
+    "Dynamics 365",
+    "Microsoft 365",
+    "Power Platform",
+    "Azure"
+  ],
+  "products": [
+    {
+      "id": "dynamics-365",
+      "name": "Dynamics 365",
+      "family": "Dynamics 365",
+      "app": null,
+      "column": "knowledge",
+      "mark": "media/jewels/dynamics-365.png",
+      "mark_scope": "exact",
+      "mark_status": "mark",
+      "entry_count": 60,
+      "declared_count": 57
+    },
+    {
+      "id": "dynamics-365-sales",
+      "name": "Dynamics 365 Sales",
+      "family": "Dynamics 365",
+      "app": "Sales",
+      "column": "knowledge",
+      "mark": "media/jewels/dynamics-365.png",
+      "mark_scope": "family",
+      "mark_status": "mark",
+      "entry_count": 30,
+      "declared_count": 0
+    },
+    {
+      "id": "dynamics-365-customer-service",
+      "name": "Dynamics 365 Customer Service",
+      "family": "Dynamics 365",
+      "app": "Customer Service",
+      "column": "knowledge",
+      "mark": "media/jewels/dynamics-365.png",
+      "mark_scope": "family",
+      "mark_status": "mark",
+      "entry_count": 25,
+      "declared_count": 15
+    },
+    {
+      "id": "dynamics-365-field-service",
+      "name": "Dynamics 365 Field Service",
+      "family": "Dynamics 365",
+      "app": "Field Service",
+      "column": "knowledge",
+      "mark": "media/jewels/dynamics-365.png",
+      "mark_scope": "family",
+      "mark_status": "mark",
+      "entry_count": 4,
+      "declared_count": 1
+    },
+    {
+      "id": "dynamics-365-finance",
+      "name": "Dynamics 365 Finance",
+      "family": "Dynamics 365",
+      "app": "Finance",
+      "column": "knowledge",
+      "mark": "media/jewels/dynamics-365.png",
+      "mark_scope": "family",
+      "mark_status": "mark",
+      "entry_count": 8,
+      "declared_count": 0
+    },
+    {
+      "id": "dynamics-365-supply-chain",
+      "name": "Dynamics 365 Supply Chain Management",
+      "family": "Dynamics 365",
+      "app": "Supply Chain Management",
+      "column": "knowledge",
+      "mark": "media/jewels/dynamics-365.png",
+      "mark_scope": "family",
+      "mark_status": "mark",
+      "entry_count": 8,
+      "declared_count": 0
+    },
+    {
+      "id": "dynamics-365-commerce",
+      "name": "Dynamics 365 Commerce",
+      "family": "Dynamics 365",
+      "app": "Commerce",
+      "column": "knowledge",
+      "mark": "media/jewels/dynamics-365.png",
+      "mark_scope": "family",
+      "mark_status": "mark",
+      "entry_count": 6,
+      "declared_count": 5
+    },
+    {
+      "id": "microsoft-teams",
+      "name": "Microsoft Teams",
+      "family": "Microsoft 365",
+      "app": null,
+      "column": "interface",
+      "mark": "media/jewels/teams.png",
+      "mark_scope": "exact",
+      "mark_status": "mark",
+      "entry_count": 51,
+      "declared_count": 50
+    },
+    {
+      "id": "outlook",
+      "name": "Outlook",
+      "family": "Microsoft 365",
+      "app": null,
+      "column": "interface",
+      "mark": "media/jewels/outlook.png",
+      "mark_scope": "exact",
+      "mark_status": "mark",
+      "entry_count": 19,
+      "declared_count": 14
+    },
+    {
+      "id": "sharepoint",
+      "name": "SharePoint",
+      "family": "Microsoft 365",
+      "app": null,
+      "column": "knowledge",
+      "mark": "media/jewels/sharepoint.png",
+      "mark_scope": "exact",
+      "mark_status": "mark",
+      "entry_count": 20,
+      "declared_count": 17
+    },
+    {
+      "id": "microsoft-365-copilot",
+      "name": "Microsoft 365 Copilot",
+      "family": "Microsoft 365",
+      "app": null,
+      "column": "interface",
+      "mark": "media/jewels/copilot.png",
+      "mark_scope": "exact",
+      "mark_status": "mark",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "word",
+      "name": "Microsoft Word",
+      "family": "Microsoft 365",
+      "app": null,
+      "column": "interface",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 2,
+      "declared_count": 2
+    },
+    {
+      "id": "excel",
+      "name": "Microsoft Excel",
+      "family": "Microsoft 365",
+      "app": null,
+      "column": "interface",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "powerpoint",
+      "name": "Microsoft PowerPoint",
+      "family": "Microsoft 365",
+      "app": null,
+      "column": "interface",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 3,
+      "declared_count": 3
+    },
+    {
+      "id": "microsoft-graph",
+      "name": "Microsoft Graph",
+      "family": "Microsoft 365",
+      "app": null,
+      "column": "knowledge",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "power-bi",
+      "name": "Power BI",
+      "family": "Power Platform",
+      "app": null,
+      "column": "reporting",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 15,
+      "declared_count": 4
+    },
+    {
+      "id": "power-automate",
+      "name": "Power Automate",
+      "family": "Power Platform",
+      "app": null,
+      "column": "automation",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 5,
+      "declared_count": 0
+    },
+    {
+      "id": "power-apps",
+      "name": "Power Apps",
+      "family": "Power Platform",
+      "app": null,
+      "column": "interface",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "microsoft-copilot-studio",
+      "name": "Microsoft Copilot Studio",
+      "family": "Power Platform",
+      "app": null,
+      "column": "interface",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 57,
+      "declared_count": 57
+    },
+    {
+      "id": "dataverse",
+      "name": "Dataverse",
+      "family": "Power Platform",
+      "app": null,
+      "column": "knowledge",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "azure-openai",
+      "name": "Azure OpenAI",
+      "family": "Azure",
+      "app": null,
+      "column": "processing",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 1,
+      "declared_count": 1
+    },
+    {
+      "id": "azure-functions",
+      "name": "Azure Functions",
+      "family": "Azure",
+      "app": null,
+      "column": "automation",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "azure-ai-search",
+      "name": "Azure AI Search",
+      "family": "Azure",
+      "app": null,
+      "column": "knowledge",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "azure-sql",
+      "name": "Azure SQL",
+      "family": "Azure",
+      "app": null,
+      "column": "knowledge",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 1,
+      "declared_count": 1
+    },
+    {
+      "id": "azure-cosmos-db",
+      "name": "Azure Cosmos DB",
+      "family": "Azure",
+      "app": null,
+      "column": "knowledge",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "azure-blob-storage",
+      "name": "Azure Blob Storage",
+      "family": "Azure",
+      "app": null,
+      "column": "knowledge",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "azure-iot-hub",
+      "name": "Azure IoT Hub",
+      "family": "Azure",
+      "app": null,
+      "column": "knowledge",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 1,
+      "declared_count": 1
+    },
+    {
+      "id": "azure-logic-apps",
+      "name": "Azure Logic Apps",
+      "family": "Azure",
+      "app": null,
+      "column": "automation",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "microsoft-fabric",
+      "name": "Microsoft Fabric",
+      "family": "Azure",
+      "app": null,
+      "column": "knowledge",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 0,
+      "declared_count": 0
+    },
+    {
+      "id": "microsoft-purview",
+      "name": "Microsoft Purview",
+      "family": "Azure",
+      "app": null,
+      "column": "reporting",
+      "mark": null,
+      "mark_scope": null,
+      "mark_status": "labelled-chip",
+      "entry_count": 13,
+      "declared_count": 0
+    }
+  ],
+  "missing_marks": [
+    "azure-ai-search",
+    "azure-blob-storage",
+    "azure-cosmos-db",
+    "azure-functions",
+    "azure-iot-hub",
+    "azure-logic-apps",
+    "azure-openai",
+    "azure-sql",
+    "dataverse",
+    "excel",
+    "microsoft-copilot-studio",
+    "microsoft-fabric",
+    "microsoft-graph",
+    "microsoft-purview",
+    "power-apps",
+    "power-automate",
+    "power-bi",
+    "powerpoint",
+    "word"
+  ],
+  "count": 160,
+  "entries": [
+    {
+      "ref": "product-line-optimization-agent",
+      "slug": "product-line-optimization-agent",
+      "kind": "solution",
+      "display_name": "Product Line Optimization Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "azure-iot-hub",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Azure IoT Hub\"",
+          "matched": [
+            "Azure IoT Hub"
+          ]
+        },
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365 for ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "power-bi",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"PowerBI\"",
+          "matched": [
+            "PowerBI",
+            "Power BI"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "contract-review-agent",
+      "slug": "contract-review-agent",
+      "kind": "solution",
+      "display_name": "Contract Review Agent",
+      "industries": [
+        "Professional Services",
+        "Consulting"
+      ],
+      "products": [
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "word",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Word\"",
+          "matched": [
+            "Microsoft Word"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "client-onboarding-agent",
+      "slug": "client-onboarding-agent",
+      "kind": "solution",
+      "display_name": "Client Onboarding Agent",
+      "industries": [
+        "Cross-Industry",
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "contact-center-escalation-agent",
+      "slug": "contact-center-escalation-agent",
+      "kind": "solution",
+      "display_name": "Contact Center Escalation Agent",
+      "industries": [
+        "Cross-Industry",
+        "Contact Center"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "portfolio-rebalancing-agent",
+      "slug": "portfolio-rebalancing-agent",
+      "kind": "solution",
+      "display_name": "Portfolio Rebalancing Agent",
+      "industries": [
+        "Capital Markets"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365 for CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "powerpoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft PowerPoint\"",
+          "matched": [
+            "Microsoft PowerPoint",
+            "PowerPoint"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "purchase-order-management-agent",
+      "slug": "purchase-order-management-agent",
+      "kind": "solution",
+      "display_name": "Purchase Order Management Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "inventory-optimization-agent",
+      "slug": "inventory-optimization-agent",
+      "kind": "solution",
+      "display_name": "Inventory Optimization Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "dynamics-365-commerce",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 Commerce\"",
+          "matched": [
+            "Dynamics 365 Commerce"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "month-end-billing-agent",
+      "slug": "month-end-billing-agent",
+      "kind": "solution",
+      "display_name": "Month-End Billing Agent",
+      "industries": [
+        "Professional Services",
+        "Consulting"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "resource-utilization-agent",
+      "slug": "resource-utilization-agent",
+      "kind": "solution",
+      "display_name": "Resource Utilization Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "energy-operations-agent-a",
+      "slug": "energy-operations-agent-a",
+      "kind": "solution",
+      "display_name": "Energy Operations Agent (a)",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "energy-operations-agent-b",
+      "slug": "energy-operations-agent-b",
+      "kind": "solution",
+      "display_name": "Energy Operations Agent (b)",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "sales-pipeline-management-agent",
+      "slug": "sales-pipeline-management-agent",
+      "kind": "solution",
+      "display_name": "Sales Pipeline Management Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "proposal-creation-agent",
+      "slug": "proposal-creation-agent",
+      "kind": "solution",
+      "display_name": "Proposal Creation Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "powerpoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft PowerPoint\"",
+          "matched": [
+            "Microsoft PowerPoint"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "word",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Word\"",
+          "matched": [
+            "Microsoft Word"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "campaign-design-agent",
+      "slug": "campaign-design-agent",
+      "kind": "solution",
+      "display_name": "Campaign Design Agent",
+      "industries": [
+        "Retail"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "predictive-maintenance-agent",
+      "slug": "predictive-maintenance-agent",
+      "kind": "solution",
+      "display_name": "Predictive Maintenance Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "client-health-score-agent",
+      "slug": "client-health-score-agent",
+      "kind": "solution",
+      "display_name": "Client Health Score Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook",
+            "Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "energy-operations-agent-c",
+      "slug": "energy-operations-agent-c",
+      "kind": "solution",
+      "display_name": "Energy Operations Agent (c)",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "energy-operations-agent-d",
+      "slug": "energy-operations-agent-d",
+      "kind": "solution",
+      "display_name": "Energy Operations Agent (d)",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "account-research-agent",
+      "slug": "account-research-agent",
+      "kind": "solution",
+      "display_name": "Account Research Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "supply-risk-intelligence-agent",
+      "slug": "supply-risk-intelligence-agent",
+      "kind": "solution",
+      "display_name": "Supply Risk Intelligence Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "store-associate-agent",
+      "slug": "store-associate-agent",
+      "kind": "solution",
+      "display_name": "Store Associate Agent",
+      "industries": [
+        "Retail"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "abandoned-cart-recovery-agent",
+      "slug": "abandoned-cart-recovery-agent",
+      "kind": "solution",
+      "display_name": "Abandoned Cart Recovery Agent",
+      "industries": [
+        "Cross-Industry",
+        "Software Tech"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "product-feedback-insights-agent",
+      "slug": "product-feedback-insights-agent",
+      "kind": "solution",
+      "display_name": "Product Feedback Insights Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "utility-leak-detection-billing-agent",
+      "slug": "utility-leak-detection-billing-agent",
+      "kind": "solution",
+      "display_name": "Utility Leak Detection & Billing Agent",
+      "industries": [
+        "Energy and Utilities",
+        "State and Local Government"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "expansion-opportunity-agent",
+      "slug": "expansion-opportunity-agent",
+      "kind": "solution",
+      "display_name": "Expansion Opportunity Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "procurement-savings-agent",
+      "slug": "procurement-savings-agent",
+      "kind": "solution",
+      "display_name": "Procurement Savings Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "dynamics-365-commerce",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 Commerce\"",
+          "matched": [
+            "Dynamics 365 Commerce"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "cross-channel-engagement-agent",
+      "slug": "cross-channel-engagement-agent",
+      "kind": "solution",
+      "display_name": "Cross-Channel Engagement Agent",
+      "industries": [
+        "Cross-Industry",
+        "Retail"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "dynamics-365-commerce",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 Commerce\"",
+          "matched": [
+            "Dynamics 365 Commerce"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "patient-intake-agent",
+      "slug": "patient-intake-agent",
+      "kind": "solution",
+      "display_name": "Patient Intake Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "care-gap-closure-agent",
+      "slug": "care-gap-closure-agent",
+      "kind": "solution",
+      "display_name": "Care Gap Closure Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "commercial-underwriting-agent",
+      "slug": "commercial-underwriting-agent",
+      "kind": "solution",
+      "display_name": "Commercial Underwriting Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "dynamics-365-commerce",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 Commerce\"",
+          "matched": [
+            "Dynamics 365 Commerce"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "omnichannel-inventory-agent",
+      "slug": "omnichannel-inventory-agent",
+      "kind": "solution",
+      "display_name": "Omnichannel Inventory Agent",
+      "industries": [
+        "Retail"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-commerce",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 Commerce\"",
+          "matched": [
+            "Dynamics 365 Commerce"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "supply-chain-risk-agent",
+      "slug": "supply-chain-risk-agent",
+      "kind": "solution",
+      "display_name": "Supply Chain Risk Agent",
+      "industries": [
+        "Retail",
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "subscription-renewal-agent",
+      "slug": "subscription-renewal-agent",
+      "kind": "solution",
+      "display_name": "Subscription Renewal Agent",
+      "industries": [
+        "Software Tech"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "customer-sentiment-churn-agent",
+      "slug": "customer-sentiment-churn-agent",
+      "kind": "solution",
+      "display_name": "Customer Sentiment & Churn Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "fraud-detection-alert-agent",
+      "slug": "fraud-detection-alert-agent",
+      "kind": "solution",
+      "display_name": "Fraud Detection & Alert Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "claims-processing-agent",
+      "slug": "claims-processing-agent",
+      "kind": "solution",
+      "display_name": "Claims Processing Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "mortgage-origination-agent",
+      "slug": "mortgage-origination-agent",
+      "kind": "solution",
+      "display_name": "Mortgage Origination Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "personal-styling-agent",
+      "slug": "personal-styling-agent",
+      "kind": "solution",
+      "display_name": "Personal Styling Agent",
+      "industries": [
+        "Retail"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "wealth-insights-agent",
+      "slug": "wealth-insights-agent",
+      "kind": "solution",
+      "display_name": "Wealth Insights Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "regulatory-compliance-agent",
+      "slug": "regulatory-compliance-agent",
+      "kind": "solution",
+      "display_name": "Regulatory Compliance Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "returns-complaints-agent",
+      "slug": "returns-complaints-agent",
+      "kind": "solution",
+      "display_name": "Returns & Complaints Agent",
+      "industries": [
+        "Retail",
+        "Consumable Products Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "order-status-delay-agent",
+      "slug": "order-status-delay-agent",
+      "kind": "solution",
+      "display_name": "Order Status & Delay Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "loyalty-insights-agent",
+      "slug": "loyalty-insights-agent",
+      "kind": "solution",
+      "display_name": "Loyalty Insights Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "building-permit-review-agent",
+      "slug": "building-permit-review-agent",
+      "kind": "solution",
+      "display_name": "Building Permit Review Agent",
+      "industries": [
+        "State and Local Government"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "prior-authorization-agent",
+      "slug": "prior-authorization-agent",
+      "kind": "solution",
+      "display_name": "Prior Authorization Agent",
+      "industries": [
+        "Healthcare",
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "hr-self-service-agent",
+      "slug": "hr-self-service-agent",
+      "kind": "solution",
+      "display_name": "HR Self-Service Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "products": [
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "clinical-summary-agent",
+      "slug": "clinical-summary-agent",
+      "kind": "solution",
+      "display_name": "Clinical Summary Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "branch-banking-advisory-agent",
+      "slug": "branch-banking-advisory-agent",
+      "kind": "solution",
+      "display_name": "Branch Banking Advisory Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/art-generator",
+      "slug": "art-generator",
+      "kind": "agent",
+      "display_name": "ArtGenerator",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "azure-openai",
+          "confidence": "declared",
+          "evidence": "requires_env: AZURE_OPENAI_ENDPOINT",
+          "matched": [
+            "AZURE_OPENAI_ENDPOINT",
+            "AZURE_OPENAI_IMAGE_DEPLOYMENT"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/account-intelligence",
+      "slug": "account-intelligence",
+      "kind": "agent",
+      "display_name": "Account Intelligence",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "source names Dynamics 365",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: account-intelligence",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/account-intelligence-orchestrator",
+      "slug": "account-intelligence-orchestrator",
+      "kind": "agent",
+      "display_name": "Account Intelligence Orchestrator",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: account-intelligence",
+          "matched": []
+        },
+        {
+          "id": "power-automate",
+          "confidence": "implied",
+          "evidence": "tag: orchestration",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/action-prioritization",
+      "slug": "action-prioritization",
+      "kind": "agent",
+      "display_name": "Action Prioritization",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2b_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/competitive-intelligence",
+      "slug": "competitive-intelligence",
+      "kind": "agent",
+      "display_name": "Competitive Intelligence",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "source names Dynamics 365",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: win-loss",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/deal-tracking",
+      "slug": "deal-tracking",
+      "kind": "agent",
+      "display_name": "Deal Tracking",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: pipeline",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: forecasting",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/meeting-prep",
+      "slug": "meeting-prep",
+      "kind": "agent",
+      "display_name": "Meeting Prep",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "source names Microsoft Teams",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2b_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/account-messaging",
+      "slug": "account-messaging",
+      "kind": "agent",
+      "display_name": "Account Messaging",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2b_sales",
+          "matched": []
+        },
+        {
+          "id": "outlook",
+          "confidence": "implied",
+          "evidence": "tag: outreach",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/account-risk-assessment",
+      "slug": "account-risk-assessment",
+      "kind": "agent",
+      "display_name": "Account Risk Assessment",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2b_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/stakeholder-intelligence",
+      "slug": "stakeholder-intelligence",
+      "kind": "agent",
+      "display_name": "Stakeholder Intelligence",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2b_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/activity-gap",
+      "slug": "activity-gap",
+      "kind": "agent",
+      "display_name": "Activity Gap Analyzer",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/deal-competitor-intel",
+      "slug": "deal-competitor-intel",
+      "kind": "agent",
+      "display_name": "Deal Competitor Intelligence",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/deal-health-score",
+      "slug": "deal-health-score",
+      "kind": "agent",
+      "display_name": "Deal Health Score",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: pipeline",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/deal-progression",
+      "slug": "deal-progression",
+      "kind": "agent",
+      "display_name": "Deal Progression",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: forecasting",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/deal-risk-assessment",
+      "slug": "deal-risk-assessment",
+      "kind": "agent",
+      "display_name": "Deal Risk Assessment",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/next-best-action",
+      "slug": "next-best-action",
+      "kind": "agent",
+      "display_name": "Next Best Action",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/pipeline-velocity",
+      "slug": "pipeline-velocity",
+      "kind": "agent",
+      "display_name": "Pipeline Velocity",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: analytics",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/revenue-forecast",
+      "slug": "revenue-forecast",
+      "kind": "agent",
+      "display_name": "Revenue Forecast",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: analytics",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/deal-stakeholder-engagement",
+      "slug": "deal-stakeholder-engagement",
+      "kind": "agent",
+      "display_name": "Stakeholder Engagement",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/stalled-deal-detection",
+      "slug": "stalled-deal-detection",
+      "kind": "agent",
+      "display_name": "Stalled Deal Detection",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/win-probability",
+      "slug": "win-probability",
+      "kind": "agent",
+      "display_name": "Win Probability",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: deal-progression",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: forecasting",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/proposal-generation",
+      "slug": "proposal-generation",
+      "kind": "agent",
+      "display_name": "Proposal Generation",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2b_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/sales-qualification",
+      "slug": "sales-qualification",
+      "kind": "agent",
+      "display_name": "Sales Qualification",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2b_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/win-loss-analysis",
+      "slug": "win-loss-analysis",
+      "kind": "agent",
+      "display_name": "Win/Loss Analysis",
+      "industries": [
+        "B2B Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "tag: win-loss",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/cart-abandonment-recovery",
+      "slug": "cart-abandonment-recovery",
+      "kind": "agent",
+      "display_name": "Cart Abandonment Recovery Agent",
+      "industries": [
+        "B2C Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-commerce",
+          "confidence": "implied",
+          "evidence": "tag: cart-abandonment",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2c_sales",
+          "matched": []
+        },
+        {
+          "id": "outlook",
+          "confidence": "implied",
+          "evidence": "tag: email",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/customer-360-speech",
+      "slug": "customer-360-speech",
+      "kind": "agent",
+      "display_name": "Customer 360 & Speech Agent",
+      "industries": [
+        "B2C Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2c_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/customer-loyalty-rewards",
+      "slug": "customer-loyalty-rewards",
+      "kind": "agent",
+      "display_name": "Customer Loyalty & Rewards Agent",
+      "industries": [
+        "B2C Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2c_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/omnichannel-engagement",
+      "slug": "omnichannel-engagement",
+      "kind": "agent",
+      "display_name": "Omnichannel Engagement Agent",
+      "industries": [
+        "B2C Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2c_sales",
+          "matched": []
+        },
+        {
+          "id": "power-automate",
+          "confidence": "implied",
+          "evidence": "tag: campaign",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/personalized-shopping-assistant",
+      "slug": "personalized-shopping-assistant",
+      "kind": "agent",
+      "display_name": "Personalized Shopping Assistant Agent",
+      "industries": [
+        "B2C Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2c_sales",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-supply-chain",
+          "confidence": "implied",
+          "evidence": "tag: inventory",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/returns-exchange",
+      "slug": "returns-exchange",
+      "kind": "agent",
+      "display_name": "Returns & Exchange Agent",
+      "industries": [
+        "B2C Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: customer-service",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2c_sales",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/sales-chat",
+      "slug": "sales-chat",
+      "kind": "agent",
+      "display_name": "Sales Chat Agent",
+      "industries": [
+        "B2C Sales"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-sales",
+          "confidence": "implied",
+          "evidence": "category: b2c_sales",
+          "matched": []
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "implied",
+          "evidence": "tag: chat",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/asset-maintenance-forecast",
+      "slug": "asset-maintenance-forecast",
+      "kind": "agent",
+      "display_name": "Asset Maintenance Forecast Agent",
+      "industries": [
+        "Energy"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-field-service",
+          "confidence": "implied",
+          "evidence": "tag: maintenance",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-finance",
+          "confidence": "implied",
+          "evidence": "tag: budget",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/emission-tracking",
+      "slug": "emission-tracking",
+      "kind": "agent",
+      "display_name": "Emission Tracking Agent",
+      "industries": [
+        "Energy"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: compliance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/field-service-dispatch",
+      "slug": "field-service-dispatch",
+      "kind": "agent",
+      "display_name": "Field Service Dispatch Agent",
+      "industries": [
+        "Energy"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-field-service",
+          "confidence": "declared",
+          "evidence": "source names Dynamics 365 Field Service",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: routing",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/permit-license-management",
+      "slug": "permit-license-management",
+      "kind": "agent",
+      "display_name": "Permit & License Management Agent",
+      "industries": [
+        "Energy"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: compliance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/energy-regulatory-reporting",
+      "slug": "energy-regulatory-reporting",
+      "kind": "agent",
+      "display_name": "Energy Regulatory Reporting Agent",
+      "industries": [
+        "Energy"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: audit",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: reporting",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/acquisition-support",
+      "slug": "acquisition-support",
+      "kind": "agent",
+      "display_name": "Acquisition Support Agent",
+      "industries": [
+        "Federal Government"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-supply-chain",
+          "confidence": "implied",
+          "evidence": "tag: procurement",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/federal-grants-oversight",
+      "slug": "federal-grants-oversight",
+      "kind": "agent",
+      "display_name": "Federal Grants Oversight Agent",
+      "industries": [
+        "Federal Government"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: audit",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: reporting",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/mission-reporting-assistant",
+      "slug": "mission-reporting-assistant",
+      "kind": "agent",
+      "display_name": "Mission Reporting Assistant Agent",
+      "industries": [
+        "Federal Government"
+      ],
+      "products": [
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: dashboard",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/regulatory-compliance-fed",
+      "slug": "regulatory-compliance-fed",
+      "kind": "agent",
+      "display_name": "Regulatory Compliance (Federal) Agent",
+      "industries": [
+        "Federal Government"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: audit",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/workforce-clearance-onboarding",
+      "slug": "workforce-clearance-onboarding",
+      "kind": "agent",
+      "display_name": "Workforce Clearance & Onboarding Agent",
+      "industries": [
+        "Federal Government"
+      ],
+      "products": [
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "source names SharePoint",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/claims-processing",
+      "slug": "claims-processing",
+      "kind": "agent",
+      "display_name": "Claims Processing Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/fs-customer-onboarding",
+      "slug": "fs-customer-onboarding",
+      "kind": "agent",
+      "display_name": "FS Customer Onboarding Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: compliance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/customer-sentiment-churn",
+      "slug": "customer-sentiment-churn",
+      "kind": "agent",
+      "display_name": "Customer Sentiment & Churn Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: analytics",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/financial-advisor-copilot",
+      "slug": "financial-advisor-copilot",
+      "kind": "agent",
+      "display_name": "Financial Advisor Copilot Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "source names Outlook",
+          "matched": []
+        },
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: compliance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/fraud-detection-alert",
+      "slug": "fraud-detection-alert",
+      "kind": "agent",
+      "display_name": "Fraud Detection & Alert Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "power-automate",
+          "confidence": "implied",
+          "evidence": "tag: alerts",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/loan-origination-assistant",
+      "slug": "loan-origination-assistant",
+      "kind": "agent",
+      "display_name": "Loan Origination Assistant Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/multi-entity-finance-ops",
+      "slug": "multi-entity-finance-ops",
+      "kind": "agent",
+      "display_name": "Multi-Entity Finance Operations Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-finance",
+          "confidence": "implied",
+          "evidence": "tag: finance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/portfolio-rebalancing",
+      "slug": "portfolio-rebalancing",
+      "kind": "agent",
+      "display_name": "Portfolio Rebalancing Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365 for CRM"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "powerpoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft PowerPoint\"",
+          "matched": [
+            "Microsoft PowerPoint",
+            "PowerPoint"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/fs-regulatory-compliance",
+      "slug": "fs-regulatory-compliance",
+      "kind": "agent",
+      "display_name": "FS Regulatory Compliance Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: compliance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/underwriting-support",
+      "slug": "underwriting-support",
+      "kind": "agent",
+      "display_name": "Underwriting Support Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/wealth-insights-generator",
+      "slug": "wealth-insights-generator",
+      "kind": "agent",
+      "display_name": "Wealth Insights Generator Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "products": [
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: analytics",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/ai-customer-assistant",
+      "slug": "ai-customer-assistant",
+      "kind": "agent",
+      "display_name": "AI Customer Assistant",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: customer-service",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/general-ask-hr",
+      "slug": "general-ask-hr",
+      "kind": "agent",
+      "display_name": "General Ask HR",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "sharepoint",
+          "confidence": "implied",
+          "evidence": "tag: policy",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/bulk-crm-data-generator",
+      "slug": "bulk-crm-data-generator",
+      "kind": "agent",
+      "display_name": "Bulk CRM Data Generator",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "source names Dynamics 365",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/dynamics-365-connector",
+      "slug": "dynamics-365-connector",
+      "kind": "agent",
+      "display_name": "Dynamics 365 Connector",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "source names Dynamics 365",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/one-click-crm-intake",
+      "slug": "one-click-crm-intake",
+      "kind": "agent",
+      "display_name": "One-Click CRM Intake",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "implied",
+          "evidence": "tag: crm",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/cross-selling",
+      "slug": "cross-selling",
+      "kind": "agent",
+      "display_name": "Cross-Selling Opportunities",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-finance",
+          "confidence": "implied",
+          "evidence": "tag: revenue",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/customer-360",
+      "slug": "customer-360",
+      "kind": "agent",
+      "display_name": "Customer 360",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "implied",
+          "evidence": "tag: crm",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/editorial-market-intelligence",
+      "slug": "editorial-market-intelligence",
+      "kind": "agent",
+      "display_name": "Editorial & Market Intelligence Agent",
+      "industries": [
+        "General"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/email-drafting",
+      "slug": "email-drafting",
+      "kind": "agent",
+      "display_name": "Email Drafting",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "outlook",
+          "confidence": "implied",
+          "evidence": "tag: email",
+          "matched": []
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "implied",
+          "evidence": "tag: drafting",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/find-accurate-models",
+      "slug": "find-accurate-models",
+      "kind": "agent",
+      "display_name": "Find Accurate Models",
+      "industries": [
+        "General"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/identify-discounts",
+      "slug": "identify-discounts",
+      "kind": "agent",
+      "display_name": "Identify Discounts",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "power-automate",
+          "confidence": "implied",
+          "evidence": "tag: approval",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/it-ticket-management",
+      "slug": "it-ticket-management",
+      "kind": "agent",
+      "display_name": "IT Ticket Management",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "azure-sql",
+          "confidence": "declared",
+          "evidence": "source names Azure SQL",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "source names Dynamics 365",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "declared",
+          "evidence": "source names Power BI",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/procurement-agent",
+      "slug": "procurement-agent",
+      "kind": "agent",
+      "display_name": "Procurement Agent",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-supply-chain",
+          "confidence": "implied",
+          "evidence": "tag: procurement",
+          "matched": []
+        },
+        {
+          "id": "power-automate",
+          "confidence": "implied",
+          "evidence": "tag: approval",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/procurement-support",
+      "slug": "procurement-support",
+      "kind": "agent",
+      "display_name": "Procurement Support",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-finance",
+          "confidence": "implied",
+          "evidence": "tag: budget",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-supply-chain",
+          "confidence": "implied",
+          "evidence": "tag: procurement",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/product-reference",
+      "slug": "product-reference",
+      "kind": "agent",
+      "display_name": "Product Reference",
+      "industries": [
+        "General"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/sales-coach",
+      "slug": "sales-coach",
+      "kind": "agent",
+      "display_name": "Sales Coach",
+      "industries": [
+        "General"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/sales-simulation",
+      "slug": "sales-simulation",
+      "kind": "agent",
+      "display_name": "Sales Simulation",
+      "industries": [
+        "General"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/speech-to-crm",
+      "slug": "speech-to-crm",
+      "kind": "agent",
+      "display_name": "Speech to CRM",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "implied",
+          "evidence": "tag: crm",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/triage-bot",
+      "slug": "triage-bot",
+      "kind": "agent",
+      "display_name": "Triage Bot",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: routing",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/voice-to-crm-d365",
+      "slug": "voice-to-crm-d365",
+      "kind": "agent",
+      "display_name": "Voice to CRM (D365)",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "source names Dynamics 365",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/voice-to-crm-email",
+      "slug": "voice-to-crm-email",
+      "kind": "agent",
+      "display_name": "Voice to CRM Email",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "outlook",
+          "confidence": "implied",
+          "evidence": "tag: email",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/sharepoint-document-extractor",
+      "slug": "sharepoint-document-extractor",
+      "kind": "agent",
+      "display_name": "SharePoint Document Extractor",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "source names SharePoint",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/voice-to-crm-servicenow",
+      "slug": "voice-to-crm-servicenow",
+      "kind": "agent",
+      "display_name": "Voice to CRM (ServiceNow)",
+      "industries": [
+        "General"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: knowledge-base",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/care-gap-closure",
+      "slug": "care-gap-closure",
+      "kind": "agent",
+      "display_name": "Care Gap Closure Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "implied",
+          "evidence": "tag: outreach",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/clinical-documentation-ring",
+      "slug": "clinical-documentation-ring",
+      "kind": "agent",
+      "display_name": "Clinical Documentation Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: governance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/clinical-notes-summarizer",
+      "slug": "clinical-notes-summarizer",
+      "kind": "agent",
+      "display_name": "Clinical Notes Summarizer Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/patient-intake",
+      "slug": "patient-intake",
+      "kind": "agent",
+      "display_name": "Patient Intake Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP"
+          ]
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CcaaS\"",
+          "matched": [
+            "Dynamics 365 CcaaS"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"SharePoint\"",
+          "matched": [
+            "SharePoint"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/prior-authorization",
+      "slug": "prior-authorization",
+      "kind": "agent",
+      "display_name": "Prior Authorization Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": [
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "built_with: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/staff-credentialing",
+      "slug": "staff-credentialing",
+      "kind": "agent",
+      "display_name": "Staff Credentialing Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: compliance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/ask-hr",
+      "slug": "ask-hr",
+      "kind": "agent",
+      "display_name": "Ask HR",
+      "industries": [
+        "Human Resources"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/frontline-coaching",
+      "slug": "frontline-coaching",
+      "kind": "agent",
+      "display_name": "Frontline Coaching Agent",
+      "industries": [
+        "Human Resources"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "declared",
+          "evidence": "source names Dynamics 365 Customer Service",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/it-helpdesk",
+      "slug": "it-helpdesk",
+      "kind": "agent",
+      "display_name": "IT Helpdesk",
+      "industries": [
+        "It Management"
+      ],
+      "products": [
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "source names Outlook",
+          "matched": []
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "declared",
+          "evidence": "source names SharePoint",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: support",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/asset-reliability-standards",
+      "slug": "asset-reliability-standards",
+      "kind": "agent",
+      "display_name": "Asset Reliability & Standards Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-field-service",
+          "confidence": "implied",
+          "evidence": "tag: maintenance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/inventory-rebalancing",
+      "slug": "inventory-rebalancing",
+      "kind": "agent",
+      "display_name": "Inventory Rebalancing Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-supply-chain",
+          "confidence": "implied",
+          "evidence": "tag: inventory",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/maintenance-scheduling",
+      "slug": "maintenance-scheduling",
+      "kind": "agent",
+      "display_name": "Maintenance Scheduling Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-field-service",
+          "confidence": "implied",
+          "evidence": "tag: maintenance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/order-status-communication",
+      "slug": "order-status-communication",
+      "kind": "agent",
+      "display_name": "Order Status Communication Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: customer-service",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/production-line-optimization",
+      "slug": "production-line-optimization",
+      "kind": "agent",
+      "display_name": "Production Line Optimization Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/supplier-risk-monitoring",
+      "slug": "supplier-risk-monitoring",
+      "kind": "agent",
+      "display_name": "Supplier Risk Monitoring Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-supply-chain",
+          "confidence": "implied",
+          "evidence": "tag: procurement",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/client-health-score",
+      "slug": "client-health-score",
+      "kind": "agent",
+      "display_name": "Client Health Score Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 CRM\"",
+          "matched": [
+            "Dynamics 365 CRM",
+            "Dynamics 365"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "outlook",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Outlook\"",
+          "matched": [
+            "Microsoft Outlook",
+            "Outlook"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/contract-risk-review",
+      "slug": "contract-risk-review",
+      "kind": "agent",
+      "display_name": "Contract Risk Review Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: compliance",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/proposal-copilot",
+      "slug": "proposal-copilot",
+      "kind": "agent",
+      "display_name": "Proposal Copilot Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/rd-discovery-requirements",
+      "slug": "rd-discovery-requirements",
+      "kind": "agent",
+      "display_name": "R&D Discovery & Requirements Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/resource-utilization",
+      "slug": "resource-utilization",
+      "kind": "agent",
+      "display_name": "Resource Utilization Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Dynamics 365 ERP\"",
+          "matched": [
+            "Dynamics 365 ERP",
+            "Dynamics 365"
+          ]
+        },
+        {
+          "id": "microsoft-copilot-studio",
+          "confidence": "declared",
+          "evidence": "requires: \"Microsoft Copilot Studio\"",
+          "matched": [
+            "Microsoft Copilot Studio"
+          ]
+        },
+        {
+          "id": "microsoft-teams",
+          "confidence": "declared",
+          "evidence": "featured_tools: \"Microsoft Teams\"",
+          "matched": [
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "id": "power-bi",
+          "confidence": "declared",
+          "evidence": "source names Power BI",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/time-entry-billing",
+      "slug": "time-entry-billing",
+      "kind": "agent",
+      "display_name": "Time Entry & Billing Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "products": [
+        {
+          "id": "power-bi",
+          "confidence": "declared",
+          "evidence": "source names Power BI",
+          "matched": []
+        },
+        {
+          "id": "dynamics-365-finance",
+          "confidence": "implied",
+          "evidence": "tag: billing",
+          "matched": []
+        },
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: audit",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/inventory-visibility",
+      "slug": "inventory-visibility",
+      "kind": "agent",
+      "display_name": "Inventory Visibility Agent",
+      "industries": [
+        "Retail Cpg"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-supply-chain",
+          "confidence": "implied",
+          "evidence": "tag: inventory",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/personalized-marketing",
+      "slug": "personalized-marketing",
+      "kind": "agent",
+      "display_name": "Personalized Marketing Agent",
+      "industries": [
+        "Retail Cpg"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/returns-complaints-resolution",
+      "slug": "returns-complaints-resolution",
+      "kind": "agent",
+      "display_name": "Returns & Complaints Resolution Agent",
+      "industries": [
+        "Retail Cpg"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: customer-service",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/store-associate-copilot",
+      "slug": "store-associate-copilot",
+      "kind": "agent",
+      "display_name": "Store Associate Copilot Agent",
+      "industries": [
+        "Retail Cpg"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/supply-chain-disruption-alert",
+      "slug": "supply-chain-disruption-alert",
+      "kind": "agent",
+      "display_name": "Supply Chain Disruption Alert Agent",
+      "industries": [
+        "Retail Cpg"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-supply-chain",
+          "confidence": "implied",
+          "evidence": "tag: logistics",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/building-permit-processing",
+      "slug": "building-permit-processing",
+      "kind": "agent",
+      "display_name": "Building Permit Processing Agent",
+      "industries": [
+        "Slg Government"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/citizen-service-request",
+      "slug": "citizen-service-request",
+      "kind": "agent",
+      "display_name": "Citizen Service Request Agent",
+      "industries": [
+        "Slg Government"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: routing",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/foia-request-assistant",
+      "slug": "foia-request-assistant",
+      "kind": "agent",
+      "display_name": "FOIA Request Assistant Agent",
+      "industries": [
+        "Slg Government"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/slg-grants-management",
+      "slug": "slg-grants-management",
+      "kind": "agent",
+      "display_name": "SLG Grants Management Agent",
+      "industries": [
+        "Slg Government"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-finance",
+          "confidence": "implied",
+          "evidence": "tag: budget",
+          "matched": []
+        },
+        {
+          "id": "power-bi",
+          "confidence": "implied",
+          "evidence": "tag: reporting",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/regulated-document-drafting",
+      "slug": "regulated-document-drafting",
+      "kind": "agent",
+      "display_name": "Regulated Document Drafting Agent",
+      "industries": [
+        "Slg Government"
+      ],
+      "products": [
+        {
+          "id": "microsoft-purview",
+          "confidence": "implied",
+          "evidence": "tag: compliance",
+          "matched": []
+        },
+        {
+          "id": "sharepoint",
+          "confidence": "implied",
+          "evidence": "tag: drafting",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/utility-billing-assistance",
+      "slug": "utility-billing-assistance",
+      "kind": "agent",
+      "display_name": "Utility Billing Assistance Agent",
+      "industries": [
+        "Slg Government"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-finance",
+          "confidence": "implied",
+          "evidence": "tag: billing",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/software-competitive-intel",
+      "slug": "software-competitive-intel",
+      "kind": "agent",
+      "display_name": "Competitive Intelligence Agent",
+      "industries": [
+        "Software Digital Products"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/software-customer-onboarding",
+      "slug": "software-customer-onboarding",
+      "kind": "agent",
+      "display_name": "Customer Onboarding Agent",
+      "industries": [
+        "Software Digital Products"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/license-renewal-expansion",
+      "slug": "license-renewal-expansion",
+      "kind": "agent",
+      "display_name": "License Renewal & Expansion Agent",
+      "industries": [
+        "Software Digital Products"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-finance",
+          "confidence": "implied",
+          "evidence": "tag: revenue",
+          "matched": []
+        }
+      ]
+    },
+    {
+      "ref": "@aibast-agents-library/product-feedback-synthesizer",
+      "slug": "product-feedback-synthesizer",
+      "kind": "agent",
+      "display_name": "Product Feedback Synthesizer Agent",
+      "industries": [
+        "Software Digital Products"
+      ],
+      "products": []
+    },
+    {
+      "ref": "@aibast-agents-library/support-ticket-resolution",
+      "slug": "support-ticket-resolution",
+      "kind": "agent",
+      "display_name": "Support Ticket Resolution Agent",
+      "industries": [
+        "Software Digital Products"
+      ],
+      "products": [
+        {
+          "id": "dynamics-365-customer-service",
+          "confidence": "implied",
+          "evidence": "tag: escalation",
+          "matched": []
+        }
+      ]
+    }
+  ]
+}

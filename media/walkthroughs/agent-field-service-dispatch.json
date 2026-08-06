@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:54+00:00",
   "subject": {
     "slug": "field-service-dispatch",
     "kind": "agent",
@@ -85,10 +85,10 @@
           "Engages you in Microsoft Teams and Outlook"
         ],
         "Actions": [
-          "Route optimization, technician assignment"
+          "Route optimization"
         ]
       },
-      "narration": "Let's say a manager needs to route optimization, technician assignment. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
+      "narration": "Let's say a manager needs to route optimization. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",
@@ -104,7 +104,7 @@
           "role": "agent",
           "heading": "Field Service Dispatch Agent",
           "rich": {
-            "intro": "I'll route optimization, technician assignment for the current workload, working against rising request volume. Reading the systems of record already in use before I propose anything.",
+            "intro": "I'll route optimization for the current workload, working against rising request volume. Reading the systems of record already in use before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
@@ -120,6 +120,14 @@
                 "items": [
                   "The systems of record already in use \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
+                ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside the systems of record already in use",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
                 ]
               }
             ],
@@ -144,9 +152,17 @@
               {
                 "label": "Steps",
                 "items": [
-                  "1. Route optimization, technician assignment",
+                  "1. Route optimization",
                   "2. Confirm the result against the source system",
                   "3. Hand back the artifact, and the reasoning behind it"
+                ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
                 ]
               }
             ],
@@ -183,6 +199,14 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from the source systems",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
@@ -194,7 +218,7 @@
           "agent_call": "Field Service Dispatch Agent"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with one unified data context, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Field Service Dispatch Agent, energy operators get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with one unified data context, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on."
     },
     {
       "act": "close",

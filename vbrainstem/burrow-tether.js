@@ -94,7 +94,7 @@
       chip = document.createElement('div');
       chip.id = 'dp-chip';
       chip.style.cssText = 'position:fixed;bottom:14px;right:14px;z-index:9989;' +
-        'background:#161b22;color:#8b949e;border:1px solid #30363d;border-radius:20px;' +
+        'background:var(--panel);color:var(--text-dim);border:1px solid var(--border);border-radius:20px;' +
         'padding:6px 14px;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;' +
         'display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.35)';
       var dot = document.createElement('span');
@@ -105,7 +105,7 @@
       chip.appendChild(dot); chip.appendChild(label);
       document.body.appendChild(chip);
     }
-    chip.querySelector('#dp-chip-dot').style.background = color || '#8b949e';
+    chip.querySelector('#dp-chip-dot').style.background = color || 'var(--text-dim)';
     chip.querySelector('#dp-chip-text').textContent = text;
   }
 
@@ -124,8 +124,8 @@
       document.body.appendChild(overlay);
     }
     overlay.innerHTML =
-      '<div style="background:#161b22;border:1px solid #30363d;border-radius:22px;padding:32px 34px;' +
-      'width:min(380px,92vw);text-align:center;color:#e6edf3;' +
+      '<div style="background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:32px 34px;' +
+      'width:min(380px,92vw);text-align:center;color:var(--text);' +
       'font:15px/1.5 -apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;' +
       'box-shadow:0 18px 60px rgba(1,4,9,.6)">' + html + '</div>';
   }
@@ -140,16 +140,16 @@
   }  function showCode() {
     showOverlay(
       '<h2 style="margin:0 0 8px;font-size:20px;font-weight:650">Enter this code on ' + esc(HOST_NAME) + '</h2>' +
-      '<p style="color:#8b949e;font-size:13.5px;margin:0 0 18px">Typing it there is the human sign-off — ' +
+      '<p style="color:var(--text-dim);font-size:13.5px;margin:0 0 18px">Typing it there is the human sign-off — ' +
       'until then this vBrainstem can\'t drive that computer.</p>' +
       '<div class="dp-code" style="display:flex;justify-content:center;gap:9px;margin:8px 0 14px">' +
       code.split('').map(function (d) {
         return '<span style="width:42px;height:56px;display:flex;align-items:center;justify-content:center;' +
-          'background:#0d1117;border:1px solid #30363d;border-radius:11px;' +
+          'background:var(--bg);border:1px solid var(--border);border-radius:11px;' +
           'font:600 28px ui-monospace,Menlo,monospace">' + d + '</span>';
       }).join('') + '</div>' +
-      '<div style="color:#484f58;font-size:11.5px">🔒 the code never travels the network</div>' +
-      '<button id="dp-skip" style="margin-top:16px;background:none;border:none;color:#8b949e;' +
+      '<div style="color:var(--text-faint);font-size:11.5px">🔒 the code never travels the network</div>' +
+      '<button id="dp-skip" style="margin-top:16px;background:none;border:none;color:var(--text-dim);' +
       'font-size:12.5px;cursor:pointer;text-decoration:underline">Skip — use the in-browser brainstem</button>');
     var b = document.getElementById('dp-skip');
     if (b) b.onclick = function () { hideOverlay(); setChip(null); };
@@ -220,14 +220,14 @@
       // browser, only route host ops to the machine.
       S.hostOs = msg.response.os || null;
       saveSession();
-      showOverlay('<div style="width:64px;height:64px;border-radius:50%;background:#238636;display:flex;' +
+      showOverlay('<div style="width:64px;height:64px;border-radius:50%;background:var(--ok);display:flex;' +
         'align-items:center;justify-content:center;margin:4px auto 14px">' +
         '<svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:none;stroke:#fff;stroke-width:3;' +
         'stroke-linecap:round;stroke-linejoin:round"><polyline points="4 12.5 10 18.5 20 6.5"/></svg></div>' +
         '<h2 style="margin:0 0 6px;font-size:20px;font-weight:650">Burrowed</h2>' +
-        '<p style="color:#8b949e;font-size:13.5px;margin:0">Copilot can now run on ' + esc(HOST_NAME) + '.</p>');
+        '<p style="color:var(--text-dim);font-size:13.5px;margin:0">Copilot can now run on ' + esc(HOST_NAME) + '.</p>');
       setTimeout(hideOverlay, 1400);
-      setChip('burrowed · Copilot can run on ' + HOST_NAME, '#3fb950');
+      setChip('burrowed · Copilot can run on ' + HOST_NAME, 'var(--ok)');
       updateTargetPill();
       return;
     }
@@ -236,7 +236,7 @@
       if (msg.response) { S.hostControl = !!msg.response.host_control; S.hostOs = msg.response.os || S.hostOs; }
       saveSession();
       hideOverlay();
-      setChip('burrowed · Copilot can run on ' + HOST_NAME, '#3fb950');
+      setChip('burrowed · Copilot can run on ' + HOST_NAME, 'var(--ok)');
       updateTargetPill();
       return;
     }
@@ -299,7 +299,7 @@
       try { cb({ status: 599, response: { error: 'tether lost' } }); } catch (e) { }
     });
     if (token) {
-      setChip('tether lost — answering in-browser · reconnecting…', '#d29922');
+      setChip('tether lost — answering in-browser · reconnecting…', 'var(--warn)');
       scheduleReconnect();
     }
   }
@@ -348,7 +348,7 @@
           try { peer.destroy(); } catch (err) { }
           if (quiet) { clearSession(); teardown(); return; }
           if (token) { markLost(); return; }   // keep trying — the tab may come back
-          setChip('burrow daemon unreachable', '#8b949e');
+          setChip('burrow daemon unreachable', 'var(--text-dim)');
           hideOverlay();
           return;
         }
@@ -359,7 +359,7 @@
         }
       });
     }).catch(function () {
-      setChip('burrow unavailable (peerjs blocked)', '#f85149');
+      setChip('burrow unavailable (peerjs blocked)', 'var(--danger)');
     });
   }
 
@@ -436,17 +436,17 @@
       tpill = document.createElement('button');
       tpill.id = 'burrow-chat-target';
       tpill.style.cssText = 'position:fixed;bottom:44px;right:14px;z-index:9989;cursor:pointer;' +
-        'background:#161b22;color:#e6edf3;border:1px solid #30363d;border-radius:20px;' +
+        'background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;' +
         'padding:5px 12px;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;' +
         'display:flex;align-items:center;gap:7px;box-shadow:0 4px 16px rgba(0,0,0,.35)';
       tpill.onclick = function () { window.__BURROW_BRIDGE__.setChatTarget(chatTarget === 'twin' ? 'local' : 'twin'); };
       document.body.appendChild(tpill);
     }
     tpill.innerHTML = (chatTarget === 'twin')
-      ? '<span style="width:8px;height:8px;border-radius:50%;background:#d29922"></span>brainstem chat → ' + esc(HOST_NAME) + ' (twin) · click for in-browser'
-      : '<span style="width:8px;height:8px;border-radius:50%;background:#3fb950"></span>brainstem chat → in-browser · click to use ' + esc(HOST_NAME);
+      ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--warn)"></span>brainstem chat → ' + esc(HOST_NAME) + ' (twin) · click for in-browser'
+      : '<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span>brainstem chat → in-browser · click to use ' + esc(HOST_NAME);
   }
 
-  setChip(token ? 'resuming burrow…' : 'connecting to ' + HOST_NAME + '…', '#d29922');
+  setChip(token ? 'resuming burrow…' : 'connecting to ' + HOST_NAME + '…', 'var(--warn)');
   connect();
 })();

@@ -1,0 +1,253 @@
+{
+ "schema": "aibast-showcase-film-beatmap/1.0",
+ "slug": "customer-service-case-intelligence-d365",
+ "total": 126.3,
+ "bed_db": 4.0,
+ "beats": [
+  {
+   "id": "b00",
+   "kind": "sting",
+   "clip": "sting-intro-logo.mp4",
+   "dur": 2.4,
+   "note": "Microsoft logo sting",
+   "t0": 0.0,
+   "actual": 2.4
+  },
+  {
+   "id": "b01",
+   "kind": "title",
+   "clip": "software/license-renewal-and-expansion-agent-01.mp4",
+   "card": "c_title",
+   "dur": 5.0,
+   "note": "title over industry b-roll",
+   "t0": 2.4,
+   "actual": 5.0
+  },
+  {
+   "id": "b02",
+   "kind": "broll",
+   "dur": 12.77,
+   "vo": "vo01",
+   "off": 0.3,
+   "clips": [
+    {
+     "file": "software/license-renewal-and-expansion-agent-01.mp4",
+     "dur": 2.3
+    },
+    {
+     "file": "software/license-renewal-and-expansion-agent-02.mp4",
+     "dur": 4.1
+    },
+    {
+     "file": "software/license-renewal-and-expansion-agent-03.mp4",
+     "dur": 4.17
+    },
+    {
+     "file": "software/license-renewal-and-expansion-agent-05.mp4",
+     "dur": 2.2
+    }
+   ],
+   "note": "the job to be done",
+   "t0": 7.4,
+   "actual": 12.8
+  },
+  {
+   "id": "b03",
+   "kind": "broll",
+   "dur": 8.43,
+   "vo": "vo02",
+   "off": 0.3,
+   "clips": [
+    {
+     "file": "software/product-feedback-synthesizer-agent-01.mp4",
+     "dur": 3.0
+    },
+    {
+     "file": "software/product-feedback-synthesizer-agent-02.mp4",
+     "dur": 3.23
+    },
+    {
+     "file": "software/product-feedback-synthesizer-agent-04.mp4",
+     "dur": 2.2
+    }
+   ],
+   "note": "the manual status quo",
+   "t0": 20.2,
+   "actual": 8.433
+  },
+  {
+   "id": "b04",
+   "kind": "card",
+   "card": "c_overview",
+   "dur": 17.79,
+   "vo": "vo03",
+   "off": 0.4,
+   "stages": 4,
+   "note": "sources, flow of work, actions",
+   "t0": 28.633,
+   "actual": 17.733
+  },
+  {
+   "id": "b05",
+   "kind": "card",
+   "card": "c_synthetic",
+   "dur": 3.6,
+   "note": "synthetic-data card, before the first data frame",
+   "t0": 46.367,
+   "actual": 3.6
+  },
+  {
+   "id": "b06",
+   "kind": "demo",
+   "question": "q1",
+   "chyron": "c_q1",
+   "dur": 14.78,
+   "vo": "vo04",
+   "off": 1.1,
+   "stages": 4,
+   "note": "Summarise this case and draft the knowledge article it shoul",
+   "t0": 49.967,
+   "actual": 14.767
+  },
+  {
+   "id": "b07",
+   "kind": "demo",
+   "question": "q2",
+   "chyron": "c_q2",
+   "dur": 13.97,
+   "vo": "vo05",
+   "off": 1.1,
+   "stages": 4,
+   "note": "Show me the plan for what still needs a human review.",
+   "t0": 64.733,
+   "actual": 13.967
+  },
+  {
+   "id": "b08",
+   "kind": "demo",
+   "question": "q3",
+   "chyron": "c_q3",
+   "dur": 13.89,
+   "vo": "vo06",
+   "off": 1.1,
+   "stages": 4,
+   "note": "What could go wrong if we publish that article as written?",
+   "t0": 78.7,
+   "actual": 13.867
+  },
+  {
+   "id": "b09",
+   "kind": "broll",
+   "dur": 8.76,
+   "vo": "vo_payoff",
+   "off": 0.3,
+   "clips": [
+    {
+     "file": "software/product-feedback-synthesizer-agent-05.mp4",
+     "dur": 4.26
+    },
+    {
+     "file": "software/license-renewal-and-expansion-agent-01.mp4",
+     "dur": 2.3
+    },
+    {
+     "file": "software/license-renewal-and-expansion-agent-03.mp4",
+     "dur": 2.2
+    }
+   ],
+   "note": "payoff",
+   "t0": 92.567,
+   "actual": 8.767
+  },
+  {
+   "id": "b10",
+   "kind": "card",
+   "card": "c_helps",
+   "dur": 10.74,
+   "vo": "vo_helps",
+   "off": 0.4,
+   "stages": 3,
+   "note": "how the agent helps",
+   "t0": 101.333,
+   "actual": 10.7
+  },
+  {
+   "id": "b11",
+   "kind": "card",
+   "card": "c_cta",
+   "dur": 7.25,
+   "vo": "vo_cta",
+   "off": 0.55,
+   "stages": 2,
+   "note": "call to action",
+   "t0": 112.033,
+   "actual": 7.267
+  },
+  {
+   "id": "b12",
+   "kind": "card",
+   "card": "c_footer",
+   "dur": 4.0,
+   "note": "synthetic-data footer",
+   "t0": 119.3,
+   "actual": 4.0
+  },
+  {
+   "id": "b13",
+   "kind": "sting",
+   "clip": "sting-outro-logo.mp4",
+   "dur": 3.0,
+   "note": "Microsoft logo outro",
+   "t0": 123.3,
+   "actual": 3.0
+  }
+ ],
+ "vo_marks": [
+  [
+   "vo01",
+   7.7,
+   11.27
+  ],
+  [
+   "vo02",
+   20.5,
+   6.93
+  ],
+  [
+   "vo03",
+   29.03,
+   16.49
+  ],
+  [
+   "vo04",
+   51.07,
+   12.38
+  ],
+  [
+   "vo05",
+   65.83,
+   11.57
+  ],
+  [
+   "vo06",
+   79.8,
+   11.49
+  ],
+  [
+   "vo_payoff",
+   92.87,
+   7.26
+  ],
+  [
+   "vo_helps",
+   101.73,
+   9.44
+  ],
+  [
+   "vo_cta",
+   112.58,
+   5.9
+  ]
+ ],
+ "nobed": "customer-service-case-intelligence-d365_NOBED.mp4"
+}

@@ -1,9 +1,9 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-index/1.0",
-  "generated": "2026-08-06T00:54:22.665960+00:00",
+  "generated": "2026-08-06T21:45:52.509065+00:00",
   "vault": "brain",
-  "count": 15,
+  "count": 16,
   "reader": "https://microsoft.github.io/aibast-agents-library/brain.html",
   "raw_base": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main",
   "dangling_links": [
@@ -74,7 +74,7 @@
       ],
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/rapp-data-exhaust.md",
       "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-rapp-data-exhaust.json",
-      "backlinks": 0
+      "backlinks": 1
     },
     {
       "slug": "concepts/the-corpus",
@@ -134,7 +134,7 @@
       ],
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/the-vault.md",
       "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-the-vault.json",
-      "backlinks": 2
+      "backlinks": 3
     },
     {
       "slug": "concepts/what-is-ms-rapp",
@@ -230,6 +230,27 @@
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/earn-a-badge.md",
       "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-earn-a-badge.json",
       "backlinks": 4
+    },
+    {
+      "slug": "how-to/make-a-showcase-film",
+      "title": "How to make a showcase film",
+      "summary": "A config file and one command produce a demo film at the grammar and audio standard of the recordings the catalog already ships.",
+      "tags": [
+        "ms-rapp",
+        "how-to",
+        "film",
+        "rappvision"
+      ],
+      "updated": "2026-08-05",
+      "path": "brain/how-to/make-a-showcase-film.md",
+      "bytes": 3036,
+      "links": [
+        "concepts/the-vault",
+        "concepts/rapp-data-exhaust"
+      ],
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/make-a-showcase-film.md",
+      "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-make-a-showcase-film.json",
+      "backlinks": 0
     },
     {
       "slug": "how-to/publish-an-agent",

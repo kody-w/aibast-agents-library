@@ -114,8 +114,13 @@ def main() -> int:
         sol_cards = page.locator(".grid .card").count()
         if sol_cards < 20:
             failures.append(f"solutions.html rendered only {sol_cards} solution cards")
-        if page.locator("video").count() < 1:
-            failures.append("solutions.html showed no hosted demo video")
+        # Recordings stream from the media-server branch rather than being
+        # carried in this clone, so what must be present is the streaming
+        # element and its source path — not a playable local file.
+        if page.locator("video[data-media]").count() < 1:
+            failures.append("solutions.html wired no streaming demo element")
+        if page.locator(".vid-engage").count() < 1:
+            failures.append("solutions.html rendered no engagement bar")
 
         # ---- onepager.html, solution mode ----
         first = page.locator('a[href^="onepager.html?solution="]').first

@@ -2,7 +2,7 @@
 
 > Single-file AI agents for the Microsoft AI stack, the runtime that executes them, and the
 > pinned protocol corpus they implement. Every machine-readable surface is a static JSON
-> file — no key, no quota, CORS-open. 105 agents across
+> file — no key, no quota, CORS-open. 112 agents across
 > 14 industries.
 
 Agents: start at [agent.json](https://microsoft.github.io/aibast-agents-library/api/v1/agent.json) — one fetch gives you what this

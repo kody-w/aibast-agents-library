@@ -7,39 +7,39 @@
       {
         "path": "scenario.subject",
         "label": "What the demo is about",
-        "value": "the delivery portfolio"
+        "value": "the working brief"
       },
       {
         "path": "scenario.driver",
         "label": "What is driving the work",
-        "value": "concurrent ramp-ups"
+        "value": "a rise in demand"
       },
       {
         "path": "scenario.systems",
         "label": "Systems it reads",
-        "value": "the delivery system, timesheets and the resource plan"
+        "value": "the brief, the asset library and brand guidance"
       },
       {
         "path": "scenario.window",
         "label": "Timeframe",
-        "value": "the coming quarter"
+        "value": "the current sprint"
       }
     ],
     "scenario": {
-      "subject": "the delivery portfolio",
-      "volume": "active engagements",
-      "target": "the utilisation target",
-      "metric": "utilisation below target",
-      "window": "the coming quarter",
-      "driver": "concurrent ramp-ups",
-      "systems": "the delivery system, timesheets and the resource plan",
-      "verb": "raises utilisation"
+      "subject": "the working brief",
+      "volume": "the requests in hand",
+      "target": "the turnaround expected",
+      "metric": "production slower than wanted",
+      "window": "the current sprint",
+      "driver": "a rise in demand",
+      "systems": "the brief, the asset library and brand guidance",
+      "verb": "accelerates production"
     },
     "how": "Replace the scenario below with your own customer's and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim.",
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:55+00:00",
   "subject": {
     "slug": "resource-utilization",
     "kind": "agent",
@@ -100,21 +100,21 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Give me intelligent resource analysis and recommendations to maximize billable utilization for the delivery portfolio \u2014 we're looking at concurrent ramp-ups."
+          "text": "Give me intelligent resource analysis and recommendations to maximize billable utilization for the working brief \u2014 we're looking at a rise in demand."
         },
         {
           "role": "agent",
           "heading": "Resource Utilization Agent",
           "rich": {
-            "intro": "I'll maximize billable utilization for the delivery portfolio, working against concurrent ramp-ups. Reading the delivery system, timesheets and the resource plan before I propose anything.",
+            "intro": "I'll maximize billable utilization for the working brief, working against a rise in demand. Reading the brief, the asset library and brand guidance before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
                 "items": [
-                  "Scope: active engagements",
-                  "Current: utilisation below target",
-                  "Goal: close the gap to the utilisation target",
-                  "Window: the coming quarter"
+                  "Scope: the requests in hand",
+                  "Current: production slower than wanted",
+                  "Goal: close the gap to the turnaround expected",
+                  "Window: the current sprint"
                 ]
               },
               {
@@ -124,11 +124,19 @@
                   "Microsoft Teams \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
                 ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside the brief, the asset library and brand guidance",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
+                ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: utilisation below target",
-              "source": "Source: the delivery system, timesheets and the resource plan",
+              "headline": "Biggest constraint: production slower than wanted",
+              "source": "Source: the brief, the asset library and brand guidance",
               "question": "Shall I show the plan?"
             }
           },
@@ -152,10 +160,18 @@
                   "3. Confirm the result against the source system",
                   "4. Hand back the artifact, and the reasoning behind it"
                 ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
+                ]
               }
             ],
             "callout": {
-              "headline": "Phased over the coming quarter, starting with the quick wins",
+              "headline": "Phased over the current sprint, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -170,7 +186,7 @@
           "role": "agent",
           "heading": "Risks and how I would cover them",
           "rich": {
-            "intro": "Three things I would watch on the delivery portfolio.",
+            "intro": "Three things I would watch on the working brief.",
             "sections": [
               {
                 "label": "Risks",
@@ -187,18 +203,26 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from Dynamics 365 ERP",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
               "headline": "You approve each step; nothing changes on its own",
-              "source": "Source: the delivery system, timesheets and the resource plan",
+              "source": "Source: the brief, the asset library and brand guidance",
               "question": "Want me to start with the quick wins?"
             }
           },
           "agent_call": "Resource Utilization Agent"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Dynamics 365 ERP and Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can reduce costs in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Resource Utilization Agent, services firms get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Dynamics 365 ERP and Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can reduce costs in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on."
     },
     {
       "act": "close",

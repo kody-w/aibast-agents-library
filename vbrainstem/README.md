@@ -16,9 +16,45 @@ What's different here:
   `microsoft/aibast-agents-library` (with a jsDelivr CDN mirror as fallback) —
   not the public RAR registry. Install integrity still verifies the SHA-256 of
   the downloaded bytes against the library catalog.
-- **Upvotes and install tallies land on this repository's Discussions** — the
-  same threads the [metrics dashboard](../metrics.html) reads, so browser
-  usage counts in the library's public numbers.
+- **Upvotes, install tallies and run tallies land on this repository's
+  Discussions** — the same threads the [metrics dashboard](../metrics.html)
+  reads, so browser usage counts in the library's public numbers.
+- **The theme is the site's theme.** The page reads the AIBAST tokens defined
+  at the top of `index.html`; light is the default because the rest of the
+  site is light, and the toggle swaps the token set. There is no second
+  stylesheet to keep in sync.
+
+## What the numbers mean
+
+This is a public interactive demo, so loading and running a library agent here
+counts the same way it counts anywhere else — and by exactly the mechanism the
+rest of the library already uses (`scripts/discussion_ratings.py`). GitHub
+Discussions is the backend; there is no server and there must not be one.
+
+| Number | Recorded as | Reads as |
+|---|---|---|
+| **↓ installs** | 👍 on the thread's `<!-- aibast:download-tally -->` comment | unique GitHub accounts that loaded this agent's `agent.py` |
+| **▷ runs** | 👍 on `<!-- aibast:vbrainstem-run-tally -->` | unique GitHub accounts that have actually executed it in this browser brainstem |
+| **▲ upvotes** | 👍 on the discussion itself | unique GitHub accounts that liked it |
+
+One reaction per account, so every count is *people*, never clicks — running an
+agent fifty times is still one. **A signed-out visitor is never counted**: a web
+page has no credential to react with and must not pretend to. Signed in, this
+page adds the reaction for you; signed out, it hands you a link straight to the
+tally comment so you can add it yourself. Every number here is therefore a
+floor — real, and smaller than reality.
+
+Counts come from published snapshots (`state/discussion_ratings.json`,
+`state/vbrainstem_usage.json`), so they move when the library rebuilds, not
+instantly. The run tally is owned by `scripts/vbrainstem_usage.py`:
+
+```bash
+GITHUB_TOKEN=... python3 scripts/vbrainstem_usage.py tally   # provision run tallies
+GITHUB_TOKEN=... python3 scripts/vbrainstem_usage.py fetch   # snapshot installs + runs
+```
+
+Until `tally` has run, agents have no run tally comment and the page shows no
+run number for them rather than a zero it cannot stand behind.
 
 ## Files
 

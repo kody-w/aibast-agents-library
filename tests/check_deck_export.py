@@ -81,8 +81,20 @@ def main() -> int:
         return len(FAILS)
     story = json.loads(story_path.read_text(encoding="utf-8"))
 
+    # A second, real subject: an entry the architecture catalog knows and that
+    # serves more than one industry. The end-to-end architecture slide is
+    # required PER INDUSTRY, and a single-industry entry cannot prove that.
+    multi_slug, multi_entry, multi_inds = "", None, []
+    arch_file = REPO_ROOT / "data" / "architectures.json"
+    if arch_file.is_file():
+        for a in json.loads(arch_file.read_text(encoding="utf-8"))["architectures"]:
+            if len(a.get("industries") or []) > 1:
+                multi_slug, multi_entry, multi_inds = a["slug"], a, a["industries"]
+                break
+
     srv, port = serve()
-    out = Path(tempfile.mkdtemp()) / "deck.pptx"
+    tmp = Path(tempfile.mkdtemp())
+    out, multi_out = tmp / "deck.pptx", tmp / "multi.pptx"
     try:
         with sync_playwright() as p:
             b = p.chromium.launch()
@@ -101,6 +113,13 @@ def main() -> int:
                     story: story, onStatus: function(){}
                 })""", story)
             dl.value.save_as(str(out))
+            if multi_entry:
+                with pg.expect_download(timeout=30000) as dl2:
+                    pg.evaluate("""(a) => RappDeck.export({
+                        kind: "solution", entry: a.entry, slug: a.slug,
+                        story: null, onStatus: function(){}
+                    })""", {"entry": multi_entry, "slug": multi_slug})
+                dl2.value.save_as(str(multi_out))
             b.close()
     except Exception as e:                                   # noqa: BLE001
         check(False, "T-DECK-BUILD", f"the browser could not produce a deck: {e}")
@@ -118,15 +137,62 @@ def main() -> int:
                         if re.fullmatch(r"ppt/slides/slide\d+\.xml", n))
         check("[Content_Types].xml" in names and bool(slides),
               "T-DECK-OOXML", f"valid OOXML package with {len(slides)} slide(s)")
-        check(len(slides) >= 6, "T-DECK-SLIDES",
+        check(len(slides) >= 7, "T-DECK-SLIDES",
               f"{len(slides)} slides — title, what it is, overview, "
-              "walkthrough, setup, close")
+              "walkthrough, architecture, setup, close")
         xml = " ".join(z.read(n).decode("utf-8", "replace") for n in slides)
 
     def strip(t):
         return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", t))
 
     text = strip(xml)
+
+    # The end-to-end architecture is REQUIRED in every deck, and it is required
+    # even when the catalog cannot be reached — this deck is built from a
+    # synthetic entry that is in no catalog, so it exercises the derived path.
+    # Nobody buys a chat window; they buy the thing that sits in their estate.
+    check("Example architecture for" in text, "T-DECK-ARCH-REQUIRED",
+          "the deck carries the end-to-end architecture slide")
+    columns = ["Knowledge", "Processing", "User Interface", "Reporting"]
+    missing_cols = [c for c in columns if c not in text]
+    check(not missing_cols, "T-DECK-ARCH-COLUMNS",
+          "all four architecture columns present"
+          if not missing_cols else f"missing columns: {missing_cols}")
+    flow = ["Natural language input", "Preliminary checks",
+            "Formulates a plan", "NL response after guideline checks",
+            "Action taken in the system of record", "Feedback"]
+    missing_flow = [f for f in flow if f not in text]
+    check(not missing_flow, "T-DECK-ARCH-FLOW",
+          "the six-step request flow is numbered through the columns"
+          if not missing_flow else f"missing steps: {missing_flow}")
+    bands = ["Model Context Protocol", "Entra ID"]
+    missing_bands = [b_ for b_ in bands if b_ not in text]
+    check(not missing_bands, "T-DECK-ARCH-BANDS",
+          "tools and supporting-features bands present"
+          if not missing_bands else f"missing: {missing_bands}")
+
+    # The setup slide used to print "No configuration / None" over half a page
+    # of white. True, and useless to the person holding the deck.
+    check("No configuration" not in text, "T-DECK-NO-EMPTY-SETUP",
+          "the setup slide no longer answers with an empty page")
+    for phrase in ("Systems it connects to", "Who it is for"):
+        check(phrase in text, "T-DECK-JEWELS",
+              f"the setup slide carries {phrase!r} from the library catalogs")
+
+    if multi_entry:
+        with zipfile.ZipFile(multi_out) as z:
+            mslides = sorted(n for n in z.namelist()
+                             if re.fullmatch(r"ppt/slides/slide\d+\.xml", n))
+            mtext = strip(" ".join(z.read(n).decode("utf-8", "replace")
+                                   for n in mslides))
+        seen = mtext.count("Example architecture for")
+        check(seen == len(multi_inds), "T-DECK-ARCH-PER-INDUSTRY",
+              f"{multi_slug}: {seen} architecture slide(s) for "
+              f"{len(multi_inds)} industries {multi_inds}")
+        missing_ind = [i for i in multi_inds if i.upper() not in mtext.upper()]
+        check(not missing_ind, "T-DECK-ARCH-INDUSTRY-NAMED",
+              "each architecture slide names its industry"
+              if not missing_ind else f"unnamed: {missing_ind}")
     check("Get started on your agentic journey today" in text,
           "T-DECK-CTA", "the close carries the campaign call to action")
 

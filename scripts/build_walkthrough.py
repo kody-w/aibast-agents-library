@@ -161,10 +161,69 @@ SCENARIOS = {
 # the product supports; "OEE 71%" and "2,400 units/day" are not ours to assert.
 
 
+# Keyed by what the agent DOES. Chosen before the industry fallback, because
+# "manufacturing" describes the customer and "supplier risk" describes the job.
+WORKLOAD_SCENARIOS = {
+    "supply_risk": {
+        "subject": "the supplier base", "volume": "the active supplier list",
+        "target": "the continuity target", "metric": "exposure above tolerance",
+        "window": "the coming quarter", "driver": "a disrupted lane",
+        "systems": "the ERP, supplier records and delivery history",
+        "verb": "reduces supply exposure",
+    },
+    "care_gap": {
+        "subject": "the member panel", "volume": "the open care gaps",
+        "target": "the quality target", "metric": "gap closure behind plan",
+        "window": "the measurement year", "driver": "a widening quality gap",
+        "systems": "the record system, claims history and the care-gap registry",
+        "verb": "accelerates gap closure",
+    },
+    "authorisation": {
+        "subject": "the authorisation queue", "volume": "the pending requests",
+        "target": "the turnaround target", "metric": "decisions behind target",
+        "window": "the current period", "driver": "a rise in request volume",
+        "systems": "the policy criteria, the clinical record and prior decisions",
+        "verb": "shortens turnaround",
+    },
+    "service_desk": {
+        "subject": "the request queue", "volume": "the open tickets",
+        "target": "the response target", "metric": "response slower than target",
+        "window": "the coming month", "driver": "rising request volume",
+        "systems": "the ticket system, the knowledge base and asset records",
+        "verb": "shortens time to resolution",
+    },
+    "content": {
+        "subject": "the working brief", "volume": "the requests in hand",
+        "target": "the turnaround expected", "metric": "production slower than wanted",
+        "window": "the current sprint", "driver": "a rise in demand",
+        "systems": "the brief, the asset library and brand guidance",
+        "verb": "accelerates production",
+    },
+}
+
+WORKLOAD_WORDS = (
+    ("supply_risk", ("supplier", "supply", "sourcing", "procure", "vendor",
+                     "logistic", "shipment", "disruption")),
+    ("care_gap", ("care gap", "care-gap", "population health", "screening")),
+    ("authorisation", ("authorization", "authorisation", "prior auth", "approval",
+                       "underwrit", "permit", "eligibility")),
+    ("service_desk", ("ticket", "helpdesk", "help desk", "service desk", "incident",
+                      "escalation", "support")),
+    ("content", ("image", "art", "content", "creative", "copy", "design",
+                 "generat")),
+)
+
 def scenario_for(entry: dict) -> dict:
     inds = entry.get("industries") or ([str(entry["category"]).replace("_", " ")]
                                        if entry.get("category") else [])
     key = "teams"
+    # What it does beats where it lives.
+    job = " ".join(str(entry.get(f, "")) for f in
+                   ("display_name", "slug", "name", "description")).lower()
+    job += " " + " ".join(entry.get("tags") or [])
+    for bucket, words in WORKLOAD_WORDS:
+        if any(w in job for w in words):
+            return WORKLOAD_SCENARIOS[bucket]
     hay = " ".join(inds).lower()
     for bucket in SCENARIOS:
         if bucket != "teams" and bucket.replace("_", " ") in hay:
@@ -215,6 +274,19 @@ def tidy_clause(text: str) -> str:
     STOP = ("and", "or", "with", "from", "for", "to", "the", "a", "an",
             "of", "in", "on", "by", "that", "into")
     tail = text.strip()
+    # A truncated list is worse than a shorter phrase: cutting to a word count
+    # produced "Monitor supplier risk across quality, delivery, financial",
+    # which reads as a sentence that lost its ending. If the cut landed inside
+    # a comma list, drop back to the last complete item.
+    #
+    # Strip trailing punctuation FIRST: with a trailing comma still attached,
+    # the fragment after the last comma is empty, so the check removed nothing
+    # and the truncated list survived.
+    tail = tail.rstrip(",;:-. ")
+    if "," in tail and not tail.endswith(")"):
+        head, _, last = tail.rpartition(",")
+        if head and len(last.split()) <= 3:
+            tail = head
     if tail.count("(") > tail.count(")"):
         tail = tail.split("(")[0]
     if tail.count(")") > tail.count("("):
@@ -474,6 +546,11 @@ def findings_block(entry: dict) -> dict:
         "sections": [
             {"label": "Current position", "items": current},
             {"label": "What I checked", "items": checks[:4]},
+            {"label": "What I did not check", "items": [
+                "Anything outside " + sc["systems"],
+                "Changes made after this reading",
+                "Judgement calls that belong to a person",
+            ]},
         ],
         "callout": {
             # "conversion below target, against the conversion target" said
@@ -505,6 +582,11 @@ def risk_block(entry: dict) -> dict:
                 "Cite the record behind every line, so it can be checked",
                 "Flag low-evidence items rather than smoothing over them",
                 "Stop and ask before anything is written back",
+            ]},
+            {"label": "What would change my answer", "items": [
+                "A more recent reading from " + named[0],
+                "A correction to any record I cited",
+                "Context a person holds that the systems do not",
             ]},
         ],
         "callout": {
@@ -626,6 +708,16 @@ def narration_for(act: str, entry: dict, name: str, seconds: float) -> str:
              "that keeps the work on track",
              "When the detail is needed, they simply ask, and the agent quickly "
              "compiles a clear summary",
+             # The grammar gives the demo 63.7% of the film's words and narrates
+             # right through it; a storyboard-derived script was reaching only
+             # 52%, which put the demo act under the 45% floor. These lines are
+             # not padding — each one narrates a section that is on screen.
+             "It is explicit about what it did not read, so nobody mistakes a "
+             "gap in the sources for a clean result",
+             "It names what it needs from a person before anything is written "
+             "back, and who owns each step",
+             "And it says what would change its answer, which is the difference "
+             "between a briefing you can act on and one you have to re-check",
              f"It can {second[0].lower() + second[1:]} in the same conversation, "
              f"without anyone switching tools",
              "Finally, the agent creates a monitoring plan, so teams keep the "
@@ -691,7 +783,12 @@ def build(entry: dict) -> dict:
               # an unfinished template.
               "rich": {"intro": "Phased, quick wins first.",
                        "sections": [{"label": "Steps",
-                                     "items": plan_block(entry)}],
+                                     "items": plan_block(entry)},
+                                    {"label": "What this needs from you", "items": [
+                                        "Confirmation before anything is written back",
+                                        "A decision where the evidence is thin",
+                                        "The owner for each step",
+                                    ]}],
                        "callout": {"headline": ("Phased over " +
                                     scenario_for(entry)["window"] +
                                     ", starting with the quick wins"),
@@ -706,7 +803,7 @@ def build(entry: dict) -> dict:
               "rich": risk_block(entry),
               "agent_call": entry.get("tool_name") or entry.get("slug")},
          ],
-         "narration": narration_for("walkthrough", entry, name, 78.0)},
+         "narration": narration_for("walkthrough", entry, name, 100.0)},
         {"act": "close", "start": 113.5, "end": 132.4,
          "shot": "Dark card, gradient CTA panel",
          "narration": narration_for("close", entry, name, 17.0),
@@ -793,6 +890,35 @@ def entries_from_registry() -> list[dict]:
     return out
 
 
+def entries_from_onepagers(taken: set[str]) -> list[dict]:
+    """Library solutions that are not also registry agents.
+
+    Without these, a solution's exported deck is three slides shorter than an
+    agent's — no overview, no flow of work — for no reason other than where the
+    entry happens to live. The one-pager already carries everything the
+    storyboard is derived from.
+    """
+    f = REPO_ROOT / "data" / "onepagers.json"
+    if not f.is_file():
+        return []
+    out = []
+    for s in json.loads(f.read_text(encoding="utf-8"))["onepagers"]:
+        key = re.sub(r"[^a-z0-9]+", "", (s.get("display_name") or "").lower())
+        if key in taken:
+            continue  # the registry entry already gets one; two would disagree
+        out.append({
+            "slug": s["slug"], "kind": "solution", "ref": s["slug"],
+            "display_name": s.get("display_name"),
+            "description": s.get("summary") or s.get("lede"),
+            "category": re.sub(r"[^a-z0-9]+", "_",
+                               (s.get("industry") or "general").lower()),
+            "tool_name": s.get("display_name"),
+            "lede": s.get("lede"), "business_value": s.get("business_value"),
+            "featured_tools": s.get("featured_tools"),
+        })
+    return out
+
+
 def entries_from_aggregated() -> list[dict]:
     f = REPO_ROOT / "state" / "aggregated.json"
     if not f.is_file():
@@ -816,7 +942,10 @@ def main() -> int:
     ap.add_argument("--only", help="build one storyboard by slug")
     args = ap.parse_args()
 
-    entries = entries_from_registry() + entries_from_aggregated()
+    registry = entries_from_registry()
+    taken = {re.sub(r"[^a-z0-9]+", "", (e.get("display_name") or "").lower())
+             for e in registry}
+    entries = registry + entries_from_onepagers(taken) + entries_from_aggregated()
     if args.only:
         entries = [e for e in entries if args.only in e["slug"]]
     if not entries:
@@ -843,10 +972,11 @@ def main() -> int:
             if stale not in kept:
                 stale.unlink()
 
-    agents = sum(1 for e in entries if e["kind"] == "agent")
-    print(f"[rappvision] {len(entries)} storyboards "
-          f"({agents} agents, {len(entries) - agents} aggregated skills), "
-          f"{written} written")
+    by_kind: dict[str, int] = {}
+    for e in entries:
+        by_kind[e["kind"]] = by_kind.get(e["kind"], 0) + 1
+    kinds = ", ".join(f"{v} {k}" for k, v in sorted(by_kind.items()))
+    print(f"[rappvision] {len(entries)} storyboards ({kinds}), {written} written")
     return 0
 
 

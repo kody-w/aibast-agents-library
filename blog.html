@@ -6,103 +6,170 @@
 <title>Engineering Blog — RAPP Brainstem</title>
 <meta name="description" content="Engineering deep-dives on RAPP Brainstem design decisions and architecture.">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #0d1117; color: #e6edf3;
-    min-height: 100vh; padding: 48px 24px;
-    display: flex; flex-direction: column; align-items: center;
-  }
-  a { color: #58a6ff; text-decoration: none; }
-  a:hover { text-decoration: underline; }
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
+:root {
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
+  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
+}
+[data-theme="dark"] {
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
+  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { max-width: 100%; overflow-x: hidden; }
+body {
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+header.site {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+}
+.nav { display: flex; align-items: center; gap: 18px; padding: 12px 0; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; color: var(--text); white-space: nowrap; }
+.brand:hover { text-decoration: none; }
+.brand .mark { color: var(--accent); display: inline-flex; }
+.brand .mark svg { width: 19px; height: 19px; }
+.nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav-links a { color: var(--text-dim); font-size: 13.5px; padding: 5px 10px; border-radius: 8px; }
+.nav-links a:hover { color: var(--text); background: var(--panel-2); text-decoration: none; }
+.nav-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.icon-btn {
+  background: var(--panel); border: 1px solid var(--border); color: var(--text-dim);
+  width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.icon-btn svg { width: 15px; height: 15px; }
+.icon-btn:hover { color: var(--text); border-color: var(--text-faint); text-decoration: none; }
+footer.site { margin-top: 40px; border-top: 1px solid var(--border); padding: 26px 0 44px; }
+.foot { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--text-faint); }
+.foot a { color: var(--text-dim); }
+.foot .copy { width: 100%; margin-top: 4px; }
+@media (max-width: 560px) { .nav-links { order: 3; width: 100%; } }
+/* ══ page-specific ══════════════════════════════════════════════════════ */
+
   code {
-    font-family: "SF Mono", "Fira Code", monospace; font-size: 13px;
-    background: #161b22; padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace; font-size: 12.5px;
+    background: var(--panel-2); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 6px; color: var(--text-dim);
   }
   pre {
-    font-family: "SF Mono", "Fira Code", monospace; font-size: 13px;
-    background: #161b22; border: 1px solid #21262d; border-radius: 8px;
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace; font-size: 12.5px;
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 16px 20px; overflow-x: auto; margin: 16px 0; line-height: 1.6;
-    color: #c9d1d9;
+    color: var(--text-dim);
   }
+  pre code { background: none; border: none; padding: 0; }
 
-  .container { max-width: 720px; width: 100%; }
+  .container { max-width: 780px; margin: 0 auto; padding: 0 20px 20px; }
 
-  .nav {
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 48px; font-size: 14px;
-  }
-  .nav .back { color: #8b949e; }
-  .nav .sep { color: #30363d; }
-
-  .page-header { margin-bottom: 48px; }
-  .page-header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
-  .page-header p { color: #8b949e; font-size: 16px; }
+  .page-header { padding: 56px 0 34px; }
+  .page-header h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; letter-spacing: -.02em; line-height: 1.14; margin-bottom: 12px; }
+  .page-header p { color: var(--text-dim); font-size: 16.5px; max-width: 66ch; }
 
   .post {
-    background: #161b22; border: 1px solid #21262d; border-radius: 12px;
-    margin-bottom: 32px; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow); margin-bottom: 22px; overflow: hidden;
   }
-  .post-header {
-    padding: 24px 28px; border-bottom: 1px solid #21262d;
-  }
-  .post-header h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-  .post-meta {
-    display: flex; align-items: center; gap: 16px;
-    font-size: 13px; color: #8b949e;
-  }
+  .post-header { padding: 22px 26px; border-bottom: 1px solid var(--border); }
+  .post-header h2 { font-size: 21px; font-weight: 700; letter-spacing: -.015em; margin-bottom: 8px; }
+  .post-meta { display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: var(--text-faint); flex-wrap: wrap; }
   .post-meta .tag {
-    font-size: 11px; font-weight: 600; padding: 3px 10px;
-    border-radius: 12px; background: #1f6feb33; color: #58a6ff;
-    border: 1px solid #1f6feb;
+    font-size: 11px; font-weight: 650; padding: 2px 10px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
   }
-  .post-body {
-    padding: 28px;
+  .post-body { padding: 26px; }
+  .post-body p { font-size: 15px; line-height: 1.75; color: var(--text-dim); margin-bottom: 18px; }
+  .post-body h2, .post-body h3, .post-body h4 {
+    font-size: 17px; font-weight: 700; letter-spacing: -.01em;
+    margin-bottom: 12px; margin-top: 8px; color: var(--text);
   }
-  .post-body p {
-    font-size: 15px; line-height: 1.75; color: #c9d1d9; margin-bottom: 20px;
-  }
-  .post-body h3 {
-    font-size: 17px; font-weight: 600; margin-bottom: 12px; margin-top: 8px;
-    color: #e6edf3;
-  }
-  .post-body ul {
-    margin: 0 0 20px 20px; font-size: 15px; line-height: 1.75; color: #c9d1d9;
+  .post-body ul, .post-body ol { margin: 0 0 18px 20px; font-size: 15px; line-height: 1.75; color: var(--text-dim); }
+  .post-body blockquote {
+    border-left: 3px solid var(--accent-2); background: var(--panel-2);
+    padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 18px 0; font-size: 14px; color: var(--text-dim);
   }
   .post-body .callout {
-    background: #1f6feb1a; border-left: 3px solid #1f6feb;
-    padding: 14px 18px; border-radius: 0 8px 8px 0;
-    margin: 20px 0; font-size: 14px; color: #c9d1d9; line-height: 1.6;
+    background: var(--accent-soft); border-left: 3px solid var(--accent);
+    padding: 14px 18px; border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 18px 0; font-size: 14px; color: var(--text-dim); line-height: 1.6;
   }
-  .post-body .callout strong { color: #58a6ff; }
+  .post-body .callout strong { color: var(--text); }
   .post-body .diagram {
-    background: #0d1117; border: 1px solid #21262d; border-radius: 8px;
-    padding: 20px; margin: 20px 0; text-align: center;
-    font-family: "SF Mono", "Fira Code", monospace; font-size: 13px;
-    line-height: 1.8; color: #8b949e; white-space: pre;
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; margin: 18px 0; text-align: center; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace; font-size: 12.5px;
+    line-height: 1.8; color: var(--text-faint); white-space: pre;
   }
-
-  .links {
-    margin-top: 32px; text-align: center; font-size: 13px; color: #484f58;
-  }
-  .links a { margin: 0 12px; }
 </style>
 </head>
 <body>
 
+<!-- ══ shared site header — identical on every page ══ -->
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="agents.html">Library</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+<script>
+/* Shared theme switch. Light is the default everywhere; dark is opt-in and
+   remembered. Runs inline so the choice applies before the page paints. */
+(function () {
+  var r = document.documentElement, s = null;
+  try { s = localStorage.getItem("aibast-theme"); } catch (e) {}
+  if (s === "dark") r.setAttribute("data-theme", "dark");
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var dark = r.getAttribute("data-theme") === "dark";
+    if (dark) r.removeAttribute("data-theme"); else r.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("aibast-theme", dark ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
 <div class="container">
 
-  <div class="nav">
-    <a class="back" href="index.html">← Home</a>
-    <span class="sep">/</span>
-    <a href="release-notes.html">Release Notes</a>
-    <span class="sep">/</span>
-    <span>Engineering Blog</span>
-  </div>
-
   <div class="page-header">
-    <h1>Field Notes from the Frontier</h1>
-    <p>How ms-rapp is actually built — decisions, defects, and the lexicon that comes out of the work. <a href="api/v1/blog/feed.json">Subscribe (JSON Feed)</a> · <a href="api/v1/blog/index.json">API</a></p>
+    <h1>Field notes from the frontier</h1>
+    <p>How this is actually built — the decisions, the defects, and the vocabulary that comes out of the work. <a href="api/v1/blog/feed.json">Subscribe</a> · <a href="release-notes.html">Release notes</a></p>
   </div>
 
   <!-- Posts published as Markdown in blog/ render here automatically. -->
@@ -373,11 +440,24 @@ def login_poll():
 
 </div>
 
-<div class="links">
-  <a href="index.html">Home</a>
-  <a href="release-notes.html">Release Notes</a>
-  <a href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
-</div>
+<!-- ══ shared site footer — identical on every page ══ -->
+<footer class="site">
+  <div class="wrap foot">
+    <a href="index.html">Get started</a>
+    <a href="agents.html">Library</a>
+    <a href="solutions.html">Solutions</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="metrics.html">Metrics</a>
+    <a href="api.html">Static API</a>
+    <a href="scan.html">Scan</a>
+    <a href="wall.html">Wall of Fame</a>
+    <a href="brain.html">Docs Vault</a>
+    <a href="blog.html">Field Notes</a>
+    <a href="vbrainstem/">Run in your browser</a>
+    <a href="DISCLAIMER.md">Disclaimer</a>
+    <span class="copy">© 2026 Microsoft AIBAST. Some rights reserved. MIT-licensed, community-driven.</span>
+  </div>
+</footer>
 
 
 <script>

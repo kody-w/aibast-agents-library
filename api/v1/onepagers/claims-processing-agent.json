@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-06T00:35:22.075942+00:00",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
   "onepager": {
     "capture_file": "36-claims-processing-agent.html",
     "industry": "Financial Services",
@@ -45,7 +45,8 @@
       "slug": "claims-processing-agent",
       "hosted": true,
       "src": "media/videos/claims-processing-agent.mp4",
-      "size_mb": 4.17
+      "source": "branch",
+      "size_mb": null
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=claims-processing-agent"

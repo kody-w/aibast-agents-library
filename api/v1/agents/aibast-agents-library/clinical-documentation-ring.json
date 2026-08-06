@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/clinical-documentation-ring",
+    "version": "1.0.0",
+    "display_name": "Clinical Documentation Agent",
+    "description": "Assembles clinical documentation for review, checks each entry against its source in the record, and reports coding and governance gaps rather than filling them.",
+    "author": "AIBAST",
+    "tags": [
+      "clinical",
+      "documentation",
+      "coding",
+      "governance",
+      "healthcare"
+    ],
+    "category": "healthcare",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+  "size_kb": 7.9,
+  "lines": 177,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/clinical-documentation-ring",
+  "engagement": null
+}

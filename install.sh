@@ -398,10 +398,29 @@ install_brainstem() {
             [ -d "$DATA_DIR" ] && cp -R "$DATA_DIR" "$FRESH_BACKUP/.brainstem_data" 2>/dev/null || true
         fi
         rm -rf "$BRAINSTEM_HOME/src" 2>/dev/null || true
-        git clone --quiet "$REPO_URL" "$BRAINSTEM_HOME/src"
+        # Shallow by default. The library carries no video or live-action
+        # assets, so the current tree is small — but the HISTORY still holds
+        # every blob ever committed, and a full clone pulls all of it. Depth 1
+        # fetches only the tip, which is the whole point of stripping them.
+        # Pinning needs real history, so that path deepens on demand below.
+        # Sparse as well as shallow. The installer only ever reads
+        # rapp_brainstem/ — the agent library, the static API, the docs and the
+        # film kit are never touched, and expanding the whole tree onto a user's
+        # disk to use 1.5 MB of it is space they did not ask to give up.
+        # Falls back to a plain clone on a git too old for sparse-checkout.
+        if git clone --quiet --depth 1 --filter=blob:none --sparse \
+                "$REPO_URL" "$BRAINSTEM_HOME/src" 2>/dev/null; then
+            ( cd "$BRAINSTEM_HOME/src" && git sparse-checkout set rapp_brainstem >/dev/null 2>&1 ) || true
+        else
+            git clone --quiet --depth 1 "$REPO_URL" "$BRAINSTEM_HOME/src"
+        fi
         # If pinning, checkout the specific tag after clone (accepts every tag form).
         if [ -n "$PIN_VERSION" ]; then
             cd "$BRAINSTEM_HOME/src"
+            # A depth-1 clone has no tags and no history to resolve them
+            # against, so pinning has to buy back what the shallow clone
+            # skipped. Only this path pays that cost.
+            git fetch --unshallow --quiet 2>/dev/null || true
             git fetch origin --tags --quiet 2>/dev/null || true
             TAG_REF=""
             for cand in "$PIN_VERSION" "v${PIN_VERSION#v}" "brainstem-${PIN_VERSION#v}" "brainstem-v${PIN_VERSION#v}"; do

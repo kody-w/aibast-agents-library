@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-categories/1.0",
-  "generated": "2026-08-04T19:28:47.237947+00:00",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
   "count": 14,
   "categories": [
     {
@@ -229,7 +229,7 @@
     },
     {
       "id": "financial_services",
-      "agents": 10,
+      "agents": 11,
       "items": [
         {
           "name": "@aibast-agents-library/claims-processing",
@@ -262,6 +262,11 @@
           "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/loan-origination-assistant.json"
         },
         {
+          "name": "@aibast-agents-library/multi-entity-finance-ops",
+          "display_name": "Multi-Entity Finance Operations Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/multi-entity-finance-ops.json"
+        },
+        {
           "name": "@aibast-agents-library/portfolio-rebalancing",
           "display_name": "Portfolio Rebalancing Agent",
           "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/portfolio-rebalancing.json"
@@ -285,7 +290,7 @@
     },
     {
       "id": "general",
-      "agents": 23,
+      "agents": 24,
       "items": [
         {
           "name": "@aibast-agents-library/art-generator",
@@ -326,6 +331,11 @@
           "name": "@aibast-agents-library/customer-360",
           "display_name": "Customer 360",
           "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/customer-360.json"
+        },
+        {
+          "name": "@aibast-agents-library/editorial-market-intelligence",
+          "display_name": "Editorial & Market Intelligence Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/editorial-market-intelligence.json"
         },
         {
           "name": "@aibast-agents-library/email-drafting",
@@ -406,12 +416,17 @@
     },
     {
       "id": "healthcare",
-      "agents": 5,
+      "agents": 6,
       "items": [
         {
           "name": "@aibast-agents-library/care-gap-closure",
           "display_name": "Care Gap Closure Agent",
           "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/care-gap-closure.json"
+        },
+        {
+          "name": "@aibast-agents-library/clinical-documentation-ring",
+          "display_name": "Clinical Documentation Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/clinical-documentation-ring.json"
         },
         {
           "name": "@aibast-agents-library/clinical-notes-summarizer",
@@ -437,12 +452,17 @@
     },
     {
       "id": "human_resources",
-      "agents": 1,
+      "agents": 2,
       "items": [
         {
           "name": "@aibast-agents-library/ask-hr",
           "display_name": "Ask HR",
           "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/ask-hr.json"
+        },
+        {
+          "name": "@aibast-agents-library/frontline-coaching",
+          "display_name": "Frontline Coaching Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/frontline-coaching.json"
         }
       ]
     },
@@ -459,8 +479,13 @@
     },
     {
       "id": "manufacturing",
-      "agents": 5,
+      "agents": 6,
       "items": [
+        {
+          "name": "@aibast-agents-library/asset-reliability-standards",
+          "display_name": "Asset Reliability & Standards Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/asset-reliability-standards.json"
+        },
         {
           "name": "@aibast-agents-library/inventory-rebalancing",
           "display_name": "Inventory Rebalancing Agent",
@@ -490,7 +515,7 @@
     },
     {
       "id": "professional_services",
-      "agents": 5,
+      "agents": 6,
       "items": [
         {
           "name": "@aibast-agents-library/client-health-score",
@@ -506,6 +531,11 @@
           "name": "@aibast-agents-library/proposal-copilot",
           "display_name": "Proposal Copilot Agent",
           "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/proposal-copilot.json"
+        },
+        {
+          "name": "@aibast-agents-library/rd-discovery-requirements",
+          "display_name": "R&D Discovery & Requirements Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/rd-discovery-requirements.json"
         },
         {
           "name": "@aibast-agents-library/resource-utilization",
@@ -552,7 +582,7 @@
     },
     {
       "id": "slg_government",
-      "agents": 5,
+      "agents": 6,
       "items": [
         {
           "name": "@aibast-agents-library/building-permit-processing",
@@ -573,6 +603,11 @@
           "name": "@aibast-agents-library/slg-grants-management",
           "display_name": "SLG Grants Management Agent",
           "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/slg-grants-management.json"
+        },
+        {
+          "name": "@aibast-agents-library/regulated-document-drafting",
+          "display_name": "Regulated Document Drafting Agent",
+          "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/regulated-document-drafting.json"
         },
         {
           "name": "@aibast-agents-library/utility-billing-assistance",

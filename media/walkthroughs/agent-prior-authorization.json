@@ -7,39 +7,39 @@
       {
         "path": "scenario.subject",
         "label": "What the demo is about",
-        "value": "the member panel"
+        "value": "the authorisation queue"
       },
       {
         "path": "scenario.driver",
         "label": "What is driving the work",
-        "value": "a widening quality gap"
+        "value": "a rise in request volume"
       },
       {
         "path": "scenario.systems",
         "label": "Systems it reads",
-        "value": "the record system, claims history and the care-gap registry"
+        "value": "the policy criteria, the clinical record and prior decisions"
       },
       {
         "path": "scenario.window",
         "label": "Timeframe",
-        "value": "the measurement year"
+        "value": "the current period"
       }
     ],
     "scenario": {
-      "subject": "the member panel",
-      "volume": "the open care gaps",
-      "target": "the quality target",
-      "metric": "gap closure behind plan",
-      "window": "the measurement year",
-      "driver": "a widening quality gap",
-      "systems": "the record system, claims history and the care-gap registry",
-      "verb": "accelerates gap closure"
+      "subject": "the authorisation queue",
+      "volume": "the pending requests",
+      "target": "the turnaround target",
+      "metric": "decisions behind target",
+      "window": "the current period",
+      "driver": "a rise in request volume",
+      "systems": "the policy criteria, the clinical record and prior decisions",
+      "verb": "shortens turnaround"
     },
     "how": "Replace the scenario below with your own customer's and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim.",
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:55+00:00",
   "subject": {
     "slug": "prior-authorization",
     "kind": "agent",
@@ -100,21 +100,21 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Automate insurance approval workflows to accelerate authorization processes for the member panel \u2014 we're looking at a widening quality gap."
+          "text": "Automate insurance approval workflows to accelerate authorization processes for the authorisation queue \u2014 we're looking at a rise in request volume."
         },
         {
           "role": "agent",
           "heading": "Prior Authorization Agent",
           "rich": {
-            "intro": "I'll accelerate authorization processes for the member panel, working against a widening quality gap. Reading the record system, claims history and the care-gap registry before I propose anything.",
+            "intro": "I'll accelerate authorization processes for the authorisation queue, working against a rise in request volume. Reading the policy criteria, the clinical record and prior decisions before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
                 "items": [
-                  "Scope: the open care gaps",
-                  "Current: gap closure behind plan",
-                  "Goal: close the gap to the quality target",
-                  "Window: the measurement year"
+                  "Scope: the pending requests",
+                  "Current: decisions behind target",
+                  "Goal: close the gap to the turnaround target",
+                  "Window: the current period"
                 ]
               },
               {
@@ -123,11 +123,19 @@
                   "Microsoft Teams \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
                 ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside the policy criteria, the clinical record and prior decisions",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
+                ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: gap closure behind plan",
-              "source": "Source: the record system, claims history and the care-gap registry",
+              "headline": "Biggest constraint: decisions behind target",
+              "source": "Source: the policy criteria, the clinical record and prior decisions",
               "question": "Shall I show the plan?"
             }
           },
@@ -152,10 +160,18 @@
                   "4. Confirm the result against the source system",
                   "5. Hand back the artifact, and the reasoning behind it"
                 ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
+                ]
               }
             ],
             "callout": {
-              "headline": "Phased over the measurement year, starting with the quick wins",
+              "headline": "Phased over the current period, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -170,7 +186,7 @@
           "role": "agent",
           "heading": "Risks and how I would cover them",
           "rich": {
-            "intro": "Three things I would watch on the member panel.",
+            "intro": "Three things I would watch on the authorisation queue.",
             "sections": [
               {
                 "label": "Risks",
@@ -187,18 +203,26 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from Microsoft Teams",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
               "headline": "You approve each step; nothing changes on its own",
-              "source": "Source: the record system, claims history and the care-gap registry",
+              "source": "Source: the policy criteria, the clinical record and prior decisions",
               "question": "Want me to start with the quick wins?"
             }
           },
           "agent_call": "Prior Authorization Agent"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can improve documentation accuracy in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Prior Authorization Agent, care teams get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across Microsoft Teams, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can improve documentation accuracy in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on."
     },
     {
       "act": "close",

@@ -7,39 +7,39 @@
       {
         "path": "scenario.subject",
         "label": "What the demo is about",
-        "value": "the region"
+        "value": "the supplier base"
       },
       {
         "path": "scenario.driver",
         "label": "What is driving the work",
-        "value": "a promotional lift"
+        "value": "a disrupted lane"
       },
       {
         "path": "scenario.systems",
         "label": "Systems it reads",
-        "value": "the ERP, point of sale and the demand forecast"
+        "value": "the ERP, supplier records and delivery history"
       },
       {
         "path": "scenario.window",
         "label": "Timeframe",
-        "value": "the promotional period"
+        "value": "the coming quarter"
       }
     ],
     "scenario": {
-      "subject": "the region",
-      "volume": "the store estate",
-      "target": "the availability target",
-      "metric": "availability below target",
-      "window": "the promotional period",
-      "driver": "a promotional lift",
-      "systems": "the ERP, point of sale and the demand forecast",
-      "verb": "improves availability"
+      "subject": "the supplier base",
+      "volume": "the active supplier list",
+      "target": "the continuity target",
+      "metric": "exposure above tolerance",
+      "window": "the coming quarter",
+      "driver": "a disrupted lane",
+      "systems": "the ERP, supplier records and delivery history",
+      "verb": "reduces supply exposure"
     },
     "how": "Replace the scenario below with your own customer's and this stops being a generic demo and becomes yours. The acts, timings, and the Agent Calls line stay fixed \u2014 those are the format and the checkable claim.",
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:55+00:00",
   "subject": {
     "slug": "supply-chain-disruption-alert",
     "kind": "agent",
@@ -70,7 +70,7 @@
       "end": 22.0,
       "shot": "B-roll \u2014 modern workplace: focused individual work at a laptop",
       "on_screen": [],
-      "narration": "There's an agent to guide retail cpg teams through these processes. It pulls data from The ERP and Point of sale."
+      "narration": "There's an agent to guide retail cpg teams through these processes. It pulls data from The ERP and Supplier records, engages you directly in Microsoft Teams."
     },
     {
       "act": "overview",
@@ -80,18 +80,18 @@
       "panels": {
         "Sources": [
           "The ERP",
-          "Point of sale",
-          "The demand forecast"
+          "Supplier records",
+          "Delivery history"
         ],
         "Flow of work": [
           "Engages you in Microsoft Teams and Outlook"
         ],
         "Actions": [
-          "Monitor supply chain networks for disruption events, performs risk",
+          "Monitor supply chain networks for disruption events",
           "Generate mitigation playbooks"
         ]
       },
-      "narration": "Let's say a manager needs to monitor supply chain networks for disruption events, performs risk. Before, they would have needed to jump across multiple systems to manually gather insights, and automatically highlight what needs attention first."
+      "narration": "Let's say a manager needs to monitor supply chain networks for disruption events. Before, they would have needed to jump across multiple systems to manually gather insights, and automatically highlight what needs attention first."
     },
     {
       "act": "walkthrough",
@@ -101,36 +101,44 @@
       "turns": [
         {
           "role": "operator",
-          "text": "Monitor supply chain networks for disruption events for the region \u2014 we're looking at a promotional lift."
+          "text": "Monitor supply chain networks for disruption events for the supplier base \u2014 we're looking at a disrupted lane."
         },
         {
           "role": "agent",
           "heading": "Supply Chain Disruption Alert Agent",
           "rich": {
-            "intro": "I'll monitor supply chain networks for disruption events, performs risk for the region, working against a promotional lift. Reading the ERP, point of sale and the demand forecast before I propose anything.",
+            "intro": "I'll monitor supply chain networks for disruption events for the supplier base, working against a disrupted lane. Reading the ERP, supplier records and delivery history before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
                 "items": [
-                  "Scope: the store estate",
-                  "Current: availability below target",
-                  "Goal: close the gap to the availability target",
-                  "Window: the promotional period"
+                  "Scope: the active supplier list",
+                  "Current: exposure above tolerance",
+                  "Goal: close the gap to the continuity target",
+                  "Window: the coming quarter"
                 ]
               },
               {
                 "label": "What I checked",
                 "items": [
                   "The ERP \u2014 read, not assumed",
-                  "Point of sale \u2014 read, not assumed",
-                  "The demand forecast \u2014 read, not assumed",
+                  "Supplier records \u2014 read, not assumed",
+                  "Delivery history \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
+                ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside the ERP, supplier records and delivery history",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
                 ]
               }
             ],
             "callout": {
-              "headline": "Biggest constraint: availability below target",
-              "source": "Source: the ERP, point of sale and the demand forecast",
+              "headline": "Biggest constraint: exposure above tolerance",
+              "source": "Source: the ERP, supplier records and delivery history",
               "question": "Shall I show the plan?"
             }
           },
@@ -149,15 +157,23 @@
               {
                 "label": "Steps",
                 "items": [
-                  "1. Monitor supply chain networks for disruption events, performs risk",
+                  "1. Monitor supply chain networks for disruption events",
                   "2. Generate mitigation playbooks",
                   "3. Confirm the result against the source system",
                   "4. Hand back the artifact, and the reasoning behind it"
                 ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
+                ]
               }
             ],
             "callout": {
-              "headline": "Phased over the promotional period, starting with the quick wins",
+              "headline": "Phased over the coming quarter, starting with the quick wins",
               "source": "Nothing is written back without confirmation",
               "question": "Approve and I'll proceed."
             }
@@ -172,7 +188,7 @@
           "role": "agent",
           "heading": "Risks and how I would cover them",
           "rich": {
-            "intro": "Three things I would watch on the region.",
+            "intro": "Three things I would watch on the supplier base.",
             "sections": [
               {
                 "label": "Risks",
@@ -189,18 +205,26 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from The ERP",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
               "headline": "You approve each step; nothing changes on its own",
-              "source": "Source: the ERP, point of sale and the demand forecast",
+              "source": "Source: the ERP, supplier records and delivery history",
               "question": "Want me to start with the quick wins?"
             }
           },
           "agent_call": "Supply Chain Disruption Alert Agent"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across The ERP and Point of sale, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can generate mitigation playbooks in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Supply Chain Disruption Alert Agent, retail cpg teams get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across The ERP and Supplier records, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can generate mitigation playbooks in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on."
     },
     {
       "act": "close",

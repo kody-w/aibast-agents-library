@@ -1,0 +1,29 @@
+{
+ "provider": "azure",
+ "voice": "en-US-AndrewMultilingualNeural",
+ "region": "eastus",
+ "slots": 9,
+ "engine_per_slot": {
+  "vo01": "azure",
+  "vo02": "azure",
+  "vo03": "azure",
+  "vo04": "azure",
+  "vo05": "azure",
+  "vo06": "azure",
+  "vo_payoff": "azure",
+  "vo_helps": "azure",
+  "vo_cta": "azure"
+ },
+ "rate_per_slot": {
+  "vo01": null,
+  "vo02": null,
+  "vo03": null,
+  "vo04": null,
+  "vo05": null,
+  "vo06": null,
+  "vo_payoff": null,
+  "vo_helps": null,
+  "vo_cta": null
+ },
+ "written_by": "film/kit/narrate.py"
+}

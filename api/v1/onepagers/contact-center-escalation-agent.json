@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
   "onepager": {
     "capture_file": "04-contact-center-escalation-agent.html",
     "industry": "Cross-Industry",
@@ -36,7 +36,8 @@
       "slug": "customer-escalations-agent",
       "hosted": true,
       "src": "media/videos/customer-escalations-agent.mp4",
-      "size_mb": 2.46
+      "source": "branch",
+      "size_mb": null
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=contact-center-escalation-agent"

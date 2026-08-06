@@ -1,7 +1,7 @@
 {
   "schema": "aibast-api-agents/1.0",
-  "generated": "2026-08-05T16:52:41.645660+00:00",
-  "count": 105,
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "count": 112,
   "agents": [
     {
       "name": "@aibast-agents-library/art-generator",
@@ -1479,6 +1479,32 @@
       }
     },
     {
+      "name": "@aibast-agents-library/multi-entity-finance-ops",
+      "display_name": "Multi-Entity Finance Operations Agent",
+      "version": "1.0.0",
+      "description": "Consolidates period-end across multiple entities, currencies and ledgers, reconciles intercompany positions, and reports every balance it could not tie with the reason it could not.",
+      "author": "AIBAST",
+      "category": "financial_services",
+      "tags": [
+        "finance",
+        "consolidation",
+        "multi-currency",
+        "intercompany",
+        "close"
+      ],
+      "quality_tier": "verified",
+      "requires_env": [],
+      "file": "agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+      "size_kb": 8.2,
+      "lines": 183,
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+      "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+      "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+      "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/multi-entity-finance-ops.json",
+      "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/multi-entity-finance-ops",
+      "engagement": null
+    },
+    {
       "name": "@aibast-agents-library/portfolio-rebalancing",
       "display_name": "Portfolio Rebalancing Agent",
       "version": "1.0.0",
@@ -1826,6 +1852,32 @@
         "comments": 0,
         "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/24"
       }
+    },
+    {
+      "name": "@aibast-agents-library/editorial-market-intelligence",
+      "display_name": "Editorial & Market Intelligence Agent",
+      "version": "1.0.0",
+      "description": "Scans a watched source set for emerging stories and market signals, clusters them by theme, and separates corroborated findings from single-sourced ones before briefing.",
+      "author": "AIBAST",
+      "category": "general",
+      "tags": [
+        "editorial",
+        "research",
+        "market-intelligence",
+        "media",
+        "briefing"
+      ],
+      "quality_tier": "verified",
+      "requires_env": [],
+      "file": "agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+      "size_kb": 8.1,
+      "lines": 179,
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+      "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+      "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/editorial_market_intelligence_stack/editorial_market_intelligence_agent.py",
+      "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/editorial-market-intelligence.json",
+      "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/editorial-market-intelligence",
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/email-drafting",
@@ -2330,6 +2382,32 @@
       }
     },
     {
+      "name": "@aibast-agents-library/clinical-documentation-ring",
+      "display_name": "Clinical Documentation Agent",
+      "version": "1.0.0",
+      "description": "Assembles clinical documentation for review, checks each entry against its source in the record, and reports coding and governance gaps rather than filling them.",
+      "author": "AIBAST",
+      "category": "healthcare",
+      "tags": [
+        "clinical",
+        "documentation",
+        "coding",
+        "governance",
+        "healthcare"
+      ],
+      "quality_tier": "verified",
+      "requires_env": [],
+      "file": "agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+      "size_kb": 7.9,
+      "lines": 177,
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+      "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+      "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/healthcare_stacks/clinical_documentation_ring_stack/clinical_documentation_ring_agent.py",
+      "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/clinical-documentation-ring.json",
+      "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/clinical-documentation-ring",
+      "engagement": null
+    },
+    {
       "name": "@aibast-agents-library/clinical-notes-summarizer",
       "display_name": "Clinical Notes Summarizer Agent",
       "version": "1.0.0",
@@ -2489,6 +2567,32 @@
       }
     },
     {
+      "name": "@aibast-agents-library/frontline-coaching",
+      "display_name": "Frontline Coaching Agent",
+      "version": "1.0.0",
+      "description": "Summarises observed frontline interactions against the coaching framework in use, drafts the one-to-one record, and separates what was observed from what was inferred.",
+      "author": "AIBAST",
+      "category": "human_resources",
+      "tags": [
+        "coaching",
+        "one-to-one",
+        "frontline",
+        "quality",
+        "contact-center"
+      ],
+      "quality_tier": "verified",
+      "requires_env": [],
+      "file": "agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+      "size_kb": 8.2,
+      "lines": 183,
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+      "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+      "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/human_resources_stacks/frontline_coaching_stack/frontline_coaching_agent.py",
+      "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/frontline-coaching.json",
+      "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/frontline-coaching",
+      "engagement": null
+    },
+    {
       "name": "@aibast-agents-library/it-helpdesk",
       "display_name": "IT Helpdesk",
       "version": "1.0.0",
@@ -2518,6 +2622,32 @@
         "comments": 0,
         "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/50"
       }
+    },
+    {
+      "name": "@aibast-agents-library/asset-reliability-standards",
+      "display_name": "Asset Reliability & Standards Agent",
+      "version": "1.0.0",
+      "description": "Correlates asset condition history with the governing engineering standard, flags where practice has drifted from specification, and sequences the interventions the standard requires.",
+      "author": "AIBAST",
+      "category": "manufacturing",
+      "tags": [
+        "reliability",
+        "maintenance",
+        "engineering-standards",
+        "asset",
+        "industrial"
+      ],
+      "quality_tier": "verified",
+      "requires_env": [],
+      "file": "agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+      "size_kb": 8.6,
+      "lines": 187,
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+      "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+      "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+      "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/asset-reliability-standards.json",
+      "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/asset-reliability-standards",
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/inventory-rebalancing",
@@ -2766,6 +2896,32 @@
         "comments": 0,
         "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/73"
       }
+    },
+    {
+      "name": "@aibast-agents-library/rd-discovery-requirements",
+      "display_name": "R&D Discovery & Requirements Agent",
+      "version": "1.0.0",
+      "description": "Searches prior internal work and published literature for what has already been attempted, then drafts the requirement or innovation record in the structure the review board expects.",
+      "author": "AIBAST",
+      "category": "professional_services",
+      "tags": [
+        "research",
+        "requirements",
+        "innovation",
+        "discovery",
+        "authoring"
+      ],
+      "quality_tier": "verified",
+      "requires_env": [],
+      "file": "agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+      "size_kb": 8.1,
+      "lines": 180,
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+      "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+      "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+      "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/rd-discovery-requirements.json",
+      "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/rd-discovery-requirements",
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/resource-utilization",
@@ -3109,6 +3265,32 @@
         "comments": 0,
         "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/85"
       }
+    },
+    {
+      "name": "@aibast-agents-library/regulated-document-drafting",
+      "display_name": "Regulated Document Drafting Agent",
+      "version": "1.0.0",
+      "description": "Drafts industry-regulated documents from an approved clause library, checks tone and taxonomy against the governing regime, and reports every clause it could not source.",
+      "author": "AIBAST",
+      "category": "slg_government",
+      "tags": [
+        "drafting",
+        "legal",
+        "tender",
+        "compliance",
+        "public-sector"
+      ],
+      "quality_tier": "verified",
+      "requires_env": [],
+      "file": "agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+      "size_kb": 8.5,
+      "lines": 184,
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+      "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+      "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+      "detail_url": "https://microsoft.github.io/aibast-agents-library/api/v1/agents/aibast-agents-library/regulated-document-drafting.json",
+      "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/regulated-document-drafting",
+      "engagement": null
     },
     {
       "name": "@aibast-agents-library/utility-billing-assistance",

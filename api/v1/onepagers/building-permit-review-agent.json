@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-onepager/1.0",
-  "generated": "2026-08-06T00:35:22.075942+00:00",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
   "onepager": {
     "capture_file": "44-building-permit-review-agent.html",
     "industry": "State & Local Government",
@@ -35,7 +35,8 @@
       "slug": "building-permit-processing-agent",
       "hosted": true,
       "src": "media/videos/building-permit-processing-agent.mp4",
-      "size_mb": 3.95
+      "source": "branch",
+      "size_mb": null
     }
   },
   "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=building-permit-review-agent"

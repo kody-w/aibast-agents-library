@@ -1,10 +1,10 @@
 {
   "schema": "aibast-api-walkthroughs/1.0",
-  "generated": "2026-08-06T00:35:22.075942+00:00",
+  "generated": "2026-08-06T03:41:48.938968+00:00",
   "format": "rappvision-walkthrough/1.0",
   "format_doc": "https://microsoft.github.io/aibast-agents-library/media/RAPPVISION.md",
   "note": "Storyboards, not footage. Generated deterministically from each entry's manifest; every figure a human must supply is marked rather than invented. Aggregated skills get the same treatment as authored agents \u2014 that is the point of aggregating here.",
-  "count": 183,
+  "count": 229,
   "walkthroughs": [
     {
       "slug": "account-intelligence-orchestrator",
@@ -106,6 +106,15 @@
       "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-asset-maintenance-forecast.json"
     },
     {
+      "slug": "asset-reliability-standards",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/asset-reliability-standards",
+      "display_name": "Asset Reliability & Standards Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-asset-reliability-standards.json"
+    },
+    {
       "slug": "building-permit-processing",
       "kind": "agent",
       "ref": "@aibast-agents-library/building-permit-processing",
@@ -167,6 +176,15 @@
       "runtime_seconds": 132.4,
       "status": "storyboard",
       "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-client-health-score.json"
+    },
+    {
+      "slug": "clinical-documentation-ring",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/clinical-documentation-ring",
+      "display_name": "Clinical Documentation Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-clinical-documentation-ring.json"
     },
     {
       "slug": "clinical-notes-summarizer",
@@ -304,6 +322,15 @@
       "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-dynamics-365-connector.json"
     },
     {
+      "slug": "editorial-market-intelligence",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/editorial-market-intelligence",
+      "display_name": "Editorial & Market Intelligence Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-editorial-market-intelligence.json"
+    },
+    {
       "slug": "email-drafting",
       "kind": "agent",
       "ref": "@aibast-agents-library/email-drafting",
@@ -383,6 +410,15 @@
       "runtime_seconds": 132.4,
       "status": "storyboard",
       "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-fraud-detection-alert.json"
+    },
+    {
+      "slug": "frontline-coaching",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/frontline-coaching",
+      "display_name": "Frontline Coaching Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-frontline-coaching.json"
     },
     {
       "slug": "fs-customer-onboarding",
@@ -500,6 +536,15 @@
       "runtime_seconds": 132.4,
       "status": "storyboard",
       "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-mission-reporting-assistant.json"
+    },
+    {
+      "slug": "multi-entity-finance-ops",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/multi-entity-finance-ops",
+      "display_name": "Multi-Entity Finance Operations Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-multi-entity-finance-ops.json"
     },
     {
       "slug": "next-best-action",
@@ -662,6 +707,24 @@
       "runtime_seconds": 132.4,
       "status": "storyboard",
       "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-proposal-generation.json"
+    },
+    {
+      "slug": "rd-discovery-requirements",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/rd-discovery-requirements",
+      "display_name": "R&D Discovery & Requirements Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-rd-discovery-requirements.json"
+    },
+    {
+      "slug": "regulated-document-drafting",
+      "kind": "agent",
+      "ref": "@aibast-agents-library/regulated-document-drafting",
+      "display_name": "Regulated Document Drafting Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/agent-regulated-document-drafting.json"
     },
     {
       "slug": "regulatory-compliance-fed",
@@ -1652,6 +1715,357 @@
       "runtime_seconds": 132.4,
       "status": "storyboard",
       "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/skill-work_brief.json"
+    },
+    {
+      "slug": "abandoned-cart-recovery-agent",
+      "kind": "solution",
+      "ref": "abandoned-cart-recovery-agent",
+      "display_name": "Abandoned Cart Recovery Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-abandoned-cart-recovery-agent.json"
+    },
+    {
+      "slug": "account-research-agent",
+      "kind": "solution",
+      "ref": "account-research-agent",
+      "display_name": "Account Research Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-account-research-agent.json"
+    },
+    {
+      "slug": "branch-banking-advisory-agent",
+      "kind": "solution",
+      "ref": "branch-banking-advisory-agent",
+      "display_name": "Branch Banking Advisory Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-branch-banking-advisory-agent.json"
+    },
+    {
+      "slug": "building-permit-review-agent",
+      "kind": "solution",
+      "ref": "building-permit-review-agent",
+      "display_name": "Building Permit Review Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-building-permit-review-agent.json"
+    },
+    {
+      "slug": "campaign-design-agent",
+      "kind": "solution",
+      "ref": "campaign-design-agent",
+      "display_name": "Campaign Design Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-campaign-design-agent.json"
+    },
+    {
+      "slug": "client-onboarding-agent",
+      "kind": "solution",
+      "ref": "client-onboarding-agent",
+      "display_name": "Client Onboarding Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-client-onboarding-agent.json"
+    },
+    {
+      "slug": "clinical-summary-agent",
+      "kind": "solution",
+      "ref": "clinical-summary-agent",
+      "display_name": "Clinical Summary Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-clinical-summary-agent.json"
+    },
+    {
+      "slug": "commercial-underwriting-agent",
+      "kind": "solution",
+      "ref": "commercial-underwriting-agent",
+      "display_name": "Commercial Underwriting Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-commercial-underwriting-agent.json"
+    },
+    {
+      "slug": "contact-center-escalation-agent",
+      "kind": "solution",
+      "ref": "contact-center-escalation-agent",
+      "display_name": "Contact Center Escalation Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-contact-center-escalation-agent.json"
+    },
+    {
+      "slug": "contract-review-agent",
+      "kind": "solution",
+      "ref": "contract-review-agent",
+      "display_name": "Contract Review Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-contract-review-agent.json"
+    },
+    {
+      "slug": "cross-channel-engagement-agent",
+      "kind": "solution",
+      "ref": "cross-channel-engagement-agent",
+      "display_name": "Cross-Channel Engagement Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-cross-channel-engagement-agent.json"
+    },
+    {
+      "slug": "energy-operations-agent-a",
+      "kind": "solution",
+      "ref": "energy-operations-agent-a",
+      "display_name": "Energy Operations Agent (a)",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-energy-operations-agent-a.json"
+    },
+    {
+      "slug": "energy-operations-agent-b",
+      "kind": "solution",
+      "ref": "energy-operations-agent-b",
+      "display_name": "Energy Operations Agent (b)",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-energy-operations-agent-b.json"
+    },
+    {
+      "slug": "energy-operations-agent-c",
+      "kind": "solution",
+      "ref": "energy-operations-agent-c",
+      "display_name": "Energy Operations Agent (c)",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-energy-operations-agent-c.json"
+    },
+    {
+      "slug": "energy-operations-agent-d",
+      "kind": "solution",
+      "ref": "energy-operations-agent-d",
+      "display_name": "Energy Operations Agent (d)",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-energy-operations-agent-d.json"
+    },
+    {
+      "slug": "expansion-opportunity-agent",
+      "kind": "solution",
+      "ref": "expansion-opportunity-agent",
+      "display_name": "Expansion Opportunity Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-expansion-opportunity-agent.json"
+    },
+    {
+      "slug": "hr-self-service-agent",
+      "kind": "solution",
+      "ref": "hr-self-service-agent",
+      "display_name": "HR Self-Service Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-hr-self-service-agent.json"
+    },
+    {
+      "slug": "inventory-optimization-agent",
+      "kind": "solution",
+      "ref": "inventory-optimization-agent",
+      "display_name": "Inventory Optimization Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-inventory-optimization-agent.json"
+    },
+    {
+      "slug": "loyalty-insights-agent",
+      "kind": "solution",
+      "ref": "loyalty-insights-agent",
+      "display_name": "Loyalty Insights Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-loyalty-insights-agent.json"
+    },
+    {
+      "slug": "month-end-billing-agent",
+      "kind": "solution",
+      "ref": "month-end-billing-agent",
+      "display_name": "Month-End Billing Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-month-end-billing-agent.json"
+    },
+    {
+      "slug": "mortgage-origination-agent",
+      "kind": "solution",
+      "ref": "mortgage-origination-agent",
+      "display_name": "Mortgage Origination Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-mortgage-origination-agent.json"
+    },
+    {
+      "slug": "omnichannel-inventory-agent",
+      "kind": "solution",
+      "ref": "omnichannel-inventory-agent",
+      "display_name": "Omnichannel Inventory Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-omnichannel-inventory-agent.json"
+    },
+    {
+      "slug": "order-status-delay-agent",
+      "kind": "solution",
+      "ref": "order-status-delay-agent",
+      "display_name": "Order Status & Delay Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-order-status-delay-agent.json"
+    },
+    {
+      "slug": "personal-styling-agent",
+      "kind": "solution",
+      "ref": "personal-styling-agent",
+      "display_name": "Personal Styling Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-personal-styling-agent.json"
+    },
+    {
+      "slug": "predictive-maintenance-agent",
+      "kind": "solution",
+      "ref": "predictive-maintenance-agent",
+      "display_name": "Predictive Maintenance Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-predictive-maintenance-agent.json"
+    },
+    {
+      "slug": "procurement-savings-agent",
+      "kind": "solution",
+      "ref": "procurement-savings-agent",
+      "display_name": "Procurement Savings Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-procurement-savings-agent.json"
+    },
+    {
+      "slug": "product-feedback-insights-agent",
+      "kind": "solution",
+      "ref": "product-feedback-insights-agent",
+      "display_name": "Product Feedback Insights Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-product-feedback-insights-agent.json"
+    },
+    {
+      "slug": "product-line-optimization-agent",
+      "kind": "solution",
+      "ref": "product-line-optimization-agent",
+      "display_name": "Product Line Optimization Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-product-line-optimization-agent.json"
+    },
+    {
+      "slug": "proposal-creation-agent",
+      "kind": "solution",
+      "ref": "proposal-creation-agent",
+      "display_name": "Proposal Creation Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-proposal-creation-agent.json"
+    },
+    {
+      "slug": "purchase-order-management-agent",
+      "kind": "solution",
+      "ref": "purchase-order-management-agent",
+      "display_name": "Purchase Order Management Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-purchase-order-management-agent.json"
+    },
+    {
+      "slug": "regulatory-compliance-agent",
+      "kind": "solution",
+      "ref": "regulatory-compliance-agent",
+      "display_name": "Regulatory Compliance Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-regulatory-compliance-agent.json"
+    },
+    {
+      "slug": "returns-complaints-agent",
+      "kind": "solution",
+      "ref": "returns-complaints-agent",
+      "display_name": "Returns & Complaints Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-returns-complaints-agent.json"
+    },
+    {
+      "slug": "sales-pipeline-management-agent",
+      "kind": "solution",
+      "ref": "sales-pipeline-management-agent",
+      "display_name": "Sales Pipeline Management Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-sales-pipeline-management-agent.json"
+    },
+    {
+      "slug": "store-associate-agent",
+      "kind": "solution",
+      "ref": "store-associate-agent",
+      "display_name": "Store Associate Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-store-associate-agent.json"
+    },
+    {
+      "slug": "subscription-renewal-agent",
+      "kind": "solution",
+      "ref": "subscription-renewal-agent",
+      "display_name": "Subscription Renewal Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-subscription-renewal-agent.json"
+    },
+    {
+      "slug": "supply-chain-risk-agent",
+      "kind": "solution",
+      "ref": "supply-chain-risk-agent",
+      "display_name": "Supply Chain Risk Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-supply-chain-risk-agent.json"
+    },
+    {
+      "slug": "supply-risk-intelligence-agent",
+      "kind": "solution",
+      "ref": "supply-risk-intelligence-agent",
+      "display_name": "Supply Risk Intelligence Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-supply-risk-intelligence-agent.json"
+    },
+    {
+      "slug": "utility-leak-detection-billing-agent",
+      "kind": "solution",
+      "ref": "utility-leak-detection-billing-agent",
+      "display_name": "Utility Leak Detection & Billing Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-utility-leak-detection-billing-agent.json"
+    },
+    {
+      "slug": "wealth-insights-agent",
+      "kind": "solution",
+      "ref": "wealth-insights-agent",
+      "display_name": "Wealth Insights Agent",
+      "runtime_seconds": 132.4,
+      "status": "storyboard",
+      "storyboard_url": "https://microsoft.github.io/aibast-agents-library/media/walkthroughs/solution-wealth-insights-agent.json"
     }
   ]
 }

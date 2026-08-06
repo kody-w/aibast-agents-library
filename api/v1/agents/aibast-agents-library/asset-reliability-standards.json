@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/asset-reliability-standards",
+    "version": "1.0.0",
+    "display_name": "Asset Reliability & Standards Agent",
+    "description": "Correlates asset condition history with the governing engineering standard, flags where practice has drifted from specification, and sequences the interventions the standard requires.",
+    "author": "AIBAST",
+    "tags": [
+      "reliability",
+      "maintenance",
+      "engineering-standards",
+      "asset",
+      "industrial"
+    ],
+    "category": "manufacturing",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+  "size_kb": 8.6,
+  "lines": 187,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/manufacturing_stacks/asset_reliability_standards_stack/asset_reliability_standards_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/asset-reliability-standards",
+  "engagement": null
+}

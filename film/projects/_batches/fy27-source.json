@@ -1,0 +1,497 @@
+{
+  "schema": "aibast-showcase-film-brief/1.0",
+  "note": "Sanitised for film. Derived from an internal planning input; every customer name, person, figure, third-party product and internal program reference was removed at extraction. All scenarios are illustrative.",
+  "batch": "fy27",
+  "agents": [
+    {
+      "slug": "seller-account-executive-productivity",
+      "name": "Seller and Account Executive Productivity Agent",
+      "industry": "Financial services",
+      "bucket": "financial_services",
+      "problem": "Sellers begin the day across a scatter of tabs and spreadsheets, assembling an account picture by hand before the first call. Product detail, campaign availability and account signals each live somewhere different. Ranked model scores arrive as numbers, and someone still has to turn them into something worth saying.",
+      "sources": [
+        "Account records",
+        "Product and battlecard content",
+        "Account signals"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Assemble the account picture ahead of the meeting",
+        "Retrieve product detail and battlecard content in one place",
+        "Turn ranked model scores into language for the conversation"
+      ],
+      "value": [
+        "One place to prepare instead of many",
+        "Shorter preparation ahead of every customer conversation",
+        "Model output expressed in words a seller can use"
+      ],
+      "example_questions": [
+        "Prepare me for tomorrow's meeting with this account - what has changed since we last spoke?",
+        "Show me the plan for the conversation.",
+        "What could go wrong in this meeting, and what should I avoid claiming?"
+      ],
+      "narration": {
+        "vo04": "A seller asks the agent to prepare for tomorrow's meeting. It reads the account record, the product detail and the recent signals, then returns a single briefing instead of a morning of tab-switching.",
+        "vo05": "Asked for the plan, the agent lays out the conversation in order - the opening, the questions worth asking, and the campaign this account is eligible for.",
+        "vo06": "Then the risk question. The agent names the claims it cannot support, flags where the account data has gone stale, and marks what needs checking before anyone walks in."
+      },
+      "payoff": "Sellers arrive prepared, with the account picture already assembled and the signals already put into plain words.",
+      "helps": "The result? One place to prepare, shorter preparation before every conversation, and model output expressed in words a seller can use."
+    },
+    {
+      "slug": "regulated-document-drafting",
+      "name": "Regulated Document Drafting Agent",
+      "industry": "Public sector",
+      "bucket": "government",
+      "problem": "Drafting in a regulated setting is slow because the standard is exacting. Opinions and precedents are hard to retrieve, so the same research is done again. Tenders, service requests and consumer-facing copy each carry their own tone, taxonomy and compliance constraints, and consistency depends on who is writing.",
+      "sources": [
+        "Legislation and precedent",
+        "Tender and service-request templates",
+        "Regulatory guidance"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Word",
+      "actions": [
+        "Draft against the approved template and taxonomy",
+        "Retrieve the opinion or precedent that already answers this",
+        "Rewrite copy to meet clarity and regulatory standards"
+      ],
+      "value": [
+        "A faster route to a usable first draft",
+        "Consistent output against the guardrails the sector requires",
+        "Less repeated research on questions already settled"
+      ],
+      "example_questions": [
+        "Draft a tender response for this procurement using our approved template.",
+        "Show me the plan for the sections and where the evidence comes from.",
+        "Where might this fall short of the regulatory standard?"
+      ],
+      "narration": {
+        "vo04": "A drafter asks for a tender response against the approved template. The agent pulls the relevant clauses and precedent, then returns a structured first draft with each section sourced.",
+        "vo05": "Asked for the plan, the agent sets out the sections in order, names the evidence behind each one, and marks the passages that still need a specialist's eye.",
+        "vo06": "On risk, the agent points to wording that falls short of the regulatory standard, explains why, and offers compliant alternatives rather than deciding on the drafter's behalf."
+      },
+      "payoff": "Drafters reach a compliant first version sooner, with the precedent and the standard already in view.",
+      "helps": "The result? A faster first draft, consistent output against sector guardrails, and less repeated research on questions already settled."
+    },
+    {
+      "slug": "industrial-asset-reliability-and-engineering-standards",
+      "name": "Industrial Asset Reliability and Engineering Standards Agent",
+      "industry": "Manufacturing",
+      "bucket": "manufacturing",
+      "problem": "Hard-won plant experience sits in non-conformance reports, maintenance history and the heads of the people who have been there longest. Engineers designing today need the current standard, not the one that was current when the document was filed. Design review is slow, and an inconsistency is easy to miss by eye.",
+      "sources": [
+        "Lessons learned and non-conformance reports",
+        "Maintenance history",
+        "Engineering standards and specifications"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Mine lessons learned and non-conformance reports for the pattern",
+        "Reason over maintenance history to shape an asset strategy",
+        "Check a design against the current standard"
+      ],
+      "value": [
+        "Plant experience becomes retrievable rather than remembered",
+        "Design review that is quicker and harder to skip",
+        "The current standard in front of the engineer at the moment of design"
+      ],
+      "example_questions": [
+        "This pump keeps failing on the same line - what does our history say about the cause?",
+        "Show me the plan for the maintenance strategy you would recommend.",
+        "What could go wrong with that strategy, and which standard governs it?"
+      ],
+      "narration": {
+        "vo04": "An engineer asks about a recurring failure on one line. The agent reads the maintenance history and the non-conformance reports, and returns the pattern with the evidence behind it.",
+        "vo05": "Asked for a maintenance strategy, the agent proposes an ordered plan - the checks to bring forward, the parts to hold, and the intervals worth revisiting, each tied back to the record.",
+        "vo06": "On risk, the agent names the engineering standard that governs the change, flags where the historical record is thin, and marks what a reviewer must confirm."
+      },
+      "payoff": "Engineers get the plant's own experience and the current standard together, at the moment of the decision.",
+      "helps": "The result? Retrievable plant experience, quicker design review, and the current standard in front of the engineer when it matters."
+    },
+    {
+      "slug": "industry-specific-finance-operations",
+      "name": "Multi-System Finance Operations Agent",
+      "industry": "Professional services",
+      "bucket": "cross_industry",
+      "problem": "Finance teams receive the same information in a different shape from every source. Statements arrive in inconsistent formats and are reconciled by hand, invoices are keyed one at a time, and expense claims scatter across systems before anyone can approve them. Travel adds currency conversion to the same manual work.",
+      "sources": [
+        "Submitted financial statements",
+        "Invoices and purchase orders",
+        "Expense claims and receipts"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Outlook",
+      "actions": [
+        "Extract and normalise statements arriving in inconsistent formats",
+        "Match invoices to purchase orders and surface the exceptions",
+        "Reconcile multi-currency expense claims against policy"
+      ],
+      "value": [
+        "Hand-keying removed from routine finance work",
+        "Submissions from many sources made comparable",
+        "A shorter wait between a submission and a decision"
+      ],
+      "example_questions": [
+        "Reconcile this month's submitted statements and tell me which ones do not add up.",
+        "Show me the plan for clearing the exceptions.",
+        "What could go wrong if we approve the rest as they stand?"
+      ],
+      "narration": {
+        "vo04": "A finance lead asks the agent to reconcile the month's submitted statements. It normalises the formats, matches the values across sources, and returns the exceptions rather than the whole pile.",
+        "vo05": "Asked for a plan, the agent orders the exceptions by what is blocking the close, proposes a correction for each, and separates the ones a person must judge.",
+        "vo06": "On risk, the agent explains what approving the remainder would assume, names the claims it could not verify against policy, and leaves the decision with finance."
+      },
+      "payoff": "Finance teams spend their time on the exceptions rather than on retyping what was already sent.",
+      "helps": "The result? Less hand-keying, submissions from many sources made comparable, and a shorter wait between a submission and a decision."
+    },
+    {
+      "slug": "public-sector-citizen-civil-service",
+      "name": "Civil Service Policy and Service Agent",
+      "industry": "Public sector",
+      "bucket": "government",
+      "problem": "Policy in government is spread across intranets, documents and old email threads, so two people asking the same question can get two answers. Small teams absorb a heavy flow of routine enquiries that rises sharply whenever something changes. Staff spend longer finding the policy than applying it.",
+      "sources": [
+        "Administrative and financial policy",
+        "HR policy documents",
+        "Published guidance"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Answer a policy question with the clause it came from",
+        "Triage routine enquiries and route the rest",
+        "Answer in the language the question was asked in"
+      ],
+      "value": [
+        "One consistent answer instead of several conflicting ones",
+        "Routine enquiry volume absorbed so small teams can handle the peaks",
+        "Less compliance risk from inconsistent interpretation"
+      ],
+      "example_questions": [
+        "What is our policy on carrying leave across the year for staff on a fixed-term contract?",
+        "Show me the plan for handling this enquiry end to end.",
+        "What could go wrong if I apply that answer in a different department?"
+      ],
+      "narration": {
+        "vo04": "A public servant asks a leave question. The agent answers from the policy itself, quoting the clause it relied on and naming the document, so the answer can be checked rather than trusted.",
+        "vo05": "Asked how the enquiry should be handled, the agent sets out the steps, identifies the team that owns the decision, and drafts a reply for the case worker to review.",
+        "vo06": "On risk, the agent notes that the policy differs by department, points to the passage that diverges, and declines to generalise where the guidance does not."
+      },
+      "payoff": "Civil servants get one consistent, sourced answer, and the small teams behind the policy get their time back.",
+      "helps": "The result? One consistent answer, routine enquiry volume absorbed at the peaks, and less risk from inconsistent interpretation."
+    },
+    {
+      "slug": "customer-service-case-intelligence-d365",
+      "name": "Customer Service Case Intelligence Agent",
+      "industry": "Software",
+      "bucket": "software",
+      "problem": "Every resolved case ends with writing. Representatives summarise what happened, and the knowledge that would help the next person stays in the case rather than the knowledge base. Incoming cases are routed on a guess at intent, so some of them travel further than they should.",
+      "sources": [
+        "Customer service cases",
+        "Resolved case history",
+        "Knowledge article templates"
+      ],
+      "surface": "Engages you in Dynamics 365 Customer Service",
+      "actions": [
+        "Summarise the case and its resolution as it closes",
+        "Propose a knowledge article from what was resolved",
+        "Classify intent so a case routes correctly the first time"
+      ],
+      "value": [
+        "Wrap-up writing lifted off the representative",
+        "A knowledge base that stays current as a by-product of the work",
+        "Cases reaching the right team sooner"
+      ],
+      "example_questions": [
+        "Summarise this case and draft the knowledge article it should become.",
+        "Show me the plan for what still needs a human review.",
+        "What could go wrong if we publish that article as written?"
+      ],
+      "narration": {
+        "vo04": "A representative closes a case and asks for the summary. The agent writes the resolution note from the conversation itself, then drafts the knowledge article the case should become.",
+        "vo05": "Asked what still needs review, the agent separates the parts it drew directly from the case from the parts it inferred, and marks the second group for a person.",
+        "vo06": "On risk, the agent flags the customer detail that must not appear in a published article, and the steps it could not confirm were the reason the case resolved."
+      },
+      "payoff": "Representatives finish a case by resolving it, and the knowledge base grows without anyone curating it.",
+      "helps": "The result? Wrap-up writing lifted off the representative, a knowledge base that stays current, and cases reaching the right team sooner."
+    },
+    {
+      "slug": "sales-manager-marketing-ops-analytics",
+      "name": "Sales Manager and Marketing Operations Analytics Agent",
+      "industry": "Software",
+      "bucket": "software",
+      "problem": "Managers build their view of the team by filtering spreadsheets, and the coaching conversation waits until the filtering is done. Opportunity progression over time is hard to see at a glance. Market signals shift quietly, and by the time the shift is noticed by hand the moment to respond has usually passed.",
+      "sources": [
+        "Opportunity and activity data",
+        "Team performance records",
+        "Market and event signals"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Assemble the team view without manual filtering",
+        "Track opportunity progression over time",
+        "Flag a shift in the ideal customer profile as it emerges"
+      ],
+      "value": [
+        "A coaching conversation that starts sooner",
+        "Market drift surfaced while there is still time to respond",
+        "Standing market insight rather than an occasional exercise"
+      ],
+      "example_questions": [
+        "Where is my team's progression slowing this quarter, and with which kinds of account?",
+        "Show me the plan for the coaching conversations.",
+        "What could go wrong if I act on this read of the data?"
+      ],
+      "narration": {
+        "vo04": "A manager asks where progression is slowing. The agent assembles the view across activity and opportunity records, and returns the pattern by account type rather than a spreadsheet to filter.",
+        "vo05": "Asked for a plan, the agent proposes the coaching conversations in order of impact, with the evidence behind each one and the question worth opening on.",
+        "vo06": "On risk, the agent names the segments where the sample is too thin to read, and separates the movement it can explain from the movement it cannot."
+      },
+      "payoff": "Managers reach the coaching conversation with the view already assembled and the shift already visible.",
+      "helps": "The result? A coaching conversation that starts sooner, market drift surfaced in time to respond, and insight that runs continuously."
+    },
+    {
+      "slug": "procurement-tender-vendor-spend",
+      "name": "Procurement and Vendor Spend Agent",
+      "industry": "Energy",
+      "bucket": "energy",
+      "problem": "Procurement documents are written from scratch each time, and consistency depends on who has the previous version. Checking a vendor invoice against its purchase order is slow work, and the supporting paperwork is rarely in one place. Errors surface late, after the payment has moved.",
+      "sources": [
+        "Procurement and tender documents",
+        "Vendor invoices and purchase orders",
+        "Supporting contract paperwork"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and SharePoint",
+      "actions": [
+        "Generate a procurement document from the approved structure",
+        "Cross-check a vendor invoice against its purchase order",
+        "Gather the supporting paperwork behind a reconciliation"
+      ],
+      "value": [
+        "A compliant procurement document produced sooner",
+        "Invoice checking that does not depend on who performs it",
+        "Fewer errors from reconciling against paperwork nobody can find"
+      ],
+      "example_questions": [
+        "Draft the tender pack for this maintenance contract using our standard structure.",
+        "Show me the plan for the evaluation criteria.",
+        "What could go wrong in the invoice checks on this vendor?"
+      ],
+      "narration": {
+        "vo04": "A procurement lead asks for a tender pack. The agent builds it from the approved structure, pulls the clauses this contract type requires, and lists what is still missing.",
+        "vo05": "Asked about evaluation, the agent sets out the criteria in order, explains the weighting it has assumed, and marks the ones the evaluation panel must set itself.",
+        "vo06": "On risk, the agent compares the vendor's invoices with their purchase orders, shows where the lines diverge, and points to the supporting document behind each mismatch."
+      },
+      "payoff": "Procurement teams produce the document sooner and see the invoice mismatch before the payment moves.",
+      "helps": "The result? A compliant document produced sooner, consistent invoice checking, and fewer errors from paperwork nobody can find."
+    },
+    {
+      "slug": "industry-compliance-and-risk-monitoring",
+      "name": "Compliance and Risk Monitoring Agent",
+      "industry": "Public sector",
+      "bucket": "government",
+      "problem": "Compliance is checked in bursts, usually when an audit is coming. Contract managers have no live view of whether their suppliers still meet the standard once the standard changes. Licences are bought without a reliable read of how they are actually used, and the gap only surfaces at renewal.",
+      "sources": [
+        "Regulatory updates and standards",
+        "Supplier and contract records",
+        "Licence assignment data"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Watch for changes to the standards that govern a contract",
+        "Give contract managers a live view of supplier compliance",
+        "Check licence assignment against actual use"
+      ],
+      "value": [
+        "Continuous monitoring in place of a periodic manual check",
+        "Gaps surfaced while there is still time to close them",
+        "Multi-source reporting made comparable without hand-standardisation"
+      ],
+      "example_questions": [
+        "The security standard for our contractors was updated - who is now out of compliance?",
+        "Show me the plan for closing those gaps before the audit.",
+        "What could go wrong if we treat the remaining suppliers as compliant?"
+      ],
+      "narration": {
+        "vo04": "A contract manager asks who has fallen out of compliance since the standard changed. The agent compares the new requirements against supplier records and returns the affected contracts with the clause behind each.",
+        "vo05": "Asked for a plan, the agent orders the gaps by how long they take to close, names an owner for each, and separates the ones that need a contract change.",
+        "vo06": "On risk, the agent explains what treating the remainder as compliant would assume, and names the suppliers whose evidence is out of date rather than absent."
+      },
+      "payoff": "Compliance becomes something teams watch continuously rather than discover in the week before an audit.",
+      "helps": "The result? Continuous monitoring, gaps surfaced while they can still be closed, and multi-source reporting made comparable without hand-standardisation."
+    },
+    {
+      "slug": "frontline-coaching-1-1-documentation",
+      "name": "Frontline Coaching and Session Documentation Agent",
+      "industry": "Financial services",
+      "bucket": "financial_services",
+      "problem": "Managers spend a large part of the week writing up conversations they have already had. Coaching forms have their own structure, and completing one properly is a task in its own right after the session ends. Customer conversations are summarised from memory and pushed into the CRM by hand, so the record is only as good as the day allowed.",
+      "sources": [
+        "Session recordings and transcripts",
+        "Coaching form templates",
+        "The CRM"
+      ],
+      "surface": "Engages you in Microsoft Teams and Dynamics 365",
+      "actions": [
+        "Capture the session and draft the write-up as it happens",
+        "Complete the coaching form from the conversation itself",
+        "Write agreed next steps into the CRM"
+      ],
+      "value": [
+        "Documentation time returned to coaching",
+        "The write-up produced as a by-product of the conversation",
+        "A record that stays current without anyone remembering to update it"
+      ],
+      "example_questions": [
+        "Write up this coaching session against our standard form.",
+        "Show me the plan of next steps we agreed.",
+        "What could go wrong if I file this as written?"
+      ],
+      "narration": {
+        "vo04": "A manager finishes a coaching session and asks for the write-up. The agent completes the standard form from the conversation itself, quoting the moments each observation rests on.",
+        "vo05": "Asked for the next steps, the agent lists what was agreed and who owns each item, then offers to write them straight into the customer record.",
+        "vo06": "On risk, the agent separates what the manager actually said from what it inferred, and holds back anything sensitive that does not belong in a shared record."
+      },
+      "payoff": "Managers leave the session with the record already written and the next steps already captured.",
+      "helps": "The result? Documentation time returned to coaching, the write-up produced as a by-product, and a record that stays current."
+    },
+    {
+      "slug": "editorial-story-discovery-and-market-intelligence",
+      "name": "Editorial Discovery and Market Intelligence Agent",
+      "industry": "Media",
+      "bucket": "professional_services",
+      "problem": "Journalists watch primary sources by hand - listings, minutes, notices - and the watching only happens when there is time to do it. Market intelligence works the same way, gathered in bursts and held in different places by different people. By the time a pattern is assembled, it is often already news to someone else.",
+      "sources": [
+        "Court and public listings",
+        "Council minutes and public notices",
+        "Market intelligence sources"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Watch primary public sources continuously",
+        "Flag an emerging story with the document behind it",
+        "Consolidate scattered market intelligence into one view"
+      ],
+      "value": [
+        "Source monitoring that runs continuously rather than in bursts",
+        "Intelligence that arrives before it is asked for",
+        "A shorter path from a source appearing to someone acting on it"
+      ],
+      "example_questions": [
+        "What has come up in this week's public listings that is worth a look?",
+        "Show me the plan for how you would stand this story up.",
+        "What could go wrong if we run with this before the hearing?"
+      ],
+      "narration": {
+        "vo04": "A reporter asks what has surfaced in the week's public listings. The agent returns the items that break the usual pattern, each linked to the document it came from.",
+        "vo05": "Asked how the story could be stood up, the agent proposes an order of work - the records to request, the parties to approach, and the claims that need a second source.",
+        "vo06": "On risk, the agent marks what the documents do not say, notes where reporting restrictions may apply, and separates established fact from reasonable inference."
+      },
+      "payoff": "Newsrooms see the public record as it changes rather than when someone finds the time to look.",
+      "helps": "The result? Monitoring that runs continuously, intelligence that arrives before it is asked for, and a shorter path from source to story."
+    },
+    {
+      "slug": "rd-scientific-discovery-and-innovation",
+      "name": "Research and Scientific Discovery Agent",
+      "industry": "Manufacturing",
+      "bucket": "manufacturing",
+      "problem": "Research knowledge accumulates faster than any team can read it, so a discovery question gets answered from the part of the corpus somebody happens to remember. Internal innovation submissions arrive in very different shapes, and comparing them fairly is hard when each one has been written to its own standard.",
+      "sources": [
+        "Research corpus and technical literature",
+        "Experimental records",
+        "Innovation submissions"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Reason across the research corpus to answer a discovery question",
+        "Coach a submission into a complete, comparable form",
+        "Apply the same evaluation criteria to every entry"
+      ],
+      "value": [
+        "More of the existing corpus brought to bear on each question",
+        "A higher floor on the completeness of submitted ideas",
+        "One evaluation standard applied consistently"
+      ],
+      "example_questions": [
+        "What does our research say about alternative binders for this formulation?",
+        "Show me the plan for the experiments that would test it.",
+        "What could go wrong with that approach, and what does the literature warn about?"
+      ],
+      "narration": {
+        "vo04": "A researcher asks what the corpus says about alternative binders. The agent reasons across the literature and the experimental record, and returns the candidates with the studies behind each one.",
+        "vo05": "Asked for an experimental plan, the agent proposes a sequence that tests the cheapest assumption first, names the measurement that would settle each question, and says what a negative result would mean.",
+        "vo06": "On risk, the agent surfaces the failure modes the literature reports, distinguishes findings that replicated from those that did not, and marks where the evidence runs out."
+      },
+      "payoff": "Researchers bring the whole corpus to a question instead of the part they happen to recall.",
+      "helps": "The result? More of the corpus brought to each question, more complete submissions, and one evaluation standard applied consistently."
+    },
+    {
+      "slug": "requirements-and-innovation-authoring",
+      "name": "Requirements and Innovation Authoring Agent",
+      "industry": "Professional services",
+      "bucket": "professional_services",
+      "problem": "Product owners write requirements and acceptance criteria from a blank page, and the quality depends on who is writing that day. Templates exist but are rarely reused, so the same structure gets rebuilt each time. Innovation submissions arrive uneven, and a good idea inside a thin write-up is easy to miss.",
+      "sources": [
+        "Requirements and acceptance criteria templates",
+        "Existing backlog items",
+        "Submission rubrics"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Draft requirements and acceptance criteria from the approved template",
+        "Reuse the existing structure rather than rebuilding it",
+        "Coach a submission towards the rubric it will be judged against"
+      ],
+      "value": [
+        "A quicker route from an idea to a usable draft",
+        "Requirement quality that holds across authors",
+        "A guided page in place of a blank one"
+      ],
+      "example_questions": [
+        "Turn this feature idea into requirements and acceptance criteria using our template.",
+        "Show me the plan for what still needs a decision from the business.",
+        "What could go wrong with these acceptance criteria as written?"
+      ],
+      "narration": {
+        "vo04": "A product owner describes a feature idea. The agent returns requirements and acceptance criteria in the approved structure, reusing patterns already in the backlog rather than inventing new ones.",
+        "vo05": "Asked what still needs a decision, the agent separates what it could derive from the idea from the choices only the business can make, and frames each of those as a question.",
+        "vo06": "On risk, the agent shows where the acceptance criteria are untestable as written, proposes a measurable form for each, and flags the assumption behind the rest."
+      },
+      "payoff": "Product owners start from a structured draft, and requirement quality stops depending on who wrote it.",
+      "helps": "The result? A quicker first draft, requirement quality that holds across authors, and a guided page in place of a blank one."
+    },
+    {
+      "slug": "healthcare-clinical-documentation-and-data-ring",
+      "name": "Clinical Documentation and Shared Care Record Agent",
+      "industry": "Healthcare",
+      "bucket": "healthcare",
+      "problem": "Clinicians write the record after the encounter, often after the day has ended, and documentation competes with the next patient. Emergency crews describe what happened twice - once in the moment and again in the write-up. Health information sits with the provider who collected it, so the next clinician starts without the context.",
+      "sources": [
+        "Consultation notes and dictation",
+        "Encounter audio",
+        "Shared care records"
+      ],
+      "surface": "Engages you in Microsoft 365 Copilot and Teams",
+      "actions": [
+        "Draft the clinical note from the consultation itself",
+        "Transcribe an emergency encounter into a structured record",
+        "Bring shared care context into the note"
+      ],
+      "value": [
+        "Documentation lifted off the clinician during and after the encounter",
+        "A single capture of an emergency call instead of a second write-up",
+        "Care context that travels with the patient rather than the provider"
+      ],
+      "example_questions": [
+        "Draft the consultation note from this encounter.",
+        "Show me the plan of follow-up actions you have captured.",
+        "What could go wrong if I sign this note as written?"
+      ],
+      "narration": {
+        "vo04": "A clinician asks for the consultation note. The agent drafts it from the encounter itself, structured the way the record expects, with every clinical statement traceable back to what was said.",
+        "vo05": "Asked about follow-up, the agent lists the actions captured during the consultation, the referrals implied by them, and the items that need the clinician to confirm before anything is sent.",
+        "vo06": "On risk, the agent marks what it inferred rather than heard, highlights anything a clinician must verify, and leaves the note unsigned until a person reviews it."
+      },
+      "payoff": "Clinicians leave the encounter with the note already drafted and their attention still on the patient.",
+      "helps": "The result? Documentation lifted off the clinician, one capture instead of a second write-up, and care context that travels with the patient."
+    }
+  ]
+}

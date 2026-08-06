@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-manifest/1.0",
-  "generated": "2026-08-06T00:54:22.665960+00:00",
+  "generated": "2026-08-06T21:45:52.509065+00:00",
   "title": "ms-rapp Vault",
   "subtitle": "Documentation for the ms-rapp distribution",
   "github": "https://github.com/microsoft/aibast-agents-library",
@@ -72,6 +72,12 @@
     {
       "path": "how-to/earn-a-badge.md",
       "title": "Earn a badge",
+      "section": "how-to",
+      "status": "published"
+    },
+    {
+      "path": "how-to/make-a-showcase-film.md",
+      "title": "How to make a showcase film",
       "section": "how-to",
       "status": "published"
     },

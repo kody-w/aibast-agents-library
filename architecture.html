@@ -6,6 +6,64 @@
 <title>Reference architecture — AIBAST Agent Library</title>
 <meta name="description" content="A generated reference architecture for any entry in the library: knowledge, processing, user interface and reporting, with the request flow numbered through them.">
 <style>
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
+:root {
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
+  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
+}
+[data-theme="dark"] {
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
+  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{max-width:100%;overflow-x:hidden}
+body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  color:var(--text);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+header.site{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav{display:flex;align-items:center;gap:18px;padding:12px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--text);white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand .mark{color:var(--accent);display:inline-flex}
+.brand .mark svg{width:19px;height:19px}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:var(--text-dim);font-size:13.5px;padding:5px 10px;border-radius:8px}
+.nav-links a:hover{color:var(--text);background:var(--panel-2);text-decoration:none}
+.nav-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
+  width:32px;height:32px;border-radius:6px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center}
+.icon-btn svg{width:15px;height:15px}
+.icon-btn:hover{color:var(--text);border-color:var(--text-faint);text-decoration:none}
+footer.site{margin-top:20px;border-top:1px solid var(--border);padding:26px 0 44px}
+.foot{display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--text-faint)}
+.foot a{color:var(--text-dim)}
+.foot .copy{width:100%;margin-top:4px}
+@media (max-width:560px){.nav-links{order:3;width:100%}}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border:1px solid var(--border);
+  border-radius:6px;background:var(--panel);color:var(--text);text-decoration:none;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:var(--text-faint);text-decoration:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+/* ══ page-specific ══ */
+
 :root{
   --ink:#1a1a1a; --dim:#4a4a4a; --faint:#767676; --line:#e3e3e3;
   --panel:#f4f4f6; --panel-2:#ebebee; --chip:#e9e9ec;
@@ -15,7 +73,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{max-width:100%}
 body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-  background:#f7f7f9;color:var(--ink);line-height:1.45;-webkit-font-smoothing:antialiased}
+  background:var(--bg);color:var(--text);line-height:1.45;-webkit-font-smoothing:antialiased}
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .bar{background:#fff;border-bottom:1px solid var(--line)}
 .barin{max-width:1500px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px}
@@ -44,18 +102,56 @@ h1{font-size:38px;font-weight:350;letter-spacing:-.01em;margin:4px 0 6px;line-he
 .group .gl{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.05em;
   text-transform:uppercase}
 .item{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.35}
-.item .gi{flex:0 0 auto;width:22px;height:22px;border-radius:4px;display:flex;
-  align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#fff}
-.gi.d365{background:linear-gradient(135deg,#3b8de0,#8661c5)}
-.gi.sharepoint{background:#1e8f6e}.gi.teams{background:#5b5fc7}
-.gi.outlook{background:#0f6cbd}.gi.word{background:#185abd}
-.gi.excel{background:#107c41}.gi.powerpoint{background:#c43e1c}
-.gi.powerbi{background:#e9c93a;color:#3b3b00}.gi.azure{background:#0089d6}
-.gi.copilot{background:linear-gradient(135deg,#e8598f,#8b5cf6,#4f7cf7)}
-.gi.purview{background:#0f9ed5}.gi.flow{background:#0066ff}
-.gi.dataverse{background:#742774}.gi.fabric{background:#117865}
-.gi.graph{background:#5c2d91}.gi.powerapps{background:#742774}
-.gi.generic{background:#8a8886}
+.item .txt,.actor .txt{min-width:0}
+.txt .sub{display:block;font-size:10.5px;color:var(--faint);line-height:1.3}
+.actor{align-items:flex-start}
+
+/* ---- product marks -------------------------------------------------------
+   A real mark is an image of the real mark. There is no fallback that draws
+   one: a product with nothing on file gets the neutral chip below and says so,
+   because an approximated Microsoft logo is a trademark problem long before it
+   is a design problem.                                                      */
+.mk{flex:0 0 auto;width:24px;height:24px;border-radius:4px;display:flex;
+  align-items:center;justify-content:center;overflow:hidden}
+.mk img{max-width:24px;max-height:22px;object-fit:contain;display:block}
+.mk.plain{border:1.5px dashed #c8c6c4;background:#fbfbfc;border-radius:5px}
+.mk.plain:after{content:"";width:7px;height:7px;border-radius:2px;background:#c8c6c4}
+.mk.unknown{border:1.5px dashed #d9d2b0;background:var(--gold-soft)}
+.mk.unknown:after{content:"?";font-size:11px;font-weight:800;color:var(--gold)}
+.conf{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  border-radius:3px;padding:1px 4px;margin-left:6px;vertical-align:1px}
+.conf.declared{background:#e4f1e4;color:#0b6a0b}
+.conf.implied{background:var(--gold-soft);color:#8a6a00;border:1px solid var(--gold-line)}
+.conf.platform{background:var(--chip);color:var(--faint)}
+
+/* ---- product filter: the same idiom the catalog pages use ---------------- */
+.prodbar{max-width:1500px;margin:14px auto 0;padding:0 24px;display:flex;
+  flex-wrap:wrap;gap:10px;align-items:center}
+.prodbar label{font-size:12px;color:var(--faint);font-weight:600}
+.prodbar select{font-family:inherit;font-size:13px;padding:7px 10px;border-radius:6px;
+  border:1px solid var(--line);background:#fff;color:var(--ink);min-width:250px}
+.prodbar .now{font-size:12px;color:var(--faint)}
+.prodlist{max-width:1500px;margin:10px auto 0;padding:0 24px}
+.prodlist .box{background:#fff;border:1px solid var(--line);border-radius:9px;
+  padding:14px 16px}
+.prodlist h4{font-size:13px;font-weight:650;margin-bottom:3px;display:flex;
+  align-items:center;gap:8px}
+.prodlist h4 .mk{width:20px;height:20px}
+.prodlist .why{font-size:11.5px;color:var(--faint);margin-bottom:9px}
+.prodlist ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px;max-height:190px;
+  overflow:auto}
+.prodlist li a{display:block;font-size:12px;border:1px solid var(--line);
+  border-radius:5px;padding:4px 9px;color:var(--dim);background:var(--panel)}
+.prodlist li a:hover{background:var(--chip);text-decoration:none}
+.prodlist li a.here{border-color:var(--gold-line);background:var(--gold-soft);color:var(--ink)}
+.prodlist li a .c{color:var(--faint)}
+
+.taglist{display:flex;flex-wrap:wrap;gap:5px}
+.taglist span{font-size:11.5px;background:#fff;border:1px solid var(--line);
+  border-radius:4px;padding:2px 7px;color:var(--dim)}
+ul.ops{list-style:none;display:flex;flex-direction:column;gap:4px}
+ul.ops li{font-size:12.5px;color:var(--ink);background:var(--panel-2);
+  border-radius:4px;padding:4px 8px;line-height:1.3}
 
 .chip{background:var(--chip);border-radius:5px;padding:9px 11px;font-size:12.5px;
   line-height:1.4;color:var(--dim)}
@@ -88,7 +184,7 @@ ul.acts li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6
 .band p{font-size:12.5px;color:var(--dim);line-height:1.45}
 .band.found{display:flex;align-items:center;justify-content:center;gap:16px;text-align:center}
 .band.found .id{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px}
-.band.found .id .gi{width:28px;height:28px}
+.band.found .id .mk{width:28px;height:28px}
 .band.found b{font-size:14px;font-weight:650}
 
 .flow{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
@@ -112,20 +208,47 @@ ul.acts li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6
 </style>
 </head>
 <body>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="agents.html">Library</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
 
 <div class="bar noprint">
   <div class="barin">
-    <b>AIBAST Agent Library</b>
-    <button class="btn" id="deckArch">Export as PowerPoint</button>
+    <!-- The site nav lives in the shared header above; this bar carries only
+         what is specific to this page, so there is one nav and not two. -->
+    <button class="btn primary" id="deckArch">Export as PowerPoint</button>
+    <a class="btn" id="opLink" href="solutions.html">Open the one-pager</a>
     <span class="deck-status" id="deckArchStatus" aria-live="polite"></span>
-    <nav>
-      <a href="agents.html">Agents</a>
-      <a href="solutions.html">Solutions</a>
-      <a id="opLink" href="solutions.html">One-pager</a>
-      <a href="api.html">API</a>
-    </nav>
   </div>
 </div>
+
+<div class="prodbar noprint" id="prodbar" hidden>
+  <label for="fProd">Product involved</label>
+  <select id="fProd"><option value="">All products</option></select>
+  <span class="now" id="prodNow"></span>
+</div>
+<div class="prodlist noprint" id="prodlist"></div>
 
 <div id="host"><p style="padding:40px;color:#767676">Loading the architecture…</p></div>
 
@@ -142,17 +265,49 @@ function getJSON(p){var i=0;return (function next(){
   return fetch(p[i++],{cache:"no-cache"}).then(function(r){return r.ok?r.json():next();})
     .catch(function(){return next();});})();}
 
-function initials(label){
-  var w=label.replace(/[^A-Za-z0-9 ]/g," ").trim().split(/\s+/);
-  return (w[0]||"?").charAt(0).toUpperCase() + (w[1]?w[1].charAt(0).toUpperCase():"");
+/* ---- marks ---------------------------------------------------------------
+ * Three states and no fourth. A product with a real mark on file draws the
+ * real mark. A product without one draws a neutral chip and says, on hover,
+ * that the mark is missing. Something the entry did not declare draws the
+ * unknown chip. Nothing here ever approximates a Microsoft logo.
+ * ------------------------------------------------------------------------ */
+function mark(x){
+  if (x && x.unknown) return '<span class="mk unknown" title="Not declared by this entry"></span>';
+  if (x && x.mark) {
+    var t = x.mark_scope === "family"
+      ? x.family + " mark, shown beside the app name"
+      : x.label + " mark";
+    return '<span class="mk"><img src="' + esc(x.mark) + '" alt="' + esc(t) + '" title="' +
+      esc(t) + '" loading="lazy"></span>';
+  }
+  return '<span class="mk plain" title="No product mark on file for ' +
+    esc(x && x.label ? x.label : "this item") + ' — shown as a labelled chip"></span>';
+}
+function confTag(x){
+  if (!x || !x.confidence || x.confidence === "unknown") return "";
+  if (x.confidence === "declared") return '<span class="conf declared">declared</span>';
+  if (x.confidence === "implied") return '<span class="conf implied">implied</span>';
+  return '<span class="conf platform">platform</span>';
 }
 function item(x){
-  return '<div class="item"><span class="gi '+esc(x.glyph)+'">'+esc(initials(x.label))+
-    '</span><span>'+esc(x.label)+"</span></div>";
+  return '<div class="item">' + mark(x) +
+    '<span class="txt">' + esc(x.label) + confTag(x) +
+    (x.from ? '<span class="sub">' + esc(x.from) + "</span>" : "") +
+    "</span></div>";
+}
+function plainItem(label){
+  return '<div class="item"><span class="mk plain" title="No product mark on file for ' +
+    esc(label) + '"></span><span class="txt">' + esc(label) + "</span></div>";
 }
 
 function render(a){
   var c=a.columns;
+  // Which products in THIS diagram have no published mark on file. Recorded on
+  // the page rather than quietly papered over with a drawn-on lookalike.
+  var noMark=[];
+  (a.products||[]).forEach(function(p){
+    if(p.mark_status!=="mark" && noMark.indexOf(p.name)===-1) noMark.push(p.name);
+  });
   document.title=a.display_name+" — reference architecture";
   var op=document.getElementById("opLink");
   op.href="onepager.html?"+(a.kind==="agent"?"agent=":"solution=")+encodeURIComponent(a.ref||a.slug);
@@ -171,10 +326,13 @@ function render(a){
       '<div class="col"><h2>'+esc(c.knowledge.title)+"</h2>" +
         '<div class="group"><div class="gl">Grounding data</div>' +
           c.knowledge.grounding.map(item).join("") + "</div>" +
+        ((c.knowledge.subject_areas||[]).length
+          ? '<div class="group"><div class="gl">Subject areas it declares</div>' +
+            '<div class="taglist">' + c.knowledge.subject_areas.map(function(t){
+              return "<span>"+esc(t)+"</span>"; }).join("") + "</div></div>"
+          : "") +
         '<div class="group"><div class="gl">Connectors &amp; actions</div>' +
-          c.knowledge.connectors.map(function(x){
-            return '<div class="item"><span class="gi flow">PP</span><span>'+esc(x)+"</span></div>";
-          }).join("") + "</div>" +
+          c.knowledge.connectors.map(plainItem).join("") + "</div>" +
         '<div class="chip">'+esc(c.knowledge.note)+"</div>" +
       "</div>" +
 
@@ -184,21 +342,39 @@ function render(a){
           '<div class="chip"><b>3.</b> '+esc(c.processing.plan)+"</div>" +
           '<div class="orch"><div class="cube"></div><span>'+
             esc(c.processing.orchestration)+"</span></div>" +
+          ((c.processing.operations||[]).length
+            ? '<div class="group"><div class="gl">Operations it accepts</div>' +
+              '<ul class="ops">' + c.processing.operations.map(function(o){
+                return "<li>"+esc(o)+"</li>"; }).join("") + "</ul>" +
+              (c.processing.parameters && c.processing.parameters.length
+                ? '<div class="chip">Parameters: <b>' +
+                  c.processing.parameters.map(esc).join("</b>, <b>") + "</b></div>"
+                : "") + "</div>"
+            : "") +
           '<ul class="acts">'+c.processing.actions.map(function(x){
             return "<li>"+esc(x)+"</li>";}).join("")+"</ul>" +
+          ((c.processing.model||[]).length
+            ? '<div class="group"><div class="gl">Model</div>' +
+              c.processing.model.map(item).join("") + "</div>" : "") +
         "</div>" +
       "</div>" +
 
       /* User interface */
       '<div class="col"><h2>'+esc(c.interface.title)+"</h2>" +
         '<div class="chip"><b>2.</b> '+esc(c.interface.checks)+"</div>" +
-        '<div class="group"><div class="gl">Microsoft 365</div>' +
+        '<div class="group"><div class="gl">' +
+          (c.interface.surface_declared ? "Where the operator meets it"
+                                        : "Surface — not declared") + "</div>" +
           c.interface.surfaces.map(item).join("") + "</div>" +
         '<div class="card" style="flex:0">' +
           c.interface.actors.map(function(x){
-            return '<div class="actor"><span class="av"></span><span>'+esc(x)+"</span></div>";
+            var label = x && x.label ? x.label : x;
+            return '<div class="actor"><span class="av"></span><span class="txt">'+
+              esc(label) + (x && x.declared === false
+                ? '<span class="sub">' + esc(x.note || "not declared") + "</span>" : "") +
+              "</span></div>";
           }).join("") +
-          '<div class="chip"><b>1.</b> Natural language input</div>' +
+          '<div class="chip"><b>1.</b> '+esc(a.flow[0].text)+"</div>" +
           '<div class="chip"><b>6.</b> Feedback</div>' +
         "</div>" +
       "</div>" +
@@ -215,8 +391,9 @@ function render(a){
 
     '<div class="bands">' +
       '<div class="band"><span class="gl">Tools</span><p>'+esc(a.tools_band)+"</p></div>" +
-      '<div class="band found"><div class="id"><span class="gi azure">ID</span>' +
-        esc(a.foundation_band.identity)+"</div>" +
+      '<div class="band found"><div class="id"><span class="mk plain" ' +
+        'title="No product mark on file for ' + esc(a.foundation_band.identity) +
+        '"></span>' + esc(a.foundation_band.identity)+"</div>" +
         "<b>"+esc(a.foundation_band.label)+"</b></div>" +
     "</div>" +
 
@@ -226,18 +403,136 @@ function render(a){
       }).join("") + "</div></div>" +
 
     '<div class="foot">' +
-      "Generated from the entry's declared systems" +
+      "Derived from what this entry declares — its description, its tags, its " +
+      "configuration and the operations in its own tool schema" +
+      (a.derivation && a.derivation.signals
+        ? " · " + a.derivation.signals.tool_schema + " declared operation" +
+          (a.derivation.signals.tool_schema === 1 ? "" : "s") + " · " +
+          a.derivation.signals.products_declared + " product" +
+          (a.derivation.signals.products_declared === 1 ? "" : "s") + " named outright, " +
+          a.derivation.signals.products_implied + " implied by a tag it carries"
+        : "") +
       (a.configuration && a.configuration.length
         ? " · configuration: " + a.configuration.map(esc).join(", ") : "") +
       (a.derivation.unclassified.length
         ? " · left unclassified rather than guessed: " +
           a.derivation.unclassified.map(esc).join(", ")
         : "") +
+      (noMark.length
+        ? " · no published mark on file, so drawn as a labelled chip: " +
+          noMark.map(esc).join(", ")
+        : "") +
       ". Microsoft AI Business Applications Specialist Team · synthetic data, no PII." +
     "</div>" +
   "</div>";
 
   document.getElementById("host").innerHTML=html;
+}
+
+/* ---- filter the library by the product an entry involves ------------------
+ * Same idiom as the industry filter on the catalog pages — one select, counts
+ * in the option text, re-render on change. Grouped by family so Dynamics 365
+ * and its apps sit together and can be picked at either level.
+ * ------------------------------------------------------------------------ */
+var PRODUCTS=null, HERE="";
+
+function wireProducts(doc, hereSlug){
+  if(!doc) return;
+  PRODUCTS=doc; HERE=hereSlug;
+  var sel=document.getElementById("fProd"), bar=document.getElementById("prodbar");
+  var byFamily={}, order=[];
+  (doc.products||[]).forEach(function(p){
+    if(!p.entry_count) return;
+    if(!byFamily[p.family]){ byFamily[p.family]=[]; order.push(p.family); }
+    byFamily[p.family].push(p);
+  });
+  order.forEach(function(fam){
+    var g=document.createElement("optgroup"); g.label=fam;
+    byFamily[fam].forEach(function(p){
+      var o=document.createElement("option");
+      o.value=p.id;
+      o.textContent=(p.app ? "— " + p.app : p.name) + " (" + p.entry_count + ")";
+      g.appendChild(o);
+    });
+    sel.appendChild(g);
+  });
+  // Whole-family option, so "everything touching Dynamics 365" is one pick.
+  order.forEach(function(fam){
+    var n=0;
+    (doc.entries||[]).forEach(function(e){
+      if((e.products||[]).some(function(x){ return productOf(x.id).family===fam; })) n++;
+    });
+    if(!n) return;
+    var o=document.createElement("option");
+    o.value="family:"+fam; o.textContent="All of " + fam + " (" + n + ")";
+    sel.insertBefore(o, sel.children[1] || null);
+  });
+  bar.hidden=false;
+  sel.addEventListener("change", renderProducts);
+
+  var mine=(doc.entries||[]).filter(function(e){ return e.slug===hereSlug; })[0];
+  var now=document.getElementById("prodNow");
+  if(mine){
+    now.textContent = mine.products.length
+      ? "This entry involves " + mine.products.length + ": " +
+        mine.products.map(function(p){ return productOf(p.id).name; }).join(", ")
+      : "This entry names no Microsoft product.";
+  }
+}
+
+function productOf(id){
+  var list=(PRODUCTS && PRODUCTS.products) || [];
+  for(var i=0;i<list.length;i++) if(list[i].id===id) return list[i];
+  return {id:id,name:id,family:"",app:null,mark:null,mark_status:"labelled-chip"};
+}
+
+/* A family picked as a whole borrows the family's own mark when there is one —
+ * the Dynamics 365 mark IS the mark for "all of Dynamics 365". If the family
+ * has no mark on file it stays a labelled chip like any other. */
+function familyHead(fam){
+  var list=(PRODUCTS && PRODUCTS.products) || [];
+  for(var i=0;i<list.length;i++){
+    if(list[i].family===fam && list[i].mark && list[i].mark_scope==="exact"){
+      return {id:"family:"+fam, name:"All of "+fam, family:fam, app:null,
+              mark:list[i].mark, mark_scope:"exact", mark_status:"mark"};
+    }
+  }
+  return {id:"family:"+fam, name:"All of "+fam, family:fam, app:null,
+          mark:null, mark_scope:null, mark_status:"labelled-chip"};
+}
+
+function renderProducts(){
+  var v=document.getElementById("fProd").value;
+  var host=document.getElementById("prodlist");
+  if(!v || !PRODUCTS){ host.innerHTML=""; return; }
+  var fam=v.indexOf("family:")===0 ? v.slice(7) : null;
+  var p=fam ? familyHead(fam) : productOf(v);
+  var hits=(PRODUCTS.entries||[]).filter(function(e){
+    return (e.products||[]).some(function(x){
+      return fam ? productOf(x.id).family===fam : x.id===v; });
+  });
+  var declared=0;
+  hits.forEach(function(e){
+    (e.products||[]).forEach(function(x){
+      var m = fam ? productOf(x.id).family===fam : x.id===v;
+      if(m && x.confidence==="declared") declared++;
+    });
+  });
+  host.innerHTML='<div class="box"><h4>' +
+      mark({label:p.name, mark:p.mark, mark_scope:p.mark_scope, family:p.family}) +
+      esc(p.name) + " · " + hits.length + " entr" + (hits.length===1?"y":"ies") + "</h4>" +
+    '<div class="why">' + declared + " named it outright; the rest carry a tag or " +
+      "category that points at it. An entry that declares neither is not listed — " +
+      "an unknown stays unknown." + (p.mark_status==="mark" ? "" :
+        " No published mark on file for this product, so it is drawn as a labelled chip.") +
+    "</div><ul>" +
+    hits.map(function(e){
+      var kindQ=(e.kind==="agent"?"agent=":"solution=")+encodeURIComponent(e.ref||e.slug);
+      return "<li><a" + (e.slug===HERE ? ' class="here"' : "") +
+        ' href="architecture.html?' + kindQ + '">' + esc(e.display_name) +
+        (e.industries && e.industries.length
+          ? ' <span class="c">· ' + esc(e.industries[0]) + "</span>" : "") + "</a></li>";
+    }).join("") + "</ul></div>";
 }
 
 (function boot(){
@@ -257,6 +552,9 @@ function render(a){
     if(!a){ document.getElementById("host").innerHTML =
       '<div class="sheet">No architecture for '+esc(ref)+'.</div>'; return; }
     render(a);
+    getJSON(["api/v1/products.json","data/products.json"]).then(function(pd){
+      wireProducts(pd, a.slug);
+    });
     // Same data, same deck: the architecture page exports the diagram's own
     // layers as native slides rather than a printout of the page.
     var btn=document.getElementById("deckArch"), st=document.getElementById("deckArchStatus");

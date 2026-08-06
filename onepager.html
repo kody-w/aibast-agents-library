@@ -8,6 +8,64 @@
 <meta property="og:title" content="AIBAST agent one-pager">
 <meta property="og:description" content="One page per agent: business framing, demo video, live source, community rating and automated review.">
 <style>
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
+:root {
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
+  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
+}
+[data-theme="dark"] {
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
+  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{max-width:100%;overflow-x:hidden}
+body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  color:var(--text);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+header.site{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav{display:flex;align-items:center;gap:18px;padding:12px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--text);white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand .mark{color:var(--accent);display:inline-flex}
+.brand .mark svg{width:19px;height:19px}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:var(--text-dim);font-size:13.5px;padding:5px 10px;border-radius:8px}
+.nav-links a:hover{color:var(--text);background:var(--panel-2);text-decoration:none}
+.nav-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
+  width:32px;height:32px;border-radius:6px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center}
+.icon-btn svg{width:15px;height:15px}
+.icon-btn:hover{color:var(--text);border-color:var(--text-faint);text-decoration:none}
+footer.site{margin-top:20px;border-top:1px solid var(--border);padding:26px 0 44px}
+.foot{display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--text-faint)}
+.foot a{color:var(--text-dim)}
+.foot .copy{width:100%;margin-top:4px}
+@media (max-width:560px){.nav-links{order:3;width:100%}}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border:1px solid var(--border);
+  border-radius:6px;background:var(--panel);color:var(--text);text-decoration:none;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:var(--text-faint);text-decoration:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+/* ══ page-specific ══ */
+
 :root {
   --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
   --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
@@ -174,6 +232,57 @@ details.src { margin:0 0 30px; }
 .slotrow input { flex:1 1 220px; padding:7px 11px; border:1px solid var(--border); border-radius:6px; background:var(--panel-2); color:var(--text); font-family:inherit; font-size:13px; }
 details.src > summary { cursor:pointer; font-weight:600; font-size:14px; padding:10px 0; }
 
+/* ---- Microsoft products involved ----------------------------------------
+   A real mark is an image of the real mark. A product with nothing on file
+   gets the neutral chip and says so on hover — no Microsoft logo is ever
+   approximated, redrawn, or stood in for by a lookalike.                   */
+.prods { display:flex; flex-wrap:wrap; gap:9px; }
+.prod {
+  display:flex; align-items:flex-start; gap:9px; border:1px solid var(--border);
+  background:var(--panel-2); border-radius:8px; padding:8px 12px 8px 10px;
+  font-size:13.5px; line-height:1.35; max-width:340px;
+}
+.prod .mk { flex:0 0 auto; width:24px; height:24px; display:flex; align-items:center;
+  justify-content:center; overflow:hidden; }
+.prod .mk img { max-width:24px; max-height:22px; object-fit:contain; display:block; }
+.mk.plain {
+  border:1.5px dashed var(--text-faint); border-radius:5px; opacity:.7;
+  display:flex; align-items:center; justify-content:center;
+}
+.mk.plain:after { content:""; width:7px; height:7px; border-radius:2px; background:var(--text-faint); }
+.prod b { font-weight:600; display:block; }
+.prod .ev { display:block; font-size:11px; color:var(--text-faint); margin-top:1px; }
+.conf {
+  font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  border-radius:3px; padding:1px 5px; margin-left:6px; vertical-align:1px;
+}
+.conf.declared { background:rgba(16,124,16,.13); color:var(--ok); }
+.conf.implied  { background:rgba(184,145,45,.16); color:var(--gold); }
+.fam-head { font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  color:var(--text-faint); width:100%; margin:6px 0 -2px; }
+
+/* ---- product filter: the catalog pages' idiom, on the detail page -------- */
+.tools {
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:14px 0 0;
+}
+.tools label { font-size:12px; font-weight:600; color:var(--text-faint); }
+.tools select {
+  font-family:inherit; font-size:13.5px; padding:8px 11px; border-radius:8px;
+  border:1px solid var(--border); background:var(--panel); color:var(--text); min-width:250px;
+}
+.prodhits { margin:10px 0 0; border:1px solid var(--border); border-radius:10px;
+  background:var(--panel); padding:14px 16px; }
+.prodhits h4 { font-size:13.5px; font-weight:650; display:flex; align-items:center;
+  gap:9px; margin-bottom:3px; }
+.prodhits .why { font-size:12px; color:var(--text-faint); margin-bottom:9px; line-height:1.5; }
+.prodhits ul { list-style:none; display:flex; flex-wrap:wrap; gap:6px;
+  max-height:210px; overflow:auto; }
+.prodhits li a { display:block; font-size:12.5px; border:1px solid var(--border);
+  border-radius:6px; padding:5px 10px; color:var(--text-dim); background:var(--panel-2); }
+.prodhits li a:hover { background:var(--accent-soft); text-decoration:none; }
+.prodhits li a.here { border-color:var(--accent); color:var(--text); }
+.prodhits li a .c { color:var(--text-faint); }
+
 footer { border-top:1px solid var(--border); margin-top:40px; padding:24px 0 40px; }
 .flinks { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; }
 .flinks a { color:var(--text-dim); }
@@ -191,6 +300,30 @@ footer { border-top:1px solid var(--border); margin-top:40px; padding:24px 0 40p
 </style>
 </head>
 <body>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="agents.html">Library</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
 
 <header>
   <div class="wrap hbar">
@@ -210,6 +343,11 @@ footer { border-top:1px solid var(--border); margin-top:40px; padding:24px 0 40p
 
 <main class="wrap">
   <div class="crumbs" id="crumbs"><a href="agents.html">Library</a> › <span id="crumbName">one-pager</span></div>
+  <div class="tools" id="prodbar" hidden>
+    <label for="fProd">Product involved</label>
+    <select id="fProd"><option value="">All products</option></select>
+  </div>
+  <div id="prodhits"></div>
   <div id="content"><p class="muted" style="padding:40px 0">Loading the one-pager…</p></div>
 </main>
 
@@ -277,6 +415,165 @@ function chips(list, mono) {
 function bullets(list) {
   if (!list || !list.length) return '<span class="muted">—</span>';
   return '<ul class="vd">' + list.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
+}
+
+/* ------------------------------------------------------------------ *
+ * Microsoft products involved.
+ *
+ * Read from data/products.json, which is where the reference architecture
+ * reads them too — one source, so a product cannot be named one way here
+ * and another way on the diagram. Three things are shown and none of them
+ * is a guess dressed as a fact:
+ *
+ *   the real mark, when a real mark exists in this repository;
+ *   a neutral labelled chip when it does not, saying so on hover;
+ *   whether the entry DECLARED the product or a tag it carries IMPLIED it,
+ *   with the evidence printed under the name.
+ *
+ * An entry that declares and implies nothing prints that it names none.
+ * ------------------------------------------------------------------ */
+var PRODUCTS = null, PROD_HERE = "";
+
+function productOf(id) {
+  var list = (PRODUCTS && PRODUCTS.products) || [];
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+  return { id: id, name: id, family: "", app: null, mark: null, mark_status: "labelled-chip" };
+}
+
+function markHTML(p) {
+  if (p && p.mark) {
+    var t = p.mark_scope === "family"
+      ? p.family + " mark, shown beside the app name" : p.name + " mark";
+    return '<span class="mk"><img src="' + esc(p.mark) + '" alt="' + esc(t) +
+      '" title="' + esc(t) + '" loading="lazy"></span>';
+  }
+  return '<span class="mk plain" title="No product mark on file for ' +
+    esc(p && p.name ? p.name : "this product") + ' — shown as a labelled chip"></span>';
+}
+
+function productsHTML(entry) {
+  if (!entry) return "";
+  if (!entry.products.length) {
+    return '<div class="col"><div class="lbl">Microsoft products involved</div>' +
+      '<p class="muted">This entry names no Microsoft product and carries no tag ' +
+      'that points at one, so none is claimed for it.</p></div>';
+  }
+  var byFamily = {}, order = [];
+  entry.products.forEach(function (a) {
+    var p = productOf(a.id);
+    if (!byFamily[p.family]) { byFamily[p.family] = []; order.push(p.family); }
+    byFamily[p.family].push({ p: p, a: a });
+  });
+  var body = order.map(function (fam) {
+    return '<div class="fam-head">' + esc(fam) + "</div>" +
+      byFamily[fam].map(function (x) {
+        return '<div class="prod">' + markHTML(x.p) +
+          "<span><b>" + esc(x.p.name) +
+          '<span class="conf ' + esc(x.a.confidence) + '">' + esc(x.a.confidence) +
+          "</span></b>" +
+          '<span class="ev">' + esc(x.a.evidence) + "</span></span></div>";
+      }).join("");
+  }).join("");
+  var noMark = entry.products.map(function (a) { return productOf(a.id); })
+    .filter(function (p) { return p.mark_status !== "mark"; })
+    .map(function (p) { return p.name; });
+  return '<div class="col" style="flex:1 1 100%"><div class="lbl">Microsoft products involved</div>' +
+    '<div class="prods">' + body + "</div>" +
+    (noMark.length
+      ? '<p class="muted" style="margin-top:8px">No published mark on file for ' +
+        noMark.map(esc).join(", ") + " — drawn as a labelled chip rather than an " +
+        "approximated logo.</p>" : "") +
+    "</div>";
+}
+
+/* A family picked as a whole borrows the family's own mark when there is one —
+ * the Dynamics 365 mark IS the mark for "all of Dynamics 365". A family with
+ * nothing on file stays a labelled chip like any other. */
+function familyHead(fam) {
+  var list = (PRODUCTS && PRODUCTS.products) || [];
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].family === fam && list[i].mark && list[i].mark_scope === "exact") {
+      return { id: "family:" + fam, name: "All of " + fam, family: fam, app: null,
+               mark: list[i].mark, mark_scope: "exact", mark_status: "mark" };
+    }
+  }
+  return { id: "family:" + fam, name: "All of " + fam, family: fam, app: null,
+           mark: null, mark_scope: null, mark_status: "labelled-chip" };
+}
+
+function renderProdHits() {
+  var v = document.getElementById("fProd").value;
+  var host = document.getElementById("prodhits");
+  if (!v || !PRODUCTS) { host.innerHTML = ""; return; }
+  var fam = v.indexOf("family:") === 0 ? v.slice(7) : null;
+  var p = fam ? familyHead(fam) : productOf(v);
+  var hits = (PRODUCTS.entries || []).filter(function (e) {
+    return (e.products || []).some(function (x) {
+      return fam ? productOf(x.id).family === fam : x.id === v;
+    });
+  });
+  var declared = 0;
+  hits.forEach(function (e) {
+    (e.products || []).forEach(function (x) {
+      var m = fam ? productOf(x.id).family === fam : x.id === v;
+      if (m && x.confidence === "declared") declared++;
+    });
+  });
+  host.innerHTML = '<div class="prodhits"><h4>' + markHTML(p) + esc(p.name) + " · " +
+    hits.length + " entr" + (hits.length === 1 ? "y" : "ies") + "</h4>" +
+    '<div class="why">' + declared + " named it outright; the rest carry a tag or " +
+    "category that points at it. An entry that declares neither is not listed — an " +
+    "unknown stays unknown." +
+    (p.mark_status === "mark" ? "" :
+      " No published mark on file for this product, so it is drawn as a labelled chip.") +
+    "</div><ul>" +
+    hits.map(function (e) {
+      var q = (e.kind === "agent" ? "agent=" : "solution=") +
+        encodeURIComponent(e.ref || e.slug);
+      return "<li><a" + (e.slug === PROD_HERE ? ' class="here"' : "") +
+        ' href="onepager.html?' + q + '">' + esc(e.display_name) +
+        (e.industries && e.industries.length
+          ? ' <span class="c">· ' + esc(e.industries[0]) + "</span>" : "") + "</a></li>";
+    }).join("") + "</ul></div>";
+}
+
+function wireProducts(hereSlug) {
+  PROD_HERE = hereSlug;
+  return getJSON(["api/v1/products.json", "data/products.json"]).then(function (doc) {
+    if (!doc) return null;
+    PRODUCTS = doc;
+    var sel = document.getElementById("fProd");
+    var byFamily = {}, order = [];
+    (doc.products || []).forEach(function (p) {
+      if (!p.entry_count) return;
+      if (!byFamily[p.family]) { byFamily[p.family] = []; order.push(p.family); }
+      byFamily[p.family].push(p);
+    });
+    order.forEach(function (fam) {
+      var g = document.createElement("optgroup"); g.label = fam;
+      byFamily[fam].forEach(function (p) {
+        var o = document.createElement("option");
+        o.value = p.id;
+        o.textContent = (p.app ? "— " + p.app : p.name) + " (" + p.entry_count + ")";
+        g.appendChild(o);
+      });
+      sel.appendChild(g);
+    });
+    // One pick for a whole family, so "anything touching Dynamics 365" works
+    // without walking its apps.
+    order.forEach(function (fam) {
+      var n = (doc.entries || []).filter(function (e) {
+        return (e.products || []).some(function (x) { return productOf(x.id).family === fam; });
+      }).length;
+      if (!n) return;
+      var o = document.createElement("option");
+      o.value = "family:" + fam; o.textContent = "All of " + fam + " (" + n + ")";
+      sel.insertBefore(o, sel.children[1] || null);
+    });
+    document.getElementById("prodbar").hidden = false;
+    sel.addEventListener("change", renderProdHits);
+    return (doc.entries || []).filter(function (e) { return e.slug === hereSlug; })[0] || null;
+  });
 }
 
 /* ------------------------------------------------------------------ *
@@ -452,6 +749,7 @@ function renderAgent(agent, review, rating, source) {
           chips((agent.requires_env || []).length ? agent.requires_env : ["No configuration"], true) + "</div>" +
         '<div class="col"><div class="lbl">Parameters</div>' + chips(params.slice(0, 8), true) + "</div>" +
       "</div>" +
+      '<div class="cols" id="prodBlock"></div>' +
       '<div class="actions">' +
         '<a class="btn primary" href="' + esc(agent.file || agent.raw_url) + '" download="' + esc(short) + '.py"' +
           ' onclick="track(\'library.agent.deployed\',\'' + esc(agent.name) + '\')">Download agent.py</a>' +
@@ -475,6 +773,10 @@ function renderAgent(agent, review, rating, source) {
   document.getElementById("content").innerHTML = html;
   wireDeck("deckAgent", "agent", agent, short);
   wireRemix(STORYBOARD);
+  wireProducts(short).then(function (e) {
+    var host = document.getElementById("prodBlock");
+    if (host) host.innerHTML = productsHTML(e);
+  });
   track("library.onepager.completed", agent.name);
 }
 
@@ -504,6 +806,7 @@ function renderSolution(sol) {
         '<div class="col"><div class="lbl">Built with</div>' + chips(sol.built_with) + "</div>" +
         '<div class="col"><div class="lbl">Featured tools</div>' + chips(sol.featured_tools || sol.requires) + "</div>" +
       "</div>" +
+      '<div class="cols" id="prodBlock"></div>' +
       '<div class="actions">' +
         '<a class="btn primary" href="architecture.html?solution=' + encodeURIComponent(sol.slug) + '">Architecture</a>' +
         '<a class="btn" href="agents.html">Find the agents that build this</a>' +
@@ -519,6 +822,10 @@ function renderSolution(sol) {
 
   document.getElementById("content").innerHTML = html;
   wireDeck("deckSolution", "solution", sol, null);
+  wireProducts(sol.slug).then(function (e) {
+    var host = document.getElementById("prodBlock");
+    if (host) host.innerHTML = productsHTML(e);
+  });
   track("library.onepager.completed", sol.slug);
 }
 

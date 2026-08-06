@@ -594,7 +594,11 @@ function Install-Brainstem {
             Remove-Item -Recurse -Force "$BRAINSTEM_HOME\src" -ErrorAction SilentlyContinue
         }
         Write-Host "  Cloning repository..."
-        git clone --quiet $REPO_URL "$BRAINSTEM_HOME\src" 2>&1
+        # Shallow by default; see install.sh for why. Pinning deepens below.
+        # Sparse as well as shallow; see install.sh. Only rapp_brainstem is
+        # expanded onto disk.
+        git clone --quiet --depth 1 --filter=blob:none --sparse $REPO_URL "$BRAINSTEM_HOME\src" 2>&1
+        Push-Location "$BRAINSTEM_HOME\src"; git sparse-checkout set rapp_brainstem 2>&1 | Out-Null; Pop-Location
         if ($LASTEXITCODE -ne 0) {
             Write-Host "  [X] Failed to clone repository" -ForegroundColor Red
             throw "git clone failed"
@@ -606,6 +610,9 @@ function Install-Brainstem {
             Push-Location "$BRAINSTEM_HOME\src"
             $prevEAP = $ErrorActionPreference
             $ErrorActionPreference = 'Continue'
+            # A depth-1 clone carries no tags and no history to resolve
+            # them against; pinning buys back what it skipped.
+            git fetch --unshallow --quiet 2>&1 | Out-Null
             git fetch --tags --quiet origin 2>&1 | Out-Null
             $TagRef = Resolve-PinnedTag $PIN_VERSION
             if ($TagRef) {

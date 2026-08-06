@@ -39,7 +39,7 @@
     "rule": "The shipped film states no figures, because these are demonstrations rather than results. Substitute real numbers only if you can stand behind them \u2014 a personalised demo carries more weight, which is exactly why an invented number in one does more damage."
   },
   "format_doc": "media/RAPPVISION.md",
-  "generated": "2026-08-06T00:12:23+00:00",
+  "generated": "2026-08-06T03:27:54+00:00",
   "subject": {
     "slug": "win-probability",
     "kind": "agent",
@@ -87,10 +87,10 @@
           "Engages you in Microsoft Teams and Outlook"
         ],
         "Actions": [
-          "Analyze contributing factors, tracks trends"
+          "Analyze contributing factors"
         ]
       },
-      "narration": "Let's say a manager needs to analyze contributing factors, tracks trends. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
+      "narration": "Let's say a manager needs to analyze contributing factors. Before, they would have needed to jump across multiple systems to manually gather insights, piecing the picture together by hand, and hoping nothing moved while they worked."
     },
     {
       "act": "walkthrough",
@@ -106,7 +106,7 @@
           "role": "agent",
           "heading": "Win Probability",
           "rich": {
-            "intro": "I'll analyze contributing factors, tracks trends for the enterprise pipeline, working against a compressed buying cycle. Reading CRM, engagement history and product signals before I propose anything.",
+            "intro": "I'll analyze contributing factors for the enterprise pipeline, working against a compressed buying cycle. Reading CRM, engagement history and product signals before I propose anything.",
             "sections": [
               {
                 "label": "Current position",
@@ -124,6 +124,14 @@
                   "Engagement history \u2014 read, not assumed",
                   "Product signals \u2014 read, not assumed",
                   "Anything I could not verify is called out below"
+                ]
+              },
+              {
+                "label": "What I did not check",
+                "items": [
+                  "Anything outside CRM, engagement history and product signals",
+                  "Changes made after this reading",
+                  "Judgement calls that belong to a person"
                 ]
               }
             ],
@@ -148,9 +156,17 @@
               {
                 "label": "Steps",
                 "items": [
-                  "1. Analyze contributing factors, tracks trends",
+                  "1. Analyze contributing factors",
                   "2. Confirm the result against the source system",
                   "3. Hand back the artifact, and the reasoning behind it"
+                ]
+              },
+              {
+                "label": "What this needs from you",
+                "items": [
+                  "Confirmation before anything is written back",
+                  "A decision where the evidence is thin",
+                  "The owner for each step"
                 ]
               }
             ],
@@ -187,6 +203,14 @@
                   "Flag low-evidence items rather than smoothing over them",
                   "Stop and ask before anything is written back"
                 ]
+              },
+              {
+                "label": "What would change my answer",
+                "items": [
+                  "A more recent reading from CRM",
+                  "A correction to any record I cited",
+                  "Context a person holds that the systems do not"
+                ]
               }
             ],
             "callout": {
@@ -198,7 +222,7 @@
           "agent_call": "Win Probability"
         }
       ],
-      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across CRM and Engagement history, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on. With Win Probability, sales teams get guided assistance embedded directly into their workflows."
+      "narration": "But what if the manager wants to go a step further? The agent handles the analysis and offers a set of targeted recommendations right in their workflow. Work like this used to require cross-referencing different systems by hand. Now, with unified data context across CRM and Engagement history, the agent can rapidly generate a phased plan with quick wins. For risk mitigation, the agent helps as well, outlining a strategy that keeps the work on track. When the detail is needed, they simply ask, and the agent quickly compiles a clear summary. It is explicit about what it did not read, so nobody mistakes a gap in the sources for a clean result. It names what it needs from a person before anything is written back, and who owns each step. And it says what would change its answer, which is the difference between a briefing you can act on and one you have to re-check. It can go further in the same conversation, without anyone switching tools. Finally, the agent creates a monitoring plan, so teams keep the effort aligned to the metrics they are measured on."
     },
     {
       "act": "close",
