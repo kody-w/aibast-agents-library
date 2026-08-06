@@ -1,0 +1,297 @@
+{
+  "schema": "aibast-base-tracks/1.0",
+  "note": "Proxy copies of the professional recordings, used as the BASE TRACK: their cinematography, transitions, Microsoft intro and b-roll are kept, and only the boxes carrying agent-specific content are replaced. Proxies are local working files; the renderer uses the full-resolution originals.",
+  "count": 48,
+  "tracks": [
+    "account-intelligence-agent",
+    "ask-hr-agent",
+    "building-permit-processing-agent",
+    "care-gap-closure-agent",
+    "cart-abandonment-recovery-agent",
+    "claims-processing-agent",
+    "client-health-score-agent",
+    "clinical-notes-summarizer-agent",
+    "contract-risk-review-agent",
+    "cross-selling-opportunities-agent",
+    "customer-escalations-agent",
+    "customer-loyalty-rewards-agent",
+    "customer-onboarding-agent",
+    "customer-sentiment-and-churn-prediction-agent",
+    "deal-progression-agent",
+    "discount-finder-agent",
+    "energy-operations-suite",
+    "field-services-dispatch-agent",
+    "financial-advisor-agent",
+    "fraud-detection-and-alert-agent",
+    "inventory-rebalancing-agent",
+    "inventory-visibility-agent",
+    "license-renewal-and-expansion-agent",
+    "loan-origination-assistant",
+    "maintenance-scheduling-agent",
+    "omnichannel-engagement-agent",
+    "order-status-communication-agent",
+    "patient-intake-and-scheduling-agent",
+    "personalized-marketing-agent",
+    "personalized-shopping-agent",
+    "portfolio-rebalancing-agent",
+    "prior-authorization-automation-agent",
+    "procurement-agent",
+    "product-feedback-synthesizer-agent",
+    "product-line-optimization-agent",
+    "proposal-generation-agent",
+    "regulatory-compliance-agent",
+    "resource-utilization-agent",
+    "returns-and-complaints-resolution-agent",
+    "sales-qualification-agent",
+    "store-associate-copilot",
+    "supply-chain-disruption-alert-agent",
+    "supply-risk-monitoring-agent",
+    "time-entry--billing-agent",
+    "underwriting-support-agent",
+    "utility-billing-and-assistance-agent",
+    "wealth-insights-generator-agent",
+    "win-loss-analysis-agent"
+  ],
+  "detail": [
+    {
+      "id": "account-intelligence-agent",
+      "seconds": 132.4,
+      "size_mb": 1.47
+    },
+    {
+      "id": "ask-hr-agent",
+      "seconds": 150.0,
+      "size_mb": 2.15
+    },
+    {
+      "id": "building-permit-processing-agent",
+      "seconds": 164.7,
+      "size_mb": 2.81
+    },
+    {
+      "id": "care-gap-closure-agent",
+      "seconds": 159.6,
+      "size_mb": 2.37
+    },
+    {
+      "id": "cart-abandonment-recovery-agent",
+      "seconds": 145.5,
+      "size_mb": 1.2
+    },
+    {
+      "id": "claims-processing-agent",
+      "seconds": 173.5,
+      "size_mb": 1.97
+    },
+    {
+      "id": "client-health-score-agent",
+      "seconds": 127.7,
+      "size_mb": 1.58
+    },
+    {
+      "id": "clinical-notes-summarizer-agent",
+      "seconds": 172.9,
+      "size_mb": 2.19
+    },
+    {
+      "id": "contract-risk-review-agent",
+      "seconds": 139.9,
+      "size_mb": 2.37
+    },
+    {
+      "id": "cross-selling-opportunities-agent",
+      "seconds": 156.4,
+      "size_mb": 2.6
+    },
+    {
+      "id": "customer-escalations-agent",
+      "seconds": 142.1,
+      "size_mb": 1.85
+    },
+    {
+      "id": "customer-loyalty-rewards-agent",
+      "seconds": 173.2,
+      "size_mb": 1.85
+    },
+    {
+      "id": "customer-onboarding-agent",
+      "seconds": 146.8,
+      "size_mb": 2.4
+    },
+    {
+      "id": "customer-sentiment-and-churn-prediction-agent",
+      "seconds": 161.4,
+      "size_mb": 1.89
+    },
+    {
+      "id": "deal-progression-agent",
+      "seconds": 135.5,
+      "size_mb": 1.81
+    },
+    {
+      "id": "discount-finder-agent",
+      "seconds": 153.3,
+      "size_mb": 2.02
+    },
+    {
+      "id": "energy-operations-suite",
+      "seconds": 201.6,
+      "size_mb": 2.81
+    },
+    {
+      "id": "field-services-dispatch-agent",
+      "seconds": 157.9,
+      "size_mb": 2.42
+    },
+    {
+      "id": "financial-advisor-agent",
+      "seconds": 164.7,
+      "size_mb": 2.73
+    },
+    {
+      "id": "fraud-detection-and-alert-agent",
+      "seconds": 178.3,
+      "size_mb": 2.09
+    },
+    {
+      "id": "inventory-rebalancing-agent",
+      "seconds": 147.0,
+      "size_mb": 2.45
+    },
+    {
+      "id": "inventory-visibility-agent",
+      "seconds": 148.3,
+      "size_mb": 2.75
+    },
+    {
+      "id": "license-renewal-and-expansion-agent",
+      "seconds": 173.9,
+      "size_mb": 2.25
+    },
+    {
+      "id": "loan-origination-assistant",
+      "seconds": 145.9,
+      "size_mb": 2.41
+    },
+    {
+      "id": "maintenance-scheduling-agent",
+      "seconds": 161.0,
+      "size_mb": 3.37
+    },
+    {
+      "id": "omnichannel-engagement-agent",
+      "seconds": 169.9,
+      "size_mb": 2.12
+    },
+    {
+      "id": "order-status-communication-agent",
+      "seconds": 169.8,
+      "size_mb": 3.24
+    },
+    {
+      "id": "patient-intake-and-scheduling-agent",
+      "seconds": 146.3,
+      "size_mb": 2.18
+    },
+    {
+      "id": "personalized-marketing-agent",
+      "seconds": 143.3,
+      "size_mb": 1.93
+    },
+    {
+      "id": "personalized-shopping-agent",
+      "seconds": 169.3,
+      "size_mb": 2.36
+    },
+    {
+      "id": "portfolio-rebalancing-agent",
+      "seconds": 153.0,
+      "size_mb": 2.69
+    },
+    {
+      "id": "prior-authorization-automation-agent",
+      "seconds": 166.8,
+      "size_mb": 2.33
+    },
+    {
+      "id": "procurement-agent",
+      "seconds": 137.0,
+      "size_mb": 1.64
+    },
+    {
+      "id": "product-feedback-synthesizer-agent",
+      "seconds": 162.6,
+      "size_mb": 2.3
+    },
+    {
+      "id": "product-line-optimization-agent",
+      "seconds": 135.5,
+      "size_mb": 3.8
+    },
+    {
+      "id": "proposal-generation-agent",
+      "seconds": 152.6,
+      "size_mb": 2.84
+    },
+    {
+      "id": "regulatory-compliance-agent",
+      "seconds": 177.0,
+      "size_mb": 2.33
+    },
+    {
+      "id": "resource-utilization-agent",
+      "seconds": 145.4,
+      "size_mb": 2.22
+    },
+    {
+      "id": "returns-and-complaints-resolution-agent",
+      "seconds": 156.9,
+      "size_mb": 1.85
+    },
+    {
+      "id": "sales-qualification-agent",
+      "seconds": 142.5,
+      "size_mb": 1.92
+    },
+    {
+      "id": "store-associate-copilot",
+      "seconds": 143.6,
+      "size_mb": 2.68
+    },
+    {
+      "id": "supply-chain-disruption-alert-agent",
+      "seconds": 156.5,
+      "size_mb": 3.34
+    },
+    {
+      "id": "supply-risk-monitoring-agent",
+      "seconds": 145.5,
+      "size_mb": 3.01
+    },
+    {
+      "id": "time-entry--billing-agent",
+      "seconds": 142.8,
+      "size_mb": 2.03
+    },
+    {
+      "id": "underwriting-support-agent",
+      "seconds": 157.7,
+      "size_mb": 1.87
+    },
+    {
+      "id": "utility-billing-and-assistance-agent",
+      "seconds": 164.7,
+      "size_mb": 2.71
+    },
+    {
+      "id": "wealth-insights-generator-agent",
+      "seconds": 169.2,
+      "size_mb": 2.09
+    },
+    {
+      "id": "win-loss-analysis-agent",
+      "seconds": 151.9,
+      "size_mb": 1.68
+    }
+  ]
+}

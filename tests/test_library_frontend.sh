@@ -1049,7 +1049,7 @@ for e in hosted:
 PY"
 check "onepager.html renders both modes and streams source from raw" "python3 - <<'PY'
 d=open('onepager.html').read()
-for k in ('?agent=','?solution=','renderAgent','renderSolution','raw_url','window.print'):
+for k in ('?agent=','?solution=','renderAgent','renderSolution','raw_url','Export as PowerPoint'):
     assert k in d, k
 PY"
 check "solutions.html lists the catalog from the static API" "python3 - <<'PY'
@@ -1452,7 +1452,10 @@ for w in idx['walkthroughs'][:5]:
                  .joinpath(f\"{w['kind']}-{w['slug']}.json\").read_text())
     assert d['schema']=='rappvision-walkthrough/1.0'
     assert [s['act'] for s in d['scenes']]==['title','problem','overview','walkthrough','close']
-    assert abs(d['runtime_seconds']-137.0)<1
+    # 132.4s, measured off the recordings these are composited onto —
+    # the storyboard is the approval artifact and must describe the
+    # film that actually gets made, not a 137s one that never existed.
+    assert abs(d['runtime_seconds']-132.4)<1, d['runtime_seconds']
 PY"
 check "the format matches the shipped recordings it was derived from" "python3 - <<'PY'
 import json, subprocess, pathlib

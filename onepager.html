@@ -774,14 +774,13 @@ function fail(msg) {
 
   Promise.all([
     getJSON(["api/v1/agents.json", "registry.json"]),
-    getJSON(["media/videos/generated/index.json"]),
     getJSON(["api/v1/reviews.json", "state/agent_reviews.json"]),
     getJSON(["state/discussion_ratings.json"])
   ]).then(function (r) {
-    var registry = r[0], films = r[1], reviews = r[2], ratings = r[3];
-    (films && films.films || []).forEach(function (f) {
-      FILMS[f.slug] = { src: f.src, size_mb: f.size_mb, generated: true };
-    });
+    var registry = r[0], reviews = r[1], ratings = r[2];
+    // Generated films are not served. The pipeline that made them is parked in
+    // archive/rappvision-pipeline/ pending a replacement; until one lands, the
+    // one-pager links the storyboard, not a film.
     if (!registry) return fail("The agent registry could not be loaded.");
     var list = registry.agents || registry;
     var agent = list.filter(function (a) {

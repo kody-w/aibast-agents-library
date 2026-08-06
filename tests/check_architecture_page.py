@@ -19,7 +19,8 @@ REQUIRED = [
     ("foundation_band", "the Supporting Features band"),
     ("a.flow", "the numbered request flow"),
     ("architectures.json", "the generated architecture data"),
-    ("window.print", "print / save as PDF"),
+    # A printed page is a picture of a page; the deck is native slides.
+    ("Export as PowerPoint", "export the deck as PowerPoint"),
     ('class="group"', "the dashed grouping boxes"),
     ('class="hl"', "the governance highlight"),
     ('class="step"', "the flow steps"),

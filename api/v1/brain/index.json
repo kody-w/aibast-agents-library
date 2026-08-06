@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-index/1.0",
-  "generated": "2026-08-05T22:14:02.894223+00:00",
+  "generated": "2026-08-06T00:54:22.665960+00:00",
   "vault": "brain",
   "count": 15,
   "reader": "https://microsoft.github.io/aibast-agents-library/brain.html",
