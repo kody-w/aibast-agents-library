@@ -96,15 +96,44 @@
 
   function bulletList(s, items, o) {
     o = o || {};
+    /* bullet must ride EACH item: a box-level bullet only marks the first
+       paragraph once breakLine splits the rest into their own paragraphs */
     var rows = (items || []).filter(Boolean).slice(0, o.max || 8).map(function (i) {
-      return { text: txt(i), options: { breakLine: true } };
+      return { text: txt(i), options: {
+        breakLine: true, bullet: { characterCode: "2022", indent: 12 }
+      } };
     });
     if (!rows.length) return;
     s.addText(rows, {
       x: o.x == null ? 0.62 : o.x, y: o.y == null ? 1.6 : o.y,
       w: o.w == null ? W - 1.24 : o.w, h: o.h == null ? 4.4 : o.h,
       fontFace: FONT, fontSize: o.size || 16, color: o.color || INK,
-      bullet: { characterCode: "2022" }, lineSpacingMultiple: 1.25, valign: "top"
+      lineSpacingMultiple: 1.25, valign: "top"
+    });
+  }
+
+  /* Jewels — the stat chips the MVP confirmation deck carries; here they are
+     grounded in what is knowable about a library agent, never invented. */
+  function jewelRow(pptx, s, jewels, o) {
+    o = o || {};
+    var live = (jewels || []).filter(function (j) { return j && j.big; });
+    if (!live.length) return;
+    var y = o.y == null ? 5.3 : o.y, cw = o.cw || 2.7, gap = 0.3;
+    live.slice(0, 4).forEach(function (j, i) {
+      var x = 0.62 + i * (cw + gap);
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: x, y: y, w: cw, h: 1.15, rectRadius: 0.14,
+        fill: { color: o.dark ? "1B2148" : "EFF3FE" }, line: { type: "none" }
+      });
+      s.addText([
+        { text: txt(j.big), options: { fontSize: 24, bold: true,
+          color: o.dark ? "F1B7D4" : BLUE, breakLine: true } },
+        { text: txt(j.label), options: { fontSize: 10.5,
+          color: o.dark ? "C7CBE6" : MUTED } }
+      ], {
+        x: x + 0.18, y: y, w: cw - 0.36, h: 1.15, valign: "middle",
+        fontFace: FONT
+      });
     });
   }
 
@@ -164,6 +193,99 @@
       "Registers as a tool automatically — no restart",
       "Runs on all three tiers: local, Azure Functions, Copilot Studio"
     ], { x: 6.6, y: 3.15, w: 6.1, h: 2.2, size: 14 });
+    var kb = entry && entry._size_kb;
+    var tier = entry && entry.quality_tier;
+    var params = paramNames(entry);
+    jewelRow(pptx, s, [
+      { big: kb ? Math.round(kb) + " KB" : "1",
+        label: "single file to install" },
+      { big: "3", label: "tiers it runs on" },
+      { big: String((entry && entry.requires_env || []).length),
+        label: "config keys required" },
+      tier ? { big: titleCase(tier), label: "quality tier" }
+           : { big: String(params.length), label: "parameters" }
+    ], { y: 5.35 });
+    footer(s, n);
+  }
+
+  function paramNames(entry) {
+    try {
+      var props = entry && entry.metadata && entry.metadata.parameters &&
+        entry.metadata.parameters.properties;
+      return props ? Object.keys(props) : (entry && entry.parameters) || [];
+    } catch (e) { return []; }
+  }
+
+  /* The "Example architecture" slide (pattern: the Smart Onboarding Agent
+     architecture slide) — where the agent sits between the person and the
+     data, as labeled boxes a customer architect can lift into their own
+     deck. Content is grounded in the entry and the film's overview panels. */
+  function architectureSlide(pptx, name, entry, panels, n) {
+    var s = lightSlide(pptx);
+    kicker(s, "Example architecture");
+    heading(s, "Where " + name + " sits");
+
+    var lanes = [
+      { title: "The person",
+        body: (panels && panels["Flow of work"] || []).slice(0, 3),
+        fallback: ["Microsoft Teams", "Microsoft 365 Copilot"], fill: "EFF3FE" },
+      { title: name,
+        body: [txt(entry && entry.description).split(". ")[0] ||
+               "A single-file RAPP agent"],
+        fallback: [], fill: "FBE9F7" },
+      { title: "The runtime",
+        body: ["Brainstem (local)", "Azure Functions",
+               "Copilot Studio"], fallback: [], fill: "F1ECFB" },
+      { title: "The sources",
+        body: (panels && panels["Sources"] || []).slice(0, 4),
+        fallback: ["The agent's packaged records"], fill: "EAF7F0" }
+    ];
+    var gap = 0.42, lw = (W - 1.24 - gap * 3) / 4;
+    lanes.forEach(function (l, i) {
+      var x = 0.62 + i * (lw + gap);
+      var items = l.body.length ? l.body : l.fallback;
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: x, y: 1.7, w: lw, h: 3.3, rectRadius: 0.12,
+        fill: { color: l.fill }, line: { color: "D9DCEA", width: 1 }
+      });
+      s.addText(txt(l.title), {
+        x: x + 0.12, y: 1.85, w: lw - 0.24, h: 0.5, align: "center",
+        fontFace: FONT, fontSize: 13.5, bold: true, color: INK
+      });
+      s.addText(items.map(function (t) {
+        return { text: txt(t), options: { breakLine: true } };
+      }), {
+        x: x + 0.18, y: 2.4, w: lw - 0.36, h: 2.4, align: "center",
+        valign: "top", fontFace: FONT, fontSize: 11.5, color: "3B3F5C",
+        lineSpacingMultiple: 1.3
+      });
+      if (i < lanes.length - 1) {
+        s.addShape(pptx.ShapeType.chevron, {
+          x: x + lw + 0.04, y: 3.1, w: 0.34, h: 0.5,
+          fill: { color: VIOLET }, line: { type: "none" }
+        });
+      }
+    });
+
+    [["1", "The person asks in the flow of work — Teams or Microsoft 365 Copilot."],
+     ["2", "The agent reasons only over its declared sources, on whichever tier it runs."],
+     ["3", "The answer lands with its evidence — records cited, never assumed."]]
+      .forEach(function (t, i) {
+        var x = 0.62 + i * ((W - 1.24 - 0.6) / 3 + 0.3);
+        var bw = (W - 1.24 - 0.6) / 3;
+        s.addShape(pptx.ShapeType.ellipse, {
+          x: x, y: 5.45, w: 0.34, h: 0.34,
+          fill: { color: BLUE }, line: { type: "none" }
+        });
+        s.addText(t[0], {
+          x: x, y: 5.45, w: 0.34, h: 0.34, align: "center", valign: "middle",
+          fontFace: FONT, fontSize: 12, bold: true, color: PAPER
+        });
+        s.addText(t[1], {
+          x: x + 0.44, y: 5.32, w: bw - 0.44, h: 0.75, valign: "middle",
+          fontFace: FONT, fontSize: 10.5, color: MUTED
+        });
+      });
     footer(s, n);
   }
 
@@ -283,12 +405,7 @@
       x: 6.8, y: 1.5, w: 5.9, h: 0.3,
       fontFace: FONT, fontSize: 12, bold: true, color: BLUE
     });
-    var params = [];
-    try {
-      var props = entry && entry.metadata && entry.metadata.parameters &&
-        entry.metadata.parameters.properties;
-      params = props ? Object.keys(props) : (entry && entry.parameters) || [];
-    } catch (e) { params = []; }
+    var params = paramNames(entry);
     bulletList(s, params.length ? params : ["None"],
       { x: 6.8, y: 1.85, w: 5.9, h: 1.9, size: 13 });
 
@@ -344,7 +461,11 @@
 
   function build(pptx, o) {
     var name = displayName(o.kind, o.entry, o.story);
-    pptx.layout = "LAYOUT_16x9";
+    /* LAYOUT_16x9 is 10" x 5.625" — everything here is laid out for the
+       13.333" x 7.5" canvas, so the wide layout is the only correct one.
+       (The old value cut every slide off at the right and bottom edge.) */
+    pptx.defineLayout({ name: "RAPP_WIDE", width: W, height: H });
+    pptx.layout = "RAPP_WIDE";
     pptx.author = "Microsoft AIBAST";
     pptx.company = "Microsoft";
     pptx.title = name;
@@ -359,6 +480,7 @@
     });
     var n = 3;
     if (panels) { overviewSlide(pptx, panels, n); n += 1; }
+    architectureSlide(pptx, name, o.entry, panels, n); n += 1;
     n = walkthroughSlides(pptx, o.story, n);
     setupSlide(pptx, o.entry, n); n += 1;
     closeSlide(pptx, name, o.entry, o.links, n);
