@@ -158,8 +158,8 @@ def test_every_solution_has_an_export_subject():
 def test_config_guides_are_well_formed():
     if not GUIDES.is_dir():
         pytest.skip("no configuration guides yet")
-    kinds = {"title", "statement", "architecture", "products", "adventure",
-             "steps", "synthetic", "close"}
+    kinds = {"title", "summary", "statement", "architecture", "products",
+             "adventure", "steps", "synthetic", "close"}
     for p in sorted(GUIDES.glob("*.json")):
         g = json.loads(read(p))
         assert g["slug"] == p.stem, f"{p.name}: slug does not match the filename"
@@ -169,6 +169,26 @@ def test_config_guides_are_well_formed():
                 f"{p.name}: slide kind '{s.get('kind')}' has no renderer"
             assert s.get("title") or s["kind"] == "architecture", \
                 f"{p.name}: a {s['kind']} slide has no title"
+
+
+def test_every_content_slide_states_its_conclusion():
+    """A slide without a takeaway makes the reader derive the point.
+
+    That is the difference between a deck that informs and one that argues,
+    and it is the thing that gets a different conclusion in every room. The
+    title and closing slides are exempt: they carry no argument to conclude.
+    """
+    if not GUIDES.is_dir():
+        pytest.skip("no configuration guides yet")
+    for p in sorted(GUIDES.glob("*.json")):
+        g = json.loads(read(p))
+        for s in g["slides"]:
+            if s["kind"] in {"title", "close"}:
+                continue
+            assert s.get("takeaway"), \
+                f"{p.name}: the '{s['id']}' slide states no conclusion"
+            assert len(s["takeaway"]) < 160, \
+                f"{p.name}: the '{s['id']}' takeaway is a paragraph, not a point"
 
 
 def test_guide_products_resolve_to_a_real_catalog_entry():

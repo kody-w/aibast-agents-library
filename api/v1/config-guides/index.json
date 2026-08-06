@@ -1,6 +1,6 @@
 {
   "schema": "aibast-api-config-guides/1.0",
-  "generated": "2026-08-06T22:29:54.321188+00:00",
+  "generated": "2026-08-06T22:56:12.749065+00:00",
   "count": 1,
   "guides": [
     {
@@ -10,7 +10,7 @@
         "Professional Services",
         "Consulting"
       ],
-      "slides": 10,
+      "slides": 11,
       "page_url": "https://microsoft.github.io/aibast-agents-library/config.html?solution=contract-review-agent"
     }
   ]

@@ -74,7 +74,10 @@ footer.site{margin-top:20px;border-top:1px solid var(--border);padding:26px 0 44
 .exp-count{font-size:12px;color:var(--text-faint)}
 
 /* The stage is a real 16:9 box so what is on screen is what lands in the file. */
-.stage{position:relative;width:100%;aspect-ratio:16/9;background:var(--panel);
+/* The stage is capped to what is left of the viewport, so a whole slide is
+   visible without scrolling — a deck you have to scroll is not a deck. */
+.stage{position:relative;width:100%;aspect-ratio:16/9;max-height:calc(100vh - 150px);
+  margin:0 auto;background:var(--panel);
   border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);
   overflow:hidden}
 .slide{position:absolute;inset:0;padding:4.2% 4.6%;display:none;flex-direction:column;
@@ -87,6 +90,19 @@ footer.site{margin-top:20px;border-top:1px solid var(--border);padding:26px 0 44
 .slide .body{font-size:3.5cqh;color:var(--text-dim);max-width:80ch;margin-top:1.8cqh;
   line-height:1.5}
 .slide .sub{font-size:3.1cqh;color:var(--text-faint);margin-top:1.2cqh}
+/* The "so what". Every page states its own conclusion rather than leaving the
+   reader to derive it — the single biggest difference between a slide that
+   informs and one that argues. */
+.slide .takeaway{margin-top:auto;padding-top:2cqh;border-top:1px solid var(--border);
+  display:flex;gap:1.4cqh;align-items:baseline;font-size:2.9cqh;line-height:1.4}
+.slide .takeaway b{color:var(--accent);font-weight:700;white-space:nowrap;letter-spacing:.04em;
+  font-size:2.4cqh;text-transform:uppercase}
+.slide .takeaway span{color:var(--text)}
+
+.sumgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2cqh;margin-top:2.4cqh}
+.sumgrid .col{border-top:3px solid var(--accent);padding-top:1.6cqh}
+.sumgrid .col b{display:block;font-size:3.1cqh;line-height:1.25;margin-bottom:1cqh}
+.sumgrid .col span{font-size:2.7cqh;color:var(--text-dim);line-height:1.45}
 
 .slide.dark{background:linear-gradient(140deg,#070f26,#141a3c 60%,#25184a);color:#fff;
   justify-content:center}
@@ -273,6 +289,13 @@ var R={
     return '<div class="rule"></div><div class="kick">'+esc(s.kicker||"")+'</div>'+
       '<h2>'+esc(s.title)+'</h2><div class="sub">'+esc(s.sub||"")+'</div>';
   },
+  summary:function(s){
+    return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
+      '<div class="body">'+esc(s.body||"")+'</div><div class="sumgrid">'+
+      (s.points||[]).map(function(p){
+        return '<div class="col"><b>'+esc(p.lead)+'</b><span>'+esc(p.detail)+'</span></div>';
+      }).join("")+'</div>';
+  },
   statement:function(s){
     return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
       '<div class="body">'+esc(s.body||"")+'</div>'+
@@ -338,8 +361,9 @@ function render(){
   stage.innerHTML=(GUIDE.slides||[]).map(function(s,i){
     var fn=R[s.kind]||R.statement;
     var dark=(s.kind==="title"||s.kind==="close");
+    var tw=s.takeaway?'<div class="takeaway"><b>So what</b><span>'+esc(s.takeaway)+'</span></div>':"";
     return '<section class="slide'+(dark?" dark":"")+(i===0?" on":"")+'" data-i="'+i+'" '+
-      'role="tabpanel" aria-label="Slide '+(i+1)+'">'+fn(s)+'</section>';
+      'role="tabpanel" aria-label="Slide '+(i+1)+'">'+fn(s)+tw+'</section>';
   }).join("");
   dots.innerHTML=(GUIDE.slides||[]).map(function(s,i){
     return '<button role="tab" data-i="'+i+'" aria-current="'+(i===0)+'" '+

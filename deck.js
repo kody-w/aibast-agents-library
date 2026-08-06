@@ -1000,6 +1000,51 @@
     });
   }
 
+  /* The "so what" strip. A slide that makes the reader derive the conclusion
+     is a slide that gets a different conclusion in every room. */
+  function takeaway(pptx, s, sl) {
+    if (!sl.takeaway) return;
+    var y = H - 1.28;
+    s.addShape(pptx.ShapeType.line, {
+      x: 0.62, y: y - 0.12, w: W - 1.24, h: 0,
+      line: { color: "DDDDE8", width: 0.75 }
+    });
+    s.addText([
+      { text: "SO WHAT", options: { bold: true, color: BLUE, fontSize: 10,
+                                    charSpacing: 1.1 } },
+      { text: "   " + txt(sl.takeaway), options: { fontSize: 12.5, color: INK } }
+    ], { x: 0.62, y: y, w: W - 1.24, h: 0.5, valign: "middle", fontFace: FONT });
+  }
+
+  function guideSummarySlide(pptx, sl, n) {
+    var s = lightSlide(pptx);
+    kicker(s, sl.kicker || "");
+    heading(s, sl.title, { size: 25 });
+    s.addText(txt(sl.body), {
+      x: 0.62, y: 1.42, w: W - 1.24, h: 1.0,
+      fontFace: FONT, fontSize: 13, color: MUTED, valign: "top",
+      lineSpacingMultiple: 1.2
+    });
+    var pts = (sl.points || []).slice(0, 3);
+    var gap = 0.26, cw = (W - 1.24 - gap * (pts.length - 1)) / Math.max(pts.length, 1);
+    pts.forEach(function (p, i) {
+      var x = 0.62 + i * (cw + gap);
+      /* A rule over each column, not a box around it: the pyramid reads as
+         three supports for one thought, not three unrelated cards. */
+      s.addShape(pptx.ShapeType.rect, {
+        x: x, y: 2.66, w: cw, h: 0.045,
+        fill: { color: BLUE }, line: { type: "none" }
+      });
+      s.addText([
+        { text: txt(p.lead), options: { bold: true, fontSize: 14, breakLine: true } },
+        { text: txt(p.detail), options: { fontSize: 11, color: MUTED } }
+      ], { x: x, y: 2.86, w: cw, h: 2.1, valign: "top", fontFace: FONT,
+           color: INK, lineSpacingMultiple: 1.18 });
+    });
+    takeaway(pptx, s, sl);
+    footer(s, n);
+  }
+
   function guideTitleSlide(pptx, g) {
     var s = darkSlide(pptx);
     s.addShape(pptx.ShapeType.roundRect, {
@@ -1030,13 +1075,13 @@
       fontFace: FONT, fontSize: 15, color: INK, valign: "top",
       lineSpacingMultiple: 1.25
     });
-    var tiles = sl.tiles || [];
+    var tiles = (sl.tiles || []).slice(0, 3);
     if (tiles.length) {
       var gap = 0.18, tw = (W - 1.24 - gap * (tiles.length - 1)) / tiles.length;
       tiles.forEach(function (t, i) {
         var x = 0.62 + i * (tw + gap);
         s.addShape(pptx.ShapeType.roundRect, {
-          x: x, y: 3.25, w: tw, h: 1.75, rectRadius: 0.08,
+          x: x, y: 3.15, w: tw, h: 1.62, rectRadius: 0.08,
           fill: { color: "F4F4F8" }, line: { color: "E3E3EC", width: 0.75 }
         });
         s.addText([
@@ -1044,10 +1089,11 @@
             options: { fontSize: 10, bold: true, color: BLUE, charSpacing: 1.1,
                        breakLine: true } },
           { text: txt(t.value), options: { fontSize: 12, color: INK } }
-        ], { x: x + 0.18, y: 3.38, w: tw - 0.36, h: 1.5, valign: "top",
+        ], { x: x + 0.18, y: 3.28, w: tw - 0.36, h: 1.4, valign: "top",
              fontFace: FONT, lineSpacingMultiple: 1.2 });
       });
     }
+    takeaway(pptx, s, sl);
     footer(s, n);
   }
 
@@ -1071,6 +1117,7 @@
       });
       productRow(pptx, s, products, r, 0.62, y, W - 1.24, h);
     });
+    takeaway(pptx, s, sl);
     footer(s, n);
   }
 
@@ -1085,7 +1132,7 @@
       });
     }
     var rows = (sl.rows || []).slice(0, 4);
-    var top = 1.9, h = Math.min(1.15, (H - top - 0.85) / Math.max(rows.length, 1));
+    var top = 1.9, h = Math.min(1.12, (H - top - 1.5) / Math.max(rows.length, 1));
     var cw = [2.6, 4.0, 5.0];                    /* need · already there · Microsoft */
     var cx = [0.62, 0.62 + cw[0] + 0.12, 0.62 + cw[0] + cw[1] + 0.24];
     ["The need", "If you already run something else", "The Microsoft path"]
@@ -1115,6 +1162,7 @@
       ], { x: cx[2] + (path ? 0.5 : 0.14), y: y + 0.06, w: cw[2] - (path ? 0.64 : 0.28),
            h: h - 0.12, valign: "top", fontFace: FONT, color: INK });
     });
+    takeaway(pptx, s, sl);
     footer(s, n);
   }
 
@@ -1129,7 +1177,7 @@
       });
     }
     var steps = (sl.steps || []).slice(0, 6);
-    var top = 1.85, h = Math.min(0.86, (H - top - 0.85) / Math.max(steps.length, 1));
+    var top = 1.85, h = Math.min(0.86, (H - top - 1.5) / Math.max(steps.length, 1));
     steps.forEach(function (t, i) {
       var y = top + i * (h + 0.08);
       s.addShape(pptx.ShapeType.roundRect, {
@@ -1146,6 +1194,7 @@
         lineSpacingMultiple: 1.15
       });
     });
+    takeaway(pptx, s, sl);
     footer(s, n);
   }
 
@@ -1158,11 +1207,11 @@
       fontFace: FONT, fontSize: 14, color: INK, valign: "top",
       lineSpacingMultiple: 1.25
     });
-    bulletList(s, sl.points, { y: 3.0, w: 7.2, h: 3.2, size: 12 });
+    bulletList(s, sl.points, { y: 2.95, w: 7.2, h: 2.55, size: 11.5 });
     /* The single file, drawn as a single file — the whole point of the
        pattern is that there is not a second one. */
     s.addShape(pptx.ShapeType.roundRect, {
-      x: 8.2, y: 1.5, w: 4.5, h: 4.4, rectRadius: 0.1,
+      x: 8.2, y: 1.5, w: 4.5, h: 3.95, rectRadius: 0.1,
       fill: { color: STAGE }, line: { type: "none" }
     });
     s.addText("blastbox.skill.md", {
@@ -1185,9 +1234,10 @@
            fontFace: FONT });
     });
     s.addText("One artifact. Nothing to keep in sync.", {
-      x: 8.45, y: 5.5, w: 4.0, h: 0.3, align: "center",
+      x: 8.45, y: 5.05, w: 4.0, h: 0.3, align: "center",
       fontFace: FONT, fontSize: 10, italic: true, color: "8C93B5"
     });
+    takeaway(pptx, s, sl);
     footer(s, n);
   }
 
@@ -1240,6 +1290,7 @@
         (g.slides || []).forEach(function (sl) {
           switch (sl.kind) {
             case "title":       guideTitleSlide(pptx, sl); break;
+            case "summary":     guideSummarySlide(pptx, sl, n); break;
             case "statement":   guideStatementSlide(pptx, sl, n); break;
             case "products":    guideProductsSlide(pptx, sl, products, n); break;
             case "adventure":   guideAdventureSlide(pptx, sl, products, n); break;
