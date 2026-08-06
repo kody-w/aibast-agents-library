@@ -1,7 +1,7 @@
 {
   "schema": "aibast-architecture/1.0",
   "format_version": "1.0.0",
-  "generated": "2026-08-06T23:14:28+00:00",
+  "generated": "2026-08-06T23:22:38+00:00",
   "note": "Reference architectures, derived from what each entry declares. They describe the shape of a working deployment, not a deployment anyone has made \u2014 nothing here is a statement about a customer environment.",
   "count": 160,
   "distinct_signatures": 158,

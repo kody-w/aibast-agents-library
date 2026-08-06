@@ -19,7 +19,17 @@
       "kind": "title",
       "title": "Contract Review Agent",
       "sub": "How to configure it on Copilot Studio and GitHub Copilot",
-      "kicker": "Professional Services \u00b7 Consulting"
+      "kicker": "Professional Services \u00b7 Consulting",
+      "harness": [
+        {
+          "id": "microsoft-copilot-studio",
+          "name": "Microsoft Copilot Studio"
+        },
+        {
+          "id": "github-copilot",
+          "name": "GitHub Copilot"
+        }
+      ]
     },
     {
       "id": "summary",

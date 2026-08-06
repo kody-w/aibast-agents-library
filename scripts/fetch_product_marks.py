@@ -57,6 +57,11 @@ TIMEOUT = 60
 OFFICE_CDN = ("https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001"
               "/assets/brand-icons/product/svg/{name}_48x1.svg")
 
+# GitHub publishes its own marks through Octicons, its official icon set. The
+# Copilot glyph there is GitHub's, which is what "GitHub Copilot" should carry
+# — the Microsoft Copilot mark is a different product.
+OCTICONS = "https://raw.githubusercontent.com/primer/octicons/main/icons/{name}.svg"
+
 ARCHIVES = {
     "azure": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip",
     "entra": ("https://download.microsoft.com/download/3/1/a/"
@@ -149,6 +154,8 @@ WANTED: dict[str, tuple[str, str]] = {
     # tells them which part of the estate they are looking at. These are the
     # marks that fallback resolves to — see NEAREST in build_products.py.
     "microsoft-365": ("office", "m365"),
+    "github-copilot": ("octicons", "copilot-48"),
+    "github": ("octicons", "mark-github-24"),
     "azure": ("azure", "icon-service-Azure-A.svg"),
     "azure-compliance": ("azure", "icon-service-Compliance.svg"),
 
@@ -229,8 +236,8 @@ def main() -> int:
     for pid, (src, key) in sorted(todo.items()):
         out = OUT_DIR / f"{pid}.svg"
         try:
-            if src == "office":
-                url = OFFICE_CDN.format(name=key)
+            if src in ("office", "octicons"):
+                url = (OFFICE_CDN if src == "office" else OCTICONS).format(name=key)
                 blob = fetch(url)
                 origin = url
             else:

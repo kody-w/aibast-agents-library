@@ -1,6 +1,6 @@
 {
   "schema": "aibast-product-marks/2.0",
-  "generated": "2026-08-06T23:11:44+00:00",
+  "generated": "2026-08-06T23:21:40+00:00",
   "note": "Official Microsoft product marks, downloaded from Microsoft's own distribution channels by scripts/fetch_product_marks.py. Each entry records the URL it came from and the date it was read. Nothing here is redrawn, traced, recoloured, or taken from a screenshot. A product with no official mark keeps a labelled chip rather than a lookalike.",
   "sources": {
     "office": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/<name>_48x1.svg",
@@ -10,7 +10,7 @@
     "d365": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip",
     "fabric": "https://github.com/microsoft/fabric-samples/raw/main/docs-samples/Icons.zip"
   },
-  "count": 55,
+  "count": 57,
   "marks": {
     "ai-builder": {
       "file": "assets/products/ai-builder.svg",
@@ -241,6 +241,20 @@
       "source": "office",
       "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/excel_48x1.svg",
       "bytes": 1485,
+      "fetched": "2026-08-06"
+    },
+    "github": {
+      "file": "assets/products/github.svg",
+      "source": "octicons",
+      "origin": "https://raw.githubusercontent.com/primer/octicons/main/icons/mark-github-24.svg",
+      "bytes": 873,
+      "fetched": "2026-08-06"
+    },
+    "github-copilot": {
+      "file": "assets/products/github-copilot.svg",
+      "source": "octicons",
+      "origin": "https://raw.githubusercontent.com/primer/octicons/main/icons/copilot-48.svg",
+      "bytes": 1855,
       "fetched": "2026-08-06"
     },
     "microsoft-365": {

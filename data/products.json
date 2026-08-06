@@ -1,7 +1,7 @@
 {
   "schema": "aibast-products/1.0",
   "format_version": "1.0.0",
-  "generated": "2026-08-06T23:11:59+00:00",
+  "generated": "2026-08-06T23:22:38+00:00",
   "note": "The Microsoft products each library entry involves. `declared` means the entry names the product; `implied` means a tag or category the entry carries points at it, and the tag is in the evidence. An entry with neither lists no products \u2014 an unknown is reported as unknown rather than filled in.",
   "marks": {
     "source": "media/jewels/index.json",

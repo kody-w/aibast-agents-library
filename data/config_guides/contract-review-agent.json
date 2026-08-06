@@ -2,9 +2,16 @@
   "schema": "aibast-config-guide/1.1",
   "slug": "contract-review-agent",
   "display_name": "Contract Review Agent",
-  "industries": ["Professional Services", "Consulting"],
+  "industries": [
+    "Professional Services",
+    "Consulting"
+  ],
   "lede": "Automate contract review to make negotiations faster, lower-risk and more likely to close.",
-  "personas": ["Legal Operations", "Attorneys", "Executives"],
+  "personas": [
+    "Legal Operations",
+    "Attorneys",
+    "Executives"
+  ],
   "note": "A configuration guide, not a deployment. Every product named here is one this solution actually declares; where a step is a judgement call it says so rather than inventing a value. No figure appears in these slides that this library cannot stand behind.",
   "slides": [
     {
@@ -12,7 +19,17 @@
       "kind": "title",
       "title": "Contract Review Agent",
       "sub": "How to configure it on Copilot Studio and GitHub Copilot",
-      "kicker": "Professional Services · Consulting"
+      "kicker": "Professional Services · Consulting",
+      "harness": [
+        {
+          "id": "microsoft-copilot-studio",
+          "name": "Microsoft Copilot Studio"
+        },
+        {
+          "id": "github-copilot",
+          "name": "GitHub Copilot"
+        }
+      ]
     },
     {
       "id": "summary",
@@ -43,9 +60,18 @@
       "title": "An agent that prepares the redline — and never sends it",
       "body": "Legal Operations, attorneys and executives get a first pass in minutes rather than days: which clauses depart from the standard, what each departure exposes, and the redline to send back with a citation on every change. The agent assembles the work. A person decides what happens to it.",
       "tiles": [
-        {"label": "Who it serves", "value": "Legal Operations · Attorneys · Executives"},
-        {"label": "What it reads", "value": "The contract, the clause library, prior negotiated positions"},
-        {"label": "What it never does", "value": "Send, sign, or alter a document without a person"}
+        {
+          "label": "Who it serves",
+          "value": "Legal Operations · Attorneys · Executives"
+        },
+        {
+          "label": "What it reads",
+          "value": "The contract, the clause library, prior negotiated positions"
+        },
+        {
+          "label": "What it never does",
+          "value": "Send, sign, or alter a document without a person"
+        }
       ],
       "takeaway": "Scope it as a preparation tool and the governance conversation gets much shorter."
     },
@@ -64,11 +90,31 @@
       "title": "Every product in this design is one the solution already declares",
       "body": "Nothing has been added to lengthen the list. Two of the five are optional and are marked as such.",
       "rows": [
-        {"product": "SharePoint", "id": "sharepoint", "role": "Where the contracts and clause library already live. The agent reads in place, under the caller's own permissions — documents are never copied into a second store."},
-        {"product": "Microsoft Word", "id": "word", "role": "Where the redline is produced and reviewed, because that is where legal teams already work."},
-        {"product": "Microsoft Copilot Studio", "id": "microsoft-copilot-studio", "role": "The agent itself: its topics, knowledge sources, and the guardrails deciding what it may do unattended."},
-        {"product": "Microsoft Teams", "id": "microsoft-teams", "role": "Optional. Where the reviewer is asked to approve — the right choice when review is a conversation rather than a queue."},
-        {"product": "Microsoft Dataverse", "id": "dataverse", "role": "Optional. Where outcomes are recorded so the same clause is not re-argued every quarter. Add it when you want the history."}
+        {
+          "product": "SharePoint",
+          "id": "sharepoint",
+          "role": "Where the contracts and clause library already live. The agent reads in place, under the caller's own permissions — documents are never copied into a second store."
+        },
+        {
+          "product": "Microsoft Word",
+          "id": "word",
+          "role": "Where the redline is produced and reviewed, because that is where legal teams already work."
+        },
+        {
+          "product": "Microsoft Copilot Studio",
+          "id": "microsoft-copilot-studio",
+          "role": "The agent itself: its topics, knowledge sources, and the guardrails deciding what it may do unattended."
+        },
+        {
+          "product": "Microsoft Teams",
+          "id": "microsoft-teams",
+          "role": "Optional. Where the reviewer is asked to approve — the right choice when review is a conversation rather than a queue."
+        },
+        {
+          "product": "Microsoft Dataverse",
+          "id": "dataverse",
+          "role": "Optional. Where outcomes are recorded so the same clause is not re-argued every quarter. Add it when you want the history."
+        }
       ],
       "takeaway": "No new licences are implied by this design — check entitlements before you promise that in a room."
     },

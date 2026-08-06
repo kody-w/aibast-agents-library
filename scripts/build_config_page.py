@@ -81,6 +81,14 @@ PAGE_CSS = """/* ══ page-specific ══════════════
 .slide.dark .kick{color:#e2669a}
 .slide.dark .body,.slide.dark .sub{color:#c7cbe6}
 .slide.dark .rule{width:7cqh;height:.9cqh;border-radius:1cqh;background:#e2669a;margin-bottom:2.4cqh}
+/* The title slide named two products and showed neither. The chips are white
+   so a monochrome mark (GitHub's) and a full-colour one (Microsoft's) both
+   read on the dark ground. */
+.titlemarks{display:flex;gap:1.6cqh;margin-top:4cqh;align-items:center}
+.titlemarks .tm{display:flex;gap:1.2cqh;align-items:center;background:#fff;
+  border-radius:8px;padding:1.2cqh 1.8cqh}
+.titlemarks .tm img{width:3.6cqh;height:3.6cqh;object-fit:contain}
+.titlemarks .tm span{font-size:2.4cqh;font-weight:650;color:#1a1d3f;white-space:nowrap}
 
 .tiles{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:1.8cqh;margin-top:auto}
 .tile{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:2.4cqh}
@@ -152,9 +160,11 @@ ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;backgroun
 .arch .orch{text-align:center;font-size:2.2cqh;font-weight:700;padding:.5cqh 0}
 .arch .agents{display:flex;flex-direction:column;gap:.5cqh;min-height:0;overflow:hidden}
 .arch .agents .a{display:flex;gap:.8cqh;align-items:baseline;font-size:2.05cqh;line-height:1.25}
-.arch .agents .a i{flex:0 0 auto;width:2.2cqh;height:2.2cqh;border-radius:50%;
-  background:var(--accent-soft);color:var(--accent);font-style:normal;font-size:1.6cqh;
-  font-weight:700;display:flex;align-items:center;justify-content:center}
+/* Sub-steps of step 3, deliberately NOT the same badge as the flow numbers.
+   Two independent sequences drawn in one visual language is why "3" appeared
+   to mean two different things on the same slide. */
+.arch .agents .a i{flex:0 0 auto;min-width:3.4cqh;font-style:normal;font-size:1.75cqh;
+  font-weight:700;color:var(--accent);letter-spacing:-.02em;text-align:right}
 .arch .agents .a b{font-weight:650}
 .arch .gov{background:var(--gold-soft,rgba(184,145,45,.09));border:1px solid rgba(184,145,45,.35);
   border-radius:6px;padding:.8cqh .9cqh;font-size:2.05cqh;line-height:1.3}
@@ -244,8 +254,14 @@ function markTag(id,name,cls){
 
 var R={
   title:function(s){
+    var harness=(s.harness||[]).map(function(h){
+      var p=markOf(h.id);
+      return p?'<div class="tm"><img src="'+esc(p)+'" alt="'+esc(h.name)+'"><span>'+
+        esc(h.name)+'</span></div>':'';
+    }).join("");
     return '<div class="rule"></div><div class="kick">'+esc(s.kicker||"")+'</div>'+
-      '<h2>'+esc(s.title)+'</h2><div class="sub">'+esc(s.sub||"")+'</div>';
+      '<h2>'+esc(s.title)+'</h2><div class="sub">'+esc(s.sub||"")+'</div>'+
+      (harness?'<div class="titlemarks">'+harness+'</div>':"");
   },
   summary:function(s){
     return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
@@ -324,11 +340,12 @@ var R={
           it({label:(ARCH.flow&&ARCH.flow[2]?"Formulates a plan across the agents below":"Formulates a plan")},3)+
           '<div class="orch">'+esc(P.orchestration||"Multi-agent orchestration")+'</div>'+
           '<div class="agents">'+(agents.length
-            ? agents.map(function(a,i){return '<div class="a"><i>'+(i+1)+'</i>'+
+            ? agents.map(function(a,i){return '<div class="a"><i>3.'+(i+1)+'</i>'+
                 '<span><b>'+esc(a.name)+'</b> — '+esc(a.does)+'</span></div>';}).join("")
-            : (P.actions||[]).slice(0,6).map(function(a,i){return '<div class="a"><i>'+(i+1)+
+            : (P.actions||[]).slice(0,6).map(function(a,i){return '<div class="a"><i>3.'+(i+1)+
                 '</i><span>'+esc(a)+'</span></div>';}).join(""))+
           '</div>'+
+          it({label:(ARCH.flow&&ARCH.flow[3]?ARCH.flow[3].text:"NL response after guideline checks")},4)+
         '</div>'+
         '<div class="col"><h4>'+esc(U.title||"User Interface")+'</h4>'+
           (U.surfaces||[]).slice(0,3).map(function(x){return it(x);}).join("")+

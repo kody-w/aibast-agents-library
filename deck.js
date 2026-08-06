@@ -451,8 +451,12 @@
        work goes, which looks answered and says nothing. */
     var agents = (P.agents || []).slice(0, 6);
     if (agents.length) {
+      /* 3.1–3.6, not 1–6. These are the expansion of step 3, and numbering
+         them as their own sequence put a second "3" and a second "5" on a
+         slide that already had a numbered flow — two sequences, one visual
+         language, and no way to tell which was which. */
       s.addText(agents.map(function (a, i) {
-        return { text: (i + 1) + ". " + txt(a.name) + " — " + txt(a.does),
+        return { text: "3." + (i + 1) + "  " + txt(a.name) + " — " + txt(a.does),
                  options: { breakLine: true, fontSize: 7.5 } };
       }), { x: xs[1] + 0.14, y: top + 3.0, w: ws[1] - 0.28, h: 1.32,
             fontFace: FONT, color: INK, valign: "top", lineSpacingMultiple: 1.1 });
@@ -460,7 +464,7 @@
       var acts = labelsOf(P.actions, 4);
       if (acts.length) {
         s.addText(acts.map(function (a, i) {
-          return { text: (i + 1) + ". " + txt(a),
+          return { text: "3." + (i + 1) + "  " + txt(a),
                    options: { breakLine: true, fontSize: 8 } };
         }), { x: xs[1] + 0.14, y: top + 3.0, w: ws[1] - 0.28, h: 1.32,
               fontFace: FONT, color: INK, valign: "top" });
@@ -1080,6 +1084,24 @@
       x: 0.62, y: 3.65, w: W - 3.2, h: 0.6,
       fontFace: FONT, fontSize: 17, color: "C7CBE6", valign: "top"
     });
+    /* The title slide named two products and showed neither. White plates so a
+       monochrome mark and a full-colour one both read on the dark ground. */
+    var harness = (g.harness || []).slice(0, 3);
+    var hx = 0.62;
+    harness.forEach(function (h) {
+      var path = markPath(g._products, h.id);
+      var w = 0.42 + 0.105 * txt(h.name).length + 0.5;
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: hx, y: 4.55, w: w, h: 0.62, rectRadius: 0.1,
+        fill: { color: PAPER }, line: { type: "none" }
+      });
+      if (path) s.addImage({ path: path, x: hx + 0.16, y: 4.68, w: 0.36, h: 0.36 });
+      s.addText(txt(h.name), {
+        x: hx + (path ? 0.6 : 0.2), y: 4.55, w: w - (path ? 0.72 : 0.4), h: 0.62,
+        valign: "middle", fontFace: FONT, fontSize: 11.5, bold: true, color: INK
+      });
+      hx += w + 0.18;
+    });
     footer(s, null, true);
   }
 
@@ -1296,6 +1318,7 @@
 
     return Promise.all(need).then(function (r) {
       var products = r[0] || { products: [] }, arch = r[1];
+      g._products = products;
       var pptx = new PptxGenJS();
       try {
         pptx.defineLayout({ name: "AIBAST_WIDE", width: W, height: H });
