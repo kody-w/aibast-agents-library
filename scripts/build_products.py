@@ -64,6 +64,18 @@ MARKS = {
     "outlook": ("media/jewels/outlook.png", "exact"),
     "sharepoint": ("media/jewels/sharepoint.png", "exact"),
     "microsoft-365-copilot": ("media/jewels/copilot.png", "exact"),
+    # Official marks lifted at full resolution from the RAPP Overview deck
+    # rather than redrawn — see assets/products/index.json. These were labelled
+    # chips until the real files existed; none of them is an approximation.
+    "microsoft-copilot-studio": ("assets/products/copilot-studio.png", "exact"),
+    "power-bi": ("assets/products/power-bi.png", "exact"),
+    "power-automate": ("assets/products/power-automate.png", "exact"),
+    "power-apps": ("assets/products/power-apps.png", "exact"),
+    "dataverse": ("assets/products/dataverse.png", "exact"),
+    "azure-openai": ("assets/products/azure.png", "family"),
+    "azure-functions": ("assets/products/azure.png", "family"),
+    "azure-ai-foundry": ("assets/products/azure.png", "family"),
+    "azure-ai-search": ("assets/products/azure.png", "family"),
 }
 
 # id, name, family, app, column, declares, prose names, implying tags,

@@ -252,7 +252,13 @@ def main() -> int:
         out = Path(args.out) if args.out else REPO_ROOT / front.get(
             "python_filename", p.stem.replace(".skill", "") + ".py")
         out.write_text(source, encoding="utf-8")
-        print(f"[toast] {out.relative_to(REPO_ROOT)}  digest verified")
+        # An --out anywhere on disk is legitimate; only pretty-print the path
+        # when it happens to sit inside the repo.
+        try:
+            shown = out.relative_to(REPO_ROOT)
+        except ValueError:
+            shown = out
+        print(f"[toast] {shown}  digest verified")
         return 0
 
     ok = verify(p)

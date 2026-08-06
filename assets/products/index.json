@@ -1,0 +1,50 @@
+{
+  "schema": "aibast-product-marks/1.0",
+  "note": "Official Microsoft product marks, taken at full resolution from the RAPP Overview deck rather than redrawn. A hand-drawn approximation of a Microsoft logo is worse than no logo: it is wrong AND it looks official. A product with no mark here gets a labelled chip instead.",
+  "source": "RAPP-Overview.pptx slide 2",
+  "count": 6,
+  "marks": [
+    {
+      "id": "power-apps",
+      "name": "Power Apps",
+      "file": "assets/products/power-apps.png",
+      "bytes": 24324,
+      "sha256": "76e30e1ecc6bf2f1"
+    },
+    {
+      "id": "copilot-studio",
+      "name": "Microsoft Copilot Studio",
+      "file": "assets/products/copilot-studio.png",
+      "bytes": 110821,
+      "sha256": "3deb67ec42a89527"
+    },
+    {
+      "id": "power-automate",
+      "name": "Power Automate",
+      "file": "assets/products/power-automate.png",
+      "bytes": 47790,
+      "sha256": "bb43a7c483ae2b3f"
+    },
+    {
+      "id": "power-bi",
+      "name": "Power BI",
+      "file": "assets/products/power-bi.png",
+      "bytes": 20761,
+      "sha256": "8e1ba645fe1c91d8"
+    },
+    {
+      "id": "dataverse",
+      "name": "Microsoft Dataverse",
+      "file": "assets/products/dataverse.png",
+      "bytes": 52817,
+      "sha256": "d27dc09aa611e937"
+    },
+    {
+      "id": "azure",
+      "name": "Microsoft Azure",
+      "file": "assets/products/azure.png",
+      "bytes": 34023,
+      "sha256": "d9c0d75fa8a793e9"
+    }
+  ]
+}
