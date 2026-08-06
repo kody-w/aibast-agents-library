@@ -1,0 +1,27 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "ms-rapp \u2014 Field Notes from the Frontier",
+  "home_page_url": "https://microsoft.github.io/aibast-agents-library/blog.html",
+  "feed_url": "https://microsoft.github.io/aibast-agents-library/api/v1/blog/feed.json",
+  "description": "Field notes from building ms-rapp.",
+  "items": [
+    {
+      "id": "https://microsoft.github.io/aibast-agents-library/blog.html#rapp-data-exhaust",
+      "url": "https://microsoft.github.io/aibast-agents-library/blog.html#rapp-data-exhaust",
+      "title": "RAPP data exhaust \u2014 reading the negative of the shape",
+      "summary": "The by-product of building something holds a cast of the thing that made it. Here is the term we use for that, why it is perishable, and three defects it caught in this repository.",
+      "date_published": "2026-08-05T00:00:00Z",
+      "authors": [
+        {
+          "name": "AIBAST"
+        }
+      ],
+      "tags": [
+        "method",
+        "lexicon",
+        "field-notes"
+      ],
+      "external_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/blog/rapp-data-exhaust.md"
+    }
+  ]
+}

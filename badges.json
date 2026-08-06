@@ -1,0 +1,66 @@
+{
+  "schema": "aibast-badge-catalog/1.0",
+  "_comment": [
+    "THE BADGE CATALOG. Hand-edited. scripts/build_api.py turns this plus",
+    "certified.json into the public badge endpoints and the Wall of Fame.",
+    "",
+    "Adding a badge is an entry here. Never reuse or repurpose an id — someone's",
+    "README may already render it, and a badge that silently changes meaning is",
+    "worse than no badge. Retire instead: set retired: true (holders keep it).",
+    "",
+    "points drive the Wall of Fame ordering and nothing else. Keep them",
+    "proportional to real effort, not to enthusiasm."
+  ],
+  "badges": [
+    {
+      "id": "rapp-ready",
+      "name": "RAPP Ready",
+      "summary": "Completed the guided walkthrough and passed the knowledge check.",
+      "criteria": "Finish the RAPP walkthrough end to end, then score 80% or better on the RAPP Ready check.",
+      "how": "Take the check at api.html#quiz, then open the pre-filled claim it generates.",
+      "color": "0078d4",
+      "points": 10,
+      "tier": "foundation"
+    },
+    {
+      "id": "agent-published",
+      "name": "Agent Published",
+      "summary": "Shipped an agent to the library that passed review.",
+      "criteria": "At least one merged agent under agents/@<username>/ with a valid manifest, no secrets, and a stated business use case.",
+      "how": "Follow docs/PUBLISHING.md. Awarded automatically on merge.",
+      "color": "107c10",
+      "points": 30,
+      "tier": "builder"
+    },
+    {
+      "id": "brainstem-operator",
+      "name": "Brainstem Operator",
+      "summary": "Ran the brainstem end to end and installed an agent from the library.",
+      "criteria": "Install the brainstem (any tier), install a library agent, and show it answering.",
+      "how": "Open a claim with the transcript or a screenshot of the agent responding.",
+      "color": "5b5fc7",
+      "points": 15,
+      "tier": "foundation"
+    },
+    {
+      "id": "skill-converter",
+      "name": "Skill Converter",
+      "summary": "Converted an outside skill into a RAPP-compliant agent or skill.",
+      "criteria": "A merged conversion that carries upstream attribution, a compatible license, and passes the quality gates.",
+      "how": "Follow docs/AGGREGATION.md, then submit as a normal publisher pull request.",
+      "color": "d83b01",
+      "points": 40,
+      "tier": "builder"
+    },
+    {
+      "id": "reviewer",
+      "name": "Reviewer",
+      "summary": "Reviews submissions from other publishers.",
+      "criteria": "Sustained, substantive review of other people's pull requests, at a maintainer's invitation.",
+      "how": "Awarded by maintainers. Not self-claimable.",
+      "color": "8b5cf6",
+      "points": 50,
+      "tier": "maintainer"
+    }
+  ]
+}

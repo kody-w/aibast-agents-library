@@ -1,0 +1,29 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "slug": "how-to/use-the-static-api",
+  "title": "Use the static API",
+  "summary": "Every endpoint is a CDN-cached JSON file. No key, no quota.",
+  "tags": [
+    "how-to",
+    "api"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/how-to/use-the-static-api.md",
+  "bytes": 908,
+  "links": [
+    "decisions/why-static-api"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/use-the-static-api.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-use-the-static-api.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#how-to/use-the-static-api",
+  "backlinks": [
+    "concepts/the-vault",
+    "decisions/why-static-api",
+    "how-to/publish-an-agent",
+    "index"
+  ]
+}

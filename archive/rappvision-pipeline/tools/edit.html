@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAPPVision edit</title>
+<!--
+  A cutting room for a rendered film. Scrub it, drag the overlays where they
+  belong, mark segments to remove, slow, speed or duck — then export the edit
+  as JSON. The renderer reads that JSON and re-cuts, so a decision made here by
+  eye becomes the burned film without anyone translating it by hand.
+
+  Nothing is destructive: the source file is never touched, and the export is
+  the whole record of what you changed.
+-->
+<style>
+:root{--bg:#101218;--panel:#1a1d25;--line:#2b2f3a;--text:#e8ebf2;--dim:#98a1b1;
+  --accent:#4f8ef7;--ok:#2ecc71;--cut:#f5556d;--slow:#f5a524;--duck:#8b5cf6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,sans-serif;
+  display:flex;height:100vh;overflow:hidden;font-size:14px}
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+#viewer{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;
+  overflow:hidden;background:#07080b}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center;flex:0 0 auto;
+  background:#000}
+#vid{position:absolute;inset:0;width:100%;height:100%;background:#000}
+.ov{position:absolute;outline:2px dashed var(--accent);cursor:grab;background:rgba(79,142,247,.10)}
+.ov.sel{outline:3px solid var(--ok);background:rgba(46,204,113,.12);z-index:4}
+.ov.hidden{display:none}
+.ov b{position:absolute;top:0;left:0;background:var(--accent);color:#fff;font-size:11px;
+  padding:1px 6px;pointer-events:none}
+.ov.sel b{background:var(--ok);color:#04331c}
+.hx{position:absolute;width:13px;height:13px;background:var(--accent);border:2px solid #fff;
+  border-radius:2px}
+.hx.se{right:-7px;bottom:-7px;cursor:nwse-resize}.hx.nw{left:-7px;top:-7px;cursor:nwse-resize}
+
+#bar{flex:0 0 auto;background:var(--panel);border-top:1px solid var(--line);padding:10px 14px;
+  display:flex;flex-direction:column;gap:9px}
+.ctrls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+button{border:1px solid var(--line);background:#242833;color:var(--text);border-radius:6px;
+  padding:7px 11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+button:hover{background:#2d3240}
+button.p{background:var(--accent);border-color:var(--accent);color:#fff}
+button.on{background:var(--ok);border-color:var(--ok);color:#04331c}
+#time{font-variant-numeric:tabular-nums;font-size:13px;color:var(--dim);min-width:96px}
+
+#track{position:relative;height:56px;background:#14171e;border:1px solid var(--line);
+  border-radius:6px;cursor:pointer;overflow:hidden}
+#wave{position:absolute;inset:0;opacity:.35}
+.clipm{position:absolute;top:0;bottom:0;opacity:.55;pointer-events:none}
+.clipm.remove{background:var(--cut)}
+.clipm.speed{background:var(--slow)}
+.clipm.volume{background:var(--duck)}
+.clipm span{position:absolute;top:2px;left:3px;font-size:10px;font-weight:700;color:#0b0d12}
+#play head,#playhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none}
+#inout{position:absolute;top:0;bottom:0;background:rgba(79,142,247,.28);
+  border-left:2px solid var(--accent);border-right:2px solid var(--accent);pointer-events:none}
+
+aside{width:330px;flex:0 0 auto;background:var(--panel);border-left:1px solid var(--line);
+  padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+h1{font-size:15px;font-weight:650}
+p.hint{font-size:12px;color:var(--dim);line-height:1.5}
+label{display:block;font-size:10.5px;color:var(--dim);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:3px}
+input,select{width:100%;padding:6px 8px;border-radius:6px;border:1px solid var(--line);
+  background:#151821;color:var(--text);font-family:inherit;font-size:13px;
+  font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.sec{border-top:1px solid var(--line);padding-top:11px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap}
+.tab{font-size:12px;padding:5px 9px;border-radius:16px;border:1px solid var(--line);
+  background:#242833;cursor:pointer;font-weight:600}
+.tab.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+ul.edits{list-style:none;display:flex;flex-direction:column;gap:5px;max-height:170px;
+  overflow-y:auto}
+ul.edits li{display:flex;gap:7px;align-items:center;background:#151821;border-radius:5px;
+  padding:5px 7px;font-size:12px}
+ul.edits li b{font-weight:700}
+ul.edits li button{padding:2px 6px;font-size:11px;margin-left:auto}
+kbd{background:#242833;border:1px solid var(--line);border-radius:3px;padding:1px 5px;
+  font-size:10.5px;font-family:ui-monospace,Menlo,monospace}
+#out{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;white-space:pre;
+  background:#0e1016;border:1px solid var(--line);border-radius:6px;padding:8px;
+  max-height:150px;overflow:auto;color:#bcc5d4}
+.badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:16px;
+  background:var(--slow);color:#231a00}
+.badge.ok{background:var(--ok);color:#04331c}
+</style>
+</head>
+<body>
+
+<div id="main">
+  <div id="viewer">
+    <div id="stage"><video id="vid" playsinline></video></div>
+  </div>
+  <div id="bar">
+    <div class="ctrls">
+      <button class="p" id="play">▶ Play</button>
+      <button id="back">−1s</button><button id="fwd">+1s</button>
+      <span id="time">0:00.0 / 0:00</span>
+      <button id="markIn">Mark in <kbd>I</kbd></button>
+      <button id="markOut">Mark out <kbd>O</kbd></button>
+      <button id="addCut">Remove <kbd>X</kbd></button>
+      <button id="addSpeed">Speed…</button>
+      <button id="addVol">Volume…</button>
+      <button id="showOv">Overlays</button>
+    </div>
+    <div id="track">
+      <div id="inout" style="display:none"></div>
+      <div id="playhead" style="left:0"></div>
+    </div>
+  </div>
+</div>
+
+<aside>
+  <h1>Edit</h1>
+  <p class="hint">Scrub, then <kbd>I</kbd>/<kbd>O</kbd> to mark a range and apply an edit to it.
+    Pause and drag an overlay to move it. Everything exports as JSON — the renderer re-cuts from it.</p>
+
+  <div class="sec">
+    <label for="src">Film</label>
+    <select id="src"></select>
+  </div>
+
+  <div class="sec">
+    <label>Overlay</label>
+    <div class="tabs" id="ovTabs"></div>
+    <div class="grid" style="margin-top:7px">
+      <div><label for="ox">X</label><input id="ox" type="number"></div>
+      <div><label for="oy">Y</label><input id="oy" type="number"></div>
+      <div><label for="ow">W</label><input id="ow" type="number"></div>
+      <div><label for="oh">H</label><input id="oh" type="number"></div>
+      <div><label for="ot0">Start</label><input id="ot0" type="number" step="0.1"></div>
+      <div><label for="ot1">End</label><input id="ot1" type="number" step="0.1"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <label>Edits</label>
+    <ul class="edits" id="edits"></ul>
+  </div>
+
+  <div class="sec">
+    <div class="ctrls" style="align-items:center">
+      <span class="badge" id="state">unsaved</span>
+      <button class="p" id="export" style="margin-left:auto">Export edit.json</button>
+    </div>
+    <div id="out" style="margin-top:8px"></div>
+  </div>
+</aside>
+
+<script>
+var FILMS=[], OV=[], EDITS=[], selOv=0, IN=null, OUT=null, showOv=true, DUR=0;
+var vid=document.getElementById("vid"), stage=document.getElementById("stage"),
+    track=document.getElementById("track"), out=document.getElementById("out"),
+    badge=document.getElementById("state");
+
+function fmt(t){ return Math.floor(t/60)+":"+String(Math.floor(t%60)).padStart(2,"0")+
+  "."+Math.floor((t%1)*10); }
+function fit(){
+  var v=document.getElementById("viewer");
+  var s=Math.min(v.clientWidth/1920, v.clientHeight/1080);
+  stage.style.transform="scale("+s+")";
+}
+window.addEventListener("resize",fit);
+
+function drawOv(){
+  document.querySelectorAll(".ov").forEach(function(n){n.remove();});
+  OV.forEach(function(r,i){
+    var d=document.createElement("div");
+    d.className="ov"+(i===selOv?" sel":"");
+    d.dataset.i=i;
+    d.innerHTML="<b>"+r.id+"</b><span class='hx nw'></span><span class='hx se'></span>";
+    stage.appendChild(d);
+  });
+  document.getElementById("ovTabs").innerHTML=OV.map(function(r,i){
+    return '<span class="tab'+(i===selOv?" sel":"")+'" data-i="'+i+'">'+r.id+"</span>";
+  }).join("");
+  document.querySelectorAll("#ovTabs .tab").forEach(function(t){
+    t.onclick=function(){ selOv=+t.dataset.i; drawOv(); sync(); };
+  });
+}
+
+function sync(){
+  var t=vid.currentTime||0;
+  OV.forEach(function(r,i){
+    var d=stage.querySelector('.ov[data-i="'+i+'"]'); if(!d) return;
+    var on = showOv && t>=r.window.start && t<r.window.end;
+    d.classList.toggle("hidden", !on);
+    d.classList.toggle("sel", i===selOv);
+    d.style.left=r.rect.x+"px"; d.style.top=r.rect.y+"px";
+    d.style.width=r.rect.w+"px"; d.style.height=r.rect.h+"px";
+  });
+  var r=OV[selOv];
+  if(r){
+    [["ox",r.rect,"x"],["oy",r.rect,"y"],["ow",r.rect,"w"],["oh",r.rect,"h"],
+     ["ot0",r.window,"start"],["ot1",r.window,"end"]].forEach(function(p){
+      var el=document.getElementById(p[0]);
+      if(el && document.activeElement!==el) el.value=p[1][p[2]];
+    });
+  }
+  document.getElementById("time").textContent=fmt(t)+" / "+fmt(DUR||0);
+  document.getElementById("playhead").style.left=(DUR? t/DUR*100:0)+"%";
+  renderTrack(); renderEdits();
+  out.textContent=JSON.stringify(payload(),null,2);
+  badge.textContent="unsaved"; badge.className="badge";
+}
+
+function renderTrack(){
+  track.querySelectorAll(".clipm").forEach(function(n){n.remove();});
+  EDITS.forEach(function(e,i){
+    var d=document.createElement("div");
+    d.className="clipm "+e.action;
+    d.style.left=(e.start/DUR*100)+"%";
+    d.style.width=((e.end-e.start)/DUR*100)+"%";
+    d.innerHTML="<span>"+(e.action==="remove"?"CUT":
+      e.action==="speed"?(e.value+"×"):("vol "+e.value))+"</span>";
+    track.appendChild(d);
+  });
+  var io=document.getElementById("inout");
+  if(IN!==null&&OUT!==null&&OUT>IN){
+    io.style.display="block";
+    io.style.left=(IN/DUR*100)+"%"; io.style.width=((OUT-IN)/DUR*100)+"%";
+  } else io.style.display="none";
+}
+function renderEdits(){
+  document.getElementById("edits").innerHTML=EDITS.map(function(e,i){
+    return "<li><b>"+e.action+"</b> "+e.start.toFixed(1)+"–"+e.end.toFixed(1)+"s"+
+      (e.value!==undefined?" · "+e.value:"")+
+      '<button data-del="'+i+'">✕</button></li>';
+  }).join("") || '<li style="color:var(--dim)">No edits yet</li>';
+  document.querySelectorAll("[data-del]").forEach(function(b){
+    b.onclick=function(){ EDITS.splice(+b.dataset.del,1); sync(); };
+  });
+}
+
+function payload(){
+  return {
+    schema:"aibast-edit/1.0",
+    film: document.getElementById("src").value,
+    source_duration: +(DUR||0).toFixed(2),
+    note:"Cuts and overlay moves made by eye against the rendered film. 'remove' drops a span; 'speed' retimes it (value is a multiplier, <1 slows); 'volume' scales audio for the span. Overlay rects are base-track pixels.",
+    edits: EDITS.slice().sort(function(a,b){return a.start-b.start;}).map(function(e){
+      return {action:e.action, start:+e.start.toFixed(2), end:+e.end.toFixed(2),
+              value:e.value};
+    }),
+    overlays: OV.map(function(r){
+      return {id:r.id, source:r.source,
+              rect:{x:Math.round(r.rect.x),y:Math.round(r.rect.y),
+                    w:Math.round(r.rect.w),h:Math.round(r.rect.h)},
+              window:{start:+r.window.start, end:+r.window.end}};
+    })
+  };
+}
+
+/* ---- overlay dragging, in film pixels ---- */
+var drag=null;
+function pt(e){ var b=stage.getBoundingClientRect(), s=b.width/1920;
+  return {x:(e.clientX-b.left)/s, y:(e.clientY-b.top)/s}; }
+stage.addEventListener("mousedown",function(e){
+  var o=e.target.closest(".ov"); if(!o) return;
+  selOv=+o.dataset.i;
+  var h=e.target.classList.contains("hx")?e.target.className.split(" ")[1]:null;
+  var p=pt(e);
+  drag={h:h,sx:p.x,sy:p.y,o:JSON.parse(JSON.stringify(OV[selOv].rect))};
+  drawOv(); sync(); e.preventDefault();
+});
+window.addEventListener("mousemove",function(e){
+  if(!drag) return;
+  var p=pt(e), dx=p.x-drag.sx, dy=p.y-drag.sy, o=drag.o, r=OV[selOv].rect;
+  if(!drag.h){ r.x=o.x+dx; r.y=o.y+dy; }
+  else if(drag.h==="se"){ r.w=Math.max(60,o.w+dx); r.h=Math.max(40,o.h+dy); }
+  else { r.w=Math.max(60,o.w-dx); r.x=o.x+dx; r.h=Math.max(40,o.h-dy); r.y=o.y+dy; }
+  sync();
+});
+window.addEventListener("mouseup",function(){drag=null;});
+
+["ox","oy","ow","oh","ot0","ot1"].forEach(function(k){
+  document.getElementById(k).addEventListener("input",function(){
+    var v=parseFloat(this.value); if(isNaN(v)) return;
+    var r=OV[selOv];
+    if(k==="ot0") r.window.start=v; else if(k==="ot1") r.window.end=v;
+    else r.rect[{ox:"x",oy:"y",ow:"w",oh:"h"}[k]]=v;
+    sync();
+  });
+});
+
+/* ---- transport + marking ---- */
+document.getElementById("play").onclick=function(){
+  if(vid.paused){ vid.play(); this.textContent="⏸ Pause"; }
+  else { vid.pause(); this.textContent="▶ Play"; }
+};
+document.getElementById("back").onclick=function(){ vid.currentTime=Math.max(0,vid.currentTime-1); };
+document.getElementById("fwd").onclick=function(){ vid.currentTime=Math.min(DUR,vid.currentTime+1); };
+vid.addEventListener("timeupdate",sync);
+vid.addEventListener("loadedmetadata",function(){ DUR=vid.duration; sync(); fit(); });
+track.addEventListener("click",function(e){
+  var b=track.getBoundingClientRect();
+  vid.currentTime=(e.clientX-b.left)/b.width*DUR;
+});
+function mark(which){
+  if(which==="in"){ IN=vid.currentTime; if(OUT!==null&&OUT<=IN) OUT=null; }
+  else { OUT=vid.currentTime; if(IN!==null&&IN>=OUT) IN=null; }
+  sync();
+}
+document.getElementById("markIn").onclick=function(){mark("in");};
+document.getElementById("markOut").onclick=function(){mark("out");};
+function addEdit(action,value){
+  if(IN===null||OUT===null||OUT<=IN){ alert("Mark in and out first (I / O)."); return; }
+  EDITS.push({action:action,start:IN,end:OUT,value:value});
+  IN=OUT=null; sync();
+}
+document.getElementById("addCut").onclick=function(){ addEdit("remove"); };
+document.getElementById("addSpeed").onclick=function(){
+  var v=parseFloat(prompt("Speed multiplier for this range (0.5 = half speed, 2 = double)","0.75"));
+  if(!isNaN(v)&&v>0) addEdit("speed",v);
+};
+document.getElementById("addVol").onclick=function(){
+  var v=parseFloat(prompt("Volume multiplier for this range (0 = mute, 0.4 = duck)","0.4"));
+  if(!isNaN(v)&&v>=0) addEdit("volume",v);
+};
+document.getElementById("showOv").onclick=function(){
+  showOv=!showOv; this.className=showOv?"on":""; sync();
+};
+window.addEventListener("keydown",function(e){
+  if(/^(INPUT|SELECT)$/.test(document.activeElement.tagName)) return;
+  var k=e.key.toLowerCase();
+  if(k==="i"){ mark("in"); e.preventDefault(); }
+  if(k==="o"){ mark("out"); e.preventDefault(); }
+  if(k==="x"){ addEdit("remove"); e.preventDefault(); }
+  if(k===" "){ document.getElementById("play").click(); e.preventDefault(); }
+});
+document.getElementById("export").onclick=function(){
+  var b=new Blob([JSON.stringify(payload(),null,2)],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(b); a.download="edit.json"; a.click();
+  badge.textContent="exported"; badge.className="badge ok";
+};
+document.getElementById("src").addEventListener("change",function(){
+  vid.src="media/videos/generated/"+this.value; EDITS=[]; IN=OUT=null;
+});
+
+Promise.all([
+  fetch("media/plates/overlays.json").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+  fetch("media/videos/generated/films.json").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+]).then(function(res){
+  var ovd=res[0], films=res[1];
+  OV=(ovd&&ovd.regions||[]).map(function(r){
+    return {id:r.id, source:r.source,
+            rect:JSON.parse(JSON.stringify(r.rect)),
+            window:JSON.parse(JSON.stringify(r.window))};
+  });
+  FILMS=(films&&films.films||[]).map(function(f){return f.file;});
+  if(!FILMS.length) FILMS=["agent-account-intelligence.mp4"];
+  document.getElementById("src").innerHTML=FILMS.map(function(f){
+    return '<option value="'+f+'">'+f.replace(/\.mp4$/,"")+"</option>";
+  }).join("");
+  vid.src="media/videos/generated/"+FILMS[0];
+  drawOv(); sync(); fit();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "schema": "aibast-certified-roster/1.0",
+  "_comment": [
+    "THE ROSTER. This is the only hand-edited file in the awards system besides",
+    "badges.json. scripts/build_api.py turns the two into the public endpoints",
+    "under api/v1/ and the Wall of Fame at wall.html.",
+    "",
+    "Adding an award: append to that member's `badges` with the badge id, the date,",
+    "and the `discussion` URL where it was approved \u2014 that thread is where people",
+    "comment and upvote, so the award has a public record, not just a row here.",
+    "",
+    "Revoking: set the member's status to 'revoked' (whole account) or drop the",
+    "single badge and note it. NEVER delete a member entry \u2014 the endpoint URL must",
+    "keep resolving so an embedded badge flips to 'not certified' instead of",
+    "breaking. A 404 is indistinguishable from an outage; an explicit answer is not.",
+    "",
+    "Usernames are matched case-insensitively (GitHub is) and stored lowercase.",
+    "Roles, not personal data: username, badges, dates, public links. No emails."
+  ],
+  "levels": {
+    "certified": "Has published at least one agent to the library that passed review.",
+    "maintainer": "Certified, and reviews submissions from other publishers."
+  },
+  "members": [
+    {
+      "username": "aibast-agents-library",
+      "level": "maintainer",
+      "certified_on": "2026-08-04",
+      "status": "active",
+      "note": "Library maintainer account \u2014 the reference entry.",
+      "badges": [
+        {
+          "id": "agent-published",
+          "awarded_on": "2026-08-04",
+          "discussion": null,
+          "note": "Reference entry."
+        }
+      ]
+    }
+  ]
+}

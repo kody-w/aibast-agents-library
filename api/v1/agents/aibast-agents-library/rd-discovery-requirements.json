@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/rd-discovery-requirements",
+    "version": "1.0.0",
+    "display_name": "R&D Discovery & Requirements Agent",
+    "description": "Searches prior internal work and published literature for what has already been attempted, then drafts the requirement or innovation record in the structure the review board expects.",
+    "author": "AIBAST",
+    "tags": [
+      "research",
+      "requirements",
+      "innovation",
+      "discovery",
+      "authoring"
+    ],
+    "category": "professional_services",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+  "size_kb": 8.1,
+  "lines": 180,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/professional_services_stacks/rd_discovery_requirements_stack/rd_discovery_requirements_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/rd-discovery-requirements",
+  "engagement": null
+}

@@ -1,0 +1,15 @@
+{
+  "protocol": "ms-rapp-badge/1.0",
+  "schema": "aibast-badge/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "id": "rapp-ready",
+  "name": "RAPP Ready",
+  "summary": "Completed the guided walkthrough and passed the knowledge check.",
+  "criteria": "Finish the RAPP walkthrough end to end, then score 80% or better on the RAPP Ready check.",
+  "how": "Take the check at api.html#quiz, then open the pre-filled claim it generates.",
+  "color": "0078d4",
+  "points": 10,
+  "tier": "foundation",
+  "holders": [],
+  "holder_count": 0
+}

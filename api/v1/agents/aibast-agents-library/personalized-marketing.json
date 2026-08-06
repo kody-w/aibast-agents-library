@@ -1,0 +1,53 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T15:05:09.370041+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/personalized-marketing",
+    "version": "1.0.0",
+    "display_name": "Personalized Marketing Agent",
+    "description": "Enables customer segmentation, personalized campaign design, dynamic content personalization, and marketing performance analysis for retail and CPG brands.",
+    "author": "AIBAST",
+    "tags": [
+      "marketing",
+      "personalization",
+      "segmentation",
+      "campaigns",
+      "retail"
+    ],
+    "category": "retail_cpg",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/retail_cpg_stacks/personalized_marketing_stack/personalized_marketing_agent.py",
+  "size_kb": 17.2,
+  "lines": 436,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/retail_cpg_stacks/personalized_marketing_stack/personalized_marketing_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/retail_cpg_stacks/personalized_marketing_stack/personalized_marketing_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/retail_cpg_stacks/personalized_marketing_stack/personalized_marketing_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/personalized-marketing",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/63"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "review-ready",
+    "overall": 100,
+    "scores": {
+      "quality": 100,
+      "usability": 100,
+      "effectiveness": 100,
+      "safety": 100,
+      "portability": 100
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

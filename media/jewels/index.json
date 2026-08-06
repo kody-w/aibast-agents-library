@@ -1,0 +1,140 @@
+{
+  "schema": "aibast-jewels/2.0",
+  "note": "The real marks, cropped from the Agent overview card in the corpus and keyed by unpremultiplying the bed out, so no mark carries a halo. Header icons (ic-*) and the chevron have no match terms \u2014 they are structural, one per panel.",
+  "source": {
+    "recording": "#3-Customer Onboarding Agent.mp4",
+    "at_seconds": 34.0,
+    "bed": [
+      7,
+      15,
+      38
+    ],
+    "panel": [
+      26,
+      29,
+      63
+    ]
+  },
+  "count": 9,
+  "jewels": [
+    {
+      "id": "copilot",
+      "file": "media/jewels/copilot.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/copilot.png",
+      "size": {
+        "w": 102,
+        "h": 94
+      },
+      "match": [
+        "copilot",
+        "brainstem",
+        "m365 copilot"
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "ic-sources",
+      "file": "media/jewels/ic-sources.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/ic-sources.png",
+      "size": {
+        "w": 53,
+        "h": 50
+      },
+      "match": [],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "ic-flow",
+      "file": "media/jewels/ic-flow.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/ic-flow.png",
+      "size": {
+        "w": 52,
+        "h": 52
+      },
+      "match": [],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "ic-actions",
+      "file": "media/jewels/ic-actions.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/ic-actions.png",
+      "size": {
+        "w": 45,
+        "h": 52
+      },
+      "match": [],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "dynamics-365",
+      "file": "media/jewels/dynamics-365.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/dynamics-365.png",
+      "size": {
+        "w": 40,
+        "h": 94
+      },
+      "match": [
+        "dynamics",
+        "d365",
+        "erp",
+        "crm",
+        "ccaas"
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "sharepoint",
+      "file": "media/jewels/sharepoint.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/sharepoint.png",
+      "size": {
+        "w": 32,
+        "h": 77
+      },
+      "match": [
+        "sharepoint",
+        "onedrive"
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "teams",
+      "file": "media/jewels/teams.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/teams.png",
+      "size": {
+        "w": 70,
+        "h": 108
+      },
+      "match": [
+        "teams"
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "outlook",
+      "file": "media/jewels/outlook.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/outlook.png",
+      "size": {
+        "w": 90,
+        "h": 110
+      },
+      "match": [
+        "outlook",
+        "exchange",
+        "email",
+        "mail"
+      ],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    },
+    {
+      "id": "chevron",
+      "file": "media/jewels/chevron.png",
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/media/jewels/chevron.png",
+      "size": {
+        "w": 100,
+        "h": 158
+      },
+      "match": [],
+      "provenance": "cropped from #3-Customer Onboarding Agent.mp4 at 34.0s, bed keyed out"
+    }
+  ]
+}

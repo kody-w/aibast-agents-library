@@ -1,0 +1,43 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "43-loyalty-insights-agent.html",
+    "industry": "Cross-Industry",
+    "display_name": "Loyalty Insights Agent",
+    "lede": "Deliver AI-driven loyalty insights and planning to reduce points liability, improve engagement results, and boost member retention.",
+    "audience": [
+      "Loyalty Program Director",
+      "CRM Manager",
+      "Marketing Leader"
+    ],
+    "business_value": [
+      "Reduce points liability",
+      "Improve engagement results",
+      "Boost member retention"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Dynamics 365 ERP",
+      "Microsoft Outlook",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "loyalty-insights-agent",
+    "industries": [
+      "Cross-Industry"
+    ],
+    "catalog_number": 43,
+    "video": {
+      "slug": "customer-loyalty-rewards-agent",
+      "hosted": true,
+      "src": "media/videos/customer-loyalty-rewards-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=loyalty-insights-agent"
+}

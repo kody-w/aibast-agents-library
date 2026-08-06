@@ -1,0 +1,15 @@
+{
+  "protocol": "ms-rapp-badge/1.0",
+  "schema": "aibast-badge/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "id": "skill-converter",
+  "name": "Skill Converter",
+  "summary": "Converted an outside skill into a RAPP-compliant agent or skill.",
+  "criteria": "A merged conversion that carries upstream attribution, a compatible license, and passes the quality gates.",
+  "how": "Follow docs/AGGREGATION.md, then submit as a normal publisher pull request.",
+  "color": "d83b01",
+  "points": 40,
+  "tier": "builder",
+  "holders": [],
+  "holder_count": 0
+}

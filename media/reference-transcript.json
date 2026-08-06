@@ -1,0 +1,1272 @@
+[
+  {
+    "text": "there's",
+    "start": 9.37,
+    "end": 22.52
+  },
+  {
+    "text": "an",
+    "start": 22.52,
+    "end": 22.65
+  },
+  {
+    "text": "agent",
+    "start": 22.66,
+    "end": 23.01
+  },
+  {
+    "text": "to",
+    "start": 23.01,
+    "end": 23.12
+  },
+  {
+    "text": "guide",
+    "start": 23.15,
+    "end": 23.5
+  },
+  {
+    "text": "manufacturers",
+    "start": 23.5,
+    "end": 24.34
+  },
+  {
+    "text": "through",
+    "start": 24.41,
+    "end": 24.75
+  },
+  {
+    "text": "these",
+    "start": 24.9,
+    "end": 25.23
+  },
+  {
+    "text": "processes.",
+    "start": 25.25,
+    "end": 26.1
+  },
+  {
+    "text": "It",
+    "start": 26.12,
+    "end": 26.28
+  },
+  {
+    "text": "pulls",
+    "start": 26.28,
+    "end": 26.68
+  },
+  {
+    "text": "data",
+    "start": 26.68,
+    "end": 27
+  },
+  {
+    "text": "from",
+    "start": 27,
+    "end": 27.32
+  },
+  {
+    "text": "Dynamics",
+    "start": 27.32,
+    "end": 27.96
+  },
+  {
+    "text": "ERP,",
+    "start": 27.96,
+    "end": 28.36
+  },
+  {
+    "text": "engages",
+    "start": 28.36,
+    "end": 28.92
+  },
+  {
+    "text": "you",
+    "start": 29.14,
+    "end": 29.16
+  },
+  {
+    "text": "directly",
+    "start": 29.21,
+    "end": 29.8
+  },
+  {
+    "text": "in",
+    "start": 29.8,
+    "end": 29.96
+  },
+  {
+    "text": "Microsoft",
+    "start": 29.96,
+    "end": 30.68
+  },
+  {
+    "text": "Teams,",
+    "start": 30.69,
+    "end": 31.12
+  },
+  {
+    "text": "and",
+    "start": 31.12,
+    "end": 31.27
+  },
+  {
+    "text": "delivers",
+    "start": 31.27,
+    "end": 31.68
+  },
+  {
+    "text": "automated",
+    "start": 31.68,
+    "end": 32.14
+  },
+  {
+    "text": "performance",
+    "start": 32.14,
+    "end": 32.7
+  },
+  {
+    "text": "analysis",
+    "start": 32.7,
+    "end": 33.12
+  },
+  {
+    "text": "with",
+    "start": 33.12,
+    "end": 33.52
+  },
+  {
+    "text": "targeted",
+    "start": 34.14,
+    "end": 34.32
+  },
+  {
+    "text": "recommendations.",
+    "start": 34.4,
+    "end": 36.1
+  },
+  {
+    "text": "Let's",
+    "start": 36.12,
+    "end": 36.42
+  },
+  {
+    "text": "say",
+    "start": 36.42,
+    "end": 36.6
+  },
+  {
+    "text": "a",
+    "start": 36.6,
+    "end": 36.66
+  },
+  {
+    "text": "plant",
+    "start": 36.66,
+    "end": 36.96
+  },
+  {
+    "text": "manager",
+    "start": 36.96,
+    "end": 37.38
+  },
+  {
+    "text": "needs",
+    "start": 37.38,
+    "end": 37.68
+  },
+  {
+    "text": "to",
+    "start": 37.68,
+    "end": 37.8
+  },
+  {
+    "text": "understand",
+    "start": 37.8,
+    "end": 38.4
+  },
+  {
+    "text": "production",
+    "start": 38.4,
+    "end": 39
+  },
+  {
+    "text": "line",
+    "start": 39.14,
+    "end": 39.24
+  },
+  {
+    "text": "performance.",
+    "start": 39.35,
+    "end": 40.12
+  },
+  {
+    "text": "Before,",
+    "start": 40.12,
+    "end": 40.56
+  },
+  {
+    "text": "they",
+    "start": 40.56,
+    "end": 40.78
+  },
+  {
+    "text": "would",
+    "start": 40.78,
+    "end": 41.05
+  },
+  {
+    "text": "have",
+    "start": 41.05,
+    "end": 41.27
+  },
+  {
+    "text": "needed",
+    "start": 41.27,
+    "end": 41.6
+  },
+  {
+    "text": "to",
+    "start": 41.6,
+    "end": 41.71
+  },
+  {
+    "text": "jump",
+    "start": 41.71,
+    "end": 41.93
+  },
+  {
+    "text": "across",
+    "start": 41.93,
+    "end": 42.26
+  },
+  {
+    "text": "multiple",
+    "start": 42.26,
+    "end": 42.7
+  },
+  {
+    "text": "systems",
+    "start": 42.7,
+    "end": 43.15
+  },
+  {
+    "text": "to",
+    "start": 43.15,
+    "end": 43.26
+  },
+  {
+    "text": "manually",
+    "start": 43.33,
+    "end": 43.85
+  },
+  {
+    "text": "gather",
+    "start": 43.85,
+    "end": 44.28
+  },
+  {
+    "text": "insights.",
+    "start": 44.34,
+    "end": 45.1
+  },
+  {
+    "text": "Now,",
+    "start": 45.12,
+    "end": 45.52
+  },
+  {
+    "text": "in",
+    "start": 45.52,
+    "end": 45.68
+  },
+  {
+    "text": "an",
+    "start": 45.68,
+    "end": 45.84
+  },
+  {
+    "text": "instant,",
+    "start": 45.84,
+    "end": 46.57
+  },
+  {
+    "text": "an",
+    "start": 46.57,
+    "end": 46.73
+  },
+  {
+    "text": "agent",
+    "start": 46.73,
+    "end": 47.13
+  },
+  {
+    "text": "can",
+    "start": 47.13,
+    "end": 47.37
+  },
+  {
+    "text": "deliver",
+    "start": 47.37,
+    "end": 47.94
+  },
+  {
+    "text": "a",
+    "start": 47.94,
+    "end": 48.16
+  },
+  {
+    "text": "clear",
+    "start": 48.16,
+    "end": 48.42
+  },
+  {
+    "text": "snapshot",
+    "start": 48.42,
+    "end": 49.12
+  },
+  {
+    "text": "of",
+    "start": 49.12,
+    "end": 49.28
+  },
+  {
+    "text": "key",
+    "start": 49.31,
+    "end": 49.53
+  },
+  {
+    "text": "metrics",
+    "start": 49.53,
+    "end": 50.1
+  },
+  {
+    "text": "like",
+    "start": 50.12,
+    "end": 50.48
+  },
+  {
+    "text": "overall",
+    "start": 50.48,
+    "end": 51.12
+  },
+  {
+    "text": "equipment",
+    "start": 51.12,
+    "end": 51.51
+  },
+  {
+    "text": "effectiveness,",
+    "start": 51.53,
+    "end": 52.12
+  },
+  {
+    "text": "as",
+    "start": 52.12,
+    "end": 52.23
+  },
+  {
+    "text": "well",
+    "start": 52.23,
+    "end": 52.46
+  },
+  {
+    "text": "as",
+    "start": 52.46,
+    "end": 52.57
+  },
+  {
+    "text": "automatically",
+    "start": 52.57,
+    "end": 53.33
+  },
+  {
+    "text": "highlight",
+    "start": 53.33,
+    "end": 53.85
+  },
+  {
+    "text": "primary",
+    "start": 53.85,
+    "end": 54.26
+  },
+  {
+    "text": "bottlenecks.",
+    "start": 54.26,
+    "end": 55.12
+  },
+  {
+    "text": "But",
+    "start": 55.12,
+    "end": 55.34
+  },
+  {
+    "text": "what",
+    "start": 55.34,
+    "end": 55.63
+  },
+  {
+    "text": "if",
+    "start": 55.63,
+    "end": 55.78
+  },
+  {
+    "text": "the",
+    "start": 55.78,
+    "end": 56
+  },
+  {
+    "text": "manager",
+    "start": 56,
+    "end": 56.52
+  },
+  {
+    "text": "wants",
+    "start": 56.52,
+    "end": 56.89
+  },
+  {
+    "text": "to",
+    "start": 56.89,
+    "end": 57.04
+  },
+  {
+    "text": "go",
+    "start": 57.04,
+    "end": 57.19
+  },
+  {
+    "text": "a",
+    "start": 57.19,
+    "end": 57.26
+  },
+  {
+    "text": "step",
+    "start": 57.26,
+    "end": 57.55
+  },
+  {
+    "text": "further",
+    "start": 57.55,
+    "end": 58.16
+  },
+  {
+    "text": "and",
+    "start": 58.16,
+    "end": 58.35
+  },
+  {
+    "text": "understand",
+    "start": 58.4,
+    "end": 59.11
+  },
+  {
+    "text": "how",
+    "start": 59.11,
+    "end": 59.34
+  },
+  {
+    "text": "to",
+    "start": 59.34,
+    "end": 59.49
+  },
+  {
+    "text": "improve",
+    "start": 59.49,
+    "end": 60.02
+  },
+  {
+    "text": "performance?",
+    "start": 60.02,
+    "end": 61.12
+  },
+  {
+    "text": "The",
+    "start": 61.12,
+    "end": 61.31
+  },
+  {
+    "text": "agent",
+    "start": 61.31,
+    "end": 61.63
+  },
+  {
+    "text": "handles",
+    "start": 61.63,
+    "end": 62.08
+  },
+  {
+    "text": "capacity",
+    "start": 62.08,
+    "end": 62.59
+  },
+  {
+    "text": "modeling",
+    "start": 62.59,
+    "end": 63.12
+  },
+  {
+    "text": "and",
+    "start": 63.12,
+    "end": 63.27
+  },
+  {
+    "text": "offers",
+    "start": 63.27,
+    "end": 63.58
+  },
+  {
+    "text": "a",
+    "start": 63.58,
+    "end": 63.63
+  },
+  {
+    "text": "set",
+    "start": 63.63,
+    "end": 63.78
+  },
+  {
+    "text": "of",
+    "start": 63.78,
+    "end": 63.88
+  },
+  {
+    "text": "targeted",
+    "start": 64.15,
+    "end": 64.3
+  },
+  {
+    "text": "recommendations",
+    "start": 64.39,
+    "end": 65.12
+  },
+  {
+    "text": "right",
+    "start": 65.12,
+    "end": 65.38
+  },
+  {
+    "text": "in",
+    "start": 65.39,
+    "end": 65.5
+  },
+  {
+    "text": "his",
+    "start": 65.5,
+    "end": 65.63
+  },
+  {
+    "text": "workflow,",
+    "start": 65.69,
+    "end": 66.12
+  },
+  {
+    "text": "like",
+    "start": 66.12,
+    "end": 66.44
+  },
+  {
+    "text": "reprogramming",
+    "start": 66.44,
+    "end": 67.48
+  },
+  {
+    "text": "equipment",
+    "start": 67.48,
+    "end": 68.21
+  },
+  {
+    "text": "and",
+    "start": 68.21,
+    "end": 68.45
+  },
+  {
+    "text": "adding",
+    "start": 68.45,
+    "end": 68.93
+  },
+  {
+    "text": "test",
+    "start": 69.14,
+    "end": 69.25
+  },
+  {
+    "text": "stations,",
+    "start": 69.35,
+    "end": 70.12
+  },
+  {
+    "text": "developing",
+    "start": 70.12,
+    "end": 70.81
+  },
+  {
+    "text": "an",
+    "start": 70.81,
+    "end": 70.95
+  },
+  {
+    "text": "implementation",
+    "start": 70.95,
+    "end": 71.92
+  },
+  {
+    "text": "plan",
+    "start": 71.92,
+    "end": 72.19
+  },
+  {
+    "text": "used",
+    "start": 72.19,
+    "end": 72.46
+  },
+  {
+    "text": "to",
+    "start": 72.46,
+    "end": 72.6
+  },
+  {
+    "text": "require",
+    "start": 72.6,
+    "end": 73.17
+  },
+  {
+    "text": "cross-referencing",
+    "start": 73.17,
+    "end": 74.12
+  },
+  {
+    "text": "different",
+    "start": 74.12,
+    "end": 74.56
+  },
+  {
+    "text": "scheduling",
+    "start": 74.56,
+    "end": 75.05
+  },
+  {
+    "text": "and",
+    "start": 75.05,
+    "end": 75.18
+  },
+  {
+    "text": "planning",
+    "start": 75.2,
+    "end": 75.6
+  },
+  {
+    "text": "systems.",
+    "start": 75.6,
+    "end": 76.12
+  },
+  {
+    "text": "Now,",
+    "start": 76.12,
+    "end": 76.5
+  },
+  {
+    "text": "with",
+    "start": 76.5,
+    "end": 76.8
+  },
+  {
+    "text": "unified",
+    "start": 76.8,
+    "end": 77.33
+  },
+  {
+    "text": "data",
+    "start": 77.33,
+    "end": 77.63
+  },
+  {
+    "text": "context",
+    "start": 77.63,
+    "end": 78.16
+  },
+  {
+    "text": "in",
+    "start": 78.16,
+    "end": 78.31
+  },
+  {
+    "text": "their",
+    "start": 78.31,
+    "end": 78.69
+  },
+  {
+    "text": "ERP",
+    "start": 78.69,
+    "end": 78.91
+  },
+  {
+    "text": "and",
+    "start": 78.91,
+    "end": 79.15
+  },
+  {
+    "text": "CRM",
+    "start": 79.15,
+    "end": 79.36
+  },
+  {
+    "text": "systems,",
+    "start": 79.39,
+    "end": 80.12
+  },
+  {
+    "text": "the",
+    "start": 80.12,
+    "end": 80.35
+  },
+  {
+    "text": "agent",
+    "start": 80.35,
+    "end": 80.73
+  },
+  {
+    "text": "can",
+    "start": 80.73,
+    "end": 80.96
+  },
+  {
+    "text": "rapidly",
+    "start": 80.96,
+    "end": 81.49
+  },
+  {
+    "text": "generate",
+    "start": 81.49,
+    "end": 82.1
+  },
+  {
+    "text": "a",
+    "start": 82.1,
+    "end": 82.17
+  },
+  {
+    "text": "phased",
+    "start": 82.17,
+    "end": 82.63
+  },
+  {
+    "text": "plan",
+    "start": 82.63,
+    "end": 82.93
+  },
+  {
+    "text": "with",
+    "start": 83.14,
+    "end": 83.23
+  },
+  {
+    "text": "quick",
+    "start": 83.23,
+    "end": 83.61
+  },
+  {
+    "text": "wins,",
+    "start": 83.61,
+    "end": 84.12
+  },
+  {
+    "text": "revise",
+    "start": 84.12,
+    "end": 84.45
+  },
+  {
+    "text": "scheduling,",
+    "start": 84.45,
+    "end": 85.11
+  },
+  {
+    "text": "and",
+    "start": 85.12,
+    "end": 85.43
+  },
+  {
+    "text": "process",
+    "start": 85.43,
+    "end": 86.15
+  },
+  {
+    "text": "tuning.",
+    "start": 86.15,
+    "end": 87.11
+  },
+  {
+    "text": "For",
+    "start": 87.12,
+    "end": 87.43
+  },
+  {
+    "text": "risk",
+    "start": 87.43,
+    "end": 87.85
+  },
+  {
+    "text": "mitigation,",
+    "start": 87.85,
+    "end": 89.12
+  },
+  {
+    "text": "the",
+    "start": 89.12,
+    "end": 89.27
+  },
+  {
+    "text": "agent",
+    "start": 89.27,
+    "end": 89.53
+  },
+  {
+    "text": "helps",
+    "start": 89.53,
+    "end": 89.79
+  },
+  {
+    "text": "as",
+    "start": 89.79,
+    "end": 89.89
+  },
+  {
+    "text": "well",
+    "start": 89.89,
+    "end": 90.15
+  },
+  {
+    "text": "by",
+    "start": 90.15,
+    "end": 90.24
+  },
+  {
+    "text": "outlining",
+    "start": 90.25,
+    "end": 90.79
+  },
+  {
+    "text": "a",
+    "start": 90.79,
+    "end": 90.85
+  },
+  {
+    "text": "strategy",
+    "start": 90.85,
+    "end": 91.32
+  },
+  {
+    "text": "that",
+    "start": 91.33,
+    "end": 91.57
+  },
+  {
+    "text": "keeps",
+    "start": 91.57,
+    "end": 91.87
+  },
+  {
+    "text": "the",
+    "start": 91.87,
+    "end": 92.05
+  },
+  {
+    "text": "project",
+    "start": 92.05,
+    "end": 92.47
+  },
+  {
+    "text": "on",
+    "start": 92.47,
+    "end": 92.59
+  },
+  {
+    "text": "track.",
+    "start": 92.59,
+    "end": 93.12
+  },
+  {
+    "text": "When",
+    "start": 93.12,
+    "end": 93.5
+  },
+  {
+    "text": "the",
+    "start": 93.5,
+    "end": 93.79
+  },
+  {
+    "text": "manager",
+    "start": 93.79,
+    "end": 94.46
+  },
+  {
+    "text": "needs",
+    "start": 94.46,
+    "end": 94.94
+  },
+  {
+    "text": "ROI",
+    "start": 94.94,
+    "end": 95.22
+  },
+  {
+    "text": "details,",
+    "start": 95.22,
+    "end": 96.12
+  },
+  {
+    "text": "he",
+    "start": 96.15,
+    "end": 96.28
+  },
+  {
+    "text": "simply",
+    "start": 96.31,
+    "end": 96.77
+  },
+  {
+    "text": "asks,",
+    "start": 96.77,
+    "end": 97.23
+  },
+  {
+    "text": "and",
+    "start": 97.23,
+    "end": 97.39
+  },
+  {
+    "text": "the",
+    "start": 97.4,
+    "end": 97.57
+  },
+  {
+    "text": "agent",
+    "start": 97.57,
+    "end": 97.85
+  },
+  {
+    "text": "quickly",
+    "start": 97.85,
+    "end": 98.24
+  },
+  {
+    "text": "compiles",
+    "start": 98.24,
+    "end": 98.68
+  },
+  {
+    "text": "a",
+    "start": 98.68,
+    "end": 98.72
+  },
+  {
+    "text": "clear",
+    "start": 98.74,
+    "end": 99.01
+  },
+  {
+    "text": "financial",
+    "start": 99.01,
+    "end": 99.5
+  },
+  {
+    "text": "summary.",
+    "start": 99.52,
+    "end": 100.11
+  },
+  {
+    "text": "Finally,",
+    "start": 100.12,
+    "end": 100.86
+  },
+  {
+    "text": "the",
+    "start": 100.86,
+    "end": 101.11
+  },
+  {
+    "text": "agent",
+    "start": 101.11,
+    "end": 101.52
+  },
+  {
+    "text": "creates",
+    "start": 101.52,
+    "end": 102.1
+  },
+  {
+    "text": "a",
+    "start": 102.1,
+    "end": 102.18
+  },
+  {
+    "text": "real-time",
+    "start": 102.18,
+    "end": 102.92
+  },
+  {
+    "text": "monitoring",
+    "start": 103.19,
+    "end": 103.75
+  },
+  {
+    "text": "plan,",
+    "start": 103.75,
+    "end": 104.24
+  },
+  {
+    "text": "enabling",
+    "start": 104.34,
+    "end": 104.78
+  },
+  {
+    "text": "teams",
+    "start": 104.78,
+    "end": 105.1
+  },
+  {
+    "text": "to",
+    "start": 105.12,
+    "end": 105.28
+  },
+  {
+    "text": "keep",
+    "start": 105.28,
+    "end": 105.6
+  },
+  {
+    "text": "optimization",
+    "start": 105.6,
+    "end": 106.55
+  },
+  {
+    "text": "efforts",
+    "start": 106.55,
+    "end": 107.12
+  },
+  {
+    "text": "aligned",
+    "start": 107.17,
+    "end": 107.62
+  },
+  {
+    "text": "to",
+    "start": 107.76,
+    "end": 107.8
+  },
+  {
+    "text": "success",
+    "start": 107.8,
+    "end": 108.3
+  },
+  {
+    "text": "metrics.",
+    "start": 108.39,
+    "end": 109.12
+  },
+  {
+    "text": "With",
+    "start": 109.12,
+    "end": 109.43
+  },
+  {
+    "text": "a",
+    "start": 109.43,
+    "end": 109.5
+  },
+  {
+    "text": "production",
+    "start": 109.5,
+    "end": 110.28
+  },
+  {
+    "text": "line",
+    "start": 110.28,
+    "end": 110.59
+  },
+  {
+    "text": "optimization",
+    "start": 110.59,
+    "end": 111.53
+  },
+  {
+    "text": "agent,",
+    "start": 111.53,
+    "end": 112.12
+  },
+  {
+    "text": "manufacturers",
+    "start": 112.33,
+    "end": 113.06
+  },
+  {
+    "text": "get",
+    "start": 113.06,
+    "end": 113.27
+  },
+  {
+    "text": "guided",
+    "start": 113.34,
+    "end": 113.69
+  },
+  {
+    "text": "assistance",
+    "start": 113.7,
+    "end": 114.41
+  },
+  {
+    "text": "embedded",
+    "start": 114.42,
+    "end": 114.99
+  },
+  {
+    "text": "directly",
+    "start": 114.99,
+    "end": 115.56
+  },
+  {
+    "text": "into",
+    "start": 115.56,
+    "end": 115.85
+  },
+  {
+    "text": "their",
+    "start": 115.85,
+    "end": 116.21
+  },
+  {
+    "text": "workflows.",
+    "start": 116.21,
+    "end": 117.12
+  },
+  {
+    "text": "The",
+    "start": 117.12,
+    "end": 117.37
+  },
+  {
+    "text": "result?",
+    "start": 117.37,
+    "end": 118.12
+  },
+  {
+    "text": "Improved",
+    "start": 118.12,
+    "end": 118.74
+  },
+  {
+    "text": "production",
+    "start": 118.74,
+    "end": 119.51
+  },
+  {
+    "text": "throughput,",
+    "start": 120.14,
+    "end": 120.43
+  },
+  {
+    "text": "increased",
+    "start": 120.43,
+    "end": 121.13
+  },
+  {
+    "text": "operational",
+    "start": 121.13,
+    "end": 121.98
+  },
+  {
+    "text": "efficiency,",
+    "start": 121.98,
+    "end": 122.9
+  },
+  {
+    "text": "and",
+    "start": 122.9,
+    "end": 123.13
+  },
+  {
+    "text": "better",
+    "start": 123.13,
+    "end": 123.59
+  },
+  {
+    "text": "ROI.",
+    "start": 123.59,
+    "end": 124.11
+  },
+  {
+    "text": "Get",
+    "start": 124.12,
+    "end": 124.33
+  },
+  {
+    "text": "started",
+    "start": 124.33,
+    "end": 124.83
+  },
+  {
+    "text": "on",
+    "start": 124.83,
+    "end": 124.97
+  },
+  {
+    "text": "your",
+    "start": 124.97,
+    "end": 125.28
+  },
+  {
+    "text": "agentic",
+    "start": 125.28,
+    "end": 125.85
+  },
+  {
+    "text": "journey",
+    "start": 125.85,
+    "end": 126.43
+  },
+  {
+    "text": "today.",
+    "start": 126.43,
+    "end": 127.12
+  },
+  {
+    "text": "Talk",
+    "start": 127.17,
+    "end": 127.37
+  },
+  {
+    "text": "to",
+    "start": 127.37,
+    "end": 127.49
+  },
+  {
+    "text": "your",
+    "start": 127.49,
+    "end": 127.74
+  },
+  {
+    "text": "Microsoft",
+    "start": 127.74,
+    "end": 128.3
+  },
+  {
+    "text": "representative",
+    "start": 128.34,
+    "end": 129.19
+  },
+  {
+    "text": "to",
+    "start": 129.2,
+    "end": 129.32
+  },
+  {
+    "text": "learn",
+    "start": 129.32,
+    "end": 129.63
+  },
+  {
+    "text": "more.",
+    "start": 129.63,
+    "end": 130.12
+  }
+]

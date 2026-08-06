@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/multi-entity-finance-ops",
+    "version": "1.0.0",
+    "display_name": "Multi-Entity Finance Operations Agent",
+    "description": "Consolidates period-end across multiple entities, currencies and ledgers, reconciles intercompany positions, and reports every balance it could not tie with the reason it could not.",
+    "author": "AIBAST",
+    "tags": [
+      "finance",
+      "consolidation",
+      "multi-currency",
+      "intercompany",
+      "close"
+    ],
+    "category": "financial_services",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+  "size_kb": 8.2,
+  "lines": 183,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/financial_services_stacks/multi_entity_finance_ops_stack/multi_entity_finance_ops_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/multi-entity-finance-ops",
+  "engagement": null
+}

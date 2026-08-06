@@ -1,0 +1,41 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "12-sales-pipeline-management-agent.html",
+    "industry": "Cross-Industry",
+    "display_name": "Sales Pipeline Management Agent",
+    "lede": "Automate sales pipeline management to keep deals moving, increase forecast confidence, and improve team productivity.",
+    "audience": [
+      "Account Executive",
+      "Sales Director"
+    ],
+    "business_value": [
+      "Keep deals moving",
+      "Increase forecast confidence",
+      "Improve team productivity"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "SharePoint",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "sales-pipeline-management-agent",
+    "industries": [
+      "Cross-Industry"
+    ],
+    "catalog_number": 12,
+    "video": {
+      "slug": "deal-progression-agent",
+      "hosted": true,
+      "src": "media/videos/deal-progression-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=sales-pipeline-management-agent"
+}

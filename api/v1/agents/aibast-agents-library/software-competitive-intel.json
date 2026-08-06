@@ -1,0 +1,53 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T16:25:21.213624+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/software-competitive-intel",
+    "version": "1.0.0",
+    "display_name": "Competitive Intelligence Agent",
+    "description": "AI-powered competitive intelligence for SaaS market landscape analysis, feature comparisons, pricing analysis, and threat assessments.",
+    "author": "AIBAST",
+    "tags": [
+      "competitive-intel",
+      "market-analysis",
+      "saas",
+      "pricing",
+      "threat-assessment"
+    ],
+    "category": "software_digital_products",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
+  "size_kb": 15.8,
+  "lines": 421,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/software_dp_stacks/competitive_intel_stack/competitive_intel_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/software-competitive-intel",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/86"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "review-ready",
+    "overall": 100,
+    "scores": {
+      "quality": 100,
+      "usability": 100,
+      "effectiveness": 100,
+      "safety": 100,
+      "portability": 100
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

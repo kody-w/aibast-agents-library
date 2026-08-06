@@ -1,0 +1,44 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "04-contact-center-escalation-agent.html",
+    "industry": "Cross-Industry",
+    "display_name": "Contact Center Escalation Agent",
+    "lede": "Automate back-office contact center escalation workflows to deliver better service outcomes and retention rates.",
+    "audience": [
+      "Back-Office Agent",
+      "Escalation Manager",
+      "Quality Analyst"
+    ],
+    "business_value": [
+      "Deliver better service outcomes",
+      "Retention rates"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CcaaS",
+      "Dynamics 365 CRM",
+      "SharePoint",
+      "Microsoft Teams",
+      "Microsoft Outlook"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "contact-center-escalation-agent",
+    "industries": [
+      "Cross-Industry",
+      "Contact Center"
+    ],
+    "catalog_number": 4,
+    "video": {
+      "slug": "customer-escalations-agent",
+      "hosted": true,
+      "src": "media/videos/customer-escalations-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=contact-center-escalation-agent"
+}

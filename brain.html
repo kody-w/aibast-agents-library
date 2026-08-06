@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ms-rapp Vault — documentation second brain</title>
+<meta name="description" content="The ms-rapp documentation vault: plain Markdown notes with wikilinks, backlinks and a graph. Readable in the browser with no client, and openable directly in Obsidian.">
+<meta property="og:title" content="ms-rapp Vault">
+<meta property="og:description" content="Read it here, or open the same folder in Obsidian. Notes come straight from GitHub.">
+<meta property="og:type" content="website">
+<style>
+:root{--bg:#faf9f8;--panel:#fff;--panel-2:#f5f4f3;--border:#edebe9;--text:#323130;
+--dim:#605e5c;--faint:#a19f9d;--accent:#0078d4;--accent-2:#5b5fc7;--soft:rgba(0,120,212,.08);
+--warn:#d83b01;--ok:#107c10;--radius:8px;
+--shadow:0 .3px .9px rgba(0,0,0,.1),0 1.6px 3.6px rgba(0,0,0,.13);}
+[data-theme=dark]{--bg:#1b1a19;--panel:#252423;--panel-2:#2d2c2b;--border:#3b3a39;--text:#f3f2f1;
+--dim:#c8c6c4;--faint:#797775;--accent:#2899f5;--accent-2:#7f85f5;--soft:rgba(40,153,245,.14);
+--warn:#f1707b;--ok:#92c353;--shadow:0 .3px .9px rgba(0,0,0,.32),0 1.6px 3.6px rgba(0,0,0,.4);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;
+display:grid;grid-template-columns:290px 1fr;height:100vh;overflow:hidden}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+#sidebar{border-right:1px solid var(--border);background:var(--panel);display:flex;
+flex-direction:column;min-width:0;overflow:hidden}
+#sidebar header{padding:14px 14px 10px;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:750;font-size:14.5px;color:var(--text)}
+.brand:hover{text-decoration:none}
+.brand small{display:block;font-weight:500;font-size:11.5px;color:var(--faint)}
+#search{width:100%;margin-top:11px;padding:8px 11px;font:inherit;font-size:13.5px;
+background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:6px;outline:none}
+#search:focus{border-color:var(--accent)}
+.actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.actions button,.actions a{font:inherit;font-size:11.5px;font-weight:650;padding:4px 10px;
+border-radius:5px;border:1px solid var(--border);background:var(--panel-2);color:var(--dim);cursor:pointer}
+.actions button:hover,.actions a:hover{color:var(--text);border-color:var(--faint);text-decoration:none}
+#tree{flex:1;overflow-y:auto;padding:10px 8px 18px}
+.section{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);
+font-weight:750;padding:12px 8px 4px}
+.item{display:block;padding:5px 9px;border-radius:5px;font-size:13px;color:var(--dim);
+cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item:hover{background:var(--panel-2);color:var(--text);text-decoration:none}
+.item.active{background:var(--soft);color:var(--accent);font-weight:650}
+#sidebar footer{border-top:1px solid var(--border);padding:9px 14px;font-size:11.5px;color:var(--faint);
+display:flex;justify-content:space-between;gap:8px}
+main{overflow-y:auto;min-width:0}
+.doc{max-width:820px;margin:0 auto;padding:36px 32px 90px}
+.crumb{font-size:12px;color:var(--faint);margin-bottom:8px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 22px}
+.tag{font-size:11px;font-weight:650;padding:2px 9px;border-radius:999px;background:var(--panel-2);
+border:1px solid var(--border);color:var(--dim);cursor:pointer}
+.tag:hover{color:var(--accent);border-color:var(--accent)}
+.doc h1{font-size:31px;font-weight:730;letter-spacing:-.02em;line-height:1.2}
+.doc h2{font-size:21px;font-weight:700;margin:30px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.doc h3{font-size:16.5px;font-weight:700;margin:22px 0 6px}
+.doc p{margin:11px 0}
+.doc ul,.doc ol{margin:11px 0 11px 24px}
+.doc li{margin:4px 0}
+.doc code{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12.5px;
+background:var(--panel-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+.doc pre{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);
+padding:13px 15px;overflow-x:auto;margin:14px 0}
+.doc pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.55}
+.doc blockquote{border-left:3px solid var(--accent);padding:2px 0 2px 14px;margin:14px 0;color:var(--dim)}
+.doc table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;display:block;overflow-x:auto}
+.doc th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);
+padding:8px 10px;border-bottom:1px solid var(--border);font-weight:750;white-space:nowrap}
+.doc td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.doc hr{border:none;border-top:1px solid var(--border);margin:26px 0}
+.wl{border-bottom:1px dotted var(--accent)}
+.wl.dangling{color:var(--warn);border-bottom-color:var(--warn);cursor:not-allowed}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+box-shadow:var(--shadow);padding:15px 17px;margin-top:30px}
+.panel h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:750}
+.panel ul{margin:8px 0 0 18px;font-size:13.5px}
+.note-hint{font-size:12.5px;color:var(--faint);margin-top:6px}
+#graph{display:none;padding:24px 32px}
+body[data-view=graph] #graph{display:block}
+body[data-view=graph] .doc{display:none}
+#graph svg{width:100%;height:calc(100vh - 150px);background:var(--panel);
+border:1px solid var(--border);border-radius:var(--radius)}
+#graph circle{cursor:pointer}
+#graph text{font-size:9px;fill:var(--dim);pointer-events:none}
+.empty{color:var(--faint);font-size:14px;padding:30px 0}
+@media(max-width:820px){body{grid-template-columns:1fr}#sidebar{display:none}
+body.nav-open{grid-template-columns:1fr}body.nav-open #sidebar{display:flex;position:fixed;
+inset:0 auto 0 0;width:290px;z-index:60}}
+</style>
+</head>
+<body data-view="note">
+
+<aside id="sidebar">
+  <header>
+    <a class="brand" href="#index">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5V21"/></svg>
+      <span><strong>ms-rapp Vault</strong><small id="subtitle">documentation second brain</small></span>
+    </a>
+    <input id="search" type="search" placeholder="Search…  ( / )" autocomplete="off" aria-label="Search notes">
+    <div class="actions">
+      <button id="graphBtn" type="button" title="Toggle graph view (g)">Graph</button>
+      <button id="randomBtn" type="button" title="Open a random note (r)">Random</button>
+      <button id="obsidianBtn" type="button" title="Open this note in Obsidian (o)">Obsidian</button>
+      <button id="exportBtn" type="button" title="Download the vault as a folder of Markdown">Export</button>
+      <button id="themeBtn" type="button" title="Toggle theme">Theme</button>
+    </div>
+  </header>
+  <nav id="tree" aria-label="Notes"></nav>
+  <footer><span id="count">…</span><a href="blog.html">field notes</a></footer>
+</aside>
+
+<main>
+  <article class="doc" id="doc"><div class="empty">Loading the vault…</div></article>
+  <section id="graph"><svg id="graphSvg" role="img" aria-label="Note graph"></svg></section>
+</main>
+
+<script>
+(function () {
+"use strict";
+var PAGES = "https://microsoft.github.io/aibast-agents-library";
+var root = document.documentElement, saved = null;
+try { saved = localStorage.getItem("aibast-theme"); } catch (e) {}
+if (saved === "dark" || (saved === null && matchMedia && matchMedia("(prefers-color-scheme: dark)").matches))
+  root.setAttribute("data-theme", "dark");
+document.getElementById("themeBtn").onclick = function () {
+  var d = root.getAttribute("data-theme") === "dark";
+  if (d) root.removeAttribute("data-theme"); else root.setAttribute("data-theme", "dark");
+  try { localStorage.setItem("aibast-theme", d ? "light" : "dark"); } catch (e) {}
+};
+var esc = function (s) { return String(s == null ? "" : s)
+  .replace(/[&<>"]/g, function (c) { return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]; }); };
+
+var INDEX = null, BY_SLUG = {}, CACHE = {}, current = null;
+
+function getJSON(paths) {
+  var p = Promise.reject();
+  paths.forEach(function (u) {
+    p = p.catch(function () {
+      return fetch(u, { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }); });
+  });
+  return p;
+}
+
+/* ── a compact Markdown renderer: enough for documentation, no dependency ── */
+function md(src, resolve) {
+  var out = [], lines = src.split("\n"), i = 0, fences = [];
+  // pull fenced code out first so nothing inside it is transformed
+  src = src.replace(/```(\w*)\n([\s\S]*?)```/g, function (_, lang, code) {
+    fences.push('<pre><code data-lang="' + esc(lang) + '">' + esc(code.replace(/\n$/, "")) + "</code></pre>");
+    return " FENCE" + (fences.length - 1) + " ";
+  });
+  lines = src.split("\n");
+
+  function inline(s) {
+    s = esc(s);
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    s = s.replace(/\[\[([^\]|#]+?)(?:#[^\]|]*)?(?:\|([^\]]+))?\]\]/g, function (_, target, label) {
+      return resolve(target.trim().toLowerCase(), label || target.trim());
+    });
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    return s;
+  }
+
+  while (i < lines.length) {
+    var line = lines[i];
+    if (/^ FENCE\d+ $/.test(line.trim())) { out.push(fences[+line.trim().match(/\d+/)[0]]); i++; continue; }
+    if (!line.trim()) { i++; continue; }
+    var h = /^(#{1,4})\s+(.*)$/.exec(line);
+    if (h) { var lv = h[1].length; out.push("<h" + lv + ">" + inline(h[2]) + "</h" + lv + ">"); i++; continue; }
+    if (/^(---|\*\*\*)\s*$/.test(line)) { out.push("<hr>"); i++; continue; }
+    if (/^\s*\|.*\|\s*$/.test(line) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
+      var cells = function (r) { return r.trim().replace(/^\||\|$/g, "").split("|").map(function (c) { return c.trim(); }); };
+      var head = cells(line); i += 2; var body = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { body.push(cells(lines[i])); i++; }
+      out.push("<table><thead><tr>" + head.map(function (c) { return "<th>" + inline(c) + "</th>"; }).join("") +
+        "</tr></thead><tbody>" + body.map(function (r) {
+          return "<tr>" + r.map(function (c) { return "<td>" + inline(c) + "</td>"; }).join("") + "</tr>"; }).join("") +
+        "</tbody></table>");
+      continue;
+    }
+    if (/^\s*>/.test(line)) {
+      var q = []; while (i < lines.length && /^\s*>/.test(lines[i])) { q.push(lines[i].replace(/^\s*>\s?/, "")); i++; }
+      out.push("<blockquote>" + inline(q.join(" ")) + "</blockquote>"); continue;
+    }
+    var ol = /^\s*\d+\.\s+/.test(line), ul = /^\s*[-*]\s+/.test(line);
+    if (ol || ul) {
+      var items = [], re = ol ? /^\s*\d+\.\s+/ : /^\s*[-*]\s+/;
+      while (i < lines.length && re.test(lines[i])) { items.push(inline(lines[i].replace(re, ""))); i++; }
+      out.push("<" + (ol ? "ol" : "ul") + ">" + items.map(function (x) { return "<li>" + x + "</li>"; }).join("") +
+        "</" + (ol ? "ol" : "ul") + ">");
+      continue;
+    }
+    var para = []; while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|\s*[-*]\s|\s*\d+\.\s|\s*>|\s*\|)/.test(lines[i])
+      && !/^ FENCE/.test(lines[i].trim())) { para.push(lines[i]); i++; }
+    if (para.length) out.push("<p>" + inline(para.join(" ")) + "</p>");
+  }
+  return out.join("\n");
+}
+
+function resolver(target, label) {
+  var n = BY_SLUG[target];
+  if (!n) return '<span class="wl dangling" title="No note with that slug yet">' + esc(label) + "</span>";
+  return '<a class="wl" href="#' + esc(target) + '">' + esc(label) + "</a>";
+}
+
+function renderTree(filter) {
+  var q = (filter || "").toLowerCase();
+  var shown = INDEX.notes.filter(function (n) {
+    return !q || (n.title + " " + n.slug + " " + (n.summary || "") + " " + (n.tags || []).join(" "))
+      .toLowerCase().indexOf(q) !== -1;
+  });
+  var groups = {};
+  shown.forEach(function (n) {
+    var sec = n.slug.indexOf("/") > -1 ? n.slug.split("/")[0] : "";
+    (groups[sec] = groups[sec] || []).push(n);
+  });
+  var html = "";
+  Object.keys(groups).sort().forEach(function (sec) {
+    if (sec) html += '<div class="section">' + esc(sec.replace(/-/g, " ")) + "</div>";
+    html += groups[sec].map(function (n) {
+      return '<a class="item' + (n.slug === current ? " active" : "") + '" href="#' + esc(n.slug) + '">' +
+        esc(n.title) + "</a>"; }).join("");
+  });
+  document.getElementById("tree").innerHTML = html || '<div class="empty">No notes match.</div>';
+}
+
+function open(slug) {
+  var n = BY_SLUG[slug];
+  var doc = document.getElementById("doc");
+  document.body.dataset.view = "note";
+  if (!n) { doc.innerHTML = '<div class="empty">No note called <code>' + esc(slug) + "</code>.</div>"; return; }
+  current = slug; renderTree(document.getElementById("search").value);
+  var show = function (text) {
+    var tags = (n.tags || []).map(function (t) { return '<span class="tag" data-tag="' + esc(t) + '">#' + esc(t) + "</span>"; }).join("");
+    var back = (n._backlinks || []);
+    doc.innerHTML =
+      '<div class="crumb">' + esc(n.path) + (n.updated ? " · updated " + esc(n.updated) : "") + "</div>" +
+      md(text, resolver) +
+      '<div class="meta" style="margin-top:26px">' + tags + "</div>" +
+      (back.length ? '<div class="panel"><h4>Linked from</h4><ul>' + back.map(function (b) {
+        return '<li><a href="#' + esc(b) + '">' + esc((BY_SLUG[b] || {}).title || b) + "</a></li>"; }).join("") + "</ul></div>" : "") +
+      '<div class="panel"><h4>This note</h4><div class="note-hint">Source: <a href="' + esc(n.raw_url) +
+      '" target="_blank" rel="noopener">' + esc(n.path) + '</a> · API: <a href="' + esc(n.note_url) +
+      '" target="_blank" rel="noopener">note endpoint</a> · the same folder opens directly in Obsidian.</div></div>';
+    Array.prototype.forEach.call(doc.querySelectorAll(".tag"), function (el) {
+      el.onclick = function () { document.getElementById("search").value = el.dataset.tag; renderTree(el.dataset.tag); };
+    });
+    window.scrollTo(0, 0); document.querySelector("main").scrollTop = 0;
+  };
+  if (CACHE[slug]) { show(CACHE[slug]); return; }
+  doc.innerHTML = '<div class="empty">Loading…</div>';
+  // Prefer the copy in this deployment; fall back to GitHub raw so the reader
+  // works even when it is opened from somewhere else entirely.
+  fetch(n.path, { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.text(); })
+    .catch(function () { return fetch(n.raw_url).then(function (r) { return r.text(); }); })
+    .then(function (text) { CACHE[slug] = text; show(text); })
+    .catch(function () { doc.innerHTML = '<div class="empty">Could not load this note.</div>'; });
+}
+
+function drawGraph(g) {
+  var svg = document.getElementById("graphSvg"), W = 900, H = 560, cx = W / 2, cy = H / 2;
+  var nodes = g.nodes, n = nodes.length, R = Math.min(cx, cy) - 60;
+  var pos = {};
+  nodes.forEach(function (nd, i) {
+    var a = (i / n) * Math.PI * 2 - Math.PI / 2;
+    var r = R * (nd.degree > 6 ? 0.55 : 1);           // hubs pulled inward
+    pos[nd.id] = { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r };
+  });
+  var out = g.edges.map(function (e) {
+    var a = pos[e.from], b = pos[e.to];
+    if (!a || !b) return "";
+    return '<line x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y +
+      '" stroke="currentColor" stroke-opacity=".16"/>';
+  }).join("");
+  out += nodes.map(function (nd) {
+    var p = pos[nd.id], r = 4 + Math.min(nd.degree, 8);
+    return '<g><circle cx="' + p.x + '" cy="' + p.y + '" r="' + r +
+      '" fill="var(--accent)" fill-opacity=".8" data-slug="' + esc(nd.id) + '"><title>' +
+      esc(nd.title) + " · " + nd.degree + " links</title></circle>" +
+      '<text x="' + p.x + '" y="' + (p.y - r - 4) + '" text-anchor="middle">' + esc(nd.title) + "</text></g>";
+  }).join("");
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.innerHTML = out;
+  Array.prototype.forEach.call(svg.querySelectorAll("[data-slug]"), function (c) {
+    c.onclick = function () { location.hash = c.dataset.slug; };
+  });
+}
+
+/* Export: a store-only zip, written by hand so the page keeps no dependency
+   and the download is a real Obsidian vault folder, not a rendering. */
+function crc32(bytes) {
+  var t = crc32.t || (crc32.t = (function () {
+    var c, tab = []; for (var n = 0; n < 256; n++) { c = n;
+      for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; tab[n] = c >>> 0; } return tab; })());
+  var crc = 0xFFFFFFFF;
+  for (var i = 0; i < bytes.length; i++) crc = (crc >>> 8) ^ t[(crc ^ bytes[i]) & 0xFF];
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+function zip(files) {
+  var enc = new TextEncoder(), chunks = [], central = [], offset = 0;
+  function u32(v) { return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+  function u16(v) { return [v & 255, (v >>> 8) & 255]; }
+  files.forEach(function (f) {
+    var name = enc.encode(f.name), data = enc.encode(f.data), crc = crc32(data);
+    var local = [].concat([80,75,3,4], u16(20), u16(0), u16(0), u16(0), u16(0),
+      u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+    chunks.push(new Uint8Array(local), name, data);
+    central.push({ name: name, crc: crc, size: data.length, offset: offset });
+    offset += local.length + name.length + data.length;
+  });
+  var cd = [], cdSize = 0;
+  central.forEach(function (e) {
+    var h = [].concat([80,75,1,2], u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+      u32(e.crc), u32(e.size), u32(e.size), u16(e.name.length), u16(0), u16(0), u16(0), u16(0),
+      u32(0), u32(e.offset));
+    cd.push(new Uint8Array(h), e.name); cdSize += h.length + e.name.length;
+  });
+  var end = new Uint8Array([].concat([80,75,5,6], u16(0), u16(0), u16(central.length), u16(central.length),
+    u32(cdSize), u32(offset), u16(0)));
+  return new Blob(chunks.concat(cd, [end]), { type: "application/zip" });
+}
+
+document.getElementById("exportBtn").onclick = function () {
+  var btn = this; btn.textContent = "Exporting…";
+  Promise.all(INDEX.notes.map(function (n) {
+    return (CACHE[n.slug] ? Promise.resolve(CACHE[n.slug])
+      : fetch(n.path).then(function (r) { return r.ok ? r.text() : fetch(n.raw_url).then(function (x) { return x.text(); }); })
+    ).then(function (text) { CACHE[n.slug] = text; return { name: n.slug + ".md", data: text }; });
+  })).then(function (files) {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(zip(files));
+    a.download = "ms-rapp-vault.zip"; a.click();
+    URL.revokeObjectURL(a.href); btn.textContent = "Export";
+  }).catch(function () { btn.textContent = "Export failed"; });
+};
+document.getElementById("obsidianBtn").onclick = function () {
+  var n = BY_SLUG[current];
+  if (!n) return;
+  // Obsidian's URI scheme opens the note if the vault is already on the machine;
+  // otherwise Export gives them the folder to open.
+  location.href = "obsidian://open?file=" + encodeURIComponent(n.slug);
+};
+document.getElementById("randomBtn").onclick = function () {
+  location.hash = INDEX.notes[Math.floor(Math.random() * INDEX.notes.length)].slug;
+};
+document.getElementById("graphBtn").onclick = function () {
+  document.body.dataset.view = document.body.dataset.view === "graph" ? "note" : "graph";
+};
+document.getElementById("search").addEventListener("input", function () { renderTree(this.value); });
+document.addEventListener("keydown", function (e) {
+  if (e.target.tagName === "INPUT") { if (e.key === "Escape") e.target.blur(); return; }
+  if (e.key === "/") { e.preventDefault(); document.getElementById("search").focus(); }
+  if (e.key === "g") document.getElementById("graphBtn").click();
+  if (e.key === "r") document.getElementById("randomBtn").click();
+  if (e.key === "o") document.getElementById("obsidianBtn").click();
+});
+window.addEventListener("hashchange", function () { open((location.hash || "#index").slice(1)); });
+
+getJSON(["api/v1/brain/index.json", PAGES + "/api/v1/brain/index.json"]).then(function (idx) {
+  INDEX = idx;
+  idx.notes.forEach(function (n) { BY_SLUG[n.slug] = n; });
+  document.getElementById("count").textContent = idx.count + " notes";
+  document.getElementById("subtitle").textContent =
+    idx.count + " notes · " + (idx.dangling_links || []).length + " dangling";
+  renderTree("");
+  return getJSON(["api/v1/brain/graph.json", PAGES + "/api/v1/brain/graph.json"])
+    .then(drawGraph).catch(function () {});
+}).then(function () {
+  // backlinks come from the per-note endpoints; fetch lazily on first open
+  var origOpen = open;
+  window.addEventListener("hashchange", function () {});
+  var slug = (location.hash || "#index").slice(1);
+  loadBacklinksThenOpen(slug);
+}).catch(function () {
+  document.getElementById("doc").innerHTML =
+    '<div class="empty">The vault index is not published on this host yet.</div>';
+});
+
+function loadBacklinksThenOpen(slug) {
+  var n = BY_SLUG[slug];
+  if (!n) { open(slug); return; }
+  if (n._backlinks) { open(slug); return; }
+  fetch(n.note_url.replace(PAGES + "/", ""), { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : fetch(n.note_url).then(function (x) { return x.json(); }); })
+    .then(function (d) { n._backlinks = d.backlinks || []; }).catch(function () { n._backlinks = []; })
+    .then(function () { open(slug); });
+}
+window.addEventListener("hashchange", function () { loadBacklinksThenOpen((location.hash || "#index").slice(1)); });
+})();
+</script>
+</body>
+</html>

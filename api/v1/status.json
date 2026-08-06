@@ -1,0 +1,9 @@
+{
+  "schema": "aibast-api-status/1.0",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "ok": true,
+  "agents": 112,
+  "publishers": 1,
+  "categories": 14,
+  "aggregated_skills": 78
+}

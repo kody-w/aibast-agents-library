@@ -1,0 +1,54 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/dynamics-365-connector",
+    "version": "1.0.0",
+    "display_name": "Dynamics 365 Connector",
+    "description": "Dynamics 365 connector for entity queries, record creation, bulk import, and schema inspection.",
+    "author": "AIBAST",
+    "tags": [
+      "dynamics-365",
+      "crm",
+      "d365",
+      "entity",
+      "bulk-import",
+      "schema"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/dynamics_365_agent.py",
+  "size_kb": 16.8,
+  "lines": 325,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/dynamics_365_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/dynamics_365_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/dynamics_365_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/dynamics-365-connector",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/34"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "review-ready",
+    "overall": 100,
+    "scores": {
+      "quality": 100,
+      "usability": 100,
+      "effectiveness": 100,
+      "safety": 100,
+      "portability": 100
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

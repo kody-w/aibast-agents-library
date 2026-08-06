@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overlay alignment — RAPPVision</title>
+<!--
+  The professional recording is the BASE TRACK. Its cinematography, transitions,
+  Microsoft intro and b-roll all stay; we replace only the boxes that carry
+  agent-specific content — the title lozenge, the overview panels, the laptop
+  screen — by compositing our own over theirs.
+
+  This tool is where those boxes get placed. Scrub to the moment a box is on
+  screen, drag ours over theirs, set the time window it lives in, export. The
+  renderer reads the export; nothing here needs a code change to take effect.
+
+  All coordinates are in BASE-TRACK pixels of the 1920x1080 frame, so an export
+  is independent of the browser it was made in.
+-->
+<style>
+:root{--bg:#14161c;--panel:#1e2028;--line:#2e3341;--text:#e9ecf2;--dim:#9aa3b2;
+  --accent:#4f8ef7;--ok:#2ecc71;--warn:#f5a524}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,sans-serif;
+  display:flex;height:100vh;overflow:hidden}
+#left{flex:1;display:flex;flex-direction:column;padding:14px;gap:10px;min-width:0}
+#stageWrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;
+  background:#000;box-shadow:0 8px 40px rgba(0,0,0,.6);flex:0 0 auto}
+#base{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.reg{position:absolute;outline:2px solid var(--accent);cursor:grab;overflow:hidden;
+  background:#fff}
+.reg.active{outline-color:var(--ok);outline-width:3px;z-index:5}
+.reg.off{display:none}
+.reg iframe{border:0;transform-origin:top left;pointer-events:none;display:block}
+.reg .tag{position:absolute;top:0;left:0;background:var(--accent);color:#fff;
+  font-size:11px;font-weight:700;padding:2px 7px;pointer-events:none;z-index:2}
+.reg.active .tag{background:var(--ok);color:#04331c}
+.h{position:absolute;width:14px;height:14px;background:var(--accent);border:2px solid #fff;
+  border-radius:3px;z-index:3}
+.h.se{right:-8px;bottom:-8px;cursor:nwse-resize}.h.nw{left:-8px;top:-8px;cursor:nwse-resize}
+.h.ne{right:-8px;top:-8px;cursor:nesw-resize}.h.sw{left:-8px;bottom:-8px;cursor:nesw-resize}
+#transport{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+#scrub{flex:1}
+button{border:1px solid var(--line);background:#232734;color:var(--text);border-radius:7px;
+  padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+button:hover{background:#2b3040}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.on{background:var(--ok);border-color:var(--ok);color:#04331c}
+aside{width:330px;flex:0 0 auto;background:var(--panel);border-left:1px solid var(--line);
+  padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+h1{font-size:15px;font-weight:650}
+p.hint{font-size:12px;color:var(--dim);line-height:1.55}
+label{display:block;font-size:10.5px;color:var(--dim);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:3px}
+input,select{width:100%;padding:7px 9px;border-radius:6px;border:1px solid var(--line);
+  background:#171a21;color:var(--text);font-family:inherit;font-size:13px;
+  font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sec{border-top:1px solid var(--line);padding-top:12px}
+.row{display:flex;gap:7px;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font-size:12px;padding:6px 10px;border-radius:20px;border:1px solid var(--line);
+  background:#232734;cursor:pointer;font-weight:600}
+.tab.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+#out{font-family:ui-monospace,Menlo,monospace;font-size:11px;white-space:pre;
+  background:#12141a;border:1px solid var(--line);border-radius:6px;padding:9px;
+  max-height:180px;overflow:auto;color:#c3cbd9}
+kbd{background:#232734;border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+  font-size:10.5px;font-family:ui-monospace,Menlo,monospace}
+.badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--warn);color:#231a00}
+.badge.ok{background:var(--ok);color:#04331c}
+</style>
+</head>
+<body>
+
+<div id="left">
+  <div id="stageWrap"><div id="stage"><video id="base" muted playsinline></video></div></div>
+  <div id="transport">
+    <button id="play">▶</button>
+    <input id="scrub" type="range" min="0" max="137" step="0.05" value="3">
+    <span id="clock" style="font-variant-numeric:tabular-nums;font-size:13px">0:03</span>
+    <button id="onlyActive">Solo active</button>
+  </div>
+</div>
+
+<aside>
+  <h1>Overlay alignment</h1>
+  <p class="hint">The professional cut is the base. Scrub to where one of their boxes is on
+    screen, drag ours over it, and set the window it lives in.
+    <kbd>↑↓←→</kbd> nudge, <kbd>Shift</kbd> ×10, <kbd>Alt</kbd> resize.</p>
+
+  <div class="sec">
+    <label for="baseSel">Base track</label>
+    <select id="baseSel"></select>
+    <label for="agent" style="margin-top:8px">Agent content</label>
+    <input id="agent" type="text" value="@aibast-agents-library/inventory-rebalancing">
+  </div>
+
+  <div class="sec">
+    <label>Region</label>
+    <div class="tabs" id="tabs"></div>
+    <div class="row" style="margin-top:8px">
+      <button id="enable" style="flex:1">Enabled</button>
+      <button id="jump" style="flex:1">Jump to window</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="grid">
+      <div><label for="x">X</label><input id="x" type="number"></div>
+      <div><label for="y">Y</label><input id="y" type="number"></div>
+      <div><label for="w">Width</label><input id="w" type="number"></div>
+      <div><label for="h">Height</label><input id="h" type="number"></div>
+      <div><label for="t0">Start (s)</label><input id="t0" type="number" step="0.1"></div>
+      <div><label for="t1">End (s)</label><input id="t1" type="number" step="0.1"></div>
+    </div>
+    <div class="grid" style="margin-top:8px">
+      <div><label for="r">Radius</label><input id="r" type="number" min="0"></div>
+      <div><label for="fade">Fade (s)</label><input id="fade" type="number" step="0.1" min="0"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="row" style="align-items:center">
+      <span class="badge" id="state">unsaved</span>
+      <button class="primary" id="export" style="margin-left:auto">Export overlays.json</button>
+    </div>
+    <p class="hint" style="margin-top:7px">Save to
+      <code>media/plates/overlays.json</code>. The renderer composites each region
+      over the base track for its window.</p>
+    <div id="out" style="margin-top:9px"></div>
+  </div>
+</aside>
+
+<script>
+var BASES = [];   // filled from media/plates/base/index.json — every recording
+
+/* One region per box we replace on the base track. Defaults are starting
+   points measured from the reference; the whole purpose of this tool is that
+   they get corrected by eye. */
+var REGIONS = [
+  {id:"title",   label:"Title lozenge", src:"lozenge",
+   x:380, y:400, w:1160, h:280, t0:2.6, t1:6.6, r:28, fade:0.4, on:true},
+  {id:"overview",label:"Overview card", src:"overview",
+   x:0, y:0, w:1920, h:1080, t0:22, t1:42, r:0, fade:0.5, on:true},
+  {id:"screen",  label:"Laptop screen", src:"screen",
+   x:189, y:52, w:1528, h:972, t0:42, t1:120, r:0, fade:0.3, on:true}
+];
+
+var stage=document.getElementById("stage"), base=document.getElementById("base"),
+    scrub=document.getElementById("scrub"), clock=document.getElementById("clock"),
+    out=document.getElementById("out"), badge=document.getElementById("state");
+var sel=0, T=3, solo=false, drag=null;
+
+function agent(){ return document.getElementById("agent").value.trim(); }
+function srcFor(r){
+  var a=encodeURIComponent(agent());
+  if(r.src==="screen")  return "screen.html?agent="+a+"&t="+Math.max(42,T).toFixed(1);
+  if(r.src==="overview")return "vision.html?agent="+a+"&overlay=overview";
+  return "lozenge.html?agent="+a;
+}
+
+function build(){
+  document.querySelectorAll(".reg").forEach(function(n){n.remove();});
+  REGIONS.forEach(function(r,i){
+    var d=document.createElement("div");
+    d.className="reg"; d.dataset.i=i;
+    d.innerHTML='<span class="tag">'+r.label+'</span><iframe></iframe>'+
+      '<span class="h nw"></span><span class="h ne"></span>'+
+      '<span class="h sw"></span><span class="h se"></span>';
+    stage.appendChild(d);
+  });
+  document.getElementById("tabs").innerHTML=REGIONS.map(function(r,i){
+    return '<span class="tab'+(i===sel?" sel":"")+'" data-i="'+i+'">'+r.label+"</span>";
+  }).join("");
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.onclick=function(){ sel=+t.dataset.i; build(); apply(); };
+  });
+  refreshFrames();
+}
+function refreshFrames(){
+  document.querySelectorAll(".reg").forEach(function(d,i){
+    var f=d.querySelector("iframe"), want=srcFor(REGIONS[i]);
+    if(f.dataset.src!==want){ f.dataset.src=want; f.src=want; }
+  });
+}
+
+function apply(){
+  REGIONS.forEach(function(r,i){
+    var d=stage.querySelector('.reg[data-i="'+i+'"]'); if(!d) return;
+    var visible = r.on && T>=r.t0 && T<r.t1 && (!solo || i===sel);
+    d.classList.toggle("off", !visible);
+    d.classList.toggle("active", i===sel);
+    d.style.left=r.x+"px"; d.style.top=r.y+"px";
+    d.style.width=r.w+"px"; d.style.height=r.h+"px";
+    d.style.borderRadius=r.r+"px";
+    var f=d.querySelector("iframe");
+    var nat = r.src==="screen" ? [r.w,r.h] : (r.src==="overview" ? [1920,1080] : [r.w,r.h]);
+    f.style.width=nat[0]+"px"; f.style.height=nat[1]+"px";
+    f.style.transform="scale("+(r.w/nat[0])+","+(r.h/nat[1])+")";
+  });
+  var r=REGIONS[sel];
+  [["x","x"],["y","y"],["w","w"],["h","h"],["t0","t0"],["t1","t1"],["r","r"],["fade","fade"]]
+    .forEach(function(p){
+      var el=document.getElementById(p[0]);
+      if(el && document.activeElement!==el) el.value=r[p[1]];
+    });
+  document.getElementById("enable").textContent=r.on?"Enabled":"Disabled";
+  document.getElementById("enable").className=r.on?"on":"";
+  clock.textContent=Math.floor(T/60)+":"+String(Math.floor(T%60)).padStart(2,"0");
+  badge.textContent="unsaved"; badge.className="badge";
+  out.textContent=JSON.stringify(payload(),null,2);
+}
+
+function payload(){
+  return {
+    schema:"aibast-overlays/1.0",
+    base_track: document.getElementById("baseSel").value,
+    frame:{w:1920,h:1080},
+    note:"The professional recording is the base; each region composites our content over theirs for its window. Coordinates are base-track pixels.",
+    regions: REGIONS.map(function(r){
+      return { id:r.id, source:r.src, enabled:r.on,
+               rect:{x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.w),h:Math.round(r.h)},
+               window:{start:+r.t0, end:+r.t1}, corner_radius:Math.round(r.r),
+               fade_seconds:+r.fade };
+    })
+  };
+}
+
+function fit(){
+  var wrap=document.getElementById("stageWrap");
+  var s=Math.min(wrap.clientWidth/1920, wrap.clientHeight/1080);
+  stage.style.transform="translate(-50%,-50%) scale("+s+")";
+  stage.style.position="absolute"; stage.style.left="50%"; stage.style.top="50%";
+}
+window.addEventListener("resize",fit);
+
+function pt(e){
+  var b=stage.getBoundingClientRect(), s=b.width/1920;
+  return {x:(e.clientX-b.left)/s, y:(e.clientY-b.top)/s};
+}
+stage.addEventListener("mousedown",function(e){
+  var reg=e.target.closest(".reg"); if(!reg) return;
+  sel=+reg.dataset.i;
+  var handle=e.target.classList.contains("h")?e.target.className.split(" ")[1]:null;
+  var p=pt(e);
+  drag={handle:handle, sx:p.x, sy:p.y, o:Object.assign({},REGIONS[sel])};
+  build(); apply(); e.preventDefault();
+});
+window.addEventListener("mousemove",function(e){
+  if(!drag) return;
+  var p=pt(e), dx=p.x-drag.sx, dy=p.y-drag.sy, o=drag.o, r=REGIONS[sel];
+  if(!drag.handle){ r.x=o.x+dx; r.y=o.y+dy; }
+  else{
+    if(drag.handle.indexOf("e")>-1) r.w=Math.max(60,o.w+dx);
+    if(drag.handle.indexOf("s")>-1) r.h=Math.max(40,o.h+dy);
+    if(drag.handle.indexOf("w")>-1){ r.w=Math.max(60,o.w-dx); r.x=o.x+dx; }
+    if(drag.handle.indexOf("n")>-1){ r.h=Math.max(40,o.h-dy); r.y=o.y+dy; }
+  }
+  apply();
+});
+window.addEventListener("mouseup",function(){ drag=null; });
+window.addEventListener("keydown",function(e){
+  if(/^(INPUT|SELECT)$/.test(document.activeElement.tagName)) return;
+  var m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+  if(!m) return;
+  e.preventDefault();
+  var r=REGIONS[sel], s=e.shiftKey?10:1;
+  if(e.altKey){ r.w=Math.max(60,r.w+m[0]*s); r.h=Math.max(40,r.h+m[1]*s); }
+  else { r.x+=m[0]*s; r.y+=m[1]*s; }
+  apply();
+});
+
+["x","y","w","h","t0","t1","r","fade"].forEach(function(k){
+  document.getElementById(k).addEventListener("input",function(){
+    var v=parseFloat(this.value); if(!isNaN(v)){ REGIONS[sel][k]=v; apply(); }
+  });
+});
+document.getElementById("enable").onclick=function(){
+  REGIONS[sel].on=!REGIONS[sel].on; apply();
+};
+document.getElementById("jump").onclick=function(){
+  T=REGIONS[sel].t0+0.4; base.currentTime=T; scrub.value=T; apply(); refreshFrames();
+};
+document.getElementById("onlyActive").onclick=function(){
+  solo=!solo; this.className=solo?"on":""; apply();
+};
+document.getElementById("play").onclick=function(){
+  if(base.paused){ base.play(); this.textContent="⏸"; } else { base.pause(); this.textContent="▶"; }
+};
+base.addEventListener("timeupdate",function(){
+  if(base.paused) return;
+  T=base.currentTime; scrub.value=T; apply();
+});
+scrub.addEventListener("input",function(){
+  T=parseFloat(this.value); base.currentTime=T; apply(); refreshFrames();
+});
+document.getElementById("agent").addEventListener("change",refreshFrames);
+document.getElementById("baseSel").addEventListener("change",function(){
+  base.src="media/plates/base/"+this.value+".mp4"; base.currentTime=T;
+});
+document.getElementById("export").onclick=function(){
+  var b=new Blob([JSON.stringify(payload(),null,2)],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(b); a.download="overlays.json"; a.click();
+  badge.textContent="exported"; badge.className="badge ok";
+};
+
+function label(id){
+  return id.replace(/[-_]+/g," ").replace(/\b\w/g,function(c){return c.toUpperCase();});
+}
+fetch("media/plates/base-tracks.json").then(function(r){return r.ok?r.json():null;})
+  .then(function(d){
+    BASES=(d&&d.tracks||[]).map(function(t){return {id:t,label:label(t)};});
+    if(!BASES.length) BASES=[{id:"product-line-optimization-agent",
+                              label:"Product Line Optimization Agent"}];
+    document.getElementById("baseSel").innerHTML=BASES.map(function(b){
+      return '<option value="'+b.id+'">'+b.label+"</option>";
+    }).join("");
+  })
+  .catch(function(){})
+  .then(function(){ return fetch("media/plates/overlays.json"); }).then(function(r){return r.ok?r.json():null;})
+  .then(function(c){
+    if(c && c.regions){
+      c.regions.forEach(function(saved){
+        var r=REGIONS.filter(function(x){return x.id===saved.id;})[0];
+        if(!r) return;
+        r.x=saved.rect.x; r.y=saved.rect.y; r.w=saved.rect.w; r.h=saved.rect.h;
+        r.t0=saved.window.start; r.t1=saved.window.end;
+        r.r=saved.corner_radius||0; r.fade=saved.fade_seconds||0; r.on=saved.enabled!==false;
+      });
+      if(c.base_track) document.getElementById("baseSel").value=c.base_track;
+    }
+  }).catch(function(){})
+  .then(function(){
+    base.src="media/plates/base/"+document.getElementById("baseSel").value+".mp4";
+    base.currentTime=T;
+    build(); apply(); fit();
+  });
+</script>
+</body>
+</html>

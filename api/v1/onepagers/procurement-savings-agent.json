@@ -1,0 +1,42 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "26-procurement-savings-agent.html",
+    "industry": "Cross-Industry",
+    "display_name": "Procurement Savings Agent",
+    "lede": "Identify and optimize savings opportunities across vendors, contracts, and purchasing cycles to reduce costs and increase procurement efficiency.",
+    "audience": [
+      "Procurement Manager",
+      "Finance Director",
+      "Category Buyer"
+    ],
+    "business_value": [
+      "Reduce costs",
+      "Increase procurement efficiency"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "Dynamics 365 CRM",
+      "Dynamics 365 Commerce",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "procurement-savings-agent",
+    "industries": [
+      "Cross-Industry"
+    ],
+    "catalog_number": 26,
+    "video": {
+      "slug": "procurement-agent",
+      "hosted": true,
+      "src": "media/videos/procurement-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=procurement-savings-agent"
+}

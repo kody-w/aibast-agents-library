@@ -1,0 +1,63 @@
+name: Release gates
+
+# The repository's own test suite, run on every change. Without this the gates
+# (secrets, clean-break, brainstem lock, corpus integrity, contracts) are
+# developer-discipline only — this makes them CI.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gates-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # T-CLEAN/T-LOCK inspect tracked + untracked state
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        # The agent contract tests import and execute every agent, so the
+        # engine's runtime deps must be present, not just the test tooling.
+        run: |
+          python -m pip install --quiet pytest pyyaml playwright pyflakes
+          python -m pip install --quiet -r rapp_brainstem/requirements.txt
+
+      - name: Install browser for the render test
+        # T8 fails closed when no browser is present, so CI must provide one —
+        # a skipped render test used to pass silently.
+        run: python -m playwright install --with-deps chromium
+
+      - name: Generated artifacts are up to date (stable-write)
+        # Runs BEFORE the suite: the suite exercises build_metrics.py, which
+        # legitimately restamps the metrics snapshot the API mirrors.
+        run: |
+          python build_registry.py
+          python scripts/build_api.py
+          if ! git diff --quiet -- registry.json api/v1/agents.json api/v1/agents api/v1/categories.json api/v1/publishers.json api/v1/status.json; then
+            echo "::error::registry.json / api/ are stale — run build_registry.py and scripts/build_api.py and commit the result"
+            git diff --stat -- registry.json api/
+            exit 1
+          fi
+
+      - name: Agent contract tests
+        run: python -m pytest tests -q
+
+      - name: Release gate suite
+        # T-SECRETS, T-CLEAN, T-LOCK, T-CORPUS, T-TERMS, T-DISCLAIMER, T-CAT,
+        # T-TELEMETRY, data contracts, static page contracts.
+        run: bash tests/test_library_frontend.sh
+

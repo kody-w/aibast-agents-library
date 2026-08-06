@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering Blog — RAPP Brainstem</title>
+<meta name="description" content="Engineering deep-dives on RAPP Brainstem design decisions and architecture.">
+<style>
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
+:root {
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
+  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
+}
+[data-theme="dark"] {
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
+  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { max-width: 100%; overflow-x: hidden; }
+body {
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+header.site {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+}
+.nav { display: flex; align-items: center; gap: 18px; padding: 12px 0; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; color: var(--text); white-space: nowrap; }
+.brand:hover { text-decoration: none; }
+.brand .mark { color: var(--accent); display: inline-flex; }
+.brand .mark svg { width: 19px; height: 19px; }
+.nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav-links a { color: var(--text-dim); font-size: 13.5px; padding: 5px 10px; border-radius: 8px; }
+.nav-links a:hover { color: var(--text); background: var(--panel-2); text-decoration: none; }
+.nav-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.icon-btn {
+  background: var(--panel); border: 1px solid var(--border); color: var(--text-dim);
+  width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.icon-btn svg { width: 15px; height: 15px; }
+.icon-btn:hover { color: var(--text); border-color: var(--text-faint); text-decoration: none; }
+footer.site { margin-top: 40px; border-top: 1px solid var(--border); padding: 26px 0 44px; }
+.foot { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--text-faint); }
+.foot a { color: var(--text-dim); }
+.foot .copy { width: 100%; margin-top: 4px; }
+@media (max-width: 560px) { .nav-links { order: 3; width: 100%; } }
+/* ══ page-specific ══════════════════════════════════════════════════════ */
+
+  code {
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace; font-size: 12.5px;
+    background: var(--panel-2); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 6px; color: var(--text-dim);
+  }
+  pre {
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace; font-size: 12.5px;
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 20px; overflow-x: auto; margin: 16px 0; line-height: 1.6;
+    color: var(--text-dim);
+  }
+  pre code { background: none; border: none; padding: 0; }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 0 20px 20px; }
+
+  .page-header { padding: 56px 0 34px; }
+  .page-header h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; letter-spacing: -.02em; line-height: 1.14; margin-bottom: 12px; }
+  .page-header p { color: var(--text-dim); font-size: 16.5px; max-width: 66ch; }
+
+  .post {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow); margin-bottom: 22px; overflow: hidden;
+  }
+  .post-header { padding: 22px 26px; border-bottom: 1px solid var(--border); }
+  .post-header h2 { font-size: 21px; font-weight: 700; letter-spacing: -.015em; margin-bottom: 8px; }
+  .post-meta { display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: var(--text-faint); flex-wrap: wrap; }
+  .post-meta .tag {
+    font-size: 11px; font-weight: 650; padding: 2px 10px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  .post-body { padding: 26px; }
+  .post-body p { font-size: 15px; line-height: 1.75; color: var(--text-dim); margin-bottom: 18px; }
+  .post-body h2, .post-body h3, .post-body h4 {
+    font-size: 17px; font-weight: 700; letter-spacing: -.01em;
+    margin-bottom: 12px; margin-top: 8px; color: var(--text);
+  }
+  .post-body ul, .post-body ol { margin: 0 0 18px 20px; font-size: 15px; line-height: 1.75; color: var(--text-dim); }
+  .post-body blockquote {
+    border-left: 3px solid var(--accent-2); background: var(--panel-2);
+    padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 18px 0; font-size: 14px; color: var(--text-dim);
+  }
+  .post-body .callout {
+    background: var(--accent-soft); border-left: 3px solid var(--accent);
+    padding: 14px 18px; border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 18px 0; font-size: 14px; color: var(--text-dim); line-height: 1.6;
+  }
+  .post-body .callout strong { color: var(--text); }
+  .post-body .diagram {
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; margin: 18px 0; text-align: center; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace; font-size: 12.5px;
+    line-height: 1.8; color: var(--text-faint); white-space: pre;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ shared site header — identical on every page ══ -->
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="agents.html">Library</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+<script>
+/* Shared theme switch. Light is the default everywhere; dark is opt-in and
+   remembered. Runs inline so the choice applies before the page paints. */
+(function () {
+  var r = document.documentElement, s = null;
+  try { s = localStorage.getItem("aibast-theme"); } catch (e) {}
+  if (s === "dark") r.setAttribute("data-theme", "dark");
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var dark = r.getAttribute("data-theme") === "dark";
+    if (dark) r.removeAttribute("data-theme"); else r.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("aibast-theme", dark ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+<div class="container">
+
+  <div class="page-header">
+    <h1>Field notes from the frontier</h1>
+    <p>How this is actually built — the decisions, the defects, and the vocabulary that comes out of the work. <a href="api/v1/blog/feed.json">Subscribe</a> · <a href="release-notes.html">Release notes</a></p>
+  </div>
+
+  <!-- Posts published as Markdown in blog/ render here automatically. -->
+  <div id="livePosts"></div>
+
+  <!-- ── Post: Fixing the Device Code Auth Race ── -->
+  <div class="post">
+    <div class="post-header">
+      <h2>How a Background Thread Silently Ate Your Login</h2>
+      <div class="post-meta">
+        <span>April 11, 2026</span>
+        <span class="tag">Bug Fix</span>
+      </div>
+    </div>
+    <div class="post-body">
+
+      <p>
+        We shipped an account switcher in v0.5.4. It worked great — unless you
+        first signed in with a GitHub account that didn't have Copilot access.
+        When you switched to the right account, the UI stayed stuck on
+        "Waiting for authorization..." forever. The fix was a six-line architectural
+        change, but the bug exposed a pattern worth documenting.
+      </p>
+
+      <h3>The setup: two callers, one resource</h3>
+      <p>
+        The brainstem's device code login flow has two consumers. A <strong>background
+        thread</strong> (<code>_bg_poll_loop</code>) polls GitHub so the token gets
+        captured even if the browser disconnects. And the <strong>client</strong>
+        polls <code>POST /login/poll</code> every 5 seconds so the UI updates when
+        auth completes.
+      </p>
+      <p>
+        Both callers invoked the same function: <code>poll_device_code()</code>.
+        That function, on success, saves the token and clears the
+        <code>_pending_login</code> state. Whoever gets there first wins the token.
+        The loser finds <code>_pending_login</code> empty, returns <code>None</code>,
+        and tells the client <code>{"status": "pending"}</code>. Forever.
+      </p>
+
+      <div class="diagram">Background thread          Client poll (/login/poll)
+       │                              │
+       ├── poll_device_code() ────┐   │
+       │   ✓ got token            │   │
+       │   ✓ cleared state ───────┤   │
+       │                          │   ├── poll_device_code()
+       │                          │   │   ✗ state empty → None
+       │                          │   │   returns {"pending"}
+       │                          │   │
+       │                          │   ├── ...forever
+       ▼                          ▼   ▼</div>
+
+      <h3>Why it only showed up on account switch</h3>
+      <p>
+        On a normal first login, the race exists but is harmless — either caller
+        reports success and the UI dismisses. On an account switch, the first
+        (wrong) account goes through the full device code flow successfully at
+        the GitHub level. GitHub grants a token. But the Copilot token exchange
+        fails because the account has no Copilot license. The background thread
+        catches this error silently, and the client is left polling an empty
+        <code>_pending_login</code> dict.
+      </p>
+      <p>
+        The second login attempt (correct account) hits the same race. If the
+        background thread wins — which it reliably does because it's already
+        polling at the right interval — the client never sees the result.
+      </p>
+
+      <h3>The fix: single-writer pattern</h3>
+      <p>
+        The solution is to stop having two callers compete for the same resource.
+        We introduced a shared <code>_login_result</code> dict. The background
+        thread is now the <strong>sole caller</strong> of
+        <code>poll_device_code()</code>. When it gets a result — success or
+        failure — it writes to <code>_login_result</code>.
+      </p>
+      <p>
+        The <code>/login/poll</code> endpoint no longer calls
+        <code>poll_device_code()</code> at all. It just reads
+        <code>_login_result</code>. Python's GIL makes dict assignment atomic,
+        so no locks are needed.
+      </p>
+
+<pre>_login_result = {}  # Written by bg thread only
+
+def _bg_poll_loop():
+    token = poll_device_code()
+    if token:
+        try:
+            get_copilot_token()
+            _login_result = {"status": "ok", ...}
+        except NO_COPILOT_ACCESS:
+            _login_result = {"status": "error", ...}
+
+@app.route("/login/poll")
+def login_poll():
+    if _login_result:          # bg thread wrote something
+        return jsonify(_login_result)
+    if not _pending_login:     # no flow in progress
+        return jsonify({"status": "expired"})
+    return jsonify({"status": "pending"})  # still waiting</pre>
+
+      <div class="callout">
+        <strong>Pattern:</strong> When a background thread and a request handler
+        both need the result of the same operation, don't let them race to call
+        it. Have one writer and N readers. The writer owns the function call; the
+        readers check a shared result.
+      </div>
+
+      <h3>Bonus fixes</h3>
+      <ul>
+        <li><strong>NO_COPILOT_ACCESS surfaces to the UI.</strong> Previously
+        swallowed — the user saw "Authenticated!" then got errors on first chat.
+        Now the login overlay shows "username doesn't have Copilot access" with
+        "Switch account" and "Sign up for Copilot" links.</li>
+        <li><strong>Client poll has a timeout.</strong> 180 attempts at 5-second
+        intervals (15 minutes, matching GitHub's device code expiry). No more
+        infinite loops.</li>
+        <li><strong>Stale Copilot cache cleared on new flow.</strong> Starting a
+        fresh device code now wipes <code>.copilot_session</code> and the
+        in-memory cache, so a previous account's session can't bleed through.</li>
+      </ul>
+
+      <h3>The lesson</h3>
+      <p>
+        Background threads that "help" by doing the same work as a request
+        handler create races that only show up under specific timing. The thread
+        was added to capture tokens when the browser disconnects — a real need.
+        But it should have been the only writer from day one, with the HTTP
+        endpoint as a passive reader. Adding a background optimization to an
+        existing request path requires rethinking ownership, not just adding
+        another caller.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ── Post: Why We Removed Remote Agents ── -->
+  <div class="post">
+    <div class="post-header">
+      <h2>Why We Killed Remote Agents (For Now)</h2>
+      <div class="post-meta">
+        <span>March 5, 2026</span>
+        <span class="tag">Architecture</span>
+      </div>
+    </div>
+    <div class="post-body">
+
+      <p>
+        The brainstem shipped with a feature that felt magical: paste a GitHub repo URL, toggle agents on, and they'd hot-load into your running server. No restart, no file copying. It worked by fetching <code>manifest.json</code> from the repo, downloading individual <code>*_agent.py</code> files, shimming their imports, and injecting them into the running Python process.
+      </p>
+
+      <p>
+        We removed all of it in v0.1.0. Here's why.
+      </p>
+
+      <h3>The complexity cost</h3>
+      <p>
+        Remote agent loading touched almost every layer of the system. It required URL normalization (handling <code>github.com/</code>, <code>owner/repo</code>, GitHub Pages URLs), manifest fetching (with three fallback strategies), file downloads, <code>sys.path</code> manipulation, <code>sys.modules</code> shimming, auto-pip-install on import failures, persistent config in <code>.repos.json</code>, restore-on-startup logic, and four HTTP endpoints for the UI to manage it all.
+      </p>
+
+      <p>
+        That's a lot of surface area for a feature whose primary value — making agents available — can be solved by just dropping a <code>.py</code> file into a folder.
+      </p>
+
+      <h3>The statelessness argument</h3>
+      <p>
+        The brainstem is designed to deploy as an Azure Function. Azure Functions are stateless by design — each invocation starts clean. Caching agents in memory and hot-loading from remote repos assumes a long-lived process. That assumption breaks in production.
+      </p>
+
+      <p>
+        By making agent loading stateless (fresh discovery every call, no cache, no remote state), we made the brainstem behave identically whether it's running locally on Flask or deployed as a serverless function. Same code path everywhere.
+      </p>
+
+      <div class="callout">
+        <strong>Design principle:</strong> If it works differently in dev vs prod, it's a bug in the architecture, not a feature.
+      </div>
+
+      <h3>What stays</h3>
+      <p>
+        The import shims (<code>_register_shims</code>) still exist. They're valuable for a different reason: agents written for the Azure deployment import <code>utils.azure_file_storage</code>, and the shims redirect those imports to <code>local_storage.py</code> so the same agent code runs locally without modification. That's a portability feature, not a remote-loading feature.
+      </p>
+
+      <p>
+        The auto-pip-install logic also stays. If a local agent imports <code>beautifulsoup4</code> and it's not installed, the brainstem installs it and retries. That makes onboarding frictionless — drop in an agent, the brainstem figures out the deps.
+      </p>
+
+      <h3>The path forward</h3>
+      <p>
+        Remote agents will likely return, but as a first-class packaging system rather than a runtime hot-loader. Think: <code>brainstem install github.com/org/agents</code> that clones the repo into your local agents folder, resolves dependencies, and you're done. Install-time, not runtime. Explicit, not magic.
+      </p>
+
+      <div class="diagram">agents/
+├── hello_agent.py            ← local, loads automatically
+├── my_custom_agent.py        ← local, loads automatically
+├── context_memory_agent.py   ← local, loads automatically
+└── experimental/
+    └── converter_agent.py    ← excluded from auto-discovery</div>
+
+    </div>
+  </div>
+
+  <!-- ── Post: Version Tracking with a Plain Text File ── -->
+  <div class="post">
+    <div class="post-header">
+      <h2>Version Tracking with a Plain Text File</h2>
+      <div class="post-meta">
+        <span>March 5, 2026</span>
+        <span class="tag">DevEx</span>
+      </div>
+    </div>
+    <div class="post-body">
+
+      <p>
+        The brainstem installs via a one-liner: <code>curl ... | bash</code>. That same one-liner should also handle upgrades. The question is: how does the installer know whether to upgrade?
+      </p>
+
+      <h3>The approach</h3>
+      <p>
+        A single file — <code>rapp_brainstem/VERSION</code> — contains the semver string. That's it. No package registry, no GitHub releases API, no <code>git describe</code> parsing.
+      </p>
+
+<pre>$ cat rapp_brainstem/VERSION
+0.1.0</pre>
+
+      <p>
+        The installer does two things:
+      </p>
+      <ul>
+        <li>Reads the local <code>VERSION</code> file from <code>~/.brainstem/src/rapp_brainstem/VERSION</code></li>
+        <li>Fetches the remote <code>VERSION</code> from the raw GitHub URL</li>
+      </ul>
+      <p>
+        If they match, print "Already up to date" and exit. If remote is newer, proceed with the full install flow (git pull, pip install, CLI wrapper update). The comparison is a simple semver walk — split on dots, compare integers left to right.
+      </p>
+
+      <h3>Why not git-based detection?</h3>
+      <p>
+        We could compare commit SHAs or use <code>git fetch</code> + <code>git rev-list</code> to detect ahead/behind. But the installer runs <em>before</em> cloning on a fresh install. We need a mechanism that works with a single HTTP request against a raw file URL, even when there's no local git repo yet.
+      </p>
+
+      <h3>Why not GitHub Releases API?</h3>
+      <p>
+        The GitHub API requires authentication for higher rate limits and adds a JSON parsing dependency. A raw file on GitHub Pages is cacheable, fast, and works with a bare <code>curl</code>. The VERSION file is also readable by Python (<code>brainstem.py</code> reads it at startup), the shell installers, and humans — one file serves every consumer.
+      </p>
+
+      <div class="callout">
+        <strong>Bump process:</strong> Edit <code>rapp_brainstem/VERSION</code>, commit, push. The next time any user runs the one-liner, they get the update. That's the whole release process.
+      </div>
+
+      <h3>Exposed in the API</h3>
+      <p>
+        The version is available at <code>GET /version</code> and included in the <code>GET /health</code> response. The startup banner prints it too. Everything reads from the same <code>VERSION</code> file — there's exactly one place to update.
+      </p>
+
+<pre>$ curl -s localhost:7071/health | python3 -m json.tool
+{
+    "status": "ok",
+    "version": "0.1.0",
+    "model": "gpt-4o",
+    "agents": ["HelloAgent", "ContextMemoryAgent"],
+    "copilot": "✓",
+    ...
+}</pre>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ shared site footer — identical on every page ══ -->
+<footer class="site">
+  <div class="wrap foot">
+    <a href="index.html">Get started</a>
+    <a href="agents.html">Library</a>
+    <a href="solutions.html">Solutions</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="metrics.html">Metrics</a>
+    <a href="api.html">Static API</a>
+    <a href="scan.html">Scan</a>
+    <a href="wall.html">Wall of Fame</a>
+    <a href="brain.html">Docs Vault</a>
+    <a href="blog.html">Field Notes</a>
+    <a href="vbrainstem/">Run in your browser</a>
+    <a href="DISCLAIMER.md">Disclaimer</a>
+    <span class="copy">© 2026 Microsoft AIBAST. Some rights reserved. MIT-licensed, community-driven.</span>
+  </div>
+</footer>
+
+
+<script>
+(function () {
+"use strict";
+var PAGES = "https://microsoft.github.io/aibast-agents-library";
+var esc = function (s) { return String(s == null ? "" : s)
+  .replace(/[&<>"]/g, function (c) { return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]; }); };
+
+/* Same compact renderer the vault uses: enough Markdown for a post, no dependency. */
+function md(src) {
+  var fences = [];
+  src = src.replace(/```(\w*)\n([\s\S]*?)```/g, function (_, l, c) {
+    fences.push("<pre><code>" + esc(c.replace(/\n$/, "")) + "</code></pre>"); return " FENCE" + (fences.length - 1) + " "; });
+  function inline(s) {
+    s = esc(s);
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    return s;
+  }
+  var lines = src.split("\n"), out = [], i = 0;
+  while (i < lines.length) {
+    var line = lines[i];
+    if (/^ FENCE\d+ $/.test(line.trim())) { out.push(fences[+line.trim().match(/\d+/)[0]]); i++; continue; }
+    if (!line.trim()) { i++; continue; }
+    var h = /^(#{1,4})\s+(.*)$/.exec(line);
+    if (h) { var lv = Math.min(h[1].length + 1, 4); out.push("<h" + lv + ">" + inline(h[2]) + "</h" + lv + ">"); i++; continue; }
+    if (/^(---|\*\*\*)\s*$/.test(line)) { out.push("<hr>"); i++; continue; }
+    if (/^\s*>/.test(line)) { var q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) { q.push(lines[i].replace(/^\s*>\s?/, "")); i++; }
+      out.push("<blockquote>" + inline(q.join(" ")) + "</blockquote>"); continue; }
+    var ol = /^\s*\d+\.\s+/.test(line), ul = /^\s*[-*]\s+/.test(line);
+    if (ol || ul) { var re = ol ? /^\s*\d+\.\s+/ : /^\s*[-*]\s+/, items = [];
+      while (i < lines.length && re.test(lines[i])) { items.push(inline(lines[i].replace(re, ""))); i++; }
+      out.push("<" + (ol ? "ol" : "ul") + ">" + items.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</" + (ol ? "ol" : "ul") + ">");
+      continue; }
+    var para = [];
+    while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|\s*[-*]\s|\s*\d+\.\s|\s*>)/.test(lines[i]) && !/^ FENCE/.test(lines[i].trim())) { para.push(lines[i]); i++; }
+    if (para.length) out.push("<p>" + inline(para.join(" ")) + "</p>");
+  }
+  return out.join("\n");
+}
+
+function getJSON(paths) {
+  var p = Promise.reject();
+  paths.forEach(function (u) { p = p.catch(function () {
+    return fetch(u, { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }); });
+  return p;
+}
+
+getJSON(["api/v1/blog/index.json", PAGES + "/api/v1/blog/index.json"]).then(function (idx) {
+  var host = document.getElementById("livePosts");
+  if (!idx.posts || !idx.posts.length) return;
+  host.innerHTML = idx.posts.map(function (p) {
+    return '<div class="post" id="' + esc(p.slug) + '"><div class="post-header"><h2>' + esc(p.title) + "</h2>" +
+      '<div class="post-meta"><span>' + esc(p.date) + "</span>" +
+      (p.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") +
+      '</div></div><div class="post-body" data-raw="' + esc(p.raw_url) + '" data-path="' + esc(p.path) + '">' +
+      "<p>" + esc(p.summary) + "</p></div></div>";
+  }).join("");
+  // Fetch each body: prefer this deployment, fall back to GitHub raw.
+  Array.prototype.forEach.call(host.querySelectorAll("[data-raw]"), function (el) {
+    fetch(el.dataset.path, { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.text(); })
+      .catch(function () { return fetch(el.dataset.raw).then(function (r) { return r.text(); }); })
+      .then(function (text) {
+        var body = text.replace(/^---[\s\S]*?\n---\n/, "").replace(/^\s+/, "");
+        body = body.replace(/^#\s+.*(\n|$)/, "");     // the title is already the post header
+        el.innerHTML = md(body);
+        if (location.hash && location.hash.slice(1) === el.parentNode.id) el.parentNode.scrollIntoView();
+      }).catch(function () {});
+  });
+}).catch(function () {});
+})();
+</script>
+</body>
+</html>

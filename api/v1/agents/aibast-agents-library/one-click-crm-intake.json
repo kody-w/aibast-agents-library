@@ -1,0 +1,62 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T15:02:57.567525+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/one-click-crm-intake",
+    "version": "1.0.0",
+    "display_name": "One-Click CRM Intake",
+    "description": "Streamlined CRM data intake with form generation, validation, duplicate detection, and import preview.",
+    "author": "AIBAST",
+    "tags": [
+      "crm",
+      "intake",
+      "data-validation",
+      "duplicate-detection",
+      "import"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/one_click_crm_intake_agent.py",
+  "size_kb": 15.5,
+  "lines": 293,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/one_click_crm_intake_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/one_click_crm_intake_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/crm_bulk_data_creator_stack/one_click_crm_intake_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/one-click-crm-intake",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/59"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "review-ready",
+    "overall": 96,
+    "scores": {
+      "quality": 100,
+      "usability": 100,
+      "effectiveness": 100,
+      "safety": 80,
+      "portability": 100
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [
+      {
+        "id": "S3",
+        "principle": "safety",
+        "level": "warn",
+        "title": "Sample data uses documented fictional domains",
+        "detail": "email addresses at: existing-customer.com, healthpro.com, newcorp.com",
+        "teachable": "Demo data in a public library must be fictional. Microsoft documentation reserves contoso.com and fabrikam.com for exactly this; a real address is personal data that a fork copies forever."
+      }
+    ],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

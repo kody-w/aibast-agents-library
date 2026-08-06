@@ -1,0 +1,30 @@
+{
+  "schema": "rapp-sentinel-service/1.0",
+  "generated": "2026-08-05T16:27:09.804095+00:00",
+  "summary": "Run this library's review rubric against your own skills. The rubric is data and the runtime is yours: nothing here holds a credential, and no content you scan is sent to us.",
+  "scan_page": "https://microsoft.github.io/aibast-agents-library/scan.html",
+  "neighborhood_url": "https://microsoft.github.io/aibast-agents-library/sentinel/NEIGHBORHOOD.json",
+  "rubric": {
+    "version": "1.0.0",
+    "principles": {
+      "provenance": "Can a reader tell where this came from and what licence it carries?",
+      "usability": "Can a model tell when to reach for this, without guessing?",
+      "determinism": "Would two runs of these steps produce the same thing?",
+      "safety": "Can following these instructions damage something?",
+      "completeness": "Is everything needed here, in this one file?"
+    },
+    "reference_implementation": "https://github.com/microsoft/aibast-agents-library/blob/main/scripts/review_skills.py",
+    "browser_implementation": "https://microsoft.github.io/aibast-agents-library/sentinel.js"
+  },
+  "mirror": {
+    "summary": "skill.md and agent.py are two projections of one contract; either can be derived from the other.",
+    "browser_implementation": "https://microsoft.github.io/aibast-agents-library/mirror.js",
+    "reference_implementation": "https://github.com/microsoft/aibast-agents-library/blob/main/scripts/export_agent.py"
+  },
+  "how_to_run": {
+    "in_a_browser": "Load https://microsoft.github.io/aibast-agents-library/sentinel.js and call RAPPSentinel.review(text) \u2014 deterministic residents only.",
+    "locally": "git clone the repository and run `python3 scripts/sentinel.py run` \u2014 no token, no service.",
+    "with_your_own_model": "A run with no model attached is DORMANT and yields no verdicts. Point scripts/wake_sentinel.py at any OpenAI-compatible endpoint (SENTINEL_ENDPOINT + SENTINEL_MODEL) to wake the interpretive residents; the answer is recorded with your model attached."
+  },
+  "limits": "Deterministic checks are exact and reproducible. Interpretive residents depend on whichever model you attach, so their findings carry that attribution and are not expected to reproduce byte for byte. Nothing here certifies a skill for use in your tenant."
+}

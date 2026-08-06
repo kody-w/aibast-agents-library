@@ -1,0 +1,62 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T16:25:21.213624+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/sharepoint-document-extractor",
+    "version": "1.0.0",
+    "display_name": "SharePoint Document Extractor",
+    "description": "SharePoint document search, URL extraction, metadata enrichment, and link validation.",
+    "author": "AIBAST",
+    "tags": [
+      "sharepoint",
+      "documents",
+      "url-extraction",
+      "metadata",
+      "search"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/extract_sharepoint_document_url_agent.py",
+  "size_kb": 14.2,
+  "lines": 243,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/extract_sharepoint_document_url_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/extract_sharepoint_document_url_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/extract_sharepoint_document_url_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/sharepoint-document-extractor",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/84"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "review-ready",
+    "overall": 95,
+    "scores": {
+      "quality": 100,
+      "usability": 75,
+      "effectiveness": 100,
+      "safety": 100,
+      "portability": 100
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [
+      {
+        "id": "U4",
+        "principle": "usability",
+        "level": "warn",
+        "title": "Configuration comes from the environment",
+        "detail": "hardcoded endpoint: https://contoso.sharepoint.com/sites/sales/Shared%20Document",
+        "teachable": "A hardcoded endpoint pins the agent to one tenant or region, so the next person who installs it is silently calling your service. Read the endpoint from the environment and declare it in `requires_env`."
+      }
+    ],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

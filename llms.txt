@@ -1,0 +1,45 @@
+# AIBAST Agents Library (ms-rapp)
+
+> Single-file AI agents for the Microsoft AI stack, the runtime that executes them, and the
+> pinned protocol corpus they implement. Every machine-readable surface is a static JSON
+> file — no key, no quota, CORS-open. 112 agents across
+> 14 industries.
+
+Agents: start at [agent.json](https://microsoft.github.io/aibast-agents-library/api/v1/agent.json) — one fetch gives you what this
+is, the endpoint map, and task recipes. Everything below is a plain fetch away.
+
+## Start here
+- [Agent entry point](https://microsoft.github.io/aibast-agents-library/api/v1/agent.json): what this is, how to use it, task recipes.
+- [API root](https://microsoft.github.io/aibast-agents-library/api/v1/index.json): every endpoint, with base URLs for Pages and raw.
+- [Full text](https://microsoft.github.io/aibast-agents-library/llms-full.txt): this file plus the complete documentation vault inline.
+
+## Catalog
+- [All agents](https://microsoft.github.io/aibast-agents-library/api/v1/agents.json): manifest, size, raw URL and engagement per agent.
+- [Categories](https://microsoft.github.io/aibast-agents-library/api/v1/categories.json): the 14 industries (b2b_sales, b2c_sales, energy, federal_government, financial_services, general…).
+- [Publishers](https://microsoft.github.io/aibast-agents-library/api/v1/publishers.json): who publishes what.
+- [Registry](https://microsoft.github.io/aibast-agents-library/registry.json): the raw registry the installers read.
+
+## Documentation
+- [Publishing guide](https://microsoft.github.io/aibast-agents-library/docs/PUBLISHING.md): how to contribute an agent.
+- [Static API guide](https://microsoft.github.io/aibast-agents-library/docs/API.md): endpoint reference.
+
+## Protocol and governance
+- [RAPP/1 specification](https://microsoft.github.io/aibast-agents-library/rapp/spec/RAPP1-SPEC.md): the protocol this implements, pinned.
+- [Corpus manifest](https://microsoft.github.io/aibast-agents-library/rapp/MIRROR-MANIFEST.json): provenance and hash for every mirrored document.
+- [Extension pattern](https://microsoft.github.io/aibast-agents-library/rapp/ext/PATTERN.md): how this distribution adds capability.
+
+## Optional
+- [Adoption metrics](https://microsoft.github.io/aibast-agents-library/api/v1/metrics.json): downloads, installs and engagement.
+- [Certification roster](https://microsoft.github.io/aibast-agents-library/api/v1/certified.json): verifiable publisher badges, checkable per username.
+- [ms-rapp-badge/1.0 specification](https://microsoft.github.io/aibast-agents-library/rapp/ext/ms-rapp-badge-1.0/SPEC.md): originated by this distribution.
+- [Field notes index](https://microsoft.github.io/aibast-agents-library/api/v1/blog/index.json): posts on how this is built; each carries a raw_url.
+- [ms-rapp-blog/1.0 specification](https://microsoft.github.io/aibast-agents-library/rapp/ext/ms-rapp-blog-1.0/SPEC.md): originated by this distribution.
+- [Documentation vault index](https://microsoft.github.io/aibast-agents-library/api/v1/brain/index.json): every note, with its links and backlinks.
+- [Vault reader](https://microsoft.github.io/aibast-agents-library/brain.html): the same notes for humans; the folder also opens in Obsidian.
+- [ms-rapp-brain/1.0 specification](https://microsoft.github.io/aibast-agents-library/rapp/ext/ms-rapp-brain-1.0/SPEC.md): originated by this distribution.
+
+## Rules of the road
+- Read an agent before running it. The single-file design exists to make that cheap.
+- This API is read-only and public. Never send it a secret.
+- Unknown fields are ignorable; documents gain fields without a major version bump.
+- Nothing changes faster than the daily build — polling harder gains nothing.

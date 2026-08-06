@@ -1,0 +1,492 @@
+{
+ "schema": "aibast-showcase-film-batch/1.0",
+ "batch": "library",
+ "generated": "2026-08-06T03:13:40+00:00",
+ "count": 12,
+ "status": "draft",
+ "note": "Rendered drafts. Publishing any of these requires a human to read the script first - see film/README.md.",
+ "films": [
+  {
+   "slug": "account-intelligence",
+   "title": "Account Intelligence",
+   "industry": "B2B sales",
+   "category": "b2b_sales",
+   "composed_from": "media/walkthroughs/agent-account-intelligence.json",
+   "broll_bucket": "cross_industry",
+   "file": "account-intelligence.mp4",
+   "duration_s": 144.6,
+   "demo_share_pct": 42.6,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.2,
+    -26.9,
+    -28.3,
+    -26.9,
+    -27.1
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "asset-maintenance-forecast",
+   "title": "Asset Maintenance Forecast Agent",
+   "industry": "Energy",
+   "category": "energy",
+   "composed_from": "media/walkthroughs/agent-asset-maintenance-forecast.json",
+   "broll_bucket": "energy",
+   "file": "asset-maintenance-forecast.mp4",
+   "duration_s": 144.57,
+   "demo_share_pct": 41.6,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.1,
+    -27.0,
+    -28.5,
+    -26.4,
+    -27.0
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "emission-tracking",
+   "title": "Emission Tracking Agent",
+   "industry": "Energy",
+   "category": "energy",
+   "composed_from": "media/walkthroughs/agent-emission-tracking.json",
+   "broll_bucket": "energy",
+   "file": "emission-tracking.mp4",
+   "duration_s": 142.13,
+   "demo_share_pct": 40.6,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.4,
+    -27.4,
+    -26.6,
+    -28.6,
+    -28.0
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "federal-grants-oversight",
+   "title": "Federal Grants Oversight Agent",
+   "industry": "Federal government",
+   "category": "federal_government",
+   "composed_from": "media/walkthroughs/agent-federal-grants-oversight.json",
+   "broll_bucket": "government",
+   "file": "federal-grants-oversight.mp4",
+   "duration_s": 144.53,
+   "demo_share_pct": 41.4,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.2,
+    -27.2,
+    -28.4,
+    -26.4,
+    -27.0
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "foia-request-assistant",
+   "title": "FOIA Request Assistant Agent",
+   "industry": "State and local government",
+   "category": "slg_government",
+   "composed_from": "media/walkthroughs/agent-foia-request-assistant.json",
+   "broll_bucket": "government",
+   "file": "foia-request-assistant.mp4",
+   "duration_s": 144.73,
+   "demo_share_pct": 41.5,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.1,
+    -27.1,
+    -28.4,
+    -26.4,
+    -26.9
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "fraud-detection-alert",
+   "title": "Fraud Detection & Alert Agent",
+   "industry": "Financial services",
+   "category": "financial_services",
+   "composed_from": "media/walkthroughs/agent-fraud-detection-alert.json",
+   "broll_bucket": "financial_services",
+   "file": "fraud-detection-alert.mp4",
+   "duration_s": 149.63,
+   "demo_share_pct": 42.6,
+   "narration_engine": "mixed",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.1,
+    -27.9,
+    -26.4,
+    -28.2,
+    -27.3,
+    -27.0
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.3,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "it-helpdesk",
+   "title": "IT Helpdesk",
+   "industry": "IT management",
+   "category": "it_management",
+   "composed_from": "media/walkthroughs/agent-it-helpdesk.json",
+   "broll_bucket": "cross_industry",
+   "file": "it-helpdesk.mp4",
+   "duration_s": 140.77,
+   "demo_share_pct": 42.4,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.3,
+    -26.7,
+    -27.5,
+    -26.5,
+    -27.0
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "prior-authorization",
+   "title": "Prior Authorization Agent",
+   "industry": "Healthcare",
+   "category": "healthcare",
+   "composed_from": "media/walkthroughs/agent-prior-authorization.json",
+   "broll_bucket": "healthcare",
+   "file": "prior-authorization.mp4",
+   "duration_s": 146.13,
+   "demo_share_pct": 43.1,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.7,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.6
+   ],
+   "bed_gap_mean_db": [
+    -27.0,
+    -26.8,
+    -28.1,
+    -26.2,
+    -26.1
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.2,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "proposal-copilot",
+   "title": "Proposal Copilot Agent",
+   "industry": "Professional services",
+   "category": "professional_services",
+   "composed_from": "media/walkthroughs/agent-proposal-copilot.json",
+   "broll_bucket": "professional_services",
+   "file": "proposal-copilot.mp4",
+   "duration_s": 145.77,
+   "demo_share_pct": 42.6,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -28.6,
+    -26.9,
+    -28.2,
+    -27.7,
+    -27.1
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "returns-complaints-resolution",
+   "title": "Returns & Complaints Resolution Agent",
+   "industry": "Retail and CPG",
+   "category": "retail_cpg",
+   "composed_from": "media/walkthroughs/agent-returns-complaints-resolution.json",
+   "broll_bucket": "retail_cpg",
+   "file": "returns-complaints-resolution.mp4",
+   "duration_s": 153.07,
+   "demo_share_pct": 43.0,
+   "narration_engine": "mixed",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.6,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -26.5,
+    -28.0,
+    -26.4,
+    -26.8,
+    -28.4,
+    -28.7
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "supplier-risk-monitoring",
+   "title": "Supplier Risk Monitoring Agent",
+   "industry": "Manufacturing",
+   "category": "manufacturing",
+   "composed_from": "media/walkthroughs/agent-supplier-risk-monitoring.json",
+   "broll_bucket": "manufacturing",
+   "file": "supplier-risk-monitoring.mp4",
+   "duration_s": 148.9,
+   "demo_share_pct": 43.3,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.6,
+    -17.7,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -26.4,
+    -27.1,
+    -27.1,
+    -28.1,
+    -26.9
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  },
+  {
+   "slug": "support-ticket-resolution",
+   "title": "Support Ticket Resolution Agent",
+   "industry": "Software and digital products",
+   "category": "software_digital_products",
+   "composed_from": "media/walkthroughs/agent-support-ticket-resolution.json",
+   "broll_bucket": "software",
+   "file": "support-ticket-resolution.mp4",
+   "duration_s": 144.5,
+   "demo_share_pct": 41.6,
+   "narration_engine": "azure",
+   "vo_slots": 9,
+   "vo_slot_mean_db": [
+    -17.5,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.6,
+    -17.5,
+    -17.7,
+    -17.6,
+    -17.6
+   ],
+   "vo_slot_range_db": [
+    -17.7,
+    -17.5
+   ],
+   "bed_gap_mean_db": [
+    -27.2,
+    -26.9,
+    -28.5,
+    -26.4,
+    -27.0
+   ],
+   "programme_mean_db": -18.6,
+   "programme_peak_db": -0.4,
+   "stereo": true,
+   "gates": "green",
+   "approval_required_before_publishing": true
+  }
+ ]
+}

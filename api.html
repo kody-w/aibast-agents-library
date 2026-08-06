@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIBAST Agents Library — Static API &amp; Impact</title>
+<meta name="description" content="Live API explorer for the AIBAST Agents Library static API, with adoption reporting and paste-ready badges. Every endpoint is a CDN-cached, CORS-open JSON file.">
+<meta property="og:title" content="AIBAST Agents Library — Static API &amp; Impact">
+<meta property="og:description" content="Try every endpoint live, copy the snippet, and see adoption over time.">
+<meta property="og:type" content="website">
+<style>
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
+:root {
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
+  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
+}
+[data-theme="dark"] {
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
+  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+html, body { max-width:100%; overflow-x:hidden; }
+body {
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.wrap { max-width:var(--maxw); margin:0 auto; padding:0 20px; }
+svg { display:inline-block; }
+header.site {
+  position:sticky; top:0; z-index:50;
+  background:color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--border);
+}
+.nav { display:flex; align-items:center; gap:18px; padding:12px 0; flex-wrap:wrap; }
+.brand { display:flex; align-items:center; gap:9px; font-weight:700; font-size:15px; color:var(--text); white-space:nowrap; }
+.brand:hover { text-decoration:none; }
+.brand .mark { color:var(--accent); display:inline-flex; }
+.brand .mark svg { width:19px; height:19px; }
+.nav-links { display:flex; gap:4px; flex-wrap:wrap; }
+.nav-links a { color:var(--text-dim); font-size:13.5px; padding:5px 10px; border-radius:8px; }
+.nav-links a:hover { color:var(--text); background:var(--panel-2); text-decoration:none; }
+.nav-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+.icon-btn {
+  background:var(--panel); border:1px solid var(--border); color:var(--text-dim);
+  width:32px; height:32px; border-radius:6px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.icon-btn svg { width:15px; height:15px; }
+.icon-btn:hover { color:var(--text); border-color:var(--text-faint); text-decoration:none; }
+footer.site { margin-top:56px; border-top:1px solid var(--border); padding:26px 0 44px; }
+.foot { display:flex; gap:20px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--text-faint); }
+.foot a { color:var(--text-dim); }
+.foot .copy { width:100%; margin-top:4px; }
+@media (max-width:560px) { .nav-links { order:3; width:100%; } }
+/* ══ page-specific ══════════════════════════════════════════════════════ */
+
+.hero { padding:56px 0 28px; position:relative; }
+.hero::before {
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(600px 300px at 20% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%);
+}
+.hero-inner { position:relative; max-width:780px; }
+.hero h1 { font-size:clamp(28px,5vw,42px); line-height:1.12; letter-spacing:-.02em; font-weight:700; }
+.hero h1 .grad {
+  background:linear-gradient(92deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p.lead { margin-top:14px; font-size:16.5px; color:var(--text-dim); max-width:64ch; }
+.hero-stats { display:flex; gap:28px; margin-top:28px; flex-wrap:wrap; }
+.stat b { display:block; font-size:24px; font-weight:750; letter-spacing:-.01em; }
+.stat span { font-size:12.5px; color:var(--text-faint); }
+
+section { padding:44px 0 8px; }
+.sec-head { margin-bottom:18px; }
+.sec-head h2 { font-size:23px; font-weight:720; letter-spacing:-.015em; }
+.sec-head p { color:var(--text-dim); font-size:14px; margin-top:6px; max-width:78ch; }
+
+/* explorer */
+.explorer { display:grid; grid-template-columns:290px 1fr; gap:16px; margin-top:8px; }
+@media (max-width:860px) { .explorer { grid-template-columns:1fr; } }
+.ep-list { display:flex; flex-direction:column; gap:6px; }
+.ep {
+  text-align:left; background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); padding:10px 12px; cursor:pointer; font-family:inherit;
+  color:var(--text); transition:border-color .15s, background .15s;
+}
+.ep:hover { border-color:color-mix(in srgb, var(--accent) 45%, var(--border)); }
+.ep.active { background:var(--accent-soft); border-color:color-mix(in srgb, var(--accent) 50%, transparent); }
+.ep code { font-family:ui-monospace,"SF Mono",Consolas,monospace; font-size:12.5px; font-weight:600; }
+.ep small { display:block; color:var(--text-faint); font-size:11.5px; margin-top:2px; }
+.panel {
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg);
+  box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; min-width:0;
+}
+.panel-head {
+  display:flex; align-items:center; gap:10px; padding:10px 14px;
+  border-bottom:1px solid var(--border); flex-wrap:wrap;
+}
+.method { font-size:11px; font-weight:700; color:var(--ok); border:1px solid color-mix(in srgb, var(--ok) 35%, transparent);
+  background:color-mix(in srgb, var(--ok) 10%, transparent); padding:2px 8px; border-radius:4px; }
+.url { font-family:ui-monospace,"SF Mono",Consolas,monospace; font-size:12px; color:var(--text-dim);
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pill { font-size:11px; font-weight:650; padding:2px 9px; border-radius:999px; white-space:nowrap;
+  color:var(--text-faint); background:var(--panel-2); border:1px solid var(--border); }
+.pill.ok { color:var(--ok); background:color-mix(in srgb, var(--ok) 12%, transparent); border-color:color-mix(in srgb, var(--ok) 30%, transparent); }
+.pill.err { color:var(--warn); background:color-mix(in srgb, var(--warn) 12%, transparent); border-color:color-mix(in srgb, var(--warn) 30%, transparent); }
+pre.out {
+  margin:0; padding:14px; overflow:auto; max-height:460px; background:var(--panel-2);
+  font-family:ui-monospace,"SF Mono",Consolas,monospace; font-size:12.5px; line-height:1.5; tab-size:2;
+}
+.k { color:var(--accent-2); } .s { color:var(--ok); } .n { color:var(--warn); } .b { color:var(--accent); }
+.tabs { display:flex; gap:6px; padding:10px 14px 0; flex-wrap:wrap; }
+.tab {
+  background:var(--panel); border:1px solid var(--border); color:var(--text-dim);
+  padding:5px 12px; border-radius:999px; font-size:12px; font-weight:650; cursor:pointer; font-family:inherit;
+}
+.tab.active { background:var(--accent-soft); color:var(--accent); border-color:color-mix(in srgb, var(--accent) 45%, transparent); }
+.snippet { position:relative; }
+.copy-btn {
+  position:absolute; top:8px; right:8px; font-size:11.5px; font-weight:650;
+  background:var(--panel); border:1px solid var(--border); color:var(--text-dim);
+  padding:4px 10px; border-radius:5px; cursor:pointer; font-family:inherit;
+}
+.copy-btn:hover { color:var(--text); border-color:var(--text-faint); }
+
+/* impact */
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-top:8px; }
+.kpi { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg); padding:15px 16px; box-shadow:var(--shadow); }
+.kpi.hero-kpi { grid-column:span 2; background:linear-gradient(135deg, var(--accent-soft), transparent); }
+@media (max-width:620px) { .kpi.hero-kpi { grid-column:span 2; } }
+.kpi .label { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; }
+.kpi .value { font-size:27px; font-weight:780; letter-spacing:-.02em; margin-top:2px; line-height:1.15; }
+.kpi.hero-kpi .value { font-size:38px; background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.kpi .sub { font-size:12px; color:var(--text-dim); margin-top:3px; }
+.chart-card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg);
+  box-shadow:var(--shadow); padding:16px 18px; margin-top:14px; }
+.chart-card h3 { font-size:14px; font-weight:700; }
+.chart-card .hint { font-size:12px; color:var(--text-faint); margin-top:2px; }
+svg.spark { width:100%; height:130px; display:block; margin-top:10px; }
+.legend { display:flex; gap:16px; font-size:12px; color:var(--text-dim); margin-top:8px; flex-wrap:wrap; }
+.legend i { width:9px; height:9px; border-radius:2px; display:inline-block; margin-right:5px; }
+
+/* badges */
+.badge-row { display:grid; grid-template-columns:200px 1fr; gap:12px; align-items:center;
+  padding:11px 0; border-bottom:1px solid var(--border); }
+.badge-row:last-child { border-bottom:none; }
+@media (max-width:620px) { .badge-row { grid-template-columns:1fr; } }
+.badge-row img { height:20px; }
+.badge-code { position:relative; }
+.badge-code code {
+  display:block; background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+  padding:8px 74px 8px 10px; font-family:ui-monospace,"SF Mono",Consolas,monospace;
+  font-size:11.5px; color:var(--text-dim); overflow-x:auto; white-space:nowrap;
+}
+table { width:100%; border-collapse:collapse; font-size:13.5px; }
+th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--text-faint); padding:8px 10px; border-bottom:1px solid var(--border); font-weight:700; }
+td { padding:9px 10px; border-bottom:1px solid var(--border); }
+tr:last-child td { border-bottom:none; }
+td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+.note { font-size:12.5px; color:var(--text-faint); line-height:1.65; }
+</style>
+</head>
+<body>
+
+<!-- ══ shared site header — identical on every page ══ -->
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="agents.html">Library</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+<script>
+/* Shared theme switch. Light is the default everywhere; dark is opt-in and
+   remembered. Runs inline so the choice applies before the page paints. */
+(function () {
+  var r = document.documentElement, s = null;
+  try { s = localStorage.getItem("aibast-theme"); } catch (e) {}
+  if (s === "dark") r.setAttribute("data-theme", "dark");
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var dark = r.getAttribute("data-theme") === "dark";
+    if (dark) r.removeAttribute("data-theme"); else r.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("aibast-theme", dark ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+<main>
+  <div class="wrap">
+
+    <div class="hero">
+      <div class="hero-inner">
+        <h1>The whole library, <span class="grad">as an API</span></h1>
+        <p class="lead">Every agent, category, publisher and metric is a static JSON file served from a CDN — CORS-open, no key, no rate limit, no server to run. Try any endpoint below: the responses on this page are fetched live, from your browser, right now.</p>
+        <div class="hero-stats">
+          <div class="stat"><b id="statAgents">–</b><span>agents indexed</span></div>
+          <div class="stat"><b id="statEndpoints">–</b><span>live endpoints</span></div>
+          <div class="stat"><b id="statDownloads">–</b><span>total downloads</span></div>
+          <div class="stat"><b id="statLatency">–</b><span>median response</span></div>
+        </div>
+      </div>
+    </div>
+
+    <section id="explorer">
+      <div class="sec-head">
+        <h2>API explorer</h2>
+        <p>Pick an endpoint. The request runs from this page against the live API, so a green status is proof the endpoint is up and cross-origin readable — the same call your application would make.</p>
+      </div>
+      <div class="explorer">
+        <div class="ep-list" id="epList"></div>
+        <div class="panel">
+          <div class="panel-head">
+            <span class="method">GET</span>
+            <span class="url" id="epUrl">—</span>
+            <span class="pill" id="epStatus">idle</span>
+            <span class="pill" id="epTime"></span>
+            <span class="pill" id="epSize"></span>
+          </div>
+          <div class="tabs" id="langTabs">
+            <button class="tab active" data-lang="json">Response</button>
+            <button class="tab" data-lang="curl">curl</button>
+            <button class="tab" data-lang="js">JavaScript</button>
+            <button class="tab" data-lang="python">Python</button>
+          </div>
+          <div class="snippet">
+            <button class="copy-btn" id="copyBtn">Copy</button>
+            <pre class="out"><code id="epOut">Select an endpoint…</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact">
+      <div class="sec-head">
+        <h2>Adoption</h2>
+        <p>Sourced from public APIs only — GitHub traffic and releases, the jsDelivr CDN, and the library's own Discussions threads. Numbers refresh daily; the methodology, including what inflates each figure, is spelled out on the <a href="metrics.html">metrics dashboard</a>.</p>
+      </div>
+      <div class="kpis" id="kpis"></div>
+
+      <div class="chart-card">
+        <h3>Downloads over time</h3>
+        <div class="hint" id="chartHint">daily repository clones, agent-file CDN fetches and page views</div>
+        <svg class="spark" id="spark" preserveAspectRatio="none" role="img" aria-label="Daily downloads over time"></svg>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>Clones</span>
+          <span><i style="background:var(--accent-2)"></i>Page views</span>
+          <span><i style="background:var(--ok)"></i>CDN fetches</span>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Most installed agents</h3>
+        <div class="hint">unique installers, counted one per GitHub user from each agent's download tally</div>
+        <div style="overflow-x:auto"><table id="topTable"></table></div>
+      </div>
+    </section>
+
+    <section id="certified">
+      <div class="sec-head">
+        <h2>RAPP Certified</h2>
+        <p>Publishers who have shipped an agent that passed review are listed on a public roster, and every one of them gets a verification endpoint keyed to their GitHub username. Anyone can check a claim — no login, no API key. Revocation is immediate: the same URL keeps resolving and simply answers <code>certified: false</code>.</p>
+      </div>
+      <div class="chart-card">
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+          <input id="certUser" type="search" placeholder="github-username"
+                 aria-label="GitHub username to verify"
+                 style="flex:1 1 240px; min-width:0; padding:9px 12px; font-size:14px; font-family:inherit;
+                        background:var(--panel-2); color:var(--text);
+                        border:1px solid var(--border); border-radius:6px; outline:none">
+          <button class="tab active" id="certGo" style="padding:9px 18px; font-size:13px">Verify</button>
+        </div>
+        <div id="certResult" style="margin-top:14px"></div>
+      </div>
+      <div class="chart-card">
+        <h3>The roster</h3>
+        <div class="hint" id="certHint">everyone currently certified, straight from the API</div>
+        <div style="overflow-x:auto"><table id="certTable"></table></div>
+      </div>
+      <p class="note" style="margin-top:12px">Certification says a publisher's submission met the review bar; it is not a Microsoft endorsement of them or their work. How to earn it: <a href="docs/CERTIFICATION.md">read the certification process</a>.</p>
+    </section>
+
+    <section id="badges">
+      <div class="sec-head">
+        <h2>Badges</h2>
+        <p>The API ships a <a href="https://shields.io/badges/endpoint-badge" target="_blank" rel="noopener">shields.io endpoint</a>, so any README can display live library numbers. Copy a line and paste it into yours.</p>
+      </div>
+      <div class="chart-card" id="badgeList"></div>
+      <p class="note" style="margin-top:12px">Badges read <code>api/v1/badge.json</code>, which the daily build regenerates. Point shields at any of the other endpoints the same way to surface your own numbers.</p>
+    </section>
+
+    <section id="integrate">
+      <div class="sec-head">
+        <h2>Integrate it</h2>
+        <p>The contract is fully <a href="docs/API.md">documented</a>: versioned endpoints under <code>api/v1/</code>, a <code>schema</code> and <code>generated</code> stamp on every document, and a stable build so a rebuild with no change produces no difference. It follows the <code>rapp-static-api/1.0</code> convention — the repository <em>is</em> the API.</p>
+      </div>
+      <div class="chart-card">
+        <div class="badge-row">
+          <b>Two hosts, same bytes</b>
+          <span class="note">GitHub Pages (<code>microsoft.github.io/aibast-agents-library/api/v1/</code>) and raw
+          (<code>raw.githubusercontent.com/microsoft/aibast-agents-library/main/api/v1/</code>). Both are CDN-cached and send
+          <code>Access-Control-Allow-Origin: *</code>.</span>
+        </div>
+        <div class="badge-row">
+          <b>No key, no quota</b>
+          <span class="note">Static files. Nothing to authenticate, nothing to rate-limit, nothing to page.</span>
+        </div>
+        <div class="badge-row">
+          <b>Pin what you ship</b>
+          <span class="note">Swap <code>main</code> for a commit SHA in the raw URL and the response is immutable forever.</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ══ shared site footer — identical on every page ══ -->
+<footer class="site">
+  <div class="wrap foot">
+    <a href="index.html">Get started</a>
+    <a href="agents.html">Library</a>
+    <a href="solutions.html">Solutions</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="metrics.html">Metrics</a>
+    <a href="api.html">Static API</a>
+    <a href="scan.html">Scan</a>
+    <a href="wall.html">Wall of Fame</a>
+    <a href="brain.html">Docs Vault</a>
+    <a href="blog.html">Field Notes</a>
+    <a href="vbrainstem/">Run in your browser</a>
+    <a href="DISCLAIMER.md">Disclaimer</a>
+    <span class="copy">© 2026 Microsoft AIBAST. Some rights reserved. MIT-licensed, community-driven.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+"use strict";
+
+/* The theme switch lives in the shared header script at the top of the page. */
+
+var REPO = "microsoft/aibast-agents-library";
+var PAGES = "https://microsoft.github.io/aibast-agents-library";
+var esc = function (s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+  });
+};
+var num = function (n) { return Number(n || 0).toLocaleString(); };
+
+/* Endpoints are fetched relative to wherever this page is served, so the
+   explorer exercises THIS deployment; the copyable snippets always show the
+   canonical published URL. */
+var ENDPOINTS = [
+  { path: "api/v1/index.json",       label: "API root — endpoint directory" },
+  { path: "api/v1/agents.json",      label: "Every agent with URLs + engagement" },
+  { path: "api/v1/agents/aibast-agents-library/art-generator.json", label: "One agent, in full" },
+  { path: "api/v1/categories.json",  label: "Industries and their agents" },
+  { path: "api/v1/publishers.json",  label: "Publisher directory" },
+  { path: "api/v1/status.json",      label: "Heartbeat — counts + timestamp" },
+  { path: "api/v1/badge.json",       label: "shields.io endpoint" },
+  { path: "api/v1/metrics.json",     label: "Adoption snapshot" },
+  { path: "api/v1/aggregated.json",  label: "Aggregated outside skills" },
+  { path: "api/v1/certified.json",   label: "RAPP Certified roster" },
+  { path: "api/v1/certified/aibast-agents-library.json", label: "Verify one publisher" },
+  { path: "registry.json",           label: "Full raw registry" }
+];
+
+var active = ENDPOINTS[0], lang = "json", lastText = "", timings = [];
+
+function highlight(json) {
+  return esc(json)
+    .replace(/(&quot;[^&]*?&quot;)(\s*:)/g, '<span class="k">$1</span>$2')
+    .replace(/:\s*(&quot;[^&]*?&quot;)/g, ': <span class="s">$1</span>')
+    .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="n">$1</span>')
+    .replace(/:\s*(true|false|null)/g, ': <span class="b">$1</span>');
+}
+
+function snippet(kind, url) {
+  if (kind === "curl")   return "curl -s " + url + " | jq .";
+  if (kind === "js")     return "const res = await fetch(\n  '" + url + "'\n);\nconst data = await res.json();\nconsole.log(data);";
+  if (kind === "python") return "import json, urllib.request\n\nwith urllib.request.urlopen(\n    '" + url + "'\n) as r:\n    data = json.load(r)\nprint(data)";
+  return "";
+}
+
+function renderList() {
+  document.getElementById("epList").innerHTML = ENDPOINTS.map(function (e) {
+    return '<button class="ep' + (e === active ? " active" : "") + '" data-path="' + esc(e.path) + '">' +
+      "<code>/" + esc(e.path) + "</code><small>" + esc(e.label) + "</small></button>";
+  }).join("");
+  Array.prototype.forEach.call(document.querySelectorAll(".ep"), function (b) {
+    b.addEventListener("click", function () {
+      active = ENDPOINTS.filter(function (e) { return e.path === b.dataset.path; })[0];
+      renderList(); load();
+    });
+  });
+}
+
+function paint() {
+  var out = document.getElementById("epOut");
+  if (lang === "json") { out.innerHTML = highlight(lastText); return; }
+  out.textContent = snippet(lang, PAGES + "/" + active.path);
+}
+
+function load() {
+  var url = active.path;                       // relative: exercises this deployment
+  document.getElementById("epUrl").textContent = PAGES + "/" + active.path;
+  var st = document.getElementById("epStatus");
+  st.className = "pill"; st.textContent = "loading…";
+  document.getElementById("epTime").textContent = "";
+  document.getElementById("epSize").textContent = "";
+  var t0 = performance.now();
+  fetch(url, { cache: "no-store" }).then(function (r) {
+    var ms = Math.round(performance.now() - t0);
+    timings.push(ms);
+    return r.text().then(function (text) {
+      st.className = "pill " + (r.ok ? "ok" : "err");
+      st.textContent = r.status + " " + (r.ok ? "OK" : r.statusText);
+      document.getElementById("epTime").textContent = ms + " ms";
+      document.getElementById("epSize").textContent = (text.length / 1024).toFixed(1) + " KB";
+      try { lastText = JSON.stringify(JSON.parse(text), null, 2); }
+      catch (e) { lastText = text; }
+      if (lastText.length > 60000) lastText = lastText.slice(0, 60000) + "\n\n… truncated for display — the full document is at the URL above.";
+      paint();
+      var med = timings.slice().sort(function (a, b) { return a - b; })[Math.floor(timings.length / 2)];
+      document.getElementById("statLatency").textContent = med + " ms";
+    });
+  }).catch(function (err) {
+    st.className = "pill err"; st.textContent = "failed";
+    lastText = "Request failed: " + err + "\n\nThe endpoint may not be published on this host yet.";
+    paint();
+  });
+}
+
+Array.prototype.forEach.call(document.querySelectorAll("#langTabs .tab"), function (t) {
+  t.addEventListener("click", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("#langTabs .tab"), function (x) { x.classList.remove("active"); });
+    t.classList.add("active"); lang = t.dataset.lang; paint();
+  });
+});
+document.getElementById("copyBtn").addEventListener("click", function () {
+  var btn = this;
+  navigator.clipboard.writeText(document.getElementById("epOut").textContent);
+  btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1400);
+});
+
+document.getElementById("statEndpoints").textContent = ENDPOINTS.length;
+renderList(); load();
+
+/* ---------- adoption ---------- */
+function getJSON(paths) {
+  var p = Promise.reject();
+  paths.forEach(function (u) {
+    p = p.catch(function () {
+      return fetch(u, { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      });
+    });
+  });
+  return p;
+}
+
+function renderImpact(m) {
+  var t = m.totals || {};
+  document.getElementById("statAgents").textContent = num(t.agents);
+  document.getElementById("statDownloads").textContent = num(t.downloads);
+
+  var cards = [
+    { hero: true, label: "Total downloads", value: num(t.downloads),
+      sub: num(t.clones) + " clones · " + num(t.cdn_hits) + " CDN · " + num(t.release_downloads) + " release assets · " + num(t.tracked_downloads) + " tracked installs" },
+    { label: "Agent file fetches", value: num(t.agent_file_downloads), sub: "individual agents pulled from the CDN" },
+    { label: "Tracked installs", value: num(t.tracked_downloads), sub: "unique installers, one per GitHub user" },
+    { label: "Agents", value: num(t.agents), sub: num(t.publishers) + " publisher" + (t.publishers === 1 ? "" : "s") + " · " + num(t.categories) + " industries" },
+    { label: "Upvotes", value: num(t.upvotes), sub: num(t.comments) + " comments on agent threads" },
+    { label: "Page views", value: num(t.page_views), sub: num(t.view_uniques_14d) + " unique visitors (14d)" },
+    { label: "Library size", value: num(t.total_lines), sub: "lines of agent Python" }
+  ];
+  document.getElementById("kpis").innerHTML = cards.map(function (c) {
+    return '<div class="kpi' + (c.hero ? " hero-kpi" : "") + '"><div class="label">' + esc(c.label) +
+      '</div><div class="value">' + c.value + '</div><div class="sub">' + esc(c.sub) + "</div></div>";
+  }).join("");
+
+  /* npm-style daily bars */
+  var data = (m.daily || []).slice(-60), svg = document.getElementById("spark");
+  if (!data.length) { svg.innerHTML = '<text x="8" y="20" fill="#a19f9d" font-size="12">No history yet</text>'; return; }
+  var W = 1000, H = 130, PAD = 18;
+  var max = Math.max(1, Math.max.apply(null, data.map(function (d) {
+    return Math.max(d.clones || 0, d.views || 0, d.cdn || 0); })));
+  var bw = (W - PAD * 2) / data.length, y = function (v) { return H - PAD - (v / max) * (H - PAD * 2); };
+  var out = "";
+  for (var i = 0; i <= 2; i++) {
+    var gy = PAD + i * (H - PAD * 2) / 2;
+    out += '<line x1="' + PAD + '" y1="' + gy + '" x2="' + (W - PAD) + '" y2="' + gy + '" stroke="currentColor" stroke-opacity=".08"/>';
+  }
+  data.forEach(function (d, i) {
+    var x = PAD + i * bw, w = Math.max(1.5, bw * 0.26);
+    if (d.clones) out += '<rect x="' + x + '" y="' + y(d.clones) + '" width="' + w + '" height="' + (H - PAD - y(d.clones)) + '" fill="var(--accent)" rx="1"><title>' + d.date + ": " + d.clones + " clones</title></rect>";
+    if (d.views)  out += '<rect x="' + (x + w + 1) + '" y="' + y(d.views) + '" width="' + w + '" height="' + (H - PAD - y(d.views)) + '" fill="var(--accent-2)" rx="1"><title>' + d.date + ": " + d.views + " views</title></rect>";
+    if (d.cdn)    out += '<rect x="' + (x + (w + 1) * 2) + '" y="' + y(d.cdn) + '" width="' + w + '" height="' + (H - PAD - y(d.cdn)) + '" fill="var(--ok)" rx="1"><title>' + d.date + ": " + d.cdn + " CDN fetches</title></rect>";
+  });
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.innerHTML = out;
+  document.getElementById("chartHint").textContent =
+    "daily, last " + data.length + " day" + (data.length === 1 ? "" : "s") +
+    (t.tracking_since ? " · tracking since " + t.tracking_since : "");
+
+  var rows = (m.leaderboards && m.leaderboards.most_downloaded) || [];
+  var tbl = document.getElementById("topTable");
+  if (!rows.length) {
+    tbl.innerHTML = '<tbody><tr><td class="note">No installs recorded yet — install tallies begin once agent threads are seeded.</td></tr></tbody>';
+    return;
+  }
+  // Rows go to the agent's own page on this site, never out to a file or a thread.
+  tbl.innerHTML = "<thead><tr><th>Agent</th><th>Industry</th><th class='num'>Installs</th><th class='num'>Upvotes</th></tr></thead><tbody>" +
+    rows.slice(0, 10).map(function (r) {
+      return '<tr><td><a href="onepager.html?agent=' + encodeURIComponent(r.name) + '">' +
+        esc(r.display_name || r.name) + "</a>" +
+        "</td><td>" + esc(String(r.category || "").replace(/_/g, " ")) +
+        "</td><td class='num'>" + num(r.downloads) + "</td><td class='num'>" + num(r.upvotes) + "</td></tr>";
+    }).join("") + "</tbody>";
+}
+
+getJSON(["api/v1/metrics.json", "state/metrics.json", PAGES + "/api/v1/metrics.json"])
+  .then(renderImpact)
+  .catch(function () {
+    document.getElementById("kpis").innerHTML = '<div class="kpi" style="grid-column:1/-1"><div class="sub">Adoption data has not been published on this host yet.</div></div>';
+  });
+
+/* ---------- RAPP Certified ---------- */
+function certCard(user, d) {
+  var okState = d && d.certified;
+  var color = okState ? "var(--ok)" : "var(--warn)";
+  var head = okState
+    ? "&#10003; " + esc(user) + " is RAPP Certified"
+    : "&#10007; " + esc(user) + " is not certified";
+  var detail;
+  if (!d) {
+    detail = "No roster entry for this username. Anyone not on the roster is not certified.";
+  } else if (okState) {
+    detail = "Level: <b>" + esc(d.level) + "</b>" + (d.certified_on ? " · since " + esc(d.certified_on) : "") +
+      (d.agents && d.agents.length ? " · " + d.agents.length + " agent" + (d.agents.length === 1 ? "" : "s") + " published" : "");
+  } else {
+    detail = "Certification was revoked" + (d.revoked_on ? " on " + esc(d.revoked_on) : "") +
+      (d.reason ? " — " + esc(d.reason) : "") + ".";
+  }
+  var badgeMd = "";
+  if (d) {
+    var b = PAGES + "/api/v1/certified/" + encodeURIComponent(user) + "/badge.json";
+    badgeMd = '<div class="badge-code" style="margin-top:12px"><button class="copy-btn" id="certCopy">Copy</button>' +
+      "<code>[![RAPP Certified](https://img.shields.io/endpoint?url=" + encodeURIComponent(b) + ")](" +
+      PAGES + "/api.html#certified)</code></div>";
+  }
+  return '<div style="border-left:3px solid ' + color + '; padding:10px 0 10px 14px">' +
+    '<div style="font-weight:700; font-size:15px; color:' + color + '">' + head + "</div>" +
+    '<div class="note" style="margin-top:4px">' + detail + "</div>" +
+    (d ? '<div class="note" style="margin-top:6px">Verified against <a href="' + esc(d.verify_url || "") + '" target="_blank" rel="noopener">the live endpoint</a>.</div>' : "") +
+    badgeMd + "</div>";
+}
+
+function verify(user) {
+  user = String(user || "").trim().toLowerCase().replace(/^@/, "");
+  var box = document.getElementById("certResult");
+  if (!user) { box.innerHTML = '<div class="note">Enter a GitHub username.</div>'; return; }
+  if (!/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/.test(user)) {
+    box.innerHTML = '<div class="note">That is not a valid GitHub username.</div>'; return;
+  }
+  box.innerHTML = '<div class="note">Checking the API…</div>';
+  fetch("api/v1/certified/" + user + ".json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; })
+    .then(function (d) {
+      box.innerHTML = certCard(user, d);
+      var c = document.getElementById("certCopy");
+      if (c) c.addEventListener("click", function () {
+        navigator.clipboard.writeText(c.parentNode.querySelector("code").textContent);
+        c.textContent = "Copied"; setTimeout(function () { c.textContent = "Copy"; }, 1400);
+      });
+    });
+}
+document.getElementById("certGo").addEventListener("click", function () {
+  verify(document.getElementById("certUser").value);
+});
+document.getElementById("certUser").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") verify(this.value);
+});
+
+getJSON(["api/v1/certified.json", PAGES + "/api/v1/certified.json"]).then(function (roster) {
+  var rows = (roster.members || []).filter(function (m) { return m.certified; });
+  document.getElementById("certHint").textContent =
+    rows.length + " certified publisher" + (rows.length === 1 ? "" : "s") + ", straight from the API";
+  document.getElementById("certTable").innerHTML =
+    "<thead><tr><th>Publisher</th><th>Level</th><th>Since</th><th class='num'>Agents</th></tr></thead><tbody>" +
+    rows.map(function (m) {
+      return "<tr><td>@" + esc(m.username) + "</td>" +
+        "<td>" + esc(m.level) + "</td><td>" + esc(m.certified_on || "—") + "</td>" +
+        "<td class='num'>" + num((m.agents || []).length) + "</td></tr>";
+    }).join("") + "</tbody>";
+}).catch(function () {
+  document.getElementById("certTable").innerHTML =
+    '<tbody><tr><td class="note">Roster not published on this host yet.</td></tr></tbody>';
+});
+
+/* ---------- badges ---------- */
+var BADGE_URL = "https://img.shields.io/endpoint?url=" + encodeURIComponent(PAGES + "/api/v1/badge.json");
+var BADGES = [
+  { name: "Agent count (live)", img: BADGE_URL, md: "[![agents](" + BADGE_URL + ")](" + PAGES + "/agents.html)" },
+  { name: "License", img: "https://img.shields.io/badge/license-MIT-blue", md: "[![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/" + REPO + "/blob/main/LICENSE)" },
+  { name: "Static API", img: "https://img.shields.io/badge/API-rapp--static--api%2F1.0-5b5fc7", md: "[![API](https://img.shields.io/badge/API-rapp--static--api%2F1.0-5b5fc7)](" + PAGES + "/api.html)" },
+  { name: "Try in browser", img: "https://img.shields.io/badge/vBrainstem-run%20in%20browser-107c10", md: "[![vBrainstem](https://img.shields.io/badge/vBrainstem-run%20in%20browser-107c10)](" + PAGES + "/vbrainstem/)" }
+];
+document.getElementById("badgeList").innerHTML = BADGES.map(function (b, i) {
+  return '<div class="badge-row"><img src="' + esc(b.img) + '" alt="' + esc(b.name) + '" loading="lazy">' +
+    '<div class="badge-code"><button class="copy-btn" data-badge="' + i + '">Copy</button><code>' + esc(b.md) + "</code></div></div>";
+}).join("");
+Array.prototype.forEach.call(document.querySelectorAll("[data-badge]"), function (btn) {
+  btn.addEventListener("click", function () {
+    navigator.clipboard.writeText(BADGES[+btn.dataset.badge].md);
+    btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1400);
+  });
+});
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "41-returns-complaints-agent.html",
+    "industry": "Retail",
+    "display_name": "Returns & Complaints Agent",
+    "lede": "Automate return decisions and complaint handling to speed resolution, reduce fraud, and protect customer loyalty.",
+    "audience": [
+      "Customer Service Agents",
+      "Quality Teams",
+      "Loss Prevention Teams"
+    ],
+    "business_value": [
+      "Speed resolution",
+      "Reduce fraud",
+      "Protect customer loyalty"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Dynamics 365 CcaaS",
+      "Dynamics 365 ERP",
+      "Microsoft Outlook",
+      "Microsoft Teams",
+      "SharePoint"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "returns-complaints-agent",
+    "industries": [
+      "Retail",
+      "Consumable Products Industry"
+    ],
+    "catalog_number": 41,
+    "video": {
+      "slug": "returns-and-complaints-resolution-agent",
+      "hosted": true,
+      "src": "media/videos/returns-and-complaints-resolution-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=returns-complaints-agent"
+}

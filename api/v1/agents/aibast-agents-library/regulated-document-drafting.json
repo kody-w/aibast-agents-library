@@ -1,0 +1,33 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-06T02:07:09.202815+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/regulated-document-drafting",
+    "version": "1.0.0",
+    "display_name": "Regulated Document Drafting Agent",
+    "description": "Drafts industry-regulated documents from an approved clause library, checks tone and taxonomy against the governing regime, and reports every clause it could not source.",
+    "author": "AIBAST",
+    "tags": [
+      "drafting",
+      "legal",
+      "tender",
+      "compliance",
+      "public-sector"
+    ],
+    "category": "slg_government",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+  "size_kb": 8.5,
+  "lines": 184,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/slg_government_stacks/regulated_document_drafting_stack/regulated_document_drafting_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/regulated-document-drafting",
+  "engagement": null
+}

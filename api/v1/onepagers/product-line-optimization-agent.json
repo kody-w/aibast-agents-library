@@ -1,0 +1,55 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "01-product-line-optimization-agent.html",
+    "industry": "Manufacturing",
+    "display_name": "Product Line Optimization Agent",
+    "lede": "Provide intelligent production capacity analysis and optimization planning to boost throughput and efficiency while maintaining quality.",
+    "audience": [
+      "Plant Manager",
+      "Production Engineer",
+      "Operations Director"
+    ],
+    "business_value": [
+      "Boost throughput",
+      "Efficiency",
+      "Maintaining quality"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "PowerBI",
+      "Azure IoT Hub"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "product-line-optimization-agent",
+    "personas": [
+      "Plant Manager",
+      "Production Engineer",
+      "Operations Director"
+    ],
+    "industries": [
+      "Manufacturing"
+    ],
+    "requires": [
+      "Microsoft Copilot Studio",
+      "Dynamics 365 for ERP",
+      "Power BI",
+      "Azure IoT Hub"
+    ],
+    "summary": "Provide intelligent production capacity analysis and optimization planning to boost throughput and efficiency while maintaining quality.",
+    "listing_file": "product-line-optimization-agent.md",
+    "catalog_number": 1,
+    "video": {
+      "slug": "product-line-optimization-agent",
+      "hosted": true,
+      "src": "media/videos/product-line-optimization-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=product-line-optimization-agent"
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "rapp-sentinel-latest/1.0",
+  "run_id": "20260805T165144Z-46fe6125",
+  "commit": "088c9906adc2",
+  "started": "2026-08-05T16:51:50+00:00",
+  "subject_count": 205,
+  "status": "dormant",
+  "verdicts": null,
+  "dormant_notice": "DORMANT \u2014 evidence only, no verdicts. The deterministic residents measured; nothing has judged. Execute the packets below with any model and absorb the answers to wake this run.",
+  "residents_awake": [
+    "static-analysis",
+    "skill-analysis"
+  ],
+  "residents_pending": [
+    "clarity",
+    "honesty",
+    "blast-radius",
+    "teachability"
+  ],
+  "run_file": "sentinel/runs/20260805T165144Z-46fe6125.json",
+  "neighborhood_url": "https://microsoft.github.io/aibast-agents-library/sentinel/NEIGHBORHOOD.json",
+  "how_to_run": "Pull sentinel/NEIGHBORHOOD.json and run `python3 scripts/sentinel.py run` locally. The deterministic residents need no model; the interpretive ones emit packets any model can execute."
+}

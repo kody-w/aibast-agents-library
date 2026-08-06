@@ -1,0 +1,42 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "28-patient-intake-agent.html",
+    "industry": "Healthcare",
+    "display_name": "Patient Intake Agent",
+    "lede": "Automate patient intake workflows to streamline operations, protect revenue from avoidable losses, and deliver a smoother patient experience.",
+    "audience": [
+      "Front Desk Staff",
+      "Scheduling Coordinators",
+      "Patient Access Reps"
+    ],
+    "business_value": [
+      "Streamline operations",
+      "Protect revenue from avoidable losses",
+      "Deliver a smoother patient experience"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "Dynamics 365 CcaaS",
+      "SharePoint"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "patient-intake-agent",
+    "industries": [
+      "Healthcare"
+    ],
+    "catalog_number": 28,
+    "video": {
+      "slug": "patient-intake-and-scheduling-agent",
+      "hosted": true,
+      "src": "media/videos/patient-intake-and-scheduling-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=patient-intake-agent"
+}

@@ -1,0 +1,51 @@
+name: Become a publisher
+description: >-
+  Claim your publisher track on the AIBAST Agents Library. Your GitHub
+  username is your publisher handle by default — agents you submit live
+  under agents/@<your-username>/.
+title: "[publisher] @your-github-username"
+labels: ["publisher-application"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for publishing on the AIBAST Agents Library! The short version:
+        your **GitHub username is your publisher handle** (`@<username>`), and
+        agents ship as ordinary pull requests adding single files under
+        `agents/@<username>/`. Full guide: [docs/PUBLISHING.md](../blob/main/docs/PUBLISHING.md).
+        This application is how we say hello and turn on your track.
+  - type: input
+    id: handle
+    attributes:
+      label: Publisher handle
+      description: Defaults to your GitHub username. Must match the @-directory your PRs will use.
+      placeholder: "@your-github-username"
+    validations:
+      required: true
+  - type: input
+    id: display_name
+    attributes:
+      label: Display name
+      description: How your publisher name should appear in the library and on the metrics dashboard.
+    validations:
+      required: false
+  - type: textarea
+    id: plans
+    attributes:
+      label: What do you plan to publish?
+      description: >-
+        A sentence or two — the industries or use cases you're targeting, and
+        whether you'll publish agents (agent.py), skills (skill.md), or both.
+    validations:
+      required: true
+  - type: checkboxes
+    id: agreements
+    attributes:
+      label: Ground rules
+      options:
+        - label: My submissions are my own work or carry a license + attribution that permits publishing here.
+          required: true
+        - label: Each agent is a single self-contained file with a valid `__manifest__` (name `@<my-username>/<slug>`).
+          required: true
+        - label: No secrets, keys, tokens, or customer data in any submission — configuration goes through `requires_env`.
+          required: true

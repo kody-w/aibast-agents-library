@@ -1,0 +1,42 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "32-supply-chain-risk-agent.html",
+    "industry": "Retail",
+    "display_name": "Supply Chain Risk Agent",
+    "lede": "Detect and manage supply chain risks to defend against disruptions, protect revenue, and maintain operational continuity.",
+    "audience": [
+      "Supply Chain Planner",
+      "Operations Leader",
+      "Procurement Manager"
+    ],
+    "business_value": [
+      "Defend against disruptions",
+      "Protect revenue",
+      "Maintain operational continuity"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "supply-chain-risk-agent",
+    "industries": [
+      "Retail",
+      "Manufacturing"
+    ],
+    "catalog_number": 32,
+    "video": {
+      "slug": "supply-risk-monitoring-agent",
+      "hosted": true,
+      "src": "media/videos/supply-risk-monitoring-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=supply-chain-risk-agent"
+}

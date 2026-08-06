@@ -1,0 +1,356 @@
+{
+  "schema": "aibast-first-party-agents/1.0",
+  "note": "Microsoft first-party agents that ship inside a product. These are NOT single-file agents and nothing here is downloadable: you enable and configure them in Dynamics 365 or Microsoft 365, and Microsoft Learn is the authoritative source for every step. They are carried in the library so a scenario can be scoped against what already exists before anyone builds something new. Status and availability change; the Learn links are the truth, this file is a pointer.",
+  "sources": [
+    {
+      "id": "d365-sales-1p",
+      "display_name": "Dynamics 365 Sales & Microsoft 365 Copilot",
+      "kind": "first_party",
+      "vendor": "Microsoft",
+      "home_url": "https://learn.microsoft.com/dynamics365/sales/",
+      "install_model": "configure_in_product",
+      "note": "Enabled and configured in the product by an administrator. No file is installed and nothing is copied into a brainstem."
+    }
+  ],
+  "agents": [
+    {
+      "ref": "@d365-sales-1p/sales-qualification-agent",
+      "source_id": "d365-sales-1p",
+      "display_name": "Sales Qualification Agent",
+      "status": "GA",
+      "description": "Researches leads, evaluates fit, and runs autonomous outreach.",
+      "product": "Dynamics 365 Sales",
+      "overview_url": "https://learn.microsoft.com/dynamics365/sales/sales-qualification-agent",
+      "configure_url": "https://learn.microsoft.com/dynamics365/sales/configure-sales-qualification-agent",
+      "tags": [
+        "sales",
+        "qualification",
+        "lead-research",
+        "outreach"
+      ],
+      "content": {
+        "overview": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/sales-qualification-agent",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Sales Qualification Agent overview",
+          "summary": "Learn how the Sales Qualification Agent in Dynamics 365 Sales automates lead research and engagement, helping your team focus on high-potential opportunities.",
+          "sections": [
+            "Sales Qualification Agent modes",
+            "Difference between Research-only and Research and engage modes",
+            "Understand Sales Qualification Agent concepts",
+            "How to use the agent",
+            "Capacity usage",
+            "Responsible AI"
+          ]
+        },
+        "configure": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/configure-sales-qualification-agent",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Set up and configure the Sales Qualification Agent",
+          "summary": "Set up the Sales Qualification Agent in Dynamics 365 Sales to automate lead research, engagement, and outreach with AI-powered assistance. Learn how to configure it effectively.",
+          "sections": [
+            "Prerequisites",
+            "Considerations",
+            "Grant permissions to sellers to work on leads handed over by agent",
+            "Set up Sales Qualification Agent",
+            "Migrate agents across environments",
+            "Manage views in custom model-driven apps"
+          ],
+          "prerequisites": [
+            "You have set up the common prerequisites applicable to all Sales agents .",
+            "You have admin permissions in Dynamics 365 Sales.",
+            "You have a Copilot Studio license. Learn more in Copilot Studio licensing .",
+            "You turned on the modern UI for the Sales Hub app. Learn more in Enabling the modern look for my app and removing the toggle .",
+            "You modified Data policies to allow the following connectors:"
+          ]
+        }
+      }
+    },
+    {
+      "ref": "@d365-sales-1p/sales-opportunity-agent",
+      "source_id": "d365-sales-1p",
+      "display_name": "Sales Opportunity Agent",
+      "status": "GA",
+      "description": "Continuous opportunity research with risk and stakeholder intelligence.",
+      "product": "Dynamics 365 Sales",
+      "overview_url": "https://learn.microsoft.com/dynamics365/sales/sales-opportunity-agent",
+      "configure_url": "https://learn.microsoft.com/dynamics365/sales/configure-opportunity-research-agent",
+      "tags": [
+        "sales",
+        "opportunity",
+        "risk",
+        "stakeholders"
+      ],
+      "content": {
+        "overview": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/sales-opportunity-agent",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Sales Opportunity Agent overview",
+          "summary": "Discover how Sales Opportunity Agent in Dynamics 365 Sales helps sales professionals manage deals effectively with AI-powered insights, risk detection, and deal prioritization.",
+          "sections": [
+            "How does the Sales Opportunity Agent help you?",
+            "Key capabilities",
+            "Capacity usage",
+            "Responsible AI",
+            "Language support and output quality",
+            "How to set up and use the agent"
+          ]
+        },
+        "configure": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/configure-opportunity-research-agent",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Set up and configure the Sales Opportunity Agent",
+          "summary": "Configure the Sales Opportunity Agent in Dynamics 365 Sales to automate opportunity research, get stakeholder and competitor intelligence, and enable risk assessment for your sales team.",
+          "sections": [
+            "Prerequisites",
+            "Plan your implementation",
+            "Grant permissions to sellers",
+            "Set up the Sales Opportunity Agent",
+            "After setup",
+            "Create multiple agent instances",
+            "Migrate agents across environments",
+            "Related content"
+          ],
+          "prerequisites": [
+            "Complete the common prerequisites applicable to all sales agents .",
+            "You have admin permissions in Dynamics 365 Sales.",
+            "You have a Copilot Studio license. Learn more in Copilot Studio licensing .",
+            "You turned on the modern UI for the Sales Hub app. Learn more in Enabling the modern look for my app and removing the toggle ."
+          ]
+        }
+      },
+      "link_note": "The source deck's Configure link 404s; the correct page is the one the product's own overview links to."
+    },
+    {
+      "ref": "@d365-sales-1p/sales-research-agent",
+      "source_id": "d365-sales-1p",
+      "display_name": "Sales Research Agent",
+      "status": "GA",
+      "description": "Natural language dialog with sales data.",
+      "product": "Dynamics 365 Sales",
+      "overview_url": "https://learn.microsoft.com/dynamics365/sales/sales-research-agent",
+      "configure_url": "https://learn.microsoft.com/dynamics365/sales/configure-sales-research-agent",
+      "tags": [
+        "sales",
+        "research",
+        "natural-language",
+        "reporting"
+      ],
+      "content": {
+        "overview": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/sales-research-agent",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Sales Research Agent overview",
+          "summary": "Learn how to use the Sales Research Agent in Dynamics 365 Sales to get insights about your customers, prospects, sales targets, and competitors.",
+          "sections": [
+            "How the agent works",
+            "How to set up and use the agent",
+            "Legal and regulatory considerations"
+          ]
+        },
+        "configure": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/configure-sales-research-agent",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Set up and configure Sales Research Agent",
+          "summary": "Learn how to configure the Sales Research Agent so that sellers can get AI-generated insights and provide feedback on the insights.",
+          "sections": [
+            "Configure Copilot Studio capacity",
+            "Grant access to the Sales Research Agent",
+            "Configure tenant settings"
+          ]
+        }
+      }
+    },
+    {
+      "ref": "@d365-sales-1p/sales-development-agent",
+      "source_id": "d365-sales-1p",
+      "display_name": "Sales Development Agent",
+      "status": "Preview",
+      "description": "Automates sales outreach and prospect management within Microsoft Teams.",
+      "product": "Microsoft Agent 365",
+      "overview_url": "https://learn.microsoft.com/en-us/microsoft-agent-365/use",
+      "configure_url": "https://learn.microsoft.com/en-us/microsoft-agent-365/use#deploy-and-create-the-sales-development-agent",
+      "tags": [
+        "sales",
+        "outreach",
+        "prospecting",
+        "teams"
+      ],
+      "naming_note": "The source deck lists this as \"Sales Deployment Agent\". Its own link points at the Sales Development Agent, which is the shipped product name; the product name is used here.",
+      "content": {
+        "overview": {
+          "url": "https://learn.microsoft.com/en-us/microsoft-agent-365/use",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Use and collaborate with agents with their own identity in Agent 365 (preview)",
+          "summary": "Learn how to use agents with their own identity, like the Sales Development agent in Agent 365 to automate sales outreach and streamline workflows. Get started today.",
+          "sections": [
+            "Use the Sales Development agent",
+            "Related content"
+          ]
+        },
+        "configure": {
+          "url": "https://learn.microsoft.com/en-us/microsoft-agent-365/use#deploy-and-create-the-sales-development-agent",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Use and collaborate with agents with their own identity in Agent 365 (preview)",
+          "summary": "Learn how to use agents with their own identity, like the Sales Development agent in Agent 365 to automate sales outreach and streamline workflows. Get started today.",
+          "sections": [
+            "Use the Sales Development agent",
+            "Related content"
+          ]
+        }
+      }
+    },
+    {
+      "ref": "@d365-sales-1p/recommended-actions-agent",
+      "source_id": "d365-sales-1p",
+      "display_name": "Recommended Actions Agent",
+      "status": "Preview",
+      "description": "Prioritized seller actions based on opportunity context.",
+      "product": "Dynamics 365 Sales",
+      "overview_url": "https://learn.microsoft.com/dynamics365/sales/recommended-actions-overview",
+      "configure_url": "https://learn.microsoft.com/dynamics365/sales/configure-recommended-actions",
+      "tags": [
+        "sales",
+        "prioritization",
+        "next-best-action"
+      ],
+      "content": {
+        "overview": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/recommended-actions-overview",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Recommended actions overview",
+          "summary": "Recommended actions is an intelligent capability that shows prioritized actions so sellers focus on the most effective tasks for their opportunities.",
+          "sections": [
+            "Key capabilities",
+            "Supported agents and behavior",
+            "Capacity usage",
+            "How to use the agent"
+          ]
+        },
+        "configure": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/configure-recommended-actions",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Configure Recommended Actions agent",
+          "summary": "Learn how to configure recommended actions in Dynamics 365 Sales to help sellers focus on the most effective tasks for their opportunities.",
+          "sections": [
+            "Enable recommended actions for agents",
+            "Add custom agents for recommended actions",
+            "Disable recommended actions",
+            "Permissions required for custom security roles",
+            "Migrate agents across environments"
+          ]
+        }
+      }
+    },
+    {
+      "ref": "@d365-sales-1p/sales-agent-m365-copilot",
+      "source_id": "d365-sales-1p",
+      "display_name": "Sales Agent (Microsoft 365 Copilot)",
+      "status": "GA",
+      "description": "Search, synthesize and act on sales data inside Microsoft 365 apps.",
+      "product": "Microsoft 365 Copilot for Sales",
+      "overview_url": "https://learn.microsoft.com/microsoft-sales-copilot/sales-chat-overview",
+      "configure_url": "https://learn.microsoft.com/microsoft-sales-copilot/m365-admin-setting",
+      "tags": [
+        "sales",
+        "microsoft-365",
+        "copilot",
+        "chat"
+      ],
+      "content": {
+        "overview": {
+          "url": "https://learn.microsoft.com/microsoft-sales-copilot/sales-chat-overview",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Overview of Sales agent in Microsoft 365 Copilot",
+          "summary": "Learn about Sales agent, an AI-powered chat interface that helps you interact with your sales data using natural language.",
+          "sections": [
+            "What can Sales agent help you with?",
+            "Getting started"
+          ]
+        },
+        "configure": {
+          "url": "https://learn.microsoft.com/microsoft-sales-copilot/m365-admin-setting",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Turn off actionable banners in Microsoft 365 apps",
+          "summary": "Learn how to turn off actionable banners in Microsoft 365 apps.",
+          "sections": [
+            "Effect on the Sales agent email notification banner"
+          ]
+        }
+      }
+    },
+    {
+      "ref": "@d365-sales-1p/data-enrichment-agent",
+      "source_id": "d365-sales-1p",
+      "display_name": "AI-powered Data Enrichment",
+      "status": "GA",
+      "description": "Enriches opportunity data from email interactions.",
+      "product": "Dynamics 365 Sales",
+      "overview_url": "https://learn.microsoft.com/dynamics365/sales/data-enrichment-agent-overview",
+      "configure_url": "https://learn.microsoft.com/dynamics365/sales/data-enrichment-agent-configure",
+      "tags": [
+        "sales",
+        "data-quality",
+        "enrichment",
+        "email"
+      ],
+      "content": {
+        "overview": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/data-enrichment-agent-overview",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "AI-powered Data Enrichment for opportunities",
+          "summary": "Learn how the AI-powered Data Enrichment helps automate updating and enriching opportunity data based on recent email interactions and Teams meeting conversations.",
+          "sections": [
+            "How the AI-powered Data Enrichment feature works",
+            "How to set up and use Data Enrichment",
+            "Capacity usage",
+            "Responsible AI"
+          ]
+        },
+        "configure": {
+          "url": "https://learn.microsoft.com/dynamics365/sales/data-enrichment-agent-configure",
+          "status": "ok",
+          "fetched": "2026-08-06",
+          "title": "Set up and configure AI-powered Data Enrichment",
+          "summary": "Learn how to set up and configure the AI-powered Data Enrichment feature for opportunity records in Dynamics 365 Sales.",
+          "sections": [
+            "Before you begin",
+            "Set up and configure AI-powered Data Enrichment",
+            "Verify prerequisites",
+            "Create the agent",
+            "Grant permissions to sellers",
+            "Migrate agents across environments"
+          ]
+        }
+      },
+      "link_note": "The source deck's Configure link 404s; the correct page is the one the product's own overview links to."
+    }
+  ],
+  "install": {
+    "model": "configure_in_product",
+    "summary": "These are enabled by an administrator inside the product. There is no download, no file, and nothing to place in a brainstem.",
+    "shape": [
+      "Confirm licensing and prerequisites for the product the agent belongs to.",
+      "Sign in to the product's admin experience as an administrator \u2014 the Sales Hub app settings for Dynamics 365 Sales, or the Microsoft 365 admin centre for the Copilot agents.",
+      "Turn the agent on for the environment, and scope it to the teams or record types it should act over.",
+      "Give it the data access it needs, and no more, under the caller's own permissions.",
+      "Verify on one record before enabling it broadly, and confirm what it writes back and what it only reads."
+    ],
+    "authority": "Each agent's Configure link is the authoritative procedure. The five steps above are the shape these installs share, not a substitute for the product documentation, which changes as the products do."
+  },
+  "crawled": "2026-08-06T21:40:16+00:00",
+  "crawl_note": "Summaries, section lists and prerequisites are read from the linked Microsoft Learn pages and are true as of the date on each record. The linked page is authoritative; nothing here is mirrored."
+}

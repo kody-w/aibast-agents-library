@@ -1,0 +1,42 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "21-store-associate-agent.html",
+    "industry": "Retail",
+    "display_name": "Store Associate Agent",
+    "lede": "Deliver real-time product intelligence and transaction support to deliver faster service and boost sales performance.",
+    "audience": [
+      "Store Associate",
+      "Sales Manager",
+      "Floor Specialist"
+    ],
+    "business_value": [
+      "Deliver faster service",
+      "Boost sales performance"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Dynamics 365 ERP",
+      "Microsoft Teams",
+      "Microsoft Outlook"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "store-associate-agent",
+    "industries": [
+      "Retail"
+    ],
+    "catalog_number": 21,
+    "video": {
+      "slug": "store-associate-copilot",
+      "hosted": true,
+      "src": "media/videos/store-associate-copilot.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=store-associate-agent"
+}

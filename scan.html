@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan a skill — RAPP Sentinel</title>
+<meta name="description" content="Run the RAPP Sentinel rubric against any raw skill.md — yours, or a whole repository of them. See what will drift, why it matters, and what the RAPP single-file format does about it.">
+<meta property="og:title" content="RAPP Sentinel — scan any skill.md">
+<meta property="og:description" content="Point it at your own skills. Findings, teachable notes, and the deterministic conversion, all in your browser.">
+<style>
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
+:root {
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
+  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
+  --machine: var(--accent-2); --machine-soft: rgba(79,82,201,.10);
+}
+[data-theme="dark"] {
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
+  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+  --machine-soft: rgba(158,163,248,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{max-width:100%;overflow-x:hidden}
+body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+header.site{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav{display:flex;align-items:center;gap:18px;padding:12px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--text);white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand .mark{color:var(--accent);display:inline-flex}
+.brand .mark svg{width:19px;height:19px}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:var(--text-dim);font-size:13.5px;padding:5px 10px;border-radius:8px}
+.nav-links a:hover{color:var(--text);background:var(--panel-2);text-decoration:none}
+.nav-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
+  width:32px;height:32px;border-radius:6px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center}
+.icon-btn svg{width:15px;height:15px}
+.icon-btn:hover{color:var(--text);border-color:var(--text-faint);text-decoration:none}
+footer.site{margin-top:36px;border-top:1px solid var(--border);padding:26px 0 44px}
+.foot{display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--text-faint)}
+.foot a{color:var(--text-dim)}
+.foot .copy{width:100%;margin-top:4px}
+@media (max-width:560px){.nav-links{order:3;width:100%}}
+
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);
+  background:var(--panel);color:var(--text);border-radius:6px;padding:9px 16px;
+  font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:var(--text-faint);text-decoration:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+/* ══ page-specific ══════════════════════════════════════════════════════ */
+
+.hero{padding:56px 0 26px}
+.hero h1{font-size:clamp(28px,5vw,42px);font-weight:700;letter-spacing:-.02em;line-height:1.14;margin-bottom:12px}
+.hero p{font-size:16.5px;color:var(--text-dim);max-width:66ch}
+.panel{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--panel);
+  padding:20px 22px;margin:20px 0;box-shadow:var(--shadow)}
+.panel h2{font-size:17px;font-weight:700;letter-spacing:-.01em;margin-bottom:10px}
+label.f{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-faint);margin:12px 0 6px}
+input[type=text],textarea{width:100%;padding:10px 13px;border:1px solid var(--border);
+  border-radius:6px;background:var(--panel-2);color:var(--text);font-family:inherit;font-size:14px}
+textarea{min-height:190px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+  white-space:pre;overflow-x:auto}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.hint{font-size:12.5px;color:var(--text-faint);margin-top:8px}
+.summary{display:flex;gap:26px;flex-wrap:wrap;align-items:baseline;margin-bottom:6px}
+.summary b{font-size:32px;font-weight:700;letter-spacing:-.02em}
+.verdict{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:5px;
+  letter-spacing:.04em;text-transform:uppercase}
+.verdict.review-ready{background:rgba(16,124,16,.12);color:var(--ok)}
+.verdict.needs-work{background:rgba(216,59,1,.12);color:var(--warn)}
+.verdict.blocked,.verdict.not-ready{background:rgba(216,59,1,.18);color:var(--warn)}
+.pline{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:13px}
+.pline .pname{width:112px;color:var(--text-dim);text-transform:capitalize}
+.pbar{flex:1;height:6px;border-radius:4px;background:var(--panel-2);overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--machine)}
+.pline .pval{width:34px;text-align:right;font-variant-numeric:tabular-nums;color:var(--text-dim)}
+.finding{border-top:1px solid var(--border);padding:13px 0 3px}
+.finding h4{font-size:13.5px;font-weight:650;display:flex;gap:8px;align-items:baseline}
+.finding h4 code{font-size:11px;color:var(--text-faint);font-family:ui-monospace,Menlo,monospace}
+.finding .detail{font-size:12.5px;color:var(--warn);margin:4px 0 6px;
+  font-family:ui-monospace,Menlo,monospace;word-break:break-word}
+.finding .teach{font-size:13px;color:var(--text-dim);line-height:1.55}
+.finding .teach:before{content:"Why this matters — ";font-weight:650;color:var(--text)}
+.ok{font-size:13px;color:var(--ok)}
+pre.code{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:15px;
+  overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+  line-height:1.6;white-space:pre;max-height:460px}
+.tabs{display:flex;gap:6px;margin:14px 0 10px;flex-wrap:wrap}
+.tab{font-size:12.5px;font-weight:650;color:var(--text-dim);background:var(--panel-2);
+  border:1px solid var(--border);border-radius:999px;padding:5px 13px;cursor:pointer;font-family:inherit}
+.tab.active{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.note{border-left:3px solid var(--machine);background:var(--machine-soft);border-radius:var(--radius);
+  padding:13px 16px;font-size:13px;color:var(--text-dim);line-height:1.6;margin:14px 0}
+.rowlist{border-top:1px solid var(--border);padding:9px 0;display:flex;gap:12px;
+  align-items:center;font-size:13.5px;flex-wrap:wrap}
+.rowlist .nm{flex:1;min-width:200px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+.muted{color:var(--text-faint);font-size:12.5px}
+</style>
+</head>
+<body>
+
+<!-- ══ shared site header — identical on every page ══ -->
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="agents.html">Library</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+<script>
+/* Shared theme switch. Light is the default everywhere; dark is opt-in and
+   remembered. Runs inline so the choice applies before the page paints. */
+(function () {
+  var r = document.documentElement, s = null;
+  try { s = localStorage.getItem("aibast-theme"); } catch (e) {}
+  if (s === "dark") r.setAttribute("data-theme", "dark");
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var dark = r.getAttribute("data-theme") === "dark";
+    if (dark) r.removeAttribute("data-theme"); else r.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("aibast-theme", dark ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Scan a skill</h1>
+    <p>Point this at your own <code>skill.md</code> — one file, a raw URL, or a whole repository of them. It runs the same rubric this library runs on itself, tells you what will drift and why it matters, and shows you the deterministic RAPP version of your file. Everything happens in your browser: nothing you paste is uploaded anywhere.</p>
+  </section>
+
+  <section class="panel">
+    <h2>What do you want scanned?</h2>
+    <div class="tabs">
+      <button class="tab active" data-src="paste">Paste a file</button>
+      <button class="tab" data-src="url">A raw URL</button>
+      <button class="tab" data-src="repo">A GitHub repository</button>
+    </div>
+
+    <div id="srcPaste">
+      <label class="f" for="pasteBox">Your skill.md</label>
+      <textarea id="pasteBox" spellcheck="false" placeholder="---&#10;name: my-skill&#10;description: ...&#10;---&#10;&#10;# My skill&#10;..."></textarea>
+    </div>
+
+    <div id="srcUrl" hidden>
+      <label class="f" for="urlBox">Raw file URL</label>
+      <input id="urlBox" type="text" spellcheck="false"
+             placeholder="https://raw.githubusercontent.com/owner/repo/main/skills/my-skill.md">
+      <p class="hint">Must allow cross-origin reads. <code>raw.githubusercontent.com</code> does.</p>
+    </div>
+
+    <div id="srcRepo" hidden>
+      <label class="f" for="repoBox">owner/repo (public)</label>
+      <input id="repoBox" type="text" spellcheck="false" placeholder="microsoft/cat-agent-skills">
+      <p class="hint">Finds every candidate <code>.md</code> (skipping README and other repository furniture) and scans up to 25 of them. Uses the public GitHub API — unauthenticated, so it is rate-limited.</p>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="runScan">Run the rubric</button>
+      <button class="btn" id="loadSample">Load a sample</button>
+      <span class="muted" id="status"></span>
+    </div>
+  </section>
+
+  <div id="out"></div>
+
+  <section class="panel">
+    <h2>Attach your own intelligence</h2>
+    <p class="muted" style="margin-bottom:4px">The rubric above is deterministic — it measures, and measurement is not judgment. The interpretive residents (clarity, honesty, blast radius, teachability) need a model, and this page has none: no endpoint, no key, no calls out.</p>
+    <div class="note">
+      Download the packet below and execute it against whatever model you use, then feed the answers back with
+      <code>sentinel.py absorb</code>. Or clone the neighborhood and run the whole thing yourself —
+      <code>python3 scripts/sentinel.py run</code> needs no token and no service. The rubric is
+      <a href="sentinel/NEIGHBORHOOD.json">a JSON file</a>; disagreeing with a check means editing data, not us.
+    </div>
+    <div class="row">
+      <button class="btn" id="dlPacket" disabled>Download the interpretive packet</button>
+      <a class="btn" href="api/v1/sentinel/service.json">Service descriptor</a>
+      <a class="btn" href="sentinel/SPEC.md">How it works</a>
+    </div>
+    <p class="muted" style="margin-top:14px">
+      Findings are analysis against published principles — not an endorsement, and not a
+      statement about anyone's wider work.
+    </p>
+  </section>
+</main>
+
+<!-- ══ shared site footer — identical on every page ══ -->
+<footer class="site">
+  <div class="wrap foot">
+    <a href="index.html">Get started</a>
+    <a href="agents.html">Library</a>
+    <a href="solutions.html">Solutions</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="metrics.html">Metrics</a>
+    <a href="api.html">Static API</a>
+    <a href="scan.html">Scan</a>
+    <a href="wall.html">Wall of Fame</a>
+    <a href="brain.html">Docs Vault</a>
+    <a href="blog.html">Field Notes</a>
+    <a href="vbrainstem/">Run in your browser</a>
+    <a href="DISCLAIMER.md">Disclaimer</a>
+    <span class="copy">© 2026 Microsoft AIBAST. Some rights reserved. MIT-licensed, community-driven.</span>
+  </div>
+</footer>
+
+<script src="sentinel.js"></script>
+<script src="mirror.js"></script>
+<script>
+var SOURCE = "paste";
+var LAST = null;
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function setStatus(s){document.getElementById("status").textContent = s || "";}
+
+document.querySelectorAll(".tab").forEach(function(t){
+  t.onclick = function(){
+    document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("active");});
+    t.classList.add("active");
+    SOURCE = t.getAttribute("data-src");
+    document.getElementById("srcPaste").hidden = SOURCE !== "paste";
+    document.getElementById("srcUrl").hidden = SOURCE !== "url";
+    document.getElementById("srcRepo").hidden = SOURCE !== "repo";
+  };
+});
+
+document.getElementById("loadSample").onclick = function(){
+  // A deliberately raw skill: no manifest, no contract, no verification step.
+  document.getElementById("pasteBox").value =
+"# Weekly report builder\n\n" +
+"Builds the weekly status report from the team's notes.\n\n" +
+"Pull the notes from the shared drive at /Users/dana/Documents/team-notes,\n" +
+"summarise each person's week, and email it to the distribution list.\n" +
+"Use the API key sk_live_9f2c41ba77de0031aa54 for the mail service.\n";
+  document.querySelector('.tab[data-src="paste"]').click();
+  setStatus("Sample loaded — a raw skill with the usual problems.");
+};
+
+function scoreBars(scores){
+  return Object.keys(scores).map(function(p){
+    return '<div class="pline"><span class="pname">'+esc(p)+'</span>' +
+      '<span class="pbar"><i style="width:'+scores[p]+'%"></i></span>' +
+      '<span class="pval">'+scores[p]+'</span></div>';
+  }).join("");
+}
+
+function findingsHTML(review){
+  var failed = review.checks.filter(function(c){return !c.passed;});
+  if (!failed.length) return '<div class="finding"><p class="ok">Every check passed.</p></div>';
+  return failed.map(function(c){
+    return '<div class="finding"><h4>'+esc(c.title)+' <code>'+esc(c.id)+' · '+esc(c.level)+'</code></h4>' +
+      (c.detail ? '<p class="detail">'+esc(c.detail)+'</p>' : "") +
+      '<p class="teach">'+esc(c.teachable)+'</p></div>';
+  }).join("");
+}
+
+function resultPanel(name, text, review){
+  var rapp = RAPPSentinel.toRappSkill(text, {
+    name: name, date: new Date().toISOString().slice(0,10)
+  });
+  var after = RAPPSentinel.review(rapp, name);
+  var py = RAPPMirror.exportAgent(rapp);
+  var id = "r" + Math.random().toString(36).slice(2, 9);
+
+  return '<section class="panel" data-result="'+id+'">' +
+    '<h2>'+esc(name)+'</h2>' +
+    '<div class="summary"><b>'+review.overall+'</b>' +
+      '<span class="verdict '+esc(review.verdict)+'">'+esc(review.verdict)+'</span>' +
+      '<span class="muted">'+review.error_count+' blocking · '+review.warn_count+' advisory</span></div>' +
+    scoreBars(review.scores) +
+    findingsHTML(review) +
+    '<div class="note"><b>What RAPP does about it.</b> The same file, shaped into the ' +
+      'single-file RAPP format: a manifest so it can be found and pinned, an explicit ' +
+      'deterministic layer so two runs agree, and a mirrored <code>agent.py</code> derived ' +
+      'from it so a brainstem can register it as a tool. Rubric score after conversion: ' +
+      '<b>'+after.overall+'</b> (<span class="verdict '+esc(after.verdict)+'">'+esc(after.verdict)+'</span>). ' +
+      'The remaining findings are the ones only you can fix — a licence, a real ' +
+      'verification step, the steps themselves.</div>' +
+    '<div class="row">' +
+      '<button class="btn primary" data-dl="md" data-id="'+id+'">Download RAPP skill.md</button>' +
+      '<button class="btn primary" data-dl="py" data-id="'+id+'">Download agent.py</button>' +
+      '<button class="btn" data-toggle="'+id+'">Show the converted file</button>' +
+    '</div>' +
+    '<pre class="code" id="pre'+id+'" hidden>'+esc(rapp)+'</pre>' +
+    '</section>';
+}
+
+var BLOBS = {};
+
+function render(results){
+  LAST = results;
+  var host = document.getElementById("out");
+  if (!results.length){ host.innerHTML = '<section class="panel"><p class="muted">Nothing scanned.</p></section>'; return; }
+
+  var blocked = results.filter(function(r){return r.review.error_count;}).length;
+  var head = results.length > 1
+    ? '<section class="panel"><h2>'+results.length+' skills scanned</h2>' +
+      '<p class="muted">'+blocked+' with a blocking finding. Each is broken out below.</p>' +
+      results.map(function(r){
+        return '<div class="rowlist"><span class="nm">'+esc(r.name)+'</span>' +
+          '<span class="verdict '+esc(r.review.verdict)+'">'+esc(r.review.verdict)+'</span>' +
+          '<span class="muted">'+r.review.overall+'</span></div>';
+      }).join("") + '</section>'
+    : "";
+
+  host.innerHTML = head + results.map(function(r){
+    var html = resultPanel(r.name, r.text, r.review);
+    return html;
+  }).join("");
+
+  // Stash the generated files for download, keyed by the panel id.
+  document.querySelectorAll("[data-result]").forEach(function(sec, i){
+    var id = sec.getAttribute("data-result");
+    var rapp = RAPPSentinel.toRappSkill(results[i].text, {
+      name: results[i].name, date: new Date().toISOString().slice(0,10)
+    });
+    BLOBS[id] = { md: rapp, py: RAPPMirror.exportAgent(rapp), name: results[i].name };
+  });
+
+  document.querySelectorAll("[data-toggle]").forEach(function(b){
+    b.onclick = function(){
+      var pre = document.getElementById("pre" + b.getAttribute("data-toggle"));
+      pre.hidden = !pre.hidden;
+      b.textContent = pre.hidden ? "Show the converted file" : "Hide the converted file";
+    };
+  });
+  document.querySelectorAll("[data-dl]").forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute("data-id"), kind = b.getAttribute("data-dl");
+      var rec = BLOBS[id];
+      var base = rec.name.replace(/\.[^.]+$/, "").replace(/[^A-Za-z0-9_-]+/g, "_");
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([rec[kind]],
+        { type: kind === "py" ? "text/x-python" : "text/markdown" }));
+      a.download = base + (kind === "py" ? ".py" : ".md");
+      a.click();
+    };
+  });
+
+  document.getElementById("dlPacket").disabled = false;
+}
+
+document.getElementById("dlPacket").onclick = function(){
+  if (!LAST) return;
+  fetch("sentinel/NEIGHBORHOOD.json").then(function(r){return r.json();}).then(function(hood){
+    var packet = {
+      schema: "rapp-sentinel-packet/1.0",
+      neighborhood: hood.name,
+      instructions: "Execute each resident's prompt once per subject. Return a JSON " +
+        "object mapping subject name to that subject's answer, in the shape the prompt " +
+        "specifies. Then absorb it with scripts/sentinel.py.",
+      residents: hood.residents.filter(function(r){return r.kind === "interpretive";})
+        .map(function(r){ return { id: r.id, lens: r.lens, authority: r.authority, prompt: r.prompt }; }),
+      subjects: LAST.map(function(r){ return { slug: r.name, chars: r.text.length }; })
+    };
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(packet, null, 2)],
+      { type: "application/json" }));
+    a.download = "sentinel-packet.json";
+    a.click();
+  });
+};
+
+function scanText(name, text){
+  return { name: name, text: text, review: RAPPSentinel.review(text, name) };
+}
+
+document.getElementById("runScan").onclick = function(){
+  var btn = this;
+  btn.disabled = true;
+  setStatus("Scanning…");
+
+  var done = function(results){
+    btn.disabled = false;
+    setStatus(results.length ? "" : "Nothing to scan.");
+    render(results);
+  };
+  var failed = function(msg){
+    btn.disabled = false;
+    setStatus(msg);
+    document.getElementById("out").innerHTML =
+      '<section class="panel"><p class="muted">'+esc(msg)+'</p></section>';
+  };
+
+  if (SOURCE === "paste") {
+    var t = document.getElementById("pasteBox").value;
+    if (!t.trim()) return failed("Paste a skill first.");
+    return done([scanText("pasted-skill.md", t)]);
+  }
+
+  if (SOURCE === "url") {
+    var u = document.getElementById("urlBox").value.trim();
+    if (!u) return failed("Enter a URL first.");
+    return fetch(u).then(function(r){
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.text();
+    }).then(function(t){
+      done([scanText(u.split("/").pop(), t)]);
+    }).catch(function(e){
+      failed("Could not fetch that URL (" + e.message + "). It may not allow cross-origin reads.");
+    });
+  }
+
+  var repo = document.getElementById("repoBox").value.trim().replace(/^https?:\/\/github\.com\//, "");
+  if (!repo || repo.indexOf("/") === -1) return failed("Enter owner/repo.");
+  setStatus("Listing " + repo + "…");
+  fetch("https://api.github.com/repos/" + repo)
+    .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function(meta){
+      return fetch("https://api.github.com/repos/" + repo + "/git/trees/" +
+                   meta.default_branch + "?recursive=1");
+    })
+    .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function(tree){
+      // Repositories do not agree on where skills live — skills/, guides/,
+      // agents/, src/content/... Requiring one layout made the scanner report
+      // "none found" on a repository full of them. Instead: take every .md
+      // that is not obviously repository furniture, and let the rubric decide.
+      var FURNITURE = /(^|\/)(readme|contributing|security|support|changelog|license|code_of_conduct|notice)\.md$/i;
+      var files = (tree.tree || []).filter(function(n){
+        return n.type === "blob" && /\.md$/i.test(n.path) &&
+               !FURNITURE.test(n.path) && n.path.indexOf(".github/") !== 0;
+      }).slice(0, 25);
+      if (!files.length) throw new Error("no candidate .md files found in that repository");
+      setStatus("Fetching " + files.length + " file(s)…");
+      return Promise.all(files.map(function(f){
+        return fetch("https://raw.githubusercontent.com/" + repo + "/HEAD/" + f.path)
+          .then(function(r){ return r.ok ? r.text() : ""; })
+          .then(function(t){ return t ? scanText(f.path, t) : null; });
+      }));
+    })
+    .then(function(rs){ done(rs.filter(Boolean)); })
+    .catch(function(e){ failed("Could not scan that repository (" + e.message + ")."); });
+};
+</script>
+</body>
+</html>

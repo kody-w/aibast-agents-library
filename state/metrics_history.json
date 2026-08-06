@@ -1,0 +1,113 @@
+{
+  "cdn_total": 0,
+  "daily": [
+    {
+      "date": "2026-07-21",
+      "clones": 2,
+      "clone_uniques": 2,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-22",
+      "clones": 23,
+      "clone_uniques": 5,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-23",
+      "clones": 3,
+      "clone_uniques": 3,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-24",
+      "clones": 0,
+      "clone_uniques": 0,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-25",
+      "clones": 5,
+      "clone_uniques": 5,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-26",
+      "clones": 4,
+      "clone_uniques": 1,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-27",
+      "clones": 1,
+      "clone_uniques": 1,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-28",
+      "clones": 0,
+      "clone_uniques": 0,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-29",
+      "clones": 0,
+      "clone_uniques": 0,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-30",
+      "clones": 0,
+      "clone_uniques": 0,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-07-31",
+      "clones": 0,
+      "clone_uniques": 0,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-08-01",
+      "clones": 0,
+      "clone_uniques": 0,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-08-02",
+      "clones": 1,
+      "clone_uniques": 1,
+      "views": 0,
+      "cdn": 0
+    },
+    {
+      "date": "2026-08-03",
+      "clones": 0,
+      "clone_uniques": 0,
+      "views": 0,
+      "cdn": 0
+    }
+  ],
+  "tracking_since": "2026-08-04",
+  "last_traffic": {
+    "as_of": "2026-08-04T19:31:53.313902+00:00",
+    "clones_14d": 39,
+    "clone_uniques_14d": 15,
+    "views_14d": 0,
+    "view_uniques_14d": 0,
+    "paths": [],
+    "referrers": []
+  }
+}

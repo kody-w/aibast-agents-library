@@ -1,0 +1,177 @@
+{
+  "schema": "rapp-source-shape/1.0",
+  "scout_version": "1.0.0",
+  "source_id": "cat-agent-skills",
+  "repo": "microsoft/cat-agent-skills",
+  "default_branch": "main",
+  "profiled": "2026-08-05T16:45:09+00:00",
+  "status": "provisional",
+  "status_note": "Measured, not confirmed. The deterministic pass found this shape; a model has not yet checked it. Aggregation may proceed, and the provisional status travels with every skill taken from here.",
+  "license": {
+    "spdx": "MIT",
+    "url": "https://github.com/microsoft/cat-agent-skills/blob/main/LICENSE"
+  },
+  "shape": {
+    "skill_glob": "src/content/skills/*.md",
+    "skill_directory": "src/content/skills",
+    "expected_count": 78,
+    "frontmatter_ratio": 1.0,
+    "content_url_template": "https://raw.githubusercontent.com/microsoft/cat-agent-skills/main/src/content/skills/{slug}.md",
+    "field_mapping": {
+      "name": "name",
+      "description": "description",
+      "tags": "tags",
+      "author": "author",
+      "version": "version"
+    },
+    "unmapped_fields": [
+      "agentDescription",
+      "platforms",
+      "authorGithub",
+      "authorUrl",
+      "bundle",
+      "createdAt",
+      "updatedAt"
+    ]
+  },
+  "evidence": {
+    "markdown_files_total": 307,
+    "clusters_considered": [
+      {
+        "directory": "src/content/skills",
+        "glob": "src/content/skills/*.md",
+        "file_count": 78,
+        "sampled": 8,
+        "frontmatter_ratio": 1.0,
+        "frontmatter_keys": [
+          "name",
+          "description",
+          "agentDescription",
+          "platforms",
+          "tags",
+          "author",
+          "authorGithub",
+          "version",
+          "authorUrl",
+          "bundle",
+          "createdAt",
+          "updatedAt"
+        ],
+        "looks_like_docs": false,
+        "examples": [
+          "src/content/skills/accessibility-pass.md",
+          "src/content/skills/acroform-writer.md",
+          "src/content/skills/agent-evaluation-designer.md"
+        ]
+      },
+      {
+        "directory": "src/content/guides",
+        "glob": "src/content/guides/*.md",
+        "file_count": 53,
+        "sampled": 8,
+        "frontmatter_ratio": 0.0,
+        "frontmatter_keys": [],
+        "looks_like_docs": false,
+        "examples": [
+          "src/content/guides/accessibility-pass.md",
+          "src/content/guides/acroform-writer.md",
+          "src/content/guides/agent-evaluation-designer.md"
+        ]
+      },
+      {
+        "directory": "submissions/business-os/assets/templates",
+        "glob": "submissions/business-os/assets/templates/*.md",
+        "file_count": 15,
+        "sampled": 8,
+        "frontmatter_ratio": 0.0,
+        "frontmatter_keys": [],
+        "looks_like_docs": false,
+        "examples": [
+          "submissions/business-os/assets/templates/checklist.md",
+          "submissions/business-os/assets/templates/company-dna-profile.md",
+          "submissions/business-os/assets/templates/decision-brief.md"
+        ]
+      },
+      {
+        "directory": "submissions/business-os/references",
+        "glob": "submissions/business-os/references/*.md",
+        "file_count": 14,
+        "sampled": 8,
+        "frontmatter_ratio": 0.0,
+        "frontmatter_keys": [],
+        "looks_like_docs": false,
+        "examples": [
+          "submissions/business-os/references/communication-engine.md",
+          "submissions/business-os/references/company-dna.md",
+          "submissions/business-os/references/decision-engine.md"
+        ]
+      },
+      {
+        "directory": "submissions/ai-first-process-redesign/references",
+        "glob": "submissions/ai-first-process-redesign/references/*.md",
+        "file_count": 6,
+        "sampled": 6,
+        "frontmatter_ratio": 0.0,
+        "frontmatter_keys": [],
+        "looks_like_docs": false,
+        "examples": [
+          "submissions/ai-first-process-redesign/references/ai-building-blocks.md",
+          "submissions/ai-first-process-redesign/references/blueprint-templates.md",
+          "submissions/ai-first-process-redesign/references/evals.md"
+        ]
+      },
+      {
+        "directory": "submissions/b2b-outreach-suite/references",
+        "glob": "submissions/b2b-outreach-suite/references/*.md",
+        "file_count": 6,
+        "sampled": 6,
+        "frontmatter_ratio": 0.0,
+        "frontmatter_keys": [],
+        "looks_like_docs": false,
+        "examples": [
+          "submissions/b2b-outreach-suite/references/ad-copywriting.md",
+          "submissions/b2b-outreach-suite/references/cold-email.md",
+          "submissions/b2b-outreach-suite/references/follow-up-sequencer.md"
+        ]
+      },
+      {
+        "directory": "submissions/agent-harness-explorer/references",
+        "glob": "submissions/agent-harness-explorer/references/*.md",
+        "file_count": 4,
+        "sampled": 4,
+        "frontmatter_ratio": 0.0,
+        "frontmatter_keys": [],
+        "looks_like_docs": false,
+        "examples": [
+          "submissions/agent-harness-explorer/references/comparison-rules.md",
+          "submissions/agent-harness-explorer/references/memory-snapshot-protocol.md",
+          "submissions/agent-harness-explorer/references/probe-catalog.md"
+        ]
+      },
+      {
+        "directory": "submissions/global-greenwashing-claim-auditor/references",
+        "glob": "submissions/global-greenwashing-claim-auditor/references/*.md",
+        "file_count": 4,
+        "sampled": 4,
+        "frontmatter_ratio": 0.0,
+        "frontmatter_keys": [],
+        "looks_like_docs": false,
+        "examples": [
+          "submissions/global-greenwashing-claim-auditor/references/Greenwashing-vocab.md",
+          "submissions/global-greenwashing-claim-auditor/references/greenwashing-analysis-research.md",
+          "submissions/global-greenwashing-claim-auditor/references/greenwashing-detection.md"
+        ]
+      }
+    ],
+    "why_this_cluster": "largest directory whose files carry frontmatter at least 50% of the time"
+  },
+  "confirmation_packet": {
+    "schema": "rapp-sentinel-packet/1.0",
+    "resident": "source-shape",
+    "kind": "interpretive",
+    "authority": "blocking",
+    "lens": "Is this actually where this repository keeps its skills?",
+    "prompt": "You are confirming the shape of a skill repository before anything is aggregated from it. You are given the candidate clusters found in its tree, with file counts, frontmatter ratios and example paths. Decide which cluster holds the repository's SKILLS, as opposed to its documentation, its website content, or its tests. Then map its frontmatter fields onto the RAPP manifest fields (name, display_name, description, version, author, tags, category, source_license), leaving out any you cannot map confidently \u2014 a wrong mapping corrupts every skill taken from this source. Return JSON: {skill_directory: string, skill_glob: string, confident: boolean, field_mapping: object, unmapped_fields: [string], reasoning: string, teachable: string}.",
+    "evidence_ref": "evidence.clusters_considered"
+  }
+}

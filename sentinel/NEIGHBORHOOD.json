@@ -1,0 +1,94 @@
+{
+  "schema": "rapp-sentinel-neighborhood/1.0",
+  "name": "aibast-review",
+  "description": "The review neighborhood for the AIBAST Agents Library. Data only \u2014 a roster of residents, each with one lens, addressed in plain language. Inert until a runtime is attached: the deterministic residents run under Python, the interpretive ones run under whatever AI you point at them. Residents review both library agents and aggregated skills; an aggregated entry gets the same review as one we wrote, which is the value of aggregating it here rather than linking to it.",
+  "anchor": "sentinel/",
+  "runtime_contract": {
+    "deterministic": "Residents with a `module` run under scripts/sentinel.py with no AI and no network. Same input, same output, forever.",
+    "interpretive": "Residents with a `prompt` emit a packet. Any model can execute it \u2014 Claude, Copilot, a local model. The packet is the whole contract; the runner does not care which model answers.",
+    "awakening": "A neighborhood is a data structure. It does nothing until something reads it. That is the point: the review workflow is portable because it is not code."
+  },
+  "separation": {
+    "rule": "Every resident in this neighborhood produces MACHINE review. Nothing here is a human opinion, and nothing here may be averaged with one.",
+    "human_channel": "GitHub Discussions category 'Community' \u2014 people, reacting and replying.",
+    "machine_channel": "GitHub Discussions category 'Automated Reviews' \u2014 sentinel runs, posted by the workflow.",
+    "why": "A reader who cannot tell which kind of review they are looking at is being misled by both. Two channels, two panels, never one number."
+  },
+  "residents": [
+    {
+      "id": "static-analysis",
+      "kind": "deterministic",
+      "lens": "Is it built the way a maintained agent is built?",
+      "module": "review_agents",
+      "principles": [
+        "quality",
+        "usability",
+        "effectiveness",
+        "safety",
+        "portability"
+      ],
+      "authority": "blocking",
+      "note": "Parses source with ast. Never imports, never executes. This resident alone can block an approval.",
+      "subjects": "agents"
+    },
+    {
+      "id": "skill-analysis",
+      "kind": "deterministic",
+      "lens": "Are these instructions followable the same way twice?",
+      "module": "review_skills",
+      "subjects": "skills",
+      "principles": [
+        "provenance",
+        "usability",
+        "determinism",
+        "safety",
+        "completeness"
+      ],
+      "authority": "blocking",
+      "note": "A skill fails by being vague, not by crashing. This checks provenance, the deterministic contract, and whether the steps can actually be followed."
+    },
+    {
+      "id": "clarity",
+      "kind": "interpretive",
+      "lens": "Would a model actually route to this agent, and would a human understand what came back?",
+      "authority": "advisory",
+      "prompt": "You are reviewing one entry in the AIBAST Agents Library \u2014 either a single-file agent (Python) or an aggregated skill (Markdown). Read what it says it does, how it is invoked, and what it hands back. Answer only these questions. (1) If twenty entries were loaded at once, would a model pick this one for the task it claims? Say what it would be confused with. (2) Is what it returns something a human can act on, or does it need interpretation the entry should have done itself? (3) Name the single edit that would most improve routing accuracy. Be concrete and quote the text you are judging. Do not praise. Return JSON: {routing_risk: low|medium|high, confusable_with: string, return_value_verdict: string, single_best_edit: string, teachable: string}.",
+      "subjects": "all"
+    },
+    {
+      "id": "honesty",
+      "kind": "interpretive",
+      "lens": "Does the agent do what it says, or does it describe doing it?",
+      "authority": "blocking",
+      "prompt": "You are reviewing one entry in the AIBAST Agents Library \u2014 a single-file agent (Python) or an aggregated skill (Markdown). Determine whether its behavior matches its claims. A demo that returns a scripted response, or a skill that describes an outcome it never produces, is legitimate ONLY if it says so plainly and says it first. A description implying live data while the implementation returns a fixed string is misrepresentation \u2014 that is the defect you are looking for. Return JSON: {claims_live_data: boolean, returns_fixed_response: boolean, misrepresents: boolean, evidence: string, teachable: string}. Set misrepresents=true only when you can quote both the claim and the contradicting implementation.",
+      "subjects": "all"
+    },
+    {
+      "id": "blast-radius",
+      "kind": "interpretive",
+      "lens": "What is the worst thing that happens to someone who installs this?",
+      "authority": "blocking",
+      "prompt": "You are reviewing one entry in the AIBAST Agents Library for installation risk \u2014 a single-file agent (Python) or an aggregated skill (Markdown) that a model will execute. Assume the operator is a non-expert running it against their own tenant. Enumerate what it writes, deletes, sends, or spends \u2014 not what it reads. For each, state whether it confirms before acting and whether the action is reversible. Ignore stylistic issues entirely. Return JSON: {writes: [string], irreversible_actions: [string], spends_money: boolean, confirms_first: boolean, worst_case: string, teachable: string}.",
+      "subjects": "all"
+    },
+    {
+      "id": "teachability",
+      "kind": "interpretive",
+      "lens": "Can someone learn the pattern from reading this?",
+      "authority": "advisory",
+      "prompt": "You are reviewing one entry in the AIBAST Agents Library as TEACHING material \u2014 the library is how people learn to build on the Microsoft AI stack, so a published entry is read far more often than it is run. Identify the one pattern it demonstrates best and the one thing in it a newcomer would wrongly copy. Return JSON: {pattern_demonstrated: string, worst_thing_to_copy: string, suitable_as_example: boolean, teachable: string}.",
+      "subjects": "all"
+    }
+  ],
+  "verdict_policy": {
+    "approved": "No blocking resident reported a defect and static-analysis overall >= 85.",
+    "changes-requested": "A blocking resident reported a defect, or static-analysis is below 60.",
+    "advisory-only": "Only advisory residents reported anything.",
+    "note": "A verdict is a queue position, not a judgment. Nothing here approves an agent for production use in anyone's tenant \u2014 see DISCLAIMER.md."
+  },
+  "subject_sets": {
+    "agents": "agents/**/*.py \u2014 single-file agents published by this library and its publishers.",
+    "skills": "skills/**/*.md \u2014 outside skills aggregated and converted to the RAPP single-file format.",
+    "all": "both."
+  }
+}

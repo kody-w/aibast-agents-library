@@ -1,0 +1,81 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T14:36:51.319385+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/art-generator",
+    "version": "1.0.0",
+    "display_name": "ArtGenerator",
+    "description": "Generates original images with an Azure GPT Image deployment and saves them locally.",
+    "author": "AIBAST",
+    "tags": [
+      "art",
+      "azure-openai",
+      "gpt-image",
+      "image-generation",
+      "multimodal"
+    ],
+    "category": "general",
+    "quality_tier": "community",
+    "requires_env": [
+      "AZURE_OPENAI_ENDPOINT",
+      "AZURE_OPENAI_IMAGE_DEPLOYMENT"
+    ],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/art-generator.py",
+  "size_kb": 10.7,
+  "lines": 343,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/art-generator.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/art-generator.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/art-generator.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/art-generator",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/10"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "needs-work",
+    "overall": 82,
+    "scores": {
+      "quality": 100,
+      "usability": 75,
+      "effectiveness": 67,
+      "safety": 100,
+      "portability": 67
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [
+      {
+        "id": "U4",
+        "principle": "usability",
+        "level": "warn",
+        "title": "Configuration comes from the environment",
+        "detail": "hardcoded endpoint: https://cognitiveservices.azure.com/.default",
+        "teachable": "A hardcoded endpoint pins the agent to one tenant or region, so the next person who installs it is silently calling your service. Read the endpoint from the environment and declare it in `requires_env`."
+      },
+      {
+        "id": "E3",
+        "principle": "effectiveness",
+        "level": "warn",
+        "title": "States its contract in a docstring",
+        "detail": "no docstring on the agent class or perform()",
+        "teachable": "The docstring is where the deterministic layer lives: inputs, outputs, and how to verify the result. It is what a reader checks when the agent behaves unexpectedly, and it costs nothing at runtime."
+      },
+      {
+        "id": "P2",
+        "principle": "portability",
+        "level": "warn",
+        "title": "Imports are standard library or declared",
+        "detail": "third-party imports: azure, requests, webbrowser",
+        "teachable": "A single-file agent should install by copying one file. Every third-party import is a dependency the installer does not know about, so the agent registers and then fails on first call. Use the standard library, or say so in the description."
+      }
+    ],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

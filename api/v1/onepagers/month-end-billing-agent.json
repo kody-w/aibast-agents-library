@@ -1,0 +1,42 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "08-month-end-billing-agent.html",
+    "industry": "Professional Services",
+    "display_name": "Month-End Billing Agent",
+    "lede": "Automate month-end billing cycles to accelerate invoicing, reduce risk, and ensure audit-ready compliance.",
+    "audience": [
+      "Finance VP",
+      "Billing Manager"
+    ],
+    "business_value": [
+      "Accelerate invoicing",
+      "Reduce risk",
+      "Ensure audit-ready compliance"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "SharePoint",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "month-end-billing-agent",
+    "industries": [
+      "Professional Services",
+      "Consulting"
+    ],
+    "catalog_number": 8,
+    "video": {
+      "slug": "time-entry-billing-agent",
+      "hosted": true,
+      "src": "media/videos/time-entry-billing-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=month-end-billing-agent"
+}

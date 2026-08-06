@@ -1,0 +1,54 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T15:02:57.567525+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/mission-reporting-assistant",
+    "version": "1.0.0",
+    "display_name": "Mission Reporting Assistant Agent",
+    "description": "Generates mission summaries, KPI dashboards, stakeholder briefs, and trend analyses for federal programs.",
+    "author": "AIBAST",
+    "tags": [
+      "mission",
+      "reporting",
+      "KPI",
+      "stakeholder",
+      "federal",
+      "dashboard"
+    ],
+    "category": "federal_government",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/federal_government_stacks/mission_reporting_assistant_stack/mission_reporting_assistant_agent.py",
+  "size_kb": 13.0,
+  "lines": 286,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/federal_government_stacks/mission_reporting_assistant_stack/mission_reporting_assistant_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/federal_government_stacks/mission_reporting_assistant_stack/mission_reporting_assistant_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/federal_government_stacks/mission_reporting_assistant_stack/mission_reporting_assistant_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/mission-reporting-assistant",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/56"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "review-ready",
+    "overall": 100,
+    "scores": {
+      "quality": 100,
+      "usability": 100,
+      "effectiveness": 100,
+      "safety": 100,
+      "portability": 100
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

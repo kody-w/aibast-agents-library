@@ -1,0 +1,63 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T15:02:57.567525+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/patient-intake",
+    "version": "1.0.0",
+    "display_name": "Patient Intake Agent",
+    "description": "Manages patient intake forms, insurance verification, appointment scheduling, and pre-visit summary preparation.",
+    "author": "AIBAST",
+    "tags": [
+      "intake",
+      "insurance",
+      "scheduling",
+      "patient",
+      "registration",
+      "healthcare"
+    ],
+    "category": "healthcare",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/healthcare_stacks/patient_intake_stack/patient_intake_agent.py",
+  "size_kb": 14.0,
+  "lines": 369,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/healthcare_stacks/patient_intake_stack/patient_intake_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/healthcare_stacks/patient_intake_stack/patient_intake_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/healthcare_stacks/patient_intake_stack/patient_intake_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/patient-intake",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/61"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "review-ready",
+    "overall": 96,
+    "scores": {
+      "quality": 100,
+      "usability": 100,
+      "effectiveness": 100,
+      "safety": 80,
+      "portability": 100
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [
+      {
+        "id": "S3",
+        "principle": "safety",
+        "level": "warn",
+        "title": "Sample data uses documented fictional domains",
+        "detail": "email addresses at: email.com",
+        "teachable": "Demo data in a public library must be fictional. Microsoft documentation reserves contoso.com and fabrikam.com for exactly this; a real address is personal data that a fork copies forever."
+      }
+    ],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

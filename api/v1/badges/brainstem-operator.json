@@ -1,0 +1,15 @@
+{
+  "protocol": "ms-rapp-badge/1.0",
+  "schema": "aibast-badge/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "id": "brainstem-operator",
+  "name": "Brainstem Operator",
+  "summary": "Ran the brainstem end to end and installed an agent from the library.",
+  "criteria": "Install the brainstem (any tier), install a library agent, and show it answering.",
+  "how": "Open a claim with the transcript or a screenshot of the agent responding.",
+  "color": "5b5fc7",
+  "points": 15,
+  "tier": "foundation",
+  "holders": [],
+  "holder_count": 0
+}

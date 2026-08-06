@@ -1,0 +1,358 @@
+{
+  "category": "Announcements",
+  "note": "Plays are reactions on a pinned tally comment, so one play is one signed-in person choosing to mark it \u2014 not a raw hit count. Likes are positive reactions on the thread; negative and neutral reactions never contribute.",
+  "repo": "kody-w/aibast-agents-library",
+  "schema": "aibast-video-engagement/1.0",
+  "totals": {
+    "likes": 0,
+    "plays": 0,
+    "videos": 43,
+    "with_thread": 0
+  },
+  "videos": {
+    "account-intelligence-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "ask-hr-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "building-permit-processing-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "care-gap-closure-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "cart-abandonment-recovery-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "claims-processing-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "client-health-score-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "clinical-notes-summarizer-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "contract-risk-review-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "cross-selling-opportunities-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "customer-escalations-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "customer-loyalty-rewards-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "customer-onboarding-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "customer-sentiment-and-churn-prediction-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "deal-progression-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "energy-operations-suite": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "financial-advisor-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "fraud-detection-and-alert-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "inventory-rebalancing-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "inventory-visibility-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "license-renewal-and-expansion-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "loan-origination-assistant": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "maintenance-scheduling-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "omnichannel-engagement-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "order-status-communication-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "patient-intake-and-scheduling-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "personalized-marketing-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "personalized-shopping-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "portfolio-rebalancing-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "prior-authorization-automation-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "procurement-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "product-feedback-synthesizer-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "product-line-optimization-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "proposal-generation-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "regulatory-compliance-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "resource-utilization-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "returns-and-complaints-resolution-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "store-associate-copilot": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "supply-risk-monitoring-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "time-entry-billing-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "underwriting-support-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "utility-billing-and-assistance-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    },
+    "wealth-insights-generator-agent": {
+      "comments": 0,
+      "likes": 0,
+      "number": null,
+      "plays": 0,
+      "thread": false,
+      "url": null
+    }
+  }
+}

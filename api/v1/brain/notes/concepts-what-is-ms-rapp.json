@@ -1,0 +1,28 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "slug": "concepts/what-is-ms-rapp",
+  "title": "What ms-rapp is",
+  "summary": "The enterprise build of RAPP \u2014 same protocol, different cadence.",
+  "tags": [
+    "ms-rapp",
+    "concept"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/concepts/what-is-ms-rapp.md",
+  "bytes": 1053,
+  "links": [
+    "concepts/kernel-and-distribution",
+    "concepts/the-corpus",
+    "concepts/the-three-tiers"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/concepts/what-is-ms-rapp.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/concepts-what-is-ms-rapp.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#concepts/what-is-ms-rapp",
+  "backlinks": [
+    "index"
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "aibast-agent-entry/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "name": "AIBAST Agents Library (ms-rapp)",
+  "what": "A catalog of single-file AI agents for the Microsoft AI stack, plus the runtime that executes them. Every surface is a static JSON file: no key, no quota, CORS-open, safe to poll.",
+  "read_this_first": "https://microsoft.github.io/aibast-agents-library/llms.txt",
+  "full_text": "https://microsoft.github.io/aibast-agents-library/llms-full.txt",
+  "api_root": "https://microsoft.github.io/aibast-agents-library/api/v1/index.json",
+  "conventions": {
+    "static_api": "rapp-static-api/1.0 \u2014 the repository is the API; pin a commit SHA in a raw URL for an immutable response.",
+    "agent_format": "One file per agent. A __manifest__ dict carries name, version, description, tags, category, requires_env.",
+    "naming": "@publisher/slug \u2014 the publisher is a GitHub username."
+  },
+  "start_here": [
+    {
+      "goal": "List every agent",
+      "get": "agents.json",
+      "then": "Filter on .category or .tags; each entry carries raw_url."
+    },
+    {
+      "goal": "Read one agent's source",
+      "get": "agents/{publisher}/{slug}.json",
+      "then": "Fetch .raw_url \u2014 it is plain Python, meant to be read before it is run."
+    },
+    {
+      "goal": "Find agents for a use case",
+      "get": "categories.json",
+      "then": "Pick a category id, then filter agents.json by it."
+    },
+    {
+      "goal": "Check adoption",
+      "get": "metrics.json",
+      "then": "Read .totals; methodology and caveats are documented on the metrics page."
+    },
+    {
+      "goal": "Verify a publisher",
+      "get": "certified/{username}.json",
+      "then": "Lowercase the username first. A 404 and certified=false both mean not certified \u2014 neither is an error to retry."
+    },
+    {
+      "goal": "Read how the platform is built and why",
+      "get": "blog/index.json",
+      "then": "Each post carries raw_url for the Markdown, or subscribe to blog/feed.json (JSON Feed 1.1)."
+    },
+    {
+      "goal": "Learn how the platform works",
+      "get": "brain/index.json",
+      "then": "Each note carries raw_url; follow .links to traverse the documentation graph, or fetch llms-full.txt for everything inline."
+    }
+  ],
+  "rules_for_agents": [
+    "Read an agent file before executing it. Single-file design exists so this is cheap.",
+    "Never send secrets to this API; it is a public read-only catalog.",
+    "Configuration for an agent comes from the environment via requires_env, never from the file.",
+    "Treat unknown fields as ignorable \u2014 documents gain fields without a major version.",
+    "Poll no more than the daily build cadence; nothing here changes faster."
+  ],
+  "extensions": {
+    "ms-rapp-badge/1.0": {
+      "spec": "rapp/ext/ms-rapp-badge-1.0/SPEC.md"
+    },
+    "ms-rapp-blog/1.0": {
+      "spec": "rapp/ext/ms-rapp-blog-1.0/SPEC.md"
+    },
+    "ms-rapp-brain/1.0": {
+      "spec": "rapp/ext/ms-rapp-brain-1.0/SPEC.md"
+    }
+  },
+  "human_ui": {
+    "library": "https://microsoft.github.io/aibast-agents-library/agents.html",
+    "api_explorer": "https://microsoft.github.io/aibast-agents-library/api.html",
+    "metrics": "https://microsoft.github.io/aibast-agents-library/metrics.html",
+    "badges": "https://microsoft.github.io/aibast-agents-library/wall.html",
+    "blog": "https://microsoft.github.io/aibast-agents-library/blog.html",
+    "docs": "https://microsoft.github.io/aibast-agents-library/brain.html"
+  },
+  "license": "MIT (\u00a9 Microsoft Corporation). Mirrored corpus under rapp/ carries upstream licenses.",
+  "disclaimer": "https://microsoft.github.io/aibast-agents-library/DISCLAIMER.md"
+}

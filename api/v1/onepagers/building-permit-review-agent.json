@@ -1,0 +1,43 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "44-building-permit-review-agent.html",
+    "industry": "State & Local Government",
+    "display_name": "Building Permit Review Agent",
+    "lede": "Automate building permit review processes to enable faster service, lower operational costs, and higher citizen satisfaction.",
+    "audience": [
+      "Permit Technicians",
+      "Plan Reviewers",
+      "Inspectors"
+    ],
+    "business_value": [
+      "Enable faster service",
+      "Lower operational costs",
+      "Higher citizen satisfaction"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 CRM",
+      "Dynamics 365 CcaaS",
+      "Microsoft Teams",
+      "SharePoint"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "building-permit-review-agent",
+    "industries": [
+      "State and Local Government"
+    ],
+    "catalog_number": 44,
+    "video": {
+      "slug": "building-permit-processing-agent",
+      "hosted": true,
+      "src": "media/videos/building-permit-processing-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=building-permit-review-agent"
+}

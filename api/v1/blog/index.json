@@ -1,0 +1,43 @@
+{
+  "protocol": "ms-rapp-blog/1.0",
+  "schema": "ms-rapp-blog-index/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "title": "Field Notes from the Frontier",
+  "description": "How ms-rapp is actually built \u2014 decisions, defects, and the lexicon that comes out of the work.",
+  "count": 1,
+  "reader": "https://microsoft.github.io/aibast-agents-library/blog.html",
+  "feed": "https://microsoft.github.io/aibast-agents-library/api/v1/blog/feed.json",
+  "tags": [
+    {
+      "tag": "field-notes",
+      "count": 1
+    },
+    {
+      "tag": "lexicon",
+      "count": 1
+    },
+    {
+      "tag": "method",
+      "count": 1
+    }
+  ],
+  "posts": [
+    {
+      "slug": "rapp-data-exhaust",
+      "title": "RAPP data exhaust \u2014 reading the negative of the shape",
+      "date": "2026-08-05",
+      "author": "AIBAST",
+      "tags": [
+        "method",
+        "lexicon",
+        "field-notes"
+      ],
+      "summary": "The by-product of building something holds a cast of the thing that made it. Here is the term we use for that, why it is perishable, and three defects it caught in this repository.",
+      "path": "blog/rapp-data-exhaust.md",
+      "bytes": 6238,
+      "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/blog/rapp-data-exhaust.md",
+      "url": "https://microsoft.github.io/aibast-agents-library/blog.html#rapp-data-exhaust",
+      "post_url": "https://microsoft.github.io/aibast-agents-library/api/v1/blog/posts/rapp-data-exhaust.json"
+    }
+  ]
+}

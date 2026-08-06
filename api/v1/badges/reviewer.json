@@ -1,0 +1,15 @@
+{
+  "protocol": "ms-rapp-badge/1.0",
+  "schema": "aibast-badge/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "id": "reviewer",
+  "name": "Reviewer",
+  "summary": "Reviews submissions from other publishers.",
+  "criteria": "Sustained, substantive review of other people's pull requests, at a maintainer's invitation.",
+  "how": "Awarded by maintainers. Not self-claimable.",
+  "color": "8b5cf6",
+  "points": 50,
+  "tier": "maintainer",
+  "holders": [],
+  "holder_count": 0
+}

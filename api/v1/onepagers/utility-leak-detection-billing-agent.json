@@ -1,0 +1,45 @@
+{
+  "schema": "aibast-api-onepager/1.0",
+  "generated": "2026-08-06T14:46:03.507822+00:00",
+  "onepager": {
+    "capture_file": "24-utility-leak-detection-billing-agent.html",
+    "industry": "Energy & Utilities",
+    "display_name": "Utility Leak Detection & Billing Agent",
+    "lede": "Automate leak detection and billing processes to improve customer satisfaction, ensure policy compliance, and protect municipal revenue.",
+    "audience": [
+      "Customer Service Rep",
+      "Billing Specialist",
+      "Assistance Coordinator"
+    ],
+    "business_value": [
+      "Improve customer satisfaction",
+      "Ensure policy compliance",
+      "Protect municipal revenue"
+    ],
+    "built_with": [
+      "Microsoft Copilot Studio"
+    ],
+    "featured_tools": [
+      "Dynamics 365 ERP",
+      "Dynamics 365 CRM",
+      "Dynamics 365 CcaaS",
+      "Microsoft Outlook",
+      "Microsoft Teams"
+    ],
+    "footnote": "Microsoft AI Business Applications Specialist Team (AIBAST) \u00b7 from the approved Agents Library. This summary is generated from the library entry; the full slide (KPIs & process flow) is the linked source deck. Synthetic data \u2014 no PII.",
+    "slug": "utility-leak-detection-billing-agent",
+    "industries": [
+      "Energy and Utilities",
+      "State and Local Government"
+    ],
+    "catalog_number": 24,
+    "video": {
+      "slug": "utility-billing-and-assistance-agent",
+      "hosted": true,
+      "src": "media/videos/utility-billing-and-assistance-agent.mp4",
+      "source": "branch",
+      "size_mb": null
+    }
+  },
+  "page_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?solution=utility-leak-detection-billing-agent"
+}

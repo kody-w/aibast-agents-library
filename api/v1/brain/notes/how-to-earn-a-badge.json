@@ -1,0 +1,31 @@
+{
+  "protocol": "ms-rapp-brain/1.0",
+  "schema": "ms-rapp-brain-note/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "slug": "how-to/earn-a-badge",
+  "title": "Earn a badge",
+  "summary": "Do the thing, get it approved in public, and it is verifiable by anyone.",
+  "tags": [
+    "how-to",
+    "certification"
+  ],
+  "updated": "2026-08-05",
+  "status": null,
+  "aliases": [],
+  "path": "brain/how-to/earn-a-badge.md",
+  "bytes": 982,
+  "links": [
+    "how-to/publish-an-agent",
+    "decisions/why-revocation-retains-the-entry",
+    "concepts/extensions"
+  ],
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/brain/how-to/earn-a-badge.md",
+  "note_url": "https://microsoft.github.io/aibast-agents-library/api/v1/brain/notes/how-to-earn-a-badge.json",
+  "reader_url": "https://microsoft.github.io/aibast-agents-library/brain.html#how-to/earn-a-badge",
+  "backlinks": [
+    "concepts/extensions",
+    "decisions/why-revocation-retains-the-entry",
+    "how-to/publish-an-agent",
+    "index"
+  ]
+}

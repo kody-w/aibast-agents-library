@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIBAST Agent Library — industry AI agents for the Microsoft AI stack</title>
+<meta name="description" content="Browse 100+ single-file AI agents by industry and use case — searchable, rated by the community, and runnable on the RAPP brainstem, Azure Functions, or Copilot Studio.">
+<meta property="og:title" content="AIBAST Agent Library">
+<meta property="og:description" content="Industry AI agent stacks for the Microsoft AI stack — browse, rate, publish.">
+<meta property="og:type" content="website">
+<style>
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
+:root {
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
+  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
+}
+[data-theme="dark"] {
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
+  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+html, body { max-width: 100%; overflow-x: hidden; }
+body {
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+svg { width: 1em; height: 1em; display: inline-block; vertical-align: -0.12em; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+header.site {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.nav { display: flex; align-items: center; gap: 18px; padding: 12px 0; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; color: var(--text); white-space: nowrap; }
+.brand:hover { text-decoration: none; }
+.brand .mark { color: var(--accent); font-size: 19px; display: inline-flex; }
+.nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav-links a { color: var(--text-dim); font-size: 13.5px; padding: 5px 10px; border-radius: 8px; }
+.nav-links a:hover { color: var(--text); background: var(--panel-2); text-decoration: none; }
+.nav-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.icon-btn {
+  background: var(--panel); border: 1px solid var(--border); color: var(--text-dim);
+  width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.icon-btn:hover { color: var(--text); border-color: var(--text-faint); text-decoration: none; }
+footer.site { margin-top: 64px; border-top: 1px solid var(--border); padding: 26px 0 44px; }
+.foot { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--text-faint); }
+.foot a { color: var(--text-dim); }
+.foot .copy { width: 100%; margin-top: 4px; }
+@media (max-width: 560px) { .nav-links { order: 3; width: 100%; } }
+/* ══ page-specific ══════════════════════════════════════════════════════ */
+
+.hero { padding: 60px 0 36px; position: relative; }
+.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(600px 300px at 20% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    radial-gradient(500px 260px at 80% 10%, color-mix(in srgb, var(--accent-2) 10%, transparent), transparent 70%);
+}
+.hero-inner { position: relative; max-width: 780px; }
+.hero h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.12; letter-spacing: -0.02em; font-weight: 700; }
+.hero h1 .grad {
+  background: linear-gradient(92deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero p.lead { margin-top: 16px; font-size: 16.5px; color: var(--text-dim); max-width: 64ch; }
+.hero-ctas { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600; padding: 9px 18px; border-radius: 6px;
+  border: 1px solid transparent; cursor: pointer; font-family: inherit;
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); text-decoration: none; }
+.btn.ghost { background: var(--panel); border-color: var(--border); color: var(--text); }
+.btn.ghost:hover { border-color: var(--text-faint); text-decoration: none; }
+.hero-stats { display: flex; gap: 28px; margin-top: 34px; flex-wrap: wrap; }
+.stat b { display: block; font-size: 24px; font-weight: 750; letter-spacing: -0.01em; }
+.stat span { font-size: 12.5px; color: var(--text-faint); }
+
+.evo {
+  margin: 8px 0 0; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: var(--accent-soft); border-radius: var(--radius);
+  padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap;
+}
+.evo .glyph { color: var(--accent); font-size: 20px; flex: 0 0 auto; margin-top: 2px; display: inline-flex; }
+.evo p { font-size: 13.5px; color: var(--text-dim); max-width: 90ch; }
+.evo p b { color: var(--text); }
+
+section { padding: 50px 0 8px; }
+.sec-head { margin-bottom: 20px; }
+.sec-head h2 { font-size: 24px; font-weight: 720; letter-spacing: -0.015em; display: flex; align-items: center; gap: 10px; }
+.sec-head h2 .glyph { color: var(--accent); font-size: 21px; display: inline-flex; }
+.sec-head p { color: var(--text-dim); font-size: 14px; margin-top: 6px; max-width: 78ch; }
+
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+.search {
+  flex: 1 1 260px; display: flex; align-items: center; gap: 8px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 4px;
+  padding: 8px 12px;
+}
+.search .glyph { color: var(--text-faint); display: inline-flex; }
+.search input {
+  flex: 1; background: none; border: none; outline: none; color: var(--text);
+  font-size: 14px; font-family: inherit; min-width: 0;
+}
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  font-size: 12px; font-weight: 600; color: var(--text-dim);
+  background: var(--panel); border: 1px solid var(--border); border-radius: 999px;
+  padding: 5px 12px; cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.chip:hover { color: var(--text); }
+.chip.active { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.vgroup { margin: 26px 0 6px; }
+.vgroup h3 { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: baseline; gap: 8px; }
+.vgroup h3 small { font-size: 12px; color: var(--text-faint); font-weight: 500; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; margin-top: 12px; }
+.card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0;
+  transition: border-color .15s, transform .15s;
+}
+.card:hover { border-color: color-mix(in srgb, var(--accent-2) 45%, var(--border)); transform: translateY(-2px); }
+.card h4 { font-size: 14.5px; font-weight: 680; letter-spacing: -0.01em; }
+.card p.desc { font-size: 13px; color: var(--text-dim); flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card .meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--text-faint); }
+.card .meta span {
+  background: var(--panel-2); border: 1px solid var(--border);
+  padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+}
+.card .meta .sig { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+.card .links { display: flex; gap: 12px; font-size: 12.5px; font-weight: 600; margin-top: 2px; flex-wrap: wrap; }
+.card .links a { cursor: pointer; }
+.empty { color: var(--text-faint); font-size: 14px; padding: 26px 0; }
+
+.agg-src {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 20px 0 4px;
+  font-size: 14px; font-weight: 700;
+}
+.agg-src .lic {
+  font-size: 11px; font-weight: 650; padding: 2px 9px; border-radius: 999px;
+  color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warn) 30%, transparent);
+}
+.agg-src .lic.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 10%, transparent); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin-top: 12px; }
+.step {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow); padding: 18px; display: flex; flex-direction: column; gap: 8px;
+}
+.step .tno { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.step h4 { font-size: 15.5px; font-weight: 700; }
+.step p { font-size: 13px; color: var(--text-dim); flex: 1; }
+.step .btn { align-self: flex-start; margin-top: 6px; }
+code.inline {
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 1px 6px; font-size: 12px; font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  color: var(--text-dim); word-break: break-all;
+}
+
+/* code viewer modal */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 90;
+  display: none; align-items: center; justify-content: center; padding: 24px;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  width: min(960px, 100%); max-height: 86vh; display: flex; flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+}
+.modal-head {
+  display: flex; align-items: center; gap: 12px; padding: 12px 18px;
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.modal-head h4 { font-size: 14.5px; font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.modal-head .path { font-size: 11px; color: var(--text-faint); font-family: ui-monospace, "SF Mono", Consolas, monospace; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.modal-actions { display: flex; gap: 8px; align-items: center; }
+.modal-actions .btn { padding: 5px 12px; font-size: 12.5px; }
+.modal pre {
+  overflow: auto; flex: 1; margin: 0; padding: 16px 18px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 12.5px;
+  line-height: 1.5; color: var(--text); background: var(--bg-soft); tab-size: 4;
+}
+
+@media (max-width: 560px) {
+  .hero { padding: 40px 0 28px; }
+  .hero-stats { gap: 18px; }
+}
+.card.is-link{cursor:pointer;transition:border-color .12s ease,box-shadow .12s ease,transform .12s ease}
+.card.is-link:hover{border-color:var(--accent-2);box-shadow:0 2px 10px rgba(79,82,201,.10);transform:translateY(-1px)}
+.card.is-link:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.card.is-link .links a{position:relative;z-index:1}
+.fp-steps{margin:10px 0 2px;padding:10px 12px;background:var(--panel-2);
+  border:1px solid var(--border);border-radius:8px}
+.fp-steps b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--accent-2);margin-bottom:6px}
+.fp-steps ol{margin:0 0 6px 18px;font-size:13px;color:var(--text-dim)}
+.fp-steps li{padding:2px 0}
+.fp-steps small{color:var(--text-faint);font-size:11.5px}
+</style>
+</head>
+<body>
+
+<!-- ══ shared site header — identical on every page ══ -->
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="agents.html">Library</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+<script>
+/* Shared theme switch. Light is the default everywhere; dark is opt-in and
+   remembered. Runs inline so the choice applies before the page paints. */
+(function () {
+  var r = document.documentElement, s = null;
+  try { s = localStorage.getItem("aibast-theme"); } catch (e) {}
+  if (s === "dark") r.setAttribute("data-theme", "dark");
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var dark = r.getAttribute("data-theme") === "dark";
+    if (dark) r.removeAttribute("data-theme"); else r.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("aibast-theme", dark ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+<main id="top">
+  <div class="wrap">
+
+    <div class="hero">
+      <div class="hero-inner">
+        <h1>Business-ready AI agents<br>for <span class="grad">every industry</span></h1>
+        <p class="lead">Browse the library by industry and by the job you need done. Every agent is a single, self-contained building block — open its one-pager to see what it does, then run it in your browser, on your own machine, or across your organisation.</p>
+        <div class="hero-ctas">
+          <a class="btn primary" href="#library">Browse the library</a>
+          <a class="btn ghost" href="vbrainstem/">Run it in your browser</a>
+          <a class="btn ghost" href="solutions.html">See the solutions</a>
+          <a class="btn ghost" href="metrics.html">Live metrics</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><b id="statAgents">–</b><span>agents</span></div>
+          <div class="stat"><b id="statIndustries">–</b><span>industries</span></div>
+          <div class="stat"><b id="statStacks">–</b><span>use-case stacks</span></div>
+          <div class="stat"><b id="statPublishers">–</b><span>publishers</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="evo">
+      <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h9M13 12l-3.5-3.5M13 12l-3.5 3.5"/><circle cx="18.5" cy="12" r="2.6"/></svg></span>
+      <p><b>Community-rated, publicly measured.</b> Every agent carries a public review thread and an install tally, so what people actually use is visible rather than asserted. It all rolls up on the <a href="metrics.html">metrics dashboard</a>, and anyone can <a href="#publish">publish</a> under their own name.</p>
+    </div>
+
+    <section id="library">
+      <div class="sec-head">
+        <h2><span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8.5 4.5L12 12 3.5 7.5z"/><path d="M3.5 12.2L12 16.7l8.5-4.5"/><path d="M3.5 16.7L12 21.2l8.5-4.5"/></svg></span>Agents by industry</h2>
+        <p>Search across names, descriptions, tags and use-case stacks, or filter by industry. The catalogue is live — it is the same index the brainstem installs from, so what you see here is exactly what you get.</p>
+      </div>
+      <div class="toolbar">
+        <label class="search">
+          <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5L16 16"/></svg></span>
+          <input id="agentSearch" type="search" placeholder="Search agents, stacks, use cases…" aria-label="Search agents">
+        </label>
+        <div class="chips" id="industryChips"></div>
+      </div>
+      <div id="agentGroups"></div>
+      <div class="empty" id="agentEmpty" hidden>No agents match that search.</div>
+    </section>
+
+    <section id="firstparty">
+      <div class="sec-head">
+        <h2><span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 12h8M12 8v8"/></svg></span>First-party agents that already ship</h2>
+        <p>Agents built into Dynamics 365 and Microsoft 365. There is nothing to download — an administrator turns these on and configures them in the product — so they are indexed here to be scoped against, not installed. Each summary and configuration outline is read from the product documentation on the date shown, and that documentation stays authoritative.</p>
+      </div>
+      <div id="fpGroups"><div class="empty">Loading first-party index\u2026</div></div>
+    </section>
+
+    <section id="aggregated">
+      <div class="sec-head">
+        <h2><span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.3 4 5.2 4 8.5s-1.4 6.2-4 8.5c-2.6-2.3-4-5.2-4-8.5s1.4-6.2 4-8.5z"/></svg></span>Aggregated skills from the wider ecosystem</h2>
+        <p>The library indexes skills published elsewhere and — where the original licence permits it — converts them into the same single-file format you can download and run. The licence is resolved from the source every time, never asserted here, and every converted file carries its attribution with it.</p>
+      </div>
+      <div id="aggGroups"><div class="empty">Loading aggregated index…</div></div>
+    </section>
+
+    <section id="publish">
+      <div class="sec-head">
+        <h2><span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17V8M12 8l-3.5 3.5M12 8l3.5 3.5"/><path d="M6 20h12"/></svg></span>Publish your own agents</h2>
+        <p>Your username is your publisher handle. Everything you ship appears here under your own track, with its own review thread and its own numbers.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="tno">Step 1 — Apply once</span>
+          <h4>Claim your publisher track</h4>
+          <p>A two-minute form registers your handle and what you plan to publish. Use the GitHub link in the header to start it.</p>
+        </div>
+        <div class="step">
+          <span class="tno">Step 2 — Write one file</span>
+          <h4>One agent, one self-contained file</h4>
+          <p>No project scaffolding and no build step. A single file describes what the agent is called, what it does, and how to run it — and it is checked automatically before it goes live.</p>
+        </div>
+        <div class="step">
+          <span class="tno">Step 3 — Ship it</span>
+          <h4>Published means live everywhere</h4>
+          <p>Once accepted, your agent appears in this gallery, gets its own review thread, and starts counting on the metrics dashboard.</p>
+          <a class="btn ghost" href="metrics.html">See the leaderboards</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="deploy">
+      <div class="sec-head">
+        <h2><span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17V8M12 8l-3.5 3.5M12 8l3.5 3.5"/><path d="M6 20h12M4.5 16.5A5 5 0 0 1 7 7.3a6 6 0 0 1 11.6 1.9 4.4 4.4 0 0 1 .3 8.2"/></svg></span>Run any of these yourself</h2>
+        <p>Agents layer onto the Microsoft AI stack one tier at a time — start in your browser, move to your machine, add the cloud, then roll out to your whole organisation. The <a href="index.html">get-started page</a> walks the same ladder.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="tno">Tier 0 — Nothing to install</span>
+          <h4>Run it in your browser</h4>
+          <p>The same engine, running entirely in a browser tab. No install, no admin rights. It browses this library live and adds agents with one click.</p>
+          <a class="btn primary" href="vbrainstem/">Open it now</a>
+        </div>
+        <div class="step">
+          <span class="tno">Tier 1 — On your machine</span>
+          <h4>A local-first agent server</h4>
+          <p>One command sets up a private server powered by your GitHub Copilot subscription. No API keys to manage. Add any agent from this library and it registers itself.</p>
+          <a class="btn primary" href="index.html">Get started</a>
+        </div>
+        <div class="step">
+          <span class="tno">Tier 2 — In your cloud</span>
+          <h4>Always-on in Azure</h4>
+          <p>Give the agents a cloud home: an always-on Azure service with Azure OpenAI and persistent memory, deployed in a few clicks.</p>
+          <a class="btn ghost" href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Faibast-agents-library%2Fmain%2Fazuredeploy.json" target="_blank" rel="noopener">Deploy to Azure</a>
+        </div>
+        <div class="step">
+          <span class="tno">Tier 3 — Across your organisation</span>
+          <h4>Copilot Studio and Teams</h4>
+          <p>Import the ready-made Copilot Studio solution, point it at your Azure service, and the same agents answer in Teams and M365 Copilot.</p>
+          <a class="btn ghost" href="MSFTAIBASMultiAgentCopilot_1_0_0_6.zip">Download the solution (v1.0.0.6)</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ══ shared site footer — identical on every page ══ -->
+<footer class="site">
+  <div class="wrap foot">
+    <a href="index.html">Get started</a>
+    <a href="agents.html">Library</a>
+    <a href="solutions.html">Solutions</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="metrics.html">Metrics</a>
+    <a href="api.html">Static API</a>
+    <a href="scan.html">Scan</a>
+    <a href="wall.html">Wall of Fame</a>
+    <a href="brain.html">Docs Vault</a>
+    <a href="blog.html">Field Notes</a>
+    <a href="vbrainstem/">Run in your browser</a>
+    <a href="DISCLAIMER.md">Disclaimer</a>
+    <span class="copy">© 2026 Microsoft AIBAST. Some rights reserved. MIT-licensed, community-driven.</span>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="codeBackdrop">
+  <div class="modal" id="codeModal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h4 id="codeTitle">Preview</h4>
+      <div class="modal-actions">
+        <button class="btn ghost" id="codeCopy">Copy</button>
+        <button class="btn primary" id="codeClose">Close</button>
+      </div>
+      <div class="path" id="codePath"></div>
+    </div>
+    <pre><code id="codeBody">Loading…</code></pre>
+  </div>
+</div>
+
+<script>
+(function () {
+"use strict";
+
+/* The theme switch lives in the shared header script at the top of the page. */
+
+var OWNER_REPO = "microsoft/aibast-agents-library";
+var RAW = "https://raw.githubusercontent.com/" + OWNER_REPO + "/main/";
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+  });
+}
+function num(n) { return Number(n || 0).toLocaleString(); }
+function getJSON(paths) {
+  var p = Promise.reject();
+  paths.forEach(function (u) {
+    p = p.catch(function () {
+      return fetch(u, { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      });
+    });
+  });
+  return p;
+}
+
+var INDUSTRY = {
+  b2b_sales: "B2B Sales", b2c_sales: "B2C Sales", energy: "Energy & Utilities",
+  federal_government: "Federal Government", financial_services: "Financial Services",
+  general: "Cross-Industry", healthcare: "Healthcare", human_resources: "Human Resources",
+  it_management: "IT Management", manufacturing: "Manufacturing",
+  professional_services: "Professional Services", retail_cpg: "Retail & CPG",
+  slg_government: "State & Local Government", software_digital_products: "Software & Digital Products"
+};
+function industryName(cat) {
+  if (INDUSTRY[cat]) return INDUSTRY[cat];
+  return String(cat || "Other").replace(/_/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
+function titleize(s) {
+  return String(s || "").replace(/_/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
+function stackOf(file) {
+  var parts = String(file || "").split("/");
+  for (var i = 0; i < parts.length; i++) {
+    if (/_stack$/.test(parts[i])) return titleize(parts[i].replace(/_stack$/, ""));
+    if (parts[i] === "templates") return "Building block";
+  }
+  return "Standalone";
+}
+
+/* ---------- state ---------- */
+var allAgents = [], ratings = {}, activeIndustry = "All", query = "";
+
+function viewModel(registry) {
+  return (registry.agents || []).map(function (a) {
+    return {
+      name: a.name,
+      display: a.display_name || a.name.split("/")[1],
+      desc: a.description || "",
+      industry: industryName(a.category),
+      stack: stackOf(a._file),
+      tags: a.tags || [],
+      tier: a.quality_tier || "",
+      publisher: a.name.split("/")[0],
+      file: a._file,
+      kb: a._size_kb,
+      lines: a._lines
+    };
+  });
+}
+
+function renderChips() {
+  var industries = ["All"].concat(Array.from(new Set(allAgents.map(function (a) { return a.industry; }))).sort());
+  var el = document.getElementById("industryChips");
+  el.innerHTML = industries.map(function (ind) {
+    return '<button class="chip' + (ind === activeIndustry ? " active" : "") + '" data-ind="' + esc(ind) + '">' + esc(ind) + "</button>";
+  }).join("");
+  Array.prototype.forEach.call(el.querySelectorAll(".chip"), function (b) {
+    b.addEventListener("click", function () {
+      activeIndustry = b.getAttribute("data-ind");
+      renderChips(); renderAgents();
+    });
+  });
+}
+
+function agentCard(a) {
+  var r = ratings[a.name] || null;
+  var meta = "<span>" + esc(a.stack) + "</span>";
+  if (a.kb) meta += "<span>" + esc(a.kb) + " KB</span>";
+  a.tags.slice(0, 2).forEach(function (t) { meta += "<span>" + esc(t) + "</span>"; });
+  if (r && (r.upvotes || r.downloads)) {
+    meta += '<span class="sig">' + num(r.upvotes) + " upvotes · " + num(r.downloads) + " installs</span>";
+  }
+  // This catalog is read by people choosing an agent, not by people reading
+  // source. Links to raw files and to the repository put a .py file in front of
+  // someone who wants to know what it does, so they are gone; the one-pager
+  // answers that question in plain language.
+  var page = "onepager.html?agent=" + encodeURIComponent(a.name);
+  var links = '<a href="' + page + '">Open the one-pager</a>';
+  // The whole tile is the target. A card that looks clickable and is not is a
+  // dead end every visitor tries at least once.
+  return '<div class="card is-link" tabindex="0" role="link" data-href="' + page + '">' +
+    '<h4>' + esc(a.display) + '</h4><p class="desc">' + esc(a.desc) + "</p>" +
+    '<div class="meta">' + meta + '</div><div class="links">' + links + "</div></div>";
+}
+
+document.addEventListener("click", function (e) {
+  var card = e.target.closest && e.target.closest(".card.is-link");
+  if (!card) return;
+  if (e.target.closest("a")) return;      // an explicit link wins
+  location.href = card.getAttribute("data-href");
+});
+document.addEventListener("keydown", function (e) {
+  if (e.key !== "Enter") return;
+  var card = e.target.closest && e.target.closest(".card.is-link");
+  if (card) location.href = card.getAttribute("data-href");
+});
+
+function renderAgents() {
+  var q = query.toLowerCase();
+  var shown = allAgents.filter(function (a) {
+    if (activeIndustry !== "All" && a.industry !== activeIndustry) return false;
+    if (!q) return true;
+    return (a.display + " " + a.name + " " + a.desc + " " + a.industry + " " +
+            a.stack + " " + a.tags.join(" ")).toLowerCase().indexOf(q) !== -1;
+  });
+  var groups = {};
+  shown.forEach(function (a) { (groups[a.industry] = groups[a.industry] || []).push(a); });
+  var names = Object.keys(groups).sort();
+  var host = document.getElementById("agentGroups");
+  host.innerHTML = names.map(function (ind) {
+    var items = groups[ind];
+    return '<div class="vgroup"><h3>' + esc(ind) + " <small>" + items.length +
+      (items.length === 1 ? " agent" : " agents") + '</small></h3><div class="grid">' +
+      items.map(agentCard).join("") + "</div></div>";
+  }).join("");
+  document.getElementById("agentEmpty").hidden = shown.length > 0;
+  wireViewers(host);
+}
+
+function applyRegistry(registry) {
+  allAgents = viewModel(registry);
+  var stats = registry.stats || {};
+  document.getElementById("statAgents").textContent = stats.total_agents || allAgents.length;
+  document.getElementById("statIndustries").textContent = stats.categories ||
+    new Set(allAgents.map(function (a) { return a.industry; })).size;
+  document.getElementById("statStacks").textContent =
+    new Set(allAgents.map(function (a) { return a.stack; })).size;
+  document.getElementById("statPublishers").textContent = stats.publishers || 1;
+  renderChips(); renderAgents();
+}
+
+document.getElementById("agentSearch").addEventListener("input", function (e) {
+  query = e.target.value; renderAgents();
+});
+
+/* ---------- code viewer ---------- */
+var backdrop = document.getElementById("codeBackdrop");
+function openViewer(file, name) {
+  document.getElementById("codeTitle").textContent = name;
+  document.getElementById("codePath").textContent = file;
+  var body = document.getElementById("codeBody");
+  body.textContent = "Loading…";
+  backdrop.classList.add("open");
+  fetch(file, { cache: "no-store" }).then(function (r) {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.text();
+  }).catch(function () {
+    return fetch(RAW + file).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.text();
+    });
+  }).then(function (text) {
+    body.textContent = text;
+  }).catch(function () {
+    body.textContent = "This file could not be previewed here.";
+  });
+}
+function wireViewers(host) {
+  Array.prototype.forEach.call(host.querySelectorAll("[data-view]"), function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      openViewer(el.getAttribute("data-view"), el.getAttribute("data-name") || "Agent source");
+    });
+  });
+}
+document.getElementById("codeClose").addEventListener("click", function () { backdrop.classList.remove("open"); });
+backdrop.addEventListener("click", function (e) { if (e.target === backdrop) backdrop.classList.remove("open"); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") backdrop.classList.remove("open"); });
+document.getElementById("codeCopy").addEventListener("click", function () {
+  var t = document.getElementById("codeBody").textContent;
+  navigator.clipboard.writeText(t);
+  this.textContent = "Copied";
+  var btn = this;
+  setTimeout(function () { btn.textContent = "Copy"; }, 1500);
+});
+
+/* ---------- aggregated skills ---------- */
+/* First-party product agents: shipped inside Dynamics 365 and Microsoft 365,
+   so there is nothing to download and nothing to convert. They are carried so a
+   scenario can be scoped against what already exists before anyone builds
+   something new, and they get the same treatment as every other entry —
+   crawled content, a rating and a discussion thread — with the one difference
+   stated plainly on the card: you configure these, you do not install them. */
+function renderFirstParty(doc, ratings) {
+  var host = document.getElementById("fpGroups");
+  if (!host) return;
+  var agents = (doc && doc.agents) || [];
+  if (!agents.length) {
+    host.innerHTML = '<div class="empty">The first-party index has not been built yet.</div>';
+    return;
+  }
+  var src = ((doc.sources || [])[0]) || {};
+  var head = '<div class="agg-src">' + esc(src.display_name || "Microsoft") +
+    ' <span class="lic ok">first-party \u00b7 configure in product</span>' +
+    (src.home_url ? ' <a href="' + esc(src.home_url) + '" target="_blank" rel="noopener" style="font-weight:600;font-size:12.5px">product documentation</a>' : "") +
+    ' <small style="color:var(--text-faint);font-weight:500">' + agents.length + " agents indexed</small></div>";
+
+  var cards = agents.map(function (a) {
+    var c = a.content || {}, ov = c.overview || {}, cf = c.configure || {};
+    var r = (ratings && ratings.agents && ratings.agents[a.ref]) || null;
+    var meta = '<span>' + esc(a.product || "") + "</span>" +
+      '<span class="sig">' + esc(a.status) + "</span>";
+    if (cf.prerequisites) meta += "<span>" + cf.prerequisites.length + " prerequisites</span>";
+    if (ov.fetched) meta += '<span style="color:var(--text-faint)">read ' + esc(ov.fetched) + "</span>";
+    if (r && (r.upvotes || r.comments)) {
+      meta += '<span class="sig">\u25b2 ' + num(r.upvotes || 0) + " \u00b7 \u1d9c " + num(r.comments || 0) + "</span>";
+    }
+    // The crawled summary, not our paraphrase of it.
+    var body = esc(ov.summary || a.description || "");
+    var steps = (cf.sections || []).slice(0, 4);
+    var stepsHtml = steps.length
+      ? '<div class="fp-steps"><b>To configure</b><ol>' +
+        steps.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") +
+        "</ol><small>Summarised from the product documentation on " +
+        esc(cf.fetched || ov.fetched || "") + " \u2014 the linked page is authoritative.</small></div>"
+      : "";
+    var links = '<a href="' + esc(a.overview_url) + '" target="_blank" rel="noopener">Overview</a>' +
+      '<a href="' + esc(a.configure_url) + '" target="_blank" rel="noopener">Configure</a>';
+    links += r && r.url
+      ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">Rate &amp; discuss</a>'
+      : '<a href="https://github.com/' + OWNER_REPO + '/discussions" target="_blank" rel="noopener">Discuss</a>';
+    return '<div class="card"><h4>' + esc(a.display_name) + "</h4>" +
+      '<p class="desc">' + body + "</p>" + stepsHtml +
+      '<div class="meta"><span>' + esc(a.ref) + "</span>" + meta + "</div>" +
+      '<div class="links">' + links + "</div></div>";
+  }).join("");
+  host.innerHTML = head + '<div class="grid">' + cards + "</div>";
+}
+
+function renderAggregated(snap) {
+  var host = document.getElementById("aggGroups");
+  var skills = (snap && snap.skills) || [];
+  if (!skills.length) {
+    host.innerHTML = '<div class="empty">The aggregated index has not been built yet — the daily crawler populates it.</div>';
+    return;
+  }
+  var bySource = {};
+  skills.forEach(function (s) { (bySource[s.source_id] = bySource[s.source_id] || []).push(s); });
+  var srcMeta = {};
+  (snap.sources || []).forEach(function (s) { srcMeta[s.id] = s; });
+  host.innerHTML = Object.keys(bySource).map(function (sid) {
+    var meta = srcMeta[sid] || { display_name: sid };
+    var L = meta.license || {};
+    var lic = L.verified
+      ? '<span class="lic ok">' + esc(L.spdx) + (L.redistributable ? " · redistributable" : " · listed only") + "</span>"
+      : '<span class="lic">listed only · licence unresolved</span>';
+    if (L.source) lic = '<a href="' + esc(L.source) + '" target="_blank" rel="noopener" style="text-decoration:none">' + lic + "</a>";
+    var head = '<div class="agg-src">' + esc(meta.display_name) + " " + lic +
+      (meta.home_url ? ' <a href="' + esc(meta.home_url) + '" target="_blank" rel="noopener" style="font-weight:600;font-size:12.5px">original source</a>' : "") +
+      ' <small style="color:var(--text-faint);font-weight:500">' + bySource[sid].length + " skills indexed</small></div>";
+    var cards = bySource[sid].map(function (s) {
+      var meta2 = "";
+      var sig = s.source_signal || {};
+      if (sig.downloads) meta2 += "<span>" + num(sig.downloads) + " downloads at source</span>";
+      if (sig.rating) meta2 += "<span>rated " + sig.rating + "</span>";
+      if (sig.featured) meta2 += "<span>featured</span>";
+      var v = s.gate_verdict;
+      if (v && v.converted) meta2 += '<span class="sig">converted</span>';
+      if (v && v.gates) {
+        Object.keys(v.gates).forEach(function (g) {
+          if (v.gates[g] && v.gates[g].passed) meta2 += '<span class="sig">' + esc(g) + " passed</span>";
+        });
+      }
+      var links = '<a href="onepager.html?skill=' + encodeURIComponent(s.ref) + '">Open the one-pager</a>';
+      if (s.rapp_skill) {
+        // The whole reason to aggregate: a single file you can actually run.
+        // The repo-relative path, not the canonical absolute URL: a relative
+        // href resolves on whichever origin is serving this page, so the
+        // download works on a fork before the change has merged upstream.
+        links += '<a href="' + esc(s.rapp_skill.path || s.rapp_skill.download_url) + '" download>Download</a>' +
+                 '<a data-view="' + esc(s.rapp_skill.path) + '" data-name="' + esc(s.display_name) + '">Preview</a>';
+        meta2 += '<span class="sig">' + Math.round(s.rapp_skill.bytes / 1024) + " KB</span>";
+      }
+      links += '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">Original source</a>';
+      return '<div class="card"><h4>' + esc(s.display_name) + '</h4>' +
+        '<p class="desc">' + esc(s.description || "") + "</p>" +
+        '<div class="meta"><span>' + esc(s.ref) + "</span>" + meta2 + "</div>" +
+        '<div class="links">' + links + "</div></div>";
+    }).join("");
+    return head + '<div class="grid">' + cards + "</div>";
+  }).join("");
+  wireViewers(document.getElementById("aggGroups"));
+}
+
+/* ---------- load ---------- */
+getJSON(["registry.json", "https://microsoft.github.io/aibast-agents-library/registry.json"])
+  .then(function (registry) {
+    applyRegistry(registry);
+    return getJSON(["state/discussion_ratings.json"]).then(function (doc) {
+      ratings = (doc && doc.agents) || {};
+      renderAgents();
+    }).catch(function () {});
+  })
+  .catch(function () {
+    document.getElementById("agentGroups").innerHTML =
+      '<div class="empty">The catalogue could not be loaded on this host yet. Try again in a moment.</div>';
+  });
+
+getJSON(["state/aggregated.json"]).then(renderAggregated).catch(function () { renderAggregated(null); });
+Promise.all([
+  getJSON(["api/v1/first-party-agents.json", "data/first_party_agents.json"]),
+  getJSON(["state/discussion_ratings.json"])
+]).then(function (r) { renderFirstParty(r[0], r[1]); })
+  .catch(function () { renderFirstParty(null, null); });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "schema": "aibast-api-agent/1.0",
+  "generated": "2026-08-05T16:52:41.645660+00:00",
+  "manifest": {
+    "schema": "rapp-agent/1.0",
+    "name": "@aibast-agents-library/voice-to-crm-email",
+    "version": "1.0.0",
+    "display_name": "Voice to CRM Email",
+    "description": "Meeting recap generation, action item extraction, follow-up email drafting, and distribution list management.",
+    "author": "AIBAST",
+    "tags": [
+      "voice",
+      "email",
+      "meeting-recap",
+      "action-items",
+      "follow-up"
+    ],
+    "category": "general",
+    "quality_tier": "verified",
+    "requires_env": [],
+    "dependencies": [
+      "@rapp/basic-agent"
+    ]
+  },
+  "file": "agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/email_drafting_agent.py",
+  "size_kb": 12.9,
+  "lines": 258,
+  "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/email_drafting_agent.py",
+  "pages_url": "https://microsoft.github.io/aibast-agents-library/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/email_drafting_agent.py",
+  "github_url": "https://github.com/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/voice_to_crm_stack/email_drafting_agent.py",
+  "onepager_url": "https://microsoft.github.io/aibast-agents-library/onepager.html?agent=@aibast-agents-library/voice-to-crm-email",
+  "engagement": {
+    "upvotes": 0,
+    "downloads": 0,
+    "comments": 0,
+    "discussion_url": "https://github.com/kody-w/aibast-agents-library/discussions/101"
+  },
+  "machine_review": {
+    "review_type": "machine",
+    "verdict": "review-ready",
+    "overall": 96,
+    "scores": {
+      "quality": 100,
+      "usability": 100,
+      "effectiveness": 100,
+      "safety": 80,
+      "portability": 100
+    },
+    "rubric_version": "1.0.0",
+    "open_findings": [
+      {
+        "id": "S3",
+        "principle": "safety",
+        "level": "warn",
+        "title": "Sample data uses documented fictional domains",
+        "detail": "email addresses at: ourcompany.com, techvantage.com",
+        "teachable": "Demo data in a public library must be fictional. Microsoft documentation reserves contoso.com and fabrikam.com for exactly this; a real address is personal data that a fork copies forever."
+      }
+    ],
+    "not_an_endorsement": "Static analysis against published principles. Never combined with community ratings."
+  }
+}

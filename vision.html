@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAPPVision — play the film</title>
+<meta name="description" content="Plays the generated demo walkthrough for any library entry — five acts, straight from the storyboard. Static: no deployed agent, no connection, nothing to configure.">
+<meta property="og:title" content="RAPPVision">
+<meta property="og:description" content="The storyboard is the program. The page is the player.">
+<style>
+:root {
+  --bg:#faf9f8; --panel:#fff; --panel-2:#f5f4f3; --border:#edebe9;
+  --text:#323130; --text-dim:#605e5c; --text-faint:#a19f9d;
+  --accent:#0078d4; --accent-hover:#106ebe;
+  --stage:#070F26; --stage-2:#1A1D3F;
+  --grad-a:#e8598f; --grad-b:#8b5cf6; --grad-c:#6b7dfb;
+  --shadow:0 .3px .9px rgba(0,0,0,.1),0 1.6px 3.6px rgba(0,0,0,.13);
+}
+[data-theme="dark"]{
+  --bg:#1b1a19; --panel:#252423; --panel-2:#2d2c2b; --border:#3b3a39;
+  --text:#f3f2f1; --text-dim:#c8c6c4; --text-faint:#797775;
+  --accent:#2899f5; --accent-hover:#3aa0f3;
+  --shadow:0 .3px .9px rgba(0,0,0,.32),0 1.6px 3.6px rgba(0,0,0,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--border);background:var(--bg)}
+.hbar{display:flex;align-items:center;gap:14px;height:56px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--text)}
+.brand svg{width:22px;height:22px;color:var(--accent)}
+.tagpill{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 9px;border-radius:20px;background:var(--accent);color:#fff}
+.hbar nav{margin-left:auto;display:flex;gap:16px;font-size:13.5px}
+.hbar nav a{color:var(--text-dim)}
+
+.layout{display:grid;grid-template-columns:1fr 330px;gap:20px;padding:20px 0 40px}
+@media(max-width:960px){.layout{grid-template-columns:1fr}}
+
+/* ---------- the stage: 16:9, everything drawn from the storyboard ---------- */
+.stage{position:relative;aspect-ratio:16/9;background:var(--stage);border-radius:12px;
+  overflow:hidden;box-shadow:var(--shadow);container-type:inline-size}
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:4cqw;opacity:0;visibility:hidden;
+  transition:opacity .4s,visibility 0s .4s;pointer-events:none}
+.scene.on{opacity:1;visibility:visible;transition:opacity .4s,visibility 0s}
+
+/* act 1 — title card, white field */
+.scene.title{background:#fff;color:#171717;gap:2.4cqw}
+.mslogo{display:flex;align-items:center;gap:1.6cqw}
+.msgrid{display:grid;grid-template-columns:repeat(2,1.9cqw);grid-template-rows:repeat(2,1.9cqw);gap:.35cqw}
+.msgrid i{display:block}
+.msgrid i:nth-child(1){background:#f25022}.msgrid i:nth-child(2){background:#7fba00}
+.msgrid i:nth-child(3){background:#00a4ef}.msgrid i:nth-child(4){background:#ffb900}
+.mslogo span{font-size:3.4cqw;color:#737373;font-weight:400;letter-spacing:-.01em}
+.title h1{font-size:3.6cqw;font-weight:700;text-align:center;letter-spacing:-.02em}
+.title p{font-size:1.6cqw;color:#5b5b5b}
+
+/* act 2 — the problem, over a b-roll plate */
+.scene.problem{background:
+  radial-gradient(120cqw 60cqw at 20% 0%, #23305e 0%, transparent 60%),
+  radial-gradient(90cqw 60cqw at 90% 100%, #3a2350 0%, transparent 60%), var(--stage);
+  color:#fff;gap:2cqw}
+.plate{position:absolute;inset:0;opacity:.16;
+  background:repeating-linear-gradient(115deg,#8899bb 0 2cqw,#5a6a8c 2cqw 4cqw)}
+.problem .narr{position:relative;font-size:2.5cqw;line-height:1.35;max-width:74%;
+  text-align:center;font-weight:600;letter-spacing:-.01em}
+.problem .cue{position:relative;font-size:1.15cqw;color:#c8d0e8;letter-spacing:.08em;
+  text-transform:uppercase}
+
+/* act 3 — agent overview.
+   Geometry MEASURED off the reference frame at 34s, not composed by flexbox:
+     panel column   x 120..609   y 133..916   (489 x 783)
+     gradient body  inset 4.3% horizontally, starting 38.2% down the panel,
+                    54.3% of the panel's height
+     three columns at 6.25% / 38.5% / 70.8% of frame width
+   Guessing these produced panels that started 200px low and ran off the
+   bottom edge of the frame. */
+.scene.overview{background:var(--stage);color:#fff;padding:0;display:block;
+  overflow:hidden}
+.overview h2{position:absolute;left:0;right:0;top:8.5%;margin:0;
+  font-size:3.15cqw;font-weight:600;display:flex;align-items:center;
+  justify-content:center;gap:1cqw}
+.overview h2 .mark{width:3.4cqw;height:3.4cqw;display:inline-block;object-fit:contain}
+.pgrid{position:absolute;left:0;right:0;top:29.17%;height:55.65%;display:block}
+.pcol{position:absolute;top:0;height:100%;width:25.36%;background:#1A1D3F;
+  border-radius:1cqw;display:block}
+.pcol:nth-of-type(1){left:6.25%}
+.pcol:nth-of-type(2){left:37.86%}
+.pcol:nth-of-type(3){left:69.43%}
+.pcol .ph{position:absolute;left:0;right:0;top:4%;height:15%;display:flex;
+  align-items:center;gap:.9cqw;padding:0 1.4cqw}
+.pcol .ph span.lbl{flex:1;text-align:center;font-size:1.95cqw;font-weight:700;
+  letter-spacing:-.005em;padding-right:2.8cqw}
+.ic{width:2.6cqw;height:2.6cqw;flex:0 0 auto;object-fit:contain}
+.pcol .pbody{position:absolute;left:4.3%;right:4.3%;top:19.5%;height:58.9%;
+  background:linear-gradient(140deg,#f36f84 0%,#e266a2 26%,#cc5bc7 55%,
+    #a86ee0 78%,#858afb 100%);
+  border-radius:.8cqw;padding:1.4cqw 1.2cqw;display:flex;flex-direction:column;
+  gap:.9cqw;justify-content:flex-start;overflow:hidden}
+.pcol .pbody div{font-size:1.42cqw;line-height:1.35;text-align:center;
+  font-weight:700;overflow-wrap:anywhere}
+.jewels{position:absolute;left:0;right:0;bottom:3.5%;display:flex;gap:.9cqw;
+  justify-content:center}
+.jw{width:3.4cqw;height:3.4cqw;display:block;object-fit:contain}
+.arrow{position:absolute;top:31%;width:3.6cqw;height:6cqw;object-fit:contain}
+.arrow[data-stagger="1"]{left:32.9%}
+.arrow[data-stagger="2"]{left:64.5%}
+
+/* act 4 — the walkthrough, laptop-framed */
+.scene.walkthrough{background:
+  linear-gradient(160deg,#2b1a4d 0%,#151a35 55%,#0b1020 100%);padding:3cqw}
+.laptop{width:88%;height:86%;background:#fafafa;border-radius:.8cqw;
+  border:.45cqw solid #101010;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 2cqw 4cqw rgba(0,0,0,.45)}
+.lbar{height:2.6cqw;background:#f1f1f1;border-bottom:1px solid #e2e2e2;display:flex;
+  align-items:center;padding:0 1cqw;gap:.6cqw;flex:0 0 auto}
+.lbar i{width:.7cqw;height:.7cqw;border-radius:50%;background:#d9d9d9;display:block}
+.lbar b{margin-left:.8cqw;font-size:.95cqw;color:#666;font-weight:500}
+.chat{flex:1;overflow:hidden;padding:1.6cqw 2.2cqw;display:flex;flex-direction:column;
+  gap:1.3cqw;color:#1c1c1c;justify-content:flex-start}
+.turn{max-width:88%}
+.turn.op{align-self:flex-end;background:#efe7fb;border-radius:.8cqw;padding:1cqw 1.3cqw;
+  font-size:1.35cqw;line-height:1.45;overflow-wrap:anywhere;max-width:72%}
+.turn.ag{align-self:flex-start;width:100%}
+.turn.ag .who{font-size:1.15cqw;font-weight:700;color:#107c10;margin-bottom:.45cqw}
+.turn.ag h4{font-size:1.6cqw;font-weight:700;margin-bottom:.6cqw}
+.turn.ag ul{list-style:none;display:flex;flex-direction:column;gap:.35cqw}
+.turn.ag li{font-size:1.3cqw;line-height:1.45;padding-left:1.3cqw;position:relative;color:#2a2a2a;overflow-wrap:anywhere}
+.turn.ag li:before{content:"•";position:absolute;left:.2cqw;color:#8b5cf6}
+.turn.ag .slot{background:#fff3bf;border-radius:.2cqw;padding:0 .25cqw}
+.agentcall{margin-top:.9cqw;font-size:1.15cqw;color:#4a4a4a;font-family:ui-monospace,Menlo,monospace}
+.agentcall b{color:#1c1c1c}
+.composer{flex:0 0 auto;border-top:1px solid #e8e8e8;padding:.9cqw 2cqw;display:flex;
+  align-items:center;gap:.8cqw}
+.composer .box{flex:1;border:1px solid #e0e0e0;border-radius:.6cqw;padding:.7cqw 1cqw;
+  font-size:1.05cqw;color:#9a9a9a;background:#fff}
+.composer .box.typing{color:#1c1c1c}
+.caret{display:inline-block;width:.1cqw;height:1.2cqw;background:#1c1c1c;
+  vertical-align:-.2cqw;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* act 5 — close */
+.scene.close{background:var(--stage);color:#fff}
+.cta{background:linear-gradient(120deg,var(--grad-a),var(--grad-b) 55%,var(--grad-c));
+  border-radius:1.4cqw;padding:3cqw 4cqw;display:flex;flex-direction:column;gap:1cqw;
+  align-items:center;max-width:80%}
+.cta div{font-size:2.1cqw;font-weight:600;text-align:center;line-height:1.3}
+.close .fine{margin-top:2cqw;font-size:1.1cqw;color:#aab3d0}
+
+/* ---------- transport ---------- */
+.transport{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);
+  background:var(--panel);color:var(--text);border-radius:8px;padding:9px 15px;
+  font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--panel-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hover)}
+#scrub{flex:1;min-width:180px;accent-color:var(--accent)}
+.clock{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--text-dim);min-width:86px}
+.acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.actchip{font-size:11.5px;font-weight:600;color:var(--text-dim);background:var(--panel-2);
+  border:1px solid var(--border);border-radius:999px;padding:4px 11px;cursor:pointer;
+  font-family:inherit}
+.actchip.now{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ---------- side rail ---------- */
+.rail{display:flex;flex-direction:column;gap:16px}
+.card{border:1px solid var(--border);border-radius:12px;background:var(--panel);padding:16px 17px}
+.card h2{font-size:14.5px;font-weight:650;margin-bottom:8px}
+.card p{font-size:12.8px;color:var(--text-dim);line-height:1.55}
+.slotrow{margin:9px 0}
+.slotrow label{display:block;font-size:11.5px;color:var(--text-faint);margin-bottom:4px}
+.slotrow input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;
+  background:var(--panel-2);color:var(--text);font-family:inherit;font-size:12.5px}
+.muted{color:var(--text-faint);font-size:12px}
+footer{border-top:1px solid var(--border);padding:20px 0 40px}
+.flinks{display:flex;flex-wrap:wrap;gap:16px;font-size:13px}
+.flinks a{color:var(--text-dim)}
+.err{border:1px solid #d83b01;border-radius:10px;padding:18px;margin:20px 0;font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hbar">
+    <a class="brand" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5a2.5 2.5 0 0 0-5 0 2.5 2.5 0 0 0-2 4 2.5 2.5 0 0 0 0 4.5 2.5 2.5 0 0 0 2 4 2.5 2.5 0 0 0 5 0Zm0 0a2.5 2.5 0 0 1 5 0 2.5 2.5 0 0 1 2 4 2.5 2.5 0 0 1 0 4.5 2.5 2.5 0 0 1-2 4 2.5 2.5 0 0 1-5 0Z"/></svg>
+      RAPPVision
+    </a>
+    <span class="tagpill" id="kindPill">storyboard</span>
+    <nav>
+      <a href="agents.html">Agents</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="scan.html">Scan</a>
+      <a href="api.html">API</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="shell"><p class="muted" style="padding:40px 0">Loading the storyboard…</p></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="flinks">
+      <a href="https://github.com/microsoft/aibast-agents-library/blob/main/media/RAPPVISION.md">The format</a>
+      <a href="agents.html">Agents</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="https://github.com/microsoft/aibast-agents-library/blob/main/DISCLAIMER.md">Disclaimer</a>
+    </div>
+    <p class="muted" style="margin-top:12px">
+      Plays entirely from the generated storyboard — no deployed agent, no connection,
+      nothing to configure. Figures a human must supply are marked, never invented.
+    </p>
+  </div>
+</footer>
+
+<script>
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function qs(n){var m=new RegExp("[?&]"+n+"=([^&]*)").exec(location.search);
+  return m?decodeURIComponent(m[1].replace(/\+/g," ")):"";}
+function getJSON(paths){var i=0;return (function next(){
+  if(i>=paths.length)return Promise.resolve(null);
+  return fetch(paths[i++],{cache:"no-cache"}).then(function(r){return r.ok?r.json():next();})
+    .catch(function(){return next();});})();}
+function mmss(t){var m=Math.floor(t/60),s=Math.floor(t%60);
+  return m+":"+(s<10?"0":"")+s;}
+
+var DOC=null, T=0, PLAYING=false, RAF=null, LAST=null, SLOTS={};
+
+/* Substitute the operator's own values into a line as it is drawn. Marked
+   placeholders stay visible when nothing has been supplied — the storyboard
+   never invents a figure, and neither does the player. */
+function fill(text){
+  var out=String(text==null?"":text);
+  var ph=(DOC.remix&&DOC.remix.placeholder)||"[operator supplies]";
+  (DOC.remix&&DOC.remix.slots||[]).forEach(function(s,i){
+    if(SLOTS[i]&&out.indexOf(ph)!==-1) out=out.split(ph).join(SLOTS[i]);
+  });
+  return out;
+}
+function markup(text){
+  var ph=(DOC.remix&&DOC.remix.placeholder)||"[operator supplies]";
+  var v=fill(text);
+  return esc(v).split(esc(ph)).join('<span class="slot">'+esc(ph)+"</span>");
+}
+
+/* ------------------------------- the scenes ------------------------------- */
+function sceneTitle(s){
+  var lines=(s.on_screen||[]);
+  return '<div class="scene title" data-act="title">' +
+    '<div class="mslogo"><span class="msgrid"><i></i><i></i><i></i><i></i></span>' +
+      "<span>Microsoft</span></div>" +
+    "<h1>"+esc(lines[0]||"")+"</h1>" +
+    (lines[1]?"<p>"+esc(lines[1])+"</p>":"") +
+    "</div>";
+}
+function sceneProblem(s){
+  return '<div class="scene problem" data-act="problem"><div class="plate"></div>' +
+    '<div class="cue">'+esc((s.shot||"").replace(/^B-roll — /,""))+"</div>" +
+    '<div class="narr">'+markup(s.narration)+"</div></div>";
+}
+/* Real product marks, matched by name against media/jewels/index.json.
+   These were blank grey tiles with a "·" in them — the reviewer counted that
+   as an unfixed defect, correctly. */
+var JEWEL_INDEX = null;
+// Resolved BEFORE the stage is built. Loading it after meant the scene HTML
+// was already constructed and the marks never made it in.
+var JEWELS_READY = fetch("media/jewels/index.json")
+  .then(function(r){ return r.ok ? r.json() : null; })
+  .then(function(d){ if(d) JEWEL_INDEX = d.jewels; })
+  .catch(function(){});
+
+function jewelsFor(lines){
+  if(!JEWEL_INDEX) return "";
+  var hay=lines.join(" ").toLowerCase(), seen={}, out=[];
+  JEWEL_INDEX.forEach(function(j){
+    if(seen[j.id]) return;
+    if((j.match||[]).some(function(m){ return hay.indexOf(m)>-1; })){
+      seen[j.id]=1; out.push(j);
+    }
+  });
+  if(!out.length) return "";
+  return '<div class="jewels">' + out.slice(0,3).map(function(j){
+    return '<img class="jw" src="'+j.file+'" alt="">';
+  }).join("") + "</div>";
+}
+function sceneOverview(s){
+  var p=s.panels||{};
+  var cols=Object.keys(p).map(function(k,i){
+    return '<div class="pcol" data-stagger="'+i+'"><div class="ph">'+
+        '<img class="ic" src="media/jewels/ic-'+
+          (i===0?"sources":i===1?"flow":"actions")+'.png" alt="">'+
+        '<span class="lbl">'+esc(k)+"</span></div>" +
+      '<div class="pbody">'+p[k].map(function(v){return "<div>"+markup(v)+"</div>";}).join("")+
+      "</div>"+jewelsFor(p[k])+"</div>";
+  }).join("");
+  var chevrons = '<img class="arrow" data-stagger="1" src="media/jewels/chevron.png" alt="">' +
+                 '<img class="arrow" data-stagger="2" src="media/jewels/chevron.png" alt="">';
+  return '<div class="scene overview" data-act="overview">' +
+    '<h2><img class="mark" src="media/jewels/copilot.png" alt="">Agent overview</h2>' +
+    '<div class="pgrid">'+cols+chevrons+"</div></div>";
+}
+function sceneWalkthrough(s){
+  return '<div class="scene walkthrough" data-act="walkthrough">' +
+    '<div class="laptop"><div class="lbar"><i></i><i></i><i></i>' +
+      "<b>"+esc(DOC.subject.display_name)+"</b></div>" +
+    '<div class="chat" id="chatFlow"></div>' +
+    '<div class="composer"><div class="box" id="composer">Message the agent</div></div>' +
+    "</div></div>";
+}
+function sceneClose(s){
+  var lines=(s.on_screen||[]);
+  return '<div class="scene close" data-act="close">' +
+    '<div class="cta">'+lines.slice(0,2).map(function(l){return "<div>"+esc(l)+"</div>";}).join("")+"</div>" +
+    (lines[2]?'<div class="fine">'+esc(lines[2])+"</div>":"") +
+    "</div>";
+}
+
+/* Act 4 is the only timed one: the chat plays out inside its own window, so
+   the turns arrive the way they do in the shipped recordings. */
+function renderWalkthrough(scene, t){
+  var flow=document.getElementById("chatFlow"), comp=document.getElementById("composer");
+  if(!flow) return;
+  var turns=scene.turns||[], span=scene.end-scene.start, per=span/turns.length;
+  var local=t-scene.start;
+  var html="", typing=null;
+
+  turns.forEach(function(turn,i){
+    var at=i*per, done=local>=at+per*0.55;
+    if(local<at) return;
+    if(turn.role==="operator"){
+      if(!done){ typing=fill(turn.text).slice(0, Math.max(0,
+        Math.floor(fill(turn.text).length*((local-at)/(per*0.55))))); return; }
+      html+='<div class="turn op">'+markup(turn.text)+"</div>";
+    } else {
+      var reveal=Math.min(1,(local-at)/(per*0.6));
+      var body=(turn.body||[]);
+      var show=Math.max(1,Math.ceil(body.length*reveal));
+      html+='<div class="turn ag"><div class="who">Agent</div><h4>'+esc(turn.heading)+"</h4><ul>"+
+        body.slice(0,show).map(function(b){return "<li>"+markup(b)+"</li>";}).join("")+"</ul>"+
+        (reveal>=1?'<div class="agentcall">↳ <b>Agent Calls:</b> '+esc(turn.agent_call)+"</div>":"")+
+        "</div>";
+    }
+  });
+  flow.innerHTML=html;
+  flow.scrollTop=flow.scrollHeight;
+  if(typing!==null){ comp.className="box typing";
+    comp.innerHTML=esc(typing)+'<span class="caret"></span>'; }
+  else { comp.className="box"; comp.textContent="Message the agent"; }
+}
+
+/* Motion, driven by T so the burned frames move.
+   88% of the previous cut was a held still because the static acts were
+   captured once and looped. Every act now animates on its own clock. */
+function animate(scene, el){
+  var p=Math.min(1,Math.max(0,(T-scene.start)/(scene.end-scene.start)));
+  if(scene.act==="overview"){
+    el.querySelectorAll("[data-stagger]").forEach(function(node){
+      var i=parseInt(node.getAttribute("data-stagger"),10);
+      var t=Math.min(1,Math.max(0,(p*(scene.end-scene.start)-(0.5+i*0.55))/0.9));
+      var e=t*t*(3-2*t);
+      node.style.opacity=e;
+      node.style.transform="translateY("+((1-e)*26).toFixed(2)+"px)";
+    });
+    var g=el.querySelector(".pgrid");
+    if(g) g.style.transform="scale("+(1+p*0.012).toFixed(4)+")";
+  } else if(scene.act==="title"){
+    var h=el.querySelector("h1");
+    var t=Math.min(1,p*3.2), e=t*t*(3-2*t);
+    if(h){ h.style.opacity=e; h.style.transform="translateY("+((1-e)*14).toFixed(2)+"px)"; }
+    el.style.setProperty("--z", (1+p*0.02).toFixed(4));
+    var l=el.querySelector(".mslogo");
+    if(l) l.style.transform="scale("+(1+p*0.02).toFixed(4)+")";
+  } else if(scene.act==="close"){
+    var c=el.querySelector(".cta");
+    var t=Math.min(1,p*4), e=t*t*(3-2*t);
+    if(c){ c.style.opacity=e;
+      c.style.transform="scale("+(0.965+e*0.035+p*0.012).toFixed(4)+")"; }
+  } else if(scene.act==="problem"){
+    var n=el.querySelector(".narr");
+    var t=Math.min(1,p*2.6), e=t*t*(3-2*t);
+    if(n){ n.style.opacity=e; n.style.transform="translateY("+((1-e)*18).toFixed(2)+"px)"; }
+  }
+}
+
+function paint(){
+  var scenes=DOC.scenes;
+  scenes.forEach(function(s,i){
+    var el=document.querySelectorAll(".scene")[i];
+    if(!el) return;
+    var on = T>=s.start && T<s.end;
+    el.classList.toggle("on", on);
+    if(on){
+      animate(s, el);
+      if(s.act==="walkthrough") renderWalkthrough(s, T);
+    }
+  });
+  document.getElementById("scrub").value=T;
+  document.getElementById("clock").textContent=mmss(T)+" / "+mmss(DOC.runtime_seconds);
+  document.querySelectorAll(".actchip").forEach(function(c,i){
+    c.classList.toggle("now", T>=scenes[i].start && T<scenes[i].end);
+  });
+}
+
+function tick(now){
+  if(!PLAYING) return;
+  if(LAST==null) LAST=now;
+  T += (now-LAST)/1000; LAST=now;
+  if(T>=DOC.runtime_seconds){ T=DOC.runtime_seconds; stop(); }
+  paint();
+  if(PLAYING) RAF=requestAnimationFrame(tick);
+}
+function play(){
+  if(T>=DOC.runtime_seconds) T=0;
+  PLAYING=true; LAST=null;
+  document.getElementById("playBtn").textContent="⏸ Pause";
+  RAF=requestAnimationFrame(tick);
+}
+function stop(){
+  PLAYING=false; LAST=null;
+  if(RAF) cancelAnimationFrame(RAF);
+  document.getElementById("playBtn").textContent="▶ Play the film";
+}
+
+function build(){
+  var s=DOC.scenes;
+  var stage='<div class="stage" id="stage">'+
+    sceneTitle(s[0])+sceneProblem(s[1])+sceneOverview(s[2])+
+    sceneWalkthrough(s[3])+sceneClose(s[4])+"</div>";
+
+  var chips=s.map(function(x){return '<button class="actchip" data-seek="'+x.start+'">'+
+    esc(x.act)+" · "+Math.round(x.start)+"s</button>";}).join("");
+
+  var slots=(DOC.remix&&DOC.remix.slots||[]).map(function(sl,i){
+    return '<div class="slotrow"><label>'+esc(sl.label || sl.path)+
+      '</label><input data-slot="'+i+'" value="'+esc(sl.value||"")+
+      '" placeholder="your customer\'s detail"></div>';
+  }).join("");
+
+  document.getElementById("shell").innerHTML =
+    '<div class="layout"><div>'+stage+
+      '<div class="transport">' +
+        '<button class="btn primary" id="playBtn">▶ Play the film</button>' +
+        '<button class="btn" id="restart">↻ Restart</button>' +
+        '<input type="range" id="scrub" min="0" max="'+DOC.runtime_seconds+'" step="0.1" value="0">' +
+        '<span class="clock" id="clock">0:00 / '+mmss(DOC.runtime_seconds)+"</span>" +
+      "</div>" +
+      '<div class="acts">'+chips+"</div>" +
+    "</div>" +
+    '<aside class="rail">' +
+      '<div class="card"><h2>'+esc(DOC.subject.display_name)+"</h2>" +
+        '<p>'+esc(DOC.subject.kind==="skill"?"Aggregated skill":"Library agent")+" · "+
+        Math.round(DOC.runtime_seconds)+"s · five acts, the same film as every industry " +
+        "recording in the catalog.</p>" +
+        '<p style="margin-top:8px"><a href="onepager.html?'+
+        (DOC.subject.kind==="skill"?"skill=":"agent=")+encodeURIComponent(DOC.subject.ref)+
+        '">Open the one-pager →</a></p></div>' +
+      (slots?'<div class="card"><h2>Make it yours</h2>' +
+        '<p>Fill these in and the film replays as your customer\'s demo. Nothing leaves ' +
+        'the browser, and anything you leave blank stays visibly marked rather than ' +
+        'invented.</p>'+slots+
+        '<button class="btn" id="applyRemix" style="margin-top:8px">Apply and replay</button>' +
+        "</div>":"") +
+      '<div class="card"><h2>Why it is a storyboard</h2>' +
+        '<p>This plays from generated data, not footage: no deployed agent, no ' +
+        'connection, nothing to configure. Approve the script here, then film it — ' +
+        'reviewing the storyboard <i>is</i> reviewing what would be shot.</p></div>' +
+    "</aside></div>";
+
+  document.getElementById("playBtn").onclick=function(){ PLAYING?stop():play(); };
+  document.getElementById("restart").onclick=function(){ T=0; paint(); play(); };
+  document.getElementById("scrub").oninput=function(){ T=parseFloat(this.value); paint(); };
+  document.querySelectorAll(".actchip").forEach(function(c){
+    c.onclick=function(){ T=parseFloat(c.getAttribute("data-seek")); paint(); };
+  });
+  var apply=document.getElementById("applyRemix");
+  if(apply) apply.onclick=function(){
+    document.querySelectorAll("[data-slot]").forEach(function(inp){
+      SLOTS[inp.getAttribute("data-slot")]=inp.value.trim();
+    });
+    T=0; paint(); play();
+  };
+  paint();
+}
+
+(function boot(){
+  var agent=qs("agent"), skill=qs("skill");
+  if(qs("overlay")){
+    document.documentElement.classList.add("overlay-only");
+    var css=document.createElement("style");
+    css.textContent=".overlay-only body>header,.overlay-only body>footer,"+
+      ".overlay-only .rail,.overlay-only .transport,.overlay-only .acts,"+
+      ".overlay-only .crumbs{display:none!important}"+
+      ".overlay-only body{margin:0;overflow:hidden;background:#0b1020}"+
+      ".overlay-only .wrap,.overlay-only .layout{max-width:none;padding:0;margin:0;"+
+      "display:block;width:100vw;height:100vh}"+
+      ".overlay-only #stage{width:100vw!important;height:100vh!important;"+
+      "border-radius:0!important;aspect-ratio:auto!important;box-shadow:none!important}";
+    document.head.appendChild(css);
+  }
+  var kind = skill?"skill":"agent";
+  var ref = skill||agent;
+  if(!ref){
+    document.getElementById("shell").innerHTML =
+      '<div class="err"><b>Nothing to play.</b><br>Add <code>?agent=&lt;name&gt;</code> or ' +
+      '<code>?skill=&lt;ref&gt;</code>.<br><br><a href="agents.html">Browse the library</a></div>';
+    return;
+  }
+  var slug=ref.split("/").pop();
+  document.getElementById("kindPill").textContent = kind==="skill"?"aggregated skill":"library agent";
+  getJSON(["media/walkthroughs/"+kind+"-"+slug+".json"]).then(function(doc){
+    if(!doc){
+      document.getElementById("shell").innerHTML =
+        '<div class="err"><b>No storyboard for '+esc(ref)+'.</b><br>' +
+        'Generate one with <code>python3 scripts/build_walkthrough.py</code>.</div>';
+      return;
+    }
+    DOC=doc;
+    document.title=doc.subject.display_name+" — RAPPVision";
+    JEWELS_READY.then(build);
+  });
+})();
+</script>
+</body>
+</html>

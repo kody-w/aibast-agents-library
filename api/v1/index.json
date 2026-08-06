@@ -1,0 +1,111 @@
+{
+  "schema": "aibast-api/1.0",
+  "generated": "2026-08-06T21:59:03.554909+00:00",
+  "name": "AIBAST Agents Library API",
+  "spec": "rapp-static-api/1.0",
+  "base_urls": {
+    "pages": "https://microsoft.github.io/aibast-agents-library/api/v1",
+    "raw": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/api/v1"
+  },
+  "docs": "https://github.com/microsoft/aibast-agents-library/blob/main/docs/API.md",
+  "endpoints": {
+    "agents": "agents.json",
+    "agent_detail": "agents/{publisher}/{slug}.json",
+    "categories": "categories.json",
+    "publishers": "publishers.json",
+    "metrics": "metrics.json",
+    "aggregated": "aggregated.json",
+    "status": "status.json",
+    "badge": "badge.json",
+    "registry": "../../registry.json"
+  },
+  "extensions": {
+    "ms-rapp-badge/1.0": {
+      "spec": "rapp/ext/ms-rapp-badge-1.0/SPEC.md",
+      "originated_by": "ms-rapp",
+      "human_ui": {
+        "badges": "https://microsoft.github.io/aibast-agents-library/wall.html"
+      },
+      "llms_lines": [
+        "- [Certification roster]({PAGES}/api/v1/certified.json): verifiable publisher badges, checkable per username."
+      ],
+      "agent_recipes": [
+        {
+          "goal": "Verify a publisher",
+          "get": "certified/{username}.json",
+          "then": "Lowercase the username first. A 404 and certified=false both mean not certified \u2014 neither is an error to retry."
+        }
+      ],
+      "endpoints": [
+        "badges.json",
+        "badges/{badge_id}.json",
+        "certified.json",
+        "certified/{username}.json",
+        "certified/{username}/badge.json",
+        "certified/{username}/{badge_id}/badge.json",
+        "wall.json"
+      ],
+      "namespaces": [
+        "badges.json",
+        "badges/",
+        "certified.json",
+        "certified/",
+        "wall.json"
+      ]
+    },
+    "ms-rapp-blog/1.0": {
+      "spec": "rapp/ext/ms-rapp-blog-1.0/SPEC.md",
+      "originated_by": "ms-rapp",
+      "human_ui": {
+        "blog": "https://microsoft.github.io/aibast-agents-library/blog.html"
+      },
+      "llms_lines": [
+        "- [Field notes index]({PAGES}/api/v1/blog/index.json): posts on how this is built; each carries a raw_url."
+      ],
+      "agent_recipes": [
+        {
+          "goal": "Read how the platform is built and why",
+          "get": "blog/index.json",
+          "then": "Each post carries raw_url for the Markdown, or subscribe to blog/feed.json (JSON Feed 1.1)."
+        }
+      ],
+      "endpoints": [
+        "blog/index.json",
+        "blog/posts/{slug}.json",
+        "blog/feed.json"
+      ],
+      "namespaces": [
+        "blog/"
+      ]
+    },
+    "ms-rapp-brain/1.0": {
+      "spec": "rapp/ext/ms-rapp-brain-1.0/SPEC.md",
+      "originated_by": "ms-rapp",
+      "reader": "https://microsoft.github.io/aibast-agents-library/brain.html",
+      "human_ui": {
+        "docs": "https://microsoft.github.io/aibast-agents-library/brain.html"
+      },
+      "llms_lines": [
+        "- [Documentation vault index]({PAGES}/api/v1/brain/index.json): every note, with its links and backlinks.",
+        "- [Vault reader]({PAGES}/brain.html): the same notes for humans; the folder also opens in Obsidian."
+      ],
+      "agent_recipes": [
+        {
+          "goal": "Learn how the platform works",
+          "get": "brain/index.json",
+          "then": "Each note carries raw_url; follow .links to traverse the documentation graph, or fetch llms-full.txt for everything inline."
+        }
+      ],
+      "endpoints": [
+        "brain/index.json",
+        "brain/notes/{slug}.json",
+        "brain/tags.json",
+        "brain/graph.json",
+        "brain/_manifest.json"
+      ],
+      "namespaces": [
+        "brain/"
+      ]
+    }
+  }
+}
