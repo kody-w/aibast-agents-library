@@ -1,0 +1,188 @@
+{
+  "schema": "aibast-config-guide/1.0",
+  "slug": "contract-review-agent",
+  "display_name": "Contract Review Agent",
+  "industries": [
+    "Professional Services",
+    "Consulting"
+  ],
+  "lede": "Automate contract review to make negotiations faster, lower-risk and more likely to close.",
+  "personas": [
+    "Legal Operations",
+    "Attorneys",
+    "Executives"
+  ],
+  "note": "A configuration guide, not a deployment. Every product named here is one this solution actually declares; where a step is a judgement call it says so rather than inventing a value.",
+  "slides": [
+    {
+      "id": "title",
+      "kind": "title",
+      "title": "Contract Review Agent",
+      "sub": "Configuration guide \u00b7 Copilot Studio and GitHub Copilot",
+      "kicker": "Professional Services \u00b7 Consulting"
+    },
+    {
+      "id": "outcome",
+      "kind": "statement",
+      "kicker": "What you are building",
+      "title": "A reviewer that reads the contract and shows its working",
+      "body": "Legal Operations, attorneys and executives get a first-pass review in minutes instead of days: the clauses that differ from the standard, the risk each one carries, and the redline to send back. Nothing is signed, sent or altered by the agent \u2014 it prepares the work and a person decides.",
+      "tiles": [
+        {
+          "label": "For",
+          "value": "Legal Operations \u00b7 Attorneys \u00b7 Executives"
+        },
+        {
+          "label": "It reads",
+          "value": "The contract, the clause library, prior negotiated positions"
+        },
+        {
+          "label": "It never",
+          "value": "Sends, signs, or changes a document without a person"
+        }
+      ]
+    },
+    {
+      "id": "architecture",
+      "kind": "architecture",
+      "kicker": "End to end",
+      "title": "Where it sits in the estate",
+      "note": "Drawn from what this solution declares, not from a template. The four columns are the same everywhere in the catalog so two solutions can be compared."
+    },
+    {
+      "id": "microsoft-path",
+      "kind": "products",
+      "kicker": "The Microsoft path",
+      "title": "One story, end to end",
+      "body": "Each product here is one this solution declares. Nothing is added to lengthen the list.",
+      "rows": [
+        {
+          "product": "SharePoint",
+          "id": "sharepoint",
+          "role": "Where the contracts and the clause library already live. The agent reads in place, under the caller's own permissions \u2014 documents are not copied into a second store."
+        },
+        {
+          "product": "Microsoft Word",
+          "id": "word",
+          "role": "Where the redline is produced and reviewed, because that is where legal teams already work."
+        },
+        {
+          "product": "Microsoft Copilot Studio",
+          "id": "microsoft-copilot-studio",
+          "role": "The agent itself: the topics, the knowledge sources, and the guardrails that decide what it may do unattended."
+        },
+        {
+          "product": "Microsoft Teams",
+          "id": "microsoft-teams",
+          "role": "Where the reviewer is asked to approve. Optional, and the usual choice when review is a conversation rather than a queue."
+        },
+        {
+          "product": "Microsoft Dataverse",
+          "id": "dataverse",
+          "role": "Where review outcomes are recorded so the same clause is not re-argued every quarter. Optional until you want the history."
+        }
+      ]
+    },
+    {
+      "id": "adventure",
+      "kind": "adventure",
+      "kicker": "Choose your own adventure",
+      "title": "If a non-Microsoft system is already in place",
+      "body": "These are real integrations and there is no need to rip them out. Each row gives the Microsoft alternative so the choice is explicit rather than accidental.",
+      "rows": [
+        {
+          "need": "Where contracts are stored",
+          "outside": "A third-party CLM or document store",
+          "outside_how": "Reach it through a Power Platform connector or its REST API from Copilot Studio.",
+          "microsoft": "SharePoint",
+          "microsoft_id": "sharepoint",
+          "why": "Already governed by the tenant's retention, sensitivity labels and access reviews \u2014 nothing new to secure."
+        },
+        {
+          "need": "E-signature",
+          "outside": "An external signature provider",
+          "outside_how": "Call it from Power Automate at the point a human approves.",
+          "microsoft": "Power Automate + the provider's connector",
+          "microsoft_id": "power-automate",
+          "why": "Microsoft has no signature product; the honest Microsoft answer is to orchestrate the provider you already have rather than pretend otherwise."
+        },
+        {
+          "need": "Where the reviewer is asked to approve",
+          "outside": "Email or a ticketing queue",
+          "outside_how": "Keep it: an approval mail is a legitimate surface.",
+          "microsoft": "Microsoft Teams",
+          "microsoft_id": "microsoft-teams",
+          "why": "The approval happens where the conversation about the clause is already happening, so the context is not lost between tools."
+        },
+        {
+          "need": "Reporting on cycle time and risk",
+          "outside": "An external BI tool",
+          "outside_how": "Point it at Dataverse; the data is queryable.",
+          "microsoft": "Power BI",
+          "microsoft_id": "power-bi",
+          "why": "Reads Dataverse directly with row-level security intact, so the report cannot show a reviewer a contract they may not open."
+        }
+      ]
+    },
+    {
+      "id": "copilot-studio",
+      "kind": "steps",
+      "kicker": "Configure \u00b7 harness 1",
+      "title": "Copilot Studio",
+      "body": "The authoritative steps are in the product documentation; this is the order that matters and the decisions that are easy to get wrong.",
+      "steps": [
+        "Create the agent and set its instructions from this solution's description \u2014 not a generic assistant prompt.",
+        "Add the contract library as a knowledge source and scope it to the sites the reviewer may already open. Scope at the source, not in the prompt.",
+        "Add the clause-comparison tool. This is the deterministic part and it must not be left to the model \u2014 see the synthetic-data slide for the single file that carries it.",
+        "Set the authentication mode so the agent acts AS the signed-in user, not as a service principal. A service principal sees every contract in the tenant, which is the single most common mistake here.",
+        "Turn off autonomous actions for anything that writes. The agent prepares a redline; a person sends it.",
+        "Publish to Teams only after testing in the maker portal, and test with an account that has ordinary permissions rather than yours."
+      ]
+    },
+    {
+      "id": "github-copilot",
+      "kind": "steps",
+      "kicker": "Configure \u00b7 harness 2",
+      "title": "GitHub Copilot",
+      "body": "The same solution, built as a single-file agent a developer runs locally before anything touches a tenant.",
+      "steps": [
+        "Install the brainstem with the one-liner; it takes the repository and starts on port 7071.",
+        "Drop the toasted skill into the agents folder. It is one file: the instructions the model reads and the Python the brainstem runs.",
+        "Point it at synthetic data first \u2014 never a real contract on a first run.",
+        "Ask it the three questions on the verification slide and read the answers rather than checking that it responded.",
+        "When it holds up locally, the same manifest is what you configure in Copilot Studio. The local run is the cheap rehearsal."
+      ]
+    },
+    {
+      "id": "synthetic",
+      "kind": "synthetic",
+      "kicker": "Data you can demo on",
+      "title": "Synthetic contracts, in one file",
+      "body": "Never demo on a real contract, and never invent numbers you cannot defend. The BlastBox pattern gives an entire fictional company \u2014 its paper, its clause library, its negotiated positions \u2014 so a demo is realistic and obviously not a customer.",
+      "points": [
+        "A fictional company, consistently named, so nothing can be mistaken for a real counterparty.",
+        "The generator ships as a toasted skill: the instructions and the Python are one file, and the Python is extracted byte for byte rather than re-derived.",
+        "Hand the file to an AI and it produces the data end to end; hand it to a brainstem and it registers as a tool. Same file.",
+        "Every generated artifact carries a synthetic-data badge, so a screenshot can never be mistaken for a real review."
+      ]
+    },
+    {
+      "id": "verify",
+      "kind": "steps",
+      "kicker": "Before you show it to anyone",
+      "title": "Prove it, do not assume it",
+      "body": "Three questions that catch the failures this solution actually has.",
+      "steps": [
+        "Ask it to review a contract the demo account may NOT open. It should decline, not answer \u2014 that proves the permission model, and it is the one an auditor asks about.",
+        "Ask it about a clause the library does not cover. It should say it has no position rather than invent one.",
+        "Ask it for the redline and check the citation on each change. A change with no source is the failure mode that loses trust in the room."
+      ]
+    },
+    {
+      "id": "close",
+      "kind": "close",
+      "title": "Get started on your agentic journey today.",
+      "sub": "Talk to your Microsoft representative to learn more."
+    }
+  ]
+}

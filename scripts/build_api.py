@@ -326,6 +326,45 @@ def main() -> int:
     if ve:
         changed += stable_write(API / "video-engagement.json", dict(ve))
 
+    # Export engagement: what the export button reads to find its tally, and
+    # what the popularity workflow ranks on.
+    ee = load("state/export_engagement.json", None)
+    if ee:
+        changed += stable_write(API / "export-engagement.json", dict(ee))
+
+    pop = load("state/popularity.json", None)
+    if pop:
+        changed += stable_write(API / "popularity.json", dict(pop))
+
+    # Configuration guides: one document per solution, and an index so a
+    # consumer can find which solutions have one without guessing at URLs.
+    guides_dir = REPO_ROOT / "data" / "config_guides"
+    if guides_dir.is_dir():
+        kept_cg, index = set(), []
+        for src in sorted(guides_dir.glob("*.json")):
+            g = load(f"data/config_guides/{src.name}", None)
+            if not g:
+                continue
+            p = API / "config-guides" / src.name
+            kept_cg.add(p)
+            changed += stable_write(p, dict(g))
+            index.append({
+                "slug": g.get("slug"),
+                "display_name": g.get("display_name"),
+                "industries": g.get("industries", []),
+                "slides": len(g.get("slides", [])),
+                "page_url": f"{PAGES_BASE}/config.html?solution={g.get('slug')}",
+            })
+        cg_dir = API / "config-guides"
+        if cg_dir.exists():
+            for p in cg_dir.glob("*.json"):
+                if p not in kept_cg and p.name != "index.json":
+                    p.unlink(); changed += 1
+        changed += stable_write(API / "config-guides" / "index.json", {
+            "schema": "aibast-api-config-guides/1.0", "generated": gen,
+            "count": len(index), "guides": index,
+        })
+
     onepagers = load("data/onepagers.json", None)
     if onepagers is not None:
         changed += stable_write(API / "onepagers.json", dict(onepagers))

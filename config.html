@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuration guide — AIBAST Agent Library</title>
+<meta name="description" content="How to configure an industry solution on the Copilot Studio and GitHub Copilot harness: the Microsoft path end to end, the alternatives where another system is already in place, and synthetic data to demo on. Slides, exportable to PowerPoint.">
+<style>
+/* ══ ms-rapp shared design language ═════════════════════════════════════
+   These tokens and the header/footer/button/card rules below are identical
+   on every page of this site. Page-specific rules follow after the marker. */
+:root {
+  --bg: #faf9f8; --bg-soft: #f5f4f3; --panel: #ffffff; --panel-2: #f5f4f3;
+  --border: #edebe9; --text: #323130; --text-dim: #605e5c; --text-faint: #a19f9d;
+  --accent: #0078d4; --accent-hover: #106ebe; --accent-pressed: #005a9e;
+  --accent-2: #4f52c9; --accent-soft: rgba(0,120,212,.08);
+  --ok: #107c10; --warn: #d83b01; --gold: #b8912d;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.1), 0 1.6px 3.6px rgba(0,0,0,.13);
+  --radius: 8px; --radius-lg: 12px; --maxw: 1180px;
+}
+[data-theme="dark"] {
+  --bg: #1b1a19; --bg-soft: #201f1e; --panel: #252423; --panel-2: #2d2c2b;
+  --border: #3b3a39; --text: #f3f2f1; --text-dim: #c8c6c4; --text-faint: #797775;
+  --accent: #2899f5; --accent-hover: #3aa0f3; --accent-pressed: #6cb8f6;
+  --accent-2: #9ea3f8; --accent-soft: rgba(40,153,245,.14);
+  --ok: #92c353; --warn: #f1707b; --gold: #d9b24c;
+  --shadow: 0 0.3px 0.9px rgba(0,0,0,.32), 0 1.6px 3.6px rgba(0,0,0,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{max-width:100%;overflow-x:hidden}
+body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  color:var(--text);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+header.site{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav{display:flex;align-items:center;gap:18px;padding:12px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--text);white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand .mark{color:var(--accent);display:inline-flex}
+.brand .mark svg{width:19px;height:19px}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:var(--text-dim);font-size:13.5px;padding:5px 10px;border-radius:8px}
+.nav-links a:hover{color:var(--text);background:var(--panel-2);text-decoration:none}
+.nav-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
+  width:32px;height:32px;border-radius:6px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center}
+.icon-btn svg{width:15px;height:15px}
+.icon-btn:hover{color:var(--text);border-color:var(--text-faint);text-decoration:none}
+footer.site{margin-top:20px;border-top:1px solid var(--border);padding:26px 0 44px}
+.foot{display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--text-faint)}
+.foot a{color:var(--text-dim)}
+.foot .copy{width:100%;margin-top:4px}
+@media (max-width:560px){.nav-links{order:3;width:100%}}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border:1px solid var(--border);
+  border-radius:6px;background:var(--panel);color:var(--text);text-decoration:none;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:var(--text-faint);text-decoration:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+/* ══ page-specific ══════════════════════════════════════════════════════ */
+
+.head{padding:34px 0 14px}
+.head .crumb{font-size:12px;color:var(--text-faint);letter-spacing:.04em;text-transform:uppercase;
+  font-weight:600;margin-bottom:8px}
+.head h1{font-size:clamp(24px,4vw,34px);font-weight:700;letter-spacing:-.02em;line-height:1.16}
+.head p{color:var(--text-dim);max-width:72ch;font-size:15.5px;margin-top:8px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;align-items:center}
+.deck-status{font-size:13px;color:var(--text-faint);min-height:1em}
+.exp-count{font-size:12px;color:var(--text-faint)}
+
+/* The stage is a real 16:9 box so what is on screen is what lands in the file. */
+.stage{position:relative;width:100%;aspect-ratio:16/9;background:var(--panel);
+  border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);
+  overflow:hidden}
+.slide{position:absolute;inset:0;padding:4.2% 4.6%;display:none;flex-direction:column;
+  container-type:size}
+.slide.on{display:flex}
+/* Type scales with the stage, so a slide reads the same at any window size. */
+.slide .kick{font-size:2.4cqh;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:1.6cqh}
+.slide h2{font-size:6.4cqh;font-weight:700;letter-spacing:-.02em;line-height:1.14}
+.slide .body{font-size:3.5cqh;color:var(--text-dim);max-width:80ch;margin-top:1.8cqh;
+  line-height:1.5}
+.slide .sub{font-size:3.1cqh;color:var(--text-faint);margin-top:1.2cqh}
+
+.slide.dark{background:linear-gradient(140deg,#070f26,#141a3c 60%,#25184a);color:#fff;
+  justify-content:center}
+.slide.dark h2{color:#fff;font-size:9cqh}
+.slide.dark .kick{color:#e2669a}
+.slide.dark .body,.slide.dark .sub{color:#c7cbe6}
+.slide.dark .rule{width:7cqh;height:.9cqh;border-radius:1cqh;background:#e2669a;margin-bottom:2.4cqh}
+
+.tiles{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:1.8cqh;margin-top:auto}
+.tile{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:2.4cqh}
+.tile .lab{font-size:2.3cqh;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accent)}
+.tile .val{font-size:3cqh;margin-top:1cqh;line-height:1.35}
+
+.prows{display:flex;flex-direction:column;gap:1.2cqh;margin-top:2.4cqh}
+.prow{display:flex;gap:2cqh;align-items:center;background:var(--panel);border:1px solid var(--border);
+  border-radius:9px;padding:1.8cqh 2.2cqh}
+.prow img{width:5.2cqh;height:5.2cqh;object-fit:contain;flex:0 0 auto}
+.prow .chip{width:5.2cqh;height:5.2cqh;border-radius:8px;background:var(--accent-soft);
+  color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;
+  font-size:3cqh;flex:0 0 auto}
+.prow b{font-size:3.1cqh;display:block}
+.prow span{font-size:2.7cqh;color:var(--text-dim);line-height:1.4}
+
+table.adv{width:100%;border-collapse:separate;border-spacing:0 1cqh;margin-top:2cqh}
+table.adv th{font-size:2.2cqh;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--text-faint);text-align:left;padding:0 1.4cqh}
+table.adv th:last-child{color:var(--accent)}
+table.adv td{background:var(--panel);border:1px solid var(--border);padding:1.6cqh 1.4cqh;
+  font-size:2.7cqh;vertical-align:top;line-height:1.4}
+table.adv td:first-child{border-radius:8px 0 0 8px;font-weight:650;font-size:2.9cqh}
+table.adv td:last-child{border-radius:0 8px 8px 0;background:var(--accent-soft);
+  border-color:var(--accent)}
+table.adv td b{display:block;font-size:2.9cqh;margin-bottom:.5cqh}
+table.adv td small{color:var(--text-dim);font-size:2.5cqh}
+table.adv td .with{display:flex;gap:1.2cqh;align-items:flex-start}
+table.adv td .with img{width:3.4cqh;height:3.4cqh;object-fit:contain;margin-top:.3cqh;flex:0 0 auto}
+
+ol.steps{list-style:none;margin-top:2.4cqh;display:flex;flex-direction:column;gap:1.4cqh}
+ol.steps li{display:flex;gap:1.8cqh;align-items:flex-start;font-size:3cqh;line-height:1.4}
+ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;background:var(--accent);
+  color:#fff;font-size:2.4cqh;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+.synth{display:grid;grid-template-columns:1.25fr 1fr;gap:3cqh;margin-top:2cqh;flex:1;min-height:0}
+.synth ul{list-style:none;margin-top:1.8cqh;display:flex;flex-direction:column;gap:1.4cqh}
+.synth ul li{font-size:2.9cqh;color:var(--text-dim);line-height:1.4;padding-left:2.6cqh;
+  position:relative}
+.synth ul li::before{content:"";position:absolute;left:0;top:1.4cqh;width:1.1cqh;height:1.1cqh;
+  border-radius:50%;background:var(--accent-2)}
+.onefile{background:#070f26;border-radius:12px;padding:2.6cqh;display:flex;flex-direction:column;
+  gap:1.4cqh}
+.onefile .fname{font-family:Consolas,ui-monospace,monospace;font-size:3cqh;font-weight:700;
+  color:#e2669a}
+.onefile .part{background:#14203f;border:1px solid #2a3a66;border-radius:8px;padding:1.6cqh}
+.onefile .part b{display:block;color:#fff;font-size:2.7cqh}
+.onefile .part span{color:#9ba3c4;font-size:2.4cqh}
+.onefile .cap{color:#8c93b5;font-size:2.4cqh;font-style:italic;text-align:center;margin-top:auto}
+
+.arch-frame{flex:1;min-height:0;margin-top:2cqh;display:flex;align-items:center;
+  justify-content:center;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden}
+.arch-frame img{max-width:100%;max-height:100%;object-fit:contain}
+.arch-frame .miss{color:var(--text-faint);font-size:3cqh;padding:3cqh;text-align:center}
+
+.controls{display:flex;align-items:center;gap:14px;margin:14px 0 6px;flex-wrap:wrap}
+.controls .pos{font-size:13px;color:var(--text-dim);font-variant-numeric:tabular-nums}
+.controls .spacer{margin-left:auto}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots button{width:9px;height:9px;padding:0;border-radius:50%;border:1px solid var(--border);
+  background:var(--panel-2);cursor:pointer}
+.dots button[aria-current=true]{background:var(--accent);border-color:var(--accent)}
+.hint{font-size:12.5px;color:var(--text-faint);margin-bottom:34px}
+@media (max-width:700px){
+  .tiles{grid-auto-flow:row}
+  .synth{grid-template-columns:1fr}
+}
+@media print{header.site,.controls,.actions,footer.site,.hint{display:none}
+  body{background:#fff}.slide{display:flex!important;position:static;page-break-after:always}
+  .stage{aspect-ratio:auto;height:auto;border:0;box-shadow:none}}
+</style>
+</head>
+<body>
+<!-- ══ shared site header — identical on every page ══ -->
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><path d="M16.75 13.6v6.3M13.6 16.75h6.3"/></svg></span>
+      AIBAST Agent Library
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="agents.html">Library</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="metrics.html">Metrics</a>
+      <a href="api.html">API</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle light and dark" aria-label="Toggle light and dark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/microsoft/aibast-agents-library" title="GitHub repository" aria-label="GitHub repository">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="head">
+    <div class="crumb" id="cCrumb">Configuration guide</div>
+    <h1 id="cTitle">Configuration guide</h1>
+    <p id="cLede"></p>
+    <p class="note-line" id="cNote" style="margin-top:14px;font-size:13.5px;color:var(--text-faint);max-width:80ch"></p>
+    <div class="actions">
+      <button class="btn primary" id="deckBtn">Export to PowerPoint</button>
+      <a class="btn" id="archLink" href="#">Reference architecture</a>
+      <a class="btn" id="solLink" href="#">The solution</a>
+      <span class="deck-status" id="deckStatus"></span>
+      <span class="exp-count" id="expCount"></span>
+    </div>
+  </section>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" aria-label="Previous slide">&larr; Back</button>
+    <button class="btn" id="nextBtn" aria-label="Next slide">Next &rarr;</button>
+    <span class="pos" id="pos"></span>
+    <span class="spacer"></span>
+    <div class="dots" id="dots" role="tablist" aria-label="Slides"></div>
+  </div>
+
+  <div class="stage" id="stage" tabindex="0" aria-live="polite"></div>
+  <p class="hint">Use the arrow keys to move through the slides. Export takes the same
+     slides away as a PowerPoint file you can edit and present yourself.</p>
+</main>
+
+<footer class="site">
+  <div class="wrap foot">
+    <a href="index.html">Get started</a>
+    <a href="agents.html">Library</a>
+    <a href="solutions.html">Solutions</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="metrics.html">Metrics</a>
+    <a href="api.html">Static API</a>
+    <a href="scan.html">Scan</a>
+    <a href="wall.html">Wall of Fame</a>
+    <a href="brain.html">Docs Vault</a>
+    <a href="blog.html">Field Notes</a>
+    <a href="vbrainstem/">Run in your browser</a>
+    <a href="DISCLAIMER.md">Disclaimer</a>
+    <span class="copy">© 2026 Microsoft AIBAST. Some rights reserved. Status is what can be demonstrated today, not what is planned · <span id="rUpdated"></span></span>
+  </div>
+</footer>
+
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/pptxgen.min.js"></script>
+<script src="export-signal.js"></script>
+<script src="deck.js"></script>
+<script>
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+
+var GUIDE=null, PRODUCTS={products:[]}, ARCH=null, AT=0;
+
+function slug(){
+  var m=/[?&]solution=([^&]+)/.exec(location.search);
+  return m?decodeURIComponent(m[1]):"contract-review-agent";
+}
+
+/* A real mark when one exists, an initial chip when one does not. An
+   approximated logo on a Microsoft page is worse than a word. */
+function markOf(id){
+  var l=PRODUCTS.products||[];
+  for(var i=0;i<l.length;i++){ if(l[i].id===id && l[i].mark_status==="mark") return l[i].mark; }
+  return null;
+}
+function markTag(id,name,cls){
+  var p=markOf(id);
+  if(p) return '<img src="'+esc(p)+'" alt="'+esc(name)+'">';
+  return '<span class="'+(cls||"chip")+'">'+esc(String(name).replace(/^Microsoft /,"").charAt(0))+'</span>';
+}
+
+var R={
+  title:function(s){
+    return '<div class="rule"></div><div class="kick">'+esc(s.kicker||"")+'</div>'+
+      '<h2>'+esc(s.title)+'</h2><div class="sub">'+esc(s.sub||"")+'</div>';
+  },
+  statement:function(s){
+    return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
+      '<div class="body">'+esc(s.body||"")+'</div>'+
+      ((s.tiles||[]).length?'<div class="tiles">'+(s.tiles||[]).map(function(t){
+        return '<div class="tile"><div class="lab">'+esc(t.label)+'</div>'+
+               '<div class="val">'+esc(t.value)+'</div></div>';}).join("")+'</div>':"");
+  },
+  products:function(s){
+    return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
+      (s.body?'<div class="body">'+esc(s.body)+'</div>':"")+
+      '<div class="prows">'+(s.rows||[]).map(function(r){
+        return '<div class="prow">'+markTag(r.id,r.product)+
+          '<div><b>'+esc(r.product)+'</b><span>'+esc(r.role)+'</span></div></div>';
+      }).join("")+'</div>';
+  },
+  adventure:function(s){
+    return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
+      (s.body?'<div class="body">'+esc(s.body)+'</div>':"")+
+      '<table class="adv"><thead><tr><th>The need</th>'+
+      '<th>If you already run something else</th><th>The Microsoft path</th></tr></thead><tbody>'+
+      (s.rows||[]).map(function(r){
+        return '<tr><td>'+esc(r.need)+'</td>'+
+          '<td><b>'+esc(r.outside)+'</b><small>'+esc(r.outside_how)+'</small></td>'+
+          '<td><div class="with">'+markTag(r.microsoft_id,r.microsoft,"chip")+
+          '<div><b>'+esc(r.microsoft)+'</b><small>'+esc(r.why)+'</small></div></div></td></tr>';
+      }).join("")+'</tbody></table>';
+  },
+  steps:function(s){
+    return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
+      (s.body?'<div class="body">'+esc(s.body)+'</div>':"")+
+      '<ol class="steps">'+(s.steps||[]).map(function(t,i){
+        return '<li><span class="n">'+(i+1)+'</span><span>'+esc(t)+'</span></li>';
+      }).join("")+'</ol>';
+  },
+  synthetic:function(s){
+    return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
+      '<div class="synth"><div><div class="body">'+esc(s.body||"")+'</div><ul>'+
+      (s.points||[]).map(function(p){return "<li>"+esc(p)+"</li>";}).join("")+
+      '</ul></div><div class="onefile"><div class="fname">blastbox.skill.md</div>'+
+      '<div class="part"><b>Instructions</b><span>what a model reads and follows</span></div>'+
+      '<div class="part"><b>Python</b><span>what a brainstem runs, byte for byte</span></div>'+
+      '<div class="part"><b>Digest</b><span>so an edit in transit fails, not runs</span></div>'+
+      '<div class="cap">One artifact. Nothing to keep in sync.</div></div></div>';
+  },
+  architecture:function(s){
+    var href="architecture.html?solution="+encodeURIComponent(GUIDE.slug);
+    return '<div class="kick">'+esc(s.kicker||"")+'</div><h2>'+esc(s.title)+'</h2>'+
+      (s.note?'<div class="body">'+esc(s.note)+'</div>':"")+
+      '<div class="arch-frame">'+(ARCH
+        ? '<div class="miss">The full reference architecture for this solution is on '+
+          '<a href="'+href+'">its own page</a>, and it is slide '+
+          '4 of the exported deck.</div>'
+        : '<div class="miss">No generated architecture is on file for this solution yet.</div>')+
+      '</div>';
+  },
+  close:function(s){
+    return '<h2>'+esc(s.title)+'</h2><div class="sub">'+esc(s.sub||"")+'</div>';
+  }
+};
+
+function render(){
+  var stage=document.getElementById("stage"), dots=document.getElementById("dots");
+  stage.innerHTML=(GUIDE.slides||[]).map(function(s,i){
+    var fn=R[s.kind]||R.statement;
+    var dark=(s.kind==="title"||s.kind==="close");
+    return '<section class="slide'+(dark?" dark":"")+(i===0?" on":"")+'" data-i="'+i+'" '+
+      'role="tabpanel" aria-label="Slide '+(i+1)+'">'+fn(s)+'</section>';
+  }).join("");
+  dots.innerHTML=(GUIDE.slides||[]).map(function(s,i){
+    return '<button role="tab" data-i="'+i+'" aria-current="'+(i===0)+'" '+
+      'title="'+esc(s.title||("Slide "+(i+1)))+'"></button>';
+  }).join("");
+  dots.onclick=function(e){ var b=e.target.closest("button"); if(b) go(+b.dataset.i); };
+  go(0);
+}
+
+function go(i){
+  var n=(GUIDE.slides||[]).length; if(!n) return;
+  AT=Math.max(0,Math.min(n-1,i));
+  Array.prototype.forEach.call(document.querySelectorAll(".slide"),function(el){
+    el.classList.toggle("on",+el.dataset.i===AT); });
+  Array.prototype.forEach.call(document.querySelectorAll(".dots button"),function(el){
+    el.setAttribute("aria-current",String(+el.dataset.i===AT)); });
+  document.getElementById("pos").textContent=(AT+1)+" / "+n;
+  document.getElementById("prevBtn").disabled=AT===0;
+  document.getElementById("nextBtn").disabled=AT===n-1;
+}
+
+document.getElementById("prevBtn").onclick=function(){go(AT-1);};
+document.getElementById("nextBtn").onclick=function(){go(AT+1);};
+document.addEventListener("keydown",function(e){
+  if(e.target.matches("input,textarea")) return;
+  if(e.key==="ArrowRight"||e.key==="PageDown"){go(AT+1);e.preventDefault();}
+  if(e.key==="ArrowLeft"||e.key==="PageUp"){go(AT-1);e.preventDefault();}
+});
+
+/* The deck is built from the same object this page rendered from, so a slide
+   on screen and a slide in the file cannot disagree. */
+document.getElementById("deckBtn").onclick=function(){
+  var btn=this, st=document.getElementById("deckStatus");
+  var say=function(m){ st.textContent=m; };
+  if(!GUIDE){ say("Guide not loaded yet."); return; }
+  btn.disabled=true;
+  RappDeck.exportConfigGuide({guide:GUIDE, arch:ARCH, onStatus:say})
+    .catch(function(){})
+    .then(function(){ btn.disabled=false;
+      if(window.RappExport) RappExport.label(document.getElementById("expCount"),GUIDE.slug);
+    });
+};
+
+var s=slug();
+Promise.all([
+  fetch("api/v1/config-guides/"+s+".json",{cache:"no-cache"})
+    .then(function(r){ return r.ok?r.json():fetch("data/config_guides/"+s+".json")
+      .then(function(x){return x.json();}); }),
+  fetch("data/products.json",{cache:"no-cache"}).then(function(r){return r.ok?r.json():null;})
+    .catch(function(){return null;}),
+  fetch("data/architectures.json",{cache:"no-cache"}).then(function(r){return r.ok?r.json():null;})
+    .catch(function(){return null;})
+]).then(function(r){
+  GUIDE=r[0]; PRODUCTS=r[1]||{products:[]};
+  ARCH=((r[2]&&r[2].architectures)||[]).filter(function(a){return a.slug===GUIDE.slug;})[0]||null;
+  document.title=GUIDE.display_name+" — configuration guide — AIBAST Agent Library";
+  document.getElementById("cCrumb").textContent=
+    "Configuration guide · "+(GUIDE.industries||[]).join(" · ");
+  document.getElementById("cTitle").textContent=GUIDE.display_name;
+  document.getElementById("cLede").textContent=GUIDE.lede||"";
+  document.getElementById("cNote").textContent=GUIDE.note||"";
+  document.getElementById("archLink").href="architecture.html?solution="+encodeURIComponent(GUIDE.slug);
+  document.getElementById("solLink").href="onepager.html?solution="+encodeURIComponent(GUIDE.slug);
+  render();
+  if(window.RappExport) RappExport.label(document.getElementById("expCount"),GUIDE.slug);
+}).catch(function(){
+  document.getElementById("stage").innerHTML=
+    '<section class="slide on"><div class="body">No configuration guide is published for '+
+    esc(s)+' yet.</div></section>';
+});
+
+/* Shared theme toggle — same behaviour on every page. */
+(function(){
+  var k="aibast:theme", b=document.getElementById("themeToggle");
+  var t=localStorage.getItem(k)||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
+  document.documentElement.setAttribute("data-theme",t);
+  if(b) b.onclick=function(){
+    t=(document.documentElement.getAttribute("data-theme")==="dark")?"light":"dark";
+    document.documentElement.setAttribute("data-theme",t);
+    localStorage.setItem(k,t);
+  };
+})();
+</script>
+</body>
+</html>

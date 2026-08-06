@@ -1,7 +1,7 @@
 {
   "protocol": "ms-rapp-brain/1.0",
   "schema": "ms-rapp-brain-note/1.0",
-  "generated": "2026-08-06T22:11:14.804611+00:00",
+  "generated": "2026-08-06T22:37:12.697860+00:00",
   "slug": "concepts/kernel-and-distribution",
   "title": "Kernel and distribution",
   "summary": "The Linux model \u2014 a fast upstream kernel, a deliberate downstream build.",

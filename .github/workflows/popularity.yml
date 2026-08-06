@@ -1,0 +1,107 @@
+name: Popularity report
+
+# Which solutions are people actually using? The signals have been accumulating
+# for a while — exports, installs, plays, comments, likes — and nothing was
+# reading them together. This does, on a schedule, and writes the answer where
+# a person can find it without running anything.
+#
+# It also provisions what it measures: a solution with no Discussion has no
+# tally to react on, so seeding and tallying run first. Both are idempotent and
+# capped, so a run that adds nothing is the normal case, not a failure.
+
+on:
+  schedule:
+    - cron: '20 6 * * 1'        # Monday mornings, after the daily metrics job
+  workflow_dispatch:
+    inputs:
+      top:
+        description: 'How many solutions to show in the ranked table'
+        required: false
+        default: '20'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build_popularity.py'
+      - 'scripts/export_engagement.py'
+      - 'data/onepagers.json'
+      - 'data/config_guides/**'
+      - '.github/workflows/popularity.yml'
+
+permissions:
+  contents: write
+  discussions: write
+
+concurrency:
+  group: popularity-report
+  cancel-in-progress: false
+
+jobs:
+  rank:
+    runs-on: ubuntu-latest
+    env:
+      # Threads live in the repo the workflow runs in, so a fork ranks itself
+      # and upstream ranks itself after sync. Never cross-counts.
+      AIBAST_RATINGS_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Open a thread for solutions that have none
+        # Capped per run: creating discussions is rate-limited content
+        # creation, and a slow rollout over a few runs is fine. A solution
+        # with no thread is reported as "not launched", never as zero.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/export_engagement.py seed --limit 15
+        continue-on-error: true
+
+      - name: Ensure every thread carries an export tally
+        # Threads seeded before the export tally existed get it here. Without
+        # it there is nothing to react on, so the export count for that
+        # solution would read zero forever and look like disinterest.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/export_engagement.py tally --limit 40
+          python scripts/discussion_ratings.py tally --limit 60
+        continue-on-error: true
+
+      - name: Snapshot every engagement signal
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/export_engagement.py fetch
+          python scripts/video_engagement.py fetch
+          python scripts/discussion_ratings.py fetch
+
+      - name: Rank the solutions
+        run: python scripts/build_popularity.py --top ${{ github.event.inputs.top || '20' }}
+
+      - name: Publish the report to the run summary
+        # So the answer is readable from the Actions tab without cloning
+        # anything or knowing which file to open.
+        run: cat docs/POPULARITY.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Rebuild the static API
+        run: python scripts/build_api.py
+
+      - name: Fail if the report contradicts the snapshot
+        # A report that disagrees with the data it was built from is worse
+        # than no report, and it is exactly the failure nobody notices.
+        run: python -m pytest tests/test_popularity.py -q
+
+      - name: Commit the report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/ api/ docs/POPULARITY.md
+          if git diff --staged --quiet; then
+            echo "No change in engagement"
+          else
+            git commit -m "chore: popularity report $(date -u +%Y-%m-%d) [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi

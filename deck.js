@@ -829,13 +829,7 @@
     }
     var file = (displayName(o.kind, o.entry, o.story) || "agent")
       .replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-AIBAST.pptx";
-    return pptx.writeFile({ fileName: file }).then(function () {
-      say("Saved " + file);
-      return file;
-    }).catch(function (e) {
-      say("Export failed: " + (e && e.message ? e.message : e));
-      throw e;
-    });
+    return save(pptx, file, { kind: o.kind || "agent", slug: slugOf(o) }, say, o);
   }
 
 
@@ -934,8 +928,28 @@
       return Promise.reject(e);
     }
     var file = "AIBAST-Roadmap-" + (txt(r.updated) || "current") + ".pptx";
+    return save(pptx, file, { kind: "roadmap", slug: "roadmap" }, say, o);
+  }
+
+  /* --- every export leaves the building through here ----------------------
+     One function writes the file, so one function can record that it happened.
+     Wiring the signal into each exporter separately guarantees that the next
+     exporter someone adds is the one that never gets counted — and a
+     popularity report with a silent hole in it is worse than none, because
+     nothing tells you the hole is there.
+
+     The signal never gates the download: it fires after writeFile resolves and
+     its failure is swallowed. See export-signal.js for what is recorded and
+     what the number honestly means.
+  */
+  function save(pptx, file, sig, say, o) {
     return pptx.writeFile({ fileName: file }).then(function () {
       say("Saved " + file);
+      if (global.RappExport && !(o && o.noSignal)) {
+        try {
+          global.RappExport.signal(sig.kind, sig.slug, { silent: o && o.silent });
+        } catch (e) { /* a count is never worth breaking a download over */ }
+      }
       return file;
     }).catch(function (e) {
       say("Export failed: " + (e && e.message ? e.message : e));
@@ -943,6 +957,323 @@
     });
   }
 
+
+  /* --- the configuration guide -------------------------------------------
+     A guide is slides because that is how it gets used: opened in a room,
+     walked through, then taken away. The page renders the same objects, so a
+     slide on screen and a slide in the file cannot disagree.
+
+     Product marks are the real ones where a real one exists and a labelled
+     chip where it does not. An approximated logo on a Microsoft deck is worse
+     than a word.
+  */
+
+  function markPath(products, id) {
+    var list = (products && products.products) || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === id && list[i].mark_status === "mark") return list[i].mark;
+    }
+    return null;
+  }
+
+  /* A product row: mark if we have one, initial-chip if we do not. */
+  function productRow(pptx, s, products, row, x, y, w, h) {
+    var path = markPath(products, row.id);
+    if (path) {
+      s.addImage({ path: path, x: x + 0.1, y: y + (h - 0.42) / 2, w: 0.42, h: 0.42 });
+    } else {
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: x + 0.1, y: y + (h - 0.42) / 2, w: 0.42, h: 0.42, rectRadius: 0.08,
+        fill: { color: "EEEBFA" }, line: { color: "DDDDE8", width: 0.5 }
+      });
+      s.addText(txt(row.product).replace(/^Microsoft /, "").charAt(0), {
+        x: x + 0.1, y: y + (h - 0.42) / 2, w: 0.42, h: 0.42, align: "center",
+        fontFace: FONT, fontSize: 14, bold: true, color: BLUE, valign: "middle"
+      });
+    }
+    s.addText([
+      { text: txt(row.product), options: { bold: true, fontSize: 12, breakLine: true } },
+      { text: txt(row.role), options: { fontSize: 10, color: MUTED } }
+    ], {
+      x: x + 0.66, y: y, w: w - 0.78, h: h, valign: "middle",
+      fontFace: FONT, color: INK
+    });
+  }
+
+  function guideTitleSlide(pptx, g) {
+    var s = darkSlide(pptx);
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: 0.62, y: 2.0, w: 0.9, h: 0.09, rectRadius: 0.04,
+      fill: { color: PINK }, line: { type: "none" }
+    });
+    s.addText(txt(g.kicker || ""), {
+      x: 0.62, y: 1.5, w: W - 1.24, h: 0.36,
+      fontFace: FONT, fontSize: 12, bold: true, charSpacing: 1.4, color: PINK
+    });
+    s.addText(txt(g.title), {
+      x: 0.62, y: 2.3, w: W - 2.4, h: 1.3,
+      fontFace: FONT, fontSize: 42, bold: true, color: PAPER, valign: "middle"
+    });
+    s.addText(txt(g.sub), {
+      x: 0.62, y: 3.65, w: W - 3.2, h: 0.6,
+      fontFace: FONT, fontSize: 17, color: "C7CBE6", valign: "top"
+    });
+    footer(s, null, true);
+  }
+
+  function guideStatementSlide(pptx, sl, n) {
+    var s = lightSlide(pptx);
+    kicker(s, sl.kicker || "");
+    heading(s, sl.title, { size: 26 });
+    s.addText(txt(sl.body), {
+      x: 0.62, y: 1.5, w: W - 1.24, h: 1.5,
+      fontFace: FONT, fontSize: 15, color: INK, valign: "top",
+      lineSpacingMultiple: 1.25
+    });
+    var tiles = sl.tiles || [];
+    if (tiles.length) {
+      var gap = 0.18, tw = (W - 1.24 - gap * (tiles.length - 1)) / tiles.length;
+      tiles.forEach(function (t, i) {
+        var x = 0.62 + i * (tw + gap);
+        s.addShape(pptx.ShapeType.roundRect, {
+          x: x, y: 3.25, w: tw, h: 1.75, rectRadius: 0.08,
+          fill: { color: "F4F4F8" }, line: { color: "E3E3EC", width: 0.75 }
+        });
+        s.addText([
+          { text: txt(t.label).toUpperCase(),
+            options: { fontSize: 10, bold: true, color: BLUE, charSpacing: 1.1,
+                       breakLine: true } },
+          { text: txt(t.value), options: { fontSize: 12, color: INK } }
+        ], { x: x + 0.18, y: 3.38, w: tw - 0.36, h: 1.5, valign: "top",
+             fontFace: FONT, lineSpacingMultiple: 1.2 });
+      });
+    }
+    footer(s, n);
+  }
+
+  function guideProductsSlide(pptx, sl, products, n) {
+    var s = lightSlide(pptx);
+    kicker(s, sl.kicker || "");
+    heading(s, sl.title, { size: 26 });
+    if (sl.body) {
+      s.addText(txt(sl.body), {
+        x: 0.62, y: 1.32, w: W - 1.24, h: 0.4,
+        fontFace: FONT, fontSize: 12, color: MUTED, valign: "top"
+      });
+    }
+    var rows = (sl.rows || []).slice(0, 5);
+    var top = 1.85, h = Math.min(0.92, (H - top - 0.9) / Math.max(rows.length, 1));
+    rows.forEach(function (r, i) {
+      var y = top + i * (h + 0.1);
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: 0.62, y: y, w: W - 1.24, h: h, rectRadius: 0.06,
+        fill: { color: PAPER }, line: { color: "DDDDE8", width: 0.5 }
+      });
+      productRow(pptx, s, products, r, 0.62, y, W - 1.24, h);
+    });
+    footer(s, n);
+  }
+
+  function guideAdventureSlide(pptx, sl, products, n) {
+    var s = lightSlide(pptx);
+    kicker(s, sl.kicker || "");
+    heading(s, sl.title, { size: 26 });
+    if (sl.body) {
+      s.addText(txt(sl.body), {
+        x: 0.62, y: 1.32, w: W - 1.24, h: 0.4,
+        fontFace: FONT, fontSize: 12, color: MUTED, valign: "top"
+      });
+    }
+    var rows = (sl.rows || []).slice(0, 4);
+    var top = 1.9, h = Math.min(1.15, (H - top - 0.85) / Math.max(rows.length, 1));
+    var cw = [2.6, 4.0, 5.0];                    /* need · already there · Microsoft */
+    var cx = [0.62, 0.62 + cw[0] + 0.12, 0.62 + cw[0] + cw[1] + 0.24];
+    ["The need", "If you already run something else", "The Microsoft path"]
+      .forEach(function (t, i) {
+        s.addText(t.toUpperCase(), {
+          x: cx[i], y: top - 0.32, w: cw[i], h: 0.28,
+          fontFace: FONT, fontSize: 9.5, bold: true, charSpacing: 1.1,
+          color: i === 2 ? BLUE : MUTED
+        });
+      });
+    rows.forEach(function (r, i) {
+      var y = top + i * (h + 0.1);
+      box(pptx, s, { x: cx[0], y: y, w: cw[0], h: h, text: r.need, size: 10.5 });
+      box(pptx, s, { x: cx[1], y: y, w: cw[1], h: h, head: r.outside,
+                     text: r.outside_how, size: 8.5, headSize: 10,
+                     valign: "middle" });
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: cx[2], y: y, w: cw[2], h: h, rectRadius: 0.06,
+        fill: { color: "F2F6FC" }, line: { color: BLUE, width: 0.75 }
+      });
+      var path = markPath(products, r.microsoft_id);
+      if (path) s.addImage({ path: path, x: cx[2] + 0.12, y: y + 0.14, w: 0.3, h: 0.3 });
+      s.addText([
+        { text: txt(r.microsoft),
+          options: { bold: true, fontSize: 10.5, breakLine: true } },
+        { text: txt(r.why), options: { fontSize: 8.5, color: MUTED } }
+      ], { x: cx[2] + (path ? 0.5 : 0.14), y: y + 0.06, w: cw[2] - (path ? 0.64 : 0.28),
+           h: h - 0.12, valign: "top", fontFace: FONT, color: INK });
+    });
+    footer(s, n);
+  }
+
+  function guideStepsSlide(pptx, sl, n) {
+    var s = lightSlide(pptx);
+    kicker(s, sl.kicker || "");
+    heading(s, sl.title, { size: 26 });
+    if (sl.body) {
+      s.addText(txt(sl.body), {
+        x: 0.62, y: 1.3, w: W - 1.24, h: 0.4,
+        fontFace: FONT, fontSize: 12, color: MUTED, valign: "top"
+      });
+    }
+    var steps = (sl.steps || []).slice(0, 6);
+    var top = 1.85, h = Math.min(0.86, (H - top - 0.85) / Math.max(steps.length, 1));
+    steps.forEach(function (t, i) {
+      var y = top + i * (h + 0.08);
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: 0.62, y: y, w: 0.42, h: 0.42, rectRadius: 0.21,
+        fill: { color: BLUE }, line: { type: "none" }
+      });
+      s.addText(String(i + 1), {
+        x: 0.62, y: y, w: 0.42, h: 0.42, align: "center", valign: "middle",
+        fontFace: FONT, fontSize: 12, bold: true, color: PAPER
+      });
+      s.addText(txt(t), {
+        x: 1.18, y: y - 0.04, w: W - 1.9, h: h,
+        fontFace: FONT, fontSize: 12.5, color: INK, valign: "top",
+        lineSpacingMultiple: 1.15
+      });
+    });
+    footer(s, n);
+  }
+
+  function guideSyntheticSlide(pptx, sl, n) {
+    var s = lightSlide(pptx);
+    kicker(s, sl.kicker || "");
+    heading(s, sl.title, { size: 26 });
+    s.addText(txt(sl.body), {
+      x: 0.62, y: 1.4, w: 7.2, h: 1.5,
+      fontFace: FONT, fontSize: 14, color: INK, valign: "top",
+      lineSpacingMultiple: 1.25
+    });
+    bulletList(s, sl.points, { y: 3.0, w: 7.2, h: 3.2, size: 12 });
+    /* The single file, drawn as a single file — the whole point of the
+       pattern is that there is not a second one. */
+    s.addShape(pptx.ShapeType.roundRect, {
+      x: 8.2, y: 1.5, w: 4.5, h: 4.4, rectRadius: 0.1,
+      fill: { color: STAGE }, line: { type: "none" }
+    });
+    s.addText("blastbox.skill.md", {
+      x: 8.45, y: 1.75, w: 4.0, h: 0.35,
+      fontFace: "Consolas", fontSize: 13, bold: true, color: PINK
+    });
+    [["Instructions", "what a model reads and follows"],
+     ["Python", "what a brainstem runs, byte for byte"],
+     ["Digest", "so an edit in transit fails, not runs"]
+    ].forEach(function (p, i) {
+      s.addShape(pptx.ShapeType.roundRect, {
+        x: 8.45, y: 2.35 + i * 1.05, w: 4.0, h: 0.85, rectRadius: 0.06,
+        fill: { color: "14203F" }, line: { color: "2A3A66", width: 0.5 }
+      });
+      s.addText([
+        { text: p[0], options: { bold: true, fontSize: 11, color: PAPER,
+                                 breakLine: true } },
+        { text: p[1], options: { fontSize: 9, color: "9BA3C4" } }
+      ], { x: 8.6, y: 2.4 + i * 1.05, w: 3.7, h: 0.75, valign: "middle",
+           fontFace: FONT });
+    });
+    s.addText("One artifact. Nothing to keep in sync.", {
+      x: 8.45, y: 5.5, w: 4.0, h: 0.3, align: "center",
+      fontFace: FONT, fontSize: 10, italic: true, color: "8C93B5"
+    });
+    footer(s, n);
+  }
+
+  function guideCloseSlide(pptx, sl, n) {
+    var s = darkSlide(pptx);
+    s.addText(txt(sl.title), {
+      x: 0.62, y: 2.6, w: W - 1.24, h: 1.0,
+      fontFace: FONT, fontSize: 34, bold: true, color: PAPER, valign: "middle"
+    });
+    s.addText(txt(sl.sub), {
+      x: 0.62, y: 3.7, w: W - 1.24, h: 0.5,
+      fontFace: FONT, fontSize: 16, color: "C7CBE6"
+    });
+    footer(s, n, true);
+  }
+
+  function exportConfigGuide(o) {
+    o = o || {};
+    var say = o.onStatus || function () {};
+    var g = o.guide;
+    if (typeof PptxGenJS === "undefined") {
+      say("PowerPoint export is unavailable — the deck library did not load.");
+      return Promise.reject(new Error("PptxGenJS missing"));
+    }
+    if (!g) { say("No guide data."); return Promise.reject(new Error("no guide")); }
+    say("Building the deck…");
+
+    /* The architecture slide is the one the catalog already knows how to draw;
+       reuse it rather than drawing a second, differently-shaped one. */
+    var need = [getJSON(["data/products.json", "api/v1/products.json"])];
+    need.push(o.arch ? Promise.resolve(o.arch)
+                     : getJSON(["data/architectures.json"]).then(function (d) {
+      var list = (d && d.architectures) || [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].slug === g.slug) return list[i];
+      }
+      return null;
+    }));
+
+    return Promise.all(need).then(function (r) {
+      var products = r[0] || { products: [] }, arch = r[1];
+      var pptx = new PptxGenJS();
+      try {
+        pptx.defineLayout({ name: "AIBAST_WIDE", width: W, height: H });
+        pptx.layout = "AIBAST_WIDE";
+        pptx.author = "Microsoft AIBAST";
+        pptx.company = "Microsoft";
+        pptx.title = txt(g.display_name) + " — configuration guide";
+        var n = 1;
+        (g.slides || []).forEach(function (sl) {
+          switch (sl.kind) {
+            case "title":       guideTitleSlide(pptx, sl); break;
+            case "statement":   guideStatementSlide(pptx, sl, n); break;
+            case "products":    guideProductsSlide(pptx, sl, products, n); break;
+            case "adventure":   guideAdventureSlide(pptx, sl, products, n); break;
+            case "steps":       guideStepsSlide(pptx, sl, n); break;
+            case "synthetic":   guideSyntheticSlide(pptx, sl, n); break;
+            case "close":       guideCloseSlide(pptx, sl, n); break;
+            case "architecture":
+              if (arch) {
+                architectureSlide(pptx, arch, g.display_name,
+                                  (g.industries || [])[0], n);
+              } else {
+                /* Say so on the slide rather than shipping a blank one. */
+                guideStatementSlide(pptx, {
+                  kicker: sl.kicker, title: sl.title,
+                  body: "No generated architecture is on file for this solution yet."
+                }, n);
+              }
+              break;
+            default:            guideStatementSlide(pptx, sl, n); break;
+          }
+          n += 1;
+        });
+      } catch (e) {
+        say("Could not build the deck: " + (e && e.message ? e.message : e));
+        throw e;
+      }
+      var file = txt(g.display_name).replace(/[^A-Za-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") + "-Configuration-Guide-AIBAST.pptx";
+      return save(pptx, file, { kind: "config-guide", slug: g.slug }, say, o);
+    });
+  }
+
   global.RappDeck = { export: exportDeck, build: build,
-                     exportRoadmap: exportRoadmap, displayName: displayName };
+                     exportRoadmap: exportRoadmap,
+                     exportConfigGuide: exportConfigGuide,
+                     displayName: displayName };
 })(window);

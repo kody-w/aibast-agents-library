@@ -1,0 +1,601 @@
+{
+  "category": "Announcements",
+  "exports": {
+    "abandoned-cart-recovery-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "account-research-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "branch-banking-advisory-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "building-permit-review-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "campaign-design-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "care-gap-closure-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "claims-processing-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "client-health-score-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "client-onboarding-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "clinical-summary-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "commercial-underwriting-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "contact-center-escalation-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "contract-review-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture",
+        "config-guide"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "cross-channel-engagement-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "customer-sentiment-churn-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "energy-operations-agent-a": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "energy-operations-agent-b": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "energy-operations-agent-c": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "energy-operations-agent-d": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "expansion-opportunity-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "fraud-detection-alert-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "hr-self-service-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "inventory-optimization-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "loyalty-insights-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "month-end-billing-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "mortgage-origination-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "omnichannel-inventory-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "order-status-delay-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "patient-intake-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "personal-styling-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "portfolio-rebalancing-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "predictive-maintenance-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "prior-authorization-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "procurement-savings-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "product-feedback-insights-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "product-line-optimization-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "proposal-creation-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "purchase-order-management-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "regulatory-compliance-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "resource-utilization-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "returns-complaints-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "roadmap": {
+      "comments": 0,
+      "decks": [
+        "roadmap"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "sales-pipeline-management-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "store-associate-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "subscription-renewal-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "supply-chain-risk-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "supply-risk-intelligence-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "utility-leak-detection-billing-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    },
+    "wealth-insights-agent": {
+      "comments": 0,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "exports": 0,
+      "likes": 0,
+      "number": null,
+      "thread": false,
+      "url": null
+    }
+  },
+  "note": "An export is a THUMBS_UP on the pinned export-tally comment of a solution's Discussion \u2014 one per GitHub account. It counts people who marked that they took a deck away, not downloads. Nothing is written from the browser.",
+  "repo": "microsoft/aibast-agents-library",
+  "schema": "aibast-export-engagement/1.0",
+  "totals": {
+    "exports": 0,
+    "subjects": 49,
+    "threads": 0
+  }
+}

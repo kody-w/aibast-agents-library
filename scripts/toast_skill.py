@@ -25,7 +25,20 @@ author wrote are gone, so the round trip cannot return the original. This keeps
 the author's Python verbatim and gates the round trip, so "lossless" is measured
 rather than asserted.
 
+HOW A RAW SKILL BECOMES A TOASTED ONE. A skill that arrives as prose has no
+Python to embed, so it cannot be toasted directly. It is first DERIVED into an
+agent.py by scripts/export_agent.py — the one lossy step, and the only one —
+and that agent.py is what gets toasted:
+
+    raw skill.md  --derive-->  agent.py  --toast-->  toasted skill.md
+                  (lossy, once)          (byte-exact, from here on)
+
+After the promotion the Python lives in the markdown, extraction returns it
+verbatim, and the derivation is never run over it again. `promote` does both
+steps in order so the sequence cannot be got wrong.
+
 Usage:
+    python3 scripts/toast_skill.py promote skills/ns/foo.md            # raw -> toasted
     python3 scripts/toast_skill.py toast agents/.../foo_agent.py   # py  -> skill.md
     python3 scripts/toast_skill.py extract skills/foo.skill.md     # md  -> agent.py
     python3 scripts/toast_skill.py verify skills/foo.skill.md      # round trip
@@ -210,7 +223,8 @@ def verify(md_path: Path) -> bool:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("command", choices=["toast", "extract", "verify", "verify-all"])
+    ap.add_argument("command",
+                    choices=["promote", "toast", "extract", "verify", "verify-all"])
     ap.add_argument("path", nargs="?")
     ap.add_argument("--out")
     args = ap.parse_args()
@@ -235,6 +249,35 @@ def main() -> int:
     p = Path(args.path)
     if not p.is_absolute():
         p = REPO_ROOT / p
+
+    if args.command == "promote":
+        # The one lossy step, run once, in the right order. Deriving AFTER
+        # toasting would overwrite real Python with a paraphrase of its own
+        # documentation, which is the whole failure this pipeline avoids.
+        if BEGIN in p.read_text(encoding="utf-8"):
+            print(f"[toast] {p.name} is already toasted; nothing to promote")
+            return 0
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from export_agent import export as derive          # noqa: PLC0415
+        py = p.with_suffix(".py")
+        py.write_text(derive(p), encoding="utf-8")
+        print(f"[toast] derived {py.relative_to(REPO_ROOT)} from prose (lossy, once)")
+        md = toast(py)
+        SKILLS_DIR.mkdir(parents=True, exist_ok=True)
+        man = manifest_of(py.read_text(encoding="utf-8"))
+        slug = (man.get("name") or py.stem).split("/")[-1]
+        out = Path(args.out) if args.out else SKILLS_DIR / f"{slug}.skill.md"
+        out.write_text(md, encoding="utf-8")
+        ok = verify(out)
+        # An --out anywhere on disk is legitimate; only pretty-print the path
+        # when it happens to sit inside the repo.
+        try:
+            shown = out.relative_to(REPO_ROOT)
+        except ValueError:
+            shown = out
+        print(f"[toast] {shown}  ({len(md.encode()) // 1024} KB, python embedded)")
+        print(f"[toast] round trip {'is byte-exact' if ok else 'LOST BYTES'}")
+        return 0 if ok else 1
 
     if args.command == "toast":
         md = toast(p)

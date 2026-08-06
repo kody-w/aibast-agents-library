@@ -37,6 +37,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILLS_ROOT = REPO_ROOT / "skills"
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toast_skill import BEGIN as TOAST_BEGIN, extract as toast_extract  # noqa: E402
+
 MANIFEST_SCHEMA = "rapp-agent/1.0"
 
 
@@ -228,6 +231,30 @@ class {class_name(slug)}(BasicAgent):
 '''
 
 
+def is_toasted(skill: Path) -> bool:
+    """A skill.md that carries its own Python, addressed by marker."""
+    try:
+        return TOAST_BEGIN in skill.read_text(encoding="utf-8")
+    except OSError:
+        return False
+
+
+def mirror_of(skill: Path) -> str:
+    """The agent.py for a skill — extracted if toasted, derived if raw.
+
+    Both produce the same artifact and only one of them can be exact. A
+    toasted skill's Python is already in the file, so it is lifted out
+    verbatim (and its digest checked on the way); a raw skill has no Python
+    to lift, so it is derived from the prose and the loss is unavoidable.
+    Deriving over a toasted skill would throw away the author's real code and
+    replace it with a paraphrase of its own documentation.
+    """
+    if is_toasted(skill):
+        source, _front = toast_extract(skill)
+        return source
+    return export(skill)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--only", help="export one skill by file stem")
@@ -236,6 +263,17 @@ def main() -> int:
     args = ap.parse_args()
 
     skills = sorted(SKILLS_ROOT.rglob("*.md")) if SKILLS_ROOT.is_dir() else []
+    # HOW A SKILL BECOMES TOASTED. A raw skill is prose only, so its agent.py
+    # has to be DERIVED — and a derivation is lossy by nature: the comments and
+    # constants an author writes cannot survive it. That one-time derivation is
+    # what this script does, and it is the promotion step:
+    #
+    #     raw skill.md  --derive-->  agent.py  --toast-->  toasted skill.md
+    #
+    # After that the Python lives inside the markdown and the pair round-trips
+    # byte for byte in both directions, so the lossy step is never run on it
+    # again. A toasted skill still has an agent.py mirror — it is EXTRACTED
+    # rather than derived, which is why it can be exact.
     if args.only:
         skills = [p for p in skills if args.only in p.stem]
     if not skills:
@@ -245,7 +283,7 @@ def main() -> int:
     written, drifted = 0, []
     for skill in skills:
         out = skill.with_suffix(".py")
-        text = export(skill)
+        text = mirror_of(skill)
         if args.check:
             if not out.is_file():
                 drifted.append(f"{out.relative_to(REPO_ROOT)} is missing")

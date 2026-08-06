@@ -147,12 +147,37 @@ SIGNAL_BODY = (
     "more than any of these."
 )
 
+# ── The export tally ─────────────────────────────────────────────────────
+#
+# Downloading an agent.py is a developer's signal. Exporting the deck is the
+# seller's, and it is the stronger one: it means somebody is taking this into
+# a room. Ranking the catalog on downloads alone therefore reads the library
+# through one audience's eyes and calls the result popularity.
+#
+# Same mechanism as the download tally, for the same reason — a static page
+# has nowhere to POST a number, and a reaction is one per GitHub account, so
+# the count means "people who marked it", never "clicks".
+EXPORT_MARKER = "<!-- aibast:export-tally -->"
+
+EXPORT_BODY = (
+    EXPORT_MARKER
+    + "\n### 📊 Export tally\n\n"
+    "React :+1: **on this comment** when you export a deck for this solution "
+    "— the one-pager, the reference architecture or the configuration guide. "
+    "One reaction per GitHub user, so the count reads as *people who took "
+    "this into a meeting*, not downloads.\n\n"
+    "This is what the popularity report ranks solutions by, alongside "
+    "installs and thread activity. Upvote the solution itself on the top "
+    "post, not here."
+)
+
 # Every marker a thread should carry, in provisioning order. Adding an entry
 # here is all it takes for a new signal surface to be created on every agent,
 # old and new, by the same idempotent seeder.
 MARKERS = {
     "download": (TALLY_MARKER, TALLY_BODY),
     "signal": (SIGNAL_MARKER, SIGNAL_BODY),
+    "export": (EXPORT_MARKER, EXPORT_BODY),
 }
 
 DISCUSSIONS_QUERY = """
@@ -320,15 +345,25 @@ def signal_counts(node: dict) -> dict[str, int]:
     return counts
 
 
-def download_count(node: dict) -> int:
-    """THUMBS_UP reactors on the tally comment — one per unique installer."""
-    tally = tally_comment_of(node)
-    if not tally:
+def thumbs_up_on(node: dict, marker: str) -> int:
+    """THUMBS_UP reactors on the comment carrying ``marker`` — one per person."""
+    comment = marker_comment_of(node, marker)
+    if not comment:
         return 0
-    for group in tally.get("reactionGroups") or []:
+    for group in comment.get("reactionGroups") or []:
         if group.get("content") == "THUMBS_UP":
             return (group.get("reactors") or {}).get("totalCount", 0)
     return 0
+
+
+def download_count(node: dict) -> int:
+    """THUMBS_UP reactors on the tally comment — one per unique installer."""
+    return thumbs_up_on(node, TALLY_MARKER)
+
+
+def export_count(node: dict) -> int:
+    """THUMBS_UP reactors on the export tally — one per person who took a deck."""
+    return thumbs_up_on(node, EXPORT_MARKER)
 
 
 def build_snapshot(
@@ -351,6 +386,7 @@ def build_snapshot(
             continue
         upvotes = positive_score(node.get("reactionGroups"))
         downloads = download_count(node)
+        exports = export_count(node)
         signals = signal_counts(node)
         # Provisioned marker comments are machinery, not conversation — one
         # per marker present, so the count stays honest as markers are added.
@@ -363,6 +399,14 @@ def build_snapshot(
         entry = {
             "upvotes": upvotes,
             "downloads": downloads,
+            "exports": exports,
+            # Storefront rank is deliberately unchanged by exports. This number
+            # orders the catalog for someone browsing it, and it has meant
+            # "votes weigh double" since the first thread was seeded — quietly
+            # re-weighting it would move every card on the page for reasons no
+            # visitor could see. Exports rank solutions in the popularity
+            # report (scripts/build_popularity.py), where the weights are
+            # printed next to the result.
             "score": 2 * upvotes + downloads,  # storefront rank: votes weigh double
             "comments": n_comments,
             "signals": signals,
@@ -710,10 +754,18 @@ def cmd_tally(limit: int, delay: float, only: str | None = None) -> int:
     return 0
 
 
-def cmd_track(agent_name: str) -> int:
-    """Register one download: THUMBS_UP on the agent's tally comment."""
+def cmd_track(agent_name: str, kind: str = "download") -> int:
+    """Register one event: THUMBS_UP on the tally comment for ``kind``.
+
+    ``kind`` is a key of MARKERS — "download" for an agent.py taken, "export"
+    for a deck taken. Anything that can hold a token can record either, which
+    is what lets the vBrainstem count a download it served without the page
+    having to open a tab.
+    """
+    marker, _ = MARKERS.get(kind, MARKERS["download"])
+    noun = "download" if kind == "download" else kind
     if not TOKEN:
-        warn("no GITHUB_TOKEN set; download not tracked.")
+        warn(f"no GITHUB_TOKEN set; {noun} not tracked.")
         return 0
     q = f'repo:{REPO} in:title "{agent_name}"'
     try:
@@ -725,17 +777,18 @@ def cmd_track(agent_name: str) -> int:
             None,
         )
         if not node:
-            warn(f"no discussion found for '{agent_name}'; download not tracked.")
+            warn(f"no discussion found for '{agent_name}'; {noun} not tracked.")
             return 0
-        tally = tally_comment_of(node)
+        tally = marker_comment_of(node, marker)
         if not tally:
-            warn(f"'{agent_name}' has no tally comment yet; download not tracked.")
+            warn(f"'{agent_name}' has no {noun} tally comment yet; "
+                 f"{noun} not tracked.")
             return 0
         graphql(ADD_REACTION_MUTATION, {"subjectId": tally["id"]})
-        print(f"[discussion-ratings] download registered for {agent_name} "
+        print(f"[discussion-ratings] {noun} registered for {agent_name} "
               f"(discussion #{node.get('number')}).")
     except (OSError, RuntimeError, urllib.error.URLError) as exc:
-        warn(f"track failed ({exc}); download not tracked.")
+        warn(f"track failed ({exc}); {noun} not tracked.")
     return 0
 
 
@@ -745,12 +798,15 @@ def main() -> int:
     seed = sub.add_parser("seed", help="create missing agent Discussions")
     seed.add_argument("--limit", type=int, default=80)
     seed.add_argument("--delay", type=float, default=1.2)
-    tally = sub.add_parser("tally", help="ensure download-tally comments exist")
+    tally = sub.add_parser("tally", help="ensure every tally comment exists")
     tally.add_argument("--limit", type=int, default=80)
     tally.add_argument("--delay", type=float, default=1.2)
     tally.add_argument("--only", help="target a single agent name")
-    track = sub.add_parser("track", help="register one download (thumbs-up the tally)")
+    track = sub.add_parser("track", help="register one event (thumbs-up the tally)")
     track.add_argument("agent", help="agent name, e.g. @aibast-agents-library/art-generator")
+    track.add_argument("--kind", choices=sorted(MARKERS), default="download",
+                       help="which tally to mark: download (an agent.py taken) "
+                            "or export (a deck taken)")
     reviews = sub.add_parser("seed-reviews",
                              help="publish machine reviews to their own category")
     reviews.add_argument("--limit", type=int, default=80)
@@ -762,7 +818,7 @@ def main() -> int:
     if args.command == "tally":
         return cmd_tally(args.limit, args.delay, args.only)
     if args.command == "track":
-        return cmd_track(args.agent)
+        return cmd_track(args.agent, args.kind)
     if args.command == "seed-reviews":
         return cmd_seed_reviews(args.limit, args.delay)
     return cmd_fetch()

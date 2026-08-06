@@ -1,0 +1,1152 @@
+{
+  "schema": "aibast-popularity/1.0",
+  "generated": "2026-08-06T22:29:33+00:00",
+  "weights": {
+    "exports": 5,
+    "installs": 3,
+    "plays": 2,
+    "comments": 2,
+    "likes": 1
+  },
+  "note": "Every figure is people, not events: each comes from a GitHub reaction or comment, one per account. They are therefore all undercounts \u2014 only signed-in people who marked something appear \u2014 and none of them is traffic. A solution with no Discussion yet is listed as not launched rather than scored zero.",
+  "totals": {
+    "exports": 0,
+    "installs": 0,
+    "plays": 0,
+    "comments": 0,
+    "likes": 0
+  },
+  "counts": {
+    "solutions": 48,
+    "launched": 9,
+    "not_launched": 39
+  },
+  "ranked": [
+    {
+      "slug": "care-gap-closure-agent",
+      "display_name": "Care Gap Closure Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/care-gap-closure",
+      "thread": null,
+      "rank": 1
+    },
+    {
+      "slug": "claims-processing-agent",
+      "display_name": "Claims Processing Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/claims-processing",
+      "thread": null,
+      "rank": 2
+    },
+    {
+      "slug": "client-health-score-agent",
+      "display_name": "Client Health Score Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/client-health-score",
+      "thread": null,
+      "rank": 3
+    },
+    {
+      "slug": "customer-sentiment-churn-agent",
+      "display_name": "Customer Sentiment & Churn Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/customer-sentiment-churn",
+      "thread": null,
+      "rank": 4
+    },
+    {
+      "slug": "fraud-detection-alert-agent",
+      "display_name": "Fraud Detection & Alert Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/fraud-detection-alert",
+      "thread": null,
+      "rank": 5
+    },
+    {
+      "slug": "patient-intake-agent",
+      "display_name": "Patient Intake Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/patient-intake",
+      "thread": null,
+      "rank": 6
+    },
+    {
+      "slug": "portfolio-rebalancing-agent",
+      "display_name": "Portfolio Rebalancing Agent",
+      "industries": [
+        "Capital Markets"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/portfolio-rebalancing",
+      "thread": null,
+      "rank": 7
+    },
+    {
+      "slug": "prior-authorization-agent",
+      "display_name": "Prior Authorization Agent",
+      "industries": [
+        "Healthcare",
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/prior-authorization",
+      "thread": null,
+      "rank": 8
+    },
+    {
+      "slug": "resource-utilization-agent",
+      "display_name": "Resource Utilization Agent",
+      "industries": [
+        "Professional Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": true,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": "@aibast-agents-library/resource-utilization",
+      "thread": null,
+      "rank": 9
+    }
+  ],
+  "not_launched": [
+    {
+      "slug": "abandoned-cart-recovery-agent",
+      "display_name": "Abandoned Cart Recovery Agent",
+      "industries": [
+        "Cross-Industry",
+        "Software Tech"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "account-research-agent",
+      "display_name": "Account Research Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "branch-banking-advisory-agent",
+      "display_name": "Branch Banking Advisory Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "building-permit-review-agent",
+      "display_name": "Building Permit Review Agent",
+      "industries": [
+        "State and Local Government"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "campaign-design-agent",
+      "display_name": "Campaign Design Agent",
+      "industries": [
+        "Retail"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "client-onboarding-agent",
+      "display_name": "Client Onboarding Agent",
+      "industries": [
+        "Cross-Industry",
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "clinical-summary-agent",
+      "display_name": "Clinical Summary Agent",
+      "industries": [
+        "Healthcare"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "commercial-underwriting-agent",
+      "display_name": "Commercial Underwriting Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "contact-center-escalation-agent",
+      "display_name": "Contact Center Escalation Agent",
+      "industries": [
+        "Cross-Industry",
+        "Contact Center"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "contract-review-agent",
+      "display_name": "Contract Review Agent",
+      "industries": [
+        "Professional Services",
+        "Consulting"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture",
+        "config-guide"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "cross-channel-engagement-agent",
+      "display_name": "Cross-Channel Engagement Agent",
+      "industries": [
+        "Cross-Industry",
+        "Retail"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "energy-operations-agent-a",
+      "display_name": "Energy Operations Agent (a)",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "energy-operations-agent-b",
+      "display_name": "Energy Operations Agent (b)",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "energy-operations-agent-c",
+      "display_name": "Energy Operations Agent (c)",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "energy-operations-agent-d",
+      "display_name": "Energy Operations Agent (d)",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "expansion-opportunity-agent",
+      "display_name": "Expansion Opportunity Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "hr-self-service-agent",
+      "display_name": "HR Self-Service Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "inventory-optimization-agent",
+      "display_name": "Inventory Optimization Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "loyalty-insights-agent",
+      "display_name": "Loyalty Insights Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "month-end-billing-agent",
+      "display_name": "Month-End Billing Agent",
+      "industries": [
+        "Professional Services",
+        "Consulting"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "mortgage-origination-agent",
+      "display_name": "Mortgage Origination Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "omnichannel-inventory-agent",
+      "display_name": "Omnichannel Inventory Agent",
+      "industries": [
+        "Retail"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "order-status-delay-agent",
+      "display_name": "Order Status & Delay Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "personal-styling-agent",
+      "display_name": "Personal Styling Agent",
+      "industries": [
+        "Retail"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "predictive-maintenance-agent",
+      "display_name": "Predictive Maintenance Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "procurement-savings-agent",
+      "display_name": "Procurement Savings Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "product-feedback-insights-agent",
+      "display_name": "Product Feedback Insights Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "product-line-optimization-agent",
+      "display_name": "Product Line Optimization Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "proposal-creation-agent",
+      "display_name": "Proposal Creation Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "purchase-order-management-agent",
+      "display_name": "Purchase Order Management Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "regulatory-compliance-agent",
+      "display_name": "Regulatory Compliance Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "returns-complaints-agent",
+      "display_name": "Returns & Complaints Agent",
+      "industries": [
+        "Retail",
+        "Consumable Products Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "sales-pipeline-management-agent",
+      "display_name": "Sales Pipeline Management Agent",
+      "industries": [
+        "Cross-Industry"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "store-associate-agent",
+      "display_name": "Store Associate Agent",
+      "industries": [
+        "Retail"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "subscription-renewal-agent",
+      "display_name": "Subscription Renewal Agent",
+      "industries": [
+        "Software Tech"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "supply-chain-risk-agent",
+      "display_name": "Supply Chain Risk Agent",
+      "industries": [
+        "Retail",
+        "Manufacturing"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "supply-risk-intelligence-agent",
+      "display_name": "Supply Risk Intelligence Agent",
+      "industries": [
+        "Manufacturing"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "utility-leak-detection-billing-agent",
+      "display_name": "Utility Leak Detection & Billing Agent",
+      "industries": [
+        "Energy and Utilities",
+        "State and Local Government"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    },
+    {
+      "slug": "wealth-insights-agent",
+      "display_name": "Wealth Insights Agent",
+      "industries": [
+        "Financial Services"
+      ],
+      "signals": {
+        "exports": 0,
+        "installs": 0,
+        "plays": 0,
+        "comments": 0,
+        "likes": 0
+      },
+      "score": 0,
+      "led_by": null,
+      "launched": false,
+      "decks": [
+        "one-pager",
+        "architecture"
+      ],
+      "agent": null,
+      "thread": null
+    }
+  ]
+}
