@@ -443,24 +443,39 @@
       rectRadius: 0.08, fill: { color: VIOLET }, line: { type: "none" }
     });
     s.addText(txt(P.orchestration || "Multi-agent orchestration"), {
-      x: xs[1] + 0.14, y: top + 2.7, w: ws[1] - 0.28, h: 0.34, align: "center",
-      fontFace: FONT, fontSize: 11, bold: true, color: INK
+      x: xs[1] + 0.14, y: top + 2.66, w: ws[1] - 0.28, h: 0.3, align: "center",
+      fontFace: FONT, fontSize: 10.5, bold: true, color: INK
     });
-    box(pptx, s, { x: xs[1] + 0.14, y: top + 3.12, w: ws[1] - 0.28, h: 0.5,
+    /* The agents the orchestrator actually runs. This slot used to read
+       "Outcome: Enable faster · Lower-risk" — business value printed where the
+       work goes, which looks answered and says nothing. */
+    var agents = (P.agents || []).slice(0, 6);
+    if (agents.length) {
+      s.addText(agents.map(function (a, i) {
+        return { text: (i + 1) + ". " + txt(a.name) + " — " + txt(a.does),
+                 options: { breakLine: true, fontSize: 7.5 } };
+      }), { x: xs[1] + 0.14, y: top + 3.0, w: ws[1] - 0.28, h: 1.32,
+            fontFace: FONT, color: INK, valign: "top", lineSpacingMultiple: 1.1 });
+    } else {
+      var acts = labelsOf(P.actions, 4);
+      if (acts.length) {
+        s.addText(acts.map(function (a, i) {
+          return { text: (i + 1) + ". " + txt(a),
+                   options: { breakLine: true, fontSize: 8 } };
+        }), { x: xs[1] + 0.14, y: top + 3.0, w: ws[1] - 0.28, h: 1.32,
+              fontFace: FONT, color: INK, valign: "top" });
+      }
+    }
+    box(pptx, s, { x: xs[1] + 0.14, y: top + ch - 0.62, w: ws[1] - 0.28, h: 0.5,
                    step: 4, text: "NL response after guideline checks",
                    size: 8.5, fill: "EEEBFA" });
-    var acts = labelsOf(P.actions, 3);
-    if (acts.length) {
-      s.addText("Outcome: " + acts.join(" · "), {
-        x: xs[1] + 0.14, y: top + 3.7, w: ws[1] - 0.28, h: 0.5,
-        fontFace: FONT, fontSize: 8.5, color: MUTED, valign: "top"
-      });
-    }
 
     /* 3 — User Interface: where the person meets it. */
     column(pptx, s, xs[2], top, ws[2], ch, U.title || "User Interface");
+    /* Step 1 above step 2, so the numbered flow reads down the column. */
     box(pptx, s, { x: xs[2] + 0.12, y: top + 0.42, w: ws[2] - 0.24, h: 0.72,
-                   step: 2, text: U.checks, size: 8, valign: "top" });
+                   step: 1, text: (arch.flow && arch.flow[0] && arch.flow[0].text)
+                     || "Natural language input", size: 8, valign: "top" });
     s.addShape(pptx.ShapeType.roundRect, {
       x: xs[2] + 0.12, y: top + 1.26, w: ws[2] - 0.24, h: 2.35, rectRadius: 0.06,
       fill: { type: "solid", color: PAPER },
@@ -470,9 +485,10 @@
       x: xs[2] + 0.2, y: top + 1.32, w: ws[2] - 0.4, h: 0.26,
       fontFace: FONT, fontSize: 9, bold: true, color: BLUE
     });
+    /* The checks run inside the platform boundary, right after the input, so
+       step 2 sits inside the Microsoft 365 panel and step 1 above it. */
     box(pptx, s, { x: xs[2] + 0.2, y: top + 1.62, w: ws[2] - 0.4, h: 0.4,
-                   step: 1, text: "Natural language input", size: 8.5,
-                   fill: "F4F4F8" });
+                   step: 2, text: U.checks, size: 7.5, fill: "F4F4F8" });
     /* Flow the actors line from where the surface chips actually END. Fixing
        it at a constant put three surfaces straight through it — a collision no
        text gate can see, because both strings are present and correct. */

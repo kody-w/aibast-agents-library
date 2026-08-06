@@ -267,17 +267,24 @@ function getJSON(p){var i=0;return (function next(){
     .catch(function(){return next();});})();}
 
 /* ---- marks ---------------------------------------------------------------
- * Three states and no fourth. A product with a real mark on file draws the
- * real mark. A product without one draws a neutral chip and says, on hover,
- * that the mark is missing. Something the entry did not declare draws the
- * unknown chip. Nothing here ever approximates a Microsoft logo.
+ * A real mark, always, wherever one exists. Exact when the product publishes
+ * its own; its family's when it does not; the nearest real one when even that
+ * is missing — and the hover text says which of the three you are looking at.
+ * Only something the entry never declared draws the unknown chip.
+ *
+ * The old rule blanked anything without an exact mark. It was meant to avoid
+ * approximating a Microsoft logo, and it still does — nothing here is drawn,
+ * traced or recoloured. But a dashed blank beside "Entra ID" reads as broken
+ * rather than as careful, and Entra ID's real mark was on disk the whole time.
  * ------------------------------------------------------------------------ */
 function mark(x){
   if (x && x.unknown) return '<span class="mk unknown" title="Not declared by this entry"></span>';
   if (x && x.mark) {
     var t = x.mark_scope === "family"
-      ? x.family + " mark, shown beside the app name"
-      : x.label + " mark";
+      ? (x.family || "Family") + " mark, shown beside the app name"
+      : x.mark_scope === "closest"
+        ? "Nearest Microsoft mark — " + x.label + " publishes none of its own"
+        : x.label + " mark";
     return '<span class="mk"><img src="' + esc(x.mark) + '" alt="' + esc(t) + '" title="' +
       esc(t) + '" loading="lazy"></span>';
   }
@@ -361,8 +368,11 @@ function render(a){
       "</div>" +
 
       /* User interface */
+      /* Ordered so the numbers read down the column: the operator, then what
+         they type (1), then what happens to it (2), then what comes back (6).
+         Step 2 used to sit above step 1, which makes a numbered flow harder to
+         follow than an unnumbered one. */
       '<div class="col"><h2>'+esc(c.interface.title)+"</h2>" +
-        '<div class="chip"><b>2.</b> '+esc(c.interface.checks)+"</div>" +
         '<div class="group"><div class="gl">' +
           (c.interface.surface_declared ? "Where the operator meets it"
                                         : "Surface — not declared") + "</div>" +
@@ -376,8 +386,9 @@ function render(a){
               "</span></div>";
           }).join("") +
           '<div class="chip"><b>1.</b> '+esc(a.flow[0].text)+"</div>" +
-          '<div class="chip"><b>6.</b> Feedback</div>' +
         "</div>" +
+        '<div class="chip"><b>2.</b> '+esc(c.interface.checks)+"</div>" +
+        '<div class="chip"><b>6.</b> Feedback</div>' +
       "</div>" +
 
       /* Reporting */
@@ -392,9 +403,8 @@ function render(a){
 
     '<div class="bands">' +
       '<div class="band"><span class="gl">Tools</span><p>'+esc(a.tools_band)+"</p></div>" +
-      '<div class="band found"><div class="id"><span class="mk plain" ' +
-        'title="No product mark on file for ' + esc(a.foundation_band.identity) +
-        '"></span>' + esc(a.foundation_band.identity)+"</div>" +
+      '<div class="band found"><div class="id">' +
+        mark(a.foundation_band) + esc(a.foundation_band.identity)+"</div>" +
         "<b>"+esc(a.foundation_band.label)+"</b></div>" +
     "</div>" +
 

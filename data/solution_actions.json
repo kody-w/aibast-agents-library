@@ -1,0 +1,21 @@
+{
+  "schema": "aibast-solution-actions/1.0",
+  "note": "The agents that make up a solution's orchestration — the actual steps that fulfil the use case, in the order they run. AUTHORED, not derived. The catalog's own source for most solutions is a single sentence of marketing copy, and splitting that on commas produces 'Enable faster' and 'Lower-risk' as though they were actions. They are outcomes. An architecture that lists outcomes where the work goes tells a reader nothing about what the agent does, so these are written by hand and reviewed. A solution with a real tool schema uses that instead — a declared operation enum beats anything anyone writes here.",
+  "fields": {
+    "name": "What the sub-agent is called, as a capability",
+    "does": "What it actually does, in one line, concrete enough to argue with"
+  },
+  "solutions": {
+    "contract-review-agent": {
+      "orchestration": "Six agents, run in order, each handing the next a smaller problem",
+      "agents": [
+        {"name": "Clause extraction", "does": "Segments the contract and labels every clause by type, so the rest of the run works on clauses rather than pages"},
+        {"name": "Standard comparison", "does": "Diffs each clause against the approved clause library and keeps only what departs from it"},
+        {"name": "Risk scoring", "does": "Rates each departure against the negotiation playbook — acceptable, negotiable, or escalate"},
+        {"name": "Precedent lookup", "does": "Finds how this same clause was settled in prior negotiations, so a position is not re-argued from scratch"},
+        {"name": "Redline drafting", "does": "Writes tracked changes in the document, with a citation on every single change"},
+        {"name": "Approval routing", "does": "Packages the review and sends it to the named approver — and stops there, because sending is a person's decision"}
+      ]
+    }
+  }
+}

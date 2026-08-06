@@ -143,10 +143,17 @@ WANTED: dict[str, tuple[str, str]] = {
     # ── Analytics ────────────────────────────────────────────────────
     "microsoft-fabric": ("fabric", "fabric_48_color.svg"),
 
-    # Microsoft Purview and Microsoft Graph are deliberately absent: neither
-    # publishes a mark in any of these sets, and the Azure Purview service
-    # icon was retired when the brand moved. They keep labelled chips. A
-    # near-enough logo on a Microsoft deck is worse than a word.
+    # ── Family marks, used when a product has no mark of its own ─────
+    # A blank placeholder tells a reader nothing and looks broken on a slide.
+    # The nearest REAL Microsoft mark, labelled as the family it belongs to,
+    # tells them which part of the estate they are looking at. These are the
+    # marks that fallback resolves to — see NEAREST in build_products.py.
+    "microsoft-365": ("office", "m365"),
+    "azure": ("azure", "icon-service-Azure-A.svg"),
+    "azure-compliance": ("azure", "icon-service-Compliance.svg"),
+
+    # Microsoft Purview and Microsoft Graph publish no mark in any of these
+    # sets, so they resolve to the nearest family mark rather than a blank.
 }
 
 

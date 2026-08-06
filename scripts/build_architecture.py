@@ -53,6 +53,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from build_products import MARKS  # noqa: E402
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_products import (  # noqa: E402
     BY_ID, detect, entries as product_entries, resolve, source_text_for)
 
@@ -225,6 +228,75 @@ def clauses(text: str, limit: int = 4, shout: set[str] | None = None) -> list[st
     return out
 
 
+
+# ── Marks for the structural boxes ───────────────────────────────────────
+#
+# The four columns carry named Microsoft things that are not catalog products:
+# the identity layer, the connector layer, the admin surface. They were built
+# with mark=None and drew a dashed blank, which on an exported slide reads as
+# broken rather than as careful — and in Entra ID's case the real mark was
+# already on disk, unused.
+#
+# So every structural box resolves to the nearest REAL mark and records how
+# near it is. Nothing is drawn that Microsoft does not publish; a `closest`
+# scope means "this is a true mark from one level up", and every surface says
+# so on hover.
+def _load_authored() -> dict:
+    f = REPO_ROOT / "data" / "solution_actions.json"
+    try:
+        return json.loads(f.read_text(encoding="utf-8")).get("solutions", {})
+    except (OSError, ValueError):
+        return {}
+
+
+AUTHORED_ACTIONS = _load_authored()
+
+STRUCTURAL = {
+    "entra id": ("entra-id", "exact"),
+    "power platform connectors and actions": ("power-platform", "family"),
+    "copilot control system": ("microsoft-365-copilot", "closest"),
+    "microsoft 365": ("microsoft-365", "exact"),
+}
+
+# Keyword -> mark id, for a label nobody enumerated. Longest key wins, so
+# "power bi" beats "power".
+STRUCTURAL_HINTS = [
+    ("copilot studio", "microsoft-copilot-studio"), ("power automate", "power-automate"),
+    ("power platform", "power-platform"), ("power apps", "power-apps"),
+    ("power pages", "power-pages"), ("power bi", "power-bi"),
+    ("dataverse", "dataverse"), ("sharepoint", "sharepoint"), ("teams", "microsoft-teams"),
+    ("outlook", "outlook"), ("dynamics", "dynamics-365"), ("entra", "entra-id"),
+    ("azure", "azure"), ("copilot", "microsoft-365-copilot"),
+    ("microsoft 365", "microsoft-365"), ("connector", "power-platform"),
+    ("graph", "microsoft-365"), ("purview", "azure-compliance"),
+]
+
+
+def structural_mark(label: str) -> tuple[str | None, str | None]:
+    """The nearest real mark for a structural box, and how near it is."""
+    key = (label or "").strip().lower()
+    if key in STRUCTURAL:
+        pid, scope = STRUCTURAL[key]
+        m = MARKS.get(pid)
+        return (m[0], scope) if m else (None, None)
+    for word, pid in sorted(STRUCTURAL_HINTS, key=lambda x: -len(x[0])):
+        if word in key:
+            m = MARKS.get(pid)
+            if m:
+                return m[0], "closest"
+    return None, None
+
+
+def structural_item(label: str, **extra) -> dict:
+    mark, scope = structural_mark(label)
+    item = {"label": label, "glyph": "generic", "mark": mark,
+            "mark_scope": scope,
+            "mark_status": "mark" if mark else "labelled-chip",
+            "product": None, "family": None, "app": None}
+    item.update(extra)
+    return item
+
+
 def subject_areas(entry: dict, limit: int = 6, shout: set[str] | None = None) -> list[str]:
     """The tags the entry carries, read as the subject areas it works on.
 
@@ -286,9 +358,8 @@ def build(entry: dict, source_text: str = "") -> dict:
         unclassified.append(s)
 
     knowledge = by_column.get("knowledge", []) + [
-        {"label": s, "glyph": "generic", "mark": None, "mark_scope": None,
-         "mark_status": "labelled-chip", "product": None, "family": None,
-         "app": None, "confidence": "declared", "from": "named by this entry"}
+        structural_item(s, confidence="declared",
+                        **{"from": "named by this entry"})
         for s in unclassified]
 
     areas = subject_areas(entry, shout=shout)
@@ -330,14 +401,35 @@ def build(entry: dict, source_text: str = "") -> dict:
             continue
         parameters.append(name)
 
-    actions = [shout_text(a, shout) for a in (entry.get("business_value") or []) if a][:4]
-    if not actions:
+    # WHAT THE ORCHESTRATOR ACTUALLY RUNS.
+    #
+    # This used to read business_value first, which is why an architecture
+    # could show "Enable faster" and "Lower-risk" in the box where the work
+    # belongs. Those are outcomes. Listing an outcome as an action tells a
+    # reader nothing about what the agent does, and it is worse than an empty
+    # box because it looks answered.
+    #
+    # Order of truth, best first:
+    #   1. the agent's own tool schema — a declared operation enum is fact
+    #   2. an authored breakdown in data/solution_actions.json, for the
+    #      solutions whose only source is one sentence of marketing copy
+    #   3. verb clauses from the description, when it describes real steps
+    # business_value is never used here. It has its own place on the page.
+    authored = AUTHORED_ACTIONS.get(entry.get("slug", "")) or {}
+    agents = authored.get("agents") or []
+    if operations:
+        actions = operations[:6]
+        action_source = "the agent's own tool schema"
+    elif agents:
+        actions = [a["name"] for a in agents]
+        action_source = "authored for this solution"
+    else:
         actions = clauses(entry.get("description") or entry.get("lede")
                           or entry.get("summary") or "", shout=shout)
-    if not actions and operations:
-        actions = operations[:4]
+        action_source = "read from this entry's description"
     if not actions:
         actions = ["Runs the task described in this entry"]
+        action_source = "nothing declared"
 
     personas = [p for p in (entry.get("personas") or entry.get("audience") or []) if p]
     actors = [{"label": p, "declared": True} for p in personas[:2]]
@@ -350,15 +442,15 @@ def build(entry: dict, source_text: str = "") -> dict:
     connectors_declared = bool(connectors)
     if not connectors:
         connectors = ["Power Platform connectors and actions"]
+    connector_items = [structural_item(c, confidence=(
+        "declared" if connectors_declared else "platform")) for c in connectors]
 
     reporting = by_column.get("reporting", [])
     reporting_declared = bool(reporting)
     if not reporting:
-        reporting = [{"label": "Copilot Control System", "glyph": "m365",
-                      "mark": None, "mark_scope": None,
-                      "mark_status": "labelled-chip", "product": None,
-                      "family": "Microsoft 365", "app": None,
-                      "confidence": "platform", "from": "platform default"}]
+        reporting = [structural_item(
+            "Copilot Control System", glyph="m365", family="Microsoft 365",
+            confidence="platform", **{"from": "platform default"})]
 
     # Steps 1 and 5 say the entry's own surface and system of record when it
     # declares them, and stay generic when it does not.
@@ -406,7 +498,10 @@ def build(entry: dict, source_text: str = "") -> dict:
             },
             "processing": {
                 "title": "Processing",
-                "orchestration": "Multi-agent orchestration",
+                "orchestration": (authored.get("orchestration")
+                                  or "Multi-agent orchestration"),
+                "agents": agents,
+                "action_source": action_source,
                 "plan": FLOW[2],
                 "operations": operations,
                 "operation_hint": schema["operation_hint"],
@@ -433,8 +528,10 @@ def build(entry: dict, source_text: str = "") -> dict:
         "flow": [{"step": i + 1, "text": t} for i, t in enumerate(flow)],
         "tools_band": ("Automatic orchestration using prompts, agent flows, computer "
                        "use, custom connectors, Model Context Protocol and REST API"),
-        "foundation_band": {"identity": "Entra ID",
-                            "label": "Supporting features and foundation models"},
+        "foundation_band": dict(
+            structural_item("Entra ID"),
+            identity="Entra ID",
+            label="Supporting features and foundation models"),
         "configuration": entry.get("requires_env") or [],
         "derivation": {
             "systems_declared": named_systems,

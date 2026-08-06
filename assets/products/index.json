@@ -1,6 +1,6 @@
 {
   "schema": "aibast-product-marks/2.0",
-  "generated": "2026-08-06T22:50:21+00:00",
+  "generated": "2026-08-06T23:11:44+00:00",
   "note": "Official Microsoft product marks, downloaded from Microsoft's own distribution channels by scripts/fetch_product_marks.py. Each entry records the URL it came from and the date it was read. Nothing here is redrawn, traced, recoloured, or taken from a screenshot. A product with no official mark keeps a labelled chip rather than a lookalike.",
   "sources": {
     "office": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/<name>_48x1.svg",
@@ -10,13 +10,20 @@
     "d365": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Dynamics-365-icons-scalable.zip",
     "fabric": "https://github.com/microsoft/fabric-samples/raw/main/docs-samples/Icons.zip"
   },
-  "count": 52,
+  "count": 55,
   "marks": {
     "ai-builder": {
       "file": "assets/products/ai-builder.svg",
       "source": "power",
       "origin": "https://download.microsoft.com/download/498606aa-6d27-4f13-aa5c-1401078c153b/Power-Platform-icons-scalable.zip!Power Platform/AIBuilder_scalable.svg",
       "bytes": 7801,
+      "fetched": "2026-08-06"
+    },
+    "azure": {
+      "file": "assets/products/azure.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/other/10018-icon-service-Azure-A.svg",
+      "bytes": 2036,
       "fetched": "2026-08-06"
     },
     "azure-ai-foundry": {
@@ -45,6 +52,13 @@
       "source": "azure",
       "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/ai + machine learning/10165-icon-service-Bot-Services.svg",
       "bytes": 1265,
+      "fetched": "2026-08-06"
+    },
+    "azure-compliance": {
+      "file": "assets/products/azure-compliance.svg",
+      "source": "azure",
+      "origin": "https://arch-center.azureedge.net/icons/Azure_Public_Service_Icons_V24.zip!Azure_Public_Service_Icons/Icons/management + governance/00011-icon-service-Compliance.svg",
+      "bytes": 1302,
       "fetched": "2026-08-06"
     },
     "azure-cosmos-db": {
@@ -227,6 +241,13 @@
       "source": "office",
       "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/excel_48x1.svg",
       "bytes": 1485,
+      "fetched": "2026-08-06"
+    },
+    "microsoft-365": {
+      "file": "assets/products/microsoft-365.svg",
+      "source": "office",
+      "origin": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/brand-icons/product/svg/m365_48x1.svg",
+      "bytes": 4829,
       "fetched": "2026-08-06"
     },
     "microsoft-365-copilot": {

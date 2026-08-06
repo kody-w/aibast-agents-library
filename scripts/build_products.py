@@ -92,10 +92,31 @@ FAMILY_MARKS = {
     "azure-sql": "azure-sql",
 }
 
+# NEAREST: what a product falls back to when it has no mark of its own.
+#
+# The old rule was "no mark, no icon". It was well meant — never approximate a
+# Microsoft logo — but it solved a trademark problem by creating a design one:
+# a dashed blank next to "Entra ID" tells a reader nothing, and on an exported
+# slide in front of a customer it reads as broken rather than as scrupulous.
+#
+# The rule now is: never DRAW a logo that does not exist, but always show the
+# nearest REAL one and say what it is. A product with no mark of its own gets
+# its family's — Microsoft Graph gets the Microsoft 365 mark, Purview gets the
+# Azure compliance mark — and the scope field records `family` or `closest` so
+# every surface can label it honestly on hover. Nothing is ever redrawn,
+# recoloured or invented; the worst case is a true mark from one level up.
+NEAREST = {
+    "microsoft-graph": ("microsoft-365", "family"),
+    "microsoft-purview": ("azure-compliance", "closest"),
+}
+
 MARKS = _load_marks()
 for _app, _fam in FAMILY_MARKS.items():
     if _app not in MARKS and _fam in MARKS:
         MARKS[_app] = (MARKS[_fam][0], "family")
+for _pid, (_to, _scope) in NEAREST.items():
+    if _pid not in MARKS and _to in MARKS:
+        MARKS[_pid] = (MARKS[_to][0], _scope)
 
 # id, name, family, app, column, declares, prose names, implying tags,
 # implying categories.
