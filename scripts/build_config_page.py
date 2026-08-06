@@ -167,9 +167,9 @@ ol.steps .n{flex:0 0 auto;width:4.4cqh;height:4.4cqh;border-radius:50%;backgroun
   justify-content:center}
 .arch .note{font-size:1.95cqh;color:var(--text-faint);line-height:1.3}
 .arch .orch{text-align:center;font-size:2.2cqh;font-weight:700;padding:.5cqh 0}
-.arch .agents{display:flex;flex-direction:column;gap:.45cqh;min-height:0;flex:1;
+.arch .agents{display:flex;flex-direction:column;gap:.3cqh;min-height:0;flex:1;
   overflow:hidden}
-.arch .agents .a{display:flex;gap:.7cqh;align-items:baseline;font-size:1.95cqh;line-height:1.22}
+.arch .agents .a{display:flex;gap:.7cqh;align-items:baseline;font-size:1.9cqh;line-height:1.18}
 /* Sub-steps of step 3, deliberately NOT the same badge as the flow numbers.
    Two independent sequences drawn in one visual language is why "3" appeared
    to mean two different things on the same slide. */
