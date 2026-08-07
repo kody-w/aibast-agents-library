@@ -1,6 +1,6 @@
 {
  "schema": "aibast-twin-stack-names/1.0",
- "note": "Every name the workshop can show for a stack \u2014 display name plus advertised names. The twin resolves any of them, because these are what a seller reads off the card.",
+ "note": "Every name the workshop can show for a stack. The twin resolves any of them.",
  "stacks": {
   "account-intelligence": {
    "dir": "account_intelligence_stack",
