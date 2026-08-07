@@ -1,7 +1,7 @@
 {
  "schema": "rapp-registry/1.0",
  "version": "1.0.0",
- "generated_at": "2026-08-07T08:42:00.520510+00:00",
+ "generated_at": "2026-08-07T13:37:01.242564+00:00",
  "instance": "AIBAST RAR",
  "stats": {
   "total_agents": 105,
@@ -1784,9 +1784,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py",
-   "_size_kb": 21.2,
-   "_lines": 421,
-   "_sha256": "0d12185a278aae7733afa44b7c9170fa5bdc19ae9898ccd52d411ee4384366a3",
+   "_size_kb": 24.8,
+   "_lines": 480,
+   "_sha256": "96c0458922546d10434d32f8c18926dcd9423c67225fbc00d0a11343bda22343",
    "_install_filename": "sales_specialist_twin_agent.py"
   },
   {

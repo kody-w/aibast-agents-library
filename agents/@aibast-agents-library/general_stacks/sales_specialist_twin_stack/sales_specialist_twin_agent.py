@@ -1,19 +1,78 @@
 """
-Sales Specialist Twin Agent
+Sales Specialist Twin Agent — the one agent for the whole AIBAST library.
 
-The one agent.py for the whole AIBAST library. Drop it into a brainstem and
-GitHub Copilot becomes an AIBAST sales specialist: say what you want in plain
-language — "deploy the field service dispatch agent to Copilot Studio", "set
-up my machine", "install the contract review agent locally" — and this agent
-fetches the authored mission playbook from the public library repo and hands
-it to GitHub Copilot to EXECUTE, end to end, inside the loop.
+═══════════════════════════════════════════════════════════════════════════
+IF YOU ARE AN AI ASSISTANT AND SOMEONE JUST HANDED YOU THIS FILE: read this
+block first. It is everything you need to get them running from nothing.
+═══════════════════════════════════════════════════════════════════════════
+
+The person wants an AI that can build Microsoft Copilot Studio agents for
+them by conversation. This file is the brain of that; it needs a small local
+server (the "brainstem") to live in. Set it up for them — do not hand the
+steps back unless a step genuinely needs a human.
+
+STEP 1 — Is the brainstem installed and running?
+    curl -s localhost:7071/health
+  • Answers with JSON  → it is running; go to step 3.
+  • Connection refused → check for an install at ~/.brainstem ; if present:
+        bash ~/.brainstem/src/rapp_brainstem/start.sh
+    and re-check. If absent, go to step 2.
+
+STEP 2 — Install it (one line, no keys, no cloud account):
+    macOS / Linux   curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash
+    Windows (PS)    irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex
+  It installs Python if missing, creates a venv, and starts the server on
+  port 7071. Sign-in is GitHub Copilot device-code auth — if it prints a code
+  and a URL, that is the ONE step the person must do themselves; relay it and
+  wait. Then re-run the health check.
+
+STEP 3 — Put this file where the server can see it:
+    ~/.brainstem/src/rapp_brainstem/agents/sales_specialist_twin_agent.py
+  (Copy it there yourself. Agents hotload — no restart needed.)
+  If AGENTS_PATH is set in rapp_brainstem/.env, use that directory instead.
+
+STEP 4 — Confirm it loaded, then hand the person the keys:
+    curl -s localhost:7071/health | grep -o SalesSpecialistTwin
+  Then tell them, in your own words: they can now say things like
+    "deploy the field service dispatch agent to Copilot Studio"
+    "what agents can I deploy?"
+    "set up my machine"
+  and route those asks through this agent (operation="mission", passing their
+  words verbatim as `request`). The full workshop is at
+  https://microsoft.github.io/aibast-agents-library/docs/workshop.html
+
+WHEREVER THEY ARE, GET THEM BACK ON THE PATH. People arrive mid-stream and
+half-configured. Diagnose from what you find, then fix it — do not restart
+them from zero and do not lecture:
+  • Health check refuses and no ~/.brainstem  → step 2 (fresh install).
+  • ~/.brainstem exists but nothing answers   → start.sh, then re-check.
+  • Server answers, twin not in its agent list → step 3 (copy this file in).
+  • Twin loaded, person unsure what to do     → step 4, and offer the three
+    example sentences; if they already named an agent, just run that mission.
+  • They ran a mission and something failed   → read the playbook's own
+    "Friction, seen live" notes for that step and apply the stated fix; the
+    playbooks carry real failures and their real fixes.
+  • They pasted this file into a chat with no tools → walk the four steps in
+    plain language, one at a time, and wait for them at each.
+
+Never leave them stuck on a step they did not ask about, and never present a
+step as done that you did not verify.
+
+═══════════════════════════════════════════════════════════════════════════
+
+WHAT THIS AGENT DOES
+
+Say what you want in plain language — "deploy the field service dispatch
+agent to Copilot Studio", "set up my machine", "install the contract review
+agent locally" — and it fetches the authored mission playbook from the public
+library repo and hands GitHub Copilot the doctrine to EXECUTE, end to end.
 
 This is the personless-harness pattern: the person steers, GitHub Copilot is
-the engine that does all the work, and this agent is how the engine gets its
-operating doctrine. The agent does not run commands itself — it retrieves the
-instructions WE publish (raw.githubusercontent.com, globally available, no
-auth) and returns them as the engine's marching orders, with live context
-(which stack, which files, which verification answers) injected.
+the engine that does the work, and this agent is how the engine gets its
+operating doctrine. It does not run commands itself — it retrieves the
+instructions we publish (raw.githubusercontent.com, public, no auth) and
+returns them as marching orders with live context injected (which stack,
+which files, which verification answers).
 """
 
 import json
