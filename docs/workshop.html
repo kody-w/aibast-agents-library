@@ -651,6 +651,136 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
 </div>
 </details>
 
+<details class="uh" id="waf">
+  <summary><span class="eng">For your architects</span>The architecture — a Well-Architected review of what just got built</summary>
+  <div class="phase">
+  <div class="card">
+    <h3>Runtime and build architecture — <span data-dyn="name">your agent</span></h3>
+    <p>Two lanes. The build lane exists only while you author; the runtime lane is what production
+      traffic touches. Nothing in this design is novel infrastructure — every box is a governed
+      Microsoft service the tenant already runs, which is precisely the argument to make when the
+      curve balls come.</p>
+    <div style="overflow-x:auto">
+    <svg viewBox="0 0 1000 560" style="min-width:820px;width:100%;font-family:'Segoe UI',sans-serif">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0L10 5L0 10z" fill="#5b5e6e"/></marker></defs>
+      <!-- lanes -->
+      <rect x="10" y="10" width="980" height="205" rx="12" fill="#f6f7fa" stroke="#e3e5ec"/>
+      <text x="28" y="38" font-size="13" font-weight="700" fill="#8a8da0" letter-spacing="2">BUILD LANE — exists only while authoring</text>
+      <rect x="10" y="230" width="980" height="230" rx="12" fill="#fff" stroke="#e3e5ec"/>
+      <text x="28" y="258" font-size="13" font-weight="700" fill="#8a8da0" letter-spacing="2">RUNTIME LANE — what production traffic touches</text>
+      <!-- build lane boxes -->
+      <rect x="30" y="60" width="200" height="120" rx="10" fill="#fff" stroke="#c2278f" stroke-width="1.5"/>
+      <text x="130" y="88" font-size="14" font-weight="700" fill="#c2278f" text-anchor="middle">Person + brainstem</text>
+      <text x="130" y="110" font-size="12" fill="#5b5e6e" text-anchor="middle">GitHub Copilot is the engine;</text>
+      <text x="130" y="127" font-size="12" fill="#5b5e6e" text-anchor="middle">the person steers in chat.</text>
+      <text x="130" y="150" font-size="11.5" fill="#8a8da0" text-anchor="middle">Sales Specialist Twin fetches</text>
+      <text x="130" y="166" font-size="11.5" fill="#8a8da0" text-anchor="middle">authored mission playbooks</text>
+      <rect x="290" y="60" width="200" height="120" rx="10" fill="#fff" stroke="#a63db8" stroke-width="1.5"/>
+      <text x="390" y="88" font-size="14" font-weight="700" fill="#a63db8" text-anchor="middle">Public library (GitHub)</text>
+      <text x="390" y="110" font-size="12" fill="#5b5e6e" text-anchor="middle">Versioned scaffold: instructions,</text>
+      <text x="390" y="127" font-size="12" fill="#5b5e6e" text-anchor="middle"><tspan data-dyn="skillCount">4</tspan> skills, knowledge, verification</text>
+      <text x="390" y="150" font-size="11.5" fill="#8a8da0" text-anchor="middle">raw.githubusercontent.com,</text>
+      <text x="390" y="166" font-size="11.5" fill="#8a8da0" text-anchor="middle">public, immutable per commit</text>
+      <rect x="550" y="60" width="180" height="120" rx="10" fill="#fff" stroke="#2f9e44" stroke-width="1.5"/>
+      <text x="640" y="88" font-size="14" font-weight="700" fill="#2f9e44" text-anchor="middle">pac CLI (ALM)</text>
+      <text x="640" y="110" font-size="12" fill="#5b5e6e" text-anchor="middle">init · pull · push · publish</text>
+      <text x="640" y="132" font-size="11.5" fill="#8a8da0" text-anchor="middle">Everything as YAML in git;</text>
+      <text x="640" y="148" font-size="11.5" fill="#8a8da0" text-anchor="middle">publish is an explicit,</text>
+      <text x="640" y="164" font-size="11.5" fill="#8a8da0" text-anchor="middle">human-confirmed gate</text>
+      <line x1="230" y1="120" x2="290" y2="120" stroke="#5b5e6e" stroke-width="1.5" marker-end="url(#ar)"/>
+      <line x1="490" y1="120" x2="550" y2="120" stroke="#5b5e6e" stroke-width="1.5" marker-end="url(#ar)"/>
+      <line x1="730" y1="120" x2="800" y2="120" stroke="#5b5e6e" stroke-width="1.5" marker-end="url(#ar)"/>
+      <!-- runtime lane -->
+      <rect x="30" y="280" width="150" height="110" rx="10" fill="#fff" stroke="#2b6cb8" stroke-width="1.5"/>
+      <text x="105" y="310" font-size="14" font-weight="700" fill="#2b6cb8" text-anchor="middle">Channels</text>
+      <text x="105" y="332" font-size="12" fill="#5b5e6e" text-anchor="middle">Teams · M365 Copilot</text>
+      <text x="105" y="349" font-size="12" fill="#5b5e6e" text-anchor="middle">· Test pane</text>
+      <text x="105" y="372" font-size="11.5" fill="#8a8da0" text-anchor="middle">shared deliberately</text>
+      <rect x="800" y="60" width="170" height="380" rx="10" fill="#fff" stroke="#7444c0" stroke-width="2"/>
+      <text x="885" y="90" font-size="15" font-weight="700" fill="#7444c0" text-anchor="middle">Copilot Studio</text>
+      <text x="885" y="112" font-size="12.5" font-weight="650" fill="#1a1a2e" text-anchor="middle" data-dyn="nameShort">agent</text>
+      <text x="885" y="140" font-size="12" fill="#5b5e6e" text-anchor="middle">Instructions (rules)</text>
+      <text x="885" y="160" font-size="12" fill="#5b5e6e" text-anchor="middle"><tspan data-dyn="skillCount">4</tspan> skills (procedures)</text>
+      <text x="885" y="180" font-size="12" fill="#5b5e6e" text-anchor="middle">Knowledge (grounding)</text>
+      <text x="885" y="205" font-size="11.5" fill="#8a8da0" text-anchor="middle">agentic loop · published</text>
+      <text x="885" y="221" font-size="11.5" fill="#8a8da0" text-anchor="middle">versions immutable</text>
+      <text x="885" y="250" font-size="12" font-weight="700" fill="#2f9e44" text-anchor="middle">Tools (production tier)</text>
+      <rect x="820" y="262" width="130" height="52" rx="8" fill="#eaf6ec" stroke="#2f9e44"/>
+      <text x="885" y="284" font-size="12" font-weight="700" fill="#1a1a2e" text-anchor="middle" id="sorBox">Dataverse / D365</text>
+      <text x="885" y="302" font-size="11" fill="#5b5e6e" text-anchor="middle" id="sorConn">native connector</text>
+      <text x="885" y="336" font-size="11.5" fill="#8a8da0" text-anchor="middle">acts as the signed-in</text>
+      <text x="885" y="352" font-size="11.5" fill="#8a8da0" text-anchor="middle">user — never a</text>
+      <text x="885" y="368" font-size="11.5" fill="#8a8da0" text-anchor="middle">service principal</text>
+      <text x="885" y="398" font-size="11.5" fill="#8a8da0" text-anchor="middle">Analytics: transcripts,</text>
+      <text x="885" y="414" font-size="11.5" fill="#8a8da0" text-anchor="middle">usage, quality signals</text>
+      <line x1="180" y1="335" x2="800" y2="335" stroke="#5b5e6e" stroke-width="1.5" marker-end="url(#ar)"/>
+      <text x="480" y="326" font-size="11.5" fill="#8a8da0" text-anchor="middle">user turn (Entra ID token, caller identity end to end)</text>
+      <!-- cross-cutting -->
+      <rect x="10" y="480" width="980" height="66" rx="10" fill="#101a35"/>
+      <text x="30" y="507" font-size="12.5" font-weight="700" fill="#f291b6">CROSS-CUTTING</text>
+      <text x="30" y="530" font-size="12.5" fill="#c7cbe6">Microsoft Entra ID (identity on every hop) · Environment DLP policies (govern every connector) · Purview labels honored by sources · Publish gate + verification regression set on every change</text>
+    </svg></div>
+    <p style="font-size:13px;color:var(--faint)">The system-of-record box follows your adventure
+      pick above — the runtime shape is identical for every hookup; only the connector and its
+      authentication provider change.</p>
+  </div>
+
+  <div class="card">
+    <h3>The five pillars, answered — Microsoft Well-Architected Framework</h3>
+    <table class="ladder">
+      <thead><tr><th>Pillar</th><th>How this design answers it</th><th>What to concede honestly</th></tr></thead>
+      <tbody>
+        <tr><td>Reliability</td>
+          <td>The agent is stateless between turns; published versions are immutable; the entire
+            definition lives as versioned YAML in git, redeployable to any environment in minutes
+            via pac. Platform SLAs are inherited from Power Platform, not built. The computed
+            verification set is a regression suite — rerun after every change, forever.</td>
+          <td>A Copilot Studio service outage takes the runtime with it (we hit one live: the
+            ecs.office.com config 503 disables the test surface). There is no self-hosted fallback
+            — the mitigation is the documented outage signature and honest degraded-state comms.</td></tr>
+        <tr><td>Security</td>
+          <td>Caller identity end to end: Entra ID on every channel, and production tools act as
+            the signed-in user — a user sees only what their own permissions allow, in Dataverse or
+            in Salesforce/ServiceNow/SAP via each connector's per-user OAuth. Environment-level DLP
+            policies govern every connector the agent may touch. No secrets live in agent content;
+            the prototype tier carries synthetic data only, stamped as such.</td>
+          <td>A maker with environment access can still author a badly-scoped tool; the publish
+            gate and transcript spot-audits are process controls, not technical ones. Prompt
+            injection through knowledge content is mitigated by curated sources, not eliminated.</td></tr>
+        <tr><td>Cost Optimization</td>
+          <td>The prototype tier costs nothing beyond existing licensing — file knowledge, no
+            infrastructure. Production billing is Copilot Studio capacity (message-based) plus
+            connectors the tenant mostly already licenses. Scale spend is deferred until the pilot
+            proves value; teardown is one command.</td>
+          <td>Message-based billing needs a usage estimate before broad rollout; an agent shared
+            tenant-wide without that estimate is the classic surprise-bill path. Model the pilot's
+            transcript volume first.</td></tr>
+        <tr><td>Operational Excellence</td>
+          <td>Everything-as-code: the scaffold is git-versioned YAML, ALM is pac pull/push/publish
+            (CI-able), the operating doctrine itself is versioned (twin playbooks carry every known
+            friction and its fix), and the smoke suite in tools/workshop-smoke encodes each defect
+            the first live runs caught. Copilot Studio analytics provide transcripts and usage for
+            continuous improvement.</td>
+          <td>Environment hygiene is on the customer: security-role grants (we hit the missing
+            prvReadbot role live) and connection ownership need a named admin. The runbook names
+            the dependency; it can't remove it.</td></tr>
+        <tr><td>Performance Efficiency</td>
+          <td>Deterministic business rules live in skills — computed in the turn, no extra service
+            hops. Small curated knowledge keeps retrieval fast and grounded. The production tier
+            pushes queries down to the system of record instead of syncing data out. Model series
+            is a per-agent setting, tunable without redesign.</td>
+          <td>Turn latency is dominated by the LLM, seconds not milliseconds — set that
+            expectation. RAG over file knowledge is for curated corpora; large document estates
+            belong in indexed sources (SharePoint), not uploaded files.</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:13px;color:var(--faint)">Failure modes and their prevent/detect/respond
+      controls are in the production step's table above — bring both to the architecture review.</p>
+  </div>
+  </div>
+</details>
+
 <!-- ═══════════ 7 PRODUCTION ═══════════ -->
 <section class="phase" id="production">
   <div class="phead"><span class="pk">Step 6</span><span class="time">when you're ready</span></div>
@@ -868,8 +998,18 @@ function renderSor(){
     updateMission();};
   document.getElementById("sorRow").style.display="block";
 }
+var SORMAP={d365:["Dataverse / D365","native connector"],
+  salesforce:["Salesforce","Power Platform connector (OAuth)"],
+  servicenow:["ServiceNow","Power Platform connector (OAuth)"],
+  sap:["SAP","SAP ERP connector / OData"],
+  workday:["Workday","Workday HCM connector"],
+  "generic-rest":["Your system","custom connector (OpenAPI)"]};
 function updateMission(){
   if(!SELECTED) return;
+  var sb=document.getElementById("sorBox"), sc=document.getElementById("sorConn");
+  if(sb&&SORMAP[SOR]){sb.textContent=SORMAP[SOR][0];sc.textContent=SORMAP[SOR][1];}
+  var ns=document.querySelectorAll("[data-dyn=nameShort]");
+  ns.forEach(function(el){el.textContent=agentTitle(SELECTED);});
   var base="\u201cDeploy the "+agentTitle(SELECTED).toLowerCase()+" agent to Copilot Studio";
   var s=SORS.filter(function(x){return x.id===SOR;})[0];
   document.getElementById("missionSay").textContent=

@@ -25,3 +25,9 @@ r3 = a.perform(operation="mission",
                request="deploy the deal progression agent to copilot studio")
 assert "MUTATION" not in r3, "mutation appended without being asked"
 print("mutation_layer_test: PASS")
+
+# architecture mission: WAF review with concessions, stack-adapted
+r4 = a.perform(operation="mission",
+               request="give me the architecture review for the field service dispatch agent")
+assert "Well-Architected" in r4 and "Concede" in r4 and "Field Service" in r4, "architecture mission broken"
+print("architecture_mission_test: PASS")
