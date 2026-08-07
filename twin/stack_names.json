@@ -1,0 +1,525 @@
+{
+ "schema": "aibast-twin-stack-names/1.0",
+ "note": "Every name the workshop can show for a stack \u2014 display name plus advertised names. The twin resolves any of them, because these are what a seller reads off the card.",
+ "stacks": {
+  "account-intelligence": {
+   "dir": "account_intelligence_stack",
+   "names": [
+    "Account Research Agent"
+   ]
+  },
+  "deal-progression": {
+   "dir": "deal_progression_stack",
+   "names": [
+    "Sales Pipeline Management Agent"
+   ]
+  },
+  "proposal-generation": {
+   "dir": "proposal_generation_stack",
+   "names": [
+    "Proposal Creation Agent",
+    "Proposal Generation"
+   ]
+  },
+  "sales-qualification": {
+   "dir": "sales_qualification_stack",
+   "names": [
+    "Sales Qualification"
+   ]
+  },
+  "win-loss-analysis": {
+   "dir": "win_loss_analysis_stack",
+   "names": [
+    "Win/Loss Analysis"
+   ]
+  },
+  "cart-abandonment-recovery": {
+   "dir": "cart_abandonment_recovery_stack",
+   "names": [
+    "Abandoned Cart Recovery Agent",
+    "Cart Abandonment Recovery Agent"
+   ]
+  },
+  "customer-360-speech": {
+   "dir": "customer_360_speech_stack",
+   "names": [
+    "Customer 360 & Speech Agent"
+   ]
+  },
+  "customer-loyalty-rewards": {
+   "dir": "customer_loyalty_rewards_stack",
+   "names": [
+    "Customer Loyalty & Rewards Agent",
+    "Loyalty Insights Agent"
+   ]
+  },
+  "omnichannel-engagement": {
+   "dir": "omnichannel_engagement_stack",
+   "names": [
+    "Cross-Channel Engagement Agent"
+   ]
+  },
+  "personalized-shopping-assistant": {
+   "dir": "personalized_shopping_assistant_stack",
+   "names": [
+    "Personal Styling Agent",
+    "Personalized Shopping Assistant Agent"
+   ]
+  },
+  "returns-exchange": {
+   "dir": "returns_exchange_stack",
+   "names": [
+    "Returns & Exchange Agent"
+   ]
+  },
+  "sales-chat": {
+   "dir": "sales_chat_stack",
+   "names": [
+    "Sales Chat Agent"
+   ]
+  },
+  "asset-maintenance-forecast": {
+   "dir": "asset_maintenance_forecast_stack",
+   "names": [
+    "Asset Maintenance Forecast Agent",
+    "Energy Operations Agent (a)"
+   ]
+  },
+  "emission-tracking": {
+   "dir": "emission_tracking_stack",
+   "names": [
+    "Emission Tracking Agent",
+    "Energy Operations Agent (d)"
+   ]
+  },
+  "field-service-dispatch": {
+   "dir": "field_service_dispatch_stack",
+   "names": [
+    "Field Service Dispatch Agent"
+   ]
+  },
+  "permit-license-management": {
+   "dir": "permit_license_management_stack",
+   "names": [
+    "Energy Operations Agent (b)",
+    "Permit & License Management Agent"
+   ]
+  },
+  "energy-regulatory-reporting": {
+   "dir": "regulatory_reporting_stack",
+   "names": [
+    "Energy Operations Agent (c)",
+    "Energy Regulatory Reporting Agent"
+   ]
+  },
+  "acquisition-support": {
+   "dir": "acquisition_support_stack",
+   "names": [
+    "Acquisition Support Agent"
+   ]
+  },
+  "federal-grants-oversight": {
+   "dir": "federal_grants_oversight_stack",
+   "names": [
+    "Federal Grants Oversight Agent"
+   ]
+  },
+  "mission-reporting-assistant": {
+   "dir": "mission_reporting_assistant_stack",
+   "names": [
+    "Mission Reporting Assistant Agent"
+   ]
+  },
+  "regulatory-compliance-fed": {
+   "dir": "regulatory_compliance_fed_stack",
+   "names": [
+    "Regulatory Compliance (Federal) Agent"
+   ]
+  },
+  "workforce-clearance-onboarding": {
+   "dir": "workforce_clearance_onboarding_stack",
+   "names": [
+    "Workforce Clearance & Onboarding Agent"
+   ]
+  },
+  "claims-processing": {
+   "dir": "claims_processing_stack",
+   "names": [
+    "Claims Processing Agent"
+   ]
+  },
+  "fs-customer-onboarding": {
+   "dir": "customer_onboarding_fs_stack",
+   "names": [
+    "Client Onboarding Agent",
+    "FS Customer Onboarding Agent"
+   ]
+  },
+  "customer-sentiment-churn": {
+   "dir": "customer_sentiment_churn_stack",
+   "names": [
+    "Customer Sentiment & Churn Agent"
+   ]
+  },
+  "financial-advisor-copilot": {
+   "dir": "financial_advisor_copilot_stack",
+   "names": [
+    "Branch Banking Advisory Agent",
+    "Financial Advisor Copilot Agent"
+   ]
+  },
+  "fraud-detection-alert": {
+   "dir": "fraud_detection_alert_stack",
+   "names": [
+    "Fraud Detection & Alert Agent"
+   ]
+  },
+  "loan-origination-assistant": {
+   "dir": "loan_origination_assistant_stack",
+   "names": [
+    "Loan Origination Assistant Agent",
+    "Mortgage Origination Agent"
+   ]
+  },
+  "portfolio-rebalancing": {
+   "dir": "portfolio_rebalancing_stack",
+   "names": [
+    "Portfolio Rebalancing Agent"
+   ]
+  },
+  "fs-regulatory-compliance": {
+   "dir": "regulatory_compliance_fs_stack",
+   "names": [
+    "FS Regulatory Compliance Agent",
+    "Regulatory Compliance Agent"
+   ]
+  },
+  "underwriting-support": {
+   "dir": "underwriting_support_stack",
+   "names": [
+    "Commercial Underwriting Agent",
+    "Underwriting Support Agent"
+   ]
+  },
+  "wealth-insights-generator": {
+   "dir": "wealth_insights_generator_stack",
+   "names": [
+    "Wealth Insights Agent",
+    "Wealth Insights Generator Agent"
+   ]
+  },
+  "ai-customer-assistant": {
+   "dir": "ai_customer_assistant_stack",
+   "names": [
+    "AI Customer Assistant"
+   ]
+  },
+  "general-ask-hr": {
+   "dir": "ask_hr_stack",
+   "names": [
+    "General Ask HR"
+   ]
+  },
+  "dynamics-365-connector": {
+   "dir": "crm_bulk_data_creator_stack",
+   "names": [
+    "CRM Bulk Data Creator Agent"
+   ]
+  },
+  "cross-selling": {
+   "dir": "cross_selling_opportunities_stack",
+   "names": [
+    "Expansion Opportunity Agent"
+   ]
+  },
+  "customer-360": {
+   "dir": "customer_360_stack",
+   "names": [
+    "Customer 360"
+   ]
+  },
+  "email-drafting": {
+   "dir": "email_drafting_stack",
+   "names": [
+    "Email Drafting"
+   ]
+  },
+  "find-accurate-models": {
+   "dir": "find_accurate_models_stack",
+   "names": [
+    "Find Accurate Models"
+   ]
+  },
+  "identify-discounts": {
+   "dir": "identify_discounts_stack",
+   "names": [
+    "Identify Discounts"
+   ]
+  },
+  "it-ticket-management": {
+   "dir": "it_ticket_management_stack",
+   "names": [
+    "IT Ticket Management"
+   ]
+  },
+  "procurement-agent": {
+   "dir": "procurement_agent_stack",
+   "names": [
+    "Procurement Agent",
+    "Procurement Savings Agent",
+    "Purchase Order Management Agent"
+   ]
+  },
+  "procurement-support": {
+   "dir": "procurement_support_stack",
+   "names": [
+    "Procurement Support"
+   ]
+  },
+  "product-reference": {
+   "dir": "product_reference_stack",
+   "names": [
+    "Product Reference"
+   ]
+  },
+  "sales-coach": {
+   "dir": "sales_coach_stack",
+   "names": [
+    "Sales Coach"
+   ]
+  },
+  "sales-simulation": {
+   "dir": "simulation_sales_stack",
+   "names": [
+    "Sales Simulation"
+   ]
+  },
+  "speech-to-crm": {
+   "dir": "speech_to_crm_stack",
+   "names": [
+    "Speech to CRM"
+   ]
+  },
+  "triage-bot": {
+   "dir": "triage_bot_stack",
+   "names": [
+    "Triage Bot"
+   ]
+  },
+  "voice-to-crm-d365": {
+   "dir": "voice_to_crm_stack",
+   "names": [
+    "Voice to CRM Agent"
+   ]
+  },
+  "care-gap-closure": {
+   "dir": "care_gap_closure_stack",
+   "names": [
+    "Care Gap Closure Agent"
+   ]
+  },
+  "clinical-notes-summarizer": {
+   "dir": "clinical_notes_summarizer_stack",
+   "names": [
+    "Clinical Notes Summarizer Agent",
+    "Clinical Summary Agent"
+   ]
+  },
+  "patient-intake": {
+   "dir": "patient_intake_stack",
+   "names": [
+    "Patient Intake Agent"
+   ]
+  },
+  "prior-authorization": {
+   "dir": "prior_authorization_stack",
+   "names": [
+    "Prior Authorization Agent"
+   ]
+  },
+  "staff-credentialing": {
+   "dir": "staff_credentialing_stack",
+   "names": [
+    "Staff Credentialing Agent"
+   ]
+  },
+  "ask-hr": {
+   "dir": "ask_hr_stack",
+   "names": [
+    "Ask HR",
+    "HR Self-Service Agent"
+   ]
+  },
+  "it-helpdesk": {
+   "dir": "it_helpdesk_stack",
+   "names": [
+    "IT Helpdesk"
+   ]
+  },
+  "inventory-rebalancing": {
+   "dir": "inventory_rebalancing_stack",
+   "names": [
+    "Inventory Optimization Agent",
+    "Inventory Rebalancing Agent"
+   ]
+  },
+  "maintenance-scheduling": {
+   "dir": "maintenance_scheduling_stack",
+   "names": [
+    "Predictive Maintenance Agent"
+   ]
+  },
+  "order-status-communication": {
+   "dir": "order_status_communication_stack",
+   "names": [
+    "Order Status & Delay Agent",
+    "Order Status Communication Agent"
+   ]
+  },
+  "production-line-optimization": {
+   "dir": "production_line_optimization_stack",
+   "names": [
+    "Product Line Optimization Agent",
+    "Production Line Optimization Agent"
+   ]
+  },
+  "supplier-risk-monitoring": {
+   "dir": "supplier_risk_monitoring_stack",
+   "names": [
+    "Supplier Risk Monitoring Agent",
+    "Supply Chain Risk Agent",
+    "Supply Risk Intelligence Agent"
+   ]
+  },
+  "client-health-score": {
+   "dir": "client_health_score_stack",
+   "names": [
+    "Client Health Score Agent"
+   ]
+  },
+  "contract-risk-review": {
+   "dir": "contract_risk_review_stack",
+   "names": [
+    "Contract Review Agent",
+    "Contract Risk Review Agent"
+   ]
+  },
+  "proposal-copilot": {
+   "dir": "proposal_copilot_stack",
+   "names": [
+    "Proposal Copilot Agent"
+   ]
+  },
+  "resource-utilization": {
+   "dir": "resource_utilization_stack",
+   "names": [
+    "Resource Utilization Agent"
+   ]
+  },
+  "time-entry-billing": {
+   "dir": "time_entry_billing_stack",
+   "names": [
+    "Month-End Billing Agent",
+    "Time Entry & Billing Agent"
+   ]
+  },
+  "inventory-visibility": {
+   "dir": "inventory_visibility_stack",
+   "names": [
+    "Inventory Visibility Agent",
+    "Omnichannel Inventory Agent"
+   ]
+  },
+  "personalized-marketing": {
+   "dir": "personalized_marketing_stack",
+   "names": [
+    "Campaign Design Agent",
+    "Personalized Marketing Agent"
+   ]
+  },
+  "returns-complaints-resolution": {
+   "dir": "returns_complaints_resolution_stack",
+   "names": [
+    "Returns & Complaints Agent",
+    "Returns & Complaints Resolution Agent"
+   ]
+  },
+  "store-associate-copilot": {
+   "dir": "store_associate_copilot_stack",
+   "names": [
+    "Store Associate Agent",
+    "Store Associate Copilot Agent"
+   ]
+  },
+  "supply-chain-disruption-alert": {
+   "dir": "supply_chain_disruption_alert_stack",
+   "names": [
+    "Supply Chain Disruption Alert Agent"
+   ]
+  },
+  "building-permit-processing": {
+   "dir": "building_permit_processing_stack",
+   "names": [
+    "Building Permit Processing Agent",
+    "Building Permit Review Agent"
+   ]
+  },
+  "citizen-service-request": {
+   "dir": "citizen_service_request_stack",
+   "names": [
+    "Citizen Service Request Agent"
+   ]
+  },
+  "foia-request-assistant": {
+   "dir": "foia_request_assistant_stack",
+   "names": [
+    "FOIA Request Assistant Agent"
+   ]
+  },
+  "slg-grants-management": {
+   "dir": "grants_management_stack",
+   "names": [
+    "SLG Grants Management Agent"
+   ]
+  },
+  "utility-billing-assistance": {
+   "dir": "utility_billing_assistance_stack",
+   "names": [
+    "Utility Billing Assistance Agent",
+    "Utility Leak Detection & Billing Agent"
+   ]
+  },
+  "software-competitive-intel": {
+   "dir": "competitive_intel_stack",
+   "names": [
+    "Competitive Intelligence Agent"
+   ]
+  },
+  "software-customer-onboarding": {
+   "dir": "customer_onboarding_stack",
+   "names": [
+    "Customer Onboarding Agent"
+   ]
+  },
+  "license-renewal-expansion": {
+   "dir": "license_renewal_expansion_stack",
+   "names": [
+    "License Renewal & Expansion Agent",
+    "Subscription Renewal Agent"
+   ]
+  },
+  "product-feedback-synthesizer": {
+   "dir": "product_feedback_synthesizer_stack",
+   "names": [
+    "Product Feedback Insights Agent",
+    "Product Feedback Synthesizer Agent"
+   ]
+  },
+  "support-ticket-resolution": {
+   "dir": "support_ticket_resolution_stack",
+   "names": [
+    "Support Ticket Resolution Agent"
+   ]
+  }
+ }
+}

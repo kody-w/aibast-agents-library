@@ -149,6 +149,17 @@ def _stack_context(request):
                 aliases.setdefault(e["b_slug"], []).append(e.get("sharepoint_name", ""))
     except Exception:  # noqa: BLE001 — aliases are a convenience, not a dependency
         pass
+    # The workshop card shows the STACK's name, which is not always any single
+    # agent's registry name (a suite's card says "CRM Bulk Data Creator").
+    # Resolve those too, or a seller reading the card cannot be understood.
+    stack_dirs = {}
+    try:
+        sn = json.loads(_fetch("twin/stack_names.json"))
+        for slug, info in sn.get("stacks", {}).items():
+            aliases.setdefault(slug, []).extend(info.get("names", []))
+            stack_dirs[slug] = info.get("dir", "")
+    except Exception:  # noqa: BLE001
+        pass
     # Slug tokens decide; description words only break ties. A big multi-agent
     # stack's rich description must never outscore an exact-name match (seen
     # live: "win loss analysis" landing on the deal-progression suite).
@@ -163,8 +174,47 @@ def _stack_context(request):
             alias_tokens |= set(re.split(r"[^a-z0-9]+", an.lower())) - {"", "agent"}
         hay = (a.get("display_name", "") + " " + " ".join(a.get("tags", [])) + " " +
                a.get("description", "") + " " + " ".join(alias_names)).lower()
-        sc = (10 * len(words & slug_tokens) + 10 * len(words & alias_tokens)
+        # Prefix-tolerant matching: "intelligence" should satisfy the slug
+        # token "intel", and "federal" should satisfy "fed".
+        def _hits(target):
+            n = 0
+            for t in target:
+                for w in words:
+                    if w == t or (len(t) >= 3 and w.startswith(t)) or \
+                       (len(w) >= 3 and t.startswith(w)):
+                        n += 1
+                        break
+            return n
+        matched = _hits(slug_tokens)
+        # Penalize slug tokens the request did NOT name: "customer 360" should
+        # prefer customer-360 over customer-360-speech, which carries an extra
+        # concept the person never asked for.
+        extra = max(0, len(slug_tokens) - matched)
+        disp_tokens = set(re.split(r"[^a-z0-9]+",
+                          a.get("display_name", "").lower())) - {"", "agent"}
+        sc = (10 * matched + 10 * len(words & alias_tokens) - 3 * extra
               + sum(1 for w in words if w in hay))
+        if words and slug_tokens == words:
+            sc += 25   # exact slug match wins outright
+        if words and disp_tokens == words:
+            sc += 30   # the person said this stack's display name verbatim
+        for an in alias_names:
+            at = set(re.split(r"[^a-z0-9]+", an.lower())) - {"", "agent"}
+            if words and at == words:
+                sc += 30   # ...or its advertised name verbatim
+        # Prefer the agent that OWNS its stack directory over a same-named
+        # member of a larger suite: only stacks carry deployable scaffolds,
+        # and two agents can legitimately share a display name.
+        stack_dir_name = os.path.basename(os.path.dirname(a.get("_file", "")))
+        if stack_dirs.get(slug) == stack_dir_name:
+            sc += 20   # this agent is the stack's declared owner
+        dir_tokens = set(re.split(r"[^a-z0-9]+", stack_dir_name.lower())) - {"", "stack"}
+        # The directory's name being covered by the slug means this agent
+        # names the stack it lives in (competitive_intel_stack <=
+        # software-competitive-intel), rather than being a member of someone
+        # else's suite (account_intelligence_stack vs competitive-intelligence).
+        if dir_tokens and dir_tokens <= slug_tokens:
+            sc += 35   # owns its stack — the only kind that deploys on its own
         if sc > score:
             entry, score = a, sc
     if not entry or score == 0:

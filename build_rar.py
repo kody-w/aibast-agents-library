@@ -42,7 +42,22 @@ def main():
     (ROOT / "rar").mkdir(exist_ok=True)
     (ROOT / "rar" / "registry.json").write_text(
         json.dumps(out, indent=1), encoding="utf-8")
+    # Stack-name index: what the workshop shows, so the twin can resolve it.
+    names = {}
+    for man in sorted(ROOT.glob("agents/@aibast-agents-library/*_stacks/*/copilot_studio/manifest.json")):
+        d = json.loads(man.read_text())
+        sp = d.get("sharepoint") or {}
+        alt = (sp.get("also_advertised_as") or {}).get("name")
+        cand = [d["display_name"], sp.get("approved_name"), alt]
+        names[d["stack"]] = {"dir": man.parent.parent.name,
+                             "names": sorted({c for c in cand if c})}
+    (ROOT / "twin" / "stack_names.json").write_text(json.dumps(
+        {"schema": "aibast-twin-stack-names/1.0",
+         "note": "Every name the workshop can show for a stack. The twin resolves any of them.",
+         "stacks": names}, indent=1), encoding="utf-8")
+
     print(f"[OK] AIBAST RAR built: {len(agents)} agents, digests verified installable")
+    print(f"[OK] stack-name index: {len(names)} stacks")
 
 
 if __name__ == "__main__":

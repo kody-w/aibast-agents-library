@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-08-07T07:52:36.556390+00:00",
+  "generated_at": "2026-08-07T08:40:07.300821+00:00",
   "stats": {
     "total_agents": 105,
     "publishers": 1,
@@ -1650,8 +1650,8 @@
         "@rapp/basic-agent"
       ],
       "_file": "agents/@aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py",
-      "_size_kb": 18.5,
-      "_lines": 371
+      "_size_kb": 20.5,
+      "_lines": 408
     },
     {
       "schema": "rapp-agent/1.0",
