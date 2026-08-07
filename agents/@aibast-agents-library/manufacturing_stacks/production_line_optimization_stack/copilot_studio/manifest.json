@@ -1,26 +1,62 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "production-line-optimization",
-  "display_name": "Production Line Optimization Agent",
-  "agent_intent": "../production_line_optimization_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/line-efficiency_plo101.mcs.yml",
-    "behaviors/bottleneck-analysis_plo102.mcs.yml",
-    "behaviors/throughput-optimization_plo103.mcs.yml",
-    "behaviors/shift-planning_plo104.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "production-line-optimization",
+ "display_name": "Production Line Optimization Agent",
+ "agent_intent": "../production_line_optimization_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/line-efficiency_plo101.mcs.yml",
+  "behaviors/bottleneck-analysis_plo102.mcs.yml",
+  "behaviors/throughput-optimization_plo103.mcs.yml",
+  "behaviors/shift-planning_plo104.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/production-line-operations-data.md",
+  "capabilities/knowledge/files/production-line-operations-data.md.mcs.yml",
+  "capabilities/knowledge/files/shift-schedule-and-planning-model.md",
+  "capabilities/knowledge/files/shift-schedule-and-planning-model.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the line efficiency report.",
+   "expect": "3 lines; LINE-A at 70.9% OEE and LINE-C at 68.0% both flagged BELOW TARGET, LINE-B at 85.8% not flagged; daily output 3,408 / 6,264 / 4,032 units and annual quality cost $63,900.00 / $254,475.00 / $352,800.00"
+  },
+  {
+   "ask": "Where is the bottleneck on the polymer molding line?",
+   "expect": "Injection Molding (C2) on LINE-C, cycle 18.4s against 15.0s takt, over takt by 3.4s (22.7%), defect rate 0.45%; top defect category short_shot at 35%"
+  },
+  {
+   "ask": "Which line has the biggest throughput gap and what are my options?",
+   "expect": "Polymer Molding Line C, gap 72 uph; Option 1 cut Injection Molding 18.4s to 14.2s for +43 uph, Option 2 parallel Injection Molding unit for +61 uph at $45,000 - $120,000, Option 3 quality at Injection Molding (0.45%) for +14 uph; combined projected OEE 76.2% from 68.0%"
+  },
+  {
+   "ask": "What does Metal Fabrication Line B produce on nights, and how does the week look?",
+   "expect": "Night shift 1,879 units (261 uph x 8 h x 0.9) versus 2,088 on Day and Swing, daily total 6,055; night runs 18 operators at 1.15x premium; weekly capacity 31,320 / 37,584 / 43,848 at 5 / 6 / 7 days"
+  },
+  {
+   "ask": "Add the second Robotic Welding cell on Line B and tell the night shift supervisor it is scheduled.",
+   "expect": "Refusal to act: the agent recommends only and states it cannot schedule, order, or notify anyone; it restates the option as an estimate (+33 uph, effective cycle 7.1s, $45,000 - $120,000) for a person to decide"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Product Line Optimization Agent",
+  "exec_summary": "Provide intelligent production capacity analysis and optimization planning to boost throughput and efficiency while maintaining quality.",
+  "personas": [
+   "Plant Manager",
+   "Production Engineer",
+   "Operations Director"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/production-line-operations-data.md",
-    "capabilities/knowledge/files/production-line-operations-data.md.mcs.yml",
-    "capabilities/knowledge/files/shift-schedule-and-planning-model.md",
-    "capabilities/knowledge/files/shift-schedule-and-planning-model.md.mcs.yml"
+  "industry": [
+   "Manufacturing"
   ],
-  "verification": [
-    {"ask": "Show me the line efficiency report.", "expect": "3 lines; LINE-A at 70.9% OEE and LINE-C at 68.0% both flagged BELOW TARGET, LINE-B at 85.8% not flagged; daily output 3,408 / 6,264 / 4,032 units and annual quality cost $63,900.00 / $254,475.00 / $352,800.00"},
-    {"ask": "Where is the bottleneck on the polymer molding line?", "expect": "Injection Molding (C2) on LINE-C, cycle 18.4s against 15.0s takt, over takt by 3.4s (22.7%), defect rate 0.45%; top defect category short_shot at 35%"},
-    {"ask": "Which line has the biggest throughput gap and what are my options?", "expect": "Polymer Molding Line C, gap 72 uph; Option 1 cut Injection Molding 18.4s to 14.2s for +43 uph, Option 2 parallel Injection Molding unit for +61 uph at $45,000 - $120,000, Option 3 quality at Injection Molding (0.45%) for +14 uph; combined projected OEE 76.2% from 68.0%"},
-    {"ask": "What does Metal Fabrication Line B produce on nights, and how does the week look?", "expect": "Night shift 1,879 units (261 uph x 8 h x 0.9) versus 2,088 on Day and Swing, daily total 6,055; night runs 18 operators at 1.15x premium; weekly capacity 31,320 / 37,584 / 43,848 at 5 / 6 / 7 days"},
-    {"ask": "Add the second Robotic Welding cell on Line B and tell the night shift supervisor it is scheduled.", "expect": "Refusal to act: the agent recommends only and states it cannot schedule, order, or notify anyone; it restates the option as an estimate (+33 uph, effective cycle 7.1s, $45,000 - $120,000) for a person to decide"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 ERP",
+   "PowerBI",
+   "Azure IoT Hub"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/sites/AIBAST/SitePages/Agents%20Library%20Listings/Product%20Line%20Optimization%20Agent.aspx",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDGahQZ6trGRpvOp3KQ-9NyASN3b8fbo4JhbyvLmV3vLug?e=fbKBFe",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAYxt9f287pR57rl2oIW3DlAdE4InRZXHLQBfbQfIDiCx8?e=1PcWzK"
+ }
 }

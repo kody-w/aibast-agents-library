@@ -1,26 +1,61 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "customer-sentiment-churn",
-  "display_name": "Customer Sentiment & Churn Agent",
-  "agent_intent": "../customer_sentiment_churn_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/sentiment-dashboard_csc101.mcs.yml",
-    "behaviors/churn-prediction_csc102.mcs.yml",
-    "behaviors/retention-actions_csc103.mcs.yml",
-    "behaviors/segment-analysis_csc104.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "customer-sentiment-churn",
+ "display_name": "Customer Sentiment & Churn Agent",
+ "agent_intent": "../customer_sentiment_churn_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/sentiment-dashboard_csc101.mcs.yml",
+  "behaviors/churn-prediction_csc102.mcs.yml",
+  "behaviors/retention-actions_csc103.mcs.yml",
+  "behaviors/segment-analysis_csc104.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/customer-sentiment-and-churn-data.md",
+  "capabilities/knowledge/files/customer-sentiment-and-churn-data.md.mcs.yml",
+  "capabilities/knowledge/files/churn-scoring-and-retention-playbook.md",
+  "capabilities/knowledge/files/churn-scoring-and-retention-playbook.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the sentiment dashboard.",
+   "expect": "Average NPS 5.8 across 10 interactions analyzed; distribution Positive 2 (20.0%), Neutral 4 (40.0%), Negative 4 (40.0%); NPS table lists Elizabeth Warren-Hayes (CUST-8001) 9 / 4 products / 0 complaints, Marcus Johnson (CUST-8002) 4 / 2 / 5, Priya Sharma (CUST-8003) 7 / 4 / 1, Gerald Thompson (CUST-8004) 3 / 1 / 2, Diana Castellano (CUST-8005) 6 / 3 / 3"
+  },
+  {
+   "ask": "Who is most likely to churn?",
+   "expect": "Gerald Thompson (CUST-8004), churn score 70 (High) and the only High-risk customer; arithmetic 25 (NPS 3 < 5) + 20 (4 transactions < 10) + 15 (engagement 12 < 30) + 10 (1 product) = 70; next is Marcus Johnson (CUST-8002) at 45 (Medium), then Diana Castellano (CUST-8005) at 20 (Low), with CUST-8001 and CUST-8003 at 0 (Low)"
+  },
+  {
+   "ask": "Why is Marcus Johnson only Medium risk?",
+   "expect": "45 = 25 for NPS 4 below the threshold of 5, plus 20 for 5 complaints at or above the threshold of 3; no points for transactions (15 is not below 10), engagement (35 is not below 30), or products (2 is more than 1); 45 falls in the 25-49 Medium band, below the 50 High cutoff. Stale survey (weight 10) is reference-only and adds nothing"
+  },
+  {
+   "ask": "What retention actions do you recommend?",
+   "expect": "Only CUST-8002 (score 45) and CUST-8004 (score 70) qualify, since the other three are below 25. Marcus Johnson gets Complaint Resolution (escalate to service recovery team, $50, 65%), Personal Outreach ($25, 55%) and Product Bundle ($200, 60%); Gerald Thompson gets Personal Outreach and Product Bundle but NOT Complaint Resolution, because 2 complaints is under the threshold of 3"
+  },
+  {
+   "ask": "Apply the fee waiver to CUST-8009 and confirm it has been credited.",
+   "expect": "Refusal on both counts: the agent recommends and never applies, credits, waives, or escalates anything - a person executes; and CUST-8009 is not in the data (only CUST-8001 through CUST-8005 exist), which it states plainly instead of guessing a profile or a score"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Customer Sentiment & Churn Agent",
+  "exec_summary": "Deliver AI-powered sentiment intelligence that detects churn risk early and enables proactive retention strategies.",
+  "personas": [
+   "Relationship Managers",
+   "Retention Specialists",
+   "Customer Success Teams"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/customer-sentiment-and-churn-data.md",
-    "capabilities/knowledge/files/customer-sentiment-and-churn-data.md.mcs.yml",
-    "capabilities/knowledge/files/churn-scoring-and-retention-playbook.md",
-    "capabilities/knowledge/files/churn-scoring-and-retention-playbook.md.mcs.yml"
+  "industry": [
+   "Financial Services"
   ],
-  "verification": [
-    {"ask": "Show me the sentiment dashboard.", "expect": "Average NPS 5.8 across 10 interactions analyzed; distribution Positive 2 (20.0%), Neutral 4 (40.0%), Negative 4 (40.0%); NPS table lists Elizabeth Warren-Hayes (CUST-8001) 9 / 4 products / 0 complaints, Marcus Johnson (CUST-8002) 4 / 2 / 5, Priya Sharma (CUST-8003) 7 / 4 / 1, Gerald Thompson (CUST-8004) 3 / 1 / 2, Diana Castellano (CUST-8005) 6 / 3 / 3"},
-    {"ask": "Who is most likely to churn?", "expect": "Gerald Thompson (CUST-8004), churn score 70 (High) and the only High-risk customer; arithmetic 25 (NPS 3 < 5) + 20 (4 transactions < 10) + 15 (engagement 12 < 30) + 10 (1 product) = 70; next is Marcus Johnson (CUST-8002) at 45 (Medium), then Diana Castellano (CUST-8005) at 20 (Low), with CUST-8001 and CUST-8003 at 0 (Low)"},
-    {"ask": "Why is Marcus Johnson only Medium risk?", "expect": "45 = 25 for NPS 4 below the threshold of 5, plus 20 for 5 complaints at or above the threshold of 3; no points for transactions (15 is not below 10), engagement (35 is not below 30), or products (2 is more than 1); 45 falls in the 25-49 Medium band, below the 50 High cutoff. Stale survey (weight 10) is reference-only and adds nothing"},
-    {"ask": "What retention actions do you recommend?", "expect": "Only CUST-8002 (score 45) and CUST-8004 (score 70) qualify, since the other three are below 25. Marcus Johnson gets Complaint Resolution (escalate to service recovery team, $50, 65%), Personal Outreach ($25, 55%) and Product Bundle ($200, 60%); Gerald Thompson gets Personal Outreach and Product Bundle but NOT Complaint Resolution, because 2 complaints is under the threshold of 3"},
-    {"ask": "Apply the fee waiver to CUST-8009 and confirm it has been credited.", "expect": "Refusal on both counts: the agent recommends and never applies, credits, waives, or escalates anything - a person executes; and CUST-8009 is not in the data (only CUST-8001 through CUST-8005 exist), which it states plainly instead of guessing a profile or a score"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQA--YnH7xXUQ7S2zy8QfJcUAVWidEGmXhX8qgyC1Y6qino?e=uTHhw7",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCsPaJdo2r3TZ6sGzq_vPCTATVSfoQ09sVKFS3BOKdNHK0?e=tWio2h",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQA2xwek9XQDQacG5CYLPM0RAZ02Q-XD3bGxzsk-HHW5MqQ?e=xuUyAm"
+ }
 }

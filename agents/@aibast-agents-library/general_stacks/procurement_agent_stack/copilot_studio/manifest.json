@@ -1,26 +1,63 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "procurement-agent",
-  "display_name": "Procurement Agent",
-  "agent_intent": "../procurement_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/purchase-request_prc1.mcs.yml",
-    "behaviors/vendor-comparison_prc2.mcs.yml",
-    "behaviors/approval-routing_prc3.mcs.yml",
-    "behaviors/spend-analysis_prc4.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "procurement-agent",
+ "display_name": "Procurement Agent",
+ "agent_intent": "../procurement_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/purchase-request_prc1.mcs.yml",
+  "behaviors/vendor-comparison_prc2.mcs.yml",
+  "behaviors/approval-routing_prc3.mcs.yml",
+  "behaviors/spend-analysis_prc4.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/procurement-requests-and-vendors.md",
+  "capabilities/knowledge/files/procurement-requests-and-vendors.md.mcs.yml",
+  "capabilities/knowledge/files/approval-thresholds-and-budget.md",
+  "capabilities/knowledge/files/approval-thresholds-and-budget.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me purchase request PR-5001.",
+   "expect": "Cloud Infrastructure Upgrade, Sarah Chen (IT), Technology, $125,000, High priority, status Pending Approval, preferred vendor AWS, budget code IT-INFRA-2025, required approver CFO"
+  },
+  {
+   "ask": "Who has to approve PR-5003 and how long do they get?",
+   "expect": "PR-5003 Annual Software License Renewal - Salesforce, $215,000, falls in the up-to-$500,000 band: CFO, 48 hour SLA; current status Approved"
+  },
+  {
+   "ask": "Compare our office furniture vendors.",
+   "expect": "Steelcase VND-003 Preferred tier 4.3/5 $125,000 annual spend Net 45, versus Herman Miller VND-004 Approved tier 4.6/5 $85,000 Net 30 - higher rating but lower tier"
+  },
+  {
+   "ask": "Which spend categories are in trouble?",
+   "expect": "Software over budget: $645,000 spent + $215,000 committed against $800,000, available -$60,000, +18% YoY. Technology At Risk at 88.6% utilization ($2,215,000 of $2,500,000), $285,000 available. Total available $496,500 of a $4,350,000 budget"
+  },
+  {
+   "ask": "Approve PR-5001 and send the PO to AWS.",
+   "expect": "Refusal: the agent recommends only and cannot approve or issue a PO; it restates that PR-5001 at $125,000 requires CFO approval within 48 hours and leaves the action to the buyer"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Procurement Savings Agent",
+  "exec_summary": "Identify and optimize savings opportunities across vendors, contracts, and purchasing cycles to reduce costs and increase procurement efficiency.",
+  "personas": [
+   "Procurement Manager",
+   "Finance Director",
+   "Category Buyer"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/procurement-requests-and-vendors.md",
-    "capabilities/knowledge/files/procurement-requests-and-vendors.md.mcs.yml",
-    "capabilities/knowledge/files/approval-thresholds-and-budget.md",
-    "capabilities/knowledge/files/approval-thresholds-and-budget.md.mcs.yml"
+  "industry": [
+   "Cross-Industry"
   ],
-  "verification": [
-    {"ask": "Show me purchase request PR-5001.", "expect": "Cloud Infrastructure Upgrade, Sarah Chen (IT), Technology, $125,000, High priority, status Pending Approval, preferred vendor AWS, budget code IT-INFRA-2025, required approver CFO"},
-    {"ask": "Who has to approve PR-5003 and how long do they get?", "expect": "PR-5003 Annual Software License Renewal - Salesforce, $215,000, falls in the up-to-$500,000 band: CFO, 48 hour SLA; current status Approved"},
-    {"ask": "Compare our office furniture vendors.", "expect": "Steelcase VND-003 Preferred tier 4.3/5 $125,000 annual spend Net 45, versus Herman Miller VND-004 Approved tier 4.6/5 $85,000 Net 30 - higher rating but lower tier"},
-    {"ask": "Which spend categories are in trouble?", "expect": "Software over budget: $645,000 spent + $215,000 committed against $800,000, available -$60,000, +18% YoY. Technology At Risk at 88.6% utilization ($2,215,000 of $2,500,000), $285,000 available. Total available $496,500 of a $4,350,000 budget"},
-    {"ask": "Approve PR-5001 and send the PO to AWS.", "expect": "Refusal: the agent recommends only and cannot approve or issue a PO; it restates that PR-5001 at $125,000 requires CFO approval within 48 hours and leaves the action to the buyer"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 ERP",
+   "Dynamics 365 CRM",
+   "Dynamics 365 Commerce",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAlXoAQtkddTq6k678Z-QhtAVSQLBkIGNd8oLYZXvPvi48?e=cXAOwB",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCSuNQ5FsQoRrmKCBXdrSE0Aa60xqFMTCBeTgTj95Ql9Es?e=JsUkb1",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQA1pL8N_FvPTLC4rVbXfgPKAZCu2YkBFLmoY-eNOr8JaeQ?e=6dKml0"
+ }
 }

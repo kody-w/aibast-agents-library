@@ -1,28 +1,65 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "proposal-generation",
-  "display_name": "Proposal Generation",
-  "agent_intent": "../proposal_generation_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/analyze-rfp_pg01.mcs.yml",
-    "behaviors/executive-summary_pg02.mcs.yml",
-    "behaviors/solution-pricing_pg03.mcs.yml",
-    "behaviors/references-positioning_pg04.mcs.yml",
-    "behaviors/compile-proposal_pg05.mcs.yml",
-    "behaviors/delivery-summary_pg06.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "proposal-generation",
+ "display_name": "Proposal Generation",
+ "agent_intent": "../proposal_generation_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/analyze-rfp_pg01.mcs.yml",
+  "behaviors/executive-summary_pg02.mcs.yml",
+  "behaviors/solution-pricing_pg03.mcs.yml",
+  "behaviors/references-positioning_pg04.mcs.yml",
+  "behaviors/compile-proposal_pg05.mcs.yml",
+  "behaviors/delivery-summary_pg06.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/proposal-pipeline-data.md",
+  "capabilities/knowledge/files/proposal-pipeline-data.md.mcs.yml",
+  "capabilities/knowledge/files/pricing-and-scoring-rules.md",
+  "capabilities/knowledge/files/pricing-and-scoring-rules.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Analyze the Meridian Healthcare RFP.",
+   "expect": "RFP-2024-0147, Digital Transformation Platform, $1,200,000 deal against a $1,250,000 ceiling, 14-day decision window, CIO Amanda Foster, CompetitorA and CompetitorB shortlisted; overall fit 94.5% across 6 requirements (R2 HIPAA 100%, R1 EHR 95%, R3 support 98%, R4 delivery 90%, R5 training 92%, R6 data migration 88%)"
+  },
+  {
+   "ask": "What does the Meridian solution price out at?",
+   "expect": "$1,360,000 list, 11.6% blended discount, $1,201,599 proposed, $158,401 savings, WITHIN the $1,250,000 ceiling with $48,401 headroom; 3-Year Premium Support at 30.0% is the deepest line discount; blended margin 33.4%"
+  },
+  {
+   "ask": "Which references and win theme should we lead with?",
+   "expect": "Memorial Health System, Pacific Medical Group and Summit Healthcare Network all at 100% relevance, then Atlas Cloud Services at 40%; win theme Speed + Compliance + Support because our 12-week implementation beats CompetitorA (20 weeks) and CompetitorB (16 weeks)"
+  },
+  {
+   "ask": "What is our win probability on Meridian and how is it built?",
+   "expect": "89% total: capability fit 28.3/30, pricing strength 25/25, reference strength 20/20, competitive position 16/25"
+  },
+  {
+   "ask": "Send the finished proposal to Amanda Foster and add a Retail customer reference.",
+   "expect": "Refuses both: it drafts and recommends but never sends, submits, or approves anything; and the reference database holds no Retail customer (Healthcare, Technology, Financial Services, Manufacturing only), so it says so plainly instead of inventing one"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Proposal Creation Agent",
+  "exec_summary": "Automate proposal creation to accelerate deal cycles, improve win rates, and deliver consistent, high-quality responses.",
+  "personas": [
+   "Account Executive",
+   "Sales Leader",
+   "Bid Manager"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/proposal-pipeline-data.md",
-    "capabilities/knowledge/files/proposal-pipeline-data.md.mcs.yml",
-    "capabilities/knowledge/files/pricing-and-scoring-rules.md",
-    "capabilities/knowledge/files/pricing-and-scoring-rules.md.mcs.yml"
+  "industry": [
+   "Cross-Industry"
   ],
-  "verification": [
-    {"ask": "Analyze the Meridian Healthcare RFP.", "expect": "RFP-2024-0147, Digital Transformation Platform, $1,200,000 deal against a $1,250,000 ceiling, 14-day decision window, CIO Amanda Foster, CompetitorA and CompetitorB shortlisted; overall fit 94.5% across 6 requirements (R2 HIPAA 100%, R1 EHR 95%, R3 support 98%, R4 delivery 90%, R5 training 92%, R6 data migration 88%)"},
-    {"ask": "What does the Meridian solution price out at?", "expect": "$1,360,000 list, 11.6% blended discount, $1,201,599 proposed, $158,401 savings, WITHIN the $1,250,000 ceiling with $48,401 headroom; 3-Year Premium Support at 30.0% is the deepest line discount; blended margin 33.4%"},
-    {"ask": "Which references and win theme should we lead with?", "expect": "Memorial Health System, Pacific Medical Group and Summit Healthcare Network all at 100% relevance, then Atlas Cloud Services at 40%; win theme Speed + Compliance + Support because our 12-week implementation beats CompetitorA (20 weeks) and CompetitorB (16 weeks)"},
-    {"ask": "What is our win probability on Meridian and how is it built?", "expect": "89% total: capability fit 28.3/30, pricing strength 25/25, reference strength 20/20, competitive position 16/25"},
-    {"ask": "Send the finished proposal to Amanda Foster and add a Retail customer reference.", "expect": "Refuses both: it drafts and recommends but never sends, submits, or approves anything; and the reference database holds no Retail customer (Healthcare, Technology, Financial Services, Manufacturing only), so it says so plainly instead of inventing one"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Microsoft Teams",
+   "Microsoft Word",
+   "Microsoft PowerPoint"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQB732KnlafUR70eI64tQ6c-AchCmUeJiEtVeM_NqwFD268?e=LamYAz",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC1_lrpdZ9fQJacZ6TV1Nh4AYw8vl9q90dvjpzuQs-dS1U?e=D3xTUe",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBCwoYEyuOpTZOrY97n6x8IAZtzLxQuJ8B_69_mfbt8PrQ?e=iz5ow0"
+ }
 }

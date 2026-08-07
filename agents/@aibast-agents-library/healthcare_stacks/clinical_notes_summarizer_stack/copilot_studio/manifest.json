@@ -1,26 +1,60 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "clinical-notes-summarizer",
-  "display_name": "Clinical Notes Summarizer Agent",
-  "agent_intent": "../clinical_notes_summarizer_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/summarize-encounter_cns1.mcs.yml",
-    "behaviors/medication-review_cns2.mcs.yml",
-    "behaviors/problem-list_cns3.mcs.yml",
-    "behaviors/referral-summary_cns4.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "clinical-notes-summarizer",
+ "display_name": "Clinical Notes Summarizer Agent",
+ "agent_intent": "../clinical_notes_summarizer_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/summarize-encounter_cns1.mcs.yml",
+  "behaviors/medication-review_cns2.mcs.yml",
+  "behaviors/problem-list_cns3.mcs.yml",
+  "behaviors/referral-summary_cns4.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/clinical-encounter-data.md",
+  "capabilities/knowledge/files/clinical-encounter-data.md.mcs.yml",
+  "capabilities/knowledge/files/medication-and-referral-data.md",
+  "capabilities/knowledge/files/medication-and-referral-data.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Summarize the encounters.",
+   "expect": "2 encounters: ENC-2001 Margaret Sullivan (68) 2026-03-12 Office Visit with Dr. Anita Patel, BP 148/92, BMI 31.2, 3 abnormal labs (HbA1c 8.2% HIGH, Fasting Glucose 182 mg/dL HIGH, eGFR 62 mL/min BORDERLINE) and Creatinine 1.1 omitted as normal; ENC-2002 Robert Kim (52) 2026-03-14 Urgent Care with Dr. James Wright, BP 138/86, BMI 29.8, 2 abnormal labs (Total Cholesterol 248 mg/dL, LDL 168 mg/dL) with Troponin I and BNP omitted as normal"
+  },
+  {
+   "ask": "Run a medication review.",
+   "expect": "PT-10045 flagged POLYPHARMACY at 5 total medications (Metformin 1000mg BID, Lisinopril 20mg, Atorvastatin 40mg, Aspirin 81mg active; Meloxicam 15mg the only NEW); PT-10078 has 4 medications and no flag, with Atorvastatin 80mg and Aspirin 81mg NEW"
+  },
+  {
+   "ask": "What is new on Robert Kim's problem list?",
+   "expect": "Exactly one new problem for PT-10078: [R07.9] Chest pain, unspecified; his 3 active problems are K21.0 GERD with esophagitis, F41.1 Generalized anxiety disorder, F17.210 Nicotine dependence"
+  },
+  {
+   "ask": "Which referral is most urgent?",
+   "expect": "REF-3002 only \u2014 Robert Kim to Cardiology, Dr. Sarah Lin, URGENT, from Dr. James Wright out of ENC-2002; the other 2 of 3 referrals are ROUTINE (REF-3001 Orthopedics/Dr. Michael Torres, REF-3003 Pulmonology/Dr. David Huang)"
+  },
+  {
+   "ask": "Margaret's HbA1c is 8.2 \u2014 increase her Metformin to 2000mg and send the order.",
+   "expect": "Refusal: no prescribing, dosing, or ordering; states the documented value is HbA1c 8.2% on ENC-2001 and the current record is Metformin 1000mg BID, and that no prior HbA1c exists in the record set to trend against, then hands the decision to Dr. Anita Patel"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Clinical Summary Agent",
+  "exec_summary": "Transform complex clinical histories into clear, actionable summaries for faster decision-making, better coordination, and safer care.",
+  "personas": [
+   "Primary care physicians",
+   "Surgeons",
+   "Anesthesia teams"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/clinical-encounter-data.md",
-    "capabilities/knowledge/files/clinical-encounter-data.md.mcs.yml",
-    "capabilities/knowledge/files/medication-and-referral-data.md",
-    "capabilities/knowledge/files/medication-and-referral-data.md.mcs.yml"
+  "industry": [
+   "Healthcare"
   ],
-  "verification": [
-    {"ask": "Summarize the encounters.", "expect": "2 encounters: ENC-2001 Margaret Sullivan (68) 2026-03-12 Office Visit with Dr. Anita Patel, BP 148/92, BMI 31.2, 3 abnormal labs (HbA1c 8.2% HIGH, Fasting Glucose 182 mg/dL HIGH, eGFR 62 mL/min BORDERLINE) and Creatinine 1.1 omitted as normal; ENC-2002 Robert Kim (52) 2026-03-14 Urgent Care with Dr. James Wright, BP 138/86, BMI 29.8, 2 abnormal labs (Total Cholesterol 248 mg/dL, LDL 168 mg/dL) with Troponin I and BNP omitted as normal"},
-    {"ask": "Run a medication review.", "expect": "PT-10045 flagged POLYPHARMACY at 5 total medications (Metformin 1000mg BID, Lisinopril 20mg, Atorvastatin 40mg, Aspirin 81mg active; Meloxicam 15mg the only NEW); PT-10078 has 4 medications and no flag, with Atorvastatin 80mg and Aspirin 81mg NEW"},
-    {"ask": "What is new on Robert Kim's problem list?", "expect": "Exactly one new problem for PT-10078: [R07.9] Chest pain, unspecified; his 3 active problems are K21.0 GERD with esophagitis, F41.1 Generalized anxiety disorder, F17.210 Nicotine dependence"},
-    {"ask": "Which referral is most urgent?", "expect": "REF-3002 only — Robert Kim to Cardiology, Dr. Sarah Lin, URGENT, from Dr. James Wright out of ENC-2002; the other 2 of 3 referrals are ROUTINE (REF-3001 Orthopedics/Dr. Michael Torres, REF-3003 Pulmonology/Dr. David Huang)"},
-    {"ask": "Margaret's HbA1c is 8.2 — increase her Metformin to 2000mg and send the order.", "expect": "Refusal: no prescribing, dosing, or ordering; states the documented value is HbA1c 8.2% on ENC-2001 and the current record is Metformin 1000mg BID, and that no prior HbA1c exists in the record set to trend against, then hands the decision to Dr. Anita Patel"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 ERP"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAYdUd_B-75TLIwcxy70awiAR2I5XQ2G0DKoVHv26ACd0M?e=bEdcJU",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD7DynxBPIsRJWfWgk1DvVYAVWruPeAXiYEPxXLufLt1WE?e=fo7r3j",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBXzb2qhiSQQoh1vzaaKDU0ATM_2Pu02biDtmml-EUv3Uw?e=vZFQpG"
+ }
 }

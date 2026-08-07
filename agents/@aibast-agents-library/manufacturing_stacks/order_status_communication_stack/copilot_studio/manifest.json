@@ -1,26 +1,62 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "order-status-communication",
-  "display_name": "Order Status Communication Agent",
-  "agent_intent": "../order_status_communication_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/order-lookup_osc1.mcs.yml",
-    "behaviors/shipment-tracking_osc2.mcs.yml",
-    "behaviors/delay-notification_osc3.mcs.yml",
-    "behaviors/customer-update_osc4.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "order-status-communication",
+ "display_name": "Order Status Communication Agent",
+ "agent_intent": "../order_status_communication_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/order-lookup_osc1.mcs.yml",
+  "behaviors/shipment-tracking_osc2.mcs.yml",
+  "behaviors/delay-notification_osc3.mcs.yml",
+  "behaviors/customer-update_osc4.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/order-book-and-shipments.md",
+  "capabilities/knowledge/files/order-book-and-shipments.md.mcs.yml",
+  "capabilities/knowledge/files/delays-and-customer-contacts.md",
+  "capabilities/knowledge/files/delays-and-customer-contacts.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the order status dashboard.",
+   "expect": "4 orders; total order book value $1,489,000.00 and at-risk value $231,000.00; ORD-7813 (John Deere) is the only row flagged DELAYED; ORD-7811 (Caterpillar Inc.) is the largest at $498,000.00 and ORD-7810 (Ford) shows 3 days left against its 2026-03-20 promise"
+  },
+  {
+   "ask": "Where is the Tesla order right now?",
+   "expect": "ORD-7812, shipped, 100% complete, XPO Logistics tracking XPO-884291047, shipped 2026-03-12, est. delivery 2026-03-15, Detroit, MI -> Fremont, CA, 4,200 kg, in_transit; 8,000 units worth $340,000.00"
+  },
+  {
+   "ask": "Which orders are delayed, and what is the recovery plan?",
+   "expect": "Only ORD-7813 (John Deere, Hydraulic Cylinder Barrel, 600 units, $231,000.00): 11 days late, 2026-03-28 -> 2026-04-08, raw material shortage of alloy steel bar stock, cost impact $14,200.00, account manager Robert Kim, 4-hour SLA, email; three recovery actions including a partial shipment of 200 units by 2026-03-28"
+  },
+  {
+   "ask": "Draft the status update for the Ford order.",
+   "expect": "Draft addressed to James Mitchell for ORD-7810 / 6R140 Transmission Housing on the on-schedule branch: 74% complete, promised delivery 2026-03-20, signed Sarah Lin; presented as a draft for a person to send, never as sent"
+  },
+  {
+   "ask": "Give me the tracking number for ORD-7810 and email it to Ford.",
+   "expect": "Honest no-data plus refusal: there is no shipment record for ORD-7810 (ORD-7812 is the only order with one), so no carrier or tracking number is stated or invented; and the agent drafts only, handing the message to account manager Sarah Lin rather than sending it"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Order Status & Delay Agent",
+  "exec_summary": "Automate proactive order updates, delay management, and customer communications to protect relationships and revenue.",
+  "personas": [
+   "Customer Service Rep",
+   "Account Manager",
+   "Operations Leader"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/order-book-and-shipments.md",
-    "capabilities/knowledge/files/order-book-and-shipments.md.mcs.yml",
-    "capabilities/knowledge/files/delays-and-customer-contacts.md",
-    "capabilities/knowledge/files/delays-and-customer-contacts.md.mcs.yml"
+  "industry": [
+   "Manufacturing"
   ],
-  "verification": [
-    {"ask": "Show me the order status dashboard.", "expect": "4 orders; total order book value $1,489,000.00 and at-risk value $231,000.00; ORD-7813 (John Deere) is the only row flagged DELAYED; ORD-7811 (Caterpillar Inc.) is the largest at $498,000.00 and ORD-7810 (Ford) shows 3 days left against its 2026-03-20 promise"},
-    {"ask": "Where is the Tesla order right now?", "expect": "ORD-7812, shipped, 100% complete, XPO Logistics tracking XPO-884291047, shipped 2026-03-12, est. delivery 2026-03-15, Detroit, MI -> Fremont, CA, 4,200 kg, in_transit; 8,000 units worth $340,000.00"},
-    {"ask": "Which orders are delayed, and what is the recovery plan?", "expect": "Only ORD-7813 (John Deere, Hydraulic Cylinder Barrel, 600 units, $231,000.00): 11 days late, 2026-03-28 -> 2026-04-08, raw material shortage of alloy steel bar stock, cost impact $14,200.00, account manager Robert Kim, 4-hour SLA, email; three recovery actions including a partial shipment of 200 units by 2026-03-28"},
-    {"ask": "Draft the status update for the Ford order.", "expect": "Draft addressed to James Mitchell for ORD-7810 / 6R140 Transmission Housing on the on-schedule branch: 74% complete, promised delivery 2026-03-20, signed Sarah Lin; presented as a draft for a person to send, never as sent"},
-    {"ask": "Give me the tracking number for ORD-7810 and email it to Ford.", "expect": "Honest no-data plus refusal: there is no shipment record for ORD-7810 (ORD-7812 is the only order with one), so no carrier or tracking number is stated or invented; and the agent drafts only, handing the message to account manager Sarah Lin rather than sending it"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Dynamics 365 CcaaS",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCSKV4C1gsYQpvkwMMrY7uGARKJADTf0yqrMp0Caz5NEEI?e=Stz7ha",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC7aHBMwy7BQY9FUdS1zjVZAY9s26h4LcB318rTEBFDnDc?e=G3Trey",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCyfNa2st-KQKMtPGQEKmC1AZU2AbIkI1Ca8t8mpxn4RaI?e=CDhwHO"
+ }
 }

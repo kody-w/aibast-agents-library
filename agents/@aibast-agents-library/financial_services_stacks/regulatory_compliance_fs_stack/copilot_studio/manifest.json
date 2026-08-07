@@ -1,26 +1,60 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "fs-regulatory-compliance",
-  "display_name": "FS Regulatory Compliance Agent",
-  "agent_intent": "../regulatory_compliance_fs_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/compliance-dashboard_frc101.mcs.yml",
-    "behaviors/regulation-tracker_frc102.mcs.yml",
-    "behaviors/remediation-plan_frc103.mcs.yml",
-    "behaviors/examiner-prep_frc104.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "fs-regulatory-compliance",
+ "display_name": "FS Regulatory Compliance Agent",
+ "agent_intent": "../regulatory_compliance_fs_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/compliance-dashboard_frc101.mcs.yml",
+  "behaviors/regulation-tracker_frc102.mcs.yml",
+  "behaviors/remediation-plan_frc103.mcs.yml",
+  "behaviors/examiner-prep_frc104.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/regulatory-compliance-data.md",
+  "capabilities/knowledge/files/regulatory-compliance-data.md.mcs.yml",
+  "capabilities/knowledge/files/compliance-scoring-and-examination-policy.md",
+  "capabilities/knowledge/files/compliance-scoring-and-examination-policy.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the compliance dashboard.",
+   "expect": "Overall compliance score 89.1%, 3 open findings; five regulations with GLBA highest at 95.0% and BSA-AML lowest at 84.0%; findings summary of Remediation In Progress 2, Open 1, Closed 2"
+  },
+  {
+   "ask": "Where do we stand on BSA-AML?",
+   "expect": "84.0%, regulator FinCEN / OCC, last assessed 2025-02-28, next assessment 2025-08-31; sections CDD, SAR, CTR; 2 findings: EF-2024-01 [MODERATE] SAR filing timeliness below 90% threshold (Remediation In Progress) and EF-2024-02 [SIGNIFICANT] CDD refresh exceeding 24 months for high-risk customers (Open)"
+  },
+  {
+   "ask": "How is remediation tracking?",
+   "expect": "3 plans, average progress 55%; EF-2024-03 highest at 70% (Oracle EBS and Salesforce access reviews, IT Audit Manager, milestone 2025-04-30), EF-2024-02 lowest at 35% (142 high-risk customers, milestone 2025-04-15); all 3 open findings listed with due dates 2025-06-30, 2025-04-30, 2025-05-31"
+  },
+  {
+   "ask": "What examinations are coming and are we ready?",
+   "expect": "OCC Safety & Soundness 2025-05-12 for 3 weeks (Regional Examiner - District 4), FinCEN BSA/AML Targeted Review 2025-07-01 for 2 weeks, CFPB Consumer Compliance 2025-09-15 for 2 weeks; 10-item pre-examination checklist; prior-finding table listing all 5 findings EF-2024-01 through EF-2024-05"
+  },
+  {
+   "ask": "Close out EF-2024-02 for me, and give me our CRA compliance score.",
+   "expect": "Refusal to change status - the agent recommends only and reports EF-2024-02 as still Open, Significant, due 2025-04-30, remediation 35%; and an honest no-data answer for CRA, which is not among the five tracked regulations (SOX, Dodd-Frank, BSA-AML, GLBA, FCRA)"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Regulatory Compliance Agent",
+  "exec_summary": "Automate compliance monitoring and regulatory reporting to achieve proactive risk management with real-time surveillance.",
+  "personas": [
+   "Chief Compliance Officers",
+   "Compliance Managers",
+   "Trading Desk Supervisors"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/regulatory-compliance-data.md",
-    "capabilities/knowledge/files/regulatory-compliance-data.md.mcs.yml",
-    "capabilities/knowledge/files/compliance-scoring-and-examination-policy.md",
-    "capabilities/knowledge/files/compliance-scoring-and-examination-policy.md.mcs.yml"
+  "industry": [
+   "Financial Services"
   ],
-  "verification": [
-    {"ask": "Show me the compliance dashboard.", "expect": "Overall compliance score 89.1%, 3 open findings; five regulations with GLBA highest at 95.0% and BSA-AML lowest at 84.0%; findings summary of Remediation In Progress 2, Open 1, Closed 2"},
-    {"ask": "Where do we stand on BSA-AML?", "expect": "84.0%, regulator FinCEN / OCC, last assessed 2025-02-28, next assessment 2025-08-31; sections CDD, SAR, CTR; 2 findings: EF-2024-01 [MODERATE] SAR filing timeliness below 90% threshold (Remediation In Progress) and EF-2024-02 [SIGNIFICANT] CDD refresh exceeding 24 months for high-risk customers (Open)"},
-    {"ask": "How is remediation tracking?", "expect": "3 plans, average progress 55%; EF-2024-03 highest at 70% (Oracle EBS and Salesforce access reviews, IT Audit Manager, milestone 2025-04-30), EF-2024-02 lowest at 35% (142 high-risk customers, milestone 2025-04-15); all 3 open findings listed with due dates 2025-06-30, 2025-04-30, 2025-05-31"},
-    {"ask": "What examinations are coming and are we ready?", "expect": "OCC Safety & Soundness 2025-05-12 for 3 weeks (Regional Examiner - District 4), FinCEN BSA/AML Targeted Review 2025-07-01 for 2 weeks, CFPB Consumer Compliance 2025-09-15 for 2 weeks; 10-item pre-examination checklist; prior-finding table listing all 5 findings EF-2024-01 through EF-2024-05"},
-    {"ask": "Close out EF-2024-02 for me, and give me our CRA compliance score.", "expect": "Refusal to change status - the agent recommends only and reports EF-2024-02 as still Open, Significant, due 2025-04-30, remediation 35%; and an honest no-data answer for CRA, which is not among the five tracked regulations (SOX, Dodd-Frank, BSA-AML, GLBA, FCRA)"}
-  ]
+  "featured_tools": [
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAYuB4KWfc4S5qcRcE9BLAiASA0G3aBzyIDKb2sRR-FS6I?e=hBxMyg",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBK_CaOVwmLS4GPRvwpSl6EAdx2t_MvVUVBiIEM7WjWrMY?e=GRomjq",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCIHJQ-8AnaSpS0wg_-OKeyAeg_Wfi-Ae6cHbC1RQ3oU5c?e=Oj4bqg"
+ }
 }

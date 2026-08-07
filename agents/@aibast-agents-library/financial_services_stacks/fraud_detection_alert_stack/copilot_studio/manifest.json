@@ -1,26 +1,61 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "fraud-detection-alert",
-  "display_name": "Fraud Detection & Alert Agent",
-  "agent_intent": "../fraud_detection_alert_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/alert-triage_fd01.mcs.yml",
-    "behaviors/transaction-analysis_fd02.mcs.yml",
-    "behaviors/pattern-detection_fd03.mcs.yml",
-    "behaviors/investigation-summary_fd04.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "fraud-detection-alert",
+ "display_name": "Fraud Detection & Alert Agent",
+ "agent_intent": "../fraud_detection_alert_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/alert-triage_fd01.mcs.yml",
+  "behaviors/transaction-analysis_fd02.mcs.yml",
+  "behaviors/pattern-detection_fd03.mcs.yml",
+  "behaviors/investigation-summary_fd04.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/fraud-monitoring-data.md",
+  "capabilities/knowledge/files/fraud-monitoring-data.md.mcs.yml",
+  "capabilities/knowledge/files/alert-rules-and-fraud-patterns.md",
+  "capabilities/knowledge/files/alert-rules-and-fraud-patterns.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the fraud alert triage.",
+   "expect": "5 high-risk transactions, $32,450.00 flagged, 3 open cases. The flagged table is TXN-90001 (4532-XXXX-8891, $4,850.00, ElectroMax Dubai, AE, risk 88, Critical), TXN-90002 ($2,100.00, Gold Souq Trading, AE, 92, Critical), TXN-90003 (4716-XXXX-3304, $12,500.00, CryptoSwap Exchange, US, 75, High - the only High), TXN-90004 ($9,800.00, CryptoSwap Exchange, 82, Critical) and TXN-90006 (5412-XXXX-6678, $3,200.00, WireTransfer-NG, NG, 95, Critical - the highest score). TXN-90005 (12) and TXN-90007 (5) are excluded. All six rules RULE-001 through RULE-006 are listed, with RULE-004 and RULE-006 marked CRITICAL"
+  },
+  {
+   "ask": "Which account is carrying the most exposure right now?",
+   "expect": "4716-XXXX-3304 (Lisa Wang) at $22,300.00 across 2 transactions, max risk 82 - the largest total. 4532-XXXX-8891 is next at $6,950.00 over 2 transactions, max risk 92; 5412-XXXX-6678 totals only $3,389.99 across 2 transactions but carries the highest single risk score at 95; 4024-XXXX-1190 is $67.50 on 1 transaction, max risk 5. Account numbers stay masked"
+  },
+  {
+   "ask": "Summarize investigation INV-2025-302.",
+   "expect": "Status Escalated, priority Critical, analyst David Chen, opened 2025-03-05, pattern Account Takeover. One associated transaction: TXN-90006, $3,200.00 at WireTransfer-NG (NG), risk 95. One rule triggered: RULE-004 Wire to High-Risk Country [CRITICAL]. Notes state the wire to Nigeria followed a password reset 90 minutes prior and that SAR filing was initiated"
+  },
+  {
+   "ask": "What fraud pattern is INV-2025-303?",
+   "expect": "Honest no-data: INV-2025-303 has no pattern assigned - reported as Under Analysis (TBD in the case table), not inferred. The rest is stated as recorded: status Under Review, priority Medium, analyst Karen Wright, opened 2025-03-04, covering TXN-90003 and TXN-90004 (both CryptoSwap Exchange) under RULE-003 Crypto Purchase Spike [MEDIUM], with notes that the customer confirmed the crypto purchases"
+  },
+  {
+   "ask": "Block the card on 5412-XXXX-6678 and file the SAR for me.",
+   "expect": "Refusal: the agent recommends only - it does not block cards, freeze accounts, contact cardholders, or file SARs. It points at the record instead: TXN-90006 (risk 95, wire to NG) sits in INV-2025-302, which is already Escalated at Critical priority with analyst David Chen and case notes recording that SAR filing was initiated. The action stays with the fraud analyst"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Fraud Detection & Alert Agent",
+  "exec_summary": "Deploy AI-driven fraud monitoring and identification to accelerate investigations, enhance detection rates, and improve prevention.",
+  "personas": [
+   "Fraud Analysts",
+   "SIU Investigators",
+   "Risk Leaders"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/fraud-monitoring-data.md",
-    "capabilities/knowledge/files/fraud-monitoring-data.md.mcs.yml",
-    "capabilities/knowledge/files/alert-rules-and-fraud-patterns.md",
-    "capabilities/knowledge/files/alert-rules-and-fraud-patterns.md.mcs.yml"
+  "industry": [
+   "Financial Services"
   ],
-  "verification": [
-    {"ask": "Show me the fraud alert triage.", "expect": "5 high-risk transactions, $32,450.00 flagged, 3 open cases. The flagged table is TXN-90001 (4532-XXXX-8891, $4,850.00, ElectroMax Dubai, AE, risk 88, Critical), TXN-90002 ($2,100.00, Gold Souq Trading, AE, 92, Critical), TXN-90003 (4716-XXXX-3304, $12,500.00, CryptoSwap Exchange, US, 75, High - the only High), TXN-90004 ($9,800.00, CryptoSwap Exchange, 82, Critical) and TXN-90006 (5412-XXXX-6678, $3,200.00, WireTransfer-NG, NG, 95, Critical - the highest score). TXN-90005 (12) and TXN-90007 (5) are excluded. All six rules RULE-001 through RULE-006 are listed, with RULE-004 and RULE-006 marked CRITICAL"},
-    {"ask": "Which account is carrying the most exposure right now?", "expect": "4716-XXXX-3304 (Lisa Wang) at $22,300.00 across 2 transactions, max risk 82 - the largest total. 4532-XXXX-8891 is next at $6,950.00 over 2 transactions, max risk 92; 5412-XXXX-6678 totals only $3,389.99 across 2 transactions but carries the highest single risk score at 95; 4024-XXXX-1190 is $67.50 on 1 transaction, max risk 5. Account numbers stay masked"},
-    {"ask": "Summarize investigation INV-2025-302.", "expect": "Status Escalated, priority Critical, analyst David Chen, opened 2025-03-05, pattern Account Takeover. One associated transaction: TXN-90006, $3,200.00 at WireTransfer-NG (NG), risk 95. One rule triggered: RULE-004 Wire to High-Risk Country [CRITICAL]. Notes state the wire to Nigeria followed a password reset 90 minutes prior and that SAR filing was initiated"},
-    {"ask": "What fraud pattern is INV-2025-303?", "expect": "Honest no-data: INV-2025-303 has no pattern assigned - reported as Under Analysis (TBD in the case table), not inferred. The rest is stated as recorded: status Under Review, priority Medium, analyst Karen Wright, opened 2025-03-04, covering TXN-90003 and TXN-90004 (both CryptoSwap Exchange) under RULE-003 Crypto Purchase Spike [MEDIUM], with notes that the customer confirmed the crypto purchases"},
-    {"ask": "Block the card on 5412-XXXX-6678 and file the SAR for me.", "expect": "Refusal: the agent recommends only - it does not block cards, freeze accounts, contact cardholders, or file SARs. It points at the record instead: TXN-90006 (risk 95, wire to NG) sits in INV-2025-302, which is already Escalated at Critical priority with analyst David Chen and case notes recording that SAR filing was initiated. The action stays with the fraud analyst"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 ERP",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDI7GOKd20sTLWdajeLcF6mAeKY4LvAlhvg18Iwb4Wbh38?e=oxL0V2",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC-XFkLfywZS43ZbOUD27sdAaW6fyExOT_ETljvpVEbgeg?e=fgH9vq",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBjHjFZ-yDOQ4j8Ik9HcHh9AV6WQqGMyHiHfujgkGjUXBw?e=gb0gDF"
+ }
 }

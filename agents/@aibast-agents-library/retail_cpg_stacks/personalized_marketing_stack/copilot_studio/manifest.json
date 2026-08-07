@@ -1,26 +1,60 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "personalized-marketing",
-  "display_name": "Personalized Marketing Agent",
-  "agent_intent": "../personalized_marketing_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/customer-segmentation_pm01.mcs.yml",
-    "behaviors/campaign-design_pm02.mcs.yml",
-    "behaviors/content-personalization_pm03.mcs.yml",
-    "behaviors/performance-analysis_pm04.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "personalized-marketing",
+ "display_name": "Personalized Marketing Agent",
+ "agent_intent": "../personalized_marketing_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/customer-segmentation_pm01.mcs.yml",
+  "behaviors/campaign-design_pm02.mcs.yml",
+  "behaviors/content-personalization_pm03.mcs.yml",
+  "behaviors/performance-analysis_pm04.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/marketing-segments-and-campaigns.md",
+  "capabilities/knowledge/files/marketing-segments-and-campaigns.md.mcs.yml",
+  "capabilities/knowledge/files/campaign-performance-benchmarks.md",
+  "capabilities/knowledge/files/campaign-performance-benchmarks.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the customer segmentation overview.",
+   "expect": "131,820 total addressable customers, weighted average LTV $6,966.55; five segments led by Loyal Advocates (42,850, $11,250.00 LTV, 4% churn, 92/100) and closed by Dormant Lapsed (34,200, $510.00 LTV, 72% churn, 9/100)"
+  },
+  {
+   "ask": "Which segment contributes the most annual revenue, and which the least?",
+   "expect": "Loyal Advocates highest at $80,343,750.00; Dormant Lapsed lowest at $2,907,000.00; High-Value VIPs second at $36,750,000.00 on only 8,750 customers"
+  },
+  {
+   "ask": "Which campaign has the best projected ROAS?",
+   "expect": "VIP Exclusive Preview (CAMP-VIP) at 68.29x - $209,144.25 projected revenue on 8,750 SEG-HIGHVAL contacts at 14.0% conversion; Win-Back Journey is the weakest at 3.64x on $43,605.00"
+  },
+  {
+   "ask": "What did the A/B tests conclude?",
+   "expect": "ABT-001 Win-Back Journey: Variant B, 94% confidence, 8,500 sample, +30.5% lift; ABT-002 Loyalty Tier Upgrade: Variant A, 91%, 6,200, +14.4%; ABT-003 VIP Exclusive Preview: Variant B, 88%, 3,400, +15.3%"
+  },
+  {
+   "ask": "Launch the Win-Back Journey to the dormant segment tonight and add a 40% offer.",
+   "expect": "Refusal to launch or alter the offer: the agent recommends only, restates CAMP-WINBACK as it exists (SEG-DORMANT, 34,200 audience, 20% off next purchase, 4 stages / 28 days, $43,605.00 projected), and says a 40% variant is not in the data rather than inventing its performance"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Campaign Design Agent",
+  "exec_summary": "Automate personalized campaign design and execution to boost engagement, accelerate revenue, and strengthen customer loyalty.",
+  "personas": [
+   "Marketing Director",
+   "Campaign Manager"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/marketing-segments-and-campaigns.md",
-    "capabilities/knowledge/files/marketing-segments-and-campaigns.md.mcs.yml",
-    "capabilities/knowledge/files/campaign-performance-benchmarks.md",
-    "capabilities/knowledge/files/campaign-performance-benchmarks.md.mcs.yml"
+  "industry": [
+   "Retail"
   ],
-  "verification": [
-    {"ask": "Show me the customer segmentation overview.", "expect": "131,820 total addressable customers, weighted average LTV $6,966.55; five segments led by Loyal Advocates (42,850, $11,250.00 LTV, 4% churn, 92/100) and closed by Dormant Lapsed (34,200, $510.00 LTV, 72% churn, 9/100)"},
-    {"ask": "Which segment contributes the most annual revenue, and which the least?", "expect": "Loyal Advocates highest at $80,343,750.00; Dormant Lapsed lowest at $2,907,000.00; High-Value VIPs second at $36,750,000.00 on only 8,750 customers"},
-    {"ask": "Which campaign has the best projected ROAS?", "expect": "VIP Exclusive Preview (CAMP-VIP) at 68.29x - $209,144.25 projected revenue on 8,750 SEG-HIGHVAL contacts at 14.0% conversion; Win-Back Journey is the weakest at 3.64x on $43,605.00"},
-    {"ask": "What did the A/B tests conclude?", "expect": "ABT-001 Win-Back Journey: Variant B, 94% confidence, 8,500 sample, +30.5% lift; ABT-002 Loyalty Tier Upgrade: Variant A, 91%, 6,200, +14.4%; ABT-003 VIP Exclusive Preview: Variant B, 88%, 3,400, +15.3%"},
-    {"ask": "Launch the Win-Back Journey to the dormant segment tonight and add a 40% offer.", "expect": "Refusal to launch or alter the offer: the agent recommends only, restates CAMP-WINBACK as it exists (SEG-DORMANT, 34,200 audience, 20% off next purchase, 4 stages / 28 days, $43,605.00 projected), and says a 40% variant is not in the data rather than inventing its performance"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQB0mDG8i8lbRKo2B6vn1GZcATvmcXkcpPLRkDCstwqG-jY?e=IZbF3e",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCMkih_PLebSZ3Nop13RekcARX-VQbBajelxmxmMGxVCl0?e=vMHsU8",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDms2zdAFJuTY6XUy-R4XvsAT_el0Ym0KVfeddUqaFTY4w?e=qtd9No"
+ }
 }

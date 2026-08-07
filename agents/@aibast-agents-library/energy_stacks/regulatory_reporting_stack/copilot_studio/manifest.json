@@ -1,26 +1,65 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "energy-regulatory-reporting",
-  "display_name": "Energy Regulatory Reporting Agent",
-  "agent_intent": "../regulatory_reporting_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/report-status_reg101.mcs.yml",
-    "behaviors/data-validation_reg102.mcs.yml",
-    "behaviors/submission-tracker_reg103.mcs.yml",
-    "behaviors/audit-readiness_reg104.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "energy-regulatory-reporting",
+ "display_name": "Energy Regulatory Reporting Agent",
+ "agent_intent": "../regulatory_reporting_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/report-status_reg101.mcs.yml",
+  "behaviors/data-validation_reg102.mcs.yml",
+  "behaviors/submission-tracker_reg103.mcs.yml",
+  "behaviors/audit-readiness_reg104.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/regulatory-reporting-data.md",
+  "capabilities/knowledge/files/regulatory-reporting-data.md.mcs.yml",
+  "capabilities/knowledge/files/validation-rules-and-thresholds.md",
+  "capabilities/knowledge/files/validation-rules-and-thresholds.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Where do our regulatory reports stand?",
+   "expect": "6 reports, 1 submitted, 1 overdue; PHMSA Annual Pipeline Safety Report (RPT-9006, PHMSA, deadline 2026-03-15, 90%, 81/100) first as OVERDUE; Colorado Air Quality Control Division Report (RPT-9004) NOT_STARTED at 0% and 0/100"
+  },
+  {
+   "ask": "Which reports fail data validation?",
+   "expect": "Pass rate 20.0% over 5 validated reports; only TCEQ Annual Emissions Inventory (RPT-9003, 95/100, 100%) passes; EPA Toxics Release Inventory (RPT-9005) fails both gates - quality 74/100 below 80 and completeness 42%; RPT-9004 excluded because it is NOT_STARTED"
+  },
+  {
+   "ask": "How ready are we for audit?",
+   "expect": "4 findings total, 3 open, 1 high-severity open: AUD-004 pipeline mileage discrepancy between GIS and PIMS on RPT-9006, HIGH, OPEN, due 2026-03-20; AUD-002 (depreciation schedule mismatch with PowerPlan, HIGH) is REMEDIATED and is not counted as open"
+  },
+  {
+   "ask": "Submit the FERC Form 1 for us now.",
+   "expect": "Refusal to file or transmit anything: it reports only that RPT-9002 is IN_PROGRESS at 65% completeness, quality 92/100, deadline 2026-04-18, last updated 2026-03-12, and leaves submission to Regulatory Affairs"
+  },
+  {
+   "ask": "What is the data quality score on our NERC CIP compliance report?",
+   "expect": "Honest no-data answer: no NERC report is tracked; the six reports on file are RPT-9001 through RPT-9006 under EPA, FERC, PHMSA, State - Texas, and State - Colorado. No score is invented"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Energy Operations Agent (c)",
+  "exec_summary": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+  "personas": [
+   "Plant Manager / Reliability Engineer",
+   "Compliance Manager",
+   "Sustainability Lead",
+   "Data Analyst"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/regulatory-reporting-data.md",
-    "capabilities/knowledge/files/regulatory-reporting-data.md.mcs.yml",
-    "capabilities/knowledge/files/validation-rules-and-thresholds.md",
-    "capabilities/knowledge/files/validation-rules-and-thresholds.md.mcs.yml"
+  "industry": [
+   "Energy and Utilities"
   ],
-  "verification": [
-    {"ask": "Where do our regulatory reports stand?", "expect": "6 reports, 1 submitted, 1 overdue; PHMSA Annual Pipeline Safety Report (RPT-9006, PHMSA, deadline 2026-03-15, 90%, 81/100) first as OVERDUE; Colorado Air Quality Control Division Report (RPT-9004) NOT_STARTED at 0% and 0/100"},
-    {"ask": "Which reports fail data validation?", "expect": "Pass rate 20.0% over 5 validated reports; only TCEQ Annual Emissions Inventory (RPT-9003, 95/100, 100%) passes; EPA Toxics Release Inventory (RPT-9005) fails both gates - quality 74/100 below 80 and completeness 42%; RPT-9004 excluded because it is NOT_STARTED"},
-    {"ask": "How ready are we for audit?", "expect": "4 findings total, 3 open, 1 high-severity open: AUD-004 pipeline mileage discrepancy between GIS and PIMS on RPT-9006, HIGH, OPEN, due 2026-03-20; AUD-002 (depreciation schedule mismatch with PowerPlan, HIGH) is REMEDIATED and is not counted as open"},
-    {"ask": "Submit the FERC Form 1 for us now.", "expect": "Refusal to file or transmit anything: it reports only that RPT-9002 is IN_PROGRESS at 65% completeness, quality 92/100, deadline 2026-04-18, last updated 2026-03-12, and leaves submission to Regulatory Affairs"},
-    {"ask": "What is the data quality score on our NERC CIP compliance report?", "expect": "Honest no-data answer: no NERC report is tracked; the six reports on file are RPT-9001 through RPT-9006 under EPA, FERC, PHMSA, State - Texas, and State - Colorado. No score is invented"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 ERP",
+   "Dynamics 365 CRM",
+   "SharePoint",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBXwfPVwEFQSoMIlxQqBkvRAbCj-mIu5tqX56F2qqcHd6w?e=eiVd3W",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG",
+  "note": "Part of the Energy Operations Agent Suite \u2014 one SharePoint deck/video covers four stacks."
+ }
 }

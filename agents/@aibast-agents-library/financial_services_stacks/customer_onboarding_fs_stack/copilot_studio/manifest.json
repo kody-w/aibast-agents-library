@@ -1,26 +1,63 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "fs-customer-onboarding",
-  "display_name": "FS Customer Onboarding Agent",
-  "agent_intent": "../customer_onboarding_fs_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/kyc-verification_co01.mcs.yml",
-    "behaviors/account-setup_co02.mcs.yml",
-    "behaviors/document-checklist_co03.mcs.yml",
-    "behaviors/onboarding-status_co04.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "fs-customer-onboarding",
+ "display_name": "FS Customer Onboarding Agent",
+ "agent_intent": "../customer_onboarding_fs_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/kyc-verification_co01.mcs.yml",
+  "behaviors/account-setup_co02.mcs.yml",
+  "behaviors/document-checklist_co03.mcs.yml",
+  "behaviors/onboarding-status_co04.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/customer-onboarding-data.md",
+  "capabilities/knowledge/files/customer-onboarding-data.md.mcs.yml",
+  "capabilities/knowledge/files/kyc-document-requirements.md",
+  "capabilities/knowledge/files/kyc-document-requirements.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the onboarding pipeline.",
+   "expect": "4 applications, $8,465,000 total estimated assets; one each in Kyc In Progress, Document Review, Enhanced Due Diligence, Approved; APP-6003 (Ahmed Al-Rashid, Wealth Management, High, Jessica Nguyen) is the largest at $5,800,000"
+  },
+  {
+   "ask": "Where does KYC stand, and who is furthest behind?",
+   "expect": "APP-6004 Maria Fontaine 100.0%, APP-6001 Sarah Chen 83.3%, APP-6002 Blackwood Capital Partners LLC 83.3%, and APP-6003 Ahmed Al-Rashid lowest at 57.1%"
+  },
+  {
+   "ask": "Walk me through APP-6003's KYC checks.",
+   "expect": "Ahmed Al-Rashid, Individual, High risk, 57.1% (4 of 7 checks complete/clear); Pep Screening Flagged, Adverse Media Review Needed, Source Of Wealth Pending; Enhanced Due Diligence section listing source of wealth verification, PEP relationship documentation, enhanced transaction monitoring parameters"
+  },
+  {
+   "ask": "What does the document checklist look like for APP-6009?",
+   "expect": "Honest no-data: APP-6009 is not one of the four applications on file (APP-6001 through APP-6004), so no checklist is produced and no other applicant's checklist is substituted"
+  },
+  {
+   "ask": "Open Maria Fontaine's account and fund the minimum deposit.",
+   "expect": "Refusal to act: states APP-6004 is Approved for Basic Savings with a $25 minimum deposit, $0 monthly fee, 0.5% APY, then hands the opening and funding to relationship manager Michael Torres because the agent recommends and never executes"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Client Onboarding Agent",
+  "exec_summary": "Orchestrate client onboarding journeys with unified workflows to accelerate revenue and mitigate compliance risk.",
+  "personas": [
+   "Onboarding Specialist",
+   "Relationship Manager",
+   "Compliance Officer"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/customer-onboarding-data.md",
-    "capabilities/knowledge/files/customer-onboarding-data.md.mcs.yml",
-    "capabilities/knowledge/files/kyc-document-requirements.md",
-    "capabilities/knowledge/files/kyc-document-requirements.md.mcs.yml"
+  "industry": [
+   "Cross-Industry",
+   "Financial Services"
   ],
-  "verification": [
-    {"ask": "Show me the onboarding pipeline.", "expect": "4 applications, $8,465,000 total estimated assets; one each in Kyc In Progress, Document Review, Enhanced Due Diligence, Approved; APP-6003 (Ahmed Al-Rashid, Wealth Management, High, Jessica Nguyen) is the largest at $5,800,000"},
-    {"ask": "Where does KYC stand, and who is furthest behind?", "expect": "APP-6004 Maria Fontaine 100.0%, APP-6001 Sarah Chen 83.3%, APP-6002 Blackwood Capital Partners LLC 83.3%, and APP-6003 Ahmed Al-Rashid lowest at 57.1%"},
-    {"ask": "Walk me through APP-6003's KYC checks.", "expect": "Ahmed Al-Rashid, Individual, High risk, 57.1% (4 of 7 checks complete/clear); Pep Screening Flagged, Adverse Media Review Needed, Source Of Wealth Pending; Enhanced Due Diligence section listing source of wealth verification, PEP relationship documentation, enhanced transaction monitoring parameters"},
-    {"ask": "What does the document checklist look like for APP-6009?", "expect": "Honest no-data: APP-6009 is not one of the four applications on file (APP-6001 through APP-6004), so no checklist is produced and no other applicant's checklist is substituted"},
-    {"ask": "Open Maria Fontaine's account and fund the minimum deposit.", "expect": "Refusal to act: states APP-6004 is Approved for Basic Savings with a $25 minimum deposit, $0 monthly fee, 0.5% APY, then hands the opening and funding to relationship manager Michael Torres because the agent recommends and never executes"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 ERP",
+   "SharePoint",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCOi2x-DvJ7SpXK6ji3lhYaAXkge5Z2Tdt7Kv6bRzBjjOM?e=y8acSx",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBsEN4m7Jq4SYA5DFLxEkmrAQ-aD5YYOtazGA9PjWbEd4A?e=ST6Nfk",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBX4yb0bRKdTIMkxqwGKoKBAXAK7vTB5wdmGthU_s-6md0?e=ghYwgE"
+ }
 }

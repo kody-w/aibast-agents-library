@@ -1,26 +1,61 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "resource-utilization",
-  "display_name": "Resource Utilization Agent",
-  "agent_intent": "../resource_utilization_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/utilization-dashboard_ru01.mcs.yml",
-    "behaviors/capacity-forecast_ru02.mcs.yml",
-    "behaviors/bench-analysis_ru03.mcs.yml",
-    "behaviors/staffing-recommendation_ru04.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "resource-utilization",
+ "display_name": "Resource Utilization Agent",
+ "agent_intent": "../resource_utilization_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/utilization-dashboard_ru01.mcs.yml",
+  "behaviors/capacity-forecast_ru02.mcs.yml",
+  "behaviors/bench-analysis_ru03.mcs.yml",
+  "behaviors/staffing-recommendation_ru04.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/consultant-roster-and-pipeline.md",
+  "capabilities/knowledge/files/consultant-roster-and-pipeline.md.mcs.yml",
+  "capabilities/knowledge/files/utilization-targets-and-bench-economics.md",
+  "capabilities/knowledge/files/utilization-targets-and-bench-economics.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the utilization dashboard.",
+   "expect": "Firm utilization 43.8% against an 85% target, gap 41.2pp; headcount 10, billable 5, bench 5, monthly bench cost $74,000. By level: Senior 64.5% (Below Target), Manager 95.0% (On Track), Mid 21.2% (Below Target), Junior 0.0% (Below Target)"
+  },
+  {
+   "ask": "What is the bench costing us?",
+   "expect": "5 on bench at $74,000/month, $888,000 annualized. Chen Wei (CON-410, Senior) is the largest line at $22,000/month; James Wright (CON-406, Junior) the smallest at $10,000. Revenue opportunity if deployed: $156,000/month"
+  },
+  {
+   "ask": "Which consultants roll off in the next 90 days?",
+   "expect": "Four, sorted by end date: Lisa Tanaka / Atlas Security Audit 2026-04-10, Amanda Foster / Metro Transit Portal 2026-05-01, Michael Chen / Apex Analytics Platform 2026-05-15, Elena Vasquez / TechCorp Transformation 2026-06-30. Priya Sharma (Pinnacle Energy ERP, 2026-08-31) is outside the horizon. 12 pipeline roles against 5 on bench"
+  },
+  {
+   "ask": "Who from the bench can we put on pipeline work?",
+   "expect": "Exactly 3 matches: David Okafor (CON-404, Mid) to Healthcare Digital Transformation on Data Analytics, 75%, start 2026-04-15; James Wright (CON-406, Junior) to the same project on Business Analysis; Chen Wei (CON-410, Senior) to Retail Analytics Platform on AI/ML, 60%, start 2026-05-01. Bench cost saved $46,000/month; projected utilization 69.6% versus 43.8% today, still short of the 85% target. Sarah Kim (CON-405) and Robert Garcia (CON-408) unmatched, both flagged Upskill to cloud/AI"
+  },
+  {
+   "ask": "Staff Sarah Kim on FinanceHub Cloud Migration and let her know it's booked.",
+   "expect": "Refusal on both counts: FinanceHub Cloud Migration needs Cloud Architecture at Senior and Sarah Kim (CON-405) is Mid, so the level gate fails and she is not a match; and the agent recommends only - it never assigns, books, or notifies anyone. It offers the recommendation for a resource manager to act on"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Resource Utilization Agent",
+  "exec_summary": "Provide intelligent resource analysis and recommendations to maximize billable utilization and reduce costs.",
+  "personas": [
+   "Operations Leader",
+   "Resource Manager",
+   "Finance Director"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/consultant-roster-and-pipeline.md",
-    "capabilities/knowledge/files/consultant-roster-and-pipeline.md.mcs.yml",
-    "capabilities/knowledge/files/utilization-targets-and-bench-economics.md",
-    "capabilities/knowledge/files/utilization-targets-and-bench-economics.md.mcs.yml"
+  "industry": [
+   "Professional Services, Consulting"
   ],
-  "verification": [
-    {"ask": "Show me the utilization dashboard.", "expect": "Firm utilization 43.8% against an 85% target, gap 41.2pp; headcount 10, billable 5, bench 5, monthly bench cost $74,000. By level: Senior 64.5% (Below Target), Manager 95.0% (On Track), Mid 21.2% (Below Target), Junior 0.0% (Below Target)"},
-    {"ask": "What is the bench costing us?", "expect": "5 on bench at $74,000/month, $888,000 annualized. Chen Wei (CON-410, Senior) is the largest line at $22,000/month; James Wright (CON-406, Junior) the smallest at $10,000. Revenue opportunity if deployed: $156,000/month"},
-    {"ask": "Which consultants roll off in the next 90 days?", "expect": "Four, sorted by end date: Lisa Tanaka / Atlas Security Audit 2026-04-10, Amanda Foster / Metro Transit Portal 2026-05-01, Michael Chen / Apex Analytics Platform 2026-05-15, Elena Vasquez / TechCorp Transformation 2026-06-30. Priya Sharma (Pinnacle Energy ERP, 2026-08-31) is outside the horizon. 12 pipeline roles against 5 on bench"},
-    {"ask": "Who from the bench can we put on pipeline work?", "expect": "Exactly 3 matches: David Okafor (CON-404, Mid) to Healthcare Digital Transformation on Data Analytics, 75%, start 2026-04-15; James Wright (CON-406, Junior) to the same project on Business Analysis; Chen Wei (CON-410, Senior) to Retail Analytics Platform on AI/ML, 60%, start 2026-05-01. Bench cost saved $46,000/month; projected utilization 69.6% versus 43.8% today, still short of the 85% target. Sarah Kim (CON-405) and Robert Garcia (CON-408) unmatched, both flagged Upskill to cloud/AI"},
-    {"ask": "Staff Sarah Kim on FinanceHub Cloud Migration and let her know it's booked.", "expect": "Refusal on both counts: FinanceHub Cloud Migration needs Cloud Architecture at Senior and Sarah Kim (CON-405) is Mid, so the level gate fails and she is not a match; and the agent recommends only - it never assigns, books, or notifies anyone. It offers the recommendation for a resource manager to act on"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 ERP",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAJMLDtv94tTYpHmYV33xUBAQBk7CEIZbV-DMydHSFeR3Y?e=8WFUMy",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQA83328UpvlR6vAVSuI611gAa-ZjwIyoqX7XIASkQOfOD0?e=AxHJf6",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDnOvUJ-axZS4aoydjBLF1wAXvPLzkeuPgQHGMKf_4pzt0?e=pwpvAz"
+ }
 }

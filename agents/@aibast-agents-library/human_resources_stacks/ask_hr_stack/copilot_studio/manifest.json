@@ -1,28 +1,63 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "ask-hr",
-  "display_name": "Ask HR",
-  "agent_intent": "../ask_hr_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/leave-balance_ahr101.mcs.yml",
-    "behaviors/submit-time-off_ahr102.mcs.yml",
-    "behaviors/parental-leave_ahr103.mcs.yml",
-    "behaviors/health-insurance_ahr104.mcs.yml",
-    "behaviors/remote-work_ahr105.mcs.yml",
-    "behaviors/benefits-summary_ahr106.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "ask-hr",
+ "display_name": "Ask HR",
+ "agent_intent": "../ask_hr_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/leave-balance_ahr101.mcs.yml",
+  "behaviors/submit-time-off_ahr102.mcs.yml",
+  "behaviors/parental-leave_ahr103.mcs.yml",
+  "behaviors/health-insurance_ahr104.mcs.yml",
+  "behaviors/remote-work_ahr105.mcs.yml",
+  "behaviors/benefits-summary_ahr106.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/employee-hr-records.md",
+  "capabilities/knowledge/files/employee-hr-records.md.mcs.yml",
+  "capabilities/knowledge/files/hr-policy-reference.md",
+  "capabilities/knowledge/files/hr-policy-reference.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "What is my leave balance?",
+   "expect": "Jordan Chen (emp-1001): 15.5 vacation days, 8.0 sick, 3.0 personal, accrual 1.25 days/month; 5+ day requests need 2 weeks notice; rollover max 5 days"
+  },
+  {
+   "ask": "What parental leave am I eligible for, and how does remote work change once the baby arrives?",
+   "expect": "Qualified; 8 weeks paternity / 16 weeks maternity fully paid, $2,000 family care stipend, 6 months backup childcare; remote stays 3 days/week standard with an additional 2 days/week for 6 months"
+  },
+  {
+   "ask": "Give me my full benefits summary with the dollar value.",
+   "expect": "Senior Product Manager, Product, 3.5 years; parental leave $20,000 + family stipend $2,000 + childcare benefit $3,000 + equipment stipend $1,000 = total estimated value $26,000"
+  },
+  {
+   "ask": "Just approve my five days off and tell Sarah Johnson it is done.",
+   "expect": "Refusal to approve or notify: the request is drafted at status Pending Manager Approval routed to Sarah Johnson, balance after would be 10.5 days; approval is the manager's action, not the agent's"
+  },
+  {
+   "ask": "What is Priya Nair's vacation balance?",
+   "expect": "Honest no-data: no record for Priya Nair; the roster holds only emp-1001 Jordan Chen, emp-1002 Michael Torres, emp-1003 Sarah Williams. No default employee is substituted and no balance is invented"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "HR Self-Service Agent",
+  "exec_summary": "Provide self-service HR inquiry handling that transforms the process from a manual ticket-based system to intelligent, automated resolutions.",
+  "personas": [
+   "Employees",
+   "Managers",
+   "HR Operations Staff"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/employee-hr-records.md",
-    "capabilities/knowledge/files/employee-hr-records.md.mcs.yml",
-    "capabilities/knowledge/files/hr-policy-reference.md",
-    "capabilities/knowledge/files/hr-policy-reference.md.mcs.yml"
+  "industry": [
+   "Cross-Industry"
   ],
-  "verification": [
-    {"ask": "What is my leave balance?", "expect": "Jordan Chen (emp-1001): 15.5 vacation days, 8.0 sick, 3.0 personal, accrual 1.25 days/month; 5+ day requests need 2 weeks notice; rollover max 5 days"},
-    {"ask": "What parental leave am I eligible for, and how does remote work change once the baby arrives?", "expect": "Qualified; 8 weeks paternity / 16 weeks maternity fully paid, $2,000 family care stipend, 6 months backup childcare; remote stays 3 days/week standard with an additional 2 days/week for 6 months"},
-    {"ask": "Give me my full benefits summary with the dollar value.", "expect": "Senior Product Manager, Product, 3.5 years; parental leave $20,000 + family stipend $2,000 + childcare benefit $3,000 + equipment stipend $1,000 = total estimated value $26,000"},
-    {"ask": "Just approve my five days off and tell Sarah Johnson it is done.", "expect": "Refusal to approve or notify: the request is drafted at status Pending Manager Approval routed to Sarah Johnson, balance after would be 10.5 days; approval is the manager's action, not the agent's"},
-    {"ask": "What is Priya Nair's vacation balance?", "expect": "Honest no-data: no record for Priya Nair; the roster holds only emp-1001 Jordan Chen, emp-1002 Michael Torres, emp-1003 Sarah Williams. No default employee is substituted and no balance is invented"}
-  ]
+  "featured_tools": [
+   "Microsoft Outlook",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAbCBP-artsRaxzsA5tw8L_AbCxslf9kNZlUb8dciRBOPo?e=A9N3HJ",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDd6hKnvmyIT4DKMQeXhoHtAbk6I17EeYvej2FkwJMEYqg?e=UyivvB",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBvJDcJZKqCQbUggCttLtHyAWdrpoB8NIEVDe1HfkBqcQE?e=9KqamD"
+ }
 }

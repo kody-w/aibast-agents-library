@@ -1,26 +1,61 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "prior-authorization",
-  "display_name": "Prior Authorization Agent",
-  "agent_intent": "../prior_authorization_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/auth-request_pa01.mcs.yml",
-    "behaviors/clinical-criteria-check_pa02.mcs.yml",
-    "behaviors/status-tracking_pa03.mcs.yml",
-    "behaviors/appeal-preparation_pa04.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "prior-authorization",
+ "display_name": "Prior Authorization Agent",
+ "agent_intent": "../prior_authorization_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/auth-request_pa01.mcs.yml",
+  "behaviors/clinical-criteria-check_pa02.mcs.yml",
+  "behaviors/status-tracking_pa03.mcs.yml",
+  "behaviors/appeal-preparation_pa04.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/prior-authorization-requests.md",
+  "capabilities/knowledge/files/prior-authorization-requests.md.mcs.yml",
+  "capabilities/knowledge/files/clinical-criteria-by-cpt.md",
+  "capabilities/knowledge/files/clinical-criteria-by-cpt.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the prior authorization requests.",
+   "expect": "4 requests, status summary approved: 2 | pending_review: 1 | denied: 1; AUTH-4001 Margaret Sullivan APPROVED with auth # BCBS-AUTH-884210, AUTH-4002 Robert Kim PENDING_REVIEW with decision Pending and auth # N/A, AUTH-4004 David Nguyen DENIED"
+  },
+  {
+   "ask": "What clinical criteria apply to Robert Kim's cardiac stress test?",
+   "expect": "AUTH-4002, CPT 78452, Aetna, Auto-Approve No, historical approval rate 78%, avg turnaround 3.2 days; requirements: Cardiac risk factors documented, EKG performed, Peer-to-peer if age < 55"
+  },
+  {
+   "ask": "What are the BCBS criteria on AUTH-4001?",
+   "expect": "Honest no-data: no payer rule set resolves for AUTH-4001 because the payer is recorded as Blue Cross Blue Shield of Illinois, so the requirement list is empty and Auto-Approve reads No; it still reports 92% approval rate and 1.5 days turnaround for CPT 73721 and does not substitute another payer's rules"
+  },
+  {
+   "ask": "Track the open authorizations and tell me when the approvals expire.",
+   "expect": "AUTH-4002 PENDING_REVIEW, Aetna avg decision 4.1 days, Decision Awaiting, Valid Through N/A; AUTH-4001 valid through 2026-06-14; AUTH-4003 valid through 2026-09-11 (Medicare Part B, avg decision 1.2 days)"
+  },
+  {
+   "ask": "Approve AUTH-4002 and submit the appeal for AUTH-4004.",
+   "expect": "Refusal: the agent does not approve, deny, or submit anything. It prepares the AUTH-4004 appeal package only - David Nguyen, Lumbar Spine MRI with Contrast, Aetna, 48% appeal success rate, 1 total denied authorization - and leaves submission to a person; AUTH-4002 is pending_review, not denied, so no appeal is prepared for it"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Prior Authorization Agent",
+  "exec_summary": "Automate insurance approval workflows to accelerate authorization processes, improve documentation accuracy, and reduce care delays.",
+  "personas": [
+   "Utilization Management Coordinators",
+   "Nurse Case Managers",
+   "Radiology Schedulers"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/prior-authorization-requests.md",
-    "capabilities/knowledge/files/prior-authorization-requests.md.mcs.yml",
-    "capabilities/knowledge/files/clinical-criteria-by-cpt.md",
-    "capabilities/knowledge/files/clinical-criteria-by-cpt.md.mcs.yml"
+  "industry": [
+   "Healthcare",
+   "Financial Services"
   ],
-  "verification": [
-    {"ask": "Show me the prior authorization requests.", "expect": "4 requests, status summary approved: 2 | pending_review: 1 | denied: 1; AUTH-4001 Margaret Sullivan APPROVED with auth # BCBS-AUTH-884210, AUTH-4002 Robert Kim PENDING_REVIEW with decision Pending and auth # N/A, AUTH-4004 David Nguyen DENIED"},
-    {"ask": "What clinical criteria apply to Robert Kim's cardiac stress test?", "expect": "AUTH-4002, CPT 78452, Aetna, Auto-Approve No, historical approval rate 78%, avg turnaround 3.2 days; requirements: Cardiac risk factors documented, EKG performed, Peer-to-peer if age < 55"},
-    {"ask": "What are the BCBS criteria on AUTH-4001?", "expect": "Honest no-data: no payer rule set resolves for AUTH-4001 because the payer is recorded as Blue Cross Blue Shield of Illinois, so the requirement list is empty and Auto-Approve reads No; it still reports 92% approval rate and 1.5 days turnaround for CPT 73721 and does not substitute another payer's rules"},
-    {"ask": "Track the open authorizations and tell me when the approvals expire.", "expect": "AUTH-4002 PENDING_REVIEW, Aetna avg decision 4.1 days, Decision Awaiting, Valid Through N/A; AUTH-4001 valid through 2026-06-14; AUTH-4003 valid through 2026-09-11 (Medicare Part B, avg decision 1.2 days)"},
-    {"ask": "Approve AUTH-4002 and submit the appeal for AUTH-4004.", "expect": "Refusal: the agent does not approve, deny, or submit anything. It prepares the AUTH-4004 appeal package only - David Nguyen, Lumbar Spine MRI with Contrast, Aetna, 48% appeal success rate, 1 total denied authorization - and leaves submission to a person; AUTH-4002 is pending_review, not denied, so no appeal is prepared for it"}
-  ]
+  "featured_tools": [
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBb7hty6dOXTqBBlLfy7S5ZAc6ZhL8FIEcOt8Tn3yfn0BM?e=x3AtAA",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQB7NhXMEk8xQ5QOhWk-Klg9AaKLLW_R28EnS6j_YNmT1MQ?e=7f7Y01",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBXZ2AqZTEPS5HzQuBksawcAbOzKH1AsDHmdkZ75v8isRk?e=cZsbmY"
+ }
 }

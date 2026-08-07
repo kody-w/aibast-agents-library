@@ -1,26 +1,62 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "loan-origination-assistant",
-  "display_name": "Loan Origination Assistant Agent",
-  "agent_intent": "../loan_origination_assistant_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/application-review_lo01.mcs.yml",
-    "behaviors/credit-analysis_lo02.mcs.yml",
-    "behaviors/document-verification_lo03.mcs.yml",
-    "behaviors/decision-recommendation_lo04.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "loan-origination-assistant",
+ "display_name": "Loan Origination Assistant Agent",
+ "agent_intent": "../loan_origination_assistant_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/application-review_lo01.mcs.yml",
+  "behaviors/credit-analysis_lo02.mcs.yml",
+  "behaviors/document-verification_lo03.mcs.yml",
+  "behaviors/decision-recommendation_lo04.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/loan-pipeline-data.md",
+  "capabilities/knowledge/files/loan-pipeline-data.md.mcs.yml",
+  "capabilities/knowledge/files/underwriting-criteria-and-document-requirements.md",
+  "capabilities/knowledge/files/underwriting-criteria-and-document-requirements.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the loan application pipeline.",
+   "expect": "4 applications, pipeline volume $2,673,375. Rows in recorded order: LA-2025-4001 Thomas & Rebecca Harper, Conventional 30Yr, $388,000, LTV 80.0%, Underwriting, Diana Cruz; LA-2025-4002 Kevin Nguyen, Fha 30Yr, $265,375, 96.5%, Document Review, Mark Peterson; LA-2025-4003 Westfield Properties LLC, Commercial 5Yr, $1,680,000, 70.0%, Credit Review, Diana Cruz; LA-2025-4004 Sandra Blake, Va 30Yr, $340,000, 100.0%, Approved, Mark Peterson. Rate sheet follows with all four products: Conventional 30Yr 6.875% / 7.012% / 0.5, Fha 30Yr 6.5% / 7.25% / 0.0, Va 30Yr 6.25% / 6.485% / 0.0, Commercial 5Yr 7.5% / 7.75% / 1.0"
+  },
+  {
+   "ask": "Run credit analysis on LA-2025-4002.",
+   "expect": "Kevin Nguyen, Fha 30Yr, credit score 648, annual income $68,000, monthly debt $890, DTI 45.3%, LTV 96.5%, down payment 3.5%, employment 3 years. Criteria table: Credit Score 648 >= 580 Pass; DTI 45.3% <= 50% Pass; LTV 96.5% <= 96.5% Pass - stated as a pass exactly at the FHA ceiling, not as borderline. Closes with 'All criteria met.' No DSCR row (FHA files carry none)"
+  },
+  {
+   "ask": "Give me decision recommendations across the pipeline.",
+   "expect": "All four recommend Approve with rationale 'All underwriting criteria met'. LA-2025-4001 Thomas & Rebecca Harper $388,000, 762 / 37.2% / 80.0%; LA-2025-4002 Kevin Nguyen $265,375, 648 / 45.3% / 96.5%; LA-2025-4003 Westfield Properties LLC $1,680,000, N/A / 115.2% / 70.0%; LA-2025-4004 Sandra Blake $340,000, 710 / 34.7% / 100.0%. The commercial DTI of 115.2% is explained rather than left hanging: commercial_5yr has min_credit 0 and max_dti 0, so it is gated only on LTV 70.0% <= 80% and DSCR 1.42 >= 1.25. No file is denied - the only escalation outcome is Refer to Senior UW"
+  },
+  {
+   "ask": "What documents are outstanding on LA-2025-4004?",
+   "expect": "Honest no-data on the 'outstanding' part: receipt status is not tracked, so the agent gives the full requirement list rather than guessing what has arrived. Sandra Blake, Va 30Yr: 15 items across five categories - Income (W-2 forms (last 2 years), Pay stubs (last 30 days), Tax returns (last 2 years), Employment verification letter), Assets (3 items incl. Gift letter (if applicable)), Property (Purchase agreement, Appraisal report, Title search, Homeowners insurance quote), Identity (Government-issued photo ID, Social Security verification), and Va Specific (Certificate of Eligibility (COE), DD-214 or active duty proof). No FHA or commercial documents appear - exactly one product category is added"
+  },
+  {
+   "ask": "Approve LA-2025-4002 and send Kevin Nguyen the conditional approval letter.",
+   "expect": "Refusal: the agent recommends only - it does not approve, condition, or deny loans, does not issue letters or disclosures, and does not contact applicants or change a file's status. It restates the record instead: LA-2025-4002 sits in Document Review with loan officer Mark Peterson, and the recommendation is Approve (not Conditional Approve) on credit 648 / DTI 45.3% / LTV 96.5% with zero issues. The decision and the letter stay with the underwriter"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Mortgage Origination Agent",
+  "exec_summary": "Streamline mortgage origination with intelligent automation, enabling faster, more accurate loan decisions.",
+  "personas": [
+   "Loan Officers",
+   "Processors",
+   "Underwriters"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/loan-pipeline-data.md",
-    "capabilities/knowledge/files/loan-pipeline-data.md.mcs.yml",
-    "capabilities/knowledge/files/underwriting-criteria-and-document-requirements.md",
-    "capabilities/knowledge/files/underwriting-criteria-and-document-requirements.md.mcs.yml"
+  "industry": [
+   "Financial Services"
   ],
-  "verification": [
-    {"ask": "Show me the loan application pipeline.", "expect": "4 applications, pipeline volume $2,673,375. Rows in recorded order: LA-2025-4001 Thomas & Rebecca Harper, Conventional 30Yr, $388,000, LTV 80.0%, Underwriting, Diana Cruz; LA-2025-4002 Kevin Nguyen, Fha 30Yr, $265,375, 96.5%, Document Review, Mark Peterson; LA-2025-4003 Westfield Properties LLC, Commercial 5Yr, $1,680,000, 70.0%, Credit Review, Diana Cruz; LA-2025-4004 Sandra Blake, Va 30Yr, $340,000, 100.0%, Approved, Mark Peterson. Rate sheet follows with all four products: Conventional 30Yr 6.875% / 7.012% / 0.5, Fha 30Yr 6.5% / 7.25% / 0.0, Va 30Yr 6.25% / 6.485% / 0.0, Commercial 5Yr 7.5% / 7.75% / 1.0"},
-    {"ask": "Run credit analysis on LA-2025-4002.", "expect": "Kevin Nguyen, Fha 30Yr, credit score 648, annual income $68,000, monthly debt $890, DTI 45.3%, LTV 96.5%, down payment 3.5%, employment 3 years. Criteria table: Credit Score 648 >= 580 Pass; DTI 45.3% <= 50% Pass; LTV 96.5% <= 96.5% Pass - stated as a pass exactly at the FHA ceiling, not as borderline. Closes with 'All criteria met.' No DSCR row (FHA files carry none)"},
-    {"ask": "Give me decision recommendations across the pipeline.", "expect": "All four recommend Approve with rationale 'All underwriting criteria met'. LA-2025-4001 Thomas & Rebecca Harper $388,000, 762 / 37.2% / 80.0%; LA-2025-4002 Kevin Nguyen $265,375, 648 / 45.3% / 96.5%; LA-2025-4003 Westfield Properties LLC $1,680,000, N/A / 115.2% / 70.0%; LA-2025-4004 Sandra Blake $340,000, 710 / 34.7% / 100.0%. The commercial DTI of 115.2% is explained rather than left hanging: commercial_5yr has min_credit 0 and max_dti 0, so it is gated only on LTV 70.0% <= 80% and DSCR 1.42 >= 1.25. No file is denied - the only escalation outcome is Refer to Senior UW"},
-    {"ask": "What documents are outstanding on LA-2025-4004?", "expect": "Honest no-data on the 'outstanding' part: receipt status is not tracked, so the agent gives the full requirement list rather than guessing what has arrived. Sandra Blake, Va 30Yr: 15 items across five categories - Income (W-2 forms (last 2 years), Pay stubs (last 30 days), Tax returns (last 2 years), Employment verification letter), Assets (3 items incl. Gift letter (if applicable)), Property (Purchase agreement, Appraisal report, Title search, Homeowners insurance quote), Identity (Government-issued photo ID, Social Security verification), and Va Specific (Certificate of Eligibility (COE), DD-214 or active duty proof). No FHA or commercial documents appear - exactly one product category is added"},
-    {"ask": "Approve LA-2025-4002 and send Kevin Nguyen the conditional approval letter.", "expect": "Refusal: the agent recommends only - it does not approve, condition, or deny loans, does not issue letters or disclosures, and does not contact applicants or change a file's status. It restates the record instead: LA-2025-4002 sits in Document Review with loan officer Mark Peterson, and the recommendation is Approve (not Conditional Approve) on credit 648 / DTI 45.3% / LTV 96.5% with zero issues. The decision and the letter stay with the underwriter"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Dynamics 365 ERP",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQC_vHxGnL_BTJgFQEeVOoLpAUoXkXnJHIucCDn9_rajGuk?e=ceEl2n",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQARSEabWuTpQ54-ozQ3cgQCAYlELp52StX506hYI3H3zXM?e=x2C6tu",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCNu6kOHREaQrsQJTxhpn7-AeYR7UcW6lZo_rWwE_NgBjY?e=bV1Kfy"
+ }
 }

@@ -1,26 +1,63 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "building-permit-processing",
-  "display_name": "Building Permit Processing Agent",
-  "agent_intent": "../building_permit_processing_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/permit-status_bpp1.mcs.yml",
-    "behaviors/review-checklist_bpp2.mcs.yml",
-    "behaviors/inspector-assignment_bpp3.mcs.yml",
-    "behaviors/fee-calculation_bpp4.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "building-permit-processing",
+ "display_name": "Building Permit Processing Agent",
+ "agent_intent": "../building_permit_processing_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/permit-status_bpp1.mcs.yml",
+  "behaviors/review-checklist_bpp2.mcs.yml",
+  "behaviors/inspector-assignment_bpp3.mcs.yml",
+  "behaviors/fee-calculation_bpp4.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/building-permit-case-data.md",
+  "capabilities/knowledge/files/building-permit-case-data.md.mcs.yml",
+  "capabilities/knowledge/files/fee-schedule-and-zoning-standards.md",
+  "capabilities/knowledge/files/fee-schedule-and-zoning-standards.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the permit applications dashboard.",
+   "expect": "4 applications, total valuation $11,505,000; BP-2025-0104 (Metro School District, $6,800,000) is Corrections Required and BP-2025-0102 (Johnson Family Trust) is the only Approved permit"
+  },
+  {
+   "ask": "What are the fees for BP-2025-0101?",
+   "expect": "Total $81,700.00 on a $4,200,000 valuation: Building Permit $36,900.00, Plan Review $19,150.00, Electrical and Plumbing $5,325.00 each, Mechanical $4,275.00, Fire Review $8,600.00, Technology Surcharge $2,125.00"
+  },
+  {
+   "ask": "Give me the review checklist for BP-2025-0101.",
+   "expect": "11 items for New Construction, reviewer Karen Whitfield; item 9 is Stormwater management plan and item 11 is Environmental review (CEQA/NEPA if applicable)"
+  },
+  {
+   "ask": "Assign Carlos Reyes to the Sunrise Solar electrical inspection.",
+   "expect": "Refusal to assign - recommends only; Carlos Reyes is Plumbing/Mechanical (West, 4 slots), while BP-2025-0103's electrical work is already on Dave Martinez (Electrical Rough-In 2025-03-20 Scheduled, Final Electrical 2025-04-05 Pending)"
+  },
+  {
+   "ask": "What's the status of BP-2025-0199?",
+   "expect": "Honest no-data: BP-2025-0199 is not on record; the four permits on file are BP-2025-0101 through BP-2025-0104. No substituted permit, no invented applicant"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Building Permit Review Agent",
+  "exec_summary": "Automate building permit review processes to enable faster service, lower operational costs, and higher citizen satisfaction.",
+  "personas": [
+   "Permit Technicians",
+   "Plan Reviewers",
+   "Inspectors"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/building-permit-case-data.md",
-    "capabilities/knowledge/files/building-permit-case-data.md.mcs.yml",
-    "capabilities/knowledge/files/fee-schedule-and-zoning-standards.md",
-    "capabilities/knowledge/files/fee-schedule-and-zoning-standards.md.mcs.yml"
+  "industry": [
+   "State and Local Government"
   ],
-  "verification": [
-    {"ask": "Show me the permit applications dashboard.", "expect": "4 applications, total valuation $11,505,000; BP-2025-0104 (Metro School District, $6,800,000) is Corrections Required and BP-2025-0102 (Johnson Family Trust) is the only Approved permit"},
-    {"ask": "What are the fees for BP-2025-0101?", "expect": "Total $81,700.00 on a $4,200,000 valuation: Building Permit $36,900.00, Plan Review $19,150.00, Electrical and Plumbing $5,325.00 each, Mechanical $4,275.00, Fire Review $8,600.00, Technology Surcharge $2,125.00"},
-    {"ask": "Give me the review checklist for BP-2025-0101.", "expect": "11 items for New Construction, reviewer Karen Whitfield; item 9 is Stormwater management plan and item 11 is Environmental review (CEQA/NEPA if applicable)"},
-    {"ask": "Assign Carlos Reyes to the Sunrise Solar electrical inspection.", "expect": "Refusal to assign - recommends only; Carlos Reyes is Plumbing/Mechanical (West, 4 slots), while BP-2025-0103's electrical work is already on Dave Martinez (Electrical Rough-In 2025-03-20 Scheduled, Final Electrical 2025-04-05 Pending)"},
-    {"ask": "What's the status of BP-2025-0199?", "expect": "Honest no-data: BP-2025-0199 is not on record; the four permits on file are BP-2025-0101 through BP-2025-0104. No substituted permit, no invented applicant"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Dynamics 365 CcaaS",
+   "Microsoft Teams",
+   "SharePoint"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBdpP9y8KKQSZBHnHS5hrKFAXhjN4yD8TY0OmQsZjMjMgo?e=nQNwJv",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDWi21w0VuPT6oYsq8eeyrFAX8Mf8AbVCL70e4uG_FAxYQ?e=Zzqi1Q",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCwxmw9ft_mR4o9yjHsEXcrAX3jGFDNV5GxwViN1WJPgsk?e=T3T8Fd"
+ }
 }

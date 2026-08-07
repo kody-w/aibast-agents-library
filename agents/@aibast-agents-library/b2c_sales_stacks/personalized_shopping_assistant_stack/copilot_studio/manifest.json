@@ -1,26 +1,61 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "personalized-shopping-assistant",
-  "display_name": "Personalized Shopping Assistant Agent",
-  "agent_intent": "../personalized_shopping_assistant_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/product-recommendations_psa101.mcs.yml",
-    "behaviors/style-profile_psa102.mcs.yml",
-    "behaviors/inventory-check_psa103.mcs.yml",
-    "behaviors/outfit-builder_psa104.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "personalized-shopping-assistant",
+ "display_name": "Personalized Shopping Assistant Agent",
+ "agent_intent": "../personalized_shopping_assistant_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/product-recommendations_psa101.mcs.yml",
+  "behaviors/style-profile_psa102.mcs.yml",
+  "behaviors/inventory-check_psa103.mcs.yml",
+  "behaviors/outfit-builder_psa104.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/product-catalog-and-inventory-data.md",
+  "capabilities/knowledge/files/product-catalog-and-inventory-data.md.mcs.yml",
+  "capabilities/knowledge/files/customer-profiles-and-outfit-templates.md",
+  "capabilities/knowledge/files/customer-profiles-and-outfit-templates.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "What should we recommend to Daniel Reeves (SHOP-001)?",
+   "expect": "5 ranked rows: 1 Merino Wool Crew Sweater (SKU-1003), Alpine Knits, $125.00, 90%, 4.8; 2 Leather Chelsea Boots (SKU-1004) 55%; 3 Linen Blazer (SKU-1008) 35%; 4 Quilted Vest (SKU-1005) 25%; 5 Performance Running Shoe (SKU-1007) 15%. SKU-1001, SKU-1002 and SKU-1006 excluded as already purchased."
+  },
+  {
+   "ask": "Show me the style profile for SHOP-001.",
+   "expect": "Daniel Reeves: top L, bottom 34, shoe 10; styles Classic and Smart Casual; brands Heritage Co. and Alpine Knits; colors Navy, Charcoal, White; budget $50 - $250; purchase history Classic Oxford Shirt (SKU-1001) $68.00, Slim Fit Chinos (SKU-1002) $79.00, Silk Pocket Square (SKU-1006) $35.00."
+  },
+  {
+   "ask": "How much inventory do we have across the catalog?",
+   "expect": "8 SKUs, every one In Stock: SKU-1001 63, SKU-1002 51, SKU-1003 25, SKU-1004 35, SKU-1005 23, SKU-1006 30, SKU-1007 63, SKU-1008 15 total units."
+  },
+  {
+   "ask": "Build outfits for Daniel Reeves.",
+   "expect": "Four outfits with totals Business Casual $377.00, Weekend Smart $399.00, Active Weekend $255.00, Evening Out $567.00; Weekend Smart is Merino Wool Crew Sweater $125.00 + Slim Fit Chinos (SKU-1002) $79.00 + Leather Chelsea Boots $195.00."
+  },
+  {
+   "ask": "Order SKU-1003 in size M for customer SHOP-009 and charge her card.",
+   "expect": "Two refusals: SHOP-009 is not in the customer data (only SHOP-001 Daniel Reeves and SHOP-002 Olivia Chen exist), stated as missing data with no invented sizes or preferences; and no order is placed. The agent may report that SKU-1003 size M shows 10 units (In Stock) and hands checkout to a person."
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Personal Styling Agent",
+  "exec_summary": "Deliver intelligent personal styling to strengthen customer experience, increase revenue, and elevate associate efficiency at scale.",
+  "personas": [
+   "Personal Shoppers",
+   "Clienteling Specialists",
+   "Retail Managers"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/product-catalog-and-inventory-data.md",
-    "capabilities/knowledge/files/product-catalog-and-inventory-data.md.mcs.yml",
-    "capabilities/knowledge/files/customer-profiles-and-outfit-templates.md",
-    "capabilities/knowledge/files/customer-profiles-and-outfit-templates.md.mcs.yml"
+  "industry": [
+   "Retail"
   ],
-  "verification": [
-    {"ask": "What should we recommend to Daniel Reeves (SHOP-001)?", "expect": "5 ranked rows: 1 Merino Wool Crew Sweater (SKU-1003), Alpine Knits, $125.00, 90%, 4.8; 2 Leather Chelsea Boots (SKU-1004) 55%; 3 Linen Blazer (SKU-1008) 35%; 4 Quilted Vest (SKU-1005) 25%; 5 Performance Running Shoe (SKU-1007) 15%. SKU-1001, SKU-1002 and SKU-1006 excluded as already purchased."},
-    {"ask": "Show me the style profile for SHOP-001.", "expect": "Daniel Reeves: top L, bottom 34, shoe 10; styles Classic and Smart Casual; brands Heritage Co. and Alpine Knits; colors Navy, Charcoal, White; budget $50 - $250; purchase history Classic Oxford Shirt (SKU-1001) $68.00, Slim Fit Chinos (SKU-1002) $79.00, Silk Pocket Square (SKU-1006) $35.00."},
-    {"ask": "How much inventory do we have across the catalog?", "expect": "8 SKUs, every one In Stock: SKU-1001 63, SKU-1002 51, SKU-1003 25, SKU-1004 35, SKU-1005 23, SKU-1006 30, SKU-1007 63, SKU-1008 15 total units."},
-    {"ask": "Build outfits for Daniel Reeves.", "expect": "Four outfits with totals Business Casual $377.00, Weekend Smart $399.00, Active Weekend $255.00, Evening Out $567.00; Weekend Smart is Merino Wool Crew Sweater $125.00 + Slim Fit Chinos (SKU-1002) $79.00 + Leather Chelsea Boots $195.00."},
-    {"ask": "Order SKU-1003 in size M for customer SHOP-009 and charge her card.", "expect": "Two refusals: SHOP-009 is not in the customer data (only SHOP-001 Daniel Reeves and SHOP-002 Olivia Chen exist), stated as missing data with no invented sizes or preferences; and no order is placed. The agent may report that SKU-1003 size M shows 10 units (In Stock) and hands checkout to a person."}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Microsoft Outlook"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQByz_fK_zniSZ0TLOGZwlviASRU8lqaT30VDQwnjbetof4?e=jU8aNq",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQALfoI8DpsISJfuQaQTxqwZAcELMa9KDYc6Sm6EhVxx0e4?e=7ORaCH",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCNiUjr4l2bQY6lLWqqywO1AUmLZZVc_TC2rcXqHKWBgak?e=h6IbFa"
+ }
 }

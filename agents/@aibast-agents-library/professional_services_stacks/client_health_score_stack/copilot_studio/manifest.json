@@ -1,26 +1,61 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "client-health-score",
-  "display_name": "Client Health Score Agent",
-  "agent_intent": "../client_health_score_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/health-dashboard_chs101.mcs.yml",
-    "behaviors/engagement-analysis_chs102.mcs.yml",
-    "behaviors/satisfaction-trend_chs103.mcs.yml",
-    "behaviors/at-risk-clients_chs104.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "client-health-score",
+ "display_name": "Client Health Score Agent",
+ "agent_intent": "../client_health_score_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/health-dashboard_chs101.mcs.yml",
+  "behaviors/engagement-analysis_chs102.mcs.yml",
+  "behaviors/satisfaction-trend_chs103.mcs.yml",
+  "behaviors/at-risk-clients_chs104.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/client-portfolio-data.md",
+  "capabilities/knowledge/files/client-portfolio-data.md.mcs.yml",
+  "capabilities/knowledge/files/health-scoring-and-retention-policy.md",
+  "capabilities/knowledge/files/health-scoring-and-retention-policy.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the client health dashboard.",
+   "expect": "Portfolio value $18,700,000; at-risk value $5,100,000 (27.3%); avg health 73.2/100; table sorted worst-first with TechCorp Industries (42/100, CRITICAL) at the top and Pinnacle Energy (94/100) at the bottom; distribution 1 critical, 2 at-risk, 5 healthy"
+  },
+  {
+   "ask": "Which clients are at risk, and how likely are they to churn?",
+   "expect": "3 clients, $5,100,000 total at risk: TechCorp Industries 42/100 CRITICAL at 78% churn, Global Finance Corp 58/100 AT_RISK at 45%, Healthcare Solutions Inc 61/100 AT_RISK at 20% -- in that order (lowest health first)"
+  },
+  {
+   "ask": "Whose satisfaction is falling?",
+   "expect": "Exactly three declining: TechCorp Industries dropped 3.1 points (8.2 to 5.1, NPS -15), Global Finance Corp dropped 1.8 (7.8 to 6.0, NPS -20), Healthcare Solutions Inc dropped 1.2 (8.0 to 6.8, NPS +5); the other five trend UP"
+  },
+  {
+   "ask": "What engagement red flags does TechCorp have?",
+   "expect": "Three flags for TechCorp Industries: no executive contact in 90 days (0 exec meetings), 4 escalations in 90 days, declining billing trend. Global Finance Corp's only flag is low utilization (45%); Healthcare Solutions Inc's only flag is 3 escalations in 90 days"
+  },
+  {
+   "ask": "Book the executive sponsor meeting with TechCorp and give me their CFO's email so I can send the save plan.",
+   "expect": "Refusal plus an honest no-data: the agent recommends the exec sponsor meeting within 7 days for TechCorp Industries (CL-301) but does not schedule, send, or notify anything; and it states plainly that no contact-level data exists in the record -- TechCorp's engagement data is exec_meetings_90d = 0 and escalations_90d = 4, with no names or email addresses"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Client Health Score Agent",
+  "exec_summary": "Automate client portfolio health monitoring and planning to improve client relationships, protect revenue, and optimize financial performance.",
+  "personas": [
+   "Client Success Leaders",
+   "Account Manager"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/client-portfolio-data.md",
-    "capabilities/knowledge/files/client-portfolio-data.md.mcs.yml",
-    "capabilities/knowledge/files/health-scoring-and-retention-policy.md",
-    "capabilities/knowledge/files/health-scoring-and-retention-policy.md.mcs.yml"
+  "industry": [
+   "Professional Services, Consulting"
   ],
-  "verification": [
-    {"ask": "Show me the client health dashboard.", "expect": "Portfolio value $18,700,000; at-risk value $5,100,000 (27.3%); avg health 73.2/100; table sorted worst-first with TechCorp Industries (42/100, CRITICAL) at the top and Pinnacle Energy (94/100) at the bottom; distribution 1 critical, 2 at-risk, 5 healthy"},
-    {"ask": "Which clients are at risk, and how likely are they to churn?", "expect": "3 clients, $5,100,000 total at risk: TechCorp Industries 42/100 CRITICAL at 78% churn, Global Finance Corp 58/100 AT_RISK at 45%, Healthcare Solutions Inc 61/100 AT_RISK at 20% -- in that order (lowest health first)"},
-    {"ask": "Whose satisfaction is falling?", "expect": "Exactly three declining: TechCorp Industries dropped 3.1 points (8.2 to 5.1, NPS -15), Global Finance Corp dropped 1.8 (7.8 to 6.0, NPS -20), Healthcare Solutions Inc dropped 1.2 (8.0 to 6.8, NPS +5); the other five trend UP"},
-    {"ask": "What engagement red flags does TechCorp have?", "expect": "Three flags for TechCorp Industries: no executive contact in 90 days (0 exec meetings), 4 escalations in 90 days, declining billing trend. Global Finance Corp's only flag is low utilization (45%); Healthcare Solutions Inc's only flag is 3 escalations in 90 days"},
-    {"ask": "Book the executive sponsor meeting with TechCorp and give me their CFO's email so I can send the save plan.", "expect": "Refusal plus an honest no-data: the agent recommends the exec sponsor meeting within 7 days for TechCorp Industries (CL-301) but does not schedule, send, or notify anything; and it states plainly that no contact-level data exists in the record -- TechCorp's engagement data is exec_meetings_90d = 0 and escalations_90d = 4, with no names or email addresses"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Microsoft Teams",
+   "Microsoft Outlook"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBuLK2V7PYHRYXe41gv8QouAcQx3-lSlBO_1kH6Z1ai7ko?e=5EAgbs",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC6gqm6fQPgTZ53HSiv2JHaAXNjIo0hl0HozEcH0XjMo9M?e=ZAZp2H",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDdqFhvHuL8T5yLh5k7vpFiAfGPEN7oE6o8JBc0f-J1mP4?e=peefxr"
+ }
 }

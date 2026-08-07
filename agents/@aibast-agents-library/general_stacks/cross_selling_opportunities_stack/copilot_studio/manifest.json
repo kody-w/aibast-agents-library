@@ -1,26 +1,61 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "cross-selling",
-  "display_name": "Cross-Selling Opportunities",
-  "agent_intent": "../cross_selling_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/opportunity-scan_cs01.mcs.yml",
-    "behaviors/product-affinity_cs02.mcs.yml",
-    "behaviors/recommendation-engine_cs03.mcs.yml",
-    "behaviors/revenue-impact_cs04.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "cross-selling",
+ "display_name": "Cross-Selling Opportunities",
+ "agent_intent": "../cross_selling_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/opportunity-scan_cs01.mcs.yml",
+  "behaviors/product-affinity_cs02.mcs.yml",
+  "behaviors/recommendation-engine_cs03.mcs.yml",
+  "behaviors/revenue-impact_cs04.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/customer-ownership-and-product-catalog.md",
+  "capabilities/knowledge/files/customer-ownership-and-product-catalog.md.mcs.yml",
+  "capabilities/knowledge/files/affinity-rules-and-segment-benchmarks.md",
+  "capabilities/knowledge/files/affinity-rules-and-segment-benchmarks.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Scan Meridian Corp for cross-sell opportunities.",
+   "expect": "CUST-001, Enterprise, current ARR $84,000, health score 92/100, tenure 24 months, contact Sandra Lee; owns Enterprise Platform, Analytics Standard, Premium Support; 3 opportunities found - Analytics Pro $28,000/yr at 91% affinity / 55% success / 28d, Analytics Pro $28,000/yr at 88% affinity / 62% success / 21d, Security Suite $15,000/yr at 78% affinity / 48% success / 30d"
+  },
+  {
+   "ask": "What should we lead with at Meridian Corp, and what is that pipeline worth?",
+   "expect": "Ranked by affinity: 1. Analytics Pro 91% affinity, weighted value $15,400/yr, 28 days; 2. Analytics Pro 88% affinity, weighted value $17,360/yr, 21 days; 3. Security Suite 78% affinity, weighted value $7,200/yr, 30 days. Total potential ARR $71,000, weighted pipeline $39,960, 3 recommendations"
+  },
+  {
+   "ask": "What is the total cross-sell pipeline across the whole book?",
+   "expect": "13 opportunities, $203,000 total potential ARR, $103,130 weighted pipeline, $169,920 projected margin; per customer - Meridian Corp 3 opps / $71,000, Atlas Digital 3 / $35,000, Pinnacle Health 3 / $51,000, Greenleaf Retail 3 / $38,000, Beacon Financial 1 / $8,000 despite the highest current ARR at $113,000"
+  },
+  {
+   "ask": "Which product pairing converts best, and which has the strongest affinity?",
+   "expect": "Best conversion is Enterprise Platform -> Premium Support at 65% success rate with the fastest 14-day average close (82% affinity); strongest affinity is Enterprise Platform -> Analytics Pro at 91% (55% success, 28d). Enterprise segment benchmark 52% success / 28d cycle / 35% expansion versus Mid-Market 38% / 42d / 25% and SMB 28% / 55d / 18%"
+  },
+  {
+   "ask": "Pull the cross-sell opportunities for Northwind Traders and email the recommendation to their account executive.",
+   "expect": "Refusal on both counts: Northwind Traders is not in the customer set (CUST-001 Meridian Corp through CUST-005 Beacon Financial), so the agent says it has no data rather than reporting another account's numbers; and it recommends only - it does not send email, create an opportunity, or update CRM"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Expansion Opportunity Agent",
+  "exec_summary": "Identify and prioritize expansion opportunities to drive revenue growth and strengthen customer relationships.",
+  "personas": [
+   "Sales Leader",
+   "Sales Operations Manager",
+   "Enablement Manager"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/customer-ownership-and-product-catalog.md",
-    "capabilities/knowledge/files/customer-ownership-and-product-catalog.md.mcs.yml",
-    "capabilities/knowledge/files/affinity-rules-and-segment-benchmarks.md",
-    "capabilities/knowledge/files/affinity-rules-and-segment-benchmarks.md.mcs.yml"
+  "industry": [
+   "Cross-Industry"
   ],
-  "verification": [
-    {"ask": "Scan Meridian Corp for cross-sell opportunities.", "expect": "CUST-001, Enterprise, current ARR $84,000, health score 92/100, tenure 24 months, contact Sandra Lee; owns Enterprise Platform, Analytics Standard, Premium Support; 3 opportunities found - Analytics Pro $28,000/yr at 91% affinity / 55% success / 28d, Analytics Pro $28,000/yr at 88% affinity / 62% success / 21d, Security Suite $15,000/yr at 78% affinity / 48% success / 30d"},
-    {"ask": "What should we lead with at Meridian Corp, and what is that pipeline worth?", "expect": "Ranked by affinity: 1. Analytics Pro 91% affinity, weighted value $15,400/yr, 28 days; 2. Analytics Pro 88% affinity, weighted value $17,360/yr, 21 days; 3. Security Suite 78% affinity, weighted value $7,200/yr, 30 days. Total potential ARR $71,000, weighted pipeline $39,960, 3 recommendations"},
-    {"ask": "What is the total cross-sell pipeline across the whole book?", "expect": "13 opportunities, $203,000 total potential ARR, $103,130 weighted pipeline, $169,920 projected margin; per customer - Meridian Corp 3 opps / $71,000, Atlas Digital 3 / $35,000, Pinnacle Health 3 / $51,000, Greenleaf Retail 3 / $38,000, Beacon Financial 1 / $8,000 despite the highest current ARR at $113,000"},
-    {"ask": "Which product pairing converts best, and which has the strongest affinity?", "expect": "Best conversion is Enterprise Platform -> Premium Support at 65% success rate with the fastest 14-day average close (82% affinity); strongest affinity is Enterprise Platform -> Analytics Pro at 91% (55% success, 28d). Enterprise segment benchmark 52% success / 28d cycle / 35% expansion versus Mid-Market 38% / 42d / 25% and SMB 28% / 55d / 18%"},
-    {"ask": "Pull the cross-sell opportunities for Northwind Traders and email the recommendation to their account executive.", "expect": "Refusal on both counts: Northwind Traders is not in the customer set (CUST-001 Meridian Corp through CUST-005 Beacon Financial), so the agent says it has no data rather than reporting another account's numbers; and it recommends only - it does not send email, create an opportunity, or update CRM"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCFt_qhDKzDQJ1UVhmb9eayAVc0PEen_-FWOSyq7aFueCY?e=bAnNiP",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDVx3gbj-DiRLgXmThlIq5HAWMRpcs_RkFZTI5426lOEI4?e=rOxLw5",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQC6pTBVVlDKRobEVrDOJdA8ASMl0kaHefo62y0jru8Kt6g?e=vMgBrW"
+ }
 }

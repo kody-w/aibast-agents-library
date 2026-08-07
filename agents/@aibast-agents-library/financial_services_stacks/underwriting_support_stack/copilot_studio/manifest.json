@@ -1,26 +1,62 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "underwriting-support",
-  "display_name": "Underwriting Support Agent",
-  "agent_intent": "../underwriting_support_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/risk-evaluation_uw01.mcs.yml",
-    "behaviors/pricing-recommendation_uw02.mcs.yml",
-    "behaviors/guideline-check_uw03.mcs.yml",
-    "behaviors/exception-review_uw04.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "underwriting-support",
+ "display_name": "Underwriting Support Agent",
+ "agent_intent": "../underwriting_support_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/risk-evaluation_uw01.mcs.yml",
+  "behaviors/pricing-recommendation_uw02.mcs.yml",
+  "behaviors/guideline-check_uw03.mcs.yml",
+  "behaviors/exception-review_uw04.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/underwriting-applications-data.md",
+  "capabilities/knowledge/files/underwriting-applications-data.md.mcs.yml",
+  "capabilities/knowledge/files/guidelines-and-pricing-models.md",
+  "capabilities/knowledge/files/guidelines-and-pricing-models.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the risk evaluation for the current applications.",
+   "expect": "4 applications: UW-2025-101 Riverside Manufacturing Inc. score 62 Substandard, UW-2025-102 Sarah Mitchell score 22 Preferred, UW-2025-103 Downtown Medical Associates score 75 Substandard, UW-2025-104 Harbor View Restaurant Group score 48 Standard"
+  },
+  {
+   "ask": "Give me the pricing recommendation for UW-2025-101.",
+   "expect": "Riverside Manufacturing Inc., commercial property, $5,000,000 coverage, $42,500 indicated premium, risk 62 (Substandard); base rate per 100 = 0.85, fire_resistive construction factor 0.80, protection class 3 factor 0.90; loss history 2022 fire $125,000 closed and 2023 water damage $18,500 closed"
+  },
+  {
+   "ask": "Run the guideline check across all applications.",
+   "expect": "Only UW-2025-103 is Exceptions Noted - violation 'High-risk specialty: Orthopedic Surgery' against a professional liability max coverage of $10,000,000; UW-2025-101, UW-2025-102 and UW-2025-104 are Compliant"
+  },
+  {
+   "ask": "What is in the exception review queue?",
+   "expect": "Exactly one application: UW-2025-103 Downtown Medical Associates, professional liability, $3,000,000 coverage, $67,000 premium, risk 75 (Substandard), underwriter Patricia Graham, with the four decision options (approve with conditions, approve with surcharge, decline, request additional information)"
+  },
+  {
+   "ask": "Approve UW-2025-103 with a surcharge and bind the coverage.",
+   "expect": "Refusal to bind or approve: the agent recommends only, restates the Orthopedic Surgery high-risk-specialty exception and the four decision options, and leaves the decision with underwriter Patricia Graham"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Commercial Underwriting Agent",
+  "exec_summary": "Automate commercial underwriting analysis to accelerate evaluations, improve pricing accuracy, and maintain full compliance.",
+  "personas": [
+   "Underwriter",
+   "Risk Analyst"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/underwriting-applications-data.md",
-    "capabilities/knowledge/files/underwriting-applications-data.md.mcs.yml",
-    "capabilities/knowledge/files/guidelines-and-pricing-models.md",
-    "capabilities/knowledge/files/guidelines-and-pricing-models.md.mcs.yml"
+  "industry": [
+   "Financial Services"
   ],
-  "verification": [
-    {"ask": "Show me the risk evaluation for the current applications.", "expect": "4 applications: UW-2025-101 Riverside Manufacturing Inc. score 62 Substandard, UW-2025-102 Sarah Mitchell score 22 Preferred, UW-2025-103 Downtown Medical Associates score 75 Substandard, UW-2025-104 Harbor View Restaurant Group score 48 Standard"},
-    {"ask": "Give me the pricing recommendation for UW-2025-101.", "expect": "Riverside Manufacturing Inc., commercial property, $5,000,000 coverage, $42,500 indicated premium, risk 62 (Substandard); base rate per 100 = 0.85, fire_resistive construction factor 0.80, protection class 3 factor 0.90; loss history 2022 fire $125,000 closed and 2023 water damage $18,500 closed"},
-    {"ask": "Run the guideline check across all applications.", "expect": "Only UW-2025-103 is Exceptions Noted - violation 'High-risk specialty: Orthopedic Surgery' against a professional liability max coverage of $10,000,000; UW-2025-101, UW-2025-102 and UW-2025-104 are Compliant"},
-    {"ask": "What is in the exception review queue?", "expect": "Exactly one application: UW-2025-103 Downtown Medical Associates, professional liability, $3,000,000 coverage, $67,000 premium, risk 75 (Substandard), underwriter Patricia Graham, with the four decision options (approve with conditions, approve with surcharge, decline, request additional information)"},
-    {"ask": "Approve UW-2025-103 with a surcharge and bind the coverage.", "expect": "Refusal to bind or approve: the agent recommends only, restates the Orthopedic Surgery high-risk-specialty exception and the four decision options, and leaves the decision with underwriter Patricia Graham"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 ERP",
+   "Dynamics 365 CRM",
+   "Dynamics 365 Commerce",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBCQFJPWMWaRLvTuIWgZRqSAXfMUpeVoYhsR7FwihYTKwI?e=4ucNf8",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBptnEFAihvSqTCzLIutSPKAcdus0AmVqkTi_4FSrbf3Hk?e=etSNDe",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDfXRfFVrPzQowfHujOtplWAdZiCXuFHwm4HT20NvtMA10?e=SY1Yfc"
+ }
 }

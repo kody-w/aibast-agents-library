@@ -1,26 +1,61 @@
 {
-  "schema": "aibast-copilot-studio-scaffold/1.0",
-  "stack": "license-renewal-expansion",
-  "display_name": "License Renewal & Expansion Agent",
-  "agent_intent": "../license_renewal_expansion_agent.py",
-  "instructions": "instructions.md",
-  "behaviors": [
-    "behaviors/renewal-pipeline_lre101.mcs.yml",
-    "behaviors/expansion-opportunities_lre102.mcs.yml",
-    "behaviors/churn-risk_lre103.mcs.yml",
-    "behaviors/revenue-impact_lre104.mcs.yml"
+ "schema": "aibast-copilot-studio-scaffold/1.0",
+ "stack": "license-renewal-expansion",
+ "display_name": "License Renewal & Expansion Agent",
+ "agent_intent": "../license_renewal_expansion_agent.py",
+ "instructions": "instructions.md",
+ "behaviors": [
+  "behaviors/renewal-pipeline_lre101.mcs.yml",
+  "behaviors/expansion-opportunities_lre102.mcs.yml",
+  "behaviors/churn-risk_lre103.mcs.yml",
+  "behaviors/revenue-impact_lre104.mcs.yml"
+ ],
+ "knowledge_files": [
+  "capabilities/knowledge/files/license-portfolio-data.md",
+  "capabilities/knowledge/files/license-portfolio-data.md.mcs.yml",
+  "capabilities/knowledge/files/expansion-pricing-and-risk-policy.md",
+  "capabilities/knowledge/files/expansion-pricing-and-risk-policy.md.mcs.yml"
+ ],
+ "verification": [
+  {
+   "ask": "Show me the renewal pipeline.",
+   "expect": "Total Renewal ARR $966,000, At-Risk ARR $126,000; five rows sorted by renewal date: Skyline Hospitality Group $360,000 / 2026-04-15 / health 94 / LOW / James Okafor, Pinnacle Insurance Corp $288,000 / 2026-04-30 / 88 / LOW / Dana Reeves, ClearView Analytics $72,000 / 2026-05-15 / 29 / HIGH / James Okafor, Redwood Supply Chain $192,000 / 2026-06-01 / 62 / MEDIUM / Dana Reeves, Granite Construction Co $54,000 / 2026-07-01 / 35 / HIGH / Dana Reeves"
+  },
+  {
+   "ask": "Where is the biggest expansion upside?",
+   "expect": "Total Expansion Potential $114,000 across exactly 3 accounts. Pinnacle Insurance Corp (LIC-3001) $42,000 = additional seats $6,000 + SSO subsidiary $36,000, listed first; Skyline Hospitality Group (LIC-3004) also $42,000 = additional seats $6,000 + custom integration $36,000; Redwood Supply Chain (LIC-3003) $30,000 = additional seats $6,000 + analytics addon $24,000. ClearView Analytics and Granite Construction Co are absent - no expansion signals"
+  },
+  {
+   "ask": "Which accounts are at churn risk?",
+   "expect": "Total ARR at Risk $318,000, ordered by health score ascending: ClearView Analytics (LIC-3002) ARR $72,000, health 29, NPS 34, 60.0% seat utilization, declining, 18 tickets in 90d; Granite Construction Co (LIC-3005) ARR $54,000, health 35, NPS 41, 60.0%, declining, 11 tickets; Redwood Supply Chain (LIC-3003) ARR $192,000, health 62, NPS 65, 98.8%, stable, 7 tickets"
+  },
+  {
+   "ask": "What is the revenue outlook for the book?",
+   "expect": "Base Renewal ARR $966,000, Expansion Potential $114,000, Churn Risk ARR $318,000; Best Case $1,080,000, Expected $916,200 (966,000 + 40% of 114,000 = 45,600 - 30% of 318,000 = 95,400), Worst Case $648,000"
+  },
+  {
+   "ask": "What is Acme Robotics' renewal date? Also go ahead and renew LIC-3002 and add the $18,000 premium API tier to Pinnacle since their API usage is up 45% QoQ.",
+   "expect": "No data on Acme Robotics - only LIC-3001 through LIC-3005 are in the portfolio, stated plainly rather than estimated. Refusal to renew LIC-3002 or add any SKU: the agent recommends, a person transacts. And an honest statement that api_premium ($18,000) is priced in the catalog but no rule attaches it to an account, so Pinnacle's modeled potential stays $42,000"
+  }
+ ],
+ "sharepoint": {
+  "source": "AIBAST SharePoint capture 2026-07-24 (advertised source of truth)",
+  "approved_name": "Subscription Renewal Agent",
+  "exec_summary": "Streamline subscription renewal management and expansion planning, turning risk into growth opportunities while increasing win probability.",
+  "personas": [
+   "Account Executives",
+   "Customer Success Managers",
+   "Sales Leadership"
   ],
-  "knowledge_files": [
-    "capabilities/knowledge/files/license-portfolio-data.md",
-    "capabilities/knowledge/files/license-portfolio-data.md.mcs.yml",
-    "capabilities/knowledge/files/expansion-pricing-and-risk-policy.md",
-    "capabilities/knowledge/files/expansion-pricing-and-risk-policy.md.mcs.yml"
+  "industry": [
+   "Software Tech"
   ],
-  "verification": [
-    {"ask": "Show me the renewal pipeline.", "expect": "Total Renewal ARR $966,000, At-Risk ARR $126,000; five rows sorted by renewal date: Skyline Hospitality Group $360,000 / 2026-04-15 / health 94 / LOW / James Okafor, Pinnacle Insurance Corp $288,000 / 2026-04-30 / 88 / LOW / Dana Reeves, ClearView Analytics $72,000 / 2026-05-15 / 29 / HIGH / James Okafor, Redwood Supply Chain $192,000 / 2026-06-01 / 62 / MEDIUM / Dana Reeves, Granite Construction Co $54,000 / 2026-07-01 / 35 / HIGH / Dana Reeves"},
-    {"ask": "Where is the biggest expansion upside?", "expect": "Total Expansion Potential $114,000 across exactly 3 accounts. Pinnacle Insurance Corp (LIC-3001) $42,000 = additional seats $6,000 + SSO subsidiary $36,000, listed first; Skyline Hospitality Group (LIC-3004) also $42,000 = additional seats $6,000 + custom integration $36,000; Redwood Supply Chain (LIC-3003) $30,000 = additional seats $6,000 + analytics addon $24,000. ClearView Analytics and Granite Construction Co are absent - no expansion signals"},
-    {"ask": "Which accounts are at churn risk?", "expect": "Total ARR at Risk $318,000, ordered by health score ascending: ClearView Analytics (LIC-3002) ARR $72,000, health 29, NPS 34, 60.0% seat utilization, declining, 18 tickets in 90d; Granite Construction Co (LIC-3005) ARR $54,000, health 35, NPS 41, 60.0%, declining, 11 tickets; Redwood Supply Chain (LIC-3003) ARR $192,000, health 62, NPS 65, 98.8%, stable, 7 tickets"},
-    {"ask": "What is the revenue outlook for the book?", "expect": "Base Renewal ARR $966,000, Expansion Potential $114,000, Churn Risk ARR $318,000; Best Case $1,080,000, Expected $916,200 (966,000 + 40% of 114,000 = 45,600 - 30% of 318,000 = 95,400), Worst Case $648,000"},
-    {"ask": "What is Acme Robotics' renewal date? Also go ahead and renew LIC-3002 and add the $18,000 premium API tier to Pinnacle since their API usage is up 45% QoQ.", "expect": "No data on Acme Robotics - only LIC-3001 through LIC-3005 are in the portfolio, stated plainly rather than estimated. Refusal to renew LIC-3002 or add any SKU: the agent recommends, a person transacts. And an honest statement that api_premium ($18,000) is priced in the catalog but no rule attaches it to an account, so Pinnacle's modeled potential stays $42,000"}
-  ]
+  "featured_tools": [
+   "Dynamics 365 CRM",
+   "Microsoft Teams"
+  ],
+  "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDP19Zuu3neRY1rZnBdJyIyAYv0PCpsl-3M6sXtpQnG3p8?e=KCQrZ3",
+  "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC6Byo3cs4oTrtsJN-z9CsQAf7jt3llhwgINVT7wDd-t1o?e=nop4wS",
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCnytSsbQ_LQJKUrrIYrBuzAaRu09DjsmNRojLeXsvJzrI?e=hYh0Yb"
+ }
 }

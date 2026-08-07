@@ -1,0 +1,661 @@
+{
+ "schema": "aibast-sharepoint-crosswalk/1.0",
+ "note": "Durable map: SharePoint approved listings <-> library stacks. Decisions: ask-hr HR-stack primary; procurement double-rows -> procurement-agent; supply-risk double-rows -> supplier-risk-monitoring (retail disruption-alert separate); customer-onboarding generic primary (FS variant separate); regulatory-compliance -> FS variant (fed/energy separate); production-line is the accurate name for SharePoint's 'Product Line Optimization'. Customer Escalations has NO stack yet \u2014 pending. Binaries (decks/videos) stay on SharePoint; these links are the pointers.",
+ "captured": "2026-07-24 (pasted from authed browser; corp CA blocks programmatic pull)",
+ "entries": [
+  {
+   "sharepoint_name": "Product Line Optimization Agent",
+   "b_slug": "production-line-optimization",
+   "match": "override",
+   "industry": [
+    "Manufacturing"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/sites/AIBAST/SitePages/Agents%20Library%20Listings/Product%20Line%20Optimization%20Agent.aspx",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDGahQZ6trGRpvOp3KQ-9NyASN3b8fbo4JhbyvLmV3vLug?e=fbKBFe",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAYxt9f287pR57rl2oIW3DlAdE4InRZXHLQBfbQfIDiCx8?e=1PcWzK"
+   }
+  },
+  {
+   "sharepoint_name": "Contract Review Agent",
+   "b_slug": "contract-risk-review",
+   "match": "override-2",
+   "industry": [
+    "Professional Services, Consulting"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBxr8NSYZ_GQpYu7Snr69YzAQOdV5nYMWjBEJaf0Pc9qoU?e=P1SWFp",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBitvkypNHIS5MJVqB5WAcyASeWkqtVOZubToNMJ0VoO-Q?e=x2yWGc",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDhgCWVeHSKS46lKcTCM2onAcDW8-mxL17a8cJlmaB1Vr0?e=4VbMnd"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Client Onboarding Agent",
+   "b_slug": "fs-customer-onboarding",
+   "match": "override-2",
+   "industry": [
+    "Cross-Industry",
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCOi2x-DvJ7SpXK6ji3lhYaAXkge5Z2Tdt7Kv6bRzBjjOM?e=y8acSx",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBsEN4m7Jq4SYA5DFLxEkmrAQ-aD5YYOtazGA9PjWbEd4A?e=ST6Nfk",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBX4yb0bRKdTIMkxqwGKoKBAXAK7vTB5wdmGthU_s-6md0?e=ghYwgE"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Contact Center Escalation Agent",
+   "b_slug": null,
+   "match": "override-2",
+   "industry": [
+    "Cross-Industry",
+    "Contact Center"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCQwduG0mfsRY8nzEi14cfGAR7CgVg3z7TPLgTFP96LpNo?e=u1XR08",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDlmCEf3cUURbDQvO-dkDRiARH-4RuHc-vhZWdzdSvl43g?e=rPugLM",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDSBGqhwM2MRbwlmM2I97beAR2tvMXoCTO2YGr_4t8mIdg?e=wro8k5"
+   },
+   "status": "unmapped \u2014 Customer/Contact-Center Escalations: decision pending (build a stack or declare ai-customer-assistant successor)"
+  },
+  {
+   "sharepoint_name": "Portfolio Rebalancing Agent",
+   "b_slug": "portfolio-rebalancing",
+   "match": "auto",
+   "industry": [
+    "Capital Markets"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBytvP2-JPJTZ3S9AFH4xsOAWQR1OGf9yJclCXNbGgdBcI?e=qNDpgk",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDjBybdy-gyQqIxlm-Jcf5FARAsTWwOWwGoYAO_VcfjAwI?e=nSgdRn",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQB903GIYQS1RZlBMAmVr4drAfFBFwgnRxwEf5sDtUurGPY?e=Ip0MXX"
+   }
+  },
+  {
+   "sharepoint_name": "Purchase Order Management Agent",
+   "b_slug": "procurement-agent",
+   "match": "override",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQD_DAAZTitiSoH5cg60Cx-PAS3EkzfIaBVoChs5sMOr4HU?e=UyswIG",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDHF7seWz5NSJcA-avsL_hyAe1rwwm7cyK-CCSlHxRrnZw?e=bv3oE8",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDf21LFQIXJSYRSXMcpUZK9AZYLxNLaZcJFhBGmRlwJUFI?e=9CFsx0"
+   }
+  },
+  {
+   "sharepoint_name": "Inventory Optimization Agent",
+   "b_slug": "inventory-rebalancing",
+   "match": "override-2",
+   "industry": [
+    "Manufacturing"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQA-sBK8xgb5TIyHVHI5gj2XAXd5eE3g_9J-OiaeFVbvrew?e=Ky5xym",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDqawnT2sX4RKg1byNmiTpkAd6NyTxPEhA8JdjgxuXWmPg?e=Gxlog9",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAgJe4e9MlrSafHHRnc95UbAV1KEpIav3SzaP8XxTooNbE?e=PdvdPO"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Month-End Billing Agent",
+   "b_slug": "time-entry-billing",
+   "match": "override",
+   "industry": [
+    "Professional Services, Consulting"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAXFTkdMsBZTIx8cQfJJx_mAfYjxGTo0llnLTABbDj-FZg?e=aD51e0",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQANEOmBor3mRL_xq2XejoB1ARsYwV7kE_hsNoILJsHizmI?e=kc0tMZ",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBS-EDV3mymTqf-8Sbpihp1ATmDOksQwLfEEtJN7x0SKpE?e=iAX94o"
+   }
+  },
+  {
+   "sharepoint_name": "Resource Utilization Agent",
+   "b_slug": "resource-utilization",
+   "match": "auto",
+   "industry": [
+    "Professional Services, Consulting"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAJMLDtv94tTYpHmYV33xUBAQBk7CEIZbV-DMydHSFeR3Y?e=8WFUMy",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQA83328UpvlR6vAVSuI611gAa-ZjwIyoqX7XIASkQOfOD0?e=AxHJf6",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDnOvUJ-axZS4aoydjBLF1wAXvPLzkeuPgQHGMKf_4pzt0?e=pwpvAz"
+   }
+  },
+  {
+   "sharepoint_name": "Energy Operations Agent (a)",
+   "b_slug": "asset-maintenance-forecast",
+   "match": "override-energy-suite",
+   "industry": [
+    "Energy and Utilities"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQA3m7-ewiRATodk7Dpb6kp-AdzjbVOJYRZ28550mvZ17-8?e=H73El7",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Energy Operations Agent (b)",
+   "b_slug": "permit-license-management",
+   "match": "override-energy-suite",
+   "industry": [
+    "Energy and Utilities"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDclbD_xkt1SI_qCmj1xrDlAdu9x_YyZPwqIeBs1oNc7Z4?e=8agThZ",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Sales Pipeline Management Agent",
+   "b_slug": "deal-progression",
+   "match": "override-2",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDlLJV1PJXyQafEFAwUNdCUAeKDDRNjJWFeyO1FAk1_1f0?e=emHqsp",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCKUM2u3gHQTpvYpAm5kgJQAcmIEvc2kmOLxcya0OOFHk4?e=7ahMdb",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAgxJTzh1KjSooXLWM3Fd-5Ackzz7rQX4rYsIcGB2t6o0w?e=ERAucm"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Proposal Creation Agent",
+   "b_slug": "proposal-generation",
+   "match": "override-2",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQB732KnlafUR70eI64tQ6c-AchCmUeJiEtVeM_NqwFD268?e=LamYAz",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC1_lrpdZ9fQJacZ6TV1Nh4AYw8vl9q90dvjpzuQs-dS1U?e=D3xTUe",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBCwoYEyuOpTZOrY97n6x8IAZtzLxQuJ8B_69_mfbt8PrQ?e=iz5ow0"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Campaign Design Agent",
+   "b_slug": "personalized-marketing",
+   "match": "override-2",
+   "industry": [
+    "Retail"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQB0mDG8i8lbRKo2B6vn1GZcATvmcXkcpPLRkDCstwqG-jY?e=IZbF3e",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCMkih_PLebSZ3Nop13RekcARX-VQbBajelxmxmMGxVCl0?e=vMHsU8",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDms2zdAFJuTY6XUy-R4XvsAT_el0Ym0KVfeddUqaFTY4w?e=qtd9No"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Predictive Maintenance Agent",
+   "b_slug": "maintenance-scheduling",
+   "match": "override",
+   "industry": [
+    "Manufacturing"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDiY4XbGu1nQqPE03behT38ARp3D8SsZh3uQVE66PWKzOI?e=ffCxTU",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCjL0_hyDU6SrXdvz74nSH8AeoAL7YL5R7Y2bGty9fauRY?e=9xaleW",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCMzd9R8lYoT7f2BwlFbTvCARFSew7Eqinrcg_qchdF-MI?e=DqYKw8"
+   }
+  },
+  {
+   "sharepoint_name": "Client Health Score Agent",
+   "b_slug": "client-health-score",
+   "match": "auto",
+   "industry": [
+    "Professional Services, Consulting"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBuLK2V7PYHRYXe41gv8QouAcQx3-lSlBO_1kH6Z1ai7ko?e=5EAgbs",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC6gqm6fQPgTZ53HSiv2JHaAXNjIo0hl0HozEcH0XjMo9M?e=ZAZp2H",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDdqFhvHuL8T5yLh5k7vpFiAfGPEN7oE6o8JBc0f-J1mP4?e=peefxr"
+   }
+  },
+  {
+   "sharepoint_name": "Energy Operations Agent (c)",
+   "b_slug": "energy-regulatory-reporting",
+   "match": "override-energy-suite",
+   "industry": [
+    "Energy and Utilities"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBXwfPVwEFQSoMIlxQqBkvRAbCj-mIu5tqX56F2qqcHd6w?e=eiVd3W",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Energy Operations Agent (d)",
+   "b_slug": "emission-tracking",
+   "match": "override-energy-suite",
+   "industry": [
+    "Energy and Utilities"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQD7ksbxVwT1SZnrXdMOiDxuAdExFfREmn4a7ZsDMPBWhpc?e=CR0BUk",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Account Research Agent",
+   "b_slug": "account-intelligence",
+   "match": "override",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBArThPryZlTIcvTkT00TFGAVifqaV1poxW3nKBgVWM710?e=oErSUI",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCfPWBeGRqaRZTEAoPu6_Y2AZLwlfAnINP5ENfZn3H6K6k?e=MGrnFb",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAK2P_gycblRqM6tmGPLP7wAboMiyIti9x_2RilQfIpIPs?e=k0743H"
+   }
+  },
+  {
+   "sharepoint_name": "Supply Risk Intelligence Agent",
+   "b_slug": "supplier-risk-monitoring",
+   "match": "override",
+   "industry": [
+    "Manufacturing"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDTCB1XU732TK6R0TzcdExxAUdgaOoJ_A2j0oZzJgJVmlY?e=1ojOZ3",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBpA4t2BA_nTaQmC_n0yDUNAV-pP-wfDPYVLGchqK5QPKA?e=gdtBJ8",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBwLCpnD0kLR4dsnUUXbx-QAbu0WbEM7tbU8kYiN_DvoIk?e=hfWRwp"
+   }
+  },
+  {
+   "sharepoint_name": "Store Associate Agent",
+   "b_slug": "store-associate-copilot",
+   "match": "override-2",
+   "industry": [
+    "Retail"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBMk94ZxQG_Q4UVd8kolJZxASYRVPCO9xbEwyeGtjv5NVI?e=AAZzfp",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBRRxAS22uvSbkagY3SUsmvAX7lZTab9axWc3ZoobH32HI?e=ouNyFO",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBtX-yzUaU8SItrjt3PowKPARPx9jRnfDkUz9eFQUaUWrk?e=7tNBKl"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Abandoned Cart Recovery Agent",
+   "b_slug": "cart-abandonment-recovery",
+   "match": "override-2",
+   "industry": [
+    "Cross-Industry",
+    "Software Tech"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDwWbqnwr7kTqfsMiFx8nG2AQSuvajl1cLbTjQ-HAY5Xos?e=BarVHZ",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCpogAtlwOURqJVHmoIzwOqAaaUxMPnBkxWGC41YVdyyvQ?e=WC0hFw",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQA2HbHtbXcnR41uulokoCtOAa-YsWYsnkjOe1xXQ__ZGkQ?e=tXxwDU"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Product Feedback Insights Agent",
+   "b_slug": "product-feedback-synthesizer",
+   "match": "override-2",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBCM-6Z4kYASq7seeCMjpIzAUKillJ3ciU8aSmdwYfoUVg?e=QMpKqr",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDxEOinIzy4QY9rKh8onSNAAVKP52Y4mAKv0-lYta4bCzo?e=HfPd3T",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCYmMzME2JYTqL-wQXJvqMYAT3hkzE1TdSxlnCnWnKWJTA?e=sxygnV"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Utility Leak Detection & Billing Agent",
+   "b_slug": "utility-billing-assistance",
+   "match": "override-2",
+   "industry": [
+    "Energy and Utilities",
+    "State and Local Government"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCsD8p8ctADS7N5E7n2B3tEASLhLhRejlX1nFCxHUwBx8s?e=hyGNzV",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCVszeYCXmlR6BPhIK3enphAUn-RGrNaxgDomm7Cle5tAQ?e=rBsAIe",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQC1qPv97mRrQbKiy9jDLIsYAfcn7sFc3D43lFJKkT6psz0?e=F8xvZs"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Expansion Opportunity Agent",
+   "b_slug": "cross-selling",
+   "match": "override",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCFt_qhDKzDQJ1UVhmb9eayAVc0PEen_-FWOSyq7aFueCY?e=bAnNiP",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDVx3gbj-DiRLgXmThlIq5HAWMRpcs_RkFZTI5426lOEI4?e=rOxLw5",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQC6pTBVVlDKRobEVrDOJdA8ASMl0kaHefo62y0jru8Kt6g?e=vMgBrW"
+   }
+  },
+  {
+   "sharepoint_name": "Procurement Savings Agent",
+   "b_slug": "procurement-agent",
+   "match": "override",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAlXoAQtkddTq6k678Z-QhtAVSQLBkIGNd8oLYZXvPvi48?e=cXAOwB",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCSuNQ5FsQoRrmKCBXdrSE0Aa60xqFMTCBeTgTj95Ql9Es?e=JsUkb1",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQA1pL8N_FvPTLC4rVbXfgPKAZCu2YkBFLmoY-eNOr8JaeQ?e=6dKml0"
+   }
+  },
+  {
+   "sharepoint_name": "Cross-Channel Engagement Agent",
+   "b_slug": "omnichannel-engagement",
+   "match": "override-2",
+   "industry": [
+    "Cross-Industry",
+    "Retail"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDW6Vz4DQcwRIu4p_b2wZ3rAXxlmrPpm5Z2ZPpMl8UM_u8?e=I0eNJ8",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQA9-V_ymAzUQqOJzbwRNNZnAZ2rRf6JX6Msp2QXhgCvovY?e=QMgTCt",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQD86lSksTOsS5V0hFHMYl9dAcvu3n5D9nf040Cpm4ZTyjs?e=DLx5no"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Patient Intake Agent",
+   "b_slug": "patient-intake",
+   "match": "auto",
+   "industry": [
+    "Healthcare"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDL5ysEWeI9SLhuys1zG028AZKQVMkiZI39ji_7-Yn0oi4?e=cyZJef",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDx4BpGeq8iTrOrDOmD9mEiAV13SHvrgc2VwNy2no-vh70?e=oI10Y4",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQABt8CYMzKmTasAi6KXUPduAUEa31XnGgCtheHrb4T0ZyI?e=cAeecG"
+   }
+  },
+  {
+   "sharepoint_name": "Care Gap Closure Agent",
+   "b_slug": "care-gap-closure",
+   "match": "auto",
+   "industry": [
+    "Healthcare"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBo8CxcmSWiS5pPPlXAUFCkAavjZXzYAzA8VYWNi7U1IqE?e=IwlmMO",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQAzqdVeBaVvS6mPtPpbYbGoAUu9YKxrZOubriki7b88b-I?e=QS5EWr",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCza-D6oHcwSq_2uCLd_m7hAaNFuXdh1AZXX0lxblgGpLY?e=C708Q1"
+   }
+  },
+  {
+   "sharepoint_name": "Commercial Underwriting Agent",
+   "b_slug": "underwriting-support",
+   "match": "override",
+   "industry": [
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBCQFJPWMWaRLvTuIWgZRqSAXfMUpeVoYhsR7FwihYTKwI?e=4ucNf8",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBptnEFAihvSqTCzLIutSPKAcdus0AmVqkTi_4FSrbf3Hk?e=etSNDe",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDfXRfFVrPzQowfHujOtplWAdZiCXuFHwm4HT20NvtMA10?e=SY1Yfc"
+   }
+  },
+  {
+   "sharepoint_name": "Omnichannel Inventory Agent",
+   "b_slug": "inventory-visibility",
+   "match": "override",
+   "industry": [
+    "Retail"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDril00d0rKSZbIJe8NCiVQAcpolzjSy2-ZUMaNSVVgXZY?e=FbL7UD",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD9L4wWVExaT5LJG8wz0a1EAVGMAZ-OszQ3_BcvxSbS7Vw?e=xgISdH",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCXYKpoqtcWSaX-geu_JmJDAcd5EofHFvCTMNj2lWktdAY?e=I71CK4"
+   }
+  },
+  {
+   "sharepoint_name": "Supply Chain Risk Agent",
+   "b_slug": "supplier-risk-monitoring",
+   "match": "override",
+   "industry": [
+    "Retail",
+    "Manufacturing"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQD26zoTNiMPRZojNs_hKUDjASOyr0LCSBx5EGcYZF4bNVk?e=ofSGsP",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBoaN23_6LPQJ9JcpAzXwIDAQ2BUqHvdezpfjlAIOv9P_8?e=lYeavV",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCgw0tyyW7tRp0sVSwluV7rAWIkqdJ4ch4b1su3Lo9BsyQ?e=u7Z9Jt"
+   }
+  },
+  {
+   "sharepoint_name": "Subscription Renewal Agent",
+   "b_slug": "license-renewal-expansion",
+   "match": "override",
+   "industry": [
+    "Software Tech"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDP19Zuu3neRY1rZnBdJyIyAYv0PCpsl-3M6sXtpQnG3p8?e=KCQrZ3",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC6Byo3cs4oTrtsJN-z9CsQAf7jt3llhwgINVT7wDd-t1o?e=nop4wS",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCnytSsbQ_LQJKUrrIYrBuzAaRu09DjsmNRojLeXsvJzrI?e=hYh0Yb"
+   }
+  },
+  {
+   "sharepoint_name": "Customer Sentiment & Churn Agent",
+   "b_slug": "customer-sentiment-churn",
+   "match": "auto",
+   "industry": [
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQA--YnH7xXUQ7S2zy8QfJcUAVWidEGmXhX8qgyC1Y6qino?e=uTHhw7",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCsPaJdo2r3TZ6sGzq_vPCTATVSfoQ09sVKFS3BOKdNHK0?e=tWio2h",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQA2xwek9XQDQacG5CYLPM0RAZ02Q-XD3bGxzsk-HHW5MqQ?e=xuUyAm"
+   }
+  },
+  {
+   "sharepoint_name": "Fraud Detection & Alert Agent",
+   "b_slug": "fraud-detection-alert",
+   "match": "auto",
+   "industry": [
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDI7GOKd20sTLWdajeLcF6mAeKY4LvAlhvg18Iwb4Wbh38?e=oxL0V2",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC-XFkLfywZS43ZbOUD27sdAaW6fyExOT_ETljvpVEbgeg?e=fgH9vq",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBjHjFZ-yDOQ4j8Ik9HcHh9AV6WQqGMyHiHfujgkGjUXBw?e=gb0gDF"
+   }
+  },
+  {
+   "sharepoint_name": "Claims Processing Agent",
+   "b_slug": "claims-processing",
+   "match": "auto",
+   "industry": [
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCIjN1GekGQQon2Licf2RLyAV9M4U7kNtZzzwM5SjWcdrI?e=7glExt",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQAIluQq3MLGS4ZJRsxJ5_ehAYBMVQ_WH87u_TbB0UwHuiY?e=IOAczd",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQD_iKx4YhAmSZG_PsiKFTKMATvCMTvDHYDXHhD0qJ1dZDo?e=m7yaMz"
+   }
+  },
+  {
+   "sharepoint_name": "Mortgage Origination Agent",
+   "b_slug": "loan-origination-assistant",
+   "match": "override",
+   "industry": [
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQC_vHxGnL_BTJgFQEeVOoLpAUoXkXnJHIucCDn9_rajGuk?e=ceEl2n",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQARSEabWuTpQ54-ozQ3cgQCAYlELp52StX506hYI3H3zXM?e=x2C6tu",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCNu6kOHREaQrsQJTxhpn7-AeYR7UcW6lZo_rWwE_NgBjY?e=bV1Kfy"
+   }
+  },
+  {
+   "sharepoint_name": "Personal Styling Agent",
+   "b_slug": "personalized-shopping-assistant",
+   "match": "override",
+   "industry": [
+    "Retail"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQByz_fK_zniSZ0TLOGZwlviASRU8lqaT30VDQwnjbetof4?e=jU8aNq",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQALfoI8DpsISJfuQaQTxqwZAcELMa9KDYc6Sm6EhVxx0e4?e=7ORaCH",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCNiUjr4l2bQY6lLWqqywO1AUmLZZVc_TC2rcXqHKWBgak?e=h6IbFa"
+   }
+  },
+  {
+   "sharepoint_name": "Wealth Insights Agent",
+   "b_slug": "wealth-insights-generator",
+   "match": "override-2",
+   "industry": [
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCD3tWsujuYQYNIBupgtpS0AVF0kYHD3PjdN433W2kYP18?e=ZLzeDm",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC4pfmkzF2jQ6zD6kk4fhA9AYhdkV1biNlR92EhFqLcZjY?e=2gjW6N",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCId4GiauzTRZdSwrf7IuFkAdu6b0-YtJoASQJeOmifbFs?e=XaV3bG"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Regulatory Compliance Agent",
+   "b_slug": "fs-regulatory-compliance",
+   "match": "override",
+   "industry": [
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAYuB4KWfc4S5qcRcE9BLAiASA0G3aBzyIDKb2sRR-FS6I?e=hBxMyg",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBK_CaOVwmLS4GPRvwpSl6EAdx2t_MvVUVBiIEM7WjWrMY?e=GRomjq",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCIHJQ-8AnaSpS0wg_-OKeyAeg_Wfi-Ae6cHbC1RQ3oU5c?e=Oj4bqg"
+   }
+  },
+  {
+   "sharepoint_name": "Returns & Complaints Agent",
+   "b_slug": "returns-complaints-resolution",
+   "match": "override-2",
+   "industry": [
+    "Retail",
+    "Consumable Products Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCGaSLQTsgwSIFN0uj6v7L9AWl7ZvQtgiTNcSNeKMDIVfU?e=pqANnP",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQAWkBfgkTAFQJ22FRw9Xu9fATaefdzEG9If3qKwVLs4CRI?e=Qb6Lpk",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAJSQIR9rQhQKdR4k7u6e83AZrb6ki6v7lNRNawTu68kQc?e=GbRnT3"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Order Status & Delay Agent",
+   "b_slug": "order-status-communication",
+   "match": "override-2",
+   "industry": [
+    "Manufacturing"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCSKV4C1gsYQpvkwMMrY7uGARKJADTf0yqrMp0Caz5NEEI?e=Stz7ha",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC7aHBMwy7BQY9FUdS1zjVZAY9s26h4LcB318rTEBFDnDc?e=G3Trey",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCyfNa2st-KQKMtPGQEKmC1AZU2AbIkI1Ca8t8mpxn4RaI?e=CDhwHO"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Loyalty Insights Agent",
+   "b_slug": "customer-loyalty-rewards",
+   "match": "override-2",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDFFWt5yLfeTaDCE4QCS_dIAVlwxPqZgtlqE32aX5-gbNo?e=rfcW6C",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQB9e1IuAmr6TI9FINT_Bd11AVpJKocEbsAA4BUgrO_axfw?e=GIGVwB",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCoYSAYsgQtTZcL6hV_kpQJATEOmPRgwpbEyKezmTvRTrw?e=5Hagw2"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Building Permit Review Agent",
+   "b_slug": "building-permit-processing",
+   "match": "override-2",
+   "industry": [
+    "State and Local Government"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBdpP9y8KKQSZBHnHS5hrKFAXhjN4yD8TY0OmQsZjMjMgo?e=nQNwJv",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDWi21w0VuPT6oYsq8eeyrFAX8Mf8AbVCL70e4uG_FAxYQ?e=Zzqi1Q",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCwxmw9ft_mR4o9yjHsEXcrAX3jGFDNV5GxwViN1WJPgsk?e=T3T8Fd"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Prior Authorization Agent",
+   "b_slug": "prior-authorization",
+   "match": "auto",
+   "industry": [
+    "Healthcare",
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBb7hty6dOXTqBBlLfy7S5ZAc6ZhL8FIEcOt8Tn3yfn0BM?e=x3AtAA",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQB7NhXMEk8xQ5QOhWk-Klg9AaKLLW_R28EnS6j_YNmT1MQ?e=7f7Y01",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBXZ2AqZTEPS5HzQuBksawcAbOzKH1AsDHmdkZ75v8isRk?e=cZsbmY"
+   }
+  },
+  {
+   "sharepoint_name": "HR Self-Service Agent",
+   "b_slug": "ask-hr",
+   "match": "override",
+   "industry": [
+    "Cross-Industry"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAbCBP-artsRaxzsA5tw8L_AbCxslf9kNZlUb8dciRBOPo?e=A9N3HJ",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDd6hKnvmyIT4DKMQeXhoHtAbk6I17EeYvej2FkwJMEYqg?e=UyivvB",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBvJDcJZKqCQbUggCttLtHyAWdrpoB8NIEVDe1HfkBqcQE?e=9KqamD"
+   }
+  },
+  {
+   "sharepoint_name": "Clinical Summary Agent",
+   "b_slug": "clinical-notes-summarizer",
+   "match": "override-2",
+   "industry": [
+    "Healthcare"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAYdUd_B-75TLIwcxy70awiAR2I5XQ2G0DKoVHv26ACd0M?e=bEdcJU",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD7DynxBPIsRJWfWgk1DvVYAVWruPeAXiYEPxXLufLt1WE?e=fo7r3j",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBXzb2qhiSQQoh1vzaaKDU0ATM_2Pu02biDtmml-EUv3Uw?e=vZFQpG"
+   },
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+  },
+  {
+   "sharepoint_name": "Branch Banking Advisory Agent",
+   "b_slug": "financial-advisor-copilot",
+   "match": "override",
+   "industry": [
+    "Financial Services"
+   ],
+   "links": {
+    "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCtjqXaijCERpNnSXLm1Cq2AUwre9OMC6vEdG2YFQ-IfVE?e=gl2kFY",
+    "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCPx28Ql8ZHSpoh-Hv7BfWuAdsal2g1QzUjjxaxxbosXjo?e=sJWSPT",
+    "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDjPDhv7IYgTJiVLsiOYwvTAY6syNexWMXzOtJYK-KBoRw?e=lFBHY9"
+   }
+  }
+ ]
+}
