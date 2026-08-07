@@ -16,3 +16,12 @@ assert "sales-specialist-twin" not in r.split("**Agent:**")[1][:120], "twin matc
 m = a.perform(operation="list_missions")
 assert "Deploy a library agent" in m
 print("twin_payload_test: PASS")
+
+# mutation layer: directive appended only when a system of record is named
+r2 = a.perform(operation="mission",
+               request="deploy the deal progression agent to copilot studio for our salesforce org")
+assert "MUTATION — adapt for Salesforce" in r2, "salesforce mutation missing"
+r3 = a.perform(operation="mission",
+               request="deploy the deal progression agent to copilot studio")
+assert "MUTATION" not in r3, "mutation appended without being asked"
+print("mutation_layer_test: PASS")
