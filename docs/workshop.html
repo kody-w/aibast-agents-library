@@ -509,6 +509,20 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
 </section>
 
   <div class="card">
+    <h3>Now share it with your team — the pay-it-forward exercise</h3>
+    <p>Generate a single <code>agent.py</code> pinned to exactly what you just built — your agent,
+      your system of record. Send it to a teammate; they drop it into their brainstem's
+      <code>agents/</code> folder and say <i>“deploy our agent”</i> — their AI runs the same
+      mission you just watched. One file, and now they've done the workshop too.</p>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button id="shareBtn" style="background:var(--skill-b);color:#fff;border:0;border-radius:8px;
+        padding:9px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">
+        Generate my team agent.py</button>
+      <span id="shareStatus" style="font-size:13px;color:var(--faint)"></span>
+    </div>
+  </div>
+
+  <div class="card">
     <h3>If a check fails</h3>
     <p>Don't debug — delegate. Go back to Copilot Chat and say: <i>“Verification question 3 failed —
       here's what it answered: …”</i> Your AI re-reads the playbook's friction notes (a component that
@@ -1132,6 +1146,140 @@ document.getElementById("sumBtn").onclick=function(){
     document.getElementById("sumStatus").textContent="Copied — paste it into the session chat.";
   }).catch(function(){document.getElementById("sumStatus").textContent="Select + copy manually.";});
 };
+function sessionRecord(){
+  var verdicts=[];
+  document.querySelectorAll("#rcHost .rc").forEach(function(c){
+    var v=localStorage.getItem(rcKey(c.dataset.rc));
+    verdicts.push({ask:c.querySelector(".ask").textContent.trim(),
+      verdict:v==="p"?"pass":v==="f"?"fail":"not run"});});
+  return {workshop:"AIBAST Agent Workshop",
+    exported:new Date().toISOString(),
+    agent:SELECTED?(SELECTED.display_name||SELECTED.name):null,
+    stack:SELECTED?slugOf(SELECTED):null,
+    system_of_record:(SORS.filter(function(s){return s.id===SOR;})[0]||{}).name,
+    verification:verdicts};
+}
+function pascal(s){return s.split(/[^a-zA-Z0-9]+/).map(function(w){
+  return w.charAt(0).toUpperCase()+w.slice(1);}).join("");}
+document.getElementById("shareBtn").onclick=function(){
+  if(!SELECTED){document.getElementById("shareStatus").textContent="Pick an agent first.";return;}
+  var slug=slugOf(SELECTED), disp=SELECTED.display_name||SELECTED.name;
+  var dir=SELECTED._file.substring(0,SELECTED._file.lastIndexOf("/"))+"/copilot_studio";
+  var cls="Deploy"+pascal(agentTitle(SELECTED));
+  var mut=SOR==="d365"?"":SOR;
+  var py = [
+'"""',
+disp+' — team workshop agent.',
+'',
+'A teammate built this agent in the AIBAST Agent Workshop and shared this',
+'file so you can build the same one. Drop it into your brainstem\'s agents/',
+'folder (it hotloads — no restart) and say: "deploy our agent".',
+'',
+'This file is also the session record — who built what, against which system',
+'of record, and how verification went. A facilitator can drop it into their',
+'own brainstem and run the identical mission to reproduce or troubleshoot.',
+'"""',
+'import json, re, urllib.parse, urllib.request',
+'try:',
+'    from agents.basic_agent import BasicAgent',
+'except ImportError:',
+'    from basic_agent import BasicAgent',
+'',
+'__manifest__ = {',
+'    "schema": "rapp-agent/1.0",',
+'    "name": "@workshop-share/'+slug+'",',
+'    "version": "1.0.0",',
+'    "display_name": "Team Workshop: '+disp+'",',
+'    "description": "Shared from the AIBAST Agent Workshop: deploys '+disp+' to Copilot Studio exactly as the sharer built it.",',
+'    "author": "AIBAST Agent Workshop attendee",',
+'    "tags": ["workshop", "shared", "copilot-studio"],',
+'    "category": "general", "quality_tier": "community", "requires_env": [], "dependencies": ["@rapp/basic-agent"],',
+'}',
+'',
+'MIRRORS = [("microsoft/aibast-agents-library", "main"),',
+'           ("kody-w/aibast-agents-library", "main"),',
+'           ("kody-w/aibast-agents-library", "feature/field-service-dispatch-copilot-studio")]',
+'STACK_DIR = '+JSON.stringify(dir),
+'MUTATION = '+JSON.stringify(mut),
+'SESSION_RECORD = '+JSON.stringify(JSON.stringify(sessionRecord(),null,1)),
+'',
+'def _fetch(path):',
+'    last = None',
+'    for repo, ref in MIRRORS:',
+'        url = urllib.parse.quote("https://raw.githubusercontent.com/%s/%s/%s" % (repo, ref, path), safe=":/%?=&")',
+'        try:',
+'            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "aibast-workshop-share"}), timeout=15) as r:',
+'                return r.read().decode("utf-8"), repo, ref',
+'        except Exception as e:',
+'            last = e',
+'    raise last',
+'',
+'HARNESS = ("# MISSION BRIEFING — you are the engine\\n\\nYou are the AI in this loop; the person"',
+'           " steers. Execute the mission yourself — run the commands, edit the files, check the"',
+'           " results. Only steps marked PERSON need a human (sign-ins, go-live). Report honestly:"',
+'           " never present an unverified step as complete.\\n")',
+'',
+'class '+cls+'(BasicAgent):',
+'    def __init__(self):',
+'        self.name = "'+cls+'"',
+'        self.metadata = {"name": self.name, "description": __manifest__["description"],',
+'            "parameters": {"type": "object", "properties": {"operation": {"type": "string",',
+'                "enum": ["deploy", "verify", "session_record", "help"],',
+'                "description": "deploy: build this exact agent in Copilot Studio. verify: the test questions. session_record: what the sharer built and how verification went. help: what this is."}},',
+'                "required": ["operation"]}}',
+'        super().__init__(name=self.name, metadata=self.metadata)',
+'',
+'    def perform(self, **kwargs):',
+'        op = kwargs.get("operation", "help")',
+'        try:',
+'            if op == "deploy":',
+'                return self._deploy()',
+'            if op == "verify":',
+'                return self._context()[1]',
+'            if op == "session_record":',
+'                return "# Session record\\n\\n```json\\n" + SESSION_RECORD + "\\n```"',
+'            return ("# Team workshop agent\\n\\nYour teammate built **'+disp+'** in the AIBAST"',
+'                    " Agent Workshop and shared it. Say \\"deploy our agent\\" and I hand your AI"',
+'                    " the same mission they ran. Full workshop: aka.ms via your teammate, or the"',
+'                    " AIBAST library on GitHub.")',
+'        except Exception as e:',
+'            return "**Could not load the mission:** %s — check connectivity to raw.githubusercontent.com." % e',
+'',
+'    def _context(self):',
+'        man = json.loads(_fetch(STACK_DIR + "/manifest.json")[0])',
+'        text, repo, ref = _fetch(STACK_DIR + "/instructions.md")',
+'        base = "https://raw.githubusercontent.com/%s/%s/%s" % (repo, ref, STACK_DIR)',
+'        files = man.get("behaviors", []) + man.get("knowledge_files", [])',
+'        ctx = ["**Agent:** " + man.get("display_name", "'+disp+'"),',
+'               "**Scaffold base URL:** " + base,',
+'               "**Instructions file:** " + base + "/" + man.get("instructions", "instructions.md"),',
+'               "**Component files** (encode @ as %40 in raw URLs):"]',
+'        ctx += ["- %s/%s  ->  place at <project>/%s" % (base, f, f) for f in files]',
+'        ver = ["# Verify — answers computed from the data\\n"]',
+'        for i, v in enumerate(man.get("verification", []), 1):',
+'            ver.append("%d. Ask: %s\\n   Expect: %s\\n" % (i, v["ask"], v["expect"]))',
+'        return "\\n".join(ctx) + "\\n\\n" + "\\n".join(ver[1:2] and ver), "\\n".join(ver)',
+'',
+'    def _deploy(self):',
+'        playbook = _fetch("twin/playbooks/deploy-copilot-studio.md")[0]',
+'        ctx, _ = self._context()',
+'        playbook = playbook.replace("{{STACK_CONTEXT}}", ctx)',
+'        if MUTATION:',
+'            muts = json.loads(_fetch("twin/mutations.json")[0]).get("mutations", [])',
+'            m = [x for x in muts if x["id"] == MUTATION]',
+'            if m:',
+'                playbook += "\\n\\n---\\n\\n# MUTATION — adapt for %s\\n\\n%s\\n" % (m[0]["name"], m[0]["directive"])',
+'        return HARNESS + "\\n---\\n\\n" + playbook',
+''].join("\n");
+  var blob=new Blob([py],{type:"text/x-python"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=slug.replace(/-/g,"_")+"_team_workshop_agent.py";
+  a.click();
+  document.getElementById("shareStatus").textContent=
+    "Downloaded — send it to a teammate with one line: drop into your brainstem agents folder and say “deploy our agent.”";
+};
+
 /* scrollspy */
 var links=[].slice.call(document.querySelectorAll(".rail a"));
 var secs=links.map(function(a){return document.querySelector(a.getAttribute("href"));});
