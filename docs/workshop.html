@@ -7,7 +7,7 @@
 <meta name="description" content="The AIBAST Agent Workshop: pick your industry, pick your agent, and take it from intent to a published, verified Copilot Studio agent by talking to your AI. One page runs the whole session for every industry in the library.">
 <style>
 :root{
-  --ink:#1a1a2e; --dim:#5b5e6e; --faint:#8a8da0; --paper:#ffffff; --wash:#f6f7fa;
+  --ink:#1a1a2e; --dim:#5b5e6e; --faint:#6f7285; --paper:#ffffff; --wash:#f6f7fa;
   --line:#e3e5ec; --accent:#0f6cbd; --accent-soft:#e8f1fa;
   --instr:#fceee7; --instr-b:#e8703a; --know:#f6ecf8; --know-b:#a63db8;
   --tools:#eaf6ec; --tools-b:#2f9e44; --mem:#eeecfb; --mem-b:#6a5ae0;
@@ -49,7 +49,7 @@ body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink);
 section.phase{padding:54px 0 10px}
 .phead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
 .phead .pk{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
-.phead .time{margin-left:auto;font-size:13px;font-weight:700;color:#fff;background:var(--accent);
+.phead .time{margin-left:auto;font-size:13px;font-weight:700;color:#fff;background:#0b5da6;
   border-radius:999px;padding:4px 14px}
 h2{font-size:29px;font-weight:720;letter-spacing:-.015em;margin-bottom:6px}
 .goal-line{font-size:16px;color:var(--dim);max-width:82ch}
@@ -71,7 +71,7 @@ ul.tight li{margin-bottom:7px}
 ol.steps{margin:14px 0 4px 0;list-style:none;counter-reset:s}
 ol.steps>li{counter-increment:s;position:relative;padding:0 0 18px 44px}
 ol.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;
-  border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:14px;
+  border-radius:50%;background:#0b5da6;color:#fff;font-weight:700;font-size:14px;
   display:flex;align-items:center;justify-content:center}
 ol.steps>li>b{display:block;font-size:15.5px;margin-bottom:4px}
 ol.steps>li>p{color:var(--dim);font-size:15px;max-width:84ch}
@@ -220,9 +220,9 @@ table.ladder td:first-child{font-weight:650;color:var(--ink);min-width:150px}
 @media(max-width:760px){.wall{grid-template-columns:1fr}}
 .wall .col{border-radius:10px;padding:14px;font-size:14px}
 .wall .col h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px}
-.wall .in{background:var(--tools);border:1px solid var(--tools-b)}.wall .in h4{color:var(--ok)}
+.wall .in{background:var(--tools);border:1px solid var(--tools-b)}.wall .in h4{color:#1f7a33}
 .wall .out{background:var(--red-soft);border:1px solid var(--red)}.wall .out h4{color:var(--red)}
-.wall .park{background:var(--sand);border:1px solid var(--sand-b)}.wall .park h4{color:#a07d1c}
+.wall .park{background:var(--sand);border:1px solid var(--sand-b)}.wall .park h4{color:#7d6014}
 .wall li{margin:0 0 7px 16px;color:var(--dim)}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -234,8 +234,8 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
 </style>
 <style id="aibast-dark-vars">
 html[data-theme=dark]{color-scheme:dark}
-html[data-theme=dark] body{--ink:#e6e8f2;--dim:#aab0c8;--faint:#7c86a8;--paper:#141a30;
-  --wash:#0b1024;--line:#26304f;--accent:#2f7fd4;--accent-soft:#14263f;--accent-ink:#9ec5f0;
+html[data-theme=dark] body{--ink:#e6e8f2;--dim:#b6bcd2;--faint:#98a1bd;--paper:#141a30;
+  --wash:#0b1024;--line:#26304f;--accent:#2a6fbd;--accent-soft:#14263f;--accent-ink:#9ec5f0;
   --ok:#5cc46e;--red:#ff8a8a;--skill-b:#e58ac4;--tools-b:#6fd48a;--sand-b:#e8b86d;
   --chan-b:#7fb3ee;--conn-b:#5fc9ad;--instr-b:#f0a377;--know-b:#d79ce8;--mem-b:#a79bf0;
   --instr:#2a1f18;--know:#241a2c;--tools:#14261a;--mem:#1b1830;--sand:#2a2113;
@@ -292,7 +292,7 @@ body{padding-top:52px!important}
   padding:6px 10px;border-radius:6px;white-space:nowrap;min-height:32px;
   display:inline-flex;align-items:center}
 #aibast-nav a.l:hover{background:rgba(255,255,255,.1);color:#fff}
-#aibast-nav a.l.now{background:rgba(255,255,255,.14);color:#fff}
+#aibast-nav a.l.now{background:rgba(255,255,255,.2);color:#fff}
 #aibast-nav .gh{margin-left:auto}
 </style>
 <nav id="aibast-nav"><div class="in">

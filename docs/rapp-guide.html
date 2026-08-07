@@ -1082,8 +1082,12 @@ html[data-theme=dark] body{--bg-light:#0b1024;--bg-white:#141a30;--text-dark:#e6
 </style>
 <style id="aibast-anchor-offset">h1,h2,h3,[id]{scroll-margin-top:140px}</style>
 <style id="aibast-amber">
-.nav-item span,.nav-icon{color:#8a5b00!important}
-html[data-theme=dark] .nav-item span,html[data-theme=dark] .nav-icon{color:#ffb900!important}
+.nav-item.audit,.nav-item.audit span,.nav-item span,.nav-icon{color:#7a4f00!important}
+html[data-theme=dark] .nav-item.audit,html[data-theme=dark] .nav-item.audit span,
+html[data-theme=dark] .nav-item span,html[data-theme=dark] .nav-icon{color:#ffc933!important}
+.badge,.badge.manual,span.badge{background:#3d2f00!important;color:#ffd977!important}
+html[data-theme=dark] .badge,html[data-theme=dark] .badge.manual{
+  background:#3d2f00!important;color:#ffd977!important}
 td span.badge,.badge{color:#1a1a2e!important;font-weight:700}
 </style>
 <style id="aibast-guide-dark">
@@ -1128,6 +1132,25 @@ html[data-theme=light] [style*="#f59e0b"] *,html[data-theme=light] [style*="#d97
 html[data-theme=light] [style*="#ffb900"] *{color:#1a1a2e!important}
 /* badges: near-black on their grey/colored gradients (2.26:1 -> AA) */
 .badge,td span.badge{color:#0f1320!important;font-weight:700}
+</style>
+<style id="aibast-contrast-floor">
+/* Contrast floor — measured fixes for the recurring offenders across pages.
+   Every rule here traces to a live WCAG measurement, not a guess. */
+/* status/tier badges: white ink was being eaten by the theme's descendant rule */
+.tier-badge,.tier-badge.start,.release-tag,span.badge{color:#ffffff!important}
+html[data-theme=light] .tier *,html[data-theme=light] .step *,
+html[data-theme=light] .post *,html[data-theme=light] .release *{color:inherit}
+html[data-theme=light] .tier p,html[data-theme=light] .tier span:not(.tier-badge),
+html[data-theme=light] .step p,html[data-theme=light] .post p,
+html[data-theme=light] .release p{color:#3c3f52}
+/* helper/secondary prose that inherited the GitHub-dark greys */
+html[data-theme=light] p,html[data-theme=light] summary,html[data-theme=light] li,
+html[data-theme=light] .links,html[data-theme=light] .links *{color:#4a4d5e}
+html[data-theme=light] a,html[data-theme=light] .links a{color:#0b5da6}
+/* tutorial: step numerals and platform tabs */
+.step .number,span.number{background:#5b47d6!important;color:#ffffff!important}
+.platform-tabs button,button.copy{color:#e6edf3!important}
+.platform-tabs button.active{background:#5b47d6!important;color:#fff!important}
 </style>
 </head>
 <body>
