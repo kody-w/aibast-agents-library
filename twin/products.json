@@ -1,27 +1,254 @@
 {
-  "schema": "aibast-twin-products/1.0",
-  "products": [
-    {"id": "d365-sales", "name": "Dynamics 365 Sales",
-     "stacks": ["deal-progression", "account-intelligence", "sales-qualification", "proposal-generation", "win-loss-analysis", "cross-selling", "identify-discounts", "sales-coach", "sales-simulation", "voice-to-crm-d365", "speech-to-crm", "dynamics-365-connector", "customer-360", "customer-360-speech", "sales-chat", "license-renewal-expansion", "software-competitive-intel", "proposal-copilot", "client-health-score"]},
-    {"id": "d365-customer-service", "name": "Dynamics 365 Customer Service",
-     "stacks": ["triage-bot", "it-helpdesk", "it-ticket-management", "returns-exchange", "ai-customer-assistant", "support-ticket-resolution", "returns-complaints-resolution", "customer-sentiment-churn", "omnichannel-engagement", "citizen-service-request", "utility-billing-assistance", "order-status-communication", "store-associate-copilot", "customer-loyalty-rewards", "software-customer-onboarding"]},
-    {"id": "d365-field-service", "name": "Dynamics 365 Field Service",
-     "stacks": ["field-service-dispatch", "asset-maintenance-forecast", "maintenance-scheduling"]},
-    {"id": "d365-supply-chain", "name": "Dynamics 365 Supply Chain",
-     "stacks": ["procurement-agent", "procurement-support", "supplier-risk-monitoring", "inventory-rebalancing", "inventory-visibility", "supply-chain-disruption-alert", "production-line-optimization"]},
-    {"id": "d365-customer-insights", "name": "Dynamics 365 Customer Insights",
-     "stacks": ["personalized-marketing", "cart-abandonment-recovery", "personalized-shopping-assistant", "customer-loyalty-rewards", "customer-sentiment-churn"]},
-    {"id": "d365-hr", "name": "Dynamics 365 Human Resources",
-     "stacks": ["ask-hr", "general-ask-hr", "workforce-clearance-onboarding", "staff-credentialing"]},
-    {"id": "m365-copilot", "name": "Microsoft 365 Copilot",
-     "stacks": ["email-drafting", "product-reference", "find-accurate-models", "proposal-copilot", "clinical-notes-summarizer", "mission-reporting-assistant", "product-feedback-synthesizer", "contract-risk-review", "time-entry-billing", "resource-utilization"]},
-    {"id": "cloud-financial-services", "name": "Cloud for Financial Services",
-     "stacks": ["claims-processing", "underwriting-support", "portfolio-rebalancing", "fraud-detection-alert", "financial-advisor-copilot", "wealth-insights-generator", "loan-origination-assistant", "fs-customer-onboarding", "fs-regulatory-compliance"]},
-    {"id": "cloud-healthcare", "name": "Cloud for Healthcare",
-     "stacks": ["patient-intake", "care-gap-closure", "prior-authorization", "staff-credentialing", "clinical-notes-summarizer"]},
-    {"id": "government", "name": "Government & Public Sector",
-     "stacks": ["acquisition-support", "federal-grants-oversight", "regulatory-compliance-fed", "mission-reporting-assistant", "workforce-clearance-onboarding", "slg-grants-management", "foia-request-assistant", "citizen-service-request", "building-permit-processing", "utility-billing-assistance", "permit-license-management"]},
-    {"id": "cloud-sustainability", "name": "Cloud for Sustainability",
-     "stacks": ["emission-tracking", "energy-regulatory-reporting", "permit-license-management", "asset-maintenance-forecast"]}
-  ]
+ "schema": "aibast-twin-products/1.0",
+ "products": [
+  {
+   "id": "d365-sales",
+   "name": "Dynamics 365 Sales",
+   "stacks": [
+    "deal-progression",
+    "account-intelligence",
+    "sales-qualification",
+    "proposal-generation",
+    "win-loss-analysis",
+    "cross-selling",
+    "identify-discounts",
+    "sales-coach",
+    "sales-simulation",
+    "voice-to-crm-d365",
+    "speech-to-crm",
+    "dynamics-365-connector",
+    "customer-360",
+    "customer-360-speech",
+    "sales-chat",
+    "license-renewal-expansion",
+    "software-competitive-intel",
+    "proposal-copilot",
+    "client-health-score"
+   ]
+  },
+  {
+   "id": "d365-customer-service",
+   "name": "Dynamics 365 Customer Service",
+   "stacks": [
+    "triage-bot",
+    "it-helpdesk",
+    "it-ticket-management",
+    "returns-exchange",
+    "ai-customer-assistant",
+    "support-ticket-resolution",
+    "returns-complaints-resolution",
+    "customer-sentiment-churn",
+    "omnichannel-engagement",
+    "citizen-service-request",
+    "utility-billing-assistance",
+    "order-status-communication",
+    "store-associate-copilot",
+    "customer-loyalty-rewards",
+    "software-customer-onboarding"
+   ]
+  },
+  {
+   "id": "d365-field-service",
+   "name": "Dynamics 365 Field Service",
+   "stacks": [
+    "field-service-dispatch",
+    "asset-maintenance-forecast",
+    "maintenance-scheduling"
+   ]
+  },
+  {
+   "id": "d365-supply-chain",
+   "name": "Dynamics 365 Supply Chain",
+   "stacks": [
+    "procurement-agent",
+    "procurement-support",
+    "supplier-risk-monitoring",
+    "inventory-rebalancing",
+    "inventory-visibility",
+    "supply-chain-disruption-alert",
+    "production-line-optimization"
+   ]
+  },
+  {
+   "id": "d365-customer-insights",
+   "name": "Dynamics 365 Customer Insights",
+   "stacks": [
+    "personalized-marketing",
+    "cart-abandonment-recovery",
+    "personalized-shopping-assistant",
+    "customer-loyalty-rewards",
+    "customer-sentiment-churn"
+   ]
+  },
+  {
+   "id": "d365-hr",
+   "name": "Dynamics 365 Human Resources",
+   "stacks": [
+    "ask-hr",
+    "general-ask-hr",
+    "workforce-clearance-onboarding",
+    "staff-credentialing"
+   ]
+  },
+  {
+   "id": "m365-copilot",
+   "name": "Microsoft 365 Copilot",
+   "stacks": [
+    "email-drafting",
+    "product-reference",
+    "find-accurate-models",
+    "proposal-copilot",
+    "clinical-notes-summarizer",
+    "mission-reporting-assistant",
+    "product-feedback-synthesizer",
+    "contract-risk-review",
+    "time-entry-billing",
+    "resource-utilization"
+   ]
+  },
+  {
+   "id": "cloud-financial-services",
+   "name": "Cloud for Financial Services",
+   "stacks": [
+    "claims-processing",
+    "underwriting-support",
+    "portfolio-rebalancing",
+    "fraud-detection-alert",
+    "financial-advisor-copilot",
+    "wealth-insights-generator",
+    "loan-origination-assistant",
+    "fs-customer-onboarding",
+    "fs-regulatory-compliance"
+   ]
+  },
+  {
+   "id": "cloud-healthcare",
+   "name": "Cloud for Healthcare",
+   "stacks": [
+    "patient-intake",
+    "care-gap-closure",
+    "prior-authorization",
+    "staff-credentialing",
+    "clinical-notes-summarizer"
+   ]
+  },
+  {
+   "id": "government",
+   "name": "Government & Public Sector",
+   "stacks": [
+    "acquisition-support",
+    "federal-grants-oversight",
+    "regulatory-compliance-fed",
+    "mission-reporting-assistant",
+    "workforce-clearance-onboarding",
+    "slg-grants-management",
+    "foia-request-assistant",
+    "citizen-service-request",
+    "building-permit-processing",
+    "utility-billing-assistance",
+    "permit-license-management"
+   ]
+  },
+  {
+   "id": "cloud-sustainability",
+   "name": "Cloud for Sustainability",
+   "stacks": [
+    "emission-tracking",
+    "energy-regulatory-reporting",
+    "permit-license-management",
+    "asset-maintenance-forecast"
+   ]
+  },
+  {
+   "id": "copilot-studio",
+   "name": "Microsoft Copilot Studio",
+   "stacks": [
+    "*"
+   ]
+  },
+  {
+   "id": "sharepoint",
+   "name": "SharePoint",
+   "stacks": [
+    "contract-risk-review",
+    "proposal-copilot",
+    "proposal-generation",
+    "foia-request-assistant",
+    "product-reference",
+    "find-accurate-models",
+    "clinical-notes-summarizer",
+    "product-feedback-synthesizer",
+    "ask-hr",
+    "general-ask-hr",
+    "staff-credentialing",
+    "acquisition-support",
+    "fs-regulatory-compliance",
+    "regulatory-compliance-fed"
+   ]
+  },
+  {
+   "id": "power-automate",
+   "name": "Power Automate",
+   "stacks": [
+    "claims-processing",
+    "loan-origination-assistant",
+    "prior-authorization",
+    "building-permit-processing",
+    "permit-license-management",
+    "returns-exchange",
+    "returns-complaints-resolution",
+    "procurement-agent",
+    "procurement-support",
+    "time-entry-billing",
+    "fs-customer-onboarding",
+    "software-customer-onboarding",
+    "workforce-clearance-onboarding",
+    "citizen-service-request",
+    "cart-abandonment-recovery",
+    "email-drafting"
+   ]
+  },
+  {
+   "id": "power-bi",
+   "name": "Power BI",
+   "stacks": [
+    "win-loss-analysis",
+    "client-health-score",
+    "resource-utilization",
+    "emission-tracking",
+    "energy-regulatory-reporting",
+    "portfolio-rebalancing",
+    "customer-sentiment-churn",
+    "supplier-risk-monitoring",
+    "production-line-optimization",
+    "inventory-visibility",
+    "inventory-rebalancing",
+    "supply-chain-disruption-alert",
+    "fraud-detection-alert",
+    "wealth-insights-generator",
+    "federal-grants-oversight",
+    "slg-grants-management",
+    "mission-reporting-assistant",
+    "identify-discounts"
+   ]
+  },
+  {
+   "id": "teams",
+   "name": "Microsoft Teams",
+   "stacks": [
+    "store-associate-copilot",
+    "it-helpdesk",
+    "it-ticket-management",
+    "field-service-dispatch",
+    "maintenance-scheduling",
+    "order-status-communication",
+    "triage-bot",
+    "sales-coach",
+    "sales-chat",
+    "omnichannel-engagement",
+    "ai-customer-assistant",
+    "customer-loyalty-rewards"
+   ]
+  }
+ ]
 }

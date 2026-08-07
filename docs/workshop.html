@@ -826,7 +826,9 @@ function groupsForMode(){
 function agentsForGroup(key){
   if(MODE==="industry") return CATS[key]||[];
   var prod=PRODUCTS.filter(function(p){return p.id===key;})[0];
-  return (prod?prod.stacks:[]).map(function(s){return BYSLUG[s];}).filter(Boolean);
+  if(!prod) return [];
+  if(prod.stacks.indexOf("*")>=0) return Object.keys(BYSLUG).sort().map(function(s){return BYSLUG[s];});
+  return prod.stacks.map(function(s){return BYSLUG[s];}).filter(Boolean);
 }
 function renderPills(){
   var host=document.getElementById("indPills");
