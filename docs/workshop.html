@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIBAST Agent Workshop — one page, one session, your industry</title>
+<meta name="description" content="The AIBAST Agent Workshop: pick your industry, pick your agent, and take it from intent to a published, verified Copilot Studio agent by talking to your AI. One page runs the whole session for every industry in the library.">
+<style>
+:root{
+  --ink:#1a1a2e; --dim:#5b5e6e; --faint:#8a8da0; --paper:#ffffff; --wash:#f6f7fa;
+  --line:#e3e5ec; --accent:#0f6cbd; --accent-soft:#e8f1fa;
+  --instr:#fceee7; --instr-b:#e8703a; --know:#f6ecf8; --know-b:#a63db8;
+  --tools:#eaf6ec; --tools-b:#2f9e44; --mem:#eeecfb; --mem-b:#6a5ae0;
+  --sand:#fdf2e5; --sand-b:#e8912d; --skill:#faeaf5; --skill-b:#c2278f;
+  --conn:#e7f5f0; --conn-b:#1d8a6b; --chan:#e9f1fb; --chan-b:#2b6cb8;
+  --red:#c92a2a; --red-soft:#fdecec; --ok:#2b8a3e;
+  --radius:12px; --mono:Consolas,"SF Mono",ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink);
+  background:var(--wash);line-height:1.55;font-size:16px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* ── hero ─────────────────────────────────────────────── */
+.hero{background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);color:#fff;
+  padding:64px 0 56px}
+.hero .kicker{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:#f291b6;margin-bottom:14px}
+.hero h1{font-size:clamp(28px,4.4vw,44px);font-weight:750;letter-spacing:-.02em;line-height:1.12}
+.hero .sub{font-size:17px;color:#c3cae6;margin-top:14px;max-width:74ch}
+.hero .goal{margin-top:26px;display:inline-block;background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:14px 20px;font-size:15.5px}
+.hero .goal b{color:#f291b6;letter-spacing:.06em;font-size:12px;text-transform:uppercase;
+  display:block;margin-bottom:4px}
+
+/* ── phase rail ───────────────────────────────────────── */
+.rail{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 8px rgba(15,20,40,.05)}
+.rail-in{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto}
+.rail a{flex:0 0 auto;display:flex;gap:8px;align-items:center;padding:13px 14px;font-size:13px;
+  font-weight:600;color:var(--dim);text-decoration:none;border-bottom:3px solid transparent;
+  white-space:nowrap}
+.rail a .n{width:20px;height:20px;border-radius:50%;background:var(--wash);border:1px solid var(--line);
+  color:var(--dim);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.rail a.on{color:var(--accent);border-bottom-color:var(--accent)}
+.rail a.on .n{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ── sections ─────────────────────────────────────────── */
+section.phase{padding:54px 0 10px}
+.phead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.phead .pk{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.phead .time{margin-left:auto;font-size:13px;font-weight:700;color:#fff;background:var(--accent);
+  border-radius:999px;padding:4px 14px}
+h2{font-size:29px;font-weight:720;letter-spacing:-.015em;margin-bottom:6px}
+.goal-line{font-size:16px;color:var(--dim);max-width:82ch}
+.goal-line b{color:var(--ink)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px 26px;margin-top:20px;box-shadow:0 1px 4px rgba(15,20,40,.04)}
+.card h3{font-size:17px;font-weight:700;margin-bottom:10px}
+.card p{color:var(--dim);margin-bottom:10px;max-width:88ch}
+.card p b,.card li b{color:var(--ink)}
+.callout{border-left:3px solid var(--instr-b);background:var(--instr);border-radius:0 9px 9px 0;
+  padding:12px 16px;margin:12px 0;color:#7a3a16;font-size:14.5px}
+.callout b{color:#7a3a16}
+.done-line{margin-top:14px;font-size:14.5px;background:var(--accent-soft);border-radius:8px;
+  padding:10px 14px;color:#134a80}
+.done-line b{text-transform:uppercase;font-size:11px;letter-spacing:.08em;margin-right:8px}
+
+ul.tight{margin:8px 0 4px 20px;color:var(--dim)}
+ul.tight li{margin-bottom:7px}
+ol.steps{margin:14px 0 4px 0;list-style:none;counter-reset:s}
+ol.steps>li{counter-increment:s;position:relative;padding:0 0 18px 44px}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;
+  border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:14px;
+  display:flex;align-items:center;justify-content:center}
+ol.steps>li>b{display:block;font-size:15.5px;margin-bottom:4px}
+ol.steps>li>p{color:var(--dim);font-size:15px;max-width:84ch}
+
+/* picker */
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pills button{border:1px solid var(--line);background:var(--wash);border-radius:999px;
+  padding:7px 16px;font-size:13.5px;font-weight:650;cursor:pointer;font-family:inherit;color:var(--dim)}
+.pills button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pill-hint{color:var(--faint);font-size:14px}
+.acards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:14px}
+.acards button{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:10px;
+  padding:12px 14px;cursor:pointer;font-family:inherit}
+.acards button b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:4px}
+.acards button span{font-size:12.5px;color:var(--dim);line-height:1.35;display:block}
+.acards button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+/* checklists */
+.check{list-style:none;margin-top:6px}
+.check li{display:flex;gap:11px;align-items:flex-start;padding:7px 0;color:var(--dim);font-size:15px}
+.check input{width:17px;height:17px;margin-top:3px;accent-color:var(--accent);flex:0 0 auto;cursor:pointer}
+.check li.donei{color:var(--faint);text-decoration:line-through}
+
+/* journey overview */
+.agenda{display:flex;flex-direction:column;gap:0;margin-top:18px}
+.ag{display:grid;grid-template-columns:44px 1fr auto;gap:16px;align-items:center;
+  background:var(--paper);border:1px solid var(--line);padding:13px 18px;font-size:15px}
+.ag:first-child{border-radius:10px 10px 0 0}.ag:last-child{border-radius:0 0 10px 10px}
+.ag+.ag{border-top:0}
+.ag .t{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;
+  font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.ag b{font-weight:650}
+.ag .d{font-size:13px;color:var(--faint)}
+
+/* code blocks */
+.code{position:relative;background:#0d1730;border-radius:10px;margin:12px 0 6px;overflow:hidden}
+.code .bar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:#111d3d;
+  color:#aeb6d8;font-size:12.5px;font-weight:600}
+.code .bar button{margin-left:auto;background:#fff;color:#0d1730;border:0;border-radius:6px;
+  padding:4px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.code .bar button:hover{background:#f291b6;color:#fff}
+.code pre{padding:14px 16px;overflow-x:auto;color:#cdd5f0;font-family:var(--mono);
+  font-size:13.2px;line-height:1.55;max-height:420px;overflow-y:auto;white-space:pre}
+details.filebox{margin:10px 0}
+details.uh{background:var(--paper);border:1px dashed var(--line);border-radius:var(--radius);
+  margin-top:16px;padding:0 22px}
+details.uh>summary{cursor:pointer;padding:16px 0;font-weight:650;font-size:15.5px;
+  color:var(--dim);list-style:none;display:flex;gap:12px;align-items:center}
+details.uh>summary::before{content:"▸";color:var(--accent);font-size:13px}
+details.uh[open]>summary::before{content:"▾"}
+details.uh>summary .eng{font-size:10px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;background:var(--skill);color:var(--skill-b);
+  border-radius:4px;padding:3px 8px;flex:0 0 auto}
+details.uh .phase{padding:0 0 22px}
+details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:var(--accent);padding:6px 0}
+
+/* ── component model board ────────────────────────────── */
+.board{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+  padding:28px 30px 22px;margin-top:20px;box-shadow:0 2px 10px rgba(15,20,40,.06)}
+.board .bk{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:6px}
+.board .bt{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:18px}
+.bx{border:1.6px solid;border-radius:12px;padding:13px 14px;font-size:13px}
+.bx h4{font-size:15px;font-weight:800;margin-bottom:2px;display:flex;align-items:center;gap:8px;
+  flex-wrap:wrap}
+.bx .status{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  border-radius:4px;padding:2px 7px;color:#fff}
+.bx .status.u{background:#2b8a3e}.bx .status.d{background:#a07d1c}.bx .status.n{background:#8a8da0}
+.bx ul{list-style:none;margin-top:8px}
+.bx li{position:relative;padding-left:13px;margin-bottom:6px;color:#3c3f52;line-height:1.4}
+.bx li::before{content:"•";position:absolute;left:1px;color:currentColor;opacity:.55}
+.bx li b{color:var(--ink)}
+.bx.i{background:var(--instr);border-color:var(--instr-b)}.bx.i h4{color:var(--instr-b)}
+.bx.k{background:var(--know);border-color:var(--know-b)}.bx.k h4{color:var(--know-b)}
+.bx.t{background:var(--tools);border-color:var(--tools-b)}.bx.t h4{color:var(--tools-b)}
+.bx.m{background:var(--mem);border-color:var(--mem-b)}.bx.m h4{color:var(--mem-b)}
+.bx.s{background:var(--sand);border-color:var(--sand-b)}.bx.s h4{color:var(--sand-b)}
+.bx.c{background:var(--conn);border-color:var(--conn-b)}.bx.c h4{color:var(--conn-b)}
+.bx.ch{background:var(--chan);border-color:var(--chan-b)}.bx.ch h4{color:var(--chan-b)}
+.b-row5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.b-mid{display:grid;grid-template-columns:1.9fr 1fr;gap:12px;margin-top:12px}
+.b-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+@media(max-width:900px){.b-row5{grid-template-columns:repeat(2,1fr)}
+  .b-mid{grid-template-columns:1fr}.b-row3{grid-template-columns:1fr}}
+/* skills band */
+.b-skills{border:1.6px solid var(--skill-b);border-radius:12px;background:#fdfafd;
+  padding:13px 14px}
+.b-skills .head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:11px}
+.b-skills .pill{background:var(--skill-b);color:#fff;font-weight:800;font-size:14px;
+  border-radius:8px;padding:5px 18px}
+.b-skills .cap{font-size:12.8px;font-weight:650;color:#7c2b60}
+.b-skills .duo{display:grid;grid-template-columns:1fr 26px 1fr;gap:6px;align-items:center}
+@media(max-width:700px){.b-skills .duo{grid-template-columns:1fr}.b-skills .arrow{display:none}}
+.b-skills .sbox{border:1.4px solid;border-radius:10px;padding:11px 12px;font-size:12.6px;
+  align-self:stretch}
+.b-skills .sbox h5{font-size:13.5px;font-weight:800;margin-bottom:6px}
+.b-skills .sbox.l{background:var(--skill);border-color:var(--skill-b)}
+.b-skills .sbox.l h5{color:var(--skill-b)}
+.b-skills .sbox.r{background:#f2f3f7;border-color:#9aa0b5}
+.b-skills .sbox.r h5{color:#525a75}
+.b-skills .sbox ul{list-style:none}
+.b-skills .sbox li{position:relative;padding-left:12px;margin-bottom:5px;color:#3c3f52;line-height:1.38}
+.b-skills .sbox li::before{content:"•";position:absolute;left:0;opacity:.5}
+.b-skills .arrow{color:var(--skill-b);font-size:19px;font-weight:800;text-align:center}
+/* product jewels — official marks from assets/products (see its NOTICE.md) */
+.jewels{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.jw{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);
+  border-radius:6px;padding:3px 9px 3px 5px;font-size:11.5px;font-weight:700;color:#33364a;
+  white-space:nowrap}
+.jw img{width:17px;height:17px;object-fit:contain;display:block}
+.jw small{font-weight:600;color:var(--faint);margin-left:2px}
+.rule-banner{margin-top:16px;background:#101a35;color:#fff;border-radius:10px;padding:14px 20px;
+  font-size:15px;font-weight:600;text-align:center}
+.rule-banner b{color:#f291b6}
+.board .foot{margin-top:10px;font-size:11.5px;color:var(--faint);text-align:right}
+
+/* verify cards */
+.rc{border:1px solid var(--line);border-radius:11px;background:var(--paper);margin-top:14px;overflow:hidden}
+.rc .q{display:flex;gap:14px;align-items:flex-start;padding:16px 18px}
+.rc .q .cardn{flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:var(--accent);
+  color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+.rc .q .ask{font-weight:650;font-size:15.5px}
+.rc .q .ask small{display:block;font-weight:400;color:var(--dim);margin-top:5px;font-size:14px}
+.rc .expect{border-top:1px dashed var(--line);background:var(--wash);padding:12px 18px;font-size:14px;color:var(--dim)}
+.rc .expect b{color:var(--ok);text-transform:uppercase;font-size:11px;letter-spacing:.08em;margin-right:8px}
+.rc .verdict{display:flex;gap:8px;padding:10px 18px;border-top:1px solid var(--line)}
+.rc .verdict button{border:1px solid var(--line);background:var(--paper);border-radius:7px;
+  padding:5px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--dim)}
+.rc .verdict button.p.sel{background:var(--ok);border-color:var(--ok);color:#fff}
+.rc .verdict button.f.sel{background:var(--red);border-color:var(--red);color:#fff}
+.rc .verdict .st{margin-left:auto;font-size:13px;color:var(--faint);align-self:center}
+#rc-tally{margin-top:16px;font-size:15px;font-weight:650;padding:12px 18px;border-radius:9px;
+  background:var(--accent-soft);color:#134a80}
+#rc-tally.bad{background:var(--red-soft);color:var(--red)}
+#rc-tally.good{background:#e7f5e9;color:var(--ok)}
+
+/* production table */
+table.ladder{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--paper);
+  border-radius:11px;overflow:hidden;border:1px solid var(--line)}
+table.ladder th{background:#101a35;color:#fff;text-align:left;padding:11px 14px;font-size:12px;
+  letter-spacing:.07em;text-transform:uppercase}
+table.ladder td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:top;color:var(--dim)}
+table.ladder td:first-child{font-weight:650;color:var(--ink);min-width:150px}
+
+/* scope wall */
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+@media(max-width:760px){.wall{grid-template-columns:1fr}}
+.wall .col{border-radius:10px;padding:14px;font-size:14px}
+.wall .col h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px}
+.wall .in{background:#e7f5e9;border:1px solid #b7dfc0}.wall .in h4{color:var(--ok)}
+.wall .out{background:var(--red-soft);border:1px solid #f0c4c4}.wall .out h4{color:var(--red)}
+.wall .park{background:#fdf6e3;border:1px solid #ecd9a0}.wall .park h4{color:#a07d1c}
+.wall li{margin:0 0 7px 16px;color:var(--dim)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--faint)}
+@media print{.rail,.verdict{display:none}body{background:#fff}
+  section.phase{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">AIBAST Agent Workshop · one page, one session, every industry</div>
+    <h1>Build your industry's agent<br>in Microsoft Copilot Studio</h1>
+    <p class="sub">Pick your industry below and this page becomes your workshop: the library agent
+      you choose goes from intent to a published, verified agent in your own environment — and you
+      build it by talking, not by typing commands. Every industry in the AIBAST library runs
+      through this same page.</p>
+    <div class="goal"><b>When you finish</b>
+      A working dispatch agent in your Copilot Studio environment that passes five computed
+      verification checks — and a clear path from prototype to production.<br><br>
+      <b>The short version</b>
+      Download the Sales Specialist Twin agent. Load it into the brainstem. Go to town —
+      GitHub Copilot runs every step of this guide for you.</div>
+  </div>
+</div>
+
+<nav class="rail"><div class="rail-in">
+  <a href="#pick"><span class="n">0</span>Pick your agent</a>
+  <a href="#start"><span class="n">1</span>Install &amp; add the twin</a>
+  <a href="#understand"><span class="n">2</span>What you're getting</a>
+  <a href="#mission"><span class="n">3</span>Say the mission</a>
+  <a href="#verify"><span class="n">4</span>Test it yourself</a>
+  <a href="#underhood"><span class="n">5</span>The hard way</a>
+  <a href="#production"><span class="n">6</span>Go to production</a>
+</div></nav>
+
+<main class="wrap">
+
+<!-- ═══════════ 0 PICK ═══════════ -->
+<section class="phase" id="pick">
+  <div class="phead"><span class="pk">Step 0</span><span class="time">30 sec</span></div>
+  <h2>Pick your industry, pick your agent</h2>
+  <p class="goal-line">Everything below personalizes to your choice — the sentence you'll say, the
+    components your AI builds, and the verification answers you'll check. Loaded live from the
+    public library; change your pick any time.</p>
+  <div class="card">
+    <div id="indPills" class="pills"><span class="pill-hint">Loading the library…</span></div>
+    <div id="agentCards" class="acards"></div>
+    <div class="done-line" id="pickStatus"><b>Selected</b><span id="pickName">nothing yet — choose above</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ 1 START ═══════════ -->
+<section class="phase" id="start">
+  <div class="phead"><span class="pk">Step 1</span><span class="time">~5 min</span></div>
+  <h2>Install the brainstem, add the twin</h2>
+  <p class="goal-line">This whole guide is an extension of the brainstem one-liner tutorial. Two
+    paste-and-run lines and you have an AI that can build this agent — and every other agent in
+    the library — for you.</p>
+
+  <div class="card">
+    <ol class="steps">
+      <li><b>Run the brainstem one-liner</b>
+        <p>Mac / Linux:</p>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</pre></div>
+        <p>Windows (PowerShell):</p>
+        <div class="code"><div class="bar">PowerShell<button data-copy>Copy</button></div>
+<pre>irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex</pre></div></li>
+      <li><b>Add the one agent that does everything</b>
+        <p>The Sales Specialist Twin. Easiest way — no terminal: open the brainstem page at
+        <code>localhost:7071</code>, search the built-in agent registry for
+        <b>“Sales Specialist Twin”</b>, and install with one click. It hotloads instantly —
+        live on your very next message. (Any library agent installs the same way, by name.)</p>
+        <p>Terminal alternative, same result:</p>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>curl -fsSL -o ~/.brainstem/src/rapp_brainstem/agents/sales_specialist_twin_agent.py \
+  "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/%40aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py"</pre></div></li>
+      <li><b>Open VS Code and start talking</b>
+        <p>Open GitHub Copilot Chat in VS Code, connected to your brainstem (the tutorial's chat
+        step). Everything from here is conversation.</p></li>
+    </ol>
+    <div class="done-line"><b>Done when</b> you ask “what agents can I deploy?” in chat and the
+      library catalog comes back.</div>
+  </div>
+</section>
+
+<!-- ═══════════ 2 UNDERSTAND ═══════════ -->
+<section class="phase" id="understand">
+  <div class="phead"><span class="pk">Step 2 · Know what you're getting</span><span class="time">read first</span></div>
+  <h2>What you're building</h2>
+  <p class="goal-line">A dispatch agent for energy field operations: the queue, the zones, who takes
+    which job, and who responds when a SCADA alarm fires. Before touching the CLI, know where each
+    behavior lives — and what this prototype deliberately leaves out.</p>
+
+  <div class="card">
+    <h3>Scope — decided up front, not discovered later</h3>
+    <div class="wall">
+      <div class="col in"><h4>In — this build</h4><ul id="wallIn">
+        <li>Dispatch dashboard, priority-ranked</li>
+        <li>Zone capacity &amp; utilization analysis</li>
+        <li>Technician recommendations via a deterministic scoring rule</li>
+        <li>Emergency responder identification</li>
+        <li>Certification gating that cannot be talked out of</li>
+        <li>Synthetic data: 5 technicians, 5 requests, 3 zones</li>
+      </ul></div>
+      <div class="col out"><h4>Out — deliberately</h4><ul>
+        <li>Actually assigning or dispatching anyone — the agent recommends, a person acts</li>
+        <li>Writing to any system of record</li>
+        <li>Real operational data of any kind</li>
+        <li>Notifications or messages to technicians</li>
+      </ul></div>
+      <div class="col park"><h4>Later — step 7</h4><ul>
+        <li>Live data via SharePoint / Dataverse / D365 Field Service tools</li>
+        <li>Teams channel rollout</li>
+        <li>Per-dispatcher memory</li>
+      </ul></div>
+    </div>
+  </div>
+
+  <div class="board">
+    <div class="bk">Separate global behavior, facts, actions, procedures, memory, delegation, and code execution.</div>
+    <div class="bt"><span data-dyn="name">Your agent</span> · Copilot Studio Component Model</div>
+
+    <div class="b-row5">
+      <div class="bx i"><h4>Instructions <span class="status u">Used</span></h4>
+        <ul>
+          <li>Everything <b>general</b>: dispatcher role, scope, operational tone</li>
+          <li>The six never-relaxed rules — cert gating, recommend-don't-dispatch, priority order, cite IDs, missing-data honesty, zone filters</li>
+        </ul>
+        <div class="jewels"><span class="jw"><img src="../assets/products/copilot-studio.svg" alt="">Copilot Studio</span></div></div>
+
+      <div class="bx k"><h4>Knowledge <span class="status u">Used</span></h4>
+        <ul>
+          <li><b>Searchable facts</b> the agent grounds and cites</li>
+          <li>Operations data — synthetic, prototype tier</li>
+          <li>Certification &amp; dispatch policy — the citable authority behind every refusal</li>
+        </ul>
+        <div class="jewels"><span class="jw"><img src="../assets/products/copilot-studio.svg" alt="">File knowledge</span><span class="jw"><img src="../assets/products/sharepoint.svg" alt="">SharePoint <small>later</small></span></div></div>
+
+      <div class="bx t"><h4>Tools <span class="status d">Step 7</span></h4>
+        <ul>
+          <li><b>Live lookups</b> — roster and work orders queried, never RAG-searched</li>
+          <li>Acts as the <b>signed-in user</b>; a service principal reads the whole tenant</li>
+        </ul>
+        <div class="jewels"><span class="jw"><img src="../assets/products/sharepoint.svg" alt="">SharePoint</span><span class="jw"><img src="../assets/products/dataverse.svg" alt="">Dataverse</span><span class="jw"><img src="../assets/products/d365-field-service.svg" alt="">D365 Field Service</span><span class="jw"><img src="../assets/products/entra-id.svg" alt="">Entra ID</span></div></div>
+
+      <div class="bx m"><h4>Memory <span class="status n">Not used</span></h4>
+        <ul>
+          <li>No per-dispatcher history is needed to prove dispatch behavior</li>
+          <li>Every component you add is a surface you must inspect and secure</li>
+        </ul></div>
+
+      <div class="bx s"><h4>Sandboxed Code Interpreter <span class="status n">Not yet</span></h4>
+        <ul>
+          <li>Scoring arithmetic is simple enough for skill-directed computation</li>
+          <li>The named upgrade if verification shows score drift — <b>data manipulation</b> in a sandbox</li>
+        </ul></div>
+    </div>
+
+    <div class="b-mid">
+      <div class="b-skills">
+        <div class="head"><span class="pill">Skills</span>
+          <span class="cap">Reusable procedures the loop invokes when dispatch needs a specific workflow — one per declared operation.</span></div>
+        <div class="duo">
+          <div class="sbox l"><h5>SKILL.md × <span data-dyn="skillCount">4</span></h5>
+            <ul id="skillList">
+              <li><b>dispatch-dashboard</b> — priority-ranked queue, filter-aware counts</li>
+              <li><b>route-optimization</b> — capacity &amp; the exact utilization formula</li>
+              <li><b>technician-assignment</b> — hard gates + <b>score = efficiency + 10 in-zone + 5 not-on-a-job</b></li>
+              <li><b>emergency-response</b> — every certified responder, regardless of status</li>
+            </ul></div>
+          <div class="arrow">⟶</div>
+          <div class="sbox r"><h5>Skill supporting files</h5>
+            <ul>
+              <li>None ship today — the procedures are declarative and auditable as text</li>
+              <li>First candidate: a sandboxed Python helper that computes assignment scores, if the model ever drifts on arithmetic</li>
+            </ul></div>
+        </div>
+      </div>
+      <div class="bx c"><h4>Connected agents <span class="status n">Not used</span></h4>
+        <ul>
+          <li>One domain, one orchestration</li>
+          <li>Delegate specialized scope <b>only if needed</b> — splitting small tasks across agents does not increase accuracy, and dispatch is exactly that case</li>
+        </ul></div>
+    </div>
+
+    <div class="b-row3">
+      <div class="bx ch"><h4>Channels <span class="status d">Step 5–7</span></h4>
+        <ul>
+          <li>Test pane during the build</li>
+          <li>Teams at pilot — sharing is a decision, not a default</li>
+        </ul>
+        <div class="jewels"><span class="jw"><img src="../assets/products/teams.svg" alt="">Microsoft Teams</span><span class="jw"><img src="../assets/products/m365-copilot.svg" alt="">M365 Copilot</span></div></div>
+      <div class="bx ch"><h4>Evaluations <span class="status u">Step 6</span></h4>
+        <ul>
+          <li>Five checks with <b>computed</b> expected answers — wrong is visible, not arguable</li>
+          <li>Rerun on every change, forever</li>
+        </ul></div>
+      <div class="bx ch"><h4>Analytics <span class="status d">Step 7</span></h4>
+        <ul>
+          <li>Transcript spot-audits against the roster</li>
+          <li>The failure-mode table drives continuous improvement</li>
+        </ul></div>
+    </div>
+
+    <div class="rule-banner">Design rule: choose the <b>smallest component</b> that makes the
+      behavior reliable, inspectable, and safe inside the loop.</div>
+    <div class="foot">* Reusable assets — skills, instructions, descriptions — still need evaluation per runtime and model combination.</div>
+  </div>
+</section>
+
+<!-- ═══════════ 3 MISSION ═══════════ -->
+<section class="phase" id="mission">
+  <div class="phead"><span class="pk">Step 3 · The easy way</span><span class="time">~15 min · mostly watching</span></div>
+  <h2>Say the mission</h2>
+  <p class="goal-line">You steer; your AI executes. It fetches the mission playbook from the public
+    library and runs every command itself — the same steps documented under the hood below. Here is
+    the whole conversation:</p>
+
+  <div class="card">
+    <ol class="steps">
+      <li><b>You say:</b> <i id="missionSay">“Deploy the … agent to Copilot Studio.”</i>
+        <p>The AI checks your machine (installs the Power Platform CLI itself if missing), detects
+        your environment, creates the project, installs the skills and knowledge from the library,
+        and sets the instructions. You watch one-line progress updates.</p></li>
+      <li><b>It may ask you to sign in — once.</b>
+        <p>If you have never authenticated, it asks you to run <code>pac auth create</code> in a
+        terminal and finish the browser sign-in with your work account. That is the only technical
+        step a person ever does, and only the first time.</p></li>
+      <li><b>It asks before going live:</b> you say <i>“yes, publish it.”</i>
+        <p>Publishing makes the agent live for everyone it's shared with — so that call is always
+        yours.</p></li>
+      <li><b>It hands you the test script.</b>
+        <p>Five questions with computed expected answers — that's step 4, and it's yours to click
+        through.</p></li>
+    </ol>
+    <div class="callout"><b>Works for the whole library.</b> Swap the agent name and the same
+      sentence deploys any stack — “deploy the <i>emission tracking</i> agent”, “deploy the
+      <i>permit license management</i> agent”. Ask “what agents can I deploy?” for the full list.</div>
+  </div>
+</section>
+
+<!-- ═══════════ 6 VERIFY ═══════════ -->
+<section class="phase" id="verify">
+  <div class="phead"><span class="pk">Step 4</span><span class="time">~15 min · you, clicking</span></div>
+  <h2>Test it yourself in Copilot Studio</h2>
+  <p class="goal-line">No automation here — this part is you, in the product. Open
+    <a href="https://copilotstudio.microsoft.com">copilotstudio.microsoft.com</a> → <b>Agents</b> →
+    <b><span data-dyn="name">your agent</span></b> → the <b>Test</b> button (top right). Ask these questions. Every expected answer is <b>computed from the synthetic data</b>, so a wrong answer
+    is visible, not arguable. Record each verdict — the page remembers.</p>
+
+  <div class="card">
+    <div id="rcHost"><p style="color:var(--faint)">Pick an agent in Step 0 to load its verification questions.</p></div>
+
+    <div id="rc-tally">No verdicts recorded yet.</div>
+    <p style="margin-top:14px">Checks 2, 3, and 4 are the gate. If any of them fail, the build is
+      not done: re-read the skill file for that behavior, confirm it pushed (a no-op push in step 5
+      is the usual culprit), fix, push, publish, and re-run all five. These five prompts are also
+      your starting <b>evaluation set</b> — rerun them after every change you ever make to this
+      agent.</p>
+  </div>
+</section>
+
+  <div class="card">
+    <h3>If a check fails</h3>
+    <p>Don't debug — delegate. Go back to Copilot Chat and say: <i>“Verification question 3 failed —
+      here's what it answered: …”</i> Your AI re-reads the playbook's friction notes (a component that
+      never pushed is the usual culprit), fixes it, and tells you when to test again.</p>
+  </div>
+<!-- ═══════════ 5 UNDER THE HOOD ═══════════ -->
+<section class="phase" id="underhood">
+  <div class="phead"><span class="pk">Step 5 · The hard way</span><span class="time">optional</span></div>
+  <h2>The hard way — do it yourself, or audit the AI</h2>
+  <p class="goal-line">The easy way is Step 3: say the mission and watch. These panels are the
+    hard way — the exact same steps, expanded for two audiences: the curious, who want to see
+    precisely what the AI just did on their machine, and the skeptics, who would rather type
+    every command themselves. Same steps, same result, either road.</p>
+</section>
+<!-- ═══════════ 3 PROJECT ═══════════ -->
+<details class="uh" id="project">
+  <summary><span class="eng">AI-run · DIY inside</span>Create the project — authenticate, scaffold, bind to the environment</summary>
+<div class="phase">
+    <h2>Create the project</h2>
+  <p class="goal-line">Two commands: authenticate, then scaffold an empty CLI-authored agent bound
+    to your environment.</p>
+
+  <div class="card">
+    <ol class="steps">
+      <li><b>Authenticate the CLI</b>
+        <p>Completes a browser sign-in. Use the account with maker permissions in your target
+        environment.</p>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>pac auth create</pre></div></li>
+
+      <li><b>Initialize the agent project</b>
+        <p>Replace the environment ID with yours. This creates the
+        <code>field-service-dispatch/</code> project: <code>settings.mcs.yml</code> plus the
+        <code>behaviors/</code> and <code>capabilities/</code> folders you'll fill next.</p>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>pac copilot init \
+  --name "Field Service Dispatch Agent" \
+  --publisher-prefix aibast \
+  --authoring-mode cli-copilot \
+  --project-dir field-service-dispatch \
+  --environment "&lt;your-environment-id&gt;"</pre></div></li>
+
+      <li><b>Confirm the scaffold</b>
+        <p>The project directory now contains <code>settings.mcs.yml</code>. If it doesn't, stop
+        here and fix it — nothing downstream works without it.</p></li>
+    </ol>
+    <div class="callout"><b>Never hand-edit <code>.mcs/</code>.</b> It is CLI-managed sync state.
+      Everything you author lives in <code>settings.mcs.yml</code>, <code>behaviors/</code>, and
+      <code>capabilities/</code>.</div>
+    <div class="done-line"><b>Done when</b> <code>field-service-dispatch/settings.mcs.yml</code>
+      exists and carries your environment binding and a generated <code>schemaName</code> — note
+      that schemaName, you need it to publish.</div>
+  </div>
+</div>
+</details>
+
+<!-- ═══════════ 4 COMPONENTS ═══════════ -->
+<details class="uh" id="components">
+  <summary><span class="eng">AI-run · DIY inside</span>Add the components — download the skills, knowledge, and instructions from the library</summary>
+<div class="phase">
+    <h2>Add the components</h2>
+  <p class="goal-line">The library ships the component set ready-made in the stack's
+    <code>copilot_studio/</code> folder — four skills, two knowledge files, and the instructions.
+    Copy them in, then set the instructions.</p>
+
+  <div class="card">
+    <ol class="steps">
+      <li><b>Copy the skills and knowledge into the project</b>
+        <p>Run from the stack folder (where <code>copilot_studio/</code> lives), with your project
+        as the destination:</p>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>cp copilot_studio/behaviors/*.mcs.yml            field-service-dispatch/behaviors/
+cp copilot_studio/capabilities/knowledge/files/*  field-service-dispatch/capabilities/knowledge/files/</pre></div>
+        <p>What just landed:</p>
+        <ul class="tight">
+          <li><code>dispatch-dashboard_fsd101.mcs.yml</code> — priority-ranked queue with
+            filter-aware counts</li>
+          <li><code>route-optimization_fsd102.mcs.yml</code> — per-zone capacity and the exact
+            utilization formula</li>
+          <li><code>technician-assignment_fsd103.mcs.yml</code> — the eligibility gates and the
+            scoring rule: <code>score&nbsp;=&nbsp;efficiency&nbsp;+&nbsp;10&nbsp;in-zone&nbsp;+&nbsp;5&nbsp;not-on-a-job</code></li>
+          <li><code>emergency-response_fsd104.mcs.yml</code> — every certified responder listed
+            regardless of status</li>
+          <li>Two knowledge files + sidecars: the synthetic operations data and the certification
+            policy</li>
+        </ul></li>
+
+      <li><b>Set the instructions</b>
+        <p>Open <code>field-service-dispatch/settings.mcs.yml</code>. <b>Keep every generated field
+        exactly as pac wrote it</b> — you are only filling the instructions segment with the full
+        contents of the stack's <code>instructions.md</code>:</p>
+        <div class="code"><div class="bar">settings.mcs.yml — the segment shape<button data-copy>Copy</button></div>
+<pre>configuration:
+  agentSettings:
+    instructions:
+      segments:
+        - kind: StaticSegment
+          value: |
+            &lt;paste the full contents of instructions.md, indented to match&gt;</pre></div>
+        <details class="filebox"><summary>The six never-relaxed rules you are pasting — know them
+          before you paste them</summary>
+        <ul class="tight">
+          <li><b>Certification gating is absolute.</b> Never recommend a technician for work
+            requiring a certification they don't hold — not for emergencies, not when nobody else
+            is available, not when asked directly.</li>
+          <li><b>The agent recommends; a person dispatches.</b> It never states or implies an
+            assignment or notification happened.</li>
+          <li><b>Critical and emergency work always ranks first.</b></li>
+          <li><b>Every claim cites record IDs</b> (TECH-, SR-); the agent never invents records.</li>
+          <li><b>Missing data is a finding</b> — said plainly, never guessed around.</li>
+          <li><b>Zone filters apply to everything</b> — tables, counts, and recommendations.</li>
+        </ul></details></li>
+    </ol>
+    <div class="done-line"><b>Done when</b> the project holds 4 skill files, 2 knowledge files with
+      their <code>.mcs.yml</code> sidecars, and instructions in the StaticSegment.</div>
+  </div>
+</div>
+</details>
+
+<!-- ═══════════ 5 PUBLISH ═══════════ -->
+<details class="uh" id="publish">
+  <summary><span class="eng">AI-run · DIY inside</span>Push &amp; publish — sync in the right order, go live only on your yes</summary>
+<div class="phase">
+    <h2>Push &amp; publish</h2>
+  <p class="goal-line">Sync order matters: pull, then push, then publish. Pull merges any remote
+    state first so your push lands clean.</p>
+
+  <div class="card">
+    <ol class="steps">
+      <li><b>Pull, then push</b>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>pac copilot pull --project-dir field-service-dispatch
+pac copilot push --project-dir field-service-dispatch</pre></div>
+        <p>If push reports a conflict, pull again, resolve, and retry. If it reports nothing to
+        send, your components didn't land — go back to step 4.</p></li>
+      <li><b>Publish</b>
+        <p>Use the <code>schemaName</code> from <code>settings.mcs.yml</code>:</p>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>pac copilot publish --bot "&lt;schemaName&gt;" --environment "&lt;your-environment-id&gt;"</pre></div></li>
+    </ol>
+    <div class="callout"><b>Publishing makes the agent live</b> for everyone it is shared with.
+      For a prototype that's just you — but make sharing a decision, not a default, before step 7.</div>
+    <div class="done-line"><b>Done when</b> publish completes and the agent opens in the Copilot
+      Studio maker portal with your four skills and two knowledge sources visible.</div>
+  </div>
+</div>
+</details>
+
+<!-- ═══════════ 7 PRODUCTION ═══════════ -->
+<section class="phase" id="production">
+  <div class="phead"><span class="pk">Step 6</span><span class="time">when you're ready</span></div>
+  <h2>Go to production</h2>
+  <p class="goal-line">The prototype answers from a synthetic file so it works on day one. A
+    production deployment swaps that file for <b>tools</b> that query live systems — and makes
+    sharing, risk, and monitoring deliberate.</p>
+
+  <div class="card">
+    <h3>Swap file knowledge for live tools</h3>
+    <ol class="steps">
+      <li><b>Put the data where it lives</b>
+        <p>The stack ships <code>data/technicians.csv</code> and
+        <code>data/service_requests.csv</code> — import them as SharePoint lists to start, or map
+        to where this data already exists: Dynamics 365 Field Service tenants have the roster and
+        work orders in Dataverse (<code>bookableresource</code>, <code>msdyn_workorder</code>).</p></li>
+      <li><b>Add connector tools in the portal</b>
+        <p>Copilot Studio → your agent → Tools → Add → Connector (SharePoint <i>Get items</i>, or
+        Dataverse). The portal binds the connection and generates the
+        <code>capabilities/tools/*.mcs.yml</code> — connection references are tenant-specific,
+        which is why the library doesn't ship pre-baked tool YAML.</p>
+        <div class="callout"><b>Authentication mode matters more than any other setting.</b>
+        Tools must act as the <b>signed-in user</b> so the agent sees only what the caller can see.
+        A service-principal connection reads everything in the tenant — the most common and most
+        expensive mistake in this pattern.</div></li>
+      <li><b>Retire the demo file</b>
+        <p>Remove <code>field-service-operations-data.md</code> and its sidecar from
+        <code>capabilities/knowledge/files/</code>, push, publish — the skills don't change; they
+        define the procedure regardless of where the rows come from.</p></li>
+      <li><b>Re-verify</b>
+        <p>Run all five checks again against live data — recompute the expected answers from the
+        real roster first. Then share to the Teams channel, deliberately.</p></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Know your failure modes before someone else finds them</h3>
+    <table class="ladder">
+      <thead><tr><th>Risk</th><th>Prevent</th><th>Detect</th><th>Respond</th></tr></thead>
+      <tbody>
+        <tr><td>Uncertified technician recommended</td>
+          <td>The gate lives in instructions <i>and</i> the assignment skill; check 4 in every run</td>
+          <td>Spot-audit transcripts against the roster</td>
+          <td>Treat as a sev-1 defect; fix and re-verify before any demo</td></tr>
+        <tr><td>Agent reads data the caller shouldn't see</td>
+          <td>Tools authenticate as the signed-in user — never a service principal</td>
+          <td>Test with an ordinary account, not your admin account</td>
+          <td>Revoke the connection, re-scope the source, re-run verification</td></tr>
+        <tr><td>Stale roster → wrong availability</td>
+          <td>Live tools before rollout (that's this step)</td>
+          <td>Answers cite their data source; cross-check during the pilot</td>
+          <td>Until swapped: the agent states it is answering from a static file</td></tr>
+        <tr><td>Hallucinated technicians or requests</td>
+          <td>Instructions require TECH-/SR- IDs on every claim</td>
+          <td>Keep asking questions with exactly one computable answer (check 3 pattern)</td>
+          <td>Tighten skill output formats; consider a code-interpreter scoring helper</td></tr>
+        <tr><td>Scope creep into real dispatch actions</td>
+          <td>No write tools exist; the Out list in step 2 is the contract</td>
+          <td>Any added tool shows up in the YAML diff at pull/push</td>
+          <td>A new write action goes back through this table before it ships</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  Microsoft AI Business Applications Specialist Team (AIBAST) · End-to-end configuration guide for
+  the Field Service Dispatch stack. All data in this guide is synthetic. Agent templates are
+  starting points that must be customized and reviewed before production use. Component layout
+  follows the Copilot Studio CLI authoring format
+  (<a href="https://github.com/microsoft/copilot-studio-plugin" style="color:inherit">microsoft/copilot-studio-plugin</a>).
+</div></footer>
+
+<script>
+/* copy buttons */
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-copy]"); if(!b) return;
+  var pre=b.closest(".code").querySelector("pre");
+  navigator.clipboard.writeText(pre.textContent).then(function(){
+    var t=b.textContent; b.textContent="Copied"; setTimeout(function(){b.textContent=t;},1500);
+  });
+});
+
+/* checklist persistence */
+var LS="aibast:fsd-guide:";
+document.querySelectorAll(".check").forEach(function(ul){
+  var key=LS+"ck:"+ul.dataset.ck;
+  var saved=JSON.parse(localStorage.getItem(key)||"[]");
+  ul.querySelectorAll("li").forEach(function(li,i){
+    var cb=li.querySelector("input");
+    if(saved[i]){cb.checked=true;li.classList.add("donei");}
+    cb.addEventListener("change",function(){
+      li.classList.toggle("donei",cb.checked);
+      var st=[].map.call(ul.querySelectorAll("input"),function(x){return x.checked;});
+      localStorage.setItem(key,JSON.stringify(st));
+    });
+  });
+});
+
+/* verification verdicts */
+var STACK="none";
+function rcKey(id){return LS+"rc:"+STACK+":"+id;}
+function tally(){
+  var cards=document.querySelectorAll(".rc"),p=0,f=0;
+  cards.forEach(function(c){
+    var v=localStorage.getItem(rcKey(c.dataset.rc));
+    if(v==="p")p++; if(v==="f")f++;
+  });
+  var el=document.getElementById("rc-tally");
+  if(p+f===0){el.textContent="No verdicts recorded yet.";el.className="";return;}
+  el.textContent=p+" pass · "+f+" fail · "+(cards.length-p-f)+" not yet run";
+  el.className = f>0 ? "bad" : (p===cards.length ? "good" : "");
+  if(f>0) el.textContent+=" — a failing gate check means the build is not done.";
+  if(p===cards.length) el.textContent+=" — all five green. This is a working prototype.";
+}
+function wireVerdicts(){
+document.querySelectorAll(".rc").forEach(function(c){
+  var key=rcKey(c.dataset.rc), pb=c.querySelector(".p"), fb=c.querySelector(".f"),
+      st=c.querySelector(".st");
+  function paint(){
+    var v=localStorage.getItem(key);
+    pb.classList.toggle("sel",v==="p"); fb.classList.toggle("sel",v==="f");
+    st.textContent=v==="p"?"recorded: pass":v==="f"?"recorded: fail":"";
+  }
+  pb.onclick=function(){localStorage.setItem(key,"p");paint();tally();};
+  fb.onclick=function(){localStorage.setItem(key,"f");paint();tally();};
+  paint();
+});
+}
+tally();
+
+
+/* ── workshop driver: one page, every industry ── */
+var MIRRORS=[["microsoft/aibast-agents-library","main"],
+             ["kody-w/aibast-agents-library","main"],
+             ["kody-w/aibast-agents-library","feature/field-service-dispatch-copilot-studio"]];
+var ACTIVE=0, REG=null, CATS={}, SELECTED=null;
+var CATNAMES={b2b_sales:"B2B Sales",b2c_sales:"B2C Sales",energy:"Energy",
+  federal_government:"Federal Government",financial_services:"Financial Services",
+  general:"Cross-Industry",healthcare:"Healthcare",human_resources:"Human Resources",
+  it_management:"IT Management",manufacturing:"Manufacturing",
+  professional_services:"Professional Services",retail_cpg:"Retail & CPG",
+  slg_government:"State & Local Government",software_digital_products:"Software & Digital"};
+function rawUrl(mi,path){var m=MIRRORS[mi];
+  return "https://raw.githubusercontent.com/"+m[0]+"/"+m[1]+"/"+
+    path.split("/").map(encodeURIComponent).join("/");}
+function fetchLib(path,asJson){
+  var tryAt=function(order,k){
+    if(k>=order.length) return Promise.reject(new Error("library unreachable"));
+    return fetch(rawUrl(order[k],path)).then(function(r){
+      if(!r.ok) throw 0;
+      ACTIVE=order[k];
+      return asJson?r.json():r.text();
+    }).catch(function(){return tryAt(order,k+1);});
+  };
+  var order=[ACTIVE].concat([0,1,2].filter(function(i){return i!==ACTIVE;}));
+  return tryAt(order,0);
+}
+function slugOf(a){return a.name.split("/")[1];}
+function agentTitle(a){return (a.display_name||a.name).replace(/ Agent$/,"");}
+function esc2(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+
+function renderPills(){
+  var host=document.getElementById("indPills");
+  host.innerHTML=Object.keys(CATS).sort().map(function(c){
+    return '<button data-cat="'+c+'">'+esc2(CATNAMES[c]||c)+"</button>";}).join("");
+  host.onclick=function(e){var b=e.target.closest("button"); if(!b)return;
+    host.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
+    renderAgents(b.dataset.cat);};
+}
+function renderAgents(cat){
+  var host=document.getElementById("agentCards");
+  host.innerHTML=CATS[cat].map(function(a){
+    return '<button data-slug="'+esc2(slugOf(a))+'"><b>'+esc2(a.display_name||a.name)+
+      "</b><span>"+esc2((a.description||"").slice(0,110))+"…</span></button>";}).join("");
+  host.onclick=function(e){var b=e.target.closest("button"); if(!b)return;
+    host.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
+    var a=CATS[cat].filter(function(x){return slugOf(x)===b.dataset.slug;})[0];
+    select(a);};
+}
+function select(a){
+  SELECTED=a; STACK=slugOf(a);
+  localStorage.setItem(LS+"pick",STACK);
+  try{history.replaceState(null,"","?agent="+encodeURIComponent(STACK));}catch(e){}
+  document.getElementById("pickName").textContent=" "+(a.display_name||a.name)+
+    " — everything on this page is now about this agent.";
+  document.querySelectorAll("[data-dyn=name]").forEach(function(el){
+    el.textContent=a.display_name||a.name;});
+  document.getElementById("missionSay").textContent=
+    "\u201cDeploy the "+agentTitle(a).toLowerCase()+" agent to Copilot Studio.\u201d";
+  var dir=a._file.substring(0,a._file.lastIndexOf("/"));
+  fetchLib(dir+"/copilot_studio/manifest.json",true).then(function(man){
+    var names=(man.behaviors||[]).map(function(b){
+      return b.split("/").pop().replace(/_[a-z0-9]+\.mcs\.yml$/,"");});
+    var sc=document.querySelector("[data-dyn=skillCount]");
+    if(sc) sc.textContent=names.length;
+    var sl=document.getElementById("skillList");
+    if(sl) sl.innerHTML=names.map(function(n){return "<li><b>"+esc2(n)+"</b></li>";}).join("");
+    var wi=document.getElementById("wallIn");
+    if(wi) wi.innerHTML=names.map(function(n){
+      return "<li>"+esc2(n.replace(/-/g," "))+"</li>";}).join("")+
+      "<li>Synthetic data only — nothing real, stamped as such</li>";
+    renderChecks(man.verification||[]);
+  }).catch(function(){
+    renderChecks(null);
+  });
+}
+function renderChecks(vs){
+  var host=document.getElementById("rcHost");
+  if(!vs){host.innerHTML='<p style="color:var(--dim)">This stack\u2019s authored scaffold is still '+
+    "being added \u2014 your AI derives the components from the agent\u2019s intent file and will "+
+    "hand you its own computed verification questions at the end of the build.</p>";
+    document.getElementById("rc-tally").textContent="";return;}
+  host.innerHTML=vs.map(function(v,i){
+    return '<div class="rc" data-rc="'+(i+1)+'"><div class="q"><span class="cardn">'+(i+1)+
+      '</span><div class="ask">\u201c'+esc2(v.ask)+'\u201d</div></div>'+
+      '<div class="expect"><b>Expected</b> '+esc2(v.expect)+"</div>"+
+      '<div class="verdict"><button class="p">Pass</button><button class="f">Fail</button>'+
+      '<span class="st"></span></div></div>';}).join("");
+  wireVerdicts(); tally();
+}
+fetchLib("registry.json",true).then(function(reg){
+  REG=reg;
+  (reg.agents||[]).forEach(function(a){
+    if(a.name==="@aibast-agents-library/sales-specialist-twin") return;
+    (CATS[a.category]=CATS[a.category]||[]).push(a);
+  });
+  renderPills();
+  var want=(/[?&]agent=([^&]+)/.exec(location.search)||[])[1]||localStorage.getItem(LS+"pick");
+  if(want){
+    var found=null,cat=null;
+    Object.keys(CATS).forEach(function(c){CATS[c].forEach(function(a){
+      if(slugOf(a)===decodeURIComponent(want)){found=a;cat=c;}});});
+    if(found){
+      var pb=document.querySelector('#indPills button[data-cat="'+cat+'"]');
+      if(pb) pb.classList.add("on");
+      renderAgents(cat);
+      var ab=document.querySelector('#agentCards button[data-slug="'+slugOf(found)+'"]');
+      if(ab) ab.classList.add("on");
+      select(found);
+    }
+  }
+}).catch(function(){
+  document.getElementById("indPills").innerHTML=
+    '<span class="pill-hint">Could not reach the library \u2014 check your connection and reload.</span>';
+});
+
+/* scrollspy */
+var links=[].slice.call(document.querySelectorAll(".rail a"));
+var secs=links.map(function(a){return document.querySelector(a.getAttribute("href"));});
+function spy(){
+  var y=window.scrollY+130, at=0;
+  secs.forEach(function(s,i){ if(s.offsetTop<=y) at=i; });
+  links.forEach(function(a,i){ a.classList.toggle("on",i===at); });
+}
+window.addEventListener("scroll",spy,{passive:true}); spy();
+</script>
+</body>
+</html>
