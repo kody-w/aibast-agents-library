@@ -1,0 +1,68 @@
+{
+  "schema": "aibast-twin-first-party/1.0",
+  "note": "Microsoft first-party agents from the PRO-ENG curriculum. These are configured in-product, not deployed — the twin drives the session from the official docs links below (extracted from the facilitator deck).",
+  "groups": [
+    {
+      "id": "d365-sales-1p",
+      "name": "Dynamics 365 Sales — first-party agents",
+      "agents": [
+        {"id": "sales-qualification-1p", "name": "Sales Qualification Agent", "status": "GA",
+         "summary": "Researches leads, evaluates fit, autonomous outreach.",
+         "overview": "https://learn.microsoft.com/dynamics365/sales/sales-qualification-agent",
+         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-sales-qualification-agent"},
+        {"id": "sales-opportunity-1p", "name": "Sales Opportunity Agent", "status": "GA",
+         "summary": "Continuous opportunity research, risk and stakeholder intelligence.",
+         "overview": "https://learn.microsoft.com/dynamics365/sales/sales-opportunity-agent",
+         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-sales-opportunity-agent"},
+        {"id": "sales-research-1p", "name": "Sales Research Agent", "status": "GA",
+         "summary": "Natural-language dialog with sales data.",
+         "overview": "https://learn.microsoft.com/dynamics365/sales/sales-research-agent",
+         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-sales-research-agent"},
+        {"id": "sales-development-1p", "name": "Sales Development Agent", "status": "Preview",
+         "summary": "Automates sales outreach and prospect management (Agent 365).",
+         "overview": "https://learn.microsoft.com/en-us/microsoft-agent-365/use",
+         "configure": "https://learn.microsoft.com/en-us/microsoft-agent-365/use#deploy-and-create-the-sales-development-agent"},
+        {"id": "recommended-actions-1p", "name": "Recommended Actions Agent", "status": "Preview",
+         "summary": "Prioritized seller actions based on opportunity context.",
+         "overview": "https://learn.microsoft.com/dynamics365/sales/recommended-actions-overview",
+         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-recommended-actions"},
+        {"id": "sales-agent-m365-1p", "name": "Sales Agent (M365 Copilot)", "status": "GA",
+         "summary": "Search, synthesize and act on sales data in M365 apps.",
+         "overview": "https://learn.microsoft.com/microsoft-sales-copilot/sales-chat-overview",
+         "configure": "https://learn.microsoft.com/microsoft-sales-copilot/m365-admin-setting"},
+        {"id": "data-enrichment-1p", "name": "AI-powered Data Enrichment", "status": "GA",
+         "summary": "Enriches opportunity data from email interactions.",
+         "overview": "https://learn.microsoft.com/dynamics365/sales/data-enrichment-agent-overview",
+         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-data-enrichment-agent"}
+      ]
+    },
+    {
+      "id": "d365-service-1p",
+      "name": "D365 Customer Service & Contact Center — first-party agents",
+      "umbrella_overview": "https://learn.microsoft.com/dynamics365/contact-center/use/overview-ai-agents-copilot-features",
+      "responsible_ai_faq": "https://learn.microsoft.com/dynamics365/contact-center/implement/faq-rai-ai-agents",
+      "agents": [
+        {"id": "case-management-1p", "name": "Case Management Agent", "status": "GA",
+         "summary": "Automates the case lifecycle — create, update, resolve, close.",
+         "overview": "https://learn.microsoft.com/dynamics365/customer-service/use/use-case-creation-agent",
+         "configure": "https://learn.microsoft.com/dynamics365/customer-service/administer/set-up-autonomous-case-agents"},
+        {"id": "knowledge-management-1p", "name": "Customer Knowledge Management Agent", "status": "GA",
+         "summary": "Extracts knowledge from closed cases, fills gaps.",
+         "overview": "https://learn.microsoft.com/dynamics365/contact-center/use/overview-ai-agents-copilot-features",
+         "configure": "https://learn.microsoft.com/dynamics365/customer-service/administer/admin-km-agent"},
+        {"id": "quality-evaluation-1p", "name": "Quality Evaluation Agent", "status": "GA",
+         "summary": "AI-scored assessments of cases and conversations.",
+         "overview": "https://learn.microsoft.com/dynamics365/contact-center/use/evaluation-plan",
+         "configure": "https://learn.microsoft.com/dynamics365/contact-center/administer/manage-quality-evaluation-agent"},
+        {"id": "customer-intent-1p", "name": "Customer Intent Agent", "status": "GA",
+         "summary": "Discovers intents from cases and conversations, builds the intent library.",
+         "overview": "https://learn.microsoft.com/dynamics365/contact-center/administer/overview-customer-intent-agent",
+         "configure": "https://learn.microsoft.com/dynamics365/contact-center/administer/enable-intent-for-service-reps"},
+        {"id": "customer-intent-voice-1p", "name": "Customer Intent Agent (Voice)", "status": "GA",
+         "summary": "Autonomous voice resolution using the intent library and playbooks.",
+         "overview": "https://learn.microsoft.com/dynamics365/contact-center/administer/overview-customer-intent-agent",
+         "configure": "https://learn.microsoft.com/dynamics365/contact-center/use/use-intent-suggestions"}
+      ]
+    }
+  ]
+}

@@ -53,6 +53,14 @@
    "playbook": "cleanup.md",
    "needs_stack": true,
    "requires_scaffold": false
+  },
+  {
+   "slug": "configure-first-party",
+   "title": "Set up a Microsoft first-party agent",
+   "summary": "Enables a first-party agent (D365 Sales / Customer Service & Contact Center) in-product, driven from the official docs \u2014 licensing gates, admin steps narrated, validated by exercising the agent once.",
+   "triggers": "first party 1p qualification opportunity research recommended actions enrichment case management knowledge quality evaluation intent voice enable set up configure in product",
+   "playbook": "configure-first-party.md",
+   "needs_first_party": true
   }
  ]
 }

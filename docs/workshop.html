@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AIBAST Agent Workshop — one page, one session, your industry</title>
+<title>The RAPP Workshop — one page, one session, your industry</title>
 <meta name="description" content="The AIBAST Agent Workshop: pick your industry, pick your agent, and take it from intent to a published, verified Copilot Studio agent by talking to your AI. One page runs the whole session for every industry in the library.">
 <style>
 :root{
@@ -237,7 +237,7 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
 
 <div class="hero">
   <div class="wrap">
-    <div class="kicker">AIBAST Agent Workshop · one page, one session, every industry</div>
+    <div class="kicker">The RAPP Workshop · one page, one session, every industry</div>
     <h1>Build your industry's agent<br>in Microsoft Copilot Studio</h1>
     <p class="sub">Pick your industry below and this page becomes your workshop: the library agent
       you choose goes from intent to a published, verified agent in your own environment — and you
@@ -277,6 +277,7 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
     <div class="pills" id="modeTabs" style="margin-bottom:12px">
       <button data-mode="industry" class="on">By industry</button>
       <button data-mode="product">By product</button>
+      <button data-mode="firstparty">First-party agents</button>
     </div>
     <div id="indPills" class="pills"><span class="pill-hint">Loading the library…</span></div>
     <div id="agentCards" class="acards"></div>
@@ -802,7 +803,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
 </details>
 
 <details class="uh" id="facilitator">
-  <summary><span class="eng">For the facilitator</span>Running this session for a room — the three things that sink workshops</summary>
+  <summary><span class="eng">For the facilitator</span>Running the RAPP Workshop for a room — the three things that sink workshops</summary>
   <div class="phase"><div class="card">
     <ol class="steps">
       <li><b>Test the room's network the day before</b>
@@ -1000,12 +1001,20 @@ document.getElementById("modeTabs").onclick=function(e){
   document.getElementById("agentCards").innerHTML="";
   renderPills();
 };
+var FP={groups:[]};
 function groupsForMode(){
   if(MODE==="industry") return Object.keys(CATS).sort().map(function(c){
     return {key:c, label:CATNAMES[c]||c};});
+  if(MODE==="firstparty") return FP.groups.map(function(g){return {key:g.id, label:g.name};});
   return PRODUCTS.map(function(p){return {key:p.id, label:p.name};});
 }
 function agentsForGroup(key){
+  if(MODE==="firstparty"){
+    var g=FP.groups.filter(function(x){return x.id===key;})[0];
+    return (g?g.agents:[]).map(function(a){
+      return {name:"@1p/"+a.id, display_name:a.name+" ("+a.status+")",
+              description:a.summary, _fp:a};});
+  }
   if(MODE==="industry") return CATS[key]||[];
   var prod=PRODUCTS.filter(function(p){return p.id===key;})[0];
   if(!prod) return [];
@@ -1062,6 +1071,7 @@ function updateMission(){
     base+(SOR==="d365"?".":" \u2014 adapted for "+s.name.replace(" (REST)","")+".")+"\u201d";
 }
 function select(a){
+  if(a._fp){ selectFP(a); return; }
   SELECTED=a; STACK=slugOf(a);
   localStorage.setItem(LS+"pick",STACK);
   try{history.replaceState(null,"","?agent="+encodeURIComponent(STACK));}catch(e){}
@@ -1087,6 +1097,21 @@ function select(a){
     renderChecks(null);
   });
 }
+function selectFP(a){
+  SELECTED=null; STACK="fp-"+a._fp.id;
+  document.getElementById("pickName").textContent=" "+a._fp.name+
+    " — a Microsoft first-party agent: configured in-product from the official docs, nothing to deploy.";
+  document.querySelectorAll("[data-dyn=name]").forEach(function(el){el.textContent=a._fp.name;});
+  document.getElementById("sorRow").style.display="none";
+  document.getElementById("missionSay").textContent=
+    "\u201cSet up the "+a._fp.name+" first-party agent \u2014 drive it from the official docs.\u201d";
+  document.getElementById("rcHost").innerHTML=
+    '<p style="color:var(--dim)">First-party agents validate per their own documentation \u2014 '+
+    'your AI walks you through it and has you exercise the agent once:</p>'+
+    '<ul class="tight"><li><a href="'+esc2(a._fp.overview)+'">Overview (Microsoft Learn)</a></li>'+
+    '<li><a href="'+esc2(a._fp.configure)+'">Configure (Microsoft Learn)</a></li></ul>';
+  document.getElementById("rc-tally").textContent="";
+}
 function renderChecks(vs){
   var host=document.getElementById("rcHost");
   if(!vs){host.innerHTML='<p style="color:var(--dim)">This stack\u2019s authored scaffold is still '+
@@ -1102,8 +1127,10 @@ function renderChecks(vs){
   wireVerdicts(); tally();
 }
 Promise.all([fetchLib("registry.json",true),
-             fetchLib("twin/products.json",true).catch(function(){return {products:[]};})
+             fetchLib("twin/products.json",true).catch(function(){return {products:[]};}),
+             fetchLib("twin/first_party.json",true).catch(function(){return {groups:[]};})
 ]).then(function(rr){
+  FP=rr[2]&&rr[2].groups?rr[2]:{groups:[]};
   var reg=rr[0]; REG=reg; PRODUCTS=(rr[1]&&rr[1].products)||[];
   (reg.agents||[]).forEach(function(a){
     if(a.name==="@aibast-agents-library/sales-specialist-twin") return;
@@ -1132,7 +1159,7 @@ Promise.all([fetchLib("registry.json",true),
 
 document.getElementById("sumBtn").onclick=function(){
   if(!SELECTED){document.getElementById("sumStatus").textContent="Pick an agent first.";return;}
-  var lines=["# AIBAST Agent Workshop — session summary","",
+  var lines=["# RAPP Workshop — session summary","",
     "**Agent:** "+(SELECTED.display_name||SELECTED.name),
     "**System of record:** "+(SORS.filter(function(s){return s.id===SOR;})[0]||{}).name,
     "**Verification:**"];
@@ -1141,7 +1168,7 @@ document.getElementById("sumBtn").onclick=function(){
     var v=localStorage.getItem(rcKey(c.dataset.rc));
     var ask=c.querySelector(".ask").textContent.trim();
     lines.push("- "+(v==="p"?"✅ PASS":v==="f"?"❌ FAIL":"⬜ not run")+" — "+ask);});
-  lines.push("","Built by talking to my AI — AIBAST Agent Workshop.");
+  lines.push("","Built by talking to my AI — the RAPP Workshop.");
   navigator.clipboard.writeText(lines.join("\n")).then(function(){
     document.getElementById("sumStatus").textContent="Copied — paste it into the session chat.";
   }).catch(function(){document.getElementById("sumStatus").textContent="Select + copy manually.";});
@@ -1152,7 +1179,7 @@ function sessionRecord(){
     var v=localStorage.getItem(rcKey(c.dataset.rc));
     verdicts.push({ask:c.querySelector(".ask").textContent.trim(),
       verdict:v==="p"?"pass":v==="f"?"fail":"not run"});});
-  return {workshop:"AIBAST Agent Workshop",
+  return {workshop:"RAPP Workshop",
     exported:new Date().toISOString(),
     agent:SELECTED?(SELECTED.display_name||SELECTED.name):null,
     stack:SELECTED?slugOf(SELECTED):null,
@@ -1171,7 +1198,7 @@ document.getElementById("shareBtn").onclick=function(){
 '"""',
 disp+' — team workshop agent.',
 '',
-'A teammate built this agent in the AIBAST Agent Workshop and shared this',
+'A teammate built this agent in the RAPP Workshop and shared this',
 'file so you can build the same one. Drop it into your brainstem\'s agents/',
 'folder (it hotloads — no restart) and say: "deploy our agent".',
 '',
@@ -1190,8 +1217,8 @@ disp+' — team workshop agent.',
 '    "name": "@workshop-share/'+slug+'",',
 '    "version": "1.0.0",',
 '    "display_name": "Team Workshop: '+disp+'",',
-'    "description": "Shared from the AIBAST Agent Workshop: deploys '+disp+' to Copilot Studio exactly as the sharer built it.",',
-'    "author": "AIBAST Agent Workshop attendee",',
+'    "description": "Shared from the RAPP Workshop: deploys '+disp+' to Copilot Studio exactly as the sharer built it.",',
+'    "author": "RAPP Workshop attendee",',
 '    "tags": ["workshop", "shared", "copilot-studio"],',
 '    "category": "general", "quality_tier": "community", "requires_env": [], "dependencies": ["@rapp/basic-agent"],',
 '}',
@@ -1238,7 +1265,7 @@ disp+' — team workshop agent.',
 '                return self._context()[1]',
 '            if op == "session_record":',
 '                return "# Session record\\n\\n```json\\n" + SESSION_RECORD + "\\n```"',
-'            return ("# Team workshop agent\\n\\nYour teammate built **'+disp+'** in the AIBAST"',
+'            return ("# Team workshop agent\\n\\nYour teammate built **'+disp+'** in the RAPP"',
 '                    " Agent Workshop and shared it. Say \\"deploy our agent\\" and I hand your AI"',
 '                    " the same mission they ran. Full workshop: aka.ms via your teammate, or the"',
 '                    " AIBAST library on GitHub.")',

@@ -273,8 +273,24 @@ class SalesSpecialistTwinAgent(BasicAgent):
 
         playbook = _fetch(f"twin/playbooks/{mission['playbook']}")
 
+        # First-party missions: context comes from the curated 1P catalog
+        # (official docs links), not from library scaffolds.
+        if mission.get("needs_first_party"):
+            fp = json.loads(_fetch("twin/first_party.json"))
+            agents = [dict(a, group=g["name"]) for g in fp.get("groups", [])
+                      for a in g.get("agents", [])]
+            hit, score = _match(request, agents, ["name", "summary", "id"])
+            if not hit or score == 0:
+                names = ", ".join(a["name"] for a in agents)
+                return ("Which first-party agent? I know these: " + names + ".")
+            ctx = (f"**First-party agent:** {hit['name']} ({hit['status']}) — {hit['group']}\n"
+                   f"**What it does:** {hit['summary']}\n"
+                   f"**Overview doc (authoritative):** {hit['overview']}\n"
+                   f"**Configure doc (authoritative):** {hit['configure']}")
+            playbook = playbook.replace("{{STACK_CONTEXT}}", ctx)
+
         # Inject live library context for stack-scoped missions.
-        if mission.get("needs_stack"):
+        elif mission.get("needs_stack"):
             entry, ctx = _stack_context(request)
             if entry is None:
                 return ("Which library agent do you mean? Say it by name — e.g. "
