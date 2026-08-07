@@ -278,6 +278,13 @@ html[data-theme=dark] .b-skills .pill{color:#2a0d20!important}
 html[data-theme=dark] .callout,html[data-theme=dark] .callout b{color:#f3c9a8!important}
 html[data-theme=dark] .bx h4{filter:brightness(1.15)}
 </style>
+<style id="aibast-dlbtn">
+.dlbtn{display:inline-flex;align-items:center;gap:8px;background:#0b5da6;color:#fff!important;
+  text-decoration:none;font-weight:700;font-size:14.5px;border-radius:9px;padding:11px 20px;
+  box-shadow:0 2px 8px rgba(11,93,166,.28)}
+.dlbtn:hover{background:#094e8c}
+html[data-theme=dark] .dlbtn{background:#2a6fbd}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
@@ -390,15 +397,18 @@ body{padding-top:52px!important}
 <pre>irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex</pre></div>
         <p id="ol-note" style="font-size:12.5px;color:var(--faint)">Showing the macOS / Linux line ·
           <a href="#" id="ol-switch" style="color:#0b5da6">on Windows? switch</a></p></li>
-      <li><b>Add the one agent that does everything</b>
-        <p>The Sales Specialist Twin. Easiest way — no terminal: open the brainstem page at
-        <code>localhost:7071</code>, search the built-in agent registry for
-        <b>“Sales Specialist Twin”</b>, and install with one click. It hotloads instantly —
-        live on your very next message. (Any library agent installs the same way, by name.)</p>
-        <p>No registry search handy? Then just ask — open GitHub Copilot in VS Code and say:</p>
-        <div class="callout" style="font-style:italic">“Download the Sales Specialist Twin agent
-          from the AIBAST agents library on GitHub into my brainstem's agents folder, and confirm
-          it loaded.”</div></li>
+      <li><b>Download the one agent that does everything</b>
+        <p>The Sales Specialist Twin — one file. Save it into your brainstem's
+        <code>agents/</code> folder (<code>~/.brainstem/src/rapp_brainstem/agents/</code>).
+        It hotloads instantly; no restart.</p>
+        <p style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px">
+          <a id="twinDl" class="dlbtn" href="#">⬇ Download sales_specialist_twin_agent.py</a>
+          <span id="twinDlNote" style="font-size:13px;color:var(--faint)"></span>
+          <span style="font-size:13px;color:var(--faint)">~14 KB · Python · no dependencies</span>
+        </p>
+        <p style="font-size:13.5px;color:var(--faint)">Prefer not to touch files at all? The
+        brainstem page at <code>localhost:7071</code> has a built-in registry — search
+        <b>“Sales Specialist Twin”</b> and install it with one click.</p></li>
       <li><b>Open VS Code and start talking</b>
         <p>Open GitHub Copilot Chat in VS Code, connected to your brainstem (the tutorial's chat
         step). Everything from here is conversation.</p></li>
@@ -1521,6 +1531,35 @@ disp+' — team workshop agent.',
     sw.onclick=function(e){e.preventDefault();show(!w);};
   }
   if(mac&&win) show(isWin);
+})();
+(function(){
+  // A cross-origin download attribute is ignored — the browser would just show
+  // the raw file. Fetch it and hand back a real blob so it saves properly.
+  var a=document.getElementById("twinDl"), note=document.getElementById("twinDlNote");
+  if(!a) return;
+  var SRC=["https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/%40aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py",
+           "https://raw.githubusercontent.com/kody-w/aibast-agents-library/main/agents/%40aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py"];
+  function grab(i){
+    if(i>=SRC.length) throw new Error("unreachable");
+    return fetch(SRC[i]).then(function(r){ if(!r.ok) throw 0; return r.text(); })
+      .catch(function(){ return grab(i+1); });
+  }
+  a.onclick=function(e){
+    e.preventDefault();
+    var label=a.textContent; a.textContent="⬇ Fetching…"; note.textContent="";
+    grab(0).then(function(src){
+      var url=URL.createObjectURL(new Blob([src],{type:"text/x-python"}));
+      var t=document.createElement("a");
+      t.href=url; t.download="sales_specialist_twin_agent.py"; t.click();
+      setTimeout(function(){URL.revokeObjectURL(url);},4000);
+      a.textContent="⬇ Downloaded ✓";
+      note.textContent="Saved — move it into your brainstem's agents/ folder.";
+      setTimeout(function(){a.textContent=label;},3000);
+    }).catch(function(){
+      a.textContent=label;
+      note.textContent="Could not reach GitHub — check your network and try again.";
+    });
+  };
 })();
 /* scrollspy */
 var links=[].slice.call(document.querySelectorAll(".rail a"));
