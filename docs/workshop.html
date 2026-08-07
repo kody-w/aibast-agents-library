@@ -356,57 +356,29 @@ body{padding-top:52px!important}
       A working dispatch agent in your Copilot Studio environment that passes five computed
       verification checks — and a clear path from prototype to production.<br><br>
       <b>The short version</b>
-      Download the Sales Specialist Twin agent. Load it into the brainstem. Go to town —
-      GitHub Copilot runs every step of this guide for you.</div>
+      Start the install, pick your agent while it runs, then tell your AI to build it.</div>
   </div>
 </div>
 
 <nav class="rail"><div class="rail-in">
-  <a href="#pick"><span class="n">0</span>Pick your agent</a>
-  <a href="#start"><span class="n">1</span>Install &amp; add the twin</a>
-  <a href="#understand"><span class="n">2</span>What you're getting</a>
-  <a href="#mission"><span class="n">3</span>Say the mission</a>
-  <a href="#verify"><span class="n">4</span>Test it yourself</a>
-  <a href="#underhood"><span class="n">5</span>The hard way</a>
-  <a href="#production"><span class="n">6</span>Go to production</a>
+  <a href="#start"><span class="n">1</span>Start the install</a>
+  <a href="#pick"><span class="n">2</span>Pick your agent</a>
+  <a href="#understand"><span class="n">3</span>What you're getting</a>
+  <a href="#mission"><span class="n">4</span>Say the mission</a>
+  <a href="#verify"><span class="n">5</span>Test it yourself</a>
+  <a href="#underhood"><span class="n">6</span>The hard way</a>
+  <a href="#production"><span class="n">7</span>Go to production</a>
 </div></nav>
 
 <main class="wrap">
 
-<!-- ═══════════ 0 PICK ═══════════ -->
-<section class="phase" id="pick">
-  <div class="phead"><span class="pk">Step 0</span><span class="time">30 sec</span></div>
-  <h2>Pick your industry — or your product — then your agent</h2>
-  <p class="goal-line">Browse by the industry you serve, or by the Microsoft product you know and
-    sell — Dynamics 365 Sales, Customer Service, Field Service, and more. Everything below
-    personalizes to your choice — the sentence you'll say, the
-    components your AI builds, and the verification answers you'll check. Loaded live from the
-    public library; change your pick any time.</p>
-  <div class="card">
-    <div class="pills" id="modeTabs" style="margin-bottom:12px">
-      <button data-mode="industry" class="on">By industry</button>
-      <button data-mode="product">By product</button>
-      <button data-mode="firstparty">First-party agents</button>
-    </div>
-    <div id="indPills" class="pills"><span class="pill-hint">Loading the library…</span></div>
-    <div id="agentCards" class="acards"></div>
-    <div id="sorRow" style="display:none;margin-top:14px">
-      <p style="font-size:13.5px;font-weight:700;color:var(--dim);margin-bottom:8px">
-        YOUR SYSTEM OF RECORD <span style="font-weight:500">— the use case is generic; pick what
-        you actually run and the build adapts its hookup (choose your own adventure):</span></p>
-      <div class="pills" id="sorPills"></div>
-    </div>
-    <div class="done-line" id="pickStatus"><b>Selected</b><span id="pickName">nothing yet — choose above</span></div>
-  </div>
-</section>
-
 <!-- ═══════════ 1 START ═══════════ -->
 <section class="phase" id="start">
-  <div class="phead"><span class="pk">Step 1</span><span class="time">~5 min</span></div>
-  <h2>Install the brainstem, add the twin</h2>
-  <p class="goal-line">This whole guide is an extension of the brainstem one-liner tutorial. Two
-    paste-and-run lines and you have an AI that can build this agent — and every other agent in
-    the library — for you.</p>
+  <div class="phead"><span class="pk">Step 1 · Start this first</span><span class="time">runs in background</span></div>
+  <h2>Kick off the install</h2>
+  <p class="goal-line">Paste the one line below and let it run — it takes a few minutes and needs
+    no attention. <b>While it installs, scroll to Step 2 and pick your agent.</b> By the time you've
+    chosen, your AI is ready to build it.</p>
 
   <div class="card">
     <ol class="steps">
@@ -436,9 +408,36 @@ body{padding-top:52px!important}
   </div>
 </section>
 
+<!-- ═══════════ 0 PICK ═══════════ -->
+<section class="phase" id="pick">
+  <div class="phead"><span class="pk">Step 2 · While it installs</span><span class="time">30 sec</span></div>
+  <h2>Pick your industry — or your product — then your agent</h2>
+  <p class="goal-line">Browse by the industry you serve, or by the Microsoft product you know and
+    sell — Dynamics 365 Sales, Customer Service, Field Service, and more. Everything below
+    personalizes to your choice — the sentence you'll say, the
+    components your AI builds, and the verification answers you'll check. Loaded live from the
+    public library; change your pick any time.</p>
+  <div class="card">
+    <div class="pills" id="modeTabs" style="margin-bottom:12px">
+      <button data-mode="industry" class="on">By industry</button>
+      <button data-mode="product">By product</button>
+      <button data-mode="firstparty">First-party agents</button>
+    </div>
+    <div id="indPills" class="pills"><span class="pill-hint">Loading the library…</span></div>
+    <div id="agentCards" class="acards"></div>
+    <div id="sorRow" style="display:none;margin-top:14px">
+      <p style="font-size:13.5px;font-weight:700;color:var(--dim);margin-bottom:8px">
+        YOUR SYSTEM OF RECORD <span style="font-weight:500">— the use case is generic; pick what
+        you actually run and the build adapts its hookup (choose your own adventure):</span></p>
+      <div class="pills" id="sorPills"></div>
+    </div>
+    <div class="done-line" id="pickStatus"><b>Selected</b><span id="pickName">nothing yet — choose above</span></div>
+  </div>
+</section>
+
 <!-- ═══════════ 2 UNDERSTAND ═══════════ -->
 <section class="phase" id="understand">
-  <div class="phead"><span class="pk">Step 2 · Know what you're getting</span><span class="time">read first</span></div>
+  <div class="phead"><span class="pk">Step 3 · Know what you're getting</span><span class="time">read first</span></div>
   <h2>What you're building</h2>
   <p class="goal-line">A dispatch agent for energy field operations: the queue, the zones, who takes
     which job, and who responds when a SCADA alarm fires. Before touching the CLI, know where each
@@ -461,7 +460,7 @@ body{padding-top:52px!important}
         <li>Real operational data of any kind</li>
         <li>Notifications or messages to technicians</li>
       </ul></div>
-      <div class="col park"><h4>Later — step 7</h4><ul>
+      <div class="col park"><h4>Later — production</h4><ul>
         <li>Live data via SharePoint / Dataverse / D365 Field Service tools</li>
         <li>Teams channel rollout</li>
         <li>Per-dispatcher memory</li>
@@ -489,7 +488,7 @@ body{padding-top:52px!important}
         </ul>
         <div class="jewels"><span class="jw"><img src="../assets/products/copilot-studio.svg" alt="">File knowledge</span><span class="jw"><img src="../assets/products/sharepoint.svg" alt="">SharePoint <small>later</small></span></div></div>
 
-      <div class="bx t"><h4>Tools <span class="status d">Step 7</span></h4>
+      <div class="bx t"><h4>Tools <span class="status d">the production step</span></h4>
         <ul>
           <li><b>Live lookups</b> — roster and work orders queried, never RAG-searched</li>
           <li>Acts as the <b>signed-in user</b>; a service principal reads the whole tenant</li>
@@ -548,7 +547,7 @@ body{padding-top:52px!important}
           <li>Five checks with <b>computed</b> expected answers — wrong is visible, not arguable</li>
           <li>Rerun on every change, forever</li>
         </ul></div>
-      <div class="bx ch"><h4>Analytics <span class="status d">Step 7</span></h4>
+      <div class="bx ch"><h4>Analytics <span class="status d">the production step</span></h4>
         <ul>
           <li>Transcript spot-audits against the roster</li>
           <li>The failure-mode table drives continuous improvement</li>
@@ -563,7 +562,7 @@ body{padding-top:52px!important}
 
 <!-- ═══════════ 3 MISSION ═══════════ -->
 <section class="phase" id="mission">
-  <div class="phead"><span class="pk">Step 3 · The easy way</span><span class="time">~15 min · mostly watching</span></div>
+  <div class="phead"><span class="pk">Step 4 · The easy way</span><span class="time">~15 min · mostly watching</span></div>
   <h2>Say the mission</h2>
   <p class="goal-line">You steer; your AI executes. It fetches the mission playbook from the public
     library and runs every command itself — the same steps documented under the hood below. Here is
@@ -594,7 +593,7 @@ body{padding-top:52px!important}
 
 <!-- ═══════════ 6 VERIFY ═══════════ -->
 <section class="phase" id="verify">
-  <div class="phead"><span class="pk">Step 4</span><span class="time">~15 min · you, clicking</span></div>
+  <div class="phead"><span class="pk">Step 5</span><span class="time">~15 min · you, clicking</span></div>
   <h2>Test it yourself in Copilot Studio</h2>
   <p class="goal-line">No automation here — this part is you, in the product. Open
     <a href="https://copilotstudio.microsoft.com">copilotstudio.microsoft.com</a> → <b>Agents</b> →
@@ -602,7 +601,7 @@ body{padding-top:52px!important}
     is visible, not arguable. Record each verdict — the page remembers.</p>
 
   <div class="card">
-    <div id="rcHost"><p style="color:var(--faint)">Pick an agent in Step 0 to load its verification questions.</p></div>
+    <div id="rcHost"><p style="color:var(--faint)">Pick an agent in Step 2 to load its verification questions.</p></div>
 
     <div id="rc-tally">No verdicts recorded yet.</div>
     <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
@@ -611,7 +610,7 @@ body{padding-top:52px!important}
         Copy my session summary</button>
       <span id="sumStatus" style="font-size:13px;color:var(--faint)"></span>
     </div>
-    <p style="margin-top:14px">Checks 2, 3, and 4 are the gate. If any of them fail, the build is
+    <p style="margin-top:14px">The refusal and computed-ranking checks are the gate. If any of them fail, the build is
       not done: re-read the skill file for that behavior, confirm it pushed (a no-op push in step 5
       is the usual culprit), fix, push, publish, and re-run all five. These five prompts are also
       your starting <b>evaluation set</b> — rerun them after every change you ever make to this
@@ -651,9 +650,9 @@ body{padding-top:52px!important}
   </div>
 <!-- ═══════════ 5 UNDER THE HOOD ═══════════ -->
 <section class="phase" id="underhood">
-  <div class="phead"><span class="pk">Step 5 · The hard way</span><span class="time">optional</span></div>
+  <div class="phead"><span class="pk">Step 6 · The hard way</span><span class="time">optional</span></div>
   <h2>The hard way — do it yourself, or audit the AI</h2>
-  <p class="goal-line">The easy way is Step 3: say the mission and watch. These panels are the
+  <p class="goal-line">The easy way is the mission step: say it and watch. These panels are the
     hard way — the exact same steps, expanded for two audiences: the curious, who want to see
     precisely what the AI just did on their machine, and the skeptics, who would rather type
     every command themselves. Same steps, same result, either road.</p>
@@ -785,7 +784,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
 <pre>pac copilot publish --bot "&lt;schemaName&gt;" --environment "&lt;your-environment-id&gt;"</pre></div></li>
     </ol>
     <div class="callout"><b>Publishing makes the agent live</b> for everyone it is shared with.
-      For a prototype that's just you — but make sharing a decision, not a default, before step 7.</div>
+      For a prototype that's just you — but make sharing a decision, not a default, before you go to production.</div>
     <div class="done-line"><b>Done when</b> publish completes and the agent opens in the Copilot
       Studio maker portal with your four skills and two knowledge sources visible.</div>
   </div>
@@ -950,7 +949,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
 
 <!-- ═══════════ 7 PRODUCTION ═══════════ -->
 <section class="phase" id="production">
-  <div class="phead"><span class="pk">Step 6</span><span class="time">when you're ready</span></div>
+  <div class="phead"><span class="pk">the production step</span><span class="time">when you're ready</span></div>
   <h2>Go to production</h2>
   <p class="goal-line">The prototype answers from a synthetic file so it works on day one. A
     production deployment swaps that file for <b>tools</b> that query live systems — and makes
@@ -1005,7 +1004,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
           <td>Keep asking questions with exactly one computable answer (check 3 pattern)</td>
           <td>Tighten skill output formats; consider a code-interpreter scoring helper</td></tr>
         <tr><td>Scope creep into real dispatch actions</td>
-          <td>No write tools exist; the Out list in step 2 is the contract</td>
+          <td>No write tools exist; the Out list in the scope wall is the contract</td>
           <td>Any added tool shows up in the YAML diff at pull/push</td>
           <td>A new write action goes back through this table before it ships</td></tr>
       </tbody>
@@ -1132,7 +1131,7 @@ document.getElementById("modeTabs").onclick=function(e){
   document.getElementById("agentCards").innerHTML="";
   document.getElementById("pickName").textContent="nothing yet — choose above";
   document.getElementById("rcHost").innerHTML=
-    '<p style="color:var(--faint)">Pick an agent in Step 0 to load its verification questions.</p>';
+    '<p style="color:var(--faint)">Pick an agent in Step 2 to load its verification questions.</p>';
   document.getElementById("rc-tally").textContent="";
   document.getElementById("missionSay").textContent="\u201cDeploy the \u2026 agent to Copilot Studio.\u201d";
   document.getElementById("sorRow").style.display="none";
@@ -1225,6 +1224,8 @@ function select(a){
   document.querySelectorAll("[data-dyn=name]").forEach(function(el){
     el.textContent=agentName(a);});
   renderSor(); updateMission(); mountGiscus(slugOf(a));
+  var ss=document.getElementById("shareStatus"); if(ss) ss.textContent="";
+  var sm=document.getElementById("sumStatus"); if(sm) sm.textContent="";
   var dir=a._file.substring(0,a._file.lastIndexOf("/"));
   fetchLib(dir+"/copilot_studio/manifest.json",true).then(function(man){
     var names=(man.behaviors||[]).map(function(b){
@@ -1327,6 +1328,8 @@ Promise.all([fetchLib("registry.json",true),
     }
   }
   var want=(/[?&]agent=([^&]+)/.exec(location.search)||[])[1];
+  var isDefault=false;
+  if(!want){ want="field-service-dispatch"; isDefault=true; }
   if(want){
     var found=null,cat=null;
     Object.keys(CATS).forEach(function(c){CATS[c].forEach(function(a){
@@ -1338,6 +1341,12 @@ Promise.all([fetchLib("registry.json",true),
       var ab=document.querySelector('#agentCards button[data-slug="'+slugOf(found)+'"]');
       if(ab) ab.classList.add("on");
       select(found);
+      if(isDefault){
+        try{history.replaceState(null,"",location.pathname);}catch(e){}
+        var pn=document.getElementById("pickName");
+        pn.innerHTML='<b style="color:var(--accent)">Example shown</b> — '+pn.innerHTML+
+          ' <span style="color:var(--faint)">Pick yours above and everything re-personalizes.</span>';
+      }
     }
   }
 }).catch(function(){

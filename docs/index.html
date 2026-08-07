@@ -336,6 +336,44 @@ html[data-theme=light] .install-body > [style*="#b3bcc9"]{color:#c7ccd6!importan
 .aibast-foot a,html[data-theme=light] .aibast-foot a{color:#f7a8c4!important}
 .copy-icon,#copy-icon{opacity:.8!important}
 </style>
+<style id="aibast-qs-polish">
+/* Quick Start: give the page the workshop's confidence — a real hero band,
+   tier cards that read as a path, and a status strip that looks deliberate. */
+html[data-theme=light] body{background:#f6f7fa}
+.hero,body > .logo,body > h1{}
+body > h1{font-size:clamp(30px,4.6vw,46px)!important;letter-spacing:-.025em}
+.qs-band{background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
+  color:#fff;margin:0 0 30px;padding:48px 20px 44px;text-align:center;
+  border-bottom:2px solid #f291b6;
+  width:100vw;position:relative;left:50%;right:50%;
+  margin-left:-50vw;margin-right:-50vw}
+/* the page's light-theme heading rules must not reach this dark band */
+.qs-band h1,.qs-band h1 *,html[data-theme=light] .qs-band h1{
+  color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;background:none!important}
+html[data-theme=light] .qs-band p,.qs-band p{color:#c3cae6!important}
+html[data-theme=light] .qs-band .kick{color:#f291b6!important}
+html[data-theme=light] .qs-band .qs-cta a{color:#0b1f4b!important}
+html[data-theme=light] .qs-band .qs-cta a.ghost{color:#ffffff!important}
+.qs-band .kick{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:#f291b6;margin-bottom:10px}
+.qs-band h1{font-size:clamp(28px,4.4vw,42px);font-weight:750;letter-spacing:-.025em;color:#fff;margin:0}
+.qs-band p{color:#c3cae6;max-width:62ch;margin:12px auto 0;font-size:16px;line-height:1.55}
+.qs-band .qs-cta{display:inline-flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center}
+.qs-band .qs-cta a{background:#fff;color:#0b1f4b;text-decoration:none;font-weight:700;
+  font-size:14px;border-radius:9px;padding:11px 20px}
+.qs-band .qs-cta a.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}
+.qs-band .qs-cta a:hover{transform:translateY(-1px)}
+/* tier cards → a numbered path */
+.tier{position:relative;transition:transform .12s ease,box-shadow .12s ease}
+html[data-theme=light] .tier{background:#fff!important;border:1px solid #e3e5ec!important;
+  box-shadow:0 1px 4px rgba(15,20,40,.05)}
+.tier:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(11,31,75,.12)}
+html[data-theme=light] .tier + .tier{margin-top:12px}
+.tier-badge{letter-spacing:.07em;font-size:10.5px!important}
+/* status strip */
+.status-bar{border-radius:12px!important;border:1px solid #26304f}
+html[data-theme=light] .status-bar{background:#101a35!important}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
@@ -394,10 +432,17 @@ body{padding-top:52px!important}
 
 
 <div class="hero">
-  <div class="logo">🧠</div>
-  <h1>RAPP Brainstem Quick Start</h1>
-  <p>The local-first agent server from the AIBAST Agents Library, powered by GitHub Copilot.</p>
-  <div class="tagline"><a href="../index.html">Agents Library</a> · <a href="rapp-guide.html">Production Guide</a></div>
+  <div class="qs-band">
+  <div class="kick">AIBAST Agents Library · Quick Start</div>
+  <h1>Your local agent server, running in one line</h1>
+  <p>The RAPP Brainstem is a local-first agent server powered by GitHub Copilot. Install it,
+     drop in an agent, and start building — no keys, no cloud account, no setup wizard.</p>
+  <div class="qs-cta">
+    <a href="workshop.html">Start the RAPP Workshop →</a>
+    <a class="ghost" href="rapp-guide.html">Production Guide</a>
+  </div>
+</div>
+  
 </div>
 
 <div class="install-widget" id="install-widget">
