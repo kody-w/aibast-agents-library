@@ -1086,6 +1086,49 @@ html[data-theme=dark] body{--bg-light:#0b1024;--bg-white:#141a30;--text-dark:#e6
 html[data-theme=dark] .nav-item span,html[data-theme=dark] .nav-icon{color:#ffb900!important}
 td span.badge,.badge{color:#1a1a2e!important;font-weight:700}
 </style>
+<style id="aibast-guide-dark">
+/* The guide is light-native: panels carry hardcoded light fills while the
+   theme flips text to light ink — 1.00:1. Map every such surface in dark. */
+html[data-theme=dark] .pitfall-box{background:linear-gradient(135deg,#2c1517,#3a1a1d)!important;
+  border-color:#7f2b30!important}
+html[data-theme=dark] .example-box{background:linear-gradient(135deg,#12233d,#16305a)!important;
+  border-color:#2b6cb8!important}
+html[data-theme=dark] .gut-check,html[data-theme=dark] .code-block,
+html[data-theme=dark] .info-box,html[data-theme=dark] .warning-box,
+html[data-theme=dark] .success-box,html[data-theme=dark] .tip-box,
+html[data-theme=dark] .highlight-box,html[data-theme=dark] .step-box,
+html[data-theme=dark] .card,html[data-theme=dark] .panel,
+html[data-theme=dark] .content-section,html[data-theme=dark] .metric-card{
+  background:var(--bg-white)!important;border-color:var(--border)!important}
+html[data-theme=dark] .pitfall-box *,html[data-theme=dark] .example-box *,
+html[data-theme=dark] .gut-check *,html[data-theme=dark] .code-block *,
+html[data-theme=dark] .info-box *,html[data-theme=dark] .warning-box *,
+html[data-theme=dark] .success-box *,html[data-theme=dark] .tip-box *,
+html[data-theme=dark] .highlight-box *,html[data-theme=dark] .step-box *,
+html[data-theme=dark] .card *,html[data-theme=dark] .panel *{color:var(--text-dark)!important}
+/* inline light fills (style="background:#e5e7eb|#f59e0b|#d97706 …") */
+html[data-theme=dark] [style*="#e5e7eb"],html[data-theme=dark] [style*="#f3f4f6"],
+html[data-theme=dark] [style*="#ffffff"],html[data-theme=dark] [style*="#fff"]{
+  background:var(--bg-white)!important;color:var(--text-dark)!important}
+html[data-theme=dark] [style*="#e5e7eb"] *,html[data-theme=dark] [style*="#f3f4f6"] *{
+  color:var(--text-dark)!important}
+</style>
+<style id="aibast-guide-light">
+/* Light mode: fills that ARE dark must pin white ink (white-on-white and
+   grey-on-navy were unreadable); amber/orange fills take near-black. */
+html[data-theme=light] [style*="#005a9e"],html[data-theme=light] [style*="#0078d4"],
+html[data-theme=light] [style*="#1a1a2e"],html[data-theme=light] [style*="#0b1f4b"]{
+  color:#ffffff!important}
+html[data-theme=light] [style*="#005a9e"] *,html[data-theme=light] [style*="#0078d4"] *,
+html[data-theme=light] [style*="#1a1a2e"] *,html[data-theme=light] [style*="#0b1f4b"] *{
+  color:#ffffff!important}
+html[data-theme=light] [style*="#f59e0b"],html[data-theme=light] [style*="#d97706"],
+html[data-theme=light] [style*="#ffb900"]{color:#1a1a2e!important}
+html[data-theme=light] [style*="#f59e0b"] *,html[data-theme=light] [style*="#d97706"] *,
+html[data-theme=light] [style*="#ffb900"] *{color:#1a1a2e!important}
+/* badges: near-black on their grey/colored gradients (2.26:1 -> AA) */
+.badge,td span.badge{color:#0f1320!important;font-weight:700}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
@@ -1119,7 +1162,7 @@ body{padding-top:52px!important}
 #aibast-nav .in::after{content:'';flex:0 0 8px}
 @media(max-width:760px){#aibast-nav{position:relative}
   #aibast-nav .in{height:auto;flex-wrap:wrap;padding:6px 14px 8px;gap:2px}
-  #aibast-nav a.l{padding:11px 10px;min-height:44px;display:flex;align-items:center}
+  #aibast-nav a.l{padding:11px 10px;min-height:44px!important;display:flex;align-items:center}
   body{padding-top:0!important}}
 #aibast-nav .brand{color:#fff;font-weight:750;font-size:14.5px;text-decoration:none;
   letter-spacing:-.01em;margin-right:14px;white-space:nowrap}

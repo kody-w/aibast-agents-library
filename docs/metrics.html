@@ -109,7 +109,7 @@ body{padding-top:52px!important}
 #aibast-nav .in::after{content:'';flex:0 0 8px}
 @media(max-width:760px){#aibast-nav{position:relative}
   #aibast-nav .in{height:auto;flex-wrap:wrap;padding:6px 14px 8px;gap:2px}
-  #aibast-nav a.l{padding:11px 10px;min-height:44px;display:flex;align-items:center}
+  #aibast-nav a.l{padding:11px 10px;min-height:44px!important;display:flex;align-items:center}
   body{padding-top:0!important}}
 #aibast-nav .brand{color:#fff;font-weight:750;font-size:14.5px;text-decoration:none;
   letter-spacing:-.01em;margin-right:14px;white-space:nowrap}
@@ -200,8 +200,8 @@ body{padding-top:52px!important}
 <div class="tip" id="tip"></div>
 
 <script>
-var MIRRORS=[["microsoft/aibast-agents-library","main"],
-             ["kody-w/aibast-agents-library","main"],
+var MIRRORS=[["kody-w/aibast-agents-library","main"],
+             ["microsoft/aibast-agents-library","main"],
              ["kody-w/aibast-agents-library","feature/field-service-dispatch-copilot-studio"]];
 var ACTIVE=0;
 function rawUrl(mi,p){var m=MIRRORS[mi];

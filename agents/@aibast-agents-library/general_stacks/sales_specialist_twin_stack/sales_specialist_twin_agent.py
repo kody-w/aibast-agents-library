@@ -50,8 +50,8 @@ RAW = f"https://raw.githubusercontent.com/{REPO}/{REF}"
 # tries the configured repo, then the mirrors, and locks onto whichever
 # answered so one downloaded file works before and after the upstream merge.
 MIRRORS = [
-    (REPO, REF),
     ("kody-w/aibast-agents-library", "main"),
+    (REPO, REF),
     ("kody-w/aibast-agents-library", "feature/field-service-dispatch-copilot-studio"),
 ]
 TIMEOUT = 15
