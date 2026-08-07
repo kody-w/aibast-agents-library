@@ -47,3 +47,10 @@ for ask, want in [("deploy the Expansion Opportunity agent to copilot studio", "
     rr = a.perform(operation="mission", request=ask)
     assert want in rr.split("Scaffold base URL:**")[1][:220], f"advertised name misrouted: {ask}"
 print("advertised_alias_test: PASS")
+
+# "copilot" must not be stripped as a mission word — it distinguishes stacks
+r7 = a.perform(operation="mission", request="deploy the Proposal Copilot agent to copilot studio")
+assert "proposal_copilot" in r7.split("Scaffold base URL:**")[1][:220], "Proposal Copilot collided"
+r8 = a.perform(operation="mission", request="deploy the Proposal Creation agent to copilot studio")
+assert "proposal_generation" in r8.split("Scaffold base URL:**")[1][:220], "Proposal Creation misrouted"
+print("phrase_strip_test: PASS")

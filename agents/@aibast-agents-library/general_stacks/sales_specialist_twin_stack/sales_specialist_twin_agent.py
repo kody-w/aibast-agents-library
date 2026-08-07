@@ -121,7 +121,10 @@ def _match(text, candidates, keys):
     return best, best_score
 
 
-MISSION_WORDS = {"deploy", "install", "build", "publish", "ship", "copilot", "studio",
+# "copilot" is NOT a mission word on its own — stripping it collided
+# "Proposal Copilot" with "Proposal Generation". The PHRASE is stripped below.
+MISSION_PHRASES = ("copilot studio", "microsoft copilot studio")
+MISSION_WORDS = {"deploy", "install", "build", "publish", "ship",
                  "locally", "local", "brainstem", "verify", "test", "the", "a", "an",
                  "agent", "to", "into", "my", "in", "for", "please", "and", "then"}
 
@@ -129,7 +132,10 @@ MISSION_WORDS = {"deploy", "install", "build", "publish", "ship", "copilot", "st
 def _stack_context(request):
     """Resolve which library stack the request names, and build its context block."""
     reg = json.loads(_fetch("registry.json"))
-    domain_words = " ".join(w for w in re.sub(r"[^a-z0-9 ]", " ", request.lower()).split()
+    cleaned = request.lower()
+    for phrase in MISSION_PHRASES:
+        cleaned = cleaned.replace(phrase, " ")
+    domain_words = " ".join(w for w in re.sub(r"[^a-z0-9 ]", " ", cleaned).split()
                             if w not in MISSION_WORDS)
     candidates = [a for a in reg.get("agents", [])
                   if a.get("name") != "@aibast-agents-library/sales-specialist-twin"]
