@@ -511,9 +511,12 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
 
   <div class="card" id="rateCard" style="display:none">
     <h3>Rate this agent — one reaction helps the next seller choose</h3>
-    <p>Votes live as reactions on this agent's GitHub Discussion (👍 ❤️ 🎉 🚀 — only positive
-      reactions count, a downvote can never lower a score). Counts refresh into the library daily.</p>
-    <div id="giscusHost"></div>
+    <p>Votes are reactions on this agent's GitHub Discussion (👍 ❤️ 🎉 🚀 — only positive
+      reactions count; a downvote can never lower a score). Counts refresh into the library
+      daily. No trackers, no embeds — it's just GitHub.</p>
+    <a id="rateLink" class="hero-action" style="display:inline-block;background:var(--accent);
+      color:#fff;border-radius:8px;padding:9px 20px;font-weight:700;font-size:14px;
+      text-decoration:none" target="_blank" rel="noopener">React on GitHub ↗</a>
   </div>
 
   <div class="card">
@@ -1123,16 +1126,10 @@ function selectFP(a){
   document.getElementById("rc-tally").textContent="";
 }
 function mountGiscus(slug){
-  var card=document.getElementById("rateCard"), host=document.getElementById("giscusHost");
-  if(!GISCUS||!GISCUS.repo_id||!GISCUS.category_id){card.style.display="none";return;}
-  card.style.display="block"; host.innerHTML="";
-  var s=document.createElement("script");
-  s.src="https://giscus.app/client.js"; s.async=true; s.crossOrigin="anonymous";
-  var attrs={repo:GISCUS.repo,"repo-id":GISCUS.repo_id,category:GISCUS.category,
-    "category-id":GISCUS.category_id,mapping:"specific",term:slug,strict:"1",
-    "reactions-enabled":"1","emit-metadata":"0",theme:"light"};
-  for(var k in attrs) s.setAttribute("data-"+k,attrs[k]);
-  host.appendChild(s);
+  var card=document.getElementById("rateCard"), link=document.getElementById("rateLink");
+  var url=GISCUS&&GISCUS[slug];
+  if(!url){card.style.display="none";return;}
+  card.style.display="block"; link.href=url;
 }
 function renderChecks(vs){
   var host=document.getElementById("rcHost");
@@ -1151,7 +1148,7 @@ function renderChecks(vs){
 var RATINGS={}, DOWNLOADS={}, GISCUS=null;
 fetchLib("rar/ratings.json",true).then(function(r){RATINGS=r||{};}).catch(function(){});
 fetchLib("rar/downloads.json",true).then(function(r){DOWNLOADS=r||{};}).catch(function(){});
-fetchLib("rar/ratings-config.json",true).then(function(c){GISCUS=c;}).catch(function(){});
+fetchLib("rar/discussions.json",true).then(function(c){GISCUS=c;}).catch(function(){});
 Promise.all([fetchLib("registry.json",true),
              fetchLib("twin/products.json",true).catch(function(){return {products:[]};}),
              fetchLib("twin/first_party.json",true).catch(function(){return {groups:[]};})
