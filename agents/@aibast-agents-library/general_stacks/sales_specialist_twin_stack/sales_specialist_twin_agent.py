@@ -160,7 +160,10 @@ class SalesSpecialistTwinAgent(BasicAgent):
     """One request in, one executed mission out — GitHub Copilot does the work."""
 
     def __init__(self):
-        self.name = "@aibast-agents-library/sales-specialist-twin"
+        # Tool name must be a bare identifier — the Copilot API rejects
+        # function names containing @ or / and the tool silently never
+        # registers. The library identity stays in __manifest__.
+        self.name = "SalesSpecialistTwin"
         self.metadata = {
             "name": self.name,
             "description": __manifest__["description"],
