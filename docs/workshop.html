@@ -329,21 +329,22 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
   <div class="card">
     <ol class="steps">
       <li><b>Run the brainstem one-liner</b>
-        <p>Mac / Linux:</p>
-        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+        <p>The only command in this whole workshop — paste it and everything installs:</p>
+        <div class="code" id="ol-mac"><div class="bar">terminal<button data-copy>Copy</button></div>
 <pre>curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</pre></div>
-        <p>Windows (PowerShell):</p>
-        <div class="code"><div class="bar">PowerShell<button data-copy>Copy</button></div>
-<pre>irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex</pre></div></li>
+        <div class="code" id="ol-win" style="display:none"><div class="bar">PowerShell<button data-copy>Copy</button></div>
+<pre>irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex</pre></div>
+        <p id="ol-note" style="font-size:12.5px;color:var(--faint)">Showing the macOS / Linux line ·
+          <a href="#" id="ol-switch" style="color:var(--accent)">on Windows? switch</a></p></li>
       <li><b>Add the one agent that does everything</b>
         <p>The Sales Specialist Twin. Easiest way — no terminal: open the brainstem page at
         <code>localhost:7071</code>, search the built-in agent registry for
         <b>“Sales Specialist Twin”</b>, and install with one click. It hotloads instantly —
         live on your very next message. (Any library agent installs the same way, by name.)</p>
-        <p>Terminal alternative, same result:</p>
-        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
-<pre>curl -fsSL -o ~/.brainstem/src/rapp_brainstem/agents/sales_specialist_twin_agent.py \
-  "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/%40aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py"</pre></div></li>
+        <p>No registry search handy? Then just ask — open GitHub Copilot in VS Code and say:</p>
+        <div class="callout" style="font-style:italic">“Download the Sales Specialist Twin agent
+          from the AIBAST agents library on GitHub into my brainstem's agents folder, and confirm
+          it loaded.”</div></li>
       <li><b>Open VS Code and start talking</b>
         <p>Open GitHub Copilot Chat in VS Code, connected to your brainstem (the tutorial's chat
         step). Everything from here is conversation.</p></li>
@@ -1360,6 +1361,18 @@ disp+' — team workshop agent.',
     "Downloaded — send it to a teammate with one line: drop into your brainstem agents folder and say “deploy our agent.”";
 };
 
+(function(){
+  var isWin = /Win/i.test((navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||"");
+  var mac=document.getElementById("ol-mac"), win=document.getElementById("ol-win"),
+      note=document.getElementById("ol-note"), sw=document.getElementById("ol-switch");
+  function show(w){
+    mac.style.display=w?"none":"block"; win.style.display=w?"block":"none";
+    note.childNodes[0].textContent="Showing the "+(w?"Windows PowerShell":"macOS / Linux")+" line · ";
+    sw.textContent=w?"not on Windows? switch":"on Windows? switch";
+    sw.onclick=function(e){e.preventDefault();show(!w);};
+  }
+  if(mac&&win) show(isWin);
+})();
 /* scrollspy */
 var links=[].slice.call(document.querySelectorAll(".rail a"));
 var secs=links.map(function(a){return document.querySelector(a.getAttribute("href"));});
@@ -1370,5 +1383,22 @@ function spy(){
 }
 window.addEventListener("scroll",spy,{passive:true}); spy();
 </script>
+
+<!-- aibast-theme -->
+<style id="aibast-theme">
+/* AIBAST signature layer: navy family, pink hairline, Segoe display type */
+#aibast-nav{border-bottom:2px solid #f291b6;box-shadow:0 2px 14px rgba(11,31,75,.35)}
+#aibast-nav .brand b{letter-spacing:.02em}
+::selection{background:#f291b6;color:#0b1f4b}
+:focus-visible{outline:2px solid #f291b6;outline-offset:2px}
+.aibast-foot{background:#0b1024;color:#8a90b8;font-family:"Segoe UI",system-ui,sans-serif;
+  font-size:12.5px;padding:26px 22px;text-align:center;line-height:1.6}
+.aibast-foot b{color:#c3cae6}
+.aibast-foot a{color:#f291b6;text-decoration:none}
+</style>
+<div class="aibast-foot"><b>AIBAST</b> — the Microsoft AI Business Applications Specialist Team ·
+  engine, not experience · agents that ship, patterns that hold, numbers you can audit ·
+  <a href="https://github.com/microsoft/aibast-agents-library">github.com/microsoft/aibast-agents-library</a></div>
+<!-- /aibast-theme -->
 </body>
 </html>
