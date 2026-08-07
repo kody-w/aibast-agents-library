@@ -509,6 +509,13 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
   </div>
 </section>
 
+  <div class="card" id="rateCard" style="display:none">
+    <h3>Rate this agent — one reaction helps the next seller choose</h3>
+    <p>Votes live as reactions on this agent's GitHub Discussion (👍 ❤️ 🎉 🚀 — only positive
+      reactions count, a downvote can never lower a score). Counts refresh into the library daily.</p>
+    <div id="giscusHost"></div>
+  </div>
+
   <div class="card">
     <h3>Now share it with your team — the pay-it-forward exercise</h3>
     <p>Generate a single <code>agent.py</code> pinned to exactly what you just built — your agent,
@@ -1032,7 +1039,10 @@ function renderPills(){
 function renderAgents(cat){
   var host=document.getElementById("agentCards");
   host.innerHTML=agentsForGroup(cat).map(function(a){
-    return '<button data-slug="'+esc2(slugOf(a))+'"><b>'+esc2(a.display_name||a.name)+
+    var s=slugOf(a), r=RATINGS[s]||0, d=DOWNLOADS[s]||0;
+    var chips=(r>0?' 👍'+r:'')+(d>0?' ⬇'+d:'');
+    return '<button data-slug="'+esc2(s)+'"><b>'+esc2(a.display_name||a.name)+
+      (chips?'<span style="float:right;font-weight:600;color:var(--faint);font-size:12px">'+chips+'</span>':'')+
       "</b><span>"+esc2((a.description||"").slice(0,110))+"…</span></button>";}).join("");
   host.onclick=function(e){var b=e.target.closest("button"); if(!b)return;
     host.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
@@ -1079,7 +1089,7 @@ function select(a){
     " — everything on this page is now about this agent.";
   document.querySelectorAll("[data-dyn=name]").forEach(function(el){
     el.textContent=a.display_name||a.name;});
-  renderSor(); updateMission();
+  renderSor(); updateMission(); mountGiscus(slugOf(a));
   var dir=a._file.substring(0,a._file.lastIndexOf("/"));
   fetchLib(dir+"/copilot_studio/manifest.json",true).then(function(man){
     var names=(man.behaviors||[]).map(function(b){
@@ -1112,6 +1122,18 @@ function selectFP(a){
     '<li><a href="'+esc2(a._fp.configure)+'">Configure (Microsoft Learn)</a></li></ul>';
   document.getElementById("rc-tally").textContent="";
 }
+function mountGiscus(slug){
+  var card=document.getElementById("rateCard"), host=document.getElementById("giscusHost");
+  if(!GISCUS||!GISCUS.repo_id||!GISCUS.category_id){card.style.display="none";return;}
+  card.style.display="block"; host.innerHTML="";
+  var s=document.createElement("script");
+  s.src="https://giscus.app/client.js"; s.async=true; s.crossOrigin="anonymous";
+  var attrs={repo:GISCUS.repo,"repo-id":GISCUS.repo_id,category:GISCUS.category,
+    "category-id":GISCUS.category_id,mapping:"specific",term:slug,strict:"1",
+    "reactions-enabled":"1","emit-metadata":"0",theme:"light"};
+  for(var k in attrs) s.setAttribute("data-"+k,attrs[k]);
+  host.appendChild(s);
+}
 function renderChecks(vs){
   var host=document.getElementById("rcHost");
   if(!vs){host.innerHTML='<p style="color:var(--dim)">This stack\u2019s authored scaffold is still '+
@@ -1126,6 +1148,10 @@ function renderChecks(vs){
       '<span class="st"></span></div></div>';}).join("");
   wireVerdicts(); tally();
 }
+var RATINGS={}, DOWNLOADS={}, GISCUS=null;
+fetchLib("rar/ratings.json",true).then(function(r){RATINGS=r||{};}).catch(function(){});
+fetchLib("rar/downloads.json",true).then(function(r){DOWNLOADS=r||{};}).catch(function(){});
+fetchLib("rar/ratings-config.json",true).then(function(c){GISCUS=c;}).catch(function(){});
 Promise.all([fetchLib("registry.json",true),
              fetchLib("twin/products.json",true).catch(function(){return {products:[]};}),
              fetchLib("twin/first_party.json",true).catch(function(){return {groups:[]};})

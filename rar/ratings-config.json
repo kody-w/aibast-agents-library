@@ -1,0 +1,14 @@
+{
+  "note": "Public giscus wiring for AIBAST RAR ratings — none of these values are secrets (same stance as the upstream pattern). Fill repo_id/category_id after enabling Discussions and installing the giscus app; the workshop widget and fetcher stay dormant until then.",
+  "repo": "microsoft/aibast-agents-library",
+  "repo_id": "",
+  "category": "Announcements",
+  "category_id": "",
+  "enable_checklist": [
+    "Repo Settings -> enable Discussions",
+    "Create/confirm the Announcements category (announcement type: only maintainers and the giscus app open threads — the anti-spam property the pattern relies on)",
+    "Install https://github.com/apps/giscus on the repo",
+    "Read repo_id and category_id from giscus.app and commit them here",
+    "The daily ratings workflow and the workshop's rate widget activate on their own"
+  ]
+}

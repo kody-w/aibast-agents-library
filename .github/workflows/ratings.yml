@@ -1,0 +1,36 @@
+# AIBAST RAR ratings refresh — the approved cat-agent-skills pattern:
+# harvest positive Discussion reactions (title = agent slug) into
+# rar/ratings.json daily; commit only when counts actually moved.
+# This bot commit to main is the sanctioned exception to the
+# no-direct-push rule (CLAUDE.md), scoped to exactly one file.
+name: ratings
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+permissions:
+  contents: write
+  discussions: read
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fetch ratings snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/fetch_ratings.py
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- rar/ratings.json; then
+            echo "no rating movement — nothing to commit"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add rar/ratings.json
+            git commit -m "chore(ratings): refresh agent reaction counts"
+            git push
+          fi
