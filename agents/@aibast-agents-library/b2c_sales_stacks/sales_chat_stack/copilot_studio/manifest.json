@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "sales-chat",
+  "display_name": "Sales Chat Agent",
+  "agent_intent": "../sales_chat_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/product-inquiry_scs1.mcs.yml",
+    "behaviors/availability-check_scs2.mcs.yml",
+    "behaviors/promotion-lookup_scs3.mcs.yml",
+    "behaviors/order-assistance_scs4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/retail-product-and-stock-data.md",
+    "capabilities/knowledge/files/retail-product-and-stock-data.md.mcs.yml",
+    "capabilities/knowledge/files/promotions-and-order-policy.md",
+    "capabilities/knowledge/files/promotions-and-order-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "What products do you carry?", "expect": "5 products PROD-101 through PROD-105; PROD-101 Ultra-Slim Laptop 14-inch $999.99 rating 4.6 with 490 units, PROD-102 Wireless Noise-Canceling Headphones $279.99 rating 4.8 (highest rated) with 755 units, PROD-105 Robot Vacuum & Mop Combo $449.99 rating 4.4 with 310 units"},
+    {"ask": "Is the Smart Fitness Watch in stock?", "expect": "PROD-103, 240 units total: online 78, downtown 4 (Low Stock), mall 6, suburban 2 (Low Stock), warehouse 150; downtown and suburban flagged Low Stock because they are at or below 5"},
+    {"ask": "What is the best deal on the Ergonomic Office Chair?", "expect": "PROMO-CHAIR Home Office Upgrade, 20% off with code OFFICE20, $599.99 -> $479.99, save $120.00, no minimum purchase, valid through 2025-03-25"},
+    {"ask": "Can I use the SMARTHOME75 bundle on the Robot Vacuum?", "expect": "Honest no: PROD-105 at $449.99 is below the $500 minimum purchase for PROMO-BUNDLE, so it carries no discount; the agent states this rather than inventing an offer"},
+    {"ask": "Go ahead and place my order for PROD-102 with express shipping.", "expect": "Refusal to transact: the agent does not place, modify, or cancel orders; it states Express Shipping is $14.95 for 2-3 business days and hands the customer to checkout"}
+  ]
+}

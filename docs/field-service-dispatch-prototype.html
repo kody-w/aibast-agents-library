@@ -231,64 +231,54 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
 </div>
 
 <nav class="rail"><div class="rail-in">
-  <a href="#prepare"><span class="n">1</span>Before you start</a>
-  <a href="#understand"><span class="n">2</span>What you're building</a>
-  <a href="#project"><span class="n">3</span>Create the project</a>
-  <a href="#components"><span class="n">4</span>Add the components</a>
-  <a href="#publish"><span class="n">5</span>Push &amp; publish</a>
-  <a href="#verify"><span class="n">6</span>Verify</a>
-  <a href="#production"><span class="n">7</span>Go to production</a>
+  <a href="#start"><span class="n">1</span>Install &amp; add the twin</a>
+  <a href="#understand"><span class="n">2</span>What you're getting</a>
+  <a href="#mission"><span class="n">3</span>Say the mission</a>
+  <a href="#verify"><span class="n">4</span>Test it yourself</a>
+  <a href="#underhood"><span class="n">5</span>Under the hood</a>
+  <a href="#production"><span class="n">6</span>Go to production</a>
 </div></nav>
 
 <main class="wrap">
 
-<!-- ═══════════ 1 PREPARE ═══════════ -->
-<section class="phase" id="prepare">
-  <div class="phead"><span class="pk">Step 1</span><span class="time">~10 min</span></div>
-  <h2>Before you start</h2>
-  <p class="goal-line">Four prerequisites. Missing any one of them is where builds stall at minute
-    forty — check them all now.</p>
+<!-- ═══════════ 1 START ═══════════ -->
+<section class="phase" id="start">
+  <div class="phead"><span class="pk">Step 1</span><span class="time">~5 min</span></div>
+  <h2>Install the brainstem, add the twin</h2>
+  <p class="goal-line">This whole guide is an extension of the brainstem one-liner tutorial. Two
+    paste-and-run lines and you have an AI that can build this agent — and every other agent in
+    the library — for you.</p>
 
-  <div class="grid2">
-    <div class="card">
-      <h3>You need</h3>
-      <ul class="check" data-ck="prep">
-        <li><input type="checkbox"><span>A Power Platform <b>environment ID</b> where you can create
-          agents, and an account with maker permissions in it (Copilot Studio → Settings, or read it
-          from the maker portal URL)</span></li>
-        <li><input type="checkbox"><span><b>Power Platform CLI (<code>pac</code>) version 2.9.3 or
-          later</b> — earlier versions do not have the CLI-authoring commands this guide uses.
-          Check with <code>pac help</code></span></li>
-        <li><input type="checkbox"><span><b>Copilot Studio licensing</b> in the tenant</span></li>
-        <li><input type="checkbox"><span>The stack folder from the library:
-          <code>agents/@aibast-agents-library/energy_stacks/field_service_dispatch_stack/</code> —
-          the agent.py intent plus the ready-made <code>copilot_studio/</code> component set</span></li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3>The journey</h3>
-      <div class="agenda">
-        <div class="ag"><span class="t">2</span><span><b>Understand what you're building</b> — the component map</span><span class="d">read</span></div>
-        <div class="ag"><span class="t">3</span><span><b>Create the project</b> — authenticate, init</span><span class="d">~10 min</span></div>
-        <div class="ag"><span class="t">4</span><span><b>Add the components</b> — skills, knowledge, instructions</span><span class="d">~15 min</span></div>
-        <div class="ag"><span class="t">5</span><span><b>Push &amp; publish</b></span><span class="d">~10 min</span></div>
-        <div class="ag"><span class="t">6</span><span><b>Verify</b> — five checks with computed answers</span><span class="d">~15 min</span></div>
-        <div class="ag"><span class="t">7</span><span><b>Go to production</b> — real data, real channels</span><span class="d">when ready</span></div>
-      </div>
-      <div class="callout" style="margin-top:14px"><b>The fast path — no commands, just conversation.</b>
-        Download the library's <a href="https://github.com/microsoft/aibast-agents-library/blob/main/agents/%40aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py">Sales
-        Specialist Twin agent</a>, drop it into your brainstem's <code>agents/</code> folder, and say
-        <i>“deploy the field service dispatch agent to Copilot Studio.”</i> GitHub Copilot fetches the
-        mission playbook from this library and executes every step below itself — you only answer the
-        sign-in and the go-live question. Steps 3–7 of this guide are what the twin does under the
-        hood, documented so you can see (and audit) exactly what runs.</div>
-    </div>
+  <div class="card">
+    <ol class="steps">
+      <li><b>Run the brainstem one-liner</b>
+        <p>Mac / Linux:</p>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</pre></div>
+        <p>Windows (PowerShell):</p>
+        <div class="code"><div class="bar">PowerShell<button data-copy>Copy</button></div>
+<pre>irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex</pre></div></li>
+      <li><b>Add the one agent that does everything</b>
+        <p>The Sales Specialist Twin. Easiest way — no terminal: open the brainstem page at
+        <code>localhost:7071</code>, search the built-in agent registry for
+        <b>“Sales Specialist Twin”</b>, and install with one click. It hotloads instantly —
+        live on your very next message. (Any library agent installs the same way, by name.)</p>
+        <p>Terminal alternative, same result:</p>
+        <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
+<pre>curl -fsSL -o ~/.brainstem/src/rapp_brainstem/agents/sales_specialist_twin_agent.py \
+  "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/agents/%40aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py"</pre></div></li>
+      <li><b>Open VS Code and start talking</b>
+        <p>Open GitHub Copilot Chat in VS Code, connected to your brainstem (the tutorial's chat
+        step). Everything from here is conversation.</p></li>
+    </ol>
+    <div class="done-line"><b>Done when</b> you ask “what agents can I deploy?” in chat and the
+      library catalog comes back.</div>
   </div>
 </section>
 
 <!-- ═══════════ 2 UNDERSTAND ═══════════ -->
 <section class="phase" id="understand">
-  <div class="phead"><span class="pk">Step 2</span><span class="time">read first</span></div>
+  <div class="phead"><span class="pk">Step 2 · Know what you're getting</span><span class="time">read first</span></div>
   <h2>What you're building</h2>
   <p class="goal-line">A dispatch agent for energy field operations: the queue, the zones, who takes
     which job, and who responds when a SCADA alarm fires. Before touching the CLI, know where each
@@ -411,6 +401,108 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
   </div>
 </section>
 
+<!-- ═══════════ 3 MISSION ═══════════ -->
+<section class="phase" id="mission">
+  <div class="phead"><span class="pk">Step 3</span><span class="time">~15 min · mostly watching</span></div>
+  <h2>Say the mission</h2>
+  <p class="goal-line">You steer; your AI executes. It fetches the mission playbook from the public
+    library and runs every command itself — the same steps documented under the hood below. Here is
+    the whole conversation:</p>
+
+  <div class="card">
+    <ol class="steps">
+      <li><b>You say:</b> <i>“Deploy the field service dispatch agent to Copilot Studio.”</i>
+        <p>The AI checks your machine (installs the Power Platform CLI itself if missing), detects
+        your environment, creates the project, installs the skills and knowledge from the library,
+        and sets the instructions. You watch one-line progress updates.</p></li>
+      <li><b>It may ask you to sign in — once.</b>
+        <p>If you have never authenticated, it asks you to run <code>pac auth create</code> in a
+        terminal and finish the browser sign-in with your work account. That is the only technical
+        step a person ever does, and only the first time.</p></li>
+      <li><b>It asks before going live:</b> you say <i>“yes, publish it.”</i>
+        <p>Publishing makes the agent live for everyone it's shared with — so that call is always
+        yours.</p></li>
+      <li><b>It hands you the test script.</b>
+        <p>Five questions with computed expected answers — that's step 4, and it's yours to click
+        through.</p></li>
+    </ol>
+    <div class="callout"><b>Works for the whole library.</b> Swap the agent name and the same
+      sentence deploys any stack — “deploy the <i>emission tracking</i> agent”, “deploy the
+      <i>permit license management</i> agent”. Ask “what agents can I deploy?” for the full list.</div>
+  </div>
+</section>
+
+<!-- ═══════════ 6 VERIFY ═══════════ -->
+<section class="phase" id="verify">
+  <div class="phead"><span class="pk">Step 4</span><span class="time">~15 min · you, clicking</span></div>
+  <h2>Test it yourself in Copilot Studio</h2>
+  <p class="goal-line">No automation here — this part is you, in the product. Open
+    <a href="https://copilotstudio.microsoft.com">copilotstudio.microsoft.com</a> → <b>Agents</b> →
+    <b>Field Service Dispatch Agent</b> → the <b>Test</b> button (top right). Ask these five questions. Every expected answer is <b>computed from the synthetic data</b>, so a wrong answer
+    is visible, not arguable. Record each verdict — the page remembers.</p>
+
+  <div class="card">
+    <div class="rc" data-rc="1"><div class="q"><span class="cardn">1</span><div class="ask">
+      “Show me the dispatch dashboard.”
+      <small>Baseline retrieval and ranking.</small></div></div>
+      <div class="expect"><b>Expected</b> 5 requests with SR-4005 (CRITICAL, SCADA) first,
+        4 unassigned, 3 available technicians. Any other order fails the priority rule.</div>
+      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
+
+    <div class="rc" data-rc="2"><div class="q"><span class="cardn">2</span><div class="ask">
+      “Who should take SR-4001?”
+      <small>The deterministic scoring rule under pressure.</small></div></div>
+      <div class="expect"><b>Expected</b> Marcus Thompson (TECH-205), score 107 (92 efficiency +
+        10 in-zone + 5 not-on-a-job), beating Carlos Rivera (TECH-201) at 99. If it recommends
+        Carlos, the scoring rule isn't being applied — in-zone outranks raw efficiency here.</div>
+      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
+
+    <div class="rc" data-rc="3"><div class="q"><span class="cardn">3</span><div class="ask">
+      “Who can respond to the SCADA emergency?”
+      <small>Hallucination check — the data has exactly one right answer.</small></div></div>
+      <div class="expect"><b>Expected</b> Exactly one eligible responder: Marcus Thompson, on
+        break, already in Denver where the failure is. Any other name is a hallucination — nobody
+        else holds <code>scada_systems</code>.</div>
+      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
+
+    <div class="rc" data-rc="4"><div class="q"><span class="cardn">4</span><div class="ask">
+      “Assign the pipeline survey to Carlos Rivera.”
+      <small>Two boundaries at once: the cert gate and the no-dispatch rule.</small></div></div>
+      <div class="expect"><b>Expected</b> A refusal on both grounds: Carlos does not hold
+        <code>pipeline_inspection</code>, and the agent recommends rather than assigns. Both
+        boundaries should appear in the answer.</div>
+      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
+
+    <div class="rc" data-rc="5"><div class="q"><span class="cardn">5</span><div class="ask">
+      “Show the dashboard for the Central zone only.”
+      <small>Scope filters applied to counts, not just rows.</small></div></div>
+      <div class="expect"><b>Expected</b> 3 requests, and the headline counts reflect the filter
+        (2 unassigned, 0 available Central technicians). Filtered rows over global counts is a fail.</div>
+      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
+
+    <div id="rc-tally">No verdicts recorded yet.</div>
+    <p style="margin-top:14px">Checks 2, 3, and 4 are the gate. If any of them fail, the build is
+      not done: re-read the skill file for that behavior, confirm it pushed (a no-op push in step 5
+      is the usual culprit), fix, push, publish, and re-run all five. These five prompts are also
+      your starting <b>evaluation set</b> — rerun them after every change you ever make to this
+      agent.</p>
+  </div>
+</section>
+
+  <div class="card">
+    <h3>If a check fails</h3>
+    <p>Don't debug — delegate. Go back to Copilot Chat and say: <i>“Verification question 3 failed —
+      here's what it answered: …”</i> Your AI re-reads the playbook's friction notes (a component that
+      never pushed is the usual culprit), fixes it, and tells you when to test again.</p>
+  </div>
+<!-- ═══════════ 5 UNDER THE HOOD ═══════════ -->
+<section class="phase" id="underhood">
+  <div class="phead"><span class="pk">Step 5</span><span class="time">reference</span></div>
+  <h2>Under the hood — what your AI executes</h2>
+  <p class="goal-line">The twin fetches an authored playbook from the library and GitHub Copilot
+    runs these exact steps. They are documented so you can audit every command it runs — and run
+    them by hand if you ever want to.</p>
+</section>
 <!-- ═══════════ 3 PROJECT ═══════════ -->
 <section class="phase" id="project">
   <div class="phead"><span class="pk">Step 3</span><span class="time">~10 min</span></div>
@@ -539,65 +631,9 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
   </div>
 </section>
 
-<!-- ═══════════ 6 VERIFY ═══════════ -->
-<section class="phase" id="verify">
-  <div class="phead"><span class="pk">Step 6</span><span class="time">~15 min</span></div>
-  <h2>Verify — with answers you can check</h2>
-  <p class="goal-line">Open the agent's <b>Test pane</b> in the maker portal and ask these five
-    questions. Every expected answer is <b>computed from the synthetic data</b>, so a wrong answer
-    is visible, not arguable. Record each verdict — the page remembers.</p>
-
-  <div class="card">
-    <div class="rc" data-rc="1"><div class="q"><span class="cardn">1</span><div class="ask">
-      “Show me the dispatch dashboard.”
-      <small>Baseline retrieval and ranking.</small></div></div>
-      <div class="expect"><b>Expected</b> 5 requests with SR-4005 (CRITICAL, SCADA) first,
-        4 unassigned, 3 available technicians. Any other order fails the priority rule.</div>
-      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
-
-    <div class="rc" data-rc="2"><div class="q"><span class="cardn">2</span><div class="ask">
-      “Who should take SR-4001?”
-      <small>The deterministic scoring rule under pressure.</small></div></div>
-      <div class="expect"><b>Expected</b> Marcus Thompson (TECH-205), score 107 (92 efficiency +
-        10 in-zone + 5 not-on-a-job), beating Carlos Rivera (TECH-201) at 99. If it recommends
-        Carlos, the scoring rule isn't being applied — in-zone outranks raw efficiency here.</div>
-      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
-
-    <div class="rc" data-rc="3"><div class="q"><span class="cardn">3</span><div class="ask">
-      “Who can respond to the SCADA emergency?”
-      <small>Hallucination check — the data has exactly one right answer.</small></div></div>
-      <div class="expect"><b>Expected</b> Exactly one eligible responder: Marcus Thompson, on
-        break, already in Denver where the failure is. Any other name is a hallucination — nobody
-        else holds <code>scada_systems</code>.</div>
-      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
-
-    <div class="rc" data-rc="4"><div class="q"><span class="cardn">4</span><div class="ask">
-      “Assign the pipeline survey to Carlos Rivera.”
-      <small>Two boundaries at once: the cert gate and the no-dispatch rule.</small></div></div>
-      <div class="expect"><b>Expected</b> A refusal on both grounds: Carlos does not hold
-        <code>pipeline_inspection</code>, and the agent recommends rather than assigns. Both
-        boundaries should appear in the answer.</div>
-      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
-
-    <div class="rc" data-rc="5"><div class="q"><span class="cardn">5</span><div class="ask">
-      “Show the dashboard for the Central zone only.”
-      <small>Scope filters applied to counts, not just rows.</small></div></div>
-      <div class="expect"><b>Expected</b> 3 requests, and the headline counts reflect the filter
-        (2 unassigned, 0 available Central technicians). Filtered rows over global counts is a fail.</div>
-      <div class="verdict"><button class="p">Pass</button><button class="f">Fail</button><span class="st"></span></div></div>
-
-    <div id="rc-tally">No verdicts recorded yet.</div>
-    <p style="margin-top:14px">Checks 2, 3, and 4 are the gate. If any of them fail, the build is
-      not done: re-read the skill file for that behavior, confirm it pushed (a no-op push in step 5
-      is the usual culprit), fix, push, publish, and re-run all five. These five prompts are also
-      your starting <b>evaluation set</b> — rerun them after every change you ever make to this
-      agent.</p>
-  </div>
-</section>
-
 <!-- ═══════════ 7 PRODUCTION ═══════════ -->
 <section class="phase" id="production">
-  <div class="phead"><span class="pk">Step 7</span><span class="time">when you're ready</span></div>
+  <div class="phead"><span class="pk">Step 6</span><span class="time">when you're ready</span></div>
   <h2>Go to production</h2>
   <p class="goal-line">The prototype answers from a synthetic file so it works on day one. A
     production deployment swaps that file for <b>tools</b> that query live systems — and makes

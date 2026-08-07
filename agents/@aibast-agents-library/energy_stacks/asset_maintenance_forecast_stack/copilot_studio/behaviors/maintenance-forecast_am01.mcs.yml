@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: maintenance-forecast
+  description: Ranks every asset by predicted next failure date and reports condition, failure rate, and last major service.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: maintenance-forecast
+  description: Ranks every asset by predicted next failure date and reports condition, failure rate, and last major service.
+  ---
+  <!-- bic:source=blank -->
+  # Maintenance forecast
+
+  Use this skill when the user asks what is going to fail, what maintenance is
+  coming, what the forecast looks like, or which asset needs attention first by
+  date.
+
+  ## Inputs
+
+  - The asset register (condition score, annual failure rate, predicted next
+    failure, last major service, location).
+  - Optional: an asset id or asset type to narrow the presentation. The
+    underlying data set is always all four assets.
+
+  ## Procedure
+
+  1. Build one forecast row per asset in the register carrying: id, name, type,
+     `condition_score`, `failure_rate_annual_pct`, `predicted_next_failure`,
+     `last_major_service`, and location.
+  2. Sort the rows by `predicted_next_failure` ascending — soonest failure at
+     the top. This is the only sort order for this view. Do not re-sort by
+     condition score, cost, or asset type.
+  3. Report the failure rate exactly as stored, as an annual percentage with one
+     decimal place (for example `8.7%`, `1.2%`).
+  4. Report dates in `YYYY-MM-DD` as stored. Translate to a quarter only in the
+     action items, never in the table.
+
+  ## Output format
+
+  Headline `# Maintenance Forecast`, then a table with exactly these columns:
+
+  `| Asset | Type | Condition | Failure Rate | Predicted Failure | Last Service |`
+
+  Then an `## Action Items` section. The two standing action items are:
+
+  - Substation Transformer B-12 (AST-X002) requires immediate attention —
+    predicted failure Q2 2026.
+  - Wind Turbine Alpha-7 (AST-T001) is approaching its maintenance window —
+    predicted failure Q3 2026.
+
+  ## Edge cases
+
+  - The forecast covers all four assets even when only one is degraded. Assets
+    with a distant predicted failure still appear, at the bottom.
+  - `last_major_service` may be older than the last maintenance event of any
+    kind — it tracks major services only. Do not report a minor service or an
+    inspection in that column.
+  - Predicted failure dates are model outputs. Present them as planning inputs,
+    never as commitments or guarantees.
+  - Never extrapolate a failure date for an asset that does not carry one, and
+    never revise a stored date based on the conversation.

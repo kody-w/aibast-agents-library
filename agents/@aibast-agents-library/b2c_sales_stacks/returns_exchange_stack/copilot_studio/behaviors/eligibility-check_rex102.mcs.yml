@@ -1,0 +1,94 @@
+mcs.metadata:
+  componentName: eligibility-check
+  description: Decides return eligibility per item by mapping the SKU prefix to a policy and comparing days since delivery against that policy's window.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: eligibility-check
+  description: Decides return eligibility per item by mapping the SKU prefix to a policy and comparing days since delivery against that policy's window.
+  ---
+  <!-- bic:source=blank -->
+  # Eligibility check
+
+  Use this skill when the user asks whether something can be returned, asks if
+  a return window is still open, asks which orders still have returnable
+  items, or names an order or SKU and asks about eligibility.
+
+  ## Inputs
+
+  - The order history and the return policy set.
+  - Optional: an `order_id`. With one, report per-item eligibility for that
+    order. Without one, report the eligibility summary across every order.
+
+  ## Procedure — compute it, do not judge it
+
+  1. **Days since delivery.** Use the fixed reference date 2025-03-10 and the
+     ordinal-day arithmetic below. Both the delivery date and the reference
+     date convert the same way:
+
+     `day = year * 365 + month * 30 + day_of_month`
+
+     Reference date 2025-03-10 converts to `2025 * 365 + 3 * 30 + 10`.
+     `days_since = reference_day - delivered_day`.
+
+     This is a fixed-length approximation (30-day months, 365-day years), not
+     a calendar difference. Report the number it produces; never substitute a
+     calendar-accurate count.
+
+  2. **Policy lookup by SKU prefix.** Take the text before the first hyphen in
+     the SKU and map it:
+
+     | Prefix | Policy |
+     |---|---|
+     | DRS | standard |
+     | SHL | standard |
+     | SNK | footwear |
+     | JKT | standard |
+     | BT | footwear |
+     | UM | standard |
+     | ELEC | electronics |
+
+     Any prefix not in this map falls back to `standard`.
+
+  3. **Gates, applied in order.**
+     - If the item's SKU is not in the order:
+       not eligible, reason `Item not found in order`.
+     - If the policy's `window_days` is 0 (final sale):
+       not eligible, reason `Item is final sale - no returns`.
+     - If `days_since > window_days`: not eligible, reason
+       `Return window expired (<days_since> days vs <window_days>-day policy)`.
+     - Otherwise eligible, reason
+       `Eligible under <policy> policy (<window_days>-day window)`.
+
+     `days_since` exactly equal to `window_days` is still eligible — the
+     comparison is strictly greater-than.
+
+  ## Output format
+
+  - `# Return Eligibility Check`
+  - **With an order id:** the header block —
+    `**Order:**`, `**Customer:**`, `**Order Date:**`, `**Delivered:**` — then
+    `## Item Eligibility` with columns
+    `SKU | Item | Price | Eligible | Details`, price as `$1,234.56`, Eligible
+    as `Yes` or `No`, Details as the reason string above.
+  - **Without an order id (or an unknown one):**
+    `## All Orders - Eligibility Summary` with columns
+    `Order | Customer | Delivered | Items | Eligible`, where Eligible is
+    `<eligible count>/<item count>`.
+
+  ## Edge cases
+
+  - An order id that is not in the order history falls through to the
+    all-orders summary. Say the id was not found before showing the summary,
+    rather than letting the customer think it matched.
+  - Condition (`unworn_with_tags`, `unopened_or_defective`) is a policy
+    requirement the warehouse verifies on receipt. It does not enter this
+    calculation — state it as a condition on the return, never as a decision
+    you have made.
+
+  ## Boundaries
+
+  - The window gate is never waived. If the customer wants an exception, say so
+    and route it to a supervisor; do not report the item as eligible.
+  - Eligibility is a finding, not an approval. Never say a return has been
+    approved, authorized, or accepted.

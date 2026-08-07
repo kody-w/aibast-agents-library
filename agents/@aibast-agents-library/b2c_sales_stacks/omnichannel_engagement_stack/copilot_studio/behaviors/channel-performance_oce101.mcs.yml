@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: channel-performance
+  description: Builds the 30-day channel performance report - sessions, conversions, CVR, revenue, cost, ROAS, and each channel's share of total revenue.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: channel-performance
+  description: Builds the 30-day channel performance report - sessions, conversions, CVR, revenue, cost, ROAS, and each channel's share of total revenue.
+  ---
+  <!-- bic:source=blank -->
+  # Channel performance
+
+  Use this skill when the user asks how the channels are doing, for the
+  30-day numbers, for revenue or conversions by channel, for a single
+  channel's CVR or ROAS, or for revenue mix.
+
+  ## Inputs
+
+  - The 30-day channel set (knowledge/tools): sessions_30d, conversions_30d,
+    revenue_30d, cost_30d, avg_order_value, bounce_rate for each channel.
+  - Optional: a single channel name. Answer from that channel's row, and say
+    the row is drawn from the all-channel report. Totals and shares stay
+    all-channel.
+
+  ## Procedure
+
+  1. Compute the totals first:
+     `total_revenue = sum(revenue_30d)` = $12,957,500 for the current set;
+     `total_conversions = sum(conversions_30d)` = 65,020.
+  2. For each channel compute:
+     `CVR = round((conversions_30d / sessions_30d) * 100, 2)`, expressed as a
+     percentage. If `sessions_30d == 0`, CVR is 0 - report it as "no sessions
+     recorded".
+  3. For each channel compute:
+     `ROAS = round(revenue_30d / cost_30d, 2)`, expressed with an `x` suffix.
+     If `cost_30d == 0`, ROAS is 0 - report it as "no cost recorded", never
+     as "no return".
+  4. For each channel compute:
+     `revenue_share = round((revenue_30d / total_revenue) * 100, 1)`.
+  5. Hold the recorded channel order for both the table and the share list -
+     Email, Sms, Social Media, Web Organic, Web Paid, Mobile App, In Store.
+     This report is never re-sorted; ROAS ranking belongs to the engagement
+     optimization skill.
+
+  ## Output format
+
+  Headline, two lines, before anything else:
+
+  - `**Total Revenue:** $12,957,500`
+  - `**Total Conversions:** 65,020`
+
+  Then one table, exactly these columns:
+
+  | Channel | Sessions | Conversions | CVR | Revenue | Cost | ROAS |
+
+  Channel names in title case with underscores as spaces (`web_organic` ->
+  `Web Organic`, `sms` -> `Sms`). Counts with thousands separators. Revenue
+  and cost as whole dollars with thousands separators. CVR with a `%` suffix,
+  ROAS with an `x` suffix.
+
+  Then a `## Revenue Share by Channel` list, one bullet per channel in the
+  same order: `- Channel: N%`.
+
+  ## Edge cases
+
+  - In Store carries a recorded bounce rate of 0; report it as 0%, not as
+    missing.
+  - Every channel except Sms and Social Media carries an average order value
+    of $200.00; Sms is $175.00. Quote AOV only when asked - it is not a
+    column in this report.
+  - A channel the user names that is not in the set (for example TikTok,
+    direct mail, affiliate) has no data. Say so and list the seven tracked
+    channels. Never estimate it from the others.
+  - This report covers the trailing 30 days only. There is no other period in
+    the data; say so rather than projecting.

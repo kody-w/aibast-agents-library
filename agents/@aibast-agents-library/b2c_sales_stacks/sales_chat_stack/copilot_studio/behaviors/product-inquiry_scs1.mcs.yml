@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: product-inquiry
+  description: Answers product questions from the catalog with price, best applicable promotion, rating, warranty, features, and total stock.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: product-inquiry
+  description: Answers product questions from the catalog with price, best applicable promotion, rating, warranty, features, and total stock.
+  ---
+  <!-- bic:source=blank -->
+  # Product inquiry
+
+  Use this skill when the shopper asks what you sell, asks about a specific
+  product by name or PROD- id, or asks for price, rating, warranty, features,
+  or a description.
+
+  ## Inputs
+
+  - The product catalog and the per-location stock levels.
+  - Optional: a single PROD- id (or a product name that resolves to one).
+    Without one, return the whole catalog.
+
+  ## Procedure - single product
+
+  1. Resolve the product to a PROD- id in the catalog. If it does not resolve,
+     do not improvise: say the catalog does not contain it and list what you do
+     carry.
+  2. Compute the best promotion for that product:
+     - Skip any offer whose `applicable_categories` does not contain `all` and
+       does not contain the product's `category`.
+     - Skip any offer where `price < min_purchase`.
+     - Savings for a `percentage` offer = `price * discount_value / 100`.
+       Savings for a `fixed` offer = `discount_value`. Savings for a
+       `free_shipping` offer = `0`.
+     - Keep the offer with the strictly largest savings. Because free shipping
+       scores 0, it never wins; if nothing scores above 0 there is no sale
+       price to quote.
+     - Round savings to 2 decimals. `sale price = price - savings`.
+  3. Total stock = the sum of every location count for that PROD- id.
+     Availability reads `In Stock` when the total is greater than 0, otherwise
+     `Out of Stock`.
+
+  ## Output format - single product
+
+  - `# <product name>`
+  - `**Price:** $x,xxx.xx`
+  - `**Sale Price:** $x,xxx.xx (save $xx.xx with code CODE)` - only when a
+    promotion applied
+  - `**Category:** Category > Subcategory`
+  - `**Rating:** n.n/5 (n,nnn reviews)`
+  - `**Warranty:** <term>`
+  - `**Description:** <text>`
+  - `## Key Features` followed by one bullet per feature
+  - `**Availability:** In Stock (N units)`
+
+  ## Output format - whole catalog
+
+  A single table, one row per product, columns exactly:
+  `Product ID | Name | Category | Price | Rating | In Stock`
+  where `In Stock` is the summed unit total across all locations.
+
+  ## Edge cases
+
+  - A product can be eligible for zero promotions (a price under every
+    applicable minimum). Quote the list price with no sale line rather than
+    inventing a discount.
+  - Rating and review count come from the catalog and are never rounded or
+    re-derived.
+  - Never recommend a substitute product as if it were the one asked for; name
+    it as an alternative with its own PROD- id.

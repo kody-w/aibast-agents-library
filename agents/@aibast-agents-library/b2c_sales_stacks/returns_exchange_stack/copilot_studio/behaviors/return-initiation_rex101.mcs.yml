@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: return-initiation
+  description: Shows the active return queue, the six-step return process, and the return policy table so a coordinator can start or triage a return.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: return-initiation
+  description: Shows the active return queue, the six-step return process, and the return policy table so a coordinator can start or triage a return.
+  ---
+  <!-- bic:source=blank -->
+  # Return initiation
+
+  Use this skill when the user asks to start a return, asks what returns are
+  open or in flight, asks how the return process works, or asks what the
+  return policies are.
+
+  ## Inputs
+
+  - The active return queue and the return policy set. No arguments are
+    required; this skill always reports the full queue and the full policy
+    table.
+
+  ## Procedure
+
+  1. List every active return, one row each, in queue order. Reason, type, and
+     status are stored with underscores and are always rendered with the
+     underscores replaced by spaces and each word capitalized: `wrong_size`
+     becomes `Wrong Size`, `received_inspecting` becomes `Received Inspecting`,
+     `refund` becomes `Refund`.
+  2. Restate the return process as the six numbered steps, unchanged:
+     1. Customer initiates return request (online or in-store)
+     2. System checks eligibility against return policy
+     3. RMA number generated and prepaid label sent
+     4. Customer ships item back within 7 days
+     5. Warehouse receives and inspects item
+     6. Refund or exchange processed
+  3. Render the policy table for all four policies. Window renders as
+     `<window_days> days` when `window_days > 0`, and exactly `No returns`
+     when `window_days` is 0. Condition is rendered underscores-to-spaces,
+     title case. Restocking fee renders as `<pct>%`.
+
+  ## Output format
+
+  - `# Return Initiation`
+  - `## Active Returns` — table with columns:
+    `Return ID | Order | Items | Reason | Type | Status`
+  - `## Return Process` — the six numbered steps above.
+  - `## Return Policies` — table with columns:
+    `Policy | Window | Condition | Restocking Fee`
+
+  ## Edge cases
+
+  - A return whose item list has more than one SKU renders the SKUs
+    comma-separated in a single `Items` cell.
+  - The queue shows only returns already in flight. A return that has not been
+    initiated does not appear; say the queue does not contain it rather than
+    implying it exists.
+
+  ## Boundaries
+
+  - Recommendation only. Never say an RMA has been generated, a label has been
+    sent, or a return has been started — steps 3 through 6 are performed by the
+    returns system and the warehouse, not by you.

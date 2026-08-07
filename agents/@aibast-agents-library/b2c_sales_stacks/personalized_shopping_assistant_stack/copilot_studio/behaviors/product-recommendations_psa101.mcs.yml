@@ -1,0 +1,78 @@
+mcs.metadata:
+  componentName: product-recommendations
+  description: Ranks catalog products for a named customer using the deterministic match score and excludes anything already purchased.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: product-recommendations
+  description: Ranks catalog products for a named customer using the deterministic match score and excludes anything already purchased.
+  ---
+  <!-- bic:source=blank -->
+  # Product recommendations
+
+  Use this skill when the user asks what to recommend or suggest to a
+  customer, asks what a customer would like, asks for a shortlist to pull for
+  a clienteling appointment, or asks why a product was ranked where it was.
+
+  ## Inputs
+
+  - The product catalog and the customer preference profiles.
+  - `customer_id` - a SHOP- id. When none is given, default to SHOP-001.
+
+  ## Eligibility
+
+  - The customer must exist in the profile data. If the SHOP- id is unknown,
+    there is no preference record, no score can be computed, and the answer is
+    "No recommendations available." Say the id is not in the data and name the
+    ids that are.
+  - Any SKU in the customer's `purchase_history` is removed from the candidate
+    set before scoring. It is never re-recommended.
+
+  ## Scoring - compute it, do not judge it
+
+  For every remaining SKU, sum these four terms, then cap the result at 100:
+
+  1. `20 * (number of the product's style_tags that also appear in the
+     customer's style_preference)`
+  2. `+ 25` if the product's brand is in the customer's `brand_affinity`,
+     otherwise 0
+  3. `10 * (number of the product's colors that also appear in the customer's
+     color_preference)`
+  4. `+ 15` if `budget_range.min <= price <= budget_range.max`, otherwise 0
+
+  `score = min(100, term1 + term2 + term3 + term4)`
+
+  Sort by score descending and return the top 5. The sort is stable, so SKUs
+  tied on score keep catalog order (SKU-1001 before SKU-1002, and so on).
+
+  Worked example, SHOP-001 and SKU-1003 (Merino Wool Crew Sweater): style tags
+  classic and smart_casual both match -> 40; brand Alpine Knits is in brand
+  affinity -> +25 = 65; color charcoal matches -> +10 = 75; $125.00 sits inside
+  $50-$250 -> +15 = 90. Reported as 90%.
+
+  ## Output format
+
+  - `# Product Recommendations: <customer name>`
+  - `**Style:** <style_preference joined with commas, raw tokens such as
+    smart_casual>`
+  - `**Budget:** $<min> - $<max>`
+  - A table with exactly these columns: Rank | Product | Brand | Price |
+    Match Score | Rating. Product renders as `<name> (SKU-nnnn)`, Price as
+    `$N,NNN.NN`, Match Score as an integer followed by `%`.
+  - If the candidate list is empty: `No recommendations available.`
+
+  ## Edge cases
+
+  - An unknown `customer_id` produces the customer name "Customer", an empty
+    style line, a budget of `$0 - $0`, and no recommendations. Report the
+    missing profile rather than presenting the empty shell as an answer.
+  - A customer whose purchase history covers most of the catalog can return
+    fewer than 5 rows. That is correct; do not pad the list.
+  - A score of 0 is a legitimate result and still ranks. Do not drop it or
+    describe it as an error.
+
+  ## Boundaries
+
+  - Recommendation only. Never reserve, hold, cart, or order a SKU.
+  - Never adjust a score for margin, inventory pressure, or personal taste.
+  - Never recommend a SKU that is not in the catalog.

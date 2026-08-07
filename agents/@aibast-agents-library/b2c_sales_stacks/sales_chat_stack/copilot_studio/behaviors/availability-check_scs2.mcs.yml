@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: availability-check
+  description: Reports stock per location with the fixed Low Stock threshold and the summed total, for one product or across the catalog.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: availability-check
+  description: Reports stock per location with the fixed Low Stock threshold and the summed total, for one product or across the catalog.
+  ---
+  <!-- bic:source=blank -->
+  # Availability check
+
+  Use this skill when the shopper asks whether something is in stock, how many
+  are left, which store has one, or whether they can pick it up today.
+
+  ## Inputs
+
+  - The per-location stock levels for each PROD- id.
+  - Optional: a single PROD- id. Without one, return the overview across every
+    product.
+
+  ## Procedure
+
+  1. Locations are exactly these five, in this order: `online`,
+     `store_downtown`, `store_mall`, `store_suburban`, `warehouse`. Never add a
+     location and never merge two.
+  2. Status per location is a fixed threshold on the quantity at that location:
+     - quantity greater than 5 -> `In Stock`
+     - quantity from 1 to 5 inclusive -> `Low Stock`
+     - quantity equal to 0 -> `Out of Stock`
+  3. `Total Available` = the sum of all five location counts. Compute it; do
+     not estimate.
+  4. Store pickup is same day only if that specific store's count is above 0.
+     Warehouse stock is not shopper-collectable - it feeds online orders.
+
+  ## Output format - single product
+
+  - `# Availability: <product name>`
+  - Table with columns exactly `Location | Stock | Status`, one row per
+    location, location names title-cased with underscores replaced by spaces
+    (Online, Store Downtown, Store Mall, Store Suburban, Warehouse).
+  - `**Total Available:** N units`
+
+  ## Output format - overview
+
+  A single table, one row per product, columns exactly:
+  `Product | Online | Downtown | Mall | Suburban | Warehouse | Total`.
+
+  ## Edge cases
+
+  - A PROD- id with no stock record has no availability answer. Say the stock
+    data does not cover it; do not report zero as if it were measured.
+  - Report counts exactly as given. Never round, never say "plenty" or "a few"
+    in place of the number, and never promise a unit will still be there.

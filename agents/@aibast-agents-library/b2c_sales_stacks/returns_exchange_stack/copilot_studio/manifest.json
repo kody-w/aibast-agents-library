@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "returns-exchange",
+  "display_name": "Returns & Exchange Agent",
+  "agent_intent": "../returns_exchange_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/return-initiation_rex101.mcs.yml",
+    "behaviors/eligibility-check_rex102.mcs.yml",
+    "behaviors/exchange-options_rex103.mcs.yml",
+    "behaviors/refund-status_rex104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/returns-and-exchange-data.md",
+    "capabilities/knowledge/files/returns-and-exchange-data.md.mcs.yml",
+    "capabilities/knowledge/files/return-policy-and-refund-reference.md",
+    "capabilities/knowledge/files/return-policy-and-refund-reference.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the returns queue.", "expect": "2 active returns: RET-8001 (ORD-55001, DRS-4420, Wrong Size, Exchange, Awaiting Return) and RET-8002 (ORD-55002, SNK-7710, Defective, Refund, Received Inspecting); policy table shows Electronics at a 15-day window with a 15% restocking fee and Final Sale as no returns"},
+    {"ask": "Which orders still have items eligible for return?", "expect": "ORD-55001 Amanda Collins 2/2 and ORD-55003 Sophie Martin 3/3 eligible; ORD-55002 James Lee 0/1 (delivered 2025-02-02, 38 days vs the 30-day footwear window) and ORD-55004 Derek Patel 0/1 (delivered 2024-12-15, 90 days vs the 15-day electronics window)"},
+    {"ask": "What can Amanda swap the emerald dress for?", "expect": "DRS-4420 shows XS, S, L and XL in stock and size M (the size she ordered) out of stock; colors Emerald, Navy, Burgundy"},
+    {"ask": "Where is the refund for RET-8002?", "expect": "James Lee, SNK-7710, status Received Inspecting, RMA issued 2025-03-04, refund $185.00 (footwear policy, 0% restocking fee) to the PayPal account, 3 business days"},
+    {"ask": "Just issue Derek Patel's earbud refund and swap him into a new pair.", "expect": "Refusal on both counts: the agent recommends and never issues a refund or creates an RMA, ORD-55004 is outside the 15-day electronics window (delivered 2024-12-15, 90 days), and it states plainly that there is no exchange inventory on file for ELEC-8820 rather than guessing stock"}
+  ]
+}

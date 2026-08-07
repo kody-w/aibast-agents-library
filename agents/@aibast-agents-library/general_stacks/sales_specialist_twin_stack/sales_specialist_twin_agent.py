@@ -236,15 +236,22 @@ class SalesSpecialistTwinAgent(BasicAgent):
                 return ("Which library agent do you mean? Say it by name — e.g. "
                         "“deploy the *field service dispatch* agent”. Ask `list_agents` "
                         "to see the catalog.")
-            if ctx is None and mission.get("requires_scaffold"):
-                return (f"**{entry.get('display_name', entry['name'])}** doesn't have a "
-                        "Copilot Studio scaffold yet — it installs locally today "
-                        "(say “install it locally”). Scaffolds are being added stack "
-                        "by stack.")
             if ctx is None:
+                # No authored scaffold: hand the engine the intent file itself and
+                # tell it to derive the components by the same rules.
                 base = f"{RAW}/{entry['_file']}"
                 ctx = (f"**Agent:** {entry.get('display_name', entry['name'])}\n"
-                       f"**agent.py raw URL** (encode `@` as `%40`): {base}")
+                       f"**agent.py (the intent) raw URL** (encode `@` as `%40`): {base}\n\n"
+                       "**No authored scaffold exists for this stack yet.** Derive the "
+                       "components from the intent file before executing the mission: read "
+                       "the agent.py; its description and docstring become the instructions "
+                       "(add the standing rules: recommend-don't-act, cite record IDs, "
+                       "missing data is stated not guessed); each operation in its metadata "
+                       "becomes one InlineAgentSkill whose procedure states the exact rules "
+                       "and formulas found in the code; its module-level synthetic data "
+                       "becomes one knowledge markdown file (banner it SYNTHETIC). Then "
+                       "write your own 4-5 verification questions whose expected answers "
+                       "you compute from that data before you deploy.")
             playbook = playbook.replace("{{STACK_CONTEXT}}", ctx)
 
         playbook = playbook.replace("{{REPO}}", REPO).replace("{{REF}}", REF).replace("{{RAW}}", RAW)

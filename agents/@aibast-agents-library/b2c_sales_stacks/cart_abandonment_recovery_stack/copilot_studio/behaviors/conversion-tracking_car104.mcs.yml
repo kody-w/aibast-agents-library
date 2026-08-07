@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: conversion-tracking
+  description: Reports the 30-day abandonment and recovery metrics, per-campaign estimated recovered revenue, and the current cart value at risk.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: conversion-tracking
+  description: Reports the 30-day abandonment and recovery metrics, per-campaign estimated recovered revenue, and the current cart value at risk.
+  ---
+  <!-- bic:source=blank -->
+  # Conversion tracking
+
+  Use this skill when the user asks how recovery is performing, what the
+  recovery rate or recovered revenue is, which campaign pays for itself, or
+  how much value is currently at risk.
+
+  ## Inputs
+
+  - The 30-day conversion metrics, the recovery campaign definitions, and the
+    abandoned cart records.
+  - Optional: a campaign name to report on a single campaign.
+
+  ## Procedure
+
+  1. Report the 30-day metrics exactly as recorded: abandonment rate 71.4%,
+     recovery rate 12.8%, average recovered order value $187.50, total
+     abandoned carts 4,250, total recovered 544, recovered revenue $102,000.
+     These are period totals — do not recompute them from the 4 open cart
+     records, which are a live snapshot, not the 30-day population.
+  2. Estimated recovered revenue per campaign:
+
+     `est_recovered = round(total_abandoned_30d * avg_conversion / 100 * avg_recovered_value, 0)`
+
+     With total_abandoned_30d = 4,250 and avg_recovered_value = $187.50:
+
+     - Reminder Email, 8.5%: 4250 * 0.085 * 187.50 = **$67,734**
+     - Urgency Email, 5.2%: 4250 * 0.052 * 187.50 = **$41,438**
+     - Incentive Email, 12.1%: 4250 * 0.121 * 187.50 = **$96,422**
+     - SMS Reminder, 4.8%: 4250 * 0.048 * 187.50 = **$38,250**
+     - Retargeting Display Ad, 2.1%: 4250 * 0.021 * 187.50 = **$16,734**
+
+     These are per-campaign estimates against the full abandoned population.
+     They overlap — do not sum them into a single recovery figure, and do not
+     reconcile them against the $102,000 actual recovered revenue.
+  3. Current active cart value at risk = the sum of the open cart records'
+     `cart_value`: 284.98 + 299.97 + 1779.96 + 129.99 = **$2,494.90**.
+  4. When ranking campaigns, rank by conversion, not by open rate. SMS Reminder
+     leads on open rate at 98.0% and is fourth on estimated recovery; the
+     Incentive Email leads on both conversion (12.1%) and estimated recovery.
+
+  ## Output format
+
+  - A bullet block of the six 30-day metrics, currency with thousands
+    separators, rates to one decimal.
+  - `## Campaign Performance` — a table with exactly these columns:
+    `Campaign | Open Rate | Conversion | Est. Recovered`, campaigns in catalog
+    order.
+  - A closing line: `**Current Active Cart Value at Risk:** $N,NNN.NN`.
+
+  ## Edge cases
+
+  - The Retargeting Display Ad's 0% open rate is a structural zero, not a
+    missing value — display ads have no open event. Say so if asked.
+  - If the user asks for a metric that is not in the six recorded values (for
+    example margin, LTV, or return rate), say it is not in the data. Do not
+    derive a proxy.
+  - The estimated recovery figures assume the campaign runs against the whole
+    abandoned population. State that assumption whenever you quote them.

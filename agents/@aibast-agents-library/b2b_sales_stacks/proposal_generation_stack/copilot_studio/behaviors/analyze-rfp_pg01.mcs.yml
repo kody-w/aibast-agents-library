@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: analyze-rfp
+  description: Extracts every RFP requirement, scores capability fit against the keyword map, and reports the weighted overall fit percentage.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: analyze-rfp
+  description: Extracts every RFP requirement, scores capability fit against the keyword map, and reports the weighted overall fit percentage.
+  ---
+  <!-- bic:source=blank -->
+  # RFP analysis
+
+  Use this skill when the user asks to analyze, break down, or qualify an RFP,
+  asks what a buyer is asking for, asks how well we fit a requirement set, or
+  names an account and asks where we stand.
+
+  ## Inputs
+
+  - The RFP pipeline (RFP-2024-0147 Meridian Healthcare, RFP-2024-0152 Contoso
+    Technologies, RFP-2024-0159 Pinnacle Financial Group).
+  - Optional: an RFP id or account name. Resolution is a lowercase substring
+    match on the short key (meridian, contoso, pinnacle) or on the account name.
+    With no name, or with a name that matches nothing, default to Meridian
+    Healthcare and say which RFP you used.
+
+  ## Procedure — the scoring rule, applied exactly
+
+  For each requirement in the RFP:
+
+  1. Start at the baseline: `fit_score = 75`, evidence "Addressed through
+     standard platform capabilities".
+  2. Scan the capability keyword map (knowledge: pricing and scoring rules).
+     For every keyword contained in the requirement text, case-insensitive,
+     keep the highest-scoring match and its evidence string. Only a strictly
+     higher score replaces the current one.
+  3. Requirements that match no keyword keep 75 and the baseline evidence.
+
+  Then: `overall fit = round( sum(fit_score * weight) / sum(weight), 1 )`.
+  Weights are the RFP's own requirement weights and sum to 1.00, so the divisor
+  is 1.00 — but compute it as written, never assume the weights sum.
+
+  Worked example, Meridian Healthcare: 95x0.25 + 100x0.20 + 98x0.15 + 90x0.20
+  + 92x0.10 + 88x0.10 = 94.5%.
+
+  ## Output format
+
+  - Headline: `**RFP Analysis: <account> -- <project>**`
+  - Detail table `| Detail | Information |` with exactly these rows: RFP ID,
+    Account, Deal value (dollars, thousands separators), Budget ceiling,
+    Decision timeline (days), Key stakeholder, Competitors shortlisted
+    (comma-separated).
+  - `**Requirements Analysis (Overall Fit: N%):**` then a table with columns
+    `| ID | Requirement | Category | Weight | Fit Score | Evidence |`. Weight
+    renders as a whole percent (0.25 -> 25%).
+  - `**Existing Assets Found:**` as a bullet list of the RFP's stored assets.
+  - Close with the provenance lines: `Source: [CRM + RFP Document + Content
+    Library]` and `Agents: RFPAnalysisAgent, ContentLibraryAgent`.
+
+  ## Edge cases
+
+  - Unknown or blank account name falls back to Meridian Healthcare; name the
+    fallback rather than answering silently about the wrong deal.
+  - An account outside the three pipeline RFPs has no data. Say that; do not
+    synthesize a requirement set.
+  - Never adjust a fit score to make a deal look better. If the user disputes a
+    score, show the keyword that produced it and its evidence string.

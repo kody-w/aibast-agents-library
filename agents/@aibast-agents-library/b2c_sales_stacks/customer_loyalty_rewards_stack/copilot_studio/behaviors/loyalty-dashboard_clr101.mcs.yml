@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: loyalty-dashboard
+  description: Builds the loyalty program dashboard - member count, total points outstanding and cash value, total spend YTD, the member table, and tier distribution.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: loyalty-dashboard
+  description: Builds the loyalty program dashboard - member count, total points outstanding and cash value, total spend YTD, the member table, and tier distribution.
+  ---
+  <!-- bic:source=blank -->
+  # Loyalty dashboard
+
+  Use this skill when the user asks for the loyalty picture, the program
+  dashboard, the member base, "how is the program doing", or any overview of
+  members and points across the whole roster.
+
+  ## Inputs
+
+  - The member roster (knowledge/tools). No arguments are required.
+  - Optional: a tier filter (Platinum, Gold, Silver, Bronze). If the user names
+    a tier, apply it to every row and every count, and say the view is
+    filtered.
+
+  ## Procedure
+
+  1. Retrieve every member in the roster.
+  2. Compute the three headline totals, exactly:
+     - Total Members = the count of members.
+     - Total Points Outstanding = the sum of every member's points balance;
+       its cash value = `sum_of_points x 0.02`, rounded to two decimals.
+     - Total Member Spend YTD = the sum of every member's spend YTD, shown
+       with no decimals.
+  3. List members in roster id order (LM-10001 first). Do not re-sort by
+     points, tier, or spend unless the user asks for that order.
+  4. Count members per tier for the distribution. Report the tiers in the fixed
+     order Platinum, Gold, Silver, Bronze, and report a tier with zero members
+     as 0 rather than dropping the line.
+
+  ## Output format
+
+  Headline block, in this order, one per line:
+
+      **Total Members:** N
+      **Total Points Outstanding:** N,NNN ($N,NNN.NN)
+      **Total Member Spend YTD:** $N,NNN
+
+  Then one table, exactly these columns:
+
+  | Member | Tier | Points | Spend YTD | Engagement | Since |
+
+  Member cell is `Name (LM-id)`. Tier in title case. Points and spend carry
+  thousands separators; spend carries a leading `$` and no decimals.
+  Engagement is the raw score 0-100. Since is the member-since date as
+  recorded (YYYY-MM-DD).
+
+  Then a `## Tier Distribution` section as a bullet per tier: `- Tier: N`.
+
+  ## Edge cases
+
+  - No members match a tier filter: say so and state the filter that produced
+    the empty view. Do not fall back to the unfiltered roster silently.
+  - There is no engagement-score threshold in the program rules. Report
+    engagement as the recorded number; do not label a member "at risk" or
+    "healthy" against a cutoff you were not given.
+  - Dashboard is read-only. Never state that a member was contacted, credited,
+    or moved between tiers.

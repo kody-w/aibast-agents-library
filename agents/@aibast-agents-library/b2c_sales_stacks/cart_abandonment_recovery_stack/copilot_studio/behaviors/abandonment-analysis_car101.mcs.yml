@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: abandonment-analysis
+  description: Reports every abandoned cart with value, segment, exit page, device, and recovery status, plus the exit-page breakdown and total value at risk.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: abandonment-analysis
+  description: Reports every abandoned cart with value, segment, exit page, device, and recovery status, plus the exit-page breakdown and total value at risk.
+  ---
+  <!-- bic:source=blank -->
+  # Abandonment analysis
+
+  Use this skill when the user asks what carts were abandoned, how much value
+  is sitting in abandoned carts, where in checkout customers are dropping off,
+  or asks about a single cart by its CART- id.
+
+  ## Inputs
+
+  - The abandoned cart records.
+  - Optional: a single CART- id, a segment, a device, or an exit page to filter
+    on. Otherwise report every cart.
+
+  ## Procedure
+
+  1. Count the carts in scope. With no filter this is all 4 records.
+  2. Total abandoned value = the sum of every in-scope cart's `cart_value`.
+     Over all 4 carts: 284.98 + 299.97 + 1779.96 + 129.99 = $2,494.90.
+  3. Report the overall abandonment rate straight from the conversion metrics:
+     71.4%. This is a business-wide rate — it is not derived from the 4 cart
+     records and must not be recomputed from them.
+  4. List every in-scope cart in record order (CART-20001 first). Do not
+     re-sort by value unless the user asks for a ranking.
+  5. Build the exit-page breakdown by counting carts per `page_exit`, in the
+     order the exit pages first appear in the records.
+  6. Title-case every enum for display: `loyal_shopper` renders as
+     "Loyal Shopper", `shipping_options` as "Shipping Options",
+     `email_1_sent` as "Email 1 Sent", `mobile` as "Mobile".
+
+  ## Output format
+
+  - Headline: `**Abandoned Carts:** N`, `**Total Abandoned Value:** $N,NNN.NN`,
+    `**Abandonment Rate:** 71.4%`.
+  - `## Abandoned Carts Detail` — a table with exactly these columns:
+    `Cart ID | Customer | Segment | Value | Exit Page | Device | Status`.
+    Value formatted with a thousands separator and two decimals.
+  - `## Exit Page Breakdown` — one bullet per exit page as
+    `- <Exit Page>: <count>`.
+  - When the user asks about one cart, add its line items with SKU, unit price,
+    and quantity.
+
+  ## Edge cases
+
+  - A cart with `email: None` still appears in this analysis — abandonment
+    analysis covers every cart, including unrecoverable ones. Its status renders
+    as "Unrecoverable".
+  - If the user names a CART- id that is not in the records, say the cart is not
+    in the data and list the ids that are. Never invent a cart.
+  - Guest carts have no prior purchase history; report `0` prior purchases as
+    recorded, not as unknown.

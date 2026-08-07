@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: customer-profile
+  description: Returns the unified profile for one customer, or the full customer 360 overview table with total lifetime value.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: customer-profile
+  description: Returns the unified profile for one customer, or the full customer 360 overview table with total lifetime value.
+  ---
+  <!-- bic:source=blank -->
+  # Customer profile
+
+  Use this skill when the user asks who a customer is, asks for a profile,
+  segment, lifetime value, tenure, preferred channel, purchase summary, or
+  preferences — or asks for the customer book as a whole.
+
+  ## Inputs
+
+  - The customer profile roster and the interaction log.
+  - Optional: a single C360- id. With no id, return the overview.
+
+  ## Procedure
+
+  1. If a customer id is supplied and it exists in the roster, return the
+     detail view. If a customer id is supplied and it does NOT exist, say the
+     id is not on file. Do not fall back to the overview or to another
+     customer's record.
+  2. If no customer id is supplied, return the overview table for every
+     customer in the roster.
+  3. Compute overall sentiment with the fixed formula: positive = +1,
+     neutral = 0, negative = -1; `score = sum / count of interactions` rounded
+     to two decimals; label is `positive` when `score > 0.30`, `negative` when
+     `score < -0.30`, otherwise `neutral`.
+  4. Formatting is exact: lifetime value as a whole dollar amount with a
+     thousands separator (`$12,450`); average order value to two decimals
+     (`$264.89`); return rate as a percentage (`4.2%`); segment and preferred
+     channel rendered with underscores replaced by spaces in Title Case
+     (`at_risk` becomes `At Risk`, `mobile_app` becomes `Mobile App`);
+     communication preference uppercased (`EMAIL`, `SMS`).
+  5. For the overview, sum lifetime value across every customer and report it
+     as `**Total Customer LTV:**`.
+
+  ## Output format — detail view
+
+  - Headline: `# Customer Profile: <name> (<C360-id>)`
+  - Bullets in this order: Email, Phone, Segment, Lifetime Value, Member
+    Since, Preferred Channel, Overall Sentiment (label and score).
+  - `## Purchase Summary` — Total Orders, Avg Order Value, Last Order,
+    Return Rate.
+  - `## Preferences` — Categories (comma separated), Communication.
+
+  ## Output format — overview
+
+  - Headline: `# Customer 360 Overview`
+  - Table columns, in this order:
+    `ID | Name | Segment | LTV | Orders | Last Order | Sentiment`
+  - Footer line: `**Total Customer LTV:** $N`
+
+  ## Edge cases
+
+  - A customer with no logged interactions scores `neutral` at 0.0; say the
+    sentiment is based on zero interactions rather than implying it is calm.
+  - Email and phone appear only in the detail view. Never add contact columns
+    to the overview table.
+  - Never recompute or restate lifetime value from order count multiplied by
+    average order value — report the recorded figure.

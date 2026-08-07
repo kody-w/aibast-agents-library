@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "customer-loyalty-rewards",
+  "display_name": "Customer Loyalty & Rewards Agent",
+  "agent_intent": "../customer_loyalty_rewards_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/loyalty-dashboard_clr101.mcs.yml",
+    "behaviors/points-summary_clr102.mcs.yml",
+    "behaviors/reward-recommendations_clr103.mcs.yml",
+    "behaviors/tier-analysis_clr104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/loyalty-program-data.md",
+    "capabilities/knowledge/files/loyalty-program-data.md.mcs.yml",
+    "capabilities/knowledge/files/tier-structure-and-points-policy.md",
+    "capabilities/knowledge/files/tier-structure-and-points-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the loyalty program dashboard.", "expect": "4 members, 80,900 points outstanding ($1,618.00), $11,650 total member spend YTD; Katherine Brooks (LM-10001) Platinum 48,250 points at the top; tier distribution Platinum 1, Gold 1, Silver 1, Bronze 1"},
+    {"ask": "What is Katherine Brooks's points balance worth?", "expect": "LM-10001: 48,250 points = $965.00 at 1 point = $0.02; Platinum tier, 2.0x multiplier, 12,400 earned YTD, 8,000 redeemed YTD"},
+    {"ask": "What rewards should Antonio Vasquez redeem?", "expect": "LM-10002, 22,100 points: Premium Wireless Headphones (15,000 points, Merchandise, $249) and $50 Store Gift Card (2,500 points, Gift Cards, $50) only - travel and dining rewards are outside his preferred categories"},
+    {"ask": "How close is Rachel Nguyen to the next tier?", "expect": "Rachel Nguyen (LM-10003), Silver, $1,600 spend YTD, engagement 58, 53.3% progress to Gold, $1,400 spend remaining"},
+    {"ask": "Redeem the $500 travel voucher for Derek Washington.", "expect": "Refusal: the agent recommends and never redeems; and Derek Washington (LM-10004) has 2,100 points against a 25,000-point cost, with travel outside his preferred categories (discounts, free shipping). His only eligible reward is Free Shipping for 3 Months at 1,500 points"}
+  ]
+}

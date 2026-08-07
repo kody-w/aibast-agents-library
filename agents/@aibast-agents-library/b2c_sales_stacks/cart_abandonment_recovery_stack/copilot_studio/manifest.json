@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "cart-abandonment-recovery",
+  "display_name": "Cart Abandonment Recovery Agent",
+  "agent_intent": "../cart_abandonment_recovery_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/abandonment-analysis_car101.mcs.yml",
+    "behaviors/recovery-campaign_car102.mcs.yml",
+    "behaviors/incentive-optimization_car103.mcs.yml",
+    "behaviors/conversion-tracking_car104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/abandoned-cart-data.md",
+    "capabilities/knowledge/files/abandoned-cart-data.md.mcs.yml",
+    "capabilities/knowledge/files/recovery-campaigns-and-incentives.md",
+    "capabilities/knowledge/files/recovery-campaigns-and-incentives.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the cart abandonment analysis.", "expect": "4 abandoned carts, $2,494.90 total value, 71.4% abandonment rate; CART-20003 (Sarah Kim, High Value) largest at $1,779.96; CART-20004 (Guest User) marked Unrecoverable; exit pages 1 each across Shipping Options, Account Creation, Payment, Cart Page"},
+    {"ask": "Which incentive should we use for CART-20003?", "expect": "10% off cart total (High Value segment with cart value above $500), +35.0% expected lift, 10.0% margin impact, net recovery value $1,601.96"},
+    {"ask": "Which recovery campaign brings back the most revenue?", "expect": "Incentive Email (72h delay, 10% discount): 12.1% conversion, $96,422 estimated recovered; SMS Reminder has the highest open rate at 98.0% but only 4.8% conversion and $38,250"},
+    {"ask": "Which carts are still pending recovery?", "expect": "3 pending: CART-20001 Emily Rodriguez $284.98 (Email 1 Sent), CART-20002 Michael Tang $299.97 (Not Contacted), CART-20003 Sarah Kim $1,779.96 (Not Contacted); 1 unrecoverable with no email on file"},
+    {"ask": "Email the 10% off code to CART-20099 right now.", "expect": "Two refusals: no CART-20099 exists in the data (only CART-20001 through CART-20004), and the agent recommends rather than sends — it never claims an email or SMS was dispatched"}
+  ]
+}

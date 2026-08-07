@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: compliance-status
+  description: Tests each facility's Scope 1 CO2 against its regulatory threshold and its actual reduction against its baseline-year target, reporting compliance and on-track status separately.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compliance-status
+  description: Tests each facility's Scope 1 CO2 against its regulatory threshold and its actual reduction against its baseline-year target, reporting compliance and on-track status separately.
+  ---
+  <!-- bic:source=blank -->
+  # Compliance status
+
+  Use this skill when the user asks whether facilities are compliant, who is
+  over threshold, who is behind on reduction targets, or how much progress has
+  been made against the baseline.
+
+  ## Inputs
+
+  - The facility emissions inventory, including `regulatory_threshold_co2`,
+    `reduction_target_pct`, `baseline_year`, and `baseline_co2`.
+  - Optional: a single FAC- id to filter to one facility.
+
+  ## Procedure — two independent tests, never merged
+
+  For each facility:
+
+  1. **Compliance test.** `compliant = scope_1_co2 <= regulatory_threshold_co2`.
+     Render `YES` or `NO`.
+  2. **Gap.** `gap_tonnes = scope_1_co2 - regulatory_threshold_co2` when not
+     compliant, otherwise `0`. A compliant facility always shows a gap of `0` —
+     never report headroom as a negative gap.
+  3. **Actual reduction.**
+     `actual_reduction_pct = round((1 - scope_1_co2 / baseline_co2) * 100, 1)`.
+     If `baseline_co2` is 0, report `0`.
+  4. **Track test.** `on_track = actual_reduction_pct >= reduction_target_pct`.
+     Render `On Track` or `Behind`.
+
+  The two tests are independent. A facility under its threshold with reduction
+  progress short of its target is `YES` / `Behind` — report both, and if asked
+  for a single verdict, give both and say why one number cannot carry it.
+
+  ## Output format
+
+  - `# Compliance Status`
+  - One table, columns exactly:
+    `Facility | Scope 1 CO2 | Threshold | Compliant | Gap | Target Reduction | Actual`
+  - The `Actual` cell renders as `N% (On Track)` or `N% (Behind)`.
+  - Tonnages with thousands separators; percentages to one decimal.
+
+  ## Edge cases
+
+  - A facility whose Scope 1 is 0 reads as a 100.0% reduction against its
+    baseline and is On Track by arithmetic. Say that its Scope 1 is zero rather
+    than presenting it as an abatement achievement.
+  - Thresholds vary by facility and are not the same as the program thresholds
+    in the regulatory register — use the facility's own
+    `regulatory_threshold_co2` for this test.
+  - Scope 2 and Scope 3 never enter the compliance test.
+
+  ## Boundaries
+
+  - This is an internal readiness read, not a regulatory determination. Never
+    state that a facility "is in compliance with" a named regulation, that a
+    filing has been made, or that an agency has been notified.
+  - Never soften a `Behind` reading with offsets; offsets are a separate lever.

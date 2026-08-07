@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: budget-projection
+  description: Computes the annual maintenance budget per asset from the rate card, applies the 1.5x degraded-asset uplift, and totals the fleet.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: budget-projection
+  description: Computes the annual maintenance budget per asset from the rate card, applies the 1.5x degraded-asset uplift, and totals the fleet.
+  ---
+  <!-- bic:source=blank -->
+  # Budget projection
+
+  Use this skill when the user asks what maintenance will cost next year, asks
+  for the maintenance budget, asks which asset is most expensive to maintain, or
+  asks to justify a spend number.
+
+  ## Inputs
+
+  - The asset register (asset type, condition score, replacement cost).
+  - The maintenance rate card: a major, minor, and inspection rate per asset
+    type.
+
+  ## Procedure — compute it, do not estimate it
+
+  For each asset, using the rate card entries for that asset's type:
+
+  `annual_budget = major_rate + (minor_rate x 2) + inspection_rate`
+
+  The cadence baked into that formula is one major service, two minor services,
+  and one inspection per year. It is fixed; do not vary it per asset.
+
+  Then apply the degraded-asset uplift:
+
+  `if condition_score < 50: annual_budget = round(annual_budget x 1.5)`
+
+  The uplift threshold is the same 50 that defines the CRITICAL band. It is
+  never applied for age, failure rate, urgency, or judgment, and never omitted
+  for an asset that qualifies.
+
+  Worked examples from the current register:
+
+  - Gas Turbine GT-3A (AST-T004, gas_turbine, condition 88):
+    `360,000 + (25,000 x 2) + 15,000 = 425,000`. No uplift.
+  - Substation Transformer B-12 (AST-X002, transformer, condition 42):
+    `135,000 + (20,000 x 2) + 7,000 = 182,000`, then `x 1.5 = 273,000`.
+  - Gas Pipeline Segment NE-14 (AST-P003, pipeline, condition 75):
+    `225,000 + (12,000 x 2) + 16,000 = 265,000`. No uplift.
+  - Wind Turbine Alpha-7 (AST-T001, wind_turbine, condition 68):
+    `52,000 + (9,000 x 2) + 4,000 = 74,000`. Condition 68 is a WARNING but is
+    not below 50, so no uplift.
+
+  Sort the rows by `annual_budget` **descending** — most expensive first. Note
+  that this ordering is not the health ordering: the healthiest asset can carry
+  the largest budget.
+
+  Total annual budget is the sum of every asset's `annual_budget` after uplift.
+
+  ## Output format
+
+  Headline `# Maintenance Budget Projection`, then:
+
+  - `**Total Annual Budget:** $N,NNN,NNN`
+  - A table with exactly these columns:
+    `| Asset | Type | Condition | Annual Budget | Replacement Cost |`
+  - All money with thousands separators and a leading `$`.
+
+  ## Edge cases
+
+  - Show the arithmetic when asked, including the uplift step, and name the
+    condition score that triggered it.
+  - Replacement cost is reported alongside the budget for capital context only.
+    It is never added into the total annual budget.
+  - There is no rate card entry for an asset type outside the four in the
+    register. If asked to budget one, say there is no rate for that type rather
+    than borrowing a neighbouring rate.
+  - Figures are rate-card estimates, not quotes and not authorized spend. Never
+    say a budget has been approved or committed.

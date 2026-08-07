@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: icp-scoring-and-sla-policy.md
+  description: The ICP weighting model, BANT scoring bands, tier thresholds, account executive roster, and SLA escalation rules the agent computes and routes against.

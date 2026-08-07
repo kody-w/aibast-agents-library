@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: emissions-dashboard
+  description: Renders the portfolio GHG inventory by facility with Scope 1, 2, and 3 CO2, the portfolio total, and each facility's Scope 1 load against its regulatory threshold.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: emissions-dashboard
+  description: Renders the portfolio GHG inventory by facility with Scope 1, 2, and 3 CO2, the portfolio total, and each facility's Scope 1 load against its regulatory threshold.
+  ---
+  <!-- bic:source=blank -->
+  # Emissions dashboard
+
+  Use this skill when the user asks for the emissions picture, the GHG
+  inventory, total portfolio emissions, emissions by facility or by scope, or
+  how close a facility is to its threshold.
+
+  ## Inputs
+
+  - The facility emissions inventory.
+  - Optional: a single FAC- id to filter to one facility. Otherwise report
+    every facility.
+
+  ## Procedure — compute it, do not estimate it
+
+  For each facility, in inventory order (FAC-E01, FAC-E02, FAC-E03, FAC-E04):
+
+  1. `scope_1 = emissions.scope_1.co2_tonnes`
+  2. `scope_2 = emissions.scope_2.co2_tonnes`
+  3. `scope_3 = emissions.scope_3.co2_tonnes`
+  4. `total = scope_1 + scope_2 + scope_3`
+  5. `pct_of_threshold = round(scope_1 / regulatory_threshold_co2 * 100, 1)`
+     — Scope 1 only. If `regulatory_threshold_co2` is 0, report `0`; never
+     divide by zero.
+  6. `total_emissions = sum(total)` across every facility reported.
+
+  Only the CO2 figure enters these sums. CH4 and N2O tonnages exist in the
+  inventory but are not aggregated here — do not add them in, and do not
+  convert them to CO2e; no conversion factor exists in this data.
+
+  ## Output format
+
+  - `# Emissions Dashboard`
+  - `**Total Portfolio Emissions:** N tonnes CO2e`
+  - One table, columns exactly:
+    `Facility | Type | Scope 1 | Scope 2 | Scope 3 | Total | % of Threshold`
+  - Facility name and raw type slug (`natural_gas_plant`, `wind_farm`,
+    `coal_plant`, `refinery`). Tonnages with thousands separators; the
+    percentage to one decimal with a `%` suffix.
+
+  ## Edge cases
+
+  - A zero-Scope-1 facility (a wind farm) shows `0` and `0.0%`. That is a real
+    reading, not missing data — say so if asked.
+  - A facility with `capacity_mw` of 0 (a refinery) is still in the inventory;
+    do not treat capacity as a filter.
+  - Scope 3 can exceed Scope 1 and 2 combined. Report it as rendered; do not
+    reweight or footnote it away.
+
+  ## Boundaries
+
+  - Reporting only. Never state that a figure has been filed, submitted, or
+    reported to a regulator.
+  - If a facility id is not in the inventory, say it is not present. Never
+    interpolate a facility from portfolio averages.

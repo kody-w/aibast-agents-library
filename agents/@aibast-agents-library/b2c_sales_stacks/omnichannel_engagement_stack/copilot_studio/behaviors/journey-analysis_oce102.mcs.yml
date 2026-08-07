@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: journey-analysis
+  description: Maps each customer journey - touchpoint sequence, average duration, average touchpoint count, and conversion rate - with the recorded optimization opportunities.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: journey-analysis
+  description: Maps each customer journey - touchpoint sequence, average duration, average touchpoint count, and conversion rate - with the recorded optimization opportunities.
+  ---
+  <!-- bic:source=blank -->
+  # Journey analysis
+
+  Use this skill when the user asks about customer journeys, the path to
+  purchase, touchpoint sequences, how long conversion takes, or which journey
+  converts best.
+
+  ## Inputs
+
+  - The mapped journey set (knowledge/tools). Four journeys are mapped:
+    Discovery to Purchase, Repeat Purchase, Win-Back, Impulse Purchase.
+  - Optional: a single journey name. Render that journey's block; the other
+    journeys stay available for comparison.
+
+  ## Procedure
+
+  1. Walk the journeys in recorded order: Discovery to Purchase, Repeat
+     Purchase, Win-Back, Impulse Purchase. Do not re-sort by conversion rate
+     unless the user asks for a ranking, and say so when you do.
+  2. For each journey report the recorded fields verbatim - `avg_days`,
+     `avg_touchpoints`, `conversion_rate`. These are recorded values, not
+     computed ones; never derive them from the channel data.
+  3. Render the touchpoint list in sequence order, numbered from 1, with
+     ` -> ` after every touchpoint except the last. Touchpoint names in title
+     case with underscores as spaces (`social_media_ad` -> `Social Media Ad`).
+  4. Close with the recorded optimization opportunities, one per journey.
+
+  ## Output format
+
+  For each journey:
+
+  - `## <Journey Name>`
+  - `- **Avg Duration:** N days`
+  - `- **Avg Touchpoints:** N`
+  - `- **Conversion Rate:** N%`
+  - `**Touchpoint Sequence:**` followed by the numbered list
+
+  Then `## Journey Optimization Opportunities`, exactly these four bullets:
+
+  - `**Discovery:** Shorten path by enabling social commerce checkout`
+  - `**Repeat:** Leverage push notifications for faster re-engagement`
+  - `**Win-Back:** Test earlier SMS touchpoint (day 7 vs day 14)`
+  - `**Impulse:** Optimize social ad creative for direct conversion`
+
+  ## Edge cases
+
+  - Impulse Purchase has `avg_days` 0. Report it as 0 days - same-session
+    conversion - not as missing data.
+  - The touchpoint labels are journey-level names (`email_promo`,
+    `website_purchase`, `mobile_app_browse`). They are not the same records as
+    the seven performance channels; never join a journey conversion rate to a
+    channel CVR or claim revenue for a journey. The journey set carries no
+    revenue, cost, or volume.
+  - A journey the user names that is not one of the four has no data. Say so
+    and list the four mapped journeys.
+  - The optimization opportunities are recorded recommendations for a person
+    to act on. Never present them as changes that have been made.

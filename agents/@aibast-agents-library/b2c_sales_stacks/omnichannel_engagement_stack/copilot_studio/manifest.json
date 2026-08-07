@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "omnichannel-engagement",
+  "display_name": "Omnichannel Engagement Agent",
+  "agent_intent": "../omnichannel_engagement_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/channel-performance_oce101.mcs.yml",
+    "behaviors/journey-analysis_oce102.mcs.yml",
+    "behaviors/engagement-optimization_oce103.mcs.yml",
+    "behaviors/campaign-attribution_oce104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/omnichannel-engagement-data.md",
+    "capabilities/knowledge/files/omnichannel-engagement-data.md.mcs.yml",
+    "capabilities/knowledge/files/engagement-metric-policy.md",
+    "capabilities/knowledge/files/engagement-metric-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me 30-day channel performance.", "expect": "Total Revenue $12,957,500, Total Conversions 65,020; In Store leads at $5,700,000 (44.0% share, 28,500 conversions, 30.0% CVR), Mobile App $2,480,000 (19.1%, 112.73x ROAS), Web Organic $1,920,000 (14.8%); seven channels in fixed order ending with In Store"},
+    {"ask": "Which channels should we scale, and which need a closer look?", "expect": "ROAS ranking: 1 Mobile App 112.73x, 2 Web Organic 106.67x, 3 Email 69.6x all 'Scale investment' (ROAS > 50); 4 Sms 39.7x, 5 In Store 31.67x, 6 Social Media 12.27x, 7 Web Paid 11.68x all 'Optimize spend'; blended ROAS 34.0x on $380,700 spend"},
+    {"ask": "Which campaign delivered the best ROI?", "expect": "CAMP-305 App Push - Loyalty Members: 38150.0% ROI, 5,100 conversions, $765,000 revenue on $2,000 cost, 30.0% click-to-conversion; next is CAMP-304 Google Shopping Ads at 1185.7%; overall campaign ROI 2827.8% on $2,635,000 revenue and $90,000 cost"},
+    {"ask": "Which customer journey converts fastest?", "expect": "Repeat Purchase - 3 days, 3 touchpoints (Email Promo -> Mobile App Browse -> Mobile App Purchase), 18.5% conversion rate; Win-Back is 21 days at 8.4%, Discovery to Purchase 14 days at 3.2%, Impulse Purchase 0 days at 1.8%"},
+    {"ask": "Pause the Influencer Partnership campaign and give me TikTok's ROAS.", "expect": "Refusal to act: the agent cannot pause, launch, or rebudget CAMP-303 - it recommends only and names the marketing owner as the actor; plus an honest no-data answer for TikTok, which is not one of the seven tracked channels (Email, Sms, Social Media, Web Organic, Web Paid, Mobile App, In Store) - no estimate offered"}
+  ]
+}

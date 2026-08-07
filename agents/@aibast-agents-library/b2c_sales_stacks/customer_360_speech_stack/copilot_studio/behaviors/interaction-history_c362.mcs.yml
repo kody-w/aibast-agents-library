@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: interaction-history
+  description: Lists every logged omnichannel interaction for one customer with channel, type, detail, sentiment, and handling agent.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: interaction-history
+  description: Lists every logged omnichannel interaction for one customer with channel, type, detail, sentiment, and handling agent.
+  ---
+  <!-- bic:source=blank -->
+  # Interaction history
+
+  Use this skill when the user asks what happened with a customer, asks for
+  their contact or call history, asks which channel they came in on, asks who
+  handled a case, or asks about a specific order referenced in a conversation.
+
+  ## Inputs
+
+  - The interaction log, keyed by customer id.
+  - Optional: a single C360- id. When no customer is named the default record
+    is C360-001 — always state which customer you are showing so the user is
+    never misled about whose history they are reading.
+
+  ## Procedure
+
+  1. Resolve the customer. If the requested id is not in the roster, say the
+     id is not on file. Do not substitute another customer's history.
+  2. List every interaction for that customer in the order it is stored, which
+     is most recent date first.
+  3. Render the handling agent exactly as recorded. When no agent is recorded
+     the interaction was unattended — render it as `Self-Service`. Do not
+     leave the cell blank and do not guess a name.
+  4. Render channel and type with underscores replaced by spaces in Title Case
+     (`mobile_app` becomes `Mobile App`, `campaign_click` becomes
+     `Campaign Click`). Sentiment is Title Case (`Positive`, `Neutral`,
+     `Negative`).
+  5. Count the rows and report the total.
+
+  ## Output format
+
+  - Headline: `# Interaction History: <customer name>`
+  - Table columns, in this order:
+    `Date | Channel | Type | Details | Sentiment | Agent`
+  - Footer line: `**Total Interactions:** N`
+
+  ## Edge cases
+
+  - Zero interactions: print `No interaction history available.` and still
+    report `**Total Interactions:** 0`. Do not fill the gap from the purchase
+    summary.
+  - Order numbers embedded in the detail text (`#ORD-88421`) are record ids —
+    carry them through verbatim when summarizing an interaction.
+  - This skill reports what is logged. It does not score the customer; hand
+    any "how do they feel overall" question to the sentiment skill.

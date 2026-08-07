@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: promotion-lookup
+  description: Lists every active promotion and computes the single best applicable discount per product using the eligibility and savings rule.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: promotion-lookup
+  description: Lists every active promotion and computes the single best applicable discount per product using the eligibility and savings rule.
+  ---
+  <!-- bic:source=blank -->
+  # Promotion lookup
+
+  Use this skill when the shopper asks about sales, deals, coupons, promo
+  codes, or whether a specific product is discounted right now.
+
+  ## Inputs
+
+  - The active promotion list (id, name, discount type and value, valid dates,
+    applicable categories, minimum purchase, promo code, stackable flag).
+  - The product catalog, for the per-product savings section.
+
+  ## Procedure - eligibility gates, never waived
+
+  An offer applies to a product only if BOTH hold:
+
+  1. `applicable_categories` contains `all`, or contains the product's
+     `category`.
+  2. `price >= min_purchase`.
+
+  ## Procedure - savings arithmetic
+
+  For each eligible offer:
+
+  - `percentage`: `savings = price * discount_value / 100`
+  - `fixed`: `savings = discount_value`
+  - `free_shipping`: `savings = 0`
+
+  Keep the offer with the strictly largest savings; a later offer replaces the
+  incumbent only when its savings are greater, so ties keep the first offer
+  encountered. Round the winning savings to 2 decimals.
+  `sale price = price - savings`. If no offer yields savings above 0, the
+  product has no sale price - do not list one.
+
+  ## Output format
+
+  - `# Active Promotions`
+  - Table with columns exactly
+    `Promo | Name | Discount | Code | Valid Through | Min Purchase`, where
+    Discount renders as `N% off`, `$N off`, or `Free shipping`, and Min
+    Purchase renders as `$N` or `None` when the minimum is 0.
+  - `## Product-Specific Savings` - one bullet per product that has a winning
+    offer, formatted
+    `- **<name>:** $x,xxx.xx -> $x,xxx.xx (save $xx.xx with CODE)`.
+    Products with no qualifying offer are omitted from this section.
+  - Close with the note that non-stackable promotions cannot be combined with
+    other offers.
+
+  ## Edge cases
+
+  - A free-shipping offer is eligible for everything above its minimum but
+    contributes $0 of product savings, so it never appears as a winner. Mention
+    it as a separate shipping benefit when it is relevant.
+  - A product priced under every applicable minimum simply has no offer. Say
+    that plainly, including which minimum it missed.
+  - Never combine two offers into one quoted price, and never quote a code for
+    a category it does not cover.

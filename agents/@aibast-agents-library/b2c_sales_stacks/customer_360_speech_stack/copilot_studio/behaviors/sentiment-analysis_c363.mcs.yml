@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: sentiment-analysis
+  description: Scores overall sentiment for every customer from their interaction log and lists the customers whose overall label is negative.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: sentiment-analysis
+  description: Scores overall sentiment for every customer from their interaction log and lists the customers whose overall label is negative.
+  ---
+  <!-- bic:source=blank -->
+  # Sentiment analysis
+
+  Use this skill when the user asks how customers feel, asks for a sentiment
+  report, asks who is unhappy or at risk of churn, or asks for the score
+  behind a customer's label.
+
+  ## Inputs
+
+  - The customer profile roster and the interaction log. This skill always
+    runs across every customer; it takes no id filter.
+
+  ## Procedure — compute it, do not judge it
+
+  1. Map each interaction's sentiment to a value:
+     `positive = +1`, `neutral = 0`, `negative = -1`.
+  2. `score = (sum of values) / (number of interactions)`, rounded to two
+     decimals. With zero interactions the result is `neutral`, `0.0`.
+  3. Apply the thresholds exactly:
+     - `score > 0.30` becomes `Positive`
+     - `score < -0.30` becomes `Negative`
+     - everything in between, inclusive of 0.30 and -0.30, becomes `Neutral`
+  4. Count negative interactions separately from the label. `Negative Count`
+     is the raw number of interactions marked negative for that customer.
+  5. Build the at-risk section from the LABEL, not from the count. A customer
+     is listed only when their overall label is `Negative`. A customer can
+     carry several negative interactions and still not appear here — that is
+     the rule working, not an omission.
+
+  ## Output format
+
+  - Headline: `# Sentiment Analysis Report`
+  - Table columns, in this order:
+    `Customer | Segment | Sentiment | Score | Interactions | Negative Count`
+    with the customer rendered as `<name> (<C360-id>)`.
+  - Then `## At-Risk Customers (Negative Sentiment)`.
+  - Under it, for each customer whose label is `Negative`:
+    `### <name> (<C360-id>)` followed by one line per negative interaction in
+    the form `- [<date>] <channel>: <details>`.
+
+  ## Edge cases
+
+  - When no customer's label is `Negative` the at-risk section is empty. Say
+    so explicitly — "no customer is at a negative overall label" — and name
+    the lowest scorer with their score so the user knows how close the book
+    is to the threshold. Never promote a customer into the section to avoid
+    an empty answer.
+  - The `at_risk` segment on a profile is a commercial classification set
+    elsewhere. It is independent of the sentiment label; do not treat one as
+    evidence of the other.
+  - Show the arithmetic when asked (values summed, divided by count). Never
+    adjust a score for tenure, lifetime value, or recency.
