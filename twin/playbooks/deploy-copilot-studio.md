@@ -132,3 +132,12 @@ Then put the verification questions from the context block to the agent in the
 Test pane and compare each answer against its expected result. Report each as
 pass or fail with what the agent actually said. If the gate questions fail,
 the mission is NOT complete — say so and fix before anyone demos this.
+
+Friction, seen live:
+- **Test pane won't open (Preview bounces to the home page) or the chat canvas
+  shows a `javascripterror` banner with an empty transcript** → Copilot
+  Studio's config service (ecs.office.com) may be having an outage; this is
+  Microsoft-side, not your build. The Build page still proves the components
+  and instructions landed. Report the deployment as "published, runtime
+  verification pending service recovery" — never as verified — and retry the
+  questions later.
