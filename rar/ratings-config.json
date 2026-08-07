@@ -6,6 +6,7 @@
   "Repo Settings -> enable Discussions",
   "Create/confirm the Announcements category (announcement type: only maintainers open threads \u2014 the anti-spam property)",
   "Run: GITHUB_TOKEN=<maintainer token> python3 tools/create_discussions.py  (idempotent; writes rar/discussions.json)",
-  "The daily ratings workflow and the workshop's rate links activate on their own"
+  "The daily ratings workflow and the workshop's rate links activate on their own",
+  "At the first release with agent assets: brainstem installs become countable automatically (release-first fetch is already wired); also flip the workshop Step 1 curl to https://github.com/microsoft/aibast-agents-library/releases/latest/download/sales_specialist_twin_agent.py so twin downloads count too"
  ]
 }

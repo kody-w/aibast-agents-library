@@ -1886,6 +1886,10 @@
   // Same revision via the staging mirror — used when the upstream repo does
   // not yet carry this commit (pre-merge) or raw rate-limits.
   const RAR_MIRROR = `https://raw.githubusercontent.com/kody-w/aibast-agents-library/${RAR_REVISION}`;
+  // Release assets carry native download counts, so installs are measurable.
+  // Integrity does NOT depend on the source: the SHA-256 pinned in the RAR
+  // catalog is verified below regardless of where the bytes came from.
+  const RAR_RELEASE_DL = 'https://github.com/microsoft/aibast-agents-library/releases/latest/download';
   async function rarFetch(path) {
     try {
       const r = await fetch(encodeURI(`${RAR_BASE}/${path}`));
@@ -2140,8 +2144,15 @@
     btn.disabled = true;
     btn.textContent = 'Adding…';
     try {
+      // Prefer the release asset (counted by GitHub) and fall back to the
+      // pinned raw file; the digest check below guards both paths equally.
       // encodeURI preserves '/' and '@' (used in scope dirs) while escaping spaces.
-      const r = await rarFetch(path);
+      let r = null;
+      try {
+        const rel = await fetch(`${RAR_RELEASE_DL}/${filename}`);
+        if (rel.ok) r = rel;
+      } catch (e) { /* release may not exist yet — fall through */ }
+      if (!r) r = await rarFetch(path);
       if (!r.ok) throw new Error('download failed (HTTP ' + r.status + ')');
       const bytes = await r.arrayBuffer();
       const actualDigest = await sha256Hex(bytes);
