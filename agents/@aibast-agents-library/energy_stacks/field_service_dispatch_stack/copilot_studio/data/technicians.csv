@@ -1,0 +1,6 @@
+tech_id,name,certifications,zone,status,current_location,jobs_today,max_jobs,efficiency_rating,years_experience
+TECH-201,Carlos Rivera,"electrical_high_voltage;transformer_maintenance;confined_space",West,available,"Sacramento, CA",1,4,94,12
+TECH-202,Amy Blackwell,"wind_turbine;electrical_high_voltage;crane_operation",Central,on_job,"Sweetwater, TX",2,4,91,8
+TECH-203,Raj Patel,"gas_turbine;combustion_systems;electrical_high_voltage",West,available,"Bakersfield, CA",0,4,97,15
+TECH-204,Sarah Johansson,"pipeline_inspection;welding_api1104;hazmat",Northeast,available,"Scranton, PA",1,4,88,6
+TECH-205,Marcus Thompson,"electrical_high_voltage;transformer_maintenance;scada_systems",Central,on_break,"Denver, CO",2,4,92,10

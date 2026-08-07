@@ -1,0 +1,48 @@
+mcs.metadata:
+  componentName: emergency-response
+  description: Builds the response plan for critical and emergency service requests - every certified responder listed regardless of current status.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: emergency-response
+  description: Builds the response plan for critical and emergency service requests - every certified responder listed regardless of current status.
+  ---
+  <!-- bic:source=blank -->
+  # Emergency response
+
+  Use this skill the moment a conversation involves an emergency, an outage, a
+  critical-priority request, or the user asks "who can respond".
+
+  ## Scope
+
+  An emergency is any service request whose `type` is `emergency` OR whose
+  `priority` is `critical`. If a zone filter applies, restrict to that zone.
+
+  ## Procedure
+
+  1. Find every request in scope. If there are none, report exactly that:
+     "No active emergencies." — nothing else.
+  2. For each emergency, list **every** technician who holds all of its
+     required certifications — regardless of status. A technician on a job or
+     on break is still a valid emergency responder; their status is shown so
+     the dispatcher can weigh the interruption.
+  3. Note proximity when it is visible in the data (a responder already located
+     in the same city or area as the emergency is worth calling out).
+
+  ## Output format
+
+  Headline: `**Active Emergencies:** N`
+
+  Then per emergency:
+
+  - `## <title>` with priority (caps), location, equipment, estimated hours
+  - `**Eligible Responders:**` table with columns:
+    | Technician | Status | Current Location |
+
+  ## Boundaries
+
+  - The certification gate holds even here. If no certified responder exists,
+    say so and recommend escalation to the on-call engineering manager —
+    never suggest sending an uncertified technician.
+  - Recommendation only: the dispatcher makes the call and contacts the
+    responder. Never state that anyone has been dispatched.

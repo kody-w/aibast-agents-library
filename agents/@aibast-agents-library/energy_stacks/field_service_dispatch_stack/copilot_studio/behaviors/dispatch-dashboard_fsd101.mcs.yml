@@ -1,0 +1,48 @@
+mcs.metadata:
+  componentName: dispatch-dashboard
+  description: Builds the dispatch dashboard - every open service request ranked by priority, with unassigned work and technician availability up front.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: dispatch-dashboard
+  description: Builds the dispatch dashboard - every open service request ranked by priority, with unassigned work and technician availability up front.
+  ---
+  <!-- bic:source=blank -->
+  # Dispatch dashboard
+
+  Use this skill when the user asks for the dispatch picture, the board, the
+  queue, today's work, or any overview of open service requests.
+
+  ## Inputs
+
+  - The service request queue and the technician roster (knowledge/tools).
+  - Optional: a zone filter (West, Central, Northeast). If the user names a
+    zone, apply it to every row and every count, and say the view is filtered.
+
+  ## Procedure
+
+  1. Retrieve all service requests. If a zone filter applies, keep only
+     requests in that zone.
+  2. Sort by priority: critical, high, medium, low. Never any other order.
+  3. Count: total requests shown, how many are unassigned, and how many
+     technicians are currently in status `available` (zone-filtered when a
+     filter applies).
+  4. Render the headline line first, then the table.
+
+  ## Output format
+
+  Headline: `**Total Requests:** N | **Unassigned:** N | **Available Techs:** N`
+
+  Then one table, exactly these columns:
+
+  | Priority | Request | Type | Zone | Location | Hours | Status |
+
+  Priority in caps (CRITICAL / HIGH / MEDIUM / LOW). Hours as the estimated
+  hours with an `h` suffix. Status as recorded (`unassigned`, `assigned`).
+
+  ## Edge cases
+
+  - No requests match: say so and state the filter that produced the empty view.
+  - If any request is priority critical or type emergency, add one line under
+    the headline pointing the user to emergency response for it, citing its
+    SR- id.

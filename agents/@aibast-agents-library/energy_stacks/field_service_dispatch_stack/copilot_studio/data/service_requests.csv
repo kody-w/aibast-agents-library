@@ -1,0 +1,6 @@
+request_id,title,priority,type,required_certs,zone,location,equipment,estimated_hours,status
+SR-4001,Transformer oil leak - Ridgeline Substation,high,corrective,"transformer_maintenance;electrical_high_voltage",Central,"Moffat County, CO",Substation Transformer B-12,6,unassigned
+SR-4002,Quarterly turbine blade inspection - Sweetwater,medium,preventive,wind_turbine,Central,"Nolan County, TX",Wind Turbine Alpha-7,4,assigned
+SR-4003,Gas turbine fuel nozzle replacement,high,corrective,"gas_turbine;combustion_systems",West,"Sacramento, CA",Gas Turbine GT-3A,8,unassigned
+SR-4004,Pipeline cathodic protection survey,medium,preventive,pipeline_inspection,Northeast,"Lackawanna County, PA",Gas Pipeline Segment NE-14,5,unassigned
+SR-4005,Emergency: SCADA communication failure,critical,emergency,"scada_systems;electrical_high_voltage",Central,"Denver, CO",Ridgeline Substation SCADA,3,unassigned

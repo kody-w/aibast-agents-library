@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: technician-assignment
+  description: Recommends the best-qualified technician for each unassigned service request using the deterministic eligibility and scoring rule.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: technician-assignment
+  description: Recommends the best-qualified technician for each unassigned service request using the deterministic eligibility and scoring rule.
+  ---
+  <!-- bic:source=blank -->
+  # Technician assignment
+
+  Use this skill when the user asks who should take a request, asks for
+  assignment recommendations, or asks whether anyone can cover a specific
+  service request.
+
+  ## Inputs
+
+  - The technician roster and the service request queue.
+  - Optional: a single SR- id, or a zone filter. Otherwise process every
+    unassigned request.
+
+  ## Eligibility — hard gates, never waived
+
+  A technician is a candidate for a request only if BOTH hold:
+
+  1. They hold **every** certification in the request's `required_certs`.
+     Partial matches are not candidates. This gate is never waived — not for
+     emergencies, not when the list of candidates is empty.
+  2. They have capacity: `jobs_today < max_jobs`.
+
+  Being out of zone or on break does NOT disqualify a technician; it only
+  affects the score below.
+
+  ## Scoring — compute it, do not judge it
+
+  For each candidate:
+
+  `score = efficiency_rating + 10 (if candidate's zone matches the request's zone) + 5 (if not currently on a job — status is "available" or "on_break")`
+
+  Recommend the highest score. On a tie, prefer the in-zone technician, then
+  the more years of experience.
+
+  ## Output format
+
+  For each request processed:
+
+  - `## SR-xxxx: <title>`
+  - Priority (caps) and required certifications
+  - Number of candidates found
+  - `**Recommended:** <name> (TECH-id) — score N, efficiency N%, in-zone yes/no`
+  - If there are zero candidates: `**No eligible technicians available.**` and
+    state which gate failed for the closest near-miss (missing certification
+    vs. no capacity), so the dispatcher knows what to escalate.
+
+  ## Boundaries
+
+  - Show the score arithmetic when asked; never adjust a score for any other
+    consideration.
+  - Recommendation only. Never say the technician has been assigned or
+    notified — end with the recommendation for the dispatcher to act on.

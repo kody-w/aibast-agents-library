@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: field-service-operations-data.md
+  description: Synthetic technician roster, service request queue, and zone definitions the agent answers from until real tools are connected.

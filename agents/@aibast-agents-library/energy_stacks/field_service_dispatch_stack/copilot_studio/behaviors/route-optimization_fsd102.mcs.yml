@@ -1,0 +1,48 @@
+mcs.metadata:
+  componentName: route-optimization
+  description: Analyzes workload versus technician capacity per geographic zone so the dispatcher can see where capacity is short before it becomes a missed SLA.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: route-optimization
+  description: Analyzes workload versus technician capacity per geographic zone so the dispatcher can see where capacity is short before it becomes a missed SLA.
+  ---
+  <!-- bic:source=blank -->
+  # Route optimization by zone
+
+  Use this skill when the user asks about zone coverage, capacity, utilization,
+  routing, or where to move technicians.
+
+  ## Inputs
+
+  - The technician roster, the service request queue, and the zone definitions.
+  - Optional: a single zone to analyze. Otherwise analyze every zone.
+
+  ## Procedure
+
+  For each zone in scope, compute exactly this — do not estimate any of it:
+
+  1. `technicians` = number of roster technicians whose zone matches.
+  2. `open_requests` = number of service requests in the zone.
+  3. `total_hours` = sum of `estimated_hours` over those requests.
+  4. `remaining_capacity` = sum over the zone's technicians of
+     `max_jobs - jobs_today` (never below zero per technician).
+  5. `utilization_pct` = `(1 - remaining_capacity / total_job_slots) * 100`,
+     rounded to one decimal, where `total_job_slots` = sum of `max_jobs` over
+     the zone's technicians. If a zone has no technicians, report utilization
+     as 0 and flag the zone as uncovered.
+
+  ## Output format
+
+  One table, exactly these columns:
+
+  | Zone | States | Technicians | Open Requests | Total Hours | Capacity | Utilization |
+
+  Capacity as `N slots`. Utilization as a percentage.
+
+  ## After the table
+
+  Name the constraint, not just the numbers: the zone where total open hours
+  most exceed remaining capacity, and — only if the data supports it — which
+  zone has slack a dispatcher could pull from. Recommendations only; the
+  dispatcher decides.

@@ -158,31 +158,36 @@ GEOGRAPHIC_ZONES = {
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _dispatch_dashboard():
+def _dispatch_dashboard(zone=None):
     priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
     requests = []
     for sid, sr in SERVICE_REQUESTS.items():
+        if zone and sr["zone"] != zone:
+            continue
         requests.append({
             "id": sid, "title": sr["title"], "priority": sr["priority"],
             "type": sr["type"], "zone": sr["zone"], "location": sr["location"],
             "status": sr["status"], "estimated_hours": sr["estimated_hours"],
         })
     requests.sort(key=lambda x: priority_order.get(x["priority"], 9))
-    available = sum(1 for t in TECHNICIANS.values() if t["status"] == "available")
-    unassigned = sum(1 for sr in SERVICE_REQUESTS.values() if sr["status"] == "unassigned")
+    available = sum(1 for t in TECHNICIANS.values()
+                    if t["status"] == "available" and (not zone or t["zone"] == zone))
+    unassigned = sum(1 for r in requests if r["status"] == "unassigned")
     return {"requests": requests, "available_techs": available, "unassigned_requests": unassigned,
             "total_requests": len(requests)}
 
 
-def _route_optimization():
+def _route_optimization(zone=None):
     routes = []
-    for zone_name, zone in GEOGRAPHIC_ZONES.items():
+    for zone_name, zone_info in GEOGRAPHIC_ZONES.items():
+        if zone and zone_name != zone:
+            continue
         zone_techs = [t for t in TECHNICIANS.values() if t["zone"] == zone_name]
         zone_reqs = [sr for sr in SERVICE_REQUESTS.values() if sr["zone"] == zone_name]
         total_hrs = sum(sr["estimated_hours"] for sr in zone_reqs)
         tech_capacity = sum(t["max_jobs"] - t["jobs_today"] for t in zone_techs)
         routes.append({
-            "zone": zone_name, "states": zone["states"],
+            "zone": zone_name, "states": zone_info["states"],
             "technicians": len(zone_techs), "open_requests": len(zone_reqs),
             "total_hours": total_hrs, "remaining_capacity": tech_capacity,
             "utilization_pct": round((1 - tech_capacity / (len(zone_techs) * 4)) * 100, 1) if zone_techs else 0,
@@ -190,10 +195,12 @@ def _route_optimization():
     return {"routes": routes}
 
 
-def _technician_assignment():
+def _technician_assignment(zone=None):
     assignments = []
     for sid, sr in SERVICE_REQUESTS.items():
         if sr["status"] != "unassigned":
+            continue
+        if zone and sr["zone"] != zone:
             continue
         candidates = []
         for tid, t in TECHNICIANS.items():
@@ -218,8 +225,10 @@ def _technician_assignment():
     return {"assignments": assignments}
 
 
-def _emergency_response():
-    emergencies = [sr for sr in SERVICE_REQUESTS.values() if sr["type"] == "emergency" or sr["priority"] == "critical"]
+def _emergency_response(zone=None):
+    emergencies = [sr for sr in SERVICE_REQUESTS.values()
+                   if (sr["type"] == "emergency" or sr["priority"] == "critical")
+                   and (not zone or sr["zone"] == zone)]
     response_plan = []
     for em in emergencies:
         eligible = []
@@ -272,18 +281,19 @@ class FieldServiceDispatchAgent(BasicAgent):
 
     def perform(self, **kwargs) -> str:
         op = kwargs.get("operation", "dispatch_dashboard")
+        zone = kwargs.get("zone")
         if op == "dispatch_dashboard":
-            return self._dispatch_dashboard()
+            return self._dispatch_dashboard(zone)
         elif op == "route_optimization":
-            return self._route_optimization()
+            return self._route_optimization(zone)
         elif op == "technician_assignment":
-            return self._technician_assignment()
+            return self._technician_assignment(zone)
         elif op == "emergency_response":
-            return self._emergency_response()
+            return self._emergency_response(zone)
         return f"**Error:** Unknown operation `{op}`."
 
-    def _dispatch_dashboard(self) -> str:
-        data = _dispatch_dashboard()
+    def _dispatch_dashboard(self, zone=None) -> str:
+        data = _dispatch_dashboard(zone)
         lines = [
             "# Field Service Dispatch Dashboard",
             "",
@@ -301,8 +311,8 @@ class FieldServiceDispatchAgent(BasicAgent):
             )
         return "\n".join(lines)
 
-    def _route_optimization(self) -> str:
-        data = _route_optimization()
+    def _route_optimization(self, zone=None) -> str:
+        data = _route_optimization(zone)
         lines = [
             "# Route Optimization by Zone",
             "",
@@ -316,8 +326,8 @@ class FieldServiceDispatchAgent(BasicAgent):
             )
         return "\n".join(lines)
 
-    def _technician_assignment(self) -> str:
-        data = _technician_assignment()
+    def _technician_assignment(self, zone=None) -> str:
+        data = _technician_assignment(zone)
         lines = ["# Technician Assignment Recommendations", ""]
         for a in data["assignments"]:
             lines.append(f"## {a['request_id']}: {a['title']}")
@@ -331,8 +341,8 @@ class FieldServiceDispatchAgent(BasicAgent):
             lines.append("")
         return "\n".join(lines)
 
-    def _emergency_response(self) -> str:
-        data = _emergency_response()
+    def _emergency_response(self, zone=None) -> str:
+        data = _emergency_response(zone)
         if data["total"] == 0:
             return "# Emergency Response\n\nNo active emergencies."
         lines = [
