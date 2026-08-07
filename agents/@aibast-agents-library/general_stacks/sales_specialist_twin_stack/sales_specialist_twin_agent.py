@@ -96,10 +96,19 @@ def _match(text, candidates, keys):
     return best, best_score
 
 
+MISSION_WORDS = {"deploy", "install", "build", "publish", "ship", "copilot", "studio",
+                 "locally", "local", "brainstem", "verify", "test", "the", "a", "an",
+                 "agent", "to", "into", "my", "in", "for", "please", "and", "then"}
+
+
 def _stack_context(request):
     """Resolve which library stack the request names, and build its context block."""
     reg = json.loads(_fetch("registry.json"))
-    entry, score = _match(request, reg.get("agents", []),
+    domain_words = " ".join(w for w in re.sub(r"[^a-z0-9 ]", " ", request.lower()).split()
+                            if w not in MISSION_WORDS)
+    candidates = [a for a in reg.get("agents", [])
+                  if a.get("name") != "@aibast-agents-library/sales-specialist-twin"]
+    entry, score = _match(domain_words, candidates,
                           ["name", "display_name", "tags", "description"])
     if not entry or score == 0:
         return None, None
