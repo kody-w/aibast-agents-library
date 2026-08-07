@@ -103,6 +103,16 @@ ol.steps>li>p{color:var(--dim);font-size:15px;max-width:84ch}
 .code pre{padding:14px 16px;overflow-x:auto;color:#cdd5f0;font-family:var(--mono);
   font-size:13.2px;line-height:1.55;max-height:420px;overflow-y:auto;white-space:pre}
 details.filebox{margin:10px 0}
+details.uh{background:var(--paper);border:1px dashed var(--line);border-radius:var(--radius);
+  margin-top:16px;padding:0 22px}
+details.uh>summary{cursor:pointer;padding:16px 0;font-weight:650;font-size:15.5px;
+  color:var(--dim);list-style:none;display:flex;gap:12px;align-items:center}
+details.uh>summary::before{content:"▸";color:var(--accent);font-size:13px}
+details.uh[open]>summary::before{content:"▾"}
+details.uh>summary .eng{font-size:10px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;background:var(--skill);color:var(--skill-b);
+  border-radius:4px;padding:3px 8px;flex:0 0 auto}
+details.uh .phase{padding:0 0 22px}
 details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:var(--accent);padding:6px 0}
 
 /* ── component model board ────────────────────────────── */
@@ -499,14 +509,16 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
 <section class="phase" id="underhood">
   <div class="phead"><span class="pk">Step 5</span><span class="time">reference</span></div>
   <h2>Under the hood — what your AI executes</h2>
-  <p class="goal-line">The twin fetches an authored playbook from the library and GitHub Copilot
-    runs these exact steps. They are documented so you can audit every command it runs — and run
-    them by hand if you ever want to.</p>
+  <p class="goal-line"><b>Nothing below is for you to do.</b> When you say the mission, your AI
+    fetches the playbook and runs these exact steps itself. They're published here, collapsed, so
+    anyone — you, IT, an auditor — can open them and see precisely what the AI executes on your
+    machine. Curiosity is the only reason to expand them.</p>
 </section>
 <!-- ═══════════ 3 PROJECT ═══════════ -->
-<section class="phase" id="project">
-  <div class="phead"><span class="pk">Step 3</span><span class="time">~10 min</span></div>
-  <h2>Create the project</h2>
+<details class="uh" id="project">
+  <summary><span class="eng">Your AI runs this</span>Create the project — authenticate, scaffold, bind to the environment</summary>
+<div class="phase">
+    <h2>Create the project</h2>
   <p class="goal-line">Two commands: authenticate, then scaffold an empty CLI-authored agent bound
     to your environment.</p>
 
@@ -541,12 +553,14 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
       exists and carries your environment binding and a generated <code>schemaName</code> — note
       that schemaName, you need it to publish.</div>
   </div>
-</section>
+</div>
+</details>
 
 <!-- ═══════════ 4 COMPONENTS ═══════════ -->
-<section class="phase" id="components">
-  <div class="phead"><span class="pk">Step 4</span><span class="time">~15 min</span></div>
-  <h2>Add the components</h2>
+<details class="uh" id="components">
+  <summary><span class="eng">Your AI runs this</span>Add the components — download the skills, knowledge, and instructions from the library</summary>
+<div class="phase">
+    <h2>Add the components</h2>
   <p class="goal-line">The library ships the component set ready-made in the stack's
     <code>copilot_studio/</code> folder — four skills, two knowledge files, and the instructions.
     Copy them in, then set the instructions.</p>
@@ -602,12 +616,14 @@ cp copilot_studio/capabilities/knowledge/files/*  field-service-dispatch/capabil
     <div class="done-line"><b>Done when</b> the project holds 4 skill files, 2 knowledge files with
       their <code>.mcs.yml</code> sidecars, and instructions in the StaticSegment.</div>
   </div>
-</section>
+</div>
+</details>
 
 <!-- ═══════════ 5 PUBLISH ═══════════ -->
-<section class="phase" id="publish">
-  <div class="phead"><span class="pk">Step 5</span><span class="time">~10 min</span></div>
-  <h2>Push &amp; publish</h2>
+<details class="uh" id="publish">
+  <summary><span class="eng">Your AI runs this</span>Push &amp; publish — sync in the right order, go live only on your yes</summary>
+<div class="phase">
+    <h2>Push &amp; publish</h2>
   <p class="goal-line">Sync order matters: pull, then push, then publish. Pull merges any remote
     state first so your push lands clean.</p>
 
@@ -629,7 +645,8 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
     <div class="done-line"><b>Done when</b> publish completes and the agent opens in the Copilot
       Studio maker portal with your four skills and two knowledge sources visible.</div>
   </div>
-</section>
+</div>
+</details>
 
 <!-- ═══════════ 7 PRODUCTION ═══════════ -->
 <section class="phase" id="production">
