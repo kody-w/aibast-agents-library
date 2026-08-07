@@ -45,6 +45,15 @@ __manifest__ = {
 REPO = os.environ.get("AIBAST_REPO", "microsoft/aibast-agents-library")
 REF = os.environ.get("AIBAST_REF", "main")
 RAW = f"https://raw.githubusercontent.com/{REPO}/{REF}"
+# The library lives upstream at microsoft/…, staged downstream-first at
+# kody-w/…. The twin works wherever the content currently is: each fetch
+# tries the configured repo, then the mirrors, and locks onto whichever
+# answered so one downloaded file works before and after the upstream merge.
+MIRRORS = [
+    (REPO, REF),
+    ("kody-w/aibast-agents-library", "main"),
+    ("kody-w/aibast-agents-library", "feature/field-service-dispatch-copilot-studio"),
+]
 TIMEOUT = 15
 
 # The engine's standing orders, prepended to every mission. These four rules
@@ -72,12 +81,28 @@ Report progress to the person as you go, in plain language, one line per step.
 """
 
 
+_active = MIRRORS[:1]  # mutable: locks onto the first mirror that answers
+
+
 def _fetch(path):
-    url = path if path.startswith("http") else f"{RAW}/{path}"
-    url = urllib.parse.quote(url, safe=":/%?=&")
-    req = urllib.request.Request(url, headers={"User-Agent": "aibast-sales-specialist-twin"})
-    with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
-        return r.read().decode("utf-8")
+    if path.startswith("http"):
+        url = urllib.parse.quote(path, safe=":/%?=&")
+        req = urllib.request.Request(url, headers={"User-Agent": "aibast-sales-specialist-twin"})
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+            return r.read().decode("utf-8")
+    order = _active + [m for m in MIRRORS if m not in _active]
+    last = None
+    for repo, ref in order:
+        url = urllib.parse.quote(
+            f"https://raw.githubusercontent.com/{repo}/{ref}/{path}", safe=":/%?=&")
+        req = urllib.request.Request(url, headers={"User-Agent": "aibast-sales-specialist-twin"})
+        try:
+            with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+                _active[0] = (repo, ref)
+                return r.read().decode("utf-8")
+        except Exception as e:  # noqa: BLE001 — try the next mirror
+            last = e
+    raise last
 
 
 def _missions():
@@ -117,7 +142,7 @@ def _stack_context(request):
         man = json.loads(_fetch(f"{stack_dir}/manifest.json"))
     except Exception:  # noqa: BLE001 — stack has no Copilot Studio scaffold
         return entry, None
-    base = f"{RAW}/{stack_dir}"
+    base = f"https://raw.githubusercontent.com/{_active[0][0]}/{_active[0][1]}/{stack_dir}"
     files = man.get("behaviors", []) + man.get("knowledge_files", [])
     ctx = [f"**Agent:** {man.get('display_name', entry['name'])}",
            f"**Scaffold base URL:** {base}",
@@ -239,7 +264,8 @@ class SalesSpecialistTwinAgent(BasicAgent):
             if ctx is None:
                 # No authored scaffold: hand the engine the intent file itself and
                 # tell it to derive the components by the same rules.
-                base = f"{RAW}/{entry['_file']}"
+                base = (f"https://raw.githubusercontent.com/{_active[0][0]}/"
+                        f"{_active[0][1]}/{entry['_file']}")
                 ctx = (f"**Agent:** {entry.get('display_name', entry['name'])}\n"
                        f"**agent.py (the intent) raw URL** (encode `@` as `%40`): {base}\n\n"
                        "**No authored scaffold exists for this stack yet.** Derive the "
@@ -254,7 +280,9 @@ class SalesSpecialistTwinAgent(BasicAgent):
                        "you compute from that data before you deploy.")
             playbook = playbook.replace("{{STACK_CONTEXT}}", ctx)
 
-        playbook = playbook.replace("{{REPO}}", REPO).replace("{{REF}}", REF).replace("{{RAW}}", RAW)
+        arepo, aref = _active[0]
+        araw = f"https://raw.githubusercontent.com/{arepo}/{aref}"
+        playbook = playbook.replace("{{REPO}}", arepo).replace("{{REF}}", aref).replace("{{RAW}}", araw)
         return HARNESS_HEADER + "\n---\n\n" + playbook
 
 
