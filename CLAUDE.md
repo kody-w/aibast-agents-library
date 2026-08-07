@@ -93,6 +93,8 @@ Each tier is self-contained. Users advance when they choose to.
 Shared Brainstem releases flow from `kody-w/rapp-installer`, but this repository is not a mirror. Preserve these AIBAST-owned surfaces during every sync:
 
 - `agents/@aibast-agents-library/`, `registry.json`, and `build_registry.py`
+- `rar/`, `build_rar.py`, and the AIBAST RAR pinning inside `rapp_brainstem` (`RAR_REVISION`, `RAR_BASE`/`RAR_MIRROR` in `index.html` and `brainstem.py` point at this repo's `rar/registry.json`, not the community kody-w RAR)
+- `twin/` (missions, playbooks, products, mutations, first-party catalog) and `docs/workshop.html`
 - `rapp_ai/`
 - `README.md`, `index.html`, `CLAUDE.md`, `docs/index.html`, `docs/tutorial.html`, and `docs/rapp-guide.html`
 - `.github/`, `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`, `.vscode/`, and `tools/`
