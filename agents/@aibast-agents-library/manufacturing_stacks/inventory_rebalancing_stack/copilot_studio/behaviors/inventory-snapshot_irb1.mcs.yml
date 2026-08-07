@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: inventory-snapshot
+  description: Reports warehouse utilization, inventory value, and SKU levels by site, flagging over-capacity facilities and below-reorder positions.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: inventory-snapshot
+  description: Reports warehouse utilization, inventory value, and SKU levels by site, flagging over-capacity facilities and below-reorder positions.
+  ---
+  <!-- bic:source=blank -->
+  # Inventory snapshot
+
+  Use this skill when the user asks for the current inventory picture, stock
+  levels, warehouse utilization, inventory value, or which positions are below
+  their reorder point.
+
+  ## Inputs
+
+  - The warehouse master (capacity, pallets used, holding rate) and the SKU
+    catalog with on-hand levels and reorder points.
+  - Optional: a warehouse id or a SKU id to filter to. Otherwise report all
+    four warehouses and all six SKUs.
+
+  ## Procedure
+
+  Warehouse table, in fixed order WH-ATL, WH-ORD, WH-DFW, WH-SEA:
+
+  1. `utilization_pct = round(used_pallets / capacity_pallets * 100, 1)`.
+  2. Append the flag `:red_circle:` to the utilization cell only when
+     `utilization_pct > 90` -- strictly greater. 90.0% is not flagged.
+  3. `inventory_value = round(sum over all SKUs of (level_at_this_warehouse *
+     unit_cost), 2)`. A SKU with no level recorded at a warehouse counts as 0.
+
+  SKU table, iterating SKUs in catalog order SKU-4401 through SKU-4406:
+
+  4. Print the on-hand level at each of the four warehouses in the fixed
+     warehouse order, with thousands separators.
+  5. Print the reorder point. Then, for every warehouse where
+     `on_hand < reorder_point` -- strictly less; equal to the reorder point is
+     not below -- append ` (below reorder at WH-x, WH-y)` listing those
+     warehouses in the fixed warehouse order.
+
+  ## Output format
+
+  - Headline `## Inventory Snapshot`.
+  - Table with columns: `Warehouse | Region | Utilization | Pallets Used/Cap |
+    Inventory Value`. Warehouse column shows the facility name; pallets as
+    `used/capacity` with thousands separators; value as `$n,nnn,nnn.nn`.
+  - Sub-heading `### SKU Levels by Warehouse`.
+  - Table with columns: `SKU | Description | ATL | ORD | DFW | SEA |
+    Reorder Pt`, the reorder cell carrying the below-reorder note.
+
+  ## Edge cases
+
+  - Utilization and value are independent: the site with the highest
+    utilization is not the site with the highest inventory value. Do not
+    conflate them.
+  - "Below reorder" is an absolute floor and is a different test from the
+    surplus/deficit test in the rebalance skill, which compares on-hand to the
+    demand forecast. A position can pass one and fail the other.
+  - If asked for a warehouse or SKU outside the four ids and six ids in the
+    data, say it is not in the data. Do not extrapolate a level.

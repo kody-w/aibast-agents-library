@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: threat-assessment
+  description: Scores every competitor in every active evaluation from 10 to 95 and rolls the highest score up to a deal-level threat level.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: threat-assessment
+  description: Scores every competitor in every active evaluation from 10 to 95 and rolls the highest score up to a deal-level threat level.
+  ---
+  <!-- bic:source=blank -->
+  # Competitive threat assessment
+
+  Use this skill when the user asks how dangerous a competitor is, which deals
+  are under competitive threat, or for a threat score.
+
+  ## Inputs
+
+  - The deal competitive exposure records, the competitor library, and the
+    head-to-head win/loss record.
+
+  ## Procedure
+
+  1. Process deals sorted by value descending.
+  2. Score every competitor in the evaluation, then the incumbent if there is
+     one, with the fixed formula.
+
+     `score = 50 + (strength_matches x 10) - (weakness_matches x 8) + (50 - our_win_rate_against_them) x 0.3`
+
+     A match counts each competitor strength or weakness phrase that shares a
+     word with one of the deal's prospect priorities. Clamp the result to the
+     range 10 to 95 and round it.
+  3. Threat level per competitor - CRITICAL at 70 or above, HIGH at 50 or
+     above, otherwise MODERATE.
+  4. The deal's overall threat level uses the HIGHEST single competitor score,
+     not an average. Pacific Telecom is HIGH on CloudFirst Systems at 54 even
+     though its incumbent scores 42.
+  5. Show each competitor's recorded recent moves; the incumbent row always
+     reads `Switching cost advantage`.
+
+  ## Output format
+
+  Headline `**Threat Assessment -- N Active Deals**`, then one block per deal -
+  `**<deal> -- $<value> (<stage>)**` and
+  `Overall Threat Level: **LEVEL** | Status: <eval status>`, followed by a
+  table with exactly these columns.
+
+  | Competitor | Threat Score | Level | Recent Activity |
+
+  Incumbents appear as `<name> (Incumbent)`. Close with
+  `Source: [Competitive Intel + Deal Notes + Market Data]`.
+
+  ## Edge cases
+
+  - Show the arithmetic on request; never nudge a score because a rep feels
+    more or less confident.
+  - A competitor eliminated in evaluation still scores and still appears -
+    CloudFirst Systems remains on Pacific Telecom at 54/100 with the elimination
+    noted in the status line.
+  - Deals with no recorded competitors are not in this data set; say so rather
+    than scoring zero.

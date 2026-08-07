@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: clause-analysis
+  description: Reports the clause-level risk register for every contract that has one - section, clause, risk rating, issue, recommendation, and a HIGH/MEDIUM count.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: clause-analysis
+  description: Reports the clause-level risk register for every contract that has one - section, clause, risk rating, issue, recommendation, and a HIGH/MEDIUM count.
+  ---
+  <!-- bic:source=blank -->
+  # Clause analysis
+
+  Use this skill when the user asks what is wrong with a contract, asks about a
+  specific section or clause, asks about liability, IP, indemnification,
+  termination, payment terms, SLA penalties, change orders, data handling, or
+  non-competes, or asks for the clause-level detail behind a risk score.
+
+  ## Inputs
+
+  - The clause register (knowledge/tools) and the contract portfolio.
+  - Optional: a single CTR- id or client name. Otherwise report every contract
+    that has a clause record.
+
+  ## Procedure
+
+  1. Select the contracts that have a clause record. In the current data only
+     CTR-5001 (NovaTech Systems) and CTR-5003 (Atlas Financial Group) have one.
+     CTR-5002 and CTR-5004 have no clause record at all.
+  2. Process them in recorded register order: CTR-5001, then CTR-5003. Do not
+     re-sort by risk score, value, or severity.
+  3. Within a contract, emit clauses in recorded order -- which is ascending by
+     section number (7.1, 8.2, 9.4, 12.1, 14.3, 15.2 for CTR-5001; 5.1, 6.3,
+     11.2 for CTR-5003). Never regroup by severity.
+  4. Count `HIGH` clauses and `MEDIUM` clauses separately for each contract and
+     emit the summary line. CTR-5001 is 3 HIGH and 3 MEDIUM; CTR-5003 is 1 HIGH
+     and 2 MEDIUM.
+  5. The register's `Issue` and `Recommendation` are abbreviated in the table
+     (the underlying report truncates the issue at 60 characters and the
+     recommendation at 50, with a trailing ellipsis). Give the full text when
+     the user asks about a specific clause.
+  6. Risk ratings are the recorded values `HIGH` and `MEDIUM` only. There is no
+     LOW rating in this register. Never re-rate a clause.
+
+  ## Output format
+
+  Per contract, a heading:
+
+  `### CTR-5001 -- NovaTech Systems ($25,000,000)`
+
+  Then one table, exactly these columns:
+
+  | Section | Clause | Risk | Issue | Recommendation |
+
+  Risk in bold caps (`**HIGH**`, `**MEDIUM**`).
+
+  Then the count line:
+
+  `**Summary:** N HIGH, M MEDIUM risk clauses`
+
+  ## Edge cases
+
+  - Asked about CTR-5002 or CTR-5004: state that no clause-level record exists
+    for that contract and that the absence is unreviewed scope, not a clean
+    bill. Do not infer clauses from the contract type, risk score, or page
+    count.
+  - Asked about a section number that is not in the register: say the section
+    is not on record for that contract and name the sections that are.
+  - Recommendations are recommendations. Never say a clause has been amended,
+    redlined, accepted, or sent to the counterparty.

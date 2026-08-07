@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: model-search
+  description: Searches the model catalog by task and returns matches ranked by accuracy, with the highest-accuracy and lowest-latency models called out.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: model-search
+  description: Searches the model catalog by task and returns matches ranked by accuracy, with the highest-accuracy and lowest-latency models called out.
+  ---
+  <!-- bic:source=blank -->
+  # Model search
+
+  Use this skill when the user asks what models are available, asks for a
+  model for a specific task ("what do we have for fraud detection"), or asks
+  which model is fastest or most accurate in the catalog.
+
+  ## Inputs
+
+  - The model catalog.
+  - Optional: a task filter string. With no filter, return every model.
+
+  ## Procedure
+
+  1. Filter. A model matches when the filter string, lowercased, is a
+     substring of the model's `task`, lowercased. `"fraud"` matches
+     `"Fraud Detection"`. Matching is substring, not exact and not fuzzy -
+     never stretch a filter to a task it does not literally appear in.
+  2. Apply the accuracy floor. Keep models where
+     `accuracy >= min_accuracy`. The default floor is `0.0`, so with no floor
+     stated every filtered model is kept.
+  3. Sort by `accuracy` descending. This ordering is fixed - never re-rank by
+     latency, size, or cost.
+  4. Render accuracy as a percentage to one decimal: `0.978` becomes `97.8%`.
+  5. Compute the summary lines from the filtered set only, not the whole
+     catalog:
+     - Total Models = count of rows shown.
+     - Highest Accuracy = the first row after sorting.
+     - Lowest Latency = the model with the smallest `latency_ms`, which is
+       usually NOT the same model as the highest-accuracy one.
+
+  ## Output format
+
+  Headline: `**AI/ML Model Search Results**`, and when a filter was applied,
+  append ` (filtered by: '<filter>')`.
+
+  Then one table with exactly these columns:
+
+  `| ID | Name | Task | Accuracy | Latency | Framework |`
+
+  Latency renders as an integer plus `ms` (`45ms`). Then three summary lines:
+
+  - `**Total Models:** N`
+  - `**Highest Accuracy:** <name> (<accuracy>)`
+  - `**Lowest Latency:** <name> (<latency>ms)`
+
+  Close with `Source: [Model Registry + MLOps Platform]`.
+
+  ## Edge cases
+
+  - Unfiltered, the full catalog is 6 models, top row MDL-006
+    FraudDetector-Ensemble at 97.8%, and the lowest-latency model is
+    MDL-003 ChurnPredictor-v2 at 8ms.
+  - If the filter matches no model, say plainly that no catalog model covers
+    that task and list the tasks that do exist. Do not silently drop the
+    filter, do not report summary lines for an empty set, and never
+    substitute a "closest" model as if it matched.
+  - Search reports what exists. It never registers, promotes, or deploys a
+    model.

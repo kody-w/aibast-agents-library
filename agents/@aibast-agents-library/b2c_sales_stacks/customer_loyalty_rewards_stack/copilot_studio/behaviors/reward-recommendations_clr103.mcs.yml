@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: reward-recommendations
+  description: Recommends catalog rewards a member can redeem today using the two-part eligibility gate - preferred category and affordable points cost.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: reward-recommendations
+  description: Recommends catalog rewards a member can redeem today using the two-part eligibility gate - preferred category and affordable points cost.
+  ---
+  <!-- bic:source=blank -->
+  # Reward recommendations
+
+  Use this skill when the user asks what a member can redeem, what to offer
+  them, which rewards fit their balance, or for the redemption catalog.
+
+  ## Inputs
+
+  - The member roster (points balance and preferred reward categories) and the
+    redemption catalog (knowledge/tools).
+  - Optional: a member id or name. Without one, produce a section per member.
+
+  ## Eligibility - hard gates, never waived
+
+  A catalog reward is recommended to a member only if BOTH hold:
+
+  1. The reward's category is in that member's preferred reward categories.
+  2. `points_cost <= points_balance`.
+
+  Neither gate is waived - not for a high tier, not for a long-tenured member,
+  not when the eligible list is empty. Evaluate the catalog in catalog order
+  and keep that order in the output.
+
+  Worked results from the current roster:
+
+  - LM-10001 Katherine Brooks, 48,250 points, prefers travel + dining ->
+    $500 Travel Voucher (25,000) and $100 Dining Gift Card (5,000).
+  - LM-10002 Antonio Vasquez, 22,100 points, prefers merchandise + gift cards
+    -> Premium Wireless Headphones (15,000) and $50 Store Gift Card (2,500).
+  - LM-10003 Rachel Nguyen, 8,450 points, prefers discounts ->
+    20% Off Next Purchase (3,000).
+  - LM-10004 Derek Washington, 2,100 points, prefers discounts + free shipping
+    -> Free Shipping for 3 Months (1,500) only; 20% Off Next Purchase costs
+    3,000 and fails the balance gate by 900 points.
+
+  ## Output format
+
+  Per member, in roster id order:
+
+  - `## <Name> (LM-id)` followed by an em dash and the points balance with
+    thousands separators and the word `points`.
+  - Then one table, exactly these columns:
+
+    | Reward | Points Cost | Category | Value |
+
+    Points cost carries thousands separators. Category is title case with
+    underscores replaced by spaces (`Gift Cards`, `Free Shipping`). Value is
+    the cash value with a leading `$`; a reward whose cash value is zero shows
+    `Discount` instead.
+  - If nothing passes both gates:
+    `No matching rewards available at current points balance.`
+
+  Close with `## Full Redemption Catalog` - every reward, unfiltered, with
+  columns `| Reward | Points | Category | Value |` and the same formatting.
+
+  ## Boundaries
+
+  - Show the gate arithmetic when asked (`balance - points_cost`), and name
+    which gate a reward failed. Never soften a gate to make a reward fit.
+  - A reward outside a member's preferred categories is not a recommendation
+    even when they can afford it. Say it is outside their stated preferences
+    and point to the full catalog.
+  - Recommendation only. Never redeem, reserve, or issue a reward, and never
+    say a member has redeemed anything.

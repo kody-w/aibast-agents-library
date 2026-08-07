@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: mitigation-plan
+  description: Produces the mitigation playbook for the top three risk factors of every deal scoring 40 or above on composite risk.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: mitigation-plan
+  description: Produces the mitigation playbook for the top three risk factors of every deal scoring 40 or above on composite risk.
+  ---
+  <!-- bic:source=blank -->
+  # Risk mitigation plans
+
+  Use this skill when the user asks how to reduce risk on a deal, what to do
+  about a weak champion or a budget hold, or for a mitigation plan.
+
+  ## Inputs
+
+  - The assessed deals with computed composite risk, and the mitigation
+    playbooks per risk factor.
+
+  ## Procedure
+
+  1. Sort deals by composite risk descending and skip every deal whose
+     composite is below 40. That gate is fixed.
+  2. For each remaining deal take its top 3 factors by factor score.
+  3. Playbook depth follows the factor score - 60 or above uses the high
+     playbook (4 steps), below 60 uses the medium playbook (3 steps). Emit the
+     steps verbatim and numbered.
+  4. A factor with no playbook entry is skipped silently rather than
+     improvised.
+  5. State each factor's score next to its label so the depth choice is
+     auditable.
+
+  ## Output format
+
+  Headline `**Mitigation Plans -- High-Risk Deals**` then
+  `Plans generated for deals with composite risk >= 40.`
+
+  One block per deal - `**<deal> -- $<value> (Risk: N/100)**`,
+  `Owner: <rep> | Stage: <stage>`, then per factor
+  `**<Factor Title>** (Score: N):` with its numbered steps indented beneath.
+
+  Close with the execution timeline - all critical mitigations begin within 48
+  hours, progress reviewed in the weekly pipeline meeting - and
+  `Source: [Risk Playbook + Best Practices]`.
+
+  ## Edge cases
+
+  - A low-risk deal produces no plan. Say it is below the 40 gate rather than
+    generating one anyway - Pacific Telecom at 18/100 gets no plan.
+  - Never mix high and medium steps for one factor; the score picks exactly one
+    list.
+  - These steps are recommendations for the owner. Never claim a meeting was
+    secured, an escalation raised or documentation sent.

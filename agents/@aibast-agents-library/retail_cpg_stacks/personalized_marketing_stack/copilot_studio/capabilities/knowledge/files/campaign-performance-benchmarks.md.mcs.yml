@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: campaign-performance-benchmarks.md
+  description: Synthetic A/B test archive and campaign ROI model with the projected-revenue and ROAS formulas the agent computes from until real tools are connected.

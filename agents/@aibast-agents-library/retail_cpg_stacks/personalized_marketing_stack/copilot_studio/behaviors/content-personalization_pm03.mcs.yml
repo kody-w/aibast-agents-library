@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: content-personalization
+  description: Returns the hero banner, product recommendations, preferred channels, and top categories mapped to each customer segment.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: content-personalization
+  description: Returns the hero banner, product recommendations, preferred channels, and top categories mapped to each customer segment.
+  ---
+  <!-- bic:source=blank -->
+  # Content personalization
+
+  Use this skill when the user asks what creative, headline, call to action,
+  product recommendations, or channels to serve a segment - on site, in email,
+  or in app.
+
+  ## Inputs
+
+  - The content block library (hero banners and product recommendations keyed
+    by SEG- id) and the segment model (preferred channels, top categories).
+  - Optional: one `segment_id`.
+
+  ## Procedure - exact rules
+
+  1. Scope selection, applied literally:
+     - If a `segment_id` is given AND it exists in the segment model, output
+       that segment only.
+     - Otherwise output all five in model order: SEG-LOYAL, SEG-ATRISK,
+       SEG-NEW, SEG-HIGHVAL, SEG-DORMANT. An unrecognized id falls back to all
+       five - say the id was not found before showing the full matrix.
+  2. For each segment emit, in this order: hero headline, hero CTA, the product
+     recommendation list, preferred channels, top categories.
+  3. Reproduce headlines, CTAs, and product names verbatim from the content
+     library. Never rewrite, shorten, translate, or A/B-vary them here - variant
+     copy belongs to the performance-analysis skill and only where a test
+     exists.
+  4. Recommendation counts are fixed by the library and are not padded:
+     SEG-LOYAL 3, SEG-ATRISK 2, SEG-NEW 3, SEG-HIGHVAL 3, SEG-DORMANT 2. If a
+     segment has two products, return two.
+  5. Channels and categories render as comma-separated lists in stored order
+     (for example SEG-HIGHVAL channels are in_store, mobile_app, email - that
+     order is the preference order, keep it).
+
+  ## Output format
+
+  - `# Content Personalization Matrix`
+  - Per segment, `## <segment name> (`SEG-ID`)` then:
+    - `**Hero Banner:**` with `- Headline: "<text>"` and `- CTA: "<text>"`
+    - `**Product Recommendations:**` as a bullet per product
+    - `**Preferred Channels:** <comma-separated>`
+    - `**Top Categories:** <comma-separated>`
+
+  ## Edge cases
+
+  - SEG-DORMANT is email-only. Never propose in-app, social, or in-store
+    creative for it; if asked, say email is the only channel in the data.
+  - SEG-ATRISK skews Electronics and Home while its hero copy is generic
+    win-back copy - note the mismatch if the user is choosing creative, but do
+    not author replacement copy.
+  - Product recommendations are segment-level catalog picks, not individual
+    propensity scores. Do not present them as one customer's recommendations.
+
+  ## Boundaries
+
+  - Never publish, schedule, or push a content block live; describe the mapping
+    and leave the decision with the marketer.
+  - If a requested placement (subject line, push notification, banner size) is
+    not in the content library, say it is not in the data rather than drafting
+    one.

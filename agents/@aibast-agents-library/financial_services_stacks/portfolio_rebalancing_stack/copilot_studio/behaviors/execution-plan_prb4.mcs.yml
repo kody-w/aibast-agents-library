@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: execution-plan
+  description: Sequences the recommended trades into a sells-then-settle-then-buys plan with post-trade verification steps for a human to execute.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: execution-plan
+  description: Sequences the recommended trades into a sells-then-settle-then-buys plan with post-trade verification steps for a human to execute.
+  ---
+  <!-- bic:source=blank -->
+  # Execution plan
+
+  Use this skill when the user asks how to carry out a rebalance, in what order
+  to trade, or for a step-by-step plan a trader can follow.
+
+  ## Inputs
+
+  - The portfolio record, including `rebalance_frequency`.
+  - Optional: a PORT- id. When none is given, use PORT-5001 and say so.
+
+  ## Procedure
+
+  1. Derive the trade list exactly as rebalance-recommendation does - same
+     `abs(drift) >= drift_threshold` gate, same trade values. `Total Trades` is
+     the count of gated trades, buys and sells together.
+  2. Split the list into SELL trades and BUY trades, each keeping the order the
+     holdings appear in the portfolio. Number each list from 1.
+  3. Sequence is fixed and never reordered: sells, then cash settlement, then
+     buys, then verification. Buys never precede the settlement step, because
+     the proceeds have not settled.
+
+  ## Output format
+
+  - `# Execution Plan: <portfolio name>`
+  - `**Rebalance Frequency:** Quarterly` (title case) and `**Total Trades:** 3`
+  - `## Step 1: Execute Sells` - numbered lines
+    `N. SELL $622,500 of VTI (US Large Cap)`
+  - `## Step 2: Settle Cash (T+1)` - allow sell proceeds to settle before
+    purchasing.
+  - `## Step 3: Execute Buys` - numbered lines
+    `N. BUY $372,500 of VB (US Small Cap)`
+  - `## Step 4: Verification` - confirm post-trade allocations match targets;
+    update portfolio records; generate client notification; document compliance
+    review.
+
+  ## Edge cases
+
+  - No trades clear the gate: emit `No trades required at this time.` after the
+    header and stop.
+  - No sells: Step 1 reads `No sells required.` and the buys must be funded
+    from cash - say so. PORT-5002 is this case, with `Total Trades: 1` and a
+    single `BUY $164,000 of VYMI (Intl Dividend)`.
+  - No buys: Step 3 reads `No buys required.` and the sale proceeds land in
+    cash, which itself moves the cash weight - flag it.
+  - When buys exceed sells (PORT-5001: $746,250 of buys against $622,500 of
+    sells), name the $123,750 shortfall in Step 3 and state that it has to come
+    from the cash position, which is at +1.0% drift and inside the 3.0%
+    threshold.
+
+  ## Boundaries
+
+  - This is a plan for a person to execute. Never say a step has been done, a
+    trade placed, cash settled, a client notified, or compliance reviewed -
+    Step 4 items are instructions, not completed work.
+  - Never invent settlement dates, venues, order types, or limit prices; the
+    only timing fact in the data is T+1 settlement.

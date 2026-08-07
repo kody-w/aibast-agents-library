@@ -1,0 +1,52 @@
+mcs.metadata:
+  componentName: draft-proposal-intro
+  description: Frames the proposal cover email with computed savings, distribution list, and a five-part structure.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: draft-proposal-intro
+  description: Frames the proposal cover email with computed savings, distribution list, and a five-part structure.
+  ---
+  <!-- bic:source=blank -->
+  # Draft proposal intro
+
+  Use this skill when the user asks for a proposal cover note, a proposal
+  introduction, or how to frame the proposal.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. `savings = int(opportunity_value * 1.65)`. Note this multiplier is
+     1.65, NOT the 1.75 used by the value-messaging and talking-points
+     skills. For Acme Corporation that is
+     `2,400,000 * 1.65 = 3,960,000`. Never mix the two figures in one
+     answer without saying which view each comes from.
+  2. `implementation_weeks = 8` when the account's industry is
+     `Manufacturing`, otherwise 6.
+  3. Distribution - Decision Makers are contacts whose influence is
+     `Decision Maker` or `Economic Buyer`; Champions are contacts whose
+     influence is `Champion`. If either list is empty, print
+     `No decision makers mapped` or `No champions identified`.
+  4. Pain points are title-cased and numbered; the recommended subject line
+     uses the FIRST pain point in its original casing.
+
+  Worked example - Acme Corporation - 3,960,000 dollars of projected 3-year
+  savings, 8-week implementation, distribution to Sarah Chen (CTO) and Lisa
+  Park (CFO) with James Miller (VP Operations) as champion, subject
+  `Proposal: Addressing legacy ERP integration at Acme Corporation`.
+
+  ## Output format
+
+  - `**Proposal Introduction: <account>**`
+  - `**Context:**`, `**Key Pain Points Addressed:**` (numbered),
+    `**Proposal Highlights:**`, `**Distribution:**`,
+    `**Recommended Subject:**`, `**Email Structure:**` (5 numbered steps).
+
+  ## Edge cases
+
+  - The savings figure is a projection derived from opportunity value. Label
+    it as projected, never as committed or contracted.
+  - Producing the intro is not sending the proposal.

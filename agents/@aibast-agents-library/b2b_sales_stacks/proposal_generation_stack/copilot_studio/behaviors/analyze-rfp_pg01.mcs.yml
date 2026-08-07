@@ -23,7 +23,7 @@ content: |
     With no name, or with a name that matches nothing, default to Meridian
     Healthcare and say which RFP you used.
 
-  ## Procedure — the scoring rule, applied exactly
+  ## Procedure -- the scoring rule, applied exactly
 
   For each requirement in the RFP:
 
@@ -37,7 +37,7 @@ content: |
 
   Then: `overall fit = round( sum(fit_score * weight) / sum(weight), 1 )`.
   Weights are the RFP's own requirement weights and sum to 1.00, so the divisor
-  is 1.00 — but compute it as written, never assume the weights sum.
+  is 1.00 -- but compute it as written, never assume the weights sum.
 
   Worked example, Meridian Healthcare: 95x0.25 + 100x0.20 + 98x0.15 + 90x0.20
   + 92x0.10 + 88x0.10 = 94.5%.

@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: background-check-tracker
+  description: Tracks each open background investigation's days elapsed against its DCSA tier target and flags only the ones that are both past target and not yet adjudicated.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: background-check-tracker
+  description: Tracks each open background investigation's days elapsed against its DCSA tier target and flags only the ones that are both past target and not yet adjudicated.
+  ---
+  <!-- bic:source=blank -->
+  # Background check tracker
+
+  Use this skill when the user asks how long an investigation has been
+  running, what the standard timeline for a tier is, whether anything is
+  overdue at DCSA, or asks for the investigation tracker.
+
+  ## Inputs
+
+  - The employee roster (investigation type, investigation opened date,
+    clearance status).
+  - The investigation timeline reference (tier name, average days, target
+    days for T1 through T5).
+  - No parameters. This skill always reports the full roster.
+
+  ## Procedure
+
+  1. Emit the timeline reference table first, all five tiers in order T1
+     through T5, so the reviewer sees the standard before the actuals.
+  2. Days elapsed is computed against a fixed evaluation date of
+     **2025-03-15** using an approximate calendar where a year is 365 days
+     and a month is 30 days:
+
+     `ordinal(y-m-d) = y * 365 + m * 30 + d`
+     `days_elapsed = max(0, ordinal(2025-03-15) - ordinal(investigation_opened))`
+
+     `ordinal(2025-03-15) = 2025 * 365 + 3 * 30 + 15 = 739230`. The result is
+     an approximation, not an exact calendar difference - say so if the user
+     asks for a precise date arithmetic.
+  3. Target days comes from the tier row for that employee's investigation
+     type. If the tier is not in the reference, target is 0.
+  4. Overdue flag, computed exactly:
+
+     `overdue = (days_elapsed > target_days) AND (clearance_status != "active")`
+
+     Both conditions must hold. An investigation that ran past its target but
+     has since been adjudicated `active` is NOT overdue and gets no marker.
+     Append the literal ` (OVERDUE)` to the status cell only when the flag is
+     true.
+
+  ## Output format
+
+  - Headline: `# Background Check Tracker`
+  - `## Investigation Timeline Reference` with the table
+    `Tier | Name | Avg Days | Target Days`
+  - `## Active Investigations` with the table
+    `Employee | Type | Opened | Days Elapsed | Target | Status`
+  - Status renders with underscores replaced by spaces and title-cased, with
+    ` (OVERDUE)` appended when the flag is true.
+
+  ## Edge cases and boundaries
+
+  - Do not flag a past-target investigation that is already `active`. Two
+    rows in the current data are past target for exactly this reason; both
+    render clean.
+  - Average days and target days are the published DCSA reference, not a
+    prediction. Never turn them into a completion estimate for a specific
+    person.
+  - Never discuss what an investigation found, why it is slow, or what the
+    likely adjudication outcome is. You report elapsed time against target
+    and nothing else.
+  - Tracking only. You do not open, expedite, escalate, or close an
+    investigation.

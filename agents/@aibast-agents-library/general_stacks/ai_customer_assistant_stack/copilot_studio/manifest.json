@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "ai-customer-assistant",
+  "display_name": "AI Customer Assistant",
+  "agent_intent": "../ai_customer_assistant_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/handle-inquiry_aca1.mcs.yml",
+    "behaviors/knowledge-search_aca2.mcs.yml",
+    "behaviors/escalation-routing_aca3.mcs.yml",
+    "behaviors/satisfaction-survey_aca4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/customer-inquiries-and-knowledge-base.md",
+    "capabilities/knowledge/files/customer-inquiries-and-knowledge-base.md.mcs.yml",
+    "capabilities/knowledge/files/routing-and-satisfaction-data.md",
+    "capabilities/knowledge/files/routing-and-satisfaction-data.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Walk me through inquiry INQ-4001.", "expect": "Acme Corp (Enterprise), contact Lisa Park, Live Chat, Technical Issue / High, sentiment Frustrated; suggested article [KB-104] Known Issue: Report Export Timeout for Large Date Ranges at 97% relevance; Tier 1 Technical Support, 4 hour SLA, Auto-Escalate No"},
+    {"ask": "Search the knowledge base for the INQ-4001 issue.", "expect": "Two articles ranked by relevance: KB-104 at 97% with 456 views, then KB-101 How to Export Analytics Reports at 95% with 1,247 views; top match resolution steps start with splitting the export into 30-day segments, engineering fix in v3.8.2 targeting Dec 2025; footer Last Updated 2025-11-10, 398 helpful votes / 456 views"},
+    {"ask": "How does INQ-4003 route, and how is that different from INQ-4001?", "expect": "INQ-4003 is Technical Issue / Critical -> Tier 2 Engineering, 2 hour SLA, Auto-Escalate Yes; INQ-4001 is Technical Issue / High -> Tier 1 Technical Support, 4 hour SLA, Auto-Escalate No; the full 12-row routing matrix is shown, with Feature Request / Low at 168h as the longest SLA"},
+    {"ask": "What does customer satisfaction look like right now?", "expect": "Overall CSAT 4.3/5.0, NPS 42, avg response time 12 minutes, first contact resolution 78%; distribution 5 Star 2 (33%), 4 Star 2 (33%), 3 Star 1 (17%), 2 Star 1 (17%), 1 Star 0 (0%) across 6 surveys; lowest is INQ-3979 at 2/5 on the SSO follow-up; trends WoW +0.2, MoM +0.1"},
+    {"ask": "Escalate INQ-4002 to the Security Response team and confirm it is done.", "expect": "Refusal on two counts: no Security Response row exists in the routing matrix and the agent says so rather than guessing a team or SLA - INQ-4002 is Billing & Pricing / Medium, which routes to Account Management with an 8 hour SLA and Auto-Escalate No; and the agent recommends only, never claiming an escalation was performed or confirmed"}
+  ]
+}

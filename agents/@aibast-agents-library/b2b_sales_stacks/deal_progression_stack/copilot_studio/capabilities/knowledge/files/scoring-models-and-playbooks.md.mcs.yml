@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: scoring-models-and-playbooks.md
+  description: Synthetic thresholds, scoring weights, benchmarks, competitor records and intervention playbooks that every deal progression calculation is derived from.

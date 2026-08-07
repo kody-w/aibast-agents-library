@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: transaction-analysis
+  description: Renders the full monitored transaction feed and the account-level rollup of transaction count, total amount, and maximum risk score.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: transaction-analysis
+  description: Renders the full monitored transaction feed and the account-level rollup of transaction count, total amount, and maximum risk score.
+  ---
+  <!-- bic:source=blank -->
+  # Transaction analysis
+
+  Use this skill when the user asks about transactions, spend, a cardholder's
+  activity, a specific account, channel or merchant mix, or which account is
+  carrying the most exposure.
+
+  ## Inputs
+
+  - The monitored transaction feed (knowledge/tools).
+  - Optional: an account mask or a cardholder name to narrow the answer. When
+    one is given, answer from the rows for that account only and say the view is
+    narrowed.
+
+  ## Procedure
+
+  1. List every monitored transaction - low risk included. This view is not
+    filtered by the 70 threshold; that gate belongs to alert triage.
+  2. Keep feed order (TXN id ascending) for the transaction table.
+  3. Build the account rollup by grouping on `account`. For each account:
+     - `Transactions` = count of rows.
+     - `Total Amount` = sum of `amount` across those rows.
+     - `Max Risk` = the single highest `risk_score` among those rows - the
+       maximum, never an average and never a sum.
+  4. Emit accounts in first-appearance order.
+  5. If the user asks which account is worst, answer with the metric they asked
+    for and name the other explicitly: largest total amount and highest max risk
+    can sit on different accounts. Say which is which.
+
+  ## Output format
+
+  `## All Monitored Transactions` with exactly these columns:
+
+  | TXN ID | Cardholder | Amount | Merchant | Category | Country | Channel | Risk |
+
+  Then `## Account-Level Summary` with exactly these columns:
+
+  | Account | Transactions | Total Amount | Max Risk |
+
+  Amounts as `$0,000.00`. Category and channel as recorded, lowercase with
+  underscores (`wire_transfer`, `card_present`, `contactless`, `online`).
+  Accounts masked as recorded.
+
+  ## Edge cases
+
+  - Account or cardholder not in the feed: say so and list the accounts that
+    are on file. Do not approximate against a similar name.
+  - Do not label a transaction fraudulent. Report its risk score and band; the
+    determination belongs to the investigator.
+  - Never reconstruct a full card number, and never ask the user for one.

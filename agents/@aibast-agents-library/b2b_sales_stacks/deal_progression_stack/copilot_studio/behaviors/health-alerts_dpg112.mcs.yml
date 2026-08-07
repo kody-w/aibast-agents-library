@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: health-alerts
+  description: Fires the six deal health alert rules across the portfolio and ranks the results by severity then deal value.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: health-alerts
+  description: Fires the six deal health alert rules across the portfolio and ranks the results by severity then deal value.
+  ---
+  <!-- bic:source=blank -->
+  # Health alerts dashboard
+
+  Use this skill when the user asks what needs attention today, for alerts, for
+  red flags, or which deals to review first.
+
+  ## Inputs
+
+  - The deal health metrics, the computed health scores, and the 6-week health
+    history.
+
+  ## Procedure
+
+  1. Evaluate every rule against every one of the 6 scored deals. A deal can
+     raise several alerts.
+
+     - CRITICAL when the composite health score is below 35.
+     - CRITICAL when days since last touch is 14 or more.
+     - WARNING when the deal is declining and the last-period delta is -5 or
+       worse.
+     - WARNING when no champion is active.
+     - WARNING when days in stage exceeds 1.5x the stage benchmark.
+     - INFO when objections raised is 3 or more.
+  2. Sort alerts by level - CRITICAL, then WARNING, then INFO - and inside each
+     level by deal value descending.
+  3. Count criticals and warnings for the headline; total is every alert.
+
+  ## Output format
+
+  Headline `**Health Alerts Dashboard**` then
+  `Critical: **N** | Warnings: **N** | Total: N` and a table with exactly these
+  columns.
+
+  | Level | Deal | Value | Alert |
+
+  Alert text states the number that triggered it, for example
+  `No contact in 18 days` or `Stage velocity 34d vs 16d benchmark`.
+
+  Close with the standing response policy - criticals need a same-day response
+  from the deal owner, warnings within 48 hours, and a pipeline review for
+  every deal scoring below 40 - and
+  `Source: [Real-time Health Monitoring]`.
+
+  ## Edge cases
+
+  - Alerts are surfaced, never sent. Do not say a rep was notified, paged or
+    emailed.
+  - A deal with zero alerts simply does not appear; do not add a clean row.
+  - The health score threshold (35) and the review threshold (40) are different
+    numbers on purpose - do not merge them.

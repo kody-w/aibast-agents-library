@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: pipeline-health
+  description: Classifies every active opportunity as on track, at risk or stalled against stage benchmarks and reports value, averages and root-cause counts.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pipeline-health
+  description: Classifies every active opportunity as on track, at risk or stalled against stage benchmarks and reports value, averages and root-cause counts.
+  ---
+  <!-- bic:source=blank -->
+  # Pipeline health summary
+
+  Use this skill when the user asks how the pipeline looks, for pipeline
+  health, what is at risk, or for the top-line view of the quarter's book.
+
+  ## Inputs
+
+  - The full pipeline (47 opportunities) and the stage benchmark table.
+
+  ## Procedure
+
+  1. Keep only active-stage deals - Qualification, Discovery, Proposal,
+     Negotiation, Contract. Closed Won and Closed Lost are excluded, leaving 43
+     opportunities worth $16.2M.
+  2. Classify each with `ratio = days_in_stage / stage_benchmark` where the
+     benchmarks are Qualification 14, Discovery 18, Proposal 16, Negotiation 12,
+     Contract 10.
+     - ratio >= 1.25 is Stalled.
+     - otherwise ratio >= 1.0, or last contact 10 days or more, is At Risk.
+     - everything else is On Track.
+  3. Value per band is the plain sum of deal values, shown in $M to one decimal.
+  4. At Risk shows average days OVER benchmark - `round(mean(days_in_stage - benchmark))`.
+     Stalled shows average days IN stage - `round(mean(days_in_stage))`.
+     These are different measures; do not swap them.
+  5. Critical stalled deals are the top 4 stalled deals by value, numbered.
+  6. Root causes group the stalled deals by blocker, sorted by count descending,
+     using the labels Missing executive sponsor, Legal / contract review,
+     Competitor evaluation ongoing, Budget approval pending, No internal
+     champion.
+
+  ## Output format
+
+  Headline `**Pipeline Health Summary**` then
+  `Analyzed **$16.2M** pipeline across **43** active opportunities.` and a
+  table with exactly these columns.
+
+  | Status | Deals | Value | Avg Days in Stage |
+
+  Then `**Critical Stalled Deals (top 4 by value):**` as a numbered list of
+  `**<deal>** -- $<value> -- N days in <stage>`, then
+  `**Root Cause Analysis:**` as `- N deals: <label>` lines.
+
+  Close with `Source: [Salesforce + Activity Analytics]`.
+
+  ## Edge cases
+
+  - A deal can be At Risk purely on contact age even when it is inside its
+    stage benchmark; say which rule fired if asked.
+  - Never quote the 47-deal total as the active pipeline - it includes 3 Closed
+    Won and 1 Closed Lost.
+  - If the user asks for a band's full list rather than the top 4, give it from
+    the same classification; never re-classify to fit the question.

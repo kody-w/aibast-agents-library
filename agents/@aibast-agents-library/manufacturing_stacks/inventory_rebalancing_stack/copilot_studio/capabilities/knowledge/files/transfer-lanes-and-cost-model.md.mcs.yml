@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: transfer-lanes-and-cost-model.md
+  description: Synthetic inter-warehouse lane rates, classification thresholds, and planning coefficients that govern every number the agent computes.

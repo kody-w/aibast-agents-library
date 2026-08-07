@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: action-summary
+  description: Consolidates the full win/loss finding set into headline insights, this-week actions, 30-day milestones, and the expected recovery outcome.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: action-summary
+  description: Consolidates the full win/loss finding set into headline insights, this-week actions, 30-day milestones, and the expected recovery outcome.
+  ---
+  <!-- bic:source=blank -->
+  # Action summary
+
+  Use this skill when the user asks for the wrap-up, the bottom line, what to do
+  next, or a single recap of everything the analysis found.
+
+  ## Inputs
+
+  - The Q3/Q2 statistics, the CompetitorX root causes, and the recovery model.
+    Every figure here must match what the other skills produced.
+
+  ## Procedure - the exact rollup
+
+  1. Insight table, five rows:
+     - Q3 win rate: `38.6% (-6.3 pts from Q2)`.
+     - Primary competitor: `CompetitorX (37.2% of losses)`.
+     - Biggest gap: the top CompetitorX loss reason by count -
+       `Security certifications (41.4%)`.
+     - Second gap: the next one - `Enterprise references (24.1%)`.
+     - Recoverable pipeline: `$10,191,400`.
+  2. Root cause count = the number of CompetitorX loss reasons with frequency
+     `>= 10%`: security_certs 41.4, enterprise_references 24.1, pricing 17.2,
+     feature_gaps 10.3 = **4**. Relationship at 6.9% is below the threshold and
+     is excluded.
+  3. Accomplishments: 127 Q3 opportunities analyzed; 4 root causes identified;
+     counter-strategies developed per driver; $10,191,400 recovery modeled;
+     board framework created.
+  4. Immediate actions (this week), in order: update security positioning
+     materials; launch pricing flexibility program; activate enterprise
+     reference calls; train the sales team on updated talk tracks.
+  5. 30-day milestones: reference video testimonials live; FedRAMP readiness
+     assessment initiated; win rate tracking dashboard active.
+  6. Expected outcome sentence: win rate recovery from **38.6% to 45.1% within
+     2 quarters**, **$10,191,400** pipeline recovery, **56.6:1** ROI on
+     **$180,000** investment.
+
+  ## Output format
+
+  - Headline: `**Win/Loss Analysis - Complete Summary**`
+  - Table `| Insight | Finding |` with the five rows above.
+  - `**Session Accomplishments:**` as five bullets.
+  - `**Immediate Actions (This Week):**` as four numbered items.
+  - `**30-Day Milestones:**` as three bullets.
+  - `**Expected Outcome:** ...` as one sentence carrying all four figures.
+  - `Source: [All Win/Loss Systems]`
+  - `Agents: ExecutivePresentationAgent (orchestrating all agents)`
+
+  ## Edge cases
+
+  - The 4 root causes counted here are the ones at or above 10% frequency, so
+    the number is smaller than the 5 rows in the root-cause table. If the user
+    notices, explain the 10% threshold rather than changing either number.
+  - "Biggest gap" and "second gap" are ranked by deal **count**, not by pipeline
+    value. Security leads on both here, but state the basis when asked.
+
+  ## Boundaries
+
+  - Summary only. The actions and milestones are recommendations with owners
+    unassigned - never say any of them are underway, scheduled, or complete.
+  - Do not add an action, a milestone, or an insight that did not come out of
+    one of the other five operations.

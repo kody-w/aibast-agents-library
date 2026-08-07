@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: itsm-and-document-data.md
+  description: Synthetic ServiceNow incidents, knowledge base, assignment groups, SLA targets, SharePoint document library, and link validation ledger the agent answers from until real tools are connected.

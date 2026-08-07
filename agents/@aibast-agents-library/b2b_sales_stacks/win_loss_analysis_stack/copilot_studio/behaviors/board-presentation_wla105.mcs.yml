@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: board-presentation
+  description: Assembles the four-slide board framework - the challenge, the evidence, the plan, and the expected outcomes - ending in a funding ask.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: board-presentation
+  description: Assembles the four-slide board framework - the challenge, the evidence, the plan, and the expected outcomes - ending in a funding ask.
+  ---
+  <!-- bic:source=blank -->
+  # Board presentation
+
+  Use this skill when the user asks for the board deck, the executive summary
+  for leadership, the QBR framing, or how to present the win/loss story
+  upward.
+
+  ## Inputs
+
+  - The Q3 and Q2 quarter statistics, the CompetitorX root causes, and the
+    revenue recovery model. This skill re-uses those computations; it never
+    restates them differently.
+
+  ## Procedure - four slides, fixed
+
+  1. **Slide 1: The Challenge.** Win rate declined to 38.6% (from 44.9%);
+     enterprise segment hit hardest at -20.0 pts; CompetitorX captured 37.2% of
+     our losses; root cause is the security positioning and references gap.
+  2. **Slide 2: Why We're Losing.** Table of the **top three** CompetitorX loss
+     reasons by count, using the short labels: Security certs 41.4% of losses;
+     Enterprise refs 24.1% of losses; Pricing 17.2% of losses. Evidence column
+     is the same for every row: "Buyer feedback, lost deal analysis".
+  3. **Slide 3: The Plan.** Immediate: security messaging refresh, pricing
+     flexibility. 30 days: enterprise reference program launch. 6 months:
+     FedRAMP + ISO 27001 certification.
+  4. **Slide 4: Expected Outcomes.** Q4 win rate target 45.1% (+6.5 pts against
+     the 38.6% base); pipeline recovery $10,191,400; investment required
+     $180,000; ROI 56.6:1.
+  5. **Ask:** "Approve $180,000 for certification and reference program."
+
+  ## Output format
+
+  - Headline: `**Board Presentation: Q3 Win/Loss Analysis**`
+  - `**Slide 1: The Challenge**` as four bullets, deltas signed (`-20.0 pts`).
+  - `**Slide 2: Why We're Losing**` as table `| Factor | Impact | Evidence |`
+    with exactly three rows.
+  - `**Slide 3: The Plan**` as three bullets.
+  - `**Slide 4: Expected Outcomes**` as four bullets.
+  - `**Ask:** Approve $180,000 for certification and reference program.`
+  - `Source: [All Analysis Systems]`
+  - `Agents: ExecutivePresentationAgent`
+
+  ## Edge cases
+
+  - Slide 2 uses the abbreviated labels (Security certs, Enterprise refs,
+    Pricing), not the long root-cause labels. Keep the two consistent in
+    meaning; do not add a fourth row.
+  - The +6.5 pts on slide 4 is `45.1 - 38.6`, not a rounding of the -6.3 pt Q2
+    decline. Do not conflate them.
+
+  ## Boundaries
+
+  - The deck ends at the **Ask**. Never present the $180,000 as approved,
+    committed, or funded, and never state that the board has seen it.
+  - This is a framework, not a filed artifact. Do not claim a PowerPoint has
+    been created, saved, or sent.

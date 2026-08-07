@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: portfolio-holdings-data.md
+  description: Synthetic portfolio records, holdings, target allocations, and cost basis the agent answers from until real tools are connected.

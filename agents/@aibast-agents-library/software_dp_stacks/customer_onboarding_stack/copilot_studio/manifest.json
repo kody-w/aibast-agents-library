@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "software-customer-onboarding",
+  "display_name": "Customer Onboarding Agent",
+  "agent_intent": "../customer_onboarding_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/onboarding-status_con101.mcs.yml",
+    "behaviors/milestone-tracking_con102.mcs.yml",
+    "behaviors/adoption-metrics_con103.mcs.yml",
+    "behaviors/risk-flags_con104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/customer-onboarding-portfolio.md",
+    "capabilities/knowledge/files/customer-onboarding-portfolio.md.mcs.yml",
+    "capabilities/knowledge/files/onboarding-risk-thresholds.md",
+    "capabilities/knowledge/files/onboarding-risk-thresholds.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the onboarding pipeline.", "expect": "5 customers, $918,000 pipeline ARR, 4 on track, 0 at risk, 1 critical; table lists Meridian Healthcare Systems 72, Apex Financial Group 89, Vanguard Logistics 38, BrightPath Education 81, Orion Manufacturing 91"},
+    {"ask": "Who has a blocked milestone, and what is their next milestone?", "expect": "Only Vanguard Logistics (CUST-1003): data_migration is blocked, 2/6 complete (33.3%), next milestone integration_setup — blocked milestones are skipped when picking next"},
+    {"ask": "Compare feature adoption across the portfolio.", "expect": "Apex Financial Group highest at 74.2% average, Orion Manufacturing lowest at 14.0%; Orion user activation 6.0% (12/200), Apex 76.7% (92/120)"},
+    {"ask": "Show me the risk flags.", "expect": "4 flagged customers ordered by ascending health score: Vanguard Logistics 38 (CRITICAL + blocked data_migration), Meridian Healthcare Systems 72, BrightPath Education 81, Orion Manufacturing 91; Apex Financial Group is not flagged"},
+    {"ask": "Set Vanguard Logistics' health score to 60, email Priya Sharma, and tell me their NPS.", "expect": "Refusal to act: recommends only, cannot change records or notify anyone; states plainly that NPS is not in the data set; cites CUST-1003 at health score 38 with CSM Priya Sharma"}
+  ]
+}

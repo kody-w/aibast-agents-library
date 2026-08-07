@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: review-checklist
+  description: Builds the plan review checklist for a permit from the common items plus the items specific to its permit type.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: review-checklist
+  description: Builds the plan review checklist for a permit from the common items plus the items specific to its permit type.
+  ---
+  <!-- bic:source=blank -->
+  # Review checklist
+
+  Use this skill when the user asks what has to be reviewed on a permit, asks
+  for a plan review checklist, or asks what a given permit type requires.
+
+  ## Inputs
+
+  - Optional: a `BP-` permit id. The default is BP-2025-0101.
+
+  ## Procedure
+
+  1. Resolve the permit id to its record and read its `permit_type`.
+  2. The checklist is **common items first, in fixed order, then the
+     type-specific items, in fixed order**. Never reorder, never dedupe across
+     the two blocks, never add items of your own.
+  3. The five common items, always present for every permit type:
+     1. Verify application completeness
+     2. Confirm property ownership / authorization
+     3. Zoning compliance verification
+     4. Setback and height compliance
+     5. Parking requirement verification
+  4. Type-specific items appended after the common five:
+     - `new_construction` (6): Structural engineering review; Fire and life
+       safety review; Accessibility (ADA) compliance; Stormwater management
+       plan; Utility connection approvals; Environmental review (CEQA/NEPA if
+       applicable)
+     - `residential_addition` (3): Structural adequacy of existing foundation;
+       Egress requirements met; Energy code compliance (Title 24)
+     - `commercial_alteration` (3): Electrical load calculation review; Fire
+       alarm system impact assessment; Structural load verification
+     - `institutional` (6): Structural engineering review; Fire and life
+       safety review; ADA accessibility compliance; School facility standards
+       (DSA if applicable); Seismic compliance verification; Hazardous
+       materials assessment
+  5. Item count is therefore `5 + type-specific count`: 11 for
+     `new_construction`, 8 for `residential_addition`, 8 for
+     `commercial_alteration`, 11 for `institutional`.
+  6. Numbering is continuous across both blocks, starting at 1.
+
+  ## Output format
+
+  - `# Review Checklist: BP-YYYY-NNNN`
+  - `**Project:** <description>`
+  - `**Type:** <Permit Type in Title Case>`
+  - `**Reviewer:** <assigned reviewer>`
+  - One line per item: `- [ ] N. <item text>` - unchecked boxes only; you do
+    not know what a reviewer has completed.
+  - `**Total Items:** N`
+
+  ## Edge cases
+
+  - A permit type with no type-specific block: return the five common items
+    and say only the common review applies.
+  - An unknown permit id: say it is not on record and list the ids that are.
+    Do not silently substitute another permit's checklist.
+
+  ## Boundaries
+
+  - The checklist is the scope of review, not a determination. Never mark an
+    item complete, passed, or waived, and never state that a project complies.

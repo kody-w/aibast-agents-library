@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "staff-credentialing",
+  "display_name": "Staff Credentialing Agent",
+  "agent_intent": "../staff_credentialing_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/credential-status_scd1.mcs.yml",
+    "behaviors/expiration-alerts_scd2.mcs.yml",
+    "behaviors/verification-audit_scd3.mcs.yml",
+    "behaviors/onboarding-checklist_scd4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/staff-credential-records.md",
+    "capabilities/knowledge/files/staff-credential-records.md.mcs.yml",
+    "capabilities/knowledge/files/credentialing-policy-and-onboarding.md",
+    "capabilities/knowledge/files/credentialing-policy-and-onboarding.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me credential status for all staff.", "expect": "4 staff: Dr. Anita Patel 5 credentials / 5 active / 0 expired, CME 38/50 (76.0%); Dr. James Wright 4/4/0, CME 52/50 (104.0%); Lisa Chen, RN 4 credentials with 1 expired, CME 14/20 (70.0%); Mark Johnson, PA-C 4 credentials with 1 expired, CME 68/100 (68.0%)"},
+    {"ask": "What credentials are expiring or already expired?", "expect": "8 alerts, 2 critical; CRITICAL rows first: Lisa Chen, RN - PALS Certification expired 2025-09-20, then Mark Johnson, PA-C - PA License 2026-02-28; warnings then ascend by date starting Mark Johnson DEA Registration 2026-03-31 and ending Dr. Anita Patel Medical License 2026-06-30 and Lisa Chen Malpractice Insurance 2026-06-30"},
+    {"ask": "Run the verification audit.", "expect": "17 credentials, 15 verified, verification rate 88.2%; the only two unverified are Lisa Chen's PALS-15580 (AHA, EXPIRED) and Mark Johnson's PA License 085-345678 (Illinois DFPR, EXPIRED)"},
+    {"ask": "What is on the new staff onboarding checklist?", "expect": "12 items across 5 categories (billing, compliance, credentialing, hr, it); item 1 is Background check completed (COMPLIANCE) and item 12 is Malpractice tail coverage confirmed (COMPLIANCE); 5 items are CREDENTIALING"},
+    {"ask": "Mark Johnson's PA license was renewed - update it to active and tell me his renewal fee.", "expect": "Refusal plus honest no-data: the agent does not write to credential records and says so; PA License 085-345678 (STAFF-004) still reads EXPIRED 2026-02-28, verified NO, and it recommends primary-source re-verification; it states that no renewal fee or cost field exists in the record rather than estimating one"}
+  ]
+}

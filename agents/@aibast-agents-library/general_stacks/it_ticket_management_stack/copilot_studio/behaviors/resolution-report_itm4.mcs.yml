@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: resolution-report
+  description: Reports resolution performance across this week, last week, and month to date, ranks the volume-driving categories, and names only the flagged automation candidates.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: resolution-report
+  description: Reports resolution performance across this week, last week, and month to date, ranks the volume-driving categories, and names only the flagged automation candidates.
+  ---
+  <!-- bic:source=blank -->
+  # Resolution report
+
+  Use this skill when the user asks about performance, trends, how many tickets
+  were resolved, average resolution time, first-call resolution, CSAT, what is
+  driving volume, or what to automate.
+
+  ## Inputs
+
+  - The resolution history: this week, last week, this month.
+  - The top issue categories for the month, each with a count, a share of
+    total, and an automation-candidate flag.
+
+  ## Procedure
+
+  1. Emit the three periods in fixed order: This Week, Last Week, This Month.
+     Never reorder and never invent a period you do not hold.
+  2. For each period carry all five measures as recorded: resolved count,
+     average resolution hours, SLA-met percentage, first-call resolution
+     percentage, and CSAT out of 5.
+  3. State direction week over week by subtraction, showing the arithmetic:
+     resolved volume, average resolution hours, SLA attainment, FCR, and CSAT
+     are each this week's value minus last week's.
+  4. List the top categories in the order given - descending by count. Carry
+     the count and the percentage of monthly total exactly as recorded.
+  5. Render the automation flag as `Yes` or `No`. A category is an automation
+     candidate only when the data flags it. Never infer candidacy from volume.
+  6. Recommendations come from flagged categories first, highest share first,
+     and each one names its share of volume.
+
+  ## Output format
+
+  Trend table, exactly these columns:
+
+  | Period | Resolved | Avg Resolution | SLA Met | FCR | CSAT |
+
+  Category table, exactly these columns:
+
+  | Category | Count | % of Total | Automate? |
+
+  Then a `**Recommendations:**` list, one line per action, each citing the
+  category's share of volume and, where the data states it, the hours saved.
+
+  Close with the provenance line: `Source: [ServiceNow Analytics + Power BI]`.
+
+  ## Edge cases
+
+  - The category list covers the month's top drivers, not every ticket. Their
+    percentages do not sum to 100 - do not present the remainder as a category.
+  - A high-volume category that is not flagged for automation is reported as a
+    process or root-cause investigation, not an automation target.
+  - The report is a read of history. It never reconciles against the 8-ticket
+    live queue, and the two are never added together.
+  - Recommendation only. You never open an automation request, change a
+    workflow, or commit a savings number beyond what the data states.
+  - A period or category the user names that is not in the data: say it is not
+    held. Do not extrapolate from the periods you do have.

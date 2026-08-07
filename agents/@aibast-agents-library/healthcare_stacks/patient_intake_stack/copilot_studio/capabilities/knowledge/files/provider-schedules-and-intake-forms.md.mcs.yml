@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: provider-schedules-and-intake-forms.md
+  description: Synthetic provider schedule, open appointment slots, and intake questionnaire definitions the agent answers from until real tools are connected.

@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: health-insurance
+  description: Reports the employee's health plan, premium, deductible, out-of-pocket max, and dependents, plus the rules for adding a dependent.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: health-insurance
+  description: Reports the employee's health plan, premium, deductible, out-of-pocket max, and dependents, plus the rules for adding a dependent.
+  ---
+  <!-- bic:source=blank -->
+  # Health insurance
+
+  Use this skill when the user asks about their health plan, premium,
+  deductible, out-of-pocket maximum, who is covered, how to add a dependent, or
+  what a new baby costs them.
+
+  ## Inputs
+
+  - Employee name (defaults to the requesting employee).
+  - Optional: the qualifying event, used only to state the enrollment window.
+
+  ## Procedure
+
+  1. Resolve the employee record. Unknown name means no record - say so, stop.
+  2. Read `health_plan` from that record and report it verbatim: `plan`,
+     `monthly_premium` (labelled as the employee's own contribution),
+     `deductible_individual`, `oop_max_individual`, and `dependents`.
+     On record: emp-1001 Jordan Chen and emp-1003 Sarah Williams are on the PPO
+     Family Plan at $450/month; emp-1002 Michael Torres is on HMO Individual at
+     $220/month.
+  3. Render `dependents` as a comma-separated list. An empty list renders as
+     `None` - never as blank and never as "unknown".
+  4. State the dependent-enrollment rules, identical for every employee:
+     - Enrollment window: 30 days from the qualifying event. Outside that
+       window, enrollment waits for open enrollment; say so rather than
+       implying an exception.
+     - Premium increase: `+$125/month` per the policy, added on top of the
+       employee's current monthly premium. For emp-1001 that is
+       `$450 + $125 = $575/month` if asked for the total.
+     - Coverage effective date: the date of the qualifying event.
+  5. State the new-baby benefits, all 100% covered: well-baby care visits, all
+     immunizations, pediatric visits at a $20 copay, and $10,000 dependent life
+     insurance applied automatically.
+
+  ## Output format
+
+  - Headline: `**Health Insurance: <name>**`
+  - Table with columns `Coverage | Detail` and rows in this order: Plan, Monthly
+    Premium (`$N (your contribution)`), Deductible (Individual),
+    Out-of-Pocket Max, Current Dependents.
+  - `**Adding a Dependent:**` as three bullets (window, premium increase,
+    effective date).
+  - `**New Baby Benefits (100% Covered):**` as four bullets.
+  - Close with `Source: [Benefits Portal + Insurance Carrier]` and
+    `Agents: AskHRAgent`.
+
+  ## Edge cases
+
+  - Family deductible and family out-of-pocket max exist only on the PPO Family
+    Plan ($1,500 and $6,000). HMO Individual has no family figures - if asked,
+    say the plan carries none rather than reusing the individual numbers.
+  - The default table shows the individual figures. Quote family figures only
+    when the user asks for them and the plan has them.
+  - You never enroll, drop, or change coverage, and you never advise on which
+    plan to pick or on any medical question. State the numbers, point the
+    employee at the Benefits Portal to make the change.

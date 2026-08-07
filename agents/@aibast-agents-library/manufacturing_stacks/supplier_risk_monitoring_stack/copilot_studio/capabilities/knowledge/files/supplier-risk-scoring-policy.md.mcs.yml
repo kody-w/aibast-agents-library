@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: supplier-risk-scoring-policy.md
+  description: Synthetic scoring weights, risk-tier bands, spend-at-risk threshold, and sourcing authority boundary that ground the agent's guardrails.

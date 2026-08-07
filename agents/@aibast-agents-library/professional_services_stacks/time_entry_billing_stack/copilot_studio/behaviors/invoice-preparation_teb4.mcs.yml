@@ -1,0 +1,86 @@
+mcs.metadata:
+  componentName: invoice-preparation
+  description: Assembles the approved billable time into per-project invoice packages, states what is held pending approval, and reports last cycle collections.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: invoice-preparation
+  description: Assembles the approved billable time into per-project invoice packages, states what is held pending approval, and reports last cycle collections.
+  ---
+  <!-- bic:source=blank -->
+  # Invoice preparation
+
+  Use this skill when the user asks what is ready to invoice, asks to prepare
+  or draft the invoice run, asks what the grand total is for this cycle, or
+  asks how last cycle collected.
+
+  ## Inputs
+
+  - The time entry log, the project budget records (for client and contract
+    type), and the invoice history.
+  - Optional: a project or client to narrow to.
+
+  ## Procedure
+
+  1. **Select invoiceable entries.** An entry is invoiceable only if BOTH hold:
+     `category == "billable"` AND `approved == true`. This gate is never
+     waived - not to hit a month-end number, not when the user says the
+     approval is coming.
+  2. **Group by project**, in first-seen order across the entry log. Per group:
+     - `entries` = count of invoiceable entries
+     - `hours` = sum of their hours
+     - `invoice amount` = `sum(hours * rate)`
+     - `client` and `contract type` come from the project budget record. If the
+       project has no budget record, render client as `Unknown` and contract
+       type as `T&M`, and say the record is missing rather than guessing.
+  3. **Grand total** = sum of the per-project invoice amounts.
+  4. **Pending approval** = `sum(hours * rate)` over billable entries with
+     `approved == false`. Report it on its own line, explicitly marked as not
+     included in the grand total.
+  5. **Invoice history** lists every invoice regardless of status, in record
+     order, with its status in lower case as recorded.
+     - `total billed = sum of all invoice amounts`
+     - `total collected = sum of amounts where status == "paid"`
+     - `collection rate = round(total collected / total billed * 100, 1)`
+
+  ## Output format
+
+  ```
+  ## Invoice Preparation
+
+  ### Invoices Ready to Generate
+
+  | Project | Client | Entries | Hours | Invoice Amount | Contract Type |
+
+  **Grand total ready to invoice:** $XX,XXX.XX
+  **Pending approval (not included):** $X,XXX.XX
+
+  ### Invoice History
+
+  | Invoice | Client | Amount | Date | Status |
+
+  **Total billed (last cycle):** $XXX,XXX.XX
+  **Total collected:** $XXX,XXX.XX
+  **Collection rate:** XX.X%
+  ```
+
+  ## Edge cases
+
+  - **Fixed Fee projects.** The amount shown is computed the same way as T&M -
+    hours times rate - because that is the work value on the timesheet. Under a
+    fixed-fee contract that figure is not automatically the invoiceable amount.
+    Show the contract type in the row and tell the reviewer to confirm the
+    milestone terms before issuing.
+  - A project with no approved billable entries does not get a row here. Say
+    which projects were excluded and why, rather than emitting a zero row.
+  - Non-billable entries never appear in this skill at any total.
+  - If total billed is 0, report the collection rate as not computable rather
+    than 0%.
+
+  ## Boundaries
+
+  - Preparation only. Never generate, number, send, or transmit an invoice;
+    never mark one paid; never contact a client. End with the package for the
+    billing approver to issue.
+  - Never add pending-approval value to the grand total, even when asked what
+    the total "could" be - quote the two figures separately.

@@ -1,0 +1,82 @@
+mcs.metadata:
+  componentName: outfit-builder
+  description: Builds all four outfit templates for a customer by picking the highest match-score item per slot and pricing the outfit total.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: outfit-builder
+  description: Builds all four outfit templates for a customer by picking the highest match-score item per slot and pricing the outfit total.
+  ---
+  <!-- bic:source=blank -->
+  # Outfit builder
+
+  Use this skill when the user asks to put together a look, asks what to pair
+  with what, asks for a head-to-toe set for an occasion, or asks what an outfit
+  would cost.
+
+  ## Inputs
+
+  - The product catalog, the customer preference profiles, and the four outfit
+    templates.
+  - `customer_id` - a SHOP- id. When none is given, default to SHOP-001.
+
+  ## Procedure
+
+  Every run builds all four templates in this order, each with its fixed slot
+  list expressed as `category:subcategory`:
+
+  1. `business_casual` (Business Casual): tops:shirts, bottoms:pants,
+     footwear:boots, accessories:pocket_squares
+  2. `weekend_smart` (Weekend Smart): tops:sweaters, bottoms:pants,
+     footwear:boots
+  3. `active_weekend` (Active Weekend): outerwear:vests, footwear:athletic
+  4. `evening_out` (Evening Out): outerwear:blazers, tops:shirts,
+     bottoms:pants, footwear:boots
+
+  For each slot:
+
+  1. Collect every catalog SKU whose `category` and `subcategory` both equal
+     the slot's pair. An exact match on both is required.
+  2. If the customer profile exists, pick the SKU with the highest match score
+     against that profile - the same formula the recommendations skill uses:
+     `min(100, 20*style_tag_overlap + 25*brand_affinity_hit +
+     10*color_overlap + 15*in_budget)`. If the profile does not exist, pick the
+     SKU with the highest `rating` instead. Ties resolve to the first candidate
+     in catalog order.
+  3. Add the chosen SKU's price to the running outfit total.
+  4. If no SKU matches the pair, emit `No matching item found` for that slot
+     and add nothing to the total.
+
+  The outfit total is the plain sum of the chosen pieces. There is no discount,
+  bundle price, tax, or shipping - never add one.
+
+  ## Output format
+
+  - `# Outfit Builder: <customer name>`
+  - Per template: `## <template display name>`, then one bullet per slot -
+    bold category label (the `category`, underscores to spaces, title-cased,
+    so `outerwear` renders as `Outerwear`), the product name, then the price at
+    `$N,NNN.NN`, separated by em dashes.
+  - Per template: `**Outfit Total:** $N,NNN.NN`
+
+  Note the bullet label is the slot's category, not its subcategory - a sweater
+  and a shirt both appear under `**Tops:**`.
+
+  ## Edge cases
+
+  - Purchase history is NOT excluded here. An outfit can legitimately reuse a
+    piece the customer already owns; that is the point of styling around the
+    wardrobe. Do not filter it out and do not treat it as a bug.
+  - The same SKU can appear across several templates - the boots and the chinos
+    recur wherever the slot calls for them. Prices are counted once per outfit.
+  - An unknown customer ID falls back to rating-based selection and renders the
+    name as "Customer". State that no profile was found rather than implying
+    the looks were personalized.
+
+  ## Boundaries
+
+  - Recommendation only. Never reserve the pieces, build a cart, or state that
+    an outfit has been ordered or held.
+  - Never substitute a product that is not in the catalog to complete a look;
+    report the empty slot instead.
+  - Never re-price an item. Prices come from the catalog unchanged.

@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: incident-create
+  description: Presents the ServiceNow incident queue and the full detail of one incident as a preview - no incident is created.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: incident-create
+  description: Presents the ServiceNow incident queue and the full detail of one incident as a preview - no incident is created.
+  ---
+  <!-- bic:source=blank -->
+  # Incident intake
+
+  Use this skill when the user asks to raise a ticket from a call, asks what is
+  in the incident queue, or asks for the detail of an INC- number.
+
+  ## Inputs
+
+  - The ServiceNow incident table (INC-20001, INC-20002, INC-20003).
+  - Optional: an incident number.
+
+  ## Procedure
+
+  1. List every incident in the table, in stored order, with number,
+     short description (first 40 characters), priority, state, and assignment
+     group.
+  2. Resolve the detail incident by exact key match on the incident number. An
+     unrecognized number falls back to the **first** incident (INC-20001). When
+     that happens, say the number was not found and name the incident you are
+     actually detailing.
+  3. Report priority together with its two drivers:
+     `<priority> (Impact: <impact>, Urgency: <urgency>)`. Impact and urgency are
+     the stored integers, 1 being the most severe. Never restate a priority
+     without them and never recompute one.
+  4. Report `assigned_to` verbatim - the literal value `unassigned` (INC-20003)
+     means nobody owns it. Say "unassigned", do not propose an owner here; that
+     is `assignment-routing`.
+  5. Quote the SLA breach timestamp from `sla_breach_at`. Compare it against the
+     opened time when the user asks how tight the window is; do not invent a
+     current time.
+
+  ## Output format
+
+  - Headline: `**ServiceNow Incidents**`
+  - Queue table `| Number | Description | Priority | State | Group |`.
+  - `**Detail: INC-xxxxx**` followed by `| Field | Value |` with rows Short
+    Description, Category, Priority, State, Assigned To, Caller, SLA Breach.
+  - `**Description:**` with the full description text.
+  - Close with `Source: [ServiceNow Instance]`.
+
+  ## Boundaries
+
+  - Despite the name, this skill creates nothing. It shows the queue and one
+    incident's detail. Never say an incident was opened, logged, updated, or
+    given a number. If the user asks you to raise a ticket, produce the intake
+    detail for them to submit and say the submission is theirs to make.
+  - Never invent an INC- number. The table holds three incidents; say so if the
+    one asked about is not among them.

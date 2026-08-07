@@ -1,0 +1,76 @@
+mcs.metadata:
+  componentName: risk-scan
+  description: Builds the portfolio risk scan - every contract ranked by risk score with total value, value at elevated risk, HIGH-issue counts, and the renewal calendar.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: risk-scan
+  description: Builds the portfolio risk scan - every contract ranked by risk score with total value, value at elevated risk, HIGH-issue counts, and the renewal calendar.
+  ---
+  <!-- bic:source=blank -->
+  # Risk scan
+
+  Use this skill when the user asks for the portfolio picture, the contract
+  board, total exposure, which contracts are riskiest, or what is coming up for
+  renewal.
+
+  ## Inputs
+
+  - The contract portfolio and the clause register (knowledge/tools).
+  - The renewal calendar.
+  - Optional: a client name or contract id to narrow the view. Otherwise scan
+    the whole portfolio.
+
+  ## Procedure
+
+  1. Count the contracts in the portfolio. Report it as `Active contracts`.
+  2. Total contract value = sum of `value` across every contract, with no
+     filter. In the current data that is
+     `25,000,000 + 4,200,000 + 12,000,000 + 8,500,000 = 49,700,000`.
+  3. Value at elevated risk = sum of `value` for contracts where
+     `risk_score >= 5.0`. Greater-than-or-equal, not greater-than. In the
+     current data that is `25,000,000 + 12,000,000 = 37,000,000` (CTR-5001 and
+     CTR-5003). Never move this threshold.
+  4. HIGH Issues for a contract = the count of clauses in its clause record
+     whose `risk` is exactly `HIGH`. A contract with no clause record counts
+     `0` -- that means nothing has been reviewed, not that it is clean. Say so
+     when the count is 0 and no clause record exists.
+  5. Sort the contract table by `risk_score` descending. No other sort order,
+     not by value, not by renewal date.
+  6. Render the three headline lines first, then the contract table, then the
+     renewal table.
+  7. The renewal table is emitted in the recorded calendar order (ascending by
+     days out), which is not the same order as the contract table. Resolve each
+     entry's client name from the contract portfolio by its contract id.
+
+  ## Output format
+
+  Headline, three lines:
+
+  - `**Active contracts:** N`
+  - `**Total contract value:** $N,NNN,NNN`
+  - `**Value at elevated risk (score >= 5.0):** $N,NNN,NNN`
+
+  Then one table, exactly these columns:
+
+  | Contract | Client | Type | Value | Term | Risk Score | HIGH Issues |
+
+  Value as `$25,000,000` (thousands separators, no decimals). Term as the
+  month count with an `mo` suffix (`36mo`). Risk score as `6.5/10`.
+
+  Then `### Upcoming Renewals` and one table, exactly these columns:
+
+  | Contract | Client | Renewal Date | Days Out | Action |
+
+  Renewal date as `YYYY-MM-DD`. Days out as the recorded integer.
+
+  ## Edge cases
+
+  - A contract with no clause record: show `0` in HIGH Issues and add a note
+    that no clause-level review exists for it.
+  - A contract with no renewal calendar entry: omit it from the renewal table
+    and say which contract has no renewal entry rather than inventing a date.
+  - Filtered view: if the user narrowed to one client or contract, apply the
+    filter to every row and every count, and state that the view is filtered.
+  - Reporting only. Never say a contract has been escalated, flagged in a
+    system, or routed to anyone.

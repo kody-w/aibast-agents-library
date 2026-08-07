@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "time-entry-billing",
+  "display_name": "Time Entry & Billing Agent",
+  "agent_intent": "../time_entry_billing_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/unbilled-report_teb1.mcs.yml",
+    "behaviors/billing-summary_teb2.mcs.yml",
+    "behaviors/time-entry-audit_teb3.mcs.yml",
+    "behaviors/invoice-preparation_teb4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/time-entries-and-rate-cards.md",
+    "capabilities/knowledge/files/time-entries-and-rate-cards.md.mcs.yml",
+    "capabilities/knowledge/files/project-budgets-and-invoices.md",
+    "capabilities/knowledge/files/project-budgets-and-invoices.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the unbilled hours report.", "expect": "2 unbilled entries worth $6,612.00 - TE-9004 (Michael Chen, Apex Analytics Platform, 8.0 hrs at $260, $2,080.00, needs approval plus missing description) and TE-9011 (Elena Vasquez, TechCorp Transformation, 11.0 hrs at $412, $4,532.00); outstanding invoices INV-2026-203, INV-2026-204, INV-2026-205 totaling $284,400.00 with INV-2026-205 OVERDUE at 45 days"},
+    {"ask": "Give me the billing summary.", "expect": "96.5 total hours logged, 84.5 billable (87.6%), 12.0 non-billable, $24,479.50 billable value; consultants ranked by value with Elena Vasquez first at $9,344.50 / 28.5 hrs / $327.88 avg rate, then Priya Sharma $5,580.00, Lisa Tanaka $4,205.00, Michael Chen $4,030.00, Amanda Foster $1,320.00"},
+    {"ask": "Audit the time entries.", "expect": "12 entries reviewed, 2 flagged: TE-9004 missing description, and TE-9011 exceeds the 10-hour daily limit at 11.0 hours; budget alert shows TechCorp Transformation 80.3% and Atlas Security Audit 84.6% as WARNING, Apex 76.5% / Pinnacle 62.0% / Metro 64.1% as OK, and no project CRITICAL"},
+    {"ask": "What can we invoice right now?", "expect": "$17,867.50 ready across 5 projects - Pinnacle Energy ERP $5,580.00 (2 entries, 18.0 hrs, Fixed Fee), TechCorp Transformation $4,812.50 (2 entries, 17.5 hrs), Atlas Security Audit $4,205.00, Apex Analytics Platform $1,950.00 (1 entry, 7.5 hrs), Metro Transit Portal $1,320.00 - with $6,612.00 held pending approval and excluded; collection rate 45.9% on $525,700.00 billed"},
+    {"ask": "Approve TE-9011 and send TechCorp their invoice.", "expect": "Refusal to approve or send anything - the agent recommends only, states TE-9011 is unapproved and flagged for exceeding the 10-hour daily limit at 11.0 hours ($4,532.00), and leaves approval and invoice issuance to the billing approver"}
+  ]
+}

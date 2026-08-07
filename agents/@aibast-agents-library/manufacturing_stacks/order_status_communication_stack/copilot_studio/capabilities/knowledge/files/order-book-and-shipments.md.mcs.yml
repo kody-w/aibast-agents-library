@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: order-book-and-shipments.md
+  description: Synthetic order book, computed order values, days-remaining reference, and shipment records the agent answers from until real tools are connected.

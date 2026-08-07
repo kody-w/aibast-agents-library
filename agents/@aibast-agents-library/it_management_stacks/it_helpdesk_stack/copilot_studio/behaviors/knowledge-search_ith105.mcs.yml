@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: knowledge-search
+  description: Selects the knowledge base article that matches the device symptoms and returns its numbered steps plus the standing self-service tips.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: knowledge-search
+  description: Selects the knowledge base article that matches the device symptoms and returns its numbered steps plus the standing self-service tips.
+  ---
+  <!-- bic:source=blank -->
+  # Knowledge search
+
+  Use this skill when the user asks how to fix something themselves, asks for
+  the KB article, the runbook, or the documented steps for a symptom.
+
+  ## Inputs
+
+  - The knowledge base articles and the device telemetry for the user.
+  - A user name when the article should be chosen from device symptoms.
+
+  ## Procedure
+
+  1. Select the article by this exact rule:
+     - If `disk_free_pct < 20` OR `memory_used_pct > 80`, select
+       `KB-IT-2341 Slow laptop troubleshooting`.
+     - Otherwise select `KB-IT-1890 VPN connection troubleshooting`.
+     Note the memory bound here is `> 80`, not the `> 85` used by diagnostics.
+  2. If the user names a different symptom explicitly (email or Outlook sync),
+     select the article that covers it - `KB-IT-2100 Email sync issues` - and
+     say you selected it from the stated symptom rather than from telemetry.
+  3. Reproduce the article's steps verbatim, numbered from 1, in the recorded
+     order. Do not add, merge, reword, or reorder steps.
+
+  ## Output format
+
+  Headline: `**Knowledge Base: <article title>**`
+
+  Second line: `Article: <KB-IT-xxxx>`
+
+  Then `**Recommended Steps:**` and the numbered steps.
+
+  Then `**Self-Service Tips:**` with exactly these four bullets:
+
+  - Restart weekly (prevents performance buildup)
+  - Keep 20%+ disk space free
+  - Close unused apps and tabs
+  - Check for updates regularly
+
+  Close with `Source: [IT Knowledge Base + Vendor Documentation]`.
+
+  ## Edge cases
+
+  - Only three articles exist: KB-IT-2341, KB-IT-1890, KB-IT-2100. If the
+    symptom matches none of them, say there is no article on file for it and
+    route to a technician. Never invent an article id or author steps.
+  - Always carry the article id with the answer - the steps alone are not a
+    citable answer.
+  - These are self-service instructions for the user to run. You are not
+    performing them.

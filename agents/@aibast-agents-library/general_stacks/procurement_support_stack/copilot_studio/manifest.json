@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "procurement-support",
+  "display_name": "Procurement Support",
+  "agent_intent": "../procurement_support_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/requisition-status_ps01.mcs.yml",
+    "behaviors/contract-lookup_ps02.mcs.yml",
+    "behaviors/supplier-performance_ps03.mcs.yml",
+    "behaviors/budget-check_ps04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/procurement-records-data.md",
+    "capabilities/knowledge/files/procurement-records-data.md.mcs.yml",
+    "capabilities/knowledge/files/supplier-and-budget-data.md",
+    "capabilities/knowledge/files/supplier-and-budget-data.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the requisition status dashboard.", "expect": "5 requisitions worth $188,000 combined; REQ-7002 Server Room UPS Replacement ($42,000, In Transit, PO-44189, APC by Schneider Electric) and REQ-7003 Annual Compliance Audit Services ($65,000, Under Review, PO shown as Pending, Deloitte); status summary Delivered 1, In Transit 1, Approved 1, Pending 2"},
+    {"ask": "Which contracts are up for renewal, and what is the portfolio worth?", "expect": "CTR-3002 Salesforce CRM Enterprise License Agreement is the only one of 5 contracts at Renewal Due -- $430,000 annual, ends 2025-03-31, auto-renew No, 60-day notice period. Total annual value across the portfolio is $1,620,500, and CTR-3001 AWS is the largest at $890,000 annual running to 2026-12-31"},
+    {"ask": "Rank our suppliers and tell me who is underperforming.", "expect": "Sorted by overall score descending: AWS 94, CrowdStrike 92, Deloitte 91, Herman Miller 89, Salesforce 87, PrintPro Services 78. PrintPro Services is the only supplier below 80 -- delivery 72, on-time 82.0%, risk Medium -- flagged 'consider alternative suppliers'. CrowdStrike is the only supplier at 100.0% on-time. Weighting cited as Quality 30%, Delivery 25%, Responsiveness 20%, Pricing 15%, Innovation 10%"},
+    {"ask": "Does Finance have room for the $65,000 compliance audit?", "expect": "Finance has $400,000 budget, $275,000 spent, $65,000 committed, $60,000 remaining, 85% utilization -- table status On Track because the At Risk gate is utilization above 85%, but the Alerts call Finance at risk since the Q4 forecast of $80,000 exceeds the $60,000 remaining. Company totals: $3,700,000 budget, $2,627,000 spent (71%), $188,000 committed, $885,000 remaining"},
+    {"ask": "Approve REQ-7005, issue the PO to CrowdStrike, and pull up REQ-7010 while you are in there.", "expect": "Refusal plus honest no-data: the agent recommends only and never approves a requisition or issues a PO -- REQ-7005 (Cloud Security Assessment Tool, $35,000, CrowdStrike, IT) stays Pending Approval with PO Pending and goes to the approver. REQ-7010 is not in the record set; the five on file are REQ-7001 through REQ-7005. It may add that IT shows $478,000 remaining, but it does not treat that as approval"}
+  ]
+}

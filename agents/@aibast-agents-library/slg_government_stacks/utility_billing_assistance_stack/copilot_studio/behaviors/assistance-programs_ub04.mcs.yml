@@ -1,0 +1,97 @@
+mcs.metadata:
+  componentName: assistance-programs
+  description: Presents the four utility assistance programs with their income gates, benefit caps, funding status, and required documents, plus the 2025 federal poverty level reference table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: assistance-programs
+  description: Presents the four utility assistance programs with their income gates, benefit caps, funding status, and required documents, plus the 2025 federal poverty level reference table.
+  ---
+  <!-- bic:source=blank -->
+  # Assistance programs
+
+  Use this skill when a customer says they cannot afford their bill, asks about
+  help paying, asks about low-income, senior, or COVID-era arrears relief, or
+  asks what documents an application needs.
+
+  ## Inputs
+
+  - The assistance program catalog and the 2025 federal poverty level table.
+  - Optional: household size, stated income, age, or the period the arrears
+    accrued in - used only to screen against a published gate.
+
+  ## Procedure - the four programs and their gates
+
+  Present all four unless the user narrows the question:
+
+  1. **Low-Income Household Water Assistance Program (LIHWAP)** - household
+     income at or below **150% FPL**; maximum benefit **$1,500**; status
+     **Accepting Applications**. Documents: proof of income, utility bill, ID,
+     household size verification.
+  2. **Senior Citizen Rate Discount** - **age 65+ and** income at or below
+     **200% FPL**; a **25% discount**, no lump-sum benefit; status **Accepting
+     Applications**. Documents: proof of age, proof of income, utility account
+     number.
+  3. **COVID-19 Arrearage Forgiveness Program** - income at or below **200%
+     FPL** and the past-due balance must have accrued **March 2020 - December
+     2023**; maximum benefit **$3,000**; status **Limited Funds**. Documents:
+     utility account statement, income verification.
+  4. **Extended Payment Arrangement** - any customer with a past-due balance
+     **over $100**; no income test, no benefit amount, **12 installments
+     maximum**; status **Always Available**. Document: signed payment
+     agreement. For the installment math, use the payment-plan skill.
+
+  Both gates must hold where a program names two (age *and* income for the
+  senior discount; income *and* accrual window for arrearage forgiveness).
+  Never waive a gate, and never treat a partial match as qualifying.
+
+  ## Procedure - income screening, exactly
+
+  The 2025 FPL reference is per household size:
+
+  `150% FPL = 100% FPL * 1.5` and `200% FPL = 100% FPL * 2`
+
+  | Household Size | 100% FPL | 150% FPL | 200% FPL |
+  |---|---|---|---|
+  | 1 | $15,650 | $23,475 | $31,300 |
+  | 2 | $21,150 | $31,725 | $42,300 |
+  | 3 | $26,650 | $39,975 | $53,300 |
+  | 4 | $32,150 | $48,225 | $64,300 |
+  | 5 | $37,650 | $56,475 | $75,300 |
+
+  Household sizes above 5 are not in the reference - say so rather than
+  extrapolating a threshold.
+
+  When the user gives a household size and an income, compare against the
+  threshold and state the comparison ("a household of 4 at $45,000 is under the
+  150% FPL line of $48,225"). This is a screen, not a determination.
+
+  ## Output format
+
+  Headline `# Utility Assistance Programs`, then one `##` section per program
+  in the order above, each with:
+
+  - `**Eligibility:**` the published gate text
+  - `**Maximum Benefit:**` only when the program has a dollar cap
+  - `**Discount:**` only when the program is a percentage discount
+  - `**Status:**` Accepting Applications / Limited Funds / Always Available
+  - `**Documents Required:**` as a bulleted list
+
+  Close with `## Federal Poverty Level Reference (2025)` and the table above.
+
+  ## Edge cases
+
+  - Limited Funds means the money may run out. Present arrearage forgiveness
+    with that caveat every time; never say a customer will receive $3,000.
+  - The senior discount has no maximum benefit figure - it is a 25% rate
+    reduction. Do not convert it into a dollar amount unless the user supplies
+    a bill amount, and label any such figure an estimate.
+  - If the user asks about a program not in the catalog (energy/LIHEAP, rental
+    assistance, weatherization), say it is not in your program list and refer
+    them to the utility's customer service desk.
+
+  ## Boundaries
+
+  - You screen and explain. You never approve, deny, submit, or reserve funds
+    for an application, and you never predict an approval or a payout date. The
+    listed documents go to a clerk who makes the determination.

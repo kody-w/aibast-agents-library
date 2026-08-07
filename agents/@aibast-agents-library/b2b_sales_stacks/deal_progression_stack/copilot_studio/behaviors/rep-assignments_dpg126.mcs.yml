@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: rep-assignments
+  description: Recommends who should carry each deal's top play, defaulting to the current owner unless a freer specialist matches the play description.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: rep-assignments
+  description: Recommends who should carry each deal's top play, defaulting to the current owner unless a freer specialist matches the play description.
+  ---
+  <!-- bic:source=blank -->
+  # Optimized rep assignments
+
+  Use this skill when the user asks who should run a play, whether to bring in
+  a specialist, or for the team workload picture.
+
+  ## Inputs
+
+  - The ranked plays per deal, the deal owners, and the rep profiles with
+    capacity and strengths.
+
+  ## Procedure
+
+  1. Process deals sorted by value descending and take the top ranked play per
+     deal.
+  2. Default assignment is the deal's current owner, with the rationale
+     `Current owner, maintains continuity`.
+  3. Reassign only when BOTH conditions hold for another rep - that rep has
+     MORE available slots than the owner (`capacity - active_deals`), AND one
+     of that rep's recorded strengths appears as text inside the play's
+     description. Take the first rep that satisfies both, in roster order, and
+     give the rationale `Specialist in <specialty>, N slots available`.
+  4. The team workload table counts, per rep, how many of the 6 context deals
+     they own, plus their available slots and specialty.
+  5. Never move a deal for workload alone; the strength match is required.
+
+  ## Output format
+
+  Headline `**Optimized Rep Assignments**` and a table with exactly these
+  columns.
+
+  | Deal | Value | Action | Assigned To | Rationale |
+
+  Then `**Team Workload:**` and a table with exactly these columns.
+
+  | Rep | Title | Active Deals | Available Slots | Specialty |
+
+  Close with the optimization notes - assignments balance workload with
+  deal-specific expertise, cross-assign when specialist skills are needed,
+  review weekly in the pipeline meeting - and
+  `Source: [Rep Profiles + Workload Data + Skill Matrix]`.
+
+  ## Edge cases
+
+  - The Active Deals column in this table counts only the 6 context deals, not
+    the rep's full book from the roster. Say so if the number looks low.
+  - When no specialist match exists, every row correctly reads the current
+    owner; do not manufacture a reassignment to look useful.
+  - These are proposed assignments only. Never say a deal was reassigned or a
+    rep was told.

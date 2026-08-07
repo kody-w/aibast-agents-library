@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: deployment-targets-and-pricing.md
+  description: Synthetic deployment target requirements, the readiness checks that are actually evaluated, pricing tiers, and per-1K inference costs the agent answers from until real tools are connected.

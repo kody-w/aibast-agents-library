@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: reduction-plan
+  description: Computes each facility's target tonnage and remaining reduction gap, then lists the costed abatement actions defined for that facility type.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: reduction-plan
+  description: Computes each facility's target tonnage and remaining reduction gap, then lists the costed abatement actions defined for that facility type.
+  ---
+  <!-- bic:source=blank -->
+  # Reduction plan
+
+  Use this skill when the user asks what a facility should do to cut
+  emissions, how far it is from target in tonnes, what abatement options exist,
+  or what those options cost.
+
+  ## Inputs
+
+  - The facility emissions inventory, including `baseline_co2` and
+    `reduction_target_pct`.
+  - The abatement action catalog, keyed by facility `type`.
+  - Optional: a single FAC- id to filter to one facility.
+
+  ## Procedure
+
+  For each facility:
+
+  1. `target_co2 = round(baseline_co2 * (1 - reduction_target_pct / 100))`
+  2. `remaining_reduction = max(0, scope_1_co2 - target_co2)` -- the gap floors
+     at 0; a facility already past target shows a gap of `0`, never a negative.
+  3. Select the action list by facility `type`:
+     - `coal_plant`: fuel switching to natural gas (400,000 t, $85.0M);
+       carbon capture retrofit (300,000 t, $120.0M); efficiency upgrades
+       (50,000 t, $12.0M).
+     - `natural_gas_plant`: heat recovery optimization (25,000 t, $4.5M);
+       turbine efficiency upgrade (18,000 t, $8.0M); methane leak detection
+       and repair (8,000 t, $1.2M).
+     - `refinery`: process electrification (120,000 t, $45.0M); flare gas
+       recovery (35,000 t, $6.0M); hydrogen integration (80,000 t, $55.0M).
+  4. **A facility type with no action list is omitted from the plan output.**
+     `wind_farm` has no actions defined. Do not author actions for it and do
+     not carry it into the table.
+
+  Action reduction tonnages and costs are catalog constants for the facility
+  type. They are not scaled to the facility's gap -- a listed action may
+  overshoot the gap. Report the arithmetic; do not prorate.
+
+  ## Output format
+
+  - `# Emission Reduction Plans`
+  - Per facility, `## <facility name>` then a single line:
+    `Current: N tonnes | Target: N tonnes | Gap: N tonnes`
+  - Then one table, columns exactly:
+    `Action | Reduction (tonnes) | Cost ($M)` with cost rendered as `$N.NM`.
+  - Facilities appear in inventory order; those with no actions do not appear.
+
+  ## Edge cases
+
+  - If asked for a plan for a facility type with no actions, state plainly that
+    no abatement actions are defined for that facility type in this data set
+    and that it is therefore absent from the plan. Do not substitute another
+    facility's actions.
+  - The target is computed from the baseline, not from current emissions.
+  - Ranking actions by cost per tonne (`cost_mm * 1,000,000 / reduction_tonnes`)
+    is allowed when asked, but state that you derived it.
+
+  ## Boundaries
+
+  - Planning input only. Never say a project has been approved, funded,
+    scheduled, or started. Capital approval sits with the accountable owner.
+  - Costs are catalog estimates for a facility type, not quotes. Say so if the
+    user treats them as a budget figure.

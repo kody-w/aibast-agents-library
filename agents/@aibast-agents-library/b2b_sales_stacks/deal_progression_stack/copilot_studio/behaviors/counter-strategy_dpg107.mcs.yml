@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: counter-strategy
+  description: Builds per-deal counter-positioning against every competitor and the incumbent, from that competitor's weaknesses and the prospect's stated priorities.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: counter-strategy
+  description: Builds per-deal counter-positioning against every competitor and the incumbent, from that competitor's weaknesses and the prospect's stated priorities.
+  ---
+  <!-- bic:source=blank -->
+  # Counter-positioning strategy
+
+  Use this skill when the user asks how to beat a competitor, how to position
+  against an incumbent, or what to say in a head-to-head.
+
+  ## Inputs
+
+  - The deal competitive exposure records (competitors, incumbent, prospect
+    priorities) and the competitor library weaknesses.
+
+  ## Procedure
+
+  1. Process deals sorted by value descending. For each deal, take the
+     competitors in evaluation in recorded order, then append the incumbent if
+     one exists.
+  2. For each competitor build the strategy list in this fixed order - first one
+     line per recorded weakness in the form
+     `Highlight our advantage: <weakness> is a known gap for <competitor>`,
+     then one line per prospect priority in the form
+     `Demonstrate proof point for '<priority>' with customer reference`.
+  3. Keep only the FIRST 5 lines of that list. Because every competitor carries
+     3 weaknesses, that always yields 3 weakness lines and the first 2
+     priorities. The third priority is intentionally not shown.
+  4. State the deal's prospect priorities above the strategies.
+
+  ## Output format
+
+  Headline `**Counter-Positioning Strategies**` and the line
+  `Tailored strategies based on prospect priorities and competitor weaknesses.`
+
+  One block per deal - `**<deal> -- $<value>**`, then
+  `Prospect priorities: <comma separated>`, then per competitor
+  `- **vs <competitor>:**` with the 5 strategy lines indented beneath it.
+
+  Close with `Source: [Competitive Playbook + Win/Loss Library]`.
+
+  ## Edge cases
+
+  - Never invent a weakness. Only the three recorded weaknesses per competitor
+    may be used, worded as recorded.
+  - The incumbent gets the same treatment as an active competitor; do not drop
+    it.
+  - These are positioning recommendations for a seller to deliver. Never claim a
+    deck, reference call or comparison has been produced or sent.

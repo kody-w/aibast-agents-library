@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: points-summary
+  description: Reports points balance, cash value at 1 point = $0.02, earned and redeemed YTD, and the tier multiplier - for one member or for the whole base.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: points-summary
+  description: Reports points balance, cash value at 1 point = $0.02, earned and redeemed YTD, and the tier multiplier - for one member or for the whole base.
+  ---
+  <!-- bic:source=blank -->
+  # Points summary
+
+  Use this skill when the user asks about a points balance, what points are
+  worth, how many points were earned or redeemed, the earning multiplier, or
+  how a member can earn more points.
+
+  ## Inputs
+
+  - The member roster and the earning-activity table (knowledge/tools).
+  - Optional: a member id (LM-xxxxx) or a member name that resolves to one.
+    With a member, produce the single-member view. Without one, produce the
+    all-member table.
+
+  ## Procedure
+
+  1. Cash value is always `points x 0.02`, rounded to two decimals - 1 point
+     is worth $0.02. Apply it to whatever balance you report:
+     48,250 x 0.02 = $965.00; 22,100 x 0.02 = $442.00; 8,450 x 0.02 = $169.00;
+     2,100 x 0.02 = $42.00.
+  2. The multiplier is the member's tier multiplier from the tier structure -
+     Bronze 1.0x, Silver 1.25x, Gold 1.5x, Platinum 2.0x. It applies to future
+     earning; never apply it to the existing balance.
+  3. Earned YTD and Redeemed YTD are reported as recorded. Do not compute the
+     balance from them - the balance is its own recorded field and does not
+     equal earned minus redeemed (LM-10001: balance 48,250 against 12,400
+     earned and 8,000 redeemed YTD).
+  4. List all six earning activities verbatim from the earning table when a
+     single member is in view.
+
+  ## Output format - single member
+
+      # Points Summary: <Name>
+
+      - **Tier:** <Tier>
+      - **Points Balance:** N,NNN ($N,NNN.NN)
+      - **Earned YTD:** N,NNN
+      - **Redeemed YTD:** N,NNN
+      - **Multiplier:** N.Nx
+
+  Then `## Earning Opportunities` as a bullet per activity:
+  `- **<Activity>:** <points rule>`.
+
+  ## Output format - all members
+
+  One table, exactly these columns:
+
+  | Member | Tier | Balance | Earned YTD | Redeemed YTD | Value |
+
+  Member cell is `Name (LM-id)`. Balance, earned, and redeemed carry thousands
+  separators. Value carries a leading `$` and two decimals.
+
+  ## Edge cases
+
+  - A member id that is not in the roster: say plainly that no member with that
+    id exists, then show the all-member table. Never map the id to the nearest
+    member and never invent a balance for it.
+  - A zero redemption figure is reported as `0`, not as "none" and not omitted.
+  - Points summary is read-only. Never credit, expire, transfer, or redeem
+    points, and never say a balance has changed.

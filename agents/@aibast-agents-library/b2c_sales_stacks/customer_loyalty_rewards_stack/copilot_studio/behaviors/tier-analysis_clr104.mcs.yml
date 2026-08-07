@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: tier-analysis
+  description: Renders the tier structure and each member's progress toward the next tier, with the exact progress percentage and remaining spend.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: tier-analysis
+  description: Renders the tier structure and each member's progress toward the next tier, with the exact progress percentage and remaining spend.
+  ---
+  <!-- bic:source=blank -->
+  # Tier analysis
+
+  Use this skill when the user asks about tiers, thresholds, multipliers,
+  perks, who is close to an upgrade, or how far a member is from the next tier.
+
+  ## Inputs
+
+  - The tier structure and the member roster (knowledge/tools).
+  - Optional: a member id or name to scope the progress section to one member.
+    The tier structure table is always available on request.
+
+  ## Procedure
+
+  1. Render the tier structure in threshold order: Bronze, Silver, Gold,
+     Platinum. Minimum spend $0 / $1,000 / $3,000 / $6,000; multiplier
+     1.0x / 1.25x / 1.5x / 2.0x. In the table show only the first two perks of
+     each tier; give the full perk list only if the user asks for it.
+  2. For each member, progress uses the NEXT tier's absolute spend threshold,
+     not an incremental amount:
+
+     `progress = min(100.0, round(spend_ytd / spend_to_next * 100, 1))`
+     `spend_remaining = max(0, spend_to_next - spend_ytd)`
+
+     where spend_to_next is 1,000 for Bronze, 3,000 for Silver, 6,000 for Gold.
+  3. Platinum has no next tier. Report `Status: Top Tier Achieved` and no
+     percentage and no remaining spend.
+  4. Worked results from the current roster:
+     - LM-10002 Antonio Vasquez, Gold, $3,400: 3400 / 6000 = 56.7% to Platinum,
+       $2,600 remaining.
+     - LM-10003 Rachel Nguyen, Silver, $1,600: 1600 / 3000 = 53.3% to Gold,
+       $1,400 remaining.
+     - LM-10004 Derek Washington, Bronze, $450: 450 / 1000 = 45.0% to Silver,
+       $550 remaining.
+     - LM-10001 Katherine Brooks, Platinum, $6,200: top tier achieved.
+
+  ## Output format
+
+  `## Tier Structure` - one table, exactly these columns:
+
+  | Tier | Min Spend | Multiplier | Key Perks |
+
+  Min spend with a leading `$`, thousands separators, no decimals. Multiplier
+  with an `x` suffix. Key perks joined by `; `.
+
+  `## Member Tier Progress` - per member, in roster id order:
+
+  - `### <Name> (LM-id)` followed by an em dash and the tier in title case.
+  - `- Spend YTD: $N,NNN`
+  - `- Engagement Score: N`
+  - Then either `- Progress to <Next Tier>: N.N%` plus
+    `- Spend Remaining: $N,NNN`, or `- Status: Top Tier Achieved`.
+
+  ## Edge cases
+
+  - Progress is capped at 100.0% - never report above it.
+  - A member whose spend already exceeds their next-tier threshold is still
+    reported at their recorded tier with 100.0% progress and $0 remaining. Do
+    not upgrade them; tier changes are a program action, not an inference.
+  - Never invent a tier, a threshold, a multiplier, or a perk that is not in
+    the tier structure.
+  - Analysis only. Never state that a member has been moved, upgraded, or
+    notified about a tier.

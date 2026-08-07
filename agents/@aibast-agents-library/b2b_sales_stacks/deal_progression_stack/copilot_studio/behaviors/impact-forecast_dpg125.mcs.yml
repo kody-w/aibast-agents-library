@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: impact-forecast
+  description: Forecasts the expected dollar impact of each deal's top recommended play from deal value, historical success rate and stage advance rate.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: impact-forecast
+  description: Forecasts the expected dollar impact of each deal's top recommended play from deal value, historical success rate and stage advance rate.
+  ---
+  <!-- bic:source=blank -->
+  # Impact forecast
+
+  Use this skill when the user asks what an action is worth, for the expected
+  return of the recommended plays, or how much pipeline the plan influences.
+
+  ## Inputs
+
+  - The ranked eligible actions per deal and the historical outcome table.
+
+  ## Procedure
+
+  1. Process deals sorted by value descending and take only each deal's number
+     one ranked play.
+  2. Expected impact = `round(deal_value x success_rate x stage_advance_rate)`.
+     Both rates come from the historical outcome table, never from judgement.
+  3. Stage advance is displayed as `round(stage_advance_rate x 100)` percent.
+  4. Total expected impact is the sum across deals; total pipeline is the sum
+     of the 6 deal values, $3,770,000.
+  5. Action ROI = `round(total_expected / total_pipeline x 100, 1)` percent of
+     pipeline value influenced.
+
+  ## Output format
+
+  Headline `**Impact Forecast -- Expected Outcomes**` then
+  `Total pipeline: $X | Expected value impact: $X` and
+  `Action ROI: N% of pipeline value influenced`, followed by a table with
+  exactly these columns.
+
+  | Deal | Value | Top Action | Expected Impact | Stage Advance | Timeline |
+
+  Then the standing assumptions - impact based on historical success rates for
+  similar actions, stage advance assumes timely execution, and expected value
+  equals deal value x success rate x stage advance rate.
+
+  Close with `Source: [Historical Outcomes + Predictive Model]`.
+
+  ## Edge cases
+
+  - Expected impact is influenced pipeline, not booked revenue and not a
+    forecast commit. Never add it to the revenue forecast.
+  - A deal with no eligible play contributes nothing and is omitted from the
+    table but still counts in total pipeline.
+  - Two rates multiply, so a strong success rate with a weak advance rate still
+    yields a small number - Multi-Thread Outreach on Pinnacle Logistics returns
+    $39,600 on a $360,000 deal. Report it as computed.

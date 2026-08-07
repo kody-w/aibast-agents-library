@@ -1,0 +1,78 @@
+mcs.metadata:
+  componentName: payment-plan
+  description: Lays out 3, 6, 9, and 12 installment options against an account's past-due balance and states the extended payment arrangement requirements.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: payment-plan
+  description: Lays out 3, 6, 9, and 12 installment options against an account's past-due balance and states the extended payment arrangement requirements.
+  ---
+  <!-- bic:source=blank -->
+  # Payment plan
+
+  Use this skill when a customer cannot pay a past-due balance in full, asks to
+  spread payments out, asks about installments, or asks what an arrangement
+  would cost per month.
+
+  ## Inputs
+
+  - The utility account ledger, for `balance_past_due`.
+  - Optional: an ACCT- id. With no id, default to ACCT-90003.
+
+  ## Procedure - installment arithmetic, exactly
+
+  Only `balance_past_due` is financed. Current charges are never rolled into
+  the plan.
+
+  For each of the four fixed terms 3, 6, 9, and 12 months:
+
+  `monthly_payment = round(balance_past_due / months, 2)`
+  `total = balance_past_due` (unchanged - there is no interest, fee, or
+  penalty in this data; never add one)
+
+  Worked example, ACCT-90003, past due `$489.20`:
+  `489.20 / 3 = $163.07`, `489.20 / 6 = $81.53`, `489.20 / 9 = $54.36`,
+  `489.20 / 12 = $40.77`.
+
+  ## Procedure - eligibility gate
+
+  The Extended Payment Arrangement is open to **any customer with a past-due
+  balance over $100**, with a **maximum of 12 installments**, and requires a
+  **signed payment agreement**. Its status is Always Available - it does not
+  depend on income or on program funding.
+
+  State whether the account clears the $100 gate, using its actual past-due
+  figure. An account at or below $100 past due does not qualify for an
+  arrangement; say so and point to paying the balance or to the
+  assistance-programs skill.
+
+  ## Output format
+
+  1. Headline `# Payment Plan Options: ACCT-xxxxx`
+  2. `**Customer:** name`
+  3. `**Past Due Balance:** $n,nnn.nn`
+  4. `## Installment Options` with a table, columns exactly
+     `| Installments | Monthly Payment | Total |`, rows for 3, 6, 9, and 12
+     months
+  5. The note: *Current charges continue to accrue during the payment plan.*
+  6. `## Payment Plan Requirements` - the eligibility line, the maximum
+     installment count, and the required documents
+
+  ## Edge cases
+
+  - Past due is `$0.00` (ACCT-90001, ACCT-90004): omit the installment table
+    entirely, state that the account has no past-due balance, and show only the
+    requirements section.
+  - Account id not in the ledger: say the id was not found rather than
+    presenting another customer's balance under it. Do not silently substitute
+    a different account.
+  - The customer asks for a term longer than 12 months: refuse the term, state
+    the 12-month maximum, and show the 12-month figure.
+
+  ## Boundaries
+
+  - You lay out options. You never open, sign, approve, or activate a plan, and
+    you never confirm one is in place. The signed payment agreement is executed
+    by a billing clerk.
+  - Never promise that entering a plan stops any collections action - no such
+    data exists here.

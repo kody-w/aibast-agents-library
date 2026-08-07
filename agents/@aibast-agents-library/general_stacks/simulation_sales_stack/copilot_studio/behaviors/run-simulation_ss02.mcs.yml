@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: run-simulation
+  description: Runs a simulated sales call and returns the weighted score, letter grade, per-skill breakdown, and deal outcome.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: run-simulation
+  description: Runs a simulated sales call and returns the weighted score, letter grade, per-skill breakdown, and deal outcome.
+  ---
+  <!-- bic:source=blank -->
+  # Run simulation
+
+  Use this skill when the user asks to run, replay, or score a simulated call,
+  or asks how a rep did on a scenario.
+
+  ## Inputs
+
+  - Optional: a scenario ID. Default `SCN-001` when none is given.
+  - Optional: observed points per skill. When a skill was not observed, the
+    rubric supplies `max_points x 0.7` for it - say that the default was used.
+
+  ## Procedure - scoring is arithmetic, not judgment
+
+  1. For each of the six skills, take the observed points and compute
+     `points x weight / max_points x 100`. Sum the six contributions and round
+     to the nearest whole number. That is the overall score out of 100.
+
+     | Skill | Weight | Max points |
+     |---|---|---|
+     | Opening | 0.10 | 10 |
+     | Discovery | 0.25 | 25 |
+     | Value Prop | 0.20 | 20 |
+     | Objection Handling | 0.20 | 20 |
+     | Closing | 0.15 | 15 |
+     | Professionalism | 0.10 | 10 |
+
+  2. Grade bands, applied in order: `A` if score >= 90, else `B` if >= 80,
+     else `C` if >= 70, else `D` if >= 60, else `F`.
+  3. Outcome: `Deal Advanced` if score >= 70, otherwise `Deal Stalled`. There
+     is no third outcome.
+  4. Show the arithmetic when asked. Never adjust a skill score for effort,
+     tenure, or difficulty.
+
+  ## Worked reference (the stored sample performance)
+
+  Opening 8/10, Discovery 18/25, Value Prop 14/20, Objection Handling 16/20,
+  Closing 11/15, Professionalism 9/10 gives
+  `8 + 18 + 14 + 16 + 11 + 9 = 76` -> **76/100, Grade C, Deal Advanced**.
+  (Each skill's `weight / max_points x 100` equals 1, so the weighted total
+  equals the raw point total for this rubric.)
+
+  ## Output format
+
+  - `**Simulation Results: <scenario name>**`
+  - `**Overall Score: N/100 (Grade: X)**`
+  - Table `| Skill | Points | Weight | Criteria |` - points as `n/max`, weight
+    as a whole percent, criteria truncated to 40 characters.
+  - `**Outcome:** Deal Advanced` or `Deal Stalled`.
+  - `**Feedback:**` - four bullets tied to the skills that moved the score,
+    naming the specific gap (for example, discovery that missed budget
+    qualification).
+  - Close with `Source: [Simulation Engine]`.
+
+  ## Edge cases
+
+  - Unknown scenario ID: say it is not in the catalog and list SCN-001,
+    SCN-002, SCN-003. Do not score against a substitute.
+  - Missing skill inputs: state which skills used the 70% default before
+    reporting the score, because the score is only as observed as its inputs.
+
+  ## Boundaries
+
+  - Scoring only. Never claim the result was saved to an LMS, a CRM, or a
+    manager's dashboard - hand the number back for a person to record.

@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: savings-calculation
+  description: Computes list total, best applicable discount, dollar savings, and final contract price from the deal profile.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: savings-calculation
+  description: Computes list total, best applicable discount, dollar savings, and final contract price from the deal profile.
+  ---
+  <!-- bic:source=blank -->
+  # Savings calculation
+
+  Use this skill when the user asks what the deal is worth, what the customer
+  saves, what the final or net price is, or asks for the discounted contract
+  value.
+
+  ## Inputs
+
+  - The deal profile: licenses, list price per license per month, term years.
+  - The set of eligible programs and their computed percentages (from the
+    eligibility rules).
+
+  ## Procedure - arithmetic, exactly as written
+
+  1. `list_total = licenses x list_price_per_license x term_years x 12`
+     (the list price is monthly, so the term is multiplied out in months).
+  2. `best_discount = the single highest percentage among eligible programs`
+     (0 if no program is eligible). Never sum percentages.
+  3. `savings = list_total x best_discount / 100`
+  4. `final_price = list_total - savings`
+
+  Worked example from the deal on file: 175 licenses x $100 x 3 years x 12
+  months = $630,000 list total; the highest eligible discount is COMP-001 at
+  30%; savings = 630,000 x 30 / 100 = $189,000; final price = 630,000 - 189,000
+  = $441,000.
+
+  ## Output format
+
+  Headline: `**Savings Calculation: <customer>**`
+
+  Then one table, exactly these rows:
+
+  | Metric | Value |
+  | List Price | $N/license/month |
+  | Licenses | N |
+  | Term | N years |
+  | List Total | $N |
+  | Best Discount | N% |
+  | Total Savings | $N |
+  | **Final Price** | **$N** |
+
+  Dollar values with thousands separators and no cents. Then
+  `**Applicable Discounts:**` as a bullet list of `- <Program name>: N%` for
+  every eligible program, including the ones not used for the quoted price.
+
+  Then the standing note, verbatim in substance: non-stackable discounts use
+  the highest single discount; stackable discounts may be combined with
+  approval.
+
+  Close with `Source: [Pricing Engine + Deal Calculator]`.
+
+  ## Edge cases
+
+  - No eligible program: best discount is 0%, savings $0, final price equals
+    list total. Say that explicitly rather than omitting the rows.
+  - If asked to price a stacked combination, do not compute it - state that
+    stacking requires approval and hand off to the approval workflow.
+  - If licenses, list price, or term is missing, say which field is missing.
+    Do not substitute a default.

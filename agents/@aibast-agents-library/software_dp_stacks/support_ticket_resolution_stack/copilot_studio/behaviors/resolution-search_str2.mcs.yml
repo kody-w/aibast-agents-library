@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: resolution-search
+  description: Searches the knowledge base, optionally filtered to one category, and ranks the articles by helpfulness descending.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: resolution-search
+  description: Searches the knowledge base, optionally filtered to one category, and ranks the articles by helpfulness descending.
+  ---
+  <!-- bic:source=blank -->
+  # Resolution search
+
+  Use this skill when the user asks how to resolve a ticket, asks what
+  documentation covers a problem, asks for KB articles, or names a category
+  and wants the reading list for it.
+
+  ## Inputs
+
+  - The knowledge base index (knowledge/tools).
+  - Optional: `category` - one of `performance`, `authentication`, `api`,
+    `data_export`, `user_management`. Omitted means search everything.
+
+  ## Procedure
+
+  1. If a category is supplied, keep only articles whose `category` field is an
+     exact string match. Matching is exact, not fuzzy and not partial - `auth`
+     does not match `authentication`. Map the user's phrasing onto one of the
+     five recorded categories before filtering, and say which one you used.
+  2. If no category is supplied, keep all six articles.
+  3. Sort by `helpfulness` descending. Views are reported but never used to
+     rank - KB-103 has the most views (2,103) and still ranks fifth of six
+     unfiltered at 78%.
+  4. Count the results and render.
+
+  ## Output format
+
+  Title: `# Knowledge Base Search` - and when a filter was applied, append the
+  filter in parentheses: `# Knowledge Base Search (filtered: authentication)`
+
+  Headline: `**Results:** N`
+
+  Then one table, exactly these columns:
+
+  | Article | Category | Views | Helpfulness |
+
+  - Article as the full title. Cite the `KB-` id alongside it in prose when
+    you reference an article in an answer.
+  - Views with thousands separators, e.g. `1,842`.
+  - Helpfulness as an integer percent with a `%` suffix, e.g. `92%`.
+
+  ## Edge cases
+
+  - A category the index does not contain returns `**Results:** 0` and an empty
+    table. Say the category does not exist in the knowledge base and list the
+    five that do. Never substitute an adjacent article.
+  - When answering "what fixes TKT-xxxx", filter by that ticket's category and
+    cite the top-ranked article by KB- id. If the category has no article, say
+    so - do not offer an unrelated one.

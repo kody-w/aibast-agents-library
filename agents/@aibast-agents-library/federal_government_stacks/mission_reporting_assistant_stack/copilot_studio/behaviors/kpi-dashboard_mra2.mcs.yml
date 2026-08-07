@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: kpi-dashboard
+  description: Renders the full KPI register with computed status per KPI and the on-target / near-target / below-target rollup.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: kpi-dashboard
+  description: Renders the full KPI register with computed status per KPI and the on-target / near-target / below-target rollup.
+  ---
+  <!-- bic:source=blank -->
+  # KPI dashboard
+
+  Use this skill when the user asks for the dashboard, the KPI picture, which
+  measures are off target, or how a specific KPI is doing against its target.
+
+  ## Inputs
+
+  - The KPI register. No filters are required; the dashboard covers all nine
+    KPIs in register order (KPI-101, 102, 103, 201, 202, 203, 301, 302, 303).
+
+  ## Procedure
+
+  1. For every KPI compute attainment:
+     - Unit `days` or `minutes` (lower is better):
+       `pct = (target / current) * 100`; if `current` is 0, `pct = 100`.
+     - Any other unit: `pct = (current / target) * 100`; if `target` is 0,
+       `pct = 0`.
+  2. Band it: `pct >= 95` is `On Target`; `pct >= 75` is `Near Target`;
+     otherwise `Below Target`.
+  3. Render the reported `trend` field in title case: `Improving`, `Stable`,
+     `Declining`. The trend field is a label carried on the record -- it does
+     not affect status.
+  4. Count the bands across all KPIs and emit the rollup.
+
+  ## Worked examples from the register
+
+  - KPI-101 FISMA Compliance Rate: `87.3 / 95.0 = 91.9%` -- Near Target.
+  - KPI-102 Mean Time to Remediate (Critical), unit days:
+    `15 / 22 = 68.2%` -- Below Target.
+  - KPI-202 Digital Service Adoption: `52.1 / 70.0 = 74.4%` -- Below Target,
+    just under the 75 band.
+  - KPI-302 Employee Engagement Score: `69.4 / 75.0 = 92.5%` -- Near Target.
+
+  ## Output format
+
+  Headline `# KPI Dashboard`, then one table with columns
+  `KPI ID | Name | Mission | Current | Target | Unit | Trend | Status`,
+  one row per KPI, then a blank line and:
+
+  `**Summary:** <n> on target, <n> near target, <n> below target`
+
+  ## Edge cases
+
+  - The attainment rule inverts only for units `days` and `minutes`. Metrics
+    where lower is better but the unit is `%` -- Phishing Click Rate (KPI-103)
+    is the one in this register -- are scored higher-is-better by the rule and
+    therefore read On Target at 4.8% against a 3.0% target. Report the computed
+    status; if the user challenges it, explain the unit-based rule rather than
+    overriding the result.
+  - A KPI can be Below Target while its trend reads Improving (KPI-102, KPI-202,
+    KPI-203, KPI-303). Show both columns; do not merge them into a verdict.
+  - If asked about a KPI id that is not in the register, say it is not in the
+    data. Never interpolate a value.
+  - Report only. Never say a target has been changed or a measure re-baselined.

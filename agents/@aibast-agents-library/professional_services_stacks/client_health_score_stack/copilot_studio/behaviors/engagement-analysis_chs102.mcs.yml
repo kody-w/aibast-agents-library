@@ -1,0 +1,71 @@
+mcs.metadata:
+  componentName: engagement-analysis
+  description: Reports executive contact, escalations, billing trend, and utilization per client, then lists the red flags each client trips against fixed thresholds.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: engagement-analysis
+  description: Reports executive contact, escalations, billing trend, and utilization per client, then lists the red flags each client trips against fixed thresholds.
+  ---
+  <!-- bic:source=blank -->
+  # Engagement analysis
+
+  Use this skill when the user asks about executive contact, escalations,
+  billing trend, utilization, engagement quality, or "what are the warning
+  signs" on an account.
+
+  ## Inputs
+
+  - The client portfolio record set. Optional: a single client name or CL- id to
+    narrow the red-flag section. Otherwise process every client.
+
+  ## Procedure -- fixed thresholds, never softened
+
+  Walk the clients in roster order (CL-301 through CL-308), not sorted by score.
+
+  Table cell rule:
+
+  - Append ` **LOW**` to the exec-meetings cell only when
+    `exec_meetings_90d == 0` **and** `risk_label != "HEALTHY"`. Both conditions
+    must hold.
+
+  Red flags. Evaluate all four, in this order, and emit only the ones that fire:
+
+  1. `exec_meetings_90d == 0` -> "No executive contact in 90 days"
+  2. `escalations_90d >= 3` -> "N escalations in 90 days"
+  3. `utilization_pct < 60` -> "Low utilization (N%) -- may not see value"
+  4. `billing_trend == "declining"` -> "Declining billing trend"
+
+  A client with zero firing flags is omitted from the red-flag section entirely.
+  Never flag a client for being near a threshold: utilization of 64% is not a
+  low-utilization flag, and 2 escalations is not an escalation flag.
+
+  ## Output format
+
+  One table with exactly these columns:
+
+  `| Client | Exec Meetings (90d) | Escalations (90d) | Billing Trend | Utilization |`
+
+  The two count columns are right-aligned. Billing trend renders verbatim as
+  stored: `growing`, `flat`, `declining`.
+
+  Then a `### Engagement Red Flags` section. For each client that fires at least
+  one flag:
+
+  - `**<Client name>:**`
+  - one `-` bullet per firing flag, in the order above
+
+  ## Edge cases
+
+  - Zero exec meetings on a HEALTHY client still fires red flag 1 even though
+    the table cell carries no **LOW** marker -- the two rules have different
+    conditions.
+  - If no client fires a flag, say "No engagement red flags." rather than
+    padding the section.
+
+  ## Boundaries
+
+  - Diagnosis only. Naming a red flag is not opening an escalation, booking a
+    meeting, or contacting anyone. Never imply outreach has happened.
+  - The record set holds counts, not contacts. There are no names, emails, or
+    meeting dates. If asked for them, say the data does not contain them.

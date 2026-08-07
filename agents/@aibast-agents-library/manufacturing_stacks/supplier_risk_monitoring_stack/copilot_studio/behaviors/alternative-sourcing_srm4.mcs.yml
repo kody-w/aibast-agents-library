@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: alternative-sourcing
+  description: Builds the alternative-sourcing plan - backup options per supplier with the deterministic activate-versus-accelerate rule and the cost of full diversification.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: alternative-sourcing
+  description: Builds the alternative-sourcing plan - backup options per supplier with the deterministic activate-versus-accelerate rule and the cost of full diversification.
+  ---
+  <!-- bic:source=blank -->
+  # Alternative sourcing
+
+  Use this skill when the user asks about second sources, backups,
+  dual-sourcing, qualification status, what to do if a supplier goes down, or
+  what diversification would cost.
+
+  ## Inputs
+
+  - The alternatives list and the supplier master.
+  - Optional: a SUP- id or supplier name to scope the plan. Otherwise cover
+    every supplier that has alternatives on file.
+
+  ## Procedure
+
+  For each supplier that has alternatives:
+
+  1. Report the incumbent's current annual spend and current risk score.
+  2. List every alternative with lead time in weeks, qualification status, and
+     estimated cost premium as a percentage.
+  3. Apply the recommendation rule, in this order and no other:
+     - Take the alternatives whose `qual_status` is exactly `Qualified`.
+     - If that set is non-empty, recommend activating the one with the
+       **lowest** cost premium: "Activate <name> immediately (qualified,
+       +N% premium, N-week lead)". Lead time does not break this choice.
+     - If that set is empty, recommend accelerating the alternative with the
+       **shortest** lead time: "Accelerate qualification of <name> (N-week
+       lead, currently <qual_status>)". Never recommend activating a source
+       that is `In Progress` or `Not Started`.
+  4. Estimated annual cost of full diversification =
+     sum over each supplier of `annual_spend * (lowest premium among its
+     alternatives) / 100`. Use the lowest premium available for that supplier,
+     regardless of qualification status.
+  5. Risk reduction value = the spend at elevated risk, i.e. the sum of
+     `annual_spend` for suppliers whose `overall_risk >= 5.0`.
+
+  ## Output format
+
+  Per supplier:
+
+  - `### Alternatives for <name> (<category>)`
+  - `- **Current spend:** $N`
+  - `- **Current risk:** N/10`
+
+  Then one table, exactly these columns:
+
+  | Alternative Supplier | Lead Time | Qual Status | Cost Premium |
+
+  Lead time as `N weeks`, cost premium as `+N%`.
+
+  Then `**Recommendation:** <one sentence from the rule above>`.
+
+  Close the whole plan with two lines:
+
+  - `**Estimated annual cost of full diversification:** $N`
+  - `**Risk reduction value:** $N of spend de-risked`
+
+  ## Edge cases
+
+  - If no supplier has any alternatives, output `No alternative suppliers have
+    been identified.` and nothing else.
+  - A supplier absent from the alternatives list has no plan. Say plainly that
+    no alternative suppliers have been identified for that SUP- id; never
+    propose a source that is not on file, even a real-world plausible one.
+  - A supplier with exactly one alternative still gets the rule: qualified
+    means activate, otherwise accelerate.
+  - Recommendation only. Never say a backup has been activated, a contract
+    moved, or a supplier notified - the buyer decides.

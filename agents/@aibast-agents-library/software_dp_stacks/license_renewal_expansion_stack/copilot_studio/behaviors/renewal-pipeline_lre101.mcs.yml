@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: renewal-pipeline
+  description: Reports every license agreement ordered by renewal date with ARR, health score, computed risk band, and owning CSM, plus total and at-risk ARR.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: renewal-pipeline
+  description: Reports every license agreement ordered by renewal date with ARR, health score, computed risk band, and owning CSM, plus total and at-risk ARR.
+  ---
+  <!-- bic:source=blank -->
+  # Renewal pipeline
+
+  Use this skill when the user asks what is renewing, what is coming up, how
+  much ARR is on the table, which accounts are at risk of not renewing, who owns
+  a renewal, or for the book of business.
+
+  ## Inputs
+
+  - The license agreement portfolio: LIC-3001 through LIC-3005.
+  - No filter input is honored by this computation: it always returns all five
+    agreements. If the user names one account or one CSM, produce the full table
+    and then call out the matching rows.
+
+  ## Procedure - compute it, do not judge it
+
+  1. For every agreement, derive the risk band from `health_score` only:
+     `risk = "low" if health_score >= 70 else ("medium" if health_score >= 50
+     else "high")`. Render the band in capitals: LOW, MEDIUM, HIGH.
+  2. Sort the pipeline by `renewal_date` ascending (ISO date string order). The
+     resulting order is LIC-3004 2026-04-15, LIC-3001 2026-04-30, LIC-3002
+     2026-05-15, LIC-3003 2026-06-01, LIC-3005 2026-07-01.
+  3. `total_arr` = sum of every agreement's ARR:
+     `360000 + 288000 + 72000 + 192000 + 54000 = 966000`.
+  4. `at_risk_arr` = sum of ARR for HIGH rows only:
+     `72000 + 54000 = 126000`. MEDIUM rows are never counted as at risk.
+  5. Never sort this table by ARR, by health score, or by risk. Renewal date is
+     the only order.
+
+  ## Output format
+
+  - `# Renewal Pipeline`
+  - `**Total Renewal ARR:** $966,000`
+  - `**At-Risk ARR:** $126,000`
+  - Table with columns exactly: `Customer | ARR | Renewal Date | Health | Risk |
+    CSM`. ARR is `$NNN,NNN` with thousands separators. Renewal date is
+    `YYYY-MM-DD`. Health is the bare integer score. Risk is uppercase.
+  - The table names customers, not IDs; when you discuss a row in prose, attach
+    its LIC- id.
+
+  ## Edge cases
+
+  - LIC-3003 Redwood Supply Chain scores 62, which is MEDIUM, even though it
+    carries a churn signal ("Budget freeze mentioned in QBR"). The signal does
+    not move the band, and its $192,000 is not in At-Risk ARR. Say that
+    explicitly if the user asks why the at-risk number looks small.
+  - LIC-3002 ClearView Analytics is the lowest health (29) but not the earliest
+    renewal (2026-05-15, third in the table). Do not float it to the top.
+  - Recommendation only. Never say a renewal has been sent, scheduled, or
+    closed - the pipeline view ends with the renewals lead deciding.

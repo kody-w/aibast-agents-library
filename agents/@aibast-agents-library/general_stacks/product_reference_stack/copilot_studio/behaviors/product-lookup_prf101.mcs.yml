@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: product-lookup
+  description: Returns the full specification card for one catalog product - category, support level, limits, list price, and feature list.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: product-lookup
+  description: Returns the full specification card for one catalog product - category, support level, limits, list price, and feature list.
+  ---
+  <!-- bic:source=blank -->
+  # Product lookup
+
+  Use this skill when the user names a product and asks what it is, what it
+  includes, what its limits are, or what it costs on its own.
+
+  ## Inputs
+
+  - The product catalog and the pricing tiers.
+  - Optional: a product ID or a product name. If none is supplied, the
+    catalog default is Core Platform (CORE).
+
+  ## Procedure
+
+  Resolve the product first, in this exact order:
+
+  1. If nothing was supplied, resolve to `CORE`.
+  2. Uppercase and trim the input. If it is an exact product ID -- `CORE`,
+     `ENT`, `ANLYT-STD`, `ANLYT-PRO`, `INTGR`, `SECUR` -- use it.
+  3. Otherwise take the FIRST product whose name contains the input as a
+     substring, scanning in catalog order: Core Platform, Enterprise Platform,
+     Analytics Standard, Analytics Pro, Integration Hub, Security Suite. So
+     "PLATFORM" resolves to Core Platform, and "ANALYTICS" resolves to
+     Analytics Standard.
+  4. If nothing matches, the resolver falls back to `CORE`. Never present that
+     fallback silently -- say the requested product is not in the catalog and
+     name the six products that are.
+
+  Then render the values verbatim from the catalog:
+
+  - `Max Users`: the number with thousands separators, or `Unlimited` when the
+    catalog stores -1 (Integration Hub and Security Suite).
+  - `API Calls`: the number with thousands separators followed by `/month`, or
+    `Unlimited` when the catalog stores -1 (Enterprise Platform and Security
+    Suite).
+  - `Pricing`: for per-seat products, `$<monthly>/user/month
+    ($<annual>/user/month annual)`. For flat-rate products (Integration Hub,
+    Security Suite), `$<monthly_flat>/month ($<annual_flat>/year)`.
+
+  ## Output format
+
+  - `**Product: <name>** (<ID>)`
+  - `**Category:** <category> | **Support:** <support level>`
+  - `**Description:** <description>`
+  - A two-column table with rows exactly: `Max Users`, `Storage` (in GB),
+    `API Calls`, `Pricing`.
+  - `**Features:**` followed by the feature list as bullets, in catalog order.
+  - Close with `Source: [Product Catalog]`.
+
+  ## Edge cases
+
+  - `Everything in Core` (Enterprise Platform) and `Everything in Standard`
+    (Analytics Pro) are rollup lines. Print them as written; do not expand
+    them into the lower tier's feature list.
+  - Storage is always a real number in GB -- there is no unlimited storage
+    tier.
+  - Lookup is read-only. Never offer to add, enable, or provision the product.

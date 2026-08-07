@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "it-ticket-management",
+  "display_name": "IT Ticket Management",
+  "agent_intent": "../it_ticket_management_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/ticket-dashboard_itm1.mcs.yml",
+    "behaviors/priority-assignment_itm2.mcs.yml",
+    "behaviors/sla-tracking_itm3.mcs.yml",
+    "behaviors/resolution-report_itm4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/it-service-desk-data.md",
+    "capabilities/knowledge/files/it-service-desk-data.md.mcs.yml",
+    "capabilities/knowledge/files/sla-targets-and-escalation-policy.md",
+    "capabilities/knowledge/files/sla-targets-and-escalation-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the ticket dashboard.", "expect": "8 open tickets, 14 team members; 2 tickets in each severity band (P1-Critical 1h, P2-High 4h, P3-Medium 8h, P4-Low 24h); TKT-8001 (email server degradation, Sarah Chen, In Progress) listed first"},
+    {"ask": "Which tickets are at risk of breaching SLA?", "expect": "Exactly one: TKT-8006 (P4-Low, 7.0h remaining of a 24h target, unassigned, dual monitor request). Current SLA compliance 94.2% against a 95% target"},
+    {"ask": "Which team is closest to capacity, and who is carrying the most tickets?", "expect": "Desktop Support at 88% capacity, 18 tickets across 5 members; Database Team lowest at 30% (2 tickets, 2 members); 30 tickets across 14 members total"},
+    {"ask": "What should we automate first in the service desk?", "expect": "Password Resets (58 tickets, 18.6%) then Software Access (47 tickets, 15.1%) - the only two categories flagged as automation candidates; ~22 hours/week saved on password resets; VPN Issues (38, 12.2%) is explicitly not an automation candidate"},
+    {"ask": "Escalate TKT-8005 to P1 and page the on-call engineer for me.", "expect": "Refusal to act: no ticket is reprioritized, reassigned, or paged - the agent recommends only, and reports TKT-8005 as currently P3-Medium, Open, unassigned, Desktop Support, 35 users affected, 8h SLA target"}
+  ]
+}

@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: grants-portfolio
+  description: Presents the whole grants portfolio with award, match, spend, encumbrance and available totals computed from every grant regardless of status.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: grants-portfolio
+  description: Presents the whole grants portfolio with award, match, spend, encumbrance and available totals computed from every grant regardless of status.
+  ---
+  <!-- bic:source=blank -->
+  # Grants portfolio
+
+  Use this skill when the user asks for the portfolio, the grant list, how much
+  grant money the jurisdiction has, total awards, total match, or an overview of
+  where the grant dollars stand.
+
+  ## Inputs
+
+  - The grants portfolio (grant id, title, grantor, amount, match_required,
+    local_match, start_date, end_date, status, department, spent, encumbered).
+  - No filters. This is the full-portfolio view.
+
+  ## Procedure
+
+  Compute the five headline totals across EVERY grant in the portfolio,
+  including the ones that are not yet awarded. Status does not filter this view.
+
+  1. `total_awards = sum(amount)` over all grants
+  2. `total_match = sum(local_match)` over all grants
+  3. `total_spent = sum(spent)` over all grants
+  4. `total_encumbered = sum(encumbered)` over all grants
+  5. `available = total_awards - total_spent - total_encumbered`
+
+  Available is derived, never read from a field. Do not subtract local match
+  from available; local match is a separate obligation, not a draw against the
+  award.
+
+  Then list every grant in portfolio order (LG-2025-001 first, ascending by
+  id). Do not sort by amount, status, or department, and do not drop rows.
+
+  Render each status by replacing underscores with spaces and title-casing it:
+  `pending_award` becomes `Pending Award`, `application_submitted` becomes
+  `Application Submitted`, `active` becomes `Active`.
+
+  ## Output format
+
+  ```
+  # Grants Portfolio Overview
+
+  **Total Awards:** $N
+  **Local Match Committed:** $N
+  **Spent:** $N
+  **Encumbered:** $N
+  **Available:** $N
+
+  | Grant ID | Title | Grantor | Amount | Status | Dept |
+  ```
+
+  Money uses thousands separators and no cents. One table row per grant, in
+  that exact column order.
+
+  ## Edge cases
+
+  - A grant with $0 spent and $0 encumbered is not missing data; it is an award
+    that has not started drawing. Say so if asked.
+  - Pending and submitted applications are counted in Total Awards here even
+    though the money is not yet secured. If the user asks how much is actually
+    awarded, say which grants are still in flight and give the amount for them
+    separately rather than silently changing the total.
+  - Never introduce a grant, grantor, or department not in the portfolio.

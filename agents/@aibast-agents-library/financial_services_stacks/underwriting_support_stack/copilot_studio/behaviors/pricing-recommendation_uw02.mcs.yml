@@ -1,0 +1,71 @@
+mcs.metadata:
+  componentName: pricing-recommendation
+  description: Presents one application's indicated premium, risk tier, the rating factors for its line of business, and its loss or claims history.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pricing-recommendation
+  description: Presents one application's indicated premium, risk tier, the rating factors for its line of business, and its loss or claims history.
+  ---
+  <!-- bic:source=blank -->
+  # Pricing recommendation
+
+  Use this skill when the user asks what an application should be priced at,
+  asks for the rating factors behind a premium, asks about an applicant's loss
+  or claims history, or names a single UW- id and asks about premium.
+
+  ## Inputs
+
+  - One application id. If none is given, default to **UW-2025-101**.
+  - The pricing model for that application's line of business.
+
+  ## Procedure
+
+  1. Resolve the application id against the application file. If the id is not
+     present, state that it is not in the application set and list the ids
+     that are - do not render another applicant's premium under the requested
+     id.
+  2. Derive the tier from the stored `risk_score` with the same bands as the
+     risk evaluation skill: `<=30` Preferred, `<=55` Standard, `<=75`
+     Substandard, `>=76` Decline.
+  3. Load the pricing model keyed by the application's line of business and
+     report every factor it contains, unchanged:
+     - `commercial_property`: `base_rate_per_100` plus the
+       `construction_factor` and `protection_class_factor` tables.
+     - `personal_auto`: `base_premium` plus the `age_factor` and
+       `credit_factor` tables.
+     - `professional_liability`: `base_rate_per_practitioner` plus the
+       `specialty_factor` table.
+     - `general_liability`: `base_rate_per_1000_revenue` plus the
+       `industry_factor` table.
+     Scalar factors render as a single bolded line. Table factors render as a
+     sub-heading followed by one `- key: value` line per entry, in the order
+     the model lists them.
+  4. Report the **indicated premium as stored**. The factor tables are
+     published for the underwriter's own rating work - never multiply them
+     together to produce a new premium, and never present a computed number as
+     the indicated premium.
+  5. Pull the loss history. Use `loss_history` when present; when the
+     application carries `claims_history` instead (professional liability),
+     use that. Title-case the loss `type` or `allegation` and the `status`.
+
+  ## Output format
+
+  - Heading: `# Pricing Recommendation: <UW- id>`
+  - Bulleted headline fields in this order: **Applicant**, **LOB**,
+    **Coverage**, **Indicated Premium**, **Risk Score** with the tier in
+    parentheses.
+  - `## Pricing Model Factors` with the scalar and table factors as described
+    above.
+  - `## Loss History` with the table
+    `Year | Type/Allegation | Amount | Status`, or the single line
+    `No loss history.` when the application has neither losses nor claims.
+
+  ## Edge cases
+
+  - An empty loss history is stated as `No loss history.` - never inferred to
+    be clean, favorable, or worth a credit.
+  - A line of business with no pricing model yields an empty factor section
+    and a plain statement that no model is on file.
+  - Pricing is a recommendation to an underwriter. Never say a premium has
+    been quoted, filed, offered, or bound.

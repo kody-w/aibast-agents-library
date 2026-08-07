@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: capacity-forecast
+  description: Forecasts capacity over the next 90 days - which consultants roll off engagements, what the pipeline demands, and total roles against available bench.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: capacity-forecast
+  description: Forecasts capacity over the next 90 days - which consultants roll off engagements, what the pipeline demands, and total roles against available bench.
+  ---
+  <!-- bic:source=blank -->
+  # Capacity forecast
+
+  Use this skill when the user asks what is coming, who rolls off, what the
+  pipeline needs, upcoming demand, or whether the firm has the people for the
+  next quarter.
+
+  ## Inputs
+
+  - The consultant roster, for `current_project` and `project_end`.
+  - The project pipeline (name, start, months, needs, probability).
+
+  ## Procedure
+
+  1. Upcoming endings = every consultant whose `project_end` is set AND is on
+     or before `2026-06-30`. That date is the horizon; a later end date is out
+     of scope even by one day. Priya Sharma on Pinnacle Energy ERP ending
+     `2026-08-31` is therefore excluded.
+  2. Sort the endings ascending by `project_end`. Never any other order.
+  3. Show at most the first two skills per consultant in the skills cell.
+  4. Pipeline demand = every project in the pipeline, in pipeline order, with
+     duration rendered as `<months>mo` and probability rendered as a whole
+     percent (`0.85` becomes `85%`).
+  5. Roles needed = each `(skill, level)` pair joined with `; ` and formatted
+     `Skill (Level)`. The per-role headcount is not shown in this cell.
+  6. Total roles in pipeline = the sum of every role's count across every
+     project, ignoring probability. Demo pipeline: `1+2 + 1+2+1 + 1+1 + 2+1 =
+     12`.
+  7. Bench available = count of consultants whose `status` is `bench`.
+
+  ## Output format
+
+  `### Upcoming Project Endings` with exactly these columns:
+
+  | Consultant | Project | End Date | Level | Skills |
+
+  `### Pipeline Demand` with exactly these columns:
+
+  | Project | Start | Duration | Probability | Roles Needed |
+
+  Then two closing lines:
+
+  - `**Total roles in pipeline:** N`
+  - `**Bench available:** N`
+
+  ## Edge cases
+
+  - A consultant on the bench has no `project_end` and never appears in the
+    endings table.
+  - Total roles counts demand, not weighted demand. Do not multiply role counts
+    by probability, and do not drop a low-probability project from the count -
+    state its probability instead.
+  - If no engagement ends inside the horizon, say so and name the horizon date
+    rather than reaching for the next end date beyond it.

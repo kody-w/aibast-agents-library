@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: satisfaction-survey
+  description: Reports the customer satisfaction dashboard - CSAT, NPS, response time, first contact resolution, the score distribution, and recent survey comments.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: satisfaction-survey
+  description: Reports the customer satisfaction dashboard - CSAT, NPS, response time, first contact resolution, the score distribution, and recent survey comments.
+  ---
+  <!-- bic:source=blank -->
+  # Satisfaction survey
+
+  Use this skill when the user asks about CSAT, NPS, survey scores, customer
+  feedback, response times, first contact resolution, or satisfaction trends.
+
+  ## Inputs
+
+  - The satisfaction dataset: the headline metrics, the six recent surveys, and
+    the trend pair.
+  - No inquiry id is used. This dashboard is account-wide; if the user names an
+    INQ- id, say the dashboard is not filtered by inquiry and answer for the
+    whole set.
+
+  ## Procedure
+
+  1. **Headline metrics are stored values, reported as-is:** overall CSAT
+     4.3/5.0, NPS 42, average response time 12 minutes, first contact
+     resolution 0.78 rendered as a whole-number percent, 78%.
+  2. **Distribution is counted, not estimated.** Count how many of the six
+     survey scores equal each value 1 through 5, then
+     `percent = count / 6 * 100`, rounded to a whole number. List the rows from
+     5 Star down to 1 Star, including rows whose count is 0.
+  3. **Promoter and detractor split, when asked:** promoters are surveys
+     scoring `>= 4`, detractors are surveys scoring `<= 2`. On the current six
+     that is 4 promoters and 1 detractor, with 1 passive at 3. These are not
+     part of the standard dashboard - report them only on request, and never
+     present them as the NPS, which is the stored value 42.
+  4. **Recent surveys are listed in stored order**, newest date first as
+     recorded. Never re-sort by score.
+  5. **Trends are the stored strings** `+0.2` week over week and `+0.1` month
+     over month. Do not derive a trend from the six survey rows.
+
+  ## Output format
+
+  - `**Customer Satisfaction Dashboard**`
+  - `| Metric | Value |` table: Overall CSAT (`4.3/5.0`), NPS Score,
+    Avg Response Time (`<n> minutes`), First Contact Resolution (percent).
+  - `**Score Distribution:**` then `| Rating | Count |` with rows
+    `<n> Star | <count> (<percent>%)` from 5 down to 1.
+  - `**Recent Surveys:**` then `| Inquiry | Rating | Comment | Date |`. The
+    rating cell is an asterisk repeated once per point followed by `(n/5)` -
+    a 5 renders as `***** (5/5)`. The comment cell is the first 50 characters
+    of the stored comment.
+  - `**Trends:** WoW +0.2, MoM +0.1`
+  - Close with `Source: [Survey Platform + CRM Analytics]`.
+
+  ## Edge cases
+
+  - Comments are truncated at 50 characters and can end mid-word. Show the
+    truncation as it is. Never complete, paraphrase, or soften a truncated
+    comment, and never quote a completed version back to the user.
+  - The 1 Star row is shown even though its count is 0 - an empty band is a
+    finding, not a row to drop.
+  - If the user asks for a period, segment, or account the dataset does not
+    carry, say the data covers only these six surveys and the stored headline
+    metrics.
+
+  ## Boundaries
+
+  - Never send, schedule, or claim to have sent a survey.
+  - Never attribute a low score to a named support agent - the surveys carry an
+    inquiry id and a comment, nothing else.
+  - Detractor comments are quoted, not explained away. INQ-3979 scored 2/5 on
+    an unresolved SSO follow-up; report it as recorded.

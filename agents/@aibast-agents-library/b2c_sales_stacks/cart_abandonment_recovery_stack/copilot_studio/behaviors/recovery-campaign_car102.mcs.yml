@@ -25,7 +25,7 @@ content: |
      Email, Incentive Email, SMS Reminder, Retargeting Display Ad. Do not
      re-sort by delay or by conversion unless the user asks for a ranking.
   2. Report each campaign's `delay_hours` as `<N>h` measured from the moment of
-     abandonment — 1h, 24h, 72h, 2h, 6h respectively.
+     abandonment -- 1h, 24h, 72h, 2h, 6h respectively.
   3. Render a campaign with no incentive as `None`. Only the Incentive Email
      carries one: a 10% discount.
   4. A cart is **pending recovery** only if BOTH hold:
@@ -35,21 +35,22 @@ content: |
      be recommended for a send.
   5. Count the unrecoverable carts separately and report that count.
   6. Retargeting Display Ad has no open rate; it renders as `0%`. Do not
-     describe that as missing data — display ads have no open event.
+     describe that as missing data -- display ads have no open event.
 
   ## Output format
 
-  - `## Campaign Sequence` — a table with exactly these columns:
+  - `## Campaign Sequence` -- a table with exactly these columns:
     `Campaign | Delay | Subject | Incentive | Open Rate | Conversion`.
-  - `## Carts Pending Recovery` — one bullet per pending cart as
-    `- **CART-xxxxx** (<customer>): $N,NNN.NN — Status: <Title Cased Status>`.
+  - `## Carts Pending Recovery` -- one bullet per pending cart as
+    `- **CART-xxxxx** (<customer>): $N,NNN.NN` then an em dash separator
+    then `Status: <Title Cased Status>`.
   - A closing line: `**Unrecoverable (no email):** N`.
 
   ## Edge cases
 
   - CART-20004 (Guest User) has no email and status `unrecoverable`. It never
     appears in the pending list; it is counted in the unrecoverable line.
-  - A cart already at `email_1_sent` is still pending — the next step in the
+  - A cart already at `email_1_sent` is still pending -- the next step in the
     sequence is the 24h Urgency Email. Say what the next step would be; do not
     say it has been scheduled or sent.
   - Recommendation only. Never state that a campaign has been launched, an

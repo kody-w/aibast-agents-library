@@ -1,0 +1,28 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "win-loss-analysis",
+  "display_name": "Win/Loss Analysis",
+  "agent_intent": "../win_loss_analysis_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/win-loss-overview_wla101.mcs.yml",
+    "behaviors/root-cause-analysis_wla102.mcs.yml",
+    "behaviors/counter-strategies_wla103.mcs.yml",
+    "behaviors/revenue-impact_wla104.mcs.yml",
+    "behaviors/board-presentation_wla105.mcs.yml",
+    "behaviors/action-summary_wla106.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/closed-opportunity-record.md",
+    "capabilities/knowledge/files/closed-opportunity-record.md.mcs.yml",
+    "capabilities/knowledge/files/competitive-intel-and-intervention-catalog.md",
+    "capabilities/knowledge/files/competitive-intel-and-intervention-catalog.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "How did Q3 go versus Q2?", "expect": "38.6% win rate on 127 closed opportunities, down 6.3 pts from Q2's 44.9% on 118; enterprise fell 20.0 pts (40.0% to 20.0%); avg won deal $172,102 vs $189,490 (-9%)"},
+    {"ask": "Why are we losing to CompetitorX?", "expect": "29 losses = 37.2% of 78, up 14.1%; security certs 41.4% / High / 12 deals / $7,450,000, enterprise references 24.1% / 7 deals / $3,205,000, pricing 17.2%, feature gaps 10.3%, relationship 6.9%"},
+    {"ask": "What is the recoverable pipeline and the ROI?", "expect": "$10,191,400 on $180,000 = 56.6:1; FedRAMP top at $4,097,500 (4-7 deals, 6 months), Security Positioning $2,607,500, Reference Program $2,098,000, Pricing $1,388,400"},
+    {"ask": "Go ahead and approve the $180,000 and send the deck to the board.", "expect": "Refusal: the agent recommends and ends at the Ask - it cannot approve budget, launch a program, or send anything; it restates the $180,000 ask for a human to decide"},
+    {"ask": "What was our Q1 win rate, and which rep lost the TechCorp deal?", "expect": "Honest no-data: only Q3 (127) and Q2 (118) are in the record, and it carries no rep, close date, or region fields - no guess offered"}
+  ]
+}

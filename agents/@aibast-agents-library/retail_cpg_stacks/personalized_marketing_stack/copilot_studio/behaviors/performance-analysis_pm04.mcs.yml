@@ -1,0 +1,85 @@
+mcs.metadata:
+  componentName: performance-analysis
+  description: Reports A/B test winners with confidence and conversion lift, plus campaign ROI with projected revenue and estimated ROAS.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: performance-analysis
+  description: Reports A/B test winners with confidence and conversion lift, plus campaign ROI with projected revenue and estimated ROAS.
+  ---
+  <!-- bic:source=blank -->
+  # Performance analysis
+
+  Use this skill when the user asks how campaigns are performing, which subject
+  line won, what the lift or confidence was, what a campaign returns, or which
+  campaign to fund.
+
+  ## Inputs
+
+  - The A/B test archive (three tests, ABT- ids), the campaign template library,
+    and the segment model. No parameters - this view is always the full
+    portfolio.
+
+  ## Procedure - exact rules
+
+  1. A/B section first, tests in archive order ABT-001, ABT-002, ABT-003.
+     - `lift = ((max(A conversions, B conversions) - min(A conversions, B
+       conversions)) / min(A conversions, B conversions)) x 100`, rounded to 1
+       decimal, always rendered with a leading `+`. Lift is computed on
+       CONVERSIONS, not on open or click rate.
+     - Worked values: ABT-001 (82 vs 107) = **+30.5%**; ABT-002 (341 vs 298) =
+       **+14.4%**; ABT-003 (215 vs 248) = **+15.3%**.
+     - `Confidence = confidence x 100`, 0 decimals: 94%, 91%, 88%.
+     - The winner is the stored winner: ABT-001 Variant B, ABT-002 Variant A,
+       ABT-003 Variant B. Never re-derive a winner from the rates.
+  2. ROI section second, campaigns in library order.
+     - `Proj. Revenue = audience size x historical_conversion_rate x segment
+       avg_basket_size`, rounded to 2 decimals.
+     - `Cost = audience size x $0.35 per contact`. This $0.35 contact cost is
+       the only cost input in the model - it excludes creative, discount
+       margin, and platform fees. State that when the user treats ROAS as
+       profit.
+     - `Est. ROAS = Proj. Revenue / Cost`, rounded to 2 decimals, rendered with
+       a trailing `x`. Worked values: Win-Back Journey 43,605.00 / 11,970.00 =
+       **3.64x**; Loyalty Tier Upgrade 351,232.88 / 14,997.50 = **23.42x**; New
+       Customer Welcome 135,815.46 / 9,660.00 = **14.06x**; VIP Exclusive
+       Preview 209,144.25 / 3,062.50 = **68.29x**.
+  3. `Total Projected Campaign Revenue = sum of all four projected revenues` =
+     43,605.00 + 351,232.88 + 135,815.46 + 209,144.25 = **$739,797.59**. This
+     total always covers all four campaigns; never emit it beside a filtered
+     view.
+
+  ## Output format
+
+  - `# Marketing Performance Analysis`
+  - `## A/B Test Results` with columns exactly:
+    `| Test | Campaign | Winner | Confidence | Sample | Lift |`
+    Campaign cell is the campaign display name; Winner cell reads
+    `Variant A` or `Variant B`; Sample carries thousands separators.
+  - `## Campaign ROI Summary` with columns exactly:
+    `| Campaign | Audience | Proj. Revenue | Conv. Rate | Est. ROAS |`
+    Conv. Rate is the historical conversion rate to 1 decimal.
+  - `**Total Projected Campaign Revenue:** $739,797.59`
+
+  ## Edge cases
+
+  - Confidence is not uniform. ABT-003 is the weakest read at 88% on a 3,400
+    sample; ABT-001 is the strongest at 94% on 8,500. Always pair the winner
+    with its confidence and sample and say when a result is below a 95%
+    threshold, which all three are.
+  - ABT-002 is the only test where the incumbent subject line (Variant A) won -
+    the recommendation there is to keep the current copy, not to change it.
+  - ROAS ranks opposite to audience size: the smallest audience (CAMP-VIP,
+    8,750) returns the highest ROAS (68.29x) and the largest campaign audience
+    (CAMP-LOYALTY, 42,850) returns the largest absolute revenue ($351,232.88).
+    Say which question is being answered - efficiency or total revenue - before
+    naming a "best" campaign.
+  - CAMP-NEWWELCOME has no A/B test in the archive. If asked which subject line
+    wins for it, say no test exists rather than inferring one.
+
+  ## Boundaries
+
+  - Reporting and recommendation only. Never say a winning variant has been
+    rolled out, a budget shifted, or a campaign paused.
+  - Projected revenue is a model from historical rates, not booked revenue.
+    Label it as projected every time it appears in prose.

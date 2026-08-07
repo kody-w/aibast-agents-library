@@ -1,0 +1,83 @@
+mcs.metadata:
+  componentName: budget-check
+  description: Checks budget availability company-wide and by department, computing utilization and the On Track / At Risk / Over status from the recorded gate.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: budget-check
+  description: Checks budget availability company-wide and by department, computing utilization and the On Track / At Risk / Over status from the recorded gate.
+  ---
+  <!-- bic:source=blank -->
+  # Budget check
+
+  Use this skill when the user asks whether there is budget for something, how
+  much a department has left, what has been spent or committed, or wants the
+  budget position.
+
+  ## Inputs
+
+  - The departmental budget allocations (knowledge/tools).
+  - Optional: one department (IT, Marketing, Finance, HR, Sales), or an amount
+    to test against remaining headroom.
+
+  ## Procedure
+
+  1. Compute the company totals by summing across all departments:
+     - `total_budget = sum(annual_budget)` = $3,700,000
+     - `total_spent = sum(spent)` = $2,627,000
+     - `total_committed = sum(committed)` = $188,000
+     - `total_remaining = total_budget - total_spent - total_committed`
+       = $885,000
+     - Spent percentage = `total_spent / total_budget * 100`, rounded to a whole
+       number = 71%
+  2. For each department compute:
+     - `utilization = (spent + committed) / annual_budget * 100`, rendered as a
+       whole number with a `%` suffix
+     - `status = "Over" if remaining < 0 else ("At Risk" if utilization > 85
+       else "On Track")`. The At Risk test is strictly greater than 85 -- a
+       department at exactly 85% computes as On Track.
+  3. Preserve allocation order: IT, Marketing, Finance, HR, Sales.
+  4. Emit the standing alerts:
+     - `Finance department at risk: Q4 forecast ($80K) exceeds remaining ($60K)`
+     - `IT has sufficient budget for planned Q4 purchases`
+     When the user asks about Finance, give both facts and label them: the
+     computed status is On Track at exactly 85% utilization, and the forward
+     alert is that the Q4 forecast exceeds what is left.
+  5. When testing a specific amount, compare it to that department's remaining
+     and say whether it fits, by how much, and what the utilization would become.
+     Do not commit or reserve the amount.
+
+  ## Output format
+
+  Headline: `**Budget Check**`
+
+  Then the totals table, exactly these columns:
+
+  | Metric | Value |
+
+  with rows Total Budget, Spent YTD (amount plus percentage in parentheses),
+  Committed, Remaining.
+
+  Then `**By Department:**` and one table, exactly these columns:
+
+  | Department | Budget | Spent | Committed | Remaining | Utilization | Status |
+
+  Then `**Alerts:**` as a list.
+
+  Close with:
+
+  `Source: [ERP + Finance System]`
+  `Agents: ProcurementSupportAgent`
+
+  ## Edge cases
+
+  - `remaining` is a recorded field, not `budget - spent - committed` recomputed
+    per department. Report the recorded value; it reconciles to the company
+    remaining of $885,000.
+  - Q4 forecast is not in the department table. Quote it only in the alert or
+    when the user asks about forward spend.
+  - A department not in the allocations is reported as not on file, with the
+    five departments listed. Never estimate a budget line.
+  - Read-only. You never release, transfer, reserve, or commit budget, and never
+    say funds have been allocated -- confirming headroom is not an approval, and
+    you say so when the ask reads as one.

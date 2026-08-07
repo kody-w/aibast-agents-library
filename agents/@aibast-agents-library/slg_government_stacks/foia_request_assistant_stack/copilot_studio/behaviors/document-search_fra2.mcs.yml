@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: document-search
+  description: Scopes the record search for a named FOIA request - repositories, custodians, retrieval time, and the exemptions the keyword rule flags.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: document-search
+  description: Scopes the record search for a named FOIA request - repositories, custodians, retrieval time, and the exemptions the keyword rule flags.
+  ---
+  <!-- bic:source=blank -->
+  # Document search
+
+  Use this skill when the user names a request and asks where the records live,
+  who holds them, how long retrieval takes, how big the production is, or which
+  exemptions may apply to that request.
+
+  ## Inputs
+
+  - A request id (`FOIA-2025-xxxx`). If the user names no request, use
+    `FOIA-2025-0301` and say which request you are scoping.
+  - The document repository inventory and the exemption catalog.
+
+  ## Procedure
+
+  1. Resolve the request id against the caseload. If the id is not in the
+     caseload, say it is not in the caseload and stop. Do not fall back to
+     another request and do not answer about a neighbor id.
+  2. Restate the request's `subject`, its `scope` verbatim, and its
+     `estimated_pages` with thousands separators.
+  3. List the document repository inventory: every repository, its custodian,
+     its `avg_retrieval_days`, and whether it is digital. The inventory is the
+     full set of systems the office can search - it is not pre-filtered to the
+     request, so the officer decides which repositories are in scope.
+  4. Determine potentially applicable exemptions by the fixed keyword rule,
+     evaluated in this order against lowercased text:
+     - `police` or `officer` in the subject -> add `EX-1` then `EX-2`
+     - `correspondence` or `memo` in the scope -> add `EX-3` then `EX-4`
+     - `development` in the subject or `developer` in the scope -> add `EX-5`
+     - if nothing matched at all -> `EX-1` alone
+     A keyword can match more than one rule, so a request can carry three
+     exemptions. Never add a code the rule did not produce.
+  5. Render each exemption as its code, its category, its description, then an
+     em dash and its statute citation.
+
+  ## Output format
+
+  - `# Document Search: FOIA-2025-xxxx`
+  - `**Subject:**`, `**Scope:**`, `**Estimated Pages:**`
+  - `## Relevant Document Repositories` with the table columns, in this order:
+    `Repository | Custodian | Retrieval Est. | Digital`
+  - `## Potentially Applicable Exemptions` as bullets:
+    `- **EX-n (Category):** description - statute`
+
+  ## Edge cases
+
+  - Retrieval estimates are per repository, in days, and they are averages.
+    Never add them up into a completion date and never present one as a
+    guaranteed turnaround.
+  - Every repository in this inventory is digital. Do not describe a physical
+    pull unless the inventory says the repository is not digital.
+  - Exemptions here are `potentially applicable` - a flag for review, not a
+    decision to withhold.
+
+  ## Boundaries
+
+  - Scoping only. Never say records have been pulled, searched, retrieved, or
+    produced, and never contact a custodian.

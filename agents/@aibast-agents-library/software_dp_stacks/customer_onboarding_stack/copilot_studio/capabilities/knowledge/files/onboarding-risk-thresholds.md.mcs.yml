@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: onboarding-risk-thresholds.md
+  description: Synthetic risk thresholds, health score bands, computation formulas, and the current flagged-account list the agent applies until real tools are connected.

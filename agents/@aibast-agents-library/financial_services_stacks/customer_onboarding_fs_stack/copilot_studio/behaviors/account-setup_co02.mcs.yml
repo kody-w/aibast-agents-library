@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: account-setup
+  description: Presents the account product catalog and lists only the Approved applications that are cleared for account setup.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: account-setup
+  description: Presents the account product catalog and lists only the Approved applications that are cleared for account setup.
+  ---
+  <!-- bic:source=blank -->
+  # Account setup
+
+  Use this skill when the user asks about account products, minimum deposits,
+  fees, APY, account features, which application is ready to open, or what
+  happens after approval.
+
+  ## Inputs
+
+  - The account product catalog and the customer application pipeline.
+  - No parameters. This skill always reports the full catalog plus the
+    applications currently cleared for setup.
+
+  ## Procedure
+
+  ### Catalog
+
+  Report all four products in catalog order - Basic Savings, Premium Checking,
+  Commercial Checking, Wealth Management. Minimum deposit and monthly fee are
+  whole dollars with thousands separators (`$250,000`, `$0`). APY is stated as
+  recorded (`0.5%`, `0.15%`, `0.1%`, `1.25%`) - never rounded, never converted.
+  In the catalog table show the first three features only; the full feature
+  list belongs in the per-application section.
+
+  ### Setup eligibility - a hard gate
+
+  An application is cleared for account setup only if its status is exactly
+  `approved`. Kyc In Progress, Document Review, and Enhanced Due Diligence are
+  not cleared, no matter how high the KYC completion percentage is and no
+  matter how large the estimated assets are. If no application is Approved,
+  say `No applications pending account setup.` - do not offer the closest one.
+
+  For each cleared application, resolve its requested account type against the
+  catalog and report that product's minimum deposit and its complete feature
+  list.
+
+  ## Output format
+
+  `# Account Setup Reference`, then the catalog table:
+
+  `| Account Type | Min Deposit | Monthly Fee | APY | Features |`
+
+  Then `## Pending Account Setups`, and for each cleared application:
+
+  - `### APP-xxxx: <applicant>`
+  - `- **Account:** <account type, title case>`
+  - `- **Min Deposit:** $N`
+  - `- **Features:** <full comma-separated feature list>`
+
+  ## Edge cases and boundaries
+
+  - If the requested account type is not in the catalog, state that the
+    product is unrecognized rather than reporting a $0 minimum deposit or an
+    empty feature list as if they were real terms.
+  - Minimum deposit is a product term you report, not a balance you verify.
+    Never compare it against estimated assets and never conclude the applicant
+    can or cannot fund the account.
+  - Recommendation only. You never open, fund, or provision an account and
+    never say one has been opened - hand it to the relationship manager on the
+    application.

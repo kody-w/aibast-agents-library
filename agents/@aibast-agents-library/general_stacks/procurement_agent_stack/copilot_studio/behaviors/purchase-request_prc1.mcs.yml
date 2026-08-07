@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: purchase-request
+  description: Shows the purchase request queue, or one request in detail with the approver its amount requires.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: purchase-request
+  description: Shows the purchase request queue, or one request in detail with the approver its amount requires.
+  ---
+  <!-- bic:source=blank -->
+  # Purchase request
+
+  Use this skill when the user asks about a purchase request, asks what is in
+  the request queue, asks the status or amount of a PR, or names a PR- id.
+
+  ## Inputs
+
+  - The purchase request queue.
+  - Optional: a single PR- id. With no id, default to PR-5001 detail; when the
+    user asks for the queue or "all requests", render the list view.
+
+  ## Procedure
+
+  1. If a PR- id is given and it exists in the queue, render the **detail
+     view**. Compute the required approver from the amount using the approval
+     threshold table: walk the bands in order and take the first whose limit
+     is greater than or equal to the amount - `<= $5,000` Direct Manager,
+     `<= $25,000` Department Head, `<= $100,000` VP Finance, `<= $500,000`
+     CFO, otherwise CEO + Board.
+  2. If no id is given, or the user asks for the queue, render the **list
+     view** of every request.
+  3. If a PR- id is given that is not in the queue, say so plainly and list
+     the ids that exist (PR-5001 through PR-5004). Do not silently show a
+     different request.
+
+  ## Output format - detail view
+
+  - Headline: `**Purchase Request: PR-xxxx**`
+  - A two-column `| Field | Detail |` table with exactly these rows, in this
+    order: Title, Requester (name plus department in parentheses), Category,
+    Amount (dollars with thousands separators), Priority, Status, Preferred
+    Vendor, Budget Code, Required Approver.
+  - Then `**Justification:** <text>` on its own line.
+  - Close with `Source: [Procurement System]`.
+
+  ## Output format - list view
+
+  - Headline: `**Purchase Requests**`
+  - Table with columns `| ID | Title | Amount | Status | Priority |`, one row
+    per request in queue order (PR-5001, PR-5002, PR-5003, PR-5004). Titles
+    are truncated to the first 35 characters in this view; give the full title
+    if the user asks for it.
+  - Close with `Source: [Procurement System]`.
+
+  ## Edge cases
+
+  - Amount alone decides the approver. A $125,000 request lands in the CFO
+    band because it exceeds the $100,000 VP Finance limit - never round it
+    down to VP Finance.
+  - Status is reported verbatim (Draft, Vendor Selection, Pending Approval,
+    Approved). A Draft request is not funded and must not be described as
+    approved.
+  - "Preferred Vendor" is the requester's preference, not a selection. Say so
+    if the user treats it as a decision.
+
+  ## Boundaries
+
+  - Read-only. Never say a request has been created, edited, submitted,
+    approved, or cancelled - recommend the next step and stop.

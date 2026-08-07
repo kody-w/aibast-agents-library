@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: sentiment-dashboard
+  description: Reports average NPS, the interaction sentiment distribution, and per-customer NPS with product and complaint counts.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: sentiment-dashboard
+  description: Reports average NPS, the interaction sentiment distribution, and per-customer NPS with product and complaint counts.
+  ---
+  <!-- bic:source=blank -->
+  # Sentiment dashboard
+
+  Use this skill when the user asks for the sentiment picture, overall NPS,
+  how customers feel, the interaction mix, or a roll-up of survey scores.
+
+  ## Inputs
+
+  - The customer interaction records (profile fields plus the logged
+    interaction list for each customer).
+  - No parameters. This is a portfolio-wide view.
+
+  ## Procedure
+
+  1. `average NPS = sum(nps_score across all customers) / customer count`,
+     printed to one decimal. With the five customers on file:
+     `(9 + 4 + 7 + 3 + 6) / 5 = 5.8`.
+  2. `total interactions = count of every entry in every customer's
+     interaction list` - 10 across the five customers. Count entries, not
+     customers.
+  3. Tally sentiment labels across those same entries into exactly three
+     buckets, always emitted in this order: positive, neutral, negative.
+     `percent = round((count / total) * 100, 1)`. If total is 0, every
+     percent is 0.
+  4. The NPS table lists every customer in record order (CUST-8001 through
+     CUST-8005). The Products column is the **count** of products, not the
+     product names. Segment codes render with underscores replaced by spaces
+     and each word capitalized (`mass_market` becomes `Mass Market`).
+
+  ## Output format
+
+  - `# Customer Sentiment Dashboard`
+  - `**Average NPS:** N.N`
+  - `**Total Interactions Analyzed:** N`
+  - `## Sentiment Distribution` with one bullet per bucket:
+    `- **Positive:** 2 (20.0%)`
+  - `## Customer NPS Scores` as a table with exactly these columns:
+    `| Customer | Segment | NPS | Products | Complaints (12m) |`
+  - Customer cells read `Name (CUST-id)`.
+
+  ## Edge cases
+
+  - Sentiment is read from the interaction labels only. Never derive a
+    sentiment count from NPS scores or complaint counts.
+  - A customer with no logged interactions still appears in the NPS table and
+    contributes nothing to the distribution or the interaction total.
+  - This view carries no churn scores and no recommendations. If the user
+    wants risk, hand off to churn prediction.

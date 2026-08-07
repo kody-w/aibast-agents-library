@@ -1,0 +1,81 @@
+mcs.metadata:
+  componentName: cost-analysis
+  description: Computes annual holding cost per warehouse, inventory value at risk from below-reorder positions, and the transfer-versus-holding trade-off.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: cost-analysis
+  description: Computes annual holding cost per warehouse, inventory value at risk from below-reorder positions, and the transfer-versus-holding trade-off.
+  ---
+  <!-- bic:source=blank -->
+  # Cost analysis
+
+  Use this skill when the user asks what inventory is costing, what a stockout
+  would expose, whether rebalancing pays for itself, or for the holding versus
+  transfer trade-off.
+
+  ## Inputs
+
+  - Warehouse pallets used and the annual holding rate per pallet.
+  - SKU unit costs, on-hand levels, and reorder points.
+  - The total transfer cost produced by the transfer-plan skill.
+
+  ## Procedure
+
+  Annual holding costs, warehouses in the fixed order WH-ATL, WH-ORD, WH-DFW,
+  WH-SEA:
+
+  1. `annual_holding_cost = round(used_pallets *
+     annual_holding_cost_per_pallet, 2)` per warehouse.
+  2. Total = the sum of the four.
+
+  Inventory value at risk, iterating SKUs in catalog order and warehouses in
+  the fixed order:
+
+  3. Include the pair only when `on_hand < reorder_point` -- strictly less.
+  4. `shortfall = reorder_point - on_hand`.
+  5. `value_at_risk = round(shortfall * unit_cost, 2)`.
+  6. Total = the sum of the included rows.
+
+  Trade-off block -- fixed multipliers, all three are estimates:
+
+  7. One-time transfer cost = the transfer-plan total, unchanged.
+  8. `avoided_expedited_premium = transfer_cost * 3.2`.
+  9. `net_annual_benefit = (total_value_at_risk * 0.6) - transfer_cost`.
+
+  Never present 8 or 9 as measured, quoted, or booked savings. They are
+  planning heuristics with hard-coded coefficients; state the coefficient when
+  you state the figure.
+
+  ## Output format
+
+  - Headline `## Inventory Holding & Transfer Cost Analysis`.
+  - Sub-heading `### Annual Holding Costs` and a table with columns:
+    `Warehouse | Pallets | Cost/Pallet/Yr | Annual Holding Cost`, warehouse
+    names, currency to two decimals.
+  - `**Total annual holding cost:** $n,nnn,nnn.nn`
+  - Sub-heading `### Inventory Value at Risk (Below Reorder Point)` and a
+    table with columns: `SKU | Warehouse | On-Hand | Reorder Pt | Shortfall |
+    Value at Risk`. Warehouse column carries the WH- id here, not the name.
+  - `**Total value at risk from stockouts:** $nnn,nnn.nn`
+  - Sub-heading `### Transfer vs. Holding Trade-off` and three bullets:
+    one-time transfer cost, avoided expedited-shipping premium (est.), net
+    annual benefit from rebalancing -- each value bolded.
+
+  ## Edge cases
+
+  - Value at risk is measured against the reorder point, not the demand
+    forecast. A DEFICIT position in the rebalance table that still sits above
+    its reorder point does not appear here -- SKU-4402 at WH-ATL and SKU-4404
+    at WH-ATL are both in that state. Explain the difference rather than
+    forcing the two tables to agree.
+  - Holding cost is driven by pallets and the per-pallet rate, not by
+    inventory value, so the most expensive site to hold stock in is not
+    necessarily the site holding the most valuable stock.
+  - The net annual benefit compares a one-time transfer cost against an
+    annualized risk figure. Call that out; it is not a like-for-like period
+    comparison.
+  - If asked for a holding rate, unit cost, or reorder point that is not in
+    the data, say so. Never interpolate one.
+  - Analysis only. Never state that a budget has been committed, a transfer
+    funded, or a purchase order raised.

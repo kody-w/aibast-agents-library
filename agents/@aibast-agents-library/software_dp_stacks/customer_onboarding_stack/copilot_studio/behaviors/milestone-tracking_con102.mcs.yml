@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: milestone-tracking
+  description: Reports milestone completion, percent complete, blocked milestones, and the next milestone in sequence for every onboarding customer.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: milestone-tracking
+  description: Reports milestone completion, percent complete, blocked milestones, and the next milestone in sequence for every onboarding customer.
+  ---
+  <!-- bic:source=blank -->
+  # Milestone tracking
+
+  Use this skill when the user asks about onboarding milestones, implementation
+  progress, what is blocked, what comes next for a customer, or how far along an
+  account is.
+
+  ## Inputs
+
+  - The milestone matrix for every customer.
+  - Optional: a single customer name or CUST- id to filter the presentation.
+
+  ## Milestone sequence - fixed order, never reordered
+
+  1. `kickoff_complete`
+  2. `sso_configured`
+  3. `data_migration`
+  4. `integration_setup`
+  5. `user_training`
+  6. `go_live`
+
+  Every customer has all six. Each milestone carries a status of `complete`,
+  `in_progress`, `not_started`, or `blocked`, and a completion date only when
+  the status is `complete`.
+
+  ## Procedure - compute, do not judge
+
+  For each customer:
+
+  1. `completed` = count of milestones whose status is exactly `complete`.
+     `in_progress` and `blocked` do not count as complete.
+  2. `total` = 6.
+  3. `pct = round(completed / 6 * 100, 1)` - one decimal place, so 2/6 is 33.3%,
+     3/6 is 50.0%, 4/6 is 66.7%, 1/6 is 16.7%.
+  4. `blocked` = every milestone whose status is `blocked`, in sequence order.
+     Render `None` when the list is empty.
+  5. `next_milestone` = the FIRST milestone in sequence order whose status is
+     `in_progress` or `not_started`. A `blocked` milestone is skipped by this
+     rule - it is reported in the blocked column only. Render `N/A` when no
+     milestone qualifies.
+  6. List customers in portfolio order (CUST-1001 through CUST-1005).
+
+  ## Output format
+
+  - `# Milestone Tracking`
+  - Table with exactly these columns:
+    `Customer | Completed | Progress | Blocked | Next Milestone`
+  - `Completed` renders as `N/6`; `Progress` renders as `N.N%`; `Blocked` renders
+    the milestone key(s) or `None`; `Next Milestone` renders the milestone key or
+    `N/A`.
+  - Use the raw milestone keys (`data_migration`, `integration_setup`) so they
+    match the underlying records.
+
+  ## Edge cases
+
+  - A blocked milestone earlier in the sequence does not stop later milestones
+    from being named next. When `data_migration` is blocked and
+    `integration_setup` is not started, the next milestone is
+    `integration_setup` while `data_migration` shows in the blocked column.
+  - A customer can be blocked and still show progress above zero - report both.
+  - Blocked milestones carry no date and no owner in this data. Do not invent a
+    blocker reason, an ETA, or who owns it; say the reason is not recorded.
+
+  ## Boundaries
+
+  - Reporting only. Never say a milestone has been completed, unblocked,
+    rescheduled, or reassigned. Recommend the next action and leave it with the
+    CSM.

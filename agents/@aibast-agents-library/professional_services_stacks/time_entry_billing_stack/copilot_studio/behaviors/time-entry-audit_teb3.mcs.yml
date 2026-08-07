@@ -1,0 +1,91 @@
+mcs.metadata:
+  componentName: time-entry-audit
+  description: Runs the four fixed compliance checks over every time entry and raises the per-project budget consumption alert.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: time-entry-audit
+  description: Runs the four fixed compliance checks over every time entry and raises the per-project budget consumption alert.
+  ---
+  <!-- bic:source=blank -->
+  # Time entry audit
+
+  Use this skill when the user asks for an audit, asks what is wrong with the
+  timesheets, asks about compliance, asks which entries are flagged, or asks
+  which projects are close to burning their budget.
+
+  ## Inputs
+
+  - The time entry log, the rate cards, and the project budget records.
+  - Optional: a consultant, project, or date to narrow to.
+
+  ## Procedure - scope
+
+  Review **every** time entry, billable and non-billable, approved and
+  unapproved. Approval status is not an audit check and never excuses an entry
+  from review.
+
+  ## Procedure - the four checks
+
+  For each entry, collect issues in this order. Let `card` be the consultant's
+  rate card.
+
+  1. **Missing description** - the entry's `description` is empty. Issue text:
+     `Missing description`.
+  2. **Daily limit** - `hours > card.max_daily_hours` (use 10 when there is no
+     card). Issue text: `Exceeds 10-hour daily limit`. Note the comparison is
+     strictly greater than: exactly 10.0 hours does not flag.
+  3. **Overtime cap** - `rate > card.overtime` AND `category == "billable"`.
+     Issue text: `Rate exceeds overtime cap`. Strictly greater than: a rate
+     equal to the overtime rate does not flag.
+  4. **Non-standard rate** - `rate != card.standard` AND `rate != card.overtime`.
+     Issue text: `Non-standard rate ($N/hr)`.
+
+  An entry is flagged if it collected one or more issues. Join multiple issues
+  with `; ` in the order above. Never invent a fifth check, and never suppress
+  a check because the work was justified.
+
+  ## Procedure - budget alert
+
+  For every project in the budget catalog, in catalog order:
+
+  - `used = round(billed_to_date / total_budget * 100, 1)`
+  - `status = CRITICAL if used >= 95, else WARNING if used >= 80, else OK`
+
+  The thresholds are fixed. A project at 80.3% is WARNING, not "approaching
+  warning".
+
+  ## Output format
+
+  ```
+  ## Time Entry Audit Report
+
+  **Total entries reviewed:** N
+  **Entries flagged:** N
+
+  | Entry ID | Consultant | Date | Hours | Rate | Issues |
+
+  ### Budget Alert
+
+  | Project | Budget Used | Remaining | Status |
+  ```
+
+  Status is rendered in bold upper case (**OK**, **WARNING**, **CRITICAL**).
+
+  ## Edge cases
+
+  - Zero flags: replace the entry table with `All entries pass audit checks.`
+    and still emit the budget alert.
+  - **Consultant with no rate card:** checks 2, 3, and 4 have no card to
+    compare against, so they cannot fire - the entry passes by default, not by
+    verification. Say that the consultant has no rate card and that their rate
+    and daily-limit compliance is unverified. Do not report them as clean.
+  - A non-billable entry can still be flagged for a missing description or a
+    daily-limit breach; only the overtime-cap check is billable-only.
+  - `Remaining` in the budget alert is the recorded remaining figure, not
+    `total_budget - billed_to_date` recomputed.
+
+  ## Boundaries
+
+  - Findings only. Never correct an entry, change a rate, approve or reject an
+    entry, or move budget. Hand each flag to the reviewer with its TE- id.

@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: relationship-map
+  description: Maps the buying committee per deal with influence and support level and runs the five relationship gap rules against it.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: relationship-map
+  description: Maps the buying committee per deal with influence and support level and runs the five relationship gap rules against it.
+  ---
+  <!-- bic:source=blank -->
+  # Relationship map
+
+  Use this skill when the user asks who the buying committee is, whether we are
+  multi-threaded, who the blockers are, or where the relationship gaps sit.
+
+  ## Inputs
+
+  - The stakeholder records for the 5 mapped deals.
+
+  ## Procedure
+
+  1. Order deals by value descending. List contacts in recorded order, not
+     sorted by score.
+  2. Support level renders as CHAMPION, Supporter, Neutral, BLOCKER or Unknown -
+     champions and blockers in caps so they are unmissable.
+  3. Run all five gap rules, in this order, and report every one that fires.
+     - No contact with support level champion.
+     - No Executive Sponsor or Economic Buyer touched within the last 14 days.
+     - No Technical Evaluator with positive or very_positive sentiment.
+     - Any high or very_high influence contact with no contact for 21 days or
+       more, named individually with the day count.
+     - Fewer than 3 contacts mapped, recommending 4 or more for
+       multi-threading.
+  4. If no rule fires, state `No critical gaps identified`.
+
+  ## Output format
+
+  Headline `**Relationship Map -- Buying Committee Analysis**`, then one block
+  per deal - `**<deal> -- $<value>**`, `Buying Committee (N mapped):` and a
+  table with exactly these columns.
+
+  | Contact | Title | Role | Influence | Support |
+
+  Then `**Relationship Gaps:**` as an indented bullet list.
+
+  Close with `Source: [CRM Contacts + LinkedIn + Meeting History]`.
+
+  ## Edge cases
+
+  - The champion rule looks at support level, not job title. A deal can have a
+    contact whose ROLE is Champion and still pass or fail on the recorded
+    support level.
+  - A well-covered deal can still show a gap - Pacific Telecom has five mapped
+    contacts and two champions yet still fails the technical evaluator rule.
+    Report it rather than suppressing it.
+  - Never infer a support level that is recorded as unknown; unknown is the
+    finding.

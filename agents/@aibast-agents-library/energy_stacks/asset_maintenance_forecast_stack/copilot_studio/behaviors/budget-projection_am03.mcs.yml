@@ -20,7 +20,7 @@ content: |
   - The maintenance rate card: a major, minor, and inspection rate per asset
     type.
 
-  ## Procedure — compute it, do not estimate it
+  ## Procedure - compute it, do not estimate it
 
   For each asset, using the rate card entries for that asset's type:
 
@@ -49,7 +49,7 @@ content: |
     `52,000 + (9,000 x 2) + 4,000 = 74,000`. Condition 68 is a WARNING but is
     not below 50, so no uplift.
 
-  Sort the rows by `annual_budget` **descending** — most expensive first. Note
+  Sort the rows by `annual_budget` **descending** - most expensive first. Note
   that this ordering is not the health ordering: the healthiest asset can carry
   the largest budget.
 

@@ -1,0 +1,71 @@
+mcs.metadata:
+  componentName: handle-inquiry
+  description: Triages a single customer inquiry and returns the record, the top-matching knowledge article, and the routed team and SLA.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: handle-inquiry
+  description: Triages a single customer inquiry and returns the record, the top-matching knowledge article, and the routed team and SLA.
+  ---
+  <!-- bic:source=blank -->
+  # Handle inquiry
+
+  Use this skill when the user names an inquiry, asks what a customer needs,
+  asks how to respond to a ticket, or asks for a triage summary of the queue.
+
+  ## Inputs
+
+  - The customer inquiry queue, the knowledge base article catalog, and the
+    routing matrix.
+  - Optional: a single INQ- id. If none is given, work INQ-4001.
+
+  ## Procedure
+
+  1. **Resolve the inquiry.** Match the id the user gave, case-insensitively,
+     against the queue ids INQ-4001 through INQ-4004. If the user named no id,
+     or named one that is not in the queue, fall back to INQ-4001 and say
+     explicitly that the view defaulted to INQ-4001 and why.
+  2. **Match articles.** Lowercase the inquiry's `subject`, split it on
+     whitespace, and keep only tokens longer than 3 characters. An article is a
+     match when any kept token appears as a substring of the article's
+     lowercased title. Substring, not word: `report` matches
+     `Report Export Timeout` and also `Analytics Reports`. If nothing matches,
+     fall back to the single article KB-101. Sort matches by
+     `relevance_score` descending; the first is the suggested article.
+  3. **Route.** Look up the routing matrix at
+     `routing[category][priority]`. Unknown category falls back to the
+     `Technical Issue` row set; unknown priority falls back to `Medium`. Take
+     `team`, `sla_hours`, and `auto_escalate` exactly as written.
+
+  ## Output format
+
+  - `**Customer Inquiry: INQ-xxxx**`
+  - A two-column `| Field | Detail |` table, in this order: Customer (rendered
+    `<customer> (<account_tier>)`), Contact, Channel, Category, Priority,
+    Sentiment.
+  - `**Subject:** <subject>`
+  - `**Description:** <description>`
+  - `**Recommended Response:**` as bullets:
+    - `- Suggested Article: [KB-xxx] <title> (relevance: NN%)` - the relevance
+      score rendered as a whole-number percent (0.97 becomes 97%).
+    - `- Assigned Team: <team>`
+    - `- SLA Target: <sla_hours> hours`
+    - `- Auto-Escalate: Yes` or `No`
+  - Close with `Source: [CRM + Knowledge Base + Ticketing System]`.
+
+  ## Edge cases
+
+  - Zero matching articles after the fallback: emit
+    `- No matching articles found` in place of the suggested-article bullet.
+  - Tokens of 3 characters or fewer never drive a match - `sso`, `not`, `idp`,
+    `for`, `via`, and `csv` are all invisible to the matcher. If the user
+    expects one of them to have matched, say that the token was too short
+    rather than inventing a hit.
+
+  ## Boundaries
+
+  - Recommendation only. Never say the response was sent, the article was
+    shared, the team was notified, or the inquiry was updated or closed.
+  - Report the priority and sentiment on the record. An Enterprise tier or a
+    Frustrated sentiment does not license you to raise the priority yourself -
+    flag it for the support agent instead.

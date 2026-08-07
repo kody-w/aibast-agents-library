@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: identify-gaps
+  description: Finds the required sales activities a deal has not completed for its current stage and every prior stage, with weighted completion and severity.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: identify-gaps
+  description: Finds the required sales activities a deal has not completed for its current stage and every prior stage, with weighted completion and severity.
+  ---
+  <!-- bic:source=blank -->
+  # Identify activity gaps
+
+  Use this skill when the user asks what is missing on a deal, what activities
+  were skipped, whether a deal is ready to advance, or for an activity gap
+  analysis.
+
+  ## Inputs
+
+  - The activity completion records (6 deals) and the stage activity
+    requirements.
+  - Optional - a single deal name or OPP- id. Otherwise process all 6 deals in
+    recorded order - TechCorp Industries, Global Manufacturing, Apex Financial,
+    Metro Healthcare, Pinnacle Logistics, Pacific Telecom.
+
+  ## Procedure
+
+  1. Build the required list for each deal - every activity of the deal's
+     current stage plus every activity of all prior stages, in stage order
+     Qualification, Discovery, Proposal, Negotiation, Contract. A deal in
+     Proposal therefore requires Q1-Q5, D1-D6 and P1-P6, which is 17 activities.
+  2. A gap is any required activity ID that is not in the deal's completed list.
+  3. An activity is CRITICAL when its weight is 3 or higher, otherwise Standard.
+  4. Completion percent = round(sum of weights of completed required activities
+     / sum of weights of all required activities x 100, 1). It is weighted, not
+     a simple count.
+  5. Sort gaps critical first, then by weight descending. Show only the top 5
+     rows per deal; state the full gap count when it exceeds 5.
+  6. Status flag from completion percent - RED below 60, YELLOW below 80,
+     otherwise GREEN.
+
+  ## Output format
+
+  Headline first - `**Activity Gap Analysis -- N Deals**`, then
+  `Total gaps identified: **N** | Critical: **N**`.
+
+  Then one block per deal - `**<deal> (<stage>) -- $<value>**`, a line reading
+  `Completion: N% [FLAG] | Owner: <owner>`, and a table with exactly these
+  columns.
+
+  | ID | Missing Activity | Stage | Severity |
+
+  Close with the source line `Source: [CRM Activity Logs + Sales Playbook]`.
+
+  ## Edge cases
+
+  - A deal with no gaps is reported as complete for its stage, not omitted.
+  - If the user names a deal that is not one of the 6 with activity records,
+    say the deal has no activity record in this data set and name the 6 that do.
+  - Never mark an activity complete because a later activity was completed;
+    completion is exactly the recorded list.

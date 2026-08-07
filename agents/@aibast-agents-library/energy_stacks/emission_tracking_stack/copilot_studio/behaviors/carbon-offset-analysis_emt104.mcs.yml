@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: carbon-offset-analysis
+  description: Sizes the portfolio-wide emission gap and prices the available carbon offset projects against it, including any shortfall in credits.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: carbon-offset-analysis
+  description: Sizes the portfolio-wide emission gap and prices the available carbon offset projects against it, including any shortfall in credits.
+  ---
+  <!-- bic:source=blank -->
+  # Carbon offset analysis
+
+  Use this skill when the user asks about offsets, credits, RECs, what it
+  would cost to cover the gap, or whether the market can close the shortfall.
+
+  ## Inputs
+
+  - The facility emissions inventory (for the gap).
+  - The carbon offset project register.
+
+  ## Procedure
+
+  1. **Portfolio gap.** For every facility in the inventory -- including ones
+     with no abatement actions -- compute
+     `target = round(baseline_co2 * (1 - reduction_target_pct / 100))` and
+     `gap = max(0, scope_1_co2 - target)`, then sum the gaps.
+     `emission_gap = sum(gap)`. The gap is portfolio-wide; it is not filtered
+     to a facility even when the user asked about one project.
+  2. **Per project.** `total_cost = round(credits_available * price_per_tonne)`.
+  3. **Totals.** `total_credits = sum(credits_available)`;
+     `total_cost = sum(total_cost)` across every project.
+  4. **Coverage.** Compare `total_credits` with `emission_gap`. If credits are
+     lower, state the shortfall as `emission_gap - total_credits` in tonnes.
+     Never describe the portfolio as covered unless credits meet or exceed the
+     gap.
+
+  ## Output format
+
+  - `# Carbon Offset Analysis`
+  - Three headline lines, in this order:
+    `**Emission Gap to Cover:** N tonnes`
+    `**Total Credits Available:** N tonnes`
+    `**Total Offset Cost:** $N`
+  - One table, columns exactly:
+    `Project | Type | Credits | Price/t | Total Cost | Verified By`
+  - Price to two decimals with a `$`; credits and costs with thousands
+    separators.
+
+  ## Edge cases
+
+  - Vintages differ by project (2025 and 2026). If the user asks about a
+    compliance year, surface the vintage from the register; never assume a
+    project's credits apply to a year other than its vintage.
+  - Verification bodies differ (Verra VCS, Green-e, ACR, Gold Standard). Name
+    the body when a project is recommended; never present them as equivalent.
+  - Cheapest by price per tonne is not automatically the recommendation --
+    state price, vintage, and verifier together and let the buyer choose.
+
+  ## Boundaries
+
+  - Never purchase, reserve, retire, or commit credits, and never imply an
+    order has been placed. Procurement is a human decision.
+  - Never subtract credits from a facility's Scope 1 figure, its threshold
+    test, or its target progress. Offsets sit alongside abatement, never
+    inside it.

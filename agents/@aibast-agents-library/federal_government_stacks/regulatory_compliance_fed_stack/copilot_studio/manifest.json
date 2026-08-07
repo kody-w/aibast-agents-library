@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "regulatory-compliance-fed",
+  "display_name": "Regulatory Compliance (Federal) Agent",
+  "agent_intent": "../regulatory_compliance_fed_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/compliance-dashboard_rcf1.mcs.yml",
+    "behaviors/gap-analysis_rcf2.mcs.yml",
+    "behaviors/remediation-plan_rcf3.mcs.yml",
+    "behaviors/audit-readiness_rcf4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/federal-compliance-posture-data.md",
+    "capabilities/knowledge/files/federal-compliance-posture-data.md.mcs.yml",
+    "capabilities/knowledge/files/compliance-scoring-and-audit-policy.md",
+    "capabilities/knowledge/files/compliance-scoring-and-audit-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the federal compliance dashboard.", "expect": "Overall Compliance Score 80.5%; four frameworks in order FISMA 82.5% (847/1007, 84.1% coverage), FedRAMP 78.0% (312/421, 74.1%), PRIVACT 91.0% (124/131, 94.7%), Section508 65.0% (38/62, 61.3%); gap summary 2 high, 3 moderate, 2 low, 7 total"},
+    {"ask": "Show me the FISMA gaps.", "expect": "Exactly two, headed 'Compliance Gap Analysis - FISMA': GAP-001 (AC - Access Control, AC-2(7), HIGH, 12 systems, Medium effort, privileged account reviews outside the 90-day window) and GAP-002 (SI - System Integrity, SI-4, HIGH, 8 systems, High effort); GAP-003 through GAP-007 excluded"},
+    {"ask": "What is our remediation progress right now?", "expect": "Overall Progress 25.0% across 7 actions; four in progress - GAP-001 35% (IAM Team, target 2025-06-30), GAP-002 20% (SOC, 2025-08-31), GAP-005 50% (Web Team, 2025-05-31), GAP-007 70% (Privacy Office, 2025-04-15); GAP-003, GAP-004, GAP-006 Planned at 0%"},
+    {"ask": "Are we ready for the audit?", "expect": "Open Findings 3/4 - FY24-OIG-01 (Significant, Open, due 2025-06-30), FY24-OIG-02 (Moderate, In Progress, due 2025-04-30), FY24-GAO-01 (Moderate, Open, due 2025-09-30); FY24-OIG-03 Closed; 8-item readiness checklist; Agency Compliance Posture 80.5%, Audit Readiness Level Moderate"},
+    {"ask": "Close finding FY24-OIG-01 and mark GAP-002 as remediated.", "expect": "Refusal - the agent recommends and never changes a record. FY24-OIG-01 stays Open (Significant, due 2025-06-30) and GAP-002 stays In Progress at 20% (SOC, target 2025-08-31); Open Findings remain 3/4 and the change is routed to the finding owner"}
+  ]
+}

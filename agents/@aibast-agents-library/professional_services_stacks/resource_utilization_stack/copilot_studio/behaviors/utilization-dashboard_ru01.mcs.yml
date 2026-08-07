@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: utilization-dashboard
+  description: Builds the utilization dashboard - firm utilization against target, billable and bench headcount, monthly bench cost, the full roster, and the per-level roll-up.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: utilization-dashboard
+  description: Builds the utilization dashboard - firm utilization against target, billable and bench headcount, monthly bench cost, the full roster, and the per-level roll-up.
+  ---
+  <!-- bic:source=blank -->
+  # Utilization dashboard
+
+  Use this skill when the user asks for utilization, the dashboard, the roster,
+  headcount, how the firm is tracking, or any overview of who is billable and
+  who is not.
+
+  ## Inputs
+
+  - The consultant roster (id, name, level, skills, rate_hr, utilization_pct,
+    status, current_project, project_end).
+  - The utilization targets table and the bench cost table.
+
+  ## Procedure
+
+  1. Firm utilization = the plain average of `utilization_pct` across ALL
+     consultants, including every bench consultant at 0%, rounded to one
+     decimal. With the demo roster this is
+     `(92+88+95+0+0+0+78+0+85+0) / 10 = 43.8`.
+  2. Gap = `firm_target - firm_utilization`, rounded to one decimal, reported in
+     percentage points. Firm target is 85, so the demo gap is `85 - 43.8 =
+     41.2pp`.
+  3. Bench = every consultant whose `status` is exactly `bench`. Billable =
+     total headcount minus bench headcount.
+  4. Monthly bench cost = sum over bench consultants of the per-level cost:
+     Senior $22,000, Manager $25,000, Mid $14,000, Junior $10,000, fallback
+     $14,000. Demo roster: `14,000 x 3 + 10,000 + 22,000 = $74,000`.
+  5. Render the headline block, then the roster table in roster order (CON-401
+     through CON-410), then the per-level roll-up.
+  6. Per level, in the fixed order Senior, Manager, Mid, Junior: headcount,
+     average `utilization_pct` rounded to one decimal, the level target, and
+     status `On Track` when `avg >= target` else `Below Target`. Skip a level
+     with no members entirely.
+
+  ## Output format
+
+  Headline lines, in this order:
+
+  - `**Firm utilization:** N% (target: 85%, gap: Npp)`
+  - `**Total headcount:** N`
+  - `**Billable:** N`
+  - `**Bench:** N`
+  - `**Monthly bench cost:** $N`
+
+  Then the roster table, exactly these columns:
+
+  | ID | Name | Level | Rate/Hr | Util % | Status | Project | End Date |
+
+  Rate as `$275`. Utilization with a `%` suffix. A bench row shows status
+  `bench **BENCH**`, project `-`, and end date `-`. Project names are truncated
+  to 22 characters (`TechCorp Transformatio`).
+
+  Then `### Utilization by Level` with exactly these columns:
+
+  | Level | Headcount | Avg Util | Target | Status |
+
+  ## Edge cases
+
+  - A consultant with no `current_project` or no `project_end` renders `-` in
+    that cell, never a guess or a placeholder date.
+  - A level with zero members is omitted from the roll-up rather than shown as
+    0%.
+  - Report the firm number even when it is far below target. Never soften it by
+    averaging only billable consultants.

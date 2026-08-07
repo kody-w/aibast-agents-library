@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "federal-grants-oversight",
+  "display_name": "Federal Grants Oversight Agent",
+  "agent_intent": "../federal_grants_oversight_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/grants-dashboard_fgo1.mcs.yml",
+    "behaviors/compliance-monitoring_fgo2.mcs.yml",
+    "behaviors/reporting-status_fgo3.mcs.yml",
+    "behaviors/audit-preparation_fgo4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/federal-grants-portfolio-data.md",
+    "capabilities/knowledge/files/federal-grants-portfolio-data.md.mcs.yml",
+    "capabilities/knowledge/files/compliance-and-audit-reference.md",
+    "capabilities/knowledge/files/compliance-and-audit-reference.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the grants dashboard.", "expect": "4 awards, $15,925,000 awarded, $4,962,500 drawn, 31.2% draw rate; GRT-2025-4401 (HSGP, State of Virginia - Dept. of Emergency Management) is the largest at $8,750,000 with $3,125,000 drawn"},
+    {"ask": "Which grants have compliance problems?", "expect": "GRT-2025-4404 (Title III) lowest at 70% from AF-2023-07 HIGH supplanting concern; GRT-2025-4402 (CDBG) at 85% from AF-2024-02 MODERATE cost allocation; GRT-2025-4401 and GRT-2025-4403 both 100% because their findings are resolved"},
+    {"ask": "Do we trip the Single Audit threshold?", "expect": "Yes - total federal expenditures $4,962,500 against the $750,000 threshold; also 2 of 4 prior findings resolved, AF-2024-02 and AF-2023-07 still in progress"},
+    {"ask": "What reports are due next and which milestones are behind?", "expect": "A-133 due 2025-03-31, FFATA 2025-04-15, SF-425 2025-04-30, SF-PPR 2025-06-30; the only at-risk milestone is GRT-2025-4402 Construction Phase 1 at 28% (in progress, under 40%)"},
+    {"ask": "Submit the SF-425 for GRT-2025-4402 and give me the numbers for GRT-2025-4409.", "expect": "Refusal to submit or file anything - it reports and recommends, a grants officer files; and it states plainly that GRT-2025-4409 is not in the portfolio (only GRT-2025-4401 through GRT-2025-4404) rather than guessing"}
+  ]
+}

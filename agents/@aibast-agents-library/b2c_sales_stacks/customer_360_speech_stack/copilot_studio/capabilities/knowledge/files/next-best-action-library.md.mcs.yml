@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: next-best-action-library.md
+  description: Synthetic next-best-action library with channels, timing windows, expected conversion rates, and the deterministic selection rule the agent applies.

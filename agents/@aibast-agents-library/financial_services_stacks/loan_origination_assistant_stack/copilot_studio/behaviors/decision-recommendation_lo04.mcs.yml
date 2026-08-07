@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: decision-recommendation
+  description: Recommends Approve, Conditional Approve, or Refer to Senior UW for every application using the deterministic issue-count rule.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: decision-recommendation
+  description: Recommends Approve, Conditional Approve, or Refer to Senior UW for every application using the deterministic issue-count rule.
+  ---
+  <!-- bic:source=blank -->
+  # Decision recommendation
+
+  Use this skill when the user asks what to do with the pipeline, which files
+  can be approved, which need escalation, or for a decision on a specific
+  application.
+
+  ## Inputs
+
+  - The whole pipeline. This skill always evaluates every application; when the
+    user names one LA- id, run the rule for all of them and present only that
+    file's block.
+  - The approval criteria per product.
+
+  ## Procedure
+
+  1. For each application compute DTI and LTV exactly as credit analysis does,
+     and run the same gate set - credit score, DTI, LTV, DSCR - skipping any
+     gate whose threshold is 0. Collect the failed gates as issues.
+  2. Apply the decision rule in this order, first match wins:
+     - zero issues -> `Approve`, rationale `All underwriting criteria met`.
+     - exactly one issue AND `DTI <= 50` -> `Conditional Approve`, rationale
+       `Minor condition: <the one issue>`.
+     - anything else (two or more issues, or one issue with DTI above 50) ->
+       `Refer to Senior UW`, rationale = every issue joined with `; `.
+     There is no fourth outcome. You never return Deny - a file that cannot
+     clear goes to a senior underwriter, who decides.
+  3. Never soften or upgrade a decision. The rule is arithmetic on the issue
+     list, not judgment about the borrower.
+
+  ## Output format
+
+  Heading `# Loan Decision Recommendations`, then one `##` block per
+  application titled `LA-xxxx-xxxx: <applicant>`, each with these four bullets
+  in order:
+
+  - `**Loan:** $N (<Product Label>)`
+  - `**Credit/DTI/LTV:** <score or N/A> / <dti>% / <ltv>%`
+  - `**Recommendation:** Approve | Conditional Approve | Refer to Senior UW`
+  - `**Rationale:** <text>`
+
+  ## Edge cases
+
+  - Commercial files show `N/A` in the credit slot and a DTI that no gate
+    reads. LA-2025-4003 recommends Approve on LTV 70.0% (<= 80%) and DSCR 1.42
+    (>= 1.25) despite a printed DTI of 115.2%. State that reasoning rather than
+    leaving the number unexplained.
+  - A metric sitting exactly on its limit is a pass, so it produces no issue
+    and no condition: LA-2025-4002 at LTV 96.5% against the FHA 96.5% ceiling
+    recommends Approve, not Conditional Approve.
+  - Recommendation only. Never say a file has been approved, conditioned,
+    escalated, or moved - the status in the pipeline is the record, and only
+    the underwriter changes it. LA-2025-4004 is already `Approved` in the
+    pipeline; that is the recorded status, not an action you took.

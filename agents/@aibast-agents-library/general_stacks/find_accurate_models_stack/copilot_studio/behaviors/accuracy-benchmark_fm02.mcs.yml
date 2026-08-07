@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: accuracy-benchmark
+  description: Compares every catalog model on accuracy and F1 score, names the top performer, and buckets the catalog into the fixed accuracy bands.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: accuracy-benchmark
+  description: Compares every catalog model on accuracy and F1 score, names the top performer, and buckets the catalog into the fixed accuracy bands.
+  ---
+  <!-- bic:source=blank -->
+  # Accuracy benchmark
+
+  Use this skill when the user asks how models compare on accuracy, asks for
+  the benchmark table, asks which model is the top performer, or asks how
+  many models clear a quality bar.
+
+  ## Inputs
+
+  - The model catalog. This skill always covers the whole catalog - it does
+    not take a task filter. If the user wants a subset, use model-search.
+
+  ## Procedure
+
+  1. Sort every catalog model by `accuracy` descending.
+  2. Render `accuracy` and `f1_score` as percentages to one decimal:
+     `0.965` becomes `96.5%`.
+  3. Truncate `training_data` to its first 30 characters exactly as the
+     source does - a truncated cell such as
+     `100K images with quality label` is correct output, not an error, and is
+     not to be "completed" from memory.
+  4. Top Performer = the first row after sorting; report its accuracy and its
+     F1 score together.
+  5. Bucket the catalog into three bands with these exact boundaries:
+     - `95%+`: count of models with `accuracy >= 0.95`
+     - `90-95%`: count with `0.90 <= accuracy < 0.95`
+     - `Below 90%`: count with `accuracy < 0.90`
+     The bands are half-open and must sum to the catalog size. A model at
+     exactly 0.95 belongs in the `95%+` band.
+
+  ## Output format
+
+  Headline: `**Accuracy Benchmark Comparison**`.
+
+  One table with exactly these columns:
+
+  `| Model | Task | Accuracy | F1 Score | Parameters | Training Data |`
+
+  Then:
+
+  - `**Top Performer:** <name> (<accuracy> accuracy, <f1> F1)`
+  - `**Accuracy Distribution:**` followed by the three band lines
+    (`- 95%+: N models`, `- 90-95%: N models`, `- Below 90%: N models`).
+
+  Close with `Source: [Benchmark Suite + Model Registry]`.
+
+  ## Edge cases
+
+  - Over the current catalog the top performer is FraudDetector-Ensemble
+    (MDL-006) at 97.8% accuracy and 96.5% F1, and the distribution is
+    3 / 2 / 1 across the three bands.
+  - F1 is always lower than accuracy in this catalog. Report both; never
+    quote one as the other, and never average them into a single "score".
+  - Parameter count is a size fact, not a quality fact. DocClassifier-XL has
+    340M parameters and is not the top performer - do not imply bigger is
+    better.

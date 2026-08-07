@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: relationship-strength
+  description: Ranks every contact by a weighted blend of relationship score and influence score and names the strongest and weakest.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: relationship-strength
+  description: Ranks every contact by a weighted blend of relationship score and influence score and names the strongest and weakest.
+  ---
+  <!-- bic:source=blank -->
+  # Relationship strength
+
+  Use this skill when the user asks who our strongest contact is, how the
+  relationships rank, or who is high-influence but cold.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. Compute the relationship score for every contact with engagement data -
+     `min(40, meetings*3) + min(20, emails_opened) + 11 if last_touch else 0
+     + min(15, downloads*5) + sentiment bonus (Positive 10, Neutral 3,
+     Unknown 0)`.
+  2. Influence score is the recorded value; an unrecorded contact defaults
+     to 50.
+  3. `weighted = int(relationship * 0.6 + influence * 0.4)`
+  4. Sort by `weighted` descending. This view covers ALL contacts with
+     engagement records, not just the buying committee.
+  5. Summary counts - average relationship score (integer mean), strong
+     relationships are `weighted >= 60`, weak are `weighted < 30`.
+
+  Worked example - Acme Corporation - James Miller ranks first at
+  `int(89*0.6 + 78*0.4) = 84`, then David Wong 68, then Lisa Park and Kevin
+  Park tied at 52, Tom Bradley 38, Sarah Chen 36, Rachel Torres 33, and
+  Maria Lopez last at 20. Average relationship score is 32/100, 2 are strong
+  and 1 is weak. Sarah Chen shows the sharpest mismatch - influence 92 with
+  a relationship score of 0.
+
+  ## Output format
+
+  - `**Relationship Strength: <account>**`
+  - Table - Name, Relationship, Influence, Weighted, Meetings, Sentiment,
+    Content.
+  - `**Key Insights:**` - strongest, weakest, average, strong count (60+),
+    weak count (under 30).
+
+  ## Edge cases
+
+  - A contact with zero engagement scores 0 on relationship but keeps their
+    influence score - that is the high-influence, no-relationship pattern
+    worth surfacing, not a data error.
+  - Scores are computed. Never adjust a rank on the basis of a rep's
+    impression of a contact.

@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: escalation-routing
+  description: Resolves the owning team, SLA target, and auto-escalate flag for an inquiry from the category-by-priority routing matrix, and shows the full matrix.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: escalation-routing
+  description: Resolves the owning team, SLA target, and auto-escalate flag for an inquiry from the category-by-priority routing matrix, and shows the full matrix.
+  ---
+  <!-- bic:source=blank -->
+  # Escalation routing
+
+  Use this skill when the user asks who owns an inquiry, what the SLA is,
+  whether something escalates, or how routing works in general.
+
+  ## Inputs
+
+  - The customer inquiry queue and the routing matrix.
+  - Optional: an INQ- id. If none is given, route INQ-4001.
+
+  ## Procedure
+
+  1. **Resolve the inquiry** exactly as `handle-inquiry` does: match an
+     INQ- id case-insensitively, otherwise default to INQ-4001 and say so.
+  2. **Look up the route** at the intersection of the inquiry's `category` and
+     `priority`. This is a lookup, never a judgment call.
+  3. **Apply the fallbacks literally.** A category with no row set falls back
+     to `Technical Issue`; a priority with no row falls back to `Medium`.
+     Whenever a fallback fires, state that the category or priority is not in
+     the matrix and that a fallback row was used - do not present a fallback as
+     if it were the real route.
+  4. **Always print the full matrix** after the resolved route, all 12 rows,
+     in category order Technical Issue, Billing & Pricing, Feature Request and
+     within each category in priority order Critical, High, Medium, Low.
+
+  The matrix, verbatim:
+
+  - Technical Issue: Critical -> Tier 2 Engineering, 2h, auto-escalate Yes;
+    High -> Tier 1 Technical Support, 4h, No; Medium -> General Support, 8h,
+    No; Low -> General Support, 24h, No.
+  - Billing & Pricing: Critical -> Billing Escalations, 2h, auto-escalate Yes;
+    High -> Account Management, 4h, No; Medium -> Account Management, 8h, No;
+    Low -> Self-Service Billing, 24h, No.
+  - Feature Request: Critical -> Product Management, 8h, No; High -> Product
+    Management, 24h, No; Medium -> Product Backlog, 72h, No; Low -> Product
+    Backlog, 168h, No.
+
+  Auto-escalate is true in exactly two cells: Technical Issue / Critical and
+  Billing & Pricing / Critical. Feature Request never auto-escalates, not even
+  at Critical, where the SLA is 8h.
+
+  ## Output format
+
+  - `**Escalation Routing: INQ-xxxx**`
+  - A two-column `| Field | Detail |` table: Category, Priority, Assigned Team,
+    SLA Target (rendered `<n> hours`), Auto-Escalate (`Yes` / `No`).
+  - `**Routing Matrix:**` then a table
+    `| Category | Priority | Team | SLA |` with all 12 rows, SLA rendered in the
+    compact `<n>h` form.
+  - Close with `Source: [Routing Engine + SLA Configuration]`.
+
+  ## Edge cases
+
+  - A category the user names that is not one of the three in the matrix has no
+    route. Say that plainly and name the three categories that do exist rather
+    than inventing a team or an SLA for it.
+  - SLA hours are business configuration, not elapsed clocks. Do not compute a
+    due timestamp from an inquiry's `created_at` unless the user supplies the
+    business-hours rule to apply.
+
+  ## Boundaries
+
+  - Recommendation only. Never say an inquiry was escalated, reassigned,
+    routed, or that a team was paged - report what the matrix says the route
+    is and leave the action to the support agent.

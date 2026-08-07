@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: health-score
+  description: Computes and explains the weighted five-component customer health score and the band it falls in.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: health-score
+  description: Computes and explains the weighted five-component customer health score and the band it falls in.
+  ---
+  <!-- bic:source=blank -->
+  # Health score
+
+  Use this skill when the user asks how healthy an account is, why a score is
+  what it is, which accounts are at risk, or what would move the score.
+
+  ## Inputs
+
+  - The account book (usage, support, billing) and the interaction log.
+  - Optional: a CUST- id or company name. Same resolution rule as the unified
+    profile.
+
+  ## Procedure -- compute it, do not judge it
+
+  Compute five components, each on a 0-100 scale:
+
+  - `product_adoption = min(100, employees_using / licenses_purchased * 100 * 1.2)`
+  - `support_satisfaction = csat_avg / 5.0 * 100`
+  - `engagement_frequency = min(100, interaction_count * 20)`
+  - `billing_health = 100 if outstanding_balance == 0 else 60`
+  - `relationship_strength = positive_interactions / max(1, interaction_count) * 100`
+    where a positive interaction is one whose sentiment is exactly `Positive`.
+
+  Weight and sum:
+
+  `score = product_adoption*0.25 + support_satisfaction*0.20 + engagement_frequency*0.20 + billing_health*0.15 + relationship_strength*0.20`
+
+  Round the total to the nearest whole number. Band it:
+
+  - `score >= 80` -> **Healthy**
+  - `60 <= score <= 79` -> **At Risk**
+  - `score < 60` -> **Critical**
+
+  The bands are arithmetic. Never re-band on narrative grounds.
+
+  ## Output format
+
+  - Headline: `**Health Score: <name>**`
+  - `**Overall Score: n/100 (<band>)**`
+  - A `| Component | Score | Weight | Weighted |` table with the five components
+    in this fixed order: Product Adoption, Support Satisfaction, Engagement
+    Frequency, Billing Health, Relationship Strength. Weights render as `25%`,
+    `20%`, `20%`, `15%`, `20%`; Weighted renders to one decimal.
+  - `**Key Indicators:**` bullets -- License utilization `<using>/<purchased> (n%)`,
+    Support CSAT `n/5.0`, Open tickets `n`, Outstanding balance `$n`.
+  - Close with `Source: [Health Score Engine]`.
+
+  ## Edge cases
+
+  - **The Product Adoption row renders as 0/100 with weighted 0.0** in the
+    component table, while the overall score does include the full adoption
+    contribution. The weighted column therefore does not sum to the overall
+    score. Report the overall score as authoritative, show the table as
+    rendered, and say plainly that the adoption row is not reflecting its
+    contribution -- never quietly patch either number.
+  - Adoption is capped at 100 by the `min`, so an account above ~83% seat
+    utilization already scores a full 100 on adoption; more seats used will not
+    move the score.
+  - Engagement saturates at 5 logged interactions (5 * 20 = 100).
+  - An account with zero `Positive` interactions scores 0 on relationship
+    strength even when nothing has gone wrong.
+
+  ## Boundaries
+
+  - Show the arithmetic when asked. Never adjust a component, a weight, or a
+    band for any other consideration.
+  - The score is a read on the data, not a forecast. Do not predict churn dates
+    or renewal outcomes.

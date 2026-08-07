@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: assess-deal-risk
+  description: Computes the weighted composite risk score from the recorded factors and derives win probability and mitigations.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: assess-deal-risk
+  description: Computes the weighted composite risk score from the recorded factors and derives win probability and mitigations.
+  ---
+  <!-- bic:source=blank -->
+  # Assess deal risk
+
+  Use this skill when the user asks how risky a deal is, for a risk score,
+  or for the weighted risk factors.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure - the weighted formula
+
+  1. `composite_risk = int(sum(factor.score * factor.weight))` over every
+     recorded factor for the account. Weights are stored per factor and sum
+     to 1.0; do not renormalize them and do not drop a factor because it is
+     favourable.
+  2. `win_probability = max(10, min(95, 100 - composite_risk))`
+  3. Mitigations are emitted for High-severity factors only, mapped by
+     category - `Stakeholder` gives schedule champion intro to close the
+     stakeholder gap, `Competitive` gives prepare TCO analysis countering
+     competitor pricing, `Financial` gives deliver customized ROI calculator
+     to the economic buyer, `Adoption` gives offer a pilot program, any
+     other category gives `Address: <factor>`.
+
+  Worked example - Acme Corporation -
+  `82*0.25 + 75*0.20 + 60*0.15 + 55*0.15 + 50*0.10 + 40*0.10 + 15*0.05
+  = 62.5`, truncated to 62/100, so win probability is 38 percent. Two High
+  factors produce two mitigations - the champion intro and the TCO analysis.
+  Note the favourable factor `Champion strongly engaged` at 15/100 is
+  included in the weighted sum.
+
+  ## Output format
+
+  - `**Deal Risk Assessment: <account>**`
+  - Metric table - Deal Stage, Days in Stage, Opportunity Value, Composite
+    Risk Score, Win Probability, Expected Close in days.
+  - `**Risk Factors:**` table - Factor, Category, Severity, Score, in
+    recorded order.
+  - `**Immediate Mitigations Required:**` - numbered, High factors only.
+
+  ## Edge cases
+
+  - With no recorded factors the composite score defaults to 50 - state that
+    it is a default, not a measurement.
+  - A win probability of 38 percent is the arithmetic result. Do not
+    reconcile it with the 61 percent the briefing-view risk skill produces -
+    they are different models. If both are asked for, name the model behind
+    each number.

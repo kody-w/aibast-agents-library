@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: gap-analysis
+  description: Quantifies open HEDIS gaps per measure - gap count, compliance rate, benchmark, and revenue opportunity - ranked by revenue opportunity.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: gap-analysis
+  description: Quantifies open HEDIS gaps per measure - gap count, compliance rate, benchmark, and revenue opportunity - ranked by revenue opportunity.
+  ---
+  <!-- bic:source=blank -->
+  # Gap analysis
+
+  Use this skill when the user asks where the care gaps are, how many gaps are
+  open, what the gaps are worth, which measure to work first, or for the
+  revenue opportunity behind quality performance.
+
+  ## Inputs
+
+  - The HEDIS measure set (knowledge/tools): eligible patients, compliant
+    patients, revenue per closure, national benchmark, star rating impact.
+  - Optional: a single measure id (BCS, CDC-HBA1C, COL, CBP, AWC). The
+    underlying operation always computes all five measures; a measure filter
+    narrows which rows you present, it never changes a computed value.
+
+  ## Procedure - compute it, do not judge it
+
+  For each measure:
+
+  1. `gap_count = eligible_patients - compliant_patients`
+  2. `compliance_rate = round(compliant_patients / eligible_patients * 100, 1)`
+     Report this computed rate, not the stored `gap_rate_pct`.
+  3. `revenue_opportunity = gap_count * revenue_per_closure`
+  4. Carry the national benchmark and the star rating impact through unchanged.
+
+  Then:
+
+  5. Sort the measures by `revenue_opportunity` descending. Never any other
+     order.
+  6. `total_revenue_opportunity = sum of every measure's revenue_opportunity`,
+     computed across all five measures.
+
+  ## Output format
+
+  Headline first: `**Total Revenue Opportunity:** $N` with thousands
+  separators.
+
+  Then one table, exactly these columns:
+
+  | Measure | Eligible | Compliant | Gaps | Rate | Benchmark | Revenue Opp | Star Impact |
+
+  Measure as its full name. Eligible, Compliant, and Gaps with thousands
+  separators. Rate and Benchmark as percentages to one decimal with a `%`
+  suffix. Revenue Opp as `$N` with thousands separators. Star Impact verbatim
+  from the measure record (for example `4-star threshold at 64%`).
+
+  ## Edge cases
+
+  - Revenue opportunity is the gross value of closing every open gap at the
+    per-closure rate. It is not a forecast and it does not net out outreach
+    cost - say so if the user treats it as expected revenue. Use the outreach
+    campaign skill for cost, projected closures, and ROI.
+  - A measure can sit above its benchmark and still carry the largest revenue
+    opportunity, because opportunity scales with population size. Point that
+    out rather than reordering the table.
+  - If a measure the user names is not in the set, say so and list the five
+    measure ids that are.
+  - Never produce a patient list. Gap counts are aggregate; there is no
+    patient-level data behind them.

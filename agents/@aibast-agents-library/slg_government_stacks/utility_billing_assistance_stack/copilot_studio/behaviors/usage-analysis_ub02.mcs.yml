@@ -1,0 +1,101 @@
+mcs.metadata:
+  componentName: usage-analysis
+  description: Renders six months of metered water and sewer volume for an account, classifies the consumption trend with the fixed threshold rule, and shows the applicable rate structure.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: usage-analysis
+  description: Renders six months of metered water and sewer volume for an account, classifies the consumption trend with the fixed threshold rule, and shows the applicable rate structure.
+  ---
+  <!-- bic:source=blank -->
+  # Usage analysis
+
+  Use this skill when the user asks why a bill went up or down, asks about
+  consumption, gallons, a possible leak, or asks what the rates are.
+
+  ## Inputs
+
+  - The meter usage history and the account ledger.
+  - Optional: an ACCT- id. With no id, default to ACCT-90001.
+
+  Usage history is on file for **ACCT-90001 and ACCT-90003 only**. Every other
+  account resolves to no history.
+
+  ## Procedure - trend classification, exactly
+
+  Let `recent` be the water gallons of the most recent period and
+  `prior_avg` be the mean water gallons of every earlier period:
+
+  `prior_avg = sum(water_gallons of all periods except the last) / (number of
+  periods - 1)`
+
+  Then classify with these thresholds, in this order:
+
+  - fewer than 2 periods on file -> **Insufficient Data**
+  - `recent > prior_avg * 1.20` -> **Significantly Increasing**
+  - `recent > prior_avg * 1.05` -> **Slightly Increasing**
+  - `recent < prior_avg * 0.80` -> **Significantly Decreasing**
+  - `recent < prior_avg * 0.95` -> **Slightly Decreasing**
+  - otherwise -> **Stable**
+
+  Worked example, ACCT-90001: `recent = 3,200`;
+  `prior_avg = (4,200 + 3,800 + 3,100 + 2,900 + 3,000) / 5 = 3,400`;
+  `3,200 < 3,400 * 0.95 = 3,230` -> **Slightly Decreasing**.
+
+  Worked example, ACCT-90003: `recent = 11,500`;
+  `prior_avg = (8,500 + 9,200 + 12,400 + 14,800 + 13,200) / 5 = 11,620`;
+  `11,500` is above `11,039` and below `12,201` -> **Stable**, even though the
+  account peaked at 14,800 gallons in 2024-12.
+
+  ## Procedure - period averages, exactly
+
+  - `avg_monthly_water = sum(water_gallons) / number of periods`, printed with
+    no decimals.
+  - `avg_monthly_bill = sum(amount) / number of periods`, printed to the cent.
+
+  For ACCT-90001 that is `20,200 / 6 = 3,367` gallons and
+  `$525.45 / 6 = $87.58`.
+
+  ## Output format
+
+  1. Headline `# Usage Analysis: ACCT-xxxxx`
+  2. `**Customer:** name` - `Unknown` if the id is not in the account ledger
+  3. `**Usage Trend:** <classification>`
+  4. Usage table, columns exactly
+     `| Period | Water (gal) | Sewer (gal) | Amount |`, one row per period in
+     chronological order
+  5. `**Avg Monthly Water Usage:** n,nnn gallons`
+  6. `**Avg Monthly Bill:** $nn.nn`
+  7. `## Rate Structure` section listing every published rate: Water
+     Residential and Water Commercial as base charge plus tier list; Sewer as
+     base charge plus per-1,000-gallon rate
+
+  ## Rate arithmetic
+
+  A water charge is the base charge plus, for each tier the volume reaches,
+  `(gallons in that tier / 1,000) * that tier's rate_per_1000`. Residential
+  tiers are 0-3,000 at $4.25, 3,001-6,000 at $6.50, 6,001-10,000 at $9.75, and
+  over 10,000 at $14.00, on an $18.50 base. Commercial tiers are 0-10,000 at
+  $5.80, 10,001-50,000 at $5.25, and over 50,000 at $4.90, on a $45.00 base.
+  Any figure you derive this way is an **estimate of the water portion only**;
+  say so. The billed `Amount` in the usage table is the full bill and includes
+  sewer, stormwater, and any other service on the account - never claim the
+  two should reconcile.
+
+  ## Edge cases
+
+  - No history on file for the account: print the trend as **Insufficient
+    Data**, state plainly that no meter history is on file for that id, omit
+    the usage table and the averages, and still show the rate structure.
+  - Stormwater and trash are flat charges with no base-charge or tier fields,
+    so they appear in the rate section with no rate line. State the flat
+    amounts from the knowledge file rather than leaving the section empty.
+  - A rising trend is a reading, not a diagnosis. You may note that a
+    significant increase is consistent with a leak and that the customer should
+    request a leak check - never assert that a leak exists.
+
+  ## Boundaries
+
+  - Never estimate a future bill as if it were billed, and never offer a
+    credit, rebate, or leak adjustment. Route adjustment requests to a billing
+    clerk.

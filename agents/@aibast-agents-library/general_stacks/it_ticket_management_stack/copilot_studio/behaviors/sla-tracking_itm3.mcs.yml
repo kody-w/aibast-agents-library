@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: sla-tracking
+  description: Computes which tickets are at risk of an SLA breach using the 30%-remaining rule, restates the severity targets, and reports compliance against the 95% goal.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: sla-tracking
+  description: Computes which tickets are at risk of an SLA breach using the 30%-remaining rule, restates the severity targets, and reports compliance against the 95% goal.
+  ---
+  <!-- bic:source=blank -->
+  # SLA tracking
+
+  Use this skill when the user asks about SLA, breach risk, what is about to
+  miss, time remaining, escalation thresholds, breach penalties, or compliance
+  against target.
+
+  ## Inputs
+
+  - The ticket queue (severity, status, `elapsed_hours`).
+  - The SLA target table (response, resolution, escalation, penalty).
+  - This week's SLA attainment from the resolution history.
+
+  ## Procedure - the at-risk rule, computed not judged
+
+  Evaluate every ticket:
+
+  1. Status gate. Only tickets in status `Open`, `In Progress`, or `Assigned`
+     are on the clock. `Pending Approval` and every other status are excluded
+     before any arithmetic. This gate is never waived.
+  2. Remaining time:
+     `remaining_hours = sla_resolution_hours - elapsed_hours`, where
+     `sla_resolution_hours` comes from the ticket's severity: P1-Critical 1,
+     P2-High 4, P3-Medium 8, P4-Low 24.
+  3. At-risk test: the ticket is at risk when
+     `remaining_hours < sla_resolution_hours * 0.3`.
+     That is: P1-Critical under 0.3h left, P2-High under 1.2h, P3-Medium under
+     2.4h, P4-Low under 7.2h.
+  4. Sort the at-risk list by `remaining_hours` ascending - least time first.
+  5. Render `remaining_hours` to one decimal place with an `h` suffix, and the
+     subject truncated to its first 40 characters.
+  6. Report compliance as this week's SLA-met percentage against the 95%
+     target, and state whether it is above or below.
+
+  ## Output format
+
+  At-risk table, exactly these columns:
+
+  | Ticket | Severity | Time Remaining | Assignee | Subject |
+
+  When nothing is at risk, emit the single row
+  `| None | - | - | - | All tickets on track |` rather than an empty table.
+
+  Targets table, exactly these columns:
+
+  | Severity | Response | Resolution | Escalation | Breach Penalty |
+
+  Then: `**Current SLA Compliance:** N% (target: 95%)`.
+
+  Close with the provenance line: `Source: [ServiceNow SLA Engine]`.
+
+  ## Edge cases
+
+  - Tight absolute clocks are not automatically at risk. A P1 with 0.5h left of
+    a 1h window has 50% of its window remaining and is NOT at risk under the
+    30% rule. If a user expects it in the list, show the arithmetic.
+  - A ticket in `Pending Approval` never appears in the at-risk list even when
+    its remaining hours are low - the approval clock is not the SLA clock. Say
+    that explicitly if asked why it is missing.
+  - The escalation column is a target from the SLA table, not a computed flag.
+    Do not claim a ticket has been escalated.
+  - Breach penalties are per breach, as recorded; P4-Low carries $0. Never
+    total a projected penalty for tickets that have not breached.
+  - Recommendation only. You never extend, waive, or reset an SLA clock.

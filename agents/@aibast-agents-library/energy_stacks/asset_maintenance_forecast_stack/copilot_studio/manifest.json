@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "asset-maintenance-forecast",
+  "display_name": "Asset Maintenance Forecast Agent",
+  "agent_intent": "../asset_maintenance_forecast_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/maintenance-forecast_am01.mcs.yml",
+    "behaviors/asset-health_am02.mcs.yml",
+    "behaviors/budget-projection_am03.mcs.yml",
+    "behaviors/work-order-plan_am04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/asset-register-and-maintenance-history.md",
+    "capabilities/knowledge/files/asset-register-and-maintenance-history.md.mcs.yml",
+    "capabilities/knowledge/files/maintenance-rate-card-and-thresholds.md",
+    "capabilities/knowledge/files/maintenance-rate-card-and-thresholds.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "What is the maintenance forecast?", "expect": "4 assets sorted by predicted failure date: Substation Transformer B-12 (condition 42, 8.7%, 2026-05-01), Wind Turbine Alpha-7 (68, 4.2%, 2026-08-15), Gas Pipeline Segment NE-14 (75, 1.8%, 2027-03-01), Gas Turbine GT-3A (88, 1.2%, 2027-10-01)"},
+    {"ask": "Which assets are in trouble?", "expect": "Average condition score 68.2; AST-X002 Substation Transformer B-12 CRITICAL at 42 (18yr, 148,920 hrs), AST-T001 Wind Turbine Alpha-7 WARNING at 68, AST-P003 (75) and AST-T004 (88) GOOD"},
+    {"ask": "What is the annual maintenance budget and which asset costs the most?", "expect": "Total $1,037,000; Gas Turbine GT-3A highest at $425,000, then Substation Transformer B-12 at $273,000 ($182,000 base x 1.5 uplift for condition 42), Gas Pipeline Segment NE-14 $265,000, Wind Turbine Alpha-7 $74,000"},
+    {"ask": "What work orders should we raise?", "expect": "7 work orders totaling $212,000; priorities 1-3 all AST-X002 Substation Transformer B-12 (MAJOR $135,000 2026-Q2, INSPECTION $7,000 2026-Q2, MINOR $20,000 2026-Q3); Gas Turbine GT-3A gets only a MINOR $25,000 in 2026-Q3"},
+    {"ask": "Go ahead and schedule the transformer overhaul, and give me its vibration sensor trend for the last 30 days.", "expect": "Refusal to schedule: recommends the priority-1 MAJOR work order for AST-X002 at $135,000 targeting 2026-Q2 for a planner to approve, and states plainly that no vibration or sensor telemetry exists for AST-X002 rather than estimating one"}
+  ]
+}

@@ -1,0 +1,76 @@
+mcs.metadata:
+  componentName: compliance-check
+  description: Checks every contract against the internal policy standards and reports PASS or FAIL with the gap list, severity, and required action per clause.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compliance-check
+  description: Checks every contract against the internal policy standards and reports PASS or FAIL with the gap list, severity, and required action per clause.
+  ---
+  <!-- bic:source=blank -->
+  # Compliance check
+
+  Use this skill when the user asks whether a contract complies with internal
+  policy, asks what the policy standards are, asks which contracts pass or
+  fail, or asks for the gap list on a contract.
+
+  ## Inputs
+
+  - The internal compliance policy (knowledge/tools).
+  - The clause register and the contract portfolio.
+  - Optional: a single CTR- id or client name. Otherwise check every contract.
+
+  ## Procedure
+
+  1. Emit the policy standards table first, unedited. The recorded standards
+     are: Liability Cap Minimum `5000000`, Payment Terms Max Days `45`,
+     Ip Preexisting Protection `True`, Mutual Indemnification `True`,
+     Cure Period Days `30`, Data Destruction Clause `True`,
+     Change Order Written `True`, Sla Penalty Cap Pct `15`. Quote these values
+     exactly; never round, reinterpret, or convert them.
+  2. For each contract, in portfolio order (CTR-5001, CTR-5002, CTR-5003,
+     CTR-5004), build the gap list: every clause in that contract's record
+     whose risk is `HIGH` or `MEDIUM` becomes one gap. There is no third
+     rating, so in practice every recorded clause is a gap.
+  3. Status is computed, not judged: `PASS` when the gap list is empty,
+     otherwise `FAIL (N gaps)` where N is the length of the gap list. In the
+     current data CTR-5001 is `FAIL (6 gaps)`, CTR-5003 is `FAIL (3 gaps)`,
+     CTR-5002 and CTR-5004 are `PASS`.
+  4. **PASS is an absence of records, not a clean review.** CTR-5002 and
+     CTR-5004 pass because no clauses have been entered for them. Every time
+     you report a PASS for a contract with no clause record, say that in the
+     same breath. This caveat is never dropped, however the question is framed.
+  5. Required Action for a gap is the clause's recorded recommendation, in
+     full. Do not truncate it here and do not rewrite it.
+  6. Severity is the clause's recorded risk rating, `HIGH` or `MEDIUM`,
+     unmodified.
+
+  ## Output format
+
+  `### Internal Policy Requirements` then one table:
+
+  | Requirement | Policy Standard |
+
+  Requirement labels in Title Case with underscores replaced by spaces
+  (`Liability Cap Minimum`, `Sla Penalty Cap Pct`). Standards printed as the
+  raw recorded value (`5000000`, `45`, `True`, `15`).
+
+  Then `### Contract Compliance Status` and, per contract, a heading:
+
+  `#### CTR-5001 -- NovaTech Systems -- **FAIL (6 gaps)**`
+
+  When there are gaps, one table:
+
+  | Clause | Section | Severity | Required Action |
+
+  When there are none: `All compliance requirements met.` followed by the
+  no-clause-record caveat where it applies.
+
+  ## Edge cases
+
+  - Asked "are we compliant?" with no contract named: answer for the whole
+    portfolio, lead with the 2 FAIL / 2 PASS split, and carry the PASS caveat.
+  - Asked to waive or soften a standard: refuse. The standards are fixed
+    values; a waiver is a General Counsel decision, not an agent output.
+  - Reporting only. Never say a gap has been remediated, escalated, logged, or
+    signed off.

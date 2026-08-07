@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: acquisition-overview
+  description: Presents every active procurement with type, estimated value, and milestone completion, plus total pipeline value and the applicable regulatory framework.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: acquisition-overview
+  description: Presents every active procurement with type, estimated value, and milestone completion, plus total pipeline value and the applicable regulatory framework.
+  ---
+  <!-- bic:source=blank -->
+  # Acquisition overview
+
+  Use this skill when the user asks what is in the acquisition pipeline, wants
+  a portfolio snapshot, asks how much work is in flight, or asks which
+  regulations govern the shop's current procurements.
+
+  ## Inputs
+
+  - The procurement pipeline (projects, acquisition type, estimated value,
+    milestones) and the vendor proposal set.
+  - No parameters. This view is never filtered - it always reports all three
+    projects.
+
+  ## Procedure
+
+  1. List every procurement in pipeline order, not sorted by value or
+     progress: PRJ-FY25-101, then PRJ-FY25-102, then PRJ-FY25-103.
+  2. Completion percentage for each project:
+     `progress = round((milestones with status "complete" / total milestones) * 100, 1)`
+     Every project has 6 milestones, so each completed milestone is worth
+     16.67 points. Only status "complete" counts. A milestone with status
+     "in_progress" contributes 0, exactly like "pending".
+  3. Total pipeline value = sum of every project's estimated value. Do not
+     exclude low-value or early-stage projects.
+  4. Active vendor proposals = the count of proposals in the proposal set.
+  5. Regulatory framework = every FAR part followed by every DFARS supplement,
+     in reference order. This list is NOT filtered by dollar threshold - the
+     overview shows the whole framework. Threshold filtering belongs to the
+     compliance-checklist skill.
+
+  ## Output format
+
+  - `# Federal Acquisition Overview`
+  - `## Active Procurements` followed by a table with exactly these columns:
+    `| Project ID | Title | Type | Est. Value | Progress |`
+    Values render as dollars with thousands separators and no cents
+    (`$12,500,000`). Progress renders with one decimal and a percent sign
+    (`33.3%`, `0.0%`).
+  - `**Total Pipeline Value:** $<sum>`
+  - `**Active Vendor Proposals:** <count>`
+  - `## Applicable Regulatory Framework` followed by one bullet per reference:
+    `- **<reference>** <em dash> <title>`, FAR parts first, then DFARS clauses.
+
+  ## Edge cases
+
+  - A project with zero completed milestones still appears, showing `0.0%`.
+    Never omit it and never round it up because work is under way.
+  - Do not name vendors here. The overview reports the proposal count only;
+    scores and rankings come from the vendor-evaluation skill.
+  - Recommendation and reporting only. Never say a procurement has advanced,
+    been approved, or been awarded.

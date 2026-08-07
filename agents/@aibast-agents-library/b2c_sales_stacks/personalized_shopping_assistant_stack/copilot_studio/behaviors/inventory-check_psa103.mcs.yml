@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: inventory-check
+  description: Reports stock for one SKU broken out by size, or the whole catalog with total units, using the fixed stock-status thresholds.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: inventory-check
+  description: Reports stock for one SKU broken out by size, or the whole catalog with total units, using the fixed stock-status thresholds.
+  ---
+  <!-- bic:source=blank -->
+  # Inventory check
+
+  Use this skill when the user asks whether something is in stock, asks how
+  many units are on hand, asks for stock in a specific size, or asks for a
+  catalog-wide inventory position.
+
+  ## Inputs
+
+  - The product catalog with its per-size stock ledger.
+  - `sku` - optional. Supplied and present in the catalog gives the single-SKU
+    view; omitted or unrecognized gives the catalog overview.
+
+  ## Procedure
+
+  Single-SKU view (a valid SKU- id was given):
+
+  1. Emit price, brand, and rating from the catalog entry.
+  2. Emit one row per size in stored order with the unit count.
+  3. Status per size is a strict threshold, applied to that size's units:
+     `qty > 5` -> `In Stock`; `0 < qty <= 5` -> `Low Stock`; `qty == 0` ->
+     `Out of Stock`.
+  4. Emit `**Total Units:**` as the sum of every size's units.
+
+  Catalog overview (no SKU, or a SKU that is not in the catalog):
+
+  1. One row per SKU in catalog order, SKU-1001 through SKU-1008.
+  2. Total Stock is the sum of that SKU's per-size units.
+  3. Status at catalog level uses a different threshold from the per-size one:
+     `total > 10` -> `In Stock`; `0 < total <= 10` -> `Low Stock`;
+     `total == 0` -> `Out of Stock`.
+
+  ## Output format
+
+  Single SKU:
+
+  - `# Inventory Check: <name> (SKU-nnnn)`
+  - `- **Price:** $N,NNN.NN`, `- **Brand:** <brand>`, `- **Rating:** <rating>`
+  - `## Stock by Size` then a table: Size | Stock | Status
+  - `**Total Units:** <n>`
+
+  Catalog overview:
+
+  - `# Inventory Overview`
+  - A table with exactly these columns: SKU | Product | Price | Total Stock |
+    Status
+
+  ## Edge cases
+
+  - An unrecognized SKU silently falls through to the catalog overview. Do not
+    present that overview as though the requested SKU was found - say the SKU
+    is not in the catalog first, then offer the overview.
+  - The two thresholds differ on purpose. A size holding 6 units is In Stock,
+    while a SKU holding 6 total units across all sizes is Low Stock. Never
+    apply the per-size threshold to a total or the reverse.
+  - Accessories carry the single size `OS`. Its stock row is the whole picture
+    for that SKU.
+
+  ## Boundaries
+
+  - Read only. Never reserve, hold, transfer, decrement, or reorder units.
+  - Never describe a size as "available" without stating the unit count.
+  - Never quote availability for a SKU or size that is not in the ledger.

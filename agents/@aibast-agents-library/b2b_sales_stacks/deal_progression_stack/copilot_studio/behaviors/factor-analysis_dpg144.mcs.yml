@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: factor-analysis
+  description: Breaks each deal's win probability into per-factor contribution against maximum possible, then shows the historical discriminative power of each factor.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: factor-analysis
+  description: Breaks each deal's win probability into per-factor contribution against maximum possible, then shows the historical discriminative power of each factor.
+  ---
+  <!-- bic:source=blank -->
+  # Factor analysis
+
+  Use this skill when the user asks what is driving a probability, where the
+  points are being lost, or which factors matter most historically.
+
+  ## Inputs
+
+  - The win probability factor scores and details, and the historical factor
+    importance table.
+
+  ## Procedure
+
+  1. Order deals by value descending. Inside a deal, order factors by
+     contribution descending, where `contribution = value x weight`.
+  2. Show `contribution = round(value x weight x 100, 1)` percent and
+     `max_possible = round(weight x 100, 1)` percent, so the headroom on each
+     factor is explicit.
+  3. Print the recorded detail string for every factor verbatim - it is the
+     evidence for the score.
+  4. Then show the historical factor importance table sorted by discriminative
+     power descending, led by champion strength at 92%.
+  5. The sum of contributions equals the deal's win probability; state that if
+     the user wants to check the arithmetic.
+
+  ## Output format
+
+  Headline `**Factor Analysis -- Win Probability Drivers**`, then one block per
+  deal - `**<deal> -- $<value> (Win Prob: N%)**` and a table with exactly these
+  columns.
+
+  | Factor | Score | Weight | Contribution | Max Possible | Detail |
+
+  Then `**Historical Factor Importance:**` with exactly these columns.
+
+  | Factor | Avg (Won) | Avg (Lost) | Discriminative Power |
+
+  Close with `Source: [Win/Loss Analysis + Factor Model]`.
+
+  ## Edge cases
+
+  - A heavily weighted factor with a low score contributes little and shows a
+    large gap to max - champion strength at 20% on TechCorp contributes 3.6% of
+    a possible 18.0%. That gap is the coaching point.
+  - Historical averages describe won and lost deals in general, never this
+    deal's odds.
+  - Never re-rank factors by weight instead of contribution; the ordering rule
+    is contribution.

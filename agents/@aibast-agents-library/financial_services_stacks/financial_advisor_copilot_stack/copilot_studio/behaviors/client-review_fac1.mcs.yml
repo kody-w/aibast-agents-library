@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: client-review
+  description: Presents the whole book of business with advisor, risk profile, assets, age, years to retirement, last review, plus total AUM and client count.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: client-review
+  description: Presents the whole book of business with advisor, risk profile, assets, age, years to retirement, last review, plus total AUM and client count.
+  ---
+  <!-- bic:source=blank -->
+  # Client review
+
+  Use this skill when the user asks for the book of business, the client
+  list, a review summary, total AUM, who is due for a review, or any
+  question that spans more than one client.
+
+  ## Inputs
+
+  - The client portfolio book. No arguments are required.
+
+  ## Procedure - compute it, do not judge it
+
+  1. List **every** client in the book, in book order: CLI-3001, CLI-3002,
+     CLI-3003. Do not sort, filter, or rank unless the user asks for it.
+  2. For each client compute years to retirement:
+     `years_to_retirement = max(0, retirement_target - age)`.
+     If `retirement_target` is 0 the client is already retired - render the
+     cell as `Retired`, not as `0 yrs`.
+  3. Render risk profile in title case: `moderate` becomes `Moderate`.
+  4. Compute `Total AUM` as the sum of every client's total assets, and
+     `Clients` as the count of rows rendered.
+  5. Dollar amounts are comma-formatted with no cents.
+
+  ## Output format
+
+  Headline `# Client Review Summary`, then one table with exactly these
+  columns:
+
+  `| Client | Advisor | Risk | Assets | Age | Retirement In | Last Review |`
+
+  The Client cell is `<name> (CLI-xxxx)` - the id is never dropped.
+
+  Below the table, two lines:
+
+  - `**Total AUM:** $N`
+  - `**Clients:** N`
+
+  ## Edge cases
+
+  - A client with `retirement_target` 0 shows `Retired` in Retirement In and
+    is still counted in Total AUM and Clients.
+  - A client with zero annual income or zero contributions is normal for a
+    trust or a retired client - do not flag it and do not comment on it.
+  - If the user asks about a client ID that is not in the book, say so and
+    list the IDs you hold. Never substitute another client's row.
+
+  ## Boundaries
+
+  - Reporting only. Never say a review has been scheduled, booked, or sent.
+  - Do not rank or grade clients, and do not comment on whether a last-review
+    date is overdue unless the user gives you the review cadence.

@@ -1,0 +1,84 @@
+mcs.metadata:
+  componentName: billing-summary
+  description: Summarizes hours logged, the billable split, and billable value, broken out by project against budget and by consultant ranked on value.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: billing-summary
+  description: Summarizes hours logged, the billable split, and billable value, broken out by project against budget and by consultant ranked on value.
+  ---
+  <!-- bic:source=blank -->
+  # Billing summary
+
+  Use this skill when the user asks for the billing summary, utilization, the
+  billable percentage, hours or revenue by project, hours or revenue by
+  consultant, or who is billing the most.
+
+  ## Inputs
+
+  - The time entry log, the project budget records, and the rate cards.
+  - Optional: a project, client, or consultant to narrow to.
+
+  ## Procedure
+
+  1. **Headline totals.**
+     - `billable hours = sum(hours) over entries where category == "billable"`
+     - `non-billable hours = sum(hours) over entries where category == "non_billable"`
+     - `total hours = billable hours + non-billable hours`
+     - `billable % = round(billable hours / total hours * 100, 1)`; if total
+       hours is 0, the percentage is 0.
+     - `billable value = sum(hours * rate) over billable entries`. This total
+       includes billable entries that are not yet approved - it is the value of
+       the work logged, not the amount ready to invoice. Say so if asked what
+       is invoiceable, and hand the user to invoice preparation.
+  2. **By project.** Only billable entries contribute hours and value. Emit one
+     row for every project in the budget catalog, in catalog order - a project
+     with no billable hours this period shows `0` hours and `$0.00`. A project
+     that appears on a time entry but has no budget record does not get a row;
+     call that out in a line under the table instead of inventing a budget.
+     - `Budget Used = round(billed_to_date / total_budget * 100, 1)`; 0 when
+       total_budget is 0.
+     - `Remaining` is the `remaining` figure on the budget record, not a
+       recomputation.
+  3. **By consultant.** Only billable entries. Sort **by billable value,
+     descending** - never by hours and never alphabetically. Note that hours
+     and value can disagree in ranking because rates differ.
+     - `Avg Rate = round(value / hours, 2)`; 0 when hours is 0. A consultant
+       who logged both standard and overtime rates has a blended average that
+       matches neither rate card figure - that is expected, not an error.
+
+  ## Output format
+
+  ```
+  ## Billing Summary
+
+  **Total hours logged:** N
+  **Billable hours:** N (X%)
+  **Non-billable hours:** N
+  **Total billable value:** $XX,XXX.XX
+
+  ### By Project
+
+  | Project | Client | Type | Hours | Value | Budget Used | Remaining |
+
+  ### By Consultant
+
+  | Consultant | Hours | Billable Value | Avg Rate |
+  ```
+
+  `Type` is the project's contract type (T&M or Fixed Fee) exactly as recorded.
+
+  ## Edge cases
+
+  - Non-billable entries never carry a dollar figure into any table here; they
+    only move the non-billable hours line and the billable percentage.
+  - A consultant with no rate card still appears in the By Consultant table if
+    they logged billable hours; do not compare their average rate to a rate
+    card that does not exist.
+  - Do not net out the pending-approval value from these totals. That split is
+    the job of unbilled-report and invoice-preparation.
+
+  ## Boundaries
+
+  - Reporting only. Never approve, invoice, adjust a rate, or reforecast a
+    budget. Never round a budget percentage to make a project look safer.

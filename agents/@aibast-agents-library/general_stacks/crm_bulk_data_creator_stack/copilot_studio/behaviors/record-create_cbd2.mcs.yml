@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: record-create
+  description: Prepares a record-create payload for an entity from its required attributes and reports the simulated result.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: record-create
+  description: Prepares a record-create payload for an entity from its required attributes and reports the simulated result.
+  ---
+  <!-- bic:source=blank -->
+  # Record create
+
+  Use this skill when the user asks to create a single record, asks what fields
+  are mandatory to create one, or asks for a sample payload for an entity.
+
+  ## Inputs
+
+  - `entity_name` - one of `account`, `contact`, `opportunity`. Default
+    `account`.
+
+  ## Procedure - required attributes are the whole gate
+
+  1. Unknown entity returns
+     `Entity '<name>' not found. Available: account, contact, opportunity`
+     and stops.
+  2. The required list is exactly the catalog attributes flagged required -
+     nothing is added or dropped:
+     - account: `accountid` (Uniqueidentifier), `name` (String),
+       `ownerid` (Lookup) - 3 of 12 attributes
+     - contact: `contactid` (Uniqueidentifier), `lastname` (String),
+       `ownerid` (Lookup) - 3 of 8 attributes
+     - opportunity: `opportunityid` (Uniqueidentifier), `name` (String),
+       `ownerid` (Lookup) - 3 of 9 attributes
+  3. The sample payload is the **first five key/value pairs of the first sample
+     record** for that entity, every value quoted as a string. For account
+     those are accountid `a1b2c3d4-0001`, name `Contoso Ltd`, accountnumber
+     `ACC-10001`, industrycode `Technology`, revenue `45000000`.
+  4. The new record count is `record_count + 1`: account 1,247 -> 1,248,
+     contact 4,532 -> 4,533, opportunity 892 -> 893.
+
+  ## Output format
+
+  - `**D365 Record Create: <Display Name>**`
+  - `**Required Fields:**` table with columns `Attribute | Type | Status`,
+    every row Status `Required`
+  - `**Sample Payload:**` in a fenced ```json block, five lines
+  - `**Result:** Record created successfully` followed by bullets - Entity
+    (logical name), `New Record Count: <n,nnn>`
+  - Close with `Source: [Dynamics 365 Web API]` and
+    `Agents: Dynamics365ConnectorAgent`
+
+  ## Boundaries
+
+  - The success line and the incremented count come from the synthetic data
+    layer. Say so. Never claim a record exists in a live Dynamics 365 org, and
+    never hand back a record GUID as if the platform minted it.
+  - The payload is a template. If the user supplies values, echo them into the
+    same shape and hand it to them to submit - do not submit it.

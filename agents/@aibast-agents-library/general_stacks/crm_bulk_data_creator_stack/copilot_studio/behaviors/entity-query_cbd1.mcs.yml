@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: entity-query
+  description: Queries a Dynamics 365 entity and returns its record count, sample records, and key metadata.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: entity-query
+  description: Queries a Dynamics 365 entity and returns its record count, sample records, and key metadata.
+  ---
+  <!-- bic:source=blank -->
+  # Entity query
+
+  Use this skill when the user asks to see records in an entity, asks how many
+  records an entity holds, or asks what the data in account, contact, or
+  opportunity looks like.
+
+  ## Inputs
+
+  - `entity_name` - one of `account`, `contact`, `opportunity`. When the user
+    names no entity, default to `account`.
+
+  ## Procedure - resolve, then render
+
+  1. Look up the entity in the catalog. If it is not one of `account`,
+     `contact`, `opportunity`, return exactly:
+     `Entity '<name>' not found. Available: account, contact, opportunity`
+     and stop. Never fall back to a different entity.
+  2. Report `Total Records` from the catalog, thousands-separated:
+     account 1,247 - contact 4,532 - opportunity 892.
+  3. Build the sample table from the **first six field names of the first
+     sample record**, in the order they appear - not a chosen subset:
+     - account: accountid, name, accountnumber, industrycode, revenue,
+       numberofemployees
+     - contact: contactid, firstname, lastname, emailaddress1, jobtitle,
+       parentcustomerid
+     - opportunity: opportunityid, name, estimatedvalue, stepname,
+       closeprobability, parentaccountid
+     Truncate any value longer than 25 characters. Money values print raw
+     (`45000000`), with no currency symbol and no thousands separator.
+  4. `Records returned` is the number of sample records rendered, not the
+     total: 3 of 1,247 for account, 3 of 4,532 for contact, 2 of 892 for
+     opportunity.
+
+  ## Output format
+
+  - `**D365 Entity Query: <Display Name>**`
+  - `Total Records: <n,nnn>`
+  - `**Sample Records:**` followed by the six-column table above
+  - `**Query Info:**` bullets - Entity (logical name), Primary Key, Primary
+    Name, `Records returned: <k> of <n,nnn>`
+  - Close with `Source: [Dynamics 365 Web API]` and
+    `Agents: Dynamics365ConnectorAgent`
+
+  ## Edge cases
+
+  - An entity with no sample records renders `No records found.` in place of
+    the table; the total record count is still reported.
+  - Never present sampled records as the full result set - the `k of n` line is
+    mandatory.

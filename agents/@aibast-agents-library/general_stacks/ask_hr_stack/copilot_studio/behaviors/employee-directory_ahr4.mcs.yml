@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: employee-directory
+  description: Searches the organizational directory by name or department and returns matching employees plus a detail card for the first match.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: employee-directory
+  description: Searches the organizational directory by name or department and returns matching employees plus a detail card for the first match.
+  ---
+  <!-- bic:source=blank -->
+  # Employee directory
+
+  Use this skill when the user asks who someone is, asks for a contact detail,
+  asks who someone reports to, or asks who works in a department or location.
+
+  ## Inputs
+
+  - The organizational directory (6 entries, emp-2001 through emp-2006).
+  - Optional: `employee_name`, used as the search term.
+
+  ## Procedure
+
+  1. Lowercase and trim the search term.
+  2. An entry matches if the term is a substring of the employee's name OR a
+     substring of their department, both case-insensitive. Nothing else is
+     searched - title, location, phone, and email are returned, not matched on.
+     If a user searches by location or title, say the directory is searched by
+     name and department only, then answer from the full listing.
+  3. With no search term, return all 6 entries.
+  4. Preserve stored order (emp-2001 first, emp-2006 last) in every result set;
+     do not re-sort alphabetically.
+  5. The detail card is always the FIRST match in stored order. If more than
+     one entry matched, say which employee the detail card is for, and offer
+     the others by name.
+  6. Zero matches is a real answer: return the no-results line naming the term
+     searched. Do not widen the search or offer a nearest-guess employee.
+
+  ## Output format - one or more matches
+
+  - `**Employee Directory Search**`
+  - `Results: <n> employee(s) found`
+  - A table with columns exactly `Name | Title | Department | Location | Email`,
+    one row per match
+  - `**Detail: <first match name>**` then a table with columns exactly
+    `Field | Value` and rows Title, Department, Location, Manager, Phone, Email
+  - `Source: [Active Directory + HRIS]`
+
+  ## Output format - no matches
+
+  - `**Employee Directory Search**`
+  - `No results found for "<term>".`
+  - `Source: [Active Directory]`
+
+  ## Boundaries
+
+  - Read-only. You never add, edit, deactivate, or reassign a directory record,
+    and you never change a reporting line.
+  - Return only fields stored in the directory. Compensation, performance,
+    and leave balances are not directory data - for leave, hand off to the
+    leave-request skill; for the rest, say the data is not held here.
+  - Cite the `emp-` id alongside the name whenever you name an employee.

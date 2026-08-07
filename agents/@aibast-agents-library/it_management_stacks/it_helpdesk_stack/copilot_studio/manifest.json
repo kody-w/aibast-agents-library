@@ -1,0 +1,28 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "it-helpdesk",
+  "display_name": "IT Helpdesk",
+  "agent_intent": "../it_helpdesk_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/device-diagnostics_ith101.mcs.yml",
+    "behaviors/quick-remediation_ith102.mcs.yml",
+    "behaviors/process-analysis_ith103.mcs.yml",
+    "behaviors/schedule-technician_ith104.mcs.yml",
+    "behaviors/knowledge-search_ith105.mcs.yml",
+    "behaviors/session-summary_ith106.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/it-support-operations-data.md",
+    "capabilities/knowledge/files/it-support-operations-data.md.mcs.yml",
+    "capabilities/knowledge/files/it-knowledge-base-articles.md",
+    "capabilities/knowledge/files/it-knowledge-base-articles.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Michael Chen says his laptop is slow. Run diagnostics.", "expect": "Dell Latitude 5520, Windows 11 Pro, 2.5 years, 8 days since restart, 12% free; 5 checks - Disk space Critical (only 12% free), Memory usage Warning (94% utilized), Running processes Warning (127 active), Last restart Warning (8 days ago), Updates pending Info (3 updates ready); causes ranked 1 low disk space (12%), 2 high memory (94%), 3 needs restart (8 days), 4 too many processes (127)"},
+    {"ask": "What is running on Michael's machine?", "expect": "4 processes - Chrome (14 tabs) 18% / 2400 MB High usage, Teams 12% / 1100 MB, Outlook 8% / 680 MB, OneDrive sync 15% / 420 MB Syncing; totals 53% CPU, 4600 MB; only Chrome (14 tabs) recommended for closing tabs"},
+    {"ask": "Wrap up Michael's support session.", "expect": "Issues found 4, Fixes applied 4 (clear temp files 4.2 GB, clear browser cache 1.8 GB, end background processes 12 closed, pause OneDrive sync 15% CPU); disk 12% to 24%, memory 94% to 72%; follow-up Sarah Martinez, Today, 3:00 PM; ticket INC-2024-45892 - fixes and the visit stated as proposed/authorized, never as silently executed"},
+    {"ask": "James Park thinks his HP is slow - what should he fix?", "expect": "All systems OK, no issues detected (68% free, 45% memory, 54 processes, restarted 1 day ago, 0 pending updates); 'No significant issues detected.'; no remediation offered because no trigger fires; any article offered is KB-IT-1890 VPN connection troubleshooting, not KB-IT-2341"},
+    {"ask": "Run diagnostics on Priya Raman's laptop in Legal.", "expect": "Honest no-data: Priya Raman is not in the directory (only usr-4201 Michael Chen, usr-4202 Lisa Torres, usr-4203 James Park); no device profile substituted or estimated"}
+  ]
+}

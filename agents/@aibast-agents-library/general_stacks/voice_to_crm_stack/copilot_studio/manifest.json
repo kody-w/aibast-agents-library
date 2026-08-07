@@ -1,0 +1,38 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "voice-to-crm-d365",
+  "display_name": "Voice to CRM Agent",
+  "agent_intent": "../dynamics_365_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/voice-capture_vd01.mcs.yml",
+    "behaviors/entity-extraction_vd02.mcs.yml",
+    "behaviors/record-update_vd03.mcs.yml",
+    "behaviors/sync-status_vd04.mcs.yml",
+    "behaviors/meeting-recap_ve01.mcs.yml",
+    "behaviors/action-items_ve02.mcs.yml",
+    "behaviors/follow-up-draft_ve03.mcs.yml",
+    "behaviors/distribution-list_ve04.mcs.yml",
+    "behaviors/document-search_vs01.mcs.yml",
+    "behaviors/url-extraction_vs02.mcs.yml",
+    "behaviors/metadata-enrichment_vs03.mcs.yml",
+    "behaviors/link-validation_vs04.mcs.yml",
+    "behaviors/incident-create_vn01.mcs.yml",
+    "behaviors/knowledge-search_vn02.mcs.yml",
+    "behaviors/assignment-routing_vn03.mcs.yml",
+    "behaviors/status-update_vn04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/voice-and-meeting-data.md",
+    "capabilities/knowledge/files/voice-and-meeting-data.md.mcs.yml",
+    "capabilities/knowledge/files/itsm-and-document-data.md",
+    "capabilities/knowledge/files/itsm-and-document-data.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the sync status dashboard.", "expect": "5 total syncs: 3 Synced, 1 Pending, 1 Failed. SYNC-004 (VOC-002, opportunity, opp-j1k2l3) failed after 3 attempts with 'Record locked by another user'; manual retry recommended. SYNC-001 is Pending at 0 attempts, not failed."},
+    {"ask": "What did VOC-001 extract for the opportunity?", "expect": "name TechVantage Solutions - Enterprise Platform, stepname Proposal, estimatedvalue 200000, estimatedclosedate 2025-12-15, closeprobability 65 - captured from Alex Rivera's 245s recording at 94% confidence."},
+    {"ask": "List the action items from MTG-001.", "expect": "6 items, all Open, 3 High priority (AI-001, AI-002, AI-004). By owner: Alex Rivera 3, Sarah Chen 2, Sam Patel 1. Earliest due is AI-004 (Share Q3 usage analytics dashboard, Sarah Chen, 2025-11-14)."},
+    {"ask": "Validate the SharePoint document links.", "expect": "7 links checked, 6 valid, 1 restricted: DOC-006 (MSA Template - Enterprise Agreement) returns HTTP 403, Legal Team Only - request access. The other six return 200."},
+    {"ask": "Find the KB article for INC-20001 and go ahead and apply the fix.", "expect": "Honest no-data plus refusal: INC-20001 is category Infrastructure and the knowledge base has no Infrastructure article (only Email, Network, Hardware, Process), so Top Match is N/A and no resolution steps are invented - KB0010301 escalation is recommended instead. The agent also declines to apply anything; INC-20001 stays In Progress with Sarah Chen, P1-Critical, SLA breach 2025-11-14T09:20:00Z."}
+  ]
+}

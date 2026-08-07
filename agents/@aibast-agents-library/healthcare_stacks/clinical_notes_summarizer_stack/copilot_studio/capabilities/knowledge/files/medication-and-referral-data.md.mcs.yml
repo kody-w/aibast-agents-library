@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: medication-and-referral-data.md
+  description: Synthetic per-patient medication lists, the polypharmacy threshold, and the referral queue the agent answers from until real tools are connected.

@@ -1,0 +1,52 @@
+mcs.metadata:
+  componentName: executive-briefing
+  description: Compiles health, stakeholders, competition, and risk into one executive-ready briefing with a pre-meeting checklist.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: executive-briefing
+  description: Compiles health, stakeholders, competition, and risk into one executive-ready briefing with a pre-meeting checklist.
+  ---
+  <!-- bic:source=blank -->
+  # Executive briefing
+
+  Use this skill when the user asks for the full briefing, the one-pager, or
+  the pre-meeting summary for an account.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  Recompute, do not re-quote from memory - health (account-overview rules),
+  risks and win probability (risk-assessment rules), stakeholder counts, and
+  competitor count. Then:
+
+  - `gaps = count of stakeholders with meetings == 0` - note this is ALL
+    zero-meeting contacts, not just the decision-maker gaps that the
+    stakeholder-map skill reports.
+  - `champions = count of stakeholders whose influence is Champion`
+    (sentiment is not filtered here).
+  - `critical = count of risks whose severity is High`.
+
+  Worked example - Acme Corporation - deal value 2,400,000 expanding from
+  1,200,000 current, win probability 61 percent, health 73/100, 8
+  stakeholders mapped with 3 needing an intro and 1 champion, 2 active
+  competitors, 3 risks of which 2 are critical.
+
+  ## Output format
+
+  - `**Account Intelligence Briefing: <account>**`
+  - `**Opportunity Summary:**` - deal value with the current-spend
+    comparison, win probability, account health.
+  - Table `| Analysis | Key Finding |` with exactly four rows - Account
+    health, Stakeholders, Competition, Risks.
+  - `**Pre-Meeting Checklist:**` - one bullet per High-severity mitigation.
+
+  ## Edge cases
+
+  - The checklist is empty when there are no High risks. Say so rather than
+    padding it with generic advice.
+  - The briefing recommends. It never books the meeting, sends the deck, or
+    updates the CRM.

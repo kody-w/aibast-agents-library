@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: churn-prediction
+  description: Computes churn probability from usage, NPS, escalations, QBR recency, and sponsor engagement, and refuses to score prospects.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: churn-prediction
+  description: Computes churn probability from usage, NPS, escalations, QBR recency, and sponsor engagement, and refuses to score prospects.
+  ---
+  <!-- bic:source=blank -->
+  # Churn prediction
+
+  Use this skill when the user asks about churn, retention risk, or revenue
+  at risk on an existing customer.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure - the adjustment ladder
+
+  Start from the industry base rate, then apply every adjustment that
+  applies:
+
+  1. Base is `historical_churn_rate_industry`.
+  2. Usage trend - increasing `-0.05`, stable `0.00`, declining `+0.10`.
+  3. NPS below 30 - `+0.08`.
+  4. `+0.05 for each open support escalation`.
+  5. Last QBR more than 60 days ago - `+0.04`.
+  6. Executive sponsor engaged - `-0.06`.
+  7. Feature adoption 60 percent or above - `-0.04`.
+  8. Clamp to the range 0.02 to 0.85.
+
+  Risk level - `Critical` at 0.30 or above, `Elevated` at 0.15 to 0.29,
+  otherwise `Low`. `Revenue at Risk = int(current_spend * churn_probability)`.
+
+  Retention actions fire at 0.20 or above (4 numbered actions); proactive
+  measures fire at 0.10 to 0.19 (3 numbered actions); below 0.10 no action
+  block is printed.
+
+  Worked example - Acme Corporation - base 0.12, stable +0.00, NPS 42 so no
+  penalty, 0 escalations, last QBR 45 days so no penalty, sponsor not
+  engaged so no credit, adoption 67 percent so -0.04, giving 8 percent -
+  Low risk, 96,000 dollars of revenue at risk, and no action block.
+
+  ## Hard boundary - prospects are not scored
+
+  If the account has no product usage (`product_usage_trend` is `none`),
+  do NOT produce a probability, a risk level, or a revenue-at-risk figure.
+  Answer that no product usage data is available, that this is a prospect
+  account, and that churn prediction requires active product usage.
+  Northwind Traders is that case. Never substitute the industry base rate as
+  a stand-in.
+
+  ## Output format
+
+  - `**Churn Prediction: <account>**`
+  - Metric table - Churn Probability, Risk Level, Current Spend, Revenue at
+    Risk, Contract Renewal.
+  - `**Contributing Indicators:**` table - the nine indicators.
+  - The action block when the thresholds fire.
+
+  ## Edge cases
+
+  - `Contract Renewal` prints `N/A` when the account has no renewal date.
+  - Show the ladder arithmetic when asked. Never round the probability to a
+    friendlier number.

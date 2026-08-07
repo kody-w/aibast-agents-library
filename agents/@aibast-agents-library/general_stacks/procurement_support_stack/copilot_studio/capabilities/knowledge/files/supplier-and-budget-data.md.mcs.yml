@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: supplier-and-budget-data.md
+  description: Synthetic supplier performance scorecard and departmental budget allocations, including the scoring weights and the utilization status gate.

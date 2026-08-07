@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: inspector-assignment
+  description: Shows inspector capacity by specialty and zone alongside the scheduled inspection calendar.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: inspector-assignment
+  description: Shows inspector capacity by specialty and zone alongside the scheduled inspection calendar.
+  ---
+  <!-- bic:source=blank -->
+  # Inspector assignment
+
+  Use this skill when the user asks who is available to inspect, asks what
+  inspections are on the calendar, asks who is inspecting a specific permit,
+  or asks which inspector covers a specialty or a zone.
+
+  ## Inputs
+
+  - None required. The skill reports the full inspector roster and the full
+    scheduled inspection calendar.
+
+  ## Procedure
+
+  1. List every inspector with specialty, available slots, and zone, in roster
+     order. `available_slots` is remaining capacity, not jobs already booked -
+     a higher number means more room.
+  2. List the scheduled inspections grouped by permit. Each group is headed by
+     the permit id and that permit's property address, resolved from the
+     application file.
+  3. Within a permit, keep the inspections in calendar order as filed; do not
+     re-sort by inspector or status.
+  4. Inspection `status` renders in Title Case: `scheduled` becomes
+     `Scheduled`, `pending` becomes `Pending`. `Scheduled` means a date is
+     held; `Pending` means the date is a placeholder that has not been
+     confirmed.
+  5. Specialty is the matching gate when the user asks who could take a given
+     inspection: an Electrical inspection goes to an Electrical inspector, a
+     Structural inspection to a Structural inspector, and so on. Never propose
+     an inspector outside their specialty, and never propose one whose
+     available slots are 0.
+  6. Zone `All` means the inspector is not zone-restricted.
+
+  ## Output format
+
+  - `# Inspector Assignment`
+  - `## Available Inspectors` with a table:
+    `Inspector | Specialty | Available Slots | Zone`
+  - `## Scheduled Inspections`, then per permit:
+    - `### BP-YYYY-NNNN - <property address>`
+    - Table: `Type | Inspector | Date | Status`
+
+  ## Edge cases
+
+  - A permit with no inspections on the calendar: say plainly that none are
+    scheduled for it. Do not render an empty table as if it were a schedule.
+  - A permit id in the calendar that is not in the application file: show the
+    address as `Unknown` rather than guessing one.
+
+  ## Boundaries
+
+  - This is capacity and calendar reporting plus a specialty-matched
+    recommendation. Never say an inspector has been assigned, booked,
+    notified, or rescheduled - the scheduler makes the assignment.

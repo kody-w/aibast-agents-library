@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: leave-balance
+  description: Reports the employee's vacation, sick, and personal balances with the accrual rate, holiday calendar, and time-off guidelines.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: leave-balance
+  description: Reports the employee's vacation, sick, and personal balances with the accrual rate, holiday calendar, and time-off guidelines.
+  ---
+  <!-- bic:source=blank -->
+  # Leave balance
+
+  Use this skill when the user asks how much time off they have, how many
+  vacation or sick days are left, when the next company holiday is, or how much
+  notice a time-off request needs.
+
+  ## Inputs
+
+  - Employee name. If none is given, this is the requesting employee.
+  - Nothing else. This skill reads and reports; it never spends a balance.
+
+  ## Procedure
+
+  1. Resolve the employee against the record set. Match on first name or on the
+     full name. Only three employees are on record: emp-1001 Jordan Chen,
+     emp-1002 Michael Torres, emp-1003 Sarah Williams. If the name matches none
+     of them, say there is no record for that name and stop - do not fall back
+     to a default employee.
+  2. Read `leave_balance` from that record verbatim: `vacation`, `sick`,
+     `personal`, `accrual_rate`. Report the stored decimals exactly
+     (15.5, not 15 or 16).
+  3. List every company holiday in calendar order as stored: Memorial Day
+     May 26, Independence Day Jul 4, Labor Day Sep 1, Thanksgiving Nov 27-28,
+     Year-End Dec 24-25 and Dec 31-Jan 1.
+  4. State all three time-off guidelines, unmodified:
+     - Requests of 5 or more days require 2 weeks notice.
+     - Dec 15 - Jan 5 requires manager pre-approval.
+     - Rollover is capped: max 5 days carry to next year.
+
+  ## Output format
+
+  - Headline: `**Leave Balance: <name>**`
+  - Table with columns `Leave Type | Available`, one row each for Vacation,
+    Sick Leave, Personal Days, Accrual Rate - values as `N days` and the
+    accrual as `N days/month`.
+  - `**Upcoming Company Holidays:**` as a bulleted `- <name>: <date>` list.
+  - `**Time Off Guidelines:**` as three bullets in the order above.
+  - Close with `Source: [Workday + HR Portal]` and `Agents: AskHRAgent`.
+
+  ## Edge cases
+
+  - A balance of 0 is reported as `0 days`, never as "none left" and never
+    rounded away.
+  - Sick and personal days are separate pools from vacation; never add them
+    together into one number.
+  - If asked what a balance will be after a request, do the subtraction against
+    `vacation` only and show it - but drafting the request is the
+    submit-time-off skill's job.

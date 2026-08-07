@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: call-review
+  description: Scores a recorded sales call against the six-part rubric and reports the weighted overall score, talk ratio, highlights, and improvement areas.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: call-review
+  description: Scores a recorded sales call against the six-part rubric and reports the weighted overall score, talk ratio, highlights, and improvement areas.
+  ---
+  <!-- bic:source=blank -->
+  # Call review
+
+  Use this skill when the user asks to review, score, grade, or debrief a
+  specific call, asks how a call went, or names a CALL- id.
+
+  ## Inputs
+
+  - The reviewed-call library and the scoring rubric.
+  - Optional: a CALL- id. The library contains CALL-901, CALL-902, and
+    CALL-903 only.
+
+  ## Procedure
+
+  1. Resolve the call by exact CALL- id. If the user names an id that is not
+     in the library, say the id is not in the library and list the three ids
+     that are. Do not fall back to another call. If no id is given, ask which
+     call, or state that you are showing CALL-901 as the default.
+  2. Compute the overall score as the weighted sum of the six rubric skills,
+     then round to the nearest whole number:
+
+     `overall = opening*0.10 + discovery_questions*0.25 + active_listening*0.15 + value_articulation*0.20 + next_steps*0.15 + objection_handling*0.15`
+
+     Worked example, CALL-901:
+     `85*0.10 + 72*0.25 + 90*0.15 + 68*0.20 + 95*0.15 + 60*0.15`
+     `= 8.5 + 18.0 + 13.5 + 13.6 + 14.25 + 9.0 = 76.85 -> 77`
+  3. Render the skill scores in the fixed rubric order: opening, discovery
+     questions, active listening, value articulation, next steps, objection
+     handling. The weight column is the rubric weight as a whole-number
+     percent (10%, 25%, 15%, 20%, 15%, 15%).
+  4. Report the talk ratio as stored, rep percent first.
+  5. Report the highlights and the improvement items verbatim from the call
+     record. Do not add, merge, or soften them.
+
+  ## Output format
+
+  - Headline: `**Call Review: CALL-90x**`
+  - A `| Field | Detail |` table with these rows in order: Rep, Prospect,
+    Date, Duration (minutes), Type, Outcome, and `**Overall Score**` as
+    `**N/100**` in bold.
+  - `**Skill Scores:**` then a `| Skill | Score | Weight |` table, six rows,
+    scores as `N/100`.
+  - `**Talk Ratio:** Rep N% / Prospect N%`
+  - `**Highlights:**` as a bulleted list.
+  - `**Areas for Improvement:**` as a bulleted list.
+  - Close with `Source: [Call Recording + AI Analysis]`.
+
+  ## Edge cases
+
+  - The deal value is on the call record but is not part of the rendered
+    review. Quote it only if the user asks for it.
+  - A high outcome does not raise the score and a poor outcome does not lower
+    it. CALL-901 scores 77 with the outcome "Meeting Scheduled"; keep them
+    separate in the narrative.
+  - If the user asks to update the CRM, notify the rep, or book the coaching
+    follow-up, decline: report the review and hand the action to the manager.

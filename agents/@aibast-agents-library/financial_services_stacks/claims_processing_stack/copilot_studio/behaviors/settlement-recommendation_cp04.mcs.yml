@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: settlement-recommendation
+  description: Computes the recommended settlement for every claim using the coverage, deductible, and fraud-score rules, with portfolio claimed/recommended/savings totals.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: settlement-recommendation
+  description: Computes the recommended settlement for every claim using the coverage, deductible, and fraud-score rules, with portfolio claimed/recommended/savings totals.
+  ---
+  <!-- bic:source=blank -->
+  # Settlement recommendation
+
+  Use this skill when the user asks what a claim should settle for, asks for
+  settlement amounts, asks how much the portfolio will pay out, or asks what
+  the adjustments save.
+
+  ## Inputs
+
+  - The claims register (claimed amount, fraud score, policy number).
+  - The policy details table (coverage limit, deductible).
+
+  ## Procedure - compute it, do not judge it
+
+  For each claim, in this exact order:
+
+  1. If `fraud_score >= 60`, the recommended settlement is `$0`. Stop here - no
+     deductible arithmetic, no partial payment, no exception for a long-tenured
+     policyholder or an urgent business need.
+  2. Otherwise `net = min(claimed_amount, coverage_limit) - deductible`. The
+     coverage limit caps the payout before the deductible comes off.
+  3. If `fraud_score >= 30`, apply the flagged-claim haircut:
+     `net = net * 0.75`, rounded to 2 decimals.
+  4. The recommendation is `max(0, net)` - never negative.
+
+  Portfolio rollup:
+
+  - `Total Claimed = sum(claimed_amount)` over every claim.
+  - `Total Recommended Settlement = sum(recommended)` over every claim.
+  - `Savings from Adjustments = Total Claimed - Total Recommended Settlement`.
+
+  Always show the arithmetic for any single claim you are asked about, in the
+  form `($claimed - $deductible) x 0.75 = $recommended`, and name which rule
+  applied (under 30, flagged at 30-59, or SIU at 60+).
+
+  ## Output format
+
+  - `# Settlement Recommendations`
+  - A table with exactly these columns:
+    `Claim ID | Claimant | Claimed | Deductible | Fraud Score | Recommended`,
+    one row per claim in register order, dollars with thousands separators and
+    no decimals.
+  - Then three bold lines: `**Total Claimed:** $N`,
+    `**Total Recommended Settlement:** $N`, `**Savings from Adjustments:** $N`.
+
+  ## Edge cases
+
+  - Missing policy record: coverage limit and deductible are treated as 0,
+    which drives the recommendation to $0. Say the policy record is missing and
+    that the $0 is an artifact of the missing terms, not a fraud decision.
+  - A claim above its coverage limit settles at `coverage_limit - deductible`,
+    not at the claimed amount. State the cap when it binds.
+  - A $0 recommendation on a 60+ score is a hold pending SIU, not a denial.
+    Say it that way.
+  - Recommendation only. Never say a settlement has been approved, authorized,
+    issued, or paid; never commit the insurer to an amount. The adjuster
+    decides.

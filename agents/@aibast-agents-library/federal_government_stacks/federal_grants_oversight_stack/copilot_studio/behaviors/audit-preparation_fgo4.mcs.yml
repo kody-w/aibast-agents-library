@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: audit-preparation
+  description: Assembles the audit package view - all prior findings with corrective actions, the readiness checklist, and the Single Audit threshold determination.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: audit-preparation
+  description: Assembles the audit package view - all prior findings with corrective actions, the readiness checklist, and the Single Audit threshold determination.
+  ---
+  <!-- bic:source=blank -->
+  # Audit preparation
+
+  Use this skill when the user asks about audit readiness, prior findings and
+  their corrective actions, whether a Single Audit is required, or what to
+  assemble before the auditors arrive.
+
+  ## Inputs
+
+  - The full audit findings log (AF- records), resolved and unresolved.
+  - The grant portfolio funds-drawn figures.
+
+  ## Procedure - the threshold test is arithmetic
+
+  1. Print every finding in the log, including resolved ones. This view does
+     not filter by status; compliance monitoring is the filtered view.
+  2. `resolved = count of findings whose status is exactly "resolved"`,
+     `total = count of all findings`. Report as `**Findings Resolved:** R/T`.
+  3. Single Audit determination:
+     - `total_expended = sum(funds_drawn)` across every grant in the portfolio.
+       Use funds drawn, not award amounts.
+     - `threshold = $750,000` (Single Audit Act / A-133 expenditure threshold).
+     - `audit_required = "Yes" if total_expended >= threshold else "No"`.
+       The comparison is greater-than-or-equal: an entity exactly at $750,000
+       requires an audit.
+  4. The readiness checklist is fixed and printed in full, in this order, as
+     unchecked boxes: SEFA prepared; cost allocation plans current and
+     documented; subrecipient monitoring documentation complete; equipment
+     inventory reconciled; time-and-effort certifications on file; procurement
+     documentation meets federal standards; financial reconciliation between GL
+     and drawdowns; prior year corrective action plans implemented. Never mark
+     an item complete on the user's behalf.
+
+  ## Output format
+
+  - `# Audit Preparation Report`
+  - `## Prior Findings Status` table with columns exactly:
+    `Finding ID | Grant | Severity | Finding | Status | Corrective Action`
+    Severity upper-cased, status title-cased with underscores as spaces.
+  - `**Findings Resolved:** R/T` on its own line after the table.
+  - `## Audit Readiness Checklist` as `- [ ] <item>` lines.
+  - `## Single Audit Threshold Analysis` as three bullets:
+    `- **Total Federal Expenditures:** $N,NNN,NNN`
+    `- **Single Audit Threshold:** $750,000`
+    `- **Audit Required:** Yes|No`
+
+  ## Edge cases
+
+  - High-severity unresolved findings (severity `high`, status not `resolved`)
+    are called out by AF- id in the answer, because they are the ones that
+    carry a 30-point compliance deduction and auditor follow-up.
+  - If the findings log is empty, say so; do not infer a clean audit history
+    from the absence of records.
+  - Never assert that an audit has been scheduled, waived, or passed, and never
+    mark a corrective action closed. Assemble the package; the officer signs.

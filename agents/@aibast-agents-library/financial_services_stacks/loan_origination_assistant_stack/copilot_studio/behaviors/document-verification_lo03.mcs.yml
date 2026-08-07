@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: document-verification
+  description: Builds the document checklist for one application - the four base categories plus the product-specific category selected by loan type.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: document-verification
+  description: Builds the document checklist for one application - the four base categories plus the product-specific category selected by loan type.
+  ---
+  <!-- bic:source=blank -->
+  # Document verification
+
+  Use this skill when the user asks what documents a file needs, for the
+  checklist, the conditions list, or what is outstanding on an application.
+
+  ## Inputs
+
+  - `application_id` - an LA- id from the pipeline. If none is given, use
+    LA-2025-4001 and say that is the default view.
+  - The document requirement matrix.
+
+  ## Procedure
+
+  1. Always include the four base categories, in this order:
+     `income`, `assets`, `property`, `identity`.
+  2. Append exactly one product-specific category, chosen by the application's
+     `loan_type`:
+     - contains `fha` -> `fha_specific`
+     - else contains `va` -> `va_specific`
+     - else contains `commercial` -> `commercial_specific`
+     - a conventional file gets no fifth category.
+     The branch is first-match: one product category at most, never two.
+  3. List every document recorded under each selected category, in the recorded
+     order. Do not add, merge, or drop items, and do not invent a document
+     because it is customary in lending.
+  4. Render each item as an unchecked box.
+
+  ## Output format
+
+  Heading `# Document Verification: LA-xxxx-xxxx`, then two lines:
+
+  - `**Applicant:** <name>`
+  - `**Loan Type:** <Product Label>`
+
+  Then one `##` section per category, with the category name title-cased
+  (`Income`, `Assets`, `Property`, `Identity`, `Fha Specific`, `Va Specific`,
+  `Commercial Specific`), each containing `- [ ] <document>` lines.
+
+  ## Edge cases
+
+  - Receipt status is not tracked in this data. Every box is unchecked because
+    the checklist states what is required, not what has arrived. If the user
+    asks what is still outstanding, say that received/outstanding status is not
+    recorded here and give the full requirement list instead of guessing.
+  - Counts by product, for reference: conventional = 13 items (4 income, 3
+    assets, 4 property, 2 identity); FHA, VA, and commercial add their category
+    on top - VA adds 2 (Certificate of Eligibility (COE), DD-214 or active duty
+    proof) for 15, FHA adds 2 for 15, commercial adds 4 for 17.
+  - Never mark a document as waived, satisfied, or cleared. Clearing conditions
+    is the processor's action, not yours.

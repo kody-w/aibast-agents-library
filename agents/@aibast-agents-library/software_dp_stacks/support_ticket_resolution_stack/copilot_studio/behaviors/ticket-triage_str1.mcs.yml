@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: ticket-triage
+  description: Builds the triage queue - every support ticket ranked by severity then ARR, with KB match count and the category's average resolution time.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: ticket-triage
+  description: Builds the triage queue - every support ticket ranked by severity then ARR, with KB match count and the category's average resolution time.
+  ---
+  <!-- bic:source=blank -->
+  # Ticket triage
+
+  Use this skill when the user asks for the queue, the board, what to work on
+  next, today's tickets, triage, or any overview of open support tickets.
+
+  ## Inputs
+
+  - The support ticket queue, the knowledge base index, and the category
+    resolution benchmarks (knowledge/tools).
+  - No parameters. Every ticket in the queue is included.
+
+  ## Procedure
+
+  1. Retrieve every ticket in the queue. All statuses are included - `open`,
+     `in_progress`, and `waiting_customer` all appear. Nothing is filtered out.
+  2. For each ticket, count the knowledge base articles whose category is an
+     exact string match for the ticket's category. That count is `KB Matches`.
+     Only `authentication` has more than one (KB-102 and KB-106).
+  3. For each ticket, look up its category in the resolution benchmarks to get
+     `avg_resolution_hrs` and `first_contact_resolution_pct`. If the category
+     has no benchmark row, both are `0`.
+  4. Sort with this exact key: `(severity_rank, -arr)` where
+     `severity_rank = {P1: 0, P2: 1, P3: 2, P4: 3}` and any severity not in
+     that map ranks `9`. Severity dominates; ARR descending only breaks ties
+     inside one severity. ARR never promotes a ticket across severities.
+  5. Render the headline, then the table.
+
+  ## Output format
+
+  Title: `# Ticket Triage Queue`
+
+  Headline: `**Open Tickets:** N`
+
+  Then one table, exactly these columns:
+
+  | Priority | Ticket | Customer | Category | ARR | KB Matches | Avg Resolution |
+
+  - Priority as recorded (`P1`, `P2`, `P3`, `P4`).
+  - Ticket as the `TKT-` id.
+  - Category as the raw snake_case value (`data_export`, `user_management`).
+  - ARR as `$` with thousands separators, e.g. `$186,000`.
+  - Avg Resolution as the benchmark hours with an `h` suffix, e.g. `18.4h`.
+
+  ## Edge cases
+
+  - A category with no benchmark row renders `0h` and a 0% first-contact rate.
+    Report that as "no benchmark recorded" rather than implying instant
+    resolution.
+  - A severity outside P1-P4 sorts last (rank 9). Flag it instead of guessing
+    a severity.
+  - First-contact resolution percentages are available on request per category
+    but are not a table column.

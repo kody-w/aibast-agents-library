@@ -1,0 +1,50 @@
+mcs.metadata:
+  componentName: stage-velocity
+  description: Compares each open deal's time in its current stage against the benchmark and flags slow or stalled deals.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: stage-velocity
+  description: Compares each open deal's time in its current stage against the benchmark and flags slow or stalled deals.
+  ---
+  <!-- bic:source=blank -->
+  # Stage velocity
+
+  Use this skill when the user asks whether deals are moving, which are
+  slipping, or how long a stage should take.
+
+  ## Inputs
+
+  - None.
+
+  ## Procedure
+
+  1. Print the benchmark table first - Qualification 18d avg / 14d target /
+     72 percent conversion, Discovery 32/28/65, Solution Design 28/21/78,
+     Proposal 25/21/70, Negotiation 18/14/85.
+  2. For each open deal, take the days in its CURRENT stage and classify:
+     - `days <= target_days` gives `On track`
+     - else `days <= avg_days * 1.5` gives `Slow`
+     - else `Stalled`
+  3. Any deal classified Slow or Stalled is repeated in the at-risk list.
+
+  Worked example - deal-001 sits 34d in Proposal - above the 21d target but
+  within `25 * 1.5 = 37.5`, so `Slow`. deal-003 sits 37d in Discovery,
+  within `32 * 1.5 = 48`, so `Slow`. deal-002 at 12d in Negotiation and
+  deal-004 at 9d in Qualification are both `On track`. Two deals are at risk.
+
+  ## Output format
+
+  - `**Stage Velocity Report**`
+  - `**Benchmarks:**` table - Stage, Avg Days, Target, Conversion.
+  - `**Current Deal Velocity:**` table - Deal, Stage, Days, Benchmark,
+    Status.
+  - `**Deals at Risk of Stalling:**` bullets, omitted when the list is empty.
+  - `**Recommendations:**` - the three fixed review lines.
+
+  ## Edge cases
+
+  - A closed deal's final stage has no benchmark and is excluded from the
+    velocity table rather than scored as instantly on track.
+  - `Slow` and `Stalled` are threshold outcomes. Never re-label a deal
+    because the rep is confident about it.

@@ -19,7 +19,7 @@ content: |
     cost).
   - Optional: an asset id or asset type to narrow the presentation.
 
-  ## Procedure — the status band is a hard rule
+  ## Procedure - the status band is a hard rule
 
   1. Assign each asset a status from its `condition_score`, with no judgment
      applied:
@@ -30,7 +30,7 @@ content: |
 
      The band is never softened, never sharpened, and never overridden by age,
      failure rate, or replacement cost.
-  2. Sort the rows by `condition_score` ascending — worst asset first.
+  2. Sort the rows by `condition_score` ascending - worst asset first.
   3. Compute the fleet average condition as the mean of every asset's
      `condition_score`, rounded to one decimal place.
   4. Render status in capitals: `CRITICAL`, `WARNING`, `GOOD`.
@@ -47,7 +47,7 @@ content: |
 
   ## Edge cases
 
-  - An asset with `operating_hours` of 0 is not a new asset — hours are not
+  - An asset with `operating_hours` of 0 is not a new asset - hours are not
     tracked for that asset class (pipelines). Render the cell as `N/A`, never as
     `0`, and never conclude the asset is unused.
   - A high replacement cost does not raise an asset's status band. The most

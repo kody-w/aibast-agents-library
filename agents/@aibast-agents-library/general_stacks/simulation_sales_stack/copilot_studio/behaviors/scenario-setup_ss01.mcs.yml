@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: scenario-setup
+  description: Sets up a simulation scenario with its brief, objectives, and the buyer personas available to role-play.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: scenario-setup
+  description: Sets up a simulation scenario with its brief, objectives, and the buyer personas available to role-play.
+  ---
+  <!-- bic:source=blank -->
+  # Scenario setup
+
+  Use this skill when the user asks to start, set up, or brief a simulation,
+  asks what scenarios are available, or names a scenario by ID or by name.
+
+  ## Inputs
+
+  - Optional: a scenario ID (`SCN-001`, `SCN-002`, `SCN-003`).
+  - When no scenario is named, default to `SCN-001` (Enterprise Discovery
+    Call) and say plainly that the default was used.
+
+  ## Procedure
+
+  1. Resolve the scenario. Match the requested ID case-insensitively against
+     the catalog keys `SCN-001`, `SCN-002`, `SCN-003`.
+  2. If the request names an ID or an industry that is not in the catalog, do
+     NOT fall back silently. State that the scenario does not exist, list the
+     three that do, and stop.
+  3. Emit the scenario field table exactly as stored: id, difficulty,
+     industry, deal size formatted with thousands separators and a leading
+     `$`, stage, and time limit in minutes.
+  4. Emit the context paragraph verbatim.
+  5. Number the objectives 1..n in stored order. Never reorder or edit them.
+  6. Emit the full persona table. All three personas are always available for
+     every scenario; the scenario does not restrict them. Truncate each
+     persona's personality string to its first 40 characters, and list only
+     the persona's first two priorities.
+
+  ## Catalog facts
+
+  - `SCN-001` Enterprise Discovery Call - Intermediate, Financial Services,
+    $250,000, Discovery, 30 minutes, 4 objectives.
+  - `SCN-002` Competitive Displacement - Advanced, Healthcare, $180,000,
+    Proposal, 45 minutes, 4 objectives.
+  - `SCN-003` Renewal with Expansion - Beginner, Technology, $95,000,
+    Negotiation, 25 minutes, 4 objectives.
+
+  ## Output format
+
+  - `**Simulation Setup: <scenario name>**`
+  - Table `| Field | Detail |` with rows Scenario, Difficulty, Industry, Deal
+    Size, Stage, Time Limit.
+  - `**Context:**` followed by the stored context sentence.
+  - `**Objectives:**` as a numbered list.
+  - `**Available Buyer Personas:**` then table
+    `| Persona | Role | Personality | Priorities |`.
+  - Close with `Source: [Sales Training Platform]`.
+
+  ## Boundaries
+
+  - Setup only. Do not book a session, notify a coach, or claim the
+    simulation has started - the rep starts it.
+  - Deal sizes are synthetic training figures. Never present one as pipeline.

@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: risk-evaluation
+  description: Scores every open application into its underwriting risk tier using the fixed score bands and presents the portfolio table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: risk-evaluation
+  description: Scores every open application into its underwriting risk tier using the fixed score bands and presents the portfolio table.
+  ---
+  <!-- bic:source=blank -->
+  # Risk evaluation
+
+  Use this skill when the user asks for the risk picture, asks how an
+  application scores, asks which submissions are Preferred/Standard/
+  Substandard/Decline, or asks for a portfolio view of the application file.
+
+  ## Inputs
+
+  - The application file (all applications, each with a risk score, line of
+    business, coverage requested, and status).
+  - Optional: a single UW- id, a line of business, or a tier to filter on.
+    Otherwise process every application.
+
+  ## Procedure
+
+  1. For each application take `risk_score` as given. It is a stored value -
+     never recompute, adjust, or interpolate it.
+  2. Map the score to a tier with these exact bands:
+     - `score <= 30` -> **Preferred**
+     - `score <= 55` -> **Standard**
+     - `score <= 75` -> **Substandard**
+     - `score >= 76` -> **Decline**
+     The boundaries are inclusive as written: 30 is Preferred, 55 is Standard,
+     75 is Substandard.
+  3. Render every application in file order. Do not re-sort by score unless
+     the user asks for a ranking; if they do, sort descending by risk score
+     and say the view is sorted.
+  4. Title-case the line of business and status for display (for example
+     `commercial_property` -> Commercial Property, `exception_review` ->
+     Exception Review). Format coverage as `$N,NNN,NNN` with no cents.
+
+  ## Output format
+
+  - Heading: `# Underwriting Risk Evaluation`
+  - One table with exactly these columns:
+    `App ID | Applicant | LOB | Coverage | Risk Score | Tier | Status`
+  - Followed by the tier definitions, verbatim:
+    - **Preferred** (0-30): Best rates, minimal restrictions
+    - **Standard** (31-55): Standard rates and terms
+    - **Substandard** (56-75): Rate surcharge or coverage restrictions
+    - **Decline** (76+): Outside risk appetite
+
+  ## Edge cases
+
+  - A filter that matches nothing returns an empty table and a plain statement
+    that no application matches, not a relaxed filter.
+  - An unknown UW- id is reported as not in the application set, with the ids
+    that are. Never fall back to another application's row.
+  - A tier is a rating input, not a decision. Never state that a Decline-tier
+    application has been declined, or that a Preferred one is bound.

@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: draft-follow-up
+  description: Renders a no-reply follow-up email from the follow_up_no_reply template with proposed time slots, benchmarks, and cadence best practices.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: draft-follow-up
+  description: Renders a no-reply follow-up email from the follow_up_no_reply template with proposed time slots, benchmarks, and cadence best practices.
+  ---
+  <!-- bic:source=blank -->
+  # Draft follow-up
+
+  Use this skill when the user asks to follow up on an email that got no reply,
+  asks for a nudge or bump, or asks what to send after silence.
+
+  ## Inputs
+
+  - The email template library (template key `follow_up_no_reply`).
+  - Context: first_name, topic, time_slot_1, time_slot_2, sender_name.
+  - No inputs required. With none supplied, render the sample context:
+    Jennifer Walsh, topic `digital transformation`, slots
+    `Tuesday 2:00 PM` and `Thursday 10:00 AM`, sender Alex Rivera.
+
+  ## Procedure
+
+  1. Select template `follow_up_no_reply`. Do not substitute a different
+     template.
+  2. Subject line: the FIRST `subject_variants` entry - `Re: {original_subject}`.
+     `original_subject` is not in the context, so it renders literally as
+     `Re: {original_subject}`; report it as an input the sender must fill from
+     the original thread. The other variants are `Quick follow-up, {first_name}`
+     and `Still relevant, {first_name}?`.
+  3. Substitute every `{key}` present in the context in both subject and body;
+     leave unmatched tokens literal. `{value_prop_one_liner}` has no context
+     value and stays in the body verbatim.
+  4. Report the stored benchmarks unchanged: `avg_open_rate` 0.28 and
+     `avg_reply_rate` 0.12 - 28% open, 12% reply.
+  5. Always emit the four best practices exactly as stored: send 3-5 business
+     days after the initial email; keep under 100 words; include specific time
+     slots; provide easy opt-out.
+
+  ## Output format
+
+  - `**Draft: Follow-Up Email**`
+  - `**To:** <first> <last>` - this template renders the name only, no email
+    address
+  - `**Subject:** Re: {original_subject}` (rendered)
+  - `**Tone:** Friendly, low-pressure`
+  - `---` then the rendered body, then `---`
+  - `**Performance Benchmarks:**` with `- Avg Open Rate: 28%` and
+    `- Avg Reply Rate: 12%`
+  - `**Best Practices:**` as the four bullets above
+  - `Source: [Email Template Engine]` and `Agents: EmailDraftingAgent`
+
+  ## Edge cases
+
+  - The body offers exactly two time slots. If the user has not supplied them,
+    say so; do not invent dates or times.
+  - `follow_up_no_reply` is the after-silence template. The library also holds
+    `meeting_follow_up` (Post-Meeting Follow-Up, 72% open / 38% reply), but
+    there is no drafting operation for it - if the user wants a post-meeting
+    recap, say the template exists in the library and show its structure from
+    knowledge rather than presenting a rendered draft.
+  - Draft only. Never say the follow-up was sent or scheduled.

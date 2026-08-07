@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: session-summary
+  description: Closes out a support session with issue and fix counts, the action table, before/after performance, the follow-up visit, and the incident number.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: session-summary
+  description: Closes out a support session with issue and fix counts, the action table, before/after performance, the follow-up visit, and the incident number.
+  ---
+  <!-- bic:source=blank -->
+  # Session summary
+
+  Use this skill when the user asks to wrap up, asks for a recap of what was
+  found and done, or needs the ticket record for the interaction.
+
+  ## Inputs
+
+  - The diagnostics result, the remediation plan, the technician roster, and
+    the ticket numbering record for the same user.
+
+  ## Procedure
+
+  1. Re-run the diagnostics rules and the remediation rules for that user -
+     the summary is derived, never re-stated from memory.
+  2. `Issues found` = the count of diagnostic checks whose status is `Critical`
+     or `Warning`. Checks with status `Info` (pending updates) and status `OK`
+     are excluded from this count.
+  3. `Fixes applied` = the number of remediation actions the triggers produced.
+  4. `Resolution` = `Remote fix + scheduled service` when a technician visit is
+     part of the session.
+  5. Before/after figures come from the remediation projection:
+     `new_disk = min(100, disk_free_pct + freed_disk)` and
+     `new_mem = max(0, memory_used_pct - freed_mem)`.
+  6. Follow-up names the selected technician and their `next_slot` verbatim;
+     the ticket is the incident number from the ticket numbering record.
+
+  ## Output format
+
+  Headline: `**Support Session Summary: <user name>**`
+
+  Then one table with exactly these rows: Issues found, Fixes applied,
+  Resolution.
+
+  Then `**Actions Taken:**` and one table with exactly these columns:
+
+  | Fix | Result |
+
+  Then `**Performance Improvement:**` and one table with exactly these columns:
+
+  | Metric | Before | After |
+
+  with rows `Disk space` and `Memory`, both rendered as bare percentages.
+
+  Then two lines:
+
+  - `**Follow-Up:** <technician> scheduled for <next slot>`
+  - `**Ticket:** <INC-xxxx-xxxxx>`
+
+  Close with `Source: [All IT Systems]`.
+
+  ## Edge cases
+
+  - Only list actions the triggers actually produced. A healthy device yields
+    zero fixes and an empty action table - report `Fixes applied | 0` rather
+    than padding the table.
+  - `Issues found` and `Fixes applied` are computed separately and will often
+    differ; never copy one into the other.
+  - The summary records what was proposed and what the user authorized. Do not
+    log a fix as taken that the user never approved, and do not describe the
+    follow-up visit as booked unless the user confirmed it.

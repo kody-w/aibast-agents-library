@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: model-catalog-data.md
+  description: Synthetic model registry catalog - accuracy, F1, latency, size, framework, license, and training data per model - that the agent answers from until real tools are connected.

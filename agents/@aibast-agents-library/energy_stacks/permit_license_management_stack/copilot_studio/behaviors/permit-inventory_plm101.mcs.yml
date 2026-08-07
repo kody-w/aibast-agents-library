@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: permit-inventory
+  description: Builds the permit and license register - every permit with its authority, permit number, status, expiration, and condition count, with the active and expired split up front.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: permit-inventory
+  description: Builds the permit and license register - every permit with its authority, permit number, status, expiration, and condition count, with the active and expired split up front.
+  ---
+  <!-- bic:source=blank -->
+  # Permit inventory
+
+  Use this skill when the user asks what permits or licenses the operator
+  holds, asks for the register, the inventory, the permit list, or asks about
+  a single permit's authority, number, status, expiration, or condition count.
+
+  ## Inputs
+
+  - The permit register (knowledge/tools).
+  - Optional: a facility name to filter on (Riverside Generating Station,
+    Bayshore Refinery, Northeast Corridor Pipeline, Ridgeline Coal Station).
+    If the user names one, apply it to every row and every count and say the
+    view is filtered.
+
+  ## Procedure
+
+  1. Retrieve every permit. Keep them in register order (`PRM-6001` through
+     `PRM-6006`). This table is not sorted - do not reorder it by expiration,
+     facility, or status. Expiration ordering is the renewal-calendar skill.
+  2. If a facility filter applies, keep only permits whose facility matches.
+  3. Count three numbers over the rows being shown:
+     - `total` = number of permits shown
+     - `active` = count of permits whose status is exactly `active`
+     - `expired` = count of permits whose status is exactly `expired`
+     These are two independent counts, not a partition: a permit in any other
+     status is counted in neither.
+  4. Render the headline line first, then the table.
+
+  ## Output format
+
+  Heading: `# Permit & License Inventory`
+
+  Headline: `**Total Permits:** N | **Active:** N | **Expired:** N`
+
+  Then one table, exactly these columns:
+
+  | ID | Permit | Facility | Authority | Status | Expiration | Conditions |
+
+  - `ID` is the `PRM-` id.
+  - `Authority` is the issuing authority, not the permit number. Cite the
+    authority-issued permit number in prose when compliance status is at issue.
+  - `Status` in caps (ACTIVE / EXPIRED).
+  - `Expiration` in ISO `YYYY-MM-DD`, exactly as recorded.
+  - `Conditions` is the integer count of conditions attached to the permit.
+
+  ## Edge cases
+
+  - Any permit in a status other than `active` or `expired` still appears in
+    the table but is excluded from both counts, so the headline will not sum to
+    the total. Say so rather than silently rebalancing.
+  - No permits match a facility filter: say so and name the filter that
+    produced the empty view.
+  - If any row is EXPIRED, add one line under the headline pointing the user to
+    the compliance-gap analysis for it, citing its `PRM-` id.
+  - Never state what a permit's conditions require. The register holds the
+    count only.

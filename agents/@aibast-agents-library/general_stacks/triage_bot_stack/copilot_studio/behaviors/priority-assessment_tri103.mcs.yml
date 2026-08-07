@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: priority-assessment
+  description: Derives priority, response clock, resolution clock, and auto-escalate flag from the impact and urgency pair using the fixed priority matrix.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: priority-assessment
+  description: Derives priority, response clock, resolution clock, and auto-escalate flag from the impact and urgency pair using the fixed priority matrix.
+  ---
+  <!-- bic:source=blank -->
+  # Priority assessment
+
+  Use this skill when the user asks how urgent an inquiry is, what its priority
+  or SLA clock is, which items are P1, or asks to see the priority matrix.
+
+  ## Inputs
+
+  - The priority matrix, keyed by the pair (impact, urgency).
+  - An inquiry (INQ- id) carrying an impact and an urgency, or an explicit
+    impact / urgency pair. Otherwise assess every inquiry in the queue.
+
+  ## Procedure
+
+  Look up the key `impact_<impact>_urgency_<urgency>` where both values are one
+  of high, medium, low. The matrix is fixed:
+
+  | Impact | Urgency | Priority | Response | Resolution | Auto-Escalate |
+  |---|---|---|---|---|---|
+  | High | High | P1-Critical | 15m | 1h | Yes |
+  | High | Medium | P2-High | 30m | 4h | No |
+  | High | Low | P3-Medium | 60m | 8h | No |
+  | Medium | High | P2-High | 30m | 4h | No |
+  | Medium | Medium | P3-Medium | 60m | 8h | No |
+  | Medium | Low | P4-Low | 120m | 24h | No |
+  | Low | High | P3-Medium | 60m | 8h | No |
+  | Low | Medium | P4-Low | 120m | 24h | No |
+  | Low | Low | P5-Informational | 240m | 72h | No |
+
+  Rules that hold every time:
+
+  - The matrix is the whole calculation. Never adjust priority for customer
+    tier, account value, tone, or who is asking.
+  - High/High is the only row that auto-escalates. If a user asserts a P2 or
+    lower item auto-escalates, correct them.
+  - If the impact or urgency value is missing or is not one of high / medium /
+    low, fall back to the medium/medium row (P3-Medium, 60m response, 8h
+    resolution, no auto-escalate) and say explicitly that you fell back
+    because the pair did not resolve.
+  - Response time is in minutes, resolution time is in hours. Do not convert
+    silently between them.
+
+  ## Output format
+
+  Headline `**Priority Assessment**`, then `**Sample Inquiries:**` and a table
+  of the inquiries assessed with these columns in this order:
+
+  `| ID | Impact | Urgency | Priority | Response Time |`
+
+  Impact and urgency are title-cased (High, Medium, Low). Response time carries
+  the `m` suffix.
+
+  Then `**Priority Matrix:**` and the full nine-row matrix table with these
+  columns in this order:
+
+  `| Impact | Urgency | Priority | Response | Resolution | Auto-Escalate |`
+
+  Close with the source line `Source: [Priority Engine]`.
+
+  ## Boundaries
+
+  - Never invent a priority level outside P1-Critical, P2-High, P3-Medium,
+    P4-Low, P5-Informational.
+  - If the inquiry id is not in the queue, say so and assess nothing.
+  - Recommendation only. Never say a priority has been set, a clock has been
+    started, or an escalation has fired.

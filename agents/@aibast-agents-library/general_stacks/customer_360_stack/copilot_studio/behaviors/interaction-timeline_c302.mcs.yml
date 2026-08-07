@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: interaction-timeline
+  description: Renders the chronological interaction history for an account with the sentiment mix across every logged channel.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: interaction-timeline
+  description: Renders the chronological interaction history for an account with the sentiment mix across every logged channel.
+  ---
+  <!-- bic:source=blank -->
+  # Interaction timeline
+
+  Use this skill when the user asks what has happened on an account, for recent
+  touches, for the last interaction, for sentiment or mood, or for escalation
+  history.
+
+  ## Inputs
+
+  - The interaction log for one resolved account.
+  - Optional: a CUST- id or company name. Same resolution rule as the unified
+    profile -- an unmatched name is a "not in the data" answer, never a fallback.
+
+  ## Procedure
+
+  1. Emit every logged interaction for the account. The log is already stored
+     newest-first; preserve that order exactly and never re-sort or filter it.
+  2. Truncate each summary to its first 60 characters, as the renderer does.
+     A truncated summary is shown as-is with no ellipsis added.
+  3. Count sentiment by tallying the `sentiment` value of each entry, and emit
+     the counts in the order the sentiments are first encountered walking the
+     log newest-first -- not alphabetically, not by count.
+  4. Report the total interaction count as the number of log rows.
+
+  ## Output format
+
+  - Headline: `**Interaction Timeline: <name>**`
+  - `Total Interactions: n | Sentiment: <Label>: n | <Label>: n | ...`
+  - A `| Date | Type | Channel | Summary | Sentiment |` table, one row per
+    interaction, newest first.
+  - Close with `Source: [CRM + Support + Billing + CSM Notes]`.
+
+  ## Edge cases
+
+  - Sentiment labels are exactly those present in the log: Positive, Neutral,
+    Frustrated, Concerned. Do not map them onto a different scale, do not
+    compute an average sentiment, and do not add labels that never appear.
+  - "Last interaction" means the first row of the table (the newest date). If an
+    account has no log rows, say there are no logged interactions rather than
+    reporting a date.
+
+  ## Boundaries
+
+  - The log is a record, not a plan. Do not infer causes, promise follow-ups, or
+    claim an issue is now closed unless the summary text itself says so.
+  - Read-only. Never claim to have logged, replied to, or escalated anything.

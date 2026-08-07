@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: portfolio-analysis
+  description: Reports current versus target allocation and drift for every holding in every portfolio, and whether each portfolio breaches its own drift threshold.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: portfolio-analysis
+  description: Reports current versus target allocation and drift for every holding in every portfolio, and whether each portfolio breaches its own drift threshold.
+  ---
+  <!-- bic:source=blank -->
+  # Portfolio analysis
+
+  Use this skill when the user asks for the portfolio picture, current
+  allocations, how far a portfolio has drifted, or whether a rebalance is due.
+  This is the default view when no portfolio is named.
+
+  ## Inputs
+
+  - The portfolio records: holdings, values, current and target percentages,
+    cost basis, total value, benchmark, drift threshold, rebalance frequency.
+  - Optional: a PORT- id to restrict the view to one portfolio. Otherwise cover
+    every portfolio in order (PORT-5001, then PORT-5002).
+
+  ## Procedure
+
+  For each portfolio:
+
+  1. Drift per holding is `drift = current_pct - target_pct`, rounded to one
+     decimal for display. Positive drift is overweight, negative is underweight.
+  2. Max drift is `max(abs(current_pct - target_pct))` across all holdings -
+     the absolute value, so an overweight and an underweight of the same size
+     count the same.
+  3. Rebalance needed is `Yes` when `max_drift >= drift_threshold`, otherwise
+     `No`. The comparison is greater-than-or-equal: a max drift of exactly 2.0%
+     against a 2.0% threshold is `Yes`.
+  4. Do not reorder holdings. Present them in the order they are held.
+
+  ## Output format
+
+  `# Portfolio Analysis`, then per portfolio:
+
+  - `## PORT-xxxx: <name>`
+  - Bullets: Manager, Strategy (title case), Total Value (`$12,450,000`),
+    Benchmark, Max Drift (one decimal, e.g. `5.0%`), Drift Threshold,
+    Rebalance Needed.
+  - Then a table with exactly these columns:
+    `| Asset | Ticker | Value | Current % | Target % | Drift |`
+  - Drift cells carry an explicit `+` when positive (`+5.0%`), a `-` when
+    negative (`-3.0%`), and plain `0.0%` when flat.
+
+  ## Edge cases
+
+  - A holding at target shows `0.0%` drift and stays in the table - the table
+    is the full portfolio, not just the breaches.
+  - Max drift can be driven by a holding that is not itself tradable under the
+    threshold rule; report max drift as computed and let the rebalance skill
+    decide what trades.
+  - If the user names a portfolio that is not in the data, say so and list the
+    portfolios that exist. Never fall back to another portfolio silently.
+
+  ## Boundaries
+
+  - Reporting only. This skill never proposes trades - hand off to
+    rebalance-recommendation for that.

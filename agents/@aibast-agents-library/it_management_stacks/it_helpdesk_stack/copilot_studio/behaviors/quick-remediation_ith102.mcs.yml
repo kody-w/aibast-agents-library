@@ -1,0 +1,71 @@
+mcs.metadata:
+  componentName: quick-remediation
+  description: Builds the remote remediation plan for a device from the three fixed triggers and projects the resulting disk and memory figures.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: quick-remediation
+  description: Builds the remote remediation plan for a device from the three fixed triggers and projects the resulting disk and memory figures.
+  ---
+  <!-- bic:source=blank -->
+  # Quick remediation
+
+  Use this skill when the user asks for a fix, asks what can be cleaned up
+  remotely, or accepts a diagnostic finding and wants it resolved.
+
+  ## Inputs
+
+  - The user directory, device telemetry, and remediation rules.
+  - A user name. If none is given, ask which user before answering.
+
+  ## Procedure
+
+  Evaluate the three triggers independently, in this order, and collect the
+  actions each one contributes:
+
+  1. `disk_free_pct < 30` contributes two actions - `Clear temp files`
+     (`4.2 GB freed`) and `Clear browser cache` (`1.8 GB freed`) - and sets
+     `freed_disk = 12`.
+  2. `memory_used_pct > 80` contributes `End background processes`
+     (`12 processes closed`) and sets `freed_mem = 22`.
+  3. `running_processes > 100` contributes `Pause OneDrive sync`
+     (`15% CPU freed`) and changes neither disk nor memory.
+
+  Then project the result:
+
+  - `new_disk = min(100, disk_free_pct + freed_disk)`
+  - `new_mem = max(0, memory_used_pct - freed_mem)`
+
+  These figures are fixed constants, not estimates. Never scale them to the
+  device, and never invent an action for a trigger that did not fire.
+
+  ## Output format
+
+  Headline: `**Quick Remediation: <user name>**`
+
+  Then `**Proposed Actions:**` and one table with exactly these columns:
+
+  | Action | Result |
+
+  Then `**Performance Improvement:**` and one table with exactly these columns:
+
+  | Metric | Before | After |
+
+  with rows `Disk space` (`N% free` before and after) and `Memory usage`
+  (`N%` before and after).
+
+  Then: `**Recommended:** Restart after current work for full optimization.`
+
+  Close with `Source: [Remote Management + Automation Scripts]`.
+
+  ## Boundaries
+
+  - Every one of these actions is side-effectful. Present them as proposed and
+    stop. Only after the user explicitly authorizes them may you describe them
+    as completed - and never claim the restart happened, since the restart is
+    always left to the user.
+  - The disk trigger is `< 30`, not the `< 20` used by diagnostics. A device
+    can be below 30% free with no Critical diagnostic and still get cleanup.
+  - If no trigger fires, return exactly: `No remediation needed - device is
+    healthy.` with `Source: [Remote Management]`. Do not pad the answer with
+    optional tidying.

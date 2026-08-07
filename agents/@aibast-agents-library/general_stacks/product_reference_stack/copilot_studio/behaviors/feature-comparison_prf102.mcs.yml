@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: feature-comparison
+  description: Builds the side-by-side Yes/No feature matrix for every product category that holds two or more products.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: feature-comparison
+  description: Builds the side-by-side Yes/No feature matrix for every product category that holds two or more products.
+  ---
+  <!-- bic:source=blank -->
+  # Feature comparison
+
+  Use this skill when the user asks how two products differ, asks what a
+  higher tier adds, or asks for a comparison table across the product line.
+
+  ## Inputs
+
+  - The product catalog, grouped by its `category` field.
+
+  ## Procedure
+
+  1. Group the six products by category. The groups are: Platform (Core
+     Platform, Enterprise Platform), Analytics (Analytics Standard, Analytics
+     Pro), Integration (Integration Hub), Security (Security Suite).
+  2. **Skip any category with fewer than two products.** Integration and
+     Security each hold one product, so they produce no comparison table. If
+     the user asks to compare Integration Hub or Security Suite against
+     something, say the category has a single product and no comparison is
+     defined, then offer the product-lookup card instead.
+  3. Within a category, build the union of all feature strings across its
+     products, **excluding any feature that starts with "Everything"** -- the
+     rollup lines `Everything in Core` and `Everything in Standard` are not
+     comparison rows.
+  4. Sort that feature union alphabetically (ASCII sort: capitals as written,
+     so `AI-Powered Insights` and `API Unlimited` sort ahead of lowercase-
+     leading words).
+  5. For each feature row and each product column, print `Yes` if the exact
+     feature string is in that product's own feature list, otherwise `No`.
+     This is a literal membership test -- inheritance through a rollup line is
+     NOT counted.
+
+  ## Output format
+
+  - Headline `**Feature Comparison**`.
+  - For each qualifying category, in catalog order (Platform, then Analytics):
+    - `**<Category>:**`
+    - A table whose first column is `Feature` and whose remaining columns are
+      the product names in catalog order.
+    - One row per feature, cells `Yes` / `No`.
+  - Close with `Source: [Product Catalog]`.
+
+  ## Edge cases
+
+  - Because of the literal membership test, Enterprise Platform shows `No`
+    against Core Platform features such as Contact Management, Deal Pipeline,
+    Task Automation, Basic Reporting, Email Integration, and Mobile App, and
+    Analytics Pro shows `No` against Analytics Standard features such as
+    Pre-built Reports, Dashboard Builder, Data Export (CSV/PDF), Scheduled
+    Reports, and Basic Visualizations. Whenever you surface such a row, add
+    one line stating the higher tier inherits those through its rollup entry
+    (`Everything in Core` / `Everything in Standard`). Never silently leave a
+    false negative on screen.
+  - The Platform table has 14 feature rows; the Analytics table has 11.
+  - A feature that appears in no product does not exist. Do not add rows for
+    features a customer asks about but the catalog does not list -- say the
+    catalog does not carry that feature.

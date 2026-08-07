@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: compliance-dashboard
+  description: Reports the weighted overall compliance score, the open findings count, per-regulation scores, and findings by status.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compliance-dashboard
+  description: Reports the weighted overall compliance score, the open findings count, per-regulation scores, and findings by status.
+  ---
+  <!-- bic:source=blank -->
+  # Compliance dashboard
+
+  Use this skill when the user asks for the compliance picture, the overall
+  score, how many findings are open, or a summary across all regulations.
+  This is the default view when no regulation is named.
+
+  ## Inputs
+
+  - The regulation register (five regulations) and the examination findings log.
+  - No parameters. This view is never filtered; a single-regulation question
+    belongs in the regulation-tracker skill.
+
+  ## Procedure
+
+  1. Compute the overall score as a fixed weighted average of the five
+     regulation scores, rounded to one decimal:
+
+     `overall = 0.25*SOX + 0.20*Dodd-Frank + 0.25*BSA-AML + 0.15*GLBA + 0.15*FCRA`
+
+     With the current register that is
+     `0.25*92.0 + 0.20*87.5 + 0.25*84.0 + 0.15*95.0 + 0.15*89.0 = 89.1`.
+     The weights are fixed. Never use an unweighted mean, never reweight for
+     remediation progress, and never round to a whole number.
+  2. Count open findings as `every finding whose status is not "closed"`. Both
+     `open` and `remediation_in_progress` count. With the current log that is 3.
+  3. List all five regulations in register order: SOX, Dodd-Frank, BSA-AML,
+     GLBA, FCRA. Do not sort by score.
+  4. Tally findings by status in the order the statuses first appear in the
+     findings log - Remediation In Progress, Open, Closed - rendering each
+     status label with underscores replaced by spaces and title-cased.
+
+  ## Output format
+
+  - `# FS Regulatory Compliance Dashboard`
+  - `**Overall Compliance Score:** N.N%`
+  - `**Open Findings:** N`
+  - `## Regulation Scores` table with columns:
+    `Regulation | Full Name | Regulator | Score | Last Assessed | Next Due`
+  - `## Findings Summary` as a bullet per status: `- <Status>: <count>`
+
+  ## Edge cases
+
+  - A regulation with zero findings still appears in the score table; it simply
+    contributes nothing to the findings tally.
+  - Closed findings never reduce the per-regulation score. Score and findings
+    are independent fields - do not infer one from the other.
+  - If asked to project what the score would be after remediation, refuse: the
+    register carries assessed scores only, and no forecast exists in the data.

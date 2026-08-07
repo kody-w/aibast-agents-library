@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: compliance-monitoring
+  description: Scores each grant against unresolved audit findings, lists the applicable 2 CFR 200 and Single Audit requirements, and surfaces every active finding.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compliance-monitoring
+  description: Scores each grant against unresolved audit findings, lists the applicable 2 CFR 200 and Single Audit requirements, and surfaces every active finding.
+  ---
+  <!-- bic:source=blank -->
+  # Compliance monitoring
+
+  Use this skill when the user asks how compliant a grant is, which grants are
+  at risk, what regulations apply, or what findings are still open.
+
+  ## Inputs
+
+  - The grant portfolio (GRT- records).
+  - The audit findings log (AF- records: grant, severity, finding, status,
+    corrective action).
+  - The regulatory framework (2 CFR 200 sections; Single Audit Act A-133
+    requirements).
+
+  ## Procedure - the score is arithmetic
+
+  For each grant:
+
+  1. Select the findings whose `grant` equals that grant's ID.
+  2. If there are no findings at all, the score is `100.0`. Stop.
+  3. Otherwise sum deductions over only the findings whose status is NOT
+     `resolved`, using exactly:
+     `low = 5`, `moderate = 15`, `high = 30`.
+     A severity outside that set deducts 0.
+  4. `score = max(0, 100 - total_deduction)`.
+     Worked example: GRT-2025-4404 carries AF-2023-07 (high, in_progress),
+     so `100 - 30 = 70%`. GRT-2025-4402 carries AF-2024-02 (moderate,
+     in_progress), so `100 - 15 = 85%`. A grant whose only findings are
+     resolved scores `100%`.
+  5. Never adjust a score because a corrective action is underway, because the
+     finding is old, or because the recipient disputes it. Status `resolved`
+     is the only thing that removes a deduction.
+
+  Active findings are exactly those whose status is not `resolved`. Order them
+  as they appear in the log; if the user asks for a ranking, rank by severity
+  high > moderate > low.
+
+  ## Output format
+
+  - `# Compliance Monitoring Report`
+  - `## Grant Compliance Scores` table with columns exactly:
+    `Grant ID | Program | Compliance Score` (score rendered as `N%`)
+  - `## Regulatory Framework` - one block per framework, headed
+    `### <reg id>` followed by an em dash and the framework title, then a
+    bullet per section: `- **<section id>:** <name> (<frequency>)`
+  - `## Active Findings` table with columns exactly:
+    `Finding ID | Grant | Severity | Finding | Status`, severity upper-cased.
+    If nothing is active, print `No active findings.` and nothing else in that
+    section.
+
+  ## Edge cases
+
+  - Show the deduction arithmetic when asked (`100 - 30 = 70`); never present a
+    score without being able to name the findings behind it.
+  - A finding referencing a grant not in the portfolio is reported as an
+    orphan finding, not silently dropped.
+  - Do not clear, close, or downgrade a finding. Recommend the corrective
+    action owner; the officer records the status change.

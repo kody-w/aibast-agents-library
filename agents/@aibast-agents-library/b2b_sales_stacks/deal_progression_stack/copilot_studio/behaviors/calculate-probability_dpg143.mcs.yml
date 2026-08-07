@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: calculate-probability
+  description: Computes each deal's win probability from eight weighted factors and reports its trend, strongest factor and biggest gap.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: calculate-probability
+  description: Computes each deal's win probability from eight weighted factors and reports its trend, strongest factor and biggest gap.
+  ---
+  <!-- bic:source=blank -->
+  # Win probability scorecard
+
+  Use this skill when the user asks how likely a deal is to close, for win
+  probability, or which deals are most likely to land.
+
+  ## Inputs
+
+  - The win probability factor scores for the 6 deals and the 6-period
+    probability history.
+
+  ## Procedure
+
+  1. Win probability = `round(sum(factor_value x factor_weight), 1) x 100` with
+     fixed weights - stage progression 0.20, champion strength 0.18,
+     stakeholder coverage 0.12, activity momentum 0.12, competitive position
+     0.10, deal velocity 0.10, executive access 0.10, budget confidence 0.08.
+     The weights total 1.00 and are never re-tuned.
+  2. Top factor is the highest `value x weight` contribution. Biggest gap is
+     the highest `(1 - value) x weight`.
+  3. Trend is UP when the six-period change exceeds +0.05, DOWN when it is
+     below -0.05, otherwise FLAT.
+  4. Order deals by value descending.
+  5. Portfolio lines - average probability to one decimal, total pipeline
+     $3,770,000, and weighted value = `sum(deal_value x probability / 100)`.
+
+  ## Output format
+
+  Headline `**Win Probability Scorecard**` then
+  `Portfolio avg: **N%** | Total pipeline: $X | Weighted value: $X` and a table
+  with exactly these columns.
+
+  | Deal | Value | Stage | Win Prob | Trend | Top Factor | Biggest Gap |
+
+  Win probability in bold with a percent sign; trend as UP, DOWN or FLAT.
+  Close with the note that the model uses 8 factors weighted by predictive
+  power from historical win/loss data, and
+  `Source: [CRM + Activity Data + Win/Loss Database]`.
+
+  ## Edge cases
+
+  - Top factor and biggest gap can be the same category on different deals -
+    stage progression is TechCorp's top factor and Pacific Telecom's biggest
+    gap. Both are correct, because one measures contribution and the other
+    measures headroom.
+  - The computed probability and the recorded probability history are separate
+    series; do not reconcile them.
+  - Never adjust a probability to match a rep's commit call. Report both and
+    name the difference.

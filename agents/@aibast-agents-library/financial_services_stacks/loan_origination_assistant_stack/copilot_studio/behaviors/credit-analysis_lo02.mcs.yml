@@ -1,0 +1,80 @@
+mcs.metadata:
+  componentName: credit-analysis
+  description: Analyzes one application - DTI, LTV, DSCR - and compares each metric against that product's approval criteria with a Pass/Fail per line.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: credit-analysis
+  description: Analyzes one application - DTI, LTV, DSCR - and compares each metric against that product's approval criteria with a Pass/Fail per line.
+  ---
+  <!-- bic:source=blank -->
+  # Credit analysis
+
+  Use this skill when the user asks about one application's credit profile,
+  DTI, LTV, DSCR, whether a file qualifies, or how it stacks up against
+  guidelines.
+
+  ## Inputs
+
+  - `application_id` - an LA- id from the pipeline. If none is given, analyze
+    LA-2025-4001 and say that is the default view.
+  - The approval criteria for that application's `loan_type`, and the rate
+    sheet entry for the payment calculation.
+
+  ## Procedure - compute it, do not judge it
+
+  1. **Monthly income** = `annual_income / 12`. If it is 0, DTI is 0; report
+     that as unmeasurable, not as a good ratio.
+  2. **Term** = 360 payments, except any product whose `loan_type` contains
+     `5yr`, which uses 60 payments (`commercial_5yr`).
+  3. **Monthly rate** `i = rate / 100 / 12`, using that product's rate sheet
+     rate. If the product is missing from the rate sheet, fall back to 7.0%.
+  4. **P&I payment** =
+     `loan_amount * (i * (1 + i)^n) / ((1 + i)^n - 1)`, with `n` from step 2.
+  5. **DTI** = `round((monthly_debt + payment) / monthly_income * 100, 1)`.
+     The existing `monthly_debt` is added to the new payment - this is a
+     back-end ratio, not a housing ratio.
+  6. **LTV** = `round(loan_amount / property_value * 100, 1)`.
+  7. Build the criteria comparison, one row per gate that actually applies:
+     - Credit score row only when the product's `min_credit` is non-zero.
+       Pass when `credit_score >= min_credit`.
+     - DTI row only when the product's `max_dti` is non-zero. Pass when
+       `DTI <= max_dti`.
+     - LTV row always. Pass when `LTV <= max_ltv` (default 100 if the product
+       has no ceiling).
+     - DSCR gate when the product sets `min_dscr`. Pass when
+       `dscr >= min_dscr`.
+     Comparisons are inclusive: exactly at the limit is a Pass.
+  8. Collect a failure line for every gate that fails, phrased as the metric,
+     its value, and the limit it broke.
+
+  ## Output format
+
+  Heading `# Credit Analysis: LA-xxxx-xxxx`, then a bullet block in this order:
+
+  - Applicant, Loan Type, Credit Score, Annual Income, Monthly Debt,
+    DTI Ratio, LTV Ratio, Down Payment, DSCR (only when the file has one),
+    Employment (years).
+
+  Then `## Criteria Comparison` and one table, exactly these columns:
+
+  | Metric | Actual | Required | Status |
+
+  Required is written as the comparison (`>= 620`, `<= 45%`, `<= 95%`), Status
+  is `Pass` or `Fail`. Then either `## Issues` with one bullet per failed gate,
+  or the single line `**All criteria met.**`.
+
+  ## Edge cases
+
+  - A commercial file records `credit_score` as 0. Print it as
+    `N/A (Commercial)` and omit the credit row from the comparison table -
+    `min_credit` is 0 for `commercial_5yr`, so no credit gate exists.
+  - `max_dti` is also 0 for `commercial_5yr`, so no DTI row appears in the
+    table even though the DTI is computed and shown in the bullet block. Say
+    explicitly that commercial DTI is informational: LA-2025-4003 shows a DTI
+    of 115.2% (a 60-month amortization on $1,680,000) and still passes, because
+    commercial is gated on LTV and DSCR only.
+  - Employment years of 0 on an entity borrower (Westfield Properties LLC) is
+    the recorded value, not a missing field. Do not treat it as a red flag.
+  - If the requested application id is not in the pipeline, say so and stop.
+    Do not analyze a different file in its place.

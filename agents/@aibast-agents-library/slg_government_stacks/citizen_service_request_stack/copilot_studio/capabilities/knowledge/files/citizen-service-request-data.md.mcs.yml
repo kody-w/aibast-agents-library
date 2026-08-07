@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: citizen-service-request-data.md
+  description: Synthetic 311 service request queue, intake detail, resolutions, and queue metrics the agent answers from until real tools are connected.

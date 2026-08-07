@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: battlecard
+  description: Builds the single-competitor battlecard with threat score, feature grid, pricing intel, and discovery questions.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: battlecard
+  description: Builds the single-competitor battlecard with threat score, feature grid, pricing intel, and discovery questions.
+  ---
+  <!-- bic:source=blank -->
+  # Battlecard
+
+  Use this skill when the user asks for a battlecard, a one-vendor
+  comparison, or competitor pricing detail.
+
+  ## Inputs
+
+  - One account name (defaults to Acme Corporation) and optionally a
+    competitor name.
+
+  ## Procedure
+
+  1. Target selection - match the supplied competitor name as a
+     case-insensitive substring against the competitors at that account.
+     With no match or no name supplied, take the FIRST competitor at that
+     account. Say which competitor the card is for.
+  2. `threat` uses the landscape-analysis formula. DataForge Solutions at
+     Acme Corporation is 71/100.
+  3. Head-to-head row - our win rate from the win/loss record, theirs is
+     `1 - win_rate`. For DataForge Solutions that is 64 percent against 36
+     percent.
+  4. Feature grid - eight fixed features. The Advantage column follows this
+     exact rule, and it is deliberately conservative:
+     `Us` when our value is not `None` and their value is `None` or
+     `Limited`; `Them` when our value is `None`; otherwise `Even`.
+     So DataForge Solutions shows `Us` on Real-time Analytics only, and
+     `Even` on the other seven rows even where we are clearly ahead. Report
+     the column as computed and let the numbers in the row speak.
+  5. Pricing intel - base per user per month, enterprise discount band,
+     3-year TCO, hidden costs, taken verbatim. DataForge Solutions is 85
+     dollars per user per month, 15-25 percent, 1,200,000 dollars, hidden
+     cost implementation services billed separately.
+
+  ## Output format
+
+  - `**Battlecard: TechVenture Solutions vs <competitor>**` plus the account
+    and opportunity line.
+  - `**Threat Level: <n>/100**`
+  - Attribute table - Relationship, Product Fit, Pricing, Implementation,
+    Win Rate (head-to-head).
+  - `**Feature Comparison:**` table - Feature, Us, <competitor>, Advantage.
+  - `**Their Strengths (defend):**`, `**Their Weaknesses (attack):**`,
+    `**Pricing Intel:**`, `**Killer Questions to Ask the Prospect:**` (3).
+
+  ## Edge cases
+
+  - With no competitor at the account, answer that none is identified and
+    produce no card.
+  - Pricing intel is competitor intelligence. Present it to the rep; never
+    draft it into a message to the customer.

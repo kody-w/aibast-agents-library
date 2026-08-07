@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: approval-workflow
+  description: Maps the resulting discount level onto the approval matrix - required approver, SLA, and whether any program forces manual review.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: approval-workflow
+  description: Maps the resulting discount level onto the approval matrix - required approver, SLA, and whether any program forces manual review.
+  ---
+  <!-- bic:source=blank -->
+  # Approval workflow
+
+  Use this skill when the user asks who has to approve a discount, how long
+  approval takes, whether a deal can be auto-approved, or what the escalation
+  path is.
+
+  ## Inputs
+
+  - The best applicable discount percentage (from the savings rules).
+  - The approval matrix and the `requires_approval` flag on each eligible
+    program.
+
+  ## Procedure - banded, no interpolation
+
+  1. Compute the best applicable discount, the same single highest eligible
+     percentage used for savings.
+  2. Select the band by these exact comparisons, in order:
+     - `best_discount <= 15` -> Sales Manager, 4h SLA, auto-approves only if
+       deal size > $50K and health score > 80.
+     - `best_discount <= 25` -> VP Sales, 8h SLA, no auto-approve.
+     - `best_discount <= 35` -> CRO, 24h SLA, no auto-approve.
+     - otherwise (`> 35`) -> CEO, 48h SLA, no auto-approve.
+  3. Manual approval is required if **any** eligible program carries
+     `requires_approval` - that is EDU-001, NPO-001, or COMP-001. A single
+     such program makes the whole deal manual, regardless of the band.
+  4. The estimated approval time is the SLA of the selected band.
+
+  ## Output format
+
+  Headline: `**Approval Workflow: <customer>**`
+
+  Then the decision line:
+  `**Discount Level:** N% | **Required Approver:** <approver>`
+
+  Then `**Approval Matrix:**` and one table, exactly these columns:
+
+  | Discount Range | Approver | SLA | Auto-Approve Criteria |
+
+  All four bands are always shown, in order (Up To 15 Pct, 15 To 25 Pct,
+  25 To 35 Pct, Above 35 Pct). SLA as hours with an `h` suffix. Auto-Approve
+  Criteria is the criteria text, or `None` where there is none. Append
+  `<-- Required` inside the last cell of the selected band's row.
+
+  Then two lines:
+  `**Programs Requiring Manual Approval:** Yes` / `None`
+  `**Estimated Approval Time:** N hours`
+
+  Close with `Source: [Approval Engine + Deal Desk]`.
+
+  ## Edge cases
+
+  - The band is selected from the discount level alone. Never move a deal to a
+    lower approver because the dollar value is small or the quarter is closing.
+  - The Sales Manager auto-approve criteria is the only auto-approve path in
+    the matrix; it applies only in the `<= 15%` band and only when both
+    conditions hold. If either is unknown, say so and treat it as manual.
+  - Recommendation only. Never say approval has been requested, routed,
+    granted, or escalated - name the approver and stop.

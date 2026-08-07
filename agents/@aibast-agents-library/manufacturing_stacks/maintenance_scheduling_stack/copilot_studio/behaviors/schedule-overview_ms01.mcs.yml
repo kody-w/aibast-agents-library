@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: schedule-overview
+  description: Presents the full maintenance picture - every asset with status and risk score, technician availability, and the last five maintenance records.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: schedule-overview
+  description: Presents the full maintenance picture - every asset with status and risk score, technician availability, and the last five maintenance records.
+  ---
+  <!-- bic:source=blank -->
+  # Schedule overview
+
+  Use this skill when the user asks for the maintenance schedule, the equipment
+  status, the plant picture, who is available, or what maintenance was done
+  recently.
+
+  ## Inputs
+
+  - The equipment master, sensor readings, failure probabilities, technician
+    roster, and maintenance history.
+  - No filters are applied. This is the only view that shows every asset,
+    including assets below the 10% alert threshold.
+
+  ## Procedure
+
+  1. Risk score for every asset, computed exactly:
+
+     `risk = round(P30 * 60 + min(vibration_mm_s / 10, 1.0) * 25 + min(temp_c / 100, 1.0) * 15, 1)`
+
+     where `P30` is the 30-day failure probability as a decimal. Both sensor
+     terms are capped at 1.0. Assets missing `vibration_mm_s` contribute 0 for
+     that term; assets missing `temp_c` are treated as 20 C.
+  2. Map the status field to a label: `running` -> `OK`, `warning` -> `WARN`,
+     `critical` -> `CRIT`. Bold the label.
+  3. Technician free hours: `free = available_hours_week - committed_hours`.
+  4. Maintenance history: show the last five records in date order, oldest of
+     the five first. Do not summarize or reorder them.
+
+  ## Output format
+
+  `## Maintenance Schedule Overview`, then three sections in this order.
+
+  `### Equipment Status` - table with columns:
+  `ID | Equipment | Type | Status | Runtime (hrs) | Last Service | Risk Score`.
+  Rows stay in equipment-master order (EQ-CNC-01, EQ-CNC-02, EQ-PRS-01,
+  EQ-WLD-01, EQ-INJ-01, EQ-ASM-01) - this table is not ranked. Runtime hours
+  carry thousands separators.
+
+  `### Technician Availability` - table with columns:
+  `Technician | Shift | Certifications | Avail Hrs/Wk | Committed | Free`.
+  Certifications are comma-separated in roster order.
+
+  `### Recent Maintenance History` - table with columns:
+  `Date | Equipment | Type | Hours | Cost`. Equipment renders as the asset name,
+  not the id. Cost renders as `$0,000.00`.
+
+  ## Edge cases
+
+  - An equipment id present in a history record but absent from the equipment
+    master renders as the raw id rather than a name. Say so if asked.
+  - Never drop a low-risk asset from the equipment table; the 10% threshold does
+    not apply to this view.
+  - Recommendation only. Presenting availability is not scheduling anyone.

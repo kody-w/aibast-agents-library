@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: revenue-impact
+  description: Projects base renewal ARR against best-case, expected, and worst-case scenarios using the fixed 40 percent expansion and 30 percent churn weightings.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: revenue-impact
+  description: Projects base renewal ARR against best-case, expected, and worst-case scenarios using the fixed 40 percent expansion and 30 percent churn weightings.
+  ---
+  <!-- bic:source=blank -->
+  # Revenue impact
+
+  Use this skill when the user asks for the forecast, the outlook, the ARR
+  projection, the upside and downside, what the book is worth, or what happens
+  if the at-risk accounts leave.
+
+  ## Inputs
+
+  - The three upstream computations: the renewal pipeline total, the expansion
+    opportunity total, and the churn-risk ARR total. This skill runs all three
+    and combines them; it reads no additional data.
+
+  ## Procedure - compute it, do not judge it
+
+  1. `base_renewal_arr` = renewal pipeline `total_arr` = **$966,000** (all five
+     agreements, not just the healthy ones).
+  2. `expansion_potential` = expansion total = **$114,000**.
+  3. `churn_risk_arr` = churn-risk total = **$318,000** (signal-gated, so it
+     includes LIC-3003's $192,000; it is not the pipeline's $126,000 At-Risk
+     ARR).
+  4. `best_case = 966000 + 114000 = $1,080,000` - full expansion, no churn.
+  5. `worst_case = 966000 - 318000 = $648,000` - no expansion, full churn.
+  6. `expected = 966000 + round(114000 * 0.4) - round(318000 * 0.3)
+     = 966000 + 45600 - 95400 = $916,200`. The 0.4 and 0.3 weightings are fixed
+     constants. Never adjust them for an account's health score, signal count,
+     or renewal date, and never re-weight per account.
+  7. Nothing in this projection is time-phased. It is a single annualized view
+     across renewal dates 2026-04-15 through 2026-07-01.
+
+  ## Output format
+
+  - `# Revenue Impact Projection`
+  - `**Base Renewal ARR:** $966,000`
+  - `**Expansion Potential:** $114,000`
+  - `**Churn Risk ARR:** $318,000`
+  - `## Scenarios`, then a table with columns exactly: `Scenario | Projected
+    ARR`, with rows labelled `Best Case (full expansion, no churn)`,
+    `Expected (40% expansion, 30% churn)`, `Worst Case (no expansion, full
+    churn)` - in that order.
+  - `## Recommendations`, then the three standing recommendations verbatim:
+    prioritize executive engagement for high-churn-risk accounts; fast-track
+    expansion proposals for Skyline Hospitality and Pinnacle Insurance; assign
+    dedicated CSM resources to ClearView Analytics and Granite Construction.
+
+  ## Edge cases
+
+  - The recommendations are a fixed list, not a derivation. They do not change
+    with the numbers, and they name Skyline Hospitality and Pinnacle Insurance
+    for expansion even though those two are tied at $42,000 rather than ranked
+    apart. Present them as recorded guidance.
+  - Expansion and churn overlap on LIC-3003 Redwood Supply Chain: its $192,000
+    sits in the churn total while its $30,000 of upside sits in the expansion
+    total. The expected case therefore both credits and debits that account.
+    Flag it if the user asks how the scenarios can move together.
+  - Worst case still assumes every non-signalled account renews in full. It is
+    not a floor on the business.
+  - These are projections, not a forecast commitment, and never an instruction
+    to act. Never say a forecast was submitted, a number committed, or an
+    engagement scheduled.

@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: customer-feedback-and-nps-data.md
+  description: Synthetic customer feedback entries, verbatims, NPS trend, and field vocabularies the agent answers from until real tools are connected.

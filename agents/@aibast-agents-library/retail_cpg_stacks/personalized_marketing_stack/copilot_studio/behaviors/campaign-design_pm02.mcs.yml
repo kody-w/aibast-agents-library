@@ -1,0 +1,79 @@
+mcs.metadata:
+  componentName: campaign-design
+  description: Lays out each campaign template with its target segment, audience, cadence, offer, email sequence, historical benchmarks, and computed projected revenue.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: campaign-design
+  description: Lays out each campaign template with its target segment, audience, cadence, offer, email sequence, historical benchmarks, and computed projected revenue.
+  ---
+  <!-- bic:source=blank -->
+  # Campaign design
+
+  Use this skill when the user asks what campaigns exist, asks to see or plan a
+  specific campaign, asks about an offer, a send cadence, an email sequence, or
+  how much revenue a campaign should produce.
+
+  ## Inputs
+
+  - The campaign template library (four templates, CAMP- ids) and the customer
+    segment model, which supplies the audience size and average basket size.
+  - Optional: one `campaign_id`.
+
+  ## Procedure - exact rules
+
+  1. Scope selection, applied literally:
+     - If a `campaign_id` is given AND it exists in the template library,
+       output that one campaign only.
+     - Otherwise output all four templates in library order: CAMP-WINBACK,
+       CAMP-LOYALTY, CAMP-NEWWELCOME, CAMP-VIP. An unrecognized id falls back
+       to the full portfolio - when that happens, say the id was not found
+       before showing the portfolio, so nobody reads it as a filtered view.
+  2. Resolve the target segment from the campaign's `target_segment` and pull
+     `size` (audience) and `avg_basket_size` from it.
+  3. `Projected Revenue = audience size x historical_conversion_rate x segment
+     avg_basket_size`, rounded to 2 decimals. Worked values:
+     - CAMP-WINBACK: 34,200 x 0.012 x 106.25 = **$43,605.00**
+     - CAMP-LOYALTY: 42,850 x 0.08 x 102.46 = **$351,232.88**
+     - CAMP-NEWWELCOME: 27,600 x 0.055 x 89.47 = **$135,815.46**
+     - CAMP-VIP: 8,750 x 0.14 x 170.73 = **$209,144.25**
+     Never substitute average annual spend for basket size, and never apply one
+     segment's basket to another campaign's audience.
+  4. Print the email sequence in full, numbered 1..n in stored order. The count
+     must equal the campaign's stage count: WINBACK 4, LOYALTY 3, NEWWELCOME 5,
+     VIP 2. Never add, reorder, reword, or trim a subject line.
+  5. Benchmarks render as `Open <rate x 100, 0dp>% | Click <rate x 100, 0dp>% |
+     Convert <rate x 100, 1dp>%`. Conversion keeps one decimal (1.2%, 8.0%,
+     5.5%, 14.0%); open and click carry none (18%/4%, 42%/15%, 35%/11%,
+     58%/24%).
+
+  ## Output format
+
+  - `# Campaign Design Portfolio`
+  - Per campaign, `## <name> (`CAMP-ID`)` then bullets in this order:
+    `**Type:**`, `**Target Segment:**` (segment name plus its SEG- id),
+    `**Audience Size:**`, `**Duration:**` (`N days, N stages`), `**Offer:**`,
+    `**Projected Revenue:**`.
+  - `**Email Sequence:**` followed by the numbered subject lines.
+  - `**Historical Benchmarks:**` on one line in the format above.
+
+  ## Edge cases
+
+  - Two templates are `automated_email` (CAMP-WINBACK, CAMP-NEWWELCOME) and two
+    are `multi_channel` (CAMP-LOYALTY, CAMP-VIP). Do not describe a
+    multi_channel campaign as email-only.
+  - CAMP-VIP is the shortest run (7 days, 2 stages) against the smallest
+    audience (8,750) and still projects $209,144.25 - a fair comparison is by
+    revenue per contact, not by audience size.
+  - Every segment except SEG-ATRISK is targeted by exactly one template.
+    SEG-ATRISK (18,420, 38% churn) has NO campaign in the library. If asked
+    which campaign covers at-risk churners, state plainly that none exists in
+    the data; do not repurpose CAMP-WINBACK as if it were designed for them.
+
+  ## Boundaries
+
+  - Design and projection only. Never say a campaign was scheduled, launched,
+    sent, paused, or approved.
+  - Do not invent offers, stages, channels, or subject lines. If the user asks
+    for a discount level or a channel that is not in the template, say it is
+    not in the data and give the stored offer as-is.

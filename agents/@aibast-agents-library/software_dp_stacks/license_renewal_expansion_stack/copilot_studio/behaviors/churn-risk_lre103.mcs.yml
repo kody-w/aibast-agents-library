@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: churn-risk
+  description: Lists every account carrying churn signals ordered worst health first with health, NPS, seat utilization, usage trend, ticket volume, and verbatim signals.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: churn-risk
+  description: Lists every account carrying churn signals ordered worst health first with health, NPS, seat utilization, usage trend, ticket volume, and verbatim signals.
+  ---
+  <!-- bic:source=blank -->
+  # Churn risk
+
+  Use this skill when the user asks who is going to churn, which accounts are in
+  trouble, where the save plays are, what the red flags are on an account, or
+  how much ARR is exposed.
+
+  ## Inputs
+
+  - The license agreement portfolio and each account's `churn_signals`,
+    `health_score`, `nps_score`, `usage_trend`, `support_tickets_90d`, seats,
+    and seats used.
+
+  ## Procedure - compute it, do not judge it
+
+  1. **Inclusion gate.** An account is skipped entirely when `churn_signals` is
+     empty. LIC-3001 Pinnacle Insurance Corp and LIC-3004 Skyline Hospitality
+     Group have no churn signals and never appear here.
+  2. `seat_utilization = round(seats_used / seats * 100, 1)`, rendered with one
+     decimal and a `%`: LIC-3002 `18 / 30 = 60.0%`, LIC-3005 `12 / 20 = 60.0%`,
+     LIC-3003 `79 / 80 = 98.8%`.
+  3. Sort ascending by `health_score`. The order is LIC-3002 ClearView
+     Analytics (29), LIC-3005 Granite Construction Co (35), LIC-3003 Redwood
+     Supply Chain (62). Never re-sort by ARR - the largest exposure, LIC-3003 at
+     $192,000, is listed last.
+  4. `total_arr_at_risk` = sum of ARR across every included account:
+     `72000 + 54000 + 192000 = $318,000`. This gate is signal presence, not the
+     health-score risk band, so this figure differs from the renewal pipeline's
+     At-Risk ARR of $126,000. Never conflate the two.
+  5. Signals are reproduced verbatim, never summarized, reworded, or ranked.
+
+  ## Output format
+
+  - `# Churn Risk Assessment`
+  - `**Total ARR at Risk:** $318,000`
+  - Then, per account in health order:
+    - `## <Customer> (ARR: $NN,NNN)`
+    - bullets, in this order: `Health Score`, `NPS`, `Seat Utilization` with a
+      `%`, `Usage Trend` in lowercase as recorded, `Support Tickets (90d)`
+    - `**Churn Signals:**` followed by one bullet per recorded signal
+
+  ## Edge cases
+
+  - LIC-3002 and LIC-3005 share an identical 60.0% seat utilization from
+    different bases (18/30 and 12/20). Do not treat that as a coincidence worth
+    interpreting.
+  - LIC-3003 Redwood Supply Chain is healthy on every measure that is not a
+    signal - 98.8% utilization, stable usage, NPS 65, 7 tickets - and appears
+    here on the strength of one signal, "Budget freeze mentioned in QBR". Say
+    that plainly rather than describing the account as failing.
+  - The two accounts with the worst health, LIC-3002 (29) and LIC-3005 (35), are
+    also the two smallest by ARR ($72,000 and $54,000). Note it; do not weight
+    the ordering for it.
+  - You assess; a person acts. Never say an escalation was raised, a save play
+    launched, an executive engaged, or a CSM reassigned.

@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: daily-plan
+  description: Produces the time-blocked day built from the top pending actions in priority order.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: daily-plan
+  description: Produces the time-blocked day built from the top pending actions in priority order.
+  ---
+  <!-- bic:source=blank -->
+  # Daily plan
+
+  Use this skill when the user asks for today's plan, a time-blocked
+  schedule, or how to structure the day.
+
+  ## Inputs
+
+  - None.
+
+  ## Procedure
+
+  1. Rank all actions with the priority formula (see prioritize-actions),
+     then keep only those whose status is `pending`. Call this list P.
+  2. Fill this fixed skeleton. Slot times and durations never change.
+
+     | Slot | Duration | Content |
+     |---|---|---|
+     | 8:00 AM | 30 min | Review pipeline and prioritize (Planning) |
+     | 8:30 AM | 60 min | P[0] |
+     | 9:30 AM | 30 min | P[1] |
+     | 10:00 AM | 60 min | P[2] |
+     | 11:00 AM | 30 min | Email follow-ups and LinkedIn engagement (Outreach) |
+     | 11:30 AM | 60 min | P[3] |
+     | 12:30 PM | 60 min | Lunch break (Break) |
+     | 1:30 PM | 90 min | P[4] |
+     | 3:00 PM | 60 min | P[5] |
+     | 4:00 PM | 60 min | CRM updates and end-of-day review (Admin) |
+
+     Each P slot takes the action's `category` as its Type. When P runs
+     short, the slot reads `Open block` with type `Free`.
+  3. `selling_hours = (count of slots whose type is not Planning, Admin,
+     Break, or Free) * 0.75`
+  4. `admin_hours = (count of slots whose type is Planning or Admin) * 0.5`
+  5. `deals touched = number of distinct accounts across P[0..5]`
+
+  Worked example - the day opens with act-001 at 8:30 AM (Stakeholder) and
+  closes the working blocks with act-009 at 3:00 PM (Admin), giving ~4.5
+  selling hours, ~1.5 admin hours, and 3 deals touched.
+
+  ## Output format
+
+  - `**Daily Plan: Michael Torres**`
+  - Table - Time, Duration, Activity, Type.
+  - `**Day Summary:**` - selling activities, admin/planning, top priority,
+    deals touched.
+
+  ## Edge cases
+
+  - act-005 is `in_progress` and therefore never appears in the plan.
+  - This is a proposed schedule. Never claim the blocks were placed on a
+    calendar or that anyone was invited.

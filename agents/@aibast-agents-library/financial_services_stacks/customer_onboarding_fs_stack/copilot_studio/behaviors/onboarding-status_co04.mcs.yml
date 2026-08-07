@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: onboarding-status
+  description: Summarizes the onboarding pipeline - application count, total estimated assets, status distribution, and the full application detail table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: onboarding-status
+  description: Summarizes the onboarding pipeline - application count, total estimated assets, status distribution, and the full application detail table.
+  ---
+  <!-- bic:source=blank -->
+  # Onboarding status
+
+  Use this skill when the user asks for the pipeline, the book of pending
+  applications, how much is in flight, what a relationship manager is
+  carrying, or where applications are stuck. This is the default view when the
+  ask is general.
+
+  ## Inputs
+
+  - The customer application pipeline. No parameters; this is a full-pipeline
+    summary.
+
+  ## Procedure
+
+  ### Rollups - computed, not recalled
+
+  - `applications = count of applications on file` (4 on the current data).
+  - `total_estimated_assets = sum of every application's estimated assets`
+    ($250,000 + $2,400,000 + $5,800,000 + $15,000 = $8,465,000).
+  - Status distribution: one line per distinct status with its count, in
+    pipeline order - Kyc In Progress, Document Review, Enhanced Due Diligence,
+    Approved. The current data holds exactly one application in each.
+
+  Money is whole dollars with thousands separators. Statuses are title-cased
+  with underscores replaced by spaces.
+
+  ### Ordering
+
+  Report applications in pipeline order (APP-6001 first). If the user asks for
+  a ranking - largest assets, highest risk, furthest behind - sort explicitly
+  for that ask and say which field you sorted on. Do not re-order the default
+  table.
+
+  ## Output format
+
+  - `# Customer Onboarding Pipeline`
+  - `**Applications:** N`
+  - `**Total Estimated Assets:** $N`
+  - `## Pipeline Status` - `- <Status>: N` per status
+  - `## Application Details` - one table:
+
+  `| App ID | Applicant | Account | Risk | Est. Assets | Status | RM |`
+
+  ## Edge cases and boundaries
+
+  - Estimated assets are the applicant's stated figure, not verified balances
+    or funded deposits. Label them estimated whenever you total them.
+  - If the user scopes the ask to one relationship manager, risk rating, or
+    status, filter every row, count, and total to that scope and say the view
+    is filtered - never present a filtered total as the pipeline total.
+  - Recommendation only. You never advance, approve, reassign, or close an
+    application; you report where each one sits and who owns it.

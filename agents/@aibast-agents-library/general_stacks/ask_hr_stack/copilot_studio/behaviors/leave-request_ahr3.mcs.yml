@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: leave-request
+  description: Reports one employee's vacation, sick, and personal balances, accrual rate, queued requests with status, and the PTO guidelines that govern them.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: leave-request
+  description: Reports one employee's vacation, sick, and personal balances, accrual rate, queued requests with status, and the PTO guidelines that govern them.
+  ---
+  <!-- bic:source=blank -->
+  # Leave request
+
+  Use this skill when the user asks how much time off they have, asks about a
+  vacation or sick balance, asks about the status of a time-off request, or
+  asks what the rules are for booking leave.
+
+  ## Inputs
+
+  - The leave balance records and the `pto` policy.
+  - Optional: `employee_name`, a name or an `emp-` id.
+
+  ## Resolution - one lookup, no substitution
+
+  1. Match `employee_name` case-insensitively against directory names as a
+     substring, or exactly against an `emp-` id.
+  2. Leave records exist for exactly three employees: `emp-2001` Angela
+     Martinez, `emp-2002` Brian Nguyen, `emp-2003` Carla Dubois.
+  3. If no name is supplied, ask whose balance is wanted rather than defaulting
+     to a person.
+  4. If the name matches nobody, say the name did not match and list the three
+     employees with leave records. If the name matches a directory entry that
+     has no leave record - emp-2004 Derek Washington, emp-2005 Elena Kowalski,
+     emp-2006 Frank O'Brien - say plainly that no leave record exists for that
+     employee. Never answer either case with a different employee's balance.
+
+  ## Procedure
+
+  1. Report the stored balances as-is. Do not recompute an entitlement from
+     hire date or tenure; the stored number is the balance.
+  2. Report the stored `accrual_rate_days_per_month` as-is: 1.67 for emp-2001,
+     1.25 for emp-2002, 2.08 for emp-2003.
+  3. List every queued request with its dates, day count, and status verbatim.
+     Statuses in the data are `Approved` and `Pending`. If the queue is empty,
+     render a single row of `None | - | -` rather than omitting the table.
+  4. Close with the first four PTO guideline lines from the `pto` policy, in
+     stored order.
+
+  ## Output format
+
+  - `**Leave Balance: <name>**`
+  - `Department: <department> | Hire Date: <hire_date>`
+  - A table with columns exactly `Leave Type | Available`, four rows:
+    Vacation, Sick Leave, Personal, Accrual Rate - days and days/month
+  - `**Pending Requests:**` then a table with columns exactly
+    `Dates | Duration | Status`
+  - `**PTO Guidelines:**` then four `- ` bullets: accrual begins on first day
+    of employment; maximum carryover 5 days per calendar year; requests of 5+
+    consecutive days require 2 weeks notice; holiday blackout Dec 20 - Jan 2
+    requires VP approval
+  - `Source: [HRIS + Time Management]`
+
+  ## Gates to state, never to decide
+
+  - 5+ consecutive days: 2 weeks notice required.
+  - Dec 20 - Jan 2: VP approval required.
+  - Approver of record for PTO is the Direct Manager.
+  - Carryover above 5 days is forfeited Dec 31; accrued PTO is paid out on
+    separation.
+
+  ## Boundaries
+
+  - Despite the name, this skill does not file anything. You never submit,
+    approve, deny, cancel, or reschedule a request, and you never say one has
+    been submitted. Report the balance and the status, name the approver, and
+    hand the action to the employee or manager.
+  - Do not compare one employee's balance against another's or report a
+    balance the user did not ask for.

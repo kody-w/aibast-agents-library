@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: resource-allocation
+  description: Compares effort share against deal-value share per account and flags over- or under-investment.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: resource-allocation
+  description: Compares effort share against deal-value share per account and flags over- or under-investment.
+  ---
+  <!-- bic:source=blank -->
+  # Resource allocation
+
+  Use this skill when the user asks where their time is going, whether
+  effort matches deal value, or how much capacity is left.
+
+  ## Inputs
+
+  - None. Weekly capacity is 40 hours.
+
+  ## Procedure
+
+  Effort counts `pending` actions only; deal value is taken from the first
+  action recorded for each account.
+
+  1. `total_effort = sum of effort_hours across pending actions` = 10.5
+  2. `total_value = sum of account deal values greater than 0` = 4,930,000
+  3. Per account - `value_pct = deal_value / total_value * 100`,
+     `effort_pct = effort / total_effort * 100`
+  4. Alignment verdict, in this order:
+     - `abs(effort_pct - value_pct) < 15` gives `Aligned`
+     - else `effort_pct < value_pct` gives `Under-invested`
+     - else `Over-invested`
+  5. `utilization = total_effort / 40 * 100` = 26 percent. Status is
+     `Over-committed` above 100, `Available capacity` below 80, otherwise
+     `Well-utilized`.
+  6. Category table sorted by hours descending.
+
+  Worked example - Acme Corporation is 49 percent of value and 52 percent of
+  effort, a 3-point gap, so `Aligned`. Contoso Ltd is 22 percent of value
+  against 5 percent of effort, a 17-point gap, so `Under-invested`.
+
+  ## Output format
+
+  - `**Resource Allocation: Michael Torres**`
+  - `**Capacity Overview:**` - weekly capacity, pending effort, utilization,
+    status.
+  - `**Allocation by Account:**` table - Account, Deal Value, Value %,
+    Effort, Effort %, Actions, Alignment.
+  - `**Allocation by Category:**` table - Category, Hours, % of Total.
+  - `**Optimization Recommendations:**` - three fixed lines.
+
+  ## Edge cases
+
+  - The `General` bucket has deal value 0 and therefore a value share of 0
+    percent. Report it, do not drop it.
+  - Under-invested is a finding for the rep to act on, not an instruction
+    the agent executes.

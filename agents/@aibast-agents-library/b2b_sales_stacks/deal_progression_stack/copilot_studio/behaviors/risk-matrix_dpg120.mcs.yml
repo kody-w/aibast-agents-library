@@ -1,0 +1,50 @@
+mcs.metadata:
+  componentName: risk-matrix
+  description: Places every assessed deal into one of four value-versus-risk quadrants using the fixed $500,000 and 50-point thresholds.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: risk-matrix
+  description: Places every assessed deal into one of four value-versus-risk quadrants using the fixed $500,000 and 50-point thresholds.
+  ---
+  <!-- bic:source=blank -->
+  # Risk matrix
+
+  Use this skill when the user asks where to spend leadership attention, for a
+  portfolio risk view, or for the quadrant picture.
+
+  ## Inputs
+
+  - The 6 assessed deals with their computed composite risk scores.
+
+  ## Procedure
+
+  1. Compute each deal's composite risk with the standard weighted formula.
+  2. Apply the two fixed thresholds - a deal is high value at $500,000 or
+     above, and high risk at composite 50 or above. Neither threshold moves.
+  3. Assign exactly one quadrant per deal.
+     - Quadrant 1 high value + high risk - IMMEDIATE ACTION.
+     - Quadrant 2 high value + low risk - PROTECT AND ACCELERATE.
+     - Quadrant 3 low value + high risk - EVALUATE ROI OF EFFORT.
+     - Quadrant 4 low value + low risk - MONITOR.
+  4. List deals inside a quadrant in the recorded data order, each as
+     `<deal>: $<value> (risk: N/100)`. An empty quadrant prints `None`.
+  5. State the thresholds above the quadrants so the placement is auditable.
+
+  ## Output format
+
+  Headline `**Risk Matrix -- Pipeline Portfolio View**` then
+  `Value threshold: $500,000 | Risk threshold: 50/100`, then the four quadrant
+  blocks in order 1 to 4, each with its heading and its deal list.
+
+  Close with the standing recommendation - put 70% of leadership attention on
+  Quadrant 1, and treat Quadrant 2 as acceleration rather than intervention -
+  and `Source: [Risk Scoring + Pipeline Data]`.
+
+  ## Edge cases
+
+  - A deal exactly at $500,000 or exactly at risk 50 counts as high; the
+    comparison is greater-than-or-equal.
+  - Quadrant 2 is not risk-free - Global Manufacturing sits there at 40/100.
+    Never describe a quadrant 2 deal as safe.
+  - Do not add a fifth quadrant, a heat map or an intermediate band.

@@ -1,0 +1,95 @@
+mcs.metadata:
+  componentName: throughput-optimization
+  description: Generates three costed throughput options per line - cycle time reduction, a parallel bottleneck station, and quality improvement - with expected uph gains and a combined projected OEE.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: throughput-optimization
+  description: Generates three costed throughput options per line - cycle time reduction, a parallel bottleneck station, and quality improvement - with expected uph gains and a combined projected OEE.
+  ---
+  <!-- bic:source=blank -->
+  # Throughput optimization
+
+  Use this skill when the user asks how to get more output, asks what to fix
+  first, asks for improvement options, asks what an upgrade would buy, or asks
+  where to spend capital on a line.
+
+  ## Inputs
+
+  - The production line metrics (design and actual output per hour, OEE inputs).
+  - The station list per line, with cycle times, takt, and defect rates.
+  - Optional: a single LINE- id. Otherwise generate options for all three lines.
+
+  ## Procedure
+
+  Per line, in fixed data order LINE-A, LINE-B, LINE-C:
+
+  1. `gap = design_capacity_per_hour - actual_output_per_hour`, in units per hour.
+     This is the hourly gap, not the daily one used by the efficiency report.
+  2. `bottleneck = the station with the maximum cycle_time_s` (same rule as the
+     bottleneck analysis).
+  3. **Option 1 - reduce the bottleneck cycle time.**
+     - `target = round(bottleneck.takt_time_s * 0.95, 1)` -- that is, drive the
+       constraint to 5% under takt, not merely to takt.
+     - Method is fixed: process re-engineering, tooling upgrade.
+     - `expected_gain = round(gap * 0.6)` uph.
+  4. **Option 2 - parallel station at the bottleneck.**
+     - Add a second unit of the bottleneck station.
+     - `effective_cycle = round(bottleneck.cycle_time_s / 2, 1)`.
+     - `expected_gain = round(gap * 0.85)` uph.
+     - Investment estimate is a fixed range: `$45,000 - $120,000`.
+  5. **Option 3 - quality improvement.**
+     - `target_station = the station with the maximum defect_rate_pct` on that
+       line. This is chosen by defect rate alone and may or may not be the
+       bottleneck.
+     - `expected_gain = round(gap * 0.2)` uph.
+  6. `combined_projected_OEE = round(current_OEE * 1.12, 1)` -- a flat 12% uplift
+     applied to the current OEE, quoted against the current value.
+
+  The 0.6 / 0.85 / 0.2 factors and the 1.12 uplift are model assumptions, not
+  measurements. State that when presenting them.
+
+  ## Output format
+
+  Headline `## Throughput Optimization Recommendations`, then per line:
+
+  - `### <line display name> (gap: <gap> uph)`
+  - `**Option 1 -- Reduce <bottleneck name> cycle time**` with bullets:
+    `- Current: <cycle>s -> Target: <target>s`,
+    `- Method: Process re-engineering, tooling upgrade`,
+    `- Expected gain: +<N> uph`
+  - `**Option 2 -- Parallel station at bottleneck**` with bullets:
+    `- Add second <bottleneck name> unit`,
+    `- Effective cycle time: <effective_cycle>s`,
+    `- Expected gain: +<N> uph`,
+    `- Investment estimate: $45,000 - $120,000`
+  - `**Option 3 -- Quality improvement**` with bullets:
+    `- Target station: <name> (<defect_rate_pct>% defect)`,
+    `- Reduce rework loop time and scrap`,
+    `- Expected gain: +<N> uph`
+  - `**Combined projected OEE:** <new>% (from <current>%)`
+
+  Option 2 always carries the largest gain and Option 3 the smallest, because the
+  factors are fixed. Do not reorder the options by attractiveness.
+
+  ## Edge cases the recommendations handle
+
+  - Option 3's target station can be the bottleneck itself. On LINE-B, Robotic
+    Welding (B3) is both the longest cycle at 14.2s and the highest defect rate at
+    0.3%, so Options 1, 2, and 3 all point at the same station. Say so -- it makes
+    that station the unambiguous first move.
+  - The largest gap is not the largest OEE problem and vice versa. Compare gaps in
+    uph (LINE-C, 72 uph) against OEE (LINE-C at 68.0%, LINE-A at 70.9%) and be
+    explicit about which measure the user asked for.
+  - The combined projected OEE can exceed a level the line has never held (LINE-B
+    projects to 96.1%). Present it as the arithmetic result of the 12% uplift
+    assumption, not as an achievable commitment.
+  - The investment range is the same for every line and covers the parallel
+    station only. Options 1 and 3 carry no cost estimate in the data -- say
+    "not in the data" rather than producing one.
+
+  ## Boundaries
+
+  - Options only. Never state that an option has been selected, funded,
+    scheduled, ordered, or started. The plant makes that call.
+  - Never invent a fourth option, a payback period, an ROI, or a vendor.

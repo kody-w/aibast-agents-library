@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: triage-operations-data.md
+  description: Synthetic inquiry queue, category taxonomy, routing rules, and keyword classifier the agent answers from until real tools are connected.

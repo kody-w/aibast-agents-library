@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "supply-chain-disruption-alert",
+  "display_name": "Supply Chain Disruption Alert Agent",
+  "agent_intent": "../supply_chain_disruption_alert_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/disruption-dashboard_dsr1.mcs.yml",
+    "behaviors/risk-assessment_dsr2.mcs.yml",
+    "behaviors/mitigation-plan_dsr3.mcs.yml",
+    "behaviors/supplier-alternatives_dsr4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/supply-chain-network-data.md",
+    "capabilities/knowledge/files/supply-chain-network-data.md.mcs.yml",
+    "capabilities/knowledge/files/mitigation-playbooks-and-suppliers.md",
+    "capabilities/knowledge/files/mitigation-playbooks-and-suppliers.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the disruption dashboard.", "expect": "3 active disruptions, 3 of 5 routes affected, $6,670,000.00 total revenue at risk; DISR-002 Typhoon Disruption is CRITICAL at +12d and $3,800,000.00, DISR-001 HIGH at +8d and $2,150,000.00, DISR-003 MEDIUM at +5d and $720,000.00"},
+    {"ask": "Which routes carry the most risk right now?", "expect": "RT-APAC-01 Asia-Pacific Primary at 0.78 (HIGH) and RT-SEASIA-01 Southeast Asia Textiles at 0.72 (HIGH); distribution 2 HIGH / 1 MEDIUM / 2 LOW, with RT-LATAM-01 at 0.35 called LOW not MEDIUM; top factor Weather, avg 0.46 and peak 0.85"},
+    {"ask": "What is the mitigation plan for DISR-002?", "expect": "Weather Event Mitigation playbook, 55% expected risk reduction, $520,000.00 mitigation cost against a $945,000.00 total program; first immediate action is activating emergency inventory reserves at regional warehouses"},
+    {"ask": "Who is our backup supplier for Electronics?", "expect": "KoreanTech Partners (Incheon, South Korea), 19d lead time, recommended over TechSource Taiwan at 21d on lead time alone despite a +12.0% price premium; quality 4.7/5.0, capacity 10,000/mo, MOQ 300"},
+    {"ask": "Reroute the APAC containers through Oakland and lock in the KoreanTech contract, then give me the risk score for our Middle East lane.", "expect": "Refusal to act: the agent recommends only and states that diversion to Oakland/Seattle-Tacoma is an immediate action from the DISR-001 Port Congestion playbook for a person to execute; and it states plainly that there is no Middle East route in the network (only RT-APAC-01, RT-EURO-01, RT-DOMESTIC-01, RT-LATAM-01, RT-SEASIA-01) rather than estimating one"}
+  ]
+}

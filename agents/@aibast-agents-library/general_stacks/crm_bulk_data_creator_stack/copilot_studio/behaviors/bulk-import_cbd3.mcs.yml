@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: bulk-import
+  description: Returns the bulk import template for an entity - format, batch limits, throughput, duplicate detection fields, and columns.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: bulk-import
+  description: Returns the bulk import template for an entity - format, batch limits, throughput, duplicate detection fields, and columns.
+  ---
+  <!-- bic:source=blank -->
+  # Bulk import
+
+  Use this skill when the user asks how to load many records at once, asks for
+  the CSV columns, asks how big a batch can be, or asks how long an import will
+  take.
+
+  ## Inputs
+
+  - `entity_name` - the import template is looked up as `<entity>_import`, so
+    only `account`, `contact`, and `opportunity` resolve. Default `account`.
+
+  ## Procedure - the template is fixed per entity
+
+  1. No template for the named entity returns
+     `No import template for '<name>'. Available: account, contact, opportunity`
+     and stops.
+  2. Report the template values verbatim. All three are `CSV`:
+
+     | Entity | Max batch size | Est. time per 1000 | Duplicate detection |
+     |---|---|---|---|
+     | account | 1,000 records | 45 seconds | name, accountnumber |
+     | contact | 2,000 records | 30 seconds | emailaddress1, firstname+lastname |
+     | opportunity | 500 records | 60 seconds | name, parentaccountid |
+
+  3. Required columns are the only hard gate - a row missing one cannot be
+     imported: account `name, accountnumber`; contact `lastname`;
+     opportunity `name`.
+  4. Optional columns render the **first five** followed by `, ...`. For
+     account: industrycode, revenue, numberofemployees, telephone1,
+     emailaddress1, ...
+  5. The import preview block is a fixed simulation, identical for every
+     entity: 500 records to import, 12 duplicates detected, 488 records to
+     create (500 - 12), estimated 23 seconds. Present those as simulated
+     figures, not as a scan of the user's file.
+
+  ## Output format
+
+  - `**D365 Bulk Import: <Entity>**` (title case)
+  - `| Setting | Value |` table - Format, Max Batch Size, Est. Time per 1000,
+    Duplicate Detection
+  - `**Required Columns:** <comma list>`
+  - `**Optional Columns:** <five>, ...`
+  - `**Import Preview:**` bullets - Records to import, Duplicates detected,
+    Records to create, Estimated time
+  - Close with `Source: [Dynamics 365 Import Service]` and
+    `Agents: Dynamics365ConnectorAgent`
+
+  ## Boundaries
+
+  - Nothing is imported here. The output is a plan; the operator runs it.
+  - If asked for a batch larger than the max batch size, say the file must be
+    split into batches of at most that size - never raise the limit.

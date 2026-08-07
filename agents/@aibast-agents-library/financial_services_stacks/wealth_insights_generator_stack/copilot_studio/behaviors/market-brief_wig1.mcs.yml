@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: market-brief
+  description: Publishes the daily market brief across the seven tracked instruments with index levels, YTD returns, P/E, yield, and total practice AUM.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: market-brief
+  description: Publishes the daily market brief across the seven tracked instruments with index levels, YTD returns, P/E, yield, and total practice AUM.
+  ---
+  <!-- bic:source=blank -->
+  # Market brief
+
+  Use this skill when the user asks for the market brief, the daily brief, where
+  the markets are, index levels, YTD performance, yields, or how a tracked
+  instrument is doing.
+
+  ## Inputs
+
+  - The market data table (seven instruments).
+  - The client portfolio book, for the total practice AUM footer only.
+  - No parameters. The brief is always the full seven-instrument table.
+
+  ## Procedure
+
+  1. Emit every instrument in source order: S&P 500, NASDAQ Composite, Dow Jones
+     Industrial, MSCI EAFE, Bloomberg US Agg Bond, 10-Year Treasury, Gold (per
+     oz). Do not reorder by return and do not omit an instrument.
+  2. Format each cell exactly:
+     - Current: thousands-separated, two decimals (`5,285.42`, `98.45`).
+     - YTD Return: signed, one decimal, percent (`+4.8%`, `+0.0%`).
+     - P/E: one decimal when `pe_ratio` is non-zero, otherwise the literal
+       `N/A`. Bloomberg US Agg Bond, 10-Year Treasury, and Gold are all `N/A`.
+     - Yield: two decimals with a percent sign when `dividend_yield` is
+       non-zero, otherwise the literal `N/A`. Gold is `N/A`.
+  3. Append the four standing observations verbatim - they are fixed commentary,
+     not generated analysis:
+     - Equity markets continue positive YTD momentum; NASDAQ leading at +6.2%
+     - International developed markets (EAFE) outperforming on weaker dollar
+     - Fixed income subdued with 10-Year Treasury at 4.28%
+     - Gold rally continues (+8.1% YTD) on geopolitical uncertainty
+  4. Compute the footer: `Total Practice AUM = sum of aum across all clients in
+     the book` = 8,500,000 + 3,200,000 + 12,400,000 + 5,700,000 = 29,800,000.
+     Render thousands-separated with no decimals.
+
+  ## Output format
+
+  - `# Daily Market Brief`
+  - `## Index Performance` and the table
+    `| Index | Current | YTD Return | P/E | Yield |`
+  - `## Key Observations` as four bullets
+  - `**Total Practice AUM:** $29,800,000`
+
+  ## Edge cases
+
+  - The 10-Year Treasury carries `ytd_return` 0, so it renders `+0.0%` - that is
+    the data, not a missing value. Its 4.28 "current" is a yield in percent, not
+    a price; do not thousands-format it into a level.
+  - Gold has neither a P/E nor a yield; both cells are `N/A`.
+  - If the user asks about an instrument outside these seven (a specific stock,
+    a crypto pair, a foreign index), say it is not tracked in this data. Never
+    quote a price you do not have.
+  - Never forecast where an index is going. Report the level and the YTD figure.

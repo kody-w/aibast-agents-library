@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: draft-proposal
+  description: Renders a proposal introduction email from the proposal_intro template with investment, timeline, ROI fields and the suggested attachment set.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: draft-proposal
+  description: Renders a proposal introduction email from the proposal_intro template with investment, timeline, ROI fields and the suggested attachment set.
+  ---
+  <!-- bic:source=blank -->
+  # Draft proposal
+
+  Use this skill when the user asks for a proposal email, a proposal cover note,
+  a partnership proposal intro, or the email that carries a quote or SOW to a
+  prospect.
+
+  ## Inputs
+
+  - The email template library (template key `proposal_intro`).
+  - Context: first_name, meeting_date, pricing, roi_projection, sender_name,
+    sender_title, plus project_name, executive_summary, timeline, and
+    proposed_meeting_date if the sender has them.
+  - No inputs required. With none supplied, render the sample context:
+    Jennifer Walsh, meeting date November 12, pricing $185,000/year, ROI
+    projection 3.2x within 18 months, sender Alex Rivera, Account Executive.
+
+  ## Procedure
+
+  1. Select template `proposal_intro`. This is the only formal template; do not
+     downgrade to `cold_outreach` for a proposal.
+  2. Subject line: the FIRST `subject_variants` entry -
+     `Proposal: {project_name} for {company_name}`. With the sample context this
+     renders as `Proposal: {project_name} for TechVantage Solutions` because
+     `project_name` has no context value. The second variant is
+     `{company_name} Partnership Proposal`.
+  3. Substitute every `{key}` present in the context in subject and body; leave
+     unmatched tokens literal. With the sample context, `{project_name}`,
+     `{executive_summary}`, `{timeline}`, and `{proposed_meeting_date}` all
+     remain literal and must be reported as required inputs. `{pricing}` renders
+     as `$185,000/year` and `{roi_projection}` as `3.2x within 18 months`.
+  4. Report the stored benchmarks unchanged: `avg_open_rate` 0.65 and
+     `avg_reply_rate` 0.45 - 65% open, 45% reply. These are the highest reply
+     rate in the library; do not treat them as a prediction for this deal.
+  5. Always emit the three suggested attachments exactly as stored: full
+     proposal PDF; ROI calculator spreadsheet; customer reference one-pager.
+
+  ## Output format
+
+  - `**Draft: Proposal Introduction Email**`
+  - `**To:** <first> <last>` - name only, no email address
+  - `**Subject:** <rendered subject>`
+  - `**Tone:** Formal, value-focused`
+  - `---` then the rendered body, then `---`. The body keeps its bolded
+    `**Executive Summary:**`, `**Investment:**`, `**Timeline:**`, and
+    `**Expected ROI:**` lines.
+  - `**Performance Benchmarks:**` with `- Avg Open Rate: 65%` and
+    `- Avg Reply Rate: 45%`
+  - `**Attachments Suggested:**` as the three bullets above
+  - `Source: [Email Template Engine]` and `Agents: EmailDraftingAgent`
+
+  ## Edge cases
+
+  - Pricing, timeline, ROI, and the executive summary are commercial claims.
+    Render only what the context supplies; never estimate a price, a timeline,
+    or an ROI multiple.
+  - The attachments are a checklist for the sender, not files the agent holds.
+    Never claim an attachment is attached.
+  - Draft only. Never say the proposal was sent or that a review meeting was
+    booked.

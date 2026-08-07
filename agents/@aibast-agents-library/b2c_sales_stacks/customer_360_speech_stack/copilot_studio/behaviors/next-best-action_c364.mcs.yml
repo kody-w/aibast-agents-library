@@ -1,0 +1,76 @@
+mcs.metadata:
+  componentName: next-best-action
+  description: Selects the next best action for every customer using the deterministic segment-and-sentiment rule and prints the full action library.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: next-best-action
+  description: Selects the next best action for every customer using the deterministic segment-and-sentiment rule and prints the full action library.
+  ---
+  <!-- bic:source=blank -->
+  # Next best action
+
+  Use this skill when the user asks what to do next for a customer, asks for
+  an outreach or retention recommendation, asks which offer to send, or asks
+  what the expected conversion of an action is.
+
+  ## Inputs
+
+  - The customer profile roster, the interaction log (for sentiment), and the
+    six-entry action library.
+
+  ## Procedure - deterministic selection, evaluated in this exact order
+
+  For each customer, first compute the sentiment label with the standard rule
+  (`positive` above 0.30, `negative` below -0.30, otherwise `neutral`), then
+  take the FIRST branch that matches:
+
+  1. sentiment label is `negative` AND segment is `at_risk`
+     -> `service_recovery` - Proactive outreach from manager with apology and
+     store credit, Phone, Immediate, 35.0%
+  2. segment is `premium`
+     -> `premium_engagement` - Send personalized VIP preview of new
+     collection, Email, Immediate, 22.5%
+  3. segment is `at_risk`
+     -> `win_back` - Send win-back offer with 20% discount and free shipping,
+     Email, Immediate, 15.0%
+  4. anything else (including the `standard` segment)
+     -> `cross_sell` - Recommend complementary products based on purchase
+     history, Email, Next 7 Days, 12.0%
+
+  Branch 1 requires BOTH conditions. An at-risk customer whose sentiment label
+  is only `neutral` falls through to branch 3, not branch 1.
+
+  Two library entries - `loyalty_nurture` (Remind of loyalty points balance
+  and redemption options, Mobile Push, Next 3 Days, 18.0%) and
+  `reactivation_sms` (Send SMS with limited-time exclusive offer, SMS, Next 3
+  Days, 10.5%) - are never produced by the rule. They exist for a human to
+  pick from the library. Say that plainly if asked why they never appear;
+  never route a customer to them yourself.
+
+  ## Output format
+
+  For each customer, in roster order:
+
+  - `## <name> (<C360-id>)`
+  - `- **Segment:** <Title Case segment>`
+  - `- **Sentiment:** <Label> (<score>)`
+  - `- **Recommended Action:** <action text>`
+  - `- **Channel:** <Title Case channel>`
+  - `- **Timing:** <Title Case timing>`
+  - `- **Expected Conversion:** <n>%`
+
+  Then `## Action Library` with columns
+  `Action | Channel | Timing | Conversion` covering all six entries.
+
+  ## Boundaries
+
+  - Recommendation only. You cannot send the email, push, or SMS, cannot
+    apply the discount or store credit, and cannot schedule the manager call.
+    Never say an offer has been sent, queued, or scheduled - end with the
+    recommendation for a person to execute.
+  - Expected conversion rates are library constants, not predictions for this
+    customer. Quote them as the library's rate; never adjust one for segment,
+    tenure, or lifetime value.
+  - Never invent a discount depth, a channel, or a timing window that is not
+    written in the library entry.

@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: compliance-scoring-and-audit-policy.md
+  description: Synthetic scoring weights, coverage and progress formulas, audit readiness bands, open-finding rule, and the record-change boundary the agent enforces.

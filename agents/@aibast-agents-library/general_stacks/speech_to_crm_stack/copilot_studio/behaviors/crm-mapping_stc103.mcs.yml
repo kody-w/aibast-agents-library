@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: crm-mapping
+  description: Shows which CRM object and field each extracted entity maps to, the mapped value, and the source the value was derived from.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: crm-mapping
+  description: Shows which CRM object and field each extracted entity maps to, the mapped value, and the source the value was derived from.
+  ---
+  <!-- bic:source=blank -->
+  # CRM mapping
+
+  Use this skill when the user asks how the call maps to CRM, which fields
+  would change, where a field value came from, or which contacts are missing
+  from the account.
+
+  ## Inputs
+
+  - The extracted-entity set and the CRM field mapping definitions.
+  - Optional: an object filter (opportunity, contact, new contacts).
+
+  ## Procedure - mechanical, not interpretive
+
+  1. Emit three sections in this order: Opportunity Update, Contact Update, New
+     Contacts to Create. Fields render in stored order - for the opportunity:
+     `name`, `amount`, `close_date`, `stage`, `probability`, `next_step`; for
+     the contact: `name`, `title`, `account`.
+  2. Every field row carries its `source` verbatim. The source is the audit
+     trail and is never dropped or reworded:
+     - `name` <- organization + context
+     - `amount` <- money entity
+     - `close_date` <- date entity
+     - `stage` <- conversation context
+     - `probability` <- engagement signals
+     - `next_step` <- action_item entity
+     - contact `title` <- inferred from context
+  3. In this table, values render raw, exactly as stored: `amount` is `200000`
+     with no currency symbol and no thousands separator; `probability` is `65`
+     with no percent sign. Currency and percent formatting belong to the update
+     preview, not here.
+  4. `close_date` renders in ISO form: `2025-12-15`. It is derived from the
+     spoken "December 15th" deadline, not from the proposal delivery date
+     (December 10th) or the review meeting date (December 12th).
+  5. New contacts are the people named in the call who are not the primary
+     contact. Emit `name`, `title`, `role` for each: Mark Davidson (CEO,
+     Economic Buyer) and Sam Patel (IT Director, Technical Evaluator), both on
+     account TechVantage Solutions.
+
+  ## Output format
+
+  - Headline: `**CRM Field Mapping**`
+  - `**Opportunity Update:**` and a table `| Field | Source | Mapped Value |`.
+  - `**Contact Update:**` and a table `| Field | Source | Mapped Value |`.
+  - `**New Contacts to Create:**` and a table `| Name | Title | Role |`.
+  - Footer: `Source: [CRM Mapping Engine]` and `Agents: SpeechToCRMAgent`.
+
+  ## Edge cases
+
+  - `stage = Proposal` and `probability = 65` are derived from conversation
+    context and engagement signals - nobody said them on the call. Label them
+    as derived whenever the user treats them as quoted fact.
+  - The contact title `VP of Operations` is inferred, not stated. Say so.
+  - Mapping is a proposal. This skill never writes and never implies a write;
+    hand off to the update preview skill for the confirmation step.
+  - If the user asks for a field not in the mapping definitions (owner,
+    campaign, lead source), say the mapping does not define it rather than
+    inventing a value.

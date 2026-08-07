@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: downtime-analysis
+  description: Quantifies unplanned downtime cost exposure against preventive cost, net savings, and the historical preventive-to-corrective ratio.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: downtime-analysis
+  description: Quantifies unplanned downtime cost exposure against preventive cost, net savings, and the historical preventive-to-corrective ratio.
+  ---
+  <!-- bic:source=blank -->
+  # Downtime and cost analysis
+
+  Use this skill when the user asks what failure would cost, the business case
+  for preventive work, downtime exposure, savings, maintenance spend, or the
+  preventive-to-corrective ratio.
+
+  ## Inputs
+
+  - The equipment master, the failure-probability model, the per-hour downtime
+    cost rates by equipment type, and the maintenance history.
+
+  ## Procedure - the exact arithmetic
+
+  1. Inclusion gate: an asset appears in the risk table only if `P30 >= 0.10`.
+     Same gate as the alerts and the work order plan. Rows stay in
+     equipment-master order; this table is not ranked.
+  2. Estimated downtime hours: `dt_hrs = round(P30 * 24, 1)`. The 24 is a
+     one-shift-plus recovery constant applied uniformly - it is not per-asset.
+  3. Downtime cost: `dt_cost = dt_hrs * rate(equipment type)`, where the rate is
+     the per-hour cost for that equipment type. If an equipment type has no
+     listed rate, the fallback rate is `500` per hour - say when the fallback
+     was used.
+  4. Prevention cost: `prev_cost = round(dt_cost * 0.25, 2)`. Preventive work is
+     modeled at a flat 25% of the exposure it removes.
+  5. Net savings: `savings = round(dt_cost - prev_cost, 2)`, equivalently 75% of
+     the downtime cost.
+  6. Totals are the column sums over the included rows only.
+  7. Historical spend: sum every maintenance record's cost; count records with
+     type `Preventive` and type `Corrective` separately; express the ratio as
+     `preventive:corrective` against the stated target of `5:1`.
+
+  ## Output format
+
+  `## Downtime & Cost Analysis`, then two sections.
+
+  `### Unplanned Downtime Risk (Next 90 Days)` - table with columns:
+  `Equipment | 30-Day P(Fail) | Est Downtime (hrs) | Downtime Cost | Prevention Cost | Net Savings`,
+  the last three right-aligned. Probability is a whole percent; hours to one
+  decimal; currency as `$0,000.00`. Below the table:
+
+  - `**Total downtime cost exposure:** $N`
+  - `**Total preventive maintenance cost:** $N`
+  - `**Net savings from preventive action:** $N`
+
+  `### Historical Maintenance Spend` - four bullets: total spend over the last
+  12 months, preventive work order count, corrective (unplanned) work order
+  count, and the preventive-to-corrective ratio with `(target 5:1)`.
+
+  ## Edge cases
+
+  - The 90-day heading and the 30-day probability column are both correct as
+    written: the exposure window is 90 days, the probability driving it is the
+    30-day figure. Do not silently substitute the 60- or 90-day probability.
+  - Assets below the 0.10 gate contribute nothing to the totals. Do not add them
+    to make the savings number larger.
+  - These are modeled figures, not booked costs. Never present them as actuals,
+    and never say a budget was committed or a work order was funded.

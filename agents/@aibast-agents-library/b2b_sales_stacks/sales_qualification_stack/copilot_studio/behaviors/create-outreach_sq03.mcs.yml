@@ -1,0 +1,82 @@
+mcs.metadata:
+  componentName: create-outreach
+  description: Drafts subject, hook, and CTA for the top Hot or Warm leads from each lead's own need, source, and timeline, plus the fixed five-touch cadence.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: create-outreach
+  description: Drafts subject, hook, and CTA for the top Hot or Warm leads from each lead's own need, source, and timeline, plus the fixed five-touch cadence.
+  ---
+  <!-- bic:source=blank -->
+  # Create outreach
+
+  Use this skill when the user asks for outreach, an email draft, a subject
+  line, a talk track, or a sequence for the leads.
+
+  ## Inputs
+
+  - The scored lead set.
+  - Optional tier: **Hot** or **Warm** only. Any other value - including
+    Nurture and Disqualified - falls back to Hot.
+
+  ## Procedure - selection
+
+  1. Resolve the tier: Hot unless the user explicitly asked for Warm.
+  2. Take the top 5 leads of that tier by combined score, highest first.
+  3. Nurture and Disqualified leads never get a draft. If asked for one,
+     state the lead's tier and combined score and say drafts are produced for
+     Hot and Warm leads only.
+
+  ## Procedure - the templates, filled from that lead's own record
+
+  `first_name` is the first token of the contact name. `need_short` is the
+  first 60 characters of the stated need.
+
+  **Hot tier:**
+
+  - Subject: `Following up on our <source in lower case> conversation,
+    <first_name>`
+  - Hook: `You mentioned "<need_short>" - we have a proven path to solve this
+    in <timeline>.`
+  - CTA: `15-minute deep dive this week?`
+
+  **Warm tier:**
+
+  - Subject: `<Company> + DataSync: <first 40 characters of the need>`
+  - Hook: `Teams like yours at <Company> are solving <need_short in lower
+    case> with our platform.`
+  - CTA: `Quick call to explore fit?`
+
+  Never invent a fact for the hook. The quoted need, the source, the
+  timeline, and the contact first name all come from that lead's record.
+
+  ## Output format
+
+  - Headline: `**Personalized Outreach - N <Tier> Leads**`
+  - One block per lead, in score order:
+    - `**<Company> Outreach:**`
+    - `**Subject:** ...`
+    - `**Hook:** "..."`
+    - `**CTA:** ...`
+    - a `---` rule between blocks
+  - `**Sequence Cadence (all leads):**` - the fixed five touches, unchanged:
+    - Day 0: Personalized email (above)
+    - Day 1: LinkedIn connection + note
+    - Day 2: Phone attempt #1
+    - Day 3: Value content email
+    - Day 5: Phone attempt #2
+  - Close with `Source: [Content Library + Booth Notes + LinkedIn]` and
+    `Agents: PersonalizedOutreachAgent`.
+
+  ## Edge cases
+
+  - A tier with fewer than 5 leads produces fewer blocks; the headline count
+    matches what was actually drafted.
+  - The cadence is the same for every lead and every tier - do not customize
+    or compress it.
+
+  ## Boundaries
+
+  - Draft only. You do not send email, schedule a LinkedIn touch, enroll a
+    lead in a sequence, or log activity. Hand the draft to the SDR or AE and
+    say so.

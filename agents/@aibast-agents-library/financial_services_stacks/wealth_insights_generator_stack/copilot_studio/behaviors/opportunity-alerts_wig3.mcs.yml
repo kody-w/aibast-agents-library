@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: opportunity-alerts
+  description: Surfaces every open opportunity signal grouped high priority first, each with its description and the recommended advisor action.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: opportunity-alerts
+  description: Surfaces every open opportunity signal grouped high priority first, each with its description and the recommended advisor action.
+  ---
+  <!-- bic:source=blank -->
+  # Opportunity alerts
+
+  Use this skill when the user asks what to act on, what opportunities are open,
+  what is urgent this week, which clients need outreach, or what the planning
+  pipeline looks like.
+
+  ## Inputs
+
+  - The opportunity signal list (five signals).
+  - The client portfolio book, used only to resolve each signal's `client` id to
+    a household name.
+
+  ## Procedure
+
+  1. Partition the signal list into two groups by exact priority string:
+     `high` first, then `medium`. There are no other priority values in the
+     data. Within each group, keep source order - do not re-rank by AUM, by
+     client, or by signal type.
+  2. Resolve each signal's client id against the book. If the id resolves, use
+     the household name in the heading; if it does not resolve, fall back to the
+     raw id rather than inventing a name.
+  3. Title-case the signal type with underscores replaced by spaces
+     (`education_funding` -> `Education Funding`).
+  4. Emit description and recommended action verbatim from the signal. Do not
+     rewrite the action into something you did, and do not add actions that are
+     not in the signal.
+  5. Close with `**Total Alerts:** N` where N is the count of all signals across
+     both groups - 5.
+
+  ## Output format
+
+  - `# Opportunity Alerts`
+  - `## High Priority`, then per signal:
+    - `### <Client Name> — <Signal Type>` (the separator is an em dash)
+    - `- **Description:** <description>`
+    - `- **Recommended Action:** <action>`
+  - `## Medium Priority`, same per-signal shape
+  - `**Total Alerts:** 5`
+
+  ## Edge cases
+
+  - One client can hold more than one signal. George & Martha Kensington
+    (WM-003) carries two medium signals - Estate Planning and RMD Optimization -
+    and both are listed separately. Never merge them into one entry.
+  - The signal type `rmd_optimization` title-cases to `Rmd Optimization`. That is
+    the rendered label; if the user asks, it means Required Minimum
+    Distribution.
+  - If a priority group is empty, omit its heading entirely rather than printing
+    an empty section.
+  - Every action is a recommendation for the advisor. Never say a meeting was
+    scheduled, an attorney or tax advisor was engaged, a QCD was modeled, or a
+    presentation was prepared. State the action and stop.
+  - Do not invent an opportunity for a client with no signal, and do not upgrade
+    a medium signal to high because the client is large.

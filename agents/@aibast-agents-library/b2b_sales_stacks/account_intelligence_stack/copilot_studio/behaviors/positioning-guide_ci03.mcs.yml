@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: positioning-guide
+  description: Turns competitor strengths and weaknesses into attack points, defend points, and a pricing-aware talk track.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: positioning-guide
+  description: Turns competitor strengths and weaknesses into attack points, defend points, and a pricing-aware talk track.
+  ---
+  <!-- bic:source=blank -->
+  # Positioning guide
+
+  Use this skill when the user asks how to position against a competitor,
+  what to attack, or what to defend.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. Open with our four fixed differentiators - deepest ERP integration
+     ecosystem, real-time analytics with AI insights, 94 percent customer
+     retention rate, fastest implementation in category.
+  2. Per competitor at that account, in roster order:
+     - Attack points are that competitor's recorded `weaknesses`.
+     - Defend points are that competitor's recorded `strengths`.
+     - Talk track branches on pricing. If the pricing string contains `-`,
+       use the TCO reframe - quote their 3-year TCO figure and their hidden
+       costs from the pricing intel. Otherwise use the single line
+       `Focus on differentiated capabilities and faster time-to-value`.
+     - Always append the head-to-head win rate and the FIRST recorded win
+       reason as the key proof point.
+
+  Worked example - Acme Corporation - DataForge Solutions is discounted, so
+  the talk track quotes their 1,200,000 dollar 3-year TCO and the hidden
+  cost `Implementation services billed separately`, then win rate 64 percent
+  and proof point `Superior integration`. CloudOps Platform is above market,
+  so it takes the capabilities line, win rate 73 percent, proof point
+  `Manufacturing expertise`.
+
+  ## Output format
+
+  `**Positioning Guide: <account>**`, `**Our Key Differentiators:**`, then
+  per competitor separated by `---` - `**vs <name>:**`,
+  `**Attack Points (their weaknesses):**`,
+  `**Defend Against (their strengths):**`, `**Recommended Talk Track:**`.
+
+  ## Edge cases
+
+  - With no competitors, say `No active competitors - focus on value
+    creation vs status quo.`
+  - Attack points come from the recorded weakness list only. Never invent a
+    competitor flaw, and never state a competitor weakness the data does not
+    hold.

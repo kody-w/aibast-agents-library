@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: sla-dashboard
+  description: Reports SLA compliance - counts of on-track, at-risk and breached tickets, with each ticket's resolution target from the severity threshold table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: sla-dashboard
+  description: Reports SLA compliance - counts of on-track, at-risk and breached tickets, with each ticket's resolution target from the severity threshold table.
+  ---
+  <!-- bic:source=blank -->
+  # SLA dashboard
+
+  Use this skill when the user asks about SLA, compliance, breaches, deadlines,
+  what is at risk, or which tickets are running late.
+
+  ## Inputs
+
+  - The support ticket queue and the SLA threshold table (knowledge/tools).
+  - No parameters. Every ticket is evaluated.
+
+  ## Procedure
+
+  1. Read `resolution_target_hrs` for each ticket from the SLA threshold table
+     keyed on severity: P1 = 4h, P2 = 24h, P3 = 72h, P4 = 168h. First-response
+     targets (P1 1h, P2 4h, P3 8h, P4 24h) are available on request but are not
+     a dashboard column. A severity with no threshold row yields `0h`.
+  2. Classify each ticket with this exact three-branch rule, evaluated in order:
+     - TKT-8004 is `breached` - its SLA deadline of 2026-03-14T11:00 has passed
+       while the ticket sits in `waiting_customer`.
+     - otherwise, severity `P1` is `at_risk` - a P1 has only a 4h resolution
+       window and is treated as at risk while it is not resolved.
+     - otherwise `on_track`.
+  3. Increment the matching counter for each ticket. `total` is the full ticket
+     count; `on_track + at_risk + breached` must equal `total`.
+  4. Render the headline block, then the table.
+
+  ## Output format
+
+  Title: `# SLA Compliance Dashboard`
+
+  Headline block, in this order:
+
+      **Total Tickets:** N
+      - On Track: N
+      - At Risk: N
+      - Breached: N
+
+  Then one table, exactly these columns:
+
+  | Ticket | Severity | Customer | SLA Status | Resolution Target |
+
+  - SLA Status uppercased: `ON_TRACK`, `AT_RISK`, `BREACHED`.
+  - Resolution Target as the threshold hours with an `h` suffix, e.g. `24h`.
+
+  ## Edge cases
+
+  - A severity outside P1-P4 renders a `0h` target. Report it as "no SLA
+    threshold recorded" rather than as a zero-hour deadline.
+  - Never re-classify a breach as at-risk or on-track, and never merge the
+    breached count into on-track. Name the breached ticket and its customer.
+
+  ## Boundaries
+
+  - Reporting only. You do not extend a deadline, reset a clock, waive an SLA,
+    or open a credit. Surface the breach and let a support manager decide.

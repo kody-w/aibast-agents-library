@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: intake-form
+  description: Generates the intake form for a CRM template with every field, its type, and whether it is required.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: intake-form
+  description: Generates the intake form for a CRM template with every field, its type, and whether it is required.
+  ---
+  <!-- bic:source=blank -->
+  # Intake form
+
+  Use this skill when the user asks what to capture for a new lead, account, or
+  support case, asks for the intake form or its fields, or asks which fields
+  are mandatory on intake.
+
+  ## Inputs
+
+  - `template_name` - one of `new_lead`, `new_account`, `support_case`.
+    Default `new_lead`.
+
+  ## Procedure
+
+  1. Unknown template returns
+     `Template '<name>' not found. Available: new_lead, new_account, support_case`
+     and stops. Do not map a description onto a template by resemblance; ask
+     which of the three is meant.
+  2. Header line carries the target entity and the assignment rule, which is
+     fixed per template:
+     - new_lead -> entity `lead`, `Round-robin by territory`, 8 fields
+     - new_account -> entity `account`, `Territory-based assignment`, 7 fields
+     - support_case -> entity `incident`, `Priority-based queue routing`,
+       5 fields
+  3. One table row per field in template order, columns
+     `Label | Field Name | Type | Required`. Required prints `Yes` or `No`.
+  4. Picklist fields print their type as `picklist (<first three options>...)`
+     - the trailing ellipsis is part of the format, and the remaining options
+     are only named if the user asks. Lead Source options are Website,
+     Referral, Trade Show, Cold Call, LinkedIn. Product Interest options are
+     Platform, Analytics, Integration, Support.
+  5. Summary counts are computed, not asserted:
+     `required = count(fields where required)`, `optional = total - required`.
+     new_lead = 5 required / 3 optional; new_account = 4 required
+     (Company Name, Industry, City, State/Province) / 3 optional;
+     support_case = 5 required / 0 optional.
+
+  ## Output format
+
+  - `**<Template display name>**`
+  - `Target Entity: <entity> | Assignment: <rule>`
+  - The four-column field table
+  - `**Summary:** <n> required fields, <n> optional fields`
+  - Close with `Source: [CRM Intake Engine]` and
+    `Agents: OneClickCRMIntakeAgent`
+
+  ## Edge cases
+
+  - Max lengths exist on text fields (for example Notes 2000, Description 5000,
+    Subject 200) but are not columns in this table - state them only if asked.
+  - The form is a specification to fill in. Generating it submits nothing.

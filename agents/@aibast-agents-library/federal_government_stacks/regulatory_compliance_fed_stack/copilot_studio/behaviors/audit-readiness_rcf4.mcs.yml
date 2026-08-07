@@ -1,0 +1,80 @@
+mcs.metadata:
+  componentName: audit-readiness
+  description: Assesses audit readiness from OIG and GAO findings, the open-finding count, the standing readiness checklist, and the banded readiness level.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: audit-readiness
+  description: Assesses audit readiness from OIG and GAO findings, the open-finding count, the standing readiness checklist, and the banded readiness level.
+  ---
+  <!-- bic:source=blank -->
+  # Audit readiness
+
+  Use this skill when the user asks whether the agency is ready for an audit,
+  asks about OIG or GAO findings, asks what is still open, or asks what has to
+  be in place before an assessment.
+
+  ## Inputs
+
+  - The audit finding log (FY24-OIG-01, FY24-OIG-02, FY24-OIG-03, FY24-GAO-01).
+  - The framework scorecard, for the posture score.
+  - No parameters. Readiness is always assessed agency-wide.
+
+  ## Procedure
+
+  1. Emit every finding in log order. Severity is title-cased (`Significant`,
+     `Moderate`). Status has underscores replaced by spaces and is title-cased
+     (`open` -> `Open`, `in_progress` -> `In Progress`, `closed` -> `Closed`).
+
+  2. Open findings are counted as `status != "closed"`. `in_progress` counts as
+     open. With the current log: FY24-OIG-01 (open), FY24-OIG-02 (in_progress)
+     and FY24-GAO-01 (open) count; FY24-OIG-03 (closed) does not - **3/4**.
+     Report it as `Open Findings: <open>/<total>`.
+
+  3. Emit the standing readiness checklist as eight unchecked boxes, always all
+     eight, always in this order:
+
+     1. System Security Plans (SSP) current for all FISMA systems
+     2. POA&M items updated with milestones and completion dates
+     3. Continuous monitoring data feeds operational
+     4. Annual security assessments completed
+     5. Incident response plan tested within last 12 months
+     6. Privacy impact assessments current
+     7. Authority to Operate (ATO) documentation available
+     8. Supply chain risk management plan documented
+
+     The boxes are unchecked by design - the agent does not attest to any of
+     them. Never mark one complete.
+
+  4. Posture is the same weighted overall score used by the dashboard:
+     `82.5*0.40 + 78.0*0.25 + 91.0*0.20 + 65.0*0.15` = `80.45` -> **80.5%**.
+
+  5. Readiness level is banded off that score, no other input:
+
+     `High` if `overall >= 85`, else `Moderate` if `overall >= 70`, else `Low`.
+
+     80.5 falls in the middle band -> **Moderate**. The bands are fixed; the
+     number of open findings does not move the level.
+
+  ## Output format
+
+  - `# Audit Readiness Assessment`
+  - `## OIG / GAO Findings Status` with table columns in this order:
+    `Finding ID | Source | Finding | Severity | Status | Due Date`.
+  - `**Open Findings:** N/M`
+  - `## Readiness Checklist` as eight `- [ ]` items.
+  - `**Agency Compliance Posture:** N%`
+  - `**Audit Readiness Level:** High|Moderate|Low`
+
+  ## Boundaries
+
+  - Assessment only. Never close, downgrade, extend, or accept a finding, and
+    never say one has been remediated or reported to the OIG or GAO. Route the
+    change to the finding's owner.
+  - A due date in the past is still an open finding, not a closed one. Say the
+    date has passed; do not infer completion.
+  - The checklist is a prompt for humans, not a claim of evidence. Never assert
+    that an SSP, POA&M, ATO package, or assessment exists - the finding log
+    does not carry that evidence.
+  - Report the readiness level even when it is unflattering. Never soften
+    `Moderate` to `High` because remediation is in flight.

@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: adjudication-review
+  description: Produces the full adjudication file for one claim - claim facts, policy terms, supporting documents, and adjuster notes.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: adjudication-review
+  description: Produces the full adjudication file for one claim - claim facts, policy terms, supporting documents, and adjuster notes.
+  ---
+  <!-- bic:source=blank -->
+  # Adjudication review
+
+  Use this skill when the user names a single claim and asks to review it, work
+  it, see the file, check the policy terms, check what documentation is on
+  hand, or read the adjuster's notes.
+
+  ## Inputs
+
+  - A claim id (`CLM-2025-####`). When the user does not name one, default to
+    `CLM-2025-7001` and say that is the default you used.
+  - The claims register, the policy details table, and the adjuster notes.
+
+  ## Procedure
+
+  1. Look up the claim by id.
+  2. Look up the policy record by the claim's `policy_number`. If the policy is
+     not on file, show `Coverage Limit: $0`, `Deductible: $0`, and
+     `Effective: N/A to N/A`, and call out that the policy record is missing -
+     do not estimate terms.
+  3. Look up the adjuster notes by claim id. Omit the notes section entirely
+     when there are none; never write a note yourself.
+  4. Report the fraud score as `N/100` and state which band it falls in: below
+     30 is not flagged, 30 to 59 is flagged, 60 or above is an SIU referral.
+  5. List every supporting document already on file as a checked box. Documents
+     not in the list are missing - say which ones the notes ask for rather than
+     assuming they exist.
+
+  ## Output format
+
+  - `# Adjudication Review: <CLM id>`
+  - Bulleted facts in this order: `Claimant`, `Policy` (number plus title-cased
+    policy type in parentheses), `Date of Loss`, `Loss Type`, `Description`,
+    `Claimed Amount`, `Adjuster`, `Fraud Score` as `N/100`.
+  - `## Policy Details` - `Coverage Limit`, `Deductible`, `Effective: <from> to
+    <to>`.
+  - `## Supporting Documents` - `- [x] <Document Name>` per document, title-cased
+    with underscores replaced by spaces.
+  - `## Adjuster Notes` - one bullet per note, verbatim, in file order.
+
+  ## Edge cases
+
+  - If the requested claim id is not in the register, say the id is not on file
+    and list the ids that are. Never substitute the nearest claim and present
+    its facts under the requested id.
+  - Review only. Never say the claim has been approved, denied, adjusted,
+    escalated, or that documentation has been requested - state what the file
+    shows and what the adjuster would need to decide.

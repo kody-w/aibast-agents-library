@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: compile-proposal
+  description: Assembles the proposal package - section list with computed page counts, compliance attachments, delivery artifacts, and the pre-delivery checklist.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compile-proposal
+  description: Assembles the proposal package - section list with computed page counts, compliance attachments, delivery artifacts, and the pre-delivery checklist.
+  ---
+  <!-- bic:source=blank -->
+  # Compile proposal package
+
+  Use this skill when the user asks to assemble, compile, or package the
+  proposal, asks how long the document will be, asks what sections or
+  attachments it contains, or asks whether it is ready to go out.
+
+  ## Inputs
+
+  - The resolved RFP, its computed pricing, its requirement fit, and its top
+    four scored references.
+
+  ## Procedure -- page count
+
+  `page_count = 12 + (requirements * 2) + (references * 2) + (competitors * 3) + 4`
+
+  where references is always the top four selected. Meridian Healthcare:
+  `12 + 6*2 + 4*2 + 2*3 + 4 = 42` pages.
+
+  ## Procedure -- section list
+
+  Eight sections, in this order, with these page counts:
+
+  1. Executive Summary (personalized) - 3
+  2. Company Overview + <industry> Expertise - 4
+  3. Solution Architecture + Roadmap - 6
+  4. Implementation Methodology (12-week plan) - 5
+  5. Pricing + Investment Summary - 4
+  6. Customer References + Case Studies (<n>) - `n * 2`
+  7. Team Bios (Industry specialists) - 3
+  8. Terms + Conditions - 3
+
+  ## Procedure -- compliance attachments
+
+  Attach a certification document for each of our certifications (SOC 2 Type II,
+  HIPAA, ISO 27001, PCI-DSS Level 1) whose name appears, case-insensitive,
+  inside any requirement text on that RFP. If none matches, the entry is the
+  single line "Standard compliance package". Meridian matches HIPAA only, via
+  R2 "HIPAA compliance certification".
+
+  ## Output format
+
+  - Headline `**Proposal Package: <account> -- <project>**`
+  - `**Main Document (<page_count> pages):**` then the numbered section list,
+    each with its page count in parentheses.
+  - `**Supporting Materials:**` the matched certification attachments, the top
+    reference's case study (2 pages), and the implementation timeline visual
+    (1 page).
+  - `**Delivery Package:**` PDF proposal (branded template), executive
+    presentation (12 slides), pricing spreadsheet (detailed breakdown),
+    reference contact sheet (<n> contacts).
+  - `**Pre-Delivery Checklist:**` legal review, pricing approval with the
+    blended margin against the 35% floor, branding, requirement coverage as the
+    overall fit percentage, spell check.
+  - Close with `Source: [Document Assembly + Compliance Check]` and
+    `Agents: ProposalAssemblyAgent`.
+
+  ## Edge cases
+
+  - The pricing-approval line compares the blended margin to the 35% floor.
+    Meridian's 33.4% is **below** the floor: report it as blocked pending
+    pricing approval, not as confirmed.
+  - The checklist reports readiness. It is not an approval and it is not a
+    submission. Never say the package was sent, filed, or signed off.
+  - Page counts are computed from the formula, not estimated. If a requirement
+    or reference count changes, recompute rather than reusing 42.

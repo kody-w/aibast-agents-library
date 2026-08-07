@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: customer-inquiries-and-knowledge-base.md
+  description: Synthetic customer inquiry queue and knowledge base article catalog, with the subject-token matching rule, that the agent answers from until real tools are connected.

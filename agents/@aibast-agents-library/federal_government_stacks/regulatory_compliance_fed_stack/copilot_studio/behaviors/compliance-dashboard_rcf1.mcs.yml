@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: compliance-dashboard
+  description: Reports the weighted overall compliance score with per-framework scores, control coverage, and the gap count by severity.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compliance-dashboard
+  description: Reports the weighted overall compliance score with per-framework scores, control coverage, and the gap count by severity.
+  ---
+  <!-- bic:source=blank -->
+  # Compliance dashboard
+
+  Use this skill when the user asks for the compliance picture, the agency
+  score, how a framework is doing, control coverage, or how many gaps are open.
+  This is the default answer when the ask is unscoped.
+
+  ## Inputs
+
+  - The federal framework scorecard (FISMA, FedRAMP, PRIVACT, Section508).
+  - The compliance gap register.
+  - No parameters. The dashboard is always agency-wide.
+
+  ## Procedure
+
+  1. Compute the overall score as a fixed weighted sum of the per-framework
+     agency scores, rounded to one decimal:
+
+     `overall = FISMA * 0.40 + FedRAMP * 0.25 + PRIVACT * 0.20 + Section508 * 0.15`
+
+     With the current scorecard: `82.5*0.40 + 78.0*0.25 + 91.0*0.20 + 65.0*0.15`
+     = `33.0 + 19.5 + 18.2 + 9.75` = `80.45` -> **80.5%**. The weights never
+     change and are never renormalized.
+
+  2. Emit one row per framework in fixed scorecard order - FISMA, FedRAMP,
+     PRIVACT, Section508. Do not sort by score.
+
+  3. Coverage per framework, rounded to one decimal:
+
+     `coverage = (controls_implemented / controls_total) * 100`
+
+     If `controls_total` is 0, coverage is `0` - never blank, never omitted.
+
+  4. Count gaps by severity across the whole register into exactly three
+     buckets - high, moderate, low - and report the total as their sum.
+
+  ## Output format
+
+  - `# Federal Compliance Dashboard`
+  - `**Overall Compliance Score:** N%`
+  - `## Regulatory Framework Scores` with the table columns, in this order:
+    `Regulation | Score | Controls Implemented | Total Controls | Coverage`.
+    The Regulation cell is `<id> (<full name>)`, e.g.
+    `FISMA (Federal Information Security Modernization Act)`.
+  - `## Gap Summary` as four bullets: `**High:**`, `**Moderate:**`, `**Low:**`,
+    `**Total:**`.
+
+  ## Boundaries
+
+  - Report only. Never say a score has been submitted, published, or reported
+    to OMB, CISA, or the FedRAMP PMO.
+  - Only these four frameworks exist in the scorecard. If asked about another
+    regulation, say the agency scorecard does not cover it.
+  - Show the weighted arithmetic when the overall score is questioned; never
+    adjust it for any other consideration.

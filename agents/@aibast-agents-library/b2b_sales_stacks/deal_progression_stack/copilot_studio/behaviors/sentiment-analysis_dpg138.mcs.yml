@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: sentiment-analysis
+  description: Converts each contact's recorded sentiment into a signal score, label and risk band, then rolls up an average and an overall deal risk.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: sentiment-analysis
+  description: Converts each contact's recorded sentiment into a signal score, label and risk band, then rolls up an average and an overall deal risk.
+  ---
+  <!-- bic:source=blank -->
+  # Sentiment analysis
+
+  Use this skill when the user asks how a committee feels, who is unhappy,
+  where the resistance is, or for sentiment signals on a deal.
+
+  ## Inputs
+
+  - The stakeholder records for the 5 mapped deals and the sentiment signal
+    table.
+
+  ## Procedure
+
+  1. Order deals by value descending. List contacts in recorded order.
+  2. Map each recorded sentiment to its fixed score, label and risk -
+     very_positive 90 Strong advocate low, positive 70 Favorable low, neutral
+     50 Undecided medium, cautious 35 Hesitant medium, frustrated 30 Frustrated
+     but engaged high, negative 15 Opposed critical, unknown 40 No signal
+     medium.
+  3. Average sentiment = `round(mean(signal_score))` over the deal's contacts,
+     unweighted by influence.
+  4. Risk contacts counts contacts whose risk band is high or critical only.
+     Overall risk - HIGH at 2 or more risk contacts, MEDIUM at 1, otherwise LOW.
+  5. Always append the signal interpretation legend.
+
+  ## Output format
+
+  Headline `**Sentiment Analysis -- Stakeholder Signals**`, then one block per
+  deal - `**<deal> -- $<value>**`,
+  `Avg Sentiment: N/100 | Risk Contacts: N | Overall: LEVEL` and a table with
+  exactly these columns.
+
+  | Contact | Title | Sentiment | Score | Label | Risk |
+
+  Close with `**Signal Interpretation:**` and
+  `Source: [Gong Call Analysis + Email Sentiment + Meeting Notes]`.
+
+  ## Edge cases
+
+  - Medium-risk contacts do not count toward the risk-contact total, so a deal
+    full of neutral and unknown contacts can read LOW overall. Say so when the
+    average sentiment is weak but the overall band is LOW.
+  - unknown is a real value scored 40, not missing data - report it as no
+    signal and recommend direct contact.
+  - Never infer sentiment from emails or meeting counts; only the recorded
+    value counts.

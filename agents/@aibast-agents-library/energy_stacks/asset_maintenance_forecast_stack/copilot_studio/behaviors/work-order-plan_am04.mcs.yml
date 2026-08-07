@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: work-order-plan
+  description: Generates the prioritized work order list from the condition-score gates, with estimated cost and target quarter per order.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: work-order-plan
+  description: Generates the prioritized work order list from the condition-score gates, with estimated cost and target quarter per order.
+  ---
+  <!-- bic:source=blank -->
+  # Work order plan
+
+  Use this skill when the user asks what work should be raised, asks for a work
+  order list or maintenance plan, asks what to do about a degraded asset, or
+  asks what the planned work will cost.
+
+  ## Inputs
+
+  - The asset register (condition score, asset type).
+  - The maintenance rate card, which supplies every estimated cost.
+
+  ## Procedure - the gates are arithmetic, not judgment
+
+  1. Process assets in `condition_score` ascending order (worst first). Keep a
+     single priority counter that starts at 1 and increments for every order
+     emitted, across all assets - priority is global, not per asset.
+  2. For each asset, emit orders in this exact sequence:
+
+     - **If `condition_score < 50`**: emit a `MAJOR` order.
+       Description: `Urgent major service - condition score <score>`.
+       Cost: the major rate for that asset type. Target: `2026-Q2`.
+     - **If `condition_score < 70`**: emit an `INSPECTION` order.
+       Description: `Detailed condition assessment required`.
+       Cost: the inspection rate for that asset type. Target: `2026-Q2`.
+     - **Always**: emit a `MINOR` order.
+       Description: `Scheduled preventive maintenance`.
+       Cost: the minor rate for that asset type. Target: `2026-Q3`.
+
+     The gates are cumulative. An asset below 50 clears both gates and therefore
+     receives three orders: MAJOR, INSPECTION, and MINOR. An asset between 50
+     and 69 receives two: INSPECTION and MINOR. An asset at 70 or above receives
+     one: MINOR only.
+  3. Total planned cost is the sum of every order's estimated cost. It is a
+     work-order total and is smaller than the annual budget projection, which
+     assumes a full-year cadence - do not present the two as the same number.
+
+  ## Output format
+
+  Headline `# Work Order Plan`, then:
+
+  - `**Total Planned Cost:** $NNN,NNN`
+  - A table with exactly these columns:
+    `| Priority | Asset | Work Type | Description | Est. Cost | Target |`
+  - Work type in capitals: `MAJOR`, `INSPECTION`, `MINOR`.
+  - Costs with thousands separators and a leading `$`.
+
+  ## Edge cases
+
+  - Assets can hold several consecutive priority slots. The worst asset occupies
+    the first three, so priority 1, 2, and 3 can all name the same asset.
+  - Every asset appears in the plan, including healthy ones - a GOOD asset still
+    gets its preventive MINOR order.
+  - `2026-Q2` and `2026-Q3` are the only target windows this plan emits. Do not
+    invent a date inside a quarter, and do not schedule against crew or outage
+    calendars - none are available.
+  - Recommendation only. Never state that an order has been raised, approved,
+    assigned, or scheduled. The plan is handed to a planner to action.

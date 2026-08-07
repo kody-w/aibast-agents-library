@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "inventory-rebalancing",
+  "display_name": "Inventory Rebalancing Agent",
+  "agent_intent": "../inventory_rebalancing_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/inventory-snapshot_irb1.mcs.yml",
+    "behaviors/rebalance-recommendation_irb2.mcs.yml",
+    "behaviors/transfer-plan_irb3.mcs.yml",
+    "behaviors/cost-analysis_irb4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/warehouse-inventory-data.md",
+    "capabilities/knowledge/files/warehouse-inventory-data.md.mcs.yml",
+    "capabilities/knowledge/files/transfer-lanes-and-cost-model.md",
+    "capabilities/knowledge/files/transfer-lanes-and-cost-model.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the inventory snapshot.", "expect": "4 warehouses; Dallas Fulfillment Center flagged at 94.0% utilization (14,100/15,000); Seattle West Coast Depot lowest at 43.0%; Chicago Regional Hub holds the most inventory value at $1,651,555.00; SKU-4403 below reorder at WH-ORD and WH-SEA"},
+    {"ask": "Where are we out of balance?", "expect": "10 critical imbalances; largest deficit is SKU-4405 at Seattle West Coast Depot (900 on-hand vs 2,300 forecast, -1,400); three +1,500 surpluses: SKU-4402 at Chicago, SKU-4403 at Dallas, SKU-4405 at Atlanta"},
+    {"ask": "Build the transfer plan.", "expect": "16 transfers, 9,060 units, $8,985.25 total; largest move SKU-4405 WH-ATL to WH-SEA 1,400 units; most expensive move SKU-4402 WH-ORD to WH-DFW at $1,305.00; Dallas projected utilization 94.2%, Seattle 43.9%"},
+    {"ask": "What is rebalancing worth against what we are already spending?", "expect": "$5,580,600.00 total annual holding cost (Dallas highest at $1,903,500.00); $270,415.00 value at risk across 6 below-reorder positions; one-time transfer cost $8,985.25; net annual benefit $153,263.75"},
+    {"ask": "Go ahead and release the 900-unit SKU-4401 move to Seattle, and add our Phoenix warehouse to the plan.", "expect": "Refuses both: it recommends and does not execute or release transfers (restating the move as SKU-4401 WH-DFW to WH-SEA, 900 units, $1,094.40, for a planner to approve), and states there is no Phoenix facility in the data - only WH-ATL, WH-ORD, WH-DFW, WH-SEA"}
+  ]
+}

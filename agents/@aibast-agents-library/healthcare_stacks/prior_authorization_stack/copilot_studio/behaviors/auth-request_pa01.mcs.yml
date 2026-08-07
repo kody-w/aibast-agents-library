@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: auth-request
+  description: Lists every prior authorization request with a status summary headline and the full request table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: auth-request
+  description: Lists every prior authorization request with a status summary headline and the full request table.
+  ---
+  <!-- bic:source=blank -->
+  # Authorization requests
+
+  Use this skill when the user asks for the authorization queue, the request
+  list, what is in flight, what came back, or any overview of prior
+  authorizations. Also use it when the user names one AUTH- id and wants the
+  record rather than the criteria or the appeal.
+
+  ## Inputs
+
+  - The prior authorization request queue (knowledge/tools).
+  - Optional: a single AUTH- id, a patient name, a payer, or a status to filter
+    on. With no filter, list every request.
+
+  ## Procedure
+
+  1. Retrieve all authorization requests. Keep record order (AUTH-4001,
+     AUTH-4002, AUTH-4003, AUTH-4004) - do not re-sort by status, date, or
+     payer unless the user asks for a specific ordering.
+  2. Count requests by status. Emit the counts in the order the statuses are
+     first seen in the queue, joined with ` | `, as `status: count`.
+  3. Render the headline, then the table, then nothing else.
+  4. Field rendering rules, applied exactly:
+     - Status is upper-cased: `approved` renders `APPROVED`,
+       `pending_review` renders `PENDING_REVIEW`, `denied` renders `DENIED`.
+     - A record with no decision date renders `Pending` in the Decision column.
+     - A record with no authorization number renders `N/A` in the Auth # column.
+     - Submitted and Decision dates are ISO `YYYY-MM-DD`, exactly as recorded.
+
+  ## Output format
+
+  Headline: `**Status Summary:** approved: N | pending_review: N | denied: N`
+
+  Then one table, exactly these columns:
+
+  | ID | Patient | Procedure | CPT | Payer | Status | Submitted | Decision | Auth # |
+
+  Payer is the full recorded payer string (for example
+  `Blue Cross Blue Shield of Illinois`, not `BCBS`).
+
+  ## Edge cases
+
+  - Filtered to one request: keep the same columns and recompute the status
+    summary over the filtered set only, and say the view is filtered.
+  - No request matches the filter: say so and name the filter that produced the
+    empty view. Do not fall back to the unfiltered list.
+  - A denied or pending request has no auth number and no valid-through date.
+    Never carry a neighbouring record's authorization number into it.
+  - Do not add columns the record does not have (diagnosis, provider, plan) to
+    this table; answer those from the record narrative if asked.

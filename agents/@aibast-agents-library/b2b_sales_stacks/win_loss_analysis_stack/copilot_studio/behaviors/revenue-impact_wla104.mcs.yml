@@ -1,0 +1,91 @@
+mcs.metadata:
+  componentName: revenue-impact
+  description: Models recoverable pipeline per intervention, the Q4 forecast lift, the win-rate recovery path, and overall program ROI.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: revenue-impact
+  description: Models recoverable pipeline per intervention, the Q4 forecast lift, the win-rate recovery path, and overall program ROI.
+  ---
+  <!-- bic:source=blank -->
+  # Revenue impact
+
+  Use this skill when the user asks what the fix is worth, how much pipeline is
+  recoverable, what the ROI is, what Q4 looks like, or how fast the win rate
+  comes back.
+
+  ## Inputs
+
+  - The 78 Q3 losses with their values and loss reasons.
+  - The intervention catalog with cost and recovery rate.
+
+  ## Procedure - the exact arithmetic
+
+  1. Map loss reasons to interventions: `security_certs` ->
+     security_positioning **and** fedramp_certification (both claim the same 12
+     deals); `enterprise_references` -> reference_program; `pricing` ->
+     pricing_flexibility; `relationship` -> reference_program;
+     `feature_gaps` -> none; `no_decision` -> none.
+  2. For each intervention: `total_pipeline = sum(value of applicable losses)`,
+     `recoverable_value = int(total_pipeline * recovery_rate)`.
+  3. Deal band: `low = max(1, int(deals * rate * 0.7))`,
+     `high = max(low, int(deals * rate * 1.1))`, rendered `low-high deals`.
+  4. Computed rows:
+     - FedRAMP Certification: 12 deals, $7,450,000 pipeline x 0.55 =
+       **$4,097,500**, band 4-7, 6 months.
+     - Security Positioning Refresh: 12 deals, $7,450,000 x 0.35 =
+       **$2,607,500**, band 2-4, Immediate.
+     - Enterprise Reference Program: 16 deals (10 reference + 6 relationship),
+       $5,245,000 x 0.40 = **$2,098,000**, band 4-7, 30 days.
+     - Pricing & Packaging Adjustment: 20 deals, $4,628,000 x 0.30 =
+       **$1,388,400**, band 4-6, Immediate.
+     - ISO 27001 Certification: 0 applicable deals, $0 pipeline, **$0**
+       recoverable, band 1-1, 4 months.
+  5. **Sort the table by recoverable value, descending.**
+  6. Totals: `total_recoverable = $10,191,400`,
+     `total_cost = 25,000 + 85,000 + 30,000 + 15,000 + 25,000 = $180,000`,
+     `ROI = round(10,191,400 / 180,000, 1) = 56.6:1`.
+  7. Q4 forecast: current trajectory = Q3 won value = **$8,433,000** flat;
+     `intervention_lift = int(10,191,400 * 0.62) = $6,318,668`;
+     with interventions = **$14,751,668**.
+  8. Win-rate path: `Q4 = round(38.6 + (10,191,400 / 23,368,000) * 100 * 0.15,
+     1) = 45.1%`, then `Q1 = 49.1%` and `Q2 = 53.1%` (+4.0 pts each).
+     $23,368,000 is the total Q3 lost value.
+
+  ## Output format
+
+  - Headline: `**Revenue Impact Model:**`
+  - Table `| Intervention | Deals Recoverable | Pipeline Value | Timeline |`,
+    recoverable-descending, with the five rows above. Note the column is
+    labeled "Pipeline Value" but carries the **recoverable** value
+    (pipeline x recovery rate), not the gross pipeline - state the gross
+    separately if asked rather than relabeling the table.
+  - `**Q4 Forecast Impact:**` - current trajectory $8,433,000 (38.6% win rate);
+    with interventions $14,751,668 (45.1% win rate); incremental revenue
+    $6,318,668.
+  - Table `| Quarter | Projected Win Rate | Key Driver |` - Q4 45.1%
+    Positioning + pricing; Q1 49.1% References + certifications; Q2 53.1% Full
+    program maturity.
+  - `**ROI Calculation:**` - Investment $180,000; Return $10,191,400 recovered
+    pipeline; ROI 56.6:1.
+  - `Source: [Revenue Analytics + Forecast Models]`
+  - `Agents: RevenueImpactAgent`
+
+  ## Edge cases
+
+  - ISO 27001 maps to zero deals, so its recoverable value is $0 while its band
+    still renders `1-1 deals` because the low bound is floored at 1. Report both
+    as shown and say plainly that the model attributes no recoverable pipeline
+    to it - do not quietly drop the row or invent deals for it.
+  - Security positioning and FedRAMP both claim the same 12 security-cert deals,
+    so the $10,191,400 total double-counts that pipeline across the two
+    interventions. Say so when asked whether the totals are additive.
+  - The $180,000 investment is the full catalog cost, including ISO 27001, even
+    though ISO returns $0 in this model.
+
+  ## Boundaries
+
+  - Modeling only. Never state that a forecast has been committed, a budget
+    allocated, or revenue booked.
+  - Recovery rates are catalog constants. Never tune one to hit a target
+    number, and never present a rate that is not in the catalog.

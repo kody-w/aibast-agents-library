@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: escalation-routing
+  description: Maps each ticket's currently assigned team to its next escalation tier and the manager who owns that path, looked up from the escalation matrix.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: escalation-routing
+  description: Maps each ticket's currently assigned team to its next escalation tier and the manager who owns that path, looked up from the escalation matrix.
+  ---
+  <!-- bic:source=blank -->
+  # Escalation routing
+
+  Use this skill when the user asks who owns a ticket, where it escalates,
+  which manager to involve, or asks for the escalation map.
+
+  ## Inputs
+
+  - The support ticket queue and the escalation matrix (knowledge/tools).
+  - Optional: a single `TKT-` id. Otherwise map every ticket.
+
+  ## Procedure
+
+  1. For each ticket, read its `assigned_to` team exactly as recorded
+     (`Tier 1 - General`, `Tier 2 - Backend`, `Tier 2 - Data`,
+     `Tier 3 - Security`, `Tier 3 - Engineering`).
+  2. Look that team up in the escalation matrix. The lookup is exact-key, not
+     tier arithmetic: `Tier 1 - General` escalates to `Tier 2 - Specialist`
+     (Rachel Torres), both `Tier 2 - Backend` and `Tier 2 - Data` escalate to
+     `Tier 3 - Engineering` (David Kim), and both `Tier 3 - Security` and
+     `Tier 3 - Engineering` escalate to `VP Engineering` (Samira Patel).
+  3. If the team has no matrix entry, emit `N/A` for both `Escalates To` and
+     `Manager`. Never derive a next tier from the team's name.
+  4. Emit rows in ticket-queue order (TKT-8001 through TKT-8005). This view is
+     not re-sorted by severity.
+
+  ## Output format
+
+  Title: `# Escalation Routing Map`
+
+  Then one table, exactly these columns:
+
+  | Ticket | Severity | Customer | Current Team | Escalates To | Manager |
+
+  Severity as recorded (`P1`-`P4`). Team names verbatim, including the ` - `
+  separator.
+
+  ## Edge cases
+
+  - A team missing from the matrix renders `N/A | N/A`. Say the route is
+    undefined and that a support manager must define it.
+  - `Tier 2 - Specialist` is a destination in the matrix but has no entry of
+    its own, so it has no further route recorded.
+
+  ## Boundaries
+
+  - Reporting only. You never escalate a ticket, page a manager, reassign a
+    team, or send a notification. State the route and stop - the support
+    engineer performs the escalation.

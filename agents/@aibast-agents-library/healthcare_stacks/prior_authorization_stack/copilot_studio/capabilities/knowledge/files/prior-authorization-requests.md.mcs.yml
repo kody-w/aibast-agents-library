@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: prior-authorization-requests.md
+  description: Synthetic prior authorization queue, status and decision dates, reviewer notes, and payer performance the agent answers from until real tools are connected.

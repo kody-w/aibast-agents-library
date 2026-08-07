@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: recommend-actions
+  description: Ranks the eligible plays for each deal by priority score, showing effort, historical success rate, time to impact and an urgency label.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: recommend-actions
+  description: Ranks the eligible plays for each deal by priority score, showing effort, historical success rate, time to impact and an urgency label.
+  ---
+  <!-- bic:source=blank -->
+  # Next best action recommendations
+
+  Use this skill when the user asks what to do next on a deal, for the next
+  best action, or which play to run first.
+
+  ## Inputs
+
+  - The next-best-action deal context (6 deals) and the action library with
+    historical outcomes.
+
+  ## Procedure
+
+  1. Process deals sorted by value descending.
+  2. An action is eligible only when BOTH gates pass - the deal's stage is in
+     the action's applicable stages AND the deal's blocker is in the action's
+     applicable blockers. Both, never either.
+  3. Priority score for each eligible action.
+
+     `priority = impact_score x 0.4 + success_rate x 100 x 0.3 + (100 - days_to_impact x 10) x 0.3`
+
+     rounded to one decimal. Note the time term penalises slow plays hard - a
+     3-day play scores 21.0 on that term, an 8-day play only 6.0.
+  4. Sort eligible actions by priority descending and show at most the top 4.
+  5. Urgency from the deal's risk score - 60 or above IMMEDIATE, 40 or above
+     THIS WEEK, otherwise STANDARD.
+  6. Report the total number of eligible actions across all deals in the
+     headline.
+
+  ## Output format
+
+  Headline `**Next Best Action Recommendations -- N Deals**` then
+  `Total actions recommended: **N**`.
+
+  One block per deal - `**<deal> -- $<value> (<stage>)**`,
+  `Risk: N/100 | Health: N/100 | Urgency: LABEL` and a table with exactly these
+  columns.
+
+  | # | Action | Priority | Effort | Success Rate | Time to Impact |
+
+  Effort carries an `h` suffix, success rate is a whole percentage, time to
+  impact carries a `d` suffix.
+
+  Close with `Source: [Deal Context + Historical Outcomes + Action Library]`.
+
+  ## Edge cases
+
+  - A deal can qualify for only one play - Pinnacle Logistics matches just
+    Multi-Thread Outreach Campaign because of its Qualification stage and
+    no_champion blocker. Do not pad the list with ineligible plays.
+  - Two deals with the same stage and blocker produce identical rankings; that
+    is correct.
+  - A high-health deal still gets recommendations - urgency, not eligibility,
+    reflects risk.
+  - Recommendations only. Never say a play was scheduled, booked or started.

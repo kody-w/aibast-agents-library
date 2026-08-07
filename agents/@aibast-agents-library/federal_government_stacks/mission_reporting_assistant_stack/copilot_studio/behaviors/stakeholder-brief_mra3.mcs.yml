@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: stakeholder-brief
+  description: Emits the stakeholder registry with briefing cadence and interest area, then an executive brief of action-needed and on-track items per mission.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: stakeholder-brief
+  description: Emits the stakeholder registry with briefing cadence and interest area, then an executive brief of action-needed and on-track items per mission.
+  ---
+  <!-- bic:source=blank -->
+  # Stakeholder brief
+
+  Use this skill when the user asks who gets briefed, how often a stakeholder
+  is briefed, what to tell an executive, or asks for briefing material for an
+  upcoming review.
+
+  ## Inputs
+
+  - The stakeholder registry, the mission objective register, the KPI register.
+  - Optional: a single SH- id. Otherwise emit the whole registry.
+
+  ## Procedure
+
+  Part one -- the registry. One row per stakeholder in register order, SH-01
+  through SH-06. Render `briefing_frequency` and `interest` in title case with
+  underscores replaced by spaces (`as_needed` becomes `As Needed`,
+  `it_modernization` becomes `It Modernization`, `bi-weekly` becomes
+  `Bi-Weekly`).
+
+  Part two -- the executive brief. For each mission objective in register order:
+
+  1. Emit `### <mission name> -- <Title Case status>`.
+  2. Select that mission's KPIs and compute each status with the attainment
+     rule: unit `days` or `minutes` uses `pct = (target / current) * 100`,
+     every other unit uses `pct = (current / target) * 100`; `pct >= 95` is On
+     Target, `pct >= 75` is Near Target, below that is Below Target.
+  3. Emit one line per KPI, but only for the two extreme bands:
+     - `Below Target` becomes
+       `- **Action Needed:** <name> at <current><unit> vs target <target><unit>`
+     - `On Target` becomes `- **On Track:** <name> at <current><unit>`
+     - `Near Target` KPIs produce no line at all. This is deliberate: the brief
+       carries what needs a decision and what can be claimed, not the middle.
+     Value and unit are concatenated without a space, as in `22days`, `4.8%`,
+     `8.3minutes`.
+
+  ## Output format
+
+  `# Stakeholder Briefing Guide`, then `## Stakeholder Registry` with columns
+  `ID | Name | Role | Briefing Frequency | Interest Area`, then
+  `## Executive Brief` with the per-mission sections above.
+
+  ## Edge cases
+
+  - A mission can produce only Action Needed lines and no On Track lines --
+    Customer Experience Modernization (MO-002) is such a case, with two action
+    items and nothing claimable. Do not add a reassuring line to balance it.
+  - A mission whose KPIs are all Near Target would produce an empty section.
+    Emit the header and say there is nothing in either extreme band.
+  - If asked about a stakeholder not in the registry, say they are not in the
+    data and list the SH- ids that are.
+  - Recommendation and reporting only. Never say a brief has been sent,
+    scheduled, or delivered to any stakeholder -- you produce the material, the
+    program manager delivers it.

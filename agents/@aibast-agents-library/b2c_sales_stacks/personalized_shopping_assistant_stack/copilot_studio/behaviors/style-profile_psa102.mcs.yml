@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: style-profile
+  description: Presents a customer's sizing, style and brand preferences, colors, budget range, and priced purchase history.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: style-profile
+  description: Presents a customer's sizing, style and brand preferences, colors, budget range, and priced purchase history.
+  ---
+  <!-- bic:source=blank -->
+  # Style profile
+
+  Use this skill when the user asks what a customer likes, what size they wear,
+  what they have bought before, what their budget is, or asks for the full
+  clienteling profile before an appointment.
+
+  ## Inputs
+
+  - The customer preference profiles and the product catalog (the catalog is
+    needed to price the purchase history).
+  - `customer_id` - a SHOP- id. When none is given, default to SHOP-001.
+
+  ## Procedure
+
+  1. Look up the SHOP- id. If it is absent, the profile renders with the name
+     `Unknown` and every field as `N/A` or empty. Report that plainly - the id
+     is not in the data - and name the ids that are. Never infer sizing,
+     budget, or brand affinity for an unknown customer.
+  2. Emit sizing verbatim from the record: `size_top`, `size_bottom`,
+     `size_shoe`. A missing field renders as `N/A`.
+  3. Emit style preferences, brand affinity, and color preference as bullet
+     lists in stored order. Style and color tokens are displayed with
+     underscores replaced by spaces and title-cased, so `smart_casual` renders
+     as `Smart Casual` and `white_grey` renders as `White Grey`. Brand names
+     are printed exactly as stored, including the trailing period in
+     `Heritage Co.`.
+  4. Emit the budget as `$<min> - $<max>` from `budget_range`.
+  5. For every SKU in `purchase_history`, look up the catalog entry and emit
+     the product name and its price at `$N,NNN.NN`. A SKU absent from the
+     catalog falls back to printing the raw SKU with a price of `$0.00` - flag
+     that as a data gap rather than reporting a $0.00 purchase.
+
+  ## Output format
+
+  - `# Style Profile: <name>`
+  - `## Sizing` with `- Top:`, `- Bottom:`, `- Shoe:`
+  - `## Style Preferences` - one bullet per style, title-cased
+  - `## Brand Affinity` - one bullet per brand
+  - `## Color Preference` - one bullet per color, title-cased
+  - `## Budget Range` - a single line, `$<min> - $<max>`
+  - `## Purchase History` - one bullet per SKU, product name then the price
+
+  ## Edge cases
+
+  - Purchase history is a record of what the customer owns; it is also the
+    exclusion list for recommendations. Never present it as a suggestion.
+  - An empty list renders as a heading with no bullets. Say the field is empty
+    rather than leaving the heading bare.
+
+  ## Boundaries
+
+  - Read only. Never add, edit, merge, or delete a preference, size, or
+    history entry - profile changes are made by a person in the system of
+    record.
+  - Never share one customer's profile while answering about another.

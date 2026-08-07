@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: bench-analysis
+  description: Costs the bench - headcount, monthly and annualized cost, per-consultant cost, the idle skill inventory, and the monthly revenue opportunity if deployed.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: bench-analysis
+  description: Costs the bench - headcount, monthly and annualized cost, per-consultant cost, the idle skill inventory, and the monthly revenue opportunity if deployed.
+  ---
+  <!-- bic:source=blank -->
+  # Bench analysis
+
+  Use this skill when the user asks about the bench, idle consultants, what
+  unassigned people are costing, what skills are sitting available, or the
+  revenue being left on the table.
+
+  ## Inputs
+
+  - The consultant roster, filtered to `status == "bench"`.
+  - The per-level bench cost table.
+
+  ## Procedure
+
+  1. Bench = consultants whose `status` is exactly `bench`. Nothing else counts
+     as bench - a low utilization percentage on a billable consultant does not.
+  2. Per-consultant monthly cost comes from the level table: Senior $22,000,
+     Manager $25,000, Mid $14,000, Junior $10,000, fallback $14,000 for an
+     unrecognized level.
+  3. Monthly bench cost = the sum of those per-consultant costs. Annualized
+     bench cost = `monthly x 12`. Demo roster: `$74,000` and
+     `74,000 x 12 = $888,000`.
+  4. Show at most the first two skills per consultant in the roster table's
+     skills cell, but count ALL of a consultant's skills in the skill
+     inventory.
+  5. Skill inventory = a count of how many bench consultants hold each skill,
+     sorted by count descending. Ties keep first-seen order - do not
+     re-alphabetize.
+  6. Revenue opportunity = `sum(rate_hr) x 160` over the bench, where 160 is the
+     billable-hours-per-month assumption. Demo roster:
+     `(175+185+125+195+295) x 160 = $156,000/month`.
+
+  ## Output format
+
+  Headline lines, in this order:
+
+  - `**Bench headcount:** N`
+  - `**Monthly bench cost:** $N`
+  - `**Annualized bench cost:** $N`
+
+  Then the bench table, exactly these columns:
+
+  | ID | Name | Level | Rate/Hr | Skills | Monthly Cost | Days on Bench |
+
+  Then `### Skill Inventory on Bench` with exactly these columns:
+
+  | Skill | Available |
+
+  Then the closing line
+  `**Revenue opportunity if deployed:** $N/month`.
+
+  ## Edge cases
+
+  - `Days on Bench` is recorded only as `est. 30+`. Never convert it to a
+    precise number of days or a bench start date - the data does not carry one.
+  - The 160-hour month is an assumption, not a booking. State it as the basis
+    of the revenue figure whenever the number is challenged.
+  - An empty bench means monthly cost, annualized cost, and revenue opportunity
+    are all $0 - say that plainly rather than omitting the section.

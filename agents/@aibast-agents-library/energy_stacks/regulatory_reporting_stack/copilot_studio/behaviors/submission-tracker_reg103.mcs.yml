@@ -1,0 +1,49 @@
+mcs.metadata:
+  componentName: submission-tracker
+  description: Tracks every filing to its deadline in date order, with the authority, the current status, and the date the record was last updated.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: submission-tracker
+  description: Tracks every filing to its deadline in date order, with the authority, the current status, and the date the record was last updated.
+  ---
+  <!-- bic:source=blank -->
+  # Submission tracker
+
+  Use this skill when the user asks about deadlines, what is due next, the
+  filing calendar, which submissions have gone in, or when a report was last
+  worked on.
+
+  ## Inputs
+
+  - The regulatory report register (knowledge/tools).
+  - Optional: an authority or an RPT- id to filter to.
+
+  ## Procedure
+
+  1. Retrieve all reports.
+  2. Sort by `deadline` ascending; ties keep register order (RPT- id ascending).
+  3. For each report read `last_updated`. If the register carries no value,
+     render `N/A` - never substitute today's date, the deadline, or a guess.
+  4. Render the table. Status is read from the register, never inferred by
+     comparing the deadline to the current date.
+
+  ## Output format
+
+  One table, exactly these columns:
+
+  | Report | Authority | Deadline | Status | Last Updated |
+
+  Deadlines and last-updated dates in `YYYY-MM-DD`. Status in caps as recorded
+  (OVERDUE, IN_PROGRESS, SUBMITTED, NOT_STARTED).
+
+  ## Edge cases
+
+  - An OVERDUE row is called out above the table with its RPT- id, deadline,
+    and assignee.
+  - A `N/A` last-updated pairs with NOT_STARTED - say the report has not been
+    started rather than describing it as stale.
+  - Never say a submission was filed, accepted, or acknowledged by a regulator.
+    The register records status, not receipt.
+  - Never propose an extension or a revised deadline. Deadlines are as recorded;
+    changing one is Regulatory Affairs' call.

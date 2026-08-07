@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: priority-assignment
+  description: Renders the priority assignment matrix - each ticket's priority, owning team, assignee, blast radius, and SLA window, against live team capacity.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: priority-assignment
+  description: Renders the priority assignment matrix - each ticket's priority, owning team, assignee, blast radius, and SLA window, against live team capacity.
+  ---
+  <!-- bic:source=blank -->
+  # Priority assignment
+
+  Use this skill when the user asks who owns a ticket, which team should take
+  work, where the load sits, whether a team is over capacity, or how many users
+  a ticket affects.
+
+  ## Inputs
+
+  - The ticket queue, the SLA target table, and the team capacity roster.
+  - Optional: a single TKT- id, or a team name. Otherwise process the whole
+    queue.
+
+  ## Procedure
+
+  1. For every ticket emit: id, severity as its priority, owning team,
+     assignee, `users_affected`, and the SLA resolution target that its
+     severity maps to (P1-Critical 1h, P2-High 4h, P3-Medium 8h, P4-Low 24h).
+  2. Walk the queue in its recorded order for this matrix - it is an ownership
+     register, not a ranking. Do not re-sort it by severity. Say so if the user
+     expects P1-first ordering here and point them at the dashboard.
+  3. For every team emit: members, current tickets in flight, capacity
+     percentage, and the first two skills on its skill list only.
+  4. Read capacity from the roster; never compute it from the ticket queue.
+     The roster's ticket counts (Network Team 4, Application Support 6, Desktop
+     Support 18, Database Team 2 - 30 in flight) cover more work than the 8
+     tickets you can enumerate. Never add the two figures together.
+  5. Routing guidance is by skill match and remaining headroom: a team is a
+     candidate when its skill list covers the ticket's category and its
+     capacity percentage leaves room. State the percentage you used.
+
+  ## Output format
+
+  Assignment table, exactly these columns:
+
+  | ID | Priority | Team | Assignee | Users Affected | SLA |
+
+  Capacity table, exactly these columns:
+
+  | Team | Members | Tickets | Capacity | Skills |
+
+  Capacity as an integer percentage with a `%` suffix. SLA as hours with an
+  `h` suffix. Skills as the first two, comma-separated.
+
+  Close with the provenance line: `Source: [ServiceNow + Workforce Management]`.
+
+  ## Edge cases
+
+  - Assignee `unassigned` is reported verbatim and flagged as needing an owner.
+  - A team at or above 85% capacity is called out as constrained before any
+    routing suggestion naming it.
+  - Recommendation only. Never say a ticket has been routed, assigned,
+    reassigned, or that a team has been told. The service desk lead assigns.
+  - Unknown TKT- id: say it is not in the queue. Do not guess an owner.

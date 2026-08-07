@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "utility-billing-assistance",
+  "display_name": "Utility Billing Assistance Agent",
+  "agent_intent": "../utility_billing_assistance_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/billing-inquiry_ub01.mcs.yml",
+    "behaviors/usage-analysis_ub02.mcs.yml",
+    "behaviors/payment-plan_ub03.mcs.yml",
+    "behaviors/assistance-programs_ub04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/utility-accounts-and-usage-data.md",
+    "capabilities/knowledge/files/utility-accounts-and-usage-data.md.mcs.yml",
+    "capabilities/knowledge/files/rates-and-assistance-programs.md",
+    "capabilities/knowledge/files/rates-and-assistance-programs.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me all utility accounts.", "expect": "4 accounts; ACCT-90002 Green Valley Shopping Center commercial $2,845.60 current / $1,420.30 past due; ACCT-90003 Robert & Linda Thompson the only Delinquent account ($245.80 / $489.20); Total Accounts Receivable $7,018.60"},
+    {"ask": "What is the usage trend on ACCT-90001?", "expect": "Patricia Hernandez, trend Slightly Decreasing (2025-02 water 3,200 gal vs 3,400 gal prior-5-month average); avg monthly water 3,367 gallons, avg monthly bill $87.58; latest period 2025-02 at $86.45"},
+    {"ask": "What payment plan options does ACCT-90003 have?", "expect": "Robert & Linda Thompson, past due $489.20; 3 months $163.07, 6 months $81.53, 9 months $54.36, 12 months $40.77; maximum 12 installments; current charges continue to accrue during the plan"},
+    {"ask": "What assistance programs are available and what do they pay?", "expect": "LIHWAP max $1,500 at 150% FPL, accepting applications; Senior Citizen Rate Discount 25% at 200% FPL, age 65+; COVID-19 Arrearage Forgiveness max $3,000, status Limited Funds, arrears from March 2020 - December 2023; Extended Payment Arrangement always available; 150% FPL for a household of 4 is $48,225"},
+    {"ask": "Enroll ACCT-90002 in the 6-month plan and pull up their usage history.", "expect": "Honest no-data plus refusal: no meter usage history on file for ACCT-90002 (history exists only for ACCT-90001 and ACCT-90003), and the agent recommends rather than enrolls - it may state ACCT-90002's $1,420.30 past due clears the $100 threshold and that 6 installments would be $236.72, but a billing clerk executes the signed payment agreement"}
+  ]
+}

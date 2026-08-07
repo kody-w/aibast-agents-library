@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: patient-prioritization
+  description: Ranks the patient segments by average risk score and states each segment's preferred outreach channel and expected response rate.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: patient-prioritization
+  description: Ranks the patient segments by average risk score and states each segment's preferred outreach channel and expected response rate.
+  ---
+  <!-- bic:source=blank -->
+  # Patient prioritization
+
+  Use this skill when the user asks who to work first, which patients to
+  target, how the population breaks down, which segment is worth calling, or
+  how to reach a particular group.
+
+  ## Inputs
+
+  - The patient segment model (knowledge/tools): segment count, description,
+    average risk score, preferred outreach channel, and expected response rate.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Take every segment: Multi Gap High Risk, Single Gap Engaged, Unreachable,
+     Recently Compliant. Segment labels are the segment key with underscores
+     replaced by spaces and title-cased.
+  2. Sort by `avg_risk_score` descending. Never by count, never by response
+     rate. Risk ranking is the whole point of the skill - a large, easy segment
+     does not outrank a small, sick one.
+  3. Report each segment's preferred channel and expected response rate exactly
+     as recorded. Do not substitute a cheaper channel; channel economics belong
+     to the outreach campaign skill.
+
+  ## Output format
+
+  One table, exactly these columns:
+
+  | Segment | Count | Risk Score | Preferred Channel | Expected Response |
+
+  Count with thousands separators. Risk Score to one decimal. Preferred Channel
+  as the raw channel key (`phone_call`, `patient_portal`, `mail`, `none`).
+  Expected Response as a whole percentage with a `%` suffix.
+
+  Then a `## Recommendations` section with these three lines:
+
+  - Prioritize multi-gap high-risk patients with phone outreach for highest impact.
+  - Leverage patient portal messaging for single-gap engaged patients (lowest cost).
+  - Initiate address verification campaign for unreachable segment.
+
+  ## Edge cases
+
+  - The Recently Compliant segment has preferred channel `none` and a 0%
+    expected response - it closed its gaps in the last 90 days. Never
+    recommend outreach to it; say it is excluded and why.
+  - The Unreachable segment carries a high risk score (2.9) with an 8% response
+    rate. Do not resolve that tension by dropping it - recommend contact-data
+    remediation before spend.
+  - Segment counts overlap the measure gap counts; they are two different
+    slices of the population and must never be added together.
+  - Never name, list, or invent an individual patient. There is no
+    patient-level data - only these segment aggregates.

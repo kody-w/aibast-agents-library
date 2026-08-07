@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: application-status
+  description: Reports every pending permit application with its authority, submission date, review stage, expected decision date, and comment count.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: application-status
+  description: Reports every pending permit application with its authority, submission date, review stage, expected decision date, and comment count.
+  ---
+  <!-- bic:source=blank -->
+  # Application status
+
+  Use this skill when the user asks what is pending with an authority, asks
+  about a submitted or in-review application, asks when a decision is expected,
+  or asks how many public comments came back.
+
+  ## Inputs
+
+  - The pending application log.
+  - Optional: a facility filter, or a single `APP-` id.
+
+  ## Procedure
+
+  1. Include every record in the application log, in log order (`APP-7001`
+     through `APP-7003`). Do not sort by submission date, decision date, or
+     status.
+  2. `total` = number of applications shown. It is reported as **Active
+     Applications** - every record in this log is an application still in
+     flight.
+  3. Report `comments_received` verbatim as the comment count. Zero is a real
+     value, not missing data.
+  4. Render the headline line first, then the table.
+
+  ## Output format
+
+  Heading: `# Permit Application Status`
+
+  Headline: `**Active Applications:** N`
+
+  Then one table, exactly these columns:
+
+  | ID | Application | Facility | Authority | Submitted | Status | Decision Date | Comments |
+
+  - `ID` is the `APP-` id.
+  - `Status` is rendered in lowercase snake_case exactly as recorded
+    (`submitted`, `under_review`, `public_comment`). Unlike permit status, it
+    is **not** uppercased.
+  - `Submitted` and `Decision Date` in ISO `YYYY-MM-DD`.
+  - `Comments` is the integer comment count.
+
+  ## Edge cases
+
+  - `Decision Date` is the authority's expected decision date. Never present it
+    as a commitment, and never predict the outcome - no "likely approved", no
+    probability, no read on what the comment volume means for the decision.
+  - A renewal application does not restore the permit it renews. If the user
+    connects an application to an expired permit, say the permit stays expired
+    and cite both the `APP-` id and the `PRM-` id.
+  - No application matches a filter or an `APP-` id: say so and name what was
+    searched. Do not offer the nearest record as if it were the match.
+  - Never say an application was filed, amended, withdrawn, or followed up on
+    by you. Report the record and recommend the next step for a person.

@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: objection-practice
+  description: Drills the objection library with each objection's category, frequency, recorded success rate, response framework, and recommended language.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: objection-practice
+  description: Drills the objection library with each objection's category, frequency, recorded success rate, response framework, and recommended language.
+  ---
+  <!-- bic:source=blank -->
+  # Objection practice
+
+  Use this skill when the user asks how to handle an objection, asks what
+  buyers push back on, asks for the objection library, or names one of the
+  four categories (price, competitor, timing, authority).
+
+  ## Inputs
+
+  - Optional: one objection key - `price`, `competitor`, `timing`,
+    `authority`. With no key, return the whole library.
+  - The objection library is scenario-independent. A scenario ID does not
+    filter it; do not pretend it does.
+
+  ## Procedure
+
+  1. Emit the summary table over every requested objection, in library order:
+     price, competitor, timing, authority.
+  2. Render `success_rate` as a whole percent (0.65 -> 65%). This is the
+     recorded historical rate, not a forecast for this rep.
+  3. For each objection emit a detail block with the buyer's line verbatim,
+     the framework exactly as stored (the `>` steps are ordered - do not
+     reorder them), and the recommended response truncated to its first 120
+     characters followed by `...`.
+  4. If asked what to practice first, rank by lowest success rate: Timing
+     (42%) before Competition (55%), then Price (65%), then Authority (72%).
+     If asked what comes up most, rank by frequency: Price and Authority are
+     "Very Common", Competition and Timing are "Common".
+
+  ## Library facts
+
+  | Objection | Category | Frequency | Success rate | Framework |
+  |---|---|---|---|---|
+  | Price | Price | Very Common | 65% | Acknowledge > Quantify Value > Reframe as Investment |
+  | Competitor | Competition | Common | 55% | Validate > Differentiate > Offer Proof |
+  | Timing | Timing | Common | 42% | Acknowledge > Probe Trigger > Quantify Cost of Inaction |
+  | Authority | Authority | Very Common | 72% | Validate > Map Stakeholders > Offer Support |
+
+  ## Output format
+
+  - `**Objection Practice Library**`
+  - Table `| Objection | Category | Frequency | Success Rate |`.
+  - One `**<Category> Objection:**` block per objection with three bullets:
+    `Buyer says:` (quoted verbatim), `Framework:`, `Recommended:`.
+  - Close with `Source: [Sales Training Platform]`.
+
+  ## Edge cases
+
+  - An objection outside the four keys (for example legal or security): say it
+    is not in the library, name the four that are, and do not improvise a
+    success rate or a framework for it.
+  - Placeholders such as `[Competitor]` and `$X` are stored as-is. Leave them
+    in place and tell the rep to substitute the real name or figure - do not
+    fill them with a guess.
+
+  ## Boundaries
+
+  - Practice material only. Never claim a rate is what this rep will achieve,
+    and never log practice reps to a training system.

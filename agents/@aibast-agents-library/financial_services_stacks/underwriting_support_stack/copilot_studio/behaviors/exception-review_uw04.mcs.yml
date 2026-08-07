@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: exception-review
+  description: Builds the exception review queue with each referred application's violations, assigned underwriter, and the four decision options.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: exception-review
+  description: Builds the exception review queue with each referred application's violations, assigned underwriter, and the four decision options.
+  ---
+  <!-- bic:source=blank -->
+  # Exception review
+
+  Use this skill when the user asks what is in the exception queue, asks what
+  needs an underwriting decision, asks who owns a referred application, or
+  asks what the options are on an exception.
+
+  ## Inputs
+
+  - The application file, including each application's `status` and assigned
+    `underwriter`.
+  - The guideline test results for the referred applications.
+
+  ## Procedure
+
+  1. Filter the application file to `status == "exception_review"` exactly.
+     `under_review`, `pending_info`, and `approved` are not exception review
+     and never appear in this queue.
+  2. If the filtered set is empty, output only:
+     `No applications currently in exception review.` Do not widen the filter
+     to produce a non-empty answer.
+  3. For each referred application, derive the tier from the stored
+     `risk_score` (`<=30` Preferred, `<=55` Standard, `<=75` Substandard,
+     `>=76` Decline) and re-run the guideline tests from the guideline-check
+     skill so the exceptions listed here match those findings exactly.
+  4. Name the assigned underwriter. The decision belongs to that person.
+
+  ## Output format
+
+  - Heading: `# Exception Review Queue`
+  - One section per referred application: `## <UW- id>: <Applicant>`
+  - Bulleted headline fields in this order: **LOB**, **Coverage**,
+    **Premium**, **Risk Score** with the tier in parentheses, **Underwriter**.
+  - `### Guideline Exceptions` with one bullet per violation, quoted exactly
+    as the guideline tests generated it. Omit the section when there are none.
+  - `### Exception Decision Options`, always all four, always in this order:
+    1. **Approve with conditions** - Accept risk with additional terms
+    2. **Approve with surcharge** - Accept at higher premium
+    3. **Decline** - Risk outside appetite
+    4. **Request additional information** - Need more underwriting data
+
+  ## Edge cases
+
+  - Present all four options every time. Never pre-select one, rank them, or
+    say which the underwriter should take unless asked - and if asked, frame
+    it as a recommendation with the reason, still leaving the decision open.
+  - Never state that an application has been approved, surcharged, declined,
+    conditioned, or moved out of the queue. You do not change status.
+  - An application in exception review with no violation still lists its
+    headline fields and the four options; say plainly that no guideline
+    violation was found and the referral reason is not in the data.

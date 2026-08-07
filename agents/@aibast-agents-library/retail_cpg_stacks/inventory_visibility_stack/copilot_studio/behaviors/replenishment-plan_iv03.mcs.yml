@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: replenishment-plan
+  description: Computes the quantity each store needs to reach a 14-day supply, selects the sourcing warehouse, and prices the plan at unit cost.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: replenishment-plan
+  description: Computes the quantity each store needs to reach a 14-day supply, selects the sourcing warehouse, and prices the plan at unit cost.
+  ---
+  <!-- bic:source=blank -->
+  # Replenishment plan
+
+  Use this skill when the user asks what to order or transfer, asks how much a
+  store needs, asks for the replenishment cost, or asks which warehouse should
+  source a shipment.
+
+  ## Inputs
+
+  - On-hand quantities, daily sell-through rates, SKU unit costs, warehouse
+    on-hand, and the warehouse-to-store lead-time matrix.
+  - Optional: a single store id or SKU id to scope the plan. Otherwise plan all
+    four stores.
+
+  ## Procedure - compute it, do not estimate it
+
+  1. The supply target is fixed at **14 days** for every store and every SKU.
+     Do not vary it by category, priority, or lead time.
+  2. Target quantity: `target_qty = int(daily_sell_through * 14)` - truncated,
+     not rounded. `SKU-1001` at 6.2/day gives `int(86.8) = 86`; `SKU-1003` at
+     14.5/day gives `203`; `SKU-1005` at 2.7/day gives `37`.
+  3. Replenish quantity: `qty = max(0, target_qty - on_hand)`. A store already
+     at or above target produces no line - drop it from the table rather than
+     showing a zero row. That is why `STR-001` shows only `SKU-1001` (12),
+     `SKU-1002` (5), and `SKU-1008` (14), while `STR-004` shows all 8 SKUs.
+  4. Sourcing: `WH-CENTRAL` if its on-hand for that SKU is greater than or
+     equal to `qty`, otherwise `WH-EAST`. Never split a line across warehouses.
+  5. Lead time: read the warehouse-to-store matrix for the chosen source.
+     `WH-CENTRAL` is 1 day to `STR-001`, `STR-002`, and `STR-004`, and 2 days
+     to `STR-003`. `WH-EAST` is 2 days to `STR-001`, `STR-002`, and `STR-004`,
+     and 3 days to `STR-003`. If a pair is missing from the matrix, use 3 days
+     and say the value is a fallback.
+  6. Line cost: `qty * unit_cost`, rounded to 2 decimals. The plan total is the
+     sum of the line costs across every store in scope - $32,257.40 for the
+     full four-store plan.
+
+  ## Output format
+
+  - `# Replenishment Plan`
+  - `**Target:** 14-day supply at each store`
+  - Per store: `## <Store Name> (`<STR-ID>`)` followed by a table with columns:
+    `SKU | Product | Current | Target | Replenish Qty | Source | Lead Time | Est. Cost`
+    where `Target` is `Current + Replenish Qty` and Lead Time is written `1d`,
+    `2d`, `3d`.
+  - Closing line: `**Estimated Total Replenishment Cost:** $NN,NNN.NN`
+
+  ## Edge cases
+
+  - Cost is at unit cost, not retail. `SKU-1005` at $55.00 unit cost, 32 units
+    for `STR-004`, is $1,760.00 - not the $149.99 retail price.
+  - A store with no lines is a valid result; say the store is at or above its
+    14-day target rather than manufacturing a token order.
+  - Warehouse on-hand is not decremented across the plan. Sourcing is evaluated
+    per line against current warehouse stock, so flag it when the same SKU is
+    pulled from `WH-CENTRAL` for several stores and the combined draw would
+    exceed its on-hand.
+  - This is a plan, not an order. Never say a transfer was raised, a PO cut, or
+    a shipment scheduled - hand the table to the planner to execute.

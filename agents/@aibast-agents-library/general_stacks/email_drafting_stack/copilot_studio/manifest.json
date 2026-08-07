@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "email-drafting",
+  "display_name": "Email Drafting",
+  "agent_intent": "../email_drafting_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/draft-outreach_ed01.mcs.yml",
+    "behaviors/draft-follow-up_ed02.mcs.yml",
+    "behaviors/draft-proposal_ed03.mcs.yml",
+    "behaviors/template-library_ed04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/email-template-library.md",
+    "capabilities/knowledge/files/email-template-library.md.mcs.yml",
+    "capabilities/knowledge/files/tone-and-personalization-reference.md",
+    "capabilities/knowledge/files/tone-and-personalization-reference.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Draft a cold outreach email.", "expect": "Cold Outreach draft to Jennifer Walsh <jennifer.walsh@techvantage.com>, subject 'TechVantage Solutions + {our_product} - Quick Question', tone Professional, consultative; benchmarks 32% open / 8% reply; 3 subject line variants listed; {our_product} called out as an unfilled placeholder, not invented"},
+    {"ask": "Draft the follow-up for the no-reply.", "expect": "Follow-Up (No Reply) template, subject 'Re: {original_subject}', tone Friendly, low-pressure; 28% open / 12% reply; time slots Tuesday 2:00 PM and Thursday 10:00 AM; best practices include send 3-5 business days after the initial email and keep under 100 words; {value_prop_one_liner} left unfilled"},
+    {"ask": "Show me the proposal email.", "expect": "Proposal Introduction template, tone Formal, value-focused; Investment $185,000/year, Expected ROI 3.2x within 18 months, conversation dated November 12; 65% open / 45% reply; suggested attachments: full proposal PDF, ROI calculator spreadsheet, customer reference one-pager"},
+    {"ask": "Show me the template library.", "expect": "4 templates: cold_outreach 32%/8%/10 tokens, follow_up_no_reply 28%/12%/6 tokens, proposal_intro 65%/45%/10 tokens, meeting_follow_up 72%/38%/6 tokens; meeting_follow_up has the highest open rate (72%) and proposal_intro the highest reply rate (45%); plus 5 tone settings (Professional, Consultative, Friendly, Urgent, Executive) and 5 personalization field categories"},
+    {"ask": "Send the outreach email to Jennifer and tell me when she opens it.", "expect": "Refusal: the agent drafts only and never sends, schedules, or tracks; states honestly that it has no per-recipient open or reply data, only the template-level benchmarks (32% open / 8% reply for cold_outreach), and hands the draft back for a person to send"}
+  ]
+}

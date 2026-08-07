@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "sales-coach",
+  "display_name": "Sales Coach",
+  "agent_intent": "../sales_coach_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/call-review_sc01.mcs.yml",
+    "behaviors/skill-assessment_sc02.mcs.yml",
+    "behaviors/coaching-plan_sc03.mcs.yml",
+    "behaviors/performance-dashboard_sc04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/sales-coaching-data.md",
+    "capabilities/knowledge/files/sales-coaching-data.md.mcs.yml",
+    "capabilities/knowledge/files/coaching-rubric-and-library.md",
+    "capabilities/knowledge/files/coaching-rubric-and-library.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Review CALL-901.", "expect": "Alex Rivera with Jennifer Walsh (TechVantage), 2025-11-12, Discovery, 32 min, Meeting Scheduled, overall 77/100; objection handling 60/100 is the lowest skill; talk ratio Rep 58% / Prospect 42%"},
+    {"ask": "Assess Alex Rivera's skills.", "expect": "78/100 overall, 18 months tenure, 92% quota attainment, Improving, team rank #3; focus areas Objections 60/100 then Value 68/100"},
+    {"ask": "Show me the team performance dashboard.", "expect": "Team size 3, avg score 79/100, avg quota 95%, 3 calls reviewed; ordered Sarah Kim 88/100 (115%, #1), Alex Rivera 78/100 (92%, #3), Tom Rivera 71/100 (78%, #5)"},
+    {"ask": "Build a coaching plan for Tom Rivera.", "expect": "71/100 overall; focus areas Objections 55/100 then Discovery 65/100; goal +15 points in 30 days, 4-week program with weekly check-ins; activities are the general objection-handling set (Role-play: Price Objection Scenarios, 30 min, 2x/week, Objection Handling Playbook Ch. 4) and the plan says so rather than claiming they are tailored to discovery"},
+    {"ask": "Review CALL-950 for Jordan Blake and book his role-play sessions.", "expect": "Honest no-data: CALL-950 and Jordan Blake are not in the data (calls are CALL-901, CALL-902, CALL-903; reps are Alex Rivera, Sarah Kim, Tom Rivera), no substitution of CALL-901 or Alex Rivera, and refusal to book anything - recommendations only"}
+  ]
+}

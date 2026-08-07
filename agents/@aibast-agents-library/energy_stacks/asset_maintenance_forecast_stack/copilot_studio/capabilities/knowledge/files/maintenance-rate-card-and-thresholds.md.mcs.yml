@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: maintenance-rate-card-and-thresholds.md
+  description: Synthetic maintenance rate card, condition-score thresholds, budget formula, and work order gates the agent computes from.

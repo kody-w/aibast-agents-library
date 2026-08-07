@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: predictive-alerts
+  description: Raises severity-banded failure alerts for equipment above the 10 percent 30-day failure threshold, ranked by risk score with the sensor evidence behind each call.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: predictive-alerts
+  description: Raises severity-banded failure alerts for equipment above the 10 percent 30-day failure threshold, ranked by risk score with the sensor evidence behind each call.
+  ---
+  <!-- bic:source=blank -->
+  # Predictive alerts
+
+  Use this skill when the user asks what is about to fail, what needs attention,
+  which equipment is at risk, what the alerts are, or why a specific asset was
+  flagged.
+
+  ## Inputs
+
+  - The equipment master, the failure-probability model, and current sensor
+    readings.
+  - Optional: a single `EQ-` id when the user asks about one asset.
+
+  ## Procedure - thresholds and ordering, never waived
+
+  1. Alert gate: an asset appears only if its 30-day failure probability is
+     `>= 0.10`. Assets below 0.10 are silently excluded - they are not "low
+     priority alerts", they are not alerts.
+  2. Severity bands on the 30-day probability, evaluated in this order:
+     - `P30 >= 0.50` -> `CRITICAL`
+     - `P30 >= 0.25` -> `WARNING`
+     - otherwise (0.10 to 0.2499) -> `WATCH`
+  3. Risk score, computed exactly:
+
+     `risk = round(P30 * 60 + min(vibration_mm_s / 10, 1.0) * 25 + min(temp_c / 100, 1.0) * 15, 1)`
+
+  4. Sort the alerts by risk score, highest first. Severity band does not drive
+     the order; risk score does. They agree on this data set, but the rule is
+     the risk score.
+  5. Sensor readings are reproduced verbatim in the order the source stores
+     them. Channels differ by equipment type - do not normalize, convert units,
+     or add a channel an asset does not have.
+
+  ## Output format
+
+  `## Predictive Maintenance Alerts`, then one block per alert:
+
+  - `### [SEVERITY] <Equipment name> (EQ-id)`
+  - `- **Failure mode:** <failure_mode>`
+  - `- **30-day failure probability:** N%` (whole percent)
+  - `- **60-day failure probability:** N%`
+  - `- **90-day failure probability:** N%`
+  - `- **Risk score:** N/100` (one decimal)
+  - `- **Current sensor readings:**` followed by one indented `- channel: value`
+    line per channel.
+
+  ## Edge cases
+
+  - If no asset clears 0.10, output exactly: `No predictive alerts at this time.
+    All equipment within normal parameters.` Do not lower the threshold to
+    produce a non-empty list.
+  - A `warning` or `critical` status field does not create an alert on its own;
+    only the probability gate does. If a user points at a status label, explain
+    the gate.
+  - An asset with no failure-probability record cannot be scored - say that it
+    has no model rather than estimating one.
+  - Alerts are findings. Never say a work order was raised or a machine was
+    taken offline.

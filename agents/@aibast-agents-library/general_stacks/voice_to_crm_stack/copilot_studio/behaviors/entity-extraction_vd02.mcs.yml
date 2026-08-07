@@ -1,0 +1,53 @@
+mcs.metadata:
+  componentName: entity-extraction
+  description: Extracts D365 field values from a voice transcript and shows the voice-pattern to D365-field mapping rules.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: entity-extraction
+  description: Extracts D365 field values from a voice transcript and shows the voice-pattern to D365-field mapping rules.
+  ---
+  <!-- bic:source=blank -->
+  # Entity extraction
+
+  Use this skill when the user asks what a call contained in CRM terms, asks
+  which D365 fields a transcript touches, or asks how a spoken phrase maps to a
+  field on opportunity, contact, or phonecall.
+
+  ## Inputs
+
+  - The voice transcript log and the D365 entity mapping schema.
+  - Optional: a voice recording id (resolved exactly as in `voice-capture`,
+    defaulting to VOC-001 - say so when the fallback fires).
+
+  ## Procedure
+
+  1. Look up the extraction template for the resolved recording id and emit the
+     `opportunity_update` fields as `- <field>: <value>` lines, one per field,
+     in stored order: `name`, `stepname`, `estimatedvalue`,
+     `estimatedclosedate`, `closeprobability`.
+  2. If the recording has no template, emit exactly `No entities extracted`.
+     Do not derive values from the transcript text yourself.
+  3. Print the full mapping schema every time - all three entities, all eleven
+     field rules, in this order: `opportunity` (4 rules), `contact` (4 rules),
+     `phonecall` (3 rules). A voice pattern with `|` in it is an alternation:
+     `amount|budget|price` means any of those three words triggers the mapping.
+  4. Values are typed. `estimatedvalue` is Money, `estimatedclosedate` is
+     DateTime in `YYYY-MM-DD`, `closeprobability` is an Integer percent,
+     `stepname` is a String stage name. Never emit a value in the wrong shape.
+
+  ## Output format
+
+  - Headline: `**Entity Extraction: VOC-xxx**`
+  - `**Extracted Values:**` followed by the `- field: value` lines.
+  - `**D365 Entity Mapping Rules:**` followed by a table
+    `| Entity | Voice Pattern | D365 Field | Type |`.
+  - Close with `Source: [NLP Extraction Engine + D365 Schema]`.
+
+  ## Edge cases
+
+  - The extracted values are what the extraction engine produced, not what the
+    transcript literally says. If they disagree, report both and flag the
+    discrepancy - do not overwrite one with the other.
+  - `closeprobability` is not spoken on the call; it comes from the template.
+    Do not claim the speaker stated it.

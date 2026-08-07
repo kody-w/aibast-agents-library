@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: health-scoring-and-retention-policy.md
+  description: Risk-label definitions, churn probability bands, the 0.3-point satisfaction trend rule, engagement red-flag thresholds, the retention action playbook, and the recommend-only approval boundary.

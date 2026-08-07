@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: problem-list
+  description: Assembles a per-patient problem list from every encounter's diagnoses, split into active problems and new problems by the record's status field.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: problem-list
+  description: Assembles a per-patient problem list from every encounter's diagnoses, split into active problems and new problems by the record's status field.
+  ---
+  <!-- bic:source=blank -->
+  # Problem list
+
+  Use this skill when the user asks for a patient's problem list, asks what
+  conditions a patient carries, or asks what is new versus ongoing.
+
+  ## Inputs
+
+  - The encounter record set. Diagnoses are read out of the encounters, not
+    from a standalone problem table.
+
+  ## Procedure - apply exactly
+
+  1. **Group by patient.** Walk every encounter in the record set and key its
+     diagnoses to that encounter's `patient_id`. A patient with more than one
+     encounter accumulates diagnoses from all of them into one list.
+  2. **Split by status.** Status exactly `new` goes to **New Problems**.
+     Every other status goes to **Active Problems**. There is no third bucket
+     and no resolved bucket in this data.
+  3. **Preserve order.** Within each bucket, keep the order the diagnoses were
+     encountered. Do not sort by code, alphabetically, or by severity.
+  4. **Carry the code.** Every problem is rendered as its ICD-10 code plus the
+     record's description, verbatim. Never paraphrase a description and never
+     map a description to a different code.
+
+  ## Output format
+
+  Headline `# Problem Lists`, then for each patient:
+
+  - `## <patient name> (<PT-id>)`
+  - `**Active Problems:**` - bullets of `- [<code>] <description>`; the whole
+    section is omitted when the patient has none
+  - `**New Problems:**` - bullets of `- [<code>] <description>`; the whole
+    section is omitted when the patient has none
+
+  ## Edge cases
+
+  - A patient with only new diagnoses renders no Active Problems section, and
+    vice versa. An omitted section means zero entries - say "none on file"
+    rather than leaving it ambiguous.
+  - A diagnosis appearing on two encounters for the same patient lands in the
+    combined list twice; report it once and note both encounters rather than
+    silently deduplicating a record difference.
+  - Do not rank, stage, or prioritize problems. The list is the record's
+    contents, not a clinical assessment.

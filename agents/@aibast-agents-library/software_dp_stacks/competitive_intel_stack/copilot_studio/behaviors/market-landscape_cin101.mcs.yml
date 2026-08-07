@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: market-landscape
+  description: Reports total addressable market, our rank and share, and every tracked competitor ranked by market share with revenue, growth, and threat level.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: market-landscape
+  description: Reports total addressable market, our rank and share, and every tracked competitor ranked by market share with revenue, growth, and threat level.
+  ---
+  <!-- bic:source=blank -->
+  # Market landscape
+
+  Use this skill when the user asks for the market picture, market share, who
+  the players are, where we rank, how big the market is, or what competitors
+  have been doing lately.
+
+  ## Inputs
+
+  - The tracked competitor set (COMP-001 DataFlow AI, COMP-002 NeuralStack,
+    COMP-003 Quantum ML) and our own company profile.
+  - No filter input is honored by this computation: it always returns all three
+    competitors. If the user names one competitor, produce the full table and
+    then call out that row.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Total tracked revenue = sum of competitor `revenue_mm` plus our
+     `revenue_mm`: `312.0 + 198.0 + 142.0 + 228.0 = 880.0`.
+  2. Total addressable market = `round(880.0 / 0.692, 1) = 1271.7`, printed with
+     no decimals as `$1272M`. The 0.692 divisor encodes the assumption that the
+     four profiled players hold 69.2% of the market; never re-derive it from the
+     share percentages, which sum to 69.3.
+  3. Our position is the fixed value `#2` and our share is `18.0%`. Do not
+     recompute the rank from the table.
+  4. Sort competitors by `market_share_pct` descending: DataFlow AI 24.3,
+     NeuralStack 15.8, Quantum ML 11.2. Rank is the 1-based index of that sort.
+  5. Threat column renders `HIGH` when `threat_level == "high"`, otherwise
+     `MED`. Only `high` maps to HIGH; `medium` maps to MED. There is no LOW.
+  6. Recent moves are listed verbatim in the same ranked order, three per
+     competitor, never summarized away.
+
+  ## Output format
+
+  - `# Competitive Market Landscape`
+  - `**Total Addressable Market:** $1272M`
+  - `**Our Position:** #2 with 18.0% share`
+  - Table with columns exactly: `Rank | Competitor | Share | Revenue | Growth |
+    Threat`. Share and Growth carry one decimal and a `%`; Revenue is `$NNNM`
+    with no decimals.
+  - `## Recent Competitor Moves`, then for each competitor in rank order a bold
+    name line followed by one bullet per recorded move.
+
+  ## Edge cases
+
+  - Revenue prints without decimals ($312M, not $312.0M) while share and growth
+    keep their recorded decimal (24.3%, 41.2%).
+  - Growth rank does not match share rank: Quantum ML is last by share (11.2%)
+    and fastest by growth (55.8%). Do not reorder the table to fix that - point
+    it out and hand off to the threat assessment skill.
+  - Never add a fourth competitor or a "we" row to the table; our numbers appear
+    only in the position line above it.

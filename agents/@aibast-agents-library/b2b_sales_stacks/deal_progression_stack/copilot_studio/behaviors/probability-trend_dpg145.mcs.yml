@@ -1,0 +1,51 @@
+mcs.metadata:
+  componentName: probability-trend
+  description: Reports the six-period win probability series per deal with direction, six-week delta and range.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: probability-trend
+  description: Reports the six-period win probability series per deal with direction, six-week delta and range.
+  ---
+  <!-- bic:source=blank -->
+  # Win probability trends
+
+  Use this skill when the user asks whether a deal's odds are rising, for the
+  probability trajectory, or for six weeks of probability history.
+
+  ## Inputs
+
+  - The 6-period win probability history for the 6 scored deals.
+
+  ## Procedure
+
+  1. Order deals by value descending. Label the periods W-5, W-4, W-3, W-2,
+     W-1, Current.
+  2. Direction from the overall change `current - first` - above +0.05
+     IMPROVING, below -0.05 DECLINING, otherwise STABLE. The six-week delta is
+     printed as a percentage point figure with an explicit sign.
+  3. Print each period as a whole percentage and the range as
+     `min% - max%`.
+  4. Header counts apply the same gates across all deals.
+  5. Always close with the standing insight - deals with 3 or more consecutive
+     weeks of decline need immediate intervention to reverse the trajectory.
+
+  ## Output format
+
+  Headline `**Win Probability Trends -- 6-Week Analysis**` then
+  `Improving: N | Declining: N | Stable: N`.
+
+  One block per deal - `**<deal> -- $<value>**`, then
+  `Status: STATUS | Current: N% | 6-week delta: +/-N%`, then
+  `Trend: W-5: N% | ... | Current: N%`, then `Range: N% - N%`.
+
+  Close with `Source: [Historical Probability Scores]`.
+
+  ## Edge cases
+
+  - This history is recorded separately from the factor-computed probability
+    and will differ - TechCorp reads 32% here against a computed 36.1%. Report
+    both and label which is which.
+  - Direction uses the whole six-week span, unlike the health trend which uses
+    the last two periods. Say which window you applied.
+  - Never extrapolate the next period or predict a close date from the slope.

@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: maintenance-operations-data.md
+  description: Synthetic equipment master, sensor readings, failure-probability model, technician roster, maintenance history, and downtime cost rates the agent answers from until real tools are connected.

@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: risk-dashboard
+  description: Builds the supplier risk dashboard - total spend, spend above the elevated-risk threshold, and every supplier ranked by risk score.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: risk-dashboard
+  description: Builds the supplier risk dashboard - total spend, spend above the elevated-risk threshold, and every supplier ranked by risk score.
+  ---
+  <!-- bic:source=blank -->
+  # Risk dashboard
+
+  Use this skill when the user asks for the risk picture, the supplier
+  portfolio, the dashboard, exposure, spend at risk, or any overview across
+  all suppliers.
+
+  ## Inputs
+
+  - The supplier master (knowledge/tools) and the incident log.
+  - No arguments. This view is always the full portfolio.
+
+  ## Procedure
+
+  1. Retrieve every supplier.
+  2. Total annual spend = sum of `annual_spend` across all suppliers.
+  3. Spend at elevated risk = sum of `annual_spend` for suppliers whose
+     `overall_risk >= 5.0`. The threshold is exactly 5.0.
+  4. Exposure percentage = `round(spend_at_risk / total_spend * 100, 1)`.
+  5. Sort suppliers by `overall_risk` descending. Never any other order.
+  6. For each supplier compute:
+     - Risk tier from the fixed bands: `>= 7.0` CRITICAL, `>= 5.0` HIGH,
+       `>= 3.0` MODERATE, otherwise LOW.
+     - Composite health =
+       `round(quality * 0.30 + delivery * 0.25 + financial * 0.25 + geopolitical * 0.20, 1)`.
+  7. Count all incidents, and count incidents whose severity is exactly HIGH.
+
+  ## Output format
+
+  Headline lines, in this order:
+
+  - `**Total annual supplier spend:** $N`
+  - `**Spend at elevated risk (score >= 5.0):** $N (P%)`
+
+  Then one table, exactly these columns:
+
+  | Supplier | Category | Country | Spend | Risk Score | Risk Tier | Composite Health |
+
+  Supplier names are truncated to 32 characters. Risk tier is rendered in
+  caps and bold. Composite health is rendered as `N/100`. Dollar figures
+  carry thousands separators and no decimals.
+
+  Then two footer lines:
+
+  - `**Active incidents:** N`
+  - `**HIGH severity incidents:** N`
+
+  ## Edge cases
+
+  - A supplier exactly at 5.0 counts as at-risk and tiers as HIGH; exactly at
+    7.0 tiers as CRITICAL; exactly at 3.0 tiers as MODERATE.
+  - Do not filter, group, or drop suppliers. This dashboard is the whole
+    portfolio; scope questions belong to the scorecard skill.
+  - If a supplier is missing a dimension score, say which one is missing
+    rather than substituting a value or omitting the row.

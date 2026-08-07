@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: churn-prediction
+  description: Scores every customer against the weighted churn indicators, bands the risk, and details the high-risk customers.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: churn-prediction
+  description: Scores every customer against the weighted churn indicators, bands the risk, and details the high-risk customers.
+  ---
+  <!-- bic:source=blank -->
+  # Churn prediction
+
+  Use this skill when the user asks who is at risk of leaving, asks for a
+  churn score, asks why a customer is flagged, or asks how risk is calculated.
+
+  ## Inputs
+
+  - The customer records and the churn indicator definitions.
+  - Optional: a single CUST- id. Otherwise score every customer.
+
+  ## Scoring - compute it, do not judge it
+
+  Start at 0 and add every weight whose condition holds. Conditions are strict
+  as written; do not re-interpret the comparison operators.
+
+  - `nps_score < 5` adds **25** (low NPS - detractor status)
+  - `monthly_transactions < 10` adds **20** (declining transactions)
+  - `complaint_count_12m >= 3` adds **20** (high complaints)
+  - `digital_engagement_score < 30` adds **15** (low engagement)
+  - `product count <= 1` adds **10** (single product)
+
+  `score = min(100, sum of the weights above)`.
+
+  The **stale survey** indicator (weight 10, last survey over 90 days ago) is
+  published in the indicator reference and is **not** part of the score. Never
+  add it. Reporting a customer's survey date as stale is fine; scoring it is
+  not.
+
+  Banding: `score >= 50` is **High**, `score >= 25` is **Medium**, otherwise
+  **Low**.
+
+  Worked example, Gerald Thompson (CUST-8004):
+  `25 (NPS 3 < 5) + 20 (4 transactions < 10) + 0 (2 complaints < 3) + 15
+  (engagement 12 < 30) + 10 (1 product <= 1) = 70 -> High`.
+
+  ## Output format
+
+  - `# Churn Prediction Report`
+  - A table with exactly these columns:
+    `| Customer | Segment | Churn Score | NPS | Transactions | Complaints |`
+    The score cell reads `70 (High)` - the number and the band together.
+    Every customer appears, including zero-score customers.
+  - `## High-Risk Customers` - present only when at least one customer scores
+    50 or above. For each, a `### Name (CUST-id) - Score: N` block with:
+    - `Segment:` the title-cased segment
+    - `Tenure:` years
+    - `Products:` the product names, comma separated
+    - `Recent sentiment:` the sentiment of the **last entry** in that
+      customer's stored interaction list (the list is stored newest first, so
+      this is the oldest logged interaction). Report `N/A` if the list is
+      empty. Do not substitute your own read of the interactions.
+  - `## Churn Indicators Reference` - all six indicators with weight and
+    description, stale survey included, as reference only.
+
+  ## Edge cases
+
+  - Medium-risk customers do not get a detail block. Only 50 and above.
+  - If no customer reaches 50, omit the High-Risk section entirely rather
+    than promoting the highest scorer.
+  - Show the arithmetic when a score is questioned; never adjust it for
+    tenure, revenue, relationship history, or any factor not in the five
+    scoring conditions.
+  - This skill scores; it does not recommend. Retention actions come from the
+    retention-actions skill.

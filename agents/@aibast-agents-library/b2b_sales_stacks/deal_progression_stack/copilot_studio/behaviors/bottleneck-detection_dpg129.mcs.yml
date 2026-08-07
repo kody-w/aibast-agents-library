@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: bottleneck-detection
+  description: Finds every stage where tracked deals exceed target days, with the value at risk, average excess days and the P75 and P90 references.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: bottleneck-detection
+  description: Finds every stage where tracked deals exceed target days, with the value at risk, average excess days and the P75 and P90 references.
+  ---
+  <!-- bic:source=blank -->
+  # Bottleneck detection
+
+  Use this skill when the user asks where the pipeline is jamming, which stage
+  is slowest, or where deals pile up.
+
+  ## Inputs
+
+  - The velocity stage timestamps for the 8 tracked deals and the stage
+    benchmark percentiles.
+
+  ## Procedure
+
+  1. For each tracked deal, compare days in its CURRENT stage to that stage's
+     target days. A deal exceeding target contributes to that stage's
+     bottleneck; there is no grace band.
+  2. Per bottleneck stage record the affected deals, the summed value at risk,
+     and `avg_excess = round(mean(days - target))`.
+  3. Report stages in fixed pipeline order and skip stages with no bottleneck.
+  4. Show each stage's benchmark target, P75 and P90 days alongside the
+     affected deals so the severity is readable.
+  5. List affected deals inside a stage sorted by value descending, each as
+     `<deal>: $<value> -- Nd (+Nd over)`.
+  6. Total value impacted is the sum across bottleneck stages.
+
+  ## Output format
+
+  Headline `**Bottleneck Detection Report**` then
+  `Bottlenecks found in **N** stages | Total value impacted: **$X**`.
+
+  One block per stage - `**<stage> Stage Bottleneck**`,
+  `Deals affected: N | Value at risk: $X`,
+  `Avg excess: N days | Benchmark: Nd`, `P75: Nd | P90: Nd`, then the affected
+  deal list.
+
+  Close with the standing root-cause patterns - Proposal stage executive access
+  and competitive evaluation delays, Negotiation stage legal review and
+  procurement bottlenecks, Qualification stage insufficient early engagement
+  and champion gaps - and `Source: [Pipeline Analytics + Stage Duration Data]`.
+
+  ## Edge cases
+
+  - When no deal exceeds its target, return the single line that no bottlenecks
+    were detected and all deals are within benchmark timelines.
+  - A deal one day over target still counts - Northstar Aerospace at 17d
+    against a 16d Proposal target is a real member of that bottleneck.
+  - A deal contributes only to its current stage, never to stages it already
+    left.

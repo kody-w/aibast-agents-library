@@ -1,0 +1,76 @@
+mcs.metadata:
+  componentName: pricing-model
+  description: Builds the phase-by-phase pricing model for each RFP from its template percentages and discount threshold, and states the gap to client budget.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pricing-model
+  description: Builds the phase-by-phase pricing model for each RFP from its template percentages and discount threshold, and states the gap to client budget.
+  ---
+  <!-- bic:source=blank -->
+  # Pricing model
+
+  Use this skill when the user asks for a price, a phase breakdown, a
+  cost allocation, a margin target, or how far below budget a bid sits.
+
+  ## Inputs
+
+  - The RFP requirements set (for the client budget) and the pricing templates.
+  - Optional: a single RFP- id. Otherwise price both models.
+
+  ## Template mapping -- fixed, never chosen by judgment
+
+  - RFP-2026-047 (GlobalManufacture Corp) uses `digital_transformation`.
+  - RFP-2026-048 (Summit Health Network) uses `clinical_optimization`.
+
+  ## Procedure
+
+  1. Compute the proposed price from the template's discount threshold:
+     `our_price = round(budget x (100 - discount_threshold_pct) / 100)`.
+     - RFP-2026-047: `10,000,000 x (100 - 15) / 100 = 8,500,000`
+     - RFP-2026-048: `4,500,000 x (100 - 10) / 100 = 4,050,000`
+  2. Compute each phase allocation against the **client budget**, not against
+     the proposed price: `allocation = budget x phase_pct / 100`. Exclude
+     `margin_target_pct` and `discount_threshold_pct` from the phase table --
+     they are not phases.
+     - digital_transformation on $10,000,000: Assessment 8% = $800,000,
+       Implementation 55% = $5,500,000, Data Analytics 18% = $1,800,000,
+       Change Mgmt 12% = $1,200,000, Project Mgmt 7% = $700,000.
+     - clinical_optimization on $4,500,000: Discovery 10% = $450,000,
+       Redesign 30% = $1,350,000, Technology 25% = $1,125,000,
+       Training 20% = $900,000, Project Mgmt 15% = $675,000.
+  3. Phase labels are the template key with `_pct` dropped, underscores replaced
+     by spaces, title-cased -- `change_mgmt_pct` renders as `Change Mgmt`.
+     Keep stored order; do not sort by amount.
+  4. The `**Total**` row carries the proposed price, not the sum of the phase
+     column. The phase percentages total 100% of the client budget, so for
+     RFP-2026-047 the column sums to $10,000,000 while the Total row reads
+     $8,500,000. If the user notices, explain it plainly: allocations are
+     budget-based, the total is the discounted bid. Never silently rescale the
+     phases to close the gap.
+  5. Pricing advantage: `budget - our_price`. RFP-2026-047 = $1,500,000 below
+     budget; RFP-2026-048 = $450,000 below budget.
+  6. Report the template's target margin as stated: 32% for
+     digital_transformation, 28% for clinical_optimization.
+
+  ## Output format
+
+  - `## Pricing Models`
+  - Per model: `### RFP-xxxx-xxx -- <client>`
+  - `- **Client budget:** $10,000,000`
+  - `- **Our proposed price:** $8,500,000`
+  - `- **Target margin:** 32%`
+  - Table with columns `Phase | Allocation`, one row per phase, then a bold
+    `**Total**` row carrying the proposed price
+  - `**Pricing advantage vs competitors:** $1,500,000 below budget`
+
+  ## Edge cases
+
+  - A discount deeper than the template threshold (more than 15% on
+    digital_transformation, more than 10% on clinical_optimization) is outside
+    the model. State that it exceeds the threshold and needs approval outside
+    this agent; do not render it as a normal price table.
+  - An RFP with no mapped template: say there is no pricing template for it
+    rather than borrowing another RFP's percentages.
+  - Recommendation only. Never say a price has been approved, sent to the
+    client, or locked.

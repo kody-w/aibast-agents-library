@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: tax-and-rebalance-policy.md
+  description: Synthetic tax rate table, per-portfolio drift thresholds, tax estimate method, and execution sequence that govern every rebalance recommendation.

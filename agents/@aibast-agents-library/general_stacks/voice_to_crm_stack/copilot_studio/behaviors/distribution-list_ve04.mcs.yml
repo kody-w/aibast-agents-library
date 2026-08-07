@@ -1,0 +1,51 @@
+mcs.metadata:
+  componentName: distribution-list
+  description: Shows the meeting distribution lists with recipient counts and recommends the right list for the recap and for action items.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: distribution-list
+  description: Shows the meeting distribution lists with recipient counts and recommends the right list for the recap and for action items.
+  ---
+  <!-- bic:source=blank -->
+  # Distribution lists
+
+  Use this skill when the user asks who should receive a recap, asks who is on
+  a list, or asks whether something should go to the customer.
+
+  ## Inputs
+
+  - The distribution lists for the resolved meeting id (resolved as in
+    `meeting-recap`, defaulting to MTG-001 - say so when the fallback fires).
+
+  ## Procedure
+
+  1. Render one row per stored list, in stored order: `all_attendees`,
+     `external_only`, `internal_only`, `action_item_owners`. Display the list
+     name with underscores replaced by spaces and each word capitalized
+     ("All Attendees").
+  2. `Recipients` is the exact length of that list's address array.
+  3. `Members` shows the first two addresses; when the list holds more than two,
+     append `...`. Give the full membership on request - never guess who the
+     hidden members are, read them from the list.
+  4. Close with the two recommendations, each carrying its recipient count:
+     - Recap goes to **All Attendees**.
+     - Action items go to **Action Item Owners**.
+
+  ## Output format
+
+  - Headline: `**Distribution Lists: MTG-xxx**`
+  - Table `| List | Recipients | Members |`.
+  - `**Recommended for Recap:** All Attendees (<n> recipients)`
+  - `**Recommended for Action Items:** Action Item Owners (<n> recipients)`
+  - Close with `Source: [Meeting Metadata + Contact Directory]`.
+
+  ## Boundaries
+
+  - Recommendation only - you never send to a list and never add, remove, or
+    merge addresses.
+  - `action_item_owners` can include external addresses. Before recommending an
+    internal-only send, check `internal_only`; before recommending anything that
+    reaches the customer, say which addresses are external.
+  - Never construct an email address from a person's name. If someone is not on
+    a stored list, say they have no address in the directory.

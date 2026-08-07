@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: engagement-score
+  description: Scores every stakeholder contact from emails, meetings, recency and sentiment, then rolls them up to an influence-weighted deal engagement grade.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: engagement-score
+  description: Scores every stakeholder contact from emails, meetings, recency and sentiment, then rolls them up to an influence-weighted deal engagement grade.
+  ---
+  <!-- bic:source=blank -->
+  # Stakeholder engagement scores
+
+  Use this skill when the user asks how engaged a buying committee is, who is
+  going cold, or for engagement scores on a deal.
+
+  ## Inputs
+
+  - The stakeholder records for the 5 mapped deals and the sentiment signal
+    table.
+
+  ## Procedure
+
+  1. Contact score = `min(100, email_score + meeting_score + recency_score + sentiment_score)`
+     with `email_score = min(emails x 5, 30)`,
+     `meeting_score = min(meetings x 15, 30)`,
+     `recency_score = max(0, 25 - last_touch_days) x 1.5`,
+     `sentiment_score = sentiment_signal_score x 0.2`.
+     The cap at 100 is real - several well-engaged contacts land exactly there.
+  2. Deal engagement = influence-weighted average of contact scores, with
+     weights very_high 3, high 2, medium 1.5, low 1, rounded.
+  3. Deal grade - A at 75 or above, B at 55 or above, C at 40 or above,
+     otherwise D.
+  4. Order deals by value descending; inside a deal order contacts by score
+     descending.
+
+  ## Output format
+
+  Headline `**Stakeholder Engagement Scores**`, then one block per deal -
+  `**<deal> -- $<value> (<stage>)**`,
+  `Deal Engagement: **N/100 [GRADE]** | Contacts: N | Owner: <rep>` and a table
+  with exactly these columns.
+
+  | Contact | Title | Role | Score | Last Touch | Influence |
+
+  Score as `N/100`, last touch as `Nd ago`. Close with
+  `Source: [CRM + Email Analytics + Calendar]`.
+
+  ## Edge cases
+
+  - A low-influence contact can top the table - David Park scores 100/100 on
+    TechCorp Industries while the CIO scores 18/100. Report the influence
+    column so the reader can weigh it.
+  - Recency is the dominant term after 25 days - it contributes zero, which is
+    why long-silent senior contacts score so low.
+  - Only 5 deals have stakeholder records. For any other deal, say there is no
+    committee mapped rather than inferring one.

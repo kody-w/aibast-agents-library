@@ -1,0 +1,84 @@
+mcs.metadata:
+  componentName: application-status
+  description: Reports every grant still in flight (pending award or application submitted) with its requested amount and match obligation, plus the six-phase application workflow reference.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: application-status
+  description: Reports every grant still in flight (pending award or application submitted) with its requested amount and match obligation, plus the six-phase application workflow reference.
+  ---
+  <!-- bic:source=blank -->
+  # Application status
+
+  Use this skill when the user asks what applications are outstanding, what is
+  pending award, what has been submitted, what the jurisdiction is waiting to
+  hear back on, or what the steps are to apply for or close out a grant.
+
+  ## Inputs
+
+  - The grants portfolio.
+  - The application workflow reference (six phases, ordered steps).
+
+  ## Procedure
+
+  Select the pending set by exact status match. A grant is in flight only if its
+  status is `pending_award` or `application_submitted`. Grants with status
+  `active` are already awarded and never appear in this view.
+
+  For each grant in the pending set, in portfolio id order, report:
+
+  - Grantor
+  - Amount Requested (the award `amount` field)
+  - Match Required, stated as `match_required * 100` rounded to a whole percent,
+    followed by the `local_match` dollars in parentheses. 0.10 renders as
+    `10% ($16,500)`; 0.25 renders as `25% ($312,500)`.
+  - Status, underscores replaced with spaces and title-cased
+  - Department
+
+  Then always render the Application Workflow Reference in this fixed phase
+  order, with steps numbered from 1 within each phase:
+
+  1. Pre Application
+  2. Application
+  3. Post Submission
+  4. Award Setup
+  5. Implementation
+  6. Closeout
+
+  The workflow is reference material. Never reorder the phases, never merge
+  them, and never claim a specific grant has reached a specific step unless the
+  data says so - the portfolio carries a status, not a step number.
+
+  ## Output format
+
+  ```
+  # Grant Application Status
+
+  ## Pending Applications
+
+  ### LG-YYYY-NNN: <title>
+
+  - **Grantor:** <grantor>
+  - **Amount Requested:** $N
+  - **Match Required:** N% ($N)
+  - **Status:** <Title Case Status>
+  - **Department:** <department>
+
+  ## Application Workflow Reference
+
+  ### <Phase>
+
+  1. <step>
+  ```
+
+  ## Edge cases
+
+  - If no grant carries a pending status, omit the Pending Applications section
+    entirely, say plainly that nothing is in flight, and render only the
+    workflow reference. Do not pad the section with active grants.
+  - `pending_award` and `application_submitted` are different states.
+    Application submitted means it has been filed and no decision has come
+    back. Pending award means the decision is expected but the agreement is not
+    executed. Do not treat either as awarded money.
+  - Recommendation and reference only. Never state that an application has been
+    submitted, resubmitted, withdrawn, or escalated on the user's behalf.

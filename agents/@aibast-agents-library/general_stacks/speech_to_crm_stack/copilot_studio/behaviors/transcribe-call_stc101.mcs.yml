@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: transcribe-call
+  description: Returns the call header and the full speaker-attributed, timestamped transcript for a call ID.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: transcribe-call
+  description: Returns the call header and the full speaker-attributed, timestamped transcript for a call ID.
+  ---
+  <!-- bic:source=blank -->
+  # Transcribe call
+
+  Use this skill when the user asks for the transcript of a call, asks what was
+  said on a call, asks who was on a call, or asks how long a call ran.
+
+  ## Inputs
+
+  - The call transcript corpus.
+  - Optional: a single CALL- id. When none is given, use `CALL-T001` - that is
+    the default the pipeline uses.
+
+  ## Procedure - mechanical, not interpretive
+
+  1. Look up the call by its id. The corpus contains exactly one call:
+     `CALL-T001`.
+  2. Compute duration from `duration_sec` as whole minutes and remainder
+     seconds: `minutes = duration_sec // 60`, `seconds = duration_sec % 60`.
+     For CALL-T001, `1847 // 60 = 30` and `1847 % 60 = 47`, so the duration
+     renders as `30m 47s`. Never round to a single number.
+  3. Render `confidence_score` as a whole percent with no decimals:
+     `0.96` renders as `96%`.
+  4. Render every transcript segment in stored order, one per paragraph, as
+     `[HH:MM:SS] **Speaker:** text`. Do not reorder, merge, summarize, or
+     paraphrase segments inside the transcript block. CALL-T001 has 8 segments
+     running from `[00:00:15]` to `[00:02:30]`.
+  5. Report participants exactly as stored, including the parenthetical role or
+     company: `Alex Rivera (Sales), Jennifer Walsh (TechVantage Solutions)`.
+
+  ## Output format
+
+  - Headline: `**Call Transcription: CALL-xxxx**`
+  - A two-column table `| Field | Detail |` with rows, in this order: `Date`,
+    `Duration`, `Participants`, `Confidence`.
+  - `**Transcript:**` followed by the segment lines.
+  - Footer: `Source: [Speech-to-Text Engine]` and `Agents: SpeechToCRMAgent`.
+
+  ## Edge cases
+
+  - Unknown call id: the underlying pipeline silently falls back to the first
+    call in the corpus. Do NOT pass that fallback off as the requested call.
+    Say the corpus does not contain the requested id, name `CALL-T001` as the
+    only call present, and ask whether the user wants that one.
+  - The header's stored duration (30m 47s) and the activity duration used in
+    the CRM preview (31 minutes) are different values from different fields.
+    Report each in its own context; do not reconcile them silently.
+  - The transcript is the record of what was said. Analysis, scoring, and
+    interpretation belong to the other skills.

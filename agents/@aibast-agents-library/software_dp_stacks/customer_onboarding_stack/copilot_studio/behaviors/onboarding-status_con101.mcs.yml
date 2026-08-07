@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: onboarding-status
+  description: Presents the onboarding pipeline summary - customer count, total ARR, and the on-track / at-risk / critical split by health score band.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: onboarding-status
+  description: Presents the onboarding pipeline summary - customer count, total ARR, and the on-track / at-risk / critical split by health score band.
+  ---
+  <!-- bic:source=blank -->
+  # Onboarding status
+
+  Use this skill when the user asks for the onboarding pipeline, the portfolio
+  overview, how onboarding is going, how many customers are on track, or the
+  total ARR in onboarding.
+
+  ## Inputs
+
+  - The customer portfolio (id, name, plan, ARR, health score, target go-live).
+  - Optional: a single customer name or CUST- id, or a CSM name, to filter the
+    presentation. Otherwise present all five customers.
+
+  ## Procedure - compute, do not judge
+
+  1. `total_customers` = count of customers in the portfolio.
+  2. `total_arr` = sum of every customer's ARR, rendered with thousands
+     separators and a leading `$`.
+  3. Bucket every customer by health score, bands are exclusive and exhaustive:
+     - `on_track` = `health_score >= 70`
+     - `at_risk` = `40 <= health_score < 70`
+     - `critical` = `health_score < 40`
+  4. List customers in portfolio order (CUST-1001 through CUST-1005). This
+     operation applies no sort - do not reorder by health, ARR, or date unless
+     the user explicitly asks for a different sort, and say so if you do.
+
+  ## Output format
+
+  - `# Customer Onboarding Pipeline`
+  - Headline: `**Total Customers:** N | **Pipeline ARR:** $N,NNN`
+  - A three-line bullet block: `On Track: N`, `At Risk: N`, `Critical: N`
+  - Table with exactly these columns: `Customer | Plan | Health | Target Go-Live`
+
+  ## Edge cases
+
+  - A health score of exactly 70 is on track, not at risk. A score of exactly 40
+    is at risk, not critical.
+  - The at-risk bucket can legitimately be zero while a critical account exists -
+    report both numbers as computed, do not merge the buckets.
+  - This operation does not carry milestone, adoption, or flag detail. If the
+    user asks why a health score is low, hand off to the risk-flags skill rather
+    than inferring a reason here.
+
+  ## Boundaries
+
+  - Reporting only. Never say a health score, plan, or go-live date has been
+    changed, and never propose that you will change one.

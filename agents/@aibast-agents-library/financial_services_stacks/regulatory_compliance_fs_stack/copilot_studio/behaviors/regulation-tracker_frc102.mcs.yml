@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: regulation-tracker
+  description: Reports one regulation in depth - regulator, score, assessment dates, key sections, and every finding written against it.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: regulation-tracker
+  description: Reports one regulation in depth - regulator, score, assessment dates, key sections, and every finding written against it.
+  ---
+  <!-- bic:source=blank -->
+  # Regulation tracker
+
+  Use this skill when the user names a regulation - "where do we stand on
+  BSA-AML", "what does SOX 404 cover", "show me the FCRA findings" - or asks
+  for the section-level detail behind a score.
+
+  ## Inputs
+
+  - The regulation register and the examination findings log.
+  - Optional: a `regulation` key. Valid keys are exactly `SOX`, `Dodd-Frank`,
+    `BSA-AML`, `GLBA`, `FCRA`.
+
+  ## Procedure
+
+  1. If the named key matches the register exactly, report that regulation
+     only. If no regulation is named, report all five in register order: SOX,
+     Dodd-Frank, BSA-AML, GLBA, FCRA.
+  2. If the user names a regulation that is not one of the five keys (for
+     example CRA, or UDAAP), say plainly that it is not tracked and list the
+     five that are. Do not fall back to dumping all five as if the question had
+     been answered.
+  3. For each regulation reported, emit in this order: regulator, compliance
+     score as a percent, last assessment date, next assessment date, then the
+     key sections as `**<section id>:** <section name>`.
+  4. Attach findings by exact regulation match - a finding belongs to the
+     regulation named in its `regulation` field, nothing fuzzier. Render the
+     count in the heading: `### Findings (N)`.
+  5. Render each finding as
+     `- **<EF-id>** [<SEVERITY IN CAPS>]: <finding text> - <Status Title Case>`.
+     Severity is upper-cased; status has underscores replaced by spaces and is
+     title-cased.
+
+  ## Output format
+
+  - `# Regulation Tracker`
+  - Per regulation: `## <KEY> - <Full Name>`
+  - Bullets: `**Regulator:**`, `**Compliance Score:**`, `**Last Assessment:**`,
+    `**Next Assessment:**`
+  - `### Key Sections` bullets
+  - `### Findings (N)` bullets, only when the regulation has at least one
+    finding
+
+  ## Edge cases
+
+  - A regulation with no findings gets no Findings section at all - GLBA is the
+    current example. Say "no examination findings on record" rather than
+    printing an empty heading, and never read that as a guarantee of
+    compliance.
+  - Section ids are not numeric across the board: SOX uses 302/404/409,
+    Dodd-Frank uses Volcker/Title VII/Title X, BSA-AML uses CDD/SAR/CTR, GLBA
+    uses Privacy/Safeguards/Pretexting, FCRA uses Accuracy/Disputes/Furnishing.
+    Quote the id as written.
+  - A regulator field may name several agencies (`Fed / OCC / CFPB`,
+    `FinCEN / OCC`, `FTC / Fed`). Report the full string; never pick one.

@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: stall-prevention
+  description: Scores each deal's probability of stalling further from contact age, champion state, activity trend and next-step presence.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: stall-prevention
+  description: Scores each deal's probability of stalling further from contact age, champion state, activity trend and next-step presence.
+  ---
+  <!-- bic:source=blank -->
+  # Stall prevention dashboard
+
+  Use this skill when the user asks which deals are about to stall, for leading
+  indicators, or how to prevent stalls.
+
+  ## Inputs
+
+  - The stall timelines for all 7 tracked deals, including their activity
+    counts and next steps.
+
+  ## Procedure
+
+  1. Stall probability starts at 50 for every deal, then adds - 20 when last
+     contact is 14 days or more, 15 when champion status is Silent or
+     Disengaged, 10 when the activity trend is declining or a sharp decline, 10
+     when next step reads `None scheduled`. Cap the result at 95.
+  2. Activity trend = `(activities_last_14d - activities_prior_14d) / activities_prior_14d`.
+     At or below -0.5 it is SHARP DECLINE, below 0 Declining, above +0.5
+     Increasing, otherwise Stable. With no prior activity it is No baseline.
+  3. Every tracked deal appears, not only stalled ones. Sort by stall
+     probability descending.
+  4. Leading indicator counts - deals with no next step, deals with silent or
+     disengaged champions, deals with a declining or sharply declining activity
+     trend.
+  5. Always append the five prevention recommendations.
+
+  ## Output format
+
+  Headline `**Stall Prevention Dashboard**` then `**Leading Indicators:**` with
+  the three counts, then `**Stall Probability by Deal:**` and a table with
+  exactly these columns.
+
+  | Deal | Value | Stage | Stall Prob | Activity Trend | Next Step |
+
+  Then `**Prevention Recommendations:**` - mandate next-step scheduling before
+  any deal review, alert at 7 days without activity against the current 21,
+  require a champion check-in every 10 days, auto-flag declining activity for
+  manager review, score stall risk weekly in pipeline meetings.
+
+  Close with `Source: [Predictive Analytics + Activity Patterns]`.
+
+  ## Edge cases
+
+  - The score caps at 95 and never reads 100; several deals tie at 95 and their
+    relative order carries no meaning.
+  - A deal with a scheduled next step and a recent contact can still sit at 60
+    because the base is 50. Explain the base rather than treating 60 as calm.
+  - The probability is a heuristic from four flags, not a statistical model;
+    say so when asked how it was derived.

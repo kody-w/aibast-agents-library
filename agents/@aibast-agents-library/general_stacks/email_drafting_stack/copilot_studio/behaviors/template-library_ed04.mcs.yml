@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: template-library
+  description: Lists every email template with category, open rate, reply rate, and personalization token count, plus the tone matrix and personalization field catalog.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: template-library
+  description: Lists every email template with category, open rate, reply rate, and personalization token count, plus the tone matrix and personalization field catalog.
+  ---
+  <!-- bic:source=blank -->
+  # Template library
+
+  Use this skill when the user asks what templates exist, which template
+  performs best, what tones are available, or what personalization fields can be
+  filled. This is also the default when the request names no specific drafting
+  task.
+
+  ## Inputs
+
+  - The email template library, the tone settings, and the personalization field
+    catalog. No user input is required.
+
+  ## Procedure
+
+  1. Emit every template in stored order: `cold_outreach`,
+     `follow_up_no_reply`, `proposal_intro`, `meeting_follow_up`. Do not sort or
+     filter unless the user asks.
+  2. Open rate and reply rate are the stored decimals formatted as whole
+     percents: 0.32 -> 32%, 0.08 -> 8%.
+  3. Token count is the number of `{...}` pairs in the template BODY only - the
+     subject variants are not counted. Scan the body left to right; on each `{`
+     find the next `}`, count one token, and resume after it. Counts:
+     `cold_outreach` 10, `follow_up_no_reply` 6, `proposal_intro` 10,
+     `meeting_follow_up` 6.
+  4. Emit all five tone settings with their formality, warmth, and urgency
+     ratings. The use case column is truncated to the first 40 characters.
+  5. Emit the five personalization field categories with their fields, category
+     name title-cased.
+
+  ## Output format
+
+  - `**Email Template Library**`
+  - Table with columns `Key | Name | Category | Open Rate | Reply Rate | Tokens`:
+
+    | Key | Name | Category | Open Rate | Reply Rate | Tokens |
+    |---|---|---|---|---|---|
+    | cold_outreach | Cold Outreach | Prospecting | 32% | 8% | 10 |
+    | follow_up_no_reply | Follow-Up (No Reply) | Follow-Up | 28% | 12% | 6 |
+    | proposal_intro | Proposal Introduction | Proposal | 65% | 45% | 10 |
+    | meeting_follow_up | Post-Meeting Follow-Up | Follow-Up | 72% | 38% | 6 |
+
+  - `**Tone Settings:**` table with columns
+    `Tone | Formality | Warmth | Urgency | Use Case` covering Professional,
+    Consultative, Friendly, Urgent, Executive.
+  - `**Personalization Fields:**` as bullets, one per category:
+    Recipient, Context, Value, Sender, Scheduling.
+  - `Source: [Email Template Engine]` and `Agents: EmailDraftingAgent`
+
+  ## Edge cases
+
+  - Rankings are computable from the table, not asserted: highest open rate is
+    `meeting_follow_up` at 72%; highest reply rate is `proposal_intro` at 45%;
+    lowest reply rate is `cold_outreach` at 8%. State the arithmetic when asked.
+  - Two templates share the `Follow-Up` category (`follow_up_no_reply` and
+    `meeting_follow_up`). Distinguish them by key, not by category.
+  - `meeting_follow_up` is listed here but has no drafting operation. Say that
+    plainly if the user asks for it as a draft.
+  - If asked for a template that is not one of these four keys, say the library
+    does not contain it. Do not compose a new template on the fly.

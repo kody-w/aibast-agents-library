@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: request-analysis
+  description: Presents the full FOIA request caseload with computed page and fee totals and a status breakdown.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: request-analysis
+  description: Presents the full FOIA request caseload with computed page and fee totals and a status breakdown.
+  ---
+  <!-- bic:source=blank -->
+  # Request analysis
+
+  Use this skill when the user asks for the FOIA queue, the caseload, how many
+  requests are open, what is due next, how many pages are outstanding, or the
+  total fees in flight. This is the default view when no request is named.
+
+  ## Inputs
+
+  - The request caseload. No parameters. This view is never filtered to a
+    single request - that is the document-search skill.
+
+  ## Procedure - compute, do not estimate
+
+  1. `Active Requests` = the count of requests in the caseload.
+  2. `Total Estimated Pages` = the sum of `estimated_pages` across every
+     request, rendered with thousands separators.
+  3. `Total Estimated Fees` = the sum of `fee_estimate` across every request,
+     rendered as `$N,NNN.NN` with exactly two decimals.
+  4. Build the queue table over every request, in caseload order (by request
+     id ascending). Do not re-sort by due date unless the user asks for it.
+  5. Render `complexity` in Title Case (high -> High) and `status` with
+     underscores replaced by spaces in Title Case (redaction_review ->
+     Redaction Review).
+  6. Build the status breakdown by counting requests per status. Each status
+     that appears in the caseload gets one line; a status with zero requests
+     does not appear at all.
+
+  ## Output format
+
+  - `# FOIA Request Analysis`
+  - `**Active Requests:** N`
+  - `**Total Estimated Pages:** N,NNN`
+  - `**Total Estimated Fees:** $N,NNN.NN`
+  - `## Request Queue` with the table columns, in this order:
+    `Request ID | Requester | Subject | Complexity | Status | Due`
+  - `## Status Breakdown` as bullets: `- <Status Title Case>: N`
+
+  ## Edge cases
+
+  - A request with `assigned_analyst` unset is still counted in every total and
+    still appears in the queue. Report the analyst as unassigned rather than
+    omitting the row or naming someone.
+  - If the caseload is unavailable, say so and give no totals. Never report a
+    partial sum as if it were the whole caseload.
+  - Fees and pages are estimates recorded on the request. Never recompute them
+    from a page rate, and never quote a fee the caseload does not carry.
+
+  ## Boundaries
+
+  - Reporting only. Never state that a request has been assigned, extended,
+    closed, or invoiced.

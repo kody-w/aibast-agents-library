@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: gap-impact-analysis
+  description: Aggregates open activity gaps across the portfolio by pipeline dollars exposed and reports the risk categories behind them.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: gap-impact-analysis
+  description: Aggregates open activity gaps across the portfolio by pipeline dollars exposed and reports the risk categories behind them.
+  ---
+  <!-- bic:source=blank -->
+  # Gap impact analysis
+
+  Use this skill when the user asks which missing activities matter most, what
+  the gaps are costing, or which gap to fix first across the portfolio.
+
+  ## Inputs
+
+  - The activity completion records for all 6 deals and the gap risk category
+    definitions.
+
+  ## Procedure
+
+  1. Compute every deal's gaps, then group them by activity name across deals.
+  2. For each activity name, count the deals affected and sum those deals' full
+     values as the value exposed. A gap on a $890,000 deal exposes $890,000.
+  3. Sort the aggregate rows by value exposed descending.
+  4. Severity is CRITICAL when the activity's weight is 3 or higher, otherwise
+     Standard.
+  5. Portfolio totals - total pipeline analyzed is the sum of the 6 deal values,
+     $3,770,000. Deals below threshold are those whose weighted completion is
+     under their stage's minimum completion percentage.
+  6. List every risk category with its severity and its recorded impact
+     statement.
+
+  ## Output format
+
+  Headline `**Gap Impact Analysis**`, then a Portfolio Overview block with
+  `Total pipeline analyzed` and `Deals below completion threshold`.
+
+  Then a table with exactly these columns.
+
+  | Gap | Deals Affected | Value Exposed | Severity |
+
+  Then a `**Risk Categories:**` list of `- **<Category>** (<severity>): <impact>`
+  and the standing recommendation to close critical gaps in top-value deals
+  first, because champion and executive access gaps yield the highest ROI.
+
+  Close with `Source: [Win/Loss Analysis + Activity Correlation]`.
+
+  ## Edge cases
+
+  - Value exposed double-counts a deal across several gap rows by design - a
+    deal with 5 gaps appears in 5 rows. Say so if the user sums the column and
+    asks why it exceeds the portfolio.
+  - Ties in value exposed keep their computed order; do not reorder by name.
+  - The impact percentages are library statistics, not predictions for a
+    specific deal. Never restate them as this deal's odds.

@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: appointment-scheduling
+  description: Lists every open provider slot in chronological order with specialty, location, duration, and visit type, and recommends a fit without booking it.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: appointment-scheduling
+  description: Lists every open provider slot in chronological order with specialty, location, duration, and visit type, and recommends a fit without booking it.
+  ---
+  <!-- bic:source=blank -->
+  # Appointment scheduling
+
+  Use this skill when the user asks what is open, asks for the next available
+  appointment, asks for availability with a named provider or specialty, or
+  asks which slot fits a new patient, a follow-up, or a consultation.
+
+  ## Inputs
+
+  - The provider schedule: each provider's specialty, location, and list of
+    available slots (date, time, duration_min, type).
+
+  ## Procedure - exact rules
+
+  1. Flatten every provider's `available_slots` into one list, one row per
+     slot, carrying the provider's specialty and location onto each row.
+  2. Sort the flattened list by `(date, time)` ascending - chronological
+     across all providers, not grouped by provider. Never re-sort by provider,
+     specialty, or duration.
+  3. `total_slots` is the length of the flattened list. State it before the
+     table. On the current schedule that is 9 slots across 3 providers:
+     Dr. Anita Patel (4), Dr. James Wright (3), Dr. Sarah Lin (2).
+  4. Duration renders as `<n>min`. Visit type renders as the raw value:
+     `follow_up`, `new_patient`, or `consultation`.
+  5. Match visit type to the request when the user states one. New patients
+     need a `new_patient` slot (60min); established follow-ups take a
+     `follow_up` slot (30min); a specialty referral takes a `consultation`
+     slot (45min, Cardiology only in the current schedule). Do not offer a
+     30min follow_up slot for a new patient.
+  6. When the user names a specialty, filter to the providers with that
+     specialty and say the view is filtered. Cardiology is Dr. Sarah Lin only;
+     Internal Medicine is Dr. Anita Patel only; Family Medicine is
+     Dr. James Wright only.
+  7. Every slot in this list is availability, not a held reservation. Two
+     requests can point at the same slot.
+
+  ## Output format
+
+  - Headline `# Available Appointments`
+  - `**Total Available Slots:** <n>`
+  - Table:
+    `| Date | Time | Provider | Specialty | Location | Duration | Type |`
+
+  When recommending, name the exact date, time, provider, location, and
+  duration, then state that front desk staff must book it.
+
+  ## Edge cases
+
+  - Asked to book, hold, reschedule, or cancel: refuse. This skill reads
+    availability only - there is no write path. Name the slot you would
+    recommend and hand it to the front desk.
+  - Asked for a specialty not in the schedule (for example Orthopedics): say
+    no provider in the schedule has that specialty and list the three that do.
+  - Asked for a date outside 2026-03-18 through 2026-03-21: say the schedule
+    holds no slots on that date rather than extrapolating a recurring pattern.
+  - Asked which provider is "best" for a patient: out of scope - that is a
+    clinical routing decision.

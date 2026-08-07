@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: outreach-campaign
+  description: Plans a per-measure outreach campaign - channel, projected closures, cost, revenue, and ROI - ranked by ROI. Recommends only; never launches outreach.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: outreach-campaign
+  description: Plans a per-measure outreach campaign - channel, projected closures, cost, revenue, and ROI - ranked by ROI. Recommends only; never launches outreach.
+  ---
+  <!-- bic:source=blank -->
+  # Outreach campaign
+
+  Use this skill when the user asks for a campaign plan, what outreach would
+  cost, what it would return, which channel to use, or which measure gives the
+  best ROI on outreach spend.
+
+  ## Inputs
+
+  - The HEDIS measure set (gap counts and revenue per closure).
+  - The outreach channel economics: cost per contact, average response rate,
+    average conversion rate for `phone_call`, `patient_portal`, `sms`, `mail`,
+    `email`.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Channel selection: pick the single channel with the highest
+     `avg_conversion_pct` across the whole channel set, and use that same
+     channel for every measure. On this data that is `patient_portal` at 31%
+     conversion and $0.25 per contact. The plan does not vary channel by
+     measure - if the user expects per-measure channels, say the model selects
+     one best-converting channel for the whole plan.
+  2. For each measure, with `gap_count = eligible_patients - compliant_patients`:
+     - `projected_closures = round(gap_count * channel.avg_conversion_pct / 100)`
+     - `cost = round(gap_count * channel.cost_per_contact, 2)`
+     - `projected_revenue = projected_closures * revenue_per_closure`
+     - `roi = round(projected_revenue / cost, 1)`, and `0` if cost is 0.
+  3. Sort by `roi` descending. Never by revenue, never by gap count.
+
+  Note the ranking consequence and state it when it matters: because cost is
+  driven by gap count and revenue by revenue-per-closure, the highest-ROI
+  measure is the one with the richest per-closure value, not the one with the
+  most gaps.
+
+  ## Output format
+
+  One table, exactly these columns:
+
+  | Measure | Gaps | Channel | Projected Closures | Cost | Revenue | ROI |
+
+  Measure as its full name. Gaps and Projected Closures with thousands
+  separators. Channel as the raw channel key. Cost as `$N.NN` with two decimals
+  and thousands separators. Revenue as `$N` with thousands separators. ROI to
+  one decimal with an `x` suffix.
+
+  ## Edge cases
+
+  - Every figure here is a projection from the channel conversion model, not a
+    booked result. Say so whenever you present the table.
+  - Cost assumes one contact per open gap through the selected channel. It does
+    not include repeat attempts, staff time, or incentives - flag that if the
+    user is budgeting from it.
+  - Response rate and conversion rate are different fields. Projections use
+    conversion; quote response rate only if asked for it by name.
+  - Recommendation only. Never say a campaign has been launched, scheduled,
+    queued, or that any patient has been contacted. The plan ends with the
+    quality team deciding.
+  - Never produce a contact list. There is no patient-level data behind these
+    gap counts.

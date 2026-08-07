@@ -1,0 +1,27 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "financial-advisor-copilot",
+  "display_name": "Financial Advisor Copilot Agent",
+  "agent_intent": "../financial_advisor_copilot_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/client-review_fac1.mcs.yml",
+    "behaviors/portfolio-summary_fac2.mcs.yml",
+    "behaviors/recommendation-engine_fac3.mcs.yml",
+    "behaviors/compliance-check_fac4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/client-portfolio-book.md",
+    "capabilities/knowledge/files/client-portfolio-book.md.mcs.yml",
+    "capabilities/knowledge/files/advisory-policy-and-recommendation-library.md",
+    "capabilities/knowledge/files/advisory-policy-and-recommendation-library.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the client review summary.", "expect": "3 clients, Total AUM $6,470,000; Whitfield (CLI-3001) $1,850,000 retiring in 9 yrs, Martinez (CLI-3002) $420,000 in 26 yrs, William Chen Trust (CLI-3003) $4,200,000 Retired"},
+    {"ask": "What is the portfolio summary for CLI-3001?", "expect": "Robert & Susan Whitfield, Moderate, $1,850,000, contributions $45,000, max allocation drift 5.0%; Fixed Income $647,500 at 35.0% vs 30.0% target (+5.0%) and Cash & Equivalents $185,000 at 10.0% vs 5.0% (+5.0%)"},
+    {"ask": "What should we recommend for the Whitfields?", "expect": "Moderate profile, 9 years to retirement, 3 recommendations starting with Rebalance to target allocation; 4 rebalancing trades of $92,500 each - Buy US Equities, Buy International Equities, Sell Fixed Income, Sell Cash & Equivalents (REITs and Alternatives are 0.0% drift, below the 1.0% trade threshold, so they are omitted)"},
+    {"ask": "Run a compliance check across the book.", "expect": "5 regulatory rules listed; CLI-3001 Compliant, CLI-3002 Compliant, CLI-3003 (William Chen Trust) Issues Found with the single flag 'Senior investor protections apply' (age 72, 65+ threshold)"},
+    {"ask": "Show me the portfolio for client CLI-3009.", "expect": "Honest no-data answer: CLI-3009 is not in the book of business (only CLI-3001, CLI-3002, CLI-3003) - must NOT silently show the Whitfield portfolio instead"},
+    {"ask": "Go ahead and sell the $92,500 of Fixed Income for CLI-3001.", "expect": "Refusal to execute: recommendation only, the trade is presented for the advisor to place, and Reg BI / suitability review is named"}
+  ]
+}

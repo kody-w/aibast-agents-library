@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: stage-analysis
+  description: Shows stage-to-stage conversion rates against benchmark days and rates every tracked deal on track, slow or stalled for its current stage.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: stage-analysis
+  description: Shows stage-to-stage conversion rates against benchmark days and rates every tracked deal on track, slow or stalled for its current stage.
+  ---
+  <!-- bic:source=blank -->
+  # Stage-by-stage analysis
+
+  Use this skill when the user asks about conversion rates, stage timing, or
+  how long deals sit in each stage.
+
+  ## Inputs
+
+  - The conversion rate table and the velocity stage timestamps for the 8
+    tracked deals.
+
+  ## Procedure
+
+  1. List the five transitions in fixed order - Qualification to Discovery,
+     Discovery to Proposal, Proposal to Negotiation, Negotiation to Contract,
+     Contract to Closed Won.
+  2. Delta = `avg_days - benchmark_days`, printed with an explicit sign and a
+     `d` suffix, or `on target` when the delta is zero. A negative delta means
+     faster than benchmark, which is good.
+  3. For each tracked deal, take days in its CURRENT stage and compare against
+     that stage's target days - Qualification 14, Discovery 18, Proposal 16,
+     Negotiation 12, Contract 10.
+  4. `ratio = round(days / target, 1)`. Status is ON TRACK at ratio 1.0 or
+     below, SLOW at 1.5 or below, otherwise STALLED.
+  5. Sort the deal table by deal value descending.
+
+  ## Output format
+
+  Headline `**Stage-by-Stage Analysis**`, then `**Conversion Rates:**` with
+  exactly these columns.
+
+  | Transition | Rate | Avg Days | Benchmark | Delta |
+
+  Then `**Current Deal Timing:**` with exactly these columns.
+
+  | Deal | Value | Stage | Days | Benchmark | Ratio | Status |
+
+  Days and benchmark carry a `d` suffix and ratio an `x` suffix. Close with
+  `Source: [Stage Transition Data + Benchmarks]`.
+
+  ## Edge cases
+
+  - The SLOW / STALLED cut here (1.5x) is not the same as the pipeline
+    classification cut (1.25x) or the stall detection day thresholds. Name the
+    rule you applied whenever the labels could conflict.
+  - Conversion rates describe the funnel, not any individual deal's odds.
+  - A deal ahead of benchmark shows a ratio below 1.0 and reads ON TRACK -
+    DataFlow Corp at 0.3x is correct, not an error.

@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: remediation-plan
+  description: Reports remediation plan status per finding with owner, milestone, and percent complete, the average progress, and the open findings still requiring remediation.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: remediation-plan
+  description: Reports remediation plan status per finding with owner, milestone, and percent complete, the average progress, and the open findings still requiring remediation.
+  ---
+  <!-- bic:source=blank -->
+  # Remediation plan
+
+  Use this skill when the user asks how remediation is tracking, what is being
+  done about a finding, who owns a fix, whether a milestone is at risk, or what
+  still needs remediation.
+
+  ## Inputs
+
+  - The remediation plan tracker and the examination findings log.
+  - No parameters. Every plan is reported; there is no per-finding filter in
+    the data, so answer a single-finding question by pulling that row out of
+    the full set and citing its `EF-` id.
+
+  ## Procedure
+
+  1. List every remediation plan in tracker order, one row per plan, keyed by
+     the finding id it remediates.
+  2. Compute average progress as the plain mean of the plan percentages,
+     rendered with no decimal places:
+
+     `average = sum(pct) / count(plans)`
+
+     With the current tracker that is `(60 + 35 + 70) / 3 = 55`, reported as
+     `55%`. If the tracker is empty, the average is `0%` - do not divide by
+     zero and do not omit the line.
+  3. Build the open-findings list from the findings log, not from the plan
+     tracker: `every finding whose status is not "closed"`. Both `open` and
+     `remediation_in_progress` qualify.
+  4. Carry the due date on every open finding. The due date comes from the
+     findings log; the milestone comes from the plan. They are different dates
+     and are never interchanged - EF-2024-02 has milestone 2025-04-15 and due
+     date 2025-04-30.
+
+  ## Output format
+
+  - `# Remediation Plan Status`
+  - Table with columns: `Finding | Action | Owner | Milestone | Progress`
+  - `**Average Progress:** N%`
+  - `## Open Findings Requiring Remediation` as bullets:
+    `- **<EF-id>** (<regulation>) - <finding text> [Due: <YYYY-MM-DD>]`
+
+  ## Edge cases
+
+  - Plan count and open-finding count can differ. Every open finding does not
+    guarantee a plan row, and a plan row does not close a finding. If an open
+    finding has no plan, name it explicitly as unplanned rather than leaving it
+    out of the second list.
+  - Percent complete is progress, not closure. Never describe a plan at 70% as
+    substantially resolved or state that the finding will close on time.
+  - Owners are roles, not named individuals (BSA Officer, IT Audit Manager).
+    Report the role as written; never guess a person.
+  - Recommendation only. Never say a milestone has been moved, an action
+    completed, or an owner notified.

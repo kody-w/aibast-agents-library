@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: disruption-dashboard
+  description: Presents the active supply chain disruption picture with revenue at risk, event detail, and the status of every route in the network.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: disruption-dashboard
+  description: Presents the active supply chain disruption picture with revenue at risk, event detail, and the status of every route in the network.
+  ---
+  <!-- bic:source=blank -->
+  # Disruption dashboard
+
+  Use this skill when the user asks what is disrupted, what is going on in the
+  network, how much revenue is exposed, or asks for a status overview of the
+  routes.
+
+  ## Inputs
+
+  - The disruption event log and the route network. No arguments required.
+
+  ## Procedure - compute it, do not estimate it
+
+  1. **Active set.** Include a disruption only if `status == "active"`. Count
+     them: that is `Active Disruptions`.
+  2. **Routes affected.** Take the union of `affected_routes` across the active
+     disruptions and count the distinct route ids. Report it as
+     `<distinct count> of <total routes in network>`. RT-APAC-01 appears in two
+     active events and is counted once.
+  3. **Revenue at risk.** Sum `estimated_revenue_impact` over the active
+     disruptions only. Do not deduplicate by route or SKU - events are summed
+     even where their affected SKUs overlap.
+  4. **Event table.** One row per active disruption, in data order (DISR-001,
+     DISR-002, DISR-003). Severity is upper-cased. Type is rendered with
+     underscores replaced by spaces (`port_congestion` -> `port congestion`).
+     Delay is `+Nd`. Revenue impact is `$X,XXX,XXX.00`.
+  5. **Route table.** Every route in the network, disrupted or not. Status is
+     upper-cased with underscores replaced by spaces (`at_risk` -> `AT RISK`).
+     Reliability is `reliability_score * 100` rounded to a whole percent
+     (0.82 -> 82%).
+  6. **Event detail.** After the tables, one section per active disruption with
+     its description, its affected SKU list, and its affected route ids.
+
+  ## Output format
+
+  - `# Supply Chain Disruption Dashboard`
+  - `**Active Disruptions:** N`
+  - `**Routes Affected:** N of M`
+  - `**Total Revenue at Risk:** $X,XXX,XXX.00`
+  - `## Active Disruption Events` table with columns:
+    `ID | Title | Type | Severity | Delay | Revenue Impact | Resolution ETA`
+  - `## Route Status Overview` table with columns:
+    `Route | Origin | Destination | Mode | Status | Reliability`
+  - `### DISR-xxx: <title>` per active event, then the description, then
+    `**Affected SKUs:**` and `**Affected Routes:**` lines.
+
+  ## Edge cases
+
+  - The route table shows route *names*, not RT- ids. The RT- ids appear in the
+    per-event `Affected Routes` lines - when the user asks about a specific
+    lane, name it both ways so the id is never lost.
+  - Routes with `current_status` of `normal` still appear in the route table.
+    Do not omit healthy lanes; the dashboard is the whole network.
+  - A route can be `disrupted` without being the highest-risk route, and a route
+    can be `at_risk` on status while scoring MEDIUM on risk. Status and risk
+    score are separate fields - never substitute one for the other.
+
+  ## Boundaries
+
+  - Reporting only. Never say a shipment has been rerouted, a container
+    released, or a carrier contacted.
+  - If asked about a disruption id or route that is not in the log, say it is
+    not in the data rather than describing a plausible event.

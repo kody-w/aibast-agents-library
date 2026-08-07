@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: next-best-action
+  description: Recommends the playbook of next actions that matches the account's health band, with priority and rationale for each.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: next-best-action
+  description: Recommends the playbook of next actions that matches the account's health band, with priority and rationale for each.
+  ---
+  <!-- bic:source=blank -->
+  # Next best action
+
+  Use this skill when the user asks what to do about an account, what the play
+  is, how to save or grow an account, or what the account team should focus on.
+
+  ## Inputs
+
+  - The resolved account, its health score, and the action playbooks.
+  - Optional: a CUST- id or company name. Same resolution rule as the unified
+    profile.
+
+  ## Procedure -- the band selects the playbook
+
+  1. Compute the health score (see the health-score skill).
+  2. Select exactly one playbook by threshold, with no blending:
+     - `score >= 80` -> **high health**: Schedule expansion discussion
+       (Medium, "Strong health score indicates readiness for upsell"); Invite to
+       customer advisory board (Low, "Champion potential for reference
+       program"); Share product roadmap preview (Medium, "Deepen partnership and
+       gather feedback").
+     - `60 <= score <= 79` -> **medium health**: Schedule adoption review
+       (High, "Usage below potential, identify barriers"); Offer training
+       session (High, "Improve feature utilization"); CSM check-in call
+       (Medium, "Proactive relationship maintenance").
+     - `score < 60` -> **low health**: Executive escalation meeting (Critical,
+       "Churn risk - requires immediate attention"); Create success plan
+       (Critical, "Define clear path to value realization"); Resolve open
+       support tickets (High, "Outstanding issues impacting satisfaction").
+  3. Emit all three actions of the selected playbook, in the order above.
+     Never drop one, never add one, never borrow an action from another band.
+
+  ## Output format
+
+  - Headline: `**Next Best Actions: <name>**`
+  - `Health Score: n/100 | Segment: <segment> | ARR: $nnn,nnn`
+  - A `| Action | Priority | Rationale |` table, three rows.
+  - `**Context:**` bullets -- Contract ends `<date>`, Open tickets `n`, Last
+    interaction `<date of the newest log entry>`.
+  - Close with `Source: [NBA Engine + CRM + Health Score]`.
+
+  ## Edge cases
+
+  - Priority labels are exactly Critical, High, Medium, Low as stored on the
+    playbook action. Do not re-prioritize an action because the account is large
+    or the contract is close to ending.
+  - If an account has no interaction log, Last interaction is `N/A` -- report it
+    as N/A rather than guessing a date.
+  - A contract end date already in the past (CUST-3002 ends 2025-01-09,
+    CUST-3003 ends 2025-02-28) is reported as it stands. Flag it as a data point
+    for the account team; do not treat the account as terminated.
+
+  ## Boundaries
+
+  - Recommendation only. Never say a meeting has been scheduled, an escalation
+    raised, training booked, or a ticket resolved -- every action ends with the
+    account team deciding.
+  - Do not attach dollar figures, discounts, or renewal terms to an action; the
+    data carries no pricing beyond ARR, MRR, original deal size, and lifetime
+    value.

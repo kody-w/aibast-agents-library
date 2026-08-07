@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: sentiment-analysis
+  description: Reports positive and negative share of feedback, the NPS trend by quarter, and the per-customer feedback line with its truncated excerpt.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: sentiment-analysis
+  description: Reports positive and negative share of feedback, the NPS trend by quarter, and the per-customer feedback line with its truncated excerpt.
+  ---
+  <!-- bic:source=blank -->
+  # Sentiment analysis
+
+  Use this skill when the user asks how customers feel, whether sentiment is
+  improving, what NPS is doing, who is unhappy, or what a specific customer
+  said.
+
+  ## Inputs
+
+  - The feedback record set (FB-5001 through FB-5006) and the NPS trend
+    (2025-Q4, 2026-Q1). No parameters.
+
+  ## Procedure - recorded labels only
+
+  1. Read each record's stored `sentiment` label and `score`. Never re-classify
+     the text yourself, and never override a stored label because the wording
+     reads differently to you.
+  2. `positive_pct` = `positive_count / total_entries * 100`, rounded to one
+     decimal. `negative_pct` = `negative_count / total_entries * 100`, rounded
+     to one decimal. For the current corpus both are `33.3` (2 of 6 each).
+  3. The headline prints **positive and negative only**. Neutral is not in the
+     headline - if asked, state the neutral count from the feedback summary
+     rather than inventing a `neutral_pct` line here.
+  4. NPS values are stored per quarter, not computed. Emit promoters, passives,
+     detractors, and the stored score for each quarter in chronological order:
+     2025-Q4 (142 / 88 / 45, NPS 35) then 2026-Q1 (158 / 91 / 51, NPS 36).
+     Never recompute NPS from the promoter and detractor counts.
+  5. The feedback table lists every record in record order (FB-5001 first),
+     not sorted by score. Sentiment is upper-cased (`NEGATIVE`), category stays
+     snake_case (`bug_report`, `feature_gap`).
+  6. The excerpt is the **first 80 characters** of the feedback text followed
+     by `...`. Never extend, complete, or paraphrase past the cut.
+
+  ## Output format
+
+  ```
+  # Sentiment Analysis
+
+  **Positive:** N% | **Negative:** N%
+
+  ## NPS Trend
+  | Quarter | Promoters | Passives | Detractors | NPS |
+
+  ## Recent Feedback
+  | Customer | Sentiment | Score | Category | Excerpt |
+  ```
+
+  ## Edge cases and boundaries
+
+  - Label, score, and category can disagree with intuition - FB-5006 (Orion
+    Manufacturing) is `positive` with a score of 8 yet is categorized
+    `feature_gap`. Report all three fields as stored; do not reconcile them.
+  - NPS rose 35 to 36 quarter over quarter while detractors also rose 45 to 51.
+    State both movements; never report the headline improvement alone.
+  - There is exactly one feedback record per customer here. Do not aggregate a
+    customer trend or claim a customer's sentiment is improving or declining.
+  - If asked about a customer, quarter, or channel not in the data, say there
+    is no record for it. Do not estimate.
+  - Reporting only. Never say a customer has been contacted, escalated, or
+    added to a save play.

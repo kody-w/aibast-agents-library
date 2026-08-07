@@ -1,0 +1,81 @@
+mcs.metadata:
+  componentName: complaint-classification
+  description: Classifies free-text complaints into a category by keyword match and reports that category's severity, resolution time, and escalation rate.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: complaint-classification
+  description: Classifies free-text complaints into a category by keyword match and reports that category's severity, resolution time, and escalation rate.
+  ---
+  <!-- bic:source=blank -->
+  # Complaint classification
+
+  Use this skill when the user pastes complaint text and asks what it is,
+  asks which team or category owns a complaint, or asks for the complaint
+  category reference and volumes.
+
+  ## Inputs
+
+  - The complaint category reference (four categories, with keywords,
+    severity weight, average resolution hours, escalation rate, monthly
+    volume).
+  - Optional: complaint text. With no text, emit the reference only.
+
+  ## Procedure - classification is a keyword count, not a judgment
+
+  1. Lowercase the complaint text.
+  2. For each category, score it as the number of its keywords that appear as
+     substrings of the lowercased text.
+  3. Take the category with the strictly highest score. Ties go to the first
+     category in reference order: product_quality, order_fulfillment,
+     pricing_billing, service_experience.
+  4. If no keyword matches at all (every score is 0), the category is
+     `service_experience` by default. Say that it was the default, not a
+     match.
+
+  Keyword sets, verbatim:
+
+  - product_quality: defective, broken, poor quality, fell apart, not durable
+  - order_fulfillment: wrong item, missing, late delivery, not received,
+    damaged in shipping
+  - pricing_billing: overcharged, wrong price, coupon not applied,
+    double charged
+  - service_experience: rude staff, long wait, unhelpful, no response,
+    poor communication
+
+  ## Output format
+
+  Headline: `# Complaint Classification`
+
+  When text was supplied, first the classification block:
+
+  - `**Input:** "<the complaint text>"`
+  - `**Classified As:** <label> (`<category_id>`)`
+  - `**Severity Weight:** <0.NN>`
+  - `**Avg Resolution Time:** <N>h`
+  - `**Escalation Rate:** <N>%` (the stored rate times 100, no decimals)
+
+  Then always `## Complaint Category Reference` with the table:
+
+  `| Category | Monthly Volume | Severity | Avg Resolution | Escalation Rate |`
+
+  Rows in reference order: Product Quality 142 / 0.85 / 36h / 15%;
+  Order Fulfillment 98 / 0.70 / 24h / 8%; Pricing & Billing 67 / 0.65 / 18h /
+  5%; Service Experience 53 / 0.60 / 48h / 22%.
+
+  Close with `**Total Monthly Complaints:** 360`.
+
+  ## Edge cases
+
+  - Empty or missing complaint text: skip the classification block entirely
+    and say no classification was performed. Do not guess a category.
+  - Severity weight is a ranking input only - it never authorizes an
+    exception to a return policy or a playbook window.
+  - Service Experience has the lowest severity (0.60) but the highest
+    escalation rate (22%) and the longest resolution (48h). State both when
+    it is the classified category; do not describe it as low risk.
+
+  ## Boundaries
+
+  - Classification only. Never say a case has been routed, assigned,
+    escalated, or acknowledged.

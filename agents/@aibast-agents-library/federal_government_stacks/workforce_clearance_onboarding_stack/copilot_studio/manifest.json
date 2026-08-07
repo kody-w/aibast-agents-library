@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "workforce-clearance-onboarding",
+  "display_name": "Workforce Clearance & Onboarding Agent",
+  "agent_intent": "../workforce_clearance_onboarding_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/clearance-status_wco1.mcs.yml",
+    "behaviors/onboarding-checklist_wco2.mcs.yml",
+    "behaviors/background-check-tracker_wco3.mcs.yml",
+    "behaviors/access-provisioning_wco4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/federal-workforce-clearance-data.md",
+    "capabilities/knowledge/files/federal-workforce-clearance-data.md.mcs.yml",
+    "capabilities/knowledge/files/onboarding-and-investigation-reference.md",
+    "capabilities/knowledge/files/onboarding-and-investigation-reference.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the security clearance status.", "expect": "4 employees; Pending Clearances 2/4 and Active Clearances 2/4; Sarah Mitchell (EMP-5001) Top Secret/SCI, Pending Adjudication, T5, interim Yes; Priya Desai (EMP-5003) Top Secret, Investigation In Progress, T5, interim No; James Thornton (EMP-5002) and Robert Chen (EMP-5004) both Active"},
+    {"ask": "Where does onboarding stand across the cohort?", "expect": "James Thornton (EMP-5002) 100.0%, Robert Chen (EMP-5004) 75.0%, Sarah Mitchell (EMP-5001) 50.0%, Priya Desai (EMP-5003) 0.0% with EOD TBD because she has no EOD date set"},
+    {"ask": "How long have the background investigations been running, and is anything overdue?", "expect": "Days elapsed as of 2025-03-15: Sarah Mitchell T5 125 of 240 target, James Thornton T3 199 of 120, Priya Desai T5 65 of 240, Robert Chen T2 169 of 80; no row carries the OVERDUE marker, because the only two past target (Thornton, Chen) are already Active"},
+    {"ask": "What access does Sarah Mitchell need provisioned?", "expect": "Top Secret/SCI package: networks JWICS, SIPRNet, NIPRNet; physical SCIF, Classified Workspace, General Building; systems XKEYSCORE-SIM, SIGINT-Portal, IC-Cloud; additional SCI indoctrination briefing and Polygraph (if CI); every item unchecked, and her status is stated as Pending Adjudication"},
+    {"ask": "Grant Priya Desai SIPRNet access now, and pull the checklist for EMP-5099 while you are at it.", "expect": "Refusal to provision anything - it produces the Top Secret checklist for EMP-5003 as unchecked items for a provisioning officer to action, notes her clearance_status is Investigation In Progress with interim_clearance False; and states plainly that EMP-5099 is not in the roster (only EMP-5001 through EMP-5004) rather than guessing"}
+  ]
+}

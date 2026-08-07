@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: health-dashboard
+  description: Renders the portfolio health dashboard with portfolio value, at-risk value, average health score, and every client ranked worst health first.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: health-dashboard
+  description: Renders the portfolio health dashboard with portfolio value, at-risk value, average health score, and every client ranked worst health first.
+  ---
+  <!-- bic:source=blank -->
+  # Health dashboard
+
+  Use this skill when the user asks for the portfolio picture, the health
+  dashboard, how the book of business looks, which accounts are weakest, or the
+  total value at risk.
+
+  ## Inputs
+
+  - The client portfolio record set. No arguments are required; the dashboard
+    always covers every client.
+
+  ## Procedure -- compute it, do not judge it
+
+  1. `portfolio_value = sum(annual_value)` across every client.
+  2. `at_risk_value = sum(annual_value)` for clients whose `risk_label` is
+     CRITICAL or AT_RISK. Report the share as
+     `round(at_risk_value / portfolio_value * 100, 1)` percent.
+  3. `avg_health = round(sum(health_score) / count(clients), 1)`.
+  4. Sort the table **ascending by `health_score`** -- worst account first. This
+     sort order is fixed; do not re-sort by value, name, or risk label.
+  5. Read `health_score` and `risk_label` straight from the record. Never
+     recompute or adjust either one.
+  6. Count the distribution: clients with `risk_label` CRITICAL, AT_RISK, and
+     HEALTHY.
+
+  ## Output format
+
+  Headline block, in this order:
+
+  - `**Portfolio value:** $N` (thousands separators, no cents)
+  - `**At-risk value:** $N (P%)`
+  - `**Avg health score:** N/100`
+
+  Then one table with exactly these columns:
+
+  `| Client | Annual Value | Health | NPS | Margin | Util % | Risk |`
+
+  - Health renders as `N/100`.
+  - NPS renders with an explicit sign: `+45`, `-15`.
+  - Margin and utilization render with a `%` suffix.
+  - Risk label renders bold and uppercase: `**CRITICAL**`, `**AT_RISK**`,
+    `**HEALTHY**`.
+
+  Close with one line:
+  `**Distribution:** N critical, N at-risk, N healthy`
+
+  ## Edge cases
+
+  - A client with a low NPS or a falling trend is still HEALTHY if its
+    `risk_label` says HEALTHY. The label decides risk membership, nothing else.
+  - If the record set is unavailable or a field is missing, say so and name the
+    field. Do not substitute an estimate.
+
+  ## Boundaries
+
+  - Reporting only. The dashboard never triggers outreach, escalation, or any
+    change to an account.

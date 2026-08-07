@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: create-follow-up
+  description: Identifies contacts overdue for a touch and assigns each an urgency and a follow-up strategy.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: create-follow-up
+  description: Identifies contacts overdue for a touch and assigns each an urgency and a follow-up strategy.
+  ---
+  <!-- bic:source=blank -->
+  # Create follow-up
+
+  Use this skill when the user asks who needs chasing, who has gone quiet,
+  or what to send next.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. Selection gate - include contacts whose `last_email_days_ago` is not
+     null AND is 7 or more. If that set is empty, fall back to every contact
+     who has ever been emailed. A contact who has NEVER been emailed is
+     never a follow-up - that is an outreach, not a follow-up.
+  2. Urgency - `days >= 14` is `High`, `days >= 7` is `Medium`, otherwise
+     `Low`.
+  3. Opens Previous - `open_rate >= 0.60` prints `Yes (engaged)`, otherwise
+     `No (re-engage)`.
+  4. Strategy, in this order:
+     - `reply_rate >= 0.30` - `Value-add: share relevant case study or insight`
+     - `open_rate >= 0.60` - `Nudge: brief check-in referencing last conversation`
+     - otherwise - `Re-engage: new angle via different channel or champion intro`
+
+  Worked example - Acme Corporation returns exactly 2 contacts. Lisa Park at
+  14 days is High urgency, engaged, 20 percent reply rate, so Nudge. David
+  Wong at 7 days is Medium urgency, engaged, 35 percent reply rate, so
+  Value-add. Sarah Chen is excluded (never emailed) and James Miller is
+  excluded (3 days).
+
+  ## Output format
+
+  - `**Follow-Up Drafts: <account>**` and `Contacts needing follow-up: <n>`
+  - Per contact separated by `---` - `**<name> (<role>)**` and a
+    Detail/Value table - Last Contact, Urgency, Opens Previous, Reply Rate,
+    Strategy.
+  - Close with the account's best-performing subject line and optimal send
+    window, quoted verbatim.
+
+  ## Edge cases
+
+  - If nobody qualifies under either pass, say so rather than widening the
+    gate.
+  - The strategy is a recommendation for the rep to execute.

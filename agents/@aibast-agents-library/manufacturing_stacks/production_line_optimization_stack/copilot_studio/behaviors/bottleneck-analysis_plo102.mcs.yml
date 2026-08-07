@@ -1,0 +1,76 @@
+mcs.metadata:
+  componentName: bottleneck-analysis
+  description: Identifies the constraint station on each line by longest cycle time, quantifies its overage against takt, and lists every station plus the line's top defect categories.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: bottleneck-analysis
+  description: Identifies the constraint station on each line by longest cycle time, quantifies its overage against takt, and lists every station plus the line's top defect categories.
+  ---
+  <!-- bic:source=blank -->
+  # Bottleneck analysis
+
+  Use this skill when the user asks where a line is constrained, asks which
+  station is slow or over takt, asks for cycle times, or asks what kinds of
+  defects a line produces.
+
+  ## Inputs
+
+  - The station list for each line: station id, name, `cycle_time_s`,
+    `takt_time_s`, `defect_rate_pct`.
+  - The defect category breakdown per line.
+  - Optional: a single LINE- id. Otherwise analyze all three lines.
+
+  ## Procedure
+
+  Per line, in fixed data order LINE-A, LINE-B, LINE-C:
+
+  1. `bottleneck = the station with the maximum cycle_time_s` on that line. This
+     is the only rule for selecting the bottleneck. Defect rate, cost, and ease
+     of fix do not enter it. On an exact tie, keep the station that appears first
+     in the station list.
+  2. `over = round(bottleneck.cycle_time_s - bottleneck.takt_time_s, 1)`.
+  3. `over_pct = round(over / bottleneck.takt_time_s * 100, 1)`.
+  4. Per station: `delta = round(cycle_time_s - takt_time_s, 1)`, rendered with an
+     explicit sign and one decimal (`+5.3`, `-1.5`, `-0.2`).
+  5. Takt is a constant per line: 20.0s on LINE-A, 12.0s on LINE-B, 15.0s on
+     LINE-C. It is not recomputed from demand.
+  6. Defect categories are listed in their stored order (highest first as stored),
+     each with a `%` suffix.
+
+  ## Output format
+
+  Headline `## Bottleneck Analysis`, then per line:
+
+  - `### <line display name>`
+  - `**Bottleneck station:** <name> (<station id>)`
+  - `- Cycle time: <cycle>s (takt: <takt>s)`
+  - `- Over takt by: <over>s (<over_pct>%)`
+  - `- Defect rate: <defect_rate_pct>%`
+  - A table with columns, exactly:
+    `| Station | Cycle (s) | Takt (s) | Delta | Defect % |`
+    listing every station in line order, with ` **BN**` appended to the
+    bottleneck station's name.
+  - `**Top defect categories (<LINE-id>):**` followed by one `- category: N%`
+    bullet per category.
+
+  ## Edge cases the analysis handles
+
+  - More than one station can run over takt. LINE-A has two (Reflow Soldering at
+    +2.1 and Functional Test at +5.3); only the longest one is the bottleneck,
+    but the table shows both, and the second one is the next constraint once the
+    first is relieved. Say that when it applies.
+  - The bottleneck is often not the highest-defect station. On LINE-A the
+    bottleneck (Functional Test, 0.04%) has a lower defect rate than Final
+    Assembly (0.18%). Report them as two separate findings; never merge them.
+  - Some stations run well under takt (QC Measurement on LINE-B at -3.8,
+    Packaging on LINE-C at -7.5). Idle capacity at an inspection or packing
+    station is not a defect and is not an improvement opportunity on its own.
+  - A 0.0% defect rate is a real value in the data, not missing data.
+
+  ## Boundaries
+
+  - Analysis only. Never state that a station has been re-timed, re-tooled,
+    taken down, or scheduled for work.
+  - Station ids belong to their line: A1-A7 on LINE-A, B1-B6 on LINE-B, C1-C6 on
+    LINE-C. Never cite a station id that is not in the line you are describing.

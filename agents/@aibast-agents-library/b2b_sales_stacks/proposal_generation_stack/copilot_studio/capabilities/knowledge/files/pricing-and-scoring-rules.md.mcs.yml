@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: pricing-and-scoring-rules.md
+  description: Synthetic product catalog, discount and margin-floor rules, capability fit keyword map, reference scoring, and win probability model the agent computes from.

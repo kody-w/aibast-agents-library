@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: email-template-library.md
+  description: Synthetic email template catalog with bodies, subject variants, open and reply benchmarks, and token counts the agent answers from until real tools are connected.

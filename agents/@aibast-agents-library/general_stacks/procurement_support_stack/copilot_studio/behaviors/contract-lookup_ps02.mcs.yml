@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: contract-lookup
+  description: Lists the contract portfolio with annual value, end date, status, and auto-renew flag, and totals the annual value and the renewals due.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: contract-lookup
+  description: Lists the contract portfolio with annual value, end date, status, and auto-renew flag, and totals the annual value and the renewals due.
+  ---
+  <!-- bic:source=blank -->
+  # Contract lookup
+
+  Use this skill when the user asks about a contract, an agreement, an MSA, a
+  renewal, an expiry date, a notice period, or what a supplier is contracted
+  for.
+
+  ## Inputs
+
+  - The contract portfolio (knowledge/tools).
+  - Optional: a `CTR-` id, a supplier name, or a category (Technology,
+    Software, Professional Services, Office Supplies, Security). A named filter
+    narrows the rows and the summary, and you say the view is filtered.
+
+  ## Procedure
+
+  1. Retrieve every contract. Preserve portfolio order -- CTR-3001 through
+     CTR-3005. Do not re-sort unless asked.
+  2. For each contract emit: id, supplier, title truncated to the first 30
+     characters, annual value formatted `$890,000`, end date `YYYY-MM-DD`,
+     status, and auto-renew rendered as `Yes` when the flag is true and `No`
+     when false.
+  3. Summary lines:
+     - `Active contracts:` = the count of contracts on file (all of them, the
+       whole portfolio). State plainly when asked that this is the portfolio
+       count and that a subset carries status `Active` -- currently 5 on file,
+       4 with status `Active`, 1 at `Renewal Due`.
+     - `Total annual value:` = sum of every contract's annual value.
+     - `Renewals due:` = count of contracts whose status is exactly
+       `Renewal Due`.
+  4. When a renewal is in play, pull the notice period from the record and give
+     the owner the window: notice must be served at least `notice_period_days`
+     before the end date. Never compute an outcome from it -- state the date
+     arithmetic and stop.
+
+  ## Output format
+
+  Headline: `**Contract Portfolio**`
+
+  Then one table, exactly these columns:
+
+  | ID | Supplier | Title | Annual Value | End Date | Status | Auto-Renew |
+
+  Then a `**Summary:**` list with Active contracts, Total annual value, and
+  Renewals due.
+
+  Close with:
+
+  `Source: [Contract Management System]`
+  `Agents: ProcurementSupportAgent`
+
+  ## Edge cases
+
+  - Titles longer than 30 characters are cut at 30 with no ellipsis
+    (`Enterprise Cloud Services Agreement` renders as
+    `Enterprise Cloud Services Agre`). Give the full title in prose if asked.
+  - A contract with `auto_renew` false and status `Renewal Due` is the one that
+    needs a human decision inside its notice window -- surface it first in any
+    prose summary even though the table keeps portfolio order.
+  - Total value and annual value are different fields. Use annual value in the
+    table and the summary; quote total contract value only when the user asks
+    for the life-of-contract number.
+  - A supplier or id not in the portfolio is reported as not on file, with the
+    suppliers that are on file listed.
+  - Read-only. Never renew, extend, terminate, or serve notice on a contract,
+    and never say that any of those has been done.

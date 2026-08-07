@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: generate-outreach
+  description: Drafts per-stakeholder outreach specs with the engagement tier, recommended approach, and benchmark expectations.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: generate-outreach
+  description: Drafts per-stakeholder outreach specs with the engagement tier, recommended approach, and benchmark expectations.
+  ---
+  <!-- bic:source=blank -->
+  # Generate outreach
+
+  Use this skill when the user asks for outreach, a first email, or how to
+  approach a specific contact.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure - tier then approach, both derived
+
+  Engagement tier, evaluated in this order:
+  1. `last_email_days_ago` is null - `no_contact`
+  2. `reply_rate >= 0.40` - `highly_engaged`
+  3. `open_rate >= 0.60` - `moderately_engaged`
+  4. otherwise - `low_engagement`
+
+  Approach follows tier one-to-one - no_contact maps to `champion_referral`
+  (benchmark 81 percent open / 48 percent reply), highly_engaged to
+  `existing_relationship` (72 / 35), moderately_engaged to `warm_intro`
+  (55 / 18), low_engagement to `cold_outreach` (22 / 3).
+
+  Template comes from the contact's `email_pref` - `concise_technical`
+  (max 150 words, CTA 15-min technical walkthrough), `roi_focused`
+  (max 200 words, CTA ROI calculator review), `executive_summary`
+  (max 120 words, CTA Executive briefing 20 min). The subject line is the
+  template pattern with the account's FIRST pain point as the topic and the
+  opportunity value as the value proposition.
+
+  Worked example - Acme Corporation - Sarah Chen has never been emailed, so
+  champion_referral at 81/48 percent; James Miller replies 45 percent of the
+  time, so existing_relationship at 72/35; Lisa Park and David Wong both
+  land on warm_intro at 55/18. Sarah Chen's subject is
+  `Quick technical overview: legacy ERP integration`.
+
+  ## Output format
+
+  - `**Outreach Drafts: <account>**` plus three context lines - account
+    context with pain points, historical open and reply rate, best send
+    window.
+  - Per contact separated by `---` -
+    `**To: <name> (<role>) - <influence>**`, the tier and approach line, the
+    expected open/reply line, then `**Subject:**`, `**Tone:**` with the word
+    cap, and `**CTA:**`.
+
+  ## Edge cases
+
+  - Benchmarks are expectations for planning, not promises.
+  - The output is a specification the rep sends. The agent never sends,
+    schedules, or enrolls anyone in a sequence.

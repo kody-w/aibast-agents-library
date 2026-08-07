@@ -25,7 +25,7 @@ content: |
   1. Report the 30-day metrics exactly as recorded: abandonment rate 71.4%,
      recovery rate 12.8%, average recovered order value $187.50, total
      abandoned carts 4,250, total recovered 544, recovered revenue $102,000.
-     These are period totals — do not recompute them from the 4 open cart
+     These are period totals -- do not recompute them from the 4 open cart
      records, which are a live snapshot, not the 30-day population.
   2. Estimated recovered revenue per campaign:
 
@@ -40,7 +40,7 @@ content: |
      - Retargeting Display Ad, 2.1%: 4250 * 0.021 * 187.50 = **$16,734**
 
      These are per-campaign estimates against the full abandoned population.
-     They overlap — do not sum them into a single recovery figure, and do not
+     They overlap -- do not sum them into a single recovery figure, and do not
      reconcile them against the $102,000 actual recovered revenue.
   3. Current active cart value at risk = the sum of the open cart records'
      `cart_value`: 284.98 + 299.97 + 1779.96 + 129.99 = **$2,494.90**.
@@ -52,7 +52,7 @@ content: |
 
   - A bullet block of the six 30-day metrics, currency with thousands
     separators, rates to one decimal.
-  - `## Campaign Performance` — a table with exactly these columns:
+  - `## Campaign Performance` -- a table with exactly these columns:
     `Campaign | Open Rate | Conversion | Est. Recovered`, campaigns in catalog
     order.
   - A closing line: `**Current Active Cart Value at Risk:** $N,NNN.NN`.
@@ -60,7 +60,7 @@ content: |
   ## Edge cases
 
   - The Retargeting Display Ad's 0% open rate is a structural zero, not a
-    missing value — display ads have no open event. Say so if asked.
+    missing value -- display ads have no open event. Say so if asked.
   - If the user asks for a metric that is not in the six recorded values (for
     example margin, LTV, or return rate), say it is not in the data. Do not
     derive a proxy.

@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: metadata-enrichment
+  description: Shows the full stored metadata for the top matching document and the metadata fields available for enrichment.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: metadata-enrichment
+  description: Shows the full stored metadata for the top matching document and the metadata fields available for enrichment.
+  ---
+  <!-- bic:source=blank -->
+  # Metadata enrichment
+
+  Use this skill when the user asks for a document's properties, asks who last
+  touched a file, asks how a document is tagged, or asks what metadata the
+  library can carry.
+
+  ## Inputs
+
+  - The SharePoint document library and, optionally, a search query.
+
+  ## Procedure
+
+  1. Run the same match rule as `document-search` and take the **first** result
+     only. Name the document you profiled by DOC- id so the user knows which one
+     the search resolved to; if the query was ambiguous, say how many documents
+     matched and that you profiled the first.
+  2. Emit the stored metadata rows in this fixed order: Title, File Name,
+     Library, Folder, Type, Size, Modified, Modified By, Tags. Size uses a
+     thousands separator and a ` KB` suffix. Tags are comma-separated in stored
+     order.
+  3. When there is no document at all, emit the single row
+     `| No document found | - |`. Do not substitute a different document.
+  4. Print the enrichment field catalogue every time, in stored order:
+     - `Standard` - Title, File Name, Modified, Modified By, File Size, Content
+       Type
+     - `Custom` - Document Category, Target Audience, Approval Status,
+       Expiration Date, Confidentiality Level
+     - `Search` - Tags, Full Text Index, Associated Account, Deal Stage
+     These are the fields the library **can** hold. The documents carry values
+     only for the Standard fields plus Tags. Never report a value for a Custom
+     or Search field other than Tags - say the field is available but unset.
+
+  ## Output format
+
+  - Headline: `**Metadata Enrichment**`
+  - `**Document Metadata:**` table `| Field | Value |`.
+  - `**Available Metadata Fields:**` table `| Category | Fields |`.
+  - Close with `Source: [SharePoint Metadata API]`.
+
+  ## Boundaries
+
+  - Read-only. Never say a metadata value was set, a tag applied, or a
+    confidentiality level assigned.
+  - `Modified By` is a team name, not a person. Do not resolve it to an
+    individual.

@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: pre-meeting-brief
+  description: Assembles the briefing for the next scheduled meeting with attendee prep levels, a risk rating, and recent history.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pre-meeting-brief
+  description: Assembles the briefing for the next scheduled meeting with attendee prep levels, a risk rating, and recent history.
+  ---
+  <!-- bic:source=blank -->
+  # Pre-meeting brief
+
+  Use this skill when the user asks to prep for a meeting, what is coming
+  up, or who will be in the room.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation. The brief always covers
+    the FIRST upcoming meeting on that account.
+
+  ## Procedure
+
+  1. Per attendee, assign a prep level in this exact order:
+     - `meetings_prior == 0` gives `Full Research`
+     - else sentiment `Unknown` gives `Sentiment Discovery`
+     - else sentiment `Neutral` gives `Value Reinforcement`
+     - else `Relationship Building`
+  2. Meeting risk, from the attendee list - let `F` be the count with
+     `meetings_prior == 0` and `U` the count with sentiment `Unknown`:
+     - `F >= 2` or `U >= 2` gives `High`
+     - else `F >= 1` or `U >= 1` gives `Medium`
+     - else `Low`
+  3. Print at most the three most recent meetings from history, each with
+     its outcome and its action items nested underneath.
+
+  Worked example - mtg-001, Executive Strategy Review, Acme Corporation,
+  2025-03-15 at 10:00 AM CT, 60 minutes, Zoom (Executive Boardroom), deal
+  stage Proposal at 2,400,000 dollars. F=1 and U=1, so risk is Medium.
+  Sarah Chen is Full Research, James Miller is Relationship Building, Lisa
+  Park is Value Reinforcement.
+
+  ## Output format
+
+  - `**Pre-Meeting Brief: <meeting title>**`
+  - Detail table - Account, Date/Time, Duration, Location, Objective, Deal
+    Stage, Deal Value, Meeting Risk.
+  - `**Their Attendees:**` table - Name, Role, Sentiment, Prior Meetings,
+    Prep Level.
+  - `**Our Team:**` bullets.
+  - `**Account Context:**` - revenue and employees, current spend and
+    opportunity, products owned, pain points.
+  - `**Recent Meeting History:**` - dated bullets with nested actions.
+
+  ## Edge cases
+
+  - With no upcoming meeting, answer `No upcoming meetings scheduled.` and
+    stop.
+  - Products owned prints `None` for an account that owns nothing.
+  - Open action items from history are outstanding, not done.

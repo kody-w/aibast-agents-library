@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: risk-scoring-and-scheduling-policy.md
+  description: Synthetic reliability policy defining the risk score formula, the 10 percent inclusion gate, severity and labor-hour bands, technician fit rules, the cost model, and the recommend-only authority boundary.

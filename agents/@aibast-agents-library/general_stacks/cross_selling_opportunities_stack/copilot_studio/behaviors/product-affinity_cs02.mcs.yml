@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: product-affinity
+  description: Presents the full product affinity rule set and the segment benchmarks those rules are measured against.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: product-affinity
+  description: Presents the full product affinity rule set and the segment benchmarks those rules are measured against.
+  ---
+  <!-- bic:source=blank -->
+  # Product affinity
+
+  Use this skill when the user asks which products pair well, asks how the
+  recommendations are derived, asks for the affinity matrix or rule set, or
+  asks how a segment typically performs on expansion.
+
+  ## Inputs
+
+  - The affinity rule set and the product catalog (for display names).
+  - The segment benchmark table.
+  - No customer is required. This view is the whole rule set; it is never
+    filtered to one account even if one is named. If a customer is named, say
+    the matrix is global and offer the opportunity scan instead.
+
+  ## Procedure
+
+  1. Render every affinity rule in the order it is defined. Do not sort, do not
+     deduplicate, do not omit rules that no current customer triggers.
+  2. For each rule, translate `if_owns` and `recommend` from product id to the
+     catalog display name (PLAT-100 is Core Platform, PLAT-200 is Enterprise
+     Platform, ANLYT-100 is Analytics Standard, ANLYT-200 is Analytics Pro,
+     INTGR-100 is Integration Hub, SECUR-100 is Security Suite, SUPRT-100 is
+     Premium Support).
+  3. Render `affinity_score` and `success_rate` as whole percentages and
+     `avg_time_to_close_days` as `Nd`.
+  4. Render the segment benchmarks in the order Enterprise, Mid-Market, SMB,
+     with average success rate, average deal cycle in days, and average
+     expansion percentage.
+
+  ## Output format
+
+  - Headline: `**Product Affinity Matrix**`
+  - Table with columns
+    `If Customer Owns | Recommend | Affinity | Success Rate | Avg Close` - all
+    eight rules.
+  - `**Segment Benchmarks:**` then a table with columns
+    `Segment | Avg Success | Avg Cycle | Avg Expansion` - all three segments.
+
+  ## Reading the matrix - state these when asked
+
+  - Highest affinity: Enterprise Platform to Analytics Pro at 91%.
+  - Highest success rate and fastest close: Enterprise Platform to Premium
+    Support at 65% and 14 days.
+  - Lowest affinity and lowest success rate: Integration Hub to Security Suite
+    at 67% affinity and 35% success, 40 days.
+  - Affinity score and success rate are different measures. Affinity is fit;
+    success rate is the historical close rate. Never treat one as the other,
+    and never average them into a single number.
+  - Segment benchmarks are a comparison baseline, not a per-deal prediction.
+    Never apply a segment average to a specific rule that carries its own
+    success rate.
+
+  ## Boundaries
+
+  - Report the rules as written. Never extrapolate a rule for a pairing that
+    has none - there is no rule producing TRAIN-100 Training Package, so it is
+    never recommended.
+  - No side effects: this view is read-only reporting.

@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: forecast-accuracy
+  description: Reports four quarters of forecast versus actual with accuracy and variance, then derives the current quarter confidence range.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: forecast-accuracy
+  description: Reports four quarters of forecast versus actual with accuracy and variance, then derives the current quarter confidence range.
+  ---
+  <!-- bic:source=blank -->
+  # Forecast accuracy
+
+  Use this skill when the user asks how reliable the forecast is, for historical
+  accuracy, or for a confidence range on the current number.
+
+  ## Inputs
+
+  - The four recorded quarters of forecast versus actual, and the current
+    weighted forecast.
+
+  ## Procedure
+
+  1. List the quarters in chronological order with forecast, actual, accuracy
+     and variance. Variance carries an explicit sign and a direction word -
+     positive is Over, negative is Under.
+  2. Four-quarter average accuracy = `round(mean(accuracy), 1)`.
+  3. Trend reads Improving only when every quarter's accuracy is greater than
+     or equal to the previous one; otherwise Mixed.
+  4. Expected accuracy for the current quarter = `min(avg_accuracy + 0.5, 98.0)`.
+  5. Confidence range around the current weighted forecast -
+     `low = round(weighted x (1 - (100 - expected_accuracy) / 100))` and
+     `high = round(weighted x (1 + (100 - expected_accuracy) / 100))`.
+  6. Always carry the recorded conversion insights - commit category accuracy
+     94%, best case conversion 62%, upside conversion 28%.
+
+  ## Output format
+
+  Headline `**Forecast Accuracy Report**` then
+  `4-Quarter avg accuracy: **N%** | Trend: **Improving or Mixed**` and a table
+  with exactly these columns.
+
+  | Quarter | Forecast | Actual | Accuracy | Variance |
+
+  Then a `**Q1 2026 Confidence Range:**` block with the weighted forecast,
+  expected accuracy, low estimate and high estimate, then
+  `**Accuracy Insights:**` and the standing recommendation to apply a +4%
+  upward adjustment for the historical under-forecasting pattern.
+
+  Close with `Source: [Historical Forecast Data + Actuals]`.
+
+  ## Edge cases
+
+  - Accuracy and variance are separate measures - Q1 2025 shows 92.8% accuracy
+    with a +7.8% variance. Do not derive one from the other.
+  - The +4% recommendation is advice, not an applied adjustment; the headline
+    forecast stays as computed.
+  - With only four quarters recorded, never extend the series or forecast next
+    quarter's accuracy.

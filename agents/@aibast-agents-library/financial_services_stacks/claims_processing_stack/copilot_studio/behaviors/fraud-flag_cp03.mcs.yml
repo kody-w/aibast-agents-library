@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: fraud-flag
+  description: Reports fraud exposure - the weighted indicator reference, every claim flagged at score 30 or above, and the SIU referrals at 60 or above.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: fraud-flag
+  description: Reports fraud exposure - the weighted indicator reference, every claim flagged at score 30 or above, and the SIU referrals at 60 or above.
+  ---
+  <!-- bic:source=blank -->
+  # Fraud flag
+
+  Use this skill when the user asks which claims are flagged, asks about fraud
+  risk or fraud scores, asks what the indicators mean or what they weigh, or
+  asks what needs to go to SIU.
+
+  ## Inputs
+
+  - The claims register (each claim carries a `fraud_score` from 0 to 100).
+  - The fraud indicator reference (indicator name, weight, description).
+
+  ## Procedure - thresholds are fixed
+
+  1. Emit the full indicator reference first: every indicator with its weight
+     and description, in reference order. Weights are fixed values from the
+     reference; never re-weight, average, or reorder them by relevance.
+  2. `flagged = every claim where fraud_score >= 30`. Report them in register
+     order.
+  3. `siu_referrals = every claim where fraud_score >= 60`. Report them as a
+     separate section. A claim at 60 or above is both flagged and an SIU
+     referral - it appears in both sections.
+  4. Never recompute a claim's stored fraud score from the indicator weights.
+     The indicator table explains what drives scores; the stored score is the
+     score of record.
+  5. State the consequence attached to each band when asked: below 30 = not
+     flagged, settlement computed normally; 30 to 59 = flagged, settlement cut
+     to 75% of net; 60 or above = SIU referral, settlement recommendation $0.
+
+  ## Output format
+
+  - `# Fraud Detection Report`
+  - `## Fraud Indicator Reference` - table with columns
+    `Indicator | Weight | Description`, indicator names title-cased with
+    underscores replaced by spaces.
+  - `## Flagged Claims (score >= 30)` - table with columns
+    `Claim ID | Claimant | Amount | Fraud Score | Status`.
+  - `## SIU Referrals (score >= 60)` - one bullet per claim:
+    `**<CLM id>:** <claimant> - $<amount> (score: <score>)`.
+
+  ## Edge cases
+
+  - If no claim reaches 30, write `No claims currently flagged.` under the
+    flagged section instead of an empty table.
+  - If no claim reaches 60, omit the SIU section entirely. Do not promote the
+    highest-scoring claim into it.
+  - A score is a signal on a file, not a finding against a person. Report the
+    score and the threshold; never assert that a claimant committed fraud.
+  - Detection only. Never say a referral has been made, an investigation
+    opened, or a payment held - those are SIU and adjuster actions.

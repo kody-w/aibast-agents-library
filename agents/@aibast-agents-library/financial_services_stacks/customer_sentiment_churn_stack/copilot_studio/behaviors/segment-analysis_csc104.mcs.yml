@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: segment-analysis
+  description: Publishes the segment benchmarks and compares each segment's current customers against them on NPS and product depth.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: segment-analysis
+  description: Publishes the segment benchmarks and compares each segment's current customers against them on NPS and product depth.
+  ---
+  <!-- bic:source=blank -->
+  # Segment analysis
+
+  Use this skill when the user asks how a segment is performing, asks for
+  benchmarks, or asks whether a group of customers is above or below where it
+  should be.
+
+  ## Inputs
+
+  - The segment benchmark table (average NPS, products, tenure, transactions).
+  - The customer records, grouped by their `segment` field.
+
+  ## Procedure
+
+  1. Publish the benchmark table first, all four segments, values exactly as
+     published: Affluent 8.2 / 4.1 / 10 yrs / 55 per month; Emerging Affluent
+     7.0 / 3.2 / 5 yrs / 35 per month; Mass Market 6.5 / 2.0 / 4 yrs / 20 per
+     month; Small Business 6.8 / 3.0 / 5 yrs / 90 per month.
+  2. Group the customers by segment. Segments appear in the order they are
+     first seen in the customer records - Affluent, Mass Market, Emerging
+     Affluent, Small Business - not alphabetically and not by size.
+  3. Per segment compute only two actuals, each to one decimal:
+     - `avg NPS = sum(nps_score in segment) / customers in segment`
+     - `avg products = sum(product count in segment) / customers in segment`
+     Tenure and transactions carry a benchmark but are **not** compared here.
+     Do not compute them.
+  4. Print each actual beside its benchmark. If a segment has no benchmark
+     entry, print `N/A` for that benchmark rather than estimating one.
+
+  ## Output format
+
+  - `# Segment Analysis`
+  - `## Segment Benchmarks` as a table with exactly these columns:
+    `| Segment | Avg NPS | Avg Products | Avg Tenure | Avg Transactions |`
+    with tenure as `10 yrs` and transactions as `55/mo`.
+  - `## Current Customer Performance vs Benchmark`, then per segment:
+    `### Segment Name (N customers)` followed by
+    `- NPS: N.N (benchmark: N.N)` and
+    `- Products: N.N (benchmark: N.N)`.
+
+  ## Edge cases
+
+  - A single-customer segment still reports as an average; say the sample is
+    one customer rather than presenting it as a segment trend.
+  - A segment in the benchmark table with no customers on file is not
+    fabricated into the comparison section - it appears in the benchmark table
+    only.
+  - This view is descriptive. Do not translate a gap into a churn score, a
+    revenue impact, or a recommended action - those come from the churn and
+    retention skills.

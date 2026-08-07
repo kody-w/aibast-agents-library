@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: bant-analysis
+  description: Breaks the top Hot leads into budget, authority, need, and timeline sub-scores with engagement signals and threshold-driven risk flags.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: bant-analysis
+  description: Breaks the top Hot leads into budget, authority, need, and timeline sub-scores with engagement signals and threshold-driven risk flags.
+  ---
+  <!-- bic:source=blank -->
+  # BANT analysis
+
+  Use this skill when the user asks for a BANT breakdown, asks whether a lead
+  has budget or authority, asks what the risks are on the top leads, or asks
+  why a lead scored the way it did.
+
+  ## Inputs
+
+  - The scored lead set produced by the score-leads rules.
+
+  ## Procedure - who is analyzed
+
+  1. Take only leads in the **Hot** tier (combined score 88 or above).
+  2. Sort by combined score descending and take the first 8. Fewer than 8 Hot
+     leads means analyze all of them; the headline reflects the real count.
+  3. Warm, Nurture, and Disqualified leads are never included. If the user
+     asks for BANT on a lead outside the Hot tier, state its tier and
+     combined score and say BANT detail is produced for Hot leads only.
+
+  ## Procedure - the four sub-scores
+
+  - **Budget (B)**: confirmed 95, planned 70, exploring 40, tbd 15.
+  - **Authority (A)**: C-Level 95, VP 80, Director 60, Manager 40,
+    Individual 20.
+  - **Need (N)**: `min(100, 50 + len(need_text) // 3 + count(signals) * 8)`.
+    Longer articulated needs and more engagement signals raise N; the cap
+    is 100.
+  - **Timeline (T)**: 90 if the timeline text contains "60" or "Q1"; 70 if it
+    contains "90"; 55 if it contains "Q2"; otherwise 25.
+  - **Composite**: `int(B*0.30 + A*0.25 + N*0.25 + T*0.20)`.
+
+  ## Procedure - risk flags
+
+  Emit a risk flag only when a threshold is crossed. Never editorialize a
+  risk that the numbers do not show.
+
+  - If `B < 50` (that is, budget is exploring or tbd):
+    `- <Company>: Budget not confirmed (<budget status>)`
+  - If `A < 60` (that is, authority is Manager or Individual):
+    `- <Company>: Decision maker not yet engaged (<authority level>)`
+
+  If no analyzed lead trips either threshold, the Risk Flags section is
+  present and empty. Say so plainly rather than inventing a risk.
+
+  ## Output format
+
+  - Headline: `**BANT Analysis - Top N Hot Leads**`
+  - A table with columns: Lead | Budget | Authority | Need | Timeline | BANT
+    Score. Budget is rendered `Confirmed (95)` - status capitalized, the
+    sub-score in parentheses. Authority is rendered `C-Level (95)`. Need is
+    the bare number. Timeline is rendered `Q1 (90)` - the raw timeline text
+    with the sub-score in parentheses.
+  - `**Strongest Engagement Signals:**` - one bullet for each of the top 3
+    analyzed leads, listing that lead's full engagement signals.
+  - `**Risk Flags:**` - the bullets produced by the threshold rules above.
+  - Close with `Source: [CRM + Booth Interactions + Intent Data]` and
+    `Agents: BANTScoringAgent`.
+
+  ## Boundaries
+
+  - Cite the lead ID when the user asks about a specific company.
+  - Never soften or upgrade a sub-score because the user believes a deal is
+    strong. Show the arithmetic instead.

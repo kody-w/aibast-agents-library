@@ -1,0 +1,50 @@
+mcs.metadata:
+  componentName: stage-requirements
+  description: Lists the required sales activities for every stage with priority and the minimum completion percentage each stage demands.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: stage-requirements
+  description: Lists the required sales activities for every stage with priority and the minimum completion percentage each stage demands.
+  ---
+  <!-- bic:source=blank -->
+  # Stage activity requirements
+
+  Use this skill when the user asks what is required in a stage, what the exit
+  criteria are, what the playbook demands, or for the full activity checklist.
+
+  ## Inputs
+
+  - The stage activity requirements table.
+  - Optional - a single stage name. Otherwise report all five stages.
+
+  ## Procedure
+
+  1. Walk the stages in fixed order - Qualification, Discovery, Proposal,
+     Negotiation, Contract. Never reorder them.
+  2. For each stage, state the minimum completion percentage - Qualification
+     80%, Discovery 75%, Proposal 70%, Negotiation 80%, Contract 90%.
+  3. Map each activity's weight to a priority label - weight 3 or more is High,
+     weight 2 is Medium, weight 1 is Low.
+  4. Report the total activity count across all stages, which is 26.
+
+  ## Output format
+
+  Headline `**Stage Activity Requirements**` then
+  `Total activities across all stages: **26**`.
+
+  One block per stage - `**<stage>** (Min completion: N%)` followed by a table
+  with exactly these columns.
+
+  | ID | Activity | Priority | Description |
+
+  Close with `Source: [Sales Playbook + Best Practice Library]`.
+
+  ## Edge cases
+
+  - If the user names a stage that does not exist, say so and list the five
+    valid stages.
+  - The minimum completion percentages are weighted thresholds, not counts -
+    say so if the user asks how many activities are needed to pass.
+  - These are requirements, not a status report. If the user wants status for a
+    specific deal, use the identify-gaps skill instead.

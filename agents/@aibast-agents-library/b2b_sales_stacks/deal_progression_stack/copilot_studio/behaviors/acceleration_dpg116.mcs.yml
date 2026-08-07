@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: acceleration
+  description: Groups the active pipeline into three intervention buckets, surfaces the contract-stage quick wins and lists the priority action per rep.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: acceleration
+  description: Groups the active pipeline into three intervention buckets, surfaces the contract-stage quick wins and lists the priority action per rep.
+  ---
+  <!-- bic:source=blank -->
+  # Pipeline acceleration strategy
+
+  Use this skill when the user asks what can be pulled forward, how to
+  accelerate the quarter, or where the quick wins are.
+
+  ## Inputs
+
+  - The full active pipeline and the rep roster.
+
+  ## Procedure
+
+  1. Build three overlapping buckets from the active pipeline.
+     - Executive alignment - stage is Proposal or Negotiation AND blocker is
+       one of executive_change, no_champion, stakeholder_alignment, none AND
+       days in stage >= 5.
+     - Contract fast-track - blocker is legal_review or procurement_process, OR
+       stage is Contract.
+     - Proof-of-value offer - blocker is competitor_eval,
+       technical_validation or timeline_uncertainty, OR (stage is Discovery AND
+       days in stage >= 8).
+     A deal may appear in more than one bucket; the combined headline value
+     therefore exceeds the pipeline total.
+  2. Days saved per bucket is fixed - executive alignment 12 days avg, contract
+     fast-track 8 days avg, proof-of-value 15 days avg.
+  3. Quick wins are active deals in Contract stage with last contact 3 days or
+     fewer, sorted by value descending. A quick win with 3 or fewer days in
+     stage reads `verbal commit, awaiting signature`; otherwise
+     `final approval pending`.
+  4. Rep-level actions - for each rep with stalled deals, take the most frequent
+     blocker among them and map it to the action - executive_change gives
+     Executive introductions, legal_review Contract negotiations,
+     competitor_eval Competitive positioning, budget_hold ROI business cases,
+     no_champion Re-engagement campaign.
+  5. Forecast impact is the standing figure of $2.4M added to Q4 commit.
+
+  ## Output format
+
+  Headline `**Pipeline Acceleration Strategy**` then
+  `Identified **$XM** that can be pulled forward with targeted interventions.`
+
+  A table with exactly these columns.
+
+  | Action | Deals Impacted | Value | Days Saved |
+
+  Then `**Quick Wins (Close This Week):**` bullets, a quick-win total in $M,
+  then a table with exactly these columns.
+
+  | Rep | Stalled Deals | Priority Action |
+
+  Close with the forecast impact line and
+  `Source: [Pipeline Analytics + Historical Patterns]`.
+
+  ## Edge cases
+
+  - Deals overlap buckets by design. Say so if the user adds the three values
+    and finds more than the pipeline.
+  - Reps with no stalled deals are omitted from the rep table.
+  - Acceleration is a recommendation set. Never say a deal was pulled forward,
+    a close date changed, or an offer extended.

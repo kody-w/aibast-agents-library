@@ -1,0 +1,83 @@
+mcs.metadata:
+  componentName: billing-inquiry
+  description: Answers account balance and status questions for one utility account, or renders the full accounts-receivable summary when no account is named.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: billing-inquiry
+  description: Answers account balance and status questions for one utility account, or renders the full accounts-receivable summary when no account is named.
+  ---
+  <!-- bic:source=blank -->
+  # Billing inquiry
+
+  Use this skill when the user asks what a customer owes, asks about an
+  account's status, services, auto-pay, or last payment, or asks for the
+  overall receivable picture across accounts.
+
+  ## Inputs
+
+  - The utility account ledger.
+  - Optional: a single ACCT- id. With no id, produce the summary view.
+
+  ## Procedure
+
+  1. If an ACCT- id is supplied and it exists in the ledger, produce the
+     **detail view** for that account only.
+  2. If no id is supplied, produce the **summary view** over every account.
+  3. If an id is supplied but is not in the ledger, say the account was not
+     found, name the id that was asked for, then produce the summary view.
+     Never fabricate a record for an unknown id.
+
+  Arithmetic, exactly:
+
+  - `total_due = balance_current + balance_past_due`
+  - `total_accounts_receivable = sum(balance_current + balance_past_due) over
+    all accounts`
+
+  No other derived numbers. Do not compute interest, penalties, or projected
+  balances - none exist in the data.
+
+  ## Output format - detail view
+
+  Headline `# Billing Inquiry: ACCT-xxxxx`, then one bullet per field, in this
+  order and no other:
+
+  - **Customer:** name
+  - **Address:** street address
+  - **Account Type:** Residential / Commercial / Institutional
+  - **Services:** title-cased service list (Water, Sewer, Stormwater, Trash,
+    Irrigation, Fire Line)
+  - **Status:** Active / Delinquent
+  - **Current Charges:** `$n,nnn.nn`
+  - **Past Due:** `$n,nnn.nn`
+  - **Total Due:** `$n,nnn.nn`
+  - **Auto-Pay:** Yes / No
+  - **Last Payment:** `$n,nnn.nn on YYYY-MM-DD`
+
+  ## Output format - summary view
+
+  Headline `# Utility Accounts Summary`, then a table with exactly these
+  columns:
+
+  `| Account | Customer | Type | Current | Past Due | Status |`
+
+  One row per account in ledger order, then a closing line:
+
+  `**Total Accounts Receivable:** $n,nnn.nn`
+
+  ## Edge cases
+
+  - An account with `balance_past_due` of `$0.00` is still shown - print the
+    zero, do not omit the row or the field.
+  - A Delinquent status is reported as a fact of the record. Do not attach a
+    shutoff date, a collections step, or a deadline - none is in the data.
+  - Auto-pay being on does not mean the balance is settled; report both fields
+    as they stand.
+
+  ## Boundaries
+
+  - Read-only. Never post a payment, waive a charge, change auto-pay, or say a
+    balance has been adjusted. If asked, state the option and hand it to a
+    billing clerk.
+  - If the customer asks why a bill changed, hand off to the usage-analysis
+    skill rather than speculating.

@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: engagement-metric-policy.md
+  description: Synthetic measurement standard - metric formulas, rounding, zero-denominator handling, ROAS thresholds, ordering, and reporting boundaries.

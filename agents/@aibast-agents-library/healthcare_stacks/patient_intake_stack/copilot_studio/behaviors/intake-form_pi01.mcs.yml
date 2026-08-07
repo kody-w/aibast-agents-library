@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: intake-form
+  description: Assembles the registration intake form for each patient - demographics, contact, emergency contact, and primary insurance identifiers.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: intake-form
+  description: Assembles the registration intake form for each patient - demographics, contact, emergency contact, and primary insurance identifiers.
+  ---
+  <!-- bic:source=blank -->
+  # Intake form
+
+  Use this skill when the user asks for a patient's intake or registration
+  form, asks for demographics or contact details, asks who a patient's
+  emergency contact is, or asks which insurance is on file for a patient.
+
+  ## Inputs
+
+  - The patient registry and the insurance plan records.
+  - Optional: a single PT- id or a patient name to narrow the presentation.
+
+  ## Procedure - exact rules
+
+  1. The tool builds one form per patient in the registry. It returns all
+     three patients (PT-20001, PT-20002, PT-20003) on every call; the
+     `patient_id` argument is declared on the tool but the current
+     implementation does not apply it. When the user names one patient,
+     select that patient's form from the returned set and present only that
+     one. Do not claim the tool filtered.
+  2. Each form carries exactly these fields, and no others: patient_id, name,
+     dob, gender, phone, address, emergency_contact (name, relation, phone),
+     insurance_payer, member_id.
+  3. Insurance fields are read from the patient's `primary` plan. If a patient
+     has no primary plan on file, both `insurance_payer` and `member_id`
+     render literally as `Unknown` - report `Unknown`, do not substitute the
+     secondary payer and do not guess.
+  4. The form does not carry medical history, medications, allergies,
+     surgical or family history, or review-of-systems answers. Those are
+     section names on the questionnaire, not captured data.
+
+  ## Output format
+
+  Headline `# Patient Intake Forms`, then one block per patient:
+
+  - `## <name> (<PT-id>)`
+  - `- DOB: <yyyy-mm-dd> | Gender: <gender>`
+  - `- Phone: <phone>`
+  - `- Address: <address>`
+  - `- Emergency Contact: <name> (<relation>) - <phone>`
+  - `- Insurance: <payer> (ID: <member_id>)`
+
+  ## Edge cases
+
+  - Asked for a patient not in the registry: say the patient is not on file
+    and name the three PT- ids that are. Never fabricate a record.
+  - Asked for allergies, medications, diagnoses, or lab results: state that
+    the intake data does not contain them, and name the questionnaire section
+    that would collect them if that is useful.
+  - Asked to correct, update, or submit a form: this is read-only. Report the
+    field and its current value and hand the edit to registration staff.

@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "customer-360-speech",
+  "display_name": "Customer 360 & Speech Agent",
+  "agent_intent": "../customer_360_speech_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/customer-profile_c361.mcs.yml",
+    "behaviors/interaction-history_c362.mcs.yml",
+    "behaviors/sentiment-analysis_c363.mcs.yml",
+    "behaviors/next-best-action_c364.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/customer-360-profiles-data.md",
+    "capabilities/knowledge/files/customer-360-profiles-data.md.mcs.yml",
+    "capabilities/knowledge/files/next-best-action-library.md",
+    "capabilities/knowledge/files/next-best-action-library.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the customer 360 overview.", "expect": "3 customers, Total Customer LTV $21,620; Jessica Alvarez (C360-001) Premium $12,450 / 47 orders / last 2025-02-28 / Neutral, Brian O'Connell (C360-002) Standard $3,280 / 15 orders / Positive, Mei Lin Zhang (C360-003) At Risk $5,890 / 28 orders / last 2024-10-05 / Neutral"},
+    {"ask": "What is Jessica Alvarez's interaction history?", "expect": "4 interactions for C360-001: 2025-03-05 Mobile App purchase #ORD-88421 Wireless Speaker (Positive, Self-Service), 2025-02-20 Chat inquiry (Positive, ChatBot), 2025-02-10 Email campaign click (Neutral, Self-Service), 2025-01-28 Phone support on #ORD-87910 (Negative, Agent_Kelly)"},
+    {"ask": "Which customers have negative sentiment?", "expect": "None - the At-Risk (Negative Sentiment) section is empty. Scores: C360-002 0.5 Positive, C360-001 0.25 Neutral (1 negative of 4), C360-003 -0.25 Neutral (2 negatives of 4); -0.25 is above the -0.30 negative threshold, stated honestly rather than promoting anyone into the list"},
+    {"ask": "What is the next best action for Mei Lin Zhang?", "expect": "Win-back offer with 20% discount and free shipping, Email, Immediate, 15.0% expected conversion - branch 3, not service recovery, because her sentiment label is Neutral (-0.25) even though her segment is At Risk"},
+    {"ask": "Send Jessica Alvarez the VIP preview and pull up C360-009's profile.", "expect": "Refusal to send: recommends the VIP preview (Email, Immediate, 22.5%) for a person to execute and states it cannot send email; and says C360-009 is not on file rather than falling back to another customer"}
+  ]
+}

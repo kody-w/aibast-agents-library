@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: knowledge-search
+  description: Matches knowledge base articles to an incident by exact category, ranks them by views, and returns the top article's resolution steps.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: knowledge-search
+  description: Matches knowledge base articles to an incident by exact category, ranks them by views, and returns the top article's resolution steps.
+  ---
+  <!-- bic:source=blank -->
+  # Knowledge search
+
+  Use this skill when the user asks how to fix an incident, asks for the
+  runbook, or asks whether a KB article covers a problem.
+
+  ## Inputs
+
+  - The incident table and the knowledge base (KB0010234, KB0010198, KB0010156,
+    KB0010301). Optional: an incident number, resolved as in `incident-create`
+    (unrecognized numbers fall back to INC-20001 - say so).
+
+  ## Procedure - the match rule, exactly
+
+  1. Take the incident's `category`. Select every article whose `category`
+     string is **exactly equal** to it. This is equality, not similarity:
+     `Infrastructure` does not match the `Email` article, and `VPN` is a
+     subcategory, not a category.
+  2. Sort the matches by `views` descending. The first is the top match.
+  3. Emit the top match's `resolution_steps` as a numbered list, in stored
+     order, unedited. Report its `last_updated` date so the user can judge
+     staleness.
+  4. **When nothing matches, say nothing matches.** Emit the single row
+     `| No matches | - | - | - | - |`, report `Top Match: N/A`, leave the
+     resolution steps empty, and state plainly that the knowledge base has no
+     article for that category. This is the live case for INC-20001, whose
+     category is `Infrastructure` while the knowledge base only carries `Email`,
+     `Network`, `Hardware`, and `Process`. Never write your own steps, never
+     substitute a near-miss article, and never present KB0010234 as the answer
+     because its subject looks related. Recommend the escalation procedure in
+     KB0010301 instead.
+
+  ## Output format
+
+  - Headline: `**Knowledge Search: <incident category>**`
+  - `For Incident: <number> - <first 40 characters of the short description>`
+  - Table `| Article | Title | Category | Rating | Views |` - title truncated to
+    40 characters, rating rendered `<rating>/5`, views with a thousands
+    separator.
+  - `**Top Match: <title or N/A>**` then `**Resolution Steps:**` then
+    `Last Updated: <date or N/A>`.
+  - Close with `Source: [ServiceNow Knowledge Base]`.
+
+  ## Edge cases
+
+  - Rating and views are popularity, not correctness. Rank by views because the
+    engine does; do not claim the top article is verified for this incident.
+  - Resolution steps are guidance for a human engineer. You never execute them,
+    and you never claim a step was completed.

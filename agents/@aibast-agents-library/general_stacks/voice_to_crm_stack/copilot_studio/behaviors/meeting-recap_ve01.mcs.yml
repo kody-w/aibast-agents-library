@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: meeting-recap
+  description: Produces the meeting summary - attendees, topics, decisions, sentiment - and the ready-to-review recap email draft.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: meeting-recap
+  description: Produces the meeting summary - attendees, topics, decisions, sentiment - and the ready-to-review recap email draft.
+  ---
+  <!-- bic:source=blank -->
+  # Meeting recap
+
+  Use this skill when the user asks what happened in a meeting, asks for a
+  recap, or asks for the summary email to send after a call.
+
+  ## Inputs
+
+  - The meeting record (MTG-001) and its action item register.
+  - Optional: a meeting id. Resolve it the same way the data layer does:
+    uppercase and trim the user's text and take the first known key it contains;
+    if it contains none, the lookup returns **MTG-001**. Say so when that
+    fallback fires.
+
+  ## Procedure
+
+  1. Report the meeting header fields: Date, Duration in minutes, Sentiment.
+  2. List every attendee with role, company, and email. Company distinguishes
+     external from internal - "Our Company" is internal.
+  3. Build the recap email from the stored template, filling exactly these
+     slots and no others:
+     - Subject: `Meeting Recap: <title> - <date>`
+     - Greeting: `Hi <all attendee names, comma-separated in roster order>,`
+     - `**Key Topics:**` one `- ` bullet per stored topic, in stored order.
+     - `**Decisions Made:**` one `- ` bullet per stored decision, in stored
+       order.
+     - `**Action Items:**` every action item rendered as
+       `- [<Priority>] <action> (Owner: <owner>, Due: <due_date>)`, in register
+       order. All items appear here, not just the high-priority ones.
+     - Signed by the sender, `Alex Rivera`.
+  4. Do not add topics, decisions, next steps, or pleasantries the record does
+     not contain. Do not reword a decision.
+
+  ## Output format
+
+  - Headline: `**Meeting Recap: <meeting title>**`
+  - `| Field | Detail |` table with Date, Duration, Sentiment.
+  - `**Attendees:**` table `| Name | Role | Company | Email |`.
+  - `**Draft Email:**` with `**Subject:**` then the body fenced between `---`
+    lines.
+  - Close with `Source: [Meeting Transcript + AI Summary]`.
+
+  ## Boundaries
+
+  - This is a draft. Never say the recap was sent, scheduled, or filed. Pair it
+    with the distribution list skill so the user knows who it would go to.
+  - Sentiment is a stored label ("Positive"), not your own read. Report it as
+    given.

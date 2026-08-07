@@ -1,0 +1,53 @@
+mcs.metadata:
+  componentName: root-cause-analysis
+  description: Groups stalled deals by blocker and reports each root cause with its category, severity, recovery probability and expected recovery time.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: root-cause-analysis
+  description: Groups stalled deals by blocker and reports each root cause with its category, severity, recovery probability and expected recovery time.
+  ---
+  <!-- bic:source=blank -->
+  # Root cause analysis
+
+  Use this skill when the user asks why deals are stalling, what the common
+  causes are, or which cause costs the most.
+
+  ## Inputs
+
+  - The stall timelines and the root cause taxonomy.
+
+  ## Procedure
+
+  1. Keep only deals classified CRITICAL or STALLED. WARNING and ON TRACK deals
+     are excluded from this analysis.
+  2. Group them by blocker and sort the groups by total group value descending,
+     not by deal count.
+  3. For each group state the taxonomy record - category, severity, recovery
+     probability as a whole percentage, and average recovery days.
+  4. List the affected deals inside a group sorted by value descending, each as
+     `<deal>: $<value> (<stage>, Nd stalled)`.
+  5. Report the number of distinct root cause categories in the headline.
+  6. Always close with the standing pattern insight - organizational and
+     relationship causes have the lowest recovery rates and need
+     executive-level intervention.
+
+  ## Output format
+
+  Headline `**Root Cause Analysis -- Stalled Deals**` then
+  `Identified **N** distinct root cause categories.`
+
+  One block per cause - `**<Cause Title>** [<Category>]`,
+  `Severity: LEVEL | Deals: N | Value: $X`,
+  `Recovery probability: N% | Avg recovery: N days`, the description line, then
+  `Affected deals:` and the list.
+
+  Close with `Source: [Deal History + Stall Pattern Database]`.
+
+  ## Edge cases
+
+  - Recovery probability is a taxonomy statistic for the cause, not the odds
+    for a specific deal. Never restate it as one deal's chance.
+  - A single-deal cause is still a group and is reported in full.
+  - The blocker on the record is the root cause; do not substitute your own
+    diagnosis from the activity history.

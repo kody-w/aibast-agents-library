@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: opportunity-signals-and-scoring-policy.md
+  description: Synthetic opportunity signal pipeline plus the computed-figure formulas and the health and attribution ladders the agent applies.

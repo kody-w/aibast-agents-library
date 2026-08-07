@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: data-validation
+  description: Runs every eligible report against the fixed quality and completeness gates and reports the pass rate with the exact gate that failed.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: data-validation
+  description: Runs every eligible report against the fixed quality and completeness gates and reports the pass rate with the exact gate that failed.
+  ---
+  <!-- bic:source=blank -->
+  # Data validation
+
+  Use this skill when the user asks whether the reporting data is clean, which
+  reports fail validation, what the pass rate is, or what is blocking a filing
+  from being ready.
+
+  ## Inputs
+
+  - The regulatory report register and the validation rule set (knowledge/tools).
+  - Optional: a single RPT- id. Otherwise validate every eligible report.
+
+  ## Eligibility
+
+  Skip any report whose status is `not_started` - it has no data to validate and
+  it is excluded from both the table and the pass-rate denominator. Every other
+  status (`in_progress`, `submitted`, `overdue`) is validated.
+
+  ## Gates - compute them, do not judge them
+
+  For each validated report, collect issues in this order:
+
+  1. If `data_quality_score < 80`, add
+     `Data quality score below threshold (<score>/100)`.
+  2. If `completeness_pct < 100` AND status is not `submitted`, add
+     `Data collection incomplete (<completeness_pct>%)`.
+
+  A report passes only when the issue list is empty. A score of exactly 80
+  passes gate 1; completeness of exactly 100 passes gate 2. A SUBMITTED report
+  is never flagged for completeness.
+
+  `pass_rate = (passed reports / validated reports) * 100`, rounded to one
+  decimal. If nothing is eligible, the pass rate is 0.
+
+  ## Output format
+
+  Headline: `**Validation Pass Rate:** N%` (one decimal, e.g. `20.0%`).
+
+  Then one table, exactly these columns:
+
+  | Report | Quality Score | Completeness | Issues | Passed |
+
+  Quality Score as `N/100`. Completeness with a `%` suffix. Issues are the issue
+  strings joined with `; `, or `None`. Passed is `YES` or `NO`.
+
+  ## Edge cases
+
+  - Both gates can fail on one report; list both issues, in gate order.
+  - State how many reports were excluded as NOT_STARTED and name them with their
+    RPT- ids, so the pass rate is not read as covering the whole register.
+  - Never recommend adjusting, overriding, or re-scoring data to clear a gate.
+    Route the fix to the report's assignee and name the source systems the rule
+    set attaches to that data type.

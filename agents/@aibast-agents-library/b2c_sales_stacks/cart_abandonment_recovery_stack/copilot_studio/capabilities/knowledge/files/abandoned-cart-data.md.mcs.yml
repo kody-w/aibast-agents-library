@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: abandoned-cart-data.md
+  description: Synthetic abandoned cart records, line items, exit-page breakdown, and 30-day conversion metrics the agent answers from until real tools are connected.

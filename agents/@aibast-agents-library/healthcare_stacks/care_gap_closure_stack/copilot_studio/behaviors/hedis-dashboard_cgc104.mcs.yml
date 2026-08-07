@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: hedis-dashboard
+  description: Reports current HEDIS compliance rate against the national benchmark for every measure, with the star rating threshold each measure is held to.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: hedis-dashboard
+  description: Reports current HEDIS compliance rate against the national benchmark for every measure, with the star rating threshold each measure is held to.
+  ---
+  <!-- bic:source=blank -->
+  # HEDIS dashboard
+
+  Use this skill when the user asks how quality performance looks, how the plan
+  compares to national benchmarks, where it is behind, or what the star rating
+  picture is.
+
+  ## Inputs
+
+  - The HEDIS measure set: eligible patients, compliant patients, national
+    benchmark, star rating impact.
+
+  ## Procedure - compute it, do not judge it
+
+  For each measure:
+
+  1. `current_rate = round(compliant_patients / eligible_patients * 100, 1)`
+  2. `vs_benchmark = round(current_rate - national_benchmark_pct, 1)`
+  3. Prefix `vs_benchmark` with `+` when it is greater than or equal to zero;
+     a negative value already carries its own minus sign.
+  4. Carry the star rating impact string through verbatim.
+
+  Order: this view is **not** ranked. List the measures in measure order -
+  Breast Cancer Screening (BCS), Diabetes HbA1c Testing (CDC-HBA1C), Colorectal
+  Cancer Screening (COL), Controlling Blood Pressure (CBP), Adolescent
+  Well-Care Visits (AWC). Do not sort by rate or by gap.
+
+  ## Output format
+
+  One table, exactly these columns:
+
+  | Measure | Current Rate | Benchmark | vs Benchmark | Eligible | Star Impact |
+
+  Current Rate, Benchmark, and vs Benchmark as percentages to one decimal with
+  a `%` suffix. Eligible with thousands separators. Star Impact verbatim.
+
+  ## Edge cases
+
+  - Being above the national benchmark is not the same as clearing the star
+    threshold, and the star threshold is a different number from the benchmark.
+    Compare the current rate to each separately and say which test the measure
+    passes.
+  - Report the threshold; never forecast a star rating or a revenue impact from
+    it.
+  - If asked which measure to fix first, hand off: the dashboard ranks nothing.
+    Gap analysis ranks by revenue opportunity, campaign planning ranks by ROI.
+  - Never produce a patient list or any identifiable detail. Rates are
+    aggregate.

@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: duplicate-check
+  description: Applies the entity's duplicate detection rules and reports matches with match type, confidence, and the configured action.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: duplicate-check
+  description: Applies the entity's duplicate detection rules and reports matches with match type, confidence, and the configured action.
+  ---
+  <!-- bic:source=blank -->
+  # Duplicate check
+
+  Use this skill when the user asks whether a record already exists, asks how
+  duplicates are detected, or asks what happens to a duplicate.
+
+  ## Inputs
+
+  - `template_name` - resolves to the target entity: `new_lead` -> `lead`,
+    `new_account` -> `account`, `support_case` -> `incident`. An unrecognized
+    template falls back to the `lead` rule set; say that the lead rules are
+    being shown rather than presenting them as the named template's rules.
+
+  ## Procedure - rules are per entity and fixed
+
+  Render every rule for the resolved entity as
+  `Rule | Fields | Match Type | Confidence`:
+
+  - **lead** - Email Match (email, exact, High); Name + Company (first_name,
+    last_name, company, fuzzy, Medium); Phone Match (phone, exact, High).
+    Action on duplicate: `Flag for review`.
+  - **account** - Company Name (company_name, fuzzy, Medium); Website Domain
+    (website, domain_match, High); Name + City (company_name, city, fuzzy,
+    Low). Action on duplicate: `Merge suggestion`.
+  - **incident** - Subject + Contact (subject, contact_email, fuzzy, Medium).
+    Action on duplicate: `Link to existing case`.
+
+  Confidence is a property of the rule that fired, not a judgement: an exact
+  email match is High, a fuzzy name-and-city match is Low. Never upgrade or
+  downgrade it, and never combine two rules into a higher confidence.
+
+  ## Scan results
+
+  The scan block reports the sample lead batch regardless of which entity's
+  rules were rendered - say so when the entity is not `lead`:
+
+  - Records scanned: 5
+  - Potential duplicates: 1
+  - Match: rachel.chen@existing-customer.com (Email Match, High confidence)
+  - Recommended action: Review and merge with existing record
+
+  ## Output format
+
+  - `**Duplicate Detection: <Entity>**` (title case)
+  - `**Detection Rules:**` table
+  - `**Action on Duplicate:** <action>`
+  - `**Scan Results (sample batch):**` bullets as above
+  - Close with `Source: [Duplicate Detection Engine]` and
+    `Agents: OneClickCRMIntakeAgent`
+
+  ## Boundaries
+
+  - Recommend only. Never merge, delete, or link records - the action column
+    names what a person should do next.
+  - A flagged record is never imported as new on the same pass; it moves to
+    Review in the import preview.

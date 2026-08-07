@@ -1,0 +1,76 @@
+mcs.metadata:
+  componentName: expansion-opportunities
+  description: Ranks accounts carrying expansion signals by modeled expansion potential and itemizes the priced lines behind each number.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: expansion-opportunities
+  description: Ranks accounts carrying expansion signals by modeled expansion potential and itemizes the priced lines behind each number.
+  ---
+  <!-- bic:source=blank -->
+  # Expansion opportunities
+
+  Use this skill when the user asks where the upsell is, which accounts can
+  grow, what a cross-sell is worth, what the seat or add-on upside is, or how
+  much expansion revenue is modeled.
+
+  ## Inputs
+
+  - The license agreement portfolio and each account's `expansion_signals`.
+  - The expansion pricing catalog: additional_seats $120 per seat (min_qty 10),
+    analytics_addon $24,000, api_premium $18,000, sso_subsidiary $12,000,
+    custom_integration $36,000.
+
+  ## Procedure - compute it, do not judge it
+
+  1. **Inclusion gate.** An account is skipped entirely when
+     `expansion_signals` is empty. LIC-3002 ClearView Analytics and LIC-3005
+     Granite Construction Co have no signals and never appear here, whatever
+     their ARR or health.
+  2. **Seat headroom line.** `seat_util = round(seats_used / seats * 100, 1)`.
+     If and only if `seat_util > 90`, add a fixed
+     `120 * 50 = $6,000` additional-seats line. The 50 is a fixed modeled
+     quantity, not a computed headroom, and `min_qty` 10 is recorded but not
+     applied. An account at exactly 90.0% gets no seat line.
+  3. **Signal keyword lines.** Scan every signal string, lowercased:
+     - contains `analytics` -> add analytics_addon `$24,000`
+     - contains `sso` -> add `12000 * 3 = $36,000` (three subsidiaries, a fixed
+       multiplier, not read from the signal text)
+     - contains `integration` -> add custom_integration `$36,000`
+     Multiple signals on one account each contribute; one signal matching two
+     keywords contributes both.
+  4. **No api_premium rule exists.** "API usage +45% QoQ" on LIC-3001 matches no
+     keyword. api_premium's $18,000 is never added by any account. Never model
+     it in.
+  5. `expansion_potential` = sum of that account's lines. The computed values
+     are LIC-3001 $6,000 + $36,000 = **$42,000**, LIC-3004 $6,000 + $36,000 =
+     **$42,000**, LIC-3003 $6,000 + $24,000 = **$30,000**.
+  6. Sort descending by `expansion_potential`. Ties keep portfolio order, so
+     LIC-3001 Pinnacle Insurance Corp precedes LIC-3004 Skyline Hospitality
+     Group at $42,000 each. Do not break the tie by ARR or health score.
+  7. `total_potential` = `42000 + 42000 + 30000 = $114,000`.
+
+  ## Output format
+
+  - `# Expansion Opportunities`
+  - `**Total Expansion Potential:** $114,000`
+  - Then, per account in ranked order:
+    - `## <Customer> (Current ARR: $NNN,NNN)`
+    - `**Expansion Potential:** $NN,NNN`
+    - `**Signals:**` followed by one bullet per recorded signal, verbatim
+    - Table with columns exactly: `Expansion Item | Value`. Item names render
+      title-cased from the catalog key, so `sso_subsidiary` prints as
+      `Sso Subsidiary` and `analytics_addon` as `Analytics Addon`.
+
+  ## Edge cases
+
+  - The seat line is identical ($6,000) for all three qualifying accounts even
+    though their utilizations differ (LIC-3001 94.7%, LIC-3004 99.2%,
+    LIC-3003 98.8%). Do not scale it.
+  - LIC-3003 Redwood Supply Chain appears here at $30,000 and also appears in
+    the churn assessment. Name that tension rather than dropping it from either.
+  - Signals such as "Opening 12 new locations" and "Requested bulk seat pricing"
+    on LIC-3004 carry no price rule and add $0. They are still listed as
+    signals.
+  - These are modeled figures, not quotes. Never say a proposal was sent, a SKU
+    added, or a price agreed - the number ends with a human deciding.

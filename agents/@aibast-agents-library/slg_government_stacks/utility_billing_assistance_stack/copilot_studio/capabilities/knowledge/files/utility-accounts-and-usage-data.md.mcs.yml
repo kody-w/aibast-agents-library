@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: utility-accounts-and-usage-data.md
+  description: Synthetic utility account ledger, meter usage history, and trend classification thresholds the agent answers from until real tools are connected.

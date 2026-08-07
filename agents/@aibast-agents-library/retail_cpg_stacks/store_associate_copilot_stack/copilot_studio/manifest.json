@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "store-associate-copilot",
+  "display_name": "Store Associate Copilot Agent",
+  "agent_intent": "../store_associate_copilot_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/product-lookup_sac1.mcs.yml",
+    "behaviors/customer-assist_sac2.mcs.yml",
+    "behaviors/task-checklist_sac3.mcs.yml",
+    "behaviors/performance-dashboard_sac4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/product-catalog-data.md",
+    "capabilities/knowledge/files/product-catalog-data.md.mcs.yml",
+    "capabilities/knowledge/files/store-operations-data.md",
+    "capabilities/knowledge/files/store-operations-data.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Look up SKU-1005.", "expect": "Premium Running Shoes by StrideMax, Footwear, $149.99, Aisle F1 wall display, 38 units on hand, UPC 0-12345-67890-5; pairs with Stainless Water Bottle and Performance Yoga Mat"},
+    {"ask": "What Electronics do we carry?", "expect": "Exactly two: Wireless Earbuds Pro (SKU-1002, $59.99, Aisle E1 locked case, 132 units) and Smart Fitness Tracker (SKU-1004, $129.99, Aisle E2 display stand, 45 units)"},
+    {"ask": "Show me the opening shift checklist.", "expect": "6 tasks, 57 min estimated, 83.3% completion; item 1 is Unlock entrance doors and disable alarm (CRITICAL, 2 min); the only MEDIUM item is Restock fitting rooms with hangers (5 min)"},
+    {"ask": "Who is the top performer today?", "expect": "Casey Rivera (ASC-104, Lead Associate, opening) leads all three highlights: $2,410.30 revenue, 4.9/5.0 CSAT, 40% upsell, 12/12 tasks (100%); store totals are $6,539.00 across 52 transactions, $125.75 average basket"},
+    {"ask": "Look up SKU-2001, the espresso machine, and tell me its price and aisle.", "expect": "Honest no-data: SKU-2001 is not in the catalog, which holds 10 SKUs from SKU-1001 to SKU-1010; no price, aisle, or stock figure is invented"}
+  ]
+}

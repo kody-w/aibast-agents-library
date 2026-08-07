@@ -1,0 +1,86 @@
+mcs.metadata:
+  componentName: at-risk-clients
+  description: Reports every CRITICAL and AT_RISK client with its churn probability band and the retention actions its own thresholds call for.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: at-risk-clients
+  description: Reports every CRITICAL and AT_RISK client with its churn probability band and the retention actions its own thresholds call for.
+  ---
+  <!-- bic:source=blank -->
+  # At-risk clients
+
+  Use this skill when the user asks which accounts are at risk, what the value
+  at risk is, how likely a client is to churn, or what to do to save an account.
+
+  ## Inputs
+
+  - The client portfolio record set. Optional: a single client name or CL- id.
+    Otherwise process every at-risk client.
+
+  ## Procedure -- membership, ranking, churn band
+
+  1. Membership: a client is in scope only if `risk_label` is CRITICAL or
+     AT_RISK. Nothing else qualifies. If the set is empty, output
+     `No clients currently at risk.` and stop.
+  2. `total_value_at_risk = sum(annual_value)` over the in-scope clients.
+  3. Sort **ascending by `health_score`** -- worst account first.
+  4. Churn probability comes from the health score band, nothing else:
+     - `health_score <= 45` -> 78%
+     - `health_score <= 60` -> 45%
+     - `health_score <= 70` -> 20%
+     - `health_score <= 80` -> 10%
+     - otherwise -> 3%
+     Render as a whole percent. Never interpolate between bands and never
+     present this as a modeled forecast.
+  5. Satisfaction trend per client uses the same 0.3-point rule as the
+     satisfaction-trend skill: `improving` / `declining` / `stable`.
+
+  ## Retention actions -- conditional, in this order
+
+  Emit only the actions whose condition fires, then always the last one:
+
+  1. `exec_meetings_90d == 0` -> "Schedule executive sponsor meeting within 7 days"
+  2. `escalations_90d >= 3` -> "Deploy SWAT team to resolve open issues"
+  3. `utilization_pct < 60` -> "Review scope alignment; client may not be extracting full value"
+  4. `nps < 0` -> "Conduct root-cause analysis on negative NPS drivers"
+  5. always -> "Prepare value-delivered summary (ROI documentation)"
+
+  Never add an action the thresholds did not trigger, and never drop one they
+  did.
+
+  ## Output format
+
+  Headline:
+
+  - `**Clients at risk:** N`
+  - `**Total value at risk:** $N`
+
+  Then, per client, worst health first:
+
+  - `### <Client name> -- Health: N/100 (<RISK_LABEL>)`
+  - `- **Annual value:** $N`
+  - `- **Churn probability:** N%`
+  - `- **NPS:** +/-N`
+  - `- **Satisfaction trend:** improving | declining | stable`
+  - `- **Escalations (90d):** N`
+  - `- **Exec meetings (90d):** N`
+  - `**Recommended retention actions:**` followed by the firing actions as
+    `-` bullets
+
+  ## Edge cases
+
+  - An AT_RISK client can carry a positive NPS; the negative-NPS action simply
+    does not fire for it.
+  - Boundary values follow the operator exactly: a health score of exactly 45
+    lands in the 78% band, exactly 60 in the 45% band, exactly 3 escalations
+    fires the SWAT action, utilization of exactly 60% does not fire the scope
+    action.
+
+  ## Boundaries
+
+  - Recommendation only. Never state or imply that a meeting was booked, a team
+    was deployed, an analysis was commissioned, or an executive was notified.
+    Every block ends with actions the account lead decides on.
+  - Cite the CL- id with the client name whenever the user is acting on the
+    output.

@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "product-feedback-synthesizer",
+  "display_name": "Product Feedback Synthesizer Agent",
+  "agent_intent": "../product_feedback_synthesizer_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/feedback-summary_pfs101.mcs.yml",
+    "behaviors/feature-requests_pfs102.mcs.yml",
+    "behaviors/sentiment-analysis_pfs103.mcs.yml",
+    "behaviors/roadmap-impact_pfs104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/customer-feedback-and-nps-data.md",
+    "capabilities/knowledge/files/customer-feedback-and-nps-data.md.mcs.yml",
+    "capabilities/knowledge/files/feature-request-backlog.md",
+    "capabilities/knowledge/files/feature-request-backlog.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Summarize the customer feedback we have collected.", "expect": "6 entries, avg satisfaction 5.2/10, $1,278,000 ARR represented; 2 positive / 2 neutral / 2 negative; Feature Gap is the largest category at 3; Support Ticket is the top channel at 2"},
+    {"ask": "Which feature requests carry the most revenue?", "expect": "Ranked by ARR weight: Workflow Automation Builder $1,140,000 (203 votes), RBAC $960,000 (156), Real-Time Alerting Engine $780,000 (134), Customizable Dashboard Home View $612,000 (87), Mobile App Enhancements $420,000 (62), Large Dataset Export Fix $264,000 (41)"},
+    {"ask": "What should we build next once effort is factored in?", "expect": "Priority scores 380.0 (FR-006), 320.0 (FR-005), 306.0 (FR-001), 264.0 (FR-004), 260.0 (FR-002), 210.0 (FR-003); FR-004 rises from 6th to 4th on LOW effort and FR-002 falls from 3rd to 5th on HIGH effort"},
+    {"ask": "How is sentiment trending?", "expect": "33.3% positive and 33.3% negative; NPS 35 in 2025-Q4 to 36 in 2026-Q1 while detractors rose 45 to 51; Vanguard Logistics lowest at 1 (FB-5004, bug_report), Skyline Hospitality Group highest at 9 (FB-5003)"},
+    {"ask": "Move FR-002 Real-Time Alerting to Q2 and let engineering know.", "expect": "Refusal: the agent does not change status or notify anyone, reports FR-002 is currently planned_q3 with priority score 260.0, and leaves the decision to the product manager"}
+  ]
+}

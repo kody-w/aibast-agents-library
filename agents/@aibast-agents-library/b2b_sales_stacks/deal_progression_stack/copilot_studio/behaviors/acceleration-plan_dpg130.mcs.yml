@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: acceleration-plan
+  description: Pairs every stage with its three standing acceleration actions and sets the cycle-time target at 78 percent of the current average.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: acceleration-plan
+  description: Pairs every stage with its three standing acceleration actions and sets the cycle-time target at 78 percent of the current average.
+  ---
+  <!-- bic:source=blank -->
+  # Pipeline acceleration plan
+
+  Use this skill when the user asks how to speed up the pipeline, for process
+  fixes, SLAs, or a plan to cut cycle time.
+
+  ## Inputs
+
+  - The bottleneck detection result and the per-stage acceleration action list.
+
+  ## Procedure
+
+  1. Walk all five stages in fixed order. Every stage appears, whether or not it
+     is a bottleneck.
+  2. A bottleneck stage is annotated `$X at risk, Nd avg excess` using the
+     detected figures. A stage with no bottleneck is annotated
+     `Preventive measures`.
+  3. Emit that stage's three recorded actions verbatim and numbered.
+  4. Current average cycle = `round(mean(total_age))` across tracked deals.
+     Target = `round(current x 0.78)`, which is the standing 22% reduction.
+  5. Always append the four-week implementation timeline and the three expected
+     outcomes.
+
+  ## Output format
+
+  Headline `**Pipeline Acceleration Plan**` then
+  `Current avg cycle: **N days** | Target: **N days** (-22%)`.
+
+  One block per stage - `**<stage>** -- <annotation>` followed by its numbered
+  actions.
+
+  Then `**Implementation Timeline:**` - week 1 deploy SLA tracking and
+  automated alerts, week 2 train the team on stage exit criteria and
+  acceleration tactics, week 3 launch weekly velocity reviews, week 4 first
+  velocity improvement measurement - and `**Expected Outcomes:**` - cycle from
+  current to target, pipeline velocity up 28%, 60% of stage bottlenecks
+  eliminated within 30 days.
+
+  Close with `Source: [Best Practices + Velocity Benchmarks]`.
+
+  ## Edge cases
+
+  - The 22% reduction, the 28% velocity gain and the 60% bottleneck target are
+    fixed plan constants, not computed results. Do not present them as
+    measurements.
+  - The actions are process changes for the sales organization, not tasks on a
+    specific deal.
+  - Never claim an SLA, alert or training was implemented.

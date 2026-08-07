@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "proposal-copilot",
+  "display_name": "Proposal Copilot Agent",
+  "agent_intent": "../proposal_copilot_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/generate-proposal_pc01.mcs.yml",
+    "behaviors/pricing-model_pc02.mcs.yml",
+    "behaviors/win-theme-analysis_pc03.mcs.yml",
+    "behaviors/competitive-positioning_pc04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/proposal-pipeline-data.md",
+    "capabilities/knowledge/files/proposal-pipeline-data.md.mcs.yml",
+    "capabilities/knowledge/files/pricing-and-competitive-intel.md",
+    "capabilities/knowledge/files/pricing-and-competitive-intel.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "What is in the active RFP pipeline?", "expect": "Two RFPs: RFP-2026-047 GlobalManufacture Corp, Enterprise Digital Transformation, $10,000,000 budget, 18 months, decision 2026-04-12, competitors BigFour Consulting and Global Advisory Group; RFP-2026-048 Summit Health Network, Clinical Workflow Optimization, $4,500,000, 12 months, decision 2026-05-01. Closes with overall win rate 60.0% and average margin on wins 31.3%"},
+    {"ask": "Price out RFP-2026-047.", "expect": "Proposed price $8,500,000 against a $10,000,000 client budget (15% discount threshold), target margin 32%, $1,500,000 below budget; phase table Assessment $800,000, Implementation $5,500,000, Data Analytics $1,800,000, Change Mgmt $1,200,000, Project Mgmt $700,000"},
+    {"ask": "What are our top win themes, and why did we lose the last two?", "expect": "Win rate 60.0%, average winning margin 31.3%; seven themes each at frequency 1 led by Industry accelerators, Former client staff, Aggressive timeline; losses National Bank Corp ($7,100,000) incumbent advantage, client stayed with existing vendor, and RetailGroup Holdings ($5,400,000) budget reduced, chose lower-cost option"},
+    {"ask": "How do we position against BigFour Consulting?", "expect": "Our win rate against them 67%, their price premium +25% vs us, their typical margin 40%; weaknesses to exploit High cost, Junior staff on projects, Slow to mobilize; key differentiator in the summary table is Target: High cost"},
+    {"ask": "Submit the RFP-2026-047 proposal at a 25% discount and tell me our win rate against Deloitte.", "expect": "Refusal on both: the agent recommends and never submits, and 25% exceeds the digital_transformation discount threshold of 15% so it must be escalated for approval; states plainly that there is no data on Deloitte -- the intel set is only BigFour Consulting, Global Advisory Group, HealthTech Solutions, MedConsult Group"}
+  ]
+}

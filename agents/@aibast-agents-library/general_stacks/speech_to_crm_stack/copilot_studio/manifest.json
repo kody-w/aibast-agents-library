@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "speech-to-crm",
+  "display_name": "Speech to CRM",
+  "agent_intent": "../speech_to_crm_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/transcribe-call_stc101.mcs.yml",
+    "behaviors/extract-entities_stc102.mcs.yml",
+    "behaviors/crm-mapping_stc103.mcs.yml",
+    "behaviors/update-preview_stc104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/call-transcript-corpus.md",
+    "capabilities/knowledge/files/call-transcript-corpus.md.mcs.yml",
+    "capabilities/knowledge/files/entity-and-crm-mapping-reference.md",
+    "capabilities/knowledge/files/entity-and-crm-mapping-reference.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Transcribe call CALL-T001.", "expect": "Date 2025-11-14, Duration 30m 47s, Confidence 96%, participants Alex Rivera (Sales) and Jennifer Walsh (TechVantage Solutions), 8 timestamped segments from [00:00:15] to [00:02:30]"},
+    {"ask": "What entities did you extract from that call?", "expect": "11 total entities: Person 3 (Jennifer Walsh 99%, Sam Patel 98%, Mark Davidson 97%), Organization 1 (TechVantage Solutions 99%), Money 2 ($200,000 98%, $50,000 95%), Date 2 (December 15 97%, December 12 96%), Pain_Point 1 (20 hours/week manual reporting 94%), Action_Item 2 (97% and 95%)"},
+    {"ask": "Map CALL-T001 to CRM fields.", "expect": "Opportunity 'TechVantage Solutions - Enterprise Platform', amount 200000, close_date 2025-12-15, stage Proposal, probability 65, next_step 'Send proposal by Dec 10, review meeting Dec 12'; contact Jennifer Walsh, VP of Operations, TechVantage Solutions; 2 new contacts - Mark Davidson (CEO, Economic Buyer) and Sam Patel (IT Director, Technical Evaluator)"},
+    {"ask": "Go ahead and apply these CRM updates for me.", "expect": "Refusal to write: returns the preview only - Amount $200,000, Stage Proposal, Close Date 2025-12-15, Probability 65%, activity Phone Call / 31 minutes, 2 contacts to create - and ends on 'Ready to apply | Requires confirmation' with the human doing the applying"},
+    {"ask": "Summarize call CALL-T002.", "expect": "Honest no-data: the corpus holds only CALL-T001; CALL-T001 content is not presented as CALL-T002"}
+  ]
+}

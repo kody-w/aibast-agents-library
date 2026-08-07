@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: alert-triage
+  description: Triages the fraud alert queue - flagged transactions at or above risk score 70, the flagged amount, the open case count, and the alert rules in force.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: alert-triage
+  description: Triages the fraud alert queue - flagged transactions at or above risk score 70, the flagged amount, the open case count, and the alert rules in force.
+  ---
+  <!-- bic:source=blank -->
+  # Alert triage
+
+  Use this skill when the user asks for the alert queue, the fraud board,
+  today's alerts, what is flagged, what needs review, or any overview of
+  high-risk transaction activity.
+
+  ## Inputs
+
+  - The monitored transaction feed, the investigation case file, and the alert
+    rule set (knowledge/tools).
+  - No parameters. Triage always covers the whole feed.
+
+  ## Procedure
+
+  1. Flag every transaction where `risk_score >= 70`. Exactly that comparison -
+    69 is not flagged, 70 is. No other criterion promotes or demotes a
+    transaction into this set.
+  2. Compute the three headline metrics:
+     - `High-Risk Transactions` = count of flagged transactions.
+     - `Flagged Amount` = sum of `amount` over the flagged transactions only.
+     - `Open Cases` = count of investigation cases whose `status` is one of
+       `open`, `under_review`, `escalated`. Any other status is not counted.
+  3. Assign each flagged transaction a risk level from its score:
+     `>= 80` Critical, `>= 60` High, `>= 40` Medium, otherwise Low.
+  4. List the flagged transactions in feed order (TXN id ascending). Do not
+     re-sort by risk, amount, or account.
+  5. List every alert rule in the rule set - all of them, not only the ones a
+     flagged transaction happened to match - with its severity in caps.
+
+  ## Output format
+
+  Headline lines, in this order:
+
+  - `**High-Risk Transactions:** N`
+  - `**Flagged Amount:** $0,000.00`
+  - `**Open Cases:** N`
+
+  Then `## Flagged Transactions` with exactly these columns:
+
+  | TXN ID | Account | Amount | Merchant | Country | Risk | Level |
+
+  Accounts masked as recorded. Amounts as `$0,000.00`. Risk as the bare integer,
+  Level as the band word.
+
+  Then `## Alert Rules Triggered`, one bullet per rule:
+  `- **RULE-00N (Name):** description [SEVERITY]`
+
+  ## Edge cases
+
+  - No transaction reaches 70: say the queue is clear, state the threshold, and
+    still report the open case count. Do not lower the threshold to produce rows.
+  - A flagged transaction with no matching case: report it in the table and note
+    that no INV- case is open against it. Do not open one.
+  - Recommendation only. Never say a card has been blocked, an account frozen, a
+    case escalated, or a SAR filed - name the analyst of record and stop.

@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: permit-status
+  description: Reports the permit application queue, or one permit in detail with its zoning standards.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: permit-status
+  description: Reports the permit application queue, or one permit in detail with its zoning standards.
+  ---
+  <!-- bic:source=blank -->
+  # Permit status
+
+  Use this skill when the user asks where a permit stands, asks for the
+  application queue or dashboard, asks who is reviewing a project, or asks
+  what the zoning district allows for a specific permit.
+
+  ## Inputs
+
+  - Optional: a single `BP-` permit id. With an id, return the detail view.
+    Without an id, return the dashboard over every application on file.
+
+  ## Procedure
+
+  1. If a permit id is supplied and it is in the application file, produce the
+     **detail view**. If a permit id is supplied and it is NOT in the
+     application file, do not fall back to another permit and do not guess -
+     say the id is not on record and list the ids that are.
+  2. Without a permit id, produce the **dashboard** over all applications, in
+     the file's own order (BP-2025-0101, BP-2025-0102, BP-2025-0103,
+     BP-2025-0104). There is no re-sort by valuation, status, or date.
+  3. Underscored values are rendered in Title Case with spaces:
+     `new_construction` becomes `New Construction`, `corrections_required`
+     becomes `Corrections Required`.
+  4. Valuation renders as a whole dollar figure with thousands separators and
+     no cents: `$4,200,000`.
+  5. On the dashboard, `Total Applications` is the row count and
+     `Total Valuation` is the arithmetic sum of every valuation in the file.
+  6. On the detail view, look up the permit's zoning district in the zoning
+     standards and append its requirements block. Quote height, lot coverage,
+     parking, and the three setbacks exactly as written; do not interpret them
+     as compliance findings.
+
+  ## Output format - dashboard
+
+  - `# Permit Applications Dashboard`
+  - Table with columns: `Permit ID | Applicant | Type | Valuation | Status |
+    Reviewer`
+  - Then `**Total Applications:** N` and `**Total Valuation:** $N`
+
+  ## Output format - detail
+
+  - `# Permit Status: BP-YYYY-NNNN`
+  - Bulleted fields in this order: Applicant, Address, Parcel, Type,
+    Description, Submitted, Valuation, Zoning, Status, Reviewer, Review Cycle
+  - Then `## Zoning Requirements - <district>` with Max Height, Lot Coverage
+    (as a percent), Parking, and Setbacks rendered as
+    `Front Nft, Side Nft, Rear Nft`
+
+  ## Edge cases
+
+  - A zoning district with no entry in the standards table: omit the zoning
+    block entirely rather than inventing figures, and note that no standards
+    are on file for that district.
+  - Review cycle greater than 1 means the project has been through correction
+    rounds. Call the number out; do not editorialize about fault.
+
+  ## Boundaries
+
+  - Status is reported, never changed. Never approve, deny, issue, or clear
+    corrections on a permit, and never reassign a reviewer.

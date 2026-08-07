@@ -1,0 +1,53 @@
+mcs.metadata:
+  componentName: benchmark-comparison
+  description: Places each deal in a quartile against the health, engagement, coverage and velocity benchmarks and shows the underlying ratios.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: benchmark-comparison
+  description: Places each deal in a quartile against the health, engagement, coverage and velocity benchmarks and shows the underlying ratios.
+  ---
+  <!-- bic:source=blank -->
+  # Benchmark comparison
+
+  Use this skill when the user asks how a deal compares to the norm, which
+  quartile it sits in, or whether engagement and velocity are typical.
+
+  ## Inputs
+
+  - The deal health metrics and the quartile benchmark table.
+
+  ## Procedure
+
+  1. Order deals by value descending and compute each deal's composite health
+     score with the standard health formula.
+  2. Assign the quartile from the composite score alone - `Top 25%` at 82 or
+     above, `Above Median` at 62 or above, `Below Median` at 38 or above,
+     otherwise `Bottom 25%`.
+  3. Compute the three displayed ratios, each rounded to two decimals -
+     `email_rate = emails_opened / emails_sent`,
+     `coverage = engaged_stakeholders / total_stakeholders`,
+     `velocity_ratio = days_in_stage / benchmark_days`.
+  4. State the quartile thresholds above the table - Top 25% health 82 with
+     engagement 0.85, Median health 62 with engagement 0.6, Bottom 25% health
+     under 38.
+
+  ## Output format
+
+  Headline `**Benchmark Comparison**`, the quartile threshold list, then a
+  table with exactly these columns.
+
+  | Deal | Score | Quartile | Email Rate | Stakeholder Coverage | Velocity Ratio |
+
+  Velocity ratio carries an `x` suffix. Close with the note that a velocity
+  ratio above 1.0 means the deal is slower than benchmark, and
+  `Source: [Pipeline Benchmarks + Peer Comparison Data]`.
+
+  ## Edge cases
+
+  - Quartile placement uses only the health score. A deal can hold a strong
+    email rate and still land in the bottom quartile - Global Manufacturing
+    reads 0.9 email rate at score 49, which is Below Median.
+  - Never invent a percentile between the four published bands.
+  - The benchmarks are portfolio configuration, not per-deal targets agreed
+    with a customer.

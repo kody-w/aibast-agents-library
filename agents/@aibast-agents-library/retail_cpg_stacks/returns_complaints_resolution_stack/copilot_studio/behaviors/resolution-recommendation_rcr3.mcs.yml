@@ -1,0 +1,105 @@
+mcs.metadata:
+  componentName: resolution-recommendation
+  description: Selects the resolution playbook for a return using the deterministic reason, condition, and day-window gates, and lays out its steps.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: resolution-recommendation
+  description: Selects the resolution playbook for a return using the deterministic reason, condition, and day-window gates, and lays out its steps.
+  ---
+  <!-- bic:source=blank -->
+  # Resolution recommendation
+
+  Use this skill when the user asks what to do with a return, asks which
+  playbook applies, asks whether a refund or exchange is warranted, or asks
+  for the pending queue's recommendations.
+
+  ## Inputs
+
+  - The return request queue and the five resolution playbooks.
+  - Optional: a single RET- id. With no id, process every return whose status
+    is `pending_review` - RET-4001, RET-4003, RET-4004.
+
+  ## Procedure - three hard gates, then a deterministic tie-break
+
+  A playbook is a candidate for a return only if ALL THREE hold:
+
+  1. The return's `reason` is in the playbook's applicable reasons.
+  2. The item's `condition` is in the playbook's applicable conditions.
+  3. `days_since_purchase <= max_days_since_purchase`, where
+     `days = (request_year * 365 + request_month * 30 + request_day) - (purchase_year * 365 + purchase_month * 30 + purchase_day)`
+
+  No gate is ever waived. A near-miss on any one of the three is not a
+  candidate.
+
+  Playbooks, in evaluation order:
+
+  - full_refund - reasons: defective, wrong_item, not_as_described;
+    conditions: non_functional, unopened, damaged; window 90d;
+    cost high, CSAT high
+  - exchange - reasons: wrong_size, wrong_item, not_as_described;
+    conditions: unworn_tags_attached, unopened, opened_unused; window 60d;
+    cost medium, CSAT very_high
+  - store_credit - reasons: changed_mind, wrong_size;
+    conditions: opened_unused, lightly_used, unworn_tags_attached; window 45d;
+    cost low, CSAT moderate
+  - warranty_replacement - reasons: defective;
+    conditions: non_functional, damaged; window 365d;
+    cost medium, CSAT high
+  - partial_refund - reasons: not_as_described, changed_mind;
+    conditions: lightly_used; window 30d; cost medium, CSAT moderate
+
+  Selection among candidates, applied in that exact order:
+
+  - Hold the FIRST candidate found.
+  - Any LATER candidate whose csat_impact is `very_high` or `high` replaces
+    the one being held.
+  - Net effect: the last candidate with high or very_high CSAT impact wins;
+    if no candidate has high or very_high CSAT impact, the first candidate
+    wins.
+  - If there are zero candidates, fall back to `store_credit` and say
+    explicitly that it is a fallback, not a match, and which gate every
+    playbook failed.
+
+  Worked results from this data: RET-4001 (wrong_size,
+  unworn_tags_attached, 18d) matches exchange and store_credit, and exchange
+  wins on very_high CSAT -> Product Exchange. RET-4003 (not_as_described,
+  lightly_used, 10d) matches only partial_refund -> Partial Refund. RET-4004
+  (changed_mind, opened_unused, 11d) matches only store_credit -> Store
+  Credit. RET-4002 (defective, non_functional, 50d) matches full_refund then
+  warranty_replacement, and warranty_replacement wins as the later high-CSAT
+  candidate.
+
+  ## Output format
+
+  Headline: `# Resolution Recommendations`
+
+  For each return processed:
+
+  - `## <RET- id>` then an em dash then the customer name
+  - `- **Product:** <product> ($N.NN)`
+  - `- **Reason:** <reason with underscores as spaces>`
+  - `- **Recommended Resolution:** <playbook label>`
+  - `- **Cost Impact:** <cost> | **CSAT Impact:** <csat>`
+  - `**Resolution Steps:**` followed by the playbook's steps, numbered, in
+    the stored order, verbatim - never reworded, reordered, or trimmed.
+
+  Close with `## Available Resolution Playbooks` listing all five as
+  `- **<label>** (`<id>`): Window Nd, Cost: <cost>, CSAT: <csat>`.
+
+  ## Edge cases
+
+  - RET-4005 (defective, damaged, 91 days) fails full_refund on its 90-day
+    window and matches warranty_replacement only (365d). It is already
+    status escalated - report the exception, not a routine recommendation.
+  - A RET- id that is not in the queue: say so. Do not silently answer with
+    the pending-review set instead.
+  - Store Credit issues full purchase amount plus a 10% bonus; Partial Refund
+    applies a 15% restocking fee for opened items. Quote those numbers when
+    the playbook is recommended - never estimate a different figure.
+
+  ## Boundaries
+
+  - Recommendation only. Never say a refund, credit, exchange, label, or
+    email has been issued, approved, or sent. End with the recommendation for
+    the specialist to act on.

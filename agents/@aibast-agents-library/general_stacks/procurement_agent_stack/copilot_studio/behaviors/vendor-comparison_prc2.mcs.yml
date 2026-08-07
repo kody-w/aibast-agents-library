@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: vendor-comparison
+  description: Renders the vendor catalog with tier, rating, annual spend, and payment terms, and explains what each tier grants.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: vendor-comparison
+  description: Renders the vendor catalog with tier, rating, annual spend, and payment terms, and explains what each tier grants.
+  ---
+  <!-- bic:source=blank -->
+  # Vendor comparison
+
+  Use this skill when the user asks to compare vendors, asks who supplies a
+  category, asks about a vendor's tier, rating, spend, or payment terms, or
+  asks whether an alternative supplier exists.
+
+  ## Inputs
+
+  - The vendor catalog.
+  - Optional: a category name or a vendor name to narrow the view.
+
+  ## Procedure
+
+  1. Render every vendor in the catalog in catalog order (VND-001 through
+     VND-006). Do not re-sort by rating or spend unless the user asks.
+  2. If the user names a category, filter to vendors whose category contains
+     that string, case-insensitively - "furniture" matches Office Furniture,
+     "cloud" matches Cloud Infrastructure - and say the view is filtered.
+  3. Every vendor listed carries an Active contract status. If a supplier the
+     user names is not in the catalog, say it is not a catalogued vendor
+     rather than assessing it.
+
+  ## Output format
+
+  - Headline: `**Vendor Comparison**`
+  - Table with columns `| ID | Vendor | Category | Tier | Rating | Annual
+    Spend | Terms |`. Rating renders as `N.N/5`; annual spend as dollars with
+    thousands separators; terms verbatim (Net 30, Net 45, Annual Prepay).
+  - Then a `**Vendor Tiers:**` block, three bullets, exactly:
+    - Strategic: Long-term partners, best pricing, dedicated support
+    - Preferred: Competitive pricing, standard support, pre-approved
+    - Approved: Vetted and available, standard terms
+  - Close with `Source: [Vendor Management System]`.
+
+  ## Edge cases
+
+  - Tier and rating can disagree. Herman Miller (VND-004) rates 4.6/5 on the
+    Approved tier while Steelcase (VND-003) rates 4.3/5 on the Preferred
+    tier. Report both facts; do not collapse them into a single "better".
+  - Two vendors share Cloud Infrastructure (AWS VND-001, Azure VND-005) and
+    two share Office Furniture (Steelcase VND-003, Herman Miller VND-004).
+    Those are the only categories with a real head-to-head in the catalog.
+  - Annual spend is historical volume, not a price quote. Never present it as
+    what a new purchase would cost.
+
+  ## Boundaries
+
+  - Comparison only. Never say a vendor has been selected, awarded, onboarded,
+    or contacted. Name the trade-offs and leave the selection to the buyer.

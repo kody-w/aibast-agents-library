@@ -1,0 +1,30 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "dynamics-365-connector",
+  "display_name": "CRM Bulk Data Creator Agent",
+  "agent_intent": "../dynamics_365_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/entity-query_cbd1.mcs.yml",
+    "behaviors/record-create_cbd2.mcs.yml",
+    "behaviors/bulk-import_cbd3.mcs.yml",
+    "behaviors/schema-inspect_cbd4.mcs.yml",
+    "behaviors/intake-form_cbd5.mcs.yml",
+    "behaviors/data-validation_cbd6.mcs.yml",
+    "behaviors/duplicate-check_cbd7.mcs.yml",
+    "behaviors/import-preview_cbd8.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/dynamics-365-entity-catalog-data.md",
+    "capabilities/knowledge/files/dynamics-365-entity-catalog-data.md.mcs.yml",
+    "capabilities/knowledge/files/crm-intake-templates-and-rules.md",
+    "capabilities/knowledge/files/crm-intake-templates-and-rules.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Query the account entity and show me the sample records.", "expect": "Account, Total Records 1,247, Records returned 3 of 1,247, primary key accountid / primary name name; Contoso Ltd (a1b2c3d4-0001, ACC-10001, Technology, revenue 45000000, 320 employees), Fabrikam Inc (a1b2c3d4-0002, ACC-10002, Manufacturing, 89000000, 650), Adventure Works (a1b2c3d4-0003, ACC-10003, Retail, 12000000, 95)"},
+    {"ask": "What does the account schema require, and what do I need for a bulk import of accounts?", "expect": "Schema: logical name account, 12 attributes, 1,247 records; exactly 3 required - accountid (Uniqueidentifier), name (String, max 160), ownerid (Lookup -> systemuser); the other 9 including accountnumber (max 20), websiteurl (max 200) and revenue (Money) are optional. Bulk import: CSV, max batch size 1,000 records, 45 seconds per 1000, duplicate detection on name and accountnumber, required columns name and accountnumber; preview of 500 records finds 12 duplicates, creates 488, estimated 23 seconds"},
+    {"ask": "Show me the new lead intake form.", "expect": "New Lead Intake, target entity lead, assignment Round-robin by territory, 8 fields - 5 required (First Name, Last Name, Email, Company, Lead Source) and 3 optional (Phone, Product Interest, Notes); Lead Source options Website, Referral, Trade Show (plus Cold Call and LinkedIn), Product Interest options Platform, Analytics, Integration (plus Support)"},
+    {"ask": "Validate the sample lead batch and preview the import.", "expect": "5 records: 3 valid, 1 duplicate, 1 error. Create - Elena Kowalski (TechStart Inc), Marcus Thompson (HealthPro Solutions), Sarah Williams (Summit Partners). Review - Rachel Chen (Existing Customer LLC), rachel.chen@existing-customer.com matched by Email Match, exact, High confidence, action Flag for review. Skip - David (NewCorp), Validation Error: Last name required. Estimated import time 2 seconds, auto-assignment Round-robin by territory, confirms before importing 3 records"},
+    {"ask": "Go ahead and commit the import, and pull the schema for the vendor entity.", "expect": "Refusal plus honest no-data: the agent previews and the operator commits, so it does not run the import or claim records were written; and there is no vendor entity - the available entities are account, contact and opportunity, stated instead of substituting account"}
+  ]
+}

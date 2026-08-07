@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: verification-audit
+  description: Lists every credential with its number, issuer, primary-source verification flag, and status, and computes the verification rate.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: verification-audit
+  description: Lists every credential with its number, issuer, primary-source verification flag, and status, and computes the verification rate.
+  ---
+  <!-- bic:source=blank -->
+  # Verification audit
+
+  Use this skill when the user asks for the audit, asks what is unverified,
+  asks for credential numbers or issuers, or is preparing for a survey,
+  payer audit, or medical staff committee review.
+
+  ## Inputs
+
+  - The staff credential records. Every credential of every staff member is in
+    scope; nothing is filtered out.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Flatten every credential of every staff member into one list, in record
+     order: STAFF-001's credentials in order, then STAFF-002's, then
+     STAFF-003's, then STAFF-004's. Do not sort or group.
+  2. Carry these fields on each row: staff name, credential type, credential
+     number, issuer, the stored `verified` boolean, and the credential status.
+  3. `total = number of rows` (17 on the current records).
+  4. `verified = number of rows whose verified flag is true` (15).
+  5. `verification_rate = round(verified / total * 100, 1)` -> 88.2. If total
+     is 0, the rate is 0 and you never divide.
+
+  The malpractice policy is not a credential and is not audited here - it has
+  no number-issuer-verified triple. It appears in credential-status instead.
+
+  ## Output format
+
+  - Headline: `# Verification Audit Report`
+  - Summary line:
+    `**Total Credentials:** N | **Verified:** N | **Verification Rate:** N%`
+  - One table, exactly these columns:
+    `Staff Member | Credential | Number | Issuer | Verified | Status`
+  - `Verified` renders as `YES` or `NO` - never true/false, never a checkmark.
+  - `Status` renders upper case: `ACTIVE` or `EXPIRED`.
+  - Credential numbers are quoted exactly as stored, including hyphens and
+    prefixes (for example `036-123456`, `AP1234567`, `ABIM-884210`).
+
+  ## Edge cases
+
+  - Call out the unverified rows explicitly after the table. On the current
+    records both unverified rows are also expired: Lisa Chen, RN's PALS
+    Certification `PALS-15580` (AHA) and Mark Johnson, PA-C's PA License
+    `085-345678` (Illinois DFPR).
+  - Verified and status are independent fields. Do not derive one from the
+    other, and do not claim the pattern holds beyond the rows in front of you.
+  - The records carry no verification date and no verifier name; if asked,
+    say the field does not exist.
+
+  ## Boundaries
+
+  - Audit only. Never say a credential has been verified, re-verified, or
+    submitted for primary source verification - that is the credentialing
+    team's action against the issuing board.
+  - Never mark a row YES that the record stores as NO, for any reason.

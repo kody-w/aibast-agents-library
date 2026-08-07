@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: support-operations-data.md
+  description: Synthetic support ticket queue and knowledge base index the agent answers from until real ticketing and KB tools are connected.

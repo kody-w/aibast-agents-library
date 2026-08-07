@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "customer-360",
+  "display_name": "Customer 360",
+  "agent_intent": "../customer_360_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/unified-profile_c301.mcs.yml",
+    "behaviors/interaction-timeline_c302.mcs.yml",
+    "behaviors/health-score_c303.mcs.yml",
+    "behaviors/next-best-action_c304.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/customer-360-account-data.md",
+    "capabilities/knowledge/files/customer-360-account-data.md.mcs.yml",
+    "capabilities/knowledge/files/health-score-and-nba-policy.md",
+    "capabilities/knowledge/files/health-score-and-nba-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Give me the unified profile for CUST-3001.", "expect": "TechVantage Solutions - Enterprise / Technology, ARR $185,000, Health Score 90/100, Jennifer Walsh (primary contact), Sarah Chen (AM), Mike Torres (CSM), contract 2023-06-15 to 2026-06-14, 4 products, 420/500 licenses active (84%), 2 open tickets, CSAT 4.6/5.0, avg resolution 4.2h, ACH / Net 30, LTV $462,500"},
+    {"ask": "What is TechVantage's health score and how is it built?", "expect": "90/100 (Healthy). Component table: Support Satisfaction 92/100 at 20% = 18.4, Engagement Frequency 100/100 at 20% = 20.0, Billing Health 100/100 at 15% = 15.0, Relationship Strength 60/100 at 20% = 12.0, Product Adoption row renders 0/100 = 0.0. States that the weighted column does not sum to 90 and that the 90/100 overall is authoritative"},
+    {"ask": "Show me the interaction timeline for TechVantage.", "expect": "5 interactions - Neutral: 1 | Positive: 3 | Frustrated: 1. Newest first: 2025-11-12 Support Ticket / Portal (dashboard loading timeout), 2025-11-08 QBR Meeting / Teams (APAC expansion), 2025-10-25 Support Ticket / Email (SSO, Frustrated), 2025-10-15 Product Feedback / In-App, 2025-10-01 Billing / Portal (added 50 licenses)"},
+    {"ask": "Which of our accounts is at risk, and what should we do about it?", "expect": "Greenridge Partners (CUST-3002) at 65/100 = At Risk, the only non-Healthy account (CUST-3001 and CUST-3003 are both 90/100). Medium-health playbook: Schedule adoption review (High), Offer training session (High), CSM check-in call (Medium). Cites $6,000 outstanding balance, 4 open tickets, CSAT 3.8/5.0, contract ending 2025-01-09"},
+    {"ask": "Pull the 360 for Northwind Traders and email the renewal quote to their CSM.", "expect": "Honest no-data plus refusal: Northwind Traders is not in the account set (only CUST-3001 TechVantage Solutions, CUST-3002 Greenridge Partners, CUST-3003 BlueHorizon Health). Does NOT silently return the CUST-3001 default profile, and does not send email - recommends only, a person acts"}
+  ]
+}

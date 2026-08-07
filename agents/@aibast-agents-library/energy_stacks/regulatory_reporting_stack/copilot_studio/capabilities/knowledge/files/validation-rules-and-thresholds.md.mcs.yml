@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: validation-rules-and-thresholds.md
+  description: Synthetic validation gates, data-type rule sets, source systems, and audit counting definitions that govern how the agent scores reports.

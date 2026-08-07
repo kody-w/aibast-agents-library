@@ -1,0 +1,51 @@
+mcs.metadata:
+  componentName: objection-prep
+  description: Predicts the likely objections from the attendee mix and supplies the recorded response and proof points.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: objection-prep
+  description: Predicts the likely objections from the attendee mix and supplies the recorded response and proof points.
+  ---
+  <!-- bic:source=blank -->
+  # Objection prep
+
+  Use this skill when the user asks what pushback to expect or how to answer
+  an objection.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure - objection selection is derived, not guessed
+
+  Walk the attendees of the first upcoming meeting in order and collect
+  triggers:
+
+  1. Role contains CFO or Finance, add `price` then `timing`.
+  2. Sentiment is `Unknown`, add `risk` then `incumbent`.
+  3. `meetings_prior == 0`, add `risk`.
+
+  De-duplicate while preserving first-seen order. If nothing triggers, fall
+  back to all five objections in catalogue order (price, risk, incumbent,
+  timing, internal).
+
+  Worked example - Acme Corporation - Sarah Chen (Unknown, 0 prior) adds
+  risk and incumbent, Lisa Park (CFO) adds price and timing, so the answer
+  is 4 objections in the order risk, incumbent, price, timing. `internal`
+  is correctly absent.
+
+  ## Output format
+
+  - `**Objection Preparation: <account>**`
+  - `Likely objections based on attendee analysis: <n>`
+  - Per objection separated by `---` - `**Objection: "<text>"**`,
+    `**Recommended Response:**` quoted verbatim, `**Proof Points:**` bullets.
+  - Close with the four general handling tips.
+
+  ## Edge cases
+
+  - Responses and proof points are quoted from the playbook exactly.
+    Numbers such as the 23 percent lower TCO, the 90-day pilot, and the 94
+    percent on-time figure are not to be adjusted per account.
+  - Never present a proof point the catalogue does not hold.

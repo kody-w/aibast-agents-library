@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: recommendation-engine
+  description: Produces a prioritized, weighted-value recommendation list for one customer, ranked by affinity score.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: recommendation-engine
+  description: Produces a prioritized, weighted-value recommendation list for one customer, ranked by affinity score.
+  ---
+  <!-- bic:source=blank -->
+  # Recommendation engine
+
+  Use this skill when the user asks what to lead with at an account, asks for
+  a prioritized play list, asks what a customer's expansion is worth, or asks
+  which opportunity to work first.
+
+  ## Inputs
+
+  - The customer ownership record, product catalog, and affinity rules.
+  - Optional: a customer id or name. Same resolution as the opportunity scan;
+    unresolvable customers are reported as no data, never substituted.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Build the opportunity list exactly as the opportunity scan does: a rule
+     fires only when the customer owns `if_owns` and does not own `recommend`;
+     results sorted by `affinity_score` descending.
+  2. For each opportunity compute:
+     `weighted_value = annual_price x success_rate`
+     Round to whole dollars. Example: Analytics Pro at $28,000 x 0.55 =
+     $15,400/yr; the second Analytics Pro path at $28,000 x 0.62 = $17,360/yr;
+     Security Suite at $15,000 x 0.48 = $7,200/yr.
+  3. Compute the summary:
+     `total_potential_ARR = sum(annual_price)` across the opportunities
+     `weighted_pipeline = sum(annual_price x success_rate)`
+     For Meridian Corp (CUST-001) that is $71,000 and $39,960 over 3
+     recommendations.
+  4. Rank strictly by affinity score. Do NOT re-rank by weighted value even
+     when the number two item is worth more than number one - Meridian's
+     rank-2 Analytics Pro ($17,360) outweighs rank-1 ($15,400) and the order
+     still stands. Call the inversion out in a line of commentary rather than
+     changing the order.
+
+  ## Output format
+
+  - Headline: `**Prioritized Recommendations: <customer name>**`
+  - Context line: `Health Score: N/100 | Segment: <segment>`
+  - One numbered block per recommendation:
+    `**N. <Product Name>** ($<price>/yr)` followed by indented bullets for
+    Affinity Score (whole %), Projected Win Rate (whole %), Weighted Value
+    (`$N/yr`), Est. Close (`N days`).
+  - `**Summary:**` bullets: Total potential ARR, Weighted pipeline,
+    Recommendations (count).
+
+  ## Edge cases the data actually produces
+
+  - **No opportunities.** Emit `No cross-sell opportunities identified.
+    Customer owns most recommended products.` Do not manufacture a play.
+  - **Duplicate product across two rules.** The same product can occupy two
+    ranks with different win rates and close times. Present both and say
+    plainly that they are two rule paths to one product, so the pipeline
+    figure double-counts that product if both are booked.
+  - Beacon Financial (CUST-005) owns four of the eight catalog products and
+    yields exactly one recommendation: Premium Support, $8,000/yr, 82%
+    affinity, 65% win rate, weighted $5,200, 14 days.
+
+  ## Boundaries
+
+  - Recommendation only. Never claim an opportunity was created, an email
+    sent, a meeting booked, or CRM updated.
+  - Show the weighted-value arithmetic when asked; never adjust a win rate for
+    optimism, relationship, or health score.

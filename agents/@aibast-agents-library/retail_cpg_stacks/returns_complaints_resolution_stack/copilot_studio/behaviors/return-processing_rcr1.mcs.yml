@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: return-processing
+  description: Presents the return request queue with days since purchase, status, pending-review count, and queue value.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: return-processing
+  description: Presents the return request queue with days since purchase, status, pending-review count, and queue value.
+  ---
+  <!-- bic:source=blank -->
+  # Return processing
+
+  Use this skill when the user asks for the return queue, asks what returns
+  are open or pending, or asks for the detail on a specific return.
+
+  ## Inputs
+
+  - The return request queue.
+  - Optional: a single RET- id. With no id, process every return in the queue
+    (all six: RET-4001 through RET-4006).
+
+  ## Procedure
+
+  1. Scope the queue. If a RET- id is supplied and it exists, the queue for
+     this answer is that one return. If the supplied id does not exist, say
+     so explicitly and do not present the full queue as the answer.
+  2. Compute days since purchase for every return in scope with the exact
+     rule the data uses:
+     `days = (request_year * 365 + request_month * 30 + request_day) - (purchase_year * 365 + purchase_month * 30 + purchase_day)`
+     This is a 30-day-month approximation, not a calendar diff. Do not
+     substitute a calendar date difference. Known values:
+     RET-4001 = 18, RET-4002 = 50, RET-4003 = 10, RET-4004 = 11,
+     RET-4005 = 91, RET-4006 = 10.
+  3. Render the queue table, then a detail block per return, then the footer.
+  4. Footer counts, exactly as defined:
+     - `Pending Reviews` counts returns with status `pending_review` across
+       the WHOLE queue (always 3), even when the answer is scoped to one id.
+     - `Queue Value` is the sum of `purchase_price` over the returns IN SCOPE
+       only. Unfiltered that is $554.94; scoped to one return it is that
+       return's price.
+
+  ## Output format
+
+  Headline: `# Return Processing Queue`
+
+  Table, in this column order:
+
+  `| Return ID | Customer | Product | Reason | Condition | Days | Status |`
+
+  Reason, condition, and status render with underscores replaced by spaces
+  (`wrong_size` becomes `wrong size`, `pending_review` becomes
+  `pending review`).
+
+  Then one detail block per return: an h3 heading of the return id, an em
+  dash, and the product; followed by bullets for Order, Customer (name with
+  the CUST- id in backticks), Purchase Date and Request Date on one line,
+  Channel, Price as `$N.NN`, and Notes.
+
+  Close with: `**Pending Reviews:** N | **Queue Value:** $N,NNN.NN`
+
+  ## Edge cases
+
+  - RET-4005 is 91 days out, status escalated, and outside every playbook
+    window except warranty replacement. Surface it as an exception, never as
+    routine queue work.
+  - Channel values are `online` and `in_store`; report them as stored.
+  - Status values present in the data are `pending_review`, `approved`, and
+    `escalated`. Never invent a status such as "refunded" or "closed".
+
+  ## Boundaries
+
+  - Reporting only. Never say a return has been approved, received, refunded,
+    or closed as a result of this answer.

@@ -1,0 +1,51 @@
+mcs.metadata:
+  componentName: forecast-accuracy
+  description: Compares committed and best-case forecasts against actuals and rebuilds the current-quarter commit and upside bands.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: forecast-accuracy
+  description: Compares committed and best-case forecasts against actuals and rebuilds the current-quarter commit and upside bands.
+  ---
+  <!-- bic:source=blank -->
+  # Forecast accuracy
+
+  Use this skill when the user asks about the forecast, commit versus
+  upside, or how accurate past calls were.
+
+  ## Inputs
+
+  - None.
+
+  ## Procedure
+
+  1. Report each recorded quarter. 2025-Q1 - forecast dated 2025-01-15,
+     target 2,500,000, committed 1,800,000, best case 2,900,000, pipeline
+     4,200,000, actual to date 2,100,000, committed accuracy 86 percent,
+     best-case accuracy 72 percent. 2025-Q2 - forecast dated 2025-03-10,
+     target 3,000,000, committed 1,100,000, best case 3,500,000, pipeline
+     5,830,000, actual to date 0, both accuracies `Pending`.
+  2. Rebuild the current-quarter bands from the open deals:
+     - `Commit` - `win_probability >= 75`
+     - `Upside` - `40 <= win_probability < 75`
+     - A deal below 40 percent falls into NEITHER band but still counts in
+       Total Active.
+  3. Weighted value per band is `sum(amount * win_probability / 100)`.
+
+  Worked example - Commit holds 1 deal, 1,100,000 dollars, weighted 902,000.
+  Upside holds 2 deals, 3,290,000 dollars, weighted 2,032,500. Total Active
+  is 4 deals, 4,930,000 dollars, weighted 3,069,500. deal-004 at 25 percent
+  is in the total but in no band.
+
+  ## Output format
+
+  - `**Forecast Accuracy Report**`
+  - Per quarter - a Metric/Value table.
+  - `**Current Quarter Forecast Build:**` table - Category, Deals, Value,
+    Weighted, with rows Commit (75%+), Upside (40-74%), Total Active.
+
+  ## Edge cases
+
+  - `Pending` means the quarter has not closed. Never substitute an estimate
+    for a pending accuracy figure.
+  - Do not roll unbanded deals into Upside to make the columns add up.

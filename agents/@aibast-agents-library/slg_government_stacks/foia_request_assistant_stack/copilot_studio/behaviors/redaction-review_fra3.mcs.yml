@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: redaction-review
+  description: Publishes the exemption catalog with statutes, lists only the requests whose status is redaction_review, and states the redaction practices.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: redaction-review
+  description: Publishes the exemption catalog with statutes, lists only the requests whose status is redaction_review, and states the redaction practices.
+  ---
+  <!-- bic:source=blank -->
+  # Redaction review
+
+  Use this skill when the user asks what can be withheld, what the exemption
+  codes mean, which requests are in redaction, what an analyst is redacting
+  right now, or how to log and apply redactions defensibly.
+
+  ## Inputs
+
+  - The exemption catalog and the request caseload. No parameters.
+
+  ## Procedure
+
+  1. Render the full exemption catalog as a table - every code, its category,
+     its description, and its statute citation. All six codes, always, in
+     catalog order EX-1 through EX-6. Never trim the catalog to the codes that
+     happen to be in play.
+  2. Select the requests in review by exact status match: `status ==
+     "redaction_review"`. A request in `intake`, `document_search`, or
+     `response_ready` is not in this queue no matter how many exemptions its
+     keyword rule produced.
+  3. For each selected request, in caseload order, report the assigned analyst,
+     the page count as recorded (no thousands separator in this view), the due
+     date, and the applicable exemption codes from the keyword rule
+     (police/officer in subject -> EX-1, EX-2; correspondence/memo in scope ->
+     EX-3, EX-4; development in subject or developer in scope -> EX-5;
+     otherwise EX-1), joined by commas.
+  4. If no request has status `redaction_review`, say exactly that: no requests
+     are currently in redaction review. Do not promote a request from another
+     status to fill the section.
+  5. Close with the redaction practices, verbatim, all five.
+
+  ## Output format
+
+  - `# Redaction Review Guide`
+  - `## Exemption Categories` with the table columns, in this order:
+    `Code | Category | Description | Statute`
+  - `## Requests in Redaction Review`, then per request:
+    - `### FOIA-2025-xxxx: <subject>`
+    - `- **Analyst:**`, `- **Pages:**`, `- **Due:**`,
+      `- **Applicable Exemptions:**`
+  - `## Redaction Best Practices` as bullets:
+    - Apply exemptions narrowly - redact only information covered by statute
+    - Log each redaction with exemption code and page reference
+    - Use Vaughn index format for withheld documents
+    - Review redactions for consistency across document set
+    - Verify no metadata leakage in redacted PDFs
+
+  ## Edge cases
+
+  - An exemption code flagged by the keyword rule is a candidate for review,
+    not a withholding decision. Say `applicable exemptions to review`, never
+    `these pages are exempt`.
+  - If a request in review has no assigned analyst, report it as unassigned and
+    flag it - redaction without a named analyst is an escalation.
+  - Statutes are quoted exactly as cataloged. Never paraphrase a statute
+    number, and never cite a federal FOIA section for these state codes.
+
+  ## Boundaries
+
+  - Review guidance only. Never apply, propose specific redaction marks on
+    text, lift a redaction, or clear a document set for release. Give the
+    analyst the codes and the practices; the analyst redacts.

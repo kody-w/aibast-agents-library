@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: executive-summary
+  description: Drafts the personalized executive summary tying the buyer's top four requirements to evidence, price, margin, and the strongest industry reference.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: executive-summary
+  description: Drafts the personalized executive summary tying the buyer's top four requirements to evidence, price, margin, and the strongest industry reference.
+  ---
+  <!-- bic:source=blank -->
+  # Executive summary
+
+  Use this skill when the user asks for the executive summary, the opening
+  section, the "why us" narrative, or a one-page pitch for a named RFP.
+
+  ## Inputs
+
+  - The resolved RFP (same resolution rule as RFP analysis).
+  - The requirement fit scores, the computed pricing, and the scored references.
+
+  ## Procedure
+
+  1. Compute the requirement fits and the overall weighted fit exactly as the
+     RFP analysis skill does.
+  2. Compute pricing exactly as the solution and pricing skill does. Take
+     `total_proposed`, `overall_margin_pct`, and `budget_headroom = budget
+     ceiling - total_proposed`.
+  3. Take the **first four requirements in RFP order** -- not the four highest
+     scoring -- for the "Why Us" table. Requirement text is truncated to 40
+     characters and the evidence string to 50 characters.
+  4. Score references by industry relevance and take the highest-scoring one as
+     the proof point. Quote its `results` string verbatim.
+  5. Budget wording: `within budget` when `total_proposed <= budget ceiling`,
+     otherwise `requires negotiation`. Headroom prints as an absolute dollar
+     figure followed by `under` when headroom is >= 0 and `over` when negative.
+
+  ## Output format
+
+  - Headline: `**Executive Summary: Transforming <account>'s Future**`
+  - One opening sentence: the account has an opportunity to <project, lowercased>
+    with a solution that matches N% of stated requirements.
+  - `**Why Us:**` then a table `| Your Need | Our Solution | Fit |` with the four
+    truncated rows.
+  - Four labeled lines: `**Capability Match:**` overall fit; `**Pricing:**`
+    proposed total, budget wording, headroom; `**Margin:**` blended gross margin;
+    then `**Proven <industry> Success:**` with the top reference and its results.
+  - `**Personalization Applied:**` three bullets: tailored to the named
+    stakeholder, industry-specific references and compliance language, matched
+    RFP terminology and requirement IDs.
+  - Close with `Source: [Content Library + Stakeholder Intel]` and
+    `Agents: ExecutiveSummaryAgent`.
+
+  Meridian Healthcare renders as: 94.5% fit, $1,201,599 total, within budget,
+  $48,401 under ceiling, 33.4% margin, Memorial Health System with "34%
+  efficiency gain, $2.4M annual savings", personalized to CIO Amanda Foster.
+
+  ## Edge cases
+
+  - The margin line reports what was computed. 33.4% is below the 35% floor;
+    state it as such rather than presenting it as approved.
+  - If the reference database holds no reference in the RFP's industry, the top
+    scoring reference is an out-of-industry one at 40% or 30% relevance -- label
+    it as out-of-industry rather than implying industry proof.
+  - Never soften "requires negotiation" into "within budget".

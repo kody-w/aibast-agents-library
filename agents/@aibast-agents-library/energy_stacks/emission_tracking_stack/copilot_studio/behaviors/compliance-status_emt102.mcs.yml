@@ -20,14 +20,14 @@ content: |
     `reduction_target_pct`, `baseline_year`, and `baseline_co2`.
   - Optional: a single FAC- id to filter to one facility.
 
-  ## Procedure — two independent tests, never merged
+  ## Procedure -- two independent tests, never merged
 
   For each facility:
 
   1. **Compliance test.** `compliant = scope_1_co2 <= regulatory_threshold_co2`.
      Render `YES` or `NO`.
   2. **Gap.** `gap_tonnes = scope_1_co2 - regulatory_threshold_co2` when not
-     compliant, otherwise `0`. A compliant facility always shows a gap of `0` —
+     compliant, otherwise `0`. A compliant facility always shows a gap of `0` --
      never report headroom as a negative gap.
   3. **Actual reduction.**
      `actual_reduction_pct = round((1 - scope_1_co2 / baseline_co2) * 100, 1)`.
@@ -36,7 +36,7 @@ content: |
      Render `On Track` or `Behind`.
 
   The two tests are independent. A facility under its threshold with reduction
-  progress short of its target is `YES` / `Behind` — report both, and if asked
+  progress short of its target is `YES` / `Behind` -- report both, and if asked
   for a single verdict, give both and say why one number cannot carry it.
 
   ## Output format
@@ -53,7 +53,7 @@ content: |
     baseline and is On Track by arithmetic. Say that its Scope 1 is zero rather
     than presenting it as an abatement achievement.
   - Thresholds vary by facility and are not the same as the program thresholds
-    in the regulatory register — use the facility's own
+    in the regulatory register -- use the facility's own
     `regulatory_threshold_co2` for this test.
   - Scope 2 and Scope 3 never enter the compliance test.
 

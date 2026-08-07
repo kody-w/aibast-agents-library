@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: building-permit-case-data.md
+  description: Synthetic permit application file, status values, inspector roster, and inspection calendar the agent answers from until real tools are connected.

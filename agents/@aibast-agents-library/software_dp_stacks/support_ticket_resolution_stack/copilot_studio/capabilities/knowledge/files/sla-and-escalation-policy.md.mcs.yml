@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: sla-and-escalation-policy.md
+  description: SLA thresholds, category resolution benchmarks, the escalation matrix, and the triage and knowledge base ranking rules the agent applies.

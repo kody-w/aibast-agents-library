@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: tone-and-personalization-reference.md
+  description: Synthetic tone matrix, personalization field catalog, and sample recipient context the agent fills drafts from until real tools are connected.

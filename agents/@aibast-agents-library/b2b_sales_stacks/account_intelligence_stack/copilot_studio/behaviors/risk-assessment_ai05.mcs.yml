@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: risk-assessment
+  description: Derives deal risks from stakeholder and competitor gaps and computes the win probability.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: risk-assessment
+  description: Derives deal risks from stakeholder and competitor gaps and computes the win probability.
+  ---
+  <!-- bic:source=blank -->
+  # Risk assessment (briefing view)
+
+  Use this skill when the user asks what could kill the deal, what the risks
+  are, or what the win probability is from the briefing dataset.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure - the three risk rules, in this order
+
+  1. For every stakeholder whose influence is `Decision Maker` and whose
+     `meetings == 0`, emit a High risk
+     `No relationship with <role> (<name>)`, mitigation
+     `Champion intro this week`, owner `You`.
+  2. For every competitor whose pricing string contains `-`, emit a High
+     risk `<competitor> pricing pressure (<pricing>)`, mitigation
+     `TCO analysis showing lower total cost`, owner `You`.
+  3. For every stakeholder whose influence is `Economic Buyer` and whose
+     sentiment is anything other than `Positive`, emit a Medium risk
+     `<role> needs ROI validation`, mitigation
+     `Send customized ROI calculator`, owner `Finance`.
+
+  Then compute, where `C` is the count of Positive Champions, `B` the count
+  of High risks, and `N` the stakeholder count:
+
+  `win_probability = min(95, max(20, 50 + C * 15 - B * 10 + N * 2))`
+
+  Worked example - Acme Corporation yields 3 risks (2 High, 1 Medium) with
+  C=1, B=2, N=8, so `50 + 15 - 20 + 16 = 61` percent.
+
+  ## Output format
+
+  - `**Deal Risk Assessment: <account>**`
+  - Table - Risk, Severity, Mitigation, Owner.
+  - `**Win Probability:** <n>%` and `**Opportunity Value:** $<amount>`.
+  - `**Immediate Actions:**` - numbered mitigations for the High risks only.
+
+  ## Edge cases
+
+  - If no rule fires, answer
+    `No significant risks identified for <account>. Win probability: <n>%.`
+  - The probability is arithmetic. Never nudge it for optimism, and never
+    present a mitigation as something already done.

@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: refund-status
+  description: Reports each active return's status and, for refund-type returns, the net refund after restocking fee plus the method and processing time.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: refund-status
+  description: Reports each active return's status and, for refund-type returns, the net refund after restocking fee plus the method and processing time.
+  ---
+  <!-- bic:source=blank -->
+  # Refund status
+
+  Use this skill when the user asks where a refund is, how much is coming back,
+  how long a refund takes, or for the status of an active return.
+
+  ## Inputs
+
+  - The active return queue, the order history (customer and payment method),
+    the return policy set (restocking fee), and the refund processing table.
+
+  ## Procedure
+
+  1. Report every active return as its own block, in queue order, with order,
+     customer, items, reason, type, status, and RMA date. Reason, type, and
+     status are rendered underscores-to-spaces, title case.
+  2. **Refund figures appear only when `type` is `refund`.** An exchange-type
+     return shows no amount, no method, and no processing time - do not invent
+     one for it.
+  3. **Net refund per item.** Map the SKU prefix to its policy exactly as the
+     eligibility check does (DRS, SHL, JKT, UM to standard; SNK, BT to
+     footwear; ELEC to electronics; anything else to standard), then:
+
+     `fee = item_price * restocking_fee_pct / 100`
+     `refund = round(item_price - fee, 2)`
+
+     Standard and footwear carry a 0% fee, so the refund equals the item price.
+     Electronics carries 15%, so a $100.00 item refunds $85.00. Show the fee
+     whenever it is non-zero.
+
+  4. **Method and time** come from the order's payment method: credit_card is
+     5 business days to the original credit card, paypal is 3 business days to
+     the PayPal account, store_credit is 1 day as instant store credit, and
+     gift_card is 1 day to the gift card balance. If the order has no payment
+     method on file, the calculation defaults to credit_card - say that the
+     default was used.
+
+  ## Output format
+
+  - `# Refund Status`
+  - `## Active Returns & Refunds`, then per return:
+    - `### <RET-id>`
+    - `- **Order:**`, `- **Customer:**`, `- **Items:**`, `- **Reason:**`,
+      `- **Type:**`, `- **Status:**`, `- **RMA Issued:**`
+    - refund-type only: `- **Refund Amount:** $N,NNN.NN` (one line per item),
+      `- **Refund Method:**`, `- **Processing Time:** N business days`
+  - `## Refund Processing Times` - table with columns
+    `Method | Processing Time | Description`
+
+  ## Edge cases
+
+  - Shipping paid on the original order is not part of the refund calculation.
+    If asked about shipping, say it is not included in the computed amount
+    rather than adding it.
+  - A SKU that is not a line item on the referenced order computes to a $0.00
+    refund. Report that as a data mismatch to investigate, not as a real
+    zero-dollar refund.
+  - An order id on a return that is not in the order history renders the
+    customer as `Unknown`; say the order record is missing.
+
+  ## Boundaries
+
+  - Amounts are computed, never negotiated. Do not adjust a refund for goodwill,
+    shipping, or a defect claim.
+  - Recommendation only. Never say a refund has been issued, approved, released,
+    or paid - processing times describe what happens after a person approves it.

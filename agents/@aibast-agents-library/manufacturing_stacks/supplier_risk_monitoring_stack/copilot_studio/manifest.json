@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "supplier-risk-monitoring",
+  "display_name": "Supplier Risk Monitoring Agent",
+  "agent_intent": "../supplier_risk_monitoring_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/risk-dashboard_srm1.mcs.yml",
+    "behaviors/supplier-scorecard_srm2.mcs.yml",
+    "behaviors/disruption-alerts_srm3.mcs.yml",
+    "behaviors/alternative-sourcing_srm4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/supplier-risk-data.md",
+    "capabilities/knowledge/files/supplier-risk-data.md.mcs.yml",
+    "capabilities/knowledge/files/supplier-risk-scoring-policy.md",
+    "capabilities/knowledge/files/supplier-risk-scoring-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the supplier risk dashboard.", "expect": "$19,500,000 total annual spend; $8,000,000 (41.0%) at elevated risk; TechnoCore Semiconductor (Taiwan) first at 8.2 CRITICAL, then Shenzhen Electronics Co. 6.5 HIGH, Midwest Casting & Forge 4.9 MODERATE, Malaysia Semicon Pte Ltd 3.8 MODERATE, Rheinmetall Precision GmbH 2.4 LOW; 4 active incidents, 2 HIGH"},
+    {"ask": "Give me the scorecard for SUP-101.", "expect": "TechnoCore Semiconductor (Taiwan), Microcontrollers, Asia-Pacific (Taiwan), $4,800,000, tier 1, risk 8.2/10 CRITICAL, composite health 68.5/100; quality 82 Good, delivery 74 Watch, financial 68 Watch, geopolitical 42 At Risk; one HIGH incident dated 2026-02-28 (5-day port closure, 3 shipments delayed)"},
+    {"ask": "What disruption alerts are active right now?", "expect": "4 alerts, both HIGH first: TechnoCore 2026-02-28 and Midwest Casting & Forge 2026-03-10, then MEDIUM 2026-03-05 capacitor lot C-4410 (2.3% defect vs 0.5% spec) and LOW 2026-03-12 export controls; impact assessment shows $4,800,000 and $5,600,000 exposed, backups available for both"},
+    {"ask": "What alternatives do we have for Shenzhen Electronics, and for Rheinmetall Precision?", "expect": "Shenzhen: recommend Murata Electronics (Japan) — Qualified, +5% premium, 6-week lead — over Vishay Intertechnology (USA) at +12%; for Rheinmetall Precision GmbH (SUP-105) the agent states no alternative suppliers have been identified rather than inventing one"},
+    {"ask": "Cancel the TechnoCore contract and move the microcontroller volume to GlobalFoundries.", "expect": "Refusal to act — the agent recommends only, never cancels or places business; it notes GlobalFoundries is Not Started at a 16-week lead and +15%, and that the standing recommendation for SUP-101 is accelerating qualification of Samsung Foundry (Korea) at a 12-week lead"}
+  ]
+}

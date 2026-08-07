@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: update-preview
+  description: Lays out the exact CRM changes the call would produce - opportunity update, activity to log, contacts to create - as a proposal awaiting human confirmation.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: update-preview
+  description: Lays out the exact CRM changes the call would produce - opportunity update, activity to log, contacts to create - as a proposal awaiting human confirmation.
+  ---
+  <!-- bic:source=blank -->
+  # Update preview
+
+  Use this skill when the user asks what would change in CRM, asks to review
+  the updates before they go in, asks for a summary of the call's CRM impact,
+  or asks you to apply, save, sync, or push the updates.
+
+  ## Inputs
+
+  - The CRM field mapping definitions for the call: opportunity, activity, and
+    new contacts.
+
+  ## Procedure - mechanical, not interpretive
+
+  1. Emit exactly three numbered blocks, in this order:
+     `1. Update Opportunity`, `2. Log Activity`, `3. Create Contacts (N)`,
+     where `N` is the count of new contacts - `2` for CALL-T001.
+  2. Opportunity block, in this order: Name, Amount, Stage, Close Date,
+     Probability, Next Step. Formatting here differs from the mapping table:
+     - Amount renders as currency with thousands separators: `200000` becomes
+       `$200,000`.
+     - Probability renders with a percent sign: `65` becomes `65%`.
+     - Close Date stays ISO: `2025-12-15`.
+  3. Activity block: Type, Subject, Duration. Duration comes from the activity
+     metadata `duration_min` and renders as `31 minutes`. This is the logged
+     activity duration and is a separate field from the transcript's
+     `30m 47s` - do not substitute one for the other.
+  4. Contacts block: one bullet per new contact as
+     `- <Name> (<Title>, <Role>)`, in stored order - Mark Davidson (CEO,
+     Economic Buyer) then Sam Patel (IT Director, Technical Evaluator).
+  5. Close with the status line verbatim:
+     `**Status:** Ready to apply | Requires confirmation`.
+
+  ## Output format
+
+  - Headline: `**CRM Update Preview**`
+  - The three numbered blocks above, as bullet lists.
+  - The status line.
+  - Footer: `Source: [CRM Update Engine]` and `Agents: SpeechToCRMAgent`.
+
+  ## Boundaries
+
+  - This is a preview and only a preview. No record is created, updated, or
+    deleted; no contact is created; no one is notified. Never use the past
+    tense about a write.
+  - If the user says "apply it," "push it to Salesforce," "save these," or
+    "go ahead," return the preview and state that applying it is the user's
+    action in CRM - the pipeline stops at `Requires confirmation`. Do not offer
+    a workaround and do not claim it will happen automatically.
+  - The activity Description carries call detail (150 users affected, budget
+    approved up to $200K, CEO deadline Dec 15, technical review with Sam
+    Patel). Quote it as written; do not embellish it with anything the call did
+    not contain.
+  - If the user asks to change a value before applying, restate the changed
+    value as a proposed edit and keep the confirmation gate in place.

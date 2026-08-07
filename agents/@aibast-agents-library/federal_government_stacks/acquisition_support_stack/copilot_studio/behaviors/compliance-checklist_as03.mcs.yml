@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: compliance-checklist
+  description: Builds the FAR and DFARS compliance checklist for a procurement by filtering FAR parts against the acquisition's estimated value thresholds.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compliance-checklist
+  description: Builds the FAR and DFARS compliance checklist for a procurement by filtering FAR parts against the acquisition's estimated value thresholds.
+  ---
+  <!-- bic:source=blank -->
+  # Compliance checklist
+
+  Use this skill when the user asks which regulations apply to a procurement,
+  asks for a compliance or FAR checklist, asks whether a DFARS clause is in
+  play, or asks what has to be documented before award.
+
+  ## Inputs
+
+  - The FAR requirement set (title, key provisions, dollar threshold), the
+    DFARS supplement set, and the procurement pipeline.
+  - Optional: a PRJ- project ID. When none is given, the checklist defaults to
+    PRJ-FY25-101 Enterprise Cloud Migration Services.
+
+  ## Procedure
+
+  1. Resolve the project and read its estimated value.
+  2. Select FAR parts by threshold. A part is applicable when
+     `estimated_value >= threshold`:
+     - FAR 15.3 Source Selection - threshold $1,000,000
+     - FAR 19.5 Small Business Set-Asides - threshold $250,000
+     - FAR 12.6 Commercial Item Streamlining - threshold $7,500,000
+     - FAR 8.4 Federal Supply Schedules - threshold $0 (always applicable)
+     Evaluate them in that reference order and keep that order in the output.
+     Worked examples from the pipeline:
+     `$12,500,000` selects all four parts; `$3,200,000` selects FAR 15.3,
+     19.5, and 8.4; `$850,000` selects only FAR 19.5 and FAR 8.4.
+  3. Under each applicable FAR part, list every key provision as an unchecked
+     checkbox item.
+  4. List all three DFARS supplements unconditionally. DFARS is NOT threshold
+     filtered in this checklist, even where the clause text names a dollar
+     figure (215.403-1 states a $2M applicability in its own text and still
+     appears on every checklist).
+  5. For each DFARS supplement report Applicability, Standard, and Assessment,
+     where Assessment renders as `Required` when the assessment flag is true
+     and `Not Required` when it is false.
+
+  ## Output format
+
+  - `# Compliance Checklist: <project title>`
+  - `**Estimated Value:** $<value>` with thousands separators, no cents.
+  - `## FAR Requirements`, then for each applicable part:
+    `### <reference> <em dash> <title>` followed by one `- [ ] <provision>`
+    line per key provision.
+  - `## DFARS Supplements`, then for each supplement:
+    `### <reference> <em dash> <title>` followed by
+    `- **Applicability:** ...`, `- **Standard:** ...`,
+    `- **Assessment:** Required | Not Required`.
+
+  ## Edge cases
+
+  - An unrecognized project ID falls back to the first project in the pipeline
+    (PRJ-FY25-101). Say which project the checklist is actually for so the user
+    is never shown a fallback as if it were their request.
+  - Checkboxes are always emitted unchecked. `- [ ]` means "to be verified by a
+    person", not "outstanding" and never "done". You do not close items.
+  - `Assessment: Required` is a requirement flag, not a status. Never report it
+    as an assessment that has been completed or passed.
+  - Never add a FAR part or DFARS clause that is not in the reference set, and
+    never drop an applicable one because it looks redundant.

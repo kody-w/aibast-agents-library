@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: route-request
+  description: Resolves the destination for an inquiry from its category - primary team, escalation team, auto-assign flag, required skill, and after-hours queue.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: route-request
+  description: Resolves the destination for an inquiry from its category - primary team, escalation team, auto-assign flag, required skill, and after-hours queue.
+  ---
+  <!-- bic:source=blank -->
+  # Route request
+
+  Use this skill when the user asks where an inquiry goes, who owns it, who it
+  escalates to, whether it auto-assigns, what skill the handler needs, or where
+  it lands outside business hours.
+
+  ## Inputs
+
+  - The routing rules, keyed by category.
+  - An inquiry (INQ- id) or a category. If the inquiry has no category yet,
+    classify it first with the classification rules, then route the result.
+
+  ## Procedure
+
+  Routing is a lookup, never a judgment. Resolve the inquiry's category, then
+  read the row for that category exactly as written:
+
+  | Category | Primary Team | Escalation | Auto-Assign | Skill Required | After Hours |
+  |---|---|---|---|---|---|
+  | Technical Support | Technical Support | Engineering | Yes | product_knowledge | On-Call Engineer |
+  | Billing & Payments | Billing Team | Finance | Yes | billing_systems | Billing Queue |
+  | Sales Inquiry | Sales Team | Sales Management | No | sales_qualification | Lead Queue |
+  | Account Management | Account Management | VP Customer Success | Yes | account_strategy | CSM Queue |
+  | Feature Request | Product Team | Product Management | No | product_strategy | Product Backlog |
+  | Security Concern | Security Team | CISO | Yes | security_ops | Security On-Call |
+
+  Rules that hold every time:
+
+  - Only Technical Support, Billing & Payments, Account Management, and
+    Security Concern are auto-assign. Sales Inquiry and Feature Request are
+    never auto-assigned - they wait for a human to pick them up from the Lead
+    Queue and the Product Backlog respectively.
+  - The escalation team is the second hop only. Never route an inquiry
+    straight to the escalation team; name the primary team first and the
+    escalation path second.
+  - After-hours destination replaces the primary team only outside business
+    hours. Say which one you are quoting.
+
+  ## Output format
+
+  Headline `**Routing Configuration**`, then the full six-row table with these
+  columns in this order:
+
+  `| Category | Primary Team | Escalation | Auto-Assign | After Hours |`
+
+  Then an example block for the inquiry in question:
+
+  - `**Example Routing: INQ-xxxx**`
+  - `- Inquiry:` the first 50 characters of the inquiry text followed by `...`
+  - `- Route to:` primary team
+  - `- Skill required:` the skill token, in snake_case, exactly as stored
+  - `- Auto-assign:` Yes or No
+
+  Close with the source line `Source: [Routing Engine]`.
+
+  ## Boundaries
+
+  - Never route to a team that is not in the table for that category, even if
+    the user names one.
+  - If the inquiry id is not in the queue, say so and route nothing.
+  - Recommendation only. Never say an inquiry has been routed, assigned,
+    queued, or that a team has been notified or paged.

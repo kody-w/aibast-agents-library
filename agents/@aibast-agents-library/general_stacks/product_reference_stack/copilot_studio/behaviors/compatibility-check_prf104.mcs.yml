@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: compatibility-check
+  description: Resolves one product's required, recommended, and incompatible relationships and prints the full dependency matrix.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compatibility-check
+  description: Resolves one product's required, recommended, and incompatible relationships and prints the full dependency matrix.
+  ---
+  <!-- bic:source=blank -->
+  # Compatibility check
+
+  Use this skill when the user asks whether two products work together, what a
+  product needs in order to run, what to attach to a deal, or whether a
+  proposed bundle is valid.
+
+  ## Inputs
+
+  - The compatibility matrix and the product catalog.
+  - Optional: a product ID or name. If none is supplied, the default subject
+    is Core Platform (CORE).
+
+  ## Procedure
+
+  1. Resolve the subject product with the same rule as product-lookup: exact
+     ID first, then the FIRST product whose name contains the input as a
+     substring in catalog order, then fall back to `CORE`. Announce the
+     fallback -- never answer as if an unknown name were Core Platform.
+  2. Read the subject's three relationship lists straight from the matrix:
+
+     | Product | Requires | Recommended | Incompatible |
+     |---|---|---|---|
+     | Core Platform | - | ANLYT-STD, INTGR | - |
+     | Enterprise Platform | - | ANLYT-PRO, INTGR, SECUR | - |
+     | Analytics Standard | CORE | INTGR | ANLYT-PRO |
+     | Analytics Pro | ENT | INTGR, SECUR | ANLYT-STD |
+     | Integration Hub | CORE | SECUR | - |
+     | Security Suite | ENT | INTGR | - |
+
+  3. `requires` is a hard gate. If the list is empty, print
+     `None (standalone)`. If it is non-empty, the bundle is invalid without
+     that base product -- state it as a blocker, not a suggestion.
+  4. `incompatible` is symmetric and absolute: Analytics Standard
+     (ANLYT-STD) and Analytics Pro (ANLYT-PRO) are the only incompatible pair
+     in the catalog and are never quoted together. When the user proposes
+     both, refuse the pairing and ask which tier they want.
+  5. `recommended` is advisory only. Never present a recommendation as a
+     requirement, and never add one to a total without being asked.
+  6. Empty relationship lists print as `None` in the subject table and as `-`
+     in the full matrix.
+
+  ## Output format
+
+  - `**Compatibility Check: <product name>**`
+  - A two-column table `Relationship | Products` with rows exactly:
+    `Requires`, `Recommended With`, `Incompatible With`. Values in this table
+    use full product NAMES.
+  - `**Full Compatibility Matrix:**` followed by the six-row table with
+    columns `Product | Requires | Recommended | Incompatible`. Values in the
+    matrix use product IDs.
+  - Close with `Source: [Product Catalog + Compatibility Engine]`.
+
+  ## Edge cases
+
+  - Requirement chains are one level deep in the catalog: ANLYT-PRO requires
+    ENT and SECUR requires ENT; ANLYT-STD requires CORE and INTGR requires
+    CORE. There is no transitive requirement beyond that -- do not invent one.
+  - Core Platform and Enterprise Platform are both standalone; neither
+    requires the other, and they are not marked incompatible. If someone asks
+    about running both, say the matrix does not block it and refer the seat
+    and entitlement question to sales.
+  - Checking compatibility does not change anything. Never say a bundle has
+    been configured, validated for order, or approved -- report the
+    relationships and let a person build the deal.

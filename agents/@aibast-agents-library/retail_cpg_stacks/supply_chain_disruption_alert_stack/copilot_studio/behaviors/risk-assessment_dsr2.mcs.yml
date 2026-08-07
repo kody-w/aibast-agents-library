@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: risk-assessment
+  description: Scores route risk across six factors, bands each route HIGH/MEDIUM/LOW against fixed thresholds, and ranks the risk factors by network peak.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: risk-assessment
+  description: Scores route risk across six factors, bands each route HIGH/MEDIUM/LOW against fixed thresholds, and ranks the risk factors by network peak.
+  ---
+  <!-- bic:source=blank -->
+  # Risk assessment
+
+  Use this skill when the user asks how risky a route is, which lanes are most
+  exposed, what is driving risk, or asks for the risk matrix.
+
+  ## Inputs
+
+  - The per-route risk score matrix.
+  - Optional: a single RT- route id. Otherwise score every route.
+
+  ## Procedure - thresholds are literal
+
+  1. **Scope.** If a `route_id` is given and it exists in the matrix, show that
+     one route in the matrix table. If it is not given, or is given but not in
+     the matrix, show all routes - and if an unknown id was supplied, say so
+     instead of silently widening the view.
+  2. **Band each route** from `overall_risk`:
+     - `overall_risk >= 0.70` -> **HIGH**
+     - `0.40 <= overall_risk < 0.70` -> **MEDIUM**
+     - `overall_risk < 0.40` -> **LOW**
+     Apply the arithmetic exactly. 0.35 is LOW. 0.40 is MEDIUM. 0.70 is HIGH.
+  3. **Distribution.** Count the bands across **all** routes in the matrix,
+     never only the filtered route. Label these counts network-wide.
+  4. **Factor ranking.** For each of the six factors - geopolitical, weather,
+     infrastructure, labor, regulatory, financial - collect the value from
+     every route, then compute `avg = sum(values) / count(values)` and
+     `peak = max(values)`. Sort the factors by **peak descending**, not by
+     average. Print each to two decimals.
+  5. Every score is printed to two decimals; `overall_risk` is bolded and
+     followed by its band label in parentheses.
+
+  ## Output format
+
+  - `# Supply Chain Risk Assessment`
+  - `## Risk Score Matrix` table with columns:
+    `Route | Overall | Geopolitical | Weather | Infrastructure | Labor | Regulatory | Financial`
+    Route is the route *name*; Overall is `**0.XX** (BAND)`.
+  - `## Risk Level Distribution` with `- **HIGH risk routes:** N`,
+    `- **MEDIUM risk routes:** N`, `- **LOW risk routes:** N`
+  - `## Highest Risk Factors` with one line per factor:
+    `- **<Factor>:** avg 0.XX, peak 0.XX`, ordered by peak descending.
+
+  ## Edge cases
+
+  - The distribution and the factor ranking are always computed over the whole
+    matrix even when the table is filtered to one route. Say so, or the reader
+    will read a network statistic as a route statistic.
+  - Peak-descending order is not average-descending order. Regulatory has a
+    higher average than Infrastructure but a lower peak than Labor; the sort
+    key is the peak.
+  - The matrix table falls back to the raw route id as the row label if a route
+    has scores but no entry in the route network.
+
+  ## Boundaries
+
+  - Report the computed score. Never adjust a score for narrative reasons,
+    never blend it with the route's `current_status` or `reliability_score`.
+  - Do not produce a risk score for a route that is not in the matrix. Say it
+    is not scored.

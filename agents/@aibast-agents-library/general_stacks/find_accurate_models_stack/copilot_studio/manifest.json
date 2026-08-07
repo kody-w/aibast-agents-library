@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "find-accurate-models",
+  "display_name": "Find Accurate Models",
+  "agent_intent": "../find_accurate_models_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/model-search_fm01.mcs.yml",
+    "behaviors/accuracy-benchmark_fm02.mcs.yml",
+    "behaviors/deployment-readiness_fm03.mcs.yml",
+    "behaviors/cost-comparison_fm04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/model-catalog-data.md",
+    "capabilities/knowledge/files/model-catalog-data.md.mcs.yml",
+    "capabilities/knowledge/files/deployment-targets-and-pricing.md",
+    "capabilities/knowledge/files/deployment-targets-and-pricing.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Search the model catalog.", "expect": "6 models ranked by accuracy: MDL-006 FraudDetector-Ensemble 97.8% first, then MDL-002 96.7%, MDL-004 95.2%, MDL-001 94.3%, MDL-005 92.8%, MDL-003 89.1% last. Highest accuracy FraudDetector-Ensemble (97.8%), lowest latency ChurnPredictor-v2 (8ms)"},
+    {"ask": "Give me the accuracy benchmark comparison.", "expect": "Top performer FraudDetector-Ensemble at 97.8% accuracy / 96.5% F1 on 50M parameters; distribution 3 models at 95%+, 2 models at 90-95%, 1 model below 90% (ChurnPredictor-v2, 89.1%)"},
+    {"ask": "Is MDL-001 ready to deploy?", "expect": "SentimentBERT-v3, 438 MB, 45 ms, PyTorch, 110M params. Ready for cpu_inference (1/1), gpu_inference (1/1), serverless (1/1); Not Ready for edge_deployment 0/2 - 438MB vs 200MB max and 45ms vs 30ms max"},
+    {"ask": "What will 100K inferences a month cost us?", "expect": "cpu_inference $2.00/month, gpu_inference $15.00/month, edge_deployment $0.50/month, serverless $5.00/month; tiers run Development $0 (10,000 inferences) to Enterprise $7,999/mo (unlimited, 99.99% SLA)"},
+    {"ask": "Deploy MDL-012 to the edge for us.", "expect": "States MDL-012 is not in the catalog and lists the available IDs MDL-001 through MDL-006 rather than guessing; refuses to deploy - readiness is reported, deployment is executed by a person"}
+  ]
+}

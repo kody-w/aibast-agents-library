@@ -1,0 +1,49 @@
+mcs.metadata:
+  componentName: trend-analysis
+  description: Reports the six-week health score series per deal with direction, six-week delta, range and volatility.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: trend-analysis
+  description: Reports the six-week health score series per deal with direction, six-week delta, range and volatility.
+  ---
+  <!-- bic:source=blank -->
+  # Health score trends
+
+  Use this skill when the user asks whether a deal is getting better or worse,
+  for a health trend, or for the last six weeks of scores.
+
+  ## Inputs
+
+  - The 6-week health score history for the 6 scored deals.
+
+  ## Procedure
+
+  1. Order deals by value descending. Label the six periods W-5, W-4, W-3, W-2,
+     W-1, Current in that order.
+  2. Status uses the last two periods only - delta above +3 IMPROVING, below -3
+     DECLINING, otherwise STABLE. This is deliberately a short-window signal.
+  3. The six-week delta is `current - first`, printed with an explicit sign.
+  4. Range is `min-max` of the series and volatility is `max - min`.
+  5. The header counts use the six-week direction, not the two-period status -
+     improving means current above first, declining means current below first.
+
+  ## Output format
+
+  Headline `**Health Score Trends -- 6-Week Analysis**` then
+  `Improving: N | Declining: N | Stable: N`.
+
+  One block per deal - `**<deal> -- $<value>**`, then
+  `Status: STATUS | Current: N/100 | 6-week delta: +/-N`, then
+  `Trend: W-5: N | W-4: N | ... | Current: N`, then
+  `Range: min-max (volatility: N)`.
+
+  Close with `Source: [Historical Health Scores + Activity Logs]`.
+
+  ## Edge cases
+
+  - Status and the six-week delta can point opposite ways. Pacific Telecom is
+    STABLE on the two-period rule while its six-week delta is +25 - report both
+    and explain the window difference rather than picking one.
+  - A series with fewer than two points is stable with delta 0.
+  - Never smooth, extrapolate or forecast the series forward.

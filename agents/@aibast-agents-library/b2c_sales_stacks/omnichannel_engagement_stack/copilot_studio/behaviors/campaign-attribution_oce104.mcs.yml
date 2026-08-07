@@ -1,0 +1,83 @@
+mcs.metadata:
+  componentName: campaign-attribution
+  description: Attributes results to each campaign - conversions, revenue, cost, ROI, open rate, click rate, and click-to-conversion - plus the portfolio total.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: campaign-attribution
+  description: Attributes results to each campaign - conversions, revenue, cost, ROI, open rate, click rate, and click-to-conversion - plus the portfolio total.
+  ---
+  <!-- bic:source=blank -->
+  # Campaign attribution
+
+  Use this skill when the user asks how a campaign performed, which campaign
+  paid off, for campaign ROI, open rates, click rates, or the campaign
+  portfolio total.
+
+  ## Inputs
+
+  - The campaign result set (knowledge/tools): CAMP-301 through CAMP-305, each
+    with channel, sent, opens, clicks, conversions, revenue, cost.
+  - Optional: a single CAMP- id. Render that campaign's detail block; the
+    portfolio totals you quote remain all-campaign.
+
+  ## Procedure
+
+  1. Walk the campaigns in recorded id order, CAMP-301 through CAMP-305.
+  2. For each campaign compute
+     `ROI = round(((revenue - cost) / cost) * 100, 1)`, expressed as a
+     percentage. If `cost == 0`, ROI is 0 - report it as "no cost recorded".
+  3. Accumulate `total_revenue = sum(revenue)` = $2,635,000 for the current
+     set and `total_cost = sum(cost)` = $90,000, then
+     `overall ROI = round(((total_revenue - total_cost) / total_cost) * 100, 1)`
+     = 2827.8%.
+  4. For each campaign detail block:
+     - If `sent > 0`: `open_rate = round((opens / sent) * 100, 1)` and
+       `ctr = round((clicks / sent) * 100, 1)`. Click rate is clicks over
+       SENT, not clicks over opens - never substitute the other denominator.
+     - If `sent == 0`: report clicks only. Do not compute or imply an open
+       rate for a channel that does not send.
+     - Always: `click-to-conversion = round((conversions / clicks) * 100, 1)`,
+       or 0 when `clicks == 0`.
+
+  ## Output format
+
+  One table first, exactly these columns:
+
+  | Campaign | Channel | Conversions | Revenue | Cost | ROI |
+
+  Campaign cell as `<Name> (CAMP-xxx)`. Channel in title case with underscores
+  as spaces. Money as whole dollars with thousands separators. ROI with a `%`
+  suffix.
+
+  Then three lines:
+
+  - `**Total Campaign Revenue:** $2,635,000`
+  - `**Total Campaign Cost:** $90,000`
+  - `**Overall Campaign ROI:** 2827.8%`
+
+  Then `## Campaign Detail`, one `### <Name> (CAMP-xxx)` block per campaign:
+
+  - `- Sent: N | Opens: N (N%) | Clicks: N (N%)` when sent > 0, otherwise
+    `- Clicks: N`
+  - `- Conversions: N (N% click-to-conversion)`
+  - `- Revenue: $N | Cost: $N`
+
+  ## Edge cases
+
+  - CAMP-303 (Influencer Partnership) and CAMP-304 (Google Shopping Ads) have
+    `sent == 0`. They get the clicks-only line. Their zero sent and zero opens
+    mean "not a send channel", not "zero engagement".
+  - CAMP-302 (Flash Sale - 48 Hours) is SMS: 115,200 opens on 120,000 sent is
+    a 96.0% open rate. That is correct for SMS - do not flag it as an error or
+    normalize it against the email campaigns.
+  - Campaign ROI is uncapped and the figures are large by design (CAMP-305
+    reaches 38150.0%). Report the computed number; never truncate it to look
+    plausible.
+  - Campaign revenue ($2,635,000) is a subset of the 30-day channel revenue
+    ($12,957,500). Never add them together and never treat campaign revenue as
+    the channel total.
+  - A campaign id outside CAMP-301 through CAMP-305 has no data. Say so and
+    list the five recorded campaigns.
+  - You report attribution. Never say a campaign has been paused, extended,
+    relaunched, or refunded - the marketing owner decides.

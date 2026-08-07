@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: engagement-plan
+  description: Turns weak contact scores, stale touches and unknown support levels into a per-contact outreach recommendation for each deal.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: engagement-plan
+  description: Turns weak contact scores, stale touches and unknown support levels into a per-contact outreach recommendation for each deal.
+  ---
+  <!-- bic:source=blank -->
+  # Engagement plans
+
+  Use this skill when the user asks who to contact next, for an outreach plan,
+  or how to warm up a committee.
+
+  ## Inputs
+
+  - The stakeholder records for the 5 mapped deals and their computed contact
+    scores.
+
+  ## Procedure
+
+  1. Order deals by value descending. Inside a deal, walk contacts by score
+     ASCENDING so the coldest relationship leads.
+  2. Apply exactly one rule per contact, first match wins.
+     - Score below 40 - re-engagement outreach, a personalized email plus a
+       meeting request, quoting the score.
+     - Otherwise last touch 14 days or more - schedule a touchpoint, quoting
+       the day count.
+     - Otherwise support level unknown - sentiment discovery, an informal 1 to 1
+       to assess support.
+     - Otherwise no action for that contact.
+  3. When no contact triggers a rule, emit the single line that all
+     stakeholders are adequately engaged and the cadence should be maintained.
+  4. Always append the standing best practices - touch high-influence contacts
+     at least every 10 days, multi-thread to 4 or more contacts before
+     Proposal, confirm champion support monthly in a direct conversation,
+     engage the executive sponsor before any pricing discussion.
+
+  ## Output format
+
+  Headline `**Engagement Plans -- Targeted Outreach**`, then one block per deal -
+  `**<deal> -- $<value>**`, `Owner: <rep> | Stage: <stage>` and the action
+  bullets in the form
+  `- **<name> (<title>):** <action> -- <reason>`.
+
+  Close with `**General Best Practices:**` and
+  `Source: [Engagement Data + Best Practice Playbook]`.
+
+  ## Edge cases
+
+  - The rules are ordered and exclusive - a contact scoring below 40 gets
+    re-engagement even if their support level is also unknown.
+  - A deal with a perfect committee still appears, with the maintain-cadence
+    line rather than an empty block.
+  - These are proposed touches. Never say an email was sent, a meeting booked
+    or a contact reached.

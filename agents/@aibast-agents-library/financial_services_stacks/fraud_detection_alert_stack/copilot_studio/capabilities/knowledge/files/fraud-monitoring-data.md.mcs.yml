@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: fraud-monitoring-data.md
+  description: Synthetic monitored transaction feed, investigation case register, and case notes the agent answers from until real tools are connected.

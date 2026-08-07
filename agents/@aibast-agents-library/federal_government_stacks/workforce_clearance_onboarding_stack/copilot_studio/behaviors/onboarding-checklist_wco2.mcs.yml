@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: onboarding-checklist
+  description: Produces the four-phase onboarding checklist for one employee with a computed completion percentage, or the cohort completion summary when no employee is named.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: onboarding-checklist
+  description: Produces the four-phase onboarding checklist for one employee with a computed completion percentage, or the cohort completion summary when no employee is named.
+  ---
+  <!-- bic:source=blank -->
+  # Onboarding checklist
+
+  Use this skill when the user asks what is left to onboard someone, asks for
+  a new-hire checklist, asks how far along onboarding is, or asks who is
+  behind on onboarding.
+
+  ## Inputs
+
+  - The employee roster, the onboarding status board, and the four phase
+    step lists.
+  - Optional: a single EMP- id. With an id, produce the detailed checklist.
+    Without one - or with an id that is not in the roster - produce the
+    cohort summary.
+
+  ## Procedure
+
+  The four phases are fixed and always processed in this order:
+  `pre_arrival`, `day_one`, `first_week`, `first_30_days`.
+
+  Completion percentage, computed exactly:
+
+  `completion = round(count(phases where status == "complete") / 4 * 100, 0)`
+
+  Only the literal status `complete` counts. `in_progress` and `pending` both
+  count as zero - a half-finished phase earns nothing. With four phases the
+  only possible values are 0.0%, 25.0%, 50.0%, 75.0%, and 100.0%. Print one
+  decimal place.
+
+  Per-step checkboxes inherit their phase, they are not tracked individually:
+  every step in a phase renders `- [x]` when that phase is `complete`, and
+  `- [ ]` when the phase is `in_progress` or `pending`. Never mark an
+  individual step inside an in-progress phase as done - that signal does not
+  exist in the data.
+
+  Steps carry a `required` flag. Append ` (required)` to required steps and
+  nothing to optional ones.
+
+  ## Output format: single employee
+
+  - Headline: `# Onboarding Checklist: <name>`
+  - Bullets: `**Position:**`, `**Office:**`, `**EOD Date:**` (the date, or
+    `TBD` when unset), `**Completion:** N%`
+  - Then one `##` section per phase, titled with the phase name, an em dash,
+    then the phase status - both with underscores replaced by spaces and
+    title-cased (`first_30_days` becomes `First 30 Days`, `in_progress`
+    becomes `In Progress`), followed by the phase's checkbox list.
+
+  ## Output format: cohort summary
+
+  - Headline: `# Onboarding Status Summary`
+  - One table: `Employee | Position | EOD | Completion`
+  - The Employee cell is `<name> (EMP-xxxx)`; EOD renders `TBD` when unset;
+    Completion renders as `N%`.
+
+  ## Edge cases and boundaries
+
+  - An employee with no EOD date has not started. Render `TBD` - never infer
+    an EOD from the hire date.
+  - An unknown EMP- id falls back to the cohort summary. Say explicitly that
+    the id was not found and name the ids that exist, rather than silently
+    returning the summary.
+  - Checklist only. You never mark a step complete, schedule a briefing,
+    order equipment, or notify a supervisor.

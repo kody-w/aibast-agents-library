@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: trend-analysis
+  description: Reports the six-month returns trend - volumes, rate, resolution time, CSAT, refund dollars, and reason mix - with the deterministic trend-direction rule.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: trend-analysis
+  description: Reports the six-month returns trend - volumes, rate, resolution time, CSAT, refund dollars, and reason mix - with the deterministic trend-direction rule.
+  ---
+  <!-- bic:source=blank -->
+  # Trend analysis
+
+  Use this skill when the user asks how returns are trending, asks about
+  return rate, CSAT, refund totals, seasonality, or which return reasons
+  dominate.
+
+  ## Inputs
+
+  - The six-month trend series: 2025-10 through 2026-03, with total returns,
+    return rate percent, average resolution hours, CSAT, refund total USD,
+    and monthly volumes for the five top return reasons.
+
+  ## Procedure - the trend direction is computed, not judged
+
+  1. `recent_avg = mean(return_rate_pct of the last 3 months)` =
+     (5.0 + 4.3 + 4.7) / 3 = 4.667
+  2. `earlier_avg = mean(return_rate_pct of the first 3 months)` =
+     (4.1 + 4.5 + 6.2) / 3 = 4.933
+  3. If `recent_avg < earlier_avg - 0.3` the trend is IMPROVING.
+     If `recent_avg > earlier_avg + 0.3` the trend is WORSENING.
+     Otherwise it is STABLE.
+     Here 4.667 is neither below 4.633 nor above 5.233, so the trend is
+     STABLE. The 0.3 band is the threshold - never call a move inside it a
+     direction.
+  4. Per reason: `total = sum(6 monthly volumes)` and
+     `avg_per_month = round(total / 6, 1)`.
+  5. `Total Refunded (6 months) = sum(refund_total_usd)` = $140,920.00.
+
+  ## Output format
+
+  Headline: `# Returns & Complaints Trend Analysis`, then
+  `**Overall Trend:** STABLE` (the computed direction, uppercased).
+
+  `## Monthly Returns Overview` with the table:
+
+  `| Month | Total Returns | Return Rate | Avg Resolution | CSAT | Refund Total |`
+
+  One row per month, rate as `N.N%`, resolution as `N.Nh`, CSAT as `N.N/5.0`,
+  refund as `$N,NNN.NN`.
+
+  `## Return Reasons Breakdown (Last 6 Months)` as bullets:
+  `- **<Reason Title Case>:** <total> total, <avg> avg/month` - Wrong Size 715
+  total / 119.2 avg, Changed Mind 511 / 85.2, Defective 466 / 77.7, Not As
+  Described 320 / 53.3, Wrong Item 218 / 36.3.
+
+  Then `**Total Refunded (6 months):** $140,920.00` and `## Key Insights`.
+
+  ## Edge cases
+
+  - December 2025 is the outlier month: 498 returns, 6.2% rate, 38.7h
+    resolution, CSAT 3.6, $34,200.00 refunded - a 44% spike over the
+    surrounding months, driven by changed-mind returns (130 that month).
+    Always separate that spike from the underlying run rate.
+  - CSAT recovered to 4.1 by 2026-03 after the 3.6 dip; do not describe the
+    dip as ongoing.
+  - The series ends at 2026-03. There is no data after that month - say so
+    rather than projecting a forecast.
+
+  ## Boundaries
+
+  - Analysis only. Recommendations that follow from a trend (size guides,
+    staffing, policy changes) are proposals for a human owner, never actions
+    taken.

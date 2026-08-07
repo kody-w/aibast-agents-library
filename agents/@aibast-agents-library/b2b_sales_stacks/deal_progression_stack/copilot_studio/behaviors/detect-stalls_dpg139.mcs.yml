@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: detect-stalls
+  description: Classifies each tracked deal against its stage warning, stalled and critical day thresholds and lists everything at or past stalled.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: detect-stalls
+  description: Classifies each tracked deal against its stage warning, stalled and critical day thresholds and lists everything at or past stalled.
+  ---
+  <!-- bic:source=blank -->
+  # Stalled deal detection
+
+  Use this skill when the user asks what is stuck, which deals crossed a
+  threshold, or for the stall report.
+
+  ## Inputs
+
+  - The stall timelines for the 7 tracked deals and the per-stage day
+    thresholds.
+
+  ## Procedure
+
+  1. Classify each deal by days in stage against its stage thresholds -
+     Qualification 12/18/25, Discovery 15/22/30, Proposal 14/20/28,
+     Negotiation 10/16/24, Contract 8/14/20 for warning / stalled / critical.
+     At or above critical is CRITICAL, at or above stalled is STALLED, at or
+     above warning is WARNING, otherwise ON TRACK.
+  2. The stalled bucket holds CRITICAL and STALLED deals; the warning bucket
+     holds WARNING deals only. Report value totals for each bucket.
+  3. Render one combined table of the stalled and warning deals, sorted by
+     value descending.
+  4. Always print the full threshold table underneath so any classification can
+     be checked.
+  5. Show last contact days and champion status alongside each deal - they
+     explain the stall even though they do not drive the classification.
+
+  ## Output format
+
+  Headline `**Stalled Deal Detection Report**` then
+  `Stalled: **N** deals ($X) | Warning: **N** deals ($X)` and a table with
+  exactly these columns.
+
+  | Deal | Value | Stage | Days in Stage | Status | Last Contact | Champion |
+
+  Then `**Detection Thresholds:**` as one line per stage.
+
+  Close with `Source: [CRM Pipeline Data + Activity Logs]`.
+
+  ## Edge cases
+
+  - These day thresholds are stricter than the 1.25x benchmark ratio used by
+    pipeline health, so the two skills can disagree on a deal. Name the rule
+    you used.
+  - A deal with a healthy champion can still be CRITICAL on days alone - Global
+    Manufacturing is CRITICAL at 28 days in Negotiation with contact 5 days
+    ago.
+  - ON TRACK deals do not appear in the table; say so rather than listing them
+    as empty rows.

@@ -1,0 +1,52 @@
+mcs.metadata:
+  componentName: action-plans
+  description: Generates the week 1 and week 2 blocker playbook for every stalled deal with the assigned resource, owner and total task count.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: action-plans
+  description: Generates the week 1 and week 2 blocker playbook for every stalled deal with the assigned resource, owner and total task count.
+  ---
+  <!-- bic:source=blank -->
+  # Action plans for stalled deals
+
+  Use this skill when the user asks what to do about the stalled deals, for an
+  action plan, or for the two-week play on a blocked deal.
+
+  ## Inputs
+
+  - The stalled set from the pipeline classification and the blocker playbooks.
+
+  ## Procedure
+
+  1. Take the stalled deals (ratio >= 1.25) sorted by value descending.
+  2. Look up the playbook for the deal's blocker. Only executive_change,
+     legal_review, competitor_eval, budget_hold and no_champion have playbooks;
+     a deal with any other blocker is skipped entirely.
+  3. Emit the playbook's week 1 tasks verbatim, then its week 2 tasks verbatim.
+     Do not merge, reorder or reword them.
+  4. Total tasks = sum of week 1 plus week 2 task counts across all planned
+     deals. executive_change, competitor_eval and no_champion carry 7 tasks
+     each; legal_review and budget_hold carry 6.
+  5. Print the assigned resource in title case and the deal's recorded owner.
+
+  ## Output format
+
+  Headline `**Action Plans -- N Stalled Deals**` then
+  `Total tasks generated: **N**`.
+
+  One block per deal - `**<deal> -- $<value> (<stage>)**`, then `**Week 1:**`
+  with a bulleted task list, then `**Week 2:**` with its list, then
+  `**Assigned Resource:** <resource>`, `**Owner:** <rep>` and
+  `**Expected Outcome:** Deal back on track within 10 days`.
+
+  Close with `Source: [Sales Playbook + Win Patterns]`.
+
+  ## Edge cases
+
+  - Two deals with the same blocker get identical task text. That is correct -
+    do not paraphrase one to look different.
+  - The assigned resource is a role, not a named person; never resolve it to a
+    rep.
+  - This is a plan proposal. Never state the tasks were created, scheduled or
+    assigned in any system.

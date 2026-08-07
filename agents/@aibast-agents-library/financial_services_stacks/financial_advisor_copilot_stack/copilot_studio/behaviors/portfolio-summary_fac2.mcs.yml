@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: portfolio-summary
+  description: Summarizes one client's portfolio - risk profile, assets, contributions, maximum allocation drift, and the holdings table with signed drift per asset class.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: portfolio-summary
+  description: Summarizes one client's portfolio - risk profile, assets, contributions, maximum allocation drift, and the holdings table with signed drift per asset class.
+  ---
+  <!-- bic:source=blank -->
+  # Portfolio summary
+
+  Use this skill when the user asks about a single client's portfolio,
+  holdings, allocation, drift from target, or how far a client has moved
+  away from their model.
+
+  ## Inputs
+
+  - A client id (`CLI-3001`, `CLI-3002`, `CLI-3003`). If the user names a
+    client by name, resolve the name to the id and show the id.
+  - If no client is named, default to `CLI-3001`.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Resolve the client. If the id is not in the book, stop and say so - do
+     not fall through to another client's portfolio.
+  2. For each asset class compute signed drift:
+     `drift = round(allocation - target, 1)`.
+     Render a leading `+` when drift is greater than 0; a negative drift
+     already carries its `-`; a zero drift renders as `0.0%`.
+  3. Compute maximum allocation drift across the whole portfolio:
+     `max_drift = round(max(abs(allocation - target)) over all asset classes, 1)`.
+     This uses the absolute value, so an underweight of 5.0 and an overweight
+     of 5.0 both yield 5.0.
+  4. List holdings in book order - the order they appear for that client.
+     Do not re-sort by value, by drift, or alphabetically.
+  5. Dollar amounts are comma-formatted with no cents; percentages carry one
+     decimal place.
+
+  ## Output format
+
+  Headline `# Portfolio Summary: <client name>`, then four bullets:
+
+  - `- **Risk Profile:** <Title case>`
+  - `- **Total Assets:** $N`
+  - `- **Annual Contributions:** $N`
+  - `- **Max Allocation Drift:** N%`
+
+  Then `## Holdings` and one table with exactly these columns:
+
+  `| Asset Class | Value | Current % | Target % | Drift |`
+
+  ## Edge cases
+
+  - Asset classes are not identical across clients - CLI-3002 holds Emerging
+    Markets, CLI-3003 holds Municipal Bonds. Render whatever that client
+    actually holds; never carry an asset class over from another client.
+  - Max allocation drift of exactly 5.0% is at the compliance threshold but
+    does not breach it - the drift flag requires strictly greater than 5%.
+    Say "at the threshold", not "over".
+  - A zero-contribution client (a trust, or a retired client) shows
+    `$0`; that is data, not an error.
+
+  ## Boundaries
+
+  - Reporting only. Never say a portfolio has been rebalanced or a trade
+    placed. Rebalancing proposals belong to the recommendation-engine skill.
+  - Do not value, price, or project any holding beyond the values given.

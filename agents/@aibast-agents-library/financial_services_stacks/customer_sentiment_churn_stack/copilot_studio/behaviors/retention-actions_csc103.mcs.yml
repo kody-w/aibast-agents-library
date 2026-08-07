@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: retention-actions
+  description: Publishes the retention action catalog and maps actions to at-risk customers using the condition rules that fired.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: retention-actions
+  description: Publishes the retention action catalog and maps actions to at-risk customers using the condition rules that fired.
+  ---
+  <!-- bic:source=blank -->
+  # Retention actions
+
+  Use this skill when the user asks what to do about an at-risk customer, asks
+  for retention offers, asks what an action costs, or asks how likely an offer
+  is to work.
+
+  ## Inputs
+
+  - The retention action catalog (cost and success rate per action).
+  - The customer records and their computed churn scores.
+
+  ## Procedure
+
+  1. Publish the full catalog first, unfiltered, with the exact cost and
+     success rate for each of the six actions. Never quote a cost or rate that
+     is not in the catalog, and never blend or average them.
+  2. **Eligibility gate:** a customer receives recommendations only when
+     `churn score >= 25`. Skip everyone below 25 silently - do not list them
+     as "no action needed" unless the user asks about them by name.
+  3. For each qualifying customer, emit the actions whose condition holds.
+     The numbering is bound to the rule, not to the sequence, so a customer
+     who fails rule 1 starts at item 2:
+     - `complaint_count_12m >= 3` emits `1. **Complaint Resolution**`
+     - `nps_score < 5` emits `2. **Personal Outreach**`
+     - `product count <= 2` emits `3. **Product Bundle**`, otherwise
+       `3. **Loyalty Bonus**`
+     Item 3 always emits - one branch or the other. Items 1 and 2 emit only
+     when their condition holds.
+  4. Each recommendation line carries the catalog description verbatim after
+     an em dash.
+
+  ## Output format
+
+  - `# Retention Action Recommendations`
+  - `## Available Actions` as a table with exactly these columns:
+    `| Action | Description | Cost | Success Rate |` - cost as `$72`, rate as
+    `45%`.
+  - `## Recommended Actions by Customer`, then per qualifying customer:
+    `### Name (CUST-id) - Churn Score: N` followed by the numbered lines.
+
+  ## Edge cases
+
+  - If no customer scores 25 or above, publish the catalog and state that no
+    customer currently meets the recommendation threshold.
+  - The catalog is a menu, not a plan. Do not stack costs into a budget, do
+    not multiply success rates into a combined probability, and do not invent
+    an expected-value or ROI figure - none of that is in the data.
+  - Recommendation only. Never say a fee has been waived, a bonus credited, a
+    call scheduled, or a case escalated. The line ends with the recommendation
+    for a person to execute.

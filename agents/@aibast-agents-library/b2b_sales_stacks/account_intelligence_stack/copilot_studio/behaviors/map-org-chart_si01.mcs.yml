@@ -1,0 +1,49 @@
+mcs.metadata:
+  componentName: map-org-chart
+  description: Renders the reporting hierarchy with level and tenure and flags anyone under a year in role.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: map-org-chart
+  description: Renders the reporting hierarchy with level and tenure and flags anyone under a year in role.
+  ---
+  <!-- bic:source=blank -->
+  # Map org chart
+
+  Use this skill when the user asks who reports to whom, for the org chart,
+  or who is new in role.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. Print every mapped person in recorded order with Name, Role,
+     Department, Level, Reports To, Tenure. A null `reports_to` prints
+     `Board`.
+  2. Tenure formatting - under 1 year prints one decimal place (for example
+     `0.1yr`), 1 year or more prints as a whole number (`8yr`).
+  3. Structure summary counts - C-Suite is level `C-Suite`, VP Level is
+     level `VP`, Director/Manager combines levels `Director` and `Manager`.
+  4. Recent changes lists anyone with `tenure_years < 1` as new to role.
+
+  Worked example - Acme Corporation - 8 stakeholders mapped, 3 C-Suite
+  (Tom Bradley, Sarah Chen, Lisa Park), 2 VP (James Miller, Kevin Park), 3
+  Director/Manager (David Wong, Maria Lopez, Rachel Torres). Sarah Chen at
+  0.1yr is the only recent change. Kevin Park and David Wong report to Sarah
+  Chen; Rachel Torres reports to Lisa Park.
+
+  ## Output format
+
+  - `**Org Chart: <account>**`
+  - Table - Name, Role, Department, Level, Reports To, Tenure.
+  - `**Structure Summary:**` - four counted bullets.
+  - `**Recent Changes:**` - one bullet per new hire, omitted when there are
+    none.
+
+  ## Edge cases
+
+  - With no org data, answer `No organizational data mapped yet.` and stop.
+  - Some accounts record `reports_to` as the literal string `CEO` where the
+    CEO is not a mapped person. Print it as recorded; do not invent the name.

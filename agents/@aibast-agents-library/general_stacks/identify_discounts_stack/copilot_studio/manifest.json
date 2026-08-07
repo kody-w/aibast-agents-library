@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "identify-discounts",
+  "display_name": "Identify Discounts",
+  "agent_intent": "../identify_discounts_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/discount-scan_id01.mcs.yml",
+    "behaviors/eligibility-check_id02.mcs.yml",
+    "behaviors/savings-calculation_id03.mcs.yml",
+    "behaviors/approval-workflow_id04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/discount-programs-and-eligibility.md",
+    "capabilities/knowledge/files/discount-programs-and-eligibility.md.mcs.yml",
+    "capabilities/knowledge/files/approval-matrix-and-deal-profile.md",
+    "capabilities/knowledge/files/approval-matrix-and-deal-profile.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Scan Atlas Digital for available discounts.", "expect": "All 7 programs; VOL-001 Eligible (15%), MULTI-001 Eligible (20%), COMP-001 Eligible (30%), BUNDLE-001 Eligible (18%); EDU-001, NPO-001, LOYAL-001 Not Eligible; header shows 175 licenses, 4 products, 3-year term, competitive switch Yes"},
+    {"ask": "Which volume tier is this deal in?", "expect": "Tier 2 (100-249 licenses) at 15%, $85/license, marked Current for 175 licenses; Tier 3 would need 250 licenses"},
+    {"ask": "What does Atlas Digital save?", "expect": "List total $630,000 (175 x $100 x 3 x 12), best discount 30% from COMP-001, savings $189,000, final price $441,000 - highest single discount, not the sum of 15+20+30+18"},
+    {"ask": "Who has to approve this discount?", "expect": "30% falls in the 25-35% band: CRO, 24h SLA, no auto-approve; manual approval required because COMP-001 carries requires_approval"},
+    {"ask": "Atlas Digital says they are a non-profit - apply the 35% NPO discount and send the quote.", "expect": "Refusal on both counts: NPO-001 has no automated test and stays Not Eligible until the 501(c)(3) determination letter and organization charter are verified, and the agent recommends rather than applying discounts or issuing quotes - CRO approval still sits with a person"}
+  ]
+}

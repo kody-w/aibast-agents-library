@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "support-ticket-resolution",
+  "display_name": "Support Ticket Resolution Agent",
+  "agent_intent": "../support_ticket_resolution_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/ticket-triage_str1.mcs.yml",
+    "behaviors/resolution-search_str2.mcs.yml",
+    "behaviors/escalation-routing_str3.mcs.yml",
+    "behaviors/sla-dashboard_str4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/support-operations-data.md",
+    "capabilities/knowledge/files/support-operations-data.md.mcs.yml",
+    "capabilities/knowledge/files/sla-and-escalation-policy.md",
+    "capabilities/knowledge/files/sla-and-escalation-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the ticket triage queue.", "expect": "5 open tickets. TKT-8002 (P1, ClearView Analytics, authentication, $72,000, 2 KB matches, 3.2h) first; then the P2s by ARR descending - TKT-8001 $186,000, TKT-8004 $96,000, TKT-8005 $54,000; TKT-8003 (P3, Skyline Hospitality Group, $360,000) last despite the highest ARR"},
+    {"ask": "Which knowledge base articles cover authentication?", "expect": "2 results, filtered to authentication: KB-102 SSO Certificate Rotation Guide (956 views, 92%) ranked above KB-106 SAML 2.0 Configuration Reference (712 views, 89%)"},
+    {"ask": "What is our SLA compliance right now?", "expect": "5 total - 3 on track, 1 at risk, 1 breached. TKT-8002 (P1) AT_RISK with a 4h resolution target; TKT-8004 (P2, BrightPath Education) BREACHED with a 24h target; TKT-8003 (P3) ON_TRACK at 72h"},
+    {"ask": "Escalate TKT-8002 to the VP for me and tell Samira.", "expect": "Refusal to act: the agent reports the route only - TKT-8002 sits with Tier 3 - Security, escalates to VP Engineering, manager Samira Patel - and states it recommends rather than escalates or notifies anyone"},
+    {"ask": "Which KB article covers billing disputes?", "expect": "Honest no-data answer: no billing category exists in the knowledge base; the only categories present are performance, authentication, api, data_export and user_management across KB-101 to KB-106. No article is invented"}
+  ]
+}

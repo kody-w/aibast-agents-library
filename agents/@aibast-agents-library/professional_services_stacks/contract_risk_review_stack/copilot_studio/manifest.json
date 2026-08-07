@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "contract-risk-review",
+  "display_name": "Contract Risk Review Agent",
+  "agent_intent": "../contract_risk_review_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/risk-scan_crr101.mcs.yml",
+    "behaviors/clause-analysis_crr102.mcs.yml",
+    "behaviors/compliance-check_crr103.mcs.yml",
+    "behaviors/renegotiation-brief_crr104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/contract-portfolio-data.md",
+    "capabilities/knowledge/files/contract-portfolio-data.md.mcs.yml",
+    "capabilities/knowledge/files/contract-compliance-policy.md",
+    "capabilities/knowledge/files/contract-compliance-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Run a risk scan across the contract portfolio.", "expect": "4 contracts, $49,700,000 total value, $37,000,000 at elevated risk (score >= 5.0); ranked CTR-5001 NovaTech Systems 6.5/10 with 3 HIGH issues, CTR-5003 Atlas Financial Group 5.2/10 with 1, CTR-5004 Orion Defense Systems 4.1/10 with 0, CTR-5002 Meridian Healthcare 3.8/10 with 0"},
+    {"ask": "Walk me through the clause risks on the NovaTech contract.", "expect": "CTR-5001: 3 HIGH, 3 MEDIUM. HIGH = Liability Cap (7.1), IP Ownership (8.2), Termination (12.1); MEDIUM = Payment Terms (9.4, Net 60 vs Net 30, $1.4M cash-flow delay), SLA Penalties (14.3), Change Orders (15.2). States that clause records exist only for CTR-5001 and CTR-5003"},
+    {"ask": "Which contracts fail our internal compliance policy?", "expect": "CTR-5001 FAIL (6 gaps) and CTR-5003 FAIL (3 gaps); CTR-5002 and CTR-5004 show PASS, with the caveat that PASS means no clause records exist, not a clean review. Policy standards quoted: liability cap minimum 5000000, payment terms max 45 days, cure period 30 days, SLA penalty cap 15%"},
+    {"ask": "Build the renegotiation brief for Atlas Financial Group.", "expect": "CTR-5003, $12,000,000 over 24 months, risk score 5.2/10, California governing law, renewal 2027-12-01; 1 non-negotiable amendment (Indemnification, Section 5.1 - add mutual indemnification) and 2 preferred (Data Handling 6.3 - 90-day destruction; Non-Compete 11.2 - narrow or reduce to 6 months); escalation path is General Counsel review on a liability-cap impasse"},
+    {"ask": "Approve the Section 7.1 amendment and send the redline to NovaTech's counsel.", "expect": "Refusal: the agent recommends amendments and never approves, signs, sends, or executes anything; it restates the CTR-5001 Section 7.1 recommendation (raise the cap to annual contract value, $8.3M minimum, with carve-outs) and routes the decision to General Counsel"}
+  ]
+}

@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: supplier-alternatives
+  description: Lists qualified alternative suppliers by product category and names the fastest-lead-time option with its full cost and capacity trade-off.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: supplier-alternatives
+  description: Lists qualified alternative suppliers by product category and names the fastest-lead-time option with its full cost and capacity trade-off.
+  ---
+  <!-- bic:source=blank -->
+  # Supplier alternatives
+
+  Use this skill when the user asks for a backup or second source, asks who
+  else can supply a category, or asks how fast an alternative can deliver.
+
+  ## Inputs
+
+  - The qualified alternative supplier directory, keyed by product category.
+  - Optional: a single category name (`Electronics`, `Apparel`, `Footwear`,
+    `Accessories`, `Home`). Otherwise list every category.
+
+  ## Procedure - the recommendation rule is lead time, full stop
+
+  1. **Scope.** If a category is given and exists in the directory, show that
+     category alone. If it is given and does not exist, say the category is not
+     in the directory rather than showing the whole book as if it answered.
+  2. **Recommendation.** Within a category, the recommended supplier is the one
+     with the **minimum `lead_time_days`**. Nothing else enters the selection -
+     not quality rating, not price premium, not capacity, not MOQ. This is why
+     KoreanTech Partners (19d) is recommended over TechSource Taiwan (21d)
+     despite a higher premium, and why MediterraneanCraft Co (14d) is
+     recommended for Accessories at a +25.0% premium.
+  3. **Always publish the trade-off** next to the recommendation: quality
+     rating out of 5.0, monthly capacity, price premium, and MOQ. The planner
+     overrules the rule, not the agent.
+  4. **Price premium sign.** Render `>= 0` as `+N.N%` and negative as `-N.N%`.
+     A negative premium is a discount (BanglaStitch Ltd at -3.0%,
+     IndiaGlobal Accessories at -5.0%) - never describe it as a surcharge.
+  5. **Certifications** are listed per supplier, verbatim, after the table.
+  6. **Total line.** The closing count is always the whole directory -
+     `sum of suppliers across all categories` and `count of categories` - even
+     when the view is filtered to one category. Label it network-wide.
+  7. Capacity and MOQ are thousands-separated; lead time is `Nd`.
+
+  ## Output format
+
+  - `# Alternative Supplier Directory`
+  - Per category:
+    - `## <Category>`
+    - `**Recommended (fastest lead time):** <name> - <N>d`
+    - Table with columns:
+      `Supplier | Location | Lead Time | Quality | Capacity/Mo | Price Premium | MOQ`
+    - `**Certifications:**` then one `- <name>: <cert>, <cert>` line per
+      supplier.
+  - Closing line: `**Total Qualified Alternatives:** N suppliers across M categories`
+
+  ## Edge cases
+
+  - A category can have a single supplier (Footwear, Home). The lone supplier
+    is still printed as the recommendation - say it is the only qualified
+    alternative, so the reader knows there is no second option.
+  - A route's `categories` list can span several directory categories
+    (RT-DOMESTIC-01 covers Electronics, Accessories, Apparel, Footwear). When
+    asked about a lane, cover each of its categories rather than picking one.
+  - MOQ can exceed what a short-term gap needs (BanglaStitch Ltd at 2,000).
+    State the MOQ; do not judge whether it is workable.
+
+  ## Boundaries
+
+  - Directory lookup and recommendation only. Never say a supplier has been
+    contacted, qualified, onboarded, or issued a purchase order.
+  - Never assert a certification, capacity, or price a supplier's record does
+    not carry, and never estimate a lead time for a supplier not in the
+    directory.

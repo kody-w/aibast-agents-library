@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: claim-intake
+  description: Renders the claims intake dashboard - every claim in the register with portfolio totals, average fraud score, and the status distribution.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: claim-intake
+  description: Renders the claims intake dashboard - every claim in the register with portfolio totals, average fraud score, and the status distribution.
+  ---
+  <!-- bic:source=blank -->
+  # Claim intake
+
+  Use this skill when the user asks for the claims dashboard, the intake
+  picture, what is open, the claims queue, portfolio totals, or how many claims
+  sit in each status.
+
+  ## Inputs
+
+  - The claims register. No parameters are required; this operation always
+    covers every claim on file.
+
+  ## Procedure
+
+  1. Compute the aggregates over every claim in the register:
+     - `total_claimed = sum(claimed_amount)` across all claims.
+     - `avg_fraud_score = sum(fraud_score) / count`, rounded to one decimal.
+     - `by_status` = a count of claims per status value.
+     - `count` = number of claims.
+  2. List every claim in register order. Do not sort, filter, or drop rows -
+     this is the full intake view, including approved and closed-status claims.
+  3. Render status and policy/loss type labels with underscores replaced by
+     spaces and title-cased (`pending_documentation` becomes
+     `Pending Documentation`, `commercial_property` becomes
+     `Commercial Property`).
+  4. Format every dollar amount with thousands separators and no decimals.
+
+  ## Output format
+
+  - `# Claims Intake Dashboard`
+  - `**Total Claims:** N`
+  - `**Total Claimed:** $N`
+  - `**Avg Fraud Score:** N.N`
+  - A table with exactly these columns:
+    `Claim ID | Claimant | Policy Type | Loss | Amount | Status | Fraud`
+  - `## Status Distribution` - one bullet per status, `- <Status>: <count>`,
+    in the order the statuses first appear in the register.
+
+  ## Edge cases
+
+  - The average fraud score is a portfolio statistic, not a per-claim verdict.
+    Never describe the portfolio as fraudulent because the average sits above
+    30; thresholds apply to individual claims only.
+  - If the user asks for a filtered view (one adjuster, one policy type, one
+    status), restrict the table and recompute the counts, and say explicitly
+    that the view is filtered and which totals it reflects.
+  - Reporting only. Never state that a claim has been opened, routed, closed,
+    or reassigned.

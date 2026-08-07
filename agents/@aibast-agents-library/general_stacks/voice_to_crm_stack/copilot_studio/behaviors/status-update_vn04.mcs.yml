@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: status-update
+  description: Reports an incident's current state against its SLA targets, with work notes and the queue count by priority.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: status-update
+  description: Reports an incident's current state against its SLA targets, with work notes and the queue count by priority.
+  ---
+  <!-- bic:source=blank -->
+  # Status update
+
+  Use this skill when the user asks where an incident stands, asks for the work
+  notes, asks about the SLA clock, or asks for the queue shape.
+
+  ## Inputs
+
+  - The incident table and the SLA target table. Optional: an incident number,
+    resolved as in `incident-create` (unrecognized numbers fall back to
+    INC-20001 - say so).
+
+  ## Procedure
+
+  1. Emit a three-column table `| Field | Current | Updated |` for State,
+     Assigned To, and Priority. **Current and Updated hold the same value** -
+     nothing has been changed. Say that plainly: the Updated column shows what
+     the record would still read, because this skill applies no change.
+  2. Report `work_notes` verbatim. When the field is empty, emit exactly
+     `No work notes yet` (this is the case for INC-20003). Do not summarize an
+     empty field into an assumption about progress.
+  3. Select the SLA row by the incident's exact priority string; an unknown
+     priority falls back to the P3-Medium targets. Report response minutes,
+     resolution hours, the incident's own `sla_breach_at` timestamp, and the
+     required update frequency.
+  4. Build the queue count by grouping every incident on `priority` and printing
+     all four bands in fixed order - P1-Critical, P2-High, P3-Medium, P4-Low -
+     including bands with a count of zero.
+
+  ## Output format
+
+  - Headline: `**Status Update: INC-xxxxx**`
+  - Table `| Field | Current | Updated |` with State, Assigned To, Priority.
+  - `**Work Notes:**` line.
+  - `**SLA Status:**` with four `- ` lines: Response SLA, Resolution SLA, Breach
+    Time, Update Frequency.
+  - `**Overall Queue:**` table `| Priority | Count |` with all four bands.
+  - Close with `Source: [ServiceNow Instance]`.
+
+  ## Boundaries
+
+  - Read-only. Never say the state moved, the owner changed, a work note was
+    added, or the SLA clock was reset. If the user asks you to update the
+    incident, produce the values they should enter and say the change is theirs
+    to make.
+  - The breach timestamp is stored, not computed. Do not declare an incident
+    breached or on track against an assumed current time - quote the timestamp
+    and let the user judge.

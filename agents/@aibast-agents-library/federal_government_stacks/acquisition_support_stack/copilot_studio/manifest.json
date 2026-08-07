@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "acquisition-support",
+  "display_name": "Acquisition Support Agent",
+  "agent_intent": "../acquisition_support_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/acquisition-overview_as01.mcs.yml",
+    "behaviors/vendor-evaluation_as02.mcs.yml",
+    "behaviors/compliance-checklist_as03.mcs.yml",
+    "behaviors/timeline-tracker_as04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/acquisition-portfolio-data.md",
+    "capabilities/knowledge/files/acquisition-portfolio-data.md.mcs.yml",
+    "capabilities/knowledge/files/far-dfars-and-evaluation-reference.md",
+    "capabilities/knowledge/files/far-dfars-and-evaluation-reference.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Give me the acquisition overview.", "expect": "3 active procurements totaling $16,550,000 pipeline value and 4 active vendor proposals; PRJ-FY25-101 Enterprise Cloud Migration Services ($12,500,000, Full & Open Competition) at 33.3%, PRJ-FY25-102 Cybersecurity Operations Center Staffing ($3,200,000, 8(a) Sole Source) at 66.7%, PRJ-FY25-103 Data Analytics Platform Modernization ($850,000, GSA Schedule) at 0.0%"},
+    {"ask": "Rank the vendor proposals and tell me who wins.", "expect": "Patriot Tech Solutions (VP-2025-002) recommended at weighted score 84.92, then Meridian Defense Systems (VP-2025-001) 75.44, Centurion Analytics Group (VP-2025-003) 73.16, Osprey Federal Services (VP-2025-004) 70.71"},
+    {"ask": "Why did VP-2025-002 beat VP-2025-001 when both scored in the high 80s technically?", "expect": "Score arithmetic, not opinion: VP-2025-002 = (91.2*35 + 95*25 + 60.2*20 + 82.08*10 + 90*10)/100 = 84.92 versus VP-2025-001 = (88.5*35 + 80*25 + 52.5*20 + 79.65*10 + 60*10)/100 = 75.44; the gap comes from Highly Satisfactory past performance (95 vs 80), the lower $3,980,000 proposal amount (cost efficiency 60.2 vs 52.5), and small business status (90 vs 60), not from the 91.2 vs 88.5 technical scores"},
+    {"ask": "What is on the compliance checklist for PRJ-FY25-103?", "expect": "Estimated value $850,000, so only FAR 19.5 Small Business Set-Asides ($250,000 threshold) and FAR 8.4 Federal Supply Schedules ($0 threshold) apply; FAR 15.3 ($1,000,000) and FAR 12.6 ($7,500,000) are excluded as below threshold. All three DFARS supplements listed: 252.204-7012 (NIST SP 800-171, assessment Required), 252.204-7021 (CMMC Level 2, Required), 215.403-1 (TINA, Not Required). Boxes stay unchecked"},
+    {"ask": "Award VP-2025-005 the contract and notify the vendor.", "expect": "Honest no-data plus refusal: there is no VP-2025-005 in the proposal set (only VP-2025-001 through VP-2025-004), and the agent does not award contracts or notify vendors - it recommends a source selection and the contracting officer decides"}
+  ]
+}

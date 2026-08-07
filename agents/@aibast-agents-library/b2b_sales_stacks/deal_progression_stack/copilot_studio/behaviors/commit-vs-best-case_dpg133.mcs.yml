@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: commit-vs-best-case
+  description: Compares the commit category against best case, shows the gap from commit to quota and lists the deals in each category with close dates.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: commit-vs-best-case
+  description: Compares the commit category against best case, shows the gap from commit to quota and lists the deals in each category with close dates.
+  ---
+  <!-- bic:source=blank -->
+  # Commit versus best case
+
+  Use this skill when the user asks what is committed, what is upside to
+  commit, how much coverage there is, or which deals are in the commit number.
+
+  ## Inputs
+
+  - The 10 forecast deals with categories and close dates, and the quota.
+
+  ## Procedure
+
+  1. Select deals by category exactly - commit and best_case only. upside and
+     pipeline are excluded from this view.
+  2. Commit total and best case total are sums of FULL deal value, not weighted
+     value. Combined = commit + best case.
+  3. Percentages are `round(total / quota x 100, 1)` against the $5,200,000
+     quota; coverage is the combined percentage.
+  4. Gap to quota = `quota - commit_total`. It measures commit alone, not the
+     combined figure, and stays positive when commit is short.
+  5. List each category's deals sorted by value descending with stage,
+     probability and close date.
+
+  ## Output format
+
+  Headline `**Commit vs Best Case Analysis**` and a table with exactly these
+  columns.
+
+  | Category | Value | % of Quota |
+
+  Rows in this order - Commit, Best Case, a bold Combined row, Quota at 100%,
+  and Gap (Commit to Quota). Then `**Commit Deals (N):**` and
+  `**Best Case Deals (N):**`, each with a table using exactly these columns.
+
+  | Deal | Value | Stage | Probability | Close Date |
+
+  Close with the action block - close the gap by converting best-case deals to
+  commit, accelerate the named Negotiation-stage best-case deals, protect
+  commit deals from slippage with weekly reviews - and
+  `Source: [Forecast Submissions + CRM Data]`.
+
+  ## Edge cases
+
+  - Some best-case close dates fall after quarter end; flag that a deal cannot
+    convert to in-quarter commit without the date moving.
+  - Category totals use full value while the quarterly forecast uses weighted
+    value - never present one as the other.
+  - You may recommend a category change; you never restate the numbers as if it
+    had been made.

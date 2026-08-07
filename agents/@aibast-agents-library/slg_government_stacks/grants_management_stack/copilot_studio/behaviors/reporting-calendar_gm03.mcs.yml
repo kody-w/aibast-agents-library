@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: reporting-calendar
+  description: Renders per-grant reporting requirements and a merged deadline list sorted ascending by due date, capped at the ten nearest reports.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: reporting-calendar
+  description: Renders per-grant reporting requirements and a merged deadline list sorted ascending by due date, capped at the ten nearest reports.
+  ---
+  <!-- bic:source=blank -->
+  # Reporting calendar
+
+  Use this skill when the user asks what reports are due, what the deadlines
+  are, what is coming up, what a specific grant owes its grantor, or what the
+  next filing is.
+
+  ## Inputs
+
+  - The reporting requirements set, keyed by grant id. Each entry has a report
+    name, a due date in `YYYY-MM-DD`, and a status.
+  - The grants portfolio, for the grant title on each section heading.
+
+  ## Procedure
+
+  Only grants that appear in the reporting requirements set get a section.
+  Grants absent from that set have no reporting schedule on file. Never
+  synthesize one.
+
+  Per-grant sections, in the order the requirements set stores them:
+
+  - Heading is `## <grant id>: <grant title>` taken from the portfolio. If the
+    portfolio has no matching grant, the title is `Unknown` - do not guess one.
+  - Table of that grant's reports in stored order. Do NOT sort within a grant.
+  - Status is title-cased (`upcoming` renders as `Upcoming`).
+
+  Then build the merged view:
+
+  1. Flatten every report from every grant into one list of
+     `{grant, report, due}`.
+  2. Sort ascending by the `due` string. ISO `YYYY-MM-DD` sorts correctly as
+     text, so this is a plain lexicographic ascending sort.
+  3. Ties on the same due date keep source order - the grant that appears first
+     in the requirements set comes first.
+  4. Take the first 10 entries only. If more than 10 exist, say that the list is
+     truncated to the 10 nearest.
+
+  ## Output format
+
+  ```
+  # Grant Reporting Calendar
+
+  ## LG-YYYY-NNN: <title>
+
+  | Report | Due Date | Status |
+
+  ## Upcoming Reports (All Grants)
+
+  | Due Date | Grant | Report |
+  ```
+
+  Dates stay in ISO `YYYY-MM-DD`. Never reformat them to prose.
+
+  ## Edge cases
+
+  - Asked about a grant with no entry in the requirements set, answer that no
+    reporting requirements are on file for that grant id and stop. Do not infer
+    a schedule from the grantor, the program type, or the grant period.
+  - `upcoming` is a stored status, not a computation against today's date. Do
+    not relabel a report as overdue, late, or complete; report the status the
+    data carries and let the grants manager judge timeliness.
+  - Reporting cadence varies by award - monthly draws, quarterly financials,
+    semi-annual performance, annual audit. Do not generalize one grant's cadence
+    onto another.
+  - Reference only. Never state that a report has been filed, submitted,
+    extended, or acknowledged by the grantor.

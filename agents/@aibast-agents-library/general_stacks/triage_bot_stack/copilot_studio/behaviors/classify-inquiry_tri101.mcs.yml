@@ -1,0 +1,76 @@
+mcs.metadata:
+  componentName: classify-inquiry
+  description: Classifies inquiries into one of six categories with a confidence score, and reports the category taxonomy with owning team and SLA.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: classify-inquiry
+  description: Classifies inquiries into one of six categories with a confidence score, and reports the category taxonomy with owning team and SLA.
+  ---
+  <!-- bic:source=blank -->
+  # Classify inquiry
+
+  Use this skill when the user asks what an inquiry is about, asks to triage
+  or categorize the queue, asks which category a piece of inquiry text falls
+  into, or asks what the categories and their SLAs are.
+
+  ## Inputs
+
+  - The inquiry queue (INQ- ids with text, customer, tier, impact, urgency,
+    stored category and stored confidence).
+  - Optional: free inquiry text to classify, or a single INQ- id. Otherwise
+    classify every inquiry in the queue.
+
+  ## Procedure
+
+  For an inquiry already in the queue, report its stored category and its
+  stored confidence. Do not recompute and do not average.
+
+  For new free text, apply the keyword classifier in this exact order and stop
+  at the first match. Order matters: a message containing both "error" and
+  "invoice" classifies as Technical Support, not Billing.
+
+  1. Technical Support, confidence 95% - text contains any of: "error",
+     "not working", "can't access", "bug", "crash".
+  2. Sales Inquiry, confidence 92% - text contains any of: "pricing", "demo",
+     "purchase", "quote".
+  3. Billing & Payments, confidence 94% - text contains any of: "invoice",
+     "payment", "billing", "charge".
+  4. Security Concern, confidence 97% - text contains any of: "security",
+     "unauthorized", "breach", "privacy".
+  5. Feature Request, confidence 88% - text contains any of: "feature",
+     "enhancement", "wish", "suggestion".
+  6. No keyword matched: Account Management, confidence 75%. Say that this is
+     the fallback bucket, not a positive match.
+
+  Matching is case-insensitive on the whole message.
+
+  ## Output format
+
+  Headline `**Inquiry Classification Results**`, then a table of the inquiries
+  processed with these columns in this order:
+
+  `| ID | Inquiry | Category | Confidence | Customer |`
+
+  Inquiry text is truncated to the first 45 characters followed by `...`.
+  Confidence is a whole percent (97%, not 0.97).
+
+  Then `**Category Definitions:**` and a second table for all six categories:
+
+  `| Category | Description | Team | SLA |`
+
+  SLA is the category SLA in hours (Security Concern 1h, Sales Inquiry 2h,
+  Technical Support 4h, Billing & Payments 8h, Account Management 8h,
+  Feature Request 72h).
+
+  Close with the source line `Source: [Classification Engine + NLP]`.
+
+  ## Boundaries
+
+  - Never invent a category outside the six defined ones, and never invent a
+    confidence for an inquiry whose confidence is not recorded.
+  - Classification is not routing and not priority. If the user also wants a
+    destination or a clock, hand off to the routing or priority skill rather
+    than improvising one here.
+  - Recommendation only. Never say an inquiry has been tagged, filed, or
+    moved.

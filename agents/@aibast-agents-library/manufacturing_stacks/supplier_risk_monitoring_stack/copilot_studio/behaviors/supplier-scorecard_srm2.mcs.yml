@@ -1,0 +1,71 @@
+mcs.metadata:
+  componentName: supplier-scorecard
+  description: Produces the per-supplier scorecard - profile, composite health, the four dimension scores with status bands, and the incidents on file.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: supplier-scorecard
+  description: Produces the per-supplier scorecard - profile, composite health, the four dimension scores with status bands, and the incidents on file.
+  ---
+  <!-- bic:source=blank -->
+  # Supplier scorecard
+
+  Use this skill when the user asks about a specific supplier, asks for a
+  scorecard, asks how a supplier is performing on quality/delivery/financial/
+  geopolitical, or asks for the detail behind a risk score.
+
+  ## Inputs
+
+  - The supplier master and the incident log.
+  - Optional: a SUP- id or a supplier name. With no argument, produce a
+    scorecard for every supplier in supplier-master order (SUP-101 through
+    SUP-105).
+
+  ## Procedure
+
+  For each supplier in scope:
+
+  1. Composite health =
+     `round(quality * 0.30 + delivery * 0.25 + financial * 0.25 + geopolitical * 0.20, 1)`.
+  2. Risk tier from `overall_risk`: `>= 7.0` CRITICAL, `>= 5.0` HIGH,
+     `>= 3.0` MODERATE, otherwise LOW.
+  3. Status band for each of the four dimensions, applied identically to all
+     four: `>= 80` Good, `>= 60` Watch, below 60 At Risk.
+  4. Select incidents whose `supplier_id` matches this supplier. Report them
+     in log order with severity, date, and the description verbatim.
+
+  ## Output format
+
+  Per supplier:
+
+  - `### <name> (SUP-xxx)`
+  - `- **Category:** <category>`
+  - `- **Region:** <region> (<country>)`
+  - `- **Annual spend:** $N`
+  - `- **Tier:** <1 or 2>`
+  - `- **Overall risk:** N/10 (<TIER>)`
+  - `- **Composite health:** N/100`
+
+  Then one table, exactly these columns:
+
+  | Dimension | Score | Status |
+
+  Rows in fixed order: Quality, Delivery, Financial, Geopolitical. Scores
+  rendered as `N/100`.
+
+  Then, only if incidents exist for that supplier:
+
+  - `**Recent incidents (N):**`
+  - one line per incident: `- [SEVERITY] YYYY-MM-DD: <description>`
+
+  ## Edge cases
+
+  - A supplier with no incidents gets no incident section at all. Do not write
+    "none recorded" into the table, and never borrow another supplier's
+    incident. If the user asks directly, state that no incidents are on file
+    for that SUP- id.
+  - A score of exactly 80 is Good; exactly 60 is Watch.
+  - If the requested supplier is not in the supplier master, say so and list
+    the SUP- ids that are on file. Do not approximate.
+  - Composite health and overall risk are different measures on different
+    scales (0-100 health, 0-10 risk). Never present one as the other.

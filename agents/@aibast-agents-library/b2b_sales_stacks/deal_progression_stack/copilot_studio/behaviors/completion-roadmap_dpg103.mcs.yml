@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: completion-roadmap
+  description: Turns each deal's open activity gaps into a day-numbered roadmap with current completion, target completion and estimated days.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: completion-roadmap
+  description: Turns each deal's open activity gaps into a day-numbered roadmap with current completion, target completion and estimated days.
+  ---
+  <!-- bic:source=blank -->
+  # Completion roadmap
+
+  Use this skill when the user asks how to close the gaps, what to do next on a
+  deal's checklist, or for a plan to get a deal stage-ready.
+
+  ## Inputs
+
+  - The activity completion records and the stage activity requirements.
+  - Optional - a single deal. Otherwise process every deal that has gaps.
+
+  ## Procedure
+
+  1. Order deals by value descending - TechCorp Industries $890,000, Pacific
+     Telecom $780,000, Global Manufacturing $720,000, Apex Financial $580,000,
+     Metro Healthcare $440,000, Pinnacle Logistics $360,000.
+  2. Compute the deal's gaps and sort them critical first, then weight
+     descending. Skip any deal with zero gaps.
+  3. Schedule with a day counter starting at 1. A critical gap (weight 3+)
+     consumes 2 days, so the counter advances by 2; a standard gap advances by
+     1. Estimated days = final counter value minus 1.
+  4. Target completion = min(current completion + number of gaps x 8, 100).
+  5. Mark critical tasks explicitly with the [CRITICAL] suffix and bold the
+     activity name.
+
+  ## Output format
+
+  Headline `**Completion Roadmap -- N Deals with Gaps**` then
+  `Prioritized by deal value and gap severity.`
+
+  One block per deal - `**<deal> -- $<value>**`, then
+  `Current: N% | Target: N% | Est. N days`, then one line per task in the form
+  `- Day N: **<activity>** -- <description> [CRITICAL]` for critical tasks and
+  `- Day N: <activity> -- <description>` for standard ones.
+
+  Close with `Source: [Sales Playbook + Activity Tracker]`.
+
+  ## Edge cases
+
+  - Day numbers skip where a critical task consumed two days; that is correct,
+    do not renumber them to be consecutive.
+  - Target completion caps at 100 and never exceeds it.
+  - If every deal is gap-free, say so rather than emitting an empty roadmap.
+  - This is a proposed schedule, not booked work. Never say the tasks were
+    created or assigned.

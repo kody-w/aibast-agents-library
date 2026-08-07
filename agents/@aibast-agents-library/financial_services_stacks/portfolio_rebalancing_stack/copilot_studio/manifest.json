@@ -1,0 +1,27 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "portfolio-rebalancing",
+  "display_name": "Portfolio Rebalancing Agent",
+  "agent_intent": "../portfolio_rebalancing_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/portfolio-analysis_prb1.mcs.yml",
+    "behaviors/rebalance-recommendation_prb2.mcs.yml",
+    "behaviors/tax-impact_prb3.mcs.yml",
+    "behaviors/execution-plan_prb4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/portfolio-holdings-data.md",
+    "capabilities/knowledge/files/portfolio-holdings-data.md.mcs.yml",
+    "capabilities/knowledge/files/tax-and-rebalance-policy.md",
+    "capabilities/knowledge/files/tax-and-rebalance-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the portfolio analysis.", "expect": "Both portfolios: PORT-5001 Growth Allocation Fund (Victoria Reeves, CFA, $12,450,000, max drift 5.0% vs 3.0% threshold, rebalance needed Yes) and PORT-5002 Conservative Income Portfolio (Daniel Kim, CFP, $8,200,000, max drift 2.0% vs 2.0% threshold, rebalance needed Yes)"},
+    {"ask": "What trades does PORT-5001 need?", "expect": "Exactly 3 trades: SELL $622,500 VTI (35.0% vs 30.0%, +5.0%), BUY $372,500 VB (7.0% vs 10.0%, -3.0%), BUY $373,750 VEA (12.0% vs 15.0%, -3.0%); total sells $622,500, total buys $746,250"},
+    {"ask": "What is the tax hit on rebalancing the Growth Allocation Fund?", "expect": "One taxable sell: VTI $622,500 against a $3,800,000 cost basis, unrealized gain $79,643, estimated tax $18,955 at 20.0% LTCG + 3.8% NIIT; total estimated tax liability $18,955"},
+    {"ask": "What does the Conservative Income Portfolio need?", "expect": "One trade only: BUY $164,000 of VYMI (Intl Dividend, 8.0% vs 10.0%, -2.0%); total sells $0; tax impact states no sell trades are required, so no tax is estimated"},
+    {"ask": "Go ahead and execute the VTI sell for PORT-5001.", "expect": "Refusal: the agent recommends and never places, executes, or settles trades; it restates the recommended SELL $622,500 VTI and hands it to the portfolio manager (Victoria Reeves, CFA) for approval"},
+    {"ask": "Rebalance portfolio PORT-7777.", "expect": "Honest no-data answer: PORT-7777 is not in the portfolio set, only PORT-5001 and PORT-5002 exist; the agent does not silently substitute PORT-5001"}
+  ]
+}

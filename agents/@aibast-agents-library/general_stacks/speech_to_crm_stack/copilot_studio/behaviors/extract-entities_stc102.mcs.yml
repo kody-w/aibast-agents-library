@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: extract-entities
+  description: Lists every named entity extracted from the call with type, value, confidence, and context, plus counts by type and a total.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: extract-entities
+  description: Lists every named entity extracted from the call with type, value, confidence, and context, plus counts by type and a total.
+  ---
+  <!-- bic:source=blank -->
+  # Extract entities
+
+  Use this skill when the user asks what was extracted from a call, asks for
+  the people / dollar amounts / dates / commitments mentioned, asks about pain
+  points raised, or asks how confident the extraction is.
+
+  ## Inputs
+
+  - The extracted-entity set for the call and the entity type definitions.
+  - Optional: a type filter (person, organization, money, date, product,
+    pain_point, action_item, competitor). Otherwise return every entity.
+
+  ## Procedure - mechanical, not interpretive
+
+  1. Emit every entity in stored order. Do not re-rank by confidence and do not
+     drop low-confidence entities; the lowest scored entity in the set is
+     `20 hours/week manual reporting` at `94%` and it still appears.
+  2. Render `type` in title case exactly as stored, underscores preserved:
+     `pain_point` renders as `Pain_Point`, `action_item` as `Action_Item`.
+  3. Render `confidence` as a whole percent with no decimals: `0.99` renders as
+     `99%`.
+  4. Truncate the context column at 45 characters - `context[:45]`, no ellipsis
+     added. For the current set every context is at or under 45 characters, so
+     nothing is cut.
+  5. Build the summary by walking the entities in order and counting per type,
+     so the summary lines appear in first-appearance order, not alphabetical:
+     Person, Organization, Money, Date, Pain_Point, Action_Item.
+  6. Total = the count of entities emitted. For CALL-T001 that is `11`
+     (Person 3 + Organization 1 + Money 2 + Date 2 + Pain_Point 1 +
+     Action_Item 2 = 11).
+
+  ## Output format
+
+  - Headline: `**Entity Extraction Results**`
+  - Table `| Type | Value | Confidence | Context |`, one row per entity.
+  - `**Summary by Type:**` followed by `- <Type>: <count>` lines in
+    first-appearance order.
+  - `**Total Entities:** N`
+  - Footer: `Source: [NLP Entity Extraction Engine]` and
+    `Agents: SpeechToCRMAgent`.
+
+  ## Edge cases
+
+  - The entity set is produced for the call as a whole; it does not vary by
+    which segment the user asks about. If asked "what did Jennifer say about
+    budget," quote the transcript segment and cite the `$200,000` money entity
+    at 98% - do not synthesize a new entity.
+  - Two Money entities exist and they mean different things: `$200,000` is the
+    approved budget, `$50,000` is the annual cost of manual reporting. Never
+    combine, net, or substitute them.
+  - Never invent an entity type that has no rows. The definitions include
+    `product` and `competitor` types; the current extraction returned no rows
+    for them, so they do not appear in the table or the summary. If the user
+    asks about competitors, say the extraction returned no competitor entity
+    and point to the transcript mention of SAP as an integration target.

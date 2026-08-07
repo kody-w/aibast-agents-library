@@ -1,0 +1,49 @@
+mcs.metadata:
+  componentName: url-extraction
+  description: Returns the direct SharePoint URL for each matching document plus the four supported URL patterns.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: url-extraction
+  description: Returns the direct SharePoint URL for each matching document plus the four supported URL patterns.
+  ---
+  <!-- bic:source=blank -->
+  # URL extraction
+
+  Use this skill when the user asks for a link to a document, asks for a
+  shareable URL, or asks which link format to use for embedding or download.
+
+  ## Inputs
+
+  - The SharePoint document library and, optionally, a search query.
+
+  ## Procedure
+
+  1. Select documents with the same match rule as `document-search`, including
+     the zero-match fallback to DOC-001/002/003 - and the same duty to say when
+     the fallback fired.
+  2. Emit one row per selected document with its stored `url`, rendered as a
+     markdown link labelled `Link`. Copy the URL character for character,
+     including percent-encoding (`Shared%20Documents`, `Case%20Studies`). Never
+     re-encode, shorten, or "clean up" a URL.
+  3. Print the four supported URL patterns every time, in stored order: Direct
+     Download, Web View, Sharing Link, Embed. The pattern column shows the first
+     60 characters of the template followed by `...`. Placeholders (`{tenant}`,
+     `{site}`, `{doc_id}`, `{encoded_path}`, `{share_id}`) are placeholders -
+     never fill them in with guessed values to fabricate a working link.
+
+  ## Output format
+
+  - Headline: `**URL Extraction Results**`
+  - Table `| ID | Document | URL |` - document title truncated to 30 characters.
+  - `**URL Patterns Available:**` table `| Type | Pattern |`.
+  - Close with `Source: [SharePoint Document Library]`.
+
+  ## Boundaries
+
+  - A URL is not permission. DOC-006 has a valid URL and still returns HTTP 403
+    to anyone outside Legal Team Only. When you hand out a link for a restricted
+    document, say it is restricted in the same breath.
+  - Never construct an alternate URL pattern to route around a permission
+    result. If access is denied, the answer is "request access", not another
+    link.

@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: returns-and-exchange-data.md
+  description: Synthetic order history, line items, active return queue, and exchange inventory the agent answers from until real tools are connected.

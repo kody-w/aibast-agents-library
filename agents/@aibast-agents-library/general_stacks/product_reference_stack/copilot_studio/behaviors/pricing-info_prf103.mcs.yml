@@ -1,0 +1,79 @@
+mcs.metadata:
+  componentName: pricing-info
+  description: Presents the published rate card for all six products and computes worked annual bundle totals for a given seat count.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pricing-info
+  description: Presents the published rate card for all six products and computes worked annual bundle totals for a given seat count.
+  ---
+  <!-- bic:source=blank -->
+  # Pricing info
+
+  Use this skill when the user asks what something costs, asks for the rate
+  card, asks about annual versus monthly billing, or asks for a bundle total
+  at a seat count.
+
+  ## Inputs
+
+  - The pricing tiers for all six products.
+  - Optional: a seat count and a billing term (`annual` or `monthly`). The
+    worked examples default to the Enterprise full suite -- ENT + ANLYT-PRO +
+    INTGR + SECUR -- at 100 and 500 users on annual billing.
+
+  ## Procedure
+
+  Render one row per product, in catalog order, with the published numbers:
+
+  | Product | Monthly | Annual | Savings |
+  |---|---|---|---|
+  | Core Platform | $29/user | $24/user | 17% |
+  | Enterprise Platform | $79/user | $65/user | 18% |
+  | Analytics Standard | $19/user | $15/user | 21% |
+  | Analytics Pro | $49/user | $40/user | 18% |
+  | Integration Hub | $1,500 flat | $15,000 flat | 17% |
+  | Security Suite | $1,250 flat | $12,500 flat | 17% |
+
+  Bundle totals are arithmetic, not judgment. For each product in the bundle:
+
+  - Per-seat product, annual term: `annual_per_user x users x 12`.
+  - Per-seat product, monthly term: `monthly_per_user x users x 12` -- the
+    monthly rate is also annualized over 12 months, so the two terms are
+    directly comparable and the difference IS the annual saving.
+  - Flat-rate product, annual term: add `annual_flat` once (already a yearly
+    figure -- do NOT multiply by 12).
+  - Flat-rate product, monthly term: `monthly_flat x 12`.
+
+  Sum across the bundle. Worked, and reproducible:
+
+  - Enterprise full suite, 100 users, annual:
+    `65 x 100 x 12 = 78,000` + `40 x 100 x 12 = 48,000` + `15,000` +
+    `12,500` = **$153,500/year**.
+  - Enterprise full suite, 500 users, annual:
+    `65 x 500 x 12 = 390,000` + `40 x 500 x 12 = 240,000` + `15,000` +
+    `12,500` = **$657,500/year**.
+
+  ## Output format
+
+  - Headline `**Pricing Information**`.
+  - The rate-card table above, columns `Product | Monthly | Annual | Savings`.
+  - `**Bundle Examples (Annual Billing):**` with one bullet per seat count,
+    formatted `- Enterprise Full Suite (<N> users): $<total>/year`, thousands
+    separated.
+  - `**Notes:**` reproducing the three published notes verbatim: volume
+    discounts available for 50+ users; multi-year commitments receive an
+    additional 10-20% discount; non-profit and education pricing available.
+  - Close with `Source: [Pricing Engine]`.
+
+  ## Edge cases
+
+  - A product with no pricing entry contributes $0 to a bundle. If that ever
+    happens, say the product has no published price rather than reporting a
+    total that quietly excludes it.
+  - Volume, multi-year, non-profit, and education pricing are stated as
+    available. The only published multi-year range is 10-20%; there is no
+    published volume percentage. Do not compute a discounted total from an
+    unpublished rate.
+  - This is list pricing, not a quote. Never present a total as an offer,
+    apply a custom discount, or commit to a price -- hand the numbers to the
+    person who owns the deal.

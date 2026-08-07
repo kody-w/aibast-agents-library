@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: customer-onboarding-data.md
+  description: Synthetic customer application pipeline, KYC verification results, account product catalog, and pipeline status definitions the agent answers from until real tools are connected.

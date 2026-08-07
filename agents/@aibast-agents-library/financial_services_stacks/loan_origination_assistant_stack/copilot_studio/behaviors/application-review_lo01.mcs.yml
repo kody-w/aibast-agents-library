@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: application-review
+  description: Renders the loan origination pipeline - every application with amount, LTV, status, and loan officer - plus pipeline volume and the current rate sheet.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: application-review
+  description: Renders the loan origination pipeline - every application with amount, LTV, status, and loan officer - plus pipeline volume and the current rate sheet.
+  ---
+  <!-- bic:source=blank -->
+  # Application review
+
+  Use this skill when the user asks for the pipeline, the board, open
+  applications, what is in origination, total volume, or today's rates.
+
+  ## Inputs
+
+  - The loan application pipeline and the rate sheet (knowledge/tools).
+  - No parameters. This skill always reports the whole pipeline; it does not
+    take an application id. A question about one file goes to credit analysis.
+
+  ## Procedure
+
+  1. Retrieve every application. Keep the recorded pipeline order
+     (LA-2025-4001, LA-2025-4002, LA-2025-4003, LA-2025-4004). Do not re-sort
+     by amount, status, or risk unless the user explicitly asks for a sort, and
+     say so when you do.
+  2. For each application compute
+     `LTV = round(loan_amount / property_value * 100, 1)`.
+     If `property_value` is 0, LTV is 0 - report it as 0% and flag the missing
+     valuation rather than omitting the row.
+  3. Format `loan_amount` as a dollar figure with thousands separators and no
+     cents (`$388,000`).
+  4. Render the product label from `loan_type` by replacing underscores with
+     spaces and title-casing: `Conventional 30Yr`, `Fha 30Yr`, `Va 30Yr`,
+     `Commercial 5Yr`. Render `status` the same way: `Underwriting`,
+     `Document Review`, `Credit Review`, `Approved`.
+  5. `Pipeline Volume` = the sum of every `loan_amount` in the table shown.
+     `Applications` = the row count.
+  6. Append the rate sheet for all four products, unfiltered.
+
+  ## Output format
+
+  Heading `# Loan Application Pipeline`, then one table, exactly these columns:
+
+  | App ID | Applicant | Type | Amount | LTV | Status | LO |
+
+  Then the two totals, each on its own line:
+
+  - `**Pipeline Volume:** $N`
+  - `**Applications:** N`
+
+  Then `## Rate Sheet` and one table, exactly these columns:
+
+  | Product | Rate | APR | Points |
+
+  Rate and APR carry a `%` suffix; points are a bare number.
+
+  ## Edge cases
+
+  - The rate sheet also records FHA mortgage insurance (1.75% upfront, 0.55%
+    annual) and the VA funding fee (2.15%). These are not columns in the rate
+    table - quote them only when the user asks about FHA MIP or the VA funding
+    fee, and name them as the recorded product fields they are.
+  - A 100.0% LTV on a VA file (LA-2025-4004) is not an exception - VA allows up
+    to 100% LTV. Do not flag it as a problem in this view.
+  - Never present pipeline volume as approved or funded volume. It is the sum
+    of requested loan amounts across all statuses, including files still in
+    document and credit review.

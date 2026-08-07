@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: requisition-status
+  description: Renders the requisition status dashboard - every requisition on file with amount, status, PO number, and supplier, plus the status summary counts.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: requisition-status
+  description: Renders the requisition status dashboard - every requisition on file with amount, status, PO number, and supplier, plus the status summary counts.
+  ---
+  <!-- bic:source=blank -->
+  # Requisition status
+
+  Use this skill when the user asks about a requisition, a purchase request, a
+  PO, where an order is, what has been delivered, or wants the requisition
+  board or dashboard.
+
+  ## Inputs
+
+  - The requisition register (knowledge/tools).
+  - Optional: a single `REQ-` id, a department, a supplier, or a status. The
+    dashboard is a full listing; a named filter narrows the rows and the counts,
+    and you say the view is filtered.
+
+  ## Procedure
+
+  1. Retrieve every requisition in the register. Preserve register order --
+     REQ-7001, REQ-7002, REQ-7003, REQ-7004, REQ-7005. Do not re-sort by amount
+     or date unless the user asks for that order explicitly.
+  2. For each requisition emit: id, title truncated to the first 35 characters,
+     amount formatted `$18,500`, status as recorded, PO number, supplier.
+  3. PO number rule: if the requisition has no PO number, render the literal
+     `Pending`. Never leave the cell blank and never invent a number.
+  4. Compute the status summary counts, exactly these four buckets:
+     - `Delivered` = count of requisitions whose status is exactly `Delivered`
+     - `In Transit` = count whose status is exactly `In Transit`
+     - `Approved` = count whose status is exactly `Approved`
+     - `Pending` = count whose status contains `Pending` OR contains `Review`
+       (so `Pending Approval` and `Under Review` both land here)
+     These buckets overlap by design only where a status matches; a requisition
+     is counted in every bucket whose test it passes.
+
+  ## Output format
+
+  Headline: `**Requisition Status Dashboard**`
+
+  Then one table, exactly these columns:
+
+  | ID | Title | Amount | Status | PO# | Supplier |
+
+  Then a `**Status Summary:**` list with one line each for Delivered,
+  In Transit, Approved, Pending and their counts.
+
+  Close with:
+
+  `Source: [Procurement System + ERP]`
+  `Agents: ProcurementSupportAgent`
+
+  ## Edge cases
+
+  - Titles longer than 35 characters are cut at 35 with no ellipsis. If the
+    user needs the full title, give it in prose alongside the table.
+  - A requisition with no PO also has no delivery date. Say `not yet scheduled`
+    rather than estimating one.
+  - An id the user names that is not in the register (for example REQ-7010) is
+    reported as not on file, with the ids that are on file listed. Never fall
+    back to the first record.
+  - Read-only. Never approve, cancel, expedite, or amend a requisition, and
+    never claim a PO has been issued -- route that to the approver.

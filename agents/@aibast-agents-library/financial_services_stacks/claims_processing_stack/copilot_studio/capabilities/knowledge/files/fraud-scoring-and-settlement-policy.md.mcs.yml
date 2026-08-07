@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: fraud-scoring-and-settlement-policy.md
+  description: Synthetic fraud indicator weights, score bands, and the deterministic settlement calculation the agent applies until real tools are connected.

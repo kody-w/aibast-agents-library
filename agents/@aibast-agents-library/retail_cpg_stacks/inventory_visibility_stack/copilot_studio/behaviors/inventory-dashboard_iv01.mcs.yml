@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: inventory-dashboard
+  description: Renders on-hand, safety stock, stock status, and days of supply for every SKU at a location, plus the network inventory total.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: inventory-dashboard
+  description: Renders on-hand, safety stock, stock status, and days of supply for every SKU at a location, plus the network inventory total.
+  ---
+  <!-- bic:source=blank -->
+  # Inventory dashboard
+
+  Use this skill when the user asks what is on hand, asks for the inventory
+  picture at a store or warehouse, asks how many days of supply something has,
+  or asks for the network inventory position.
+
+  ## Inputs
+
+  - The location master, the SKU catalog, on-hand quantities, safety-stock
+    levels, and daily sell-through rates.
+  - Optional: a single location id (`STR-001`..`STR-004`, `WH-CENTRAL`,
+    `WH-EAST`). With no location, report all four stores in id order.
+
+  ## Procedure - compute it, do not estimate it
+
+  1. Scope the locations. If a location id is given and it exists in the
+     inventory data, report that location only. Otherwise report the four
+     stores `STR-001`, `STR-002`, `STR-003`, `STR-004` in that order.
+  2. Within each location, list all 8 SKUs in ascending SKU-id order
+     (`SKU-1001` through `SKU-1008`). Never re-sort by quantity or status.
+  3. Days of supply: `on_hand / daily_sell_through`, rounded to one decimal.
+     If the sell-through rate is 0, report `999.0` (effectively no drain).
+  4. Stock status, applied in this order, no exceptions:
+     - `on_hand == 0` -> `OUT_OF_STOCK`
+     - `on_hand <= safety_stock` -> `CRITICAL`
+     - `on_hand <= safety_stock * 1.5` -> `LOW`
+     - otherwise -> `HEALTHY`
+     The comparisons are inclusive: 12 on-hand against 8 safety stock is
+     `LOW`, because `8 * 1.5 = 12`.
+  5. Network total: sum every SKU at every one of the 6 locations - the four
+     stores plus `WH-CENTRAL` and `WH-EAST`. This total is 26,315 units and
+     does not change when the view is filtered to one location.
+
+  ## Output format
+
+  - `# Inventory Dashboard`
+  - Per location: `## <Location Name> (`<LOC-ID>`)` followed by a table with
+    columns: `SKU | Product | On-Hand | Safety Stock | Status | Days of Supply`
+  - Closing line: `**Total Network Inventory:** 26,315 units across 6 locations`
+
+  ## Edge cases
+
+  - Warehouses (`WH-CENTRAL`, `WH-EAST`) have no safety-stock levels defined.
+    Report their Safety Stock cell as `N/A` and say the status column is
+    computed against a zero floor there, so a warehouse reads `HEALTHY` on any
+    non-zero quantity.
+  - An unrecognized location id is not a filter failure to hide: say the id is
+    not in the location master, name the six valid ids, and do not silently
+    fall back to the all-stores view.
+  - Report status labels verbatim in caps (`HEALTHY`, `LOW`, `CRITICAL`,
+    `OUT_OF_STOCK`); never paraphrase them as "fine" or "running out".

@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: insurance-verification
+  description: Reports coverage status, office copay, remaining deductible, and secondary policy state for every patient with a plan on file.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: insurance-verification
+  description: Reports coverage status, office copay, remaining deductible, and secondary policy state for every patient with a plan on file.
+  ---
+  <!-- bic:source=blank -->
+  # Insurance verification
+
+  Use this skill when the user asks whether coverage is verified, what a
+  patient owes at the desk, what the remaining deductible is, or whether a
+  patient has a secondary policy.
+
+  ## Inputs
+
+  - The insurance plan records, joined to the patient registry for names.
+
+  ## Procedure - exact rules
+
+  1. Process every patient that has an entry in the insurance records. The
+     name is looked up from the registry; if the patient id has no registry
+     entry the name renders as `Unknown`.
+  2. All reported plan fields come from the `primary` policy. If a field is
+     absent the renderer substitutes `N/A` (payer, plan, member id),
+     `unknown` (status), or `0` (copay).
+  3. Remaining deductible is arithmetic, computed as:
+     `deductible_remaining = max(0, deductible - deductible_met)`
+     Never round, never estimate, never report a negative number.
+     Worked from the current records:
+     - PT-20001 Jennifer Walsh: 1500 - 875 = $625
+     - PT-20002 David Nguyen: 2000 - 320 = $1,680
+     - PT-20003 Maria Gonzalez: 257 - 257 = $0
+  4. The `Copay` column is the **office** copay (`copay_office`). The
+     specialist copay is a separate value ($50 for PT-20001, $40 for
+     PT-20002, $0 for PT-20003) and must be labeled as the specialist copay
+     whenever you quote it.
+  5. Status renders in capitals (`VERIFIED`, `PENDING`). Report the status as
+     recorded. Do not treat a `pending` policy as usable coverage.
+  6. Secondary coverage renders as `Yes (<secondary status>)` when a
+     secondary policy exists, otherwise `No`. A secondary policy contributes
+     nothing to the copay or deductible columns - those are primary-only.
+     Do not add, net, or estimate a secondary contribution.
+  7. Coinsurance percentages and effective dates exist in the records but are
+     not part of this table. Quote them only if asked, and label them.
+
+  ## Output format
+
+  Headline `# Insurance Verification`, then one table:
+
+  `| Patient | Payer | Plan | Member ID | Status | Copay | Ded. Remaining | Secondary |`
+
+  Money renders with a leading `$` and thousands separators (`$1,680`).
+
+  ## Edge cases
+
+  - A pending secondary (PT-20003) has no `last_verified` date. Say the
+    secondary is pending and unverified; recommend the front desk re-run
+    eligibility. You cannot run it.
+  - Asked to re-verify, submit an eligibility check, or change a status:
+    refuse - this is a read of the record, not a payer transaction.
+  - Asked what a visit will cost: give copay and remaining deductible only.
+    A total charge estimate is not supported by this data.

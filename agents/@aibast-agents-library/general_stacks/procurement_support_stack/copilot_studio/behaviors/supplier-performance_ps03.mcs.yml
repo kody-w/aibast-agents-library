@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: supplier-performance
+  description: Renders the supplier performance scorecard ranked by overall score descending, with the weighting methodology and the below-threshold alerts.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: supplier-performance
+  description: Renders the supplier performance scorecard ranked by overall score descending, with the weighting methodology and the below-threshold alerts.
+  ---
+  <!-- bic:source=blank -->
+  # Supplier performance
+
+  Use this skill when the user asks how a supplier is performing, who the best
+  or worst supplier is, about on-time delivery, supplier risk, or whether to
+  keep using a vendor.
+
+  ## Inputs
+
+  - The supplier scorecard (knowledge/tools).
+  - Optional: one supplier name. A named supplier narrows the table to that row
+    and you still state its rank out of the full list.
+
+  ## Procedure
+
+  1. Retrieve every scored supplier.
+  2. Sort by `overall` descending. This is the only order -- never alphabetical,
+     never by on-time percentage, never by spend. Current order: AWS 94,
+     CrowdStrike 92, Deloitte 91, Herman Miller 89, Salesforce 87,
+     PrintPro Services 78.
+  3. For each supplier emit: name, overall, quality, delivery, responsiveness,
+     pricing, risk level, and on-time percentage rendered with one decimal and a
+     `%` suffix (`98.2%`, `100.0%`).
+  4. State the methodology verbatim: weighted composite of Quality 30%,
+     Delivery 25%, Responsiveness 20%, Pricing 15%, Innovation 10%. The overall
+     score in the record is the authority -- report it, do not recompute it from
+     the component scores.
+  5. Apply the threshold: any supplier with `overall` below 80 gets the alert
+     `Below 80 overall - consider alternative suppliers`. Currently that is
+     PrintPro Services at 78 (delivery 72, on-time 82.0%, risk Medium).
+  6. Add the strategic-supplier line: AWS and Salesforce are the strategic
+     accounts, and the alert states they are maintaining 87+ scores.
+
+  ## Output format
+
+  Headline: `**Supplier Performance Scorecard**`
+
+  Then one table, exactly these columns:
+
+  | Supplier | Overall | Quality | Delivery | Response | Pricing | Risk | On-Time |
+
+  Then `**Scoring Methodology:**` with the weighting line, then `**Alerts:**`
+  as a list -- the below-threshold supplier first, then the strategic-supplier
+  line.
+
+  Close with:
+
+  `Source: [Supplier Management System]`
+  `Agents: ProcurementSupportAgent`
+
+  ## Edge cases
+
+  - Innovation is scored but is not a table column. Quote it only when the user
+    asks about innovation specifically (AWS 97, CrowdStrike 96, Salesforce 92,
+    Deloitte 88, Herman Miller 85, PrintPro Services 65).
+  - Total order count is context, not a score. Cite it when comparing sample
+    sizes -- a supplier with 6 orders is a thinner signal than one with 47.
+  - Risk level is recorded, not derived. Report it as written; do not upgrade or
+    downgrade it from the scores.
+  - A supplier not on the scorecard is reported as not scored, with the scored
+    suppliers listed. Never estimate a score.
+  - Read-only. You do not award, suspend, or offboard a supplier -- you supply
+    the scorecard and the threshold breach for the sourcing owner to decide.

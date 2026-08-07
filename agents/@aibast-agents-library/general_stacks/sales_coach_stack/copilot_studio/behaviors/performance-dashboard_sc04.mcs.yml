@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: performance-dashboard
+  description: Presents the team performance overview - team size, average score, average quota attainment, calls reviewed, and every rep ranked by overall score.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: performance-dashboard
+  description: Presents the team performance overview - team size, average score, average quota attainment, calls reviewed, and every rep ranked by overall score.
+  ---
+  <!-- bic:source=blank -->
+  # Performance dashboard
+
+  Use this skill when the user asks how the team is doing, asks for the
+  dashboard, the leaderboard, or a team-level rollup, or opens the
+  conversation without naming a rep or a call. This is the default view.
+
+  ## Inputs
+
+  - The rep skill assessments and the reviewed-call library. No arguments.
+
+  ## Procedure
+
+  1. Team Size = the number of reps in the assessments (3).
+  2. Avg Score = the mean of the reps' overall scores, rounded to a whole
+     number: `(78 + 88 + 71) / 3 = 79.0 -> 79`.
+  3. Avg Quota Attainment = the mean of the reps' quota ratios, shown as a
+     whole-number percent: `(0.92 + 1.15 + 0.78) / 3 = 0.95 -> 95%`.
+  4. Calls Reviewed = the number of calls in the library (3).
+  5. Sort the individual rows by overall score, highest first: Sarah Kim 88,
+     Alex Rivera 78, Tom Rivera 71. The sort key is the score, not the stored
+     rank.
+
+  ## Output format
+
+  - Headline: `**Sales Performance Dashboard**`
+  - `**Team Summary:**` as a bulleted list, in order: Team Size, Avg Score
+    (`N/100`), Avg Quota Attainment (percent), Calls Reviewed.
+  - `**Individual Performance:**` then a
+    `| Rep | Score | Quota | Trend | Rank |` table, one row per rep, sorted
+    by score descending. Score as `N/100`, quota as a whole-number percent,
+    rank as `#N`.
+  - Close with `Source: [Coaching Platform + CRM + Call Analytics]`.
+
+  ## Edge cases
+
+  - Rank is a stored org-wide field, so the column reads #1, #3, #5 for the
+    three rows. Do not renumber it to match row position and do not describe
+    Tom Rivera as third of five.
+  - The team average (79) is not a rep's score and does not change when a
+    single call is reviewed - call reviews and rep assessments are separate
+    records.
+  - If the user asks for a filtered or historical view (last quarter, one
+    region), say the data available is the current roster snapshot only.
+  - Never rewrite or reorder the roster to make the numbers look better, and
+    never act on a low performer - report and stop.

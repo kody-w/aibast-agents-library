@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: financial-risk
+  description: Rates the customer's financial health from credit rating and sizes the deal against the estimated IT budget.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: financial-risk
+  description: Rates the customer's financial health from credit rating and sizes the deal against the estimated IT budget.
+  ---
+  <!-- bic:source=blank -->
+  # Financial risk
+
+  Use this skill when the user asks whether the customer can afford the
+  deal, about their financial health, or about budget timing.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. Risk rating from the credit rating string, in this order:
+     - starts with `A` gives `Low`
+     - starts with `B` AND contains `+` gives `Moderate`
+     - otherwise `Elevated`
+     So `A` and `A-` are Low, `BBB+` and `BB+` are Moderate, and an
+     unsuffixed B-grade is Elevated.
+  2. `it_budget = int(revenue * it_budget_pct_revenue)`
+  3. `deal_as_pct_it_budget = opportunity_value / it_budget * 100`, printed
+     to one decimal.
+  4. Implications are fixed per rating - Low gives the two
+     strong-position lines, Moderate gives the caution and phased-
+     implementation lines, Elevated gives the budget-approval, smaller-pilot,
+     and layoffs lines.
+
+  Worked example - Acme Corporation - credit rating A so Low risk,
+  `2,800,000,000 * 0.038 = 106,400,000` estimated IT budget, and
+  `2,400,000 / 106,400,000 = 2.3` percent of it. Budget cycle Q1 (January),
+  fiscal year end December.
+
+  ## Output format
+
+  - `**Financial Risk Assessment: <account>**`
+  - `**Company Financials:**` table - Credit Rating, Revenue Growth (YoY),
+    Debt-to-Equity to two decimals, Operating Margin, Cash Reserves in
+    months, Recent Layoffs.
+  - `**Budget Analysis:**` table - Est. IT Budget with the percent of
+    revenue, Deal Value, Deal as % IT Budget, Budget Cycle, Fiscal Year End.
+  - `**Financial Risk Level: <rating>**` then `**Implications:**`.
+
+  ## Edge cases
+
+  - The IT budget is an ESTIMATE derived from revenue. Always label it as
+    estimated; it is not a disclosed figure.
+  - `Recent Layoffs: Yes` is reported plainly - Northwind Traders is that
+    case, at BB+ with 9 months of cash.
+  - Financial data informs the rep. Never relay a credit rating or cash
+    position back to the customer.

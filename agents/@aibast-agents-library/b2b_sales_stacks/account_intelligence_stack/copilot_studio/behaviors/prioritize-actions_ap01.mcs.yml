@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: prioritize-actions
+  description: Ranks every open sales action by the computed priority score and classifies each into an effort-impact quadrant.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: prioritize-actions
+  description: Ranks every open sales action by the computed priority score and classifies each into an effort-impact quadrant.
+  ---
+  <!-- bic:source=blank -->
+  # Prioritize actions
+
+  Use this skill when the user asks what to work on, what the priorities
+  are, or for the ranked action list.
+
+  ## Inputs
+
+  - None. The action list covers all accounts for the rep, Michael Torres.
+
+  ## Procedure - the priority formula
+
+  For each action, where `impact` is `impact_score` and `value` is
+  `deal_value`:
+
+  1. `value_weight = min(30, value / 100000)`
+  2. `deadline_bonus = max(0, 20 - days_left * 3)` with `days_left = 3` for
+     every action that carries a deadline, so the bonus is a flat `11`.
+  3. `priority = min(100, int(impact * 0.5 + value_weight + deadline_bonus))`
+
+  Sort by `priority` descending. The list includes actions in every status,
+  `pending` and `in_progress` alike.
+
+  Quadrant classification, evaluated in this order:
+  - `impact >= 70` and `effort_hours <= 1.5`, quadrant is `Quick Wins`
+  - `impact >= 70`, quadrant is `Major Projects`
+  - `effort_hours <= 1.5`, quadrant is `Fill-Ins`
+  - otherwise `Reconsider`
+
+  Worked example - act-001 scores `95 * 0.5 + 24 + 11 = 82` and ranks first;
+  act-010 (deal value 0, so value_weight 0) scores `40 * 0.5 + 0 + 11 = 31`
+  and ranks last. The header counts are 9 pending actions, 10.5 hours of
+  pending effort, and 3 Quick Wins.
+
+  ## Output format
+
+  - `**Action Priority List: Michael Torres**`
+  - Three header lines - total pending actions, total effort required in
+    hours to one decimal, quick wins available.
+  - Table - Rank, Action, Account, Priority as `<n>/100`, Effort as
+    `<n>h`, Quadrant, Deadline.
+  - `**Quick Wins (do first):**` - one bullet per Quick Win with account and
+    effort.
+
+  ## Edge cases
+
+  - Total effort counts `pending` actions only, so act-005 (in_progress) is
+    in the ranked table but not in the 10.5-hour total.
+  - Cite the act- id when the user asks about a specific item.
+  - Ranking is arithmetic. Never promote an action because it sounds urgent.

@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: customer-segmentation
+  description: Presents the full customer segment model with size, spend, LTV, churn risk, engagement, and each segment's annual revenue contribution.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: customer-segmentation
+  description: Presents the full customer segment model with size, spend, LTV, churn risk, engagement, and each segment's annual revenue contribution.
+  ---
+  <!-- bic:source=blank -->
+  # Customer segmentation
+
+  Use this skill when the user asks about segments, audience size, customer
+  value, churn risk, engagement, or which part of the base drives revenue.
+
+  ## Inputs
+
+  - The customer segment model (five segments, SEG- ids).
+  - No parameters. This view is always the whole base; there is no per-segment
+    filter on this operation. If the user asks about one segment only, present
+    that segment's row and contribution and say the totals below cover all five.
+
+  ## Procedure - exact rules
+
+  1. Report the base totals first:
+     - `Total Addressable Customers = sum of every segment size`
+       = 42,850 + 18,420 + 27,600 + 8,750 + 34,200 = **131,820**
+     - `Weighted Average LTV = sum(size x lifetime_value) / sum(size)`,
+       rounded to 2 decimals = **$6,966.55**. This is size-weighted, not a
+       simple mean of the five LTVs - never average the LTV column.
+  2. Emit the segment table in model order: SEG-LOYAL, SEG-ATRISK, SEG-NEW,
+     SEG-HIGHVAL, SEG-DORMANT. This order is fixed and is NOT a ranking - do
+     not re-sort it by value, size, or risk unless the user asks for a ranking,
+     and say so when you do.
+  3. Formatting rules, applied exactly:
+     - Size: thousands separators, no decimals.
+     - Avg Spend and LTV: `$` with thousands separators and 2 decimals.
+     - Orders/Yr: the raw value, one decimal (18.3, 5.1, 3.8, 24.6, 0.8).
+     - Churn Risk: `churn_risk x 100` rendered with 0 decimals and a `%`
+       (0.04 -> 4%, 0.38 -> 38%, 0.72 -> 72%).
+     - Engagement: `score/100` (92/100, 31/100, 58/100, 97/100, 9/100).
+  4. Then emit revenue contribution, one bullet per segment in the same order:
+     `revenue contribution = size x avg_annual_spend`, rounded to 2 decimals.
+     This is annual spend, not lifetime value - do not mix the two.
+
+  ## Output format
+
+  - `# Customer Segmentation Overview`
+  - `**Total Addressable Customers:** 131,820`
+  - `**Weighted Average LTV:** $6,966.55`
+  - Table with exactly these columns:
+    `| Segment | Size | Avg Spend | Orders/Yr | LTV | Churn Risk | Engagement |`
+    Segment cell is the display name (Loyal Advocates, At-Risk Churners, New
+    Explorers, High-Value VIPs, Dormant Lapsed), not the id; carry the SEG- id
+    in prose whenever you cite a segment outside the table.
+  - `## Revenue Contribution by Segment`, then
+    `- **<segment name>:** $<amount>` per segment.
+
+  ## Edge cases
+
+  - Highest contribution is Loyal Advocates at $80,343,750.00; lowest is
+    Dormant Lapsed at $2,907,000.00. High-Value VIPs contribute $36,750,000.00
+    from only 8,750 customers - call out that concentration when ranking.
+  - Highest churn risk is SEG-DORMANT at 72%, then SEG-ATRISK at 38%. Flag
+    these as retention targets; do not propose an action that sends anything.
+  - If asked for a segment id that is not one of the five, say it is not in the
+    segment model and list the ids that are. Do not model it.
+
+  ## Boundaries
+
+  - Segment-level only. Never name, profile, or infer an individual customer.
+  - Reporting only. Never say an audience has been built, exported, synced, or
+    activated in any channel.

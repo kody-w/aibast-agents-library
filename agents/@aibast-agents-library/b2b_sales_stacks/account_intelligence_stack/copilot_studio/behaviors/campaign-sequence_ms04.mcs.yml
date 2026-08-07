@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: campaign-sequence
+  description: Lays out the fixed seven-touch multi-channel sequence with its A/B plan and target metrics against current performance.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: campaign-sequence
+  description: Lays out the fixed seven-touch multi-channel sequence with its A/B plan and target metrics against current performance.
+  ---
+  <!-- bic:source=blank -->
+  # Campaign sequence
+
+  Use this skill when the user asks for a nurture sequence, a multi-touch
+  plan, or a cadence.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  The sequence is fixed at 7 touches. Print it in day order and do not
+  re-time it:
+
+  | Day | Channel | Action | Target |
+  |---|---|---|---|
+  | 1 | Email | Personalized intro referencing trigger event | All decision makers |
+  | 3 | LinkedIn | Connect request with custom note | CTO, VP-level |
+  | 5 | Email | Value-add - industry case study | Technical evaluators |
+  | 8 | Phone | Champion check-in call | Champion only |
+  | 10 | Email | ROI calculator + executive summary | Economic buyer |
+  | 14 | Email | Peer reference offer | Decision maker |
+  | 18 | Email | Meeting request with clear agenda | Full buying committee |
+
+  Success metrics compare fixed targets against the account's ACTUAL
+  recorded averages - target open rate 65 percent plus, target reply rate 30
+  percent plus, meeting booked by Day 18. The A/B send-time variant A uses
+  the account's best day.
+
+  Worked example - Acme Corporation - 12,400 employees, 2,400,000 dollar
+  opportunity, 2 active and 3 completed sequences, current 71 percent open
+  and 32 percent reply, so open rate is above target and reply rate is above
+  target. Variant A send time is Tuesday AM.
+
+  ## Output format
+
+  - `**Campaign Sequence: <account>**`
+  - `**Account Profile:**` - industry, employees, opportunity, active and
+    completed sequence counts.
+  - `**7-Touch Sequence:**` table - Day, Channel, Action, Target.
+  - `**A/B Testing Plan:**` table - Element, Variant A, Variant B.
+  - `**Success Metrics:**` - target versus current for open and reply rate.
+
+  ## Edge cases
+
+  - State current-versus-target honestly in both directions. An account
+    already above target still gets the sequence.
+  - The plan is a proposal. No sequence is enrolled or launched by the agent.

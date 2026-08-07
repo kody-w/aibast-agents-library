@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: client-portfolio-data.md
+  description: Synthetic client portfolio -- annual value, health score, risk label, NPS, margin, utilization, billing trend, escalation and exec-meeting counts, and four quarters of satisfaction scores -- the agent answers from until real tools are connected.

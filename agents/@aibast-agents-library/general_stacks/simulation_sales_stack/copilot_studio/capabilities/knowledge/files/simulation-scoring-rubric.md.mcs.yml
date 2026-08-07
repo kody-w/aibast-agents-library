@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: simulation-scoring-rubric.md
+  description: Synthetic skill weights, scoring formula, grade bands, and sample performance record the agent scores against until real tools are connected.

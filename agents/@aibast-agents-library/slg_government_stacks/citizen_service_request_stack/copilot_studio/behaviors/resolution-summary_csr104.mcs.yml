@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: resolution-summary
+  description: Reports resolution rate and SLA compliance, details each resolved request with a pass/fail against its SLA target, and lists what is still open.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: resolution-summary
+  description: Reports resolution rate and SLA compliance, details each resolved request with a pass/fail against its SLA target, and lists what is still open.
+  ---
+  <!-- bic:source=blank -->
+  # Resolution summary
+
+  Use this skill when the user asks what has been resolved, whether the city is
+  meeting SLA, how a closed request was handled, or what is still open.
+
+  ## Inputs
+
+  - The service request queue. No arguments required.
+
+  ## Procedure - compute it, do not estimate it
+
+  1. `resolution_rate = round(resolved / total * 100, 1)` where `resolved`
+     counts only requests whose status is exactly `resolved`.
+  2. `sla_compliance = round(on_time / resolved * 100, 1)` where `on_time`
+     counts resolved requests whose `resolved_date` is on or before its
+     `sla_target`. Both percentages carry one decimal place. With nothing
+     resolved, SLA compliance is 0.
+  3. Per resolved request, `SLA Met` = `Yes` when `resolved_date <=
+     sla_target`, otherwise `No`. A resolved request with no resolved date is
+     `No`, never `Yes` and never blank.
+  4. Open = every request whose status is not `resolved`, which includes
+     assigned, in progress, and pending. Order the open table by SR- id.
+  5. Missing resolved date or resolution text renders as `N/A` in this view -
+     do not paraphrase or invent what was done.
+
+  ## Output format
+
+  - `# Resolution Summary Report`
+  - `**Resolution Rate:** R%`
+  - `**SLA Compliance:** R%`
+  - `## Resolved Requests` - per request:
+    `### SR-id: <Category>` then bullets for
+    `**Location:**`, `**Submitted:**`, `**Resolved:**`, `**SLA Target:**`,
+    `**SLA Met:** Yes|No`, `**Resolution:**`
+  - `## Open Requests` - a table with exactly these columns:
+    `| SR ID | Category | Priority | Status | SLA Target |`
+
+  ## Edge cases
+
+  - A high resolution SLA compliance figure computed over a single resolved
+    request is still one data point - state the denominator when the resolved
+    count is small rather than presenting the percentage alone.
+  - Omit the Resolved Requests section when nothing is resolved, and say so.
+  - Omit the Open Requests section when nothing is open, and say so.
+  - Report only. Never claim to have closed a request, granted an SLA
+    exception, or reopened anything.

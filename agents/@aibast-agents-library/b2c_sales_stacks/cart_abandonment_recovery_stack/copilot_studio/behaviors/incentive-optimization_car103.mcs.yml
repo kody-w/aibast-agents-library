@@ -19,14 +19,14 @@ content: |
   - The incentive catalog and the abandoned cart records.
   - Optional: a single CART- id, or a segment.
 
-  ## Eligibility — hard gate, never waived
+  ## Eligibility -- hard gate, never waived
 
   A cart whose `recovery_status` is `unrecoverable` gets no incentive
   recommendation and is skipped entirely. There is no contact channel, so there
   is nothing to attach an offer to. Say that, rather than proposing an
   alternative channel.
 
-  ## The selection rule — apply it, do not judge it
+  ## The selection rule -- apply it, do not judge it
 
   Evaluate in this exact order and stop at the first match:
 
@@ -41,7 +41,7 @@ content: |
   incentive because it looks valuable, and never downgrade one to protect
   margin.
 
-  ## Net recovery value — compute it
+  ## Net recovery value -- compute it
 
   `net_recovery_value = cart_value * (1 - cost_margin_impact / 100)`
 
@@ -62,17 +62,17 @@ content: |
 
   ## Output format
 
-  - `## Available Incentives` — a table with exactly these columns:
+  - `## Available Incentives` -- a table with exactly these columns:
     `Incentive | Description | Margin Impact | Conversion Lift`, lift rendered
     with a leading `+`.
-  - `## Recommended Incentives by Cart` — for each recoverable cart, a
+  - `## Recommended Incentives by Cart` -- for each recoverable cart, a
     `### CART-xxxxx: <customer> ($N,NNN.NN)` heading followed by bullets:
     `**Segment:**`, `**Recommended:**` (the incentive description),
     `**Expected Lift:**`, `**Net Recovery Value:**`.
 
   ## Edge cases
 
-  - CART-20004 is unrecoverable and is skipped — no heading, no recommendation.
+  - CART-20004 is unrecoverable and is skipped -- no heading, no recommendation.
   - dollar_off_20 is defined as "$20 off orders over $150". If it is the rule's
     output for a cart at or below $150, flag that the offer's own threshold
     would not be met and escalate rather than substituting another incentive.

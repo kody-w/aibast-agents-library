@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: renegotiation-brief
+  description: Produces the renegotiation brief for elevated-risk contracts - non-negotiable and preferred amendments, negotiation strategy, and total value in play.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: renegotiation-brief
+  description: Produces the renegotiation brief for elevated-risk contracts - non-negotiable and preferred amendments, negotiation strategy, and total value in play.
+  ---
+  <!-- bic:source=blank -->
+  # Renegotiation brief
+
+  Use this skill when the user asks what to renegotiate, asks for a
+  negotiation prep or brief, asks what to push for on a contract, or asks how
+  to approach a renewal.
+
+  ## Inputs
+
+  - The contract portfolio and the clause register (knowledge/tools).
+  - Optional: a single CTR- id or client name. Otherwise brief every
+    elevated-risk contract.
+
+  ## Procedure
+
+  1. Select contracts where `risk_score >= 5.0`. In the current data that is
+     CTR-5001 (6.5) and CTR-5003 (5.2). CTR-5004 (4.1) and CTR-5002 (3.8) are
+     out of scope for a brief. The threshold is 5.0 and it never moves -- not
+     for a near-miss, not on request.
+  2. Sort the selected contracts by `risk_score` descending: CTR-5001 first,
+     then CTR-5003.
+  3. Split that contract's clauses into two lists, by recorded rating only:
+     - `HIGH` clauses become **Non-Negotiable Amendments (must resolve)**
+     - `MEDIUM` clauses become **Preferred Amendments**
+     Keep the register's section order inside each list and number each list
+     from 1. Never move a clause between lists.
+  4. Amendment text is the clause's recorded recommendation, in full.
+  5. Emit the fixed negotiation strategy for every contract briefed:
+     - Lead with non-negotiable items; concede on lower-priority terms if needed
+     - Fallback: accept current value on MEDIUM items if all HIGH items resolved
+     - Escalation path: General Counsel review if impasse on liability cap
+  6. Close with the total: sum of `value` across the briefed contracts. In the
+     current data `25,000,000 + 12,000,000 = 37,000,000`, which is the same
+     figure as the risk scan's value at elevated risk.
+
+  ## Output format
+
+  Per contract, a heading `### CTR-5001 -- NovaTech Systems` then four bullets:
+
+  - `**Value:** $25,000,000 over 36 months`
+  - `**Risk score:** 6.5/10`
+  - `**Governing law:** Delaware`
+  - `**Renewal:** 2028-06-30`
+
+  Then, when the list is non-empty,
+  `**Non-Negotiable Amendments (must resolve):**` as a numbered list of
+  `**<Clause title>** (Section <n.n>): <recommendation>`, then
+  `**Preferred Amendments:**` in the same shape, then
+  `**Negotiation strategy:**` as the three fixed bullets.
+
+  Close the whole brief with:
+
+  `**Total contract value requiring renegotiation:** $N,NNN,NNN`
+
+  ## Edge cases
+
+  - An elevated-risk contract with no clause record: emit the header block and
+    state that no amendments can be drafted because no clause-level review
+    exists. Do not invent amendments from the risk score.
+  - Asked to brief a contract below 5.0 (CTR-5002, CTR-5004): say it is not an
+    elevated-risk contract, give its score, and offer the clause analysis
+    instead -- but note that neither has a clause record.
+  - Asked for a position on the liability cap beyond the recorded
+    recommendation: that is the General Counsel escalation, not an agent call.
+  - Recommendation only. Never say an amendment has been approved, drafted into
+    a redline, sent to counsel, or accepted by the counterparty.

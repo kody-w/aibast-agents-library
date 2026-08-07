@@ -1,0 +1,80 @@
+mcs.metadata:
+  componentName: expiration-alerts
+  description: Raises expired credentials as CRITICAL and credentials or malpractice policies expiring on or before the cutoff as WARNING, sorted critical first then by date.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: expiration-alerts
+  description: Raises expired credentials as CRITICAL and credentials or malpractice policies expiring on or before the cutoff as WARNING, sorted critical first then by date.
+  ---
+  <!-- bic:source=blank -->
+  # Expiration alerts
+
+  Use this skill when the user asks what is expiring, what is already expired,
+  what needs renewal, what is urgent, or asks for the credentialing risk list.
+
+  ## Inputs
+
+  - The staff credential records, including each staff member's malpractice
+    policy.
+  - The alert cutoff date: `2026-06-30`, inclusive.
+
+  ## Procedure - the exact alert rule
+
+  Walk staff in record order (STAFF-001 to STAFF-004). For each credential on
+  each staff member, apply this rule in this order and stop at the first match:
+
+  1. If `status == "expired"` -> severity `critical`, action
+     `Immediate renewal required`, date = the credential's expiration date.
+  2. Else if `expires <= "2026-06-30"` (string date comparison, cutoff
+     inclusive) -> severity `warning`, action
+     `Renewal due within 90 days`.
+  3. Otherwise no alert.
+
+  The two branches are exclusive: an expired credential is never also raised as
+  a warning.
+
+  Then, once per staff member, check the malpractice policy: if
+  `expires <= "2026-06-30"`, raise a `warning` with credential name
+  `Malpractice Insurance` and action `Policy renewal needed`. The malpractice
+  policy has no `status` field, so it can never be critical.
+
+  ## Sort order - never re-order by anything else
+
+  `sort key = (0 if severity is critical else 1, expiration date ascending)`
+
+  Critical rows first, then warnings, each block strictly ascending by date.
+  Ties keep record order.
+
+  ## Counts
+
+  - `total = number of alert rows`
+  - `critical = number of rows whose severity is critical`
+
+  On the current records that is 8 total, 2 critical.
+
+  ## Output format
+
+  - Headline: `# Credential Expiration Alerts`
+  - Summary line: `**Total Alerts:** N | **Critical:** N`
+  - One table, exactly these columns:
+    `Severity | Staff Member | Credential | Expires | Action Required`
+  - Severity is upper case: `CRITICAL` or `WARNING`.
+  - Dates are raw YYYY-MM-DD.
+
+  ## Edge cases
+
+  - If there are zero alert rows, emit `# Expiration Alerts` and the single
+    line `No credentials expiring within the alert window.` Do not emit an
+    empty table.
+  - The cutoff is a fixed date, not a rolling window: a credential expiring
+    exactly on 2026-06-30 is in scope, one expiring 2026-07-01 is not.
+  - Board certifications with far-out dates (for example NCCPA-778410 expiring
+    2033-12-31) never appear here; that is correct, not a gap.
+
+  ## Boundaries
+
+  - Alerting only. Never say a renewal has been filed, a reminder sent, or a
+    board contacted.
+  - Never soften a CRITICAL row into "expiring soon", and never suggest a grace
+    period or an exception for an expired credential.

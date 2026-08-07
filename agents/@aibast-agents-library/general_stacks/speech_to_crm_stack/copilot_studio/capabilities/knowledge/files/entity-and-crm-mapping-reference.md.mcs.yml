@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: entity-and-crm-mapping-reference.md
+  description: Synthetic extracted-entity set with confidences and the CRM opportunity, contact, activity, and new-contact field mappings the agent answers from until real tools are connected.

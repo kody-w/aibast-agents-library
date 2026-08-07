@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: stalled-deals
+  description: Deep-dives every stalled opportunity with its benchmark multiplier, contact age, champion state, blocker and playbook diagnosis.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: stalled-deals
+  description: Deep-dives every stalled opportunity with its benchmark multiplier, contact age, champion state, blocker and playbook diagnosis.
+  ---
+  <!-- bic:source=blank -->
+  # Stalled deal deep-dive
+
+  Use this skill when the user asks which deals are stuck, wants detail on a
+  stalled deal, or asks why a deal is not moving.
+
+  ## Inputs
+
+  - The full pipeline and the blocker playbook diagnoses.
+
+  ## Procedure
+
+  1. Classify the active pipeline and keep only deals at ratio >= 1.25 of their
+     stage benchmark. That is 11 deals worth $4.2M.
+  2. Sort by value descending, starting at TechCorp Industries $890,000.
+  3. For each deal compute `multiplier = round(days_in_stage / benchmark, 1)`
+     and state it alongside the benchmark, for example
+     `34 (2.1x benchmark of 16 days)`.
+  4. The diagnosis is the recorded playbook diagnosis for the deal's blocker.
+     If the blocker has no playbook entry, title-case the blocker instead.
+  5. Print the blocker in title case with underscores removed.
+  6. Close with the velocity comparison - the average deal closes in 45 days,
+     against the mean days in current stage for the stalled set.
+
+  ## Output format
+
+  Headline `**Stalled Deal Deep-Dive (N deals, $XM at risk)**`, then one block
+  per deal - `**<deal> -- $<value>**` and a table with exactly these columns.
+
+  | Factor | Status |
+
+  Rows in this order - Stage, Days stalled, Last contact, Champion, Blocker -
+  followed by `**Diagnosis:** <text>`. Blocks are separated by a horizontal
+  rule.
+
+  Close with `Source: [CRM + Email Analytics + Meeting Logs]`.
+
+  ## Edge cases
+
+  - Champion is printed as `<name> (<status>)`; when no champion exists it
+    reads `None identified (None)` - report that as a finding, not as missing
+    data.
+  - A deal below the 1.25 ratio is not in this view even if the user believes
+    it is stuck; point them at pipeline-health for the at-risk band.
+  - Days stalled means days in the current stage, not days since the deal was
+    created.

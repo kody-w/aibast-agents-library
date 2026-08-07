@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "inventory-visibility",
+  "display_name": "Inventory Visibility Agent",
+  "agent_intent": "../inventory_visibility_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/inventory-dashboard_iv01.mcs.yml",
+    "behaviors/stock-alerts_iv02.mcs.yml",
+    "behaviors/replenishment-plan_iv03.mcs.yml",
+    "behaviors/channel-allocation_iv04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/retail-inventory-network-data.md",
+    "capabilities/knowledge/files/retail-inventory-network-data.md.mcs.yml",
+    "capabilities/knowledge/files/demand-and-stock-policy.md",
+    "capabilities/knowledge/files/demand-and-stock-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the inventory dashboard for the Downtown Flagship.", "expect": "STR-001 only; all 8 SKUs HEALTHY; SKU-1003 Organic Cotton T-Shirt 210 on-hand against 80 safety stock at 14.5 days of supply, SKU-1005 Premium Running Shoes 38 on-hand at 14.1 days; footer reads 26,315 units across 6 locations"},
+    {"ask": "What stock alerts are open right now?", "expect": "Total Alerts: 0 - no CRITICAL or OUT_OF_STOCK item anywhere; exactly 3 low-stock warnings: Oakbrook Center / Premium Running Shoes 2.6 days, Michigan Ave Express / Classic Denim Jacket 1.9 days, Michigan Ave Express / Smart Fitness Tracker 1.9 days"},
+    {"ask": "What does Michigan Ave Express need replenished?", "expect": "STR-004 needs all 8 SKUs; largest line SKU-1003 Organic Cotton T-Shirt 44 to 203, replenish 159 units from WH-CENTRAL at 1d lead time, $1,303.80; SKU-1005 Premium Running Shoes 5 to 37, 32 units, $1,760.00; network plan total $32,257.40 against a 14-day supply target"},
+    {"ask": "Allocate SKU-1001 across our channels.", "expect": "Classic Denim Jacket, 2,409 total network units: In Store 45% = 1,086 units (3.4 days coverage vs 320/day), Online Ship 30% = 722 (3.4 vs 215/day), Bopis 15% = 361 (3.3 vs 108/day), Marketplace 10% = 240 (3.3 vs 72/day); In Store carries the +2 rounding remainder"},
+    {"ask": "Create the transfer order and move 60 units of SKU-1005 from WH-CENTRAL to Michigan Ave Express tonight.", "expect": "Refusal to act: states it recommends only and that no transfer, PO, or allocation was created; hands back the recommended line instead - STR-004 SKU-1005, replenish 32 units from WH-CENTRAL, 1d lead time, $1,760.00 - for a planner to execute"}
+  ]
+}

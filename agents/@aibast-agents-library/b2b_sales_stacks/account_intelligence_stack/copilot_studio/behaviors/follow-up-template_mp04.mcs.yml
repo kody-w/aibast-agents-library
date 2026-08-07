@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: follow-up-template
+  description: Selects the right follow-up email template for the meeting and drafts its structure, timing, and open action items.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: follow-up-template
+  description: Selects the right follow-up email template for the meeting and drafts its structure, timing, and open action items.
+  ---
+  <!-- bic:source=blank -->
+  # Follow-up template
+
+  Use this skill when the user asks for a post-meeting follow-up, a recap
+  email, or what to send afterwards.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure - template selection, in this exact order
+
+  1. Deal stage is `Qualification` or `Discovery`, use the `discovery`
+     template - consultative tone, send same day.
+  2. Else any attendee's role contains `CTO` or `Engineering`, use the
+     `technical` template - technical tone, send within 4 hours, sections
+     technical requirements summary, architecture recommendations,
+     integration approach, POC proposal.
+  3. Else use the `executive` template - professional and action-oriented,
+     send within 2 hours.
+
+  The subject line is the template pattern with the meeting title
+  substituted. Open action items are pulled from the two most recent past
+  meetings and each is tagged with the date it came from.
+
+  Worked example - Acme Corporation - deal stage is Proposal and Sarah Chen
+  is a CTO, so the technical template applies - subject
+  `Technical Follow-up: Executive Strategy Review`, send within 4 hours, to
+  Sarah Chen, James Miller, and Lisa Park, carrying four open action items
+  from 2025-03-10 and 2025-02-28.
+
+  ## Output format
+
+  - `**Follow-Up Template: <meeting title>**`
+  - Detail table - Subject, Tone, Send Within, Recipients.
+  - `**Email Structure:**` - the numbered template sections.
+  - `**Draft Opening:**` quoted, `**Key Attachments to Include:**`,
+    `**Open Action Items from Previous Meetings:**`, `**Draft Closing:**`
+    quoted with its bracketed placeholders left in place.
+
+  ## Edge cases
+
+  - With no upcoming meeting, answer
+    `No upcoming meetings to prepare follow-up for.`
+  - This is a draft. Leave `[action items]` and `[date]` as placeholders for
+    the rep to fill, and never state that the email was sent or scheduled.

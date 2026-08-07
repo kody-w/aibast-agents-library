@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: rebalance-recommendation
+  description: Classifies every SKU-warehouse position as DEFICIT, SURPLUS, or Balanced against the demand forecast using fixed thresholds, and counts the critical imbalances.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: rebalance-recommendation
+  description: Classifies every SKU-warehouse position as DEFICIT, SURPLUS, or Balanced against the demand forecast using fixed thresholds, and counts the critical imbalances.
+  ---
+  <!-- bic:source=blank -->
+  # Rebalance recommendation
+
+  Use this skill when the user asks where inventory is out of balance, which
+  sites are short or long, how stock compares to the forecast, or how many
+  critical imbalances exist.
+
+  ## Inputs
+
+  - On-hand levels per SKU per warehouse and the demand forecast per SKU per
+    warehouse.
+  - Optional: a SKU id or a warehouse id to filter to. Otherwise evaluate all
+    24 SKU-warehouse pairs (6 SKUs x 4 warehouses).
+
+  ## Procedure -- compute it, do not judge it
+
+  For every SKU-warehouse pair, iterating SKUs in catalog order and warehouses
+  in the fixed order WH-ATL, WH-ORD, WH-DFW, WH-SEA:
+
+  1. `delta = on_hand - forecast`.
+  2. Classify against fixed thresholds:
+     - `delta < -200` -> **DEFICIT**, and increment the critical counter.
+     - `delta > 500` -> **SURPLUS**. Surpluses do not increment the critical
+       counter.
+     - otherwise -> Balanced.
+  3. Print a row only for DEFICIT and SURPLUS. Balanced rows are suppressed.
+  4. In the Warehouse cell, use the facility name truncated to its first 20
+     characters (so "Dallas Fulfillment Center" prints as
+     "Dallas Fulfillment C" and "Seattle West Coast Depot" prints as
+     "Seattle West Coast D").
+  5. Print the delta with an explicit sign and thousands separators.
+
+  Footer, in this order:
+
+  - `**Critical imbalances detected:** N` where N is the count of DEFICIT rows
+    only.
+  - `**Recommendation:** Execute transfer plan to redistribute surplus stock
+    to deficit locations.`
+
+  ## Output format
+
+  - Headline `## Rebalance Recommendations`, then the line
+    `Analysis of stock-vs-demand across all facilities:`.
+  - Table with columns: `SKU | Warehouse | On-Hand | Forecast | Delta |
+    Status`, Status bolded and in caps (`**DEFICIT**` / `**SURPLUS**`).
+  - The two footer lines above.
+
+  ## Edge cases
+
+  - The thresholds are asymmetric on purpose: the deficit band opens at -200
+    but the surplus band does not open until +500. A pair sitting between
+    +201 and +500 prints as Balanced here and is therefore absent from the
+    table, yet still qualifies as a shipping source in the transfer plan,
+    which uses a `> 200` surplus test. SKU-4401 at Atlanta is exactly that
+    case. Explain this rather than reconciling the two tables by hand.
+  - A pair at exactly -200 or exactly +500 is Balanced; the tests are strict.
+  - The critical count is deficits only. Never report it as "imbalances" of
+    both kinds.
+  - This test is against the forecast, not the reorder point. A position can
+    be DEFICIT here and still sit above its reorder point (SKU-4402 at
+    WH-ATL), so it will not appear in the cost analysis value-at-risk table.
+  - Recommendation only. Never say stock has been moved or a transfer has been
+    released.

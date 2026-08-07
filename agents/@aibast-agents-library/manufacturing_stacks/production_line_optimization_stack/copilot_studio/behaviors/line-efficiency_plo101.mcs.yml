@@ -1,0 +1,81 @@
+mcs.metadata:
+  componentName: line-efficiency
+  description: Reports OEE, its three components, daily output, throughput gap, and annual quality cost for every production line.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: line-efficiency
+  description: Reports OEE, its three components, daily output, throughput gap, and annual quality cost for every production line.
+  ---
+  <!-- bic:source=blank -->
+  # Line efficiency
+
+  Use this skill when the user asks how the lines are running, asks for OEE,
+  availability, performance or quality, asks which line is underperforming, asks
+  about output versus capacity, or asks what defects are costing.
+
+  ## Inputs
+
+  - The production line metrics: design capacity per hour, actual output per
+    hour, availability %, performance %, quality %.
+  - The shift schedule (used only for its total hours per day).
+  - Optional: a single LINE- id. Otherwise report all three lines.
+
+  ## Procedure
+
+  Compute, per line, in this order:
+
+  1. `OEE = availability_pct * performance_pct * quality_pct / 10000`, rounded to
+     one decimal. This is a product of percentages, not an average.
+  2. Flag the line ` **BELOW TARGET**` immediately after the OEE value if and
+     only if `OEE < 75`.
+  3. `daily_output = actual_output_per_hour * total_shift_hours`, where
+     `total_shift_hours = 8 + 8 + 8 = 24` (Day + Swing + Night). This figure
+     ignores the night-shift efficiency factor; see edge cases.
+  4. `gap_per_hour = design_capacity_per_hour - actual_output_per_hour`.
+     `gap_per_day = gap_per_hour * 24`, reported as "N units lost".
+  5. `annual_quality_cost = daily_output * 250 * ((100 - quality_pct) / 100) * 12.50`,
+     rounded to two decimals. 250 is the operating days per year; $12.50 is the
+     average scrap-and-rework cost per defective unit.
+
+  Report the lines in fixed data order: LINE-A, LINE-B, LINE-C.
+
+  ## Output format
+
+  Headline `## Production Line Efficiency Report`, then two tables.
+
+  Table 1 columns, exactly:
+  `| Line | Product | OEE | Availability | Performance | Quality | Actual/Design (uph) |`
+
+  - Line is the line's display name (for example `Electronics Assembly Line A`).
+  - Product is truncated to its first 24 characters.
+  - OEE carries the ` **BELOW TARGET**` flag inline when it applies.
+  - Actual/Design is rendered `142/180`.
+
+  Then `### Daily Output Summary` with columns, exactly:
+  `| Line | Output/Day | Gap vs Design | Annual Quality Cost |`
+
+  - Output/Day and the gap use thousands separators.
+  - Gap reads `912 units lost`.
+  - Cost reads `$63,900.00` -- dollar sign, thousands separators, two decimals.
+
+  ## Edge cases the report handles
+
+  - A high quality percentage does not protect a line: LINE-A is at 99.4% quality
+    and still lands below target, because availability (87.0%) and performance
+    (82.0%) multiply through.
+  - Annual quality cost tracks volume as well as defect rate, so the highest-
+    volume line is not automatically the cheapest or the most expensive one. Read
+    the number, do not infer it from the quality percentage alone.
+  - The daily output here (`uph * 24`) is the flat figure. The shift plan applies
+    a 0.9 factor to the night shift and therefore reports a lower daily total for
+    the same line. Both are correct for their own purpose; if the user compares
+    them, say which one they are looking at rather than reconciling them
+    silently.
+
+  ## Boundaries
+
+  - Reporting only. Never state that a line has been adjusted, a target reset, or
+    a maintenance action raised.
+  - Only LINE-A, LINE-B, and LINE-C exist. Any other line, product, or plant is
+    "not in the data" -- do not extrapolate one from the others.

@@ -1,0 +1,85 @@
+mcs.metadata:
+  componentName: discount-scan
+  description: Scans all seven discount programs against a deal and reports eligibility, percentage, and approval requirement for each.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: discount-scan
+  description: Scans all seven discount programs against a deal and reports eligibility, percentage, and approval requirement for each.
+  ---
+  <!-- bic:source=blank -->
+  # Discount scan
+
+  Use this skill when the user asks what discounts are available, what a deal
+  qualifies for, to scan or review the discount catalog, or for the discount
+  picture on an account.
+
+  ## Inputs
+
+  - The discount program catalog and the eligibility criteria.
+  - The deal profile: licenses, list price per license, products, term years,
+    competitive switch flag, tenure years, health score, segment flags.
+
+  ## Procedure
+
+  Evaluate every program in catalog order - VOL-001, MULTI-001, EDU-001,
+  NPO-001, COMP-001, LOYAL-001, BUNDLE-001 - using exactly these tests:
+
+  1. **VOL-001** - eligible if `licenses >= 50`. The percentage is the tier the
+     license count falls into: 50-99 = 10%, 100-249 = 15%, 250-499 = 20%,
+     500+ = 25%.
+  2. **MULTI-001** - eligible if `term_years >= 2`. The percentage is the
+     highest tier the term reaches: `term_years >= 2` = 10%,
+     `term_years >= 3` = 20%.
+  3. **EDU-001** - no automated test. Always reports `Not Eligible` from deal
+     data; it requires an accreditation certificate and a tax-exempt status
+     letter, and the institution must be a University, College, or K-12 School
+     District.
+  4. **NPO-001** - no automated test. Always reports `Not Eligible` from deal
+     data; it requires a 501(c)(3) determination letter and an organization
+     charter, for a Registered Non-Profit, NGO, or Foundation.
+  5. **COMP-001** - eligible if the deal is flagged as a competitive switch.
+     The percentage is the program cap, 30%.
+  6. **LOYAL-001** - eligible if `tenure_years >= 3`. The percentage is the
+     program cap, 15%.
+  7. **BUNDLE-001** - count the deal's products that appear in the eligible
+     product list (Core Platform, Enterprise Platform, Analytics Standard,
+     Analytics Pro, Integration Hub, Security Suite). Eligible if that count
+     is `>= 3`. The percentage is the program cap, 18%.
+
+  The Approval column is a property of the program, not of the deal:
+  EDU-001, NPO-001, and COMP-001 are `Yes`; VOL-001, MULTI-001, LOYAL-001, and
+  BUNDLE-001 are `Auto`.
+
+  ## Output format
+
+  Headline: `**Discount Scan: <customer>**`
+
+  Then a deal summary table, exactly these rows:
+
+  | Field | Detail |
+  | Licenses | <count> |
+  | Products | <number of products on the deal> |
+  | Term | <n> years |
+  | Competitive Switch | Yes / No |
+
+  Then `**Available Programs:**` and one table, exactly these columns:
+
+  | ID | Program | Type | Max Discount | Status | Approval |
+
+  Status is `Eligible (N%)` with the computed percentage, or `Not Eligible`.
+  Max Discount is the program cap with a `%` suffix. Approval is `Yes` when the
+  program requires approval, `Auto` when it does not.
+
+  Close with `Source: [Pricing Engine + Discount Rules]`.
+
+  ## Edge cases
+
+  - A program with no automated test (EDU-001, NPO-001) is reported
+    `Not Eligible`, and if the user asks why, name the documents that would be
+    required. Never report it as eligible on assertion alone.
+  - If a required deal field is absent (licenses, term, product list, switch
+    flag), state which field is missing and mark the dependent programs
+    undetermined rather than guessing a percentage.
+  - The scan is read-only. Never say a discount has been applied or a quote
+    issued.

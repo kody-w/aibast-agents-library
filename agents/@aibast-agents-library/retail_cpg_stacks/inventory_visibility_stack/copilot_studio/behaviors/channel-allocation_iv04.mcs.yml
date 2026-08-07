@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: channel-allocation
+  description: Splits total network inventory for one SKU across in-store, online ship, BOPIS, and marketplace by demand weight and reports days of coverage.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: channel-allocation
+  description: Splits total network inventory for one SKU across in-store, online ship, BOPIS, and marketplace by demand weight and reports days of coverage.
+  ---
+  <!-- bic:source=blank -->
+  # Channel allocation
+
+  Use this skill when the user asks how to split inventory across channels,
+  asks how much a SKU should go to online versus store versus marketplace, or
+  asks how many days each channel is covered for.
+
+  ## Inputs
+
+  - A SKU id. If none is given, the default view is `SKU-1001`; say which SKU
+    you are reporting so the default is never mistaken for a choice.
+  - On-hand quantities at all 6 locations and the channel demand weights.
+
+  ## Procedure - compute it, do not estimate it
+
+  1. Total available = sum of on-hand for that SKU across all 6 locations, both
+     stores and warehouses. For `SKU-1001` that is
+     `74 + 35 + 18 + 12 + 1450 + 820 = 2,409` units.
+  2. Allocate by fixed demand weight, truncating each result:
+     - `in_store` 45% -> `int(total * 0.45)`
+     - `online_ship` 30% -> `int(total * 0.30)`
+     - `bopis` 15% -> `int(total * 0.15)`
+     - `marketplace` 10% -> `int(total * 0.10)`
+  3. Truncation leaves a remainder. `remainder = total - sum(allocations)` and
+     the whole remainder goes to `in_store`. For `SKU-1001` the truncated
+     allocations are 1,084 / 722 / 361 / 240 = 2,407, so the 2-unit remainder
+     lifts in-store to **1,086**. Always state that in-store carries the
+     remainder when it is non-zero.
+  4. Days of coverage per channel: `allocated_units / daily_units_avg`, rounded
+     to one decimal, using the fixed averages - in-store 320/day, online ship
+     215/day, BOPIS 108/day, marketplace 72/day.
+  5. Close with the four standing allocation guardrails: flagship and mall
+     locations take 60% of the in-store allocation; hold a 3-day safety buffer
+     for e-commerce fulfillment; reserve a 10% BOPIS buffer for same-day pickup
+     surges; cap marketplace to prevent channel conflict.
+
+  ## Output format
+
+  - `# Channel Allocation`
+  - `**SKU:** <SKU-ID> - <Product Name>`
+  - `**Total Network Inventory:** N,NNN units`
+  - Table with columns:
+    `Channel | Weight | Allocated Units | Daily Demand Avg | Days Coverage`
+    with channel names title-cased (`In Store`, `Online Ship`, `Bopis`,
+    `Marketplace`) and weights as whole percents.
+  - `## Allocation Recommendations` followed by the four guardrail bullets.
+
+  ## Edge cases
+
+  - An unknown SKU id has no inventory and no catalog entry. Say the SKU is not
+    in the catalog and list the eight ids you carry. Never render an allocation
+    table against a product name you substituted for it.
+  - The allocation is a recommendation on total network inventory, not a
+    reservation and not a picking instruction. Never say units were reserved,
+    fenced, or pushed to a channel.
+  - Days of coverage is measured against network-wide daily demand, so it is
+    short (3.3-3.4 days for `SKU-1001`) even when a store looks well stocked.
+    Do not reconcile it against store-level days of supply - they answer
+    different questions, and say so if the user compares them.

@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: resolution-playbooks-and-policy.md
+  description: Synthetic resolution playbooks, eligibility gates, day windows, and step sequences that govern which resolution the agent may recommend.

@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: medication-review
+  description: Reviews each patient's medication list, orders active before new, and applies the count-based polypharmacy flag.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: medication-review
+  description: Reviews each patient's medication list, orders active before new, and applies the count-based polypharmacy flag.
+  ---
+  <!-- bic:source=blank -->
+  # Medication review
+
+  Use this skill when the user asks what a patient is taking, asks for a
+  medication review or reconciliation, asks what was newly started, or asks
+  whether anyone is flagged for polypharmacy.
+
+  ## Inputs
+
+  - The per-patient medication lists, keyed by PT- id. Each medication carries
+    name, dose, frequency, route, indication, status, and start date.
+  - Optional: a single PT- id to narrow the presentation. The operation itself
+    always returns every patient; narrowing is done by presenting only the
+    requested patient and saying the view is filtered.
+
+  ## Procedure - apply exactly
+
+  For each patient:
+
+  1. **Partition by status.** `active` medications form one group, `new`
+     medications form the other. Status is read from the record; it is never
+     inferred from the start date.
+  2. **Count.** `total_medications = count(active) + count(new)` - the full
+     list length, with no filtering by route, indication, or recency.
+  3. **Polypharmacy flag.** `polypharmacy_flag = (total_medications >= 5)`.
+     Exactly five triggers the flag. Four does not. The flag is a count
+     crossing a threshold - it is never a recommendation to stop, change, or
+     consolidate a medication.
+  4. **Order the table** as all active medications first, then all new
+     medications, each group in the record's own order. Do not sort by name,
+     dose, or date.
+  5. **Uppercase the status** in the table (`active` renders `ACTIVE`, `new`
+     renders `NEW`).
+
+  ## Output format
+
+  Headline `# Medication Review`, then for each patient:
+
+  - `## Patient <PT-id>` with ` [POLYPHARMACY FLAG]` appended when the flag is
+    true, and nothing appended when it is false
+  - `**Total Medications:** <n>`
+  - A table with columns
+    `| Medication | Dose | Frequency | Route | Indication | Status |`,
+    active rows first then new rows
+
+  ## Edge cases
+
+  - A PT- id with no medication list yields a total of 0 and no polypharmacy
+    flag. Report "no medications on file for <PT-id>" - do not treat an empty
+    list as evidence the patient takes nothing outside this record set.
+  - The same drug can appear for two patients at different doses (Atorvastatin
+    is 40mg for PT-10045 and 80mg for PT-10078; Aspirin is 81mg for both).
+    Never merge patients' lists or carry a dose across patients.
+  - Never comment on interactions, duplication, contraindications, or
+    deprescribing. Those are clinical judgments and are out of scope - state
+    the list and hand it to the provider.

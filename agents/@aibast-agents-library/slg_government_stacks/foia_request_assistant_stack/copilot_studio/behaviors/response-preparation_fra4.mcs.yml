@@ -1,0 +1,79 @@
+mcs.metadata:
+  componentName: response-preparation
+  description: Assembles the response package for a named request - disclosure facts, the five response templates with the real fee filled in, and the pre-release checklist.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: response-preparation
+  description: Assembles the response package for a named request - disclosure facts, the five response templates with the real fee filled in, and the pre-release checklist.
+  ---
+  <!-- bic:source=blank -->
+  # Response preparation
+
+  Use this skill when the user asks to draft or prepare a response, asks what
+  letter language to send, asks what a request will cost the requester, or asks
+  what is left before a request can go out.
+
+  ## Inputs
+
+  - A request id (`FOIA-2025-xxxx`). If the user names no request, use
+    `FOIA-2025-0303` and say which request you are preparing.
+  - The response template set.
+
+  ## Procedure
+
+  1. Resolve the request id against the caseload. If the id is not in the
+     caseload, say it is not in the caseload and stop - never prepare a
+     response for a request that does not exist, and never substitute a
+     neighboring id.
+  2. State the disclosure facts from the record: requester, subject, pages as
+     recorded, `fee_estimate` rendered as `$N,NNN.NN` with exactly two
+     decimals, and status with underscores replaced by spaces in Title Case.
+  3. Render all five response templates - Full Grant, Partial Grant, Denial,
+     No Records, Fee Notice - as block quotes, in that order. In the Fee Notice
+     template, substitute the `{fee}` placeholder with this request's own fee
+     estimate formatted the same way. Never quote a fee from another request
+     and never round it.
+  4. Present the templates as options with their trigger conditions, and let
+     the officer choose:
+     - Full Grant when no exemption applies to any responsive page.
+     - Partial Grant when redactions are applied under cited exemptions.
+     - Denial when every responsive record is exempt, with the codes cited.
+     - No Records when a diligent search located nothing responsive.
+     - Fee Notice when payment is required before processing continues.
+  5. Render the pre-release checklist as unchecked boxes, all eight, in order.
+     Every box is unchecked - you never mark a step complete.
+
+  ## Output format
+
+  - `# Response Preparation: FOIA-2025-xxxx`
+  - `- **Requester:**`, `- **Subject:**`, `- **Pages:**`,
+    `- **Fee Estimate:**`, `- **Status:**`
+  - `## Response Templates`, then per template `### <Template Name>` followed
+    by the template text as a block quote
+  - `## Response Checklist` as `- [ ]` items, in this order:
+    - Responsive documents identified and compiled
+    - Exemption review completed
+    - Redactions applied and logged
+    - Vaughn index prepared (if applicable)
+    - Fee calculation finalized
+    - Response letter drafted
+    - Supervisory review completed
+    - Response mailed/emailed to requester
+
+  ## Edge cases
+
+  - A request whose status is not `response_ready` can still be prepared, but
+    lead with the status gap: name the status and say what remains. A request
+    at `intake` with no assigned analyst is not close to release.
+  - The Partial Grant and Denial templates are incomplete without exemption
+    codes. If the request's exemption review has not run, say the codes are
+    outstanding rather than inserting placeholder codes.
+  - Supervisory review is the last gate before the response goes out. Never
+    describe a package as ready to send with that box open.
+
+  ## Boundaries
+
+  - Drafting support only. Never send, mail, email, or file a response, never
+    charge or waive a fee, and never close a request. The template text is a
+    draft for the records officer to sign.

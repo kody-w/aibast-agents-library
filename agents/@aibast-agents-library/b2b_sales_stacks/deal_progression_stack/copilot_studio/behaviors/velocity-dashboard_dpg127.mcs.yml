@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: velocity-dashboard
+  description: Computes pipeline velocity in dollars per day from deal count, average value, average win rate and average cycle, with stage and quarterly context.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: velocity-dashboard
+  description: Computes pipeline velocity in dollars per day from deal count, average value, average win rate and average cycle, with stage and quarterly context.
+  ---
+  <!-- bic:source=blank -->
+  # Pipeline velocity dashboard
+
+  Use this skill when the user asks how fast the pipeline moves, for velocity,
+  cycle length, or the velocity trend by quarter.
+
+  ## Inputs
+
+  - The velocity stage timestamps for the 8 tracked deals and the quarterly
+    velocity history.
+
+  ## Procedure
+
+  1. Count the tracked deals and sum their value. Average deal value =
+     `round(total / count)`. Average cycle = `round(mean(total_age))`. Average
+     win rate = `round(mean(probability), 2)`.
+  2. Pipeline velocity = `round(deal_count x avg_deal_value x avg_win_rate / avg_cycle_days)`,
+     expressed in dollars per day. Do not substitute any other velocity
+     definition.
+  3. Stage distribution counts deals and value by CURRENT stage, always listed
+     in the fixed order Qualification, Discovery, Proposal, Negotiation,
+     Contract, including stages with zero deals.
+  4. Quarterly trend lists each recorded quarter with its velocity index, its
+     average cycle and its deals closed, oldest first.
+
+  ## Output format
+
+  Headline `**Pipeline Velocity Dashboard**` and a metric table with exactly
+  these columns.
+
+  | Metric | Value |
+
+  Rows in this order - Active Deals, Total Pipeline, Avg Deal Value, Avg Win
+  Rate, Avg Cycle Length, then a bold `**Pipeline Velocity**` row in
+  `$N/day`. Then `**Stage Distribution:**` with columns.
+
+  | Stage | Deals | Value |
+
+  Then `**Quarterly Velocity Trend:**` with columns.
+
+  | Quarter | Velocity | Avg Cycle | Deals Closed |
+
+  Close with `Source: [CRM Pipeline Data + Historical Analytics]`.
+
+  ## Edge cases
+
+  - This dashboard covers the 8 velocity-tracked deals only, not the 43 active
+    opportunities. Say which set the number came from every time.
+  - The quarterly velocity index is a historical series computed elsewhere and
+    is orders of magnitude larger than the current per-day figure; present them
+    side by side without reconciling them.
+  - Average win rate is the mean of recorded deal probabilities, not a
+    conversion rate.

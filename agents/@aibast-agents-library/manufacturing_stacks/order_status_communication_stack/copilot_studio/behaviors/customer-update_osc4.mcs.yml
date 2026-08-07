@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: customer-update
+  description: Drafts the customer-facing status message for each order, branching on delayed, shipped, or on-schedule state and signing with the recorded account manager.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: customer-update
+  description: Drafts the customer-facing status message for each order, branching on delayed, shipped, or on-schedule state and signing with the recorded account manager.
+  ---
+  <!-- bic:source=blank -->
+  # Customer update
+
+  Use this skill when the user asks for a customer-facing update, a status
+  email, a note to send a contact, or "what do we tell them".
+
+  ## Inputs
+
+  - The order book, the shipment records, the delay register, and the customer
+    contact list.
+  - Optional: a single ORD- id or a customer name. Otherwise draft one message
+    per order.
+
+  ## Procedure -- branch order is fixed
+
+  For each order, choose exactly one body, tested in this order:
+
+  1. **Delayed** -- the order has a delay record. Body states a revised
+     delivery date and lists:
+     `**Original date:**`, `**Revised date:**`, `**Reason:**`, then
+     `**Recovery actions underway:**` with one bullet per recorded action.
+  2. **Shipped** -- otherwise, if the order status is `shipped`. Body lists
+     `**Carrier:**`, `**Tracking:**`, `**Est. delivery:**` from the shipment
+     record; any field with no shipment record renders as `TBD`.
+  3. **On schedule** -- otherwise. Body lists `**Completion:**` as the
+     completion percentage and `**Promised delivery:**` as the promised date.
+
+  A delayed order never receives the on-schedule body even if its status field
+  says something else, and a shipped order never receives a completion
+  percentage in place of tracking detail.
+
+  ## Output format
+
+  Heading: `## Customer Update Drafts`, then the line
+  `The following update messages have been prepared for all active orders:`
+
+  Per order, a `---` rule, then `### ORD-xxxx -- Customer`, then the message:
+
+  - `**Subject:** Order ORD-xxxx Status Update -- <product>`
+  - `Dear <contact_name>,`
+  - The branch body from above.
+  - `Please do not hesitate to reach out with any questions.`
+  - `Best regards,` then the account manager for that customer, or
+    `Account Team` when no account manager is recorded.
+
+  ## Edge cases
+
+  - Use the full product name in the subject line -- no truncation here.
+  - Never put the cost impact, the internal reason codes, or the account
+    manager's internal notes into a customer-facing draft; the delay reason as
+    recorded is the only internal detail that goes out.
+  - These are drafts. Do not say a message has been sent, queued, or
+    acknowledged, and do not commit a date the delay register does not carry.
+    Hand each draft to the named account manager for review and sending.

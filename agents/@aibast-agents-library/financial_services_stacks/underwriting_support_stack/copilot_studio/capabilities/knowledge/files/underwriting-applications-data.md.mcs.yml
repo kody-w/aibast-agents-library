@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: underwriting-applications-data.md
+  description: Synthetic application file, risk characteristics, and loss/claims history the agent answers from until real tools are connected.

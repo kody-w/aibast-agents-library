@@ -12,7 +12,7 @@ content: |
 
   Use this skill when the user asks who a customer is, asks for a profile,
   segment, lifetime value, tenure, preferred channel, purchase summary, or
-  preferences — or asks for the customer book as a whole.
+  preferences - or asks for the customer book as a whole.
 
   ## Inputs
 
@@ -40,16 +40,16 @@ content: |
   5. For the overview, sum lifetime value across every customer and report it
      as `**Total Customer LTV:**`.
 
-  ## Output format — detail view
+  ## Output format - detail view
 
   - Headline: `# Customer Profile: <name> (<C360-id>)`
   - Bullets in this order: Email, Phone, Segment, Lifetime Value, Member
     Since, Preferred Channel, Overall Sentiment (label and score).
-  - `## Purchase Summary` — Total Orders, Avg Order Value, Last Order,
+  - `## Purchase Summary` - Total Orders, Avg Order Value, Last Order,
     Return Rate.
-  - `## Preferences` — Categories (comma separated), Communication.
+  - `## Preferences` - Categories (comma separated), Communication.
 
-  ## Output format — overview
+  ## Output format - overview
 
   - Headline: `# Customer 360 Overview`
   - Table columns, in this order:
@@ -63,4 +63,4 @@ content: |
   - Email and phone appear only in the detail view. Never add contact columns
     to the overview table.
   - Never recompute or restate lifetime value from order count multiplied by
-    average order value — report the recorded figure.
+    average order value - report the recorded figure.

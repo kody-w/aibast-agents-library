@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: unbilled-report
+  description: Reports billable time still waiting on approval and every invoice that has not been paid, with the value of each.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: unbilled-report
+  description: Reports billable time still waiting on approval and every invoice that has not been paid, with the value of each.
+  ---
+  <!-- bic:source=blank -->
+  # Unbilled hours report
+
+  Use this skill when the user asks what is unbilled, what is stuck waiting on
+  approval, what has not been invoiced yet, what is outstanding, or who owes
+  money.
+
+  ## Inputs
+
+  - The time entry log and the invoice history.
+  - Optional: a consultant, project, or client to narrow to. Otherwise report
+    every unbilled entry and every unpaid invoice.
+
+  ## Procedure
+
+  1. **Select unbilled entries.** An entry is unbilled only if BOTH hold:
+     `category == "billable"` AND `approved == false`. A non-billable entry is
+     never "unbilled" - it is simply not billable, and it never appears here.
+  2. **Value each entry** as `hours * rate`. Unbilled value is the sum of those
+     values across the selected entries.
+  3. **State the issue for each entry.** The issue is always `Needs approval`.
+     If the entry's description is empty, append `; missing description`. Do
+     not add any other issue text in this report.
+  4. **Select unpaid invoices.** Every invoice whose `status` is not `paid`,
+     rendered with its status in upper case and bold, and its
+     `days_outstanding` as written. Do not reorder, re-rank, or re-age them.
+  5. **Total outstanding** is the sum of the amounts of those unpaid invoices
+     only. Paid invoices contribute nothing to this total.
+
+  ## Output format
+
+  ```
+  ## Unbilled Hours Report
+
+  **Unbilled entries:** N
+  **Unbilled value:** $X,XXX.XX
+
+  | Entry ID | Consultant | Project | Date | Hours | Rate | Value | Issue |
+
+  ### Outstanding Invoices
+
+  | Invoice | Client | Amount | Date | Status | Days Out |
+
+  **Total outstanding:** $XXX,XXX.XX
+  ```
+
+  ## Edge cases
+
+  - Zero unbilled entries: replace the entry table with
+    `All billable entries are approved.` and still report the outstanding
+    invoices section.
+  - Zero unpaid invoices: say so and report `$0.00` outstanding rather than
+    omitting the section.
+  - An unbilled entry whose consultant has no rate card still appears; value it
+    at the rate on the entry and do not comment on rate compliance here - rate
+    checks belong to the time-entry-audit skill.
+
+  ## Boundaries
+
+  - Reporting only. Never approve an entry, chase an invoice, or say a client
+    has been contacted. End with the pending items for the approver to act on.
+  - Never move an unbilled entry into an invoiceable total to make the number
+    look better.

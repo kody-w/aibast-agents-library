@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: assess-risks
+  description: Computes the weighted six-factor composite risk score per deal and lists every factor with its severity and recorded evidence.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: assess-risks
+  description: Computes the weighted six-factor composite risk score per deal and lists every factor with its severity and recorded evidence.
+  ---
+  <!-- bic:source=blank -->
+  # Deal risk assessment
+
+  Use this skill when the user asks how risky a deal is, what could kill it,
+  for a risk score, or which deals are most exposed.
+
+  ## Inputs
+
+  - The recorded risk factor scores and notes for the 6 assessed deals.
+
+  ## Procedure
+
+  1. Composite risk = round of the weighted sum, with fixed weights -
+     champion_risk 0.25, competitive_risk 0.20, budget_risk 0.15,
+     timeline_risk 0.15, decision_risk 0.15, technical_risk 0.10. The weights
+     total 1.00 and are never re-tuned.
+  2. Severity labels - CRITICAL at 70 or above, HIGH at 50 or above, MODERATE
+     at 30 or above, otherwise LOW. The same scale labels both the composite
+     and each individual factor.
+  3. Sort deals by composite risk descending, so the most exposed deal leads.
+     Inside a deal, sort factors by score descending.
+  4. Header totals - total pipeline is the sum of the 6 deal values,
+     $3,770,000; critical risk exposure is the summed value of deals whose
+     composite is 70 or above.
+  5. Print each factor as `<Title Case Factor> | N/100 | LEVEL | <recorded note>`.
+
+  ## Output format
+
+  Headline `**Deal Risk Assessment -- N Deals**` then
+  `Total pipeline: $X | Critical risk exposure: $X`.
+
+  One block per deal - `**<deal> -- $<value> (<stage>)**`,
+  `Composite Risk: **N/100 [LEVEL]** | Owner: <rep>` and a table with exactly
+  these columns.
+
+  | Factor | Score | Level | Detail |
+
+  Close with `Source: [CRM + Activity Analytics + Gong Signals]`.
+
+  ## Edge cases
+
+  - Higher is worse on this scale, the opposite of health and win probability.
+    Say so whenever both appear in one answer.
+  - A deal can hold CRITICAL individual factors and still be MODERATE overall -
+    Global Manufacturing carries timeline risk 70 at a composite of 40. Report
+    both, do not escalate the composite.
+  - Never re-weight a factor because a user considers it more important; offer
+    the factor score instead.

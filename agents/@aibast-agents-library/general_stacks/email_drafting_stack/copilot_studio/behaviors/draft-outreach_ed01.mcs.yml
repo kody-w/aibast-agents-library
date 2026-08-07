@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: draft-outreach
+  description: Renders a cold outreach email from the cold_outreach template with the sample recipient context, subject variants, and open/reply benchmarks.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: draft-outreach
+  description: Renders a cold outreach email from the cold_outreach template with the sample recipient context, subject variants, and open/reply benchmarks.
+  ---
+  <!-- bic:source=blank -->
+  # Draft outreach
+
+  Use this skill when the user asks for a cold outreach email, a prospecting
+  email, a first-touch email, or an intro to a prospect they have not emailed
+  before.
+
+  ## Inputs
+
+  - The email template library (template key `cold_outreach`).
+  - The recipient context: first_name, last_name, company_name, industry,
+    observation, pain_point, reference_customer, result, product_name,
+    sender_name, sender_title.
+  - No inputs are required. With none supplied, render the sample context:
+    Jennifer Walsh, VP of Operations, TechVantage Solutions, Technology.
+
+  ## Procedure
+
+  1. Select template `cold_outreach`. Do not select any other template for this
+     skill.
+  2. Subject line: take the FIRST entry of `subject_variants` -
+     `{company_name} + {our_product} - Quick Question`. The other two variants
+     are reported but not used as the subject.
+  3. Substitute tokens: for every key present in the context, replace every
+     literal `{key}` in the subject and the body with its value. A token with no
+     matching context key is left in the text exactly as written. With the
+     sample context, `{our_product}` has no value and renders literally in the
+     subject as `TechVantage Solutions + {our_product} - Quick Question`.
+  4. Recipient address is built as
+     `<first_name lowercased>.<last_name lowercased>@techvantage.com` - for the
+     sample context, `jennifer.walsh@techvantage.com`. Only the sample context
+     has this domain; for any other company, state that you do not have the
+     recipient's address.
+  5. Report the template's stored benchmarks unchanged: `avg_open_rate` 0.32 and
+     `avg_reply_rate` 0.08, formatted as whole percents - 32% and 8%.
+  6. List all three subject-line variants verbatim, tokens included.
+
+  ## Output format
+
+  - `**Draft: Cold Outreach Email**`
+  - `**To:** <first> <last> <email>`
+  - `**Subject:** <rendered subject>`
+  - `**Tone:** Professional, consultative`
+  - `---` then the rendered body, then `---`
+  - `**Performance Benchmarks:**` with `- Avg Open Rate: 32%` and
+    `- Avg Reply Rate: 8%`
+  - `**Subject Line Variants:**` as a bullet list of all three variants
+  - `Source: [Email Template Engine]` and `Agents: EmailDraftingAgent`
+
+  ## Edge cases
+
+  - Unfilled tokens are not an error. Surface them as inputs the sender must
+    supply before sending; never invent a product name, reference customer, or
+    result.
+  - The tone for this template is fixed at `Professional, consultative`. If the
+    user wants a different tone, point to the tone matrix and say the template
+    body would have to be edited - do not rewrite it here.
+  - Draft only. Never say the email was sent, scheduled, or tracked.

@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: setup-tracking
+  description: States the per-tier response SLA, escalation path, and follow-up sequence, with the live lead count sitting behind each rule.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: setup-tracking
+  description: States the per-tier response SLA, escalation path, and follow-up sequence, with the live lead count sitting behind each rule.
+  ---
+  <!-- bic:source=blank -->
+  # Setup tracking
+
+  Use this skill when the user asks about SLAs, response times, escalation,
+  follow-up cadence, or how the queue is monitored.
+
+  ## Inputs
+
+  - The scored lead set, for the per-tier counts.
+  - The SLA policy.
+
+  ## Procedure - the rules, quoted exactly
+
+  | Tier | Response SLA | Escalation | Sequence |
+  |------|--------------|------------|----------|
+  | Hot | 4h | Manager alert + Slack DM | Immediate call + personalized email |
+  | Warm | 24h | Team channel alert | Personalized email day 0, call day 1 |
+  | Nurture | 48h | Weekly digest flag | 3-email drip over 10 days |
+  | Disqualified | N/A | None - routed to marketing | Marketing nurture list |
+
+  Disqualified has a response window of 0 hours, which renders as `N/A`, not
+  as `0h`. These four windows are fixed - never quote a different SLA, and
+  never grant an extension.
+
+  Count the leads in each tier from the scored set and put the count beside
+  the tier name in the first column, as `Hot (N leads)`.
+
+  ## Output format
+
+  - Headline: `**SLA Tracking Configuration - N Leads**` where N is the total
+    scored.
+  - The SLA table above, rows in the fixed order Hot, Warm, Nurture,
+    Disqualified, with the live counts in the tier column.
+  - `**Monitoring Activated:**` - the fixed four items: real-time dashboard
+    tracking all N leads; Slack alerts when SLA is at risk (50% of the window
+    elapsed); daily summary report at 9:00 AM; weekly conversion tracking by
+    tier.
+  - `**Escalation Rules:**` - the fixed four rules: Hot lead no contact in 4h
+    goes to Manager DM + email; Warm lead no contact in 24h goes to the team
+    channel; any lead with no response after the full sequence is re-routed
+    to an alternate AE; a booked meeting auto-updates the opportunity stage
+    in the CRM.
+  - Close with `Source: [SLA Engine + Notification System]` and
+    `Agents: SLAMonitoringAgent`.
+
+  ## Boundaries
+
+  - This describes the configuration. You do not enable alerts, create
+    dashboards, send Slack messages, or write to the CRM - state the rule and
+    who owns turning it on.
+  - If the user asks for an SLA on a tier or channel that is not in the
+    table, say it does not exist rather than proposing one.

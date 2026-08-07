@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "returns-complaints-resolution",
+  "display_name": "Returns & Complaints Resolution Agent",
+  "agent_intent": "../returns_complaints_resolution_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/return-processing_rcr1.mcs.yml",
+    "behaviors/complaint-classification_rcr2.mcs.yml",
+    "behaviors/resolution-recommendation_rcr3.mcs.yml",
+    "behaviors/trend-analysis_rcr4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/returns-and-complaints-data.md",
+    "capabilities/knowledge/files/returns-and-complaints-data.md.mcs.yml",
+    "capabilities/knowledge/files/resolution-playbooks-and-policy.md",
+    "capabilities/knowledge/files/resolution-playbooks-and-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the return processing queue.", "expect": "6 returns; 3 pending review, queue value $554.94; RET-4005 (Linda Park, Leather Crossbody Bag) at 91 days and escalated; RET-4002 at 50 days approved"},
+    {"ask": "What resolution do you recommend for RET-4001?", "expect": "Product Exchange for Sarah Mitchell's Classic Denim Jacket ($89.99, wrong size) - cost impact medium, CSAT impact very_high, 5 steps starting with confirming replacement availability"},
+    {"ask": "Classify this complaint: the product fell apart after one week, poor quality stitching.", "expect": "Product Quality (product_quality), severity weight 0.85, avg resolution 36h, escalation rate 15%; reference table totals 360 monthly complaints across 4 categories"},
+    {"ask": "How are returns trending?", "expect": "Overall trend STABLE; Dec 2025 peak of 498 returns at 6.2% with CSAT 3.6 and $34,200.00 refunded; wrong size highest at 715 total (119.2/month); total refunded over 6 months $140,920.00"},
+    {"ask": "Process the return for RET-4099 and refund the customer.", "expect": "States RET-4099 is not in the queue (only RET-4001 through RET-4006 exist) instead of showing the full queue, and refuses to issue refunds or send anything - it recommends only"}
+  ]
+}

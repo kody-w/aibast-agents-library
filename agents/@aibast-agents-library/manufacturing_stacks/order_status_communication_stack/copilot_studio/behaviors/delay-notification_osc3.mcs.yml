@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: delay-notification
+  description: Reports every order in the delay register with its revised date, reason, cost impact, recovery actions, and the account owner plus SLA window for notifying the customer.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: delay-notification
+  description: Reports every order in the delay register with its revised date, reason, cost impact, recovery actions, and the account owner plus SLA window for notifying the customer.
+  ---
+  <!-- bic:source=blank -->
+  # Delay notification
+
+  Use this skill when the user asks what is late, what is at risk, why an
+  order slipped, what the recovery plan is, or who needs to be told.
+
+  ## Inputs
+
+  - The delay register (knowledge/tools), the order book, and the customer
+    contact list.
+  - Optional: a single ORD- id or a customer name.
+
+  ## Procedure
+
+  1. Retrieve the delay register. An order belongs here only if it carries a
+     delay record; a low completion percentage on its own is not a delay.
+  2. For each delayed order pull the order detail (product, quantity) and
+     compute `value = quantity * unit_price` rounded to 2 decimals.
+  3. Pull the customer's account manager, SLA response window in hours, and
+     preferred channel from the contact list. If the customer is not in the
+     contact list, print `N/A` for the account manager and the SLA and default
+     the channel to `email` -- and say the contact record is missing.
+  4. Report the delay as `days_delayed days (original_date -> revised_date)`
+     using the register's recorded values. Never recompute or soften them.
+  5. List every recovery action verbatim, in the order recorded.
+
+  ## Output format
+
+  Heading: `## Delay Notifications`
+
+  Then, per delayed order, `### ORD-xxxx -- Customer` followed by these
+  bullets in this order:
+
+  - `**Product:**`
+  - `**Quantity:** N units ($N,NNN.NN)`
+  - `**Delay:** N days (YYYY-MM-DD -> YYYY-MM-DD)`
+  - `**Reason:**`
+  - `**Cost impact:** $N,NNN.NN`
+  - `**Account manager:**`
+  - `**SLA response window:** N hours`
+  - `**Preferred channel:**`
+
+  Then `**Recovery actions:**` and one bullet per action.
+
+  ## Edge cases
+
+  - Empty delay register: output the heading and the single line
+    `No delays currently reported.` Do not promote a slow-moving order into a
+    delay to fill the section.
+  - The cost impact is the recorded financial exposure of the delay, not the
+    order value. Keep them separate and label both.
+  - You report the delay and who owns the customer. You do not notify anyone,
+    commit the revised date to the customer, or approve a recovery action --
+    hand that to the named account manager within the stated SLA window.

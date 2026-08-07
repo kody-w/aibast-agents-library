@@ -1,0 +1,100 @@
+mcs.metadata:
+  componentName: solution-pricing
+  description: Builds the industry component set, applies the rule-driven discounts and budget guard, and lays out the three-phase 12-week implementation plan.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: solution-pricing
+  description: Builds the industry component set, applies the rule-driven discounts and budget guard, and lays out the three-phase 12-week implementation plan.
+  ---
+  <!-- bic:source=blank -->
+  # Solution and pricing
+
+  Use this skill when the user asks what the solution costs, asks for the
+  pricing structure, asks about discount or margin, asks whether we fit the
+  budget, or asks for the implementation timeline.
+
+  ## Inputs
+
+  - The resolved RFP: its industry and its budget ceiling.
+  - The product catalog, the solution configurations, and the discount rules.
+
+  ## Procedure -- component selection
+
+  Pick the component set by industry:
+
+  - Healthcare and Financial Services: Platform Core License, Integration Suite,
+    Analytics & Reporting, Implementation Services, Training Program, 3-Year
+    Premium Support (six components).
+  - Technology: the same set **without** Analytics & Reporting (five components).
+  - Any other industry falls back to the Technology set.
+
+  ## Procedure -- per-line arithmetic, exactly
+
+  For each component, with its category's discount rule:
+
+  1. `discount = base`
+  2. `if list_price >= volume_threshold: discount = discount + volume_bonus`
+  3. `discount = min(discount, max)`
+  4. `proposed_price = int(list_price * (1 - discount))` -- truncated, not rounded
+  5. `cost = int(list_price * (1 - margin_floor))`
+  6. `savings = list_price - proposed_price`
+  7. `margin_pct = round((proposed_price - cost) / proposed_price * 100, 1)`
+
+  Rules: Software base 8%, threshold $600,000, bonus 3%, cap 15%. Services base
+  10%, threshold $400,000, bonus 4%, cap 18%. Support base 25%, threshold
+  $150,000, bonus 5%, cap 35%. On the current catalog only 3-Year Premium
+  Support ($180,000 >= $150,000) clears its threshold, so it prices at 30.0%
+  while all Software lines sit at 8.0% and all Services lines at 10.0%.
+
+  ## Procedure -- budget guard
+
+  `total_proposed = sum(proposed_price)`. If `total_proposed > budget_ceiling`:
+  `scale = budget_ceiling / total_proposed`, then every line becomes
+  `int(proposed_price * scale)`, savings and margin are recomputed from the
+  scaled price, and the total is re-summed. Say when the scaling ran.
+
+  Then: `overall_discount_pct = round((1 - total_proposed / total_list) * 100, 1)`,
+  `overall_margin_pct = round((total_proposed - total_cost) / total_proposed * 100, 1)`,
+  `within_budget = total_proposed <= budget_ceiling`,
+  `budget_headroom = budget_ceiling - total_proposed`.
+
+  Meridian Healthcare: $1,360,000 list, no scaling needed, $1,201,599 proposed,
+  11.6% blended discount, $158,401 savings, 33.4% blended margin, $48,401
+  headroom under the $1,250,000 ceiling.
+
+  ## Procedure -- implementation phases
+
+  Fixed three-phase plan totalling 12 weeks. Phase start week = sum of prior
+  phase durations + 1.
+
+  - Phase 1 Foundation, weeks 1-4: infrastructure assessment, connector
+    deployment, security configuration, core team training.
+  - Phase 2 Rollout, weeks 5-10: phased facility deployment, workflow
+    integration, staff certification, go-live support.
+  - Phase 3 Optimization, weeks 11-12: performance tuning, advanced training,
+    success metrics validation, handoff to support.
+
+  ## Output format
+
+  - Headline `**Solution & Pricing: <account>**`
+  - `**Implementation Approach (12 weeks):**` then one bolded block per phase
+    with its week range and its activities on a single bullet.
+  - `**Pricing Structure:**` then a table with columns `| Component | List Price
+    | Discount | Proposed | Savings | Margin |`, one row per component, closing
+    with a bolded **Total** row carrying total list, blended discount, total
+    proposed, total savings, and blended margin.
+  - `**Budget Analysis:**` bullets: budget ceiling, proposed total, status
+    **WITHIN** or **EXCEEDS** with headroom, overall discount, gross margin with
+    the floor stated as 35%.
+  - Close with `Source: [Pricing Engine + Competitive Data]` and
+    `Agents: SolutionArchitectAgent, PricingOptimizationAgent`.
+
+  ## Edge cases
+
+  - When the blended margin lands below the 35% floor -- Meridian is 33.4% -- call
+    it out as requiring pricing approval. Do not present it as cleared.
+  - Never grant a discount the rules do not produce, and never lower a price to
+    win. If asked, quote the rule that caps it.
+  - Truncation is real: `int(180000 * 0.7)` yields $125,999, not $126,000. Report
+    the computed figures rather than tidying them.

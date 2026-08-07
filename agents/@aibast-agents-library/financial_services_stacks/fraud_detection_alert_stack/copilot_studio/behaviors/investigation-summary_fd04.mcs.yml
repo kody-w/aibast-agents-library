@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: investigation-summary
+  description: Reports the investigation case register, or a single case with its status, priority, analyst, associated transactions, and triggered rules.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: investigation-summary
+  description: Reports the investigation case register, or a single case with its status, priority, analyst, associated transactions, and triggered rules.
+  ---
+  <!-- bic:source=blank -->
+  # Investigation summary
+
+  Use this skill when the user asks about investigations, open cases, case
+  status, who owns a case, or names an INV- id.
+
+  ## Inputs
+
+  - The investigation case file, the transaction feed, and the alert rule set
+    (knowledge/tools).
+  - Optional: a single `case_id` (INV- id). With one, produce the detail view.
+    Without one, produce the register.
+
+  ## Procedure - single case
+
+  1. Look up the case by its exact INV- id. If it is not in the file, say so and
+    list the case ids that are - do not answer from the nearest match.
+  2. Report, in this order: Status, Priority, Analyst, Opened, Pattern, Notes.
+    Status and pattern render underscores as spaces in Title Case
+    (`under_review` becomes `Under Review`). Priority renders in Title Case.
+  3. Pattern renders as `Under Analysis` when the case has none. Never infer it.
+  4. `## Associated Transactions` - resolve each TXN id in `alert_txns` against
+    the feed and give amount, merchant, country, and risk score. A TXN id that
+    does not resolve is omitted from the list and called out as unresolved.
+  5. `## Rules Triggered` - resolve each RULE id and give its name and severity
+    in caps. An unresolved rule id renders as `Unknown` with severity `N/A`.
+
+  ## Procedure - register
+
+  1. List every case in file order. Do not sort by priority, status, or date.
+  2. Pattern renders as `TBD` when the case has none.
+
+  ## Output format
+
+  Single case - `# Investigation: INV-YYYY-NNN`, then the bullet block
+  (Status / Priority / Analyst / Opened / Pattern / Notes), then
+  `## Associated Transactions` as
+  `- **TXN-NNNNN:** $0,000.00 at <merchant> (<country>) - Risk: N`, then
+  `## Rules Triggered` as `- **RULE-00N:** <name> [SEVERITY]`.
+
+  Register - one table, exactly these columns:
+
+  | Case ID | Pattern | Status | Priority | Analyst | Opened |
+
+  ## Edge cases
+
+  - Notes are quoted as recorded. Never soften, extend, or add a conclusion to
+    them.
+  - Never change a case's status or priority, close a case, reassign an analyst,
+    or say a SAR has been filed. If the notes record that a filing was
+    initiated, report that as a note - not as a completed action you took.
+  - Recommendation only. State what the record shows and leave the next step
+    with the named analyst.

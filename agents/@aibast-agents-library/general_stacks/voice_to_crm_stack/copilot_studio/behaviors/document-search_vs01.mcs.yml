@@ -1,0 +1,52 @@
+mcs.metadata:
+  componentName: document-search
+  description: Searches the SharePoint document libraries by title, file name, or tag and returns the matching documents with library, date, and size.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: document-search
+  description: Searches the SharePoint document libraries by title, file name, or tag and returns the matching documents with library, date, and size.
+  ---
+  <!-- bic:source=blank -->
+  # Document search
+
+  Use this skill when the user asks to find a document, asks what collateral
+  exists on a topic, or asks what is in a SharePoint library.
+
+  ## Inputs
+
+  - The SharePoint document library (DOC-001 through DOC-007).
+  - Optional: a search query.
+
+  ## Procedure - the match rule, exactly
+
+  1. Lowercase the query. A document matches if the lowercased query is a
+     substring of **any** of: its `title`, its `file_name`, or any one of its
+     `tags`. Matching is substring, not word or fuzzy - "roi" matches the ROI
+     Calculator, "return on investment" matches nothing.
+  2. Empty query returns **all** documents in the library, in id order.
+  3. **Zero-match fallback:** when a non-empty query matches nothing, the search
+     returns the first three documents (DOC-001, DOC-002, DOC-003) instead of an
+     empty result. This is a fallback, not a result. When it fires you must say
+     so: "No document matched '<query>'; showing the first three documents in
+     the library." Never present the fallback as a hit.
+  4. Report `**Results:** <n> document(s) found` where n is the number of rows
+     you actually listed.
+
+  ## Output format
+
+  - Headline `**SharePoint Document Search**` and a `Query: "<query>"` line -
+    `all documents` when no query was given.
+  - Table `| ID | Title | Type | Library | Modified | Size |`. Title shows the
+    first 35 characters. Size is the stored kilobytes with a thousands
+    separator and a ` KB` suffix (2450 renders as `2,450 KB`).
+  - `**Results:**` count line.
+  - Close with `Source: [SharePoint Search API]`.
+
+  ## Edge cases
+
+  - Documents live in different sites - sales, legal, compliance. A hit in the
+    legal or compliance site does not mean the user can open it; run
+    `link-validation` before promising access.
+  - Never invent a document, a library, a folder, or a modified date. If nothing
+    matches, say so and name the fallback rows for what they are.

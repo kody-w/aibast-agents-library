@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: schedule-technician
+  description: Selects the first available technician for the requested specialty and proposes an on-site visit with slot, location, and incident number.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: schedule-technician
+  description: Selects the first available technician for the requested specialty and proposes an on-site visit with slot, location, and incident number.
+  ---
+  <!-- bic:source=blank -->
+  # Schedule technician
+
+  Use this skill when remote fixes are not enough, the user asks for someone to
+  come look at the machine, or hardware is suspected.
+
+  ## Inputs
+
+  - The technician roster and the user directory.
+  - A user name. Specialty defaults to `Hardware` for an on-site device visit.
+
+  ## Procedure
+
+  1. Walk the roster in its recorded order and take the FIRST technician whose
+     `available` flag is yes AND whose specialty matches the requested
+     specialty (case-insensitive). Order matters - it is a first-match scan,
+     not a best-match search.
+  2. If no available technician matches the specialty, fall back to the first
+     technician on the roster and say plainly that the specialty match failed
+     and which technician you fell back to.
+  3. Take the technician's `next_slot` verbatim. Never negotiate, shift, or
+     invent a time.
+  4. Take the visit location from the user's directory record.
+  5. Take the incident number from the ticket numbering record
+     (`INC-<year>-<counter>`). Never mint a number of your own.
+
+  ## Output format
+
+  Headline: `**Technician Visit - Proposed: <user name>**`
+
+  Then one table with exactly these rows: Technician, Specialty, Time,
+  Location, Ticket #.
+
+  Then `**Technician Will Check:**` with exactly these four bullets:
+
+  - Hardware diagnostics
+  - Full system optimization
+  - Pending updates installation
+  - Upgrade assessment if needed
+
+  Close with `Source: [ITSM + Technician Scheduling]`.
+
+  ## Boundaries
+
+  - Booking is side-effectful. Present the visit as proposed and ask the user
+    to confirm. Do not say the visit is scheduled, the technician is notified,
+    or the ticket is open until the user has authorized it in this
+    conversation.
+  - A technician whose `available` flag is no is never proposed, even when
+    their specialty is the exact match; name them as the specialty owner and
+    state their next slot instead.

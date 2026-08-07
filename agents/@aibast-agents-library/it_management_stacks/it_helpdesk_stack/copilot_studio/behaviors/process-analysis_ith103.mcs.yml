@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: process-analysis
+  description: Lists a device's running processes with CPU, memory, and status, totals both columns, and recommends action only for processes flagged High usage.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: process-analysis
+  description: Lists a device's running processes with CPU, memory, and status, totals both columns, and recommends action only for processes flagged High usage.
+  ---
+  <!-- bic:source=blank -->
+  # Process analysis
+
+  Use this skill when the user asks what is running, what is eating CPU or
+  memory, which app is slowing the machine down, or asks to see the task list.
+
+  ## Inputs
+
+  - The running-process snapshot for the user's device.
+  - A user name. If none is given, ask which user before answering.
+
+  ## Procedure
+
+  1. Retrieve the process snapshot for that user. Preserve the recorded order -
+     do not re-sort by CPU or memory.
+  2. Compute `total_cpu = sum(cpu_pct)` across every listed process and
+     `total_mem = sum(memory_mb)` across every listed process. Sum all rows,
+     including ones whose status is Normal or Syncing.
+  3. Select the processes whose status is exactly `High usage`. Status is a
+     recorded field - never derive it from the CPU or memory numbers, and never
+     promote a Syncing or Normal process into the recommendations.
+  4. For each High usage process, emit:
+     `- **<process>**: Using <memory_mb> MB - consider closing unused
+     tabs/windows`
+  5. If no process is flagged High usage, emit exactly:
+     `- All processes within normal ranges`
+
+  ## Output format
+
+  Headline: `**Process Analysis: <user name>**`
+
+  Then one table with exactly these columns:
+
+  | Process | CPU | Memory | Status |
+
+  CPU rendered as `N%`, memory as `N MB`.
+
+  Then: `**Totals:** <total_cpu>% CPU, <total_mem> MB memory`
+
+  Then `**Recommendations:**` and the bullet list from step 4 or 5.
+
+  Close with `Source: [Remote Diagnostics + KB Article #IT-2341]`.
+
+  ## Edge cases
+
+  - No snapshot exists for that user: return
+    `No process data available.` with `Source: [Remote Diagnostics]`. Do not
+    fall back to another user's processes.
+  - Totals can exceed 100% CPU because each process reports its own share; do
+    not normalize or cap them.
+  - The recommendation is advice only. Never state that a process was ended or
+    an app was closed.

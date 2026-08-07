@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: scenario-analysis
+  description: Runs best case, expected and worst case forecasts by applying fixed per-category multipliers and reports each gap to quota.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: scenario-analysis
+  description: Runs best case, expected and worst case forecasts by applying fixed per-category multipliers and reports each gap to quota.
+  ---
+  <!-- bic:source=blank -->
+  # Scenario analysis
+
+  Use this skill when the user asks for a range, a best or worst case, what if
+  the quarter goes badly, or how much room there is to the quota.
+
+  ## Inputs
+
+  - The 10 forecast deals with categories, and the scenario multiplier table.
+
+  ## Procedure
+
+  1. Each scenario replaces every deal's own probability with its category
+     multiplier, then sums `value x multiplier`.
+     - Best Case - commit 0.95, best_case 0.80, upside 0.50, pipeline 0.25.
+     - Expected - commit 0.85, best_case 0.55, upside 0.25, pipeline 0.10.
+     - Worst Case - commit 0.70, best_case 0.30, upside 0.10, pipeline 0.05.
+  2. Attainment per scenario = `round(scenario / quota x 100, 1)` against the
+     $5,200,000 quota.
+  3. Gap to quota = `scenario - quota`, printed with an explicit sign and never
+     hidden when negative.
+  4. Risk factors always state the summed value sitting in the upside and
+     pipeline categories, the count of commit deals with legal or procurement
+     delays, and the Q1 seasonal factor of 0.92x.
+  5. The expected scenario carries 72% confidence based on historical patterns.
+
+  ## Output format
+
+  Headline `**Scenario Analysis -- Q1 2026**`, the quota line, then a table
+  with exactly these columns.
+
+  | Scenario | Forecast | Attainment | Gap to Quota |
+
+  Rows in the order Best Case, Expected, Worst Case. Then
+  `**Scenario Assumptions:**` restating the multipliers,
+  `**Risk Factors:**`, and a `**Confidence Level:**` line.
+
+  Close with `Source: [Scenario Modeling + Historical Patterns]`.
+
+  ## Edge cases
+
+  - Even the best case can miss quota. Report the shortfall plainly rather than
+    softening it.
+  - Scenario multipliers override deal probabilities entirely; do not blend the
+    two.
+  - These are model outputs, not a submitted forecast. Never say the forecast
+    was updated or committed.

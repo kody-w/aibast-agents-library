@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: win-theme-analysis
+  description: Reports historical proposal performance, win rate, average winning margin, theme frequency from won bids only, and the stated reason for every loss.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: win-theme-analysis
+  description: Reports historical proposal performance, win rate, average winning margin, theme frequency from won bids only, and the stated reason for every loss.
+  ---
+  <!-- bic:source=blank -->
+  # Win theme analysis
+
+  Use this skill when the user asks what wins deals, asks for the win rate, asks
+  which themes to lead with, or asks why a bid was lost.
+
+  ## Inputs
+
+  - The historical proposal record: proposal name, value, result, win themes,
+    competitor beaten, margin, and loss reason where present.
+
+  ## Procedure
+
+  1. Emit the full history first, in stored order, one row per proposal. The
+     Themes cell shows only the **first two** themes for that proposal; do not
+     expand it.
+  2. Win rate: `won / total x 100`, one decimal. `3 / 5 x 100 = 60.0%`.
+  3. Average winning margin: mean of `margin_pct` across Won rows only, one
+     decimal. `(34 + 29 + 31) / 3 = 31.3%`. Margins on lost bids (26%, 22%)
+     never enter this average.
+  4. Theme frequency counts themes from **Won proposals only**. Themes attached
+     to lost bids -- "Price competitive" (National Bank Corp) and "Innovative
+     approach" (RetailGroup Holdings) -- are excluded from the theme table
+     entirely.
+  5. Sort themes by frequency descending, ties held in first-seen order. In the
+     current record every theme appears exactly once, so the table reads:
+     Industry accelerators, Former client staff, Aggressive timeline, 14-site
+     rollout experience, Quick wins strategy, On-time delivery track record,
+     Domain expertise -- seven themes, frequency 1 each. Do not present any of
+     them as more proven than the others when the counts are equal.
+  6. Loss analysis lists every Lost row with its stored `loss_reason` verbatim.
+     If a lost row has no stored reason, print `Unknown` -- do not infer one.
+
+  ## Output format
+
+  - `## Win Theme Analysis`
+  - `### Historical Performance` -- table with columns
+    `Proposal | Value | Result | Margin | Themes`; Result in bold
+    (`**Won**` / `**Lost**`); Value as `$8,200,000`; Margin as `34%`; Themes as
+    the first two joined by `; `
+  - `**Win rate:** 60.0%` and `**Average winning margin:** 31.3%`
+  - `### Top Win Themes (from won proposals)` -- table `Theme | Frequency`
+  - `### Loss Analysis` -- one bullet per loss:
+    `- **<proposal>** ($7,100,000): <loss reason>`
+
+  ## Edge cases
+
+  - Seven distinct themes at frequency 1 means the record shows no repeated win
+    theme. Say that rather than manufacturing a ranking.
+  - `competitor_beaten` is null on losses. Never report a firm as beaten on a
+    bid we lost.
+  - This is internal pursuit analysis. Never draft client-facing copy that
+    quotes our margins or loss reasons.

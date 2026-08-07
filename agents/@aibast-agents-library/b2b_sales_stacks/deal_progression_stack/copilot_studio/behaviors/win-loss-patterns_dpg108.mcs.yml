@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: win-loss-patterns
+  description: Reports the historical head-to-head record against each competitor with win rate, cycle delta and the recorded win and loss factors.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: win-loss-patterns
+  description: Reports the historical head-to-head record against each competitor with win rate, cycle delta and the recorded win and loss factors.
+  ---
+  <!-- bic:source=blank -->
+  # Win/loss pattern analysis
+
+  Use this skill when the user asks how we do against a competitor, what our
+  win rate is, or which competitor beats us most often.
+
+  ## Inputs
+
+  - The head-to-head win/loss record for the four tracked competitors.
+
+  ## Procedure
+
+  1. Sort competitors by win rate descending - Legacy Corp ERP 75.0%,
+     CloudFirst Systems 70.6%, Vendara Solutions 63.6%, Nextera Platform 45.0%.
+  2. Render each record as `wins-losses` and each cycle delta with an explicit
+     sign, so +12 days and -5 days read as recorded.
+  3. Overall win rate = round(total wins / (total wins + total losses) x 100, 1).
+     With 53 wins and 30 losses that is 63.9%.
+  4. Name the strongest position as the highest win rate with its win factor,
+     and the most challenged as the lowest win rate with its loss factor.
+  5. Always carry the two standing insights - deals against incumbents take an
+     average of 12 days longer but yield higher ACV, and evaluations with 3 or
+     more competitors reduce win rate by 15%.
+
+  ## Output format
+
+  Headline `**Win/Loss Pattern Analysis**` then
+  `Overall competitive win rate: **63.9%** (53W-30L)` and a table with exactly
+  these columns.
+
+  | Competitor | Record | Win Rate | Cycle Delta | Key Win Factor | Key Loss Factor |
+
+  Then a `**Key Insights:**` list and the standing recommendation to
+  disqualify competitively in Discovery, with reference calls and POC
+  differentiation as the highest-impact tactics.
+
+  Close with `Source: [Win/Loss Database + CRM Outcomes]`.
+
+  ## Edge cases
+
+  - A high win rate against a competitor is not a forecast for a live deal;
+    keep it labelled as history.
+  - If the user asks for a competitor outside the four tracked, say there is no
+    record for it in this data set.
+  - Do not average the four win rates - the overall figure is computed from
+    total wins and losses.

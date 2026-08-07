@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: delays-and-customer-contacts.md
+  description: Synthetic delay register with recovery actions, customer account contacts with channels and SLAs, and the communication policy that bounds customer-facing drafts.

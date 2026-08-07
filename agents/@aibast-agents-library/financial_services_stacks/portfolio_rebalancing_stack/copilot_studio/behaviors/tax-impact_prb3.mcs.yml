@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: tax-impact
+  description: Estimates capital gains tax on the sell side of a rebalance using pro-rata unrealized gain at the long-term rate plus the net investment income tax.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: tax-impact
+  description: Estimates capital gains tax on the sell side of a rebalance using pro-rata unrealized gain at the long-term rate plus the net investment income tax.
+  ---
+  <!-- bic:source=blank -->
+  # Tax impact
+
+  Use this skill when the user asks what a rebalance costs in tax, about
+  capital gains, or how to rebalance more tax-efficiently.
+
+  ## Inputs
+
+  - The portfolio record, including `cost_basis` for every holding.
+  - The tax rate table.
+  - Optional: a PORT- id. When none is given, use PORT-5001 and say so.
+
+  ## Procedure
+
+  1. Derive the trade list exactly as rebalance-recommendation does - the same
+     `abs(drift) >= drift_threshold` gate and the same trade values. Tax is
+     computed only on trades whose action is SELL. Buys are never taxable here.
+  2. For each SELL, on the holding being sold:
+     - `gain_pct = (current_value - cost_basis) / current_value`
+     - `unrealized_gain = sell_amount * gain_pct`
+     - If `unrealized_gain <= 0`, estimated tax is `$0` - a loss position is
+       never taxed. Do not net losses across holdings.
+     - Otherwise `estimated_tax = unrealized_gain * (0.20 + 0.038)`, i.e. the
+       long-term capital gains rate plus the net investment income tax, 23.8%
+       combined. The short-term rate of 37.0% is listed for reference and is
+       not applied by this calculation.
+  3. `Total Estimated Tax Liability` is the sum of the per-trade estimates.
+
+  Worked example (PORT-5001, VTI): gain_pct = (4,357,500 - 3,800,000) /
+  4,357,500 = 0.12794; unrealized_gain = 622,500 * 0.12794 = $79,643;
+  estimated_tax = 79,643 * 0.238 = $18,955.
+
+  ## Output format
+
+  - `# Tax Impact Analysis: <portfolio name>`
+  - `## Tax Rate Reference` - bulleted, all five rates as percentages to one
+    decimal: Short Term Capital Gains 37.0%, Long Term Capital Gains 20.0%,
+    Qualified Dividends 20.0%, Ordinary Income 37.0%, Net Investment Income
+    Tax 3.8%.
+  - `## Estimated Tax on Sell Trades`, then a table with exactly these columns:
+    `| Asset | Ticker | Sell Amount | Cost Basis | Unrealized Gain | Est. Tax |`
+  - `**Total Estimated Tax Liability:** $N`
+  - `## Tax-Efficient Alternatives` - direct new contributions to underweight
+    asset classes; use tax-loss positions to offset gains; rebalance within
+    tax-advantaged accounts first; consider charitable donation of appreciated
+    shares.
+
+  ## Edge cases
+
+  - No SELL trades in the rebalance: keep the rate reference, then emit
+    `No sell trades required.` and stop. PORT-5002 lands here - its only trade
+    is a BUY, so there is no tax to estimate.
+  - Cost basis above current value (a loss position, e.g. VEA at $1,600,000
+    basis against $1,493,750 value) yields a negative gain and `$0` tax.
+  - A holding with zero current value produces `$0` rather than a division
+    error.
+
+  ## Boundaries
+
+  - This is a planning estimate, not tax advice, and you say so. It assumes
+    long-term treatment for every lot, ignores lot-level selection, wash sale
+    rules, state and local tax, holding period, and whether the account is
+    taxable or tax-advantaged.
+  - Never file, report, or claim to reserve anything. Recommendation only.

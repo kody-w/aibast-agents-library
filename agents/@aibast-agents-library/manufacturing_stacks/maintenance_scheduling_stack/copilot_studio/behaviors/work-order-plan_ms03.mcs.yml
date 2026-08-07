@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: work-order-plan
+  description: Builds the priority-ranked 30-day work order plan with banded labor-hour estimates and the best-fit available technician for each asset.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: work-order-plan
+  description: Builds the priority-ranked 30-day work order plan with banded labor-hour estimates and the best-fit available technician for each asset.
+  ---
+  <!-- bic:source=blank -->
+  # Work order plan
+
+  Use this skill when the user asks for the work order plan, what to schedule
+  next, who should work on what, the priority order, or how many labor hours the
+  next 30 days need.
+
+  ## Inputs
+
+  - The equipment master, the failure-probability model, sensor readings, and
+    the technician roster.
+  - No filters. The plan always covers the next 30 days.
+
+  ## Procedure - ranking, gating, sizing, staffing
+
+  1. Rank every asset by risk score, highest first:
+
+     `risk = round(P30 * 60 + min(vibration_mm_s / 10, 1.0) * 25 + min(temp_c / 100, 1.0) * 15, 1)`
+
+  2. Inclusion gate: skip any asset with `P30 < 0.10`. Skipped assets get no
+     priority number and never appear in the table.
+  3. Assign priority numbers `P1, P2, P3, ...` in rank order after the gate, so
+     the numbering is contiguous.
+  4. Estimated labor hours are banded off the 30-day probability, evaluated in
+     this order:
+     - `P30 >= 0.50` -> `8` hours
+     - `P30 >= 0.25` -> `5` hours
+     - `P30 >= 0.10` -> `3` hours
+     - otherwise `2` hours (unreachable here, because the gate already excluded
+       those assets)
+  5. Technician fit - both gates must hold:
+     - The technician's certifications contain the asset's equipment type
+       **or** contain `General`. `General` is a genuine wildcard in this roster:
+       it makes a technician eligible for any equipment type.
+     - Free hours `available_hours_week - committed_hours` are greater than
+       zero.
+     Sort the eligible technicians by free hours, highest first, and take the
+     first. This picks the least-loaded eligible technician, which is why a
+     `General`-certified technician with the most free hours can be the best fit
+     for several assets in a row. If the tie or the outcome looks surprising,
+     show the free-hours arithmetic rather than substituting judgment.
+  6. If no technician clears both gates, the assignment cell reads `UNASSIGNED`
+     and the shift cell reads `-`.
+  7. Work description is `<failure_mode> -- preventive service`.
+
+  ## Output format
+
+  `## Work Order Plan`, then the line
+  `Priority-ranked work orders for the next 30 days:`, then a table with columns:
+  `Priority | Equipment | Work Description | Est Hours | Assigned Tech | Shift`.
+  Equipment renders as the asset name; the technician renders as their name.
+
+  Below the table:
+
+  - `**Total work orders:** N` - the count of rows.
+  - `**Total estimated labor hours:** N` - the sum of the Est Hours column.
+  - `**Scheduling notes:**` with the three fixed SLA lines: P1 within 7 days,
+    P2 within 14 days, P3+ within 30 days.
+
+  ## Edge cases
+
+  - Zero assets above the gate means zero rows, totals of 0, and the SLA notes
+    still print. Do not fabricate a work order to fill the table.
+  - Never merge two assets into one work order or split one into two.
+  - Recommendation only. The plan is a proposal - never say a work order was
+    created, a technician was booked, or a shift was changed.

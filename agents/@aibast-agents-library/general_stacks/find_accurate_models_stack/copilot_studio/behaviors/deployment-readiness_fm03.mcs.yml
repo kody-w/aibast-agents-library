@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: deployment-readiness
+  description: Checks one model against every deployment target and reports pass/fail per check with the exact numeric margin.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: deployment-readiness
+  description: Checks one model against every deployment target and reports pass/fail per check with the exact numeric margin.
+  ---
+  <!-- bic:source=blank -->
+  # Deployment readiness
+
+  Use this skill when the user asks whether a model can run somewhere - on
+  the edge, serverless, on CPU, on GPU - or asks what is blocking a model
+  from a target.
+
+  ## Inputs
+
+  - A model ID (`MDL-001` ... `MDL-006`). When none is given, default to
+    `MDL-001` and say which model you evaluated.
+  - The deployment target requirements table.
+
+  ## Procedure
+
+  1. Look up the model. If the ID is not in the catalog, stop and answer:
+     the model was not found, followed by the available IDs. Do not guess a
+     near-match by name.
+  2. For each of the four targets in this order - `cpu_inference`,
+     `gpu_inference`, `edge_deployment`, `serverless` - build the check list
+     from the requirements the target actually defines:
+     - If the target defines `max_model_size_mb`, add a **Model Size** check:
+       `Pass when size_mb <= max_model_size_mb`.
+     - If the target defines `max_latency_ms`, add a **Latency** check:
+       `Pass when latency_ms <= max_latency_ms`.
+     Model Size is evaluated before Latency.
+  3. Only those two checks are ever run. `min_ram_gb`, `min_cores`,
+     `gpu_vram_gb`, and `max_cold_start_ms` are recorded requirements but are
+     NOT evaluated - never report a verdict on them. That means
+     `cpu_inference` and `gpu_inference` are 1-check targets (Latency only),
+     `serverless` is a 1-check target (Model Size only), and
+     `edge_deployment` is the only 2-check target.
+  4. `passed` = the number of checks with status Pass. The model is
+     **Ready** only when `passed == total`; otherwise **Not Ready**. There is
+     no partial-ready state.
+  5. Write every check detail as the comparison arithmetic:
+     `<actual> vs <limit> max`, e.g. `438MB vs 200MB max`, `45ms vs 50ms max`.
+
+  ## Output format
+
+  Headline: `**Deployment Readiness: <model name>**`.
+
+  Then, in order:
+
+  1. A properties table `| Property | Value |` with Model Size (MB), Latency
+     (ms), Framework, Parameters.
+  2. `**Target Compatibility:**` and a table
+     `| Target | Checks Passed | Status |`, one row per target, cells reading
+     `N/M checks` and `Ready` or `Not Ready`.
+  3. `**Detailed Checks:**` and a table
+     `| Target | Check | Result | Detail |`, one row per check across all
+     targets, Result being `Pass` or `Fail`.
+
+  Close with `Source: [MLOps Platform + Infrastructure]`.
+
+  ## Edge cases
+
+  - MDL-001 SentimentBERT-v3 (438 MB, 45 ms) is Ready for cpu_inference
+    (1/1), gpu_inference (1/1), and serverless (1/1), and Not Ready for
+    edge_deployment (0/2): `438MB vs 200MB max` and `45ms vs 30ms max`.
+    Its gpu_inference pass is a 45ms-against-50ms margin - state the margin,
+    do not call it comfortable.
+  - A target can pass on latency and fail on size, or the reverse. Report
+    each check independently; never collapse them into one verdict.
+  - Readiness is a finding. Never say a model has been deployed, packaged,
+    containerized, or scheduled - hand the verdict to the owner.

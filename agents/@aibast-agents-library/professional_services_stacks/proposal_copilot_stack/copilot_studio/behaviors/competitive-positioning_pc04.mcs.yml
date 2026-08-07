@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: competitive-positioning
+  description: Reports our win rate against each known bidder, their price premium and typical margin, the strengths to counter, and the weakness to attack.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: competitive-positioning
+  description: Reports our win rate against each known bidder, their price premium and typical margin, the strengths to counter, and the weakness to attack.
+  ---
+  <!-- bic:source=blank -->
+  # Competitive positioning
+
+  Use this skill when the user names a competitor, asks how we stack up, asks
+  who else is bidding, or asks what to attack in a pursuit.
+
+  ## Inputs
+
+  - The competitor intelligence set and, when a specific RFP is named, that
+    RFP's `competitors` list.
+
+  ## Procedure
+
+  1. Process competitors in stored order -- BigFour Consulting, Global Advisory
+     Group, HealthTech Solutions, MedConsult Group -- not sorted by win rate.
+     When the user names one RFP, restrict to that RFP's competitors:
+     RFP-2026-047 faces BigFour Consulting and Global Advisory Group;
+     RFP-2026-048 faces HealthTech Solutions and MedConsult Group.
+  2. Win rate against renders as a whole percent: `win_rate_against x 100`.
+     `0.67 -> 67%`, `0.60 -> 60%`, `0.50 -> 50%`, `0.55 -> 55%`. This is our
+     rate against them, not their overall rate.
+  3. Price premium renders with an explicit plus sign against us:
+     `+25% vs us` for BigFour, `+18%` Global Advisory, `+5%` HealthTech,
+     `+10%` MedConsult. Typical margin renders as stored: 40%, 35%, 30%, 32%.
+  4. List every stored strength under "Strengths to counter" and every stored
+     weakness under "Weaknesses to exploit", in stored order.
+  5. The summary table's `Key Differentiator` is always `Target: ` plus the
+     **first** stored weakness -- High cost (BigFour), Limited manufacturing
+     experience (Global Advisory), Small team (HealthTech), Technology
+     integration gaps (MedConsult). If a competitor had no weaknesses stored,
+     it renders `N/A`.
+
+  ## Output format
+
+  - `## Competitive Positioning`
+  - Per competitor: `### <name>`, then
+    `- **Our win rate against:** 67%`,
+    `- **Their price premium:** +25% vs us`,
+    `- **Their typical margin:** 40%`,
+    then `**Strengths to counter:**` bullets and
+    `**Weaknesses to exploit:**` bullets
+  - `### Positioning Summary` -- table with columns
+    `Competitor | Price Premium | Win Rate | Key Differentiator`
+
+  ## Edge cases
+
+  - A firm with no intel record (any competitor not in the four above): say
+    there is no intelligence on that firm and name the four that are covered.
+    Never estimate a premium, margin, or win rate for an unlisted firm.
+  - Our lowest win rate is 50% against HealthTech Solutions, whose premium is
+    only +5% -- state that the price lever is weakest there rather than
+    implying it works everywhere.
+  - Internal use only. Never produce client-facing text that quotes a
+    competitor's margin, premium, or our win rate against them, and never claim
+    a competitor has been contacted or a bid has been submitted.

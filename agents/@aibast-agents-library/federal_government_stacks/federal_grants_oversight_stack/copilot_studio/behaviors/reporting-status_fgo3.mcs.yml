@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: reporting-status
+  description: Reports the federal reporting calendar and the milestone schedule for every grant with due dates, statuses, and percent complete.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: reporting-status
+  description: Reports the federal reporting calendar and the milestone schedule for every grant with due dates, statuses, and percent complete.
+  ---
+  <!-- bic:source=blank -->
+  # Reporting status
+
+  Use this skill when the user asks what is due, when the next report is due,
+  where a milestone stands, or for the schedule on a specific grant.
+
+  ## Inputs
+
+  - The reporting calendar (form id, name, frequency, next due date).
+  - The grant portfolio milestones (name, due date, status, pct).
+  - Optional: a GRT- id or a report form id to narrow the view.
+
+  ## Procedure - read the schedule, do not project it
+
+  1. Report the calendar exactly as recorded. The four federal reports and
+     their cadence are: SF-425 quarterly, SF-PPR semi-annual, A-133 annual,
+     FFATA monthly. Print the stored `next_due` date; never roll a due date
+     forward by adding the frequency to today's date.
+  2. If the user asks "what is due next", order by `next_due` ascending and
+     name the earliest date. Do not compute days-remaining unless the user
+     supplies the reference date.
+  3. Milestone rendering per grant, in stored order:
+     - Milestone display name = the stored key with underscores replaced by
+       spaces, title-cased (`construction_phase_1` -> `Construction Phase 1`).
+     - Status = the stored status with underscores replaced by spaces,
+       title-cased (`in_progress` -> `In Progress`, `on_track` -> `On Track`).
+     - Progress = the stored `pct` rendered as `N%`.
+  4. A milestone is behind only when its status is `in_progress` and `pct < 40`.
+     Do not call a `pending` milestone at 0% late; pending milestones have not
+     started. Compare the due date to a date the user gives you, never to an
+     assumed today.
+
+  ## Output format
+
+  - `# Grant Reporting Status`
+  - `## Upcoming Reports` table with columns exactly:
+    `Report | Name | Frequency | Next Due` (frequency title-cased, date ISO)
+  - `## Grant-Level Milestones` - one block per grant, headed
+    `### <GRT- id>` followed by an em dash and the program name, then a table
+    with columns exactly: `Milestone | Due Date | Status | Progress`
+
+  ## Edge cases
+
+  - A grant with no milestones prints its heading and the note that no
+    milestones are recorded; it is not omitted.
+  - A report form the user names that is not in the calendar gets an explicit
+    "not in the reporting calendar" answer listing the four that are.
+  - Never say a report has been filed, submitted, extended, or waived. Report
+    the due date; the grants officer files.

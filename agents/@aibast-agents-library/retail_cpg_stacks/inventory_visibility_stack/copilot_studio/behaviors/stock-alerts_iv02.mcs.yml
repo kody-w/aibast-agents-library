@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: stock-alerts
+  description: Lists every CRITICAL and OUT_OF_STOCK store position with its required action, then the LOW-stock warnings with days remaining.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: stock-alerts
+  description: Lists every CRITICAL and OUT_OF_STOCK store position with its required action, then the LOW-stock warnings with days remaining.
+  ---
+  <!-- bic:source=blank -->
+  # Stock alerts
+
+  Use this skill when the user asks what is at risk, asks for stock-out or
+  low-stock exposure, asks what needs attention today, or asks whether
+  anything is below safety stock.
+
+  ## Inputs
+
+  - On-hand quantities, safety-stock levels, and daily sell-through rates.
+  - No parameters. The scan always covers the four stores.
+
+  ## Procedure - hard thresholds, never waived
+
+  1. Scan stores only - `STR-001`, `STR-002`, `STR-003`, `STR-004` in id order,
+     and within each store all 8 SKUs in ascending SKU-id order. Warehouses are
+     out of scope for alerts; they have no safety-stock floor defined.
+  2. Classify each store/SKU position:
+     - `on_hand == 0` -> `OUT_OF_STOCK`
+     - `on_hand <= safety_stock` -> `CRITICAL`
+     - `on_hand <= safety_stock * 1.5` -> `LOW`
+     - otherwise `HEALTHY`, and it does not appear in either section.
+  3. Section one holds `CRITICAL` and `OUT_OF_STOCK` only. Action required is
+     mechanical: `OUT_OF_STOCK` -> `Emergency replenish`; `CRITICAL` ->
+     `Expedite transfer`. Do not invent a third action.
+  4. Section two holds `LOW` only, one bullet per position, with days
+     remaining = `on_hand / daily_sell_through` rounded to one decimal.
+  5. Report both counts explicitly, including when a count is zero.
+
+  ## Output format
+
+  - `# Stock Alerts`
+  - `## Critical & Out-of-Stock Items` then a table with columns:
+    `Location | SKU | Product | On-Hand | Safety Stock | Status | Action Required`
+  - `**Total Alerts:** N`
+  - `## Low-Stock Warnings` then bullets shaped
+    `- **<Store Name>** / <Product>: <N.N> days remaining`
+  - `**Low-Stock Warnings:** N`
+
+  ## Edge cases
+
+  - An empty critical table is a real answer. Say `Total Alerts: 0` and state
+    plainly that no store position is at or below its safety-stock floor. Never
+    promote a `LOW` position into the critical table to avoid an empty section.
+  - Positions sitting just above the 1.5x line are `HEALTHY` even when days of
+    supply is short - `STR-004` `SKU-1005` at 5 on-hand against 3 safety stock
+    is `HEALTHY` (`3 * 1.5 = 4.5`) despite only 1.9 days of supply. If the user
+    challenges it, show the arithmetic; do not reclassify it.
+  - Low days-of-supply on its own never creates an alert. The safety-stock
+    ratio is the only trigger.

@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: production-line-operations-data.md
+  description: Synthetic production line metrics, station cycle times against takt, and defect category breakdowns the agent answers from until real tools are connected.

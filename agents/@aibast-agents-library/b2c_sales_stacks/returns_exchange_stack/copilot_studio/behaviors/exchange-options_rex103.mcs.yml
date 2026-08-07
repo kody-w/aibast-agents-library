@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: exchange-options
+  description: Reports in-stock sizes and colors for an exchangeable SKU, or the stock summary across every SKU that carries exchange inventory.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: exchange-options
+  description: Reports in-stock sizes and colors for an exchangeable SKU, or the stock summary across every SKU that carries exchange inventory.
+  ---
+  <!-- bic:source=blank -->
+  # Exchange options
+
+  Use this skill when the user asks what a customer can swap an item for, asks
+  which sizes or colors are available, or asks whether an exchange is possible
+  for a specific SKU.
+
+  ## Inputs
+
+  - The exchange inventory and the order history (the order history supplies
+    the product name for the headline).
+  - Optional: an `item_sku`. With one that has inventory on file, report the
+    full size and color breakdown for that SKU. Otherwise report the summary
+    across every SKU in the inventory.
+
+  ## Procedure
+
+  1. **Resolve the product name.** Scan the order history for a line item whose
+     SKU matches. Use that item's name in the headline. If no order contains
+     the SKU, the headline is the SKU alone.
+  2. **Size availability.** For each size, `qty > 0` renders as `Available`
+     and `qty` of 0 renders as `Out of Stock`. Report the quantity as stored;
+     never round, bucket, or describe stock as "low" or "plenty".
+  3. **Colors.** List each available color, underscores replaced by spaces,
+     title case.
+  4. **Summary mode.** For every SKU in the inventory, the `Sizes Available`
+     cell is the comma-separated list of sizes with `qty > 0` only - sizes at
+     0 are omitted from the summary entirely, so a size missing from that list
+     is out of stock, not absent from the catalog.
+
+  ## Output format
+
+  - `# Exchange Options`
+  - **With a SKU that has inventory:**
+    - `## <Product Name> (<SKU>)`
+    - `### Available Sizes` - table with columns `Size | Stock | Status`
+    - `### Available Colors` - a bullet per color
+  - **Without a SKU, or with a SKU that has no inventory on file:**
+    - `## Exchange Inventory Summary` - table with columns
+      `SKU | Sizes Available | Colors`
+
+  ## Edge cases
+
+  - Only SKUs present in the exchange inventory can be exchanged. A SKU with no
+    inventory record - for example an electronics SKU - has no exchange
+    options; say exactly that and do not fall back to describing the summary
+    table as if it covered the SKU.
+  - The size the customer originally bought may be the one that is out of
+    stock. Call that out explicitly, then offer the in-stock sizes.
+  - A SKU can be exchangeable in inventory while the underlying item is outside
+    its return window. Stock availability is not eligibility - run the
+    eligibility check before presenting an exchange as actionable.
+
+  ## Boundaries
+
+  - Recommendation only. Never say stock has been reserved, held, allocated, or
+    that an exchange has been placed.

@@ -1,0 +1,83 @@
+mcs.metadata:
+  componentName: kyc-verification
+  description: Reports KYC verification checks and the counted completion percentage for one application or across the whole pipeline.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: kyc-verification
+  description: Reports KYC verification checks and the counted completion percentage for one application or across the whole pipeline.
+  ---
+  <!-- bic:source=blank -->
+  # KYC verification
+
+  Use this skill when the user asks about KYC status, identity or address
+  verification, OFAC / PEP / adverse media screening, how far along an
+  application is, or who is furthest behind on verification.
+
+  ## Inputs
+
+  - The customer application pipeline and the KYC verification results.
+  - Optional: a single APP- id. Without one, report every application.
+
+  ## Procedure
+
+  ### Completion percentage - count it, do not estimate it
+
+  For an application, take only the checks recorded for that application.
+
+  `kyc_progress = round(checks_recorded_as_complete_or_clear / total_checks_recorded * 100, 1)`
+
+  Only the values `complete` and `clear` count toward the numerator. `pending`,
+  `in_progress`, `flagged`, and `review_needed` never count. The denominator is
+  the number of checks on file for that application, which differs by
+  application type and risk - an individual carries six checks, a business
+  carries six, and a high-risk application carries seven because source of
+  wealth is added. Worked examples from the data on file:
+
+  - APP-6001: 5 of 6 complete/clear (address verification pending) = 83.3%
+  - APP-6002: 5 of 6 complete/clear (beneficial ownership in progress) = 83.3%
+  - APP-6003: 4 of 7 complete/clear = 57.1%
+  - APP-6004: 6 of 6 complete/clear = 100.0%
+
+  If no verification record exists for an application, progress is 0.0% -
+  report that as "no verification record on file", not as work not yet started.
+
+  ### Enhanced due diligence gate
+
+  If and only if the application's risk rating is High, append an Enhanced Due
+  Diligence Required section listing exactly:
+
+  - Source of wealth verification
+  - PEP relationship documentation
+  - Enhanced transaction monitoring parameters
+
+  This is triggered by the risk rating alone, never by the screening outcomes,
+  and it is never omitted because the other checks look complete.
+
+  ## Output format
+
+  For a single application (`# KYC Verification: APP-xxxx`):
+
+  - `- **Applicant:** <name>`
+  - `- **Type:** Individual | Business`
+  - `- **Risk Rating:** Low | Medium | High`
+  - `- **KYC Progress:** N%`
+  - `## Verification Checks` - a two-column table `| Check | Status |` with one
+    row per check on file, check name and status both title-cased
+    (`Ofac Screening | Clear`, `Pep Screening | Flagged`).
+  - `## Enhanced Due Diligence Required` only when risk rating is High.
+
+  For the whole pipeline (`# KYC Verification Summary`), one table:
+
+  `| App ID | Applicant | Risk | KYC Progress | Status |`
+
+  ## Edge cases and boundaries
+
+  - An APP- id that is not in the pipeline gets an explicit "not on file"
+    answer plus the ids that are (APP-6001 through APP-6004). Never fall back
+    to another applicant's verification record.
+  - Report screening outcomes verbatim. Never characterize a Flagged PEP
+    result or a Review Needed adverse media result as low concern, and never
+    recommend proceeding past one - route it to compliance.
+  - Recommendation only. You never clear a check, re-run a screening, or move
+    an application forward.

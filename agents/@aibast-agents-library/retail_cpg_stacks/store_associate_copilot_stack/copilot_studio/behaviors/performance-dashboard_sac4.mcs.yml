@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: performance-dashboard
+  description: Reports today's store totals, the per-associate performance table, and the top-performer highlights computed from the associate figures.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: performance-dashboard
+  description: Reports today's store totals, the per-associate performance table, and the top-performer highlights computed from the associate figures.
+  ---
+  <!-- bic:source=blank -->
+  # Performance dashboard
+
+  Use this skill when someone asks how the store is doing today, what an
+  associate's numbers are, who is leading on revenue, CSAT, or upsell, or asks
+  for the shift's dashboard.
+
+  ## Inputs
+
+  - The associate performance figures (4 associates, ASC-101 through ASC-104).
+  - No parameters. The dashboard always covers all four associates for today.
+
+  ## Procedure - every number is computed, none are judged
+
+  1. `Store Total Revenue Today` = sum of every associate's revenue today =
+     1847.50 + 1295.80 + 985.40 + 2410.30 = 6539.00. Render with a thousands
+     separator and two decimals: `$6,539.00`.
+  2. `Store Total Transactions` = sum of transactions today =
+     14 + 11 + 9 + 18 = 52.
+  3. `Store Avg Basket` = total revenue / total transactions =
+     6539.00 / 52 = `$125.75`. If transactions are zero, omit the line rather
+     than dividing.
+  4. Per-associate task percentage =
+     `round(tasks_completed / tasks_total * 100)` with no decimals - 11/12 =
+     92%, 8/10 = 80%, 7/9 = 78%, 12/12 = 100%.
+  5. Upsell rate renders as a whole-number percent (0.35 -> `35%`). CSAT
+     renders as `<score>/5.0`.
+  6. Rows are listed in roster order - ASC-101, ASC-102, ASC-103, ASC-104 -
+     not sorted by revenue.
+  7. Highlights are three independent maxima over the same four associates:
+     highest `revenue_today`, highest `csat_score`, highest `upsell_rate`. On a
+     tie, the first associate in roster order wins. All three can land on one
+     person, and today they do.
+
+  ## Output format
+
+  Headline `# Associate Performance Dashboard`, then:
+
+  - `**Store Total Revenue Today:** $N,NNN.NN`
+  - `**Store Total Transactions:** N`
+  - `**Store Avg Basket:** $NNN.NN`
+  - a table with exactly these columns:
+    `Associate | Role | Shift | Revenue | Units | Txns | Basket | Upsell | CSAT | Tasks`
+    where Tasks renders as `<done>/<total> (<pct>%)`
+  - `## Top Performer Highlights` with exactly three bullets:
+    `**Highest Revenue:**`, `**Best CSAT:**`, `**Top Upsell Rate:**`, each
+    naming one associate and their figure
+
+  The rendered table keys on the associate's name. Carry the `ASC-` id
+  alongside the name in your own prose so the record is always identifiable.
+
+  ## Edge cases
+
+  - Show the arithmetic when asked; never adjust a figure for tenure, hours, or
+    shift difficulty. Hours this week is in the roster data but is not a
+    dashboard column - quote it only if asked, and never blend it into a rate.
+  - The three highlights are independent maxima. Do not synthesise an overall
+    "best associate" rank, a score, or a bottom performer.
+
+  ## Boundaries
+
+  - Reporting only. Never write up, warn, coach into a performance action,
+    schedule, or discipline anyone, and never say a manager has been notified.
+  - These are today's figures for four named people. Do not project them into a
+    trend, a forecast, a rating, or a compensation recommendation.

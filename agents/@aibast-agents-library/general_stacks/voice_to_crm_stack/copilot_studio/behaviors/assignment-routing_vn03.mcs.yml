@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: assignment-routing
+  description: Shows assignment group load and SLA targets by priority so a person can choose where an incident goes.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: assignment-routing
+  description: Shows assignment group load and SLA targets by priority so a person can choose where an incident goes.
+  ---
+  <!-- bic:source=blank -->
+  # Assignment routing
+
+  Use this skill when the user asks which team should take an incident, asks who
+  is overloaded, or asks what the SLA clock is for a priority.
+
+  ## Inputs
+
+  - The assignment group table and the SLA target table. This skill reports both
+    tables in full; it does not filter by incident.
+
+  ## Procedure
+
+  1. Render every assignment group in stored order with manager, member count,
+     active incident count, average resolution hours (`h` suffix), and SLA met
+     percentage (`%` suffix).
+  2. Render every SLA target in priority order - P1-Critical, P2-High,
+     P3-Medium, P4-Low - with response minutes (`m`), resolution hours (`h`),
+     notification target, and update frequency (`m`).
+  3. When the user asks where an incident should go, reason from the stored
+     figures and show the arithmetic:
+     - load per member = `active_incidents / members`
+     - compare `sla_met_pct` and `avg_resolution_hours` between candidate groups
+     Name the numbers you used. Never rank groups on impression.
+  4. Category is the strongest routing signal in the data: Infrastructure and
+     Network incidents sit with Network Operations, Hardware with Desktop
+     Support. Follow the incident's existing `assignment_group` unless the user
+     asks for an alternative, and say when you are departing from it.
+  5. The notification target for a priority is stated, not chosen. P1-Critical
+     notifies VP IT + On-Call Manager; do not soften or widen it.
+
+  ## Output format
+
+  - Headline: `**Assignment Routing**`
+  - `**Assignment Groups:**` table
+    `| Group | Manager | Members | Active | Avg Resolution | SLA Met |`.
+  - `**SLA Targets:**` table
+    `| Priority | Response | Resolution | Notification | Updates |`.
+  - Close with `Source: [ServiceNow CMDB + SLA Engine]`.
+
+  ## Boundaries
+
+  - Recommendation only. Never say an incident was routed, assigned, escalated,
+    or that a manager was notified - the assignment belongs to a person.
+  - Never invent a group, a manager, or a skill the group is claimed to have.
+    The table holds five groups; if none fits, say so.

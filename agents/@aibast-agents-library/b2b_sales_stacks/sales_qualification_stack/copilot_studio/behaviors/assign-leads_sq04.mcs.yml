@@ -1,0 +1,86 @@
+mcs.metadata:
+  componentName: assign-leads
+  description: Recommends an account executive for every Hot and Warm lead using the deterministic specialty, size, and capacity match score.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: assign-leads
+  description: Recommends an account executive for every Hot and Warm lead using the deterministic specialty, size, and capacity match score.
+  ---
+  <!-- bic:source=blank -->
+  # Assign leads
+
+  Use this skill when the user asks who should own a lead, asks for routing
+  or territory assignment, or asks how the book is split across the AE team.
+
+  ## Inputs
+
+  - The scored lead set and the five-person AE roster: Mike Rodriguez (West,
+    Enterprise Tech, 62% capacity, max 12), Sarah Kim (East, Healthcare /
+    FinServ, 55%, max 14), James Chen (Central, Manufacturing / Industrial,
+    70%, max 10), Lisa Park (West, Mid-Market SaaS, 48%, max 15), David
+    Okafor (East, Enterprise FinServ, 58%, max 12).
+
+  ## Eligibility - which leads are routed
+
+  Only leads in the **Hot** or **Warm** tier are routed. Nurture leads go to
+  the automated email sequence and Disqualified leads go to the marketing
+  nurture list - never to a named AE. This gate is never waived.
+
+  ## Scoring - compute it, do not judge it
+
+  For each lead, score every AE and take the highest. Compare the lead's
+  industry in lower case against the AE's specialty in lower case.
+
+  `score = 0`
+  - `+50` if the lead's industry string appears inside the specialty string.
+  - `+20` if the specialty contains "enterprise" and employees >= 1000;
+    otherwise `+20` if the specialty contains "mid-market" and
+    employees < 1000. These two are mutually exclusive.
+  - `+30` if the specialty contains "finserv" and the industry contains
+    "financial".
+  - `+25` if the specialty contains "tech" and the industry is technology or
+    saas.
+  - `+30` if the specialty contains "health" and the industry is healthcare.
+  - `+30` if the specialty contains "manufactur" and the industry is
+    manufacturing.
+  - `+ (100 - current_capacity_pct) // 5` as the capacity bonus. That is
+    Mike 7, Sarah 9, James 6, Lisa 10, David 8.
+
+  Highest score wins. On an exact tie the first AE in roster order wins
+  (Mike Rodriguez, Sarah Kim, James Chen, Lisa Park, David Okafor).
+
+  Estimated pipeline value per lead is `int(company revenue * 0.001)`. An AE's
+  pipeline is the sum over the leads routed to them.
+
+  ## Output format
+
+  - Headline: `**Lead Assignments - N Leads Routed**` where N is the count of
+    Hot plus Warm leads.
+  - A table with columns: AE | Leads | Est. Pipeline | Specialty Match |
+    Capacity. Include only AEs who received at least one lead. Est. Pipeline
+    is a dollar figure with thousands separators; Capacity is the AE's
+    current capacity percentage.
+  - `**Assignment Detail:**` - up to the first 3 leads per AE, in AE roster
+    order, as `- <Company> ($<value>) -> <AE name> (<specialty>)`.
+  - `**Handoff Package per Lead:**` - the fixed four items: lead score + BANT
+    summary; booth interaction / source notes; personalized email draft;
+    recommended talk track.
+  - Close with `Source: [Territory Rules + Capacity Dashboard]` and
+    `Agents: LeadRoutingAgent`.
+
+  ## Edge cases
+
+  - The detail list is truncated at 3 leads per AE; say so when an AE holds
+    more, and give the full list only if asked.
+  - `max_leads` on the roster is the AE's stated ceiling. If a recommendation
+    would push an AE past it, flag the overload for the sales manager rather
+    than silently rerouting.
+  - An AE with zero routed leads is omitted from the summary table.
+
+  ## Boundaries
+
+  - Recommendation only. Never say a lead has been assigned, transferred,
+    accepted, or that an AE has been notified - the sales manager routes.
+  - Show the match arithmetic when asked. Never route to anyone outside the
+    five-person roster.

@@ -1,0 +1,49 @@
+mcs.metadata:
+  componentName: voice-capture
+  description: Replays a captured voice recording with speaker, duration, transcription confidence, and the transcript verbatim.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: voice-capture
+  description: Replays a captured voice recording with speaker, duration, transcription confidence, and the transcript verbatim.
+  ---
+  <!-- bic:source=blank -->
+  # Voice capture
+
+  Use this skill when the user asks what was said on a call, asks for a
+  transcript, asks about a VOC- recording, or asks who recorded it and how
+  reliable the transcription is.
+
+  ## Inputs
+
+  - The voice transcript log (VOC-001, VOC-002).
+  - Optional: a voice recording id.
+
+  ## Procedure
+
+  1. Resolve the recording id exactly as the data layer does: uppercase and trim
+     the user's text, then take the first known key it contains - `VOC-001` or
+     `VOC-002`. If it contains neither, the lookup returns **VOC-001**. When
+     that fallback fires, say so: name the id the user asked for, state it is
+     not in the transcript log, and say you are reporting VOC-001.
+  2. Report `duration_sec` in seconds with an `s` suffix - 245 becomes `245s`.
+  3. Report `confidence` as a whole percent, rounded from the stored fraction:
+     `0.94` becomes `94%`, `0.96` becomes `96%`.
+  4. Reproduce `raw_text` verbatim inside double quotes. Do not summarize it,
+     correct it, or convert its spoken numbers ("two hundred thousand dollars")
+     into figures. Extraction is a separate skill.
+
+  ## Output format
+
+  - Headline: `**Voice Capture: VOC-xxx**`
+  - A two-column table `| Field | Detail |` with exactly these rows, in order:
+    Date, Speaker, Duration, Confidence.
+  - `**Transcript:**` followed by the quoted raw text.
+  - Close with `Source: [Voice Capture + Speech-to-Text]`.
+
+  ## Edge cases
+
+  - A confidence below 100% means the transcript may contain misheard names or
+    figures. Say the confidence; never present a transcript as certified.
+  - The log holds two recordings only. If asked for a third, say the log
+    contains VOC-001 and VOC-002 and nothing else.

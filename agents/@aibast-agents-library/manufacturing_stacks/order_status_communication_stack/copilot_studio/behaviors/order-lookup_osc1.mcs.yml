@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: order-lookup
+  description: Builds the order status dashboard - every order with computed value, status, completion, promised date, and days remaining, with delayed orders flagged and the book totalled.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: order-lookup
+  description: Builds the order status dashboard - every order with computed value, status, completion, promised date, and days remaining, with delayed orders flagged and the book totalled.
+  ---
+  <!-- bic:source=blank -->
+  # Order lookup
+
+  Use this skill when the user asks for the order book, the order status
+  dashboard, open orders, what is in production, or the status of a single
+  order by ORD- id or by customer name.
+
+  ## Inputs
+
+  - The order book (knowledge/tools).
+  - Optional: a single ORD- id or a customer name. Otherwise show every order.
+
+  ## Procedure
+
+  1. Retrieve all orders. If the user named an order or a customer, keep only
+     the matching rows and say the view is filtered.
+  2. Keep the order book's recorded sequence (ORD-7810, ORD-7811, ORD-7812,
+     ORD-7813). Do not re-sort by value, date, or status unless asked.
+  3. For each order compute:
+     - `value = quantity * unit_price`, rounded to 2 decimals
+       (2,500 * 168.00 = 420,000.00; 40 * 12,450.00 = 498,000.00;
+       8,000 * 42.50 = 340,000.00; 600 * 385.00 = 231,000.00).
+     - `days_left = (year - 2026) * 365 + (month - 3) * 30 + (day - 17)`
+       from the promised date, against the fixed reference date 2026-03-17.
+       A negative result means the promised date has already passed.
+     - The at-risk flag: append ` **DELAYED**` to the status when the status
+       is `delayed` OR the order appears in the delay register. No other
+       condition sets the flag.
+  4. Truncate the product name to its first 28 characters in the table cell
+     (so "Model Y Rocker Panel Stamping" renders as
+     "Model Y Rocker Panel Stampin"). Use the full name in prose.
+  5. Total the book: `total_value` = sum of every order's value;
+     `at_risk_value` = sum of value over at-risk orders only.
+
+  ## Output format
+
+  Heading: `## Order Status Dashboard`
+
+  Then one table, exactly these columns:
+
+  | Order | Customer | Product | Qty | Value | Status | Complete | Promise Date | Days Left |
+
+  Quantities with thousands separators. Values as `$N,NNN.NN`. Completion as
+  a percent with a `%` suffix. Status exactly as recorded (`in_production`,
+  `shipped`, `delayed`) plus the DELAYED flag where it applies.
+
+  Then two lines, in this order:
+
+  - `**Total order book value:** $N,NNN,NNN.NN`
+  - `**At-risk order value:** $N,NNN,NNN.NN`
+
+  ## Edge cases
+
+  - An order with `pct_complete` 100 and status `shipped` still belongs on the
+    board; its days-left figure will be negative once the promised date has
+    passed. Report the negative number, do not clamp it to zero.
+  - If a filter matches nothing, say so and repeat the filter that produced
+    the empty view. Never substitute a near match.
+  - Shipment and delay detail are not part of this table. Point the user to
+    shipment tracking or delay notifications, citing the ORD- id.

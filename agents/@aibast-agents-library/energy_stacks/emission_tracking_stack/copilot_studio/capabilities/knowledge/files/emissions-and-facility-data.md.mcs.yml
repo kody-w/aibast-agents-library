@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: emissions-and-facility-data.md
+  description: Synthetic facility inventory, per-scope emissions by gas, regulatory thresholds, baselines, and the abatement action catalog the agent answers from until real tools are connected.

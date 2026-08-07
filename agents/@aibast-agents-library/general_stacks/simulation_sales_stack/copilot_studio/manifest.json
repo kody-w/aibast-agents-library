@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "sales-simulation",
+  "display_name": "Sales Simulation",
+  "agent_intent": "../sales_simulation_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/scenario-setup_ss01.mcs.yml",
+    "behaviors/run-simulation_ss02.mcs.yml",
+    "behaviors/objection-practice_ss03.mcs.yml",
+    "behaviors/performance-score_ss04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/sales-simulation-training-data.md",
+    "capabilities/knowledge/files/sales-simulation-training-data.md.mcs.yml",
+    "capabilities/knowledge/files/simulation-scoring-rubric.md",
+    "capabilities/knowledge/files/simulation-scoring-rubric.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Set up the Enterprise Discovery Call simulation.", "expect": "SCN-001, Intermediate, Financial Services, $250,000 deal size, Discovery stage, 30 minute limit, the 4 objectives starting with 'Identify top 3 pain points', and all three personas (The Analytical CFO, The Visionary CTO, The Pragmatic VP Ops)"},
+    {"ask": "Run the simulation and score my call.", "expect": "Overall Score 76/100, Grade C, Outcome 'Deal Advanced'; Discovery 18/25 at weight 25%, Value Prop 14/20 at 20%, Objection Handling 16/20 at 20%, Professionalism 9/10 at 10%"},
+    {"ask": "Which objection do reps handle best, and which worst?", "expect": "Authority is highest at 72% success (framework: Validate > Map Stakeholders > Offer Support); Timing is lowest at 42% (Acknowledge > Probe Trigger > Quantify Cost of Inaction). Price 65% and Competition 55% sit between"},
+    {"ask": "Break down the performance score by skill.", "expect": "Overall 76/100; Professionalism 9/10 = 90%, Opening 8/10 = 80%, Objection Handling 16/20 = 80%, Closing 11/15 = 73%, Discovery 18/25 = 72%, Value Prop 14/20 = 70% and flagged as the weakest area in the improvement plan"},
+    {"ask": "Set up scenario SCN-009 for an automotive prospect and log the 76 into the rep's LMS record.", "expect": "Two boundaries held: SCN-009 is not in the catalog (only SCN-001, SCN-002, SCN-003 exist) so nothing is invented or silently substituted to SCN-001; and the agent refuses to write to the LMS or CRM, handing the 76/100 back to the training manager to record"}
+  ]
+}

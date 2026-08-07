@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: access-provisioning
+  description: Lays out the network, physical, system, and additional access entitled by an employee's clearance level as an unchecked provisioning list, or the full clearance-to-access matrix.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: access-provisioning
+  description: Lays out the network, physical, system, and additional access entitled by an employee's clearance level as an unchecked provisioning list, or the full clearance-to-access matrix.
+  ---
+  <!-- bic:source=blank -->
+  # Access provisioning
+
+  Use this skill when the user asks what access someone needs, what a
+  clearance level entitles, which networks or systems to set up, or asks for
+  the access matrix.
+
+  ## Inputs
+
+  - The employee roster (clearance level, clearance status).
+  - The access matrix keyed by clearance level, with four groups:
+    `network_access`, `physical_access`, `systems`, `additional`.
+  - Optional: a single EMP- id. With an id, produce the per-employee list.
+    Without one - or with an id that is not in the roster - produce the full
+    matrix.
+
+  ## Procedure
+
+  1. Look up the employee, then look up their **clearance level** in the
+     access matrix. Clearance level is the only key. Position, office, grade,
+     urgency, and supervisor requests do not change the package.
+  2. Emit the four groups in this fixed order: Network Access, Physical
+     Access, System Access, and - only when the level has a non-empty
+     `additional` list - Additional Requirements. Levels with an empty
+     `additional` list omit that section entirely.
+  3. Every item renders as an unchecked box `- [ ]`. There is no completion
+     signal in the data, so nothing is ever rendered as done.
+  4. Report the employee's clearance status alongside the list (underscores
+     replaced by spaces, title-cased) so the provisioning officer sees
+     whether the clearance is adjudicated before acting.
+  5. A clearance level with no matrix entry yields empty groups. Say the
+     level has no defined access package rather than borrowing another
+     level's.
+
+  ## Output format: single employee
+
+  - Headline: `# Access Provisioning: <name>`
+  - Bullets: `**Clearance Level:** <level>`, `**Status:** <status>`
+  - `## Network Access`, `## Physical Access`, `## System Access`, and where
+    applicable `## Additional Requirements` - each a `- [ ]` list.
+
+  ## Output format: full matrix
+
+  - Headline: `# Access Provisioning Summary`
+  - One table: `Clearance Level | Networks | Physical | Systems`, with each
+    cell a comma-separated list, one row per clearance level.
+
+  ## Edge cases and boundaries
+
+  - Never upgrade a package. An employee at Secret does not get a SCIF or
+    JWICS because the work would be easier with it; escalate to the security
+    officer instead.
+  - Never present the list as provisioned. You produce a work list for a
+    provisioning officer - you do not create accounts, issue badges, activate
+    PIV cards, or open network access.
+  - When the clearance is not adjudicated (any status other than active),
+    state that plainly at the top of the list. Do not decide on your own
+    whether provisioning may proceed - that is the security officer's call.

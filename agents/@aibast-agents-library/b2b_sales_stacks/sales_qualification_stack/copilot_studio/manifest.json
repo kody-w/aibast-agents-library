@@ -1,0 +1,28 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "sales-qualification",
+  "display_name": "Sales Qualification",
+  "agent_intent": "../sales_qualification_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/score-leads_sq01.mcs.yml",
+    "behaviors/bant-analysis_sq02.mcs.yml",
+    "behaviors/create-outreach_sq03.mcs.yml",
+    "behaviors/assign-leads_sq04.mcs.yml",
+    "behaviors/setup-tracking_sq05.mcs.yml",
+    "behaviors/qualification-report_sq06.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/lead-pipeline-data.md",
+    "capabilities/knowledge/files/lead-pipeline-data.md.mcs.yml",
+    "capabilities/knowledge/files/icp-scoring-and-sla-policy.md",
+    "capabilities/knowledge/files/icp-scoring-and-sla-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Score the leads.", "expect": "45 leads scored: Hot 13 (avg 93/100), Warm 11 (avg 80/100), Nurture 13 (avg 65/100), Disqualified 8 (avg 46/100); top hot lead NovaTech Solutions at 96 (Amanda Torres, CTO)"},
+    {"ask": "Run BANT on the hot leads.", "expect": "Top 8 Hot leads all at composite 92 - NovaTech Solutions, Pacific Mutual Insurance, Nexus Health Network, Summit Health Partners, Crestline Financial, Greenfield Health, Orion Manufacturing, FusionTech Labs; every one Confirmed (95) budget and C-Level (95) authority, so the Risk Flags section is empty"},
+    {"ask": "Who should own these leads?", "expect": "24 Hot+Warm leads routed: Sarah Kim 9 leads / $8,414,000; David Okafor 6 / $8,350,000; Mike Rodriguez 5 / $384,000; James Chen 2 / $1,460,000; Lisa Park 2 / $168,000. Nexus Health Network ($3,200,000) goes to Sarah Kim (Healthcare / FinServ)"},
+    {"ask": "Give me the pipeline summary.", "expect": "Hot pipeline $15,303,000, Warm $3,473,000, total qualified $18,776,000; Healthcare leads the industry mix with 10 leads (5 Hot, 4 Warm); expected pipeline from hot leads $3,672,720; 5 hot-to-meeting targets"},
+    {"ask": "Email the outreach draft to Gregory Adams at Pacific Mutual and mark L016 as assigned to David Okafor.", "expect": "Refusal to act: it drafts the subject 'Following up on our executive event conversation, Gregory' and states it cannot send email or update the CRM - David Okafor (Enterprise FinServ) is a routing recommendation for the sales manager, not an assignment"}
+  ]
+}

@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: renewal-calendar
+  description: Orders every permit by expiration date ascending and reports the renewal lead time each authority expects.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: renewal-calendar
+  description: Orders every permit by expiration date ascending and reports the renewal lead time each authority expects.
+  ---
+  <!-- bic:source=blank -->
+  # Renewal calendar
+
+  Use this skill when the user asks what expires next, what is coming due, when
+  renewal work has to start, or asks for the renewal calendar or schedule.
+
+  ## Inputs
+
+  - The permit register, including `expiration_date` and `renewal_lead_days`.
+  - Optional: a facility filter. Apply it to every row and say the view is
+    filtered.
+
+  ## Procedure
+
+  1. Include **every** permit, regardless of status. Expired permits stay on
+     the calendar - they are past due, not off the list.
+  2. Sort ascending by `expiration_date`. Dates are ISO `YYYY-MM-DD`, so
+     lexicographic order is chronological order. Ties keep register order.
+     Never reorder by facility, authority, status, or lead time.
+  3. Report `renewal_lead_days` verbatim as the lead time, rendered `N days`.
+     It is the number of days before expiration that renewal work must begin.
+  4. Only when the user asks when work must start, compute it and show the
+     arithmetic: `renewal start = expiration_date - renewal_lead_days`. For
+     example, Pipeline Operating License: `2026-08-20 - 365 days = 2025-08-20`.
+     Do not print a computed start date in the table itself.
+
+  ## Output format
+
+  Heading: `# Permit Renewal Calendar`
+
+  No headline counts line for this view. Then one table, exactly these columns:
+
+  | Permit | Facility | Expiration | Status | Lead Time |
+
+  - `Permit` is the permit name. This table has no ID column - cite the `PRM-`
+    id in prose whenever you name a permit outside the table.
+  - `Status` in caps (ACTIVE / EXPIRED).
+  - `Lead Time` as `N days`.
+
+  ## Edge cases
+
+  - An expired permit sorts to the top when it has the earliest expiration.
+    Call it out as already lapsed rather than "upcoming", and hand it to the
+    compliance-gap analysis.
+  - Two permits sharing a lead time value are not related; lead time is set per
+    permit by its authority, not per facility or per type.
+  - Never propose that renewal has been started, filed, or scheduled. State
+    when it must start and leave the filing to a person.

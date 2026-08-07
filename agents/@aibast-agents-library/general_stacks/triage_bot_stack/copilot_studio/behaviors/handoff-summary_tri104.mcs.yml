@@ -1,0 +1,71 @@
+mcs.metadata:
+  componentName: handoff-summary
+  description: Builds the escalation handoff packet for an inquiry - customer, category, priority, routing, SLA clocks, and the required template sections.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: handoff-summary
+  description: Builds the escalation handoff packet for an inquiry - customer, category, priority, routing, SLA clocks, and the required template sections.
+  ---
+  <!-- bic:source=blank -->
+  # Handoff summary
+
+  Use this skill when the user asks to escalate an inquiry, asks for a handoff
+  packet or transfer summary, asks what the receiving team needs to know, or
+  asks which sections a handoff must contain.
+
+  ## Inputs
+
+  - An inquiry (INQ- id) with its customer, tier, text, category, impact and
+    urgency.
+  - The routing rules, the priority matrix, and the handoff templates.
+
+  ## Procedure
+
+  Assemble the packet in this order, taking each field from its own source -
+  never restate a value the other skills would compute differently:
+
+  1. Category from the inquiry's stored classification.
+  2. Priority, response minutes, resolution hours, and auto-escalate from the
+     priority matrix using the inquiry's impact and urgency pair.
+  3. Assigned team = the category's primary team. Escalation path = the
+     category's escalation team.
+  4. Template selection:
+     - **Technical Escalation** - the inquiry stays inside its category and is
+       being escalated to the technical escalation team. Sections: Customer
+       Information, Issue Description, Steps Taken, Environment Details,
+       Business Impact, Recommended Next Steps.
+     - **Management Escalation** - the escalation is about account risk or
+       sentiment rather than the technical fault. Sections: Customer
+       Information, Account Value, Issue History, Customer Sentiment, Risk
+       Assessment, Recommended Action.
+     - **Cross-Team Handoff** - the inquiry is moving to a different category's
+       team than the one it started in. Sections: Customer Information,
+       Original Category, Reason for Transfer, Context Summary, Outstanding
+       Questions.
+  5. Every section of the chosen template is listed. Never drop a section, and
+     never add one. If you cannot fill a section from the data, list the
+     section and mark it as not recorded.
+
+  ## Output format
+
+  - `**Handoff Summary: INQ-xxxx**`
+  - `**Customer:** <name> (<tier>)`
+  - `**Category:** <category label>`
+  - `**Priority:** <priority>`
+  - `**Issue:** <full inquiry text, not truncated>`
+  - `**Routing:**` with the bullets: Assigned to, Escalation path, Response SLA
+    in minutes, Resolution SLA in hours, Auto-escalate (Yes / No)
+  - `**Handoff Template:** <template name>`
+  - `**Sections:**` followed by one `- ` bullet per section, in template order
+
+  Close with the source line `Source: [Triage Engine + Routing]`.
+
+  ## Boundaries
+
+  - If the tier is Unknown, print Unknown - do not infer a tier from the
+    customer name or the request size.
+  - If the inquiry id is not in the queue, say so and build no packet.
+  - Recommendation only. This skill drafts the handoff for a person to send.
+    Never say the handoff was sent, the ticket was transferred, or the
+    receiving team was notified or paged.

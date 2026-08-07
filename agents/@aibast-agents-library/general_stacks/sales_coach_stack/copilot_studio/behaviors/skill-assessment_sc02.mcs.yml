@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: skill-assessment
+  description: Reports a rep's skill profile - overall score, tenure, quota attainment, trend, team rank, six skill scores, and the two weakest skills.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: skill-assessment
+  description: Reports a rep's skill profile - overall score, tenure, quota attainment, trend, team rank, six skill scores, and the two weakest skills.
+  ---
+  <!-- bic:source=blank -->
+  # Skill assessment
+
+  Use this skill when the user asks how a rep is doing, asks for a rep's
+  skill profile or scorecard, asks where a rep is strong or weak, or names a
+  rep without asking for a plan.
+
+  ## Inputs
+
+  - The rep skill assessments.
+  - A rep name. The roster is Alex Rivera, Sarah Kim, and Tom Rivera.
+
+  ## Procedure
+
+  1. Resolve the rep by case-insensitive substring match against the roster
+     names, in roster order (Alex Rivera, Sarah Kim, Tom Rivera). "Rivera"
+     matches two reps - say so and ask which one rather than taking the first
+     match. A name that matches nobody is not on the roster: say that and
+     list the three reps. Never substitute Alex Rivera as a default.
+  2. Read the stored profile: overall, tenure_months, quota_attainment,
+     trend, rank.
+  3. Render the six skill scores in the stored order: opening, discovery,
+     listening, value, closing, objections. These short skill names are the
+     assessment's own vocabulary and differ from the call rubric's names.
+  4. Focus areas = the two lowest skill scores, sorted ascending. Compute
+     them; do not pick by intuition. Examples from the data:
+     - Alex Rivera: objections 60, value 68
+     - Sarah Kim: objections 82, listening 85
+     - Tom Rivera: objections 55, discovery 65
+
+  ## Output format
+
+  - Headline: `**Skill Assessment: <Rep Name>**`
+  - A `| Metric | Value |` table with rows in order: Overall Score (`N/100`),
+    Tenure (`N months`), Quota Attainment (whole-number percent), Trend,
+    Team Rank (`#N`).
+  - `**Skill Breakdown:**` then a `| Skill | Score |` table, six rows, scores
+    as `N/100`.
+  - `**Focus Areas (weakest skills):**` as a bulleted list, `Skill: N/100`,
+    lowest first.
+  - Close with `Source: [Coaching Platform + CRM]`.
+
+  ## Edge cases
+
+  - Team rank is a stored field from the wider org, not a position in this
+    three-person roster. The roster holds ranks #1, #3, and #5 - never
+    renumber them 1-2-3.
+  - Quota attainment is stored as a ratio and shown as a whole-number percent
+    (0.92 renders as 92%, 1.15 renders as 115%).
+  - Trend is one of Improving, Consistent, or Needs Improvement. Report it as
+    stored; do not infer a trend from the score.
+  - If the user asks for a plan, hand off to the coaching-plan skill rather
+    than improvising activities here.

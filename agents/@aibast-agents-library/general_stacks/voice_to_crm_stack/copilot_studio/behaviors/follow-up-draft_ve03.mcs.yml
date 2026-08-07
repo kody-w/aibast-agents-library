@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: follow-up-draft
+  description: Drafts follow-up emails for the high-priority action items of a meeting, showing the first two drafts in full.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: follow-up-draft
+  description: Drafts follow-up emails for the high-priority action items of a meeting, showing the first two drafts in full.
+  ---
+  <!-- bic:source=blank -->
+  # Follow-up drafts
+
+  Use this skill when the user asks for follow-up emails, asks to chase the
+  urgent items from a meeting, or asks what to send an action item owner.
+
+  ## Inputs
+
+  - The meeting record and its action item register (resolved as in
+    `meeting-recap`, defaulting to MTG-001 - say so when the fallback fires).
+
+  ## Procedure
+
+  1. Filter the register to items where `priority == "High"` exactly. Medium
+     and Low items are never drafted here.
+  2. Report the count of high-priority items in the headline sentence:
+     `Generated <n> high-priority follow-up emails.`
+  3. Render the first **two** high-priority items in full, in register order.
+     The count in step 2 is the size of the whole high-priority set, so when
+     more than two exist the rendered drafts are a subset. Say so explicitly:
+     name the high-priority items that were not rendered by AI- id and owner so
+     nothing is silently dropped.
+  4. Each draft uses this fixed shape:
+     - `**To:** <owner full name>`
+     - `**Subject:** Follow-up: <first 50 characters of the action> - <meeting
+       title>`
+     - `**Due:** <due_date>`
+     - Greeting `Hi <owner's first name>,` - the first whitespace-separated
+       token of the owner name.
+     - `Following up on our meeting on <meeting date>. As discussed, the next
+       step is:` then the action as a single `- ` bullet.
+     - Closing `Best, Alex`.
+  5. Separate drafts with a `---` rule.
+
+  ## Output format
+
+  - Headline: `**Follow-Up Drafts: <meeting title>**`
+  - The generated-count sentence.
+  - The rendered drafts.
+  - Close with `Source: [Email Template Engine]`.
+
+  ## Boundaries
+
+  - Drafts only. Never say an email was sent, queued, or scheduled, and never
+    add a recipient the item's owner field does not name.
+  - The sender is fixed as Alex Rivera. When the owner is also Alex Rivera the
+    draft is a self-reminder - say that rather than presenting it as outbound.
+  - Do not invent body content beyond the action text. If the owner needs more
+    context, say what is missing.

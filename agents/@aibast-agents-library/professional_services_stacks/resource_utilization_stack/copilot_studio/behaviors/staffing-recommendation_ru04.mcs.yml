@@ -1,0 +1,88 @@
+mcs.metadata:
+  componentName: staffing-recommendation
+  description: Matches bench consultants to pipeline roles under the exact level and skill gates, names the unmatched bench, and projects the utilization impact of deployment.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: staffing-recommendation
+  description: Matches bench consultants to pipeline roles under the exact level and skill gates, names the unmatched bench, and projects the utilization impact of deployment.
+  ---
+  <!-- bic:source=blank -->
+  # Staffing recommendation
+
+  Use this skill when the user asks who should go on what, how to deploy the
+  bench, how to close the utilization gap, or whether a specific consultant
+  fits a specific pipeline project.
+
+  ## Inputs
+
+  - The bench (roster filtered to `status == "bench"`).
+  - The project pipeline and its `needs` as `(skill, level, count)` triples.
+  - The per-level bench cost table and the firm utilization target.
+
+  ## Matching - hard gates, never waived
+
+  For each pipeline project, in pipeline order, and each of its `(skill, level,
+  count)` needs, a bench consultant is a candidate only if BOTH hold:
+
+  1. `consultant.level == level` exactly. Senior, Manager, Mid, and Junior are
+     not interchangeable. A Senior does not backfill a Mid role and a Mid never
+     fills a Senior role.
+  2. One of the consultant's skills contains the required skill as a
+     case-insensitive substring. `Data Analytics` matches the skill
+     `Data Analytics`; `Cloud Architecture` does not match `AWS`.
+
+  Take the first `count` candidates in roster order. A consultant already
+  matched to an earlier project remains eligible for later ones - the walk does
+  not remove them from the bench.
+
+  Worked example on the demo data: FinanceHub Cloud Migration needs Cloud
+  Architecture at Senior, and the only bench Senior is Chen Wei (CON-410,
+  AI/ML) - no match. Sarah Kim (CON-405) holds Cloud Architecture but is Mid,
+  so the level gate fails. Healthcare Digital Transformation matches David
+  Okafor (CON-404, Data Analytics, Mid) and James Wright (CON-406, Business
+  Analysis, Junior); its Program Management (Manager) role has no bench
+  Manager. Retail Analytics Platform matches Chen Wei (CON-410, AI/ML, Senior).
+  Government Cyber Assessment matches nobody. Three matches total.
+
+  ## Arithmetic - compute it, do not judge it
+
+  - `Bench cost saved` = the per-level bench cost summed over the DISTINCT
+    consultant ids that appear in the matches. Demo: CON-404 $14,000 + CON-406
+    $10,000 + CON-410 $22,000 = `$46,000/month`.
+  - `Projected utilization` = `(currently_billable + number_of_matches) / total_headcount x 100 x 0.87`,
+    rounded to one decimal, where 0.87 is the weighted-average utilization
+    assumption. Demo: `(5 + 3) / 10 x 100 x 0.87 = 69.6%`.
+  - Unmatched bench recommendation: `Upskill to cloud/AI` when the level is Mid
+    or Junior, otherwise `Internal innovation project`.
+
+  ## Output format
+
+  `### Bench-to-Pipeline Matches` with exactly these columns:
+
+  | Consultant | Project | Skill Match | Level | Probability | Start |
+
+  Probability as a whole percent. Then the line
+  `**Bench cost saved if deployed:** $N/month`.
+
+  `### Unmatched Bench Resources` with exactly these columns:
+
+  | Consultant | Level | Skills | Recommendation |
+
+  `### Projected Utilization Impact` as three bullets:
+
+  - `Current firm utilization: **N%**`
+  - `Projected after deployment: **N%**`
+  - `Target: **85%**`
+
+  ## Edge cases
+
+  - Zero matches: state `No direct bench-to-pipeline matches found.` and still
+    render the unmatched bench and the projection.
+  - Every bench consultant matched: omit the unmatched section rather than
+    printing an empty table.
+  - Projected utilization is a projection under the 0.87 assumption, not a
+    commitment, and it can still sit below the 85% target - say so.
+  - Recommendation only. Never say a consultant has been staffed, booked,
+    allocated, or notified. End with the recommendation for the resource
+    manager to act on.

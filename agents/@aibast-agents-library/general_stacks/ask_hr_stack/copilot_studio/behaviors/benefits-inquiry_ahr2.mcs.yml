@@ -1,0 +1,83 @@
+mcs.metadata:
+  componentName: benefits-inquiry
+  description: Presents the medical, dental, vision, and 401(k) plan terms and the modeled annual employer contribution value.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: benefits-inquiry
+  description: Presents the medical, dental, vision, and 401(k) plan terms and the modeled annual employer contribution value.
+  ---
+  <!-- bic:source=blank -->
+  # Benefits inquiry
+
+  Use this skill when the user asks about health plans, premiums, deductibles,
+  copays, dental or vision coverage, the 401(k) match, or what their benefits
+  are worth.
+
+  ## Inputs
+
+  - The benefit plan catalog. No parameters are required; the overview always
+    covers all plans.
+
+  ## Procedure
+
+  1. Build the medical comparison over exactly two plans, in this order:
+     Medical PPO Plan, then High Deductible Health Plan. Columns are the
+     employee premium, the individual deductible, the individual out-of-pocket
+     maximum, and the primary/specialist copay pair.
+  2. State dental, vision, and retirement as single lines, not table rows.
+  3. Compute the estimated annual employer contribution value with these exact
+     arithmetic rules - never estimate them, never substitute a percentage:
+     - `medical = medical_ppo monthly_premium_employee * 12 * 0.75`
+       = `185 * 12 * 0.75` = `$1,665/yr`
+     - `dental = dental monthly_premium_employee * 12 * 0.80`
+       = `28 * 12 * 0.80` = `$269/yr` (268.8, rounded to whole dollars)
+     - `vision = vision monthly_premium_employee * 12 * 1.0`
+       = `12 * 12 * 1.0` = `$144/yr`
+     - `retirement_match = 100000 * max_match_percent / 100`
+       = `100000 * 5 / 100` = `$5,000/yr`
+     - `total = 1665 + 269 + 144 + 5000` = `$7,078/yr`
+     The $100,000 figure is a modeling assumption, not anyone's salary. The
+     medical figure models the PPO plan; the HDHP is not the basis of the
+     total. Say both whenever you quote the total.
+  4. Round every contribution figure to whole dollars. Format deductibles and
+     out-of-pocket maximums with thousands separators.
+
+  ## Output format
+
+  - `**Benefits Overview**`
+  - `**Medical Plans:**` then a table with columns exactly `Plan | Employee
+    Premium | Deductible | OOP Max | Copay (PCP/Spec)`, two rows:
+    `Medical PPO Plan | $185/mo | $500 | $3,500 | $25/50` and
+    `High Deductible Health Plan | $95/mo | $1,600 | $5,000 | $0/0`
+  - `**Dental:**` one line - plan name, `$28/mo`, Preventive 100%, Basic 80%,
+    Major 50%
+  - `**Vision:**` one line - plan name, `$12/mo`, `$10` exam copay, `$200`
+    frames allowance
+  - `**Retirement:**` plan name, then bullets for the employer match
+    (`100% of first 4%, 50% of next 2%`), vesting
+    (`3-year graded (33%/66%/100%)`), and the 2025 contribution limit
+    (`$23,500`)
+  - `**Estimated Employer Contribution Value:**` one line of the four
+    components, then a bolded `Total: $7,078/yr`
+  - `Source: [Benefits Portal + Insurance Carriers]`
+
+  ## Facts held but not printed in the overview
+
+  Answer these when asked directly, and only from the stored values: family
+  premiums ($520 PPO, $310 HDHP, $85 dental, $35 vision), family deductibles
+  ($1,500 PPO, $3,200 HDHP), family out-of-pocket maximums ($7,000 PPO,
+  $10,000 HDHP), the HDHP employer HSA contribution ($750), the dental annual
+  maximum ($2,000), dental deductible ($50), orthodontia lifetime maximum
+  ($1,500), vision contacts allowance ($150) and 12-month frequency, the
+  network (Blue Cross Blue Shield National), and the over-50 catch-up
+  contribution ($7,500).
+
+  ## Boundaries
+
+  - Recommendation and explanation only. You never enroll anyone, change an
+    election, or open an enrollment window.
+  - Do not tell an employee which plan is better for them; lay out the premium
+    and deductible tradeoff and let them choose.
+  - If asked about a plan not in the catalog (life, disability, FSA, commuter),
+    say it is not in the benefits data you hold rather than inferring terms.

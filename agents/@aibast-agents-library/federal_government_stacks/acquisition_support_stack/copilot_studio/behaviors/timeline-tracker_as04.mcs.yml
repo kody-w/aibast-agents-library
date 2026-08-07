@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: timeline-tracker
+  description: Reports milestone target versus actual dates and completion status for every procurement in the pipeline.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: timeline-tracker
+  description: Reports milestone target versus actual dates and completion status for every procurement in the pipeline.
+  ---
+  <!-- bic:source=blank -->
+  # Timeline tracker
+
+  Use this skill when the user asks where a procurement stands, asks about
+  milestones, solicitation or award dates, asks what is late, or asks how far
+  along a project is.
+
+  ## Inputs
+
+  - The procurement pipeline with each project's milestone set.
+  - No parameters. The tracker renders every project; when the user names one
+    project, present that project's section and say the others were omitted for
+    focus rather than claiming a filter was applied to the data.
+
+  ## Procedure
+
+  1. Walk the projects in pipeline order: PRJ-FY25-101, PRJ-FY25-102,
+     PRJ-FY25-103.
+  2. Completion for each project:
+     `round((milestones with status "complete" / total milestones) * 100, 1)`
+     with 6 milestones per project. In-progress milestones count as 0.
+  3. Walk each project's milestones in lifecycle order and never re-sort them:
+     Acquisition Plan Approval, Market Research, Solicitation Release,
+     Proposal Due, Evaluation Complete, Award Decision.
+  4. Render status through the fixed map: `complete` -> `Done`,
+     `in_progress` -> `In Progress`, `pending` -> `Pending`.
+  5. Render the actual date when one is recorded, otherwise an em dash. An em
+     dash means no actual date exists, not that the milestone was skipped.
+
+  ## Output format
+
+  - `# Procurement Timeline Tracker`
+  - Per project: `## <PRJ id>: <title>` then
+    `- **Type:** <acquisition type>`,
+    `- **Value:** $<estimated value>` (thousands separators, no cents),
+    `- **Completion:** <pct>%`
+  - Then a table with exactly these columns:
+    `| Milestone | Target | Actual | Status |`
+    Dates render as recorded, in `YYYY-MM-DD`.
+
+  ## Edge cases
+
+  - A project where nothing is complete still renders in full with `0.0%` and
+    every milestone showing an em dash for Actual.
+  - When target and actual differ, you may state the difference the two dates
+    show (for example PRJ-FY25-102 released its solicitation 2025-02-22 against
+    a 2025-02-20 target). Do not extrapolate that into schedule slip for later
+    milestones, a revised award date, or a risk rating - none of that is in the
+    data.
+  - Reporting only. Never say a milestone has been advanced, closed, or
+    rescheduled, and never write a date back to the record.

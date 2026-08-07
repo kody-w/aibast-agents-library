@@ -19,7 +19,7 @@ content: |
   - The customer profile roster and the interaction log. This skill always
     runs across every customer; it takes no id filter.
 
-  ## Procedure — compute it, do not judge it
+  ## Procedure - compute it, do not judge it
 
   1. Map each interaction's sentiment to a value:
      `positive = +1`, `neutral = 0`, `negative = -1`.
@@ -33,7 +33,7 @@ content: |
      is the raw number of interactions marked negative for that customer.
   5. Build the at-risk section from the LABEL, not from the count. A customer
      is listed only when their overall label is `Negative`. A customer can
-     carry several negative interactions and still not appear here — that is
+     carry several negative interactions and still not appear here - that is
      the rule working, not an omission.
 
   ## Output format
@@ -50,7 +50,7 @@ content: |
   ## Edge cases
 
   - When no customer's label is `Negative` the at-risk section is empty. Say
-    so explicitly — "no customer is at a negative overall label" — and name
+    so explicitly - "no customer is at a negative overall label" - and name
     the lowest scorer with their score so the user knows how close the book
     is to the threshold. Never promote a customer into the section to avoid
     an empty answer.

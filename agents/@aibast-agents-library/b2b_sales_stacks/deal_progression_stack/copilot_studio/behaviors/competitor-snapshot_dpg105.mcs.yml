@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: competitor-snapshot
+  description: Renders the competitive landscape - the four tracked competitors and the deal-level exposure showing who is in each evaluation.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: competitor-snapshot
+  description: Renders the competitive landscape - the four tracked competitors and the deal-level exposure showing who is in each evaluation.
+  ---
+  <!-- bic:source=blank -->
+  # Competitive landscape snapshot
+
+  Use this skill when the user asks who we are up against, for a competitor
+  overview, market share, competitor pricing, or which deals have competitive
+  exposure.
+
+  ## Inputs
+
+  - The competitor library (4 competitors) and the deal competitive exposure
+    records (5 deals).
+
+  ## Procedure
+
+  1. List competitors in recorded order - Vendara Solutions, Nextera Platform,
+     CloudFirst Systems, Legacy Corp ERP. Show each one's type, market share,
+     pricing model, and only the FIRST listed strength and FIRST listed
+     weakness. Do not summarise or reorder the strength and weakness lists.
+  2. List deal exposure sorted by deal value descending - TechCorp Industries
+     $890,000, Pacific Telecom $780,000, Global Manufacturing $720,000, Apex
+     Financial $580,000, Metro Healthcare $440,000.
+  3. Show the incumbent per deal, or `None` when there is no incumbent
+     recorded. Global Manufacturing and Metro Healthcare have no incumbent.
+  4. Total competitive pipeline is the sum of those 5 deals, $3,410,000.
+
+  ## Output format
+
+  Headline `**Competitive Landscape Snapshot**`, then
+  `**Active Competitors (4):**` and a table with exactly these columns.
+
+  | Competitor | Type | Market Share | Pricing | Top Strength | Top Weakness |
+
+  Then `**Deal-Level Competitive Exposure ($3,410,000 pipeline):**` and a table
+  with exactly these columns.
+
+  | Deal | Value | Competitors in Eval | Incumbent |
+
+  Close with `Source: [Competitive Intel DB + CRM Notes]`.
+
+  ## Edge cases
+
+  - Market share percentages describe the market, not our deals; never present
+    them as win probability.
+  - If asked about a competitor that is not one of the four, say it is not
+    tracked in this data set and name the four that are.
+  - Recent moves belong to the threat assessment view; do not fold them into
+    this table.

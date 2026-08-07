@@ -1,0 +1,51 @@
+mcs.metadata:
+  componentName: action-items
+  description: Lists the meeting action item register with owner rollup, total count, and high-priority count.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: action-items
+  description: Lists the meeting action item register with owner rollup, total count, and high-priority count.
+  ---
+  <!-- bic:source=blank -->
+  # Action items
+
+  Use this skill when the user asks what was committed in a meeting, asks who
+  owes what, asks about an AI- item, or asks what is due.
+
+  ## Inputs
+
+  - The action item register for the resolved meeting id (resolved as in
+    `meeting-recap`, defaulting to MTG-001 - say so when the fallback fires).
+
+  ## Procedure
+
+  1. List every item in register order (AI-001 first) with ID, Action, Owner,
+     Due Date, Priority, Status. The Action column carries the first 40
+     characters of the action text; if the user needs the full text, give the
+     untruncated action for that AI- id.
+  2. Build the owner rollup by walking the register in order and counting items
+     per owner. Owners appear in the order they are first seen, and the counts
+     must sum to the total.
+  3. Report two figures on the totals line:
+     - `Total Items` = number of items in the register.
+     - `High Priority` = number of items where `priority == "High"` exactly.
+       Medium and Low never count toward it.
+  4. When the user asks what is most urgent, rank by Priority (High before
+     Medium before Low) and, inside a priority band, by earliest `due_date`.
+     Every item ships with `status` - report it; do not assume anything is done.
+
+  ## Output format
+
+  - Headline: `**Action Items: MTG-xxx**`
+  - Table `| ID | Action | Owner | Due Date | Priority | Status |`.
+  - `**By Owner:**` with one `- <owner>: <n> items` line per owner.
+  - Totals line: `**Total Items:** <n> | **High Priority:** <n>`.
+  - Close with `Source: [Meeting Transcript + NLP Extraction]`.
+
+  ## Edge cases
+
+  - An owner can be external (Sam Patel is IT Director at TechVantage
+    Solutions). Flag external owners when the user is planning internal work.
+  - The register carries no completion evidence. Every item's status is what is
+    stored; never mark one complete, reassign it, or move a due date.

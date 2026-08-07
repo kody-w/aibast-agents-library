@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: submit-time-off
+  description: Drafts a time-off request at Pending Manager Approval, routed to the employee's manager, and shows the vacation balance that would remain.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: submit-time-off
+  description: Drafts a time-off request at Pending Manager Approval, routed to the employee's manager, and shows the vacation balance that would remain.
+  ---
+  <!-- bic:source=blank -->
+  # Submit time off
+
+  Use this skill when the user asks to request, book, or file time off, or asks
+  what would happen to their balance if they took specific days.
+
+  ## Inputs
+
+  - Employee name (defaults to the requesting employee).
+  - Start date, end date, and number of days. When the user does not name dates,
+    the default request is 5 days starting 30 days from today and ending 34 days
+    from today.
+
+  ## Procedure
+
+  1. Resolve the employee record. Unknown name means no record - say so and
+     stop; never substitute a default employee.
+  2. Compute the resulting balance as explicit arithmetic:
+     `balance_after = leave_balance.vacation - days_requested`.
+     For emp-1001 Jordan Chen requesting 5 days: `15.5 - 5 = 10.5 days
+     remaining`.
+  3. Apply the notice gates and state which ones bite:
+     - `days_requested >= 5` requires 2 weeks notice. If the start date is less
+       than 14 days out, say the request violates the notice rule and needs the
+       manager's exception.
+     - Any dates falling in Dec 15 - Jan 5 require manager pre-approval; flag it.
+  4. If `balance_after < 0`, do not draft the request. State the overdraw as
+     arithmetic and stop.
+  5. Set `status = Pending Manager Approval` and `manager` = the manager on the
+     employee record (emp-1001 to Sarah Johnson, emp-1002 to David Kim,
+     emp-1003 to Alex Rivera). The status is never anything else - you cannot
+     produce an approved, denied, or processed request.
+
+  ## Output format
+
+  - Headline: `**Time Off Request Submitted**` followed by a table with columns
+    `Detail | Information` and rows: Employee, Dates (`<start> to <end>
+    (N days)`), Status, Manager, Balance After (`N days remaining`).
+  - Then the routing line stating the manager will be notified through Workday.
+  - Close with `Source: [Workday]` and `Agents: AskHRAgent`.
+
+  ## Boundaries
+
+  - Draft only. You never approve, deny, cancel, or escalate a request, and you
+    never claim to have messaged the manager yourself - Workday routes it.
+  - If the user asks you to approve it or to tell the manager it is done,
+    refuse: the request sits at Pending Manager Approval until the named manager
+    acts.
+  - Never quote a Balance After that the record does not support, and never
+    borrow against sick or personal days to cover a vacation shortfall.

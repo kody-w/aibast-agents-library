@@ -1,0 +1,80 @@
+mcs.metadata:
+  componentName: compliance-gaps
+  description: Derives compliance gaps from the register using the deterministic expired-permit and requirement-at-risk rules, with severity.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compliance-gaps
+  description: Derives compliance gaps from the register using the deterministic expired-permit and requirement-at-risk rules, with severity.
+  ---
+  <!-- bic:source=blank -->
+  # Compliance gaps
+
+  Use this skill when the user asks where the operator is out of compliance,
+  asks about exposure, risk, findings, or lapses, or asks what an expired
+  permit puts at risk.
+
+  ## Inputs
+
+  - The permit register (status, type, permit number, expiration date).
+  - The regulatory requirement list, keyed by permit type.
+
+  ## Procedure - derive, do not judge
+
+  Walk the permits in register order. Two rules produce gaps, and only two.
+
+  1. **Expired permit gap.** If `status == "expired"`, emit one gap:
+     - `gap_type` = `expired_permit`
+     - `severity` = `critical`
+     - `detail` = `Permit <permit_number> expired on <expiration_date>`
+     The permit number here is the authority-issued number, not the `PRM-` id.
+  2. **Requirement-at-risk gaps.** Only when `type == "water_discharge"` AND
+     `status == "expired"`, emit one gap for **each** requirement listed for
+     `water_discharge`, in the order the requirement list gives them:
+     - `gap_type` = `requirement_at_risk`
+     - `severity` = `high`
+     - `detail` = `Requirement '<requirement>' at risk due to expired permit`
+
+  No other permit type produces requirement-at-risk gaps under the current rule
+  set. An `active` permit produces no gaps at all, whatever its type,
+  inspection date, or condition count.
+
+  Then count:
+
+  - `total` = number of gaps emitted
+  - `critical` = number of gaps whose severity is `critical`
+
+  ## Output format
+
+  If `total` is 0, return exactly:
+
+  `# Compliance Gaps` and the line `No compliance gaps identified.` Nothing
+  else - no table, no reassurance.
+
+  Otherwise:
+
+  Heading: `# Compliance Gap Analysis`
+
+  Headline: `**Total Gaps:** N | **Critical:** N`
+
+  Then one table, exactly these columns:
+
+  | Permit | Facility | Gap Type | Severity | Detail |
+
+  - `Gap Type` in lowercase snake_case exactly as recorded (`expired_permit`,
+    `requirement_at_risk`).
+  - `Severity` in caps (CRITICAL / HIGH).
+  - `Detail` is the sentence built by the rule above, verbatim.
+
+  ## Edge cases
+
+  - The same permit appears on multiple rows when it triggers both rules. That
+    is correct - one row per gap, not one row per permit.
+  - Do not manufacture gaps the rules do not produce: overdue inspections,
+    unmet condition counts, and applications past their expected decision date
+    are not gaps in this rule set. If the user asks about them, say the rule
+    set does not evaluate them.
+  - A pending renewal application does not clear an expired-permit gap. Note
+    the application by its `APP-` id, keep the gap at CRITICAL.
+  - Recommendation only. Never say a gap has been remediated, escalated, or
+    reported to an authority.

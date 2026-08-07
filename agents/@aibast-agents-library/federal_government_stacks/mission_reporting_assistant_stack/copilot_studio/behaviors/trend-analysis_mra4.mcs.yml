@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: trend-analysis
+  description: Reports quarterly history for the three tracked KPIs with the computed trend direction and net change over the observed quarters.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: trend-analysis
+  description: Reports quarterly history for the three tracked KPIs with the computed trend direction and net change over the observed quarters.
+  ---
+  <!-- bic:source=blank -->
+  # Trend analysis
+
+  Use this skill when the user asks how a measure has moved over time, asks for
+  the trend, asks about quarterly performance, or asks whether something is
+  getting better or worse.
+
+  ## Inputs
+
+  - The quarterly KPI history and the KPI register.
+  - The tracked set is fixed: **KPI-101, KPI-201, KPI-301**. Only these three
+    have quarterly history. The other six KPIs have a current value and a
+    reported trend label but no series.
+
+  ## Procedure
+
+  For each tracked KPI, in the order KPI-101, KPI-201, KPI-301:
+
+  1. Walk the quarters in stored order -- Q1-FY24, Q2-FY24, Q3-FY24, Q4-FY24,
+     Q1-FY25 -- and collect the values present for that KPI. Quarters with no
+     value for the KPI are skipped entirely, not zero-filled.
+  2. Compute direction from the **last two values only**, not the whole series:
+     - fewer than 2 values: `insufficient_data`
+     - `recent > previous * 1.02`: `improving`
+     - `recent < previous * 0.98`: `declining`
+     - otherwise: `stable`
+  3. Compute net change: `round(last - first, 1)`, prefixed with `+` when the
+     result is greater than or equal to zero.
+
+  ## Worked examples from the history
+
+  - KPI-101: last 87.3 against `85.0 * 1.02 = 86.7` -- 87.3 is greater, so
+    **Improving**. Net change `87.3 - 78.1 = +9.2 %` over 5 quarters.
+  - KPI-201: last 68.5 against `69.1 * 0.98 = 67.72` -- 68.5 is not below it, so
+    **Stable**, even though the register's trend label reads Declining and the
+    series falls every quarter. The 2% band is what decides.
+  - KPI-301: last 72.0 against `70.8 * 1.02 = 72.216` -- 72.0 does not clear it,
+    so **Stable**, despite `+7.0 %` net change over 5 quarters.
+
+  ## Output format
+
+  Headline `# Trend Analysis`, then per tracked KPI:
+
+  - `## KPI-xxx: <name>`
+  - `**Target:** <target> <unit>`
+  - Table with columns `Quarter | Value`, values as `<number> <unit>`
+  - `**Trend:** <Title Case direction>`
+  - `**Net Change:** <+/-><change> <unit> over <n> quarters`
+
+  ## Edge cases
+
+  - Direction from the two-point band and the register's `trend` label can
+    disagree (KPI-201). Report the computed direction, name the label, and say
+    which is which. Never average them or pick the more flattering one.
+  - Never project a future quarter, estimate a date the target will be met, or
+    fit a line through the series -- the rule is two-point, and the data stops
+    at Q1-FY25.
+  - If asked for the trend on a KPI with no history (KPI-102, 103, 202, 203,
+    302, 303), say there is no quarterly series for it and give its current
+    value, target, and reported trend label instead.

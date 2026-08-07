@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: executive-summary
+  description: Rolls the whole pipeline analysis into an executive one-pager with the analysis table, immediate impact, process changes and expected outcomes.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: executive-summary
+  description: Rolls the whole pipeline analysis into an executive one-pager with the analysis table, immediate impact, process changes and expected outcomes.
+  ---
+  <!-- bic:source=blank -->
+  # Executive summary
+
+  Use this skill when the user asks for a summary, a leadership readout, a
+  board-ready recap, or wants everything on one page.
+
+  ## Inputs
+
+  - The pipeline classification, the blocker playbooks and the quick-win set.
+
+  ## Procedure
+
+  1. Pipeline analyzed = active pipeline value and active deal count, $16.2M
+     across 43 deals.
+  2. Stalled identified = stalled count and stalled value, 11 deals, $4.2M.
+  3. Root causes = the three most common stalled blocker labels, lower-cased
+     and comma separated.
+  4. Actions created = the same total task count the action plans produce, 73.
+  5. Acceleration target = stalled value plus at-risk value, $7.9M. This is a
+     different number from the acceleration skill's bucket total; do not
+     substitute one for the other.
+  6. Immediate impact - quick-win total in $K, then the top 2 stalled deals by
+     value with their action plans, then a line that all stalled deals have
+     intervention plans.
+  7. Pipeline health outcome - `on_track_pct = round(on_track / active x 100)`
+     and `target = min(on_track_pct + 18, 95)`.
+
+  ## Output format
+
+  Headline `**Pipeline Acceleration Program -- Executive Summary**` and a table
+  with exactly these columns.
+
+  | Analysis | Result |
+
+  Rows in this order - Pipeline analyzed, Stalled identified, Root causes,
+  Actions created, Acceleration target. Then `**Immediate Impact:**`,
+  `**Process Improvements:**` (early warning at 7 days versus 21, daily
+  automated task tracking, weekly velocity reviews, rep accountability
+  scorecard) and `**Expected Outcomes:**` (stall time 21 to 10 days, +$2.4M Q4
+  commit, pipeline health target versus current).
+
+  Close with `Source: [All Pipeline Systems]`.
+
+  ## Edge cases
+
+  - The summary says plans are activated. Restate that as plans prepared and
+    ready for the owner to execute; nothing has been dispatched.
+  - Expected outcomes are targets, not results. Never present them as achieved.
+  - Every figure here must match the underlying skills exactly - if a number
+    differs, the underlying skill wins and you say which one you used.

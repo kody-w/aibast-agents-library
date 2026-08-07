@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: policy-lookup
+  description: Returns the company policy directory, or the full text of one named policy with its effective date, category, summary, details, and approver.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: policy-lookup
+  description: Returns the company policy directory, or the full text of one named policy with its effective date, category, summary, details, and approver.
+  ---
+  <!-- bic:source=blank -->
+  # Policy lookup
+
+  Use this skill when the user asks what a policy says, asks whether something
+  is allowed, asks what policies exist, or asks who approves something.
+
+  ## Inputs
+
+  - The policy library.
+  - Optional: `policy_name`, a policy key. The four keys are `remote_work`,
+    `pto`, `expense_reimbursement`, `code_of_conduct`.
+
+  ## Procedure
+
+  1. If `policy_name` is supplied AND it is one of the four keys, return the
+     full policy detail view.
+  2. Otherwise return the policy directory table listing all four policies.
+     A supplied key that is not one of the four is not an error to guess
+     around: return the directory and say the named policy was not found.
+  3. Never paraphrase a detail line into a different number. The stored lines
+     are the policy.
+
+  ## Output format - full policy detail
+
+  - `**<title>**`
+  - `**Effective:** <effective_date> | **Category:** <category>`
+  - `**Summary:** <summary>`
+  - `**Details:**` followed by one `- ` bullet per stored detail line, in
+    stored order
+  - `**Approver:** <approver>`
+  - `Source: [HR Policy Portal]`
+
+  ## Output format - policy directory
+
+  A single table with columns exactly: `Policy Key | Title | Category |
+  Effective Date`, four rows in stored order (remote_work, pto,
+  expense_reimbursement, code_of_conduct), then the line telling the user to
+  name a policy to see full details, then `Source: [HR Policy Portal]`.
+
+  ## Thresholds carried in the policies - quote, never round
+
+  - Remote work: up to 3 days per week with manager approval; eligible after
+    the 90-day probation period; core hours 10 AM - 3 PM local; $750 one-time
+    home office stipend; $50/month internet reimbursement; quarterly in-office
+    week required.
+  - PTO: 15 days (0-2 yr), 20 days (3-5 yr), 25 days (6+ yr); carryover max
+    5 days per calendar year; 5+ consecutive days require 2 weeks notice;
+    Dec 20 - Jan 2 blackout requires VP approval; excess forfeited Dec 31.
+  - Expenses: submit via Concur within 60 days; reimbursed within 30 days of
+    submission; meals $75/day domestic, $100/day international; economy class
+    under 6 hours; hotel up to $250/night domestic, $350/night international;
+    Manager approval over $500, VP approval over $2,500.
+  - Code of Conduct: annual acknowledgment; conflicts disclosed to HR; vendor
+    gifts limited to $100 value; ethics hotline or HR portal for reports.
+
+  ## Boundaries
+
+  - Read-only. You do not grant exceptions, waive a threshold, or predict
+    whether an approver will say yes. Name the approver and stop.
+  - If the user's situation sits outside the stored details, say the policy
+    does not address it and route to the named approver.

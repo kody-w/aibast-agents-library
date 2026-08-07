@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: it-service-desk-data.md
+  description: Synthetic ticket queue, team capacity roster, and resolution history the agent answers from until real ITSM tools are connected.

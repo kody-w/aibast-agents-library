@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: spend-analysis
+  description: Totals budget, spend, and commitments, then grades every category On Track, At Risk, or Over Budget by the utilization rule.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: spend-analysis
+  description: Totals budget, spend, and commitments, then grades every category On Track, At Risk, or Over Budget by the utilization rule.
+  ---
+  <!-- bic:source=blank -->
+  # Spend analysis
+
+  Use this skill when the user asks about budget, spend, burn, commitments,
+  remaining funds, category health, or whether anything is over budget.
+
+  ## Inputs
+
+  - The category budget ledger: budget, spent YTD, committed, available, and
+    year-over-year trend per category.
+
+  ## Procedure - the arithmetic, exactly
+
+  1. Totals are sums across all five categories:
+     `total_budget = sum(budget)` = $4,350,000;
+     `total_spent = sum(spent_ytd)` = $3,197,000;
+     `total_committed = sum(committed)` = $656,500;
+     `total_available = total_budget - total_spent - total_committed`
+     = $4,350,000 - $3,197,000 - $656,500 = $496,500.
+  2. Spent YTD is also shown as a share of total budget, rounded to a whole
+     percent: $3,197,000 / $4,350,000 = 73%.
+  3. Per category, `utilization = (spent_ytd + committed) / budget * 100`.
+  4. Status is decided in this order, first match wins:
+     - `available < 0` -> **Over Budget**
+     - else `utilization > 85` -> **At Risk**
+     - else -> **On Track**
+     Worked: Technology ($1,875,000 + $340,000) / $2,500,000 = 88.6% with
+     $285,000 available -> At Risk. Software has -$60,000 available -> Over
+     Budget regardless of its 107.5% utilization. Office Supplies 73.9%,
+     Professional Services 72.0%, Travel 80.0% -> On Track.
+
+  ## Output format
+
+  - Headline: `**Spend Analysis**`
+  - A `| Metric | Value |` table with exactly: Total Budget, Spent YTD (amount
+    plus percent in parentheses), Committed, Available.
+  - Then `**By Category:**` and a table with columns `| Category | Budget |
+    Spent YTD | Committed | Available | Status | Trend |`, one row per
+    category in ledger order: Technology, Software, Office Supplies,
+    Professional Services, Travel. Negative available renders with the minus
+    sign inside the amount.
+  - Then an `**Alerts:**` block naming the Software overage of $60,000 as
+    requiring reallocation, and Technology committed spend approaching its
+    budget limit.
+  - Close with `Source: [ERP + Finance System]`.
+
+  ## Edge cases
+
+  - Available is a stored figure, not always `budget - spent - committed` per
+    row. Report the stored value; do not recompute a row's available and
+    quietly change it.
+  - Trend is year-over-year direction only (+12%, +18%, -5%, +8%, -15%). It is
+    not a forecast - never project a future balance from it.
+  - Software is the only category with negative available. If asked "what is
+    over budget", the answer is Software and only Software.
+
+  ## Boundaries
+
+  - Analysis only. Never say funds have been reallocated, a budget has been
+    raised, or spend has been frozen. Name the overage and the reallocation
+    decision belongs to Finance.

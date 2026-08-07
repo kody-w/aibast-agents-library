@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: mission-summary
+  description: Reports every mission objective with strategic goal, lead office, status, priority, period, budget utilization, and its KPI table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: mission-summary
+  description: Reports every mission objective with strategic goal, lead office, status, priority, period, budget utilization, and its KPI table.
+  ---
+  <!-- bic:source=blank -->
+  # Mission summary
+
+  Use this skill when the user asks for the mission summary, a program status
+  report, where the mission objectives stand, or how a mission is tracking
+  against budget.
+
+  ## Inputs
+
+  - The mission objective register and the KPI register.
+  - Optional: a single MO- id. Otherwise report every mission objective, in
+    register order (MO-001, MO-002, MO-003).
+
+  ## Procedure
+
+  For each mission objective:
+
+  1. Compute budget utilization:
+     `utilization = round((budget_spent / budget_allocated) * 100, 1)`.
+     If `budget_allocated` is 0, utilization is `0.0` -- never divide.
+  2. Render status and priority in title case with underscores replaced by
+     spaces: `on_track` becomes `On Track`, `at_risk` becomes `At Risk`.
+  3. Select the KPIs whose `mission` field equals this mission's id. Every KPI
+     belongs to exactly one mission: MO-001 owns KPI-101/102/103, MO-002 owns
+     KPI-201/202/203, MO-003 owns KPI-301/302/303.
+  4. Compute each KPI's status with the attainment rule:
+     - Unit is `days` or `minutes` (lower is better):
+       `pct = (target / current) * 100`; if `current` is 0, `pct = 100`.
+     - Any other unit: `pct = (current / target) * 100`; if `target` is 0,
+       `pct = 0`.
+     - `pct >= 95` is `On Target`; `pct >= 75` is `Near Target`; otherwise
+       `Below Target`. The bands are inclusive at 95 and at 75.
+
+  ## Output format
+
+  Headline `# Mission Summary Report`, then per mission:
+
+  - `## MO-xxx: <name>`
+  - `- **Strategic Goal:** <strategic_goal>`
+  - `- **Lead Office:** <lead_office>`
+  - `- **Status:** <Title Case status>`
+  - `- **Priority:** <Title Case priority>`
+  - `- **Period:** <start_date> to <target_date>`
+  - `- **Budget:** $<allocated with thousands separators> allocated /
+    $<spent with thousands separators> spent (<utilization>%)`
+  - `- **Description:** <description>`
+  - Then the KPI table with columns `KPI | Current | Target | Status`, values
+    written as `<number> <unit>` (for example `87.3 %`, `22 days`,
+    `8.3 minutes`).
+
+  ## Edge cases
+
+  - A mission with no KPIs gets its header block and no table -- do not emit an
+    empty table.
+  - Dates are reported exactly as stored (`2024-10-01` to `2025-09-30`); never
+    convert them to fiscal quarters or compute time remaining.
+  - If the user names a mission that is not in the register, say it is not in
+    the data and list the mission ids that are.
+  - Report only. Never say a status, budget, or target has been updated.

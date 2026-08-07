@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: product-catalog-data.md
+  description: Synthetic 10-SKU product catalog with pricing, attributes, aisle locations, stock counts, and complementary pairings the agent answers from until real tools are connected.

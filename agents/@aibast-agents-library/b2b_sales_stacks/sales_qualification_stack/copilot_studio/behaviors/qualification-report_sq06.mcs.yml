@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: qualification-report
+  description: Produces the full pipeline summary - tier counts, qualified pipeline value, industry mix, conversion targets, and the immediate action list.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: qualification-report
+  description: Produces the full pipeline summary - tier counts, qualified pipeline value, industry mix, conversion targets, and the immediate action list.
+  ---
+  <!-- bic:source=blank -->
+  # Qualification report
+
+  Use this skill when the user asks for the pipeline summary, the event
+  readout, how much pipeline the leads represent, the industry mix, or what
+  to do next across the whole queue.
+
+  ## Inputs
+
+  - The scored lead set.
+
+  ## Procedure - the arithmetic
+
+  - Tier counts come straight from the tier thresholds (88+ Hot, 73-87 Warm,
+    55-72 Nurture, below 55 Disqualified).
+  - Per-lead value is `int(company revenue * 0.001)`.
+  - `hot_pipeline` is the sum of that value across Hot leads;
+    `warm_pipeline` across Warm leads.
+  - `total_qualified_pipeline = hot_pipeline + warm_pipeline`. Nurture and
+    Disqualified leads contribute nothing - never fold them in.
+  - Industry rows are sorted by total lead count, highest first, and each row
+    also carries the Hot and Warm counts for that industry.
+  - Conversion targets use fixed rates, not judgment:
+    - Hot to meeting 40%: `int(hot_count * 0.4)`
+    - Meeting to opportunity 60%: `int(hot_count * 0.4 * 0.6)`
+    - Warm to meeting 20%: `int(warm_count * 0.2)`
+    - Expected pipeline from hot leads: `int(hot_pipeline * 0.4 * 0.6)`
+
+  ## Output format
+
+  - Headline: `**Qualification Report - Full Pipeline Summary**`
+  - A Metric | Value table with these rows in order: Total leads scored; Hot
+    leads; Warm leads; Nurture leads; Disqualified; Hot pipeline value; Warm
+    pipeline value; **Total qualified pipeline** (bold, both cells). Dollar
+    figures carry thousands separators.
+  - `**Leads by Industry:**` - a table with columns Industry | Count | Hot |
+    Warm, sorted by Count descending.
+  - `**Conversion Targets:**` - the four lines above, each showing the
+    percentage and the computed count or dollar figure.
+  - `**Immediate Actions:**` - a numbered list: hot leads with AE outreach
+    within 4 hours; warm leads with SDR calls today or tomorrow; nurture
+    leads entering the email sequence; disqualified leads routed to
+    marketing. Each carries its live count.
+  - Close with `Source: [All Qualification Systems]` and
+    `Agents: QualificationReportAgent (orchestrating all agents)`.
+
+  ## Edge cases
+
+  - Industries with zero Hot and zero Warm leads still appear in the industry
+    table with their total count and zeros.
+  - Conversion counts are truncated, not rounded - a projection can be lower
+    than a naive percentage.
+
+  ## Boundaries
+
+  - Report only. The conversion rates are targets, not forecasts you have
+    validated; say so if the user treats them as commitments.
+  - Never quote a pipeline figure that includes Nurture or Disqualified
+    leads, and never present these synthetic revenues as real bookings.

@@ -1,0 +1,80 @@
+mcs.metadata:
+  componentName: references-positioning
+  description: Scores and ranks the top four customer references by industry relevance and builds the competitive differentiator matrix and win theme.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: references-positioning
+  description: Scores and ranks the top four customer references by industry relevance and builds the competitive differentiator matrix and win theme.
+  ---
+  <!-- bic:source=blank -->
+  # References and competitive positioning
+
+  Use this skill when the user asks which references to use, asks for case
+  studies or proof points, asks how we compare to a shortlisted competitor, or
+  asks for the win theme or objection handling.
+
+  ## Inputs
+
+  - The resolved RFP: its industry and its shortlisted competitors.
+  - The reference database (8 customers) and the competitive intelligence file
+    (CompetitorA, CompetitorB, CompetitorC) plus our own capability record.
+
+  ## Procedure -- reference scoring
+
+  For every reference in the database:
+
+  1. `relevance = 100 if reference.industry == RFP.industry else 30`
+  2. `if reference.contact_ready: relevance = relevance + 10`
+  3. `relevance = min(relevance, 100)`
+
+  Sort descending by relevance and take the **top four**. So an in-industry,
+  contact-ready reference caps at 100; an out-of-industry contact-ready
+  reference is 40; an out-of-industry reference that is not contact ready is 30.
+  Ties keep database order.
+
+  Meridian Healthcare (Healthcare): Memorial Health System 100%, Pacific Medical
+  Group 100%, Summit Healthcare Network 100%, then Atlas Cloud Services at 40%
+  as the fourth.
+
+  ## Procedure -- differentiator matrix
+
+  Five factors, in this order, us versus each shortlisted competitor only:
+  Implementation (weeks), HIPAA certified (Yes / Pending), EHR integration
+  (Native / Third-party), Support SLA (minutes), Pricing (position). Our column
+  is fixed: 12 weeks, Yes, Native, 15 min, Market rate. A competitor not in the
+  intelligence file renders as `N/A` -- never as a guess.
+
+  ## Procedure -- win theme
+
+  `Speed + Compliance + Support` when **every** shortlisted competitor's
+  implementation weeks exceed our 12. Otherwise `Compliance + Integration +
+  Support`. Meridian: CompetitorA 20 and CompetitorB 16 both exceed 12, so the
+  theme is Speed + Compliance + Support.
+
+  ## Output format
+
+  - Headline `**References & Competitive Positioning: <account>**`
+  - `**Customer References (<industry>-weighted):**` then a table with columns
+    `| Customer | Size | Results | Relevance | Contact Ready |`. Contact Ready
+    renders `Yes` or `On request`.
+  - `**Win Theme: <theme>**`
+  - `**Competitive Differentiator Matrix:**` then a table `| Factor | Us |
+    <each shortlisted competitor> |`.
+  - `**Objection Pre-Handlers:**` the first three of our differentiator
+    statements, each quoted.
+  - Close with `Source: [Reference Database + Competitive Intel]` and
+    `Agents: CompetitiveDifferentiationAgent, ContentLibraryAgent`.
+
+  ## Edge cases
+
+  - `On request` means the customer has not agreed to take calls. Never offer
+    Nexus Software Corp or Vanguard Logistics as a callable contact.
+  - Only the competitors shortlisted on that RFP appear in the matrix. Do not
+    add a competitor the buyer did not name, and do not drop one because the
+    comparison is unfavorable.
+  - Results strings are quoted verbatim from the reference database. Never
+    round, restate, or extrapolate a customer outcome.
+  - An industry with no references in the database yields four out-of-industry
+    rows at 40% or 30%; say the proof is out-of-industry rather than implying
+    sector experience we do not have.

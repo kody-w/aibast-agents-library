@@ -1,0 +1,49 @@
+mcs.metadata:
+  componentName: risk-trend
+  description: Reports the six-week risk score series per deal and labels each direction as worsening, improving or stable.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: risk-trend
+  description: Reports the six-week risk score series per deal and labels each direction as worsening, improving or stable.
+  ---
+  <!-- bic:source=blank -->
+  # Risk trend analysis
+
+  Use this skill when the user asks whether risk is rising, for the risk
+  trajectory, or for six weeks of risk history.
+
+  ## Inputs
+
+  - The 6-week risk score history for the 6 assessed deals.
+
+  ## Procedure
+
+  1. Order deals by VALUE descending for this view, not by risk.
+  2. Direction from the six-week change `current - first` - above +5 is
+     WORSENING, below -5 is IMPROVING, otherwise STABLE.
+  3. Print the series as an arrow chain `52 -> 55 -> 60 -> 64 -> 68 -> 72` and
+     the change with an explicit sign.
+  4. Header counts apply the same +5 and -5 gates across all deals.
+  5. Higher scores are worse on this scale, so a rising line is bad news.
+
+  ## Output format
+
+  Headline `**Risk Trend Analysis -- 6-Week View**` then
+  `Worsening: N | Improving: N | Stable: N`.
+
+  One block per deal - `**<deal> -- $<value>**`, then
+  `Direction: STATUS | Current: N/100 | 6-week change: +/-N`, then
+  `Trend: <arrow chain>`.
+
+  Close with the alert line that deals with worsening trends require immediate
+  pipeline review, and `Source: [Historical Risk Scores]`.
+
+  ## Edge cases
+
+  - The risk history series is independent of the composite risk computed from
+    factors and the two can differ - Apex Financial computes 71/100 while its
+    history currently reads 70. Report both and say which is which.
+  - A change of exactly +5 or -5 is STABLE; the gates are strict inequalities.
+  - Never project the series forward or state when a deal will cross a
+    threshold.

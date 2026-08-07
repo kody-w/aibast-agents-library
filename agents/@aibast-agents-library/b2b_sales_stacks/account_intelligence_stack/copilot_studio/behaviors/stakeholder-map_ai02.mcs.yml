@@ -1,0 +1,50 @@
+mcs.metadata:
+  componentName: stakeholder-map
+  description: Lists every mapped contact with influence and sentiment, then calls out relationship gaps and the champion.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: stakeholder-map
+  description: Lists every mapped contact with influence and sentiment, then calls out relationship gaps and the champion.
+  ---
+  <!-- bic:source=blank -->
+  # Stakeholder map
+
+  Use this skill when the user asks who the contacts are at an account, who
+  the buying committee is, or where the relationship gaps sit.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. List every stakeholder in roster order. Do not re-sort.
+  2. Engagement cell - `"<meetings> meetings"` when `meetings > 0`,
+     otherwise the literal `Schedule intro`.
+  3. Relationship gaps - a stakeholder is a gap only if `meetings == 0` AND
+     influence is one of Decision Maker, Economic Buyer, Executive Sponsor.
+     An Influencer with zero meetings is NOT a gap in this view.
+  4. Champion intelligence - the first stakeholder whose influence is
+     Champion AND sentiment is Positive. Report that person's notes verbatim.
+
+  Worked example - Acme Corporation returns 8 contacts, exactly 2 gaps
+  (Sarah Chen, CTO and Tom Bradley, CEO) and one champion, James Miller.
+  Maria Lopez has zero meetings but is an Influencer, so she is not listed
+  as a gap.
+
+  ## Output format
+
+  - `**Stakeholder Map (<N> contacts):**`
+  - Table - Name, Role, Influence, Sentiment, Engagement.
+  - `**Relationship Gaps:**` - `- <name> (<role>): <notes>` per gap. Omit
+    the whole section when there are none.
+  - `**Champion Intelligence:**` - `<name> - <notes>`. Omit when there is
+    no positive champion.
+
+  ## Edge cases
+
+  - If an account has no stakeholders, answer exactly
+    `No stakeholders mapped for this account yet.` and stop. Do not
+    substitute another account's roster.
+  - Sentiment "Unknown" means unknown. Never infer it from role or seniority.

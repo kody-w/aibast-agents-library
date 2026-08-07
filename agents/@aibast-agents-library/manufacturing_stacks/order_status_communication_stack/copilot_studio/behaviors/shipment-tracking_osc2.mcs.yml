@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: shipment-tracking
+  description: Reports carrier, tracking number, route, weight, and estimated delivery for orders that have an actual shipment record, plus the order detail behind each shipment.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: shipment-tracking
+  description: Reports carrier, tracking number, route, weight, and estimated delivery for orders that have an actual shipment record, plus the order detail behind each shipment.
+  ---
+  <!-- bic:source=blank -->
+  # Shipment tracking
+
+  Use this skill when the user asks where an order is, for a tracking number,
+  a carrier, an estimated delivery date, or for everything currently in
+  transit.
+
+  ## Inputs
+
+  - The shipment records (knowledge/tools) and the order book, which supplies
+    the customer, product, quantity, and value for each shipped order.
+  - Optional: a single ORD- id or a customer name.
+
+  ## Procedure
+
+  1. Retrieve the shipment records. Only orders that appear in the shipment
+     register have shipment data -- an order being marked `shipped` in the
+     order book is not itself a tracking record.
+  2. For each shipment, render the route as `origin -> destination` (for
+     example `Detroit, MI -> Fremont, CA`).
+  3. Show weight with thousands separators and a ` kg` suffix.
+  4. After the table, list the order detail behind each shipment: customer,
+     product, quantity, and `value = quantity * unit_price` rounded to 2
+     decimals.
+
+  ## Output format
+
+  Heading: `## Shipment Tracking`
+
+  Then one table, exactly these columns:
+
+  | Order | Carrier | Tracking | Ship Date | Est Delivery | Route | Weight | Status |
+
+  Status exactly as recorded (`in_transit`). Dates as `YYYY-MM-DD`.
+
+  Then `### Shipped Orders Detail` and one bullet per shipment:
+
+  `- **ORD-xxxx** (Customer): Product -- N,NNN units, $N,NNN.NN`
+
+  ## Edge cases
+
+  - No shipment records at all: output the heading and the single line
+    `No active shipments at this time.` Do not fabricate a carrier.
+  - An order with no shipment record: say plainly that there is no shipment on
+    file for that ORD- id, and name which orders do have one. Never guess a
+    carrier or tracking number.
+  - If a shipment record is missing a field, render it as `TBD` rather than
+    inferring it.

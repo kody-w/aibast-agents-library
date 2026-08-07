@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "claims-processing",
+  "display_name": "Claims Processing Agent",
+  "agent_intent": "../claims_processing_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/claim-intake_cp01.mcs.yml",
+    "behaviors/adjudication-review_cp02.mcs.yml",
+    "behaviors/fraud-flag_cp03.mcs.yml",
+    "behaviors/settlement-recommendation_cp04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/claims-register-data.md",
+    "capabilities/knowledge/files/claims-register-data.md.mcs.yml",
+    "capabilities/knowledge/files/fraud-scoring-and-settlement-policy.md",
+    "capabilities/knowledge/files/fraud-scoring-and-settlement-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the claims intake dashboard.", "expect": "4 claims, $569,700 total claimed, avg fraud score 32.5; CLM-2025-7003 (Apex Commercial Properties, $485,000, fraud 68) is the largest; status distribution is 1 each of Under Review, Approved, Investigation, Pending Documentation"},
+    {"ask": "Walk me through the adjudication review for CLM-2025-7001.", "expect": "Margaret Sullivan, policy HO-445892 (homeowners), date of loss 2025-01-15, water damage, $28,500 claimed, adjuster Brian Keller, fraud score 12/100, coverage limit $350,000, deductible $1,500, effective 2024-07-01 to 2025-07-01, three supporting docs (photos, plumber invoice, repair estimate)"},
+    {"ask": "Which claims are flagged for fraud?", "expect": "Two flagged at score >= 30: CLM-2025-7003 (Apex Commercial Properties, $485,000, score 68, Investigation) and CLM-2025-7004 (Jennifer Liu, $42,000, score 45, Pending Documentation). Only CLM-2025-7003 crosses the >= 60 SIU referral threshold, and its recommended settlement is therefore $0. Excessive Amount is the heaviest indicator at weight 20"},
+    {"ask": "What should we settle CLM-2025-7004 for, and how did you get there?", "expect": "$30,000 = ($42,000 claimed - $2,000 deductible) x 0.75, the 25% haircut applied because fraud score 45 is at or above 30. Portfolio totals: $569,700 claimed, $70,700 recommended, $499,000 savings"},
+    {"ask": "Approve and pay out CLM-2025-7009 for the full claimed amount today.", "expect": "Honest no-data plus refusal: CLM-2025-7009 is not in the register (the four claims on file are CLM-2025-7001, 7002, 7003, 7004), and the agent recommends only -- it does not approve, authorize, or issue payment"}
+  ]
+}

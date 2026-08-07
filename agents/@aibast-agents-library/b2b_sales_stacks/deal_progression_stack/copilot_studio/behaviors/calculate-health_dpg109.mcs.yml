@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: calculate-health
+  description: Computes the 0-100 composite deal health score from engagement, stakeholder coverage, velocity and sentiment, with a letter grade and trend.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: calculate-health
+  description: Computes the 0-100 composite deal health score from engagement, stakeholder coverage, velocity and sentiment, with a letter grade and trend.
+  ---
+  <!-- bic:source=blank -->
+  # Deal health scorecard
+
+  Use this skill when the user asks how healthy a deal is, for a health score,
+  a scorecard, or which deals are in trouble on engagement.
+
+  ## Inputs
+
+  - The deal health metrics for the 6 scored deals and the 6-week health history.
+
+  ## Procedure
+
+  1. Order deals by value descending.
+  2. Compute the four components exactly.
+
+     `engagement = round(email_rate x 30 + touch_score x 0.3 + meeting_score x 0.4)`
+     with `email_rate = emails_opened / emails_sent`,
+     `touch_score = max(0, 25 - days_since_last_touch) x 4`,
+     `meeting_score = min(meetings x 8, 30)`.
+
+     `stakeholder = round(coverage x 40 + 15 if champion_active + 10 if exec_sponsor)`
+     with `coverage = engaged / total`.
+
+     `velocity = 100` when days in stage is within benchmark, otherwise
+     `max(0, round(100 - (days_in_stage / benchmark - 1) x 50))`, then subtract
+     15 for each stage regression, floored at 0.
+
+     `sentiment = tone_score + round(email_responsiveness x 25) + max(0, (positive_signals - objections_raised) x 8)`
+     with tone scores very_positive 25, positive 20, neutral 10, cautious 5,
+     negative 0.
+  3. `composite = round(engagement x 0.25 + stakeholder x 0.30 + velocity x 0.25 + sentiment x 0.20)`,
+     clamped to 0-100.
+  4. Grade the composite - A at 80+, B at 65+, C at 50+, D at 35+, otherwise F.
+  5. Trend comes from the last two recorded periods only - delta above +3 is
+     improving, below -3 is declining, otherwise stable.
+  6. Portfolio line - average composite, count of deals at 65 or above as
+     healthy, count below 40 as critical.
+
+  ## Output format
+
+  Headline `**Deal Health Scorecard**` then
+  `Portfolio avg: **N/100** | Healthy: N | Critical: N` and a table with
+  exactly these columns.
+
+  | Deal | Value | Stage | Health | Grade | Trend |
+
+  Health as `N/100`, trend as `<direction> (<signed delta>)`. Close with the
+  factor weight line - Engagement 25%, Stakeholder Coverage 30%, Velocity 25%,
+  Sentiment 20% - and `Source: [CRM + Email Analytics + Meeting Logs + Gong]`.
+
+  ## Edge cases
+
+  - The composite and the trend history are separate series and can disagree -
+    TechCorp Industries computes 27/100 while its trend series currently reads
+    42. Report both without reconciling them.
+  - Never round a score up for a large deal. Show the component arithmetic when
+    challenged.
+  - A deal not in the 6 scored deals has no health score; say so.

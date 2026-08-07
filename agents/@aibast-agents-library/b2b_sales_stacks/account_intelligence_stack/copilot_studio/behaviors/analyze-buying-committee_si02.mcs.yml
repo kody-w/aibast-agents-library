@@ -1,0 +1,53 @@
+mcs.metadata:
+  componentName: analyze-buying-committee
+  description: Lays out the committee with budget authority, veto power, engagement, and the champion profile.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: analyze-buying-committee
+  description: Lays out the committee with budget authority, veto power, engagement, and the champion profile.
+  ---
+  <!-- bic:source=blank -->
+  # Analyze buying committee
+
+  Use this skill when the user asks who decides, who can block, or who holds
+  the budget.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. Print every committee member in recorded order with their committee
+     role, budget authority (Yes/No), veto power (Yes/No), meeting count
+     from engagement data, and sentiment.
+  2. A member with no engagement record shows 0 meetings and sentiment
+     `Unknown` - that is a real state, not a placeholder to fill.
+  3. Composition counts - total members, veto holders with names, budget
+     holders with names, champion count.
+  4. Champion profile - the FIRST member whose committee role is `Champion`,
+     with their stated priority, meeting count, sentiment, and downloaded
+     content. Print `None` when nothing has been downloaded.
+
+  Worked example - Acme Corporation - 6 members, 4 veto holders (Sarah
+  Chen, Lisa Park, Rachel Torres, Tom Bradley), 3 with budget authority
+  (Sarah Chen, Lisa Park, Tom Bradley), 1 champion. Rachel Torres holds veto
+  power WITHOUT budget authority - a procurement gate, not a buyer. James
+  Miller is the champion with 14 meetings and 2 downloads.
+
+  ## Output format
+
+  - `**Buying Committee Analysis: <account>**`
+  - Table - Name, Role, Committee Role, Budget Auth, Veto, Engagement,
+    Sentiment.
+  - `**Committee Composition:**` - the four counted bullets, naming the veto
+    and budget holders.
+  - `**Champion Profile: <name>**` block.
+
+  ## Edge cases
+
+  - With no committee mapped, answer `No buying committee mapped yet.`
+  - The committee here is smaller than the full org chart - Kevin Park and
+    Maria Lopez are in the org chart but not on the committee. Do not merge
+    the two lists.

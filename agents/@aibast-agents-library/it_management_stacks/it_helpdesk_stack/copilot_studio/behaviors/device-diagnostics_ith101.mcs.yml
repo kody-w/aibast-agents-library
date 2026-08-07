@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: device-diagnostics
+  description: Scans a user's device telemetry against the fixed thresholds and reports every check that fired plus the ranked likely causes.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: device-diagnostics
+  description: Scans a user's device telemetry against the fixed thresholds and reports every check that fired plus the ranked likely causes.
+  ---
+  <!-- bic:source=blank -->
+  # Device diagnostics
+
+  Use this skill when the user reports a slow, hot, freezing, or misbehaving
+  machine, asks what is wrong with a device, or asks for a health check or
+  scan.
+
+  ## Inputs
+
+  - The user directory and device telemetry (knowledge/tools).
+  - A user name. If none is given, ask which user before answering - do not
+    default to a person.
+
+  ## Procedure
+
+  1. Resolve the user by name against the directory (Michael Chen, Lisa Torres,
+     James Park). If the name is not in the directory, stop and say so.
+  2. Evaluate every check in this exact order, emitting a row only when its
+     condition is true:
+     - `disk_free_pct < 20` -> Disk space / Critical / `Only N% free`
+     - `memory_used_pct > 85` -> Memory usage / Warning / `N% utilized`
+     - `running_processes > 100` -> Running processes / Warning / `N active`
+     - `last_restart_days > 3` -> Last restart / Warning / `N days ago`
+     - `pending_updates > 0` -> Updates pending / Info / `N updates ready`
+  3. If no row was emitted, emit exactly one row:
+     All systems / OK / `No issues detected`.
+  4. Build the ranked causes list in this fixed order, again only for
+     conditions that are true:
+     1. `Low disk space (N% free)` when `disk_free_pct < 20`
+     2. `High memory usage (N%)` when `memory_used_pct > 85`
+     3. `Needs restart (N days uptime)` when `last_restart_days > 3`
+     4. `Too many processes (N running)` when `running_processes > 100`
+     Number them 1..n after filtering. Pending updates is never a cause.
+  5. If no cause qualifies, print `No significant issues detected.` instead of
+     a list.
+
+  ## Output format
+
+  Headline: `**Device Diagnostics: <user name>**`
+
+  Then the device table, exactly these rows: Device, OS, Age (in years), Last
+  restart (`N days ago`), Disk space (`N% free`).
+
+  Then `**Diagnostics:**` and one table with exactly these columns:
+
+  | Check | Status | Finding |
+
+  Then `**Likely Causes (Ranked):**` and the numbered list.
+
+  Close with `Source: [Asset Management + Remote Diagnostics]`.
+
+  ## Edge cases
+
+  - Threshold boundaries are strict: 20% free disk is not Critical, 85% memory
+    is not a Warning, 100 processes is not a Warning, 3 days uptime is not a
+    Warning. Only values past the boundary fire.
+  - A device with zero fired checks is a valid result - report OK and do not
+    invent a cause.
+  - Diagnose only from these five signals. Hardware failure, malware, and
+    network faults are not visible here; say so and route to a technician.

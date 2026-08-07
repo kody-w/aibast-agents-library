@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: grants-dashboard
+  description: Renders the federal grant portfolio dashboard with aggregate award, drawdown, and draw-rate totals plus a per-grant milestone roll-up.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: grants-dashboard
+  description: Renders the federal grant portfolio dashboard with aggregate award, drawdown, and draw-rate totals plus a per-grant milestone roll-up.
+  ---
+  <!-- bic:source=blank -->
+  # Grants dashboard
+
+  Use this skill when the user asks for the portfolio picture, the dashboard,
+  how much has been awarded or drawn, the draw rate, or a status sweep across
+  all grants.
+
+  ## Inputs
+
+  - The federal grant portfolio (GRT- records: program, CFDA, recipient, award
+    amount, federal share, period, status, funds drawn, milestones).
+  - Optional: a single GRT- id to narrow the view. Otherwise report all awards.
+
+  ## Procedure - compute it, do not estimate it
+
+  1. `total_awarded = sum(award_amount)` across every grant in the portfolio.
+  2. `total_drawn = sum(funds_drawn)` across every grant.
+  3. `draw_rate = round((total_drawn / total_awarded) * 100, 1)`, expressed as a
+     percent. If `total_awarded` is 0, the draw rate is 0 - never divide by
+     zero and never substitute a guess.
+  4. `grant_count = number of grants in the portfolio`.
+  5. Milestone roll-up per grant:
+     - `total` = count of milestones on that grant.
+     - `complete` = count of milestones whose status is exactly `complete`.
+     - `at_risk` = count of milestones whose status is exactly `in_progress`
+       AND whose `pct` is strictly less than 40.
+     - Status `on_track` and status `pending` are never counted as at risk,
+       whatever their percentage.
+  6. List grants in portfolio order (GRT- id ascending). Do not re-rank by
+     award size unless the user asks for a ranking.
+
+  ## Output format
+
+  - `# Federal Grants Dashboard`
+  - Headline lines, one per row:
+    `**Total Awards:** N`, `**Total Awarded:** $N,NNN,NNN`,
+    `**Total Drawn:** $N,NNN,NNN`, `**Draw Rate:** N.N%`
+  - `## Grant Portfolio` table with columns exactly:
+    `Grant ID | Program | Recipient | Award | Drawn | Status`
+    Currency with thousands separators, no cents. Status title-cased.
+  - `## Milestone Summary` as a bullet per grant:
+    `- **GRT-xxxx-xxxx:** C/T complete, A at risk`
+
+  ## Edge cases
+
+  - A grant with zero milestones reports `0/0 complete, 0 at risk`; do not
+    suppress the row.
+  - Funds drawn above the award amount would push the draw rate above 100% -
+    report the computed figure and flag it as an exception rather than
+    capping it.
+  - Never state that funds have been drawn, obligated, or released by you.
+    This is a reporting view; drawdown actions belong to the grants officer.

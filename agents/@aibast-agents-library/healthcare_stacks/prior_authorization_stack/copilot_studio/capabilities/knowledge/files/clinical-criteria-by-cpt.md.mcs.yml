@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: clinical-criteria-by-cpt.md
+  description: Synthetic per-CPT payer rule sets, auto-approve flags, approval rates, and the payer-key resolution rule the criteria check follows.

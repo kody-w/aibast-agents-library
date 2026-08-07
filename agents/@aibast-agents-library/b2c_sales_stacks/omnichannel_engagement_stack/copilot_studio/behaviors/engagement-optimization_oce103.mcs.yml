@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: engagement-optimization
+  description: Ranks channels by ROAS, applies the fixed spend-recommendation thresholds, and reports blended ROAS across the whole mix.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: engagement-optimization
+  description: Ranks channels by ROAS, applies the fixed spend-recommendation thresholds, and reports blended ROAS across the whole mix.
+  ---
+  <!-- bic:source=blank -->
+  # Engagement optimization
+
+  Use this skill when the user asks which channels to scale or cut, where the
+  budget should go, which channels are efficient, or for the efficiency
+  ranking.
+
+  ## Inputs
+
+  - The 30-day channel set (knowledge/tools), including bounce_rate.
+  - No filters. The ranking is always the full seven-channel mix, because the
+    blended ROAS and the rank positions are only meaningful across all of it.
+
+  ## Procedure - compute it, do not judge it
+
+  1. For each channel compute `ROAS = round(revenue_30d / cost_30d, 2)` and
+     `CVR = round((conversions_30d / sessions_30d) * 100, 2)`.
+  2. Sort descending by ROAS. That is the only sort key. Revenue, conversion
+     rate, bounce rate, and strategic importance never move a channel's rank.
+  3. Assign the recommendation from ROAS alone, with these exact thresholds:
+     - `ROAS > 50` -> `Scale investment`
+     - `ROAS > 10` and `ROAS <= 50` -> `Optimize spend`
+     - `ROAS <= 10` -> `Review ROI`
+     The boundary is strict: a channel at exactly 50.0x is "Optimize spend",
+     and a channel at exactly 10.0x is "Review ROI".
+  4. Compute the mix totals:
+     `total_cost = sum(cost_30d)` = $380,700 for the current set;
+     `total_revenue = sum(revenue_30d)` = $12,957,500;
+     `blended ROAS = round(total_revenue / total_cost, 1)` = 34.0x.
+  5. Close with the recorded optimization actions.
+
+  ## Output format
+
+  `## Channel Efficiency Ranking`, then one table, exactly these columns:
+
+  | Rank | Channel | ROAS | CVR | Bounce Rate | Recommendation |
+
+  Rank starting at 1. ROAS with an `x` suffix, CVR and bounce rate with a `%`
+  suffix. Channel names in title case with underscores as spaces.
+
+  Then three lines:
+
+  - `**Total Marketing Spend:** $380,700`
+  - `**Total Revenue:** $12,957,500`
+  - `**Blended ROAS:** 34.0x`
+
+  Then `## Optimization Actions`, exactly these four numbered items:
+
+  1. Shift 10% of social media budget to mobile app push campaigns
+  2. Implement progressive profiling on email signups
+  3. Launch A/B test on checkout flow for web paid traffic
+  4. Increase SMS frequency for high-value customer segment
+
+  ## Edge cases
+
+  - On the current data no channel falls into `Review ROI` - the lowest ROAS
+    is Web Paid at 11.68x. Say that plainly if asked what to cut; do not
+    promote the bottom-ranked channel into a cut recommendation the threshold
+    did not produce.
+  - In Store ranks 5th on ROAS (31.67x) while holding the highest CVR (30.0%)
+    and the largest revenue ($5,700,000). The ranking is ROAS only; call the
+    tension out rather than resolving it by re-sorting.
+  - A channel with `cost_30d == 0` computes ROAS 0 and would sort last. Report
+    it as "no cost recorded" and exclude it from the scale/cut conclusion
+    instead of labelling it "Review ROI".
+  - The four optimization actions are recommendations. Never say a budget has
+    been shifted, a test has been launched, or a send frequency has been
+    changed. A marketing owner executes; you recommend.

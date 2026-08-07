@@ -1,0 +1,86 @@
+mcs.metadata:
+  componentName: risk-flags
+  description: Applies the fixed risk thresholds to every customer and lists flagged accounts worst-health-first with the exact flags that fired.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: risk-flags
+  description: Applies the fixed risk thresholds to every customer and lists flagged accounts worst-health-first with the exact flags that fired.
+  ---
+  <!-- bic:source=blank -->
+  # Risk flags
+
+  Use this skill when the user asks which accounts are at risk, what is going
+  wrong, which customers need attention, why an account is flagged, or how much
+  ARR is exposed.
+
+  ## Inputs
+
+  - The customer portfolio with health score, training completion, active and
+    licensed users, milestone statuses, and ARR.
+  - Optional: a single customer name or CUST- id to filter the presentation.
+
+  ## Thresholds - fixed constants, never adjusted
+
+  - `health_score_critical` = 40
+  - `health_score_warning` = 60
+  - `training_min_pct` = 50
+  - `adoption_min_pct` = 30
+  - `user_activation_min_pct` = 40
+
+  `adoption_min_pct` is defined in the threshold set but is NOT evaluated by
+  this rule. Average feature adoption does not raise a flag here. If the user
+  asks about low adoption, answer from the adoption-metrics skill and say the
+  adoption threshold is not part of the flag logic.
+
+  ## Procedure - evaluate every check, in this order
+
+  For each customer, build the flag list:
+
+  1. Health, exactly one of these two can fire:
+     - `health_score < 40` gives `CRITICAL: Health score below threshold`
+     - else `health_score < 60` gives `WARNING: Health score declining`
+     - a score of 60 or above raises no health flag
+  2. `training_completion_pct < 50` gives `Low training completion`
+  3. `activation_pct = round(active_users / licensed_users * 100, 1)`; if
+     `activation_pct < 40` gives `Low user activation`
+  4. Any milestone whose status is `blocked` gives
+     `Blocked milestones: <comma-separated milestone keys>`
+
+  A customer appears in the output only if at least one flag fired. Customers
+  with zero flags are omitted entirely - do not list them as "clear".
+
+  ## Sort order
+
+  Sort flagged customers by `health_score` ASCENDING - worst health first. This
+  is the sort, not ARR and not flag count. A high-health customer with a single
+  flag therefore appears below a low-health customer, even if its ARR is larger.
+  Say the sort key when you present the list.
+
+  ## Output format
+
+  - `# Customer Risk Flags`
+  - Then, per flagged customer, in sort order:
+    - `## <Customer name> (ARR: $N,NNN)`
+    - `Health Score: N`
+    - one bullet per flag, in the evaluation order above
+  - If no customer has any flag: `# Risk Flags` followed by
+    `No customers currently flagged.`
+
+  ## Edge cases
+
+  - CRITICAL and WARNING are mutually exclusive; a critical account never also
+    shows the warning line.
+  - A customer can be flagged while its health score is high - training and
+    activation checks are independent of the health band.
+  - Flags carry no severity ranking among themselves and no owner. Do not rank
+    `Low training completion` above `Low user activation`, and do not assign a
+    remediation owner that is not in the data.
+  - ARR is shown for context only; it never changes whether a flag fires or
+    where a customer sorts.
+
+  ## Boundaries
+
+  - Recommendation only. Never say an account has been escalated, a save plan
+    opened, a CSM notified, or a health score overridden. State the exposure and
+    the recommended next step, and leave the action with the CSM.

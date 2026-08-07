@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: delivery-summary
+  description: Closes the proposal with the element-by-element status table and the four-factor win probability computed from fit, pricing, references, and competition.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: delivery-summary
+  description: Closes the proposal with the element-by-element status table and the four-factor win probability computed from fit, pricing, references, and competition.
+  ---
+  <!-- bic:source=blank -->
+  # Delivery summary and win probability
+
+  Use this skill when the user asks for the wrap-up, asks what our odds are,
+  asks for the win probability or how it was calculated, or asks how and when to
+  deliver the proposal.
+
+  ## Inputs
+
+  - The resolved RFP, the overall capability fit, the computed pricing, and the
+    top four scored references.
+
+  ## Procedure -- win probability, four factors
+
+  1. **Capability fit, 0-30:** `fit_pts = min(30, overall_fit * 0.3)`.
+     Meridian: `94.5 * 0.3 = 28.35`, displayed 28.3.
+  2. **Pricing strength, 0-25:** `20` if the proposed total is within the budget
+     ceiling, otherwise `10`; add `5` when `budget_headroom > 30,000`.
+     Meridian: within budget and $48,401 headroom, so 25.
+  3. **Reference strength, 0-20:** `min(20, count_of_references_in_RFP_industry * 7)`
+     counted across the whole reference database, not the selected four.
+     Meridian: 3 Healthcare references, `min(20, 21)` = 20.
+  4. **Competitive position, 0-25:** `max(5, 25 - competitors * 7)`, plus `5`
+     when every shortlisted competitor's implementation weeks exceed our 12;
+     displayed capped at 25. Meridian: `25 - 2*7 = 11`, +5 because CompetitorA
+     (20 weeks) and CompetitorB (16 weeks) are both slower, so 16.
+
+  Then `win_pct = min(95, max(15, int(fit + pricing + reference + competitive)))`.
+  Meridian: `28.35 + 25 + 20 + 16 = 89.35` -> **89%**.
+
+  ## Output format
+
+  - Headline `**Delivery Summary: <account> -- <project>**`
+  - A status table `| Element | Status |` with rows: Capability match (fit % and
+    requirement count), Executive summary (personalized to the stakeholder),
+    Solution (12-week implementation plan), Pricing (proposed total, blended
+    discount, blended margin), References (count, industry, contact-ready),
+    Compliance (first three certifications).
+  - `**Win Probability: N%**` then a factor table `| Factor | Score | Max |` with
+    capability fit / 30, pricing strength / 25, reference strength / 20,
+    competitive position / 25, and a bolded **Total** row against **100**.
+  - `**Session Accomplishments:**` five bullets covering requirement mapping,
+    personalization, competitive positioning against the shortlist count,
+    pricing optimization with the savings figure and protected margin, and
+    package assembly.
+  - `**Delivery Recommendation:**` submit within the RFP's decision window,
+    request a confirmation meeting within 48 hours, offer reference calls
+    proactively, CC the executive sponsor.
+  - Close with `Source: [All Proposal Systems]` and `Agents:
+    ProposalAssemblyAgent (orchestrating all agents)`.
+
+  ## Edge cases
+
+  - The win probability is clamped to the 15-95 band. It is never 100%, and it
+    is never adjusted by optimism, urgency, or a request to "make it look
+    better" -- show the four factors instead.
+  - The delivery recommendation is advice for the seller. Never say the proposal
+    was submitted, scheduled, or that reference calls were booked.
+  - "Margin protected" reports the computed blended margin. Meridian's 33.4% is
+    below the 35% floor and must be flagged, not described as protected.

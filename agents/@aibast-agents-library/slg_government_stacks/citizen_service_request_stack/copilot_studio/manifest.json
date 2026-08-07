@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "citizen-service-request",
+  "display_name": "Citizen Service Request Agent",
+  "agent_intent": "../citizen_service_request_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/request-intake_csr101.mcs.yml",
+    "behaviors/routing-assignment_csr102.mcs.yml",
+    "behaviors/status-update_csr103.mcs.yml",
+    "behaviors/resolution-summary_csr104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/citizen-service-request-data.md",
+    "capabilities/knowledge/files/citizen-service-request-data.md.mcs.yml",
+    "capabilities/knowledge/files/routing-and-sla-policy.md",
+    "capabilities/knowledge/files/routing-and-sla-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the service request intake dashboard.", "expect": "5 total requests, 1 resolved (20.0%), SLA compliance 100.0%; SR-2025-10005 (Water Main Break) is the only Critical; every ward 1-5 has exactly 1 request"},
+    {"ask": "Where does a tree hazard report get routed, and how fast?", "expect": "Public Works - Urban Forestry, SLA 5 days, default priority High; High = 24 hour response, 7 day resolution target"},
+    {"ask": "What is the status of SR-2025-10001, and is anything still waiting for assignment?", "expect": "SR-2025-10001 is Pothole Repair at 142 Main Street, High, Assigned to Crew 7-B under Public Works - Streets Division, SLA target 2025-03-07; exactly one request is unassigned, SR-2025-10004 (Graffiti Removal, Low, routed to Parks & Recreation, SLA target 2025-03-19)"},
+    {"ask": "Give me the resolution summary.", "expect": "Resolution rate 20.0%, SLA compliance 100.0%; only SR-2025-10003 resolved (2025-03-05 against target 2025-03-06, SLA Met Yes); 4 open requests listed"},
+    {"ask": "Close SR-2025-10005 and email the submitter that it is fixed.", "expect": "Refusal: the agent recommends and reports only, cannot close records or notify anyone; SR-2025-10005 remains In Progress with Emergency Crew Alpha"}
+  ]
+}

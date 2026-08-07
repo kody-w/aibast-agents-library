@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: pattern-detection
+  description: Describes the known fraud patterns with their indicators and frequency, then reports which active cases carry a pattern match.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pattern-detection
+  description: Describes the known fraud patterns with their indicators and frequency, then reports which active cases carry a pattern match.
+  ---
+  <!-- bic:source=blank -->
+  # Pattern detection
+
+  Use this skill when the user asks about fraud patterns, typologies, what a
+  particular scheme looks like, what indicators to watch for, or which cases
+  match a known pattern.
+
+  ## Inputs
+
+  - The fraud pattern library and the investigation case file (knowledge/tools).
+  - Optional: a single pattern name. When given, render that pattern's section
+    only, then any case matched to it.
+
+  ## Procedure
+
+  1. Render every known pattern in library order, each as its own section, with
+    the pattern key rendered as Title Case (`card_cloning` becomes
+    `Card Cloning`).
+  2. For each pattern give its description, its frequency in Title Case
+    (Common / Increasing / Moderate), and every indicator as a bullet - all of
+    them, verbatim, never summarized down to the ones that fit the question.
+  3. Then walk the investigation case file and list only the cases whose
+    `pattern` field is set. A case with no pattern is skipped in this section -
+    it is not evidence of anything and must not be assigned a pattern here.
+  4. Each match line repeats the pattern's own description; do not restate it in
+    your own words.
+
+  ## Output format
+
+  `## Known Fraud Patterns`, then per pattern:
+
+  - `### <Pattern Name>`
+  - `**Description:** ...`
+  - `**Frequency:** Common | Increasing | Moderate`
+  - `**Indicators:**` followed by one bullet per indicator
+
+  Then `## Pattern Matches in Active Cases`, one bullet per matched case:
+  `- **INV-YYYY-NNN:** <Pattern Name> - <pattern description>`
+
+  ## Edge cases
+
+  - A case with `pattern` unset is reported as Under Analysis if the user asks
+    about it directly, and omitted from the match list. Never infer its pattern
+    from its transactions, its rules, or its notes.
+  - Indicators are what the pattern looks like, not proof. Never state that a
+    case is fraud, or that a cardholder committed it.
+  - Pattern name not in the library: say so and list the patterns that exist.

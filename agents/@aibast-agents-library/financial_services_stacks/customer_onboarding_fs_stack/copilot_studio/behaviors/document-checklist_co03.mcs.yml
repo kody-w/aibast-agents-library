@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: document-checklist
+  description: Produces the KYC document checklist for an application, split into required and optional items by application type, with the standing compliance notes.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: document-checklist
+  description: Produces the KYC document checklist for an application, split into required and optional items by application type, with the standing compliance notes.
+  ---
+  <!-- bic:source=blank -->
+  # Document checklist
+
+  Use this skill when the user asks what documents an applicant must provide,
+  what is still outstanding for onboarding paperwork, or what a business
+  versus an individual account needs.
+
+  ## Inputs
+
+  - The customer application pipeline and the document requirements by
+    application type.
+  - Optional: an APP- id. Without one, default to APP-6001.
+
+  ## Procedure
+
+  ### Resolve the application type first
+
+  The checklist is driven entirely by the application's type. Look the APP- id
+  up, read its `application_type`, and emit that type's requirement list.
+  Never mix the two lists.
+
+  - `individual` - 5 items: 4 required (government-issued photo ID, Social
+    Security Number verification, proof of address, W-9 Tax Form) and 1
+    optional (source of funds documentation).
+  - `business` - 8 items: 6 required (Articles of Incorporation / Formation,
+    EIN verification letter, Certificate of Good Standing, Operating Agreement
+    / Bylaws, beneficial ownership declaration (FinCEN BOI), government ID for
+    all authorized signers) and 2 optional (business license, financial
+    statements for the last 2 years).
+
+  Every item is rendered at its recorded requirement level, marked
+  ` (Required)` or ` (Optional)`. Never promote an optional item to required,
+  never demote a required one, and never let an optional item substitute for a
+  missing required one.
+
+  ### Compliance notes - always appended, verbatim
+
+  - All documents must be current (within 90 days)
+  - Copies must be certified or notarized for business accounts
+  - BSA/AML requirements apply to all account openings
+  - CIP (Customer Identification Program) verification mandatory
+
+  ## Output format
+
+  - `# Document Checklist: APP-xxxx`
+  - `**Applicant:** <name>` and `**Type:** Individual | Business`
+  - `## Required Documents` - an unchecked task list, one line per item:
+    `- [ ] <document> (Required)` or `- [ ] <document> (Optional)`
+  - `## Compliance Notes` - the four bullets above.
+
+  ## Edge cases and boundaries
+
+  - An APP- id that is not on file gets an explicit "not on file" answer plus
+    the ids that are (APP-6001 through APP-6004). Never render another
+    applicant's checklist under the requested id - a business applicant given
+    the individual list is a compliance failure, not a near miss.
+  - The checklist states what is required, not what has been received. If the
+    user asks which documents are already in hand, say that receipt status is
+    not in this data and point at the KYC verification checks, which are.
+  - Recommendation only. You never mark an item satisfied, waive a
+    requirement, or request documents from the customer.

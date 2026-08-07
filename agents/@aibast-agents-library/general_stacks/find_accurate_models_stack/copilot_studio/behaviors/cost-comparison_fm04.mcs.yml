@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: cost-comparison
+  description: Compares pricing tiers and per-target infrastructure cost, and projects the monthly cost of 100K inferences.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: cost-comparison
+  description: Compares pricing tiers and per-target infrastructure cost, and projects the monthly cost of 100K inferences.
+  ---
+  <!-- bic:source=blank -->
+  # Cost comparison
+
+  Use this skill when the user asks what a model or a tier costs, asks which
+  hosting target is cheapest, asks about SLAs or support levels, or asks to
+  size a monthly bill.
+
+  ## Inputs
+
+  - The pricing tiers table and the deployment target requirements table.
+  - This skill compares tiers and targets. It does not take a model ID -
+    per-1K cost in this catalog is a property of the target, not the model.
+
+  ## Procedure
+
+  1. List the four pricing tiers in catalog order: development, standard,
+     professional, enterprise. Title-case the tier name for display.
+  2. Format `monthly_cost` with a thousands separator and a `$` prefix:
+     `$1,999/mo`. Format `inference_limit` with a thousands separator, except
+     that a limit of `-1` renders as `Unlimited`.
+  3. List the four infrastructure targets in order: cpu_inference,
+     gpu_inference, edge_deployment, serverless. Render
+     `cost_per_1k_inferences` to three decimals: `$0.020`, `$0.005`.
+  4. Where a target does not define `min_ram_gb` or `max_latency_ms`, render
+     the cell as `N/A GB` / `N/A ms`. serverless is the target with both
+     missing - never fill either in from another target.
+  5. Project the monthly cost of 100K inferences per target as
+     `monthly = cost_per_1k_inferences * 100`, rendered to two decimals.
+     100,000 inferences is 100 blocks of 1,000, so the multiplier is exactly
+     100. Show the multiplication if asked.
+
+  ## Output format
+
+  Headline: `**Cost Comparison**`. Then:
+
+  1. `**Pricing Tiers:**` and a table
+     `| Tier | Monthly Cost | Inference Limit | Support | SLA |`.
+  2. `**Infrastructure Cost per 1K Inferences:**` and a table
+     `| Target | Cost/1K | Min RAM | Max Latency |`.
+  3. `**Estimated Monthly Cost (100K inferences):**` and one bullet per
+     target: `- <target>: $N.NN/month`.
+
+  Close with `Source: [Pricing Engine + Cloud Cost Calculator]`.
+
+  ## Edge cases
+
+  - Current figures: Development $0/mo (10,000 inferences, Community, no
+    SLA), Standard $499/mo (500,000, Email 48h, 99.5%), Professional
+    $1,999/mo (5,000,000, Priority 4h, 99.9%), Enterprise $7,999/mo
+    (Unlimited, Dedicated 1h, 99.99%).
+  - At 100K inferences: edge_deployment $0.50, cpu_inference $2.00,
+    serverless $5.00, gpu_inference $15.00 per month. edge_deployment is the
+    cheapest per inference and gpu_inference the most expensive - but a
+    target is only usable if deployment-readiness passes it, so pair a cost
+    recommendation with the readiness verdict rather than recommending edge
+    on price alone.
+  - Infrastructure cost and tier subscription are separate line items. Never
+    add them into a single "total cost" figure the data does not state.
+  - Never change a tier, commit spend, or claim a quote has been requested.
+    Cost is a finding for the budget owner.

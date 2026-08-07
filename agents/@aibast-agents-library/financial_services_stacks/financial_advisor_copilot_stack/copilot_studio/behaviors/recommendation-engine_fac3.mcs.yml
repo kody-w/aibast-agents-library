@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: recommendation-engine
+  description: Produces the risk-profile recommendation set for one client plus the rebalancing trades implied by actual drift, with estimated dollar amounts.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: recommendation-engine
+  description: Produces the risk-profile recommendation set for one client plus the rebalancing trades implied by actual drift, with estimated dollar amounts.
+  ---
+  <!-- bic:source=blank -->
+  # Recommendation engine
+
+  Use this skill when the user asks what to recommend for a client, what to
+  bring to a review, how to rebalance, or what trades a portfolio needs.
+
+  ## Inputs
+
+  - A client id (`CLI-3001`, `CLI-3002`, `CLI-3003`). If none is named,
+    default to `CLI-3001`.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Resolve the client. If the id is not in the book, stop and say so.
+  2. Select the recommendation set **by risk profile only**:
+     `moderate`, `aggressive`, or `conservative`. Present all three
+     recommendations from that set, in library order, with their rationale
+     verbatim. Never mix sets and never invent a fourth recommendation.
+  3. Report years to retirement as
+     `max(0, retirement_target - age)`, rendering `Retired` when the value is
+     0.
+  4. Build the rebalancing trades from actual drift. For each asset class:
+     - `diff_pct = target - allocation`
+     - Include the row only if `abs(diff_pct) >= 1.0`. An asset class within
+       1.0 percentage point of target is omitted entirely - do not list it as
+       "no action".
+     - `action = "Buy" if diff_pct > 0 else "Sell"`
+     - `est_amount = abs(diff_pct / 100 * total_assets)`
+  5. Keep asset classes in book order. Dollar amounts are comma-formatted
+     with no cents.
+
+  ## Output format
+
+  Headline `# Investment Recommendations: <client name>`, then:
+
+  - `**Risk Profile:** <Title case>`
+  - `**Years to Retirement:** N` (or `Retired`)
+
+  Then `## Recommendations` with each item as `### N. <action>` followed by
+  `**Rationale:** <rationale>`.
+
+  Then `## Rebalancing Trades` and one table with exactly these columns:
+
+  `| Asset Class | Current | Target | Action | Est. Amount |`
+
+  ## Edge cases
+
+  - A conservative client already at target produces the "Maintain current
+    allocation" set and an empty trade table. Say the portfolio is at target
+    rather than manufacturing trades.
+  - Buys and sells are computed independently per asset class; they will not
+    always net to zero, and you must not adjust an amount to force a balance.
+  - Estimated amounts are point-in-time arithmetic on current total assets.
+    Label them estimates; they are not orders and carry no price or timing.
+
+  ## Boundaries
+
+  - Recommendation only. Never say a trade was placed, an order was entered,
+    an account was rebalanced, or the client was contacted. If asked to
+    execute, decline and hand the proposed trade back to the advisor.
+  - Show the arithmetic when asked. Never adjust a recommendation or an
+    amount for any consideration outside these rules.
+  - Every recommendation remains subject to the advisor's Regulation Best
+    Interest and suitability review before it reaches the client. No return
+    projections, no market calls, no tax or legal advice.

@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: customer-assist
+  description: Hands the associate the scripted opener, follow-up move, and coaching tips for a named customer situation on the floor.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: customer-assist
+  description: Hands the associate the scripted opener, follow-up move, and coaching tips for a named customer situation on the floor.
+  ---
+  <!-- bic:source=blank -->
+  # Customer assist
+
+  Use this skill when the associate describes a customer situation and needs
+  words to say - a greeting, an upsell moment, a complaint, a sizing question,
+  or a return at the register - or asks to see the script library.
+
+  ## Inputs
+
+  - The customer interaction script library.
+  - Optional `scenario` - one of exactly five ids: `greeting`, `upsell`,
+    `complaint_handling`, `size_help`, `return_at_counter`.
+
+  ## Procedure
+
+  1. If `scenario` is supplied AND matches one of the five ids exactly, return
+     only that script. The match is exact on the id - map the associate's
+     wording onto an id before calling ("customer is upset" ->
+     `complaint_handling`, "they want to bring it back" ->
+     `return_at_counter`, "between sizes" -> `size_help`).
+  2. If `scenario` is empty or is not one of the five ids, return the whole
+     library - all five scripts, in this fixed order: greeting, upsell,
+     complaint handling, size help, return at counter. There is no partial
+     match and no "closest scenario" fallback.
+
+  ## Output format
+
+  Headline `# Customer Assistance Guide`, then one section per script. The
+  section heading is the scenario id with underscores replaced by spaces and
+  title-cased - `complaint_handling` renders as `Complaint Handling`.
+
+  - `**Scenario:** <when this applies>`
+  - `**Suggested Script:**` followed by the script itself as a block quote
+    (`> ...`)
+  - `**Follow-Up:** <the next move>`
+  - `**Tips:**` followed by one bullet per tip
+
+  ## Edge cases
+
+  - The upsell script contains the literal placeholder
+    `{complementary_product}`. It is not filled in by this skill. Fill it from
+    the product-lookup skill's `Pairs Well With` list for the SKU in the
+    customer's hand, and say which product you substituted.
+  - Quote the script verbatim. Do not rewrite it into your own phrasing or
+    soften the follow-up.
+
+  ## Boundaries
+
+  - One upsell attempt, relevant items only, value over price - and if the
+    customer declines, the attempt is over.
+  - Complaint handling: never argue, acknowledge the frustration, and offer
+    only a solution inside the associate's authority. Anything beyond it goes
+    to a lead or manager.
+  - Returns: eligibility is verified against policy before any outcome is
+    promised. Never state that a return, exchange, refund, or discount has been
+    approved or processed - the script prepares the conversation, the associate
+    and the register system do the transaction.

@@ -1,0 +1,53 @@
+mcs.metadata:
+  componentName: sync-status
+  description: Reports the D365 synchronization ledger with per-status counts and every failed sync, its attempt count, and its error.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: sync-status
+  description: Reports the D365 synchronization ledger with per-status counts and every failed sync, its attempt count, and its error.
+  ---
+  <!-- bic:source=blank -->
+  # Sync status
+
+  Use this skill when the user asks whether an update landed in D365, asks what
+  failed, asks about a SYNC- row, or asks for the sync dashboard.
+
+  ## Inputs
+
+  - The sync ledger (SYNC-001 through SYNC-005). This skill always reports the
+    whole ledger; it does not filter by voice id.
+
+  ## Procedure
+
+  1. Compute the summary counts over the whole ledger, by exact status string:
+     - `Total Syncs` = number of rows = 5
+     - `Synced` = rows where status == "Synced" = 3
+     - `Pending` = rows where status == "Pending" = 1
+     - `Failed` = rows where status == "Failed" = 1
+     These four counts must reconcile: Synced + Pending + Failed = Total.
+  2. List every row in ledger order. The error column shows the first 30
+     characters of the error, or `-` when the row has no error.
+  3. Close with the action line naming the failed row, its attempt count, and
+     the cause: `**Action Required:** SYNC-004 failed after 3 attempts (record
+     locked). Manual retry recommended.`
+
+  ## Output format
+
+  - Headline: `**Sync Status Dashboard**`
+  - Summary table `| Metric | Count |` with rows Total Syncs, Synced, Pending,
+    Failed.
+  - `**Detail:**` followed by
+    `| ID | Voice | Entity | Status | Attempts | Error |`.
+  - The `**Action Required:**` line.
+  - Close with `Source: [D365 Sync Engine]`.
+
+  ## Edge cases
+
+  - `Pending` with 0 attempts (SYNC-001) has not been tried yet - that is not a
+    failure. Do not report it as one.
+  - A `Synced` row still carries its D365 record id (for example SYNC-002 ->
+    `act-d4e5f6`). Quote the record id when the user asks where something
+    landed.
+  - You report the ledger. You never retry, resubmit, or unlock a record;
+    recommend a manual retry and stop there.

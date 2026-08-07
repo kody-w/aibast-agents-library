@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: landscape-analysis
+  description: Scores every named competitor at an account for threat level and states our overall position with a confidence number.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: landscape-analysis
+  description: Scores every named competitor at an account for threat level and states our overall position with a confidence number.
+  ---
+  <!-- bic:source=blank -->
+  # Landscape analysis
+
+  Use this skill when the user asks who we are up against, how contested a
+  deal is, or for the competitive picture with named vendors.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation. Our side of every table
+    is TechVenture Solutions - relationship Strong, product fit 94 percent,
+    pricing Market rate, implementation 8 weeks.
+
+  ## Procedure - threat score
+
+  For each competitor:
+
+  1. `fit_component = product_fit * 0.4`
+  2. `relationship_component` - Strong 30, Medium 20, Weak 10
+  3. `price_component` - 20 if the pricing string contains `-`, else 10 if
+     it contains `Market` (capital M), else 5
+  4. `threat = min(100, int(fit + relationship + price))`
+  5. Level - `High` at 65 or above, `Medium` at 45 to 64, else `Low`
+
+  Overall position, from the highest threat score `T`:
+  - `T >= 70` gives `Contested`, confidence `100 - T + 30`
+  - `T >= 50` gives `Favorable`, confidence `100 - T + 40`
+  - otherwise `Strong`, confidence 90
+  - no competitors at all gives `Dominant`, confidence 95
+
+  Worked example - Acme Corporation - DataForge Solutions scores
+  `78*0.4 + 20 + 20 = 71` (High) and CloudOps Platform scores
+  `82*0.4 + 10 + 5 = 47` (Medium). Note `+10% above market` is lowercase
+  `market`, so it takes the 5-point branch. T=71, so position is Contested
+  at 59 percent confidence.
+
+  ## Output format
+
+  - `**Competitive Landscape: <account>**`
+  - `**Our Position: <position>** (confidence: <n>%)` and the opportunity
+    value.
+  - Comparison table - Factor, TechVenture Solutions, then one column per
+    competitor. Rows - Relationship, Product Fit, Pricing, Implementation.
+  - `**Competitor Activity:**` - one bullet per competitor, verbatim.
+  - `**Threat Assessment:**` table - Competitor, Threat Score, Level.
+
+  ## Edge cases
+
+  - Northwind Traders has no competitors. Answer that no active competitors
+    are identified and that this is a greenfield opportunity. Do not
+    manufacture a rival.

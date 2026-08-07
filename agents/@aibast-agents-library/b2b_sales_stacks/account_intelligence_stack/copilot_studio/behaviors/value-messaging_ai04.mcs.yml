@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: value-messaging
+  description: Builds stakeholder-specific talking points for decision makers, economic buyers, and champions only.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: value-messaging
+  description: Builds stakeholder-specific talking points for decision makers, economic buyers, and champions only.
+  ---
+  <!-- bic:source=blank -->
+  # Value messaging
+
+  Use this skill when the user asks what to say to a specific stakeholder,
+  or wants talking points drawn from the account roster.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure - eligibility gate first
+
+  1. A stakeholder gets talking points ONLY if their influence is one of
+     Decision Maker, Economic Buyer, or Champion. Influencers and
+     Gatekeepers are skipped, even when asked about directly.
+  2. Theme selection, evaluated in this order against the role string:
+     - role contains CTO, IT, or Engineering, theme is `Tech Vision`
+     - else role contains CFO or Finance, theme is `ROI`
+     - else influence is Champion, theme is `Internal Positioning`
+  3. ROI points use `savings = int(opportunity_value * 1.75)`. For Acme
+     Corporation that is `2,400,000 * 1.75 = 4,200,000`. The implementation
+     figure quoted is our fixed 8 weeks.
+  4. Tech Vision points reference `3 <industry> CTO references`, taking the
+     industry verbatim from the account record.
+
+  Worked example - Acme Corporation returns exactly three blocks - Sarah
+  Chen (CTO, Tech Vision), James Miller (VP Operations, Internal
+  Positioning), Lisa Park (CFO, ROI at 4,200,000 dollars over 3 years).
+  David Wong, Rachel Torres, Kevin Park, Maria Lopez, and Tom Bradley are
+  correctly absent.
+
+  ## Output format
+
+  - `**Meeting Talking Points:**`
+  - Per person - `**For <name> (<role> - <focus>):**` then the points as
+    quoted bullets.
+  - Close with `**Objection Handling:**` - the price line (TCO 23 percent
+    lower) and the risk line (47 similar companies, 94 percent success rate).
+
+  ## Edge cases
+
+  - If no eligible contact exists, answer exactly
+    `No decision-maker or champion contacts mapped yet.`
+  - These are draft talking points for the rep. Never send, schedule, or
+    claim to have delivered them.

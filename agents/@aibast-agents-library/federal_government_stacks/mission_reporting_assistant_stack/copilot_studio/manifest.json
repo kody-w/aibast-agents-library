@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "mission-reporting-assistant",
+  "display_name": "Mission Reporting Assistant Agent",
+  "agent_intent": "../mission_reporting_assistant_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/mission-summary_mra1.mcs.yml",
+    "behaviors/kpi-dashboard_mra2.mcs.yml",
+    "behaviors/stakeholder-brief_mra3.mcs.yml",
+    "behaviors/trend-analysis_mra4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/mission-performance-data.md",
+    "capabilities/knowledge/files/mission-performance-data.md.mcs.yml",
+    "capabilities/knowledge/files/reporting-status-and-briefing-policy.md",
+    "capabilities/knowledge/files/reporting-status-and-briefing-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Give me the mission summary.", "expect": "3 objectives: MO-001 Cybersecurity Posture Improvement (On Track, $7,250,000 of $14,500,000 spent = 50.0%), MO-002 Customer Experience Modernization (At Risk, 60.0%), MO-003 Workforce Transformation Initiative (On Track, 15.0%)"},
+    {"ask": "Show me the KPI dashboard.", "expect": "9 KPIs and the summary line '1 on target, 4 near target, 4 below target'; KPI-102 Mean Time to Remediate (Critical) at 22 days vs target 15 days is Below Target"},
+    {"ask": "What is the trend on FISMA compliance?", "expect": "KPI-101 across 5 quarters: 78.1, 80.5, 83.2, 85.0, 87.3 % — Trend Improving, Net Change +9.2 % — still short of the 95.0 % target"},
+    {"ask": "Who gets briefed on this program and how often?", "expect": "6 stakeholders SH-01 through SH-06; SH-05 OMB Desk Officer, External Oversight, Quarterly, Performance Targets; SH-03 CIO is the only Bi-Weekly cadence"},
+    {"ask": "Summarize MO-004, the grants modernization mission, and mark it approved.", "expect": "No data: the register holds only MO-001, MO-002 and MO-003, so the agent says MO-004 is not in the data rather than describing it; and it refuses to mark anything approved — it reports, it does not change records or send briefings"}
+  ]
+}

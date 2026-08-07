@@ -1,0 +1,61 @@
+mcs.metadata:
+  componentName: request-intake
+  description: Renders the 311 intake dashboard - queue counts, resolution rate, SLA compliance, and the breakdowns by category and by ward.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: request-intake
+  description: Renders the 311 intake dashboard - queue counts, resolution rate, SLA compliance, and the breakdowns by category and by ward.
+  ---
+  <!-- bic:source=blank -->
+  # Request intake
+
+  Use this skill when the user asks for the intake dashboard, the overall queue
+  picture, how many requests are open, the volume by category, or the volume by
+  ward.
+
+  ## Inputs
+
+  - The service request queue. No arguments are required; this view is never
+    filtered to a single request.
+
+  ## Procedure - compute it, do not estimate it
+
+  1. `total` = the number of requests in the queue.
+  2. `resolved` = the number of requests whose status is exactly `resolved`.
+     Assigned, in progress, and pending are NOT resolved.
+  3. `resolution_rate = round(resolved / total * 100, 1)`, expressed with one
+     decimal place. If `total` is 0, the rate is 0.
+  4. `on_time` = the number of resolved requests whose `resolved_date` is on or
+     before its `sla_target`. A resolved request with no resolved date counts as
+     NOT on time.
+  5. `sla_compliance = round(on_time / resolved * 100, 1)`, one decimal place.
+     If nothing is resolved, SLA compliance is 0 - never "n/a" and never blank.
+  6. Category counts: one line per distinct category, counting every request in
+     the queue including resolved ones.
+  7. Ward counts: one line per ward, sorted ascending by ward number.
+
+  Category and status labels are rendered in Title Case with underscores
+  replaced by spaces (`trash_collection_missed` becomes `Trash Collection
+  Missed`, `in_progress` becomes `In Progress`).
+
+  ## Output format
+
+  - `# Service Request Intake Dashboard`
+  - `**Total Requests:** N`
+  - `**Resolved:** N (R%)`
+  - `**SLA Compliance:** R%`
+  - `## Active Requests` - a table with exactly these columns, one row per
+    request in SR-id order:
+    `| SR ID | Category | Location | Priority | Status | Department |`
+  - `## Requests by Category` - a bullet per category: `- <Category>: N`
+  - `## Requests by Ward` - a bullet per ward ascending: `- Ward N: N`
+
+  ## Edge cases
+
+  - The Active Requests table lists the whole queue, resolved rows included;
+    do not silently drop resolved work from it.
+  - If asked for a filtered view (one ward, one department, one priority), say
+    the view is filtered and keep the headline counts consistent with the filter.
+  - Report only, never act. Do not claim to have opened, closed, or escalated
+    anything.

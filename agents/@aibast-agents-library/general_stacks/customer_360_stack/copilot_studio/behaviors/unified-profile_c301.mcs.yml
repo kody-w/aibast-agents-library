@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: unified-profile
+  description: Assembles the complete customer profile by merging CRM, support, billing, and product-usage records into one view.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: unified-profile
+  description: Assembles the complete customer profile by merging CRM, support, billing, and product-usage records into one view.
+  ---
+  <!-- bic:source=blank -->
+  # Unified profile
+
+  Use this skill when the user asks for a customer's profile, "the 360",
+  "everything we know about" an account, who owns an account, what an account
+  has bought, or how big an account is.
+
+  ## Inputs
+
+  - The account book and the interaction log.
+  - Optional: a CUST- id or a company name. Resolution is literal: the id is
+    matched inside the request text, otherwise the company name is matched as a
+    substring. If neither matches anything, the lookup falls back to CUST-3001 --
+    do not present that fallback as the requested customer. Say the account is
+    not in the data.
+
+  ## Procedure
+
+  1. Resolve the account to exactly one of CUST-3001, CUST-3002, CUST-3003.
+  2. Compute the health score with the health-score rule (see the health-score
+     skill) and report it as `<score>/100`.
+  3. Compute license utilization as
+     `employees_using / licenses_purchased * 100`, rendered with no decimals.
+  4. Report products as a count and a bulleted list, in the order stored on the
+     record.
+  5. Never merge fields across accounts and never carry a figure forward from a
+     previous answer.
+
+  ## Output format
+
+  - Headline: `**Customer 360: <name>**`
+  - A `| Field | Detail |` table with exactly these rows, in this order:
+    Segment, Industry, ARR (as `$nnn,nnn`), Health Score (`n/100`), Primary
+    Contact, Account Manager, CSM, Contract (`<start> to <end>`).
+  - `**Products (n):**` followed by one bullet per product.
+  - `**Usage:** <using>/<purchased> licenses active (n%)`
+  - `**Support:** n open tickets | CSAT n/5.0 | Avg resolution: n h`
+  - `**Billing:** <payment method> | <terms> | LTV: $nnn,nnn`
+  - Close with `Source: [CRM + Support + Billing + Product Usage]`.
+
+  ## Edge cases
+
+  - Utilization can exceed the raw seat ratio in the health score because
+    adoption is multiplied by 1.2 there; the profile's Usage line is the raw
+    ratio and the two are not the same number. Do not reconcile them.
+  - Outstanding balance is not on the profile table; if the user asks about
+    money owed, pull it from the billing record and cite it explicitly
+    (CUST-3002 is the only account with a non-zero balance).
+
+  ## Boundaries
+
+  - Read-only. Never claim to have updated a record, added licenses, or
+    contacted the customer.
+  - Do not summarize sentiment here -- that is the interaction-timeline skill.

@@ -1,0 +1,51 @@
+mcs.metadata:
+  componentName: weekly-review
+  description: Reports last week's activity metrics against targets, quota progress, and per-account action load.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: weekly-review
+  description: Reports last week's activity metrics against targets, quota progress, and per-account action load.
+  ---
+  <!-- bic:source=blank -->
+  # Weekly review
+
+  Use this skill when the user asks how last week went, for the weekly
+  numbers, or for quota and coverage status.
+
+  ## Inputs
+
+  - None. The review covers the week of 2025-03-10.
+
+  ## Procedure
+
+  1. Report the recorded metrics against their fixed targets - Actions
+     Completed 12/18 (target 90 percent plus), Completion Rate (target 85
+     percent plus), Selling Hours (target 60 percent plus), Emails Sent
+     (30 plus), Meetings Held (10 plus), Calls Made (20 plus), Deals
+     Advanced (3 plus), Deals Stalled (target 0), Pipeline Movement
+     (500K plus).
+  2. `selling_pct = hours_selling / (hours_selling + hours_admin +
+     hours_meetings) * 100`, that is `22 / (22 + 8 + 10) = 55` percent.
+  3. `quota_pct = ytd_closed / quota * 100`, that is
+     `3,200,000 / 8,000,000 = 40` percent.
+  4. `pipeline_coverage = pipeline_value / (quota - ytd_closed)`, that is
+     `7,800,000 / 4,800,000 = 1.6x`.
+  5. Account activity table sorted by deal value descending. An account's
+     deal value is taken from the first action recorded against it.
+
+  ## Output format
+
+  - `**Weekly Review: Michael Torres**` and `Week of 2025-03-10`.
+  - `**Performance Summary:**` table - Metric, Value, Target.
+  - `**Quota Progress:**` - YTD closed with percent of quota, pipeline with
+    coverage multiple.
+  - `**Account Activity:**` table - Account, Deal Value, Total Actions,
+    Pending.
+  - `**Recommendations:**` - the selling-time ratio gap, the stalled deal
+    (re-engage within 48 hours), and the highest-value account.
+
+  ## Edge cases
+
+  - A metric below target is stated as below target. Do not soften it.
+  - 1 deal stalled against a target of 0 is a miss, not a rounding issue.

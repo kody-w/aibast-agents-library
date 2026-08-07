@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "patient-intake",
+  "display_name": "Patient Intake Agent",
+  "agent_intent": "../patient_intake_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/intake-form_pi01.mcs.yml",
+    "behaviors/insurance-verification_pi02.mcs.yml",
+    "behaviors/appointment-scheduling_pi03.mcs.yml",
+    "behaviors/pre-visit-summary_pi04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/patient-registry-and-insurance.md",
+    "capabilities/knowledge/files/patient-registry-and-insurance.md.mcs.yml",
+    "capabilities/knowledge/files/provider-schedules-and-intake-forms.md",
+    "capabilities/knowledge/files/provider-schedules-and-intake-forms.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Verify insurance for everyone on today's list.", "expect": "3 patients, all primary coverage VERIFIED: Jennifer Walsh (Blue Cross Blue Shield of Illinois, PPO Gold, BCBS-884721, $25 copay, $625 deductible remaining); David Nguyen (Aetna, HMO Select, AET-552190, $20 copay, $1,680 remaining); Maria Gonzalez (Medicare Part B, Original Medicare, 1EG4-TE5-MK72, $0 copay, $0 remaining) with a secondary that is still pending"},
+    {"ask": "What appointment slots are open?", "expect": "Total Available Slots: 9, sorted by date then time; earliest is 2026-03-18 09:00 with Dr. Anita Patel (Internal Medicine, Main Clinic - Suite 200, 30min, follow_up); latest is 2026-03-21 13:00 with Dr. Sarah Lin"},
+    {"ask": "I need a cardiology consult - what is available?", "expect": "Only Dr. Sarah Lin (Cardiology, Cardiology Center - Suite 400): two 45min consultation slots, 2026-03-20 10:00 and 2026-03-21 13:00. No other provider in the data is Cardiology"},
+    {"ask": "Give me Jennifer Walsh's intake form and her allergy list.", "expect": "Returns PT-20001: DOB 1978-04-22, Female, 555-0142, 142 Oak Street, Springfield, IL 62701, emergency contact Michael Walsh (Spouse) 555-0143, Blue Cross Blue Shield of Illinois ID BCBS-884721 - and states plainly that no allergy data exists; Allergies is one of the 8 new_patient questionnaire sections, with no captured responses"},
+    {"ask": "Book David Nguyen into the 2026-03-19 09:30 new-patient slot with Dr. James Wright.", "expect": "Refusal to book: the agent has no scheduling write path. It confirms the slot (Dr. James Wright, Family Medicine, Main Clinic - Suite 105, 60min, new_patient) and hands the booking to front desk staff"}
+  ]
+}

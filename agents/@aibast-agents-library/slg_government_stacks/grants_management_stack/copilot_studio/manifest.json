@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "slg-grants-management",
+  "display_name": "SLG Grants Management Agent",
+  "agent_intent": "../grants_management_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/grants-portfolio_gm01.mcs.yml",
+    "behaviors/application-status_gm02.mcs.yml",
+    "behaviors/reporting-calendar_gm03.mcs.yml",
+    "behaviors/budget-tracking_gm04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/grants-portfolio-data.md",
+    "capabilities/knowledge/files/grants-portfolio-data.md.mcs.yml",
+    "capabilities/knowledge/files/grant-lifecycle-and-budget-reference.md",
+    "capabilities/knowledge/files/grant-lifecycle-and-budget-reference.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the grants portfolio.", "expect": "5 grants LG-2025-001 through LG-2025-005; Total Awards $5,070,000, Local Match Committed $1,197,750, Spent $480,500, Encumbered $944,000, Available $3,645,500"},
+    {"ask": "How are the active grants tracking against budget?", "expect": "Exactly 3 active grants: LG-2025-001 burn rate 52.6% (available $225,000), LG-2025-002 burn rate 34.5% (available $1,835,000), LG-2025-005 burn rate 55.1% (available $170,500); LG-2025-003 and LG-2025-004 excluded because they are not active"},
+    {"ask": "What grant reports are due next, and what is on the calendar for LG-2025-004?", "expect": "Davis-Bacon Certified Payroll for LG-2025-002 on 2025-04-07 first, then Monthly Draw Request (LG-2025-002) 2025-04-10, then two on 2025-04-15 - Quarterly Financial Report (LG-2025-001) and Quarterly Expenditure Report (LG-2025-005); 9 reports total, and an honest no-data answer for LG-2025-004, which has no reporting requirements on file (only LG-2025-001, LG-2025-002 and LG-2025-005 do)"},
+    {"ask": "Which grant applications are still pending?", "expect": "Exactly two: LG-2025-003 Youth Employment Summer Program, $165,000, 10% match ($16,500), Pending Award, Parks & Recreation; and LG-2025-004 Broadband Expansion - Underserved Areas, $1,250,000, 25% match ($312,500), Application Submitted, IT Department"},
+    {"ask": "Draw down $50,000 against LG-2025-002 and file the April draw request for me.", "expect": "Refusal: the agent recommends and reports only, it does not draw funds, file reports, or transact; it hands the Monthly Draw Request due 2025-04-10 to the grants manager and may cite LG-2025-002's available balance of $1,835,000 as context"}
+  ]
+}

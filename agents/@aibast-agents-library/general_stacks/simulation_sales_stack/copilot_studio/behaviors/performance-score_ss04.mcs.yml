@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: performance-score
+  description: Breaks a simulation score down skill by skill with percentages and an improvement plan aimed at the weakest skill.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: performance-score
+  description: Breaks a simulation score down skill by skill with percentages and an improvement plan aimed at the weakest skill.
+  ---
+  <!-- bic:source=blank -->
+  # Performance score
+
+  Use this skill when the user asks for a score breakdown, asks where a rep is
+  weak, asks what to work on next, or asks why a score came out where it did.
+
+  ## Inputs
+
+  - The observed points per skill from a completed simulation. Unobserved
+    skills default to `max_points x 0.7`; say when a default was used.
+  - This breakdown is scenario-independent - it reports the performance
+    record, not the scenario brief.
+
+  ## Procedure
+
+  1. Compute the overall score the same way `run-simulation` does:
+     sum of `points x weight / max_points x 100`, rounded.
+  2. For each skill compute `percentage = points / max_points x 100`, rounded
+     to a whole number. Report the percentage next to the raw `n/max`, never
+     instead of it.
+  3. Emit the full criteria text for each skill - untruncated here, unlike the
+     simulation results table.
+  4. The improvement plan targets the LOWEST percentage first. State that
+     skill's percentage in the bullet so the target is unambiguous.
+  5. Recommend the next simulation: retry at higher difficulty when the score
+     clears 70 (Deal Advanced); repeat at the same difficulty when it does not.
+
+  ## Worked reference (the stored sample performance)
+
+  | Skill | Score | Percentage |
+  |---|---|---|
+  | Opening | 8/10 | 80% |
+  | Discovery | 18/25 | 72% |
+  | Value Prop | 14/20 | 70% |
+  | Objection Handling | 16/20 | 80% |
+  | Closing | 11/15 | 73% |
+  | Professionalism | 9/10 | 90% |
+
+  Overall 76/100. Weakest skill: Value Prop at 70%, so the plan leads with
+  value proposition delivery. Strongest: Professionalism at 90%.
+
+  ## Output format
+
+  - `**Performance Score Detail**`
+  - `**Overall: N/100**`
+  - Table `| Skill | Score | Percentage | Criteria |` with the full criteria
+    text.
+  - `**Improvement Plan:**` - three bullets, the first naming the weakest
+    skill and its percentage.
+  - `**Next Simulation:**` - one line with the recommended difficulty.
+  - Close with `Source: [Simulation Engine + Scoring Algorithm]`.
+
+  ## Edge cases
+
+  - Two skills tied for lowest percentage: lead with the one carrying the
+    higher weight, because it moves the overall score more.
+  - No performance record supplied: say there is nothing to break down and ask
+    for the simulation to be run first. Do not report the sample as if it were
+    the user's result.
+
+  ## Boundaries
+
+  - Assessment only. Never claim the plan was assigned, scheduled, or sent to
+    a manager - the trainer acts on it.

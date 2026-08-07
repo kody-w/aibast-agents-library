@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: task-checklist
+  description: Renders the daily task checklist for the opening, midday, or closing shift with priorities, per-task minutes, the shift total, and the completion projection.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: task-checklist
+  description: Renders the daily task checklist for the opening, midday, or closing shift with priorities, per-task minutes, the shift total, and the completion projection.
+  ---
+  <!-- bic:source=blank -->
+  # Task checklist
+
+  Use this skill when the associate or lead asks what needs doing on a shift,
+  how long a shift's tasks take, what is critical before opening or before
+  locking up, or asks for the whole day's task plan.
+
+  ## Inputs
+
+  - The daily task lists.
+  - Optional `shift` - one of exactly three ids: `opening`, `midday`,
+    `closing`.
+
+  ## Procedure
+
+  1. If `shift` matches one of the three ids exactly, render only that shift.
+     Otherwise render all three, in order: opening, midday, closing.
+  2. Tasks are rendered in their stored running order and numbered from 1. Do
+     NOT re-sort by priority - the order is the order the shift runs in. The
+     closing shift, for example, ends on `Set alarm and lock all entrances`
+     even though it is CRITICAL.
+  3. Estimated time for a shift is the plain sum of every task's estimated
+     minutes: opening = 2 + 5 + 10 + 5 + 15 + 20 = 57 min; midday =
+     20 + 15 + 10 + 5 + 10 = 60 min; closing = 15 + 20 + 25 + 15 + 3 = 78 min.
+  4. Completion is computed, not observed:
+     `completion = round(count(tasks with priority CRITICAL or HIGH) / count(all tasks) * 100, 1)`
+     It assumes every CRITICAL and HIGH task is done and every MEDIUM task is
+     not. Opening = 5/6 = 83.3%. Midday = 4/5 = 80.0%. Closing = 4/5 = 80.0%.
+     Always render one decimal place.
+  5. Priority renders in upper case: CRITICAL, HIGH, MEDIUM. There are only
+     these three levels in the task data.
+
+  ## Output format
+
+  Headline `# Daily Task Checklist`, then per shift:
+
+  - `## <Shift> Shift` (title-cased id)
+  - `**Estimated Time:** <n> min | **Completion:** <n.n>%`
+  - a table with exactly these columns: `# | Task | Priority | Est. Time`, one
+    row per task, time rendered as `<n> min`
+
+  ## Edge cases
+
+  - An unrecognised shift name (a date, a person, `evening`) falls through to
+    all three shifts. Say the shift was not recognised and that you are showing
+    all three, rather than presenting it as the requested shift.
+  - Quoting the completion figure without its caveat is wrong every time - it
+    is a projection from priority, not a live task feed.
+
+  ## Boundaries
+
+  - Reporting only. Never say a task has been marked complete, assigned,
+    reassigned, or scheduled - the checklist informs, the lead runs the shift.
+  - Never add, drop, reword, or re-prioritise a task, and never estimate
+    minutes for a task that is not in the list.

@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: link-validation
+  description: Validates every document link for reachability and permission, counting valid versus restricted and alerting on the restricted document.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: link-validation
+  description: Validates every document link for reachability and permission, counting valid versus restricted and alerting on the restricted document.
+  ---
+  <!-- bic:source=blank -->
+  # Link validation
+
+  Use this skill when the user asks whether a link works, asks who can open a
+  document, or asks before sending collateral to a customer.
+
+  ## Inputs
+
+  - The link validation ledger. This skill always checks **every** document in
+    the ledger; the search query does not filter it.
+
+  ## Procedure
+
+  1. Compute the summary from the whole ledger:
+     - `Total Links` = number of ledger rows.
+     - `Valid` = rows where `accessible` is true.
+     - `Invalid/Restricted` = Total minus Valid.
+  2. List every row with its document title (first 30 characters), status
+     string, HTTP code, an accessibility verdict of `Pass` when accessible and
+     `Fail` when not, and the permission scope.
+  3. Read `accessible` as the verdict, not the status word. HTTP 200 with
+     `accessible` true is Pass; HTTP 403 is Fail regardless of how the status
+     reads.
+  4. Close with the alert line naming the restricted document, its permission
+     scope, and the remedy: `DOC-006 (MSA Template) is restricted to Legal Team
+     Only - request access if needed`.
+
+  ## Output format
+
+  - Headline: `**Link Validation Report**`
+  - Summary table `| Metric | Value |` with Total Links, Valid,
+    Invalid/Restricted.
+  - `**Validation Results:**` table
+    `| ID | Document | Status | HTTP | Accessible | Permissions |`.
+  - `**Alerts:**` with one `- ` line per restricted document.
+  - Close with `Source: [SharePoint Link Validator]`.
+
+  ## Boundaries
+
+  - Permission scopes are not equal. `Organization` is safe internally;
+    `Sales Team` and `Legal Team Only` are narrower. Say the scope before
+    recommending a send, and never assume a customer can open an
+    `Organization`-scoped link - that scope is internal.
+  - A `Fail` row is escalated, never worked around. Recommend requesting access
+    through the owning team; do not offer an alternate URL, a copy, or a summary
+    of the restricted contents.
+  - Every row carries `last_checked`. A validation result is a point in time -
+    quote the timestamp when it matters.

@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: guideline-check
+  description: Tests every application against the underwriting guidelines for its line of business and reports compliance or the exact violations found.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: guideline-check
+  description: Tests every application against the underwriting guidelines for its line of business and reports compliance or the exact violations found.
+  ---
+  <!-- bic:source=blank -->
+  # Guideline check
+
+  Use this skill when the user asks whether an application is within
+  guidelines, asks what the guidelines are for a line of business, asks which
+  submissions have violations, or asks what documents or inspections are
+  required.
+
+  ## Inputs
+
+  - The application file and the underwriting guidelines keyed by line of
+    business.
+  - Optional: a single UW- id or a line of business to scope the check.
+    Otherwise check every application.
+
+  ## Procedure - run exactly these tests, in this order
+
+  For every application, load the guidelines for its `line_of_business`, then:
+
+  1. **Coverage ceiling (all lines).** If
+     `coverage_requested > max_coverage`, record the violation
+     `Coverage $X exceeds max $Y`. Maximums: commercial property $25,000,000;
+     personal auto $1,000,000; professional liability $10,000,000; general
+     liability $5,000,000.
+  2. **Professional liability only.**
+     - If the application's `specialty` is in `high_risk_specialties`
+       (neurosurgery, orthopedic surgery, obstetrics), record
+       `High-risk specialty: <Title Case Specialty>`.
+     - If `len(claims_history) > max_claims_5yr` (max 3), record
+       `Claims count N exceeds 5-year max of 3`.
+  3. **Personal auto only.** If
+     `driving_record.violations > max_violations_3yr` (max 3), record
+     `Violation count exceeds guideline`.
+
+  No other test is run. Protection class minimums, maximum building age,
+  maximum loss ratio, minimum driver age, minimum credit score, minimum years
+  in practice, minimum years in business, and whether required documents or
+  inspections were actually collected are published for the underwriter but
+  are **not evaluated here**. Never report them as passed.
+
+  Status is `Compliant` when the violation list is empty and
+  `Exceptions Noted` when it is not.
+
+  ## Output format
+
+  - Heading: `# Underwriting Guideline Check`
+  - One section per application:
+    `## <UW- id>: <Applicant> - <Compliant | Exceptions Noted>`
+  - Under each section, bulleted: **LOB**, **Max Coverage**, then
+    **Required Documents** (comma separated) when the line of business defines
+    them, and **Required Inspections** when it defines those instead.
+    Commercial property publishes inspections; personal auto, professional
+    liability, and general liability publish documents.
+  - When violations exist, a bolded `**Violations:**` block with one bullet
+    per violation, quoted exactly as generated.
+
+  ## Edge cases
+
+  - A line of business with no guidelines on file has no ceiling to test -
+    say the guidelines are missing rather than treating it as compliant.
+  - `Compliant` means "passed the tests above", not "clear to bind". Never
+    extend it into an approval.
+  - Violations are findings for the underwriter. Never waive one, net one
+    against a strength, or describe one as acceptable.

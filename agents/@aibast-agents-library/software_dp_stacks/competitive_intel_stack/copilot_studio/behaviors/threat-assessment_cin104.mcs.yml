@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: threat-assessment
+  description: Ranks tracked competitors by growth rate and reports each one's threat level, share, high-impact roadmap count, and full roadmap.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: threat-assessment
+  description: Ranks tracked competitors by growth rate and reports each one's threat level, share, high-impact roadmap count, and full roadmap.
+  ---
+  <!-- bic:source=blank -->
+  # Threat assessment
+
+  Use this skill when the user asks who the biggest threat is, who is coming
+  after us, what a competitor is shipping next, which roadmaps matter, or for a
+  competitive risk read.
+
+  ## Inputs
+
+  - The tracked competitor set with their threat levels, market shares and
+    growth rates, plus the per-competitor product roadmap.
+  - No filter input is honored: all three competitors are assessed every time.
+
+  ## Procedure - two orderings, both reported as computed
+
+  1. For each competitor, count roadmap items where `impact == "high"`.
+     Computed: DataFlow AI 2 (Enterprise SSO integration, On-prem deployment
+     option), NeuralStack 1 (Real-time inference API), Quantum ML 2 (SOC2
+     certification, Managed cloud offering).
+  2. Sort the assessments by `growth_rate_pct` descending. Result order:
+     Quantum ML 55.8, DataFlow AI 41.2, NeuralStack 28.5. This is the section
+     order in the output - never reorder it by threat level or share.
+  3. The headline `Highest Overall Threat` is the fixed designation
+     `DataFlow AI`. It is not derived from the sort. Quantum ML appears first
+     because it grows fastest, while DataFlow AI carries the designation on
+     share (24.3%) and threat level (`high`). Explain that tension when asked
+     rather than silently resolving it either way.
+  4. Level label renders `HIGH` when `threat_level == "high"`, otherwise
+     `MEDIUM`. DataFlow AI is HIGH; NeuralStack and Quantum ML are MEDIUM.
+     Note that the threat assessment prints `MEDIUM` where the market landscape
+     prints `MED` for the same value.
+  5. Roadmap items are listed in their recorded order, not sorted by quarter or
+     impact, and every item is shown - medium-impact items included.
+
+  ## Output format
+
+  - `# Threat Assessment`
+  - `**Highest Overall Threat:** DataFlow AI`
+  - For each competitor in growth-descending order:
+    - `## <name> [HIGH|MEDIUM]`
+    - `- Market Share: N%`
+    - `- Growth Rate: N%`
+    - `- High-Impact Roadmap Items: N`
+    - `**Roadmap:**` followed by one bullet per item formatted
+      `- [<quarter>] <initiative> (impact: <impact>)`
+
+  ## Edge cases
+
+  - Quantum ML leads the ordering at 55.8% growth from the smallest share
+    (11.2%), and both of its high-impact items - SOC2 certification (Q2 2026)
+    and Managed cloud offering (Q3 2026) - close gaps where we currently hold an
+    advantage. Flag that as the fastest-closing threat without overriding the
+    DataFlow AI headline.
+  - DataFlow AI's On-prem deployment option (Q3 2026) would erase another of our
+    differentiators; it currently answers NO on On-Prem Deployment.
+  - No competitor has FedRAMP on their roadmap, so that advantage is not
+    contested by any tracked item.
+  - Assessment only. Never say a counter-move has been launched, a battlecard
+    published, or a team briefed - the response is a human decision.

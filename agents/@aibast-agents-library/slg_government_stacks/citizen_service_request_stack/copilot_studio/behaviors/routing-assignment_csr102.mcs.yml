@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: routing-assignment
+  description: Routes a request category to its owning department with the SLA in days and default priority, and lists every request still awaiting assignment.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: routing-assignment
+  description: Routes a request category to its owning department with the SLA in days and default priority, and lists every request still awaiting assignment.
+  ---
+  <!-- bic:source=blank -->
+  # Routing assignment
+
+  Use this skill when the user asks which department owns a category, how long
+  a category has to be resolved, what priority a new report should carry, what
+  the response standards are, or what is still waiting to be assigned.
+
+  ## Inputs
+
+  - The category routing table and the priority SLA standards.
+  - Optional: a single category name. Otherwise present the full routing table.
+
+  ## Procedure - the routing rules are fixed
+
+  1. Look the category up in the routing table. Each entry carries exactly three
+     facts: owning department, `sla_days`, and `priority_default`. Report all
+     three together; never quote a department without its SLA.
+  2. The ten routed categories are: pothole repair, streetlight outage, trash
+     collection missed, graffiti removal, water main break, sidewalk damage,
+     noise complaint, abandoned vehicle, tree hazard, illegal dumping. If the
+     asked-for category is not one of these, say it is not in the routing table
+     and recommend manual routing. Do not infer a department from a similar
+     category.
+  3. Response standards come from the priority, not the category:
+     critical = 4 hour response / 1 day resolution;
+     high = 24 hours / 7 days; medium = 48 hours / 14 days;
+     low = 72 hours / 21 days.
+     The category `sla_days` is the operational target for that work type and
+     may differ from the priority resolution target - quote the category value
+     when routing a specific report.
+  4. Pending assignment = every request whose assigned crew is empty. For each,
+     print the SR- id, its category, and the department its category routes to.
+     If the category has no routing entry, the destination is `TBD`.
+  5. If no request is unassigned, state `All requests currently assigned.`
+     rather than omitting the section.
+
+  ## Output format
+
+  - `# Service Request Routing Guide`
+  - `## Category Routing Table` - table with exactly these columns:
+    `| Category | Department | SLA (days) | Default Priority |`
+  - `## SLA Response Standards` - table with exactly these columns:
+    `| Priority | Response Time | Resolution Target |`, one row per priority
+    from critical down to low.
+  - `## Pending Assignment` - a bullet per unassigned request:
+    `- **SR-id:** <Category> -> <Department>`
+
+  ## Edge cases
+
+  - Two categories can share a department (trash collection missed and illegal
+    dumping both route to Sanitation Services; pothole repair and sidewalk
+    damage both route to Public Works Streets Division) with different SLAs -
+    keep the SLA attached to the category, not the department.
+  - Routing a request to a department is not assigning it to a crew. Never
+    report a routed request as assigned.
+  - Recommend only. Never say a request has been routed, dispatched, or handed
+    to a department by you.

@@ -1,0 +1,84 @@
+mcs.metadata:
+  componentName: shift-planning
+  description: Builds the shift production plan - output by line and shift with the night-shift efficiency factor, operator allocation, and weekly capacity at 5, 6, and 7 operating days.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: shift-planning
+  description: Builds the shift production plan - output by line and shift with the night-shift efficiency factor, operator allocation, and weekly capacity at 5, 6, and 7 operating days.
+  ---
+  <!-- bic:source=blank -->
+  # Shift planning
+
+  Use this skill when the user asks about shifts, asks how much a line makes per
+  shift or per day, asks about operator headcount or shift premium, or asks what
+  a week of production looks like at five, six, or seven days.
+
+  ## Inputs
+
+  - The shift schedule: name, start, end, hours, operators, premium multiplier.
+  - The production line metrics (actual output per hour).
+  - Optional: a single LINE- id or a single shift name. Otherwise report all.
+
+  ## Procedure
+
+  1. Shifts are fixed: Day 06:00-14:00, Swing 14:00-22:00, Night 22:00-06:00.
+     Each is 8 hours. Operators are 24 / 22 / 18. Premium is 1.0x on Day and
+     Swing, 1.15x on Night.
+  2. Per line:
+     - `day_output = actual_output_per_hour * 8`
+     - `swing_output = actual_output_per_hour * 8`
+     - `night_output = round(actual_output_per_hour * 8 * 0.9)` -- the night shift
+       is planned at 90% efficiency. Apply the 0.9 factor to the night shift only,
+       never to Day or Swing.
+     - `daily_total = day_output + swing_output + night_output`
+  3. Operator allocation:
+     - `total_operators = 24 + 22 + 18 = 64`
+     - `lines_running = 3`
+     - `avg_operators_per_line_per_shift = round(64 / 3 / 3, 1)`
+  4. Weekly capacity uses the flat daily output (`actual_output_per_hour * 24`,
+     no night factor) multiplied by 5, 6, and 7.
+
+  ## Output format
+
+  Headline `## Shift Production Plan`, then four blocks.
+
+  `### Shift Schedule` with columns, exactly:
+  `| Shift | Hours | Operators | Premium | Start | End |`
+  Premium renders as `1.0x` / `1.15x`.
+
+  `### Planned Output by Line and Shift` with columns, exactly:
+  `| Line | Day Shift | Swing Shift | Night Shift | Daily Total |`
+  Line names are truncated to their first 28 characters; all figures use
+  thousands separators.
+
+  `### Operator Allocation` as three bold-value bullets: total operators across
+  shifts, lines running, average operators per line per shift.
+
+  `### Weekly Capacity Summary` with columns, exactly:
+  `| Line | Weekly Output (5 days) | Weekly Output (6 days) | Weekly Output (7 days) |`
+
+  ## Edge cases the plan handles
+
+  - Two daily totals exist and they differ. The shift plan's daily total applies
+    the 0.9 night factor; the efficiency report's daily output does not. The
+    weekly capacity table in this same plan uses the flat figure, so the weekly
+    numbers are not five times the daily total shown above them. When a user
+    notices, name which figure they are reading rather than reconciling them
+    silently, and never average the two.
+  - The night premium (1.15x) is a labor cost multiplier. It does not change
+    output, and output is separately reduced by the 0.9 factor -- a night hour
+    costs more and yields less. State both when asked whether to add night hours.
+  - Operator allocation is a plant-wide average, not a per-line staffing model.
+    The data does not say which operators are on which line; if asked, say so.
+  - Six- and seven-day weeks are capacity arithmetic only. The data contains no
+    maintenance windows, no overtime rules, and no labor agreements, so do not
+    present a 7-day week as sustainable.
+
+  ## Boundaries
+
+  - Planning only. Never state that a shift has been scheduled, staffed,
+    extended, cancelled, or that anyone has been told. The plan goes to a
+    supervisor.
+  - Only three shifts and three lines exist. A fourth shift, weekend crew, or
+    another line is not in the data.

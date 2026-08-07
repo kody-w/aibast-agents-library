@@ -1,0 +1,78 @@
+mcs.metadata:
+  componentName: vendor-evaluation
+  description: Computes the weighted composite score for vendor proposals from the published evaluation criteria and ranks them, or profiles a single proposal by ID.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: vendor-evaluation
+  description: Computes the weighted composite score for vendor proposals from the published evaluation criteria and ranks them, or profiles a single proposal by ID.
+  ---
+  <!-- bic:source=blank -->
+  # Vendor evaluation
+
+  Use this skill when the user asks who should win, asks to rank or compare
+  proposals, asks for a single vendor's score or profile, or asks why one
+  proposal outscored another.
+
+  ## Inputs
+
+  - The vendor proposal set and the evaluation criteria weights.
+  - Optional: a single VP- proposal ID. With an ID, produce the single-proposal
+    profile. Without one, produce the ranked summary of every proposal.
+
+  ## Procedure - the scoring rule, computed exactly
+
+  For each proposal, derive five criterion scores:
+
+  1. `technical = technical_score` (as recorded, 0-100).
+  2. `past_performance` from the fixed rating map:
+     Highly Satisfactory = 95, Satisfactory = 80, Neutral = 60,
+     Unsatisfactory = 30. Any rating outside this map = 50.
+  3. `cost_efficiency = max(0, 100 - (proposal_amount / 100000))`
+     A $3,980,000 proposal yields `100 - 39.8 = 60.2`. A proposal above
+     $10,000,000 floors at 0; it never goes negative.
+  4. `management = min(100, technical_score * 0.9)`
+  5. `small_business = 90 if the vendor is a small business, else 60`
+
+  Then apply the published weights:
+
+  `score = (technical*35 + past_performance*25 + cost_efficiency*20 + management*10 + small_business*10) / 100`
+
+  Round to 2 decimals. Weights sum to 100, so the score is on a 0-100 scale.
+
+  Rank descending by score. The recommendation is the top-scoring proposal.
+
+  Nothing else moves the score. CAGE code, NAICS code, CMMC level, and delivery
+  days are recorded facts reported alongside the score; they carry weight 0.
+
+  ## Output format - ranked summary (no ID given)
+
+  - `# Vendor Evaluation Summary`
+  - Table with exactly these columns:
+    `| Proposal | Vendor | Amount | Technical | PP Rating | Weighted Score |`
+    sorted highest score first. Amount renders as dollars with thousands
+    separators and no cents.
+  - `**Recommendation:** <vendor> (highest weighted score: <score>)`
+
+  ## Output format - single proposal (ID given)
+
+  - `# Vendor Evaluation: <vendor>`
+  - Bulleted facts in this order: Proposal ID, CAGE Code, NAICS, Proposal
+    Amount, Technical Score (as `N/100`), Past Performance, Small Business
+    (Yes/No), CMMC Level, Delivery (`N days`).
+  - `**Weighted Composite Score:** <score>`
+
+  ## Edge cases
+
+  - An unrecognized proposal ID does not produce an error and must not produce
+    an invented vendor. State plainly that the ID is not in the proposal set,
+    name the IDs that are, and fall back to the ranked summary.
+  - When asked why one proposal beat another, show the five criterion values
+    and the weighted arithmetic for both. Never explain a ranking with judgment
+    language when the arithmetic is available.
+  - Small business status changes the small-business-plan criterion only
+    (90 vs 60, weight 10). It is not a set-aside determination and does not by
+    itself make a proposal eligible or ineligible.
+  - Evaluation only. Never say a proposal has been selected, awarded,
+    debriefed, or eliminated. Source selection authority rests with the
+    contracting officer.

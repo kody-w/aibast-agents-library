@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: quarterly-forecast
+  description: Builds the weighted quarterly forecast with seasonal adjustment, quota attainment, category breakdown and the deal-level weighted table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: quarterly-forecast
+  description: Builds the weighted quarterly forecast with seasonal adjustment, quota attainment, category breakdown and the deal-level weighted table.
+  ---
+  <!-- bic:source=blank -->
+  # Quarterly revenue forecast
+
+  Use this skill when the user asks for the forecast, the number, quota
+  attainment, or the weighted pipeline for the quarter.
+
+  ## Inputs
+
+  - The 10 forecast deals with probability, category, close date and any
+    forecast override, plus the quota and seasonal adjustment settings.
+
+  ## Procedure
+
+  1. Weighted forecast = `sum(deal_value x probability)` across all 10 deals.
+  2. Seasonal adjustment applies the recorded Q1 factor of 0.92x -
+     `adjusted = round(weighted x 0.92)`.
+  3. Forecast attainment = `round(weighted / quota x 100, 1)` against the
+     $5,200,000 Q1 2026 quota. Attainment uses the WEIGHTED figure, not the
+     seasonally adjusted one.
+  4. Category breakdown sums FULL deal value by category - commit, best_case,
+     upside, pipeline. These are raw values, not weighted.
+  5. The deal table is sorted by value descending and shows the weighted value
+     per deal as `round(value x probability)` plus the recorded forecast
+     override, or `-` when there is none.
+
+  ## Output format
+
+  Headline `**Q1 2026 Revenue Forecast**` and a metric table with exactly these
+  columns.
+
+  | Metric | Value |
+
+  Rows in this order - Total Pipeline, Weighted Forecast, Seasonal Adjustment
+  (0.92x), Quota, then a bold `**Forecast Attainment**` row. Then
+  `**Category Breakdown:**` bullets, then a deal table with exactly these
+  columns.
+
+  | Deal | Value | Stage | Prob | Weighted | Category | Override |
+
+  Close with `Source: [CRM Pipeline + Forecast Submissions]`.
+
+  ## Edge cases
+
+  - An override is a rep's submitted number and never replaces the weighted
+    calculation; show both.
+  - The forecast set is 10 deals and does not match the 43 active
+    opportunities. Never present the forecast pipeline as the whole pipeline.
+  - If asked to move a deal's category or probability, say what the forecast
+    would become and that the record itself is unchanged.

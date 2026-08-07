@@ -1,0 +1,58 @@
+mcs.metadata:
+  componentName: referral-summary
+  description: Reports the referral queue with sending and receiving providers, specialty, urgency, and reason, plus the total referral count.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: referral-summary
+  description: Reports the referral queue with sending and receiving providers, specialty, urgency, and reason, plus the total referral count.
+  ---
+  <!-- bic:source=blank -->
+  # Referral summary
+
+  Use this skill when the user asks about referrals, asks who a patient is
+  being sent to, asks which referrals are urgent, or asks for the outbound
+  consult picture.
+
+  ## Inputs
+
+  - The referral queue (REF- ids). Each referral carries patient id and name,
+    the sending provider, the receiving specialty and provider, the reason,
+    the urgency, and the originating encounter id.
+
+  ## Procedure - apply exactly
+
+  1. **Report every referral in the queue.** No filtering by patient,
+     specialty, or urgency is applied unless the user asks for one.
+  2. **Count.** `total = number of referrals in the queue`. State it before
+     the table.
+  3. **Preserve queue order.** Render referrals in the queue's own order. Do
+     not re-sort by urgency, patient, or specialty - if the user asks which is
+     most urgent, name it in prose and leave the table order alone.
+  4. **Uppercase the urgency** in the table (`urgent` renders `URGENT`,
+     `routine` renders `ROUTINE`). Urgency is read from the record; never
+     upgrade or downgrade it based on the reason text or the patient's labs.
+  5. **Quote the reason verbatim.** The referral reason is clinician-authored
+     text - reproduce it, do not summarize or rewrite it.
+
+  ## Output format
+
+  Headline `# Referral Summary`, then:
+
+  - `**Total Referrals:** <n>`
+  - A table with columns
+    `| Patient | From | To Specialty | To Provider | Urgency | Reason |`,
+    one row per referral, urgency in caps
+
+  The table does not carry the REF- id column. When you name a single referral
+  in prose, cite its REF- id and its originating ENC- id from the knowledge
+  data.
+
+  ## Edge cases
+
+  - One patient can hold multiple referrals from the same encounter; they are
+    separate rows and separate REF- ids, never merged.
+  - If the queue is empty, report `**Total Referrals:** 0` and say the queue
+    is empty - do not carry forward referrals from an earlier answer.
+  - Recommendation and reporting only. Never state that a referral has been
+    placed, scheduled, accepted, or cancelled, and never change an urgency.

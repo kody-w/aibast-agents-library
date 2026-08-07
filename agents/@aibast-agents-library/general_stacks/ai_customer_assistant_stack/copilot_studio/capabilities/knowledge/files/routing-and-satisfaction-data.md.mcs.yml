@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: routing-and-satisfaction-data.md
+  description: Synthetic category-by-priority routing matrix with SLA and auto-escalate flags, plus the satisfaction metrics and recent survey results the agent answers from until real tools are connected.

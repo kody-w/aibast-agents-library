@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: pricing-analysis
+  description: Computes our price gap against every competitor at the starter, professional, and enterprise tiers, plus the average gap across the set.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pricing-analysis
+  description: Computes our price gap against every competitor at the starter, professional, and enterprise tiers, plus the average gap across the set.
+  ---
+  <!-- bic:source=blank -->
+  # Pricing analysis
+
+  Use this skill when the user asks how our pricing compares, whether we are
+  overpriced, where the discount pressure is, what a competitor charges, or for
+  a tier-by-tier price gap.
+
+  ## Inputs
+
+  - Our three pricing tiers and each tracked competitor's three pricing tiers.
+  - No filter input is honored: all three tiers against all three competitors,
+    nine rows, every time.
+
+  ## Procedure - compute the arithmetic, do not estimate it
+
+  1. Iterate tiers in this exact order: `starter`, `professional`,
+     `enterprise`. Within each tier, iterate competitors in registry order -
+     COMP-001 DataFlow AI, COMP-002 NeuralStack, COMP-003 Quantum ML.
+  2. For each pair:
+     `gap_pct = round(((our_price - their_price) / their_price) * 100, 1)`.
+  3. Divide-by-zero guard: if `their_price == 0`, `gap_pct = 0`. This fires only
+     on Quantum ML's free starter tier and is reported as `+0.0%`. It is NOT
+     price parity - it means the comparison is undefined against a free tier.
+     Say so whenever that row is discussed.
+  4. `average_gap_pct = round(sum of the nine gap values / 9, 1)`. Computed:
+     `(50.1 + 15.4 + 0.0 + 16.7 + 6.1 + 75.0 + 40.0 + 16.7 + 75.0) / 9 = 32.8`.
+     The +0.0% guard row is included in that mean, which pulls the average down;
+     state that if the user leans on the average.
+  5. The three recommendations below the table are fixed guidance, not derived
+     per run. Reproduce them verbatim; never invent a fourth.
+
+  ## Output format
+
+  - `# Pricing Analysis`
+  - `**Average Price Gap:** 32.8% above competitors`
+  - Table with columns exactly: `Tier | Competitor | Our Price | Their Price |
+    Gap`. Tier is title-cased (Starter, Professional, Enterprise), prices are
+    `$N,NNN/mo` with a thousands separator, Gap is signed with one decimal.
+  - `## Recommendations` with exactly these three bullets:
+    - Consider matching enterprise tier pricing to defend large accounts.
+    - Evaluate a free/community tier to compete with open-core entrants.
+    - Emphasize compliance value to justify premium in regulated verticals.
+
+  ## Edge cases
+
+  - We are priced above every competitor at every tier: starter $1,499,
+    professional $3,499, enterprise $6,999.
+  - The widest gaps are both against Quantum ML at +75.0% (professional
+    $3,499 vs $1,999 and enterprise $6,999 vs $3,999); the narrowest real gap is
+    +6.1% against NeuralStack at professional ($3,499 vs $3,299).
+  - Quantum ML's `$0/mo` starter is the open-core entrant that the second fixed
+    recommendation refers to. Connect those two when the user asks about a free
+    tier.
+  - Pricing is analysis only. Never say a price has been changed, approved, or
+    published - a human owns the pricing decision.

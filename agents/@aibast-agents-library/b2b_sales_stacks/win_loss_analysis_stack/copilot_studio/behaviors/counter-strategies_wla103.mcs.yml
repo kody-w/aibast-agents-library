@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: counter-strategies
+  description: Lays out the immediate and longer-term interventions per loss driver, with investment and timeline, and the updated competitive talk track.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: counter-strategies
+  description: Lays out the immediate and longer-term interventions per loss driver, with investment and timeline, and the updated competitive talk track.
+  ---
+  <!-- bic:source=blank -->
+  # Counter-strategies
+
+  Use this skill when the user asks what we should do about the losses, how we
+  fight back against CompetitorX, what the plan is, or what the sales team
+  should say differently.
+
+  ## Inputs
+
+  - The Q3 loss reason distribution across all 78 losses.
+  - The intervention catalog: five interventions, each with a label, cost,
+    recovery rate, timeline, and a fixed action list.
+
+  ## Procedure - the exact split
+
+  1. Partition the catalog by timeline. `Immediate` or `30 days` goes to
+     **Immediate Actions (This Quarter)**; everything else goes to
+     **Longer-Term (Next 2 Quarters)**.
+  2. Immediate, in catalog order and numbered 1..3:
+     1. **Security Positioning Refresh** - $25,000, Immediate, recovery rate
+        0.35.
+     2. **Enterprise Reference Program** - $30,000, 30 days, recovery rate 0.40.
+     3. **Pricing & Packaging Adjustment** - $15,000, Immediate, recovery rate
+        0.30.
+  3. Longer-term, as a bulleted list carrying `(<timeline> timeline,
+     $<cost> investment)`:
+     - **FedRAMP Certification** - 6 months timeline, $85,000 investment
+       (recovery rate 0.55).
+     - **ISO 27001 Certification** - 4 months timeline, $25,000 investment
+       (recovery rate 0.20).
+  4. Print each intervention's actions verbatim from the catalog as sub-bullets.
+     Do not invent, merge, reorder, or add actions.
+  5. Close with the fixed talk track, quoted exactly: "We're the secure choice
+     for enterprises who want modern UX. Here's our SOC 2 Type II, and our
+     FedRAMP is in progress. Let us connect you with 3 enterprise references in
+     your industry."
+
+  ## Output format
+
+  - Headline: `**Counter-Strategies for Win Rate Recovery:**`
+  - `**Immediate Actions (This Quarter):**` then the three numbered
+    interventions, each with its action bullets.
+  - `**Longer-Term (Next 2 Quarters):**` then FedRAMP and ISO 27001 as bullets
+    with timeline and investment, each with indented action sub-bullets.
+  - `**Updated Talk Track:**` followed by the quoted script.
+  - `Source: [Competitive Playbook + Product Roadmap]`
+  - `Agents: CompetitiveStrategyAgent`
+
+  ## Edge cases
+
+  - The Enterprise Reference Program is classified Immediate because its
+    timeline is "30 days" - do not move it to longer-term because it is not
+    same-week.
+  - The immediate section numbering follows catalog order, not cost or impact
+    order. Do not re-rank it.
+  - Feature gaps and no-decision losses have **no** mapped intervention. If the
+    user asks what to do about them, say the catalog carries none and point to
+    the roadmap and nurture classifications from root-cause analysis.
+
+  ## Boundaries
+
+  - Proposal only. Never say a program has been launched, a budget approved, a
+    reference customer contacted, or a 3PAO engaged.
+  - Costs and timelines are catalog values. Never negotiate them down or
+    quote a range that is not in the catalog.

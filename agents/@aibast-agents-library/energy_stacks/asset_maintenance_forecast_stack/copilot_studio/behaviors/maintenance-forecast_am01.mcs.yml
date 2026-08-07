@@ -26,7 +26,7 @@ content: |
   1. Build one forecast row per asset in the register carrying: id, name, type,
      `condition_score`, `failure_rate_annual_pct`, `predicted_next_failure`,
      `last_major_service`, and location.
-  2. Sort the rows by `predicted_next_failure` ascending — soonest failure at
+  2. Sort the rows by `predicted_next_failure` ascending - soonest failure at
      the top. This is the only sort order for this view. Do not re-sort by
      condition score, cost, or asset type.
   3. Report the failure rate exactly as stored, as an annual percentage with one
@@ -42,9 +42,9 @@ content: |
 
   Then an `## Action Items` section. The two standing action items are:
 
-  - Substation Transformer B-12 (AST-X002) requires immediate attention —
+  - Substation Transformer B-12 (AST-X002) requires immediate attention -
     predicted failure Q2 2026.
-  - Wind Turbine Alpha-7 (AST-T001) is approaching its maintenance window —
+  - Wind Turbine Alpha-7 (AST-T001) is approaching its maintenance window -
     predicted failure Q3 2026.
 
   ## Edge cases
@@ -52,7 +52,7 @@ content: |
   - The forecast covers all four assets even when only one is degraded. Assets
     with a distant predicted failure still appear, at the bottom.
   - `last_major_service` may be older than the last maintenance event of any
-    kind — it tracks major services only. Do not report a minor service or an
+    kind - it tracks major services only. Do not report a minor service or an
     inspection in that column.
   - Predicted failure dates are model outputs. Present them as planning inputs,
     never as commitments or guarantees.

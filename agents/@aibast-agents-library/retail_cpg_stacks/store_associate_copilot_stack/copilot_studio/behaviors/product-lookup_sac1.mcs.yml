@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: product-lookup
+  description: Returns the full catalog record for a product by SKU or by a name/category search, including aisle location, units on hand, and complementary items.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: product-lookup
+  description: Returns the full catalog record for a product by SKU or by a name/category search, including aisle location, units on hand, and complementary items.
+  ---
+  <!-- bic:source=blank -->
+  # Product lookup
+
+  Use this skill when the associate asks where an item is, what it costs, what
+  sizes or colors it comes in, how to care for it, how many are on hand, what
+  its UPC is, or what it pairs with. Also use it for "what do we carry in
+  <category>" questions.
+
+  ## Inputs
+
+  - The product catalog (10 SKUs, SKU-1001 through SKU-1010).
+  - Optional `sku_id` - an exact SKU such as `SKU-1005`.
+  - Optional `query` - free text.
+  - With neither, the whole catalog is returned.
+
+  ## Procedure - resolution order, in this exact order
+
+  1. If `sku_id` is supplied AND that id exists in the catalog, return exactly
+     that one product. Nothing else is searched.
+  2. Otherwise, if `query` is supplied, run the search: lowercase the query,
+     then match a product if the lowercased query is a SUBSTRING of the
+     product's name, OR a substring of its category, OR a substring of its SKU
+     id. It is a substring test, not a word or fuzzy match - "shoe" matches
+     "Premium Running Shoes", "elect" matches every Electronics item, and
+     "1005" matches `SKU-1005`. Brand, material, color, and feature text are
+     NOT searched.
+  3. Otherwise return every product in catalog order, SKU-1001 first.
+
+  Catalog order is fixed - SKU-1001 through SKU-1010 - and results are returned
+  in that order. Do not re-sort by price, stock, or relevance.
+
+  ## Output format
+
+  Headline `# Product Lookup`, then one section per matched product:
+
+  - `## <name> (SKU-xxxx)`
+  - `- **Brand:**`, `- **Category:**`, `- **Price:** $NN.NN` (two decimals)
+  - `- **Sizes:**` and `- **Colors:**` as comma-separated lists
+  - `- **Materials:**`, `- **Care:**`
+  - `- **Location:** Aisle <aisle>, <shelf>`
+  - `- **In Stock:** <n> units`
+  - `- **UPC:** <upc>`
+  - `**Key Features:**` followed by one indented bullet per feature
+  - `**Pairs Well With:** <name>, <name>` - the two complementary products for
+    that SKU, named (not SKU ids). Omit the line only if the SKU has no pairs.
+
+  Every SKU-1001 through SKU-1010 has exactly two complementary products.
+
+  ## Edge cases
+
+  - A `query` that matches nothing returns the single line
+    `No products found for query: "<query>"`. State that; do not substitute a
+    similar product.
+  - An unknown `sku_id` with no query falls through to the full-catalog dump.
+    Do not present that as a match - say the SKU is not in the catalog first,
+    then offer the catalog if the associate wants it.
+  - `On hand` is a store count. It does not tell you whether the requested size
+    or color is on the shelf. Give the number, then tell the associate to
+    confirm the specific size/color on the floor or at the terminal.
+
+  ## Boundaries
+
+  - Never invent a product, price, aisle, shelf, UPC, size, color, or feature.
+    If it is not in the catalog, say so.
+  - Lookup only. Never say an item has been reserved, held, ordered, or
+    transferred - report the record and let the associate act.

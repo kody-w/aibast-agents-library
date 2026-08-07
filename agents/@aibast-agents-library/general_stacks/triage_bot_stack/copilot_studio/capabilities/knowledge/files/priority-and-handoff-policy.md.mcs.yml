@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: priority-and-handoff-policy.md
+  description: Synthetic priority matrix, SLA clocks, and escalation handoff templates that govern how the agent assesses urgency and drafts handoffs.

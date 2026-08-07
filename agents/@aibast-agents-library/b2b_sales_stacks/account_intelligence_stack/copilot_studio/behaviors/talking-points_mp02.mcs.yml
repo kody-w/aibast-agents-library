@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: talking-points
+  description: Generates a role-themed talking track for every attendee of the next meeting.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: talking-points
+  description: Generates a role-themed talking track for every attendee of the next meeting.
+  ---
+  <!-- bic:source=blank -->
+  # Talking points
+
+  Use this skill when the user asks what to say in the upcoming meeting or
+  wants per-attendee messaging.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation. Covers the first
+    upcoming meeting.
+
+  ## Procedure - theme routing, in this order
+
+  Unlike the account value-messaging skill, this one covers EVERY attendee,
+  not just decision makers. Match the role string in this order:
+
+  1. contains CTO, IT, Engineering, or VP IT - `Technical Vision &
+     Architecture`, referencing the account's industry in lower case, a 60
+     percent integration timeline reduction, and three industry CTO peer
+     references.
+  2. contains CFO or Finance - `ROI & Business Value`, quoting
+     `savings = int(opportunity_value * 1.75)`, the 8-week implementation,
+     and the 90-day proof-of-value pilot.
+  3. contains Operations or COO - `Operational Excellence`, 15+ hours per
+     week saved, predictive analytics, transformation leadership named for
+     the account.
+  4. contains Product or VP Product - `Product Capability & Roadmap`.
+  5. otherwise - `Strategic Partnership`.
+
+  Worked example - Acme Corporation - Sarah Chen takes Technical Vision,
+  James Miller takes Operational Excellence, and Lisa Park takes ROI at
+  4,200,000 dollars over 3 years.
+
+  ## Output format
+
+  - `**Talking Points: <meeting title>**`
+  - Per attendee separated by `---` - `**For <name> (<role>):**`, the
+    `**Theme: ...**` line, three quoted bullets.
+  - Close with `**Universal Proof Points:**` - 94 percent retention, 47
+    deployments in the account's industry, 8-week average implementation,
+    24/7 support with a named CSM.
+
+  ## Edge cases
+
+  - With no upcoming meeting, answer `No upcoming meetings scheduled.`
+  - These are the rep's lines. Never send them and never assert a customer
+    has agreed with any of them.

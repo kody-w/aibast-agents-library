@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: data-validation
+  description: Validates the intake batch against the six validation rules and reports pass or fail per record with the reason.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: data-validation
+  description: Validates the intake batch against the six validation rules and reports pass or fail per record with the reason.
+  ---
+  <!-- bic:source=blank -->
+  # Data validation
+
+  Use this skill when the user asks whether the intake data is clean, asks what
+  the validation rules are, or asks which records will fail.
+
+  ## Inputs
+
+  - The intake batch. No template argument changes this output - the rule set
+    and the batch are the same whichever template was named.
+
+  ## Procedure - six rules, then a per-record verdict
+
+  1. Render all six validation rules, in order, as
+     `Rule | Pattern | Error Message`:
+     email (contains @ and valid domain / Invalid email format); phone
+     (10-15 digits with optional country code / Invalid phone number); url
+     (starts with http:// or https:// / Invalid URL format); currency
+     (numeric, non-negative / Invalid currency value); required (non-empty
+     value / Required field cannot be empty); max_length (within character
+     limit / Value exceeds maximum length).
+  2. Classify every record by its status string, with no interpretation:
+     - `Result = Pass` only when status is exactly `Valid`
+     - `Result = Fail` for everything else, and `Details` repeats the status
+       verbatim (for example `Validation Error: Last name required`)
+  3. Counts are computed from the same statuses:
+     `valid = count(status == "Valid")`,
+     `duplicates = count("Duplicate" in status)`,
+     `errors = count("Error" in status)`.
+     For the 5-record sample batch this is 3 valid, 1 duplicates, 1 errors -
+     and 3 + 1 + 1 must equal the 5 records scanned.
+  4. A record failing on a missing required field stays failed. Never infer the
+     missing value from the email address or company name.
+
+  ## Output format
+
+  - `**Data Validation Report**`
+  - `**Validation Rules:**` table (`Rule | Pattern | Error Message`)
+  - `**Batch Validation Results (<n> records):**` table
+    (`Name | Email | Result | Details`), Name rendered as first name then last
+    name - a record with no last name shows the first name alone
+  - `**Summary:** <v> valid, <d> duplicates, <e> errors`
+  - Close with `Source: [Validation Engine]` and
+    `Agents: OneClickCRMIntakeAgent`
+
+  ## Boundaries
+
+  - Report only. Nothing is corrected, normalized, or written back.
+  - Duplicate status is surfaced here as a Fail, but the merge decision belongs
+    to duplicate-check and to the operator.

@@ -1,0 +1,96 @@
+mcs.metadata:
+  componentName: score-leads
+  description: Scores every lead against the ICP and BANT models, assigns a tier by fixed threshold, and ranks the queue by combined score.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: score-leads
+  description: Scores every lead against the ICP and BANT models, assigns a tier by fixed threshold, and ranks the queue by combined score.
+  ---
+  <!-- bic:source=blank -->
+  # Score leads
+
+  Use this skill when the user asks to score, qualify, rank, or tier the
+  leads, asks how good a lead is, or asks which leads are hot.
+
+  ## Inputs
+
+  - The lead pipeline data (45 leads, L001-L045).
+  - Optional: a tier filter of exactly Hot, Warm, Nurture, or Disqualified.
+    Any other value is ignored and produces the summary only.
+
+  ## Procedure - compute it, do not judge it
+
+  For every lead, compute three numbers in order.
+
+  1. ICP fit score, 0-100:
+
+     `icp = size*0.20 + industry*0.25 + tech*0.20 + budget*0.20 + authority*0.15`
+
+     - size: 100 when 200 <= employees <= 10000; below 200 use
+       `max(10, int(employees / 200 * 100))`; above 10000 use
+       `max(40, 100 - int((employees - 10000) / 200))`.
+     - industry: 100 for Technology, Financial Services, Healthcare,
+       Manufacturing, SaaS. Every other industry is 30.
+     - tech: `min(100, int(overlap / 6 * 150))` where overlap counts the
+       lead's tools that appear in Salesforce, AWS, Snowflake, Kubernetes,
+       Databricks, Azure. So 1 tool = 25, 2 = 50, 3 = 75, 4 or more = 100.
+     - budget: confirmed 100, planned 70, exploring 40, tbd 20.
+     - authority: C-Level 100, VP 85, Director 70, Manager 50, Individual 30.
+     - Truncate to an integer and clamp to 0-100.
+
+  2. BANT composite, 0-100:
+
+     `bant = int(B*0.30 + A*0.25 + N*0.25 + T*0.20)`
+
+     - B: confirmed 95, planned 70, exploring 40, tbd 15.
+     - A: C-Level 95, VP 80, Director 60, Manager 40, Individual 20.
+     - N: `min(100, 50 + len(need_text) // 3 + count(engagement_signals) * 8)`.
+     - T: 90 if the timeline text contains "60" or "Q1"; 70 if it contains
+       "90"; 55 if it contains "Q2"; otherwise 25.
+
+  3. Combined score and tier:
+
+     `combined = int(icp * 0.55 + bant * 0.45)`
+
+     - 88 or above: Hot
+     - 73 to 87: Warm
+     - 55 to 72: Nurture
+     - below 55: Disqualified
+
+  Sort every lead by combined score, highest first. The scoring is
+  deterministic - the same lead always produces the same score.
+
+  ## Output format
+
+  - Headline: `**Lead Qualification Summary - N Leads Scored**`
+  - A table with columns: Tier | Leads | Avg Score | Recommended Action.
+    One row per tier in the fixed order Hot, Warm, Nurture, Disqualified.
+    Avg Score is the integer mean of that tier's combined scores, written
+    `NN/100`. Recommended Action is fixed per tier: Hot = Immediate AE
+    handoff, Warm = SDR qualification call, Nurture = Automated email
+    sequence, Disqualified = Marketing nurture list.
+  - `**Top Hot Leads:**` - a numbered list of the top 5 Hot leads:
+    `N. **Company** - Score: NN - Contact Name, Title, first 50 characters
+    of the stated need`.
+  - If a tier filter was given, add `**<Tier> Leads Detail:**` and a table
+    with columns: Company | Contact | Score | Industry | Signals, where
+    Signals is the first two engagement signals joined by a comma.
+  - Close with the provenance lines: `Source: [CRM + ZoomInfo + 6sense Intent
+    Data]` and `Agents: LeadEnrichmentAgent, ICPMatchingAgent`.
+
+  ## Edge cases
+
+  - An empty tier shows `0` leads and `0/100` average - it is never omitted
+    from the summary table.
+  - A tier filter that is not one of the four tier names is silently ignored;
+    return the summary and say no detail table was produced because the
+    filter did not match a tier.
+  - Never round a score up to cross a tier threshold.
+
+  ## Boundaries
+
+  - Show the arithmetic when asked. Never adjust a weight, a sub-score, or a
+    threshold for any lead.
+  - Scoring only. Never say a lead has been contacted, assigned, or updated
+    in the CRM.

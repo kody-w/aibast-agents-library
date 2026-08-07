@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: opportunity-scan
+  description: Scans one customer for cross-sell openings by applying the affinity rules against what that customer already owns.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: opportunity-scan
+  description: Scans one customer for cross-sell openings by applying the affinity rules against what that customer already owns.
+  ---
+  <!-- bic:source=blank -->
+  # Opportunity scan
+
+  Use this skill when the user asks what a specific customer could buy next,
+  asks for a cross-sell scan or account review, or asks what openings exist at
+  a named account.
+
+  ## Inputs
+
+  - The customer ownership record and the product catalog.
+  - Optional: a customer id (CUST-001 through CUST-005) or a customer name.
+    A name is matched case-insensitively against the roster ("beacon" resolves
+    CUST-005 Beacon Financial). With no customer named, default to CUST-001
+    Meridian Corp and say that is what you defaulted to.
+
+  ## Procedure - the rule, not a judgment call
+
+  1. Resolve the customer. If the requested customer is not in the ownership
+     record, stop and say so, listing the five customers you cover. Do not
+     substitute another account.
+  2. Take the customer's owned product set.
+  3. Walk the affinity rules in catalog order. A rule produces an opportunity
+     only when BOTH hold:
+     - `rule.if_owns` IS in the owned set, AND
+     - `rule.recommend` is NOT in the owned set.
+     Every other rule is skipped. No rule, no opportunity.
+  4. Each surviving rule contributes one row carrying that rule's own
+     `affinity_score`, `success_rate`, and `avg_time_to_close_days`, plus the
+     recommended product's `annual_price` and `margin_pct` from the catalog.
+  5. Sort rows by `affinity_score` descending. Do not re-order for price,
+     margin, or close time.
+
+  ## Output format
+
+  - Headline: `**Cross-Sell Opportunity Scan: <customer name>**`
+  - A detail table with exactly these rows: Segment, Current ARR (dollars with
+    thousands separators), Health Score (`N/100`), Tenure (`N months`),
+    Contact.
+  - `**Current Products:**` - a bulleted list of the catalog display names of
+    everything owned.
+  - `**Opportunities Found (N):**` then a table with the columns
+    `Product | Price | Affinity | Success Rate | Est. Close`, price rendered
+    `$28,000/yr`, affinity and success rate as whole percentages, close time
+    as `28d`.
+
+  ## Edge cases the data actually produces
+
+  - **The same product can appear twice.** Rules are evaluated independently,
+    so a product reachable from two owned products lists once per rule with
+    that rule's own numbers. Meridian Corp (CUST-001) shows Analytics Pro at
+    91% / 55% / 28d (from Enterprise Platform) and again at 88% / 62% / 21d
+    (from Analytics Standard). Report both rows as they stand and note that
+    they are two paths to one product, not two sales.
+  - **Zero opportunities.** If no rule fires, emit a single row reading
+    `No opportunities identified` with dashes in the remaining columns.
+  - Never invent a row to fill an empty table, and never drop a row because it
+    looks redundant.
+
+  ## Boundaries
+
+  - Recommendation only. Never say an opportunity was created, logged, or sent
+    to anyone.
+  - Cite the CUST- id alongside the customer name.

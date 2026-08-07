@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: adoption-metrics
+  description: Reports per-feature adoption, average adoption, training completion, and user activation against licensed seats for every onboarding customer.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: adoption-metrics
+  description: Reports per-feature adoption, average adoption, training completion, and user activation against licensed seats for every onboarding customer.
+  ---
+  <!-- bic:source=blank -->
+  # Adoption metrics
+
+  Use this skill when the user asks about feature adoption, product usage,
+  training completion, seat utilization, user activation, or which features are
+  under-adopted.
+
+  ## Inputs
+
+  - Per-customer feature adoption percentages, training completion percentage,
+    active user count, and licensed user count.
+  - Optional: a single customer name or CUST- id, or a single feature, to filter
+    the presentation.
+
+  ## Tracked features - fixed set of five
+
+  `dashboard`, `reporting`, `api_access`, `automation_rules`, `custom_fields`.
+  There are no other features in this data set. Render them title-cased with
+  underscores replaced by spaces: Dashboard, Reporting, Api Access, Automation
+  Rules, Custom Fields.
+
+  ## Procedure - compute, do not judge
+
+  For each customer:
+
+  1. `avg_adoption_pct = round(sum(five feature percentages) / 5, 1)`. The
+     average is unweighted - every feature counts the same regardless of how
+     many users touch it.
+  2. `activation_pct = round(active_users / licensed_users * 100, 1)`. If
+     `licensed_users` is 0 or missing, `activation_pct` is 0 - never divide by
+     zero and never omit the row.
+  3. `training_pct` is reported as-is from the record, as a whole number.
+  4. Report customers in portfolio order (CUST-1001 through CUST-1005) unless
+     the user asks for a ranking; if they do, sort by `avg_adoption_pct` and say
+     that is the sort key.
+
+  ## Output format
+
+  - `# Feature Adoption Metrics`
+  - Then, per customer:
+    - `## <Customer name>`
+    - `- Avg Adoption: N.N%`
+    - `- Training: N%`
+    - `- User Activation: N.N% (active/licensed)`
+    - Table with exactly these columns: `Feature | Adoption %`, one row per
+      feature in the fixed order above, each value suffixed with `%`.
+
+  ## Edge cases
+
+  - A feature adoption value of 0 is real data, not missing data - render `0%`
+    and keep it in the average.
+  - A high average adoption can sit alongside low activation, and the reverse:
+    average adoption measures breadth of feature use, activation measures seats
+    logged in. Report both; do not blend them into one score.
+  - Training completion and adoption are separate numbers. Do not infer one from
+    the other.
+  - There is no per-user, per-session, or time-series usage in this data. If the
+    user asks for a trend, a month-over-month change, or which users are
+    inactive, say the data set does not contain it.
+
+  ## Boundaries
+
+  - Reporting only. Never say training has been assigned, a license reclaimed,
+    an enablement session scheduled, or a user contacted.

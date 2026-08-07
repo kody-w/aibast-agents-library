@@ -1,0 +1,50 @@
+mcs.metadata:
+  componentName: win-loss-review
+  description: Reports head-to-head encounter counts, win rates, average deal sizes, and the recorded win and loss reasons.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: win-loss-review
+  description: Reports head-to-head encounter counts, win rates, average deal sizes, and the recorded win and loss reasons.
+  ---
+  <!-- bic:source=blank -->
+  # Win/loss review
+
+  Use this skill when the user asks how we do against a competitor, for win
+  rates, or for why we win and lose.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. Determine the competitor set - the competitors active at that account.
+     If the account has none, fall back to every competitor in the win/loss
+     database.
+  2. For each, report the stored record only. Do not recompute win rate from
+     wins over encounters and do not average across competitors.
+  3. Skip any competitor with no win/loss record rather than filling in
+     zeroes.
+
+  Recorded values - DataForge Solutions 28 encounters, 18 wins, 10 losses,
+  64 percent, average won 1,850,000 dollars, average lost 920,000 dollars,
+  trend improving with 4 of the last 5 won. CloudOps Platform 15
+  encounters, 11 wins, 4 losses, 73 percent, average won 2,100,000 dollars,
+  average lost 1,400,000 dollars, trend stable. ValueStack Inc 12
+  encounters, 9 wins, 3 losses, 75 percent, average won 780,000 dollars,
+  average lost 340,000 dollars, trend strong on enterprise deals.
+
+  ## Output format
+
+  - `**Win/Loss Review: <account>**`
+  - Per competitor, separated by `---` - `**vs <name>:**`, a Metric/Value
+    table (Total Encounters, Wins, Losses, Win Rate, Avg Deal Won, Avg Deal
+    Lost, Trend), then `**Why We Win:**` and `**Why We Lose:**` bullets.
+
+  ## Edge cases
+
+  - Win rates are historical, not predictive. Do not present 64 percent as
+    this deal's probability - that comes from the risk skills.
+  - Loss reasons are recorded findings. State them plainly; never omit an
+    unflattering one.

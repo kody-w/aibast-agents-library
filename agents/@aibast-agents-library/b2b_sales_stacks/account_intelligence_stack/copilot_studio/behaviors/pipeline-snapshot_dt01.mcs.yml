@@ -1,0 +1,46 @@
+mcs.metadata:
+  componentName: pipeline-snapshot
+  description: Reports total and probability-weighted pipeline, the active deal table, and the 14-day change.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pipeline-snapshot
+  description: Reports total and probability-weighted pipeline, the active deal table, and the 14-day change.
+  ---
+  <!-- bic:source=blank -->
+  # Pipeline snapshot
+
+  Use this skill when the user asks for the pipeline, what is open, or how
+  the number moved.
+
+  ## Inputs
+
+  - None. Covers all deals for the territory.
+
+  ## Procedure
+
+  1. Active deals exclude any stage of `Closed Won` or `Closed Lost`. deal-005
+     (Acme Corporation - Support Tier Upgrade, Closed Won) is therefore out
+     of every total.
+  2. `total_pipeline = sum of amount over active deals` = 4,930,000
+  3. `weighted_pipeline = sum of amount * win_probability / 100` =
+     `1,632,000 + 902,000 + 400,500 + 135,000` = 3,069,500
+  4. Deal table sorted by amount descending.
+  5. Stage summary printed in the fixed order Qualification, Discovery,
+     Solution Design, Proposal, Negotiation, omitting stages with no deals.
+  6. `14-day change = snapshot(2025-03-14).total - snapshot(2025-03-01).total`
+     = `4,930,000 - 5,110,000` = -180,000.
+
+  ## Output format
+
+  - `**Pipeline Snapshot**`
+  - Metric table - Total Pipeline, Weighted Pipeline, Active Deals, 14-Day
+    Change (signed).
+  - `**Deals:**` table - Deal, Stage, Amount, Probability, Close Date, Owner.
+  - `**By Stage:**` table - Stage, Deals, Value.
+
+  ## Edge cases
+
+  - Solution Design currently holds no deals and is omitted from the stage
+    table. Say the stage is empty if asked; do not print a zero row.
+  - Cite the deal- id when the user asks about a single deal.

@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: approval-routing
+  description: Maps a request's amount to its approval threshold band, names the required approver, and states the SLA.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: approval-routing
+  description: Maps a request's amount to its approval threshold band, names the required approver, and states the SLA.
+  ---
+  <!-- bic:source=blank -->
+  # Approval routing
+
+  Use this skill when the user asks who approves a request, how long approval
+  takes, what the approval thresholds are, or what sign-off a given dollar
+  amount needs.
+
+  ## Inputs
+
+  - The purchase request queue and the approval threshold table.
+  - Optional: a single PR- id. With no id, default to PR-5001.
+
+  ## Procedure - the band rule, applied literally
+
+  Walk the threshold bands in ascending order and take the **first** band
+  whose `max_amount` is greater than or equal to the request amount:
+
+  | Amount Limit | Approver | SLA |
+  |---|---|---|
+  | Up to $5,000 | Direct Manager | 4h |
+  | Up to $25,000 | Department Head | 8h |
+  | Up to $100,000 | VP Finance | 24h |
+  | Up to $500,000 | CFO | 48h |
+  | Up to Unlimited | CEO + Board | 120h |
+
+  The comparison is `amount <= max_amount`. A request of exactly $100,000
+  routes to VP Finance; $100,001 routes to the CFO. Worked examples from the
+  queue: PR-5001 at $125,000 and PR-5003 at $215,000 both exceed $100,000, so
+  both route to the CFO with a 48 hour SLA. PR-5002 at $48,500 and PR-5004 at
+  $35,000 both exceed $25,000, so both route to VP Finance with a 24 hour SLA.
+
+  ## Output format
+
+  - Headline: `**Approval Routing: PR-xxxx**`
+  - A `| Field | Detail |` table with exactly these rows in order: Request
+    (title), Amount, Required Approver, Approval SLA (in hours), Current
+    Status.
+  - Then `**Approval Thresholds:**` and the full five-row table above, with
+    the request's own band marked ` <-- This request` at the end of that row.
+  - Close with `Source: [Approval Workflow Engine]`.
+
+  ## Edge cases
+
+  - The SLA is the approver's response window in hours, not elapsed time on
+    the request. Do not report time remaining - that is not in the data.
+  - Current Status is independent of the routing. PR-5003 routes to the CFO
+    and is already Approved; PR-5004 routes to VP Finance and is still Draft.
+    Report both without implying one causes the other.
+  - If the user asks about an amount rather than a request, apply the band
+    rule to the amount and say no PR- record backs it.
+  - If a PR- id is not in the queue, say so and list PR-5001 through PR-5004
+    rather than routing a substitute request.
+
+  ## Boundaries
+
+  - Routing information only. Never say a request has been submitted for
+    approval, escalated, approved, or that an approver has been notified.
+  - Never propose splitting a request across multiple lower-band requests to
+    avoid an approver. Refuse and restate the band.

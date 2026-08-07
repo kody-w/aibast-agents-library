@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: compliance-check
+  description: Lists the applicable regulatory requirements and computes each client's Compliant / Issues Found status from the concentration, senior-investor, and drift rules.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: compliance-check
+  description: Lists the applicable regulatory requirements and computes each client's Compliant / Issues Found status from the concentration, senior-investor, and drift rules.
+  ---
+  <!-- bic:source=blank -->
+  # Compliance check
+
+  Use this skill when the user asks about compliance, supervision, Reg BI,
+  Form CRS, suitability, concentration, senior investor protections, or which
+  clients have flags.
+
+  ## Inputs
+
+  - The regulatory rule set and the client portfolio book. No arguments are
+    required; the check runs across every client.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Print the full regulatory rule set first, in rule order: Regulation Best
+     Interest, Form CRS Delivery, Suitability Obligation, Concentration Limit,
+     Senior Investor Protection. Render `applies_to` in title case (`All`,
+     `Seniors`).
+  2. Then evaluate every client, in book order, against exactly three
+     computed flags - no others:
+     - **Concentration:** for each asset class, if `allocation > 50` emit
+       `Concentration risk: <asset class> at <allocation>%`. Note the gap
+       honestly if asked: the written Concentration Limit rule says no single
+       position exceeds 10% of the portfolio, but the automated check fires
+       only above 50% at the asset-class level. Report what fired; do not
+       silently apply the stricter number, and do not claim the 10% rule was
+       tested.
+     - **Senior investor:** if `age >= 65` emit
+       `Senior investor protections apply`.
+     - **Allocation drift:** compute
+       `max_drift = round(max(abs(allocation - target)), 1)`; if
+       `max_drift > 5` emit
+       `Allocation drift of <max_drift>% exceeds threshold`. Strictly greater
+       than 5 - a max drift of exactly 5.0% does not fire.
+  3. Status is `Issues Found` if the client has one or more flags, otherwise
+     `Compliant`. Flags are listed in the order above.
+
+  ## Output format
+
+  Headline `# Compliance Check Report`, then:
+
+  `## Regulatory Requirements` with one table:
+
+  `| Rule | Description | Applies To |`
+
+  Then `## Client Compliance Status`, and for each client a section headed
+  `### <name> (CLI-xxxx)` followed by an em dash and then
+  `Compliant` or `Issues Found`, followed by either one
+  `- **Flag:** <text>` line per flag, or the single line
+  `- No compliance issues detected`.
+
+  ## Edge cases
+
+  - A client can be Compliant and still sit at the drift threshold - say "at
+    5.0%, at but not over the threshold" rather than implying a breach.
+  - Senior investor protection is an age-driven flag, not a defect. Report it
+    as a required-handling flag, not as a failure by the advisor.
+  - Reg BI, Form CRS, and Suitability are stated obligations with no
+    automated per-client test here. Never report them as passed or failed -
+    list them as applicable requirements only.
+
+  ## Boundaries
+
+  - Detection and reporting only. Never say a flag was cleared, escalated,
+    reported to compliance, filed, or remediated. Escalation is the advisor's
+    and the compliance officer's call.
+  - Never suppress a flag that fires and never add one that does not. This is
+    not legal advice and is not a supervisory sign-off.

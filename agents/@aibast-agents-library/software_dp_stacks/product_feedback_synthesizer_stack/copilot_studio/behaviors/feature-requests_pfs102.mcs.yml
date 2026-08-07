@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: feature-requests
+  description: Ranks the feature request backlog strictly by ARR weight, with votes, effort, and current status for each request.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: feature-requests
+  description: Ranks the feature request backlog strictly by ARR weight, with votes, effort, and current status for each request.
+  ---
+  <!-- bic:source=blank -->
+  # Feature requests
+
+  Use this skill when the user asks what customers are asking for, what is in
+  the backlog, which requests carry the most revenue, or how many votes a
+  feature has.
+
+  ## Inputs
+
+  - The feature request backlog (FR-001 through FR-006). No parameters.
+
+  ## Procedure - one sort, no judgment
+
+  1. Sort every feature request by `arr_weight` **descending**. This sort is by
+     ARR weight only. Votes, effort, status, and category never influence the
+     order in this report.
+  2. Number the rows from 1 in that order.
+  3. `total_requests` = the count of backlog items (6).
+  4. Render `arr_weight` with a dollar sign and thousands separators
+     (`$1,140,000`), `effort` upper-cased (`HIGH`, `MEDIUM`, `LOW`), and
+     `status` exactly as stored in snake_case (`planned_q3`, `planned_q2`,
+     `under_review`, `in_progress`).
+
+  For the current backlog the ARR-weight order is: Workflow Automation Builder
+  ($1,140,000), Role-Based Access Controls (RBAC) ($960,000), Real-Time
+  Alerting Engine ($780,000), Customizable Dashboard Home View ($612,000),
+  Mobile App Enhancements ($420,000), Large Dataset Export Fix ($264,000).
+
+  ## Output format
+
+  ```
+  # Feature Requests (Ranked by ARR Weight)
+
+  **Total Requests:** N
+
+  | Rank | Feature | Votes | ARR Weight | Effort | Status |
+  ```
+
+  One row per request, in the sorted order.
+
+  ## Edge cases and boundaries
+
+  - Vote count and ARR weight happen to agree on the current backlog
+    (203, 156, 134, 87, 62, 41 descending). Do not treat that as a rule - if
+    they ever diverge, this report still ranks by ARR weight, and you say so.
+  - If the user asks for a vote-ranked or effort-ranked view, you may re-sort,
+    but state explicitly that you changed the sort away from ARR weight.
+  - This report does not apply the effort divisor. Effort-adjusted ranking is
+    the roadmap-impact skill, and its order is different - never present this
+    table as the priority ranking.
+  - Status is read-only. Never say a request has been promoted, scheduled,
+    closed, or re-prioritized; report the stored status and stop.
+  - Each request links to the feedback that raised it (FR-006 to FB-5006, and
+    so on). Cite the FB- id when explaining why a request exists.

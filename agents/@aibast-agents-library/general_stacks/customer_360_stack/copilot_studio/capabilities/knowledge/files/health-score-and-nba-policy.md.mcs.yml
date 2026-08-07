@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: health-score-and-nba-policy.md
+  description: Synthetic health-score weights, band thresholds, and next-best-action playbooks the agent scores and recommends against.

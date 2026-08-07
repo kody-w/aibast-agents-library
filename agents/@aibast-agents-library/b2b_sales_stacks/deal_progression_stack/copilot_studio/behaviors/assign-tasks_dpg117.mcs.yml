@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: assign-tasks
+  description: Proposes the task load per rep from their stalled deals and playbooks, with deadlines derived from stalled-deal count and the monitoring cadence.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: assign-tasks
+  description: Proposes the task load per rep from their stalled deals and playbooks, with deadlines derived from stalled-deal count and the monitoring cadence.
+  ---
+  <!-- bic:source=blank -->
+  # Task assignment proposal
+
+  Use this skill when the user asks who does what, for the task split across
+  the team, or for the accountability plan on the stalled deals.
+
+  ## Inputs
+
+  - The stalled set grouped by owner, the rep roster with capacity, and the
+    blocker playbooks.
+
+  ## Procedure
+
+  1. Group stalled deals by owner. For each rep, task count = sum over their
+     stalled deals of that blocker's week 1 plus week 2 task counts
+     (executive_change 7, competitor_eval 7, no_champion 7, legal_review 6,
+     budget_hold 6).
+  2. Cross-assignment rule - a rep with zero stalled deals whose specialty is
+     executive alignment and who has more than 2 available slots receives 3
+     exec support tasks instead. Available slots = capacity - active deals.
+  3. Deadline - `This week` when the rep has 2 or fewer stalled deals,
+     otherwise `Next N days` where `N = min(stalled_count x 2, 7)`.
+  4. The deals column reads `N stalled` for a rep with stalled deals, or
+     `Exec support` for a cross-assigned rep.
+  5. Reps with zero tasks are omitted. Report total tasks and the number of
+     reps carrying them.
+  6. Always append the standing monitoring and cadence blocks - daily Slack
+     alerts for overdue tasks, deal stage change notifications, weekly pipeline
+     velocity report, stall warning at 7 days versus the current 21; daily
+     automated reminders, Wednesday pipeline review (30 min), Friday deal
+     progression scorecard.
+
+  ## Output format
+
+  Headline `**Task Assignments Completed**` then
+  `**N** tasks assigned across **N** reps.` and a table with exactly these
+  columns.
+
+  | Rep | Tasks | Deadline | Deals |
+
+  Then the monitoring, cadence and success-metric blocks - reduce average stall
+  time from 21 to 10 days, move the stalled value back to active, add $2.4M to
+  Q4 commit.
+
+  Close with `Source: [Salesforce + Task Management]`.
+
+  ## Edge cases
+
+  - The report heading says Completed, but nothing was created. State plainly
+    that these are proposed assignments awaiting the leader's approval, and
+    never claim a rep was notified or a task written to a system.
+  - The task counts come from playbook length, not from rep capacity - a rep
+    at capacity can still show the largest load. Flag that rather than
+    rebalancing on your own.
+  - If a rep is named who has no stalled deals and does not meet the
+    cross-assignment rule, say they carry no tasks in this cycle.

@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: quality-and-outreach-policy.md
+  description: Synthetic health plan policy grounding the agent's guardrails - recommend-never-act outreach, no patient-level data, star thresholds, and the fixed prioritization rules.

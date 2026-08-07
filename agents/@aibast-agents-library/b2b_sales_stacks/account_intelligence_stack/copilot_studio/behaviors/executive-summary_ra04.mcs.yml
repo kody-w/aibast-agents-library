@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: executive-summary
+  description: Consolidates deal risk, win probability, churn, and financial health into one executive risk verdict with a recommendation.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: executive-summary
+  description: Consolidates deal risk, win probability, churn, and financial health into one executive risk verdict with a recommendation.
+  ---
+  <!-- bic:source=blank -->
+  # Risk executive summary
+
+  Use this skill when the user asks for the risk summary, the exec view of
+  an account's risk, or what to escalate.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  Recompute the composite risk score, win probability, and churn probability
+  using the assess-deal-risk and churn-prediction rules, then:
+
+  1. Overall verdict from the composite score - 65 or above is `High Risk`
+     with the recommendation to escalate to management and accelerate
+     mitigations; 40 to 64 is `Moderate Risk` with the recommendation to
+     address high-severity factors within 2 weeks; below 40 is `Low Risk`
+     with the recommendation to maintain the current cadence.
+  2. Win probability status - `Above 50% threshold` at 50 or higher,
+     otherwise `Below 50% threshold`.
+  3. Churn status - `Monitoring` when churn is below 0.15,
+     `Action needed` when it is 0.15 or above, `N/A` when there is no churn
+     figure (a prospect), where the churn cell reads `N/A (prospect)`.
+  4. Key risks lists every High and Medium factor, tagged `[High]` or
+     `[Medium]`. Low factors are omitted from this list.
+  5. `Total at risk = opportunity_value + current_spend`.
+
+  Worked example - Acme Corporation - 62/100 so Moderate Risk, win
+  probability 38 percent (below threshold), churn 8 percent (Monitoring),
+  credit rating A with 8 percent YoY growth, 2 high and 3 medium factors
+  listed, and 3,600,000 dollars total at stake.
+
+  ## Output format
+
+  - `**Risk Executive Summary: <account>**`
+  - `**Overall Assessment: <verdict>**`
+  - Table - Dimension, Score, Status, with rows Deal Risk, Win Probability,
+    Churn Probability, Financial Health.
+  - `**Key Risks:**` bullets, `**Recommendation:** <line>`,
+    `**Value at Stake:**` with opportunity, current ARR, and total at risk.
+
+  ## Edge cases
+
+  - A prospect account shows `N/A (prospect)` for churn. Do not backfill it.
+  - The recommendation is an escalation proposal for a human. The agent does
+    not escalate, notify, or open anything.

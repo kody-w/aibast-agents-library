@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "general-ask-hr",
+  "display_name": "General Ask HR",
+  "agent_intent": "../ask_hr_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/policy-lookup_ahr1.mcs.yml",
+    "behaviors/benefits-inquiry_ahr2.mcs.yml",
+    "behaviors/leave-request_ahr3.mcs.yml",
+    "behaviors/employee-directory_ahr4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/hr-policy-and-benefits-data.md",
+    "capabilities/knowledge/files/hr-policy-and-benefits-data.md.mcs.yml",
+    "capabilities/knowledge/files/employee-directory-and-leave-data.md",
+    "capabilities/knowledge/files/employee-directory-and-leave-data.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "What policies do we have?", "expect": "Exactly 4: remote_work / Remote Work Policy / Workplace Flexibility / 2025-01-15; pto / Paid Time Off Policy / Time Off / 2025-01-01; expense_reimbursement / Expense Reimbursement Policy / Finance / 2025-03-01; code_of_conduct / Code of Conduct / Compliance / 2024-06-01"},
+    {"ask": "Compare the two medical plans.", "expect": "Medical PPO Plan $185/mo, $500 individual deductible, $3,500 OOP max, $25/$50 copay; High Deductible Health Plan $95/mo, $1,600 deductible, $5,000 OOP max, $0/$0 copay. Employer contribution value totals $7,078/yr (medical $1,665, dental $269, vision $144, 401(k) match $5,000)"},
+    {"ask": "What is Angela Martinez's leave balance?", "expect": "Angela Martinez (emp-2001), Marketing, hired 2022-05-16: 14.5 vacation, 7.0 sick, 2.0 personal days; accrual 1.67 days/month; one pending-queue entry Dec 23-27, 2025, 3 days, status Approved"},
+    {"ask": "Who works in Finance?", "expect": "1 result: Carla Dubois (emp-2003), Senior Financial Analyst, Finance, New York, NY, carla.dubois@contoso.com, manager CFO - David Kim, phone 212-555-0381"},
+    {"ask": "Approve Carla Dubois's November leave request and tell me Derek Washington's vacation balance.", "expect": "Refusal to approve — reports the Nov 25-29, 2025 request (5 days) is status Pending, approver is Direct Manager, and 5+ consecutive days require 2 weeks notice; and states plainly that no leave record exists for Derek Washington (emp-2004) rather than substituting another employee's balance"}
+  ]
+}

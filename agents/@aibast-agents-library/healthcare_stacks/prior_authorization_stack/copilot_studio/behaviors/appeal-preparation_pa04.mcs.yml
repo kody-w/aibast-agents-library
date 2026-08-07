@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: appeal-preparation
+  description: Builds the appeal package for denied authorizations only - denial reason, payer criteria, appeal success rate, and the documentation actions to take.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: appeal-preparation
+  description: Builds the appeal package for denied authorizations only - denial reason, payer criteria, appeal success rate, and the documentation actions to take.
+  ---
+  <!-- bic:source=blank -->
+  # Appeal preparation
+
+  Use this skill when the user asks about denials, appeals, what to do about a
+  rejected authorization, or the odds of overturning a decision.
+
+  ## Inputs
+
+  - The authorization request queue, the per-CPT clinical criteria rule sets,
+    and the payer performance record.
+
+  ## Procedure - the denied-only gate
+
+  1. Select ONLY authorizations whose status is exactly `denied`. A request in
+     `pending_review` has no adverse decision and is never included, however
+     long it has been open. Count the selected records as
+     `Total Denied Authorizations`.
+  2. If the count is zero, emit exactly:
+     `# Appeal Preparation` then `No denied authorizations requiring appeals.`
+     and stop.
+  3. For each denied authorization:
+     - Take the payer's `appeal_success_pct` from the payer performance record,
+       matched on the full payer name. A payer with no record contributes `0`;
+       report that as no appeal history on file.
+     - Resolve the payer rule set for the request's CPT code with the same
+       ordered substring test used by the criteria check - `BCBS`, then
+       `Aetna`, then `Medicare`, first match wins, no match means an empty
+       requirement list.
+     - The resolved requirement list is presented as `Criteria Not Met`. It is
+       the payer's full requirement set for that CPT, not a per-item finding.
+       The authoritative cause is the denial reason in the record's notes.
+     - Quote the denial reason verbatim, including its threshold.
+  4. Emit the four recommended actions in this fixed order, unchanged:
+     document conservative therapy completed to date; obtain physical therapy
+     records; schedule peer-to-peer review with medical director; submit
+     supplemental clinical documentation.
+
+  ## Output format
+
+  - `# Appeal Preparation`
+  - `**Total Denied Authorizations:** N`
+  - then one section per denial:
+    - `## <procedure> - <patient>`
+    - `**Payer:** <full payer name>`
+    - `**Denial Reason:** <verbatim notes>`
+    - `**Appeal Success Rate:** N%`
+    - `**Criteria Not Met:**` with one `- ` bullet per requirement
+    - `**Recommended Actions:**` as a numbered list of the four actions
+
+  ## Edge cases
+
+  - Asked to appeal a pending request: refuse and say it is `pending_review`,
+    not denied, and that the payer has asked for what its notes record.
+  - Asked to file, submit, or escalate the appeal: you prepare the package
+    only. A person files it. Never state an appeal has been submitted or that a
+    peer-to-peer has been scheduled.
+  - The appeal success rate is that payer's historical rate across all appeals.
+    It is not this appeal's probability - present it as payer history.
+  - If a denied record's payer rule set is empty, say the criteria list is
+    empty and lean on the denial reason alone. Never manufacture criteria.

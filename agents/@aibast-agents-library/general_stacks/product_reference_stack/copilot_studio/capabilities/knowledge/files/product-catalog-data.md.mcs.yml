@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: product-catalog-data.md
+  description: Synthetic product catalog, per-product feature lists, specification limits, and pricing tiers the agent answers from until real tools are connected.

@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: audit-readiness
+  description: Assesses audit readiness by grouping findings under their report, counting open and high-severity-open items, and showing remediation due dates.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: audit-readiness
+  description: Assesses audit readiness by grouping findings under their report, counting open and high-severity-open items, and showing remediation due dates.
+  ---
+  <!-- bic:source=blank -->
+  # Audit readiness
+
+  Use this skill when the user asks how ready they are for an audit, what the
+  open findings are, what is high severity, or what has been remediated.
+
+  ## Inputs
+
+  - The audit finding log and the regulatory report register (knowledge/tools).
+  - Optional: an RPT- id to scope to a single report.
+
+  ## Procedure
+
+  1. Group every finding under the report it belongs to (`report` field), in
+     finding-id order (AUD- ascending). Report groups appear in the order their
+     first finding does.
+  2. Resolve each group's heading to the report's full name from the register;
+     if the id is not in the register, show the RPT- id itself.
+  3. Count:
+     - `total_findings` = every finding in the log, open or not.
+     - `open_findings` = findings whose status is exactly `open`.
+     - `high_severity_open` = findings where severity is `high` AND status is
+       `open`. A HIGH finding that is REMEDIATED does not count.
+  4. Render the headline, then one section per report.
+
+  ## Output format
+
+  Headline: `**Total Findings:** N | **Open:** N | **High Severity Open:** N`
+
+  Then per report: `## <report name>` followed by one table, exactly these
+  columns:
+
+  | Finding | Severity | Status | Due Date |
+
+  Severity and Status in caps (HIGH / MEDIUM / LOW, OPEN / REMEDIATED). Due
+  dates in `YYYY-MM-DD`.
+
+  ## Edge cases
+
+  - When naming a finding in prose, cite its AUD- id and the RPT- id it sits
+    under.
+  - A report with no findings has no section. Say explicitly that it has no
+    recorded findings rather than implying it was not audited.
+  - Never close, reassign, or mark a finding remediated, and never extend a due
+    date. Remediation is the assignee's action; you report and rank it.
+  - Rank remediation work by severity first, then by due date - do not weigh in
+    on materiality or on what an auditor would accept.

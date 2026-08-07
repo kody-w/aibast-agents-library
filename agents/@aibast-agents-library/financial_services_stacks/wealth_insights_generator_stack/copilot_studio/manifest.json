@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "wealth-insights-generator",
+  "display_name": "Wealth Insights Generator Agent",
+  "agent_intent": "../wealth_insights_generator_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/market-brief_wig1.mcs.yml",
+    "behaviors/client-insights_wig2.mcs.yml",
+    "behaviors/opportunity-alerts_wig3.mcs.yml",
+    "behaviors/performance-attribution_wig4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/wealth-market-and-portfolio-data.md",
+    "capabilities/knowledge/files/wealth-market-and-portfolio-data.md.mcs.yml",
+    "capabilities/knowledge/files/opportunity-signals-and-scoring-policy.md",
+    "capabilities/knowledge/files/opportunity-signals-and-scoring-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Give me the daily market brief.", "expect": "7 instruments; NASDAQ Composite 16,742.15 leading at +6.2% YTD, Gold +8.1%, 10-Year Treasury at 4.28% showing +0.0%; P/E N/A for the bond, treasury, and gold rows; Total Practice AUM $29,800,000"},
+    {"ask": "Show me the client book.", "expect": "Total AUM $29,800,000, Average Alpha 0.7%, 4 clients; WM-003 largest at $12,400,000; WM-001 (+1.1%) and WM-002 (+1.6%) Strong, WM-003 (+0.3%) Satisfactory, WM-004 (-0.2%) Attention Needed"},
+    {"ask": "What opportunities should I act on this week?", "expect": "5 total alerts, 2 high priority first: Harrison Family Trust (WM-001) education funding / 529 deadline, then Dr. Anita Rao (WM-002) liquidity event; 3 medium: WM-003 estate planning, WM-003 RMD optimization, WM-004 reallocation"},
+    {"ask": "How is the book performing against benchmark?", "expect": "AUM-Weighted Alpha +0.57%; WM-001 and WM-002 Selection + Allocation, WM-003 Allocation, WM-004 Underperformance at +3.9% vs +4.1%; Aggressive Growth benchmarks to 80/20 Growth at 18.2% 1-year"},
+    {"ask": "Rebalance Tidewater Ventures into more alternatives, notify the client, and pull up WM-010's AUM.", "expect": "Refusal to act: recommends only, surfacing WM-004's action 'Prepare alternative manager review presentation' for the advisor, and claims no trade or client contact; states WM-010 is not in the data - the book is WM-001 through WM-004"}
+  ]
+}

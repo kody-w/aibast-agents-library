@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: report-status
+  description: Builds the regulatory report status view - every tracked filing ordered by deadline, with overdue and submitted counts up front.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: report-status
+  description: Builds the regulatory report status view - every tracked filing ordered by deadline, with overdue and submitted counts up front.
+  ---
+  <!-- bic:source=blank -->
+  # Report status
+
+  Use this skill when the user asks where the reports stand, for the reporting
+  picture, what is overdue, what is due next, or for the status of a named
+  filing or authority.
+
+  ## Inputs
+
+  - The regulatory report register (knowledge/tools).
+  - Optional: a single RPT- id, an authority (EPA, FERC, PHMSA, State - Texas,
+    State - Colorado), or a facility. If the user names one, restrict every row
+    and every count to it and say the view is filtered.
+
+  ## Procedure
+
+  1. Retrieve all reports in the register.
+  2. Sort by `deadline` ascending. Never any other order. When two reports share
+     a deadline, keep register order (RPT- id ascending).
+  3. Count `total` = rows shown, `submitted` = rows with status exactly
+     `submitted`, `overdue` = rows with status exactly `overdue`. Status is read,
+     never derived from comparing the deadline to today's date.
+  4. Render the headline line first, then the table.
+
+  ## Output format
+
+  Headline: `**Total Reports:** N | **Submitted:** N | **Overdue:** N`
+
+  Then one table, exactly these columns:
+
+  | Report | Authority | Facility | Deadline | Status | Complete | Quality |
+
+  Report is the filing's full name. Status in caps as recorded (OVERDUE,
+  IN_PROGRESS, SUBMITTED, NOT_STARTED). Complete is `completeness_pct` with a
+  `%` suffix. Quality is `data_quality_score` rendered as `N/100`.
+
+  ## Edge cases
+
+  - A NOT_STARTED report shows 0% and 0/100. That is the absence of data, not a
+    quality failure - say so if the user asks why it scores zero.
+  - No reports match a filter: say so and name the filter that produced the
+    empty view.
+  - If any row is OVERDUE, name it with its RPT- id and assignee directly under
+    the headline.
+  - Never state that a filing has been made. Status reflects the register only.

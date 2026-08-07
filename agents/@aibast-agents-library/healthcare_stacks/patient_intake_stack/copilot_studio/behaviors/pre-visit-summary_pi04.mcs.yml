@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: pre-visit-summary
+  description: Produces the front-desk pre-visit brief for each patient - identity, language, payer, verification status, and amount due at the desk.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pre-visit-summary
+  description: Produces the front-desk pre-visit brief for each patient - identity, language, payer, verification status, and amount due at the desk.
+  ---
+  <!-- bic:source=blank -->
+  # Pre-visit summary
+
+  Use this skill when the user asks what to know before a patient arrives,
+  asks for a huddle or day-sheet brief, asks what a patient owes at check-in,
+  or asks whether an interpreter is needed.
+
+  ## Inputs
+
+  - The patient registry joined to each patient's `primary` insurance plan.
+
+  ## Procedure - exact rules
+
+  1. Build one summary per patient in the registry. The tool returns all three
+     patients on every call; present only the patient the user named.
+  2. Fields are exactly: patient_id, name, dob, phone, language
+     (`primary_language`), payer, copay (`copay_office`),
+     deductible_remaining, verification_status.
+  3. `deductible_remaining = max(0, deductible - deductible_met)` - the same
+     arithmetic as insurance verification, floored at zero. Current values:
+     PT-20001 $625, PT-20002 $1,680, PT-20003 $0.
+  4. Missing insurance fields fall back to `N/A` for payer, `0` for copay, and
+     `unknown` for verification status. Report the fallback as-is; an
+     `unknown` status is a flag for the front desk, not an assumption of
+     coverage.
+  5. Verification status renders in capitals. If any patient is not
+     `VERIFIED`, lead with that patient - it is the item that blocks check-in.
+  6. Language is an operational flag. When `primary_language` is not English
+     (PT-20003 Maria Gonzalez, Spanish), state that an interpreter should be
+     arranged. Do not assume English proficiency from anything else in the
+     record.
+  7. Amount due at the desk is the copay only. Do not add the remaining
+     deductible into a single figure - they are separate numbers and are
+     presented separately.
+
+  ## Output format
+
+  Headline `# Pre-Visit Summaries`, then one block per patient:
+
+  - `## <name> (<PT-id>)`
+  - `- DOB: <yyyy-mm-dd> | Language: <language>`
+  - `- Insurance: <payer> (<STATUS>)`
+  - `- Copay: $<n> | Deductible Remaining: $<n,nnn>`
+
+  ## Edge cases
+
+  - Asked for the visit reason, chief complaint, appointment time, or the
+    patient's provider: the summary does not carry them. Say so; the provider
+    schedule lists open slots, not booked visits, so it cannot supply them
+    either.
+  - Asked for medications, allergies, or prior visit history: not in the data.
+    State that plainly.
+  - Asked to notify the patient, send a reminder, or collect the copay:
+    refuse - read-only. Report what is owed and hand the action to staff.

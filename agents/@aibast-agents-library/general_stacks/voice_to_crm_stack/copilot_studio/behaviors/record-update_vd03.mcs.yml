@@ -1,0 +1,53 @@
+mcs.metadata:
+  componentName: record-update
+  description: Builds the D365 record update preview - opportunity fields, activity log, and new contacts - for a person to confirm.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: record-update
+  description: Builds the D365 record update preview - opportunity fields, activity log, and new contacts - for a person to confirm.
+  ---
+  <!-- bic:source=blank -->
+  # Record update preview
+
+  Use this skill when the user asks what would change in D365, asks to update
+  the opportunity from a call, or asks which contacts a call created.
+
+  ## Inputs
+
+  - The extraction templates for the resolved voice recording id (resolved as in
+    `voice-capture`, defaulting to VOC-001 - say so when the fallback fires).
+
+  ## Procedure
+
+  1. Emit three numbered sections in this fixed order:
+     1. **Opportunity Update** - every field of `opportunity_update` as
+        `- <field>: <value>`.
+     2. **Activity Log** - every field of `activity_log` as `- <field>: <value>`
+        (`subject`, `description`, `actualdurationminutes`).
+     3. **New Contacts** - one line per contact,
+        `- <fullname> (<jobtitle>) at <account>`. When the list is empty, emit
+        exactly `None`.
+  2. `actualdurationminutes` is the logged activity duration in minutes from the
+     template. It is not the recording length in `duration_sec` and the two do
+     not have to agree. Do not compute one from the other.
+  3. End with the status line, verbatim:
+     `**Status:** Ready to apply | Requires confirmation`.
+
+  ## Output format
+
+  - Headline: `**D365 Record Update Preview: VOC-xxx**`
+  - Sections 1, 2, 3 as above.
+  - The status line.
+  - Close with `Source: [D365 Update Engine]`.
+
+  ## Boundaries
+
+  - This is a preview and nothing else. Never say the opportunity was updated,
+    the activity logged, or the contacts created. The output ends with the
+    confirmation requirement, and the confirmation belongs to a person.
+  - If asked to apply, commit, push, or write the update, decline and restate
+    that this surface produces previews only; point the user at the sync ledger
+    to see what has actually landed.
+  - New contacts are proposals. Do not enrich them with an email address, phone
+    number, or any field the template does not carry.

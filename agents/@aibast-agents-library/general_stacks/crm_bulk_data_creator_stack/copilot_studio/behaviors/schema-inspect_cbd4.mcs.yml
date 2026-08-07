@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: schema-inspect
+  description: Inspects entity metadata - attributes, types, required flags, lengths and lookup targets - or returns the catalog overview.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: schema-inspect
+  description: Inspects entity metadata - attributes, types, required flags, lengths and lookup targets - or returns the catalog overview.
+  ---
+  <!-- bic:source=blank -->
+  # Schema inspect
+
+  Use this skill when the user asks what fields an entity has, asks for types
+  or field lengths, asks which fields are mandatory, or asks what entities
+  exist at all.
+
+  ## Inputs
+
+  - `entity_name` - optional. With no entity named, or with an entity that is
+    not in the catalog, return the overview instead of an error.
+
+  ## Procedure
+
+  1. **Entity not in the catalog -> overview, not a guess.** Render the catalog
+     table:
+
+     | Entity | Display Name | Attributes | Records |
+     |---|---|---|---|
+     | account | Account | 12 | 1,247 |
+     | contact | Contact | 8 | 4,532 |
+     | opportunity | Opportunity | 9 | 892 |
+
+     then the line: Specify entity_name to inspect a specific entity.
+  2. **Entity found -> properties then attributes.** Properties are Logical
+     Name, Primary Key, Primary Name, Record Count (thousands-separated) and
+     Attributes (the count):
+     - account: accountid / name / 1,247 / 12
+     - contact: contactid / fullname / 4,532 / 8
+     - opportunity: opportunityid / name / 892 / 9
+  3. The attribute table is `Name | Type | Required | Details`, one row per
+     attribute in catalog order. `Required` is `Yes` or `No`. `Details` follows
+     one rule and only one: if the attribute has a max length, print
+     `max: <n>`; else if it is a Lookup, print `-> <target>`; else leave it
+     blank. Uniqueidentifier, Picklist, Money, Integer and DateTime attributes
+     therefore have an empty Details cell.
+  4. Account has exactly 3 required attributes (accountid, name, ownerid) and
+     9 optional. `name` is `max: 160`, `accountnumber` `max: 20`, `websiteurl`
+     `max: 200`, `ownerid` `-> systemuser`.
+
+  ## Output format
+
+  - `**D365 Schema: <Display Name>**` (or `**D365 Schema Overview**`)
+  - `| Property | Value |` table
+  - `**Attributes:**` followed by the four-column attribute table
+  - Close with `Source: [Dynamics 365 Metadata API]` and
+    `Agents: Dynamics365ConnectorAgent`
+
+  ## Boundaries
+
+  - Read-only. Never propose creating, renaming, or deleting an attribute or
+    entity, and never report a field the catalog does not list.
+  - If asked about an attribute that is not in the table, say it is not in this
+    entity's metadata rather than inferring it from the entity name.

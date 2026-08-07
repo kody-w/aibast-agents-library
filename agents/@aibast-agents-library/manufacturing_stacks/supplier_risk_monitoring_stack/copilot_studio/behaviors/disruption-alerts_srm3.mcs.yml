@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: disruption-alerts
+  description: Lists active disruption alerts ordered by severity and assesses the spend exposed by every HIGH-severity event.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: disruption-alerts
+  description: Lists active disruption alerts ordered by severity and assesses the spend exposed by every HIGH-severity event.
+  ---
+  <!-- bic:source=blank -->
+  # Disruption alerts
+
+  Use this skill when the user asks what is going wrong right now, asks about
+  incidents, disruptions, alerts, force majeure, quality excursions, or asks
+  what is exposed today.
+
+  ## Inputs
+
+  - The incident log, the supplier master, and the alternatives list.
+  - No arguments. All recorded incidents are considered active.
+
+  ## Procedure
+
+  1. Retrieve every incident.
+  2. Sort by severity using the fixed rank `HIGH = 0, MEDIUM = 1, LOW = 2`;
+     any other severity ranks 3. Within the same severity, keep log order.
+     Never re-sort by date across severities.
+  3. Resolve each incident's `supplier_id` to the supplier name from the
+     supplier master; if the id is not found, print the id itself.
+  4. Build the impact assessment from HIGH-severity incidents only. MEDIUM and
+     LOW incidents appear in the table but never in the assessment.
+  5. For each HIGH incident report the supplier's `annual_spend` as the spend
+     exposed, its category, and whether that SUP- id has any entry in the
+     alternatives list (Yes / No).
+
+  ## Output format
+
+  One table, exactly these columns:
+
+  | Severity | Date | Supplier | Description |
+
+  Severity in caps and bold. Supplier names truncated to 28 characters.
+  Descriptions verbatim, including lot numbers and defect rates.
+
+  Then `### Impact Assessment`, and per HIGH incident:
+
+  - `**<supplier name>**`
+  - `- Annual spend exposed: $N`
+  - `- Category: <category>`
+  - `- Backup suppliers available: Yes|No`
+
+  ## Edge cases
+
+  - If there are no incidents at all, output `No active disruption alerts.`
+    and nothing else.
+  - If there are incidents but none at HIGH severity, render the table and
+    state that no HIGH-severity impact assessment applies. Do not promote a
+    MEDIUM incident to fill the section.
+  - Two incidents against the same supplier stay as two rows; do not merge.
+  - "Backup suppliers available" answers only whether alternatives exist. It
+    is not a recommendation - route sourcing questions to the alternative
+    sourcing skill.

@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: competitive-intel
+  description: Side-by-side competitor comparison inside the account briefing view, with the discount risk alert.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: competitive-intel
+  description: Side-by-side competitor comparison inside the account briefing view, with the discount risk alert.
+  ---
+  <!-- bic:source=blank -->
+  # Competitive intel (briefing view)
+
+  Use this skill when the user wants the competitive picture as part of an
+  account briefing. For named-competitor depth, win rates, battlecards, or
+  pricing intel, use the competitive-intelligence skills instead.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure
+
+  1. Build a comparison table whose first data column is `You` and whose
+     remaining columns are the competitors for that account, in roster order.
+     In this briefing dataset the Acme competitors are labelled
+     `CompetitorA` and `CompetitorB` - anonymized labels. Use them exactly.
+  2. Rows, in this order - Relationship depth, Product fit (percent),
+     Pricing, Implementation (weeks).
+  3. Our fixed profile - relationship Strong, product fit 94 percent,
+     pricing Market rate, implementation 8 weeks.
+  4. Competitor activity - one bullet per competitor, verbatim.
+  5. Your advantages - the three fixed advantages, numbered 1 to 3.
+  6. Risk alert - fire only when a competitor's pricing string contains a
+     `-` (a discount below market). Name the FIRST such competitor and say
+     the discount may appeal to the economic buyer. `+10% above market` does
+     not trigger it.
+
+  Worked example - Acme Corporation shows You 94 percent fit / 8 weeks
+  against CompetitorA 78 percent / 14 weeks and CompetitorB 82 percent /
+  10 weeks, and the alert fires on CompetitorA at -15 percent below market.
+
+  ## Output format
+
+  `**Competitive Intelligence:**`, the comparison table,
+  `**Competitor Activity:**`, `**Your Advantages:**` (numbered), then
+  `**Risk Alert:**` when triggered.
+
+  ## Edge cases
+
+  - If the account has no competitors, answer exactly
+    `No active competitors identified for this account.` Northwind Traders
+    is that case.
+  - Do not merge this view with the named-competitor dataset. Naming
+    CompetitorA as a real vendor here would be inventing data.

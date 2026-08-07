@@ -1,0 +1,70 @@
+mcs.metadata:
+  componentName: satisfaction-trend
+  description: Shows four quarters of satisfaction scores per client, classifies the trend with a fixed 0.3-point rule, and calls out declining accounts with the size of the drop.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: satisfaction-trend
+  description: Shows four quarters of satisfaction scores per client, classifies the trend with a fixed 0.3-point rule, and calls out declining accounts with the size of the drop.
+  ---
+  <!-- bic:source=blank -->
+  # Satisfaction trend
+
+  Use this skill when the user asks about satisfaction, CSAT, NPS movement,
+  whose scores are falling or rising, or which accounts are trending the wrong
+  way.
+
+  ## Inputs
+
+  - The client portfolio record set, specifically the four quarterly
+    `satisfaction_scores` (Q1 oldest, Q4 newest) and `nps` per client.
+
+  ## Procedure -- the 0.3-point rule
+
+  Walk the clients in roster order (CL-301 through CL-308).
+
+  Classify each client from the first and last score only. The two middle
+  quarters do not affect the classification:
+
+  - fewer than 2 scores -> `insufficient_data`, render the trend cell as `-`
+  - `last > first + 0.3` -> `improving`, render `**UP**`
+  - `last < first - 0.3` -> `declining`, render `**DOWN**`
+  - otherwise -> `stable`, render `**FLAT**`
+
+  The band is exactly 0.3. A move of 0.3 or less in either direction is FLAT,
+  not a trend. Do not eyeball the shape of the four numbers; apply the
+  comparison.
+
+  For every declining client compute
+  `drop = round(satisfaction_scores[0] - satisfaction_scores[-1], 1)`.
+
+  ## Output format
+
+  One table with exactly these columns:
+
+  `| Client | Q1 | Q2 | Q3 | Q4 | Trend | NPS |`
+
+  - Each quarterly score renders to one decimal place: `8.2`, `9.0`.
+  - Trend renders bold: `**UP**`, `**DOWN**`, `**FLAT**`, or `-`.
+  - NPS renders with an explicit sign: `+52`, `-20`.
+
+  If at least one client is declining, add:
+
+  `### Declining Accounts Requiring Attention`
+
+  and one bullet per declining client:
+  `- **<Client name>**: dropped N points over 4 quarters (NPS: +/-N)`
+
+  Omit the section entirely when nothing is declining.
+
+  ## Edge cases
+
+  - A declining trend can sit on a positive NPS. Report both as they stand and
+    do not reconcile them.
+  - A declining trend does not make a client at-risk. Risk membership comes from
+    `risk_label` only.
+
+  ## Boundaries
+
+  - Reporting only. Flagging a decline is not a save plan and not an action
+    taken. Recommendations belong to the at-risk-clients skill.

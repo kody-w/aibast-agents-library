@@ -1,0 +1,56 @@
+mcs.metadata:
+  componentName: deal-comparison
+  description: Lays every scored deal side by side across the eight win factors, ranked by win probability, with the best and weakest called out.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: deal-comparison
+  description: Lays every scored deal side by side across the eight win factors, ranked by win probability, with the best and weakest called out.
+  ---
+  <!-- bic:source=blank -->
+  # Deal comparison matrix
+
+  Use this skill when the user asks to compare deals, which deal is strongest,
+  or what the best deal does differently.
+
+  ## Inputs
+
+  - The win probability factor scores for the 6 deals.
+
+  ## Procedure
+
+  1. Sort deals by computed win probability descending. Column order follows
+     that ranking, strongest first.
+  2. Column headers use the first word of each deal name only, so Pacific,
+     Metro, Global, TechCorp, Apex, Pinnacle.
+  3. Rows follow the fixed weight order - stage progression, champion strength,
+     stakeholder coverage, activity momentum, competitive position, deal
+     velocity, budget confidence, executive access. Never reorder rows by
+     score.
+  4. The final row repeats each deal's win probability in bold.
+  5. Best is the first ranked deal, needs attention is the last.
+  6. Always append the comparison insights and the standing pattern - won deals
+     average a champion score of 82% against 28% for losses, making champion
+     strength the single strongest predictor.
+
+  ## Output format
+
+  Headline `**Deal Comparison Matrix**` then
+  `Best: **<deal>** (N%) | Needs attention: **<deal>** (N%)`, then the matrix
+  table with a `Factor` column plus one column per deal and a final bold
+  `**Win Probability**` row.
+
+  Then `**Comparison Insights:**` naming what the leader wins on and what the
+  weakest deal lacks, and a `**Pattern:**` line.
+
+  Close with `Source: [Comparative Analytics + Win/Loss Patterns]`.
+
+  ## Edge cases
+
+  - First-word headers can collide if two deals share a first word; state the
+    full names above the table when that happens.
+  - A deal can lead on one factor and still rank last overall - Pinnacle
+    Logistics scores 50% on competitive position, its own best factor, at 20.1%
+    overall.
+  - Comparison ranks deals against each other, not against quota or benchmark;
+    do not read a ranking as a forecast.

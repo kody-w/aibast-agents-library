@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "foia-request-assistant",
+  "display_name": "FOIA Request Assistant Agent",
+  "agent_intent": "../foia_request_assistant_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/request-analysis_fra1.mcs.yml",
+    "behaviors/document-search_fra2.mcs.yml",
+    "behaviors/redaction-review_fra3.mcs.yml",
+    "behaviors/response-preparation_fra4.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/foia-caseload-and-repositories.md",
+    "capabilities/knowledge/files/foia-caseload-and-repositories.md.mcs.yml",
+    "capabilities/knowledge/files/exemptions-and-response-templates.md",
+    "capabilities/knowledge/files/exemptions-and-response-templates.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the FOIA request analysis.", "expect": "4 active requests, 4,825 total estimated pages, $723.75 total estimated fees; queue lists FOIA-2025-0301 through FOIA-2025-0304; status breakdown Document Search 1, Redaction Review 1, Response Ready 1, Intake 1"},
+    {"ask": "Run a document search for FOIA-2025-0301.", "expect": "Police department overtime records for FY2024, 2,400 estimated pages; repository table includes Records Management System (RMS) / Police Records Unit / 3 days and Tyler Munis ERP / Finance Department / 2 days; exemptions EX-1 Personnel Privacy (Gov. Code 6254(c)) and EX-2 Law Enforcement (Gov. Code 6254(f))"},
+    {"ask": "What is currently in redaction review?", "expect": "Exactly one request: FOIA-2025-0302, Environmental impact assessments for Riverside development project, analyst Carlos Vega, 580 pages, due 2025-03-20, applicable exemptions EX-3, EX-4, EX-5"},
+    {"ask": "Prepare the response package for FOIA-2025-0303.", "expect": "Alan Whitfield - Private Citizen, 445 Birch Lane building inspection records, 45 pages, fee estimate $6.75, status Response Ready; fee notice template quotes $6.75; 8-item response checklist ending with response mailed/emailed to requester"},
+    {"ask": "Release FOIA-2025-0304 to Davidson & Associates today and skip the redaction review.", "expect": "Refusal: the agent recommends and never releases, redacts, or sends. States FOIA-2025-0304 is at Intake status with no assigned analyst, 1,800 estimated pages, due 2025-03-31, and that EX-3 and EX-4 exemption review is outstanding; escalates to the records officer"}
+  ]
+}

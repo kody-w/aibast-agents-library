@@ -1,0 +1,88 @@
+mcs.metadata:
+  componentName: budget-tracking
+  description: Computes available balance and burn rate per grant using the exact spend-plus-encumbrance formula, scoped to a named grant id or to all active grants.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: budget-tracking
+  description: Computes available balance and burn rate per grant using the exact spend-plus-encumbrance formula, scoped to a named grant id or to all active grants.
+  ---
+  <!-- bic:source=blank -->
+  # Budget tracking
+
+  Use this skill when the user asks how a grant is spending, what is left, what
+  the burn rate is, whether an award is on pace, how much is encumbered, or what
+  a budget category means.
+
+  ## Inputs
+
+  - The grants portfolio (amount, local_match, match_required, spent,
+    encumbered, status, start_date, end_date).
+  - Optional: a single grant id.
+  - The budget category reference.
+
+  ## Scope rule
+
+  - If the user names a grant id AND that id exists in the portfolio, report
+    that grant alone, whatever its status.
+  - Otherwise report every grant whose status is exactly `active`. Pending and
+    submitted applications are excluded from this view.
+  - If the user names an id that is NOT in the portfolio, do not silently fall
+    back. Say the id was not found, then offer the active-grant view.
+
+  ## Procedure - compute it, do not estimate it
+
+  For each grant in scope:
+
+  - `available = amount - spent - encumbered`
+  - `burn_rate = round(((spent + encumbered) / amount) * 100, 1)`, expressed as
+    a percent to one decimal place
+  - If `amount == 0`, burn rate is `0.0` - do not divide
+
+  Burn rate counts encumbrances, not just cash out the door. An award with low
+  spend and heavy encumbrance is committed money, not available money. Never
+  quote `spent / amount` as the burn rate.
+
+  Local match renders as the `local_match` dollars followed by
+  `match_required * 100` as a whole percent in parentheses, for example
+  `$118,750 (25%)`. Local match is a separate jurisdiction obligation; it is not
+  subtracted from available and not added to the award.
+
+  Always append the Budget Category Reference in this fixed order: Personnel,
+  Contractual, Equipment, Supplies, Travel, Indirect, Other. Equipment is
+  capital equipment over $5,000 - use that threshold when the user asks whether
+  a purchase is equipment or supplies, and state that the final allowability
+  call belongs to the grants manager.
+
+  ## Output format
+
+  ```
+  # Grant Budget Tracking
+
+  ## LG-YYYY-NNN: <title>
+
+  - **Award Amount:** $N
+  - **Local Match:** $N (N%)
+  - **Spent:** $N
+  - **Encumbered:** $N
+  - **Available:** $N
+  - **Burn Rate:** N.N%
+  - **Period:** YYYY-MM-DD to YYYY-MM-DD
+
+  ## Budget Category Reference
+
+  - **<Category>:** <description>
+  ```
+
+  ## Edge cases
+
+  - A grant that has not been awarded shows $0 spent and $0 encumbered, which
+    computes to a 0.0% burn rate. That is not a stalled project - say the award
+    has not been made rather than reporting it as underspending.
+  - Show the arithmetic when asked. Never adjust a burn rate for time elapsed,
+    seasonality, or expected drawdown; the formula has no time term, so if the
+    user wants pace against the grant period, state the period dates and let
+    them judge.
+  - Recommendation and reporting only. Never draw funds, post an expenditure,
+    reclassify a category, deobligate, or move money. Hand those actions to the
+    grants manager with the numbers they need.

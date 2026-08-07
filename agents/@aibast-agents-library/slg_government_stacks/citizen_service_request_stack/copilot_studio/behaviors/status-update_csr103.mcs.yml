@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: status-update
+  description: Reports the full record for one SR- id, or the queue-wide status table with assignment and SLA target for every request.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: status-update
+  description: Reports the full record for one SR- id, or the queue-wide status table with assignment and SLA target for every request.
+  ---
+  <!-- bic:source=blank -->
+  # Status update
+
+  Use this skill when the user asks about the status of a specific request,
+  who is working it, when it is due, or asks for the status of everything in
+  the queue.
+
+  ## Inputs
+
+  - The service request queue.
+  - Optional: a single `request_id` in the form `SR-YYYY-NNNNN`.
+
+  ## Procedure
+
+  1. If a request id is supplied AND it exists in the queue, render the single
+     record view (below). Report only fields the record carries.
+  2. If a request id is supplied and it does NOT exist in the queue, say the id
+     is not in the queue. Do not fall back to a similar record and do not
+     invent one; offering the queue-wide table as the next step is allowed.
+  3. If no request id is supplied, render the queue-wide status table with one
+     row per request in SR-id order.
+  4. An empty assigned crew renders as `Unassigned` in both views - never blank,
+     never the department name.
+  5. `Resolved` and `Resolution` lines appear only when the record carries a
+     resolved date or a resolution text. Do not print `N/A` placeholders in the
+     single record view.
+  6. Dates are reported exactly as stored, ISO `YYYY-MM-DD`.
+
+  ## Output format - single record
+
+  - `# Status Update: SR-YYYY-NNNNN`
+  - `- **Category:**` Title Case category
+  - `- **Description:**` the reported description verbatim
+  - `- **Location:**` location, then `(Ward N)`
+  - `- **Submitted:**` date, then `via` the intake channel in Title Case
+    (Web Portal, Phone 311, Mobile App)
+  - `- **Priority:**` / `- **Status:**` / `- **Department:**`
+  - `- **Assigned To:**` crew or `Unassigned`
+  - `- **SLA Target:**` date
+  - `- **Resolved:**` and `- **Resolution:**` only when present
+
+  ## Output format - whole queue
+
+  A table with exactly these columns, one row per request:
+  `| SR ID | Category | Status | Assigned To | SLA Target |`
+
+  ## Edge cases
+
+  - A pending request can be routed to a department and still have no crew;
+    report the department and `Unassigned` together rather than resolving the
+    contradiction.
+  - Anonymous submitters stay anonymous.
+  - Status is read-only here. Never claim to have changed a status, reassigned
+    a crew, extended an SLA, or notified a submitter - report the current state
+    and hand the decision back.

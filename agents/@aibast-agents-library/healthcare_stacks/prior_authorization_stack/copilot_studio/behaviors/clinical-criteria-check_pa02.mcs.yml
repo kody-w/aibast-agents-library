@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: clinical-criteria-check
+  description: Resolves the payer rule set for each authorization's CPT code and reports the requirement list, auto-approve flag, approval rate, and turnaround.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: clinical-criteria-check
+  description: Resolves the payer rule set for each authorization's CPT code and reports the requirement list, auto-approve flag, approval rate, and turnaround.
+  ---
+  <!-- bic:source=blank -->
+  # Clinical criteria check
+
+  Use this skill when the user asks what the payer requires, what documentation
+  is needed, whether a procedure auto-approves, what the approval odds are, or
+  how long a decision takes for a given CPT code.
+
+  ## Inputs
+
+  - The authorization request queue and the per-CPT clinical criteria rule sets.
+  - Optional: one AUTH- id, a CPT code, or a patient name. With no filter,
+    process every authorization in record order.
+
+  ## Procedure - resolve, do not interpret
+
+  For each authorization:
+
+  1. Take the request's `cpt_code` and look up its criteria record. The
+     criteria record carries `payer_rules`, `avg_turnaround_days`, and
+     `approval_rate_pct`.
+  2. **Resolve the payer key deterministically.** Test the keys in this exact
+     order - `BCBS`, then `Aetna`, then `Medicare` - and take the FIRST key
+     whose lower-cased text appears as a substring of the lower-cased payer
+     name on the request. Stop at the first match.
+     - `Aetna` matches the payer `Aetna`.
+     - `Medicare` matches the payer `Medicare Part B`.
+     - No key matches the payer `Blue Cross Blue Shield of Illinois`, because
+       the literal string `bcbs` does not occur in it.
+  3. If a key resolved, the rule set is that payer's entry: its `requires`
+     list and its `auto_approve` flag. If no key resolved, there is no rule
+     set: the requirement list is EMPTY and Auto-Approve is `No`. Do not
+     substitute the rules of a payer whose key did not match.
+  4. Approval rate and average turnaround come from the CPT record and are
+     reported whether or not a payer key resolved.
+  5. Reproduce every requirement string verbatim, including its threshold and
+     comparison operator.
+
+  ## Output format
+
+  One section per authorization, in record order:
+
+  - `## AUTH-xxxx: <procedure> (<patient>)`
+  - `**Payer:** <full payer name> | **Auto-Approve:** Yes|No`
+  - `**Historical Approval Rate:** N% | **Avg Turnaround:** N.N days`
+  - blank line
+  - `**Requirements:**`
+  - one `- ` bullet per requirement, in rule-set order
+
+  ## Edge cases
+
+  - **No rule set resolved.** Print the section normally with `Auto-Approve:
+    No` and an empty requirement list, and state plainly that no payer rule set
+    matched the recorded payer name so no requirements are on file for that
+    request. This is the honest answer - never fill the list from another
+    payer's rules for the same CPT.
+  - A CPT code with no criteria record yields approval rate `0` and turnaround
+    `0`; report that the CPT has no criteria on file rather than guessing.
+  - Auto-Approve `Yes` describes the payer's configuration for that CPT, not
+    the outcome of this request. Say so when the two disagree - AUTH-4003 is
+    approved and auto-approve `Yes`, while AUTH-4002 is auto-approve `No` and
+    still pending.
+  - Never state that a requirement has been met. The rule set says what is
+    required; the record's notes say what the reviewer concluded.

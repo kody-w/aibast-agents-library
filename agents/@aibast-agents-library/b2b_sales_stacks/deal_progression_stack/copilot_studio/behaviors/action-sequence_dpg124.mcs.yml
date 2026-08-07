@@ -1,0 +1,51 @@
+mcs.metadata:
+  componentName: action-sequence
+  description: Chains each deal's top plays into a back-to-back day schedule sized by each play's historical time to impact.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: action-sequence
+  description: Chains each deal's top plays into a back-to-back day schedule sized by each play's historical time to impact.
+  ---
+  <!-- bic:source=blank -->
+  # Action sequences
+
+  Use this skill when the user asks for a sequence, an order of operations, or
+  a multi-step plan for a deal.
+
+  ## Inputs
+
+  - The ranked eligible actions per deal and their historical days to impact.
+
+  ## Procedure
+
+  1. Process deals sorted by value descending. Take the deal's top 4 ranked
+     eligible actions.
+  2. Schedule them back to back with a day counter starting at 1. Each play
+     spans `days_to_impact` days, so `end_day = start_day + days_to_impact - 1`
+     and the next play starts the day after.
+  3. Total sequence length is the last end day. Append a review step on the
+     following day.
+  4. Print the play's recorded description after its name.
+  5. State the deal owner alongside the total sequence length.
+
+  ## Output format
+
+  Headline `**Action Sequences -- Multi-Step Plans**` then
+  `Sequenced for optimal execution and minimal rep context-switching.`
+
+  One block per deal - `**<deal> -- $<value>**`,
+  `Total sequence: N days | Owner: <rep>`, then lines of the form
+  `- **Days A-B:** <action> -- <description>`, closing with
+  `- **Day N+1:** Review progress and reassess`.
+
+  Close with `Source: [Action Sequencing Model + Rep Calendars]`.
+
+  ## Edge cases
+
+  - Plays run sequentially, never in parallel; do not compress the calendar
+    because a rep says they can multitask.
+  - A deal with a single eligible play produces a single span plus the review
+    day - Pinnacle Logistics runs Days 1-7 then Day 8.
+  - A deal with no eligible plays is skipped entirely.
+  - This is a proposed calendar. Never say anything was put on a rep's diary.

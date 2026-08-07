@@ -1,0 +1,71 @@
+mcs.metadata:
+  componentName: feedback-summary
+  description: Summarizes the whole feedback corpus - entry count, average satisfaction score, ARR represented, and the sentiment, category, and channel breakdowns.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: feedback-summary
+  description: Summarizes the whole feedback corpus - entry count, average satisfaction score, ARR represented, and the sentiment, category, and channel breakdowns.
+  ---
+  <!-- bic:source=blank -->
+  # Feedback summary
+
+  Use this skill when the user asks for an overview of customer feedback, how
+  much feedback exists, what the mix looks like, how much revenue the feedback
+  represents, or where the feedback is coming from.
+
+  ## Inputs
+
+  - The feedback record set (FB-5001 through FB-5006). No parameters.
+
+  ## Procedure - compute it, do not estimate it
+
+  Walk every feedback record once and accumulate:
+
+  1. `total_entries` = the count of records (6).
+  2. `by_sentiment` = a count per label, always emitted in the fixed order
+     **Positive, Neutral, Negative** - even when a count is zero.
+  3. `by_category` = a count per `category`, emitted in first-seen record
+     order (usability, feature_gap, praise, bug_report).
+  4. `by_channel` = a count per `channel`, emitted in first-seen record order
+     (support_ticket, nps_survey, qbr, in_app, sales_call).
+  5. `avg_score` = `sum(score) / total_entries`, rounded to one decimal.
+     For the current corpus: `(2 + 6 + 9 + 1 + 5 + 8) / 6 = 5.2`.
+  6. `total_arr_represented` = `sum(arr_impact)`, printed with thousands
+     separators. For the current corpus: `$1,278,000`.
+
+  Category and channel labels are rendered by replacing underscores with
+  spaces and title-casing, so `feature_gap` prints as `Feature Gap`,
+  `nps_survey` as `Nps Survey`, and `in_app` as `In App`. Keep that exact
+  rendering.
+
+  ## Output format
+
+  ```
+  # Product Feedback Summary
+
+  **Total Feedback Entries:** N
+  **Avg Satisfaction Score:** N/10
+  **ARR Represented:** $N
+
+  ## Sentiment Breakdown
+  | Sentiment | Count |
+
+  ## By Category
+  | Category | Count |
+
+  ## By Channel
+  | Channel | Count |
+  ```
+
+  ## Edge cases and boundaries
+
+  - The summary is corpus-wide. It carries no per-customer detail, no ARR per
+    sentiment, and no trend - if the user wants those, use sentiment-analysis
+    or say the split is not computed here.
+  - `avg_score` is the mean of the recorded satisfaction scores on a 0-10
+    scale. It is not NPS. Never present it as NPS.
+  - ARR represented is the sum of `arr_impact` across feedback entries. It is
+    not the sum of feature request `arr_weight` values, and the two totals are
+    not interchangeable.
+  - Never add a category, channel, or sentiment label that no record uses.

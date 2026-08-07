@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: summarize-encounter
+  description: Summarizes each documented patient encounter with chief complaint, vitals headline, the full diagnosis list with new problems tagged, and only the abnormal labs.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: summarize-encounter
+  description: Summarizes each documented patient encounter with chief complaint, vitals headline, the full diagnosis list with new problems tagged, and only the abnormal labs.
+  ---
+  <!-- bic:source=blank -->
+  # Encounter summary
+
+  Use this skill when the user asks what happened at a visit, asks for an
+  encounter or visit summary, asks what a patient came in for, or asks which
+  labs came back abnormal.
+
+  ## Inputs
+
+  - The encounter record set (ENC- ids), each carrying patient demographics,
+    encounter metadata, clinical notes, vital signs, diagnoses, and labs.
+  - Optional: a single ENC- id or patient name to narrow the presentation.
+    The operation itself always returns every encounter; narrowing is done by
+    presenting only the requested record and saying the view is filtered.
+
+  ## Procedure - apply exactly
+
+  For every encounter in the record set:
+
+  1. **Select abnormal labs.** Keep a lab if and only if its flag is not
+     exactly `normal`. `high` and `borderline` are both kept; `normal` is
+     dropped. No other test is applied - the value is never compared against
+     the reference range independently.
+  2. **Tag new diagnoses.** Append ` [NEW]` to a diagnosis when its status is
+     exactly `new`. All other statuses get no tag. Never re-order the
+     diagnosis list; keep the record's order.
+  3. **Compose the vitals headline** as `bp_systolic/bp_diastolic` plus `bmi`.
+     Only those two vitals go in the headline; the rest stay in the record.
+  4. **Uppercase the flag** in the abnormal labs table (`high` renders as
+     `HIGH`, `borderline` as `BORDERLINE`).
+
+  ## Output format
+
+  Headline `# Encounter Summaries`, then for each encounter:
+
+  - `## <patient name> (Age <age>) - <encounter_date>`
+  - `**Type:** <encounter_type> | **Provider:** <provider>`
+  - `**Chief Complaint:** <chief_complaint>`
+  - `**BP:** <systolic>/<diastolic> | **BMI:** <bmi>`
+  - `**Diagnoses:**` - one bullet per diagnosis, `- <code>: <description>`
+    with ` [NEW]` appended when status is new
+  - `**Abnormal Labs:**` - a table with columns
+    `| Test | Value | Reference | Flag |`, one row per abnormal lab, flag in
+    caps
+
+  Cite the ENC- id when naming a specific encounter in prose.
+
+  ## Edge cases
+
+  - If an encounter has zero abnormal labs, the Abnormal Labs heading and
+    table are omitted entirely - say "no abnormal labs on this encounter"
+    rather than printing an empty table.
+  - An ENC- id that is not in the record set does not exist here. Say so; do
+    not substitute the nearest encounter and do not fabricate one.
+  - Normal labs are held in the knowledge data but are not findings. Report
+    them only when the user asks for a specific test by name.
+  - Never derive a trend, delta, or baseline. A single documented value has no
+    prior value in this record set.

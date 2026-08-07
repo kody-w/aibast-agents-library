@@ -1,0 +1,64 @@
+mcs.metadata:
+  componentName: engagement-gaps
+  description: Scores committee relationships, keeps those below threshold, and ranks the gaps by severity with named actions.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: engagement-gaps
+  description: Scores committee relationships, keeps those below threshold, and ranks the gaps by severity with named actions.
+  ---
+  <!-- bic:source=blank -->
+  # Engagement gaps
+
+  Use this skill when the user asks where the relationship holes are, who to
+  meet next, or who is dangerously untouched.
+
+  ## Inputs
+
+  - One account name. Defaults to Acme Corporation.
+
+  ## Procedure - relationship score, then severity, then the threshold
+
+  Relationship score, out of 100:
+  1. `min(40, meetings * 3)`
+  2. `min(20, emails_opened)`
+  3. recency - `max(0, 25 - 14) = 11` when `last_touch` is set, else 0
+  4. `min(15, content_downloaded_count * 5)`
+  5. sentiment bonus - Positive 10, Neutral 3, Unknown 0
+
+  Severity, evaluated in this order:
+  - `score == 0` and (veto power or budget authority) gives `Critical`
+  - `score < 20` and veto power gives `High`
+  - `score < 30` gives `Medium`
+  - otherwise `Low`
+
+  Inclusion gate - a committee member appears only when
+  `relationship_score < 50`. Sort the survivors Critical, High, Medium, Low.
+  Actions are emitted for the top 5 - Critical gets
+  `**Urgent:** Get champion intro to <name>` naming what they control, High
+  gets `**This week:** Schedule meeting with <name>`, anything else gets
+  `Plan touchpoint with <name>`.
+
+  Worked example - Acme Corporation returns 4 gaps. Sarah Chen and Tom
+  Bradley score 0/100 with veto power, so Critical. Rachel Torres scores
+  `3 + 2 + 11 + 0 + 3 = 19` with veto power, so High. Lisa Park scores
+  `6 + 5 + 11 + 5 + 3 = 30`, which is below the 50 threshold but not below
+  30, so Low. James Miller (89) and David Wong (72) clear the threshold and
+  are absent.
+
+  ## Output format
+
+  - `**Engagement Gaps: <account>**` and
+    `Gaps identified: <n> stakeholders below engagement threshold`
+  - Table - Name, Role, Committee Role, Severity, Score, Meetings, Last
+    Touch (`Never` when null).
+  - `**Recommended Actions:**` - numbered, top 5.
+
+  ## Edge cases
+
+  - With no gaps, say all key stakeholders are adequately engaged rather
+    than lowering the threshold to produce a list.
+  - A `Low` severity gap is still a gap - it appears because the score is
+    under 50.
+  - Every action names a person for the rep to approach. The agent does not
+    request the intro itself.

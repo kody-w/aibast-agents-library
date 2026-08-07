@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: knowledge-search
+  description: Searches the knowledge base for articles matching an inquiry subject and returns them ranked by relevance with the top article's resolution steps.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: knowledge-search
+  description: Searches the knowledge base for articles matching an inquiry subject and returns them ranked by relevance with the top article's resolution steps.
+  ---
+  <!-- bic:source=blank -->
+  # Knowledge search
+
+  Use this skill when the user asks what the knowledge base says, asks for
+  resolution steps, asks whether an article covers a problem, or asks for a
+  workaround.
+
+  ## Inputs
+
+  - The knowledge base article catalog and the customer inquiry queue.
+  - Optional: an INQ- id whose subject becomes the query. If none is given,
+    query with the subject of INQ-4001.
+
+  ## Procedure
+
+  1. **Form the query.** The query string is the resolved inquiry's `subject`,
+     verbatim. Quote it back to the user.
+  2. **Match.** Lowercase the subject, split on whitespace, keep only tokens
+     longer than 3 characters. An article matches when any kept token appears
+     as a substring of the article's lowercased title. Every matching article
+     is returned - this is not a top-N cut.
+  3. **Fallback.** If no article matches, return exactly one article, KB-101,
+     and say the result is a fallback rather than a match.
+  4. **Rank.** Sort by `relevance_score` descending. Relevance is a stored
+     property of the article, not a computed similarity to the query - never
+     recompute or adjust it. Fixed values: KB-104 0.97, KB-101 0.95,
+     KB-102 0.92, KB-103 0.88.
+  5. **Expand the top match only.** Its summary and its resolution steps are
+     reproduced verbatim and in stored order.
+
+  ## Output format
+
+  - `**Knowledge Base Search Results**`
+  - `Query: "<subject>"`
+  - A table `| Article ID | Title | Relevance | Views |`, one row per matching
+    article in rank order. Relevance is a whole-number percent; views carry
+    thousands separators (1247 renders as 1,247).
+  - `**Top Match: <title>**`
+  - `**Summary:** <summary>`
+  - `**Resolution Steps:**` numbered `1.`, `2.`, ... in stored order. Never
+    reorder, merge, or add a step.
+  - `Last Updated: <date> | Helpful Votes: <helpful_votes> / <views> views`
+  - Close with `Source: [Knowledge Base]`.
+
+  ## Edge cases
+
+  - Multi-article results are ordered by relevance, not by views: KB-104 (97%,
+    456 views) outranks KB-101 (95%, 1,247 views).
+  - Trailing punctuation stays attached to a token, so `request:` is matched as
+    `request:` and will not hit a title containing `request`.
+  - If the user asks a question the catalog does not cover, say no article
+    covers it. Do not write troubleshooting steps of your own and present them
+    as knowledge base content.
+
+  ## Boundaries
+
+  - Never claim an article was sent, linked to a ticket, or published.
+  - Do not update a helpful-vote count, view count, or last-updated date.

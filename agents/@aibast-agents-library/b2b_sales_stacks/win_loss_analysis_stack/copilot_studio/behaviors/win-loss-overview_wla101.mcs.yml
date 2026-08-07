@@ -1,0 +1,72 @@
+mcs.metadata:
+  componentName: win-loss-overview
+  description: Reports Q3 versus Q2 win rates, segment performance, and the loss split by competitor from the closed-opportunity record.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: win-loss-overview
+  description: Reports Q3 versus Q2 win rates, segment performance, and the loss split by competitor from the closed-opportunity record.
+  ---
+  <!-- bic:source=blank -->
+  # Win/loss overview
+
+  Use this skill when the user asks how the quarter went, what the win rate is,
+  how we compare to last quarter, which segment is slipping, or who we are
+  losing to.
+
+  ## Inputs
+
+  - The Q3 closed-opportunity record (127 opportunities) and the Q2 record
+    (118 opportunities).
+  - No parameters. The overview always covers the full quarter.
+
+  ## Procedure - compute, do not judge
+
+  1. Win rate per quarter: `round(won / total * 100, 1)`. Q3 = 49 won of 127 =
+     38.6%. Q2 = 53 won of 118 = 44.9%. Change = `38.6 - 44.9 = -6.3 pts`.
+  2. Opportunity change: `round((127 - 118) / 118 * 100) = +8%`.
+  3. Average won deal size: `int(sum(value of won) / count(won))`. Q3 =
+     `8,433,000 / 49 = $172,102`. Q2 = `10,043,000 / 53 = $189,490`. Change =
+     `round((172102 - 189490) / 189490 * 100) = -9%`.
+  4. Segment win rate for each of enterprise, mid-market, smb, in that order:
+     `round(segment_won / segment_total * 100, 1)`, with the delta in points
+     against Q2 and an explicit sign.
+  5. Loss split by competitor. Every loss with no `competitor_lost_to` is
+     bucketed as **No Decision**. `% of Total = round(count / 78 * 100, 1)`
+     against all 78 Q3 losses. **Sort the table by loss count, descending.**
+  6. Trend column, against the same competitor's Q2 share of 65 Q2 losses:
+     delta > 1 renders `Up <delta>%` with one decimal; delta < -1 renders
+     `Down <abs delta>%` rounded to whole; otherwise `Flat`.
+  7. The "top competitor" is the highest loss count **excluding No Decision** -
+     CompetitorX at 29.
+
+  ## Output format
+
+  - Headline: `**Q3 Win/Loss Overview** (127 closed opportunities analyzed)`
+  - Table `| Metric | Q3 | Q2 | Change |` with rows: Total opportunities
+    (127 / 118 / +8%), Win rate (38.6% / 44.9% / -6.3 pts), Enterprise win rate
+    (20.0% / 40.0% / -20.0 pts), Avg deal size won ($172,102 / $189,490 / -9%).
+  - Table `| Segment | Q3 | Q2 | Change |`: Enterprise 20.0% / 40.0% /
+    -20.0 pts; Mid-Market 31.6% / 31.0% / +0.6 pts; Smb 76.7% / 76.7% /
+    +0.0 pts.
+  - Table `| Competitor | Losses | % of Total | Trend |`: CompetitorX 29 /
+    37.2% / Up 14.1%; CompetitorY 23 / 29.5% / Down 7%; No Decision 17 /
+    21.8% / Down 4%; CompetitorZ 9 / 11.5% / Down 2%.
+  - `**Initial Pattern:** CompetitorX wins are concentrated in enterprise
+    ($500K+) deals with security-conscious buyers.`
+  - `Source: [CRM + Win/Loss Interviews + Competitive Intel]`
+  - `Agents: WinLossDataAgent, PatternRecognitionAgent`
+
+  ## Edge cases
+
+  - Segment labels are title-cased on output, so `smb` renders as `Smb`. Keep
+    it consistent with the table rather than rewriting it as `SMB`.
+  - A segment whose win rate is unchanged renders `+0.0 pts`, not `Flat`.
+  - Only Q3 and Q2 exist in the record. Any other quarter is "no data", never
+    an extrapolation.
+
+  ## Boundaries
+
+  - Reporting only. Never claim a forecast has been updated or a deal reworked.
+  - No per-rep, per-region, or open-pipeline breakdown - the record does not
+    carry those fields. Say so.

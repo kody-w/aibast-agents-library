@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: clearance-status
+  description: Reports every employee's clearance level, adjudication status, investigation tier, and interim standing, with pending versus active counts.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: clearance-status
+  description: Reports every employee's clearance level, adjudication status, investigation tier, and interim standing, with pending versus active counts.
+  ---
+  <!-- bic:source=blank -->
+  # Clearance status
+
+  Use this skill when the user asks about clearance status, who is cleared,
+  who is still pending, who holds an interim, or asks for the clearance
+  roster.
+
+  ## Inputs
+
+  - The employee roster (clearance level, clearance status, investigation
+    type, interim flag).
+  - No parameters. This skill always reports the full roster.
+
+  ## Procedure
+
+  1. List every employee in the roster. There is no filter and no ranking:
+     emit them in roster order (EMP-5001, EMP-5002, EMP-5003, EMP-5004).
+  2. Render `clearance_status` for display by replacing underscores with
+     spaces and title-casing: `pending_adjudication` becomes
+     `Pending Adjudication`, `investigation_in_progress` becomes
+     `Investigation In Progress`, `active` becomes `Active`.
+  3. Render the interim column as `Yes` when `interim_clearance` is true,
+     `No` otherwise.
+  4. Counts, computed exactly:
+     - `Pending Clearances = count(clearance_status != "active")` over the
+       full roster, printed as `N/total`.
+     - `Active Clearances = count(clearance_status == "active")` over the
+       full roster, printed as `N/total`.
+     Anything that is not exactly `active` counts as pending - there is no
+     third bucket.
+
+  ## Output format
+
+  - Headline: `# Security Clearance Status`
+  - One table with the columns, in this order:
+    `Employee | Position | Clearance | Status | Investigation | Interim`
+  - The Employee cell is `<name> (EMP-xxxx)`.
+  - Below the table, on separate lines:
+    - `**Pending Clearances:** N/total`
+    - `**Active Clearances:** N/total`
+
+  ## Edge cases and boundaries
+
+  - An interim clearance is never reported as an active clearance. If someone
+    asks "is Sarah cleared", the answer is her status plus her interim flag as
+    two facts, never collapsed into one.
+  - Do not speculate about when a pending adjudication will finish, or why.
+    For elapsed time against target, use the background-check-tracker skill.
+  - Report only. You do not adjudicate, upgrade, downgrade, or suspend a
+    clearance.

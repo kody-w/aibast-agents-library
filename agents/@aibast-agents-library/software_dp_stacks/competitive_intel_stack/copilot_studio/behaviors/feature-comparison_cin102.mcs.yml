@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: feature-comparison
+  description: Builds the eight-feature YES/NO matrix of us against every tracked competitor and reports each player's coverage count out of 8.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: feature-comparison
+  description: Builds the eight-feature YES/NO matrix of us against every tracked competitor and reports each player's coverage count out of 8.
+  ---
+  <!-- bic:source=blank -->
+  # Feature comparison
+
+  Use this skill when the user asks what we have that competitors do not, where
+  we are behind on capability, whether a specific competitor supports a feature,
+  or for a capability or compliance matrix.
+
+  ## Inputs
+
+  - Our feature flags and each tracked competitor's feature flags.
+  - No filter input is honored: the matrix is always all eight features against
+    all three competitors.
+
+  ## Procedure - fixed feature list, fixed order
+
+  1. The eight tracked features, in this exact row order with these exact
+     labels: AutoML (`automl`), No-Code UI (`no_code_ui`), Model Monitoring
+     (`model_monitoring`), Explainability (`explainability`), On-Prem Deployment
+     (`on_prem_deploy`), SOC2 Type II (`soc2`), HIPAA Compliance (`hipaa`),
+     FedRAMP Authorization (`fedramp`).
+  2. Column order is `Us` then competitors in registry order - COMP-001 DataFlow
+     AI, COMP-002 NeuralStack, COMP-003 Quantum ML. This is registry order, not
+     market-share order; do not sort the columns.
+  3. Each cell renders `YES` when the flag is true and `NO` when it is false. A
+     feature key absent from a player's record is treated as false and renders
+     `NO` - never as unknown or blank.
+  4. Coverage count for a player = the number of true flags out of 8. Computed:
+     us 7/8, DataFlow AI 4/8, NeuralStack 6/8, Quantum ML 4/8.
+
+  ## Output format
+
+  - `# Feature Comparison Matrix`
+  - Table with columns exactly: `Feature | Us | DataFlow AI | NeuralStack |
+    Quantum ML`, one row per feature in the fixed order above, cells `YES`/`NO`.
+  - `**Our Feature Coverage:** 7/8`
+  - One bullet per competitor: `- <name>: N/8`, in registry order.
+
+  ## Edge cases
+
+  - Our only `NO` is No-Code UI; DataFlow AI and Quantum ML both have it and
+    NeuralStack does not. Report the gap as exactly that, one feature.
+  - FedRAMP Authorization is `YES` for us and `NO` for all three competitors -
+    the only uncontested row in the matrix.
+  - DataFlow AI and Quantum ML tie at 4/8 with different profiles: DataFlow AI
+    has SOC2 and monitoring but no explainability or on-prem; Quantum ML has
+    explainability and on-prem but no monitoring or SOC2. Never present the tie
+    as equivalence.
+  - Coverage is always out of 8. If asked about a capability outside the eight
+    (latency, connectors, support SLAs), say it is not tracked rather than
+    scoring it.

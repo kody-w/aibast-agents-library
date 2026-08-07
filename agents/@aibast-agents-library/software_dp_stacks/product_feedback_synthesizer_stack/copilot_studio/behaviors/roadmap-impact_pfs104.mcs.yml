@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: roadmap-impact
+  description: Computes the effort-adjusted priority score for every feature request, ranks by it, and surfaces where that ranking disagrees with raw ARR weight.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: roadmap-impact
+  description: Computes the effort-adjusted priority score for every feature request, ranks by it, and surfaces where that ranking disagrees with raw ARR weight.
+  ---
+  <!-- bic:source=blank -->
+  # Roadmap impact
+
+  Use this skill when the user asks what to build next, what the priority order
+  is, which requests are worth the effort, or how effort changes the ranking.
+
+  ## Inputs
+
+  - The feature request backlog (FR-001 through FR-006). No parameters.
+
+  ## Procedure - compute the score, do not judge it
+
+  For each feature request:
+
+  `priority_score = round(arr_weight / 1000 / divisor, 1)`
+
+  where `divisor` is:
+
+  | Effort | Divisor |
+  |--------|---------|
+  | high   | 3       |
+  | medium | 2       |
+  | low    | 1       |
+
+  Then sort by `priority_score` **descending** and number the rows from 1.
+
+  Worked arithmetic for the current backlog:
+
+  - FR-006 Workflow Automation Builder: `1140000 / 1000 / 3 = 380.0` (HIGH)
+  - FR-005 Role-Based Access Controls (RBAC): `960000 / 1000 / 3 = 320.0` (HIGH)
+  - FR-001 Customizable Dashboard Home View: `612000 / 1000 / 2 = 306.0` (MEDIUM)
+  - FR-004 Large Dataset Export Fix: `264000 / 1000 / 1 = 264.0` (LOW)
+  - FR-002 Real-Time Alerting Engine: `780000 / 1000 / 3 = 260.0` (HIGH)
+  - FR-003 Mobile App Enhancements: `420000 / 1000 / 2 = 210.0` (MEDIUM)
+
+  ## Output format
+
+  ```
+  # Roadmap Impact Assessment
+
+  | Rank | Feature | Priority Score | ARR Weight | Effort | Status |
+
+  ## Recommendations
+  - ...
+  ```
+
+  The three standing recommendations this report always carries:
+
+  - RBAC and Workflow Automation are highest priority by ARR-weighted scoring.
+  - Large Dataset Export fix is quick win with low effort and active churn risk.
+  - Real-Time Alerting should be accelerated given competitive pressure.
+
+  ## Edge cases and boundaries
+
+  - The effort divisor changes the order. Against the ARR-weight ranking,
+    Large Dataset Export Fix rises from 6th to 4th (LOW effort, 264.0) and
+    Real-Time Alerting Engine falls from 3rd to 5th (HIGH effort, 260.0).
+    Call out those two shifts whenever both rankings are discussed.
+  - Show the arithmetic when asked. Never adjust a score for urgency, a
+    customer's name, executive interest, or anything else - the formula is the
+    formula.
+  - Ties do not occur in the current backlog. If two scores tie, report the tie
+    rather than inventing a tiebreaker.
+  - Status is context, not an input to the score. A `planned_q3` item can
+    outrank an `in_progress` one; report it that way.
+  - Recommendation only. Never say a request has been re-prioritized, moved to
+    a quarter, added to a sprint, or communicated to engineering - the product
+    manager decides from this table.

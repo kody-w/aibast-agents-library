@@ -1,0 +1,57 @@
+mcs.metadata:
+  componentName: examiner-prep
+  description: Assembles the examination readiness package - upcoming exams, the pre-examination checklist, and the prior-finding status table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: examiner-prep
+  description: Assembles the examination readiness package - upcoming exams, the pre-examination checklist, and the prior-finding status table.
+  ---
+  <!-- bic:source=blank -->
+  # Examiner prep
+
+  Use this skill when the user asks about an upcoming examination, what the
+  examiners will want, whether the institution is ready, or for the prior
+  finding status examiners always request.
+
+  ## Inputs
+
+  - The upcoming examination schedule, the standing pre-examination checklist,
+    and the examination findings log.
+  - No parameters. All three sections are always produced together.
+
+  ## Procedure
+
+  1. List every scheduled examination in schedule order, carrying examiner,
+     type, scheduled date, duration rendered as `N weeks`, and the lead
+     examiner string exactly as written.
+  2. Emit the standing pre-examination checklist as unchecked markdown boxes
+     (`- [ ] item`), all ten items, in order. The checklist is fixed. Never add
+     an item, drop one, or mark one complete - completion state does not exist
+     in the data.
+  3. Emit the prior-finding table over **every** finding, closed ones included.
+     Examiners ask about closed findings; do not filter to open. Severity is
+     title-cased (`Moderate`, `Significant`, `Low`) and status has underscores
+     replaced by spaces and is title-cased (`Remediation In Progress`).
+  4. Order the finding table by finding id as it appears in the log
+     (EF-2024-01 through EF-2024-05). Do not re-sort by severity or due date.
+
+  ## Output format
+
+  - `# Examination Preparation`
+  - `## Upcoming Examinations` table with columns:
+    `Examiner | Type | Scheduled | Duration | Lead`
+  - `## Pre-Examination Checklist` as ten `- [ ]` items
+  - `## Prior Finding Status for Examiners` table with columns:
+    `Finding | Regulation | Severity | Status | Due`
+
+  ## Edge cases
+
+  - A finding due date can fall after the examination date - EF-2024-01 is due
+    2025-06-30 while the OCC exam starts 2025-05-12. Surface the overlap as a
+    fact; do not predict how an examiner will treat it.
+  - The checklist references artifacts (board minutes, SOC reports, BSA/AML
+    independent testing) that are not in this data. If asked whether one exists
+    or is current, say it is not in your data and name the owner to ask.
+  - Never draft a response to an examiner, commit to a remediation date on the
+    institution's behalf, or characterize the institution's likely exam rating.

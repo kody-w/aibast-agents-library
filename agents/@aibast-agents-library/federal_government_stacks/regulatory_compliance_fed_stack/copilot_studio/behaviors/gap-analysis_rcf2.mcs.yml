@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: gap-analysis
+  description: Lists compliance gaps from the register, optionally filtered to one regulation, with control family, severity, systems affected, and remediation effort.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: gap-analysis
+  description: Lists compliance gaps from the register, optionally filtered to one regulation, with control family, severity, systems affected, and remediation effort.
+  ---
+  <!-- bic:source=blank -->
+  # Gap analysis
+
+  Use this skill when the user asks what is out of compliance, asks about a
+  specific control or control family, asks which gaps are high severity, or
+  asks for the gaps under one regulation.
+
+  ## Inputs
+
+  - The compliance gap register (GAP-001 through GAP-007).
+  - Optional: `regulation` - a single framework filter.
+
+  ## Procedure
+
+  1. Start from the full register. If `regulation` is supplied, keep only rows
+     whose `regulation` field equals it exactly. The four accepted values are
+     written exactly as `FISMA`, `FedRAMP`, `PRIVACT`, `Section508` - match
+     that spelling, and if the user's wording differs (`Privacy Act`,
+     `Section 508`, `fedramp`) map it to the record value before filtering.
+  2. Do **not** re-sort. Rows are emitted in register order, GAP-001 first
+     through GAP-007 last, filtered or not. Severity does not reorder the table.
+  3. Severity is rendered in capitals: `HIGH`, `MODERATE`, `LOW`.
+     Remediation effort is rendered title-cased: `Low`, `Medium`, `High`.
+  4. `systems_affected` is a count of systems, pages, or documents in scope for
+     that gap - report it as the record's integer, never as a percentage.
+  5. If the filter matches no rows, emit the heading and the table header with
+     no data rows and state that the register holds no gaps for that
+     regulation. Never substitute the unfiltered register.
+
+  ## Output format
+
+  - `# Compliance Gap Analysis` unfiltered, or
+    `# Compliance Gap Analysis - <regulation>` when filtered.
+  - Table columns in this order:
+    `Gap ID | Regulation | Family | Control | Severity | Systems | Effort`.
+  - `## Gap Details`, then one block per gap in the same order:
+    - `### <GAP-id>: <control> (<regulation>)`
+    - `- **Description:**`
+    - `- **Severity:**` (capitals)
+    - `- **Systems Affected:**`
+    - `- **Remediation Effort:**` (title case)
+
+  ## Boundaries
+
+  - Read-only. Never say a gap has been opened, closed, accepted, waived, or
+    risk-accepted - that is the ISSO's call.
+  - Every gap is named by its GAP- id and its control ID. Never describe a gap
+    without both.
+  - Do not infer a gap for a control that has no register row. A control with
+    no gap row is not evidence of compliance - say the register does not track
+    it.

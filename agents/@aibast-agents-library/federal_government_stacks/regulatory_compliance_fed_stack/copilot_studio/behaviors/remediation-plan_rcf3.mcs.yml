@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: remediation-plan
+  description: Reports the remediation action plan with owners, target dates, statuses, percent complete, and the mean overall progress.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: remediation-plan
+  description: Reports the remediation action plan with owners, target dates, statuses, percent complete, and the mean overall progress.
+  ---
+  <!-- bic:source=blank -->
+  # Remediation plan
+
+  Use this skill when the user asks what is being done about the gaps, who owns
+  a remediation, when something lands, how far along the agency is, or what is
+  actively in flight.
+
+  ## Inputs
+
+  - The remediation action plan - one action per gap, GAP-001 through GAP-007.
+  - No parameters. The plan is always reported in full.
+
+  ## Procedure
+
+  1. Overall progress is the unweighted mean of every action's percent
+     complete, rounded to one decimal:
+
+     `progress = sum(pct for all actions) / count(actions)`
+
+     With the current plan: `(35 + 20 + 0 + 0 + 50 + 0 + 70) / 7` = `175 / 7`
+     = **25.0%**. Every action counts equally - a Planned action at 0% is not
+     excluded, and severity does not weight the mean.
+     If the plan is empty, progress is `0.0` - never undefined.
+
+  2. Emit rows in plan order, GAP-001 first through GAP-007 last. Do not sort
+     by target date, status, or progress.
+
+  3. Status is rendered with underscores replaced by spaces and title-cased:
+     `in_progress` -> `In Progress`, `planned` -> `Planned`.
+
+  4. The `Active Remediations` section lists only actions whose status is
+     exactly `in_progress`. `planned` is not active. Omit the whole section if
+     no action is in progress.
+
+  ## Output format
+
+  - `# Remediation Plan`
+  - `**Overall Progress:** N%`
+  - Table columns in this order:
+    `Gap | Action | Owner | Target | Status | Progress`. Progress is a percent.
+  - `## Active Remediations`, then one bullet per in-progress action:
+    `- **<GAP-id>:** <action> - N% complete (target: YYYY-MM-DD)`
+
+  ## Boundaries
+
+  - Recommendation only. Never say an action has been started, reassigned,
+    accelerated, or completed, and never move a target date. Name the owner
+    who would make the change.
+  - `target` is a planned date, not a completion date. Never report a target as
+    evidence the work is done.
+  - Percent complete is the record's number. Never re-estimate it from
+    elapsed time between `start` and `target`.
+  - If asked about a gap with no action row, say the plan has no action for it
+    rather than proposing one as if it were tracked.

@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: mitigation-plan
+  description: Matches each disruption to its type playbook and lays out immediate, short-term, and long-term actions with cost and expected risk reduction.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: mitigation-plan
+  description: Matches each disruption to its type playbook and lays out immediate, short-term, and long-term actions with cost and expected risk reduction.
+  ---
+  <!-- bic:source=blank -->
+  # Mitigation plan
+
+  Use this skill when the user asks what to do about a disruption, asks for a
+  playbook or a response plan, or asks what mitigation will cost.
+
+  ## Inputs
+
+  - The disruption event log and the mitigation playbook library.
+  - Optional: a single DISR- id. Otherwise plan for every active disruption.
+
+  ## Procedure - playbook selection is by type, not by judgment
+
+  1. **Scope.** If a `disruption_id` is given and it exists, plan for that event
+     alone. Otherwise plan for every event with `status == "active"`.
+  2. **Playbook lookup.** The playbook is selected by the disruption's `type`
+     field: `port_congestion` -> Port Congestion Mitigation,
+     `weather_event` -> Weather Event Mitigation,
+     `regulatory` -> Regulatory Change Mitigation. If a disruption's type has
+     no playbook, it is skipped entirely - say which event was skipped and why
+     rather than improvising actions for it.
+  3. **Total investment.** Sum `estimated_mitigation_cost` over the **distinct
+     playbook types** of the **active** disruptions - each type is counted once
+     no matter how many events share it. Two active `weather_event` disruptions
+     would still contribute one weather playbook cost.
+  4. **Do not scale the total to the filter.** The total investment figure is
+     always the network-wide active-set total, even when the plan is filtered
+     to one DISR- id. Label it as the whole-program figure so it is not read as
+     that single event's cost - the single event's cost is the per-playbook
+     `Mitigation Cost` line.
+  5. **Actions are printed in playbook order** within each horizon, and the
+     horizons always run immediate (0-48 hours), short-term (1-2 weeks),
+     long-term (1-3 months). Never reorder, merge, or drop an action.
+  6. Costs are `$XXX,XXX.00`; risk reduction is a whole percent.
+
+  ## Output format
+
+  - `# Disruption Mitigation Plan`
+  - `**Estimated Total Mitigation Investment:** $XXX,XXX.00`
+  - Per event:
+    - `## DISR-xxx: <title>`
+    - `**Playbook:** <label>`
+    - `**Expected Risk Reduction:** N%`
+    - `**Mitigation Cost:** $XXX,XXX.00`
+    - `### Immediate Actions (0-48 hours)` - numbered list
+    - `### Short-Term Actions (1-2 weeks)` - numbered list
+    - `### Long-Term Actions (1-3 months)` - numbered list
+
+  ## Edge cases
+
+  - Two active events can share a route (RT-APAC-01 sits under both the port
+    congestion and the weather event). Their playbooks are separate and both
+    are shown; do not merge them into one plan for the lane.
+  - Expected risk reduction is the playbook's figure, not a per-route number.
+    It does not subtract from a route's `overall_risk` score - never present it
+    as a new risk score.
+  - A DISR- id that is not in the log is a miss, not a prompt to build a
+    generic plan. Say the id is not in the data.
+
+  ## Boundaries
+
+  - Every action is a recommendation for a planner to approve and execute.
+    Never say a playbook has been activated, freight converted, stock
+    increased, a broker engaged, or a customer notified.
+  - Do not invent actions, costs, or reduction percentages beyond what the
+    playbook contains.

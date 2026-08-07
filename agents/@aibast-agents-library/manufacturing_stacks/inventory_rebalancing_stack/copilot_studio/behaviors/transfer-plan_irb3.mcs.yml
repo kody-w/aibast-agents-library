@@ -1,0 +1,92 @@
+mcs.metadata:
+  componentName: transfer-plan
+  description: Matches surplus sites to deficit sites per SKU with the deterministic greedy rule, prices each move on the lane rate matrix, and projects post-transfer utilization.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: transfer-plan
+  description: Matches surplus sites to deficit sites per SKU with the deterministic greedy rule, prices each move on the lane rate matrix, and projects post-transfer utilization.
+  ---
+  <!-- bic:source=blank -->
+  # Transfer plan
+
+  Use this skill when the user asks what to move, asks for a transfer or
+  redistribution plan, asks what rebalancing would cost to execute, or asks
+  what utilization would look like afterwards.
+
+  ## Inputs
+
+  - On-hand levels, demand forecasts, SKU unit weights, and the directed lane
+    rate matrix in dollars per kilogram.
+  - Optional: a SKU id to plan for a single item. Otherwise plan all six.
+
+  ## Procedure -- the matching rule, exactly
+
+  For each SKU in catalog order SKU-4401 through SKU-4406:
+
+  1. Compute `delta = on_hand - forecast` at each warehouse.
+  2. Build `surpluses` = every warehouse with `delta > 200`, carrying that
+     delta as its available quantity. Build `deficits` = every warehouse with
+     `delta < -200`, carrying `abs(delta)` as its needed quantity.
+  3. Sort both lists by quantity, descending. The sort is stable, so equal
+     quantities keep the warehouse order WH-ATL, WH-ORD, WH-DFW, WH-SEA.
+  4. Walk sources outer, destinations inner:
+     `move_qty = min(source_remaining, destination_need)`.
+     Skip and continue when `move_qty <= 0`.
+     `source_remaining` is drawn down as the source ships and carries into the
+     next destination. The destination's need is **not** carried between
+     source passes -- each new source is matched against the destination's
+     original deficit figure. Do not "improve" this by netting deficits across
+     sources; reproduce it as written.
+  5. Price the move:
+     `cost = round(move_qty * lane_rate_per_kg * unit_weight_kg, 2)`,
+     where `lane_rate_per_kg` is the rate for the directed pair (from, to).
+     If a lane is absent from the matrix the rate defaults to `0.30`; all 12
+     directed lanes among the four warehouses are defined, so the default does
+     not fire on the current data.
+
+  Totals: sum `move_qty` across all rows for total units, sum `cost` for total
+  transfer cost.
+
+  ## Procedure -- projected utilization
+
+  For each warehouse, in the fixed order:
+
+  - `inbound_units` = sum of `move_qty` for every row whose destination is
+    this warehouse.
+  - `projected_pallets = used_pallets + int(inbound_units * 0.02)` -- truncated,
+    not rounded.
+  - `projected_util = round(projected_pallets / capacity_pallets * 100, 1)`.
+
+  The outbound side is not deducted, so projected utilization only ever rises,
+  including at sites that are net shippers. This is a rough 0.02 pallet-factor
+  planning model, not a capacity commitment -- say so when you present it.
+
+  ## Output format
+
+  - Headline `## Transfer Plan`.
+  - Table with columns: `SKU | From | To | Qty | Unit Wt (kg) | Transfer Cost`.
+    From and To carry warehouse ids (WH-ATL, WH-ORD, WH-DFW, WH-SEA), not
+    names.
+  - `**Total units to transfer:** n,nnn`
+  - `**Total transfer cost:** $n,nnn.nn`
+  - `**Estimated transit time:** 2-5 business days (ground freight)` -- a fixed
+    planning assumption, not a carrier quote.
+  - Sub-heading `### Expected Post-Transfer Utilization` and a table with
+    columns: `Warehouse | Current Util | Projected Util`, warehouse names.
+
+  ## Edge cases
+
+  - If no SKU has any pair outside the +/-200 band, emit exactly:
+    `No transfers required; inventory is balanced within tolerance.` and stop.
+  - Because destination needs are not netted between sources, a destination
+    can appear as the target of more than one source for the same SKU and the
+    planned inflow can exceed its computed deficit. Report the rows as
+    computed and flag the over-shipment if the planner asks.
+  - A warehouse can be both a source and a destination in the same plan for
+    different SKUs. That is expected, not an error.
+  - Lane rates are directional in the matrix but symmetric in the current
+    data; never assume a rate for a pair that is not listed.
+  - Recommendation only. Never say a transfer has been released, cut,
+    scheduled, or tendered to a carrier. The plan ends with the planner
+    approving it.

@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: performance-attribution
+  description: Reports strategy benchmarks over 1/3/5 years, each client against their own benchmark with a computed attribution class, and the AUM-weighted alpha.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: performance-attribution
+  description: Reports strategy benchmarks over 1/3/5 years, each client against their own benchmark with a computed attribution class, and the AUM-weighted alpha.
+  ---
+  <!-- bic:source=blank -->
+  # Performance attribution
+
+  Use this skill when the user asks how the book is performing against
+  benchmark, what is driving returns, which strategies are working, what a
+  strategy's benchmark is, or for the practice-level alpha.
+
+  ## Inputs
+
+  - The strategy benchmark table (four strategies, 1/3/5-year figures).
+  - The client portfolio book (YTD return, benchmark return, alpha, AUM).
+  - No parameters. The report always covers all four strategies and all four
+    clients.
+
+  ## Procedure
+
+  1. Emit the strategy benchmark table in source order: Balanced Growth
+     (60/40 Balanced), Aggressive Growth (80/20 Growth), Capital Preservation
+     (20/80 Conservative), Alternative Focused (HFRI Fund Weighted). Render the
+     1-, 3-, and 5-year figures with a trailing percent sign and no forced sign.
+  2. Emit one client row per household in book order. YTD, Benchmark, and Alpha
+     are signed to one decimal with a percent sign.
+  3. Classify attribution with this exact ladder, in order:
+     - `alpha >= 1.0` -> `Selection + Allocation`
+     - else `alpha >= 0` -> `Allocation`
+     - else -> `Underperformance`
+     Note the boundary difference from relationship health: attribution tests
+     alpha alone, with no YTD-versus-benchmark second condition.
+  4. Compute the practice figure:
+     `AUM-Weighted Alpha = sum(alpha * aum) / sum(aum)`
+     = (1.1*8,500,000 + 1.6*3,200,000 + 0.3*12,400,000 + -0.2*5,700,000)
+       / 29,800,000
+     = (9,350,000 + 5,120,000 + 3,720,000 - 1,140,000) / 29,800,000
+     = 17,050,000 / 29,800,000
+     = +0.57%. Render signed to two decimals.
+  5. If asked to show the work, show that arithmetic. Never round the inputs
+     before weighting and never substitute the simple mean.
+
+  ## Output format
+
+  - `# Performance Attribution`
+  - `## Strategy Benchmarks` and the table
+    `| Strategy | Benchmark | 1-Year | 3-Year | 5-Year |`
+  - `## Client Performance vs Benchmark` and the table
+    `| Client | Strategy | YTD | Benchmark | Alpha | Attribution |`
+  - `**AUM-Weighted Alpha:** +0.57%`
+
+  ## Edge cases
+
+  - The AUM-weighted alpha (+0.57%) is materially lower than the simple average
+    alpha (0.7%) because the largest household, WM-003 at $12,400,000, carries
+    only +0.3% alpha. If the two figures are compared, explain that weighting,
+    do not reconcile them away.
+  - Tidewater Ventures LLC is the only `Underperformance` row: YTD +3.9% against
+    a +4.1% benchmark, alpha -0.2%. Report it as underperformance in plain
+    words.
+  - Client benchmark returns in the client table are YTD figures and are not the
+    same series as the 1/3/5-year strategy benchmark figures. Never compare a
+    client's YTD return to the strategy table's 1-Year column.
+  - Alternative Focused benchmarks to HFRI Fund Weighted, which has no P/E or
+    index level in the market data - do not cross-reference the two tables.
+  - This is reporting, not advice. Do not recommend a strategy change, a manager
+    swap, or a rebalance beyond the action already carried on an opportunity
+    signal.

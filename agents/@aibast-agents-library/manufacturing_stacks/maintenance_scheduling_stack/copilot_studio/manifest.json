@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "maintenance-scheduling",
+  "display_name": "Maintenance Scheduling Agent",
+  "agent_intent": "../maintenance_scheduling_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/schedule-overview_ms01.mcs.yml",
+    "behaviors/predictive-alerts_ms02.mcs.yml",
+    "behaviors/work-order-plan_ms03.mcs.yml",
+    "behaviors/downtime-analysis_ms04.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/maintenance-operations-data.md",
+    "capabilities/knowledge/files/maintenance-operations-data.md.mcs.yml",
+    "capabilities/knowledge/files/risk-scoring-and-scheduling-policy.md",
+    "capabilities/knowledge/files/risk-scoring-and-scheduling-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Show me the maintenance schedule overview.", "expect": "6 assets; EQ-INJ-01 Injection Molder 220T is CRIT with risk 73.7 (highest) and EQ-ASM-01 Assembly Line Conveyor lowest at 10.4; 4 technicians with Karen Oduya (TECH-202) most free at 24 hrs and James Whitfield (TECH-203) least at 10; history shows the last 5 records starting 2025-09-30 Hydraulic Press 400T Corrective $8,750.00"},
+    {"ask": "What equipment is about to fail?", "expect": "Exactly 3 alerts, ranked by risk score: [CRITICAL] Injection Molder 220T (EQ-INJ-01) barrel heater band failure, 62%/84%/93%, risk 73.7/100; [WARNING] Hydraulic Press 400T (EQ-PRS-01) hydraulic seal degradation, 35%/58%/74%, risk 51.6/100; [WATCH] CNC Milling Center #1 (EQ-CNC-01) spindle bearing wear, 12%/28%/41%, risk 27.0/100"},
+    {"ask": "Give me the 30-day work order plan.", "expect": "3 work orders totaling 16 labor hours: P1 Injection Molder 220T 8 hrs, P2 Hydraulic Press 400T 5 hrs, P3 CNC Milling Center #1 3 hrs; all three best-fit to Karen Oduya (TECH-202, Day) because General certification plus 24 free hours wins the most-free-hours sort"},
+    {"ask": "What is unplanned downtime going to cost us, and what do we save by acting?", "expect": "3 rows only: Injection Molder 220T 62%, 14.9 hrs, $20,860.00 downtime / $5,215.00 prevention / $15,645.00 savings; Hydraulic Press 400T 35%, 8.4 hrs, $10,080.00; CNC Milling Center #1 12%, 2.9 hrs, $2,465.00. Totals $33,405.00 exposure, $8,351.25 prevention, $25,053.75 net savings; history $15,900.00 spend at a 5:1 preventive-to-corrective ratio"},
+    {"ask": "Schedule the Assembly Line Conveyor for service this week and tell me its spindle load.", "expect": "Declines both: EQ-ASM-01 has a 30-day failure probability of 2%, below the 0.10 inclusion gate, and the lowest risk score of the six at 10.4, so no work order is raised regardless of age; the conveyor has no spindle_load_pct channel (only belt_tension_n 620 and motor_current_a 12.3), stated as no data rather than estimated; and the agent recommends only, never says it scheduled anything"}
+  ]
+}

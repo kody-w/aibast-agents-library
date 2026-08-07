@@ -1,0 +1,49 @@
+mcs.metadata:
+  componentName: deal-movement
+  description: Walks each open deal's stage history against target durations and lists next steps and risk flags.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: deal-movement
+  description: Walks each open deal's stage history against target durations and lists next steps and risk flags.
+  ---
+  <!-- bic:source=blank -->
+  # Deal movement
+
+  Use this skill when the user asks how a deal has progressed, where it has
+  been stuck, or what the next step is.
+
+  ## Inputs
+
+  - None. Covers every open deal.
+
+  ## Procedure
+
+  1. Skip closed deals entirely.
+  2. Per deal, print the full stage history in chronological order. The
+     current stage has a null exit date and is labelled `Current`; every
+     other row is `Completed (<days>d)`.
+  3. The `(on target)` / `(over target)` annotation is added ONLY to
+     completed stages, and it compares against `target_days`, not the
+     average. Targets - Qualification 14, Discovery 28, Solution Design 21,
+     Proposal 21, Negotiation 14.
+  4. Close each deal with days open, win probability, next steps, and risk
+     flags. If there are no risk flags, print `None`.
+
+  Worked example - deal-001 (Acme Corporation - Platform Expansion,
+  2,400,000 dollars) shows Qualification 25d over target, Discovery 36d over
+  target, Solution Design 24d over target, and Proposal current at 34d,
+  120 days open at 68 percent, flagged for competitor pricing pressure and
+  no CTO relationship.
+
+  ## Output format
+
+  Per deal separated by `---` - `**<deal name>** ($<amount>)`, a table of
+  Stage, Entered, Exited, Duration, Status, then bullets for days open and
+  win probability, next steps, and risk flags.
+
+  ## Edge cases
+
+  - The current stage carries no target annotation because it has not
+    finished. Do not label it over target.
+  - Next steps are recorded plans, not completed work.

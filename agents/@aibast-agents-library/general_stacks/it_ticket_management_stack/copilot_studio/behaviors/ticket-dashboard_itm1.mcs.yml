@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: ticket-dashboard
+  description: Builds the IT ticket dashboard - open ticket counts per severity with SLA targets, then every ticket ordered P1 through P4.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: ticket-dashboard
+  description: Builds the IT ticket dashboard - open ticket counts per severity with SLA targets, then every ticket ordered P1 through P4.
+  ---
+  <!-- bic:source=blank -->
+  # Ticket dashboard
+
+  Use this skill when the user asks for the dashboard, the board, the queue,
+  what is open, today's tickets, or any overview of ticket status.
+
+  ## Inputs
+
+  - The ticket queue and the SLA target table (knowledge/tools).
+  - The team capacity roster, for the team member count in the headline.
+  - Optional: a severity, team, or status filter. If the user names one, apply
+    it to every row and every count, and say the view is filtered.
+
+  ## Procedure
+
+  1. Retrieve all tickets. Count them - that is the open ticket total.
+  2. Sum `members` across all four teams on the capacity roster - that is the
+     team member count. Do not use the roster's ticket counts here.
+  3. Group tickets by severity and emit the four bands in fixed order:
+     P1-Critical, P2-High, P3-Medium, P4-Low. Print a row for a band even when
+     its count is 0.
+  4. Against each band print its SLA resolution target from the target table:
+     P1-Critical 1h, P2-High 4h, P3-Medium 8h, P4-Low 24h.
+  5. List every ticket sorted by its severity label ascending, which yields
+     P1-Critical, then P2-High, then P3-Medium, then P4-Low. Within a band keep
+     the queue's own order; do not re-sort by age or user count.
+  6. Truncate each subject to its first 45 characters. Do not paraphrase or
+     re-word a subject to make it fit.
+
+  ## Output format
+
+  Headline: `**Summary:** N open tickets | M team members`
+
+  Then the severity table, exactly these columns:
+
+  | Severity | Count | SLA Target |
+
+  Then the ticket table, exactly these columns:
+
+  | ID | Subject | Severity | Status | Assignee |
+
+  Severity as recorded (`P1-Critical`, `P2-High`, `P3-Medium`, `P4-Low`).
+  Status as recorded (`Open`, `In Progress`, `Assigned`, `Pending Approval`).
+  Assignee as recorded, including the literal value `unassigned`.
+
+  Close with the provenance line: `Source: [ServiceNow + IT Asset Management]`.
+
+  ## Edge cases
+
+  - No tickets match a filter: say so and state the filter that produced the
+    empty view. Do not fall back to the unfiltered board.
+  - A ticket with assignee `unassigned` is shown as such and called out under
+    the headline with its TKT- id.
+  - The dashboard reports status only. If the user asks who should take a
+    ticket, hand off to priority assignment; if they ask about breach risk,
+    hand off to SLA tracking.

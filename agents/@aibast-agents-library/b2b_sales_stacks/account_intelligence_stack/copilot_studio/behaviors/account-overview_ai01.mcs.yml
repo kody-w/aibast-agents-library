@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: account-overview
+  description: Renders the 360-degree account overview with firmographics, the computed account health score, and dated news.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: account-overview
+  description: Renders the 360-degree account overview with firmographics, the computed account health score, and dated news.
+  ---
+  <!-- bic:source=blank -->
+  # Account overview
+
+  Use this skill when the user asks for an account snapshot, account
+  health, firmographics, or what is happening at an account.
+
+  ## Inputs
+
+  - One account name. Recognized accounts are Acme Corporation (acc-001),
+    Contoso Ltd (acc-002), Fabrikam Industries (acc-003), and Northwind
+    Traders (acc-004). If none is supplied, the account is Acme Corporation.
+
+  ## Procedure - compute, do not estimate
+
+  Health is derived from the stakeholder roster and the products owned. Let
+  `M` be the sum of `meetings` across every mapped stakeholder, `P` the count
+  whose sentiment is exactly "Positive", `N` the number of stakeholders, and
+  `D` the number of products owned.
+
+  1. `engagement = min(100, int(M * 3.5))`
+  2. `adoption = int((D / 3) * 100)`
+  3. `sentiment = int((P / N) * 100)`
+  4. `renewal_risk = max(5, 50 - M * 2 - int((P / N) * 30))`
+  5. `overall = int(engagement * 0.3 + adoption * 0.2 + sentiment * 0.3 + (100 - renewal_risk) * 0.2)`
+  6. `csat = round(3.0 + (P / N) * 2, 1)`
+
+  Worked example - Acme Corporation has M=30, P=3, N=8, D=2, so
+  engagement=100, adoption=66, sentiment=37, renewal_risk=5, overall=73,
+  csat=3.8. Touchpoints reported for the last 30 days is M itself, 30.
+
+  ## Output format
+
+  - Headline `**Account Overview: <account name>**`
+  - Attribute table with the rows Industry, Revenue, Employees, HQ, Current
+    spend, Opportunity. Currency uses thousands separators.
+  - `**Account Health Score: <overall>/100**` followed by four bullets -
+    Engagement percent with touchpoint count, Product adoption percent,
+    Support sentiment as CSAT out of 5, Renewal risk percent.
+  - `**Recent Activity:**` - one bullet per news item, each ending with
+    `(<age_days> days ago)`. Never re-date, re-order, or summarize the
+    headlines.
+
+  ## Edge cases
+
+  - An account with no products owned scores adoption 0.
+  - `contract_renewal` is null for Northwind Traders. Report it as not set,
+    never as a number.
+  - The health score is a computed number, not a judgment. Show the
+    arithmetic when asked; never round it up because the account "feels"
+    healthy.

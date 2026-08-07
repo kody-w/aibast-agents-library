@@ -1,0 +1,69 @@
+mcs.metadata:
+  componentName: coaching-plan
+  description: Builds a 4-week coaching plan for a rep's two weakest skills using the coaching activity library, with durations, cadence, and named resources.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: coaching-plan
+  description: Builds a 4-week coaching plan for a rep's two weakest skills using the coaching activity library, with durations, cadence, and named resources.
+  ---
+  <!-- bic:source=blank -->
+  # Coaching plan
+
+  Use this skill when the user asks for a coaching plan, a development plan,
+  a 30-day plan, or what a rep should work on next.
+
+  ## Inputs
+
+  - The rep skill assessments and the coaching activity library.
+  - A rep name. The roster is Alex Rivera, Sarah Kim, and Tom Rivera.
+
+  ## Procedure
+
+  1. Resolve the rep exactly as the skill-assessment skill does. An unknown
+     name is stated, never substituted.
+  2. Focus areas = the two lowest skill scores, ascending. Alex Rivera:
+     objections 60, value 68. Tom Rivera: objections 55, discovery 65. Sarah
+     Kim: objections 82, listening 85.
+  3. For each focus area, look up its activity set in the coaching library.
+     The library is keyed by the call rubric's names - objection_handling,
+     discovery_questions, value_articulation - while the assessment uses the
+     short names objections, value, discovery, listening, opening, closing.
+     Those short names do not match a library key, so every focus area
+     currently falls back to the **general objection-handling set**:
+     - Role-play: Price Objection Scenarios (30 min, 2x/week) - Objection
+       Handling Playbook Ch. 4
+     - Review 5 recorded calls where objections were handled well (45 min,
+       1x/week) - Call Library - Top Performers
+     - Practice the Feel-Felt-Found framework (15 min, Daily) - Sales
+       Methodology Guide
+     Say so in the plan whenever the fallback is used. Do not present the
+     objection-handling set as if it were tailored to value articulation or
+     discovery, and do not invent substitute activities.
+  4. The goal is fixed: improve the weakest skills by 15+ points in 30 days.
+     The program is 4 weeks with weekly check-ins. Success metrics are skill
+     score improvement, call conversion rate, and quota attainment.
+
+  ## Output format
+
+  - Headline: `**Coaching Plan: <Rep Name>**`
+  - `**Assessment:** N/100 overall`
+  - `**Goal:** Improve weakest skills by 15+ points in 30 days`
+  - One block per focus area, lowest score first:
+    `**<Skill>** (Current: N/100)` then a bulleted list of
+    `- <Activity> (<duration>, <frequency>)` with `Resource: <resource>` on
+    the following line.
+  - `**Timeline:** 4-week program with weekly check-ins`
+  - `**Success Metrics:** Skill score improvement, call conversion rate,
+    quota attainment`
+  - Close with `Source: [Coaching Platform]`.
+
+  ## Edge cases
+
+  - Both focus-area blocks can list the same three activities. That is the
+    fallback behavior, not a rendering error - name it rather than hiding it.
+  - Never schedule, book, enroll, or notify. The plan is a recommendation the
+    manager runs.
+  - If the rep's weakest skill is already strong (Sarah Kim's lowest is
+    objections at 82), still produce the plan and state that the focus areas
+    are relative, not deficiencies.

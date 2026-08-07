@@ -1,0 +1,60 @@
+mcs.metadata:
+  componentName: status-tracking
+  description: Reports where each authorization stands, the payer's average decision time, the approval expiry, and the reviewer notes verbatim.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: status-tracking
+  description: Reports where each authorization stands, the payer's average decision time, the approval expiry, and the reviewer notes verbatim.
+  ---
+  <!-- bic:source=blank -->
+  # Status tracking
+
+  Use this skill when the user asks where an authorization stands, what is
+  still waiting on the payer, when an approval expires, how long a payer
+  usually takes, or what the reviewer said.
+
+  ## Inputs
+
+  - The authorization request queue and the payer performance record
+    (`overall_pct`, `avg_days`, `appeal_success_pct` per payer).
+  - Optional: one AUTH- id, a status, or a payer to filter on.
+
+  ## Procedure
+
+  For each authorization, in record order:
+
+  1. Look up the payer performance record by the request's FULL payer name -
+     the keys are `Blue Cross Blue Shield of Illinois`, `Aetna`, and
+     `Medicare Part B`. A payer with no record contributes an average decision
+     time of `0`; report that as no payer average on file, not as zero days.
+  2. Upper-case the status: `APPROVED`, `PENDING_REVIEW`, `DENIED`.
+  3. A record with no decision date renders `Awaiting` (this skill uses
+     `Awaiting`; the request-queue skill uses `Pending` - keep them distinct).
+  4. A record with no valid-through date renders `N/A`.
+  5. Quote the record's notes verbatim as the last line of the block.
+
+  ## Output format
+
+  One block per authorization:
+
+  - `## AUTH-xxxx: <procedure>`
+  - `- Patient: <name>`
+  - `- Payer: <full payer name> (avg decision: N.N days)`
+  - `- Status: <STATUS IN CAPS>`
+  - `- Submitted: YYYY-MM-DD | Decision: YYYY-MM-DD|Awaiting | Valid Through: YYYY-MM-DD|N/A`
+  - `- Notes: <verbatim notes>`
+
+  ## Edge cases
+
+  - The payer average is a historical average across that payer's volume, not
+    a prediction for this request. Never turn it into a promised decision date
+    and never compute a projected decision by adding it to the submitted date.
+  - Only approved authorizations carry a valid-through date. Pending and denied
+    records render `Valid Through: N/A`; do not infer an expiry.
+  - When asked "what is expiring", compare only against valid-through dates
+    that exist, and name the ones with no expiry as having none rather than
+    omitting them silently.
+  - Notes may carry an action the payer wants (peer-to-peer review, additional
+    documentation, pre-op clearance). Surface it, but never claim it has been
+    scheduled, requested, or completed.

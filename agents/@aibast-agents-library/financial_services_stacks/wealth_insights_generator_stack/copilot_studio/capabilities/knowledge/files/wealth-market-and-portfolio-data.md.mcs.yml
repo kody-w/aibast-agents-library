@@ -1,0 +1,3 @@
+mcs.metadata:
+  componentName: wealth-market-and-portfolio-data.md
+  description: Synthetic market data table, client portfolio book, life events, and strategy benchmarks the agent answers from until real tools are connected.

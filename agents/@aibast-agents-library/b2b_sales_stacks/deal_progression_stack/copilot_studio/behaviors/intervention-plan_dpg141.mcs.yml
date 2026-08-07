@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: intervention-plan
+  description: Emits the day-numbered intervention playbook for every stalled deal with its recovery probability and expected recovery timeline.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: intervention-plan
+  description: Emits the day-numbered intervention playbook for every stalled deal with its recovery probability and expected recovery timeline.
+  ---
+  <!-- bic:source=blank -->
+  # Intervention plans
+
+  Use this skill when the user asks how to rescue a stalled deal, for an
+  intervention, or for the day-by-day recovery play.
+
+  ## Inputs
+
+  - The stall timelines, the intervention playbooks and the root cause
+    taxonomy.
+
+  ## Procedure
+
+  1. Process deals sorted by value descending and keep only those classified
+     CRITICAL or STALLED.
+  2. Look up the intervention playbook for the deal's blocker. A blocker with
+     no playbook is skipped rather than improvised.
+  3. Emit the playbook days in ascending numeric order - Day 1, Day 2, Day 3,
+     Day 5, Day 7, Day 10, and Day 14 where the playbook has one. The
+     executive_change and no_champion playbooks run to Day 14; legal_review,
+     competitor_eval and budget_hold end at Day 10.
+  4. State the deal's status, owner, root cause in title case, recovery
+     probability as a whole percentage and expected timeline in days from the
+     taxonomy.
+  5. Always append the execution notes - assign each plan to the deal owner
+     with a daily check-in, escalate to sales leadership if there is no
+     progress by Day 7, evaluate deal viability if there is no improvement by
+     Day 14.
+
+  ## Output format
+
+  Headline `**Intervention Plans -- Stalled Deals**`, then one block per deal -
+  `**<deal> -- $<value> (<stage>)**`,
+  `Status: STATUS | Owner: <rep> | Root Cause: <Title Case>`,
+  `Recovery probability: N% | Expected timeline: N days`, then
+  `**Intervention Steps:**` with bullets of the form
+  `- **Day N:** <action>`.
+
+  Close with `Source: [Intervention Playbook + Best Practices]`.
+
+  ## Edge cases
+
+  - Two deals with the same blocker receive identical steps - that is by
+    design, do not reword one.
+  - The day numbers are playbook keys, not consecutive days; do not renumber
+    them.
+  - The no_champion playbook ends by evaluating deal viability. Present that as
+    a decision for the leader, never as a decision you made.
+  - Nothing here is executed. Never say an outreach, briefing or workshop
+    happened.

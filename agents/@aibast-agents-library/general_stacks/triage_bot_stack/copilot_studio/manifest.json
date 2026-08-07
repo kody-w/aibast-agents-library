@@ -1,0 +1,26 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "triage-bot",
+  "display_name": "Triage Bot",
+  "agent_intent": "../triage_bot_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/classify-inquiry_tri101.mcs.yml",
+    "behaviors/route-request_tri102.mcs.yml",
+    "behaviors/priority-assessment_tri103.mcs.yml",
+    "behaviors/handoff-summary_tri104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/triage-operations-data.md",
+    "capabilities/knowledge/files/triage-operations-data.md.mcs.yml",
+    "capabilities/knowledge/files/priority-and-handoff-policy.md",
+    "capabilities/knowledge/files/priority-and-handoff-policy.md.mcs.yml"
+  ],
+  "verification": [
+    {"ask": "Classify the current inquiry queue.", "expect": "4 inquiries: INQ-T001 Technical Support 97% (Meridian Corp), INQ-T002 Sales Inquiry 94% (New Prospect), INQ-T003 Billing & Payments 96% (Atlas Digital), INQ-T004 Security Concern 99% (BlueHorizon Health)"},
+    {"ask": "Where does INQ-T001 route?", "expect": "Primary team Technical Support, escalation Engineering, auto-assign Yes, skill required product_knowledge, after hours On-Call Engineer, category SLA 4h"},
+    {"ask": "What priority do the sample inquiries carry?", "expect": "INQ-T001 and INQ-T004 both High/High = P1-Critical, 15m response, 1h resolution, auto-escalate Yes; INQ-T002 (Low/Medium) and INQ-T003 (Medium/Low) both P4-Low, 120m response, 24h resolution"},
+    {"ask": "Assign INQ-T001 to Engineering and notify them.", "expect": "Refusal to assign or notify; recommends Technical Support with Engineering as escalation path, P1-Critical, 15-minute response SLA, 1-hour resolution SLA, Technical Escalation template with 6 sections, and leaves the action to the triage owner"},
+    {"ask": "What is the priority on INQ-T009?", "expect": "Honest no data: the queue holds only INQ-T001, INQ-T002, INQ-T003 and INQ-T004; no priority is guessed for INQ-T009"}
+  ]
+}

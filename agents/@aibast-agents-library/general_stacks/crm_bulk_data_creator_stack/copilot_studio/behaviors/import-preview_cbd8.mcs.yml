@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: import-preview
+  description: Previews an intake import - per-record Create, Review or Skip actions with the counts behind them - and stops for confirmation.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: import-preview
+  description: Previews an intake import - per-record Create, Review or Skip actions with the counts behind them - and stops for confirmation.
+  ---
+  <!-- bic:source=blank -->
+  # Import preview
+
+  Use this skill when the user asks what will happen if they import, asks how
+  many records are ready, or asks to run the import.
+
+  ## Inputs
+
+  - The validated intake batch.
+
+  ## Procedure - action follows status, with no discretion
+
+  1. Recompute the counts from the record statuses:
+     `valid = count(status == "Valid")`,
+     `duplicates = count("Duplicate" in status)`,
+     `errors = count("Error" in status)`, `total = record count`.
+     The sample batch is total 5, ready 3, duplicates 1, errors 1.
+  2. Map each record to exactly one action:
+     - status is exactly `Valid` -> `Create`
+     - status contains `Duplicate` -> `Review`
+     - anything else (validation errors) -> `Skip`
+     Nothing else may be promoted to `Create`.
+  3. Ready-to-import equals the number of `Create` rows - duplicates and errors
+     are never counted as importable.
+  4. Estimated import time for the sample batch is 2 seconds; auto-assignment
+     is `Round-robin by territory`.
+  5. Close by asking for confirmation to import the Create count, and stop
+     there.
+
+  ## Output format
+
+  - `**Import Preview**`
+  - `| Metric | Count |` table - Total Records, Ready to Import, Duplicates
+    (Review), Validation Errors (Skip)
+  - `**Record Actions:**` table (`Name | Company | Action | Status`), Status
+    repeated verbatim from validation
+  - `**Estimated Import Time:** <n> seconds`
+  - `**Auto-Assignment:** <rule>`
+  - `Confirm to proceed with importing <n> records.`
+  - Close with `Source: [CRM Import Engine]` and
+    `Agents: OneClickCRMIntakeAgent`
+
+  ## Boundaries
+
+  - This is the last step you take. You never execute the import, and you never
+    report records as imported, created, or assigned - the operator confirms
+    and runs it.
+  - If asked to import the Review or Skip rows anyway, refuse: duplicates need
+    a merge decision and validation errors need the missing required field
+    supplied first. Name the specific record and the specific reason.

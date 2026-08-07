@@ -1,0 +1,79 @@
+mcs.metadata:
+  componentName: rebalance-recommendation
+  description: Produces the buy and sell trade list that returns a portfolio to target, using the deterministic drift-threshold gate and target-value arithmetic.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: rebalance-recommendation
+  description: Produces the buy and sell trade list that returns a portfolio to target, using the deterministic drift-threshold gate and target-value arithmetic.
+  ---
+  <!-- bic:source=blank -->
+  # Rebalance recommendation
+
+  Use this skill when the user asks what to trade, what a rebalance would look
+  like, or how to bring a portfolio back to its targets.
+
+  ## Inputs
+
+  - The portfolio record for one portfolio.
+  - Optional: a PORT- id. When none is given, use PORT-5001 (Growth Allocation
+    Fund) and say which portfolio you used.
+
+  ## Trade gate - hard, never waived
+
+  A holding produces a trade only if:
+
+  `abs(current_pct - target_pct) >= drift_threshold`
+
+  Thresholds are per portfolio: PORT-5001 is 3.0%, PORT-5002 is 2.0%. The
+  comparison is greater-than-or-equal, so a drift of exactly -2.0% in PORT-5002
+  does trade. A holding inside its threshold is never traded, not to raise cash
+  and not to make the buys and sells net.
+
+  ## Trade arithmetic - compute it, do not judge it
+
+  For each holding that clears the gate:
+
+  - `drift = current_pct - target_pct`
+  - `action = SELL if drift > 0 else BUY`
+  - `target_value = total_value * target_pct / 100`
+  - `trade_value = abs(target_value - current_value)`
+
+  Worked example (PORT-5001, US Large Cap / VTI): drift = 35.0 - 30.0 = +5.0,
+  so SELL; target_value = 12,450,000 * 30 / 100 = 3,735,000; trade_value =
+  abs(3,735,000 - 4,357,500) = 622,500.
+
+  Totals: `Total Sells` is the sum of SELL trade values, `Total Buys` the sum of
+  BUY trade values. They are reported as computed and are not forced to match.
+
+  ## Output format
+
+  - `# Rebalance Recommendation: <portfolio name>`
+  - `**Portfolio Value:** $12,450,000` and `**Drift Threshold:** 3.0%`
+  - `## Recommended Trades`, then a table with exactly these columns:
+    `| Asset | Ticker | Action | Current % | Target % | Drift | Trade Amount |`
+    Action in caps (`SELL` / `BUY`), drift signed (`+5.0%`, `-3.0%`), trade
+    amount as `$622,500`.
+  - `**Total Sells:** $N` and `**Total Buys:** $N` after the table.
+
+  ## Edge cases
+
+  - No holding clears the gate: emit
+    `No rebalancing trades required` + em dash +
+    `all holdings within drift threshold.` and stop. Do not manufacture a
+    smaller trade.
+  - Sells and buys do not net. In PORT-5001, $622,500 of sells funds $746,250
+    of buys - a $123,750 shortfall, because Cash sits at +1.0% drift, inside
+    the 3.0% threshold, and is therefore not traded. State the gap and where it
+    must be funded from; do not silently rescale the trades.
+  - A portfolio can be all-buy: PORT-5002 produces a single BUY of $164,000 in
+    VYMI and `Total Sells: $0`.
+  - Unknown PORT- id: say it is not in the data and name the portfolios that
+    are. Never answer about a different portfolio without saying so.
+
+  ## Boundaries
+
+  - Recommendation only. Never say a trade has been placed, routed, staged, or
+    approved - end with the recommendation for the portfolio manager to act on.
+  - Show the target-value arithmetic when asked; never adjust a trade value for
+    market view, timing, or convenience.

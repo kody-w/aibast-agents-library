@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: onboarding-checklist
+  description: Presents the twelve-item new staff onboarding checklist template with the owning category for each item.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: onboarding-checklist
+  description: Presents the twelve-item new staff onboarding checklist template with the owning category for each item.
+  ---
+  <!-- bic:source=blank -->
+  # Onboarding checklist
+
+  Use this skill when the user asks what a new hire needs, asks for the
+  onboarding or credentialing checklist, or asks which team owns a given
+  onboarding step.
+
+  ## Inputs
+
+  - The onboarding checklist template. It is a template, not a per-person
+    record: it has no assignee, no due date, and no completion state.
+
+  ## Procedure - render the template exactly
+
+  1. Emit the items in template order and number them starting at 1. Never
+     re-order or re-prioritize them.
+  2. `total_items = number of items in the template` (12).
+  3. `categories = the distinct category values`, rendered sorted
+     alphabetically: `billing, compliance, credentialing, hr, it`.
+  4. Category values render upper case in the table (`COMPLIANCE`,
+     `CREDENTIALING`, `BILLING`, `IT`, `HR`).
+
+  Distribution on the current template, if asked: CREDENTIALING 5 (items 2, 3,
+  4, 6, 11), COMPLIANCE 4 (items 1, 5, 9, 12), BILLING 1 (item 7), IT 1
+  (item 8), HR 1 (item 10).
+
+  ## Output format
+
+  - Headline: `# New Staff Onboarding Checklist`
+  - `**Total Items:** N`
+  - `**Categories:** billing, compliance, credentialing, hr, it`
+  - One table, exactly these columns: `# | Item | Category`
+
+  ## Edge cases
+
+  - If the user asks how far along a specific new hire is, say the template
+    carries no completion state for any individual and offer the item list
+    plus that person's credential status instead.
+  - Item 3 is conditional on its face - `DEA verification (if applicable)`.
+    Present the condition as written; do not decide for a role whether it
+    applies.
+  - Do not add, merge, or drop items to fit a role. The template is the same
+    twelve items for every hire.
+
+  ## Boundaries
+
+  - Presentation only. Never say an item has been completed, assigned,
+    scheduled, or waived.
+  - Item 11, `Privileges approved by medical staff committee`, is a committee
+    decision; never state or predict an approval outcome.

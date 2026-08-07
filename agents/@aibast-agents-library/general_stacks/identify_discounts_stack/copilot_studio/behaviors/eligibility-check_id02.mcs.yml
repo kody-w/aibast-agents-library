@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: eligibility-check
+  description: Lists only the programs a deal actually qualifies for, with stackability, and places the deal in the volume tier table.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: eligibility-check
+  description: Lists only the programs a deal actually qualifies for, with stackability, and places the deal in the volume tier table.
+  ---
+  <!-- bic:source=blank -->
+  # Eligibility check
+
+  Use this skill when the user asks which programs a deal qualifies for, asks
+  about a specific program's criteria, asks whether discounts can be stacked,
+  or asks which volume tier the deal is in.
+
+  ## Inputs
+
+  - The discount program catalog, the eligibility criteria, and the volume tier
+    table.
+  - The deal profile, in particular the license count.
+
+  ## Procedure
+
+  1. Run the same eligibility tests as the discount scan and keep only the
+     programs that pass. Report the count of eligible programs in the header.
+  2. For each eligible program, report the computed discount percentage, its
+     stackable flag, and its description.
+  3. Place the deal in the volume tier table: the current tier is the one where
+     `min_licenses <= licenses <= max_licenses`. Tiers are fixed:
+     Tier 1 = 50-99 licenses, 10%, $90/license; Tier 2 = 100-249, 15%,
+     $85/license; Tier 3 = 250-499, 20%, $80/license; Tier 4 = 500-99999, 25%,
+     $75/license. Mark the current tier and no other.
+  4. Stackability comes from the program, not the deal: VOL-001 and the two
+     segment programs (EDU-001, NPO-001) are not stackable; MULTI-001,
+     COMP-001, LOYAL-001, and BUNDLE-001 are stackable. Stackable does not mean
+     automatically combined - combination requires approval.
+
+  ## Output format
+
+  Headline: `**Eligibility Check: <customer>**`
+
+  Then `**Eligible Programs (N):**` and one table, exactly these columns:
+
+  | Program | Discount | Stackable | Description |
+
+  Discount with a `%` suffix, Stackable as `Yes` / `No`, Description as the
+  program description (truncated at 50 characters, as rendered).
+
+  Then `**Volume Tier Placement:**` and one table, exactly these columns:
+
+  | Tier | Licenses | Discount | Price |
+
+  Licenses as the `min-max` range, Price as `$N/license`. Append `<-- Current`
+  to the row the deal falls into.
+
+  Close with `Source: [Eligibility Engine]`.
+
+  ## Edge cases
+
+  - Zero eligible programs: say `**Eligible Programs (0):**` plainly and state
+    which threshold each program missed. Do not offer a workaround discount.
+  - Fewer than 50 licenses: no volume tier applies. Say the deal is below
+    Tier 1's 50-license floor rather than showing a tier as current.
+  - If the user asks to be moved into a higher tier, state the license count
+    that tier requires (100, 250, or 500) - do not reclassify the deal.
