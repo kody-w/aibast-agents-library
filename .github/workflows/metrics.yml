@@ -27,18 +27,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python tools/fetch_release_downloads.py
+      - name: Community snapshot (adoption, conversations, in-the-wild)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/fetch_community.py
       - name: Accumulate traffic history (needs TRAFFIC_TOKEN secret; skips without)
         env:
           TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
         run: python tools/fetch_traffic.py
       - name: Commit if changed
         run: |
-          if git diff --quiet -- rar/ratings.json rar/downloads.json rar/traffic.json; then
+          if git diff --quiet -- rar/ratings.json rar/downloads.json rar/traffic.json rar/community.json; then
             echo "no rating movement — nothing to commit"
           else
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add rar/ratings.json rar/downloads.json rar/traffic.json
+            git add rar/ratings.json rar/downloads.json rar/traffic.json rar/community.json
             git commit -m "chore(metrics): refresh ratings, downloads, traffic"
             git push
           fi

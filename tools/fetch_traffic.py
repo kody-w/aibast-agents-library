@@ -33,6 +33,7 @@ def main():
         views = get(base + "/views", token)
         clones = get(base + "/clones", token)
         paths = get(base + "/popular/paths", token)
+        referrers = get(base + "/popular/referrers", token)
     except Exception as e:  # noqa: BLE001
         print(f"[traffic] fetch failed, history unchanged: {e}")
         return 0
@@ -48,6 +49,9 @@ def main():
     hist["popular_paths_latest"] = [
         {"path": p["path"], "views_14d": p["count"], "uniques_14d": p["uniques"]}
         for p in paths]
+    hist["referrers_latest"] = [
+        {"referrer": p["referrer"], "views_14d": p["count"], "uniques_14d": p["uniques"]}
+        for p in referrers]
     hist["days"] = dict(sorted(hist["days"].items()))
     OUT.write_text(json.dumps(hist, indent=1) + "\n")
     print(f"[traffic] history now covers {len(hist['days'])} days; "
