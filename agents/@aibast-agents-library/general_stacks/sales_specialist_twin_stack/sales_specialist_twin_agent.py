@@ -133,8 +133,18 @@ def _stack_context(request):
                             if w not in MISSION_WORDS)
     candidates = [a for a in reg.get("agents", [])
                   if a.get("name") != "@aibast-agents-library/sales-specialist-twin"]
-    entry, score = _match(domain_words, candidates,
-                          ["name", "display_name", "tags", "description"])
+    # Slug tokens decide; description words only break ties. A big multi-agent
+    # stack's rich description must never outscore an exact-name match (seen
+    # live: "win loss analysis" landing on the deal-progression suite).
+    words = set(domain_words.split())
+    entry, score = None, 0
+    for a in candidates:
+        slug_tokens = set(re.split(r"[^a-z0-9]+", a["name"].split("/")[1].lower())) - {""}
+        hay = (a.get("display_name", "") + " " + " ".join(a.get("tags", [])) + " " +
+               a.get("description", "")).lower()
+        sc = 10 * len(words & slug_tokens) + sum(1 for w in words if w in hay)
+        if sc > score:
+            entry, score = a, sc
     if not entry or score == 0:
         return None, None
     stack_dir = os.path.dirname(entry["_file"]) + "/copilot_studio"

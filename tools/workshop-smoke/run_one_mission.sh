@@ -13,6 +13,11 @@ print(SalesSpecialistTwinAgent().perform(operation='mission', request='deploy th
 if ! echo "$PAYLOAD" | grep -q "MISSION BRIEFING"; then
   echo "MISSION RESULT: FAILURE — twin returned no briefing for $SLUG"; exit 1
 fi
+# Guard: the briefing must be about the agent we asked for (live defect: a
+# fuzzy-match miss once routed win-loss to the deal-progression suite).
+if ! echo "$PAYLOAD" | grep -qi "$NAME"; then
+  echo "MISSION RESULT: FAILURE — briefing agent mismatch for $SLUG (matcher routed elsewhere)"; exit 1
+fi
 DIRECTIVE="Operator directives for this run (they override PERSON pauses — the operator has pre-approved):
 - Target environment GUID: 35fb6ec1-10b0-e529-8c78-2c48a93fd517 (skip auto-detection).
 - Use project folder ~/CopilotStudioAgents/batch/$SLUG (add -2 suffix if it exists).
