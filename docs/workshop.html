@@ -41,14 +41,16 @@ body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink);
   font-weight:600;color:var(--dim);text-decoration:none;border-bottom:3px solid transparent;
   white-space:nowrap}
 .rail a .n{width:20px;height:20px;border-radius:50%;background:var(--wash);border:1px solid var(--line);
-  color:var(--dim);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
-.rail a.on{color:var(--accent);border-bottom-color:var(--accent)}
+  color:var(--ink);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.rail a.on{color:#0b5da6;border-bottom-color:#0b5da6}
+html[data-theme=dark] .rail a.on{color:#8fc0f5;border-bottom-color:#8fc0f5}
 .rail a.on .n{background:var(--accent);border-color:var(--accent);color:#fff}
 
 /* ── sections ─────────────────────────────────────────── */
 section.phase{padding:54px 0 10px}
 .phead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
-.phead .pk{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.phead .pk{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0b5da6}
+html[data-theme=dark] .phead .pk{color:#8fc0f5}
 .phead .time{margin-left:auto;font-size:13px;font-weight:700;color:#fff;background:#0b5da6;
   border-radius:999px;padding:4px 14px}
 h2{font-size:29px;font-weight:720;letter-spacing:-.015em;margin-bottom:6px}
@@ -138,6 +140,7 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
   flex-wrap:wrap}
 .bx .status{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
   border-radius:4px;padding:2px 7px;color:#fff}
+.bx .status.u{background:#1f7a33}.bx .status.d{background:#7d6014}
 .bx .status.u{background:#2b8a3e}.bx .status.d{background:#a07d1c}.bx .status.n{background:#8a8da0}
 .bx ul{list-style:none;margin-top:8px}
 .bx li{position:relative;padding-left:13px;margin-bottom:6px;color:var(--dim);line-height:1.4}
@@ -170,7 +173,7 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
 .b-skills .sbox.l{background:var(--skill);border-color:var(--skill-b)}
 .b-skills .sbox.l h5{color:var(--skill-b)}
 .b-skills .sbox.r{background:var(--wash);border-color:#9aa0b5}
-.b-skills .sbox.r h5{color:var(--dim)}
+.b-skills .sbox.r h5{color:var(--ink)}
 .b-skills .sbox ul{list-style:none}
 .b-skills .sbox li{position:relative;padding-left:12px;margin-bottom:5px;color:var(--dim);line-height:1.38}
 .b-skills .sbox li::before{content:"•";position:absolute;left:0;opacity:.5}

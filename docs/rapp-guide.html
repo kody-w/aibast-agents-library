@@ -1075,12 +1075,20 @@
 <style id="aibast-guide-offset">.top-bar{top:52px!important}.sidebar{top:122px!important;height:calc(100vh - 122px)!important}</style>
 <style id="aibast-dark-vars">
 html[data-theme=dark]{color-scheme:dark}
-html[data-theme=dark] body{--bg-light:#0b1024;--bg-white:#141a30;--text-dark:#e6e8f2;
+html[data-never] body{--bg-light:#0b1024;--bg-white:#141a30;--text-dark:#e6e8f2;
   --text-medium:#aab0c8;--text-light:#7c86a8;--border:#26304f;
   --shadow:0 1px 4px rgba(0,0,0,.5);--shadow-lg:0 8px 24px rgba(0,0,0,.5);
   background:#0b1024}
 </style>
 <style id="aibast-anchor-offset">h1,h2,h3,[id]{scroll-margin-top:140px}</style>
+<style id="aibast-guide-pin">
+/* This guide is a large light-native reference document with hundreds of
+   authored inline styles. Forcing it dark produced unreadable hybrids, so it
+   renders in its authored light theme on purpose; the rest of the site still
+   honors the visitor's choice. */
+html[data-theme=dark]{color-scheme:light}
+#aibast-theme-btn{display:none!important}
+</style>
 <style id="aibast-guide-contrast">
 /* ONE authority for this legacy page's contrast, both themes.
    Every value below was measured live, not guessed.
@@ -1098,49 +1106,50 @@ html[data-theme=dark] body{--bg-light:#0b1024;--bg-white:#141a30;--text-dark:#e6
 [style*="#ffbe5f"] *,[style*="#fbbf24"] *{color:#241a00!important}
 [style*="#10b981"],[style*="#107c10"]{color:#ffffff!important}
 [style*="#10b981"] *,[style*="#107c10"] *{color:#ffffff!important}
-.copy-btn,button.copy-btn{color:#241a00!important;font-weight:700}
+.copy-btn,button.copy-btn{background:#0b5da6!important;color:#ffffff!important;font-weight:700}
 .quiz-submit,button.quiz-submit{background:#0b5da6!important;color:#fff!important}
 
 /* 2. Grey secondary text — AA on the page's own light greys */
-.breadcrumb-item,.progress-text,.nav-section-title,.meta,.caption{color:#5b5e6e!important}
-html[data-theme=dark] .breadcrumb-item,html[data-theme=dark] .progress-text,
-html[data-theme=dark] .nav-section-title{color:#aab0c8!important}
+.breadcrumb-item,.progress-text,.nav-section-title,.meta,.caption,
+.breadcrumb span,.breadcrumb-separator{color:#5b5e6e!important}
+html[data-never] .breadcrumb-item,html[data-never] .progress-text,
+html[data-never] .nav-section-title{color:#aab0c8!important}
 
 /* 3. Headings that used mid-azure/green on near-white */
 h4,.section-title h4{color:#0b5da6!important}
-html[data-theme=dark] h4{color:#7fb3ee!important}
+html[data-never] h4{color:#7fb3ee!important}
 h3[style*="#107c10"],h4[style*="#107c10"]{color:#0f5f0f!important}
-html[data-theme=dark] h3,html[data-theme=dark] h4{color:#7fb3ee!important}
+html[data-never] h3,html[data-never] h4{color:#7fb3ee!important}
 
 /* 4. DARK: light panel fills become dark surfaces (text already flips) */
-html[data-theme=dark] [style*="#e8f4fd"],html[data-theme=dark] [style*="#f5f5f5"],
-html[data-theme=dark] [style*="#f8fafc"],html[data-theme=dark] [style*="#ffffff"],
-html[data-theme=dark] [style*="#fff;"],html[data-theme=dark] [style*="#e5e7eb"],
-html[data-theme=dark] [style*="#f3f4f6"],html[data-theme=dark] [style*="#e2e8f0"],
-html[data-theme=dark] .pitfall-box,html[data-theme=dark] .example-box,
-html[data-theme=dark] .gut-check,html[data-theme=dark] .code-block{
+html[data-never] [style*="#e8f4fd"],html[data-never] [style*="#f5f5f5"],
+html[data-never] [style*="#f8fafc"],html[data-never] [style*="#ffffff"],
+html[data-never] [style*="#fff;"],html[data-never] [style*="#e5e7eb"],
+html[data-never] [style*="#f3f4f6"],html[data-never] [style*="#e2e8f0"],
+html[data-never] .pitfall-box,html[data-never] .example-box,
+html[data-never] .gut-check,html[data-never] .code-block{
   background:#141a30!important;background-image:none!important;border-color:#26304f!important}
-html[data-theme=dark] [style*="#e8f4fd"] *,html[data-theme=dark] [style*="#f5f5f5"] *,
-html[data-theme=dark] [style*="#f8fafc"] *,html[data-theme=dark] [style*="#e5e7eb"] *,
-html[data-theme=dark] [style*="#e2e8f0"] *,html[data-theme=dark] .pitfall-box *,
-html[data-theme=dark] .example-box *,html[data-theme=dark] .gut-check *{color:#e6e8f2!important}
-html[data-theme=dark] [style*="#e8f4fd"] a,html[data-theme=dark] .example-box a{color:#7fb3ee!important}
+html[data-never] [style*="#e8f4fd"] *,html[data-never] [style*="#f5f5f5"] *,
+html[data-never] [style*="#f8fafc"] *,html[data-never] [style*="#e5e7eb"] *,
+html[data-never] [style*="#e2e8f0"] *,html[data-never] .pitfall-box *,
+html[data-never] .example-box *,html[data-never] .gut-check *{color:#e6e8f2!important}
+html[data-never] [style*="#e8f4fd"] a,html[data-never] .example-box a{color:#7fb3ee!important}
 
 /* 5. Sidebar amber + badges */
 .nav-item.audit,.nav-item.audit span,.nav-item span,.nav-icon{color:#7a4f00!important}
-html[data-theme=dark] .nav-item.audit,html[data-theme=dark] .nav-item.audit span,
-html[data-theme=dark] .nav-item span,html[data-theme=dark] .nav-icon{color:#ffc933!important}
+html[data-never] .nav-item.audit,html[data-never] .nav-item.audit span,
+html[data-never] .nav-item span,html[data-never] .nav-icon{color:#ffc933!important}
 .badge,.badge.audit,.badge.manual,span.badge{background:#2e2400!important;color:#ffd977!important}
 </style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
-<script id="aibast-theme-boot">
+<script id="aibast-theme-boot" data-pin="light">
 (function(){
   var k="aibast:theme";
   function get(){try{return localStorage.getItem(k);}catch(e){return null;}}
   function set(v){try{localStorage.setItem(k,v);}catch(e){}}
-  var t=get()||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  var t=document.currentScript&&document.currentScript.dataset.pin?"light":(get()||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
   document.documentElement.setAttribute("data-theme",t);
   addEventListener("DOMContentLoaded",function(){
     var nav=document.querySelector("#aibast-nav .in"); if(!nav) return;
