@@ -109,6 +109,27 @@ html[data-theme=light] .hero-action.primary{background:#0f6cbd!important;color:#
 html[data-theme=light] .install-widget,html[data-theme=light] .one-liner{
   box-shadow:0 10px 30px rgba(11,16,36,.18)}
 </style>
+<style id="aibast-darksurface-pin">
+/* Surfaces that stay dark in BOTH themes must pin their own text colors —
+   inheriting the light theme's ink is what made these unreadable. */
+html[data-theme=light] .header,
+html[data-theme=light] .install-widget,html[data-theme=light] .one-liner,
+html[data-theme=light] .status-bar,html[data-theme=light] .cmd,
+html[data-theme=light] .code-block,html[data-theme=light] pre{
+  color:#e6edf3!important}
+/* only surfaces that KEEP a dark background in light mode get white text —
+   index's .hero has no background of its own and must stay dark-on-light */
+html[data-theme=light] .header,html[data-theme=light] .header h1,
+html[data-theme=light] .header h2,html[data-theme=light] .header p,
+html[data-theme=light] .header .subtitle{
+  color:#ffffff!important;-webkit-text-fill-color:#ffffff!important}
+html[data-theme=light] .status-bar,html[data-theme=light] .status-bar *,
+html[data-theme=light] .status-label{color:#c3cae6!important}
+/* inline code in prose: light chip on light pages (not a dark chip) */
+html[data-theme=light] code{background:#eef1f7!important;color:#1a1a2e!important;
+  border:1px solid #e3e5ec}
+html[data-theme=light] pre code{background:transparent!important;color:#e6edf3!important;border:0}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
