@@ -62,6 +62,58 @@ A catalog reward is eligible for a member only when both conditions hold:
 Both gates are hard. A reward that fails either one is not a recommendation;
 it appears only in the full catalog listing.
 
+## Points liability
+
+Outstanding points are an open program liability: every unredeemed point is
+value the program still owes its members.
+
+`points_liability = round(points_outstanding x 0.02, 2)`
+
+Program-wide: 80,900 points outstanding = $1,618.00 liability.
+
+The only levers that reduce the liability are redemptions. A member's
+addressable liability is the total points cost of the rewards they are already
+eligible for today under the two eligibility gates above:
+
+| Member | Points | Eligible Rewards | Points Redeemable | Liability Addressed |
+|--------|--------|------------------|-------------------|---------------------|
+| LM-10001 Katherine Brooks | 48,250 | $500 Travel Voucher; $100 Dining Gift Card | 30,000 | $600.00 |
+| LM-10002 Antonio Vasquez | 22,100 | Premium Wireless Headphones; $50 Store Gift Card | 17,500 | $350.00 |
+| LM-10003 Rachel Nguyen | 8,450 | 20% Off Next Purchase | 3,000 | $60.00 |
+| LM-10004 Derek Washington | 2,100 | Free Shipping for 3 Months | 1,500 | $30.00 |
+
+Addressable now: 52,000 points ($1,040.00), 64.3% of points outstanding.
+Residual liability if every eligible reward is taken: 28,900 points ($578.00).
+
+A lever is a redemption the member could make, not one the agent makes. There
+is no expiry rule in this program, so points never fall off the liability on
+their own.
+
+## Engagement bands and retention
+
+Engagement score is a recorded 0-100 field. It maps to exactly three published
+bands, and these are the only bands in the program:
+
+| Band | Engagement Score | Retention Meaning |
+|------|------------------|-------------------|
+| Engaged | 75-100 | No retention action required; standard program communications. |
+| Watch | 50-74 | Review for a retention touch; engagement has slipped below Engaged. |
+| At Risk | 0-49 | Prioritize for retention outreach by the program team. |
+
+Applied to the current roster: LM-10001 (92) Engaged; LM-10002 (75) Engaged;
+LM-10003 (58) Watch; LM-10004 (32) At Risk.
+
+The retention watchlist is every member below the Engaged band, in roster id
+order — currently LM-10003 (Watch) and LM-10004 (At Risk), 2 of 4 members.
+
+Points redeemed YTD is a supporting signal, never a band on its own: a member
+with 0 redeemed YTD has converted no points to value this year (LM-10003 and
+LM-10004 are both at 0). Report it beside the band; do not derive a band from
+it.
+
+Bands describe attention, not outcome. The agent never states that a member
+has churned, will churn, or has been contacted.
+
 ## Boundaries
 
 - The agent recommends. Redeeming points, crediting points, changing a tier,

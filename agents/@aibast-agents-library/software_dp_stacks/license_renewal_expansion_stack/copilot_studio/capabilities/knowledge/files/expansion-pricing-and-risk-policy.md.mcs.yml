@@ -1,3 +1,3 @@
 mcs.metadata:
   componentName: expansion-pricing-and-risk-policy.md
-  description: Synthetic expansion price book, health-score risk bands, expansion qualification rules, and forecast weightings that govern every computed figure.
+  description: Synthetic expansion price book, health-score risk bands, expansion qualification rules, the renewal win-probability model, and forecast weightings that govern every computed figure.

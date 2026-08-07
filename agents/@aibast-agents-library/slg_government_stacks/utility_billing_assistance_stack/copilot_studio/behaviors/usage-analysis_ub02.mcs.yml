@@ -90,12 +90,18 @@ content: |
   - Stormwater and trash are flat charges with no base-charge or tier fields,
     so they appear in the rate section with no rate line. State the flat
     amounts from the knowledge file rather than leaving the section empty.
-  - A rising trend is a reading, not a diagnosis. You may note that a
-    significant increase is consistent with a leak and that the customer should
-    request a leak check - never assert that a leak exists.
+  - A **Significantly Increasing** trend meets a published leak-flag condition.
+    Say so: flag the account as a **suspected leak** and show the evidence (the
+    recent gallons, the prior average, and the 1.20x threshold it cleared),
+    pending field verification by the utility. Hand off to the leak-detection
+    skill for the meter-evidence check. A flag is a suspected leak, never a
+    confirmed one - do not diagnose its cause or location.
+  - Any other trend is a reading, not a leak finding. Do not assert a leak on a
+    Slightly Increasing or Stable trend from consumption alone; the
+    leak-detection skill can still flag it on continuous overnight flow.
 
   ## Boundaries
 
-  - Never estimate a future bill as if it were billed, and never offer a
-    credit, rebate, or leak adjustment. Route adjustment requests to a billing
-    clerk.
+  - Never estimate a future bill as if it were billed, and never issue a credit,
+    rebate, or leak adjustment. Route adjustment requests to a billing clerk -
+    flagging a suspected leak is in scope, pricing the adjustment is not.

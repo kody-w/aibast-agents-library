@@ -196,6 +196,64 @@ def _audit_readiness():
             "open_findings": open_findings, "high_severity_open": high_sev}
 
 
+def _remediation_package():
+    """Assemble the routable remediation work list.
+
+    Read-only: every item is derived from an OPEN audit finding or a failed
+    validation gate already in the data. Nothing is filed, assigned, or closed.
+    """
+    items = []
+    for aid, af in AUDIT_FINDINGS.items():
+        if af["status"] != "open":
+            continue
+        rid = af["report"]
+        rpt = REGULATORY_REPORTS.get(rid, {})
+        items.append({
+            "owner": rpt.get("assignee", "Unassigned"),
+            "item_id": aid,
+            "report_id": rid,
+            "report": rpt.get("name", rid),
+            "source": "Audit finding",
+            "action": af["finding"],
+            "severity": af["severity"],
+            "due_date": af["due_date"],
+        })
+    for v in _data_validation()["validations"]:
+        if v["passed"]:
+            continue
+        rid = v["report_id"]
+        rpt = REGULATORY_REPORTS.get(rid, {})
+        for issue in v["issues"]:
+            items.append({
+                "owner": rpt.get("assignee", "Unassigned"),
+                "item_id": rid,
+                "report_id": rid,
+                "report": rpt.get("name", rid),
+                "source": "Validation gate",
+                "action": issue,
+                "severity": "n/a",
+                "due_date": rpt.get("deadline", "N/A"),
+            })
+
+    packages = {}
+    for it in items:
+        packages.setdefault(it["owner"], []).append(it)
+    for owner in packages:
+        packages[owner].sort(key=lambda x: (x["due_date"], 0 if x["source"] == "Audit finding" else 1))
+    ordered = sorted(
+        packages.items(),
+        key=lambda kv: (min(i["due_date"] for i in kv[1]), kv[0]),
+    )
+    return {
+        "packages": ordered,
+        "total_items": len(items),
+        "owners": len(ordered),
+        "open_findings": sum(1 for i in items if i["source"] == "Audit finding"),
+        "failed_gates": sum(1 for i in items if i["source"] == "Validation gate"),
+        "earliest_due": min((i["due_date"] for i in items), default="N/A"),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Agent
 # ---------------------------------------------------------------------------
@@ -218,6 +276,7 @@ class RegulatoryReportingAgent(BasicAgent):
                             "data_validation",
                             "submission_tracker",
                             "audit_readiness",
+                            "remediation_package",
                         ],
                         "description": "The regulatory reporting operation to perform.",
                     },
@@ -241,6 +300,8 @@ class RegulatoryReportingAgent(BasicAgent):
             return self._submission_tracker()
         elif op == "audit_readiness":
             return self._audit_readiness()
+        elif op == "remediation_package":
+            return self._remediation_package()
         return f"**Error:** Unknown operation `{op}`."
 
     def _report_status(self) -> str:
@@ -314,11 +375,42 @@ class RegulatoryReportingAgent(BasicAgent):
             lines.append("")
         return "\n".join(lines)
 
+    def _remediation_package(self) -> str:
+        data = _remediation_package()
+        lines = [
+            "# Remediation Package",
+            "",
+            f"**Work Items:** {data['total_items']} | "
+            f"**Owners:** {data['owners']} | "
+            f"**Open Findings:** {data['open_findings']} | "
+            f"**Failed Gates:** {data['failed_gates']} | "
+            f"**Earliest Due:** {data['earliest_due']}",
+            "",
+        ]
+        for owner, work in data["packages"]:
+            noun = "item" if len(work) == 1 else "items"
+            lines.append(f"## {owner} ({len(work)} {noun})")
+            lines.append("")
+            lines.append("| Item | Report | Source | Action | Severity | Due Date |")
+            lines.append("|------|--------|--------|--------|----------|----------|")
+            for it in work:
+                lines.append(
+                    f"| {it['item_id']} | {it['report']} | {it['source']} "
+                    f"| {it['action']} | {it['severity'].upper()} | {it['due_date']} |"
+                )
+            lines.append("")
+        lines.append(
+            "Routing, assignment, and closure are the named owner's action. "
+            "This package is a read-only work list assembled from the open audit "
+            "findings and failed validation gates already on record."
+        )
+        return "\n".join(lines)
+
 
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     agent = RegulatoryReportingAgent()
-    for op in ["report_status", "data_validation", "submission_tracker", "audit_readiness"]:
+    for op in ["report_status", "data_validation", "submission_tracker", "audit_readiness", "remediation_package"]:
         print(f"\n{'='*60}")
         print(f"Operation: {op}")
         print("=" * 60)

@@ -1,0 +1,84 @@
+mcs.metadata:
+  componentName: renewal-probability
+  description: Derives a win probability per renewal from health score, usage trend, and signal counts, ranks the book by it, and reports probability-weighted ARR.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: renewal-probability
+  description: Derives a win probability per renewal from health score, usage trend, and signal counts, ranks the book by it, and reports probability-weighted ARR.
+  ---
+  <!-- bic:source=blank -->
+  # Renewal win probability
+
+  Use this skill when the user asks how likely a renewal is to close, what the
+  win probability is, which renewals are safe or contested, what is committable,
+  where to spend save effort to lift the odds, or for a probability-weighted
+  view of the book.
+
+  ## Inputs
+
+  - The license agreement portfolio: each account's `health_score`,
+    `usage_trend`, `expansion_signals`, `churn_signals`, and `arr`.
+  - Nothing else. There is no stored probability, no win/loss history, no stage
+    field, and no CRM opportunity record behind this number.
+
+  ## Procedure - compute it, do not judge it
+
+  1. Start from `health_score` as the base.
+  2. Apply the usage-trend adjustment: `increasing` +10, `stable` 0,
+     `declining` -10.
+  3. Add 3 for each expansion signal on the account.
+  4. Subtract 5 for each churn signal on the account.
+  5. Clamp the result to the range 5-95. Report the raw pre-clamp score whenever
+     a row was clamped, so the ceiling is never mistaken for certainty.
+  6. Band the probability: `>= 80` is COMMIT, `50-79` is CONTESTED, `< 50` is
+     UNLIKELY. These bands are separate from the pipeline's LOW/MEDIUM/HIGH risk
+     bands and never substitute for them.
+  7. `weighted_arr = round(arr * probability / 100)` per account.
+  8. Sort by probability descending, then by weighted ARR descending as the only
+     tiebreak. Never re-sort by renewal date, health score, or ARR alone.
+  9. The computed values are fixed by the data:
+
+     | Account | Base | Trend | Signals | Raw | Probability | Band | Weighted ARR |
+     |---------|------|-------|---------|-----|-------------|------|--------------|
+     | LIC-3004 Skyline Hospitality Group | 94 | +10 | +3 exp, -0 churn | 113 | 95% | COMMIT | $342,000 |
+     | LIC-3001 Pinnacle Insurance Corp | 88 | +10 | +2 exp, -0 churn | 104 | 95% | COMMIT | $273,600 |
+     | LIC-3003 Redwood Supply Chain | 62 | 0 | +1 exp, -1 churn | 60 | 60% | CONTESTED | $115,200 |
+     | LIC-3005 Granite Construction Co | 35 | -10 | +0 exp, -2 churn | 15 | 15% | UNLIKELY | $8,100 |
+     | LIC-3002 ClearView Analytics | 29 | -10 | +0 exp, -3 churn | 4 | 5% | UNLIKELY | $3,600 |
+
+  10. `Probability-Weighted ARR` = sum of weighted ARR:
+      `342000 + 273600 + 115200 + 8100 + 3600 = $742,500` of the $966,000
+      portfolio.
+
+  ## Output format
+
+  - `# Renewal Win Probability`
+  - `**Probability-Weighted ARR:** $742,500 of $966,000`
+  - Table with columns exactly: `Customer | ARR | Health | Trend | Signals
+    (exp/churn) | Win Probability | Band | Weighted ARR`. Trend is lowercase as
+    recorded, signals render as `+N/-N`, probability carries a `%`, band is
+    uppercase, dollars use thousands separators.
+  - Then the model line stating the weightings and the 5-95 clamp, the list of
+    clamped rows with their raw scores, and the statement that this is a derived
+    model rather than a stored field or a committed forecast.
+
+  ## Edge cases
+
+  - LIC-3004 and LIC-3001 both clamp to 95% from raw 113 and 104. They are tied
+    on probability and separated only by weighted ARR. Never present 95% as
+    certainty, and never report a probability above 95 or below 5.
+  - LIC-3002 ClearView Analytics computes a raw 4 and is floored to 5%. The
+    floor is a bound, not a judgement that a save is impossible.
+  - LIC-3005 Granite Construction Co ranks above LIC-3002 at 15% while carrying
+    less ARR ($54,000 against $72,000). Probability leads the sort; ARR is only
+    the tiebreak.
+  - This number never reconciles with the revenue impact view. That projection
+    applies fixed 40% expansion and 30% churn weightings to portfolio totals and
+    lands at an expected $916,200; this view weights each account by its own
+    probability and lands at $742,500. Report both as what they are and never
+    average, blend, or reconcile them.
+  - The lift levers are the recorded inputs only - closing churn signals,
+    reversing a declining usage trend, or adding an expansion signal. Never
+    claim a play was run, a probability was updated in a system, or a renewal
+    was committed. You model the odds; a person works the account.

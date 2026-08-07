@@ -2,8 +2,10 @@
 Inventory Visibility Agent — Retail & CPG Stack
 
 Provides real-time inventory visibility across stores, warehouses, and channels.
-Surfaces stock alerts, generates replenishment plans, and optimizes channel
-allocation for omni-channel retail operations.
+Surfaces stock alerts, reviews overstock exposure, generates replenishment
+plans, and optimizes channel allocation for omni-channel retail operations.
+Dashboard, alert, and overstock views can be scoped to a merchandise category
+for category managers.
 """
 
 import sys
@@ -22,14 +24,16 @@ __manifest__ = {
     "display_name": "Inventory Visibility Agent",
     "description": (
         "Delivers real-time inventory dashboards, stock-out alerts, "
-        "replenishment planning, and channel allocation optimization "
-        "for omni-channel retail and CPG operations."
+        "overstock review, replenishment planning, and channel allocation "
+        "optimization for omni-channel retail and CPG operations, with "
+        "category-level rollups for category managers."
     ),
     "author": "AIBAST",
     "tags": [
         "inventory",
         "stock-management",
         "replenishment",
+        "overstock",
         "omni-channel",
         "retail",
     ],
@@ -164,12 +168,78 @@ def _stock_status(sku_id, location_id):
     return "HEALTHY"
 
 
+def _categories():
+    """Merchandise categories present in the SKU catalog, alphabetical."""
+    return sorted({sku["category"] for sku in SKUS.values()})
+
+
+def _resolve_category(raw):
+    """Map a user-supplied category string to its catalog spelling, or None."""
+    if not raw:
+        return None
+    wanted = str(raw).strip().lower()
+    for category in _categories():
+        if category.lower() == wanted:
+            return category
+    return None
+
+
+def _skus_in_scope(category=None):
+    """SKU ids in ascending id order, optionally restricted to one category."""
+    if category is None:
+        return sorted(SKUS.keys())
+    return sorted(s for s in SKUS if SKUS[s]["category"] == category)
+
+
+def _target_qty(sku_id, target_days=14):
+    """Truncated N-day supply target for a SKU."""
+    return int(DAILY_SELL_THROUGH.get(sku_id, 1.0) * target_days)
+
+
+def _category_rollup(category, location_ids):
+    """On-hand, sell-through, days of supply, and unit-cost value for a category."""
+    sku_ids = _skus_in_scope(category)
+    on_hand = sum(
+        INVENTORY.get(loc, {}).get(sku_id, 0)
+        for loc in location_ids
+        for sku_id in sku_ids
+    )
+    daily = sum(DAILY_SELL_THROUGH.get(sku_id, 0.0) for sku_id in sku_ids)
+    value = sum(
+        INVENTORY.get(loc, {}).get(sku_id, 0) * SKUS[sku_id]["unit_cost"]
+        for loc in location_ids
+        for sku_id in sku_ids
+    )
+    return {
+        "sku_ids": sku_ids,
+        "on_hand": on_hand,
+        "daily": round(daily, 1),
+        "days_of_supply": round(on_hand / daily, 1) if daily > 0 else 999.0,
+        "value": round(value, 2),
+    }
+
+
+def _overstock_position(sku_id, location_id, target_days=14):
+    """Excess above the N-day target at a store, or None when at/below target."""
+    on_hand = INVENTORY.get(location_id, {}).get(sku_id, 0)
+    target = _target_qty(sku_id, target_days)
+    if on_hand <= target:
+        return None
+    excess = on_hand - target
+    daily = DAILY_SELL_THROUGH.get(sku_id, 1.0)
+    return {
+        "on_hand": on_hand,
+        "target": target,
+        "excess": excess,
+        "days_over": round(excess / daily, 1) if daily > 0 else 999.0,
+        "capital": round(excess * SKUS[sku_id]["unit_cost"], 2),
+    }
+
+
 def _replenishment_qty(sku_id, location_id, target_days=14):
     """Calculate replenishment quantity targeting N days of supply."""
     on_hand = INVENTORY.get(location_id, {}).get(sku_id, 0)
-    daily = DAILY_SELL_THROUGH.get(sku_id, 1.0)
-    target_qty = int(daily * target_days)
-    needed = max(0, target_qty - on_hand)
+    needed = max(0, _target_qty(sku_id, target_days) - on_hand)
     return needed
 
 
@@ -203,12 +273,22 @@ class InventoryVisibilityAgent(BasicAgent):
                         "enum": [
                             "inventory_dashboard",
                             "stock_alerts",
+                            "overstock_review",
                             "replenishment_plan",
                             "channel_allocation",
                         ],
                     },
                     "sku_id": {"type": "string"},
                     "location_id": {"type": "string"},
+                    "category": {
+                        "type": "string",
+                        "description": (
+                            "Optional merchandise category scope for "
+                            "inventory_dashboard, stock_alerts, and "
+                            "overstock_review: Accessories, Apparel, "
+                            "Electronics, or Footwear."
+                        ),
+                    },
                 },
                 "required": ["operation"],
             },
@@ -217,35 +297,87 @@ class InventoryVisibilityAgent(BasicAgent):
 
     # ---- operations -------------------------------------------------------
 
+    def _unknown_category(self, raw):
+        return (
+            f"`{raw}` is not a merchandise category in the SKU catalog. "
+            f"Valid categories: {', '.join(_categories())}."
+        )
+
     def _inventory_dashboard(self, **kwargs):
+        raw_category = kwargs.get("category")
+        category = _resolve_category(raw_category)
+        if raw_category and category is None:
+            return self._unknown_category(raw_category)
+        sku_ids = _skus_in_scope(category)
+
         location_id = kwargs.get("location_id")
         locations = [location_id] if location_id and location_id in INVENTORY else list(STORES.keys())
         lines = ["# Inventory Dashboard", ""]
+        if category:
+            lines.append(
+                f"**Category filter:** {category} ({', '.join(sku_ids)}) — "
+                "this view is filtered; the network total below is not."
+            )
+            lines.append("")
         for loc_id in locations:
             loc_info = STORES.get(loc_id, WAREHOUSES.get(loc_id, {}))
             lines.append(f"## {loc_info.get('name', loc_id)} (`{loc_id}`)")
             lines.append("")
-            lines.append("| SKU | Product | On-Hand | Safety Stock | Status | Days of Supply |")
-            lines.append("|-----|---------|---------|--------------|--------|----------------|")
-            for sku_id in sorted(SKUS.keys()):
+            lines.append("| SKU | Product | Category | On-Hand | Safety Stock | Status | Days of Supply |")
+            lines.append("|-----|---------|----------|---------|--------------|--------|----------------|")
+            for sku_id in sku_ids:
                 sku = SKUS[sku_id]
                 on_hand = INVENTORY[loc_id].get(sku_id, 0)
                 safety = SAFETY_STOCK.get(loc_id, {}).get(sku_id, "N/A")
                 status = _stock_status(sku_id, loc_id)
                 dos = _days_of_supply(sku_id, loc_id)
-                lines.append(f"| {sku_id} | {sku['name']} | {on_hand} | {safety} | {status} | {dos} |")
+                lines.append(
+                    f"| {sku_id} | {sku['name']} | {sku['category']} | {on_hand} | {safety} | {status} | {dos} |"
+                )
             lines.append("")
+
+        lines.append("## Category Rollup")
+        lines.append("")
+        lines.append(
+            f"Covers the {len(locations)} location(s) in view: "
+            f"{', '.join(locations)}."
+        )
+        lines.append("")
+        lines.append("| Category | SKUs | On-Hand | Daily Sell-Through | Days of Supply | Value at Unit Cost |")
+        lines.append("|----------|------|---------|--------------------|----------------|--------------------|")
+        for cat in ([category] if category else _categories()):
+            roll = _category_rollup(cat, locations)
+            lines.append(
+                f"| {cat} | {len(roll['sku_ids'])} | {roll['on_hand']:,} | "
+                f"{roll['daily']} | {roll['days_of_supply']} | ${roll['value']:,.2f} |"
+            )
+        lines.append("")
+
         total_units = sum(sum(v.values()) for v in INVENTORY.values())
         lines.append(f"**Total Network Inventory:** {total_units:,} units across {len(INVENTORY)} locations")
         return "\n".join(lines)
 
     def _stock_alerts(self, **kwargs):
-        lines = ["# Stock Alerts", "", "## Critical & Out-of-Stock Items", ""]
-        lines.append("| Location | SKU | Product | On-Hand | Safety Stock | Status | Action Required |")
-        lines.append("|----------|-----|---------|---------|--------------|--------|-----------------|")
+        raw_category = kwargs.get("category")
+        category = _resolve_category(raw_category)
+        if raw_category and category is None:
+            return self._unknown_category(raw_category)
+        sku_ids = _skus_in_scope(category)
+
+        lines = ["# Stock Alerts", ""]
+        if category:
+            lines.append(
+                f"**Category filter:** {category} ({', '.join(sku_ids)}) — "
+                "every count below covers this category only."
+            )
+            lines.append("")
+        lines.extend(["## Critical & Out-of-Stock Items", ""])
+        lines.append("| Location | SKU | Product | Category | On-Hand | Safety Stock | Status | Action Required |")
+        lines.append("|----------|-----|---------|----------|---------|--------------|--------|-----------------|")
         alert_count = 0
+        by_category = {cat: {"critical": 0, "low": 0} for cat in ([category] if category else _categories())}
         for loc_id in sorted(STORES.keys()):
-            for sku_id in sorted(SKUS.keys()):
+            for sku_id in sku_ids:
                 status = _stock_status(sku_id, loc_id)
                 if status in ("CRITICAL", "OUT_OF_STOCK"):
                     sku = SKUS[sku_id]
@@ -254,9 +386,11 @@ class InventoryVisibilityAgent(BasicAgent):
                     action = "Emergency replenish" if status == "OUT_OF_STOCK" else "Expedite transfer"
                     loc_name = STORES[loc_id]["name"]
                     lines.append(
-                        f"| {loc_name} | {sku_id} | {sku['name']} | {on_hand} | {safety} | {status} | {action} |"
+                        f"| {loc_name} | {sku_id} | {sku['name']} | {sku['category']} | "
+                        f"{on_hand} | {safety} | {status} | {action} |"
                     )
                     alert_count += 1
+                    by_category[sku["category"]]["critical"] += 1
         lines.append("")
         lines.append(f"**Total Alerts:** {alert_count}")
         lines.append("")
@@ -264,13 +398,97 @@ class InventoryVisibilityAgent(BasicAgent):
         lines.append("")
         low_count = 0
         for loc_id in sorted(STORES.keys()):
-            for sku_id in sorted(SKUS.keys()):
+            for sku_id in sku_ids:
                 status = _stock_status(sku_id, loc_id)
                 if status == "LOW":
                     dos = _days_of_supply(sku_id, loc_id)
-                    lines.append(f"- **{STORES[loc_id]['name']}** / {SKUS[sku_id]['name']}: {dos} days remaining")
+                    lines.append(
+                        f"- **{STORES[loc_id]['name']}** / {SKUS[sku_id]['name']} "
+                        f"({SKUS[sku_id]['category']}): {dos} days remaining"
+                    )
                     low_count += 1
+                    by_category[SKUS[sku_id]["category"]]["low"] += 1
         lines.append(f"\n**Low-Stock Warnings:** {low_count}")
+        lines.append("")
+        lines.append("## By Category")
+        lines.append("")
+        lines.append("| Category | Critical & Out-of-Stock | Low |")
+        lines.append("|----------|-------------------------|-----|")
+        for cat in sorted(by_category.keys()):
+            counts = by_category[cat]
+            lines.append(f"| {cat} | {counts['critical']} | {counts['low']} |")
+        return "\n".join(lines)
+
+    def _overstock_review(self, **kwargs):
+        target_days = 14
+        raw_category = kwargs.get("category")
+        category = _resolve_category(raw_category)
+        if raw_category and category is None:
+            return self._unknown_category(raw_category)
+        sku_ids = _skus_in_scope(category)
+
+        lines = [
+            "# Overstock Review",
+            "",
+            f"**Target:** {target_days}-day supply at each store; on-hand above "
+            "that target is excess.",
+            "",
+        ]
+        if category:
+            lines.append(
+                f"**Category filter:** {category} ({', '.join(sku_ids)}) — "
+                "every count below covers this category only."
+            )
+            lines.append("")
+        lines.append(
+            "| Location | SKU | Product | Category | On-Hand | 14-Day Target | "
+            "Excess Units | Days Over Target | Capital Tied Up |"
+        )
+        lines.append(
+            "|----------|-----|---------|----------|---------|---------------|"
+            "--------------|------------------|-----------------|"
+        )
+        position_count = 0
+        total_excess = 0
+        total_capital = 0.0
+        by_category = {cat: {"units": 0, "capital": 0.0} for cat in ([category] if category else _categories())}
+        for loc_id in sorted(STORES.keys()):
+            for sku_id in sku_ids:
+                pos = _overstock_position(sku_id, loc_id, target_days)
+                if not pos:
+                    continue
+                sku = SKUS[sku_id]
+                lines.append(
+                    f"| {STORES[loc_id]['name']} | {sku_id} | {sku['name']} | {sku['category']} | "
+                    f"{pos['on_hand']} | {pos['target']} | {pos['excess']} | "
+                    f"{pos['days_over']} | ${pos['capital']:,.2f} |"
+                )
+                position_count += 1
+                total_excess += pos["excess"]
+                total_capital += pos["capital"]
+                by_category[sku["category"]]["units"] += pos["excess"]
+                by_category[sku["category"]]["capital"] += pos["capital"]
+        lines.append("")
+        lines.append(f"**Positions Above Target:** {position_count}")
+        lines.append(f"**Total Excess Units:** {total_excess:,}")
+        lines.append(f"**Capital Tied Up:** ${total_capital:,.2f}")
+        lines.append("")
+        lines.append("## By Category")
+        lines.append("")
+        lines.append("| Category | Excess Units | Capital Tied Up |")
+        lines.append("|----------|--------------|-----------------|")
+        for cat in sorted(by_category.keys()):
+            entry = by_category[cat]
+            lines.append(f"| {cat} | {entry['units']:,} | ${entry['capital']:,.2f} |")
+        lines.append("")
+        lines.append("## How to read this")
+        lines.append("")
+        lines.append("- Stores only. The two distribution centers hold network cover, "
+                     "so the 14-day store target does not apply to them and they are out of scope.")
+        lines.append("- Excess is reported, never resolved by drawing a store below its "
+                     "safety-stock floor. Safety stock is a floor, not a source.")
+        lines.append("- This is a finding, not a markdown, a transfer, or a write-off. "
+                     "A planner decides what happens to the excess.")
         return "\n".join(lines)
 
     def _replenishment_plan(self, **kwargs):
@@ -343,6 +561,7 @@ class InventoryVisibilityAgent(BasicAgent):
         dispatch = {
             "inventory_dashboard": self._inventory_dashboard,
             "stock_alerts": self._stock_alerts,
+            "overstock_review": self._overstock_review,
             "replenishment_plan": self._replenishment_plan,
             "channel_allocation": self._channel_allocation,
         }
@@ -362,6 +581,10 @@ if __name__ == "__main__":
     print(agent.perform(operation="inventory_dashboard", location_id="STR-001"))
     print("\n" + "=" * 80)
     print(agent.perform(operation="stock_alerts"))
+    print("\n" + "=" * 80)
+    print(agent.perform(operation="overstock_review"))
+    print("\n" + "=" * 80)
+    print(agent.perform(operation="inventory_dashboard", category="Apparel"))
     print("\n" + "=" * 80)
     print(agent.perform(operation="replenishment_plan"))
     print("\n" + "=" * 80)

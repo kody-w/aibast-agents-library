@@ -60,6 +60,52 @@ for the period and includes every service on the account, not water alone.
   gal, inside the 0.95 to 1.05 band (11,039 to 12,201 gal), even though the
   account peaked at 14,800 gal in 2024-12.
 
+## Meter interval diagnostics
+
+Interval telemetry is on file for **ACCT-90001 and ACCT-90003 only** — the same
+two accounts that have meter history. ACCT-90002 and ACCT-90004 have no interval
+data, so they are reported as **Not Assessed**, never as leak-free.
+
+`Min Nightly Flow` is the lowest hourly flow observed during the overnight
+window. `Continuous-Flow Nights` is the number of nights in the 30-night window
+on which that flow never dropped to zero — water moving when nobody is drawing
+it.
+
+| Account | Customer | Min Nightly Flow (gal/hr) | Continuous-Flow Nights | Last Meter Read |
+|---|---|---|---|---|
+| ACCT-90001 | Patricia Hernandez | 0.0 | 0 of 30 | 2025-02-28 |
+| ACCT-90002 | Green Valley Shopping Center | No interval data | No interval data | — |
+| ACCT-90003 | Robert & Linda Thompson | 5.0 | 30 of 30 | 2025-02-28 |
+| ACCT-90004 | Sunnyvale Elementary School | No interval data | No interval data | — |
+
+## Leak flag rule
+
+An account is flagged as a **Suspected Leak** when either published condition
+holds. Conditions are independent; either one alone flags the account.
+
+| Condition | Meaning |
+|---|---|
+| `min_nightly_flow_gph > 0.5` **and** `continuous_flow_nights >= 30` | Continuous flow across the whole 30-night window |
+| Trend is `Significantly Increasing` | Consumption above 1.20x the prior-period average |
+
+If neither condition holds and interval data is on file, the assessment is **No
+Leak Indicator**. If no interval data is on file, the assessment is **Not
+Assessed — no interval data on file**.
+
+Estimated loss at the continuous-flow rate is
+`min_nightly_flow_gph * 24 * window_nights`, reported in gallons only.
+
+- **ACCT-90003 — Suspected Leak.** 5.0 gal/hr on 30 of 30 nights, above the 0.5
+  gal/hr threshold. Estimated loss `5.0 * 24 * 30 = 3,600 gallons` over the
+  window, roughly 31% of the 11,500 gallons billed in 2025-02. The consumption
+  trend is Stable, so the meter evidence — not the trend — carries this flag.
+- **ACCT-90001 — No Leak Indicator.** 0.0 gal/hr, 0 continuous-flow nights, and
+  a Slightly Decreasing trend. Neither condition is met.
+
+A flag is a **suspected** leak pending field verification by the utility. It is
+never a confirmed leak, a repair order, or a billing adjustment, and the dollar
+impact crosses rate tiers and is quantified by a billing clerk.
+
 ## Trend classification thresholds
 
 Let `recent` be the latest period's water gallons and `prior_avg` the mean of

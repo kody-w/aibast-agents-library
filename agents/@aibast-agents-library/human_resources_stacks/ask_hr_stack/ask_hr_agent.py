@@ -158,6 +158,21 @@ def _benefits_value(emp):
     return values, total
 
 
+def _pending_for_manager(manager_name=None):
+    """Read the pending time-off queue, optionally scoped to one manager."""
+    if not manager_name:
+        return list(_PENDING_REQUESTS)
+    m = manager_name.lower().strip()
+    return [r for r in _PENDING_REQUESTS if m in r["manager"].lower()]
+
+
+def _emp_id(name):
+    for emp in _EMPLOYEES.values():
+        if emp["name"] == name:
+            return emp["id"]
+    return "unknown"
+
+
 def _submit_time_off(emp_key, start_date, end_date, days):
     emp = _EMPLOYEES[emp_key]
     remaining = emp["leave_balance"]["vacation"] - days
@@ -185,6 +200,7 @@ class AskHRAgent(BasicAgent):
         health_insurance  - health plan details and dependent enrollment
         remote_work       - remote work policy and new-parent flexibility
         benefits_summary  - comprehensive benefits package overview
+        pending_requests  - read the pending time-off queue (manager / HR Ops view)
     """
 
     def __init__(self):
@@ -201,12 +217,22 @@ class AskHRAgent(BasicAgent):
                             "leave_balance", "submit_time_off",
                             "parental_leave", "health_insurance",
                             "remote_work", "benefits_summary",
+                            "pending_requests",
                         ],
                         "description": "The HR inquiry to handle",
                     },
                     "employee_name": {
                         "type": "string",
                         "description": "Employee name (e.g. 'Jordan Chen')",
+                    },
+                    "manager_name": {
+                        "type": "string",
+                        "description": (
+                            "Manager name (e.g. 'Sarah Johnson'). With "
+                            "pending_requests, scopes the queue to that "
+                            "manager's direct reports. Omit for the full "
+                            "HR Operations view."
+                        ),
                     },
                 },
                 "required": ["operation"],
@@ -216,6 +242,8 @@ class AskHRAgent(BasicAgent):
 
     def perform(self, **kwargs) -> str:
         op = kwargs.get("operation", "leave_balance")
+        if op == "pending_requests":
+            return self._pending_requests(kwargs.get("manager_name", ""))
         key = _resolve_employee(kwargs.get("employee_name", ""))
         dispatch = {
             "leave_balance": self._leave_balance,
@@ -379,6 +407,51 @@ class AskHRAgent(BasicAgent):
             f"Source: [All HR Systems]\nAgents: AskHRAgent"
         )
 
+    # ── pending_requests ──────────────────────────────────────
+    def _pending_requests(self, manager_name=""):
+        """Manager and HR Operations view of the pending time-off queue."""
+        queue = _pending_for_manager(manager_name)
+        if manager_name:
+            scope = f"Routed to {manager_name}"
+            known = {e["manager"] for e in _EMPLOYEES.values()}
+            if not any(manager_name.lower().strip() in m.lower() for m in known):
+                return (
+                    f"**Pending Time Off Requests**\n\n"
+                    f"No manager on record matches '{manager_name}'. "
+                    f"Managers on record: {', '.join(sorted(known))}.\n\n"
+                    f"Source: [Workday]\nAgents: AskHRAgent"
+                )
+        else:
+            scope = "All managers (HR Operations view)"
+
+        if not queue:
+            return (
+                f"**Pending Time Off Requests**\n\n"
+                f"| Scope | {scope} |\n|---|---|\n"
+                f"| Requests Pending | 0 |\n\n"
+                f"The queue is empty. Requests appear here at status "
+                f"`Pending Manager Approval` once they are drafted, and stay "
+                f"there until the named manager acts.\n\n"
+                f"Source: [Workday]\nAgents: AskHRAgent"
+            )
+
+        rows = "\n".join(
+            f"| {r['employee']} ({_emp_id(r['employee'])}) | {r['dates']} | "
+            f"{r['days']} | {r['status']} | {r['manager']} | "
+            f"{r['balance_after']} days |"
+            for r in queue
+        )
+        return (
+            f"**Pending Time Off Requests**\n\n"
+            f"| Scope | {scope} |\n|---|---|\n"
+            f"| Requests Pending | {len(queue)} |\n\n"
+            f"| Employee | Dates | Days | Status | Manager | Balance After |\n"
+            f"|---|---|---|---|---|---|\n{rows}\n\n"
+            f"Approval is the named manager's action in Workday, not this "
+            f"agent's.\n\n"
+            f"Source: [Workday]\nAgents: AskHRAgent"
+        )
+
 
 if __name__ == "__main__":
     agent = AskHRAgent()
@@ -387,3 +460,9 @@ if __name__ == "__main__":
         print("=" * 60)
         print(agent.perform(operation=op, employee_name="Jordan Chen"))
         print()
+    print("=" * 60)
+    print(agent.perform(operation="pending_requests", manager_name="Sarah Johnson"))
+    print()
+    print("=" * 60)
+    print(agent.perform(operation="pending_requests"))
+    print()

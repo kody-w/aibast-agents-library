@@ -384,7 +384,7 @@ class DealProgressionAgent(BasicAgent):
                 for i, d in enumerate(sorted(stalled, key=lambda x: -x["value"])[:4], 1)
             )
             + f"\n**Root Cause Analysis:**\n{blocker_lines}\n\n"
-            f"Source: [Salesforce + Activity Analytics]\n"
+            f"Source: [Dynamics 365 + Activity Analytics]\n"
             f"Agents: PipelineAnalyticsAgent, StalledDealDetectionAgent"
         )
 
@@ -562,7 +562,7 @@ class DealProgressionAgent(BasicAgent):
             f"|-----|-------|----------|-------|\n"
             f"{table}\n"
             f"**Automated Monitoring:**\n"
-            f"- Daily Slack alerts for overdue tasks\n"
+            f"- Daily Teams alerts for overdue tasks\n"
             f"- Deal stage change notifications\n"
             f"- Weekly pipeline velocity report\n"
             f"- Stall warning at 7 days (vs current 21)\n\n"
@@ -574,7 +574,7 @@ class DealProgressionAgent(BasicAgent):
             f"- Target: Reduce avg stall time from 21 to 10 days\n"
             f"- Goal: Move ${_total_value(stalled) / 1_000_000:.1f}M stalled back to active\n"
             f"- Forecast: Add $2.4M to Q4 commit\n\n"
-            f"Source: [Salesforce + Task Management]\n"
+            f"Source: [Dynamics 365 + Task Management]\n"
             f"Agents: TaskAssignmentAgent"
         )
 

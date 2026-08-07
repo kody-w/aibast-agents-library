@@ -1,0 +1,89 @@
+mcs.metadata:
+  componentName: preop-summary
+  description: Assembles the documented pre-operative picture per patient - latest vitals, medications in a peri-operative review class, comorbidities, abnormal labs, and referrals on file.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: preop-summary
+  description: Assembles the documented pre-operative picture per patient - latest vitals, medications in a peri-operative review class, comorbidities, abnormal labs, and referrals on file.
+  ---
+  <!-- bic:source=blank -->
+  # Pre-operative summary
+
+  Use this skill when a surgeon or an anesthesia team member asks for the
+  pre-op or peri-op picture, asks what a patient is on going into a procedure,
+  asks which medications need peri-operative review, asks what comorbidities or
+  airway-relevant conditions a patient carries, or asks whether a surgical
+  consult is pending.
+
+  ## Inputs
+
+  - The encounter record set (ENC- ids) for vitals, diagnoses, and labs.
+  - The per-patient medication lists, each medication carrying a recorded
+    `periop_class`.
+  - The documented peri-operative review class set from the knowledge data:
+    `antiplatelet`, `nsaid`, `ace-inhibitor`, `biguanide`. `statin`, `ppi`,
+    and `ssri` are not in it.
+  - The referral queue (REF- ids).
+  - Optional: a single PT- id to narrow the presentation. The operation itself
+    always returns every patient; narrowing is done by presenting only the
+    requested patient and saying the view is filtered.
+
+  ## Procedure - apply exactly
+
+  For each patient:
+
+  1. **Pick the latest encounter.** The patient's encounter with the greatest
+     `encounter_date`. Vitals and abnormal labs come from that encounter only,
+     and its ENC- id is cited beside them.
+  2. **Select peri-operative medications.** Keep a medication if and only if
+     its recorded `periop_class` is in the documented review class set. Never
+     classify a drug yourself, never infer a class from the indication, and
+     never add a drug because it sounds surgical.
+  3. **List comorbidities** as the patient's problem list - active problems
+     first, then new problems - rendered exactly as the problem-list skill
+     renders them, including the multi-encounter attribution.
+  4. **Select abnormal labs** by the same rule as the encounter summary: keep a
+     lab if and only if its flag is not exactly `normal`.
+  5. **List every referral on file** for the patient with its REF- id,
+     specialty, receiving provider, urgency in caps, and the reason verbatim.
+     Do not filter to the ones you think are surgical - report them all and let
+     the reason text speak.
+  6. **Never assign an ASA class, an airway grade, a risk score, or a hold
+     window.** State that no ASA class is assigned in this record set and that
+     the anesthesia team assigns it.
+
+  ## Output format
+
+  Headline `# Pre-Operative Summary`, then for each patient:
+
+  - `## <patient name> (<PT-id>, Age <age>)`
+  - `**Latest encounter:** <ENC-id> - <date> <type> with <provider>`
+  - `**Vitals:** BP <sys>/<dia> | HR <hr> | RR <rr> | SpO2 <spo2>% | BMI <bmi>`
+  - `**ASA class:** not assigned in this record set - the anesthesia team
+    assigns it.`
+  - `**Medications in a peri-operative review class:**` - a table with columns
+    `| Medication | Dose | Frequency | Class | Status |`, status in caps
+  - `**Comorbidities on the problem list:**` - bullets of
+    `- [<code>] <description>`
+  - `**Abnormal labs (<ENC-id>):**` - a table with columns
+    `| Test | Value | Reference | Flag |`, flag in caps
+  - `**Referrals on file:**` - a table with columns
+    `| Referral | To Specialty | To Provider | Urgency | Reason |`
+  - A closing line stating this is documentation only and that the surgical and
+    anesthesia teams decide.
+
+  ## Edge cases
+
+  - A patient with no medication in a review class gets the sentence "None of
+    this patient's medications carry a peri-operative review class" instead of
+    an empty table. That is not a statement that the patient is safe to
+    proceed.
+  - A patient with no referrals gets "No referrals on file for this patient" -
+    never read an empty queue as clearance.
+  - A patient with no encounter has no vitals and no labs. Say so; do not carry
+    another patient's numbers across.
+  - This is a documentation view for a human pre-op review. Never say a
+    medication should be held, resumed, bridged, or timed, never state a NPO or
+    fasting instruction, never clear or delay a case, and never state that
+    surgery, anesthesia, or a consult has been scheduled or booked.

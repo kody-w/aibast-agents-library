@@ -2,11 +2,13 @@
 Store Associate Copilot Agent — Retail & CPG Stack
 
 Empowers store associates with product lookup, customer assistance
-scripts, daily task management, and performance dashboards.
+scripts, daily task management, receipt and return-eligibility lookup,
+and performance dashboards.
 """
 
 import sys
 import os
+from datetime import date, timedelta
 
 sys.path.insert(
     0,
@@ -21,8 +23,9 @@ __manifest__ = {
     "display_name": "Store Associate Copilot Agent",
     "description": (
         "Provides store associates with instant product lookup, guided "
-        "customer assistance scripts, daily task checklists, and real-time "
-        "performance dashboards to improve in-store operations."
+        "customer assistance scripts, daily task checklists, receipt and "
+        "return-eligibility lookup, and real-time performance dashboards to "
+        "improve in-store operations."
     ),
     "author": "AIBAST",
     "tags": [
@@ -30,6 +33,7 @@ __manifest__ = {
         "associate",
         "copilot",
         "product-lookup",
+        "transaction-support",
         "retail",
     ],
     "category": "retail_cpg",
@@ -325,6 +329,126 @@ COMPLEMENTARY_PRODUCTS = {
     "SKU-1010": ["SKU-1009", "SKU-1006"],
 }
 
+# ---------------------------------------------------------------------------
+# Synthetic Data — Receipt Archive (transaction support)
+# ---------------------------------------------------------------------------
+#
+# Fixed demo business date. Every return-window figure is measured against it so
+# the answers stay reproducible. The archive is a lookup sample of eight prior
+# orders — it is NOT the store transaction log and does not reconcile with the
+# 52 transactions on today's performance dashboard.
+
+STORE_BUSINESS_DATE = "2026-07-24"
+
+# Return window by product category, in days. Policy of record for this store.
+RETURN_WINDOW_DAYS = {
+    "Apparel": 30,
+    "Footwear": 30,
+    "Accessories": 30,
+    "Fitness": 30,
+    "Home": 30,
+    "Electronics": 15,
+}
+
+ORDER_HISTORY = {
+    "ORD-5001": {
+        "order_date": "2026-07-22",
+        "sku_id": "SKU-1005",
+        "quantity": 1,
+        "unit_price_paid": 149.99,
+        "promo": None,
+        "tender": "Credit Card",
+        "channel": "In-store",
+        "associate_id": "ASC-101",
+        "status": "Completed",
+        "window_start": "2026-07-22",
+    },
+    "ORD-5002": {
+        "order_date": "2026-07-05",
+        "sku_id": "SKU-1002",
+        "quantity": 1,
+        "unit_price_paid": 59.99,
+        "promo": None,
+        "tender": "Debit Card",
+        "channel": "Online pickup (BOPIS)",
+        "associate_id": "ASC-102",
+        "status": "Completed",
+        "window_start": "2026-07-05",
+    },
+    "ORD-5003": {
+        "order_date": "2026-06-28",
+        "sku_id": "SKU-1001",
+        "quantity": 1,
+        "unit_price_paid": 89.99,
+        "promo": None,
+        "tender": "Cash",
+        "channel": "In-store",
+        "associate_id": "ASC-103",
+        "status": "Completed",
+        "window_start": "2026-06-28",
+    },
+    "ORD-5004": {
+        "order_date": "2026-07-19",
+        "sku_id": "SKU-1003",
+        "quantity": 2,
+        "unit_price_paid": 23.99,
+        "promo": "Summer Basics promotion, $6.00 off each",
+        "tender": "Credit Card",
+        "channel": "In-store",
+        "associate_id": "ASC-101",
+        "status": "Completed",
+        "window_start": "2026-07-19",
+    },
+    "ORD-5005": {
+        "order_date": "2026-07-23",
+        "sku_id": "SKU-1004",
+        "quantity": 1,
+        "unit_price_paid": 129.99,
+        "promo": None,
+        "tender": "Gift Card",
+        "channel": "Online pickup (BOPIS)",
+        "associate_id": "ASC-104",
+        "status": "Awaiting pickup",
+        "window_start": None,
+    },
+    "ORD-5006": {
+        "order_date": "2026-07-10",
+        "sku_id": "SKU-1007",
+        "quantity": 1,
+        "unit_price_paid": 79.99,
+        "promo": None,
+        "tender": "Store Credit",
+        "channel": "In-store",
+        "associate_id": "ASC-102",
+        "status": "Completed",
+        "window_start": "2026-07-10",
+    },
+    "ORD-5007": {
+        "order_date": "2026-06-15",
+        "sku_id": "SKU-1009",
+        "quantity": 1,
+        "unit_price_paid": 54.99,
+        "promo": None,
+        "tender": "Credit Card",
+        "channel": "In-store",
+        "associate_id": "ASC-103",
+        "status": "Completed",
+        "window_start": "2026-06-15",
+    },
+    "ORD-5008": {
+        "order_date": "2026-07-23",
+        "sku_id": "SKU-1010",
+        "quantity": 1,
+        "unit_price_paid": 34.99,
+        "promo": None,
+        "tender": "Mobile Wallet",
+        "channel": "Online pickup (BOPIS)",
+        "associate_id": "ASC-104",
+        "status": "Completed",
+        "window_start": "2026-07-23",
+    },
+}
+
 
 # ---------------------------------------------------------------------------
 # Helper Functions
@@ -348,6 +472,40 @@ def _store_total_revenue():
 
 def _store_total_transactions():
     return sum(a["transactions_today"] for a in ASSOCIATE_PERFORMANCE.values())
+
+
+def _order_total(order):
+    return round(order["quantity"] * order["unit_price_paid"], 2)
+
+
+def _return_eligibility(order):
+    """Return (status_label, detail) for an order's return window.
+
+    Every figure is measured against STORE_BUSINESS_DATE, never the clock.
+    """
+    product = PRODUCT_CATALOG.get(order["sku_id"], {})
+    window_days = RETURN_WINDOW_DAYS.get(product.get("category", ""), 30)
+    if not order["window_start"]:
+        return (
+            "Not started",
+            f"{window_days}-day window starts at pickup; this order is "
+            f"{order['status'].lower()}",
+        )
+    today = date.fromisoformat(STORE_BUSINESS_DATE)
+    start = date.fromisoformat(order["window_start"])
+    expires = start + timedelta(days=window_days)
+    days_left = (expires - today).days
+    if days_left >= 0:
+        return (
+            "Eligible",
+            f"{window_days}-day window closes {expires.isoformat()} "
+            f"({days_left} days left)",
+        )
+    return (
+        "Expired",
+        f"{window_days}-day window closed {expires.isoformat()} "
+        f"({abs(days_left)} days ago)",
+    )
 
 
 def _task_completion_rate(shift):
@@ -379,6 +537,7 @@ class StoreAssociateCopilotAgent(BasicAgent):
                             "product_lookup",
                             "customer_assist",
                             "task_checklist",
+                            "transaction_support",
                             "performance_dashboard",
                         ],
                     },
@@ -386,6 +545,7 @@ class StoreAssociateCopilotAgent(BasicAgent):
                     "sku_id": {"type": "string"},
                     "scenario": {"type": "string"},
                     "shift": {"type": "string"},
+                    "order_id": {"type": "string"},
                 },
                 "required": ["operation"],
             },
@@ -473,6 +633,61 @@ class StoreAssociateCopilotAgent(BasicAgent):
             lines.append("")
         return "\n".join(lines)
 
+    def _transaction_support(self, **kwargs):
+        order_id = kwargs.get("order_id", "")
+        sku_id = kwargs.get("sku_id", "")
+        if order_id and order_id in ORDER_HISTORY:
+            orders = [(order_id, ORDER_HISTORY[order_id])]
+        elif order_id:
+            return (
+                "# Transaction Support\n\n"
+                f"Order `{order_id}` is not in the receipt archive, which holds "
+                "8 orders from ORD-5001 to ORD-5008. No purchase, price, tender, "
+                "or return window can be confirmed for it. Ask the customer for "
+                "another order id or receipt, or hand the return to a lead."
+            )
+        elif sku_id:
+            orders = [(o, r) for o, r in ORDER_HISTORY.items() if r["sku_id"] == sku_id]
+            if not orders:
+                return (
+                    "# Transaction Support\n\n"
+                    f"No archived order references `{sku_id}`."
+                )
+        else:
+            orders = list(ORDER_HISTORY.items())
+        lines = [
+            "# Transaction Support",
+            "",
+            f"**Business date:** {STORE_BUSINESS_DATE} - every return window is "
+            "measured against this date.",
+            "",
+        ]
+        for oid, order in orders:
+            product = PRODUCT_CATALOG.get(order["sku_id"], {})
+            total = _order_total(order)
+            status_label, detail = _return_eligibility(order)
+            lines.append(f"## {oid} - {product.get('name', order['sku_id'])}")
+            lines.append("")
+            lines.append(f"- **Purchased:** {order['order_date']} ({order['channel']})")
+            lines.append(f"- **Item:** {product.get('name', 'unknown')} (`{order['sku_id']}`), {product.get('category', 'unknown')}")
+            lines.append(f"- **Quantity:** {order['quantity']}")
+            lines.append(f"- **Price Paid:** ${order['unit_price_paid']:.2f} each | **Order Total:** ${total:,.2f}")
+            if product:
+                lines.append(f"- **Current Retail:** ${product['retail_price']:.2f}")
+            if order["promo"]:
+                lines.append(f"- **Promotion Applied:** {order['promo']}")
+            lines.append(f"- **Tender:** {order['tender']}")
+            lines.append(f"- **Order Status:** {order['status']}")
+            lines.append(f"- **Rung By:** {order['associate_id']}")
+            lines.append(f"- **Return Eligibility:** {status_label} - {detail}")
+            lines.append("")
+        lines.append(
+            "Eligibility is a policy read against the archived record, not a "
+            "processed return. Refunds go back to the original tender and are "
+            "rung by an associate at the register."
+        )
+        return "\n".join(lines)
+
     def _performance_dashboard(self, **kwargs):
         total_rev = _store_total_revenue()
         total_txn = _store_total_transactions()
@@ -512,6 +727,7 @@ class StoreAssociateCopilotAgent(BasicAgent):
             "product_lookup": self._product_lookup,
             "customer_assist": self._customer_assist,
             "task_checklist": self._task_checklist,
+            "transaction_support": self._transaction_support,
             "performance_dashboard": self._performance_dashboard,
         }
         handler = dispatch.get(operation)
@@ -532,6 +748,8 @@ if __name__ == "__main__":
     print(agent.perform(operation="customer_assist", scenario="upsell"))
     print("\n" + "=" * 80)
     print(agent.perform(operation="task_checklist", shift="opening"))
+    print("\n" + "=" * 80)
+    print(agent.perform(operation="transaction_support", order_id="ORD-5002"))
     print("\n" + "=" * 80)
     print(agent.perform(operation="performance_dashboard"))
     print("=" * 80)

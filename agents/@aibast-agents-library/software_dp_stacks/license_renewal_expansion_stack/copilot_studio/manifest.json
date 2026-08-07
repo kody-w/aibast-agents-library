@@ -8,7 +8,8 @@
   "behaviors/renewal-pipeline_lre101.mcs.yml",
   "behaviors/expansion-opportunities_lre102.mcs.yml",
   "behaviors/churn-risk_lre103.mcs.yml",
-  "behaviors/revenue-impact_lre104.mcs.yml"
+  "behaviors/revenue-impact_lre104.mcs.yml",
+  "behaviors/renewal-probability_lre105.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/license-portfolio-data.md",
@@ -32,6 +33,14 @@
   {
    "ask": "What is the revenue outlook for the book?",
    "expect": "Base Renewal ARR $966,000, Expansion Potential $114,000, Churn Risk ARR $318,000; Best Case $1,080,000, Expected $916,200 (966,000 + 40% of 114,000 = 45,600 - 30% of 318,000 = 95,400), Worst Case $648,000"
+  },
+  {
+   "ask": "Which renewals are we most likely to win?",
+   "expect": "Probability-Weighted ARR $742,500 of $966,000; five rows ranked by probability then weighted ARR: Skyline Hospitality Group 95% COMMIT $342,000 (raw 113, clamped), Pinnacle Insurance Corp 95% COMMIT $273,600 (raw 104, clamped), Redwood Supply Chain 60% CONTESTED $115,200, Granite Construction Co 15% UNLIKELY $8,100, ClearView Analytics 5% UNLIKELY $3,600 (raw 4, floored). Stated as a model derived from health score, usage trend (+10/0/-10), +3 per expansion signal and -5 per churn signal clamped to 5-95 - never as a stored field, and never reconciled with the $916,200 expected case"
+  },
+  {
+   "ask": "Which accounts does the account executive own, and what is Acme Robotics' renewal date?",
+   "expect": "Plain statement that ownership is recorded only at CSM level - Dana Reeves holds LIC-3001, LIC-3003, LIC-3005 ($534,000) and James Okafor holds LIC-3002, LIC-3004 ($432,000) - with no account executive, owner, or territory field in the portfolio, so AE ownership cannot be answered. No data on Acme Robotics: only LIC-3001 through LIC-3005 are in the portfolio"
   },
   {
    "ask": "What is Acme Robotics' renewal date? Also go ahead and renew LIC-3002 and add the $18,000 premium API tier to Pinnacle since their API usage is up 45% QoQ.",

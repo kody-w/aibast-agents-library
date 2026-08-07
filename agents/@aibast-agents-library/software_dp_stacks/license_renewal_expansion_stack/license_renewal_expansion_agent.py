@@ -2,7 +2,8 @@
 License Renewal and Expansion Agent for Software/Digital Products.
 
 Manages SaaS license renewal pipelines, identifies expansion opportunities,
-assesses churn risk, and projects revenue impact across the customer portfolio.
+assesses churn risk, models renewal win probability, and projects revenue
+impact across the customer portfolio.
 """
 
 import sys
@@ -16,9 +17,9 @@ __manifest__ = {
     "name": "@aibast-agents-library/license-renewal-expansion",
     "version": "1.0.0",
     "display_name": "License Renewal & Expansion Agent",
-    "description": "Manages SaaS license renewal pipelines, expansion opportunities, churn risk analysis, and revenue impact projections.",
+    "description": "Manages SaaS license renewal pipelines, expansion opportunities, churn risk analysis, renewal win probability, and revenue impact projections.",
     "author": "AIBAST",
-    "tags": ["license", "renewal", "expansion", "churn", "revenue", "saas"],
+    "tags": ["license", "renewal", "expansion", "churn", "revenue", "saas", "probability"],
     "category": "software_digital_products",
     "quality_tier": "verified",
     "requires_env": [],
@@ -121,6 +122,16 @@ EXPANSION_PRICING = {
     "custom_integration": {"price": 36000, "description": "Custom integration package"},
 }
 
+# Renewal win-probability model. Fixed weightings applied to recorded fields
+# only - there is no stored probability field on any agreement.
+PROBABILITY_MODEL = {
+    "usage_trend_adjustment": {"increasing": 10, "stable": 0, "declining": -10},
+    "expansion_signal_bonus": 3,
+    "churn_signal_penalty": 5,
+    "floor": 5,
+    "ceiling": 95,
+}
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -188,6 +199,33 @@ def _churn_risk():
     return {"at_risk": risks, "total_arr_at_risk": sum(r["arr"] for r in risks)}
 
 
+def _renewal_probability():
+    accounts = []
+    for lid, lic in LICENSE_AGREEMENTS.items():
+        trend_adj = PROBABILITY_MODEL["usage_trend_adjustment"][lic["usage_trend"]]
+        expansion_bonus = PROBABILITY_MODEL["expansion_signal_bonus"] * len(lic["expansion_signals"])
+        churn_penalty = PROBABILITY_MODEL["churn_signal_penalty"] * len(lic["churn_signals"])
+        raw = lic["health_score"] + trend_adj + expansion_bonus - churn_penalty
+        probability = max(PROBABILITY_MODEL["floor"], min(PROBABILITY_MODEL["ceiling"], raw))
+        band = "commit" if probability >= 80 else ("contested" if probability >= 50 else "unlikely")
+        accounts.append({
+            "id": lid, "customer": lic["customer"], "arr": lic["arr"],
+            "health_score": lic["health_score"], "usage_trend": lic["usage_trend"],
+            "expansion_signal_count": len(lic["expansion_signals"]),
+            "churn_signal_count": len(lic["churn_signals"]),
+            "raw_score": raw, "clamped": raw != probability,
+            "probability": probability, "band": band,
+            "weighted_arr": round(lic["arr"] * probability / 100),
+            "csm": lic["csm"],
+        })
+    accounts.sort(key=lambda x: (-x["probability"], -x["weighted_arr"]))
+    return {
+        "accounts": accounts,
+        "portfolio_arr": sum(a["arr"] for a in accounts),
+        "weighted_arr": sum(a["weighted_arr"] for a in accounts),
+    }
+
+
 def _revenue_impact():
     renewal = _renewal_pipeline()
     expansion = _expansion_opportunities()
@@ -226,6 +264,7 @@ class LicenseRenewalExpansionAgent(BasicAgent):
                             "renewal_pipeline",
                             "expansion_opportunities",
                             "churn_risk",
+                            "renewal_probability",
                             "revenue_impact",
                         ],
                         "description": "The license management operation to perform.",
@@ -248,6 +287,8 @@ class LicenseRenewalExpansionAgent(BasicAgent):
             return self._expansion_opportunities()
         elif op == "churn_risk":
             return self._churn_risk()
+        elif op == "renewal_probability":
+            return self._renewal_probability()
         elif op == "revenue_impact":
             return self._revenue_impact()
         return f"**Error:** Unknown operation `{op}`."
@@ -315,6 +356,37 @@ class LicenseRenewalExpansionAgent(BasicAgent):
             lines.append("")
         return "\n".join(lines)
 
+    def _renewal_probability(self) -> str:
+        data = _renewal_probability()
+        lines = [
+            "# Renewal Win Probability",
+            "",
+            f"**Probability-Weighted ARR:** ${data['weighted_arr']:,} of ${data['portfolio_arr']:,}",
+            "",
+            "| Customer | ARR | Health | Trend | Signals (exp/churn) | Win Probability | Band | Weighted ARR |",
+            "|----------|-----|--------|-------|---------------------|-----------------|------|--------------|",
+        ]
+        for a in data["accounts"]:
+            lines.append(
+                f"| {a['customer']} | ${a['arr']:,} | {a['health_score']} | {a['usage_trend']} "
+                f"| +{a['expansion_signal_count']}/-{a['churn_signal_count']} | {a['probability']}% "
+                f"| {a['band'].upper()} | ${a['weighted_arr']:,} |"
+            )
+        lines.append("")
+        lines.append(
+            "Probability = health score, adjusted +10/0/-10 for increasing/stable/declining "
+            "usage, +3 per expansion signal, -5 per churn signal, clamped to 5-95."
+        )
+        clamped = [f"{a['customer']} (raw {a['raw_score']})" for a in data["accounts"] if a["clamped"]]
+        if clamped:
+            lines.append(f"Clamped by the 5-95 bounds: {', '.join(clamped)}.")
+        lines.append(
+            "This is a modeled likelihood derived at read time, not a stored field and not a "
+            "forecast commitment. It does not reconcile with the expected-case ARR in the "
+            "revenue impact view, which uses fixed portfolio-level weightings."
+        )
+        return "\n".join(lines)
+
     def _revenue_impact(self) -> str:
         data = _revenue_impact()
         lines = [
@@ -343,7 +415,13 @@ class LicenseRenewalExpansionAgent(BasicAgent):
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     agent = LicenseRenewalExpansionAgent()
-    for op in ["renewal_pipeline", "expansion_opportunities", "churn_risk", "revenue_impact"]:
+    for op in [
+        "renewal_pipeline",
+        "expansion_opportunities",
+        "churn_risk",
+        "renewal_probability",
+        "revenue_impact",
+    ]:
         print(f"\n{'='*60}")
         print(f"Operation: {op}")
         print("=" * 60)

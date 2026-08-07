@@ -8,6 +8,16 @@
 
 ## Asset register
 
+**Register as of 2026-03-01.** Condition scores, operating hours, and predicted
+next-failure dates are a snapshot taken on that date and nothing in this stack
+refreshes them afterwards; quote them with the as-of date, never as a live
+reading.
+
+Production note: the condition score, operating hours, and predicted next
+failure columns are the swap point - repoint them at a live condition
+monitoring feed or CMMS work order history and the rest of the stack runs
+unchanged.
+
 | ID | Name | Type | Location | Installed | Age | Capacity (MW) | Condition | Status Band | Failure Rate (annual) | Operating Hours | Last Major Service | Predicted Next Failure | Replacement Cost |
 |----|------|------|----------|-----------|-----|---------------|-----------|-------------|-----------------------|-----------------|--------------------|------------------------|------------------|
 | AST-T001 | Wind Turbine Alpha-7 | wind_turbine | Sweetwater Wind Farm, TX | 2016 | 10yr | 3.2 | 68 | WARNING | 4.2% | 72,480 | 2025-06-15 | 2026-08-15 | $2,400,000 |

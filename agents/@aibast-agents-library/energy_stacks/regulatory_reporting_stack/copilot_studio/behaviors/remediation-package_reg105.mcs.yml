@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: remediation-package
+  description: Assembles the routable remediation work list - open audit findings and failed validation gates grouped by the owning team with due dates.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: remediation-package
+  description: Assembles the routable remediation work list - open audit findings and failed validation gates grouped by the owning team with due dates.
+  ---
+  <!-- bic:source=blank -->
+  # Remediation package
+
+  Use this skill when the user asks what has to be worked, who owns it, what to
+  send a team, what the remediation plan is, or asks for a work list, punch list,
+  or hand-off they can route.
+
+  ## Inputs
+
+  - The regulatory report register (for assignee and deadline) and the audit
+    finding log (knowledge/tools).
+  - Optional: a team name or an RPT- id to scope the package to one owner or one
+    report.
+
+  ## What goes in the package
+
+  Two item sources, and only these two - nothing is created that is not already
+  on record:
+
+  1. Every audit finding whose status is exactly `open`. Its item id is the
+    AUD- id, its severity is the recorded severity, and its due date is the
+    finding's `due_date`.
+  2. Every validation issue raised by the data-validation gates. One item per
+    issue, in gate order (quality before completeness). Its item id is the
+    RPT- id, its severity is `n/a` because the register records no severity for
+    a gate, and its due date is the report's filing deadline.
+
+  A REMEDIATED finding is never a work item. A report that passes validation
+  contributes no items. A NOT_STARTED report contributes no gate items, because
+  it is excluded from validation.
+
+  ## Ownership and order
+
+  - The owner of an item is the `assignee` recorded on the report it belongs to.
+    Never guess an owner, split one, or route to a person - teams only, exactly
+    as the register names them.
+  - Inside a group, order by due date ascending; on a tie, audit findings before
+    validation gates, then gate order.
+  - Order the groups by their earliest due date ascending, then by owner name.
+
+  ## Output format
+
+  Headline: `**Work Items:** N | **Owners:** N | **Open Findings:** N |
+  **Failed Gates:** N | **Earliest Due:** YYYY-MM-DD`
+
+  Then per owner: `## <owner> (N items)` followed by one table, exactly these
+  columns:
+
+  | Item | Report | Source | Action | Severity | Due Date |
+
+  Source is `Audit finding` or `Validation gate`. Severity in caps (HIGH /
+  MEDIUM / LOW), or `N/A` for a gate item. Due dates in `YYYY-MM-DD`.
+
+  Close with one line stating that routing, assignment, and closure are the named
+  owner's action and that this package is a read-only work list.
+
+  ## Edge cases
+
+  - This skill produces the work list. It does not open a ticket, send it,
+    assign it, set a reminder, change a due date, or mark anything done. If the
+    user asks you to route or file it, hand back the package and name the owner.
+  - When the package is empty, say so plainly - no open findings and no failed
+    gates - rather than padding it with passing reports.
+  - A report can appear under one owner with several items; that is expected, and
+    the item count in the heading is the number of rows, not the number of
+    reports.
+  - Never rank one owner's work above another's, and never assert what an
+    auditor or regulator would accept. Severity and due date are the ranking.

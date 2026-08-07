@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: surveillance-alerts
+  description: Reports the recorded surveillance exception queue - rule, regulation, section, desk, trigger time, and disposition - with the not-yet-cleared count.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: surveillance-alerts
+  description: Reports the recorded surveillance exception queue - rule, regulation, section, desk, trigger time, and disposition - with the not-yet-cleared count.
+  ---
+  <!-- bic:source=blank -->
+  # Surveillance alerts
+
+  Use this skill when the user asks what surveillance has flagged, what
+  exceptions are outstanding, what has been escalated, or what compliance
+  monitoring has picked up since the last batch.
+
+  ## Inputs
+
+  - The surveillance exception feed and the trading desk register.
+  - Optional: a `regulation` key (`Dodd-Frank` or `BSA-AML` are the only two
+    with exceptions on record) or a `desk` id (`DESK-01`, `DESK-02`,
+    `DESK-03`).
+
+  ## Procedure
+
+  1. Open with the batch window and refresh date - 2025-03-01 to 2025-03-31,
+     last refreshed 2025-03-31 - and state plainly that this is a recorded
+     batch, not a live feed. Never describe the queue as real time, continuous,
+     or streaming.
+  2. Count exceptions in scope and count the not-yet-cleared subset:
+     `every exception whose disposition is not "cleared"`. Both `under_review`
+     and `escalated` count. With the current feed that is 5 of 6.
+  3. List exceptions in feed order, carrying the `SA-` id, the rule as written,
+     regulation, section, desk, trigger timestamp, and disposition. Render the
+     disposition with underscores replaced by spaces and title-cased.
+  4. Where an exception has no desk, say so explicitly rather than leaving the
+     column blank - SA-2025-05 and SA-2025-06 are BSA-AML exceptions and are
+     not desk-attributed.
+  5. Tally dispositions in the order they first appear in the feed - Escalated,
+     Under Review, Cleared - as `- <Disposition>: <count>`.
+  6. Close by stating that surveillance exceptions are not examination findings
+     and change neither the open-findings count nor any regulation score.
+
+  ## Output format
+
+  - `# Surveillance Exception Queue`
+  - `**Recorded batch:** <from> to <to> (last refreshed <date>)` plus the
+    not-a-live-feed sentence
+  - `**Exceptions in scope:** N` and `**Not yet cleared:** N`
+  - Table with columns:
+    `Alert | Rule | Regulation | Section | Desk | Triggered | Disposition`
+  - `## Dispositions` as a bullet per disposition: `- <Disposition>: <count>`
+
+  ## Edge cases
+
+  - `SA-` and `EF-` are different record types. Never merge an exception into
+    the findings log, the remediation tracker, or the prior-finding table an
+    examiner receives, and never present an escalated exception as a finding.
+  - A disposition is recorded by a reviewer. Never set, change, or recommend
+    changing one, and never say an exception has been cleared, escalated, or
+    routed by you.
+  - An escalated exception is not a violation. Report the rule that triggered
+    and the disposition on record; do not conclude that a rule was broken.
+  - If a filter matches nothing, say the batch holds no matching exception
+    rather than widening the filter and answering a different question.
+  - If the user asks what is happening right now, on today's trades, or for an
+    alert since the refresh date, say that the feed ends at its refresh date and
+    that no live signal is available to you.

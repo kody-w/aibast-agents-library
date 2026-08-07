@@ -1,0 +1,92 @@
+mcs.metadata:
+  componentName: churn-risk
+  description: Bands the at-risk accounts from recorded sentiment and satisfaction score, sums the ARR they represent, names the backlog request each traces to, and sets it against the detractor trend.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: churn-risk
+  description: Bands the at-risk accounts from recorded sentiment and satisfaction score, sums the ARR they represent, names the backlog request each traces to, and sets it against the detractor trend.
+  ---
+  <!-- bic:source=blank -->
+  # Churn risk
+
+  Use this skill when the user asks who is at risk of churning, which accounts
+  are unhappy, how much revenue is exposed, what is putting ARR at risk, or
+  what to fix to keep an account.
+
+  ## Inputs
+
+  - The feedback record set (FB-5001 through FB-5006), the feature request
+    backlog (FR-001 through FR-006) for the linked request, and the NPS trend
+    (2025-Q4, 2026-Q1). No parameters.
+
+  ## Procedure - band from stored fields, never predict
+
+  1. Walk every feedback record and assign a band from fields already stored on
+     it. Nothing is inferred from the verbatim text.
+
+     | Band | Rule |
+     |----------|-------------------------------------------------|
+     | CRITICAL | stored `sentiment` is `negative` |
+     | WATCH | sentiment is not `negative` AND `score` is 6 or lower |
+
+     Records that match neither rule are not on the watchlist and are not
+     listed.
+  2. Order the table CRITICAL band first, then WATCH; inside each band sort by
+     `arr_impact` descending.
+  3. `ARR at risk` = the sum of `arr_impact` across the banded accounts.
+     `at_risk_pct` = `at_risk_arr / total_corpus_arr * 100`, rounded to one
+     decimal. Report the critical and watch subtotals separately as well.
+  4. The linked request is the FR- id whose `linked_feedback` contains that
+     FB- id. Print the id, not a description of the work. If a record has no
+     linked request, print `none`.
+  5. Close with the detractor movement: detractors and NPS for the earliest
+     and latest recorded quarter, with the detractor delta signed.
+
+  Worked figures for the current corpus:
+
+  - CRITICAL: FB-5001 Meridian Healthcare Systems (NEGATIVE, 2, $186,000,
+    FR-001); FB-5004 Vanguard Logistics (NEGATIVE, 1, $84,000, FR-004).
+    Subtotal $270,000.
+  - WATCH: FB-5002 Apex Financial Group (NEUTRAL, 6, $240,000, FR-002);
+    FB-5005 BrightPath Education (NEUTRAL, 5, $96,000, FR-005). Subtotal
+    $336,000.
+  - 4 of 6 accounts, $606,000 at risk of $1,278,000 represented (47.4%).
+  - Detractors 45 (2025-Q4) to 51 (2026-Q1), +6, while NPS moved 35 to 36.
+
+  ## Output format
+
+  ```
+  # Churn Risk Watchlist
+
+  **Accounts At Risk:** N of N
+  **ARR At Risk:** $N of $N (N%)
+  **Critical Band:** $N | **Watch Band:** $N
+
+  | Band | Feedback | Customer | Sentiment | Score | ARR At Risk | Linked Request |
+
+  ## Detractor Trend
+  - ...
+
+  ## Boundaries
+  - ...
+  ```
+
+  ## Edge cases and boundaries
+
+  - This is a watchlist built from recorded signals, not a churn prediction.
+    Never state a churn probability, a likelihood, a renewal date, or a
+    projected revenue loss - none of those are in the data.
+  - `ARR at risk` is the sum of recorded `arr_impact` for the banded accounts.
+    It is not revenue forecast to be lost, and it is not the feature request
+    `arr_weight` total - the two figures are not interchangeable.
+  - A WATCH account can be `neutral` and still carry the largest exposure -
+    FB-5002 Apex Financial Group at $240,000 outweighs both CRITICAL accounts
+    individually. Report the band and the money side by side; do not reorder
+    bands by ARR.
+  - FB-5003 (score 9) and FB-5006 (score 8) are not at risk and stay off the
+    table. Never pad the watchlist to make it look complete.
+  - Naming the linked FR- id is diagnosis, not commitment. Never say the fix
+    has been scheduled, prioritized, or promised to the account.
+  - Reporting only. Never say a customer has been contacted, escalated, put
+    into a save play, or handed to customer success.

@@ -1,7 +1,7 @@
 {
  "schema": "aibast-copilot-studio-scaffold/1.0",
  "stack": "deal-progression",
- "display_name": "Deal Progression Agent",
+ "display_name": "Sales Pipeline Management Agent",
  "agent_intent": "../deal_progression_agent.py",
  "instructions": "instructions.md",
  "behaviors": [

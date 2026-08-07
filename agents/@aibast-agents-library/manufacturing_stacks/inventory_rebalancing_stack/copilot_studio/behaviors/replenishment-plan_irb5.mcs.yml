@@ -1,0 +1,86 @@
+mcs.metadata:
+  componentName: replenishment-plan
+  description: Turns network coverage gaps into recommend-only buy quantities with supplier and lead-time context, and shows which below-reorder positions rebalancing already closes.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: replenishment-plan
+  description: Turns network coverage gaps into recommend-only buy quantities with supplier and lead-time context, and shows which below-reorder positions rebalancing already closes.
+  ---
+  <!-- bic:source=blank -->
+  # Replenishment plan
+
+  Use this skill for the procurement question: what do we need to buy, how
+  much, from whom, and how long is the lead time. Also use it when the user
+  asks whether a below-reorder position needs a purchase order or whether
+  moving stock is enough.
+
+  ## Inputs
+
+  - On-hand levels and the demand forecast per SKU per warehouse, summed to
+    the network.
+  - Reorder points, unit costs, and the sourcing master (supplier id,
+    supplier name, lead time in days) from the knowledge data.
+  - The inbound quantities produced by the transfer-plan skill.
+  - Optional: a SKU id to filter to. Otherwise report all six SKUs.
+
+  ## Procedure
+
+  Network coverage, iterating SKUs in catalog order SKU-4401 through SKU-4406:
+
+  1. `network_on_hand` = the sum of the four warehouse levels.
+  2. `network_forecast` = the sum of the four warehouse forecasts. The
+     forecast covers one 90-day horizon.
+  3. `safety_floor` = the SKU reorder point, held once at network level.
+  4. `network_target = network_forecast + safety_floor`.
+  5. `buy_qty = max(0, network_target - network_on_hand)`.
+
+  Recommended buys, for every SKU where `buy_qty > 0`:
+
+  6. `estimated_spend = round(buy_qty * unit_cost, 2)`.
+  7. Carry the supplier name, the SUP- id, and the lead time in days straight
+     from the sourcing master. Never quote a price, a discount, or a delivery
+     date -- the data has none.
+  8. Report the longest lead time in the buy as the pacing constraint.
+
+  Residual check, for every SKU-warehouse pair where
+  `on_hand < reorder_point` -- strictly less:
+
+  9. `inbound` = units of that SKU the transfer plan routes into that
+     warehouse.
+  10. `residual = max(0, reorder_point - (on_hand + inbound))`.
+  11. State the residual total. On the current data all six positions land at
+      residual 0, so the recommended buys are justified by network coverage,
+      not by a local gap. Say that plainly rather than implying the buy fixes
+      the below-reorder rows.
+
+  ## Output format
+
+  - Headline `## Replenishment Plan (Buy Recommendations)` and the framing
+    line that the target is the 90-day forecast plus one reorder point of
+    network safety stock, recommend-only.
+  - Table with columns: `SKU | Description | Network On-Hand | 90-Day
+    Forecast | Safety Floor | Target | Buy Qty`.
+  - Sub-heading `### Recommended Buys` and a table with columns: `SKU | Buy
+    Qty | Supplier | Supplier ID | Lead Time (days) | Est. Spend`. Then
+    `**Total recommended buy spend:** $nnn,nnn.nn` and the pacing lead time.
+  - Sub-heading `### Below-Reorder Positions After Rebalancing` and a table
+    with columns: `SKU | Warehouse | On-Hand | Reorder Pt | Inbound from
+    Transfers | Residual Buy`, warehouse as the WH- id, then
+    `**Residual units still short after the transfer plan:** N`.
+
+  ## Edge cases
+
+  - A SKU can be long across the network and short at one site. SKU-4402,
+    SKU-4403, and SKU-4404 are all in that state: no buy, transfer only.
+  - SKU-4405 and SKU-4406 hold exactly their 90-day forecast, so the entire
+    buy is the safety floor. Say so; do not present it as a stockout.
+  - Lead time is a duration, not a schedule. There is no calendar in the data,
+    so never assert an order date, an arrival date, or a week number.
+  - The sourcing master carries only supplier id, supplier name, and lead time
+    for the six SKUs. Price breaks, contract terms, minimum order quantities,
+    second sources, and supplier quality history are not in the data -- say so
+    and stop.
+  - Recommendation only. Never say a purchase order has been raised, a
+    requisition submitted, a supplier contacted, or a budget committed. A
+    procurement manager places the order.

@@ -1,0 +1,102 @@
+mcs.metadata:
+  componentName: transaction-support
+  description: Looks up an archived order or receipt and reports what was bought, what was paid, how it was tendered, and whether the return window is still open.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: transaction-support
+  description: Looks up an archived order or receipt and reports what was bought, what was paid, how it was tendered, and whether the return window is still open.
+  ---
+  <!-- bic:source=blank -->
+  # Transaction support
+
+  Use this skill when a customer is at the register or the service desk with an
+  order number or receipt: what was on the order, what they actually paid, how
+  they paid, whether an online pickup order has been collected, and whether the
+  item can still be returned.
+
+  ## Inputs
+
+  - The receipt archive (8 orders, ORD-5001 through ORD-5008).
+  - The product catalog, for the item name, category, and current retail price.
+  - The return window policy: Electronics 15 days; Apparel, Footwear,
+    Accessories, Fitness, and Home 30 days. There are no other categories.
+  - Optional `order_id` - an exact order such as `ORD-5002`.
+  - Optional `sku_id` - returns every archived order for that product.
+  - With neither, all eight orders are returned in archive order.
+
+  ## Procedure - the business date is fixed, never the clock
+
+  1. The business date is `2026-07-24`. Every day count is measured against it.
+     Never use today's real date, and never say "as of today" without naming
+     2026-07-24.
+  2. Order total = quantity x price paid, rounded to two decimals. ORD-5004 is
+     the only multi-unit order: 2 x 23.99 = `$47.98`.
+  3. Price paid is what was tendered; current retail comes from the catalog.
+     They match on every order except ORD-5004, which carries the Summer Basics
+     promotion ($6.00 off each, 29.99 -> 23.99). Show the promotion line only on
+     an order that has one.
+  4. The return window opens on the purchase date for an in-store order and on
+     the pickup date for an online pickup (BOPIS) order. An order still
+     `Awaiting pickup` has no window yet - report `Not started`, not eligible
+     and not expired. ORD-5005 is the only such order.
+  5. `expires = window start + window days`. If the business date is on or
+     before the expiry date the order is `Eligible` and you quote
+     `(expires - 2026-07-24)` days left; otherwise it is `Expired` and you quote
+     how many days ago the window closed. The eight results are fixed:
+     ORD-5001 eligible, closes 2026-08-21, 28 days left;
+     ORD-5002 expired, closed 2026-07-20, 4 days ago;
+     ORD-5003 eligible, closes 2026-07-28, 4 days left;
+     ORD-5004 eligible, closes 2026-08-18, 25 days left;
+     ORD-5005 not started, awaiting pickup;
+     ORD-5006 eligible, closes 2026-08-09, 16 days left;
+     ORD-5007 expired, closed 2026-07-15, 9 days ago;
+     ORD-5008 eligible, closes 2026-08-22, 29 days left.
+  6. Archive order is fixed - ORD-5001 through ORD-5008. Do not re-sort by date,
+     amount, or eligibility.
+
+  ## Output format
+
+  Headline `# Transaction Support`, then the business date line, then one
+  section per order:
+
+  - `## <ORD-id> - <product name>`
+  - `- **Purchased:** <YYYY-MM-DD> (<channel>)`
+  - `- **Item:** <name> (SKU-xxxx), <category>`
+  - `- **Quantity:** <n>`
+  - `- **Price Paid:** $NN.NN each | **Order Total:** $N,NNN.NN`
+  - `- **Current Retail:** $NN.NN`
+  - `- **Promotion Applied:** <text>` - only when the order carries one
+  - `- **Tender:** <tender>`
+  - `- **Order Status:** <Completed or Awaiting pickup>`
+  - `- **Rung By:** <ASC-id>`
+  - `- **Return Eligibility:** <Eligible | Expired | Not started> - <detail>`
+
+  Close with the reminder that eligibility is a policy read, not a processed
+  return.
+
+  ## Edge cases
+
+  - An order id that is not in the archive returns the honest no-data answer:
+    the archive holds 8 orders, ORD-5001 to ORD-5008, and nothing about the
+    unknown order can be confirmed. Never reconstruct a purchase from the
+    customer's description, and never guess a price, tender, or date.
+  - No order id at all means you cannot verify the purchase. Say so and send the
+    customer to a lead rather than approving a return on memory.
+  - A `sku_id` with no archived order returns "no archived order references that
+    SKU" - not the full archive.
+  - An expired window is a finding, not a refusal. Report it plainly and let the
+    lead decide whether to make an exception; you do not grant one.
+
+  ## Boundaries
+
+  - The archive is a lookup sample of eight prior orders. It is NOT the store's
+    transaction log and does not reconcile with the 52 transactions on today's
+    performance dashboard. Never total it into a sales figure or compare it with
+    the dashboard.
+  - Lookup and policy read only. Never say a return has been processed, a refund
+    or store credit issued, a price adjusted, an exception approved, or an order
+    cancelled, released, or held. An associate rings every one of those at the
+    register.
+  - Refunds go back to the original tender. State the tender on file; do not
+    offer the customer a different refund method.

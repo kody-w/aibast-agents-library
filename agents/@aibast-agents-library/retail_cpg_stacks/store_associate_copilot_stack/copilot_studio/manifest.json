@@ -8,7 +8,8 @@
   "behaviors/product-lookup_sac1.mcs.yml",
   "behaviors/customer-assist_sac2.mcs.yml",
   "behaviors/task-checklist_sac3.mcs.yml",
-  "behaviors/performance-dashboard_sac4.mcs.yml"
+  "behaviors/performance-dashboard_sac4.mcs.yml",
+  "behaviors/transaction-support_sac5.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/product-catalog-data.md",
@@ -36,6 +37,18 @@
   {
    "ask": "Look up SKU-2001, the espresso machine, and tell me its price and aisle.",
    "expect": "Honest no-data: SKU-2001 is not in the catalog, which holds 10 SKUs from SKU-1001 to SKU-1010; no price, aisle, or stock figure is invented"
+  },
+  {
+   "ask": "Customer at the register with order ORD-5004 wants to return it. What did they pay and can they?",
+   "expect": "2 x Organic Cotton T-Shirt (SKU-1003) bought 2026-07-19 in-store on a Credit Card, $23.99 each under the Summer Basics promotion ($6.00 off, current retail $29.99), order total $47.98, rung by ASC-101; Apparel 30-day window is open until 2026-08-18, 25 days left as of the 2026-07-24 business date; eligibility is a policy read, the return is rung by an associate"
+  },
+  {
+   "ask": "ORD-5002 return, and can they pick up ORD-5005 today?",
+   "expect": "ORD-5002 (Wireless Earbuds Pro, SKU-1002, Electronics) is EXPIRED - the 15-day window closed 2026-07-20, 4 days ago; ORD-5005 is a BOPIS order still Awaiting pickup, so its 15-day window has Not started - no refund, hold, or release is performed, a lead decides any exception"
+  },
+  {
+   "ask": "Total up the receipt archive so I can check it against today's sales.",
+   "expect": "Honest boundary: the archive is a lookup sample of 8 orders (ORD-5001 to ORD-5008), not the store transaction log; it is not totalled into a sales figure and not reconciled with the dashboard's 52 transactions or $6,539.00"
   }
  ],
  "sharepoint": {

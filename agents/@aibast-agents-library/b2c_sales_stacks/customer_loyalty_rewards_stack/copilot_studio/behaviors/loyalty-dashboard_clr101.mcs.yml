@@ -1,11 +1,11 @@
 mcs.metadata:
   componentName: loyalty-dashboard
-  description: Builds the loyalty program dashboard - member count, total points outstanding and cash value, total spend YTD, the member table, and tier distribution.
+  description: Builds the loyalty program dashboard - member count, total points outstanding and cash value, total spend YTD, the member table, tier distribution, and the retention watchlist.
 kind: InlineAgentSkill
 content: |
   ---
   name: loyalty-dashboard
-  description: Builds the loyalty program dashboard - member count, total points outstanding and cash value, total spend YTD, the member table, and tier distribution.
+  description: Builds the loyalty program dashboard - member count, total points outstanding and cash value, total spend YTD, the member table, tier distribution, and the retention watchlist.
   ---
   <!-- bic:source=blank -->
   # Loyalty dashboard
@@ -35,6 +35,13 @@ content: |
   4. Count members per tier for the distribution. Report the tiers in the fixed
      order Platinum, Gold, Silver, Bronze, and report a tier with zero members
      as 0 rather than dropping the line.
+  5. Build the retention watchlist from the published engagement bands -
+     Engaged 75-100, Watch 50-74, At Risk 0-49. The watchlist is every member
+     below the Engaged band, in roster id order. State the count as
+     `N of M members fall below the Engaged band (engagement 75-100)`.
+     Current roster: LM-10001 (92) Engaged, LM-10002 (75) Engaged,
+     LM-10003 (58) Watch, LM-10004 (32) At Risk - so the watchlist is
+     LM-10003 and LM-10004, 2 of 4 members.
 
   ## Output format
 
@@ -55,12 +62,23 @@ content: |
 
   Then a `## Tier Distribution` section as a bullet per tier: `- Tier: N`.
 
+  Then a `## Retention Watchlist` section: the count line, then one table,
+  exactly these columns:
+
+  | Member | Tier | Engagement | Band | Redeemed YTD |
+
+  Member cell is `Name (LM-id)`. Band is the published band name exactly -
+  Engaged, Watch, or At Risk. Redeemed YTD is the recorded figure, reported as
+  `0` when zero.
+
   ## Edge cases
 
   - No members match a tier filter: say so and state the filter that produced
     the empty view. Do not fall back to the unfiltered roster silently.
-  - There is no engagement-score threshold in the program rules. Report
-    engagement as the recorded number; do not label a member "at risk" or
-    "healthy" against a cutoff you were not given.
+  - The three published engagement bands are the only cutoffs that exist.
+    Report the raw engagement score alongside its band; never invent a
+    different threshold, a fourth band, or a churn probability.
+  - If every member is in the Engaged band, say the watchlist is empty rather
+    than promoting the lowest-scoring member onto it.
   - Dashboard is read-only. Never state that a member was contacted, credited,
     or moved between tiers.

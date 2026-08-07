@@ -2,7 +2,9 @@
 Financial Services Regulatory Compliance Agent — Financial Services Stack
 
 Manages compliance dashboards, regulation tracking, remediation planning,
-and examination preparation for financial institution compliance teams.
+examination preparation, the recorded surveillance exception queue, and the
+desk-level Volcker / Title VII view for financial institution compliance teams
+and trading desk supervisors.
 """
 
 import sys
@@ -16,9 +18,9 @@ __manifest__ = {
     "name": "@aibast-agents-library/fs-regulatory-compliance",
     "version": "1.0.0",
     "display_name": "FS Regulatory Compliance Agent",
-    "description": "Financial services regulatory compliance with SOX, Dodd-Frank, BSA tracking, remediation planning, and examiner preparation.",
+    "description": "Financial services regulatory compliance with SOX, Dodd-Frank, BSA tracking, remediation planning, examiner preparation, a recorded surveillance exception queue, and desk-level Volcker/Title VII supervision.",
     "author": "AIBAST",
-    "tags": ["compliance", "SOX", "Dodd-Frank", "BSA", "AML", "regulatory", "financial-services"],
+    "tags": ["compliance", "SOX", "Dodd-Frank", "BSA", "AML", "regulatory", "financial-services", "surveillance", "trading-desk"],
     "category": "financial_services",
     "quality_tier": "verified",
     "requires_env": [],
@@ -92,6 +94,28 @@ UPCOMING_EXAMINATIONS = [
     {"examiner": "CFPB", "type": "Consumer Compliance", "scheduled": "2025-09-15", "duration_weeks": 2, "lead_examiner": "CFPB Supervision — Region III"},
 ]
 
+# Trading desks carrying Dodd-Frank Volcker / Title VII obligations. Desk
+# supervisors are roles, never named individuals.
+TRADING_DESKS = [
+    {"id": "DESK-01", "desk": "Rates & Derivatives Trading", "supervisor": "Rates Desk Supervisor", "sections": ["Volcker", "Title VII"]},
+    {"id": "DESK-02", "desk": "Equities Market Making", "supervisor": "Equities Desk Supervisor", "sections": ["Volcker"]},
+    {"id": "DESK-03", "desk": "Credit Trading", "supervisor": "Credit Desk Supervisor", "sections": ["Volcker", "Title VII"]},
+]
+
+# Recorded surveillance exception feed. This is a batch of exceptions already
+# written to the log — not a live activity stream. Dispositions are recorded by
+# a reviewer; the agent never sets one.
+SURVEILLANCE_FEED_WINDOW = {"from": "2025-03-01", "to": "2025-03-31", "last_refreshed": "2025-03-31"}
+
+SURVEILLANCE_ALERTS = [
+    {"id": "SA-2025-01", "rule": "Volcker 60-day trading-account presumption exceeded on a held position", "desk": "DESK-02", "regulation": "Dodd-Frank", "section": "Volcker", "triggered_at": "2025-03-03T09:12Z", "disposition": "escalated"},
+    {"id": "SA-2025-02", "rule": "RENTD inventory ceiling breached for market-making desk", "desk": "DESK-01", "regulation": "Dodd-Frank", "section": "Volcker", "triggered_at": "2025-03-07T14:40Z", "disposition": "under_review"},
+    {"id": "SA-2025-03", "rule": "Swap reported outside the real-time public reporting window", "desk": "DESK-01", "regulation": "Dodd-Frank", "section": "Title VII", "triggered_at": "2025-03-11T08:05Z", "disposition": "under_review"},
+    {"id": "SA-2025-04", "rule": "Uncleared swap confirmation not evidenced by T+1", "desk": "DESK-03", "regulation": "Dodd-Frank", "section": "Title VII", "triggered_at": "2025-03-12T16:22Z", "disposition": "cleared"},
+    {"id": "SA-2025-05", "rule": "SAR review ageing beyond 30 days from alert intake", "desk": None, "regulation": "BSA-AML", "section": "SAR", "triggered_at": "2025-03-14T07:45Z", "disposition": "escalated"},
+    {"id": "SA-2025-06", "rule": "Structured cash activity below CTR threshold across related accounts", "desk": None, "regulation": "BSA-AML", "section": "CTR", "triggered_at": "2025-03-18T11:30Z", "disposition": "under_review"},
+]
+
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -107,6 +131,21 @@ def _overall_compliance():
 def _open_findings_count():
     """Count open findings."""
     return sum(1 for f in EXAMINATION_FINDINGS if f["status"] not in ("closed",))
+
+
+def _desk_label(desk_id):
+    """Human label for a desk id, or an explicit non-desk marker."""
+    if not desk_id:
+        return "— (not desk-attributed)"
+    for d in TRADING_DESKS:
+        if d["id"] == desk_id:
+            return f"{d['id']} {d['desk']}"
+    return desk_id
+
+
+def _alerts_for_desk(desk_id):
+    """Surveillance alerts recorded against one desk."""
+    return [a for a in SURVEILLANCE_ALERTS if a["desk"] == desk_id]
 
 
 # ---------------------------------------------------------------------------
@@ -132,9 +171,12 @@ class FSRegulatoryComplianceAgent(BasicAgent):
                             "regulation_tracker",
                             "remediation_plan",
                             "examiner_prep",
+                            "surveillance_alerts",
+                            "desk_supervision",
                         ],
                     },
                     "regulation": {"type": "string"},
+                    "desk": {"type": "string"},
                 },
                 "required": ["operation"],
             },
@@ -148,6 +190,8 @@ class FSRegulatoryComplianceAgent(BasicAgent):
             "regulation_tracker": self._regulation_tracker,
             "remediation_plan": self._remediation_plan,
             "examiner_prep": self._examiner_prep,
+            "surveillance_alerts": self._surveillance_alerts,
+            "desk_supervision": self._desk_supervision,
         }
         handler = dispatch.get(operation)
         if not handler:
@@ -251,6 +295,90 @@ class FSRegulatoryComplianceAgent(BasicAgent):
             )
         return "\n".join(lines)
 
+    def _surveillance_alerts(self, **kwargs) -> str:
+        regulation = kwargs.get("regulation")
+        desk = kwargs.get("desk")
+        alerts = SURVEILLANCE_ALERTS
+        if regulation and regulation in REGULATIONS:
+            alerts = [a for a in alerts if a["regulation"] == regulation]
+        if desk:
+            alerts = [a for a in alerts if a["desk"] == desk]
+        window = SURVEILLANCE_FEED_WINDOW
+        lines = ["# Surveillance Exception Queue\n"]
+        lines.append(
+            f"**Recorded batch:** {window['from']} to {window['to']} "
+            f"(last refreshed {window['last_refreshed']})"
+        )
+        lines.append("**Not a live feed.** These exceptions were written to the log by the")
+        lines.append("surveillance systems; this agent reads the batch and never sets a disposition.\n")
+        if not alerts:
+            lines.append("No surveillance exceptions match that filter in the recorded batch.")
+            return "\n".join(lines)
+        open_alerts = [a for a in alerts if a["disposition"] != "cleared"]
+        lines.append(f"**Exceptions in scope:** {len(alerts)}")
+        lines.append(f"**Not yet cleared:** {len(open_alerts)}\n")
+        lines.append("| Alert | Rule | Regulation | Section | Desk | Triggered | Disposition |")
+        lines.append("|---|---|---|---|---|---|---|")
+        for a in alerts:
+            lines.append(
+                f"| {a['id']} | {a['rule']} | {a['regulation']} | {a['section']} "
+                f"| {_desk_label(a['desk'])} | {a['triggered_at']} "
+                f"| {a['disposition'].replace('_', ' ').title()} |"
+            )
+        lines.append("\n## Dispositions\n")
+        by_disp = {}
+        for a in alerts:
+            by_disp[a["disposition"]] = by_disp.get(a["disposition"], 0) + 1
+        for disp, count in by_disp.items():
+            lines.append(f"- {disp.replace('_', ' ').title()}: {count}")
+        lines.append(
+            "\nSurveillance exceptions are not examination findings. They do not change "
+            "the open-findings count or any regulation score."
+        )
+        return "\n".join(lines)
+
+    def _desk_supervision(self, **kwargs) -> str:
+        desk = kwargs.get("desk")
+        desks = TRADING_DESKS
+        if desk:
+            desks = [d for d in TRADING_DESKS if d["id"] == desk or d["desk"] == desk]
+            if not desks:
+                names = ", ".join(f"{d['id']} ({d['desk']})" for d in TRADING_DESKS)
+                return f"**Not tracked:** `{desk}` is not a covered desk. Covered desks: {names}."
+        reg = REGULATIONS["Dodd-Frank"]
+        lines = ["# Trading Desk Supervision — Dodd-Frank\n"]
+        lines.append(f"**Regulation:** Dodd-Frank ({reg['regulator']}) — {reg['compliance_score']}%")
+        lines.append(f"**Last Assessment:** {reg['last_assessment']} | **Next Assessment:** {reg['next_assessment']}\n")
+        for d in desks:
+            lines.append(f"## {d['id']} — {d['desk']}\n")
+            lines.append(f"- **Supervisor:** {d['supervisor']}")
+            obligations = ", ".join(f"{s} ({reg['sections'][s]})" for s in d["sections"])
+            lines.append(f"- **Obligations:** {obligations}")
+            alerts = _alerts_for_desk(d["id"])
+            lines.append(f"- **Open surveillance exceptions:** {len([a for a in alerts if a['disposition'] != 'cleared'])} of {len(alerts)}\n")
+            if alerts:
+                lines.append("| Alert | Section | Rule | Triggered | Disposition |")
+                lines.append("|---|---|---|---|---|")
+                for a in alerts:
+                    lines.append(
+                        f"| {a['id']} | {a['section']} | {a['rule']} | {a['triggered_at']} "
+                        f"| {a['disposition'].replace('_', ' ').title()} |"
+                    )
+                lines.append("")
+        df_findings = [f for f in EXAMINATION_FINDINGS if f["regulation"] == "Dodd-Frank"]
+        lines.append("## Dodd-Frank examination findings\n")
+        for f in df_findings:
+            lines.append(
+                f"- **{f['id']}** [{f['severity'].upper()}]: {f['finding']} — "
+                f"{f['status'].replace('_', ' ').title()} [Due: {f['due']}] — Owner: {f['owner']}"
+            )
+        lines.append(
+            "\nThe findings log records a regulation, not a section or a desk, so no "
+            "finding is attributed to Volcker or Title VII. No finding on record is not "
+            "a statement that a desk is compliant."
+        )
+        return "\n".join(lines)
+
 
 # ---------------------------------------------------------------------------
 # Main
@@ -265,3 +393,7 @@ if __name__ == "__main__":
     print(agent.perform(operation="remediation_plan"))
     print("\n" + "=" * 80 + "\n")
     print(agent.perform(operation="examiner_prep"))
+    print("\n" + "=" * 80 + "\n")
+    print(agent.perform(operation="surveillance_alerts"))
+    print("\n" + "=" * 80 + "\n")
+    print(agent.perform(operation="desk_supervision"))

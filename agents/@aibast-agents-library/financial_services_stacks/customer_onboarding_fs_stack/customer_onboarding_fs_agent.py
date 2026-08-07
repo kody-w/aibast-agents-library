@@ -7,6 +7,7 @@ onboarding status tracking for financial institution customer onboarding.
 
 import sys
 import os
+from datetime import date
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates"))
 from basic_agent import BasicAgent
@@ -150,6 +151,23 @@ def _kyc_completion_pct(app_id):
     return round((complete / total) * 100, 1)
 
 
+def _pipeline_as_of():
+    """Reference date for pipeline aging: the most recent submission on file.
+
+    Derived from the data so the aging numbers are reproducible — never the
+    real-world clock.
+    """
+    return max(date.fromisoformat(app["submitted"]) for app in CUSTOMER_APPLICATIONS.values())
+
+
+def _days_in_pipeline(app_id):
+    """Days an application has been in the pipeline as of the reference date."""
+    app = CUSTOMER_APPLICATIONS.get(app_id)
+    if not app:
+        return None
+    return (_pipeline_as_of() - date.fromisoformat(app["submitted"])).days
+
+
 def _onboarding_pipeline():
     """Summarize onboarding pipeline metrics."""
     by_status = {}
@@ -283,19 +301,29 @@ class FSCustomerOnboardingAgent(BasicAgent):
 
     def _onboarding_status(self, **kwargs) -> str:
         pipeline = _onboarding_pipeline()
+        as_of = _pipeline_as_of().isoformat()
+        oldest = max(CUSTOMER_APPLICATIONS, key=lambda aid: _days_in_pipeline(aid))
         lines = ["# Customer Onboarding Pipeline\n"]
         lines.append(f"**Applications:** {pipeline['count']}")
-        lines.append(f"**Total Estimated Assets:** ${pipeline['total_assets']:,.0f}\n")
+        lines.append(f"**Total Estimated Assets:** ${pipeline['total_assets']:,.0f}")
+        lines.append(
+            f"**Longest in Pipeline:** {oldest} - {_days_in_pipeline(oldest)} days "
+            f"(aging measured as of {as_of}, the most recent submission on file)\n"
+        )
         lines.append("## Pipeline Status\n")
         for status, count in pipeline["by_status"].items():
             lines.append(f"- {status.replace('_', ' ').title()}: {count}")
         lines.append("\n## Application Details\n")
-        lines.append("| App ID | Applicant | Account | Risk | Est. Assets | Status | RM |")
-        lines.append("|---|---|---|---|---|---|---|")
+        lines.append(
+            "| App ID | Applicant | Account | Risk | Est. Assets | Submitted "
+            "| Days in Pipeline | Status | RM |"
+        )
+        lines.append("|---|---|---|---|---|---|---|---|---|")
         for aid, app in CUSTOMER_APPLICATIONS.items():
             lines.append(
                 f"| {aid} | {app['applicant']} | {app['account_requested'].replace('_', ' ').title()} "
                 f"| {app['risk_rating'].title()} | ${app['estimated_assets']:,.0f} "
+                f"| {app['submitted']} | {_days_in_pipeline(aid)} "
                 f"| {app['status'].replace('_', ' ').title()} | {app['relationship_manager']} |"
             )
         return "\n".join(lines)

@@ -1,8 +1,8 @@
 """
 Procurement Agent
 
-Manages purchase requests, vendor comparisons, approval routing, and
-spend analysis for organizational procurement workflows.
+Manages purchase requests, purchase orders, vendor comparisons, approval
+routing, and spend analysis for organizational procurement workflows.
 
 Where a real deployment would connect to ERP and procurement platforms,
 this agent uses a synthetic data layer so it runs anywhere without credentials.
@@ -51,6 +51,12 @@ _VENDOR_CATALOG = {
     "VND-006": {"name": "FranklinCovey", "category": "Training Services", "contract_status": "Active", "tier": "Approved", "rating": 4.2, "annual_spend": 45000, "payment_terms": "Net 30", "contact": "Program Director"},
 }
 
+_PURCHASE_ORDERS = {
+    "PO-7001": {"id": "PO-7001", "source_pr": "PR-5003", "vendor": "Salesforce", "vendor_id": "VND-002", "amount": 215000, "terms": "Annual Prepay", "issue_status": "Issued", "receipt_status": "Not Received", "blocked_by": ""},
+    "PO-7002": {"id": "PO-7002", "source_pr": "PR-5002", "vendor": "Steelcase", "vendor_id": "VND-003", "amount": 48500, "terms": "Net 45", "issue_status": "Draft", "receipt_status": "Not Received", "blocked_by": "PR-5002 is in Vendor Selection - vendor not yet selected"},
+    "PO-7003": {"id": "PO-7003", "source_pr": "PR-5001", "vendor": "AWS", "vendor_id": "VND-001", "amount": 125000, "terms": "Net 30", "issue_status": "Draft", "receipt_status": "Not Received", "blocked_by": "PR-5001 is Pending Approval - CFO sign-off outstanding"},
+}
+
 _APPROVAL_THRESHOLDS = [
     {"max_amount": 5000, "approver": "Direct Manager", "sla_hours": 4},
     {"max_amount": 25000, "approver": "Department Head", "sla_hours": 8},
@@ -79,6 +85,10 @@ def _get_approval_level(amount):
     return _APPROVAL_THRESHOLDS[-1]
 
 
+def _orders_for_request(req_id):
+    return [o for o in _PURCHASE_ORDERS.values() if o["source_pr"] == req_id]
+
+
 def _find_competing_vendors(category):
     return [v for v in _VENDOR_CATALOG.values() if category.lower() in v["category"].lower()]
 
@@ -100,6 +110,7 @@ class ProcurementAgent(BasicAgent):
 
     Operations:
         purchase_request   - create and view purchase requests
+        purchase_order     - draft and track purchase orders against requests
         vendor_comparison  - compare vendors for a category
         approval_routing   - determine approval path for a request
         spend_analysis     - analyze spend by category and budget
@@ -116,14 +127,19 @@ class ProcurementAgent(BasicAgent):
                     "operation": {
                         "type": "string",
                         "enum": [
-                            "purchase_request", "vendor_comparison",
-                            "approval_routing", "spend_analysis",
+                            "purchase_request", "purchase_order",
+                            "vendor_comparison", "approval_routing",
+                            "spend_analysis",
                         ],
                         "description": "The procurement operation to perform",
                     },
                     "request_id": {
                         "type": "string",
                         "description": "Purchase request ID (e.g. 'PR-5001')",
+                    },
+                    "order_id": {
+                        "type": "string",
+                        "description": "Purchase order ID (e.g. 'PO-7001')",
                     },
                 },
                 "required": ["operation"],
@@ -135,6 +151,7 @@ class ProcurementAgent(BasicAgent):
         op = kwargs.get("operation", "purchase_request")
         dispatch = {
             "purchase_request": self._purchase_request,
+            "purchase_order": self._purchase_order,
             "vendor_comparison": self._vendor_comparison,
             "approval_routing": self._approval_routing,
             "spend_analysis": self._spend_analysis,
@@ -172,6 +189,57 @@ class ProcurementAgent(BasicAgent):
             f"**Purchase Requests**\n\n"
             f"| ID | Title | Amount | Status | Priority |\n|---|---|---|---|---|\n"
             f"{rows}\n\n"
+            f"Source: [Procurement System]\nAgents: ProcurementAgent"
+        )
+
+    # ── purchase_order ─────────────────────────────────────────
+    def _purchase_order(self, params):
+        po_id = params.get("order_id")
+        if not po_id:
+            matches = _orders_for_request(params.get("request_id", ""))
+            po_id = matches[0]["id"] if matches else None
+        if po_id in _PURCHASE_ORDERS:
+            po = _PURCHASE_ORDERS[po_id]
+            pr = _PURCHASE_REQUESTS.get(po["source_pr"], {})
+            cat = _SPEND_CATEGORIES.get(pr.get("category", ""), {})
+            note = po["blocked_by"] or "None - the buyer has issued this order."
+            flag = ""
+            if cat and cat.get("available", 0) < 0:
+                flag = (
+                    f"\n**Budget flag:** {pr['category']} is over budget by "
+                    f"${abs(cat['available']):,}; this order is inside that "
+                    f"category's committed spend.\n"
+                )
+            return (
+                f"**Purchase Order: {po['id']}**\n\n"
+                f"| Field | Detail |\n|---|---|\n"
+                f"| Source Request | {po['source_pr']} - {pr.get('title', 'unknown')} |\n"
+                f"| Vendor | {po['vendor']} ({po['vendor_id']}) |\n"
+                f"| Amount | ${po['amount']:,} |\n"
+                f"| Payment Terms | {po['terms']} |\n"
+                f"| Issue Status | {po['issue_status']} |\n"
+                f"| Receipt Status | {po['receipt_status']} |\n\n"
+                f"**Blocked by:** {note}\n"
+                f"{flag}\n"
+                f"Source: [Procurement System]\nAgents: ProcurementAgent"
+            )
+        rows = ""
+        for po in _PURCHASE_ORDERS.values():
+            rows += (
+                f"| {po['id']} | {po['source_pr']} | {po['vendor']} "
+                f"({po['vendor_id']}) | ${po['amount']:,} | {po['terms']} | "
+                f"{po['issue_status']} | {po['receipt_status']} |\n"
+            )
+        no_po = [p["id"] for p in _PURCHASE_REQUESTS.values() if not _orders_for_request(p["id"])]
+        tail = f"No purchase order drafted yet for: {', '.join(no_po)}.\n\n" if no_po else ""
+        return (
+            f"**Purchase Orders**\n\n"
+            f"| ID | Source PR | Vendor | Amount | Terms | Issue Status | Receipt Status |\n"
+            f"|---|---|---|---|---|---|---|\n"
+            f"{rows}\n"
+            f"{tail}"
+            f"A person issues and receives every order; this view reports where\n"
+            f"each one stands.\n\n"
             f"Source: [Procurement System]\nAgents: ProcurementAgent"
         )
 
@@ -243,7 +311,7 @@ class ProcurementAgent(BasicAgent):
 
 if __name__ == "__main__":
     agent = ProcurementAgent()
-    for op in ["purchase_request", "vendor_comparison", "approval_routing", "spend_analysis"]:
+    for op in ["purchase_request", "purchase_order", "vendor_comparison", "approval_routing", "spend_analysis"]:
         print("=" * 60)
         print(agent.perform(operation=op, request_id="PR-5001"))
         print()

@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: desk-supervision
+  description: Gives a trading desk supervisor the desk-level Volcker and Title VII view - obligations per desk, the exceptions recorded against it, and the Dodd-Frank findings on record.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: desk-supervision
+  description: Gives a trading desk supervisor the desk-level Volcker and Title VII view - obligations per desk, the exceptions recorded against it, and the Dodd-Frank findings on record.
+  ---
+  <!-- bic:source=blank -->
+  # Desk supervision
+
+  Use this skill when a trading desk supervisor asks what their desk is on the
+  hook for, what Volcker or Title VII requires of a desk, what has been flagged
+  against a desk, or when the user names a desk.
+
+  ## Inputs
+
+  - The trading desk register, the Dodd-Frank entry in the regulation register,
+    the surveillance exception feed, and the examination findings log.
+  - Optional: a `desk` id or desk name. Valid ids are exactly `DESK-01`,
+    `DESK-02`, `DESK-03`. With no desk named, report all three in register
+    order.
+
+  ## Procedure
+
+  1. Head the answer with the Dodd-Frank position from the register - regulator
+     `Fed / OCC / CFPB`, score 87.5%, last assessment 2024-12-15, next
+     assessment 2025-06-15. The score is the regulation's, never a desk's;
+     there is no per-desk score in the data and none may be invented.
+  2. If the user names a desk that is not in the register, say plainly that it
+     is not covered and list the three that are. Do not fall back to reporting
+     all three as if the question had been answered.
+  3. For each desk reported, emit the supervisor role, then the obligations as
+     `<section> (<section name>)` taken from the Dodd-Frank section list -
+     Volcker is Proprietary Trading Restrictions, Title VII is Derivatives
+     Regulation.
+  4. Give the desk's exception count as `not-yet-cleared of total`, then list
+     the desk's exceptions with `SA-` id, section, rule, trigger timestamp, and
+     disposition. DESK-01 has 2 of 2, DESK-02 has 1 of 1, DESK-03 has 0 of 1.
+  5. Report the Dodd-Frank examination findings on record, then state that the
+     findings log records a regulation rather than a section or a desk, so no
+     finding is attributed to Volcker or Title VII.
+
+  ## Output format
+
+  - `# Trading Desk Supervision - Dodd-Frank`
+  - `**Regulation:**`, `**Last Assessment:**`, `**Next Assessment:**` lines
+  - Per desk: `## <DESK-id> - <desk name>` with `**Supervisor:**`,
+    `**Obligations:**`, `**Open surveillance exceptions:**` bullets
+  - Per desk, when exceptions exist, a table with columns:
+    `Alert | Section | Rule | Triggered | Disposition`
+  - `## Dodd-Frank examination findings` bullets, then the attribution note
+
+  ## Edge cases
+
+  - No finding on record against a desk is not a statement that the desk is
+    compliant. Say what the data holds and stop; never grade a desk.
+  - Supervisors are roles (Rates Desk Supervisor, Equities Desk Supervisor,
+    Credit Desk Supervisor). Report the role as written; never guess a person.
+  - The only Dodd-Frank finding, EF-2024-04, is a Title X consumer complaint
+    finding and is closed. Never present it as a desk finding.
+  - Never advise whether a position, trade, or hedge is permitted under Volcker
+    or Title VII, and never state that an exception clears a desk of an
+    obligation. Report the obligation as written and let the supervisor decide.
+  - Exception counts come from the recorded batch, which ends 2025-03-31. Do not
+    describe a desk as currently clean; describe it as clean in the batch on
+    record.

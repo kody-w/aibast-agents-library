@@ -1,0 +1,86 @@
+mcs.metadata:
+  componentName: pipeline-review
+  description: Rolls every pipeline RFP into one portfolio view for the Sales Leader -- proposed value, blended margin against the floor, win probability by factor, and the win-weighted pipeline total.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pipeline-review
+  description: Rolls every pipeline RFP into one portfolio view for the Sales Leader -- proposed value, blended margin against the floor, win probability by factor, and the win-weighted pipeline total.
+  ---
+  <!-- bic:source=blank -->
+  # Pipeline review -- the portfolio view
+
+  Use this skill when the user asks about the pipeline rather than a single
+  deal: "how does the pipeline look", "what is our weighted pipeline", "which
+  deals are at risk", "where are we breaking margin", "which deal closes first",
+  "rank the open RFPs". This is the Sales Leader surface -- every other skill
+  answers about one resolved RFP, this one answers about all of them.
+
+  ## Inputs
+
+  - Every RFP in the pipeline: RFP-2024-0147 Meridian Healthcare,
+    RFP-2024-0152 Contoso Technologies, RFP-2024-0159 Pinnacle Financial Group.
+  - No account name is resolved. If the user names an account, that is a
+    single-deal question -- hand it to the matching deal skill instead.
+
+  ## Procedure
+
+  1. For each RFP, run the same computations the single-deal skills run: the
+     weighted capability fit, the rule-driven pricing, and the four-factor win
+     probability. Nothing is re-scored or re-weighted for the portfolio view.
+  2. Per deal, compute the win-weighted value:
+     `weighted_value = int(proposed_total * win_pct / 100)`.
+  3. Sort the deals by win probability, highest first.
+  4. Roll up: stated deal value, list price, proposed total, discount given
+     (`list - proposed`, and `round((1 - proposed/list) * 100, 1)` as a
+     percent), blended pipeline margin
+     (`round((proposed - cost) / proposed * 100, 1)`), and the win-weighted
+     pipeline total as the sum of the per-deal weighted values.
+  5. Flag every deal whose blended margin is below the 35% floor, every deal
+     priced above its budget ceiling, the nearest decision window, and the
+     weakest win position with the factor that is dragging it.
+
+  Current pipeline, computed from the data on file:
+
+  | RFP ID | Account | Fit | Proposed | Margin | Win | Weighted |
+  |---|---|---|---|---|---|---|
+  | RFP-2024-0147 | Meridian Healthcare | 94.5% | $1,201,599 | 33.4% | 89% | $1,069,423 |
+  | RFP-2024-0152 | Contoso Technologies | 92.0% | $849,998 | 11.0% | 84% | $713,998 |
+  | RFP-2024-0159 | Pinnacle Financial Group | 91.8% | $1,201,599 | 33.4% | 76% | $913,215 |
+
+  Roll-up: $3,500,000 stated deal value, $4,000,000 list, $3,253,196 proposed,
+  $746,804 discount given (18.7%), 27.5% blended margin, $2,696,636
+  win-weighted.
+
+  ## Output format
+
+  - Headline `**Pipeline Review: N open RFPs**`
+  - `**Portfolio Position:**` then a table
+    `| RFP ID | Account | Industry | Fit | Proposed | Headroom | Margin | Win | Weighted | Decision |`
+    ordered by win probability descending, closed with a bolded **Total** row
+    carrying the proposed total, the blended margin, and the weighted total.
+  - A roll-up table `| Roll-up | Value |` with rows: Stated deal value, List
+    price, Proposed total, Discount given (dollars and percent), Blended margin
+    (with the 35% floor named), Win-weighted value.
+  - `**Win Probability by Factor:**` then a table
+    `| Account | Capability fit /30 | Pricing /25 | References /20 | Competitive /25 | Win |`
+    so the leader can see which factor moves which deal.
+  - `**Flags for the Sales Leader:**` covering the margin floor breaches with
+    the blended pipeline margin, ceiling status, the nearest decision window,
+    and the weakest win position with its competitive-position score and
+    shortlist count.
+  - An offer to drill into any single account by name.
+  - Close with `Source: [CRM Pipeline + Pricing Engine + Win Model]` and
+    `Agents: ProposalAssemblyAgent (rolling up all pipeline RFPs)`.
+
+  ## Edge cases
+
+  - The pipeline is exactly these three RFPs. Never forecast a fourth deal, a
+    quarter, a quota attainment number, or a trend -- there is no historical
+    data on file and no close-date field, only a decision window in days.
+  - The win-weighted value is arithmetic on the win model, not a commit number.
+    Present it as such; never call it forecast, committed, or booked.
+  - Margin is reported as computed. All three deals currently sit below the 35%
+    floor -- that is the finding, not something to smooth over or average away.
+  - This view recommends where the leader should spend attention. It never
+    reprices, reprioritizes in the CRM, or notifies a seller.

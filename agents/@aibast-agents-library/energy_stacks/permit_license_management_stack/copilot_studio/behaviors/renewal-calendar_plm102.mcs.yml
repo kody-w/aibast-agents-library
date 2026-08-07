@@ -37,6 +37,12 @@ content: |
 
   Heading: `# Permit Renewal Calendar`
 
+  When a facility filter applies, print the filter line directly under the
+  heading:
+  `**Filter:** facility = <name> - this view is filtered; counts cover the filtered rows only.`
+  With no filter, omit the line entirely - never claim a filtered view when
+  every row is shown.
+
   No headline counts line for this view. Then one table, exactly these columns:
 
   | Permit | Facility | Expiration | Status | Lead Time |
@@ -53,5 +59,9 @@ content: |
     compliance-gap analysis.
   - Two permits sharing a lead time value are not related; lead time is set per
     permit by its authority, not per facility or per type.
+  - No permits match a facility filter: say so and name the filter that
+    produced the empty view.
   - Never propose that renewal has been started, filed, or scheduled. State
-    when it must start and leave the filing to a person.
+    when it must start and leave the filing to a person. To hand the work over,
+    use the renewal-work-packet skill, which assembles the packet the person
+    executes.

@@ -31,6 +31,13 @@ __manifest__ = {
 # Synthetic domain data
 # ---------------------------------------------------------------------------
 
+# Snapshot date of the register below. Condition scores, operating hours, and
+# predicted failure dates are as of this date and never refresh on their own.
+# In production this is the timestamp of the condition-monitoring / CMMS pull
+# that replaces ASSETS. Keep it in sync with the "Register as of" line in
+# capabilities/knowledge/files/asset-register-and-maintenance-history.md.
+REGISTER_AS_OF = "2026-03-01"
+
 ASSETS = {
     "AST-T001": {
         "name": "Wind Turbine Alpha-7",
@@ -132,7 +139,7 @@ def _maintenance_forecast():
             "location": a["location"],
         })
     forecasts.sort(key=lambda x: x["predicted_failure"])
-    return {"forecasts": forecasts}
+    return {"forecasts": forecasts, "as_of": REGISTER_AS_OF}
 
 
 def _asset_health():
@@ -146,7 +153,11 @@ def _asset_health():
             "replacement_cost": a["replacement_cost"],
         })
     health.sort(key=lambda x: x["condition_score"])
-    return {"assets": health, "avg_condition": round(sum(a["condition_score"] for a in ASSETS.values()) / len(ASSETS), 1)}
+    return {
+        "assets": health,
+        "avg_condition": round(sum(a["condition_score"] for a in ASSETS.values()) / len(ASSETS), 1),
+        "as_of": REGISTER_AS_OF,
+    }
 
 
 def _budget_projection():
@@ -250,6 +261,8 @@ class AssetMaintenanceForecastAgent(BasicAgent):
         lines = [
             "# Maintenance Forecast",
             "",
+            f"**Register as of:** {data['as_of']} (snapshot, not a live feed)",
+            "",
             "| Asset | Type | Condition | Failure Rate | Predicted Failure | Last Service |",
             "|-------|------|-----------|-------------|-------------------|--------------|",
         ]
@@ -270,6 +283,7 @@ class AssetMaintenanceForecastAgent(BasicAgent):
             "# Asset Health Dashboard",
             "",
             f"**Average Condition Score:** {data['avg_condition']}",
+            f"**Register as of:** {data['as_of']} (snapshot, not a live feed)",
             "",
             "| Asset | Type | Condition | Status | Age | Operating Hours | Replacement Cost |",
             "|-------|------|-----------|--------|-----|----------------|-----------------|",

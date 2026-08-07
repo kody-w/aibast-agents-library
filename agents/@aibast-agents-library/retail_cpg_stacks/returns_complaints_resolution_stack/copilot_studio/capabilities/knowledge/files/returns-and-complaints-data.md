@@ -34,6 +34,57 @@ same expression for the purchase date.
 | RET-4005 | Strap broke after normal use. Outside 60-day window but claims manufacturing defect. |
 | RET-4006 | Received aviator style instead of ordered wayfarer style. |
 
+## Customer 12-month return history
+
+Trailing-twelve-month history for the customers in the queue above. This is
+this retailer's own record only — there is no cross-retailer watchlist, device
+signal, or real-time fraud feed in this stack.
+
+| Customer ID | Customer | Returns (12mo) | Orders (12mo) | Return Rate | Refunded (12mo) | Prior Denied Claims |
+|-------------|----------|----------------|---------------|-------------|-----------------|---------------------|
+| CUST-2041 | Sarah Mitchell | 2 | 12 | 16.7% | $164.98 | 0 |
+| CUST-3178 | James Kowalski | 1 | 9 | 11.1% | $74.50 | 0 |
+| CUST-1590 | Maria Chen | 5 | 12 | 41.7% | $612.45 | 1 |
+| CUST-4422 | David Okafor | 4 | 11 | 36.4% | $301.96 | 0 |
+| CUST-0887 | Linda Park | 2 | 8 | 25.0% | $158.00 | 0 |
+| CUST-5610 | Robert Fernandez | 1 | 6 | 16.7% | $61.25 | 0 |
+
+`Return Rate` is `returns_12mo / orders_12mo`. Refunded dollars are refunds
+already paid in the trailing twelve months and exclude the open request in the
+queue.
+
+### Return-abuse signals and weights
+
+Signals are additive and each fires at most once per return.
+
+| Signal | Weight | Fires when |
+|--------|--------|------------|
+| high_return_frequency | 2 | Return rate is 0.40 or higher |
+| elevated_return_frequency | 1 | Return rate is 0.25 or higher but below 0.40 |
+| prior_denied_claims | 2 | Customer has 1 or more prior denied claims |
+| used_item_claim | 1 | Item condition is `lightly_used` or `damaged` |
+| out_of_policy_window | 1 | Days since purchase is greater than 90 |
+
+The two frequency signals are mutually exclusive. Risk tier from the total
+score: 4 or more is `high`, 2 to 3 is `elevated`, 0 to 1 is `low`.
+
+### Worked screening outcomes against the current queue
+
+| Return ID | Customer | Return Rate | Signals | Score | Risk |
+|-----------|----------|-------------|---------|-------|------|
+| RET-4001 | Sarah Mitchell | 16.7% | none | 0 | low |
+| RET-4002 | James Kowalski | 11.1% | none | 0 | low |
+| RET-4003 | Maria Chen | 41.7% | high_return_frequency, prior_denied_claims, used_item_claim | 5 | high |
+| RET-4004 | David Okafor | 36.4% | elevated_return_frequency | 1 | low |
+| RET-4005 | Linda Park | 25.0% | elevated_return_frequency, used_item_claim, out_of_policy_window | 3 | elevated |
+| RET-4006 | Robert Fernandez | 16.7% | none | 0 | low |
+
+Screening totals: 6 screened, 2 at elevated or higher, refund value under
+review $229.98 (RET-4003 $149.99 + RET-4005 $79.99).
+
+The screen is evidence for a loss-prevention reviewer. Nothing here denies a
+return, withholds a refund, blocks a customer, or opens a fraud case.
+
 ## Complaint categories
 
 | Category | ID | Monthly Volume | Severity Weight | Avg Resolution | Escalation Rate |

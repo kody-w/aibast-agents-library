@@ -1,3 +1,3 @@
 mcs.metadata:
   componentName: demand-and-stock-policy.md
-  description: Synthetic daily sell-through rates, channel demand weights, stock status thresholds, and replenishment sourcing policy the agent computes against until real tools are connected.
+  description: Synthetic daily sell-through rates, channel demand weights, stock status thresholds, overstock policy, and replenishment sourcing policy the agent computes against until real tools are connected.

@@ -55,3 +55,9 @@ tenure column above.
 
 The queue starts empty. Requests drafted by the agent are added here at status
 `Pending Manager Approval` and stay there until the named manager acts.
+
+The queue is readable, not just written. A manager reads the rows whose Manager
+column is their own name — Sarah Johnson sees emp-1001, David Kim sees emp-1002,
+Alex Rivera sees emp-1003. HR Operations reads the queue unfiltered across all
+three. An empty queue is reported as `0` requests pending; no example row is
+ever added to make it look populated.

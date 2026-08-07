@@ -1,0 +1,93 @@
+mcs.metadata:
+  componentName: renewal-work-packet
+  description: Assembles the renewal work packet for each permit - authority, permit number, computed renewal start date, accountable owner, draft submission checklist, and the evidence to attach - for a person to execute.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: renewal-work-packet
+  description: Assembles the renewal work packet for each permit - authority, permit number, computed renewal start date, accountable owner, draft submission checklist, and the evidence to attach - for a person to execute.
+  ---
+  <!-- bic:source=blank -->
+  # Renewal work packet
+
+  Use this skill when the user asks to prepare, assemble, package, or hand off
+  renewal work - "get the renewal ready", "what do we need to file", "who owns
+  this renewal", "build the remediation packet for the expired permit", or asks
+  what has to happen next on a permit or a gap.
+
+  This skill prepares work. It never performs it. Nothing it produces has been
+  filed, submitted, scheduled, or sent to an authority.
+
+  ## Inputs
+
+  - The permit register, including `expiration_date`, `renewal_lead_days`,
+    `type`, `issuing_authority`, and the authority-issued permit number.
+  - The accountable-owner table, keyed by permit type.
+  - The recurring requirement list, keyed by permit type.
+  - The standing draft submission checklist, identical for every permit.
+  - Optional: a facility filter. Apply it to every row and every count, and say
+    the view is filtered.
+
+  ## Procedure
+
+  1. Build one packet per permit in scope. Every permit gets a packet -
+     expired permits are the urgent ones, not the only ones.
+  2. Compute the renewal start date for each packet:
+     `renewal start = expiration_date - renewal_lead_days`. Show it as an ISO
+     `YYYY-MM-DD` date. Never round the arithmetic and never substitute
+     today's date - this agent has no clock and does not compute "days
+     remaining".
+  3. Resolve the accountable owner from the permit `type` using the
+     accountable-owner table, rendered as `<role>, <facility>`. The owner is a
+     role, never a named person - the register holds no personal names.
+  4. Sort packets by renewal start date ascending. Ties keep register order.
+  5. Count:
+     - `total` = number of packets shown
+     - `expired` = number of packets whose permit status is exactly `expired`
+  6. Print the draft submission checklist once. It is identical for every
+     packet - do not vary, reorder, or personalize the steps.
+  7. List the evidence to attach per packet: the recurring requirements for
+     that permit's `type`, in the order the requirement list gives them.
+
+  ## Output format
+
+  Heading: `# Renewal Work Packet`
+
+  When a facility filter applies, print the filter line directly under the
+  heading and before the headline:
+  `**Filter:** facility = <name> - this view is filtered; counts cover the filtered rows only.`
+
+  Headline: `**Packets:** N | **Expired (act now):** N`
+
+  Then one table, exactly these columns:
+
+  | Permit | ID | Facility | Authority | Permit Number | Expiration | Lead Time | Renewal Start | Owner | Status |
+
+  - `Permit Number` is the authority-issued number, `ID` is the `PRM-` id.
+  - `Lead Time` as `N days`, `Expiration` and `Renewal Start` in ISO format.
+  - `Status` in caps (ACTIVE / EXPIRED).
+
+  Then `## Draft submission checklist (same for every packet)` as a numbered
+  list, then `## Evidence to attach, by permit` as a table:
+
+  | Permit | Type | Evidence required |
+
+  Close with one line stating that nothing in the packet has been filed and
+  each packet is prepared for its named owner to execute.
+
+  ## Edge cases
+
+  - A renewal start date already in the past is a finding to state plainly, not
+    a reason to alter the date or claim work began.
+  - An expired permit still gets a packet, and its packet is remediation work.
+    Say the permit stays a CRITICAL gap until the authority issues the renewal,
+    and cite the `PRM-` id and the authority-issued number.
+  - A pending application (`APP-` id) does not remove the packet or close the
+    gap. Note the application alongside the packet if one exists.
+  - No permits match a facility filter: say so and name the filter that
+    produced the empty view.
+  - Never say the packet was sent, assigned, approved, or accepted. Naming an
+    owner is a recommendation, not an assignment the agent made.
+  - Never invent a checklist step, an evidence item, an owner role, or a permit
+    condition that is not in the data. The register holds condition counts
+    only.

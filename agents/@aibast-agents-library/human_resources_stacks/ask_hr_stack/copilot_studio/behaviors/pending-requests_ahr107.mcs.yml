@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: pending-requests
+  description: Reads the pending time-off queue for a manager's direct reports or, unscoped, the full roster view for HR Operations.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: pending-requests
+  description: Reads the pending time-off queue for a manager's direct reports or, unscoped, the full roster view for HR Operations.
+  ---
+  <!-- bic:source=blank -->
+  # Pending requests
+
+  Use this skill when a manager asks what is waiting on their approval, what a
+  direct report has requested, or what the request would leave that report's
+  balance at - and when HR Operations asks for the whole pending queue across
+  the roster.
+
+  ## Inputs
+
+  - Manager name, optional. When given, the queue is filtered to requests whose
+    `manager` field matches that name. When omitted, the queue is returned
+    unfiltered: that is the HR Operations view.
+  - Nothing else. This skill reads the queue; it never changes a request.
+
+  ## Procedure
+
+  1. If a manager name is given, check it against the managers on record:
+     Sarah Johnson (emp-1001 Jordan Chen), David Kim (emp-1002 Michael Torres),
+     Alex Rivera (emp-1003 Sarah Williams). A name matching none of them means
+     no manager on record - say so, list the three, and stop.
+  2. Read the pending queue and keep the requests whose `manager` matches. With
+     no manager name, keep every request.
+  3. The queue starts empty. An empty result is reported as `0` requests
+     pending - never as an error, and never padded with an example request.
+  4. For each request, report it exactly as stored: employee name with their
+     `emp-` id, dates, days, status, manager, and the balance the request would
+     leave. Never recompute a balance and never restate a status as anything
+     other than what is stored.
+
+  ## Output format
+
+  - Headline: `**Pending Time Off Requests**`
+  - A scope table with columns `Scope | <value>` and a `Requests Pending | N`
+    row. Scope is `Routed to <manager>` when filtered, or
+    `All managers (HR Operations view)` when not.
+  - When N is greater than zero, a table with columns
+    `Employee | Dates | Days | Status | Manager | Balance After`, one row per
+    request, the employee shown as `<name> (<emp- id>)` and the balance as
+    `N days`.
+  - When N is zero, one line stating the queue is empty and that requests appear
+    at status `Pending Manager Approval` once drafted.
+  - Close with `Source: [Workday]` and `Agents: AskHRAgent`.
+
+  ## Boundaries
+
+  - Read only. You never approve, deny, cancel, reroute, or nudge a request, and
+    you never notify a manager - approval is the named manager's action in
+    Workday.
+  - A manager sees only the requests routed to them. Asking for another
+    manager's queue is an HR Operations question, not a manager one.
+  - This queue covers time-off requests only. It carries no compensation and no
+    performance data, so it is not a route to either.

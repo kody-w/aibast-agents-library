@@ -104,6 +104,27 @@ Sort descending, take the top four.
 
 Total: `min(95, max(15, int(sum of factors)))`.
 
+## Pipeline roll-up
+
+The portfolio view re-uses the single-deal computations without re-scoring
+anything, then aggregates across every RFP in the pipeline.
+
+| Roll-up figure | Rule |
+|----------------|------|
+| Win-weighted value, per deal | `int(proposed_total * win_pct / 100)` |
+| Win-weighted value, pipeline | Sum of the per-deal weighted values |
+| Proposed total | Sum of each deal's proposed total |
+| Discount given | `list_total - proposed_total`, and `round((1 - proposed_total / list_total) * 100, 1)` as a percent |
+| Blended pipeline margin | `round((proposed_total - cost_total) / proposed_total * 100, 1)` against the same 35% floor |
+| Ranking | Win probability descending |
+
+Computed from the three RFPs on file: $3,500,000 stated deal value, $4,000,000
+list, $3,253,196 proposed, $746,804 discount given (18.7%), 27.5% blended margin,
+$2,696,636 win-weighted. All three deals sit below the 35% margin floor.
+
+There is no historical win/loss record, close date, or quota in this data, so the
+roll-up is arithmetic on the win model and never a forecast or a commit number.
+
 ## Proposal page count
 
 `page_count = 12 + (requirements * 2) + (references * 2) + (competitors * 3) + 4`

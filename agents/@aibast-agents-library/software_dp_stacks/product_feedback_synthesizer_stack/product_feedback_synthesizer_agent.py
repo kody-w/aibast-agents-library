@@ -213,6 +213,56 @@ def _roadmap_impact():
     return {"items": impacts}
 
 
+def _churn_risk():
+    """Band at-risk accounts from recorded sentiment and satisfaction score.
+
+    CRITICAL = stored sentiment is negative. WATCH = non-negative sentiment
+    with a recorded satisfaction score of 6 or lower. Nothing here is a
+    prediction: the bands and the ARR total are read off stored fields.
+    """
+    critical = []
+    watch = []
+    for fid, fb in FEEDBACK_ENTRIES.items():
+        linked = [frid for frid, fr in FEATURE_REQUESTS.items() if fid in fr["linked_feedback"]]
+        row = {
+            "id": fid, "customer": fb["customer"], "sentiment": fb["sentiment"],
+            "score": fb["score"], "channel": fb["channel"],
+            "arr_impact": fb["arr_impact"], "linked_requests": linked,
+        }
+        if fb["sentiment"] == "negative":
+            row["band"] = "critical"
+            critical.append(row)
+        elif fb["score"] <= 6:
+            row["band"] = "watch"
+            watch.append(row)
+    critical.sort(key=lambda r: r["arr_impact"], reverse=True)
+    watch.sort(key=lambda r: r["arr_impact"], reverse=True)
+    accounts = critical + watch
+    critical_arr = sum(r["arr_impact"] for r in critical)
+    watch_arr = sum(r["arr_impact"] for r in watch)
+    at_risk_arr = critical_arr + watch_arr
+    total_arr = sum(fb["arr_impact"] for fb in FEEDBACK_ENTRIES.values())
+    quarters = list(NPS_SCORES.keys())
+    prior, latest = quarters[0], quarters[-1]
+    return {
+        "accounts": accounts,
+        "at_risk_count": len(accounts),
+        "total_entries": len(FEEDBACK_ENTRIES),
+        "critical_arr": critical_arr,
+        "watch_arr": watch_arr,
+        "at_risk_arr": at_risk_arr,
+        "total_arr": total_arr,
+        "at_risk_pct": round(at_risk_arr / total_arr * 100, 1),
+        "prior_quarter": prior,
+        "latest_quarter": latest,
+        "detractors_prior": NPS_SCORES[prior]["detractors"],
+        "detractors_latest": NPS_SCORES[latest]["detractors"],
+        "detractor_delta": NPS_SCORES[latest]["detractors"] - NPS_SCORES[prior]["detractors"],
+        "nps_prior": NPS_SCORES[prior]["score"],
+        "nps_latest": NPS_SCORES[latest]["score"],
+    }
+
+
 # ---------------------------------------------------------------------------
 # Agent
 # ---------------------------------------------------------------------------
@@ -235,6 +285,7 @@ class ProductFeedbackSynthesizerAgent(BasicAgent):
                             "feature_requests",
                             "sentiment_analysis",
                             "roadmap_impact",
+                            "churn_risk",
                         ],
                         "description": "The feedback operation to perform.",
                     },
@@ -254,6 +305,8 @@ class ProductFeedbackSynthesizerAgent(BasicAgent):
             return self._sentiment_analysis()
         elif op == "roadmap_impact":
             return self._roadmap_impact()
+        elif op == "churn_risk":
+            return self._churn_risk()
         return f"**Error:** Unknown operation `{op}`."
 
     def _feedback_summary(self) -> str:
@@ -351,11 +404,48 @@ class ProductFeedbackSynthesizerAgent(BasicAgent):
         lines.append("- Real-Time Alerting should be accelerated given competitive pressure.")
         return "\n".join(lines)
 
+    def _churn_risk(self) -> str:
+        data = _churn_risk()
+        lines = [
+            "# Churn Risk Watchlist",
+            "",
+            f"**Accounts At Risk:** {data['at_risk_count']} of {data['total_entries']}",
+            f"**ARR At Risk:** ${data['at_risk_arr']:,} of ${data['total_arr']:,} "
+            f"({data['at_risk_pct']}%)",
+            f"**Critical Band:** ${data['critical_arr']:,} | "
+            f"**Watch Band:** ${data['watch_arr']:,}",
+            "",
+            "| Band | Feedback | Customer | Sentiment | Score | ARR At Risk | Linked Request |",
+            "|------|----------|----------|-----------|-------|-------------|----------------|",
+        ]
+        for r in data["accounts"]:
+            linked = ", ".join(r["linked_requests"]) or "none"
+            lines.append(
+                f"| {r['band'].upper()} | {r['id']} | {r['customer']} "
+                f"| {r['sentiment'].upper()} | {r['score']} | ${r['arr_impact']:,} | {linked} |"
+            )
+        lines.append("")
+        lines.append("## Detractor Trend")
+        lines.append("")
+        lines.append(
+            f"- Detractors {data['detractors_prior']} ({data['prior_quarter']}) to "
+            f"{data['detractors_latest']} ({data['latest_quarter']}), "
+            f"{data['detractor_delta']:+d}, while NPS moved {data['nps_prior']} to "
+            f"{data['nps_latest']}."
+        )
+        lines.append("")
+        lines.append("## Boundaries")
+        lines.append("- Bands come from recorded sentiment and satisfaction score. This is a watchlist, not a churn prediction.")
+        lines.append("- ARR at risk is the sum of recorded arr_impact for these accounts, not a forecast of revenue that will be lost.")
+        lines.append("- No account here has been contacted, escalated, or entered into a save play. A person decides and acts.")
+        return "\n".join(lines)
+
 
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     agent = ProductFeedbackSynthesizerAgent()
-    for op in ["feedback_summary", "feature_requests", "sentiment_analysis", "roadmap_impact"]:
+    for op in ["feedback_summary", "feature_requests", "sentiment_analysis",
+               "roadmap_impact", "churn_risk"]:
         print(f"\n{'='*60}")
         print(f"Operation: {op}")
         print("=" * 60)

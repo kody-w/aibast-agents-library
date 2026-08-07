@@ -36,6 +36,10 @@ data.
 | Transfer destination | `on_hand - forecast < -200` | Transfer matching |
 | Over-capacity flag | `utilization > 90.0%` | Inventory snapshot |
 | Below reorder | `on_hand < reorder_point` | Snapshot note and value at risk |
+| Covered | `coverage_months <= 3.0` | Waste exposure (row suppressed, no excess) |
+| Excess | `3.0 < coverage_months <= 6.0` | Waste exposure (write-off factor 0.10) |
+| Aging | `coverage_months > 6.0` | Waste exposure (write-off factor 0.25) |
+| Buy required | `network_on_hand < forecast + reorder_point` | Replenishment plan |
 
 The surplus band for reporting (+500) is stricter than the surplus band for
 transfer matching (+200). A position between +201 and +500 is reported
@@ -49,11 +53,47 @@ Balanced but can still ship.
 | Expedite premium multiplier | `3.2` x total transfer cost | Avoided expedited-shipping premium |
 | Risk realization factor | `0.6` x total value at risk | Net annual benefit calculation |
 | Transit window | 2-5 business days, ground freight | Transfer plan transit estimate |
+| Forecast horizon | 90 days = `3` months | Coverage, months of supply, network target |
+| Excess write-off factor | `0.10` x excess value | Waste exposure, Excess band |
+| Aging write-off factor | `0.25` x excess value | Waste exposure, Aging band |
+| Network safety stock | one reorder point per SKU | Replenishment target |
 
 Net annual benefit = `(total_value_at_risk * 0.6) - total_transfer_cost`.
 Avoided expedited-shipping premium = `total_transfer_cost * 3.2`.
 Projected pallets = `used_pallets + int(inbound_units * 0.02)` — inbound only;
 outbound units are not deducted.
+
+## Waste exposure model
+
+`coverage_months = round(on_hand / forecast * 3, 1)`.
+`excess_units = on_hand - forecast`, counted only where positive.
+`write_off_exposure = round(excess_units * unit_cost * band_factor, 2)`, with
+the band factor 0.10 for Excess and 0.25 for Aging. The total is the sum of
+the rounded rows.
+
+`exposure_removed = round(min(excess_units, units_shipped_out_by_the_transfer
+_plan) * unit_cost * band_factor, 2)` per position. Relocated units are excess
+only at the shipping site; the receiving site is in deficit, so those units get
+consumed instead of written off. Whatever the transfer plan does not relocate
+stays exposed.
+
+Both band factors are fixed planning coefficients. Neither is a booked
+write-off, an inventory reserve, or a finance-approved impairment.
+
+## Replenishment model
+
+`network_on_hand` and `network_forecast` are the four-warehouse sums for a SKU.
+`network_target = network_forecast + reorder_point` — one reorder point held as
+network safety stock.
+`buy_qty = max(0, network_target - network_on_hand)`.
+`estimated_spend = round(buy_qty * unit_cost, 2)`.
+
+Redistribution and replenishment answer different questions. A transfer fixes
+where the stock is; a buy fixes how much of it exists. Residual buy at a
+below-reorder position = `max(0, reorder_point - (on_hand + inbound units from
+the transfer plan))`. On the current data every one of those residuals is zero,
+so no buy is justified by a local gap — the recommended buys exist purely to
+restore network coverage.
 
 Every figure in this section is a fixed-coefficient planning heuristic. None
 of them is a carrier quote, a booked saving, or a finance-approved number.

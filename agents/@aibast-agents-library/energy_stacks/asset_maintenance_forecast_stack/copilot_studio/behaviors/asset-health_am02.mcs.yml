@@ -40,6 +40,7 @@ content: |
   Headline `# Asset Health Dashboard`, then:
 
   - `**Average Condition Score:** N.N`
+  - `**Register as of:** 2026-03-01 (snapshot, not a live feed)`
   - A table with exactly these columns:
     `| Asset | Type | Condition | Status | Age | Operating Hours | Replacement Cost |`
   - Age as `Nyr`. Operating hours with thousands separators. Replacement cost as

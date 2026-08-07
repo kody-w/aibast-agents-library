@@ -11,7 +11,7 @@
 | App ID | Applicant | Line of Business | Coverage Requested | Indicated Premium | Risk Score | Tier | Status | Underwriter |
 |--------|-----------|------------------|--------------------|-------------------|------------|------|--------|-------------|
 | UW-2025-101 | Riverside Manufacturing Inc. | commercial_property | $5,000,000 | $42,500 | 62 | Substandard | under_review | Patricia Graham |
-| UW-2025-102 | Sarah Mitchell | personal_auto | $500,000 | $2,400 | 22 | Preferred | approved | James Chen |
+| UW-2025-102 | Cascade Freight Logistics LLC | commercial_auto | $2,000,000 | $55,000 | 22 | Preferred | approved | James Chen |
 | UW-2025-103 | Downtown Medical Associates | professional_liability | $3,000,000 | $67,000 | 75 | Substandard | exception_review | Patricia Graham |
 | UW-2025-104 | Harbor View Restaurant Group | general_liability | $2,000,000 | $18,500 | 48 | Standard | pending_info | James Chen |
 
@@ -30,16 +30,17 @@ Standard, 56-75 Substandard, 76+ Decline.
 | Square footage | 85,000 |
 | Protection class | 3 |
 
-### UW-2025-102 — Sarah Mitchell (personal auto)
+### UW-2025-102 — Cascade Freight Logistics LLC (commercial auto)
 
 | Attribute | Value |
 |-----------|-------|
-| Vehicle | 2024 Toyota RAV4 |
-| Driver age | 34 |
-| Violations | 0 |
-| Accidents | 0 |
-| Years licensed | 16 |
-| Credit score | 745 |
+| Fleet size | 18 |
+| Vehicle class | light_truck |
+| Radius of operation | intermediate |
+| DOT safety rating | satisfactory |
+| Fleet violations | 0 |
+| Fleet accidents | 0 |
+| Years operating | 9 |
 
 ### UW-2025-103 — Downtown Medical Associates (professional liability)
 

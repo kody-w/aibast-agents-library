@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: overstock-review
+  description: Flags store positions whose on-hand exceeds the 14-day supply target, reporting excess units, days over target, and the capital tied up.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: overstock-review
+  description: Flags store positions whose on-hand exceeds the 14-day supply target, reporting excess units, days over target, and the capital tied up.
+  ---
+  <!-- bic:source=blank -->
+  # Overstock review
+
+  Use this skill when the user asks where there is too much stock, asks about
+  overstock, excess, surplus, slow movers, or aged cover, asks how much working
+  capital is sitting in inventory, or asks what to stop shipping.
+
+  ## Inputs
+
+  - On-hand quantities, daily sell-through rates, and SKU unit costs.
+  - Optional: a merchandise category (`Accessories`, `Apparel`, `Electronics`,
+    `Footwear`) to scope the review. With no category, review all 8 SKUs.
+
+  ## Procedure - compute it, do not estimate it
+
+  1. Scan stores only - `STR-001`, `STR-002`, `STR-003`, `STR-004` in id order,
+     and within each store the SKUs in scope in ascending SKU-id order.
+     Warehouses are out of scope: they hold network cover, so the 14-day store
+     target does not apply to them and their on-hand is never called overstock.
+  2. The target is the same 14-day figure the replenishment plan uses:
+     `target_qty = int(daily_sell_through * 14)`, truncated. `SKU-1003` at
+     14.5/day gives 203; `SKU-1006` at 12.0/day gives 168.
+  3. A position is overstock only when `on_hand > target_qty`. At or below
+     target it is not a line - do not report a zero or negative excess.
+  4. Excess units: `on_hand - target_qty`.
+  5. Days over target: `excess / daily_sell_through`, rounded to one decimal.
+  6. Capital tied up: `excess * unit_cost`, rounded to 2 decimals. Unit cost,
+     never retail price.
+  7. Total the positions, the excess units, and the capital, then break the
+     excess down by category so a category manager can read their own number.
+
+  ## Output format
+
+  - `# Overstock Review`
+  - `**Target:** 14-day supply at each store; on-hand above that target is excess.`
+  - Table with columns:
+    `Location | SKU | Product | Category | On-Hand | 14-Day Target | Excess Units | Days Over Target | Capital Tied Up`
+  - `**Positions Above Target:** N`, `**Total Excess Units:** N`,
+    `**Capital Tied Up:** $N.NN`
+  - `## By Category` then a table `Category | Excess Units | Capital Tied Up`
+  - `## How to read this` with the three standing caveats below.
+
+  ## The current picture
+
+  Against today's on-hand, exactly four store positions sit above target, all of
+  them at `STR-001` Downtown Flagship: `SKU-1003` 210 vs 203 (7 units, 0.5 days
+  over, $57.40), `SKU-1004` 45 vs 43 (2 units, 0.6 days, $84.00), `SKU-1005` 38
+  vs 37 (1 unit, 0.4 days, $55.00), and `SKU-1006` 195 vs 168 (27 units, 2.2
+  days, $183.60). That is 37 excess units and $380.00 of capital tied up. No
+  position at `STR-002`, `STR-003`, or `STR-004` is above target.
+
+  ## Edge cases
+
+  - A small excess is still the honest answer. Do not inflate the language -
+    $380.00 across one store is a thin, not a crisis, and say so.
+  - Excess is reported, never resolved by drawing a store below its safety-stock
+    floor. If asked to rebalance, you may point out that `STR-001` `SKU-1006`
+    holds 195 against a 70 safety stock while `STR-004` needs 113 to reach
+    target, but the recommendation stops at naming the option.
+  - A position can be overstocked and still not be slow-moving; days over target
+    is the only slowness measure you have. Never claim a SKU is discontinued,
+    seasonal, or aged - that data is not in your sources.
+  - This is a finding, not a markdown, a transfer, or a write-off. Never say
+    inventory was moved, marked down, returned to the vendor, or written off.

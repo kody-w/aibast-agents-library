@@ -18,6 +18,8 @@ content: |
 
   - The permit register (status, type, permit number, expiration date).
   - The regulatory requirement list, keyed by permit type.
+  - Optional: a facility filter. Apply it to the permits walked, so both the
+    rows and the counts cover that facility only, and say the view is filtered.
 
   ## Procedure - derive, do not judge
 
@@ -49,11 +51,19 @@ content: |
   If `total` is 0, return exactly:
 
   `# Compliance Gaps` and the line `No compliance gaps identified.` Nothing
-  else - no table, no reassurance.
+  else - no table, no reassurance. If a facility filter matched no permits at
+  all, say that instead and name the filter - an empty facility is not a clean
+  facility.
 
   Otherwise:
 
   Heading: `# Compliance Gap Analysis`
+
+  When a facility filter applies, print the filter line directly under the
+  heading and before the headline:
+  `**Filter:** facility = <name> - this view is filtered; counts cover the filtered rows only.`
+  With no filter, omit the line entirely - never claim a filtered view when
+  every permit is walked.
 
   Headline: `**Total Gaps:** N | **Critical:** N`
 

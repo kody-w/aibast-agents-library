@@ -1,3 +1,3 @@
 mcs.metadata:
   componentName: procurement-requests-and-vendors.md
-  description: Synthetic purchase request queue and vendor catalog the agent answers from until real tools are connected.
+  description: Synthetic purchase request queue, purchase order ledger, and vendor catalog the agent answers from until real tools are connected.

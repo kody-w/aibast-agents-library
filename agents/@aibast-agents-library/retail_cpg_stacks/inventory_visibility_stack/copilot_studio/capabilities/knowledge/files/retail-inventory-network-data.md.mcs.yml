@@ -1,3 +1,3 @@
 mcs.metadata:
   componentName: retail-inventory-network-data.md
-  description: Synthetic store and warehouse master, SKU catalog, on-hand quantities, safety-stock levels, and lead times the agent answers from until real tools are connected.
+  description: Synthetic store and warehouse master, SKU catalog, merchandise-category rollups, on-hand quantities, safety-stock levels, and lead times the agent answers from until real tools are connected.

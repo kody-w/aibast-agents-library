@@ -54,6 +54,32 @@ still carries a churn signal.
 Resulting modeled potential: LIC-3001 $42,000, LIC-3004 $42,000, LIC-3003
 $30,000; total $114,000.
 
+## Renewal win-probability model
+
+Win probability is derived at read time. Nothing stores it, and no win/loss
+history informs it.
+
+| Step | Rule |
+|------|------|
+| 1 | Base = `health_score` |
+| 2 | Usage trend: `increasing` +10, `stable` 0, `declining` -10 |
+| 3 | +3 for each recorded expansion signal |
+| 4 | -5 for each recorded churn signal |
+| 5 | Clamp to the range 5-95, and report the raw pre-clamp score when a row is clamped |
+| 6 | Band: `>= 80` COMMIT, `50-79` CONTESTED, `< 50` UNLIKELY |
+| 7 | `weighted_arr = round(arr * probability / 100)` |
+| 8 | Sort by probability descending, then weighted ARR descending |
+
+Resulting probabilities: LIC-3004 95% (raw 113), LIC-3001 95% (raw 104),
+LIC-3003 60%, LIC-3005 15%, LIC-3002 5% (raw 4). Probability-weighted ARR is
+$342,000 + $273,600 + $115,200 + $8,100 + $3,600 = **$742,500** against the
+$966,000 portfolio.
+
+The COMMIT/CONTESTED/UNLIKELY bands are separate from the LOW/MEDIUM/HIGH risk
+bands above and never substitute for them. The probability-weighted $742,500
+and the expected-case $916,200 below are two different models of the same book
+and are never averaged, blended, or reconciled.
+
 ## Forecast weightings
 
 | Scenario | Formula | Value |

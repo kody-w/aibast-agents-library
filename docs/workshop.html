@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The RAPP Workshop — one page, one session, your industry</title>
+<title>The RAPP Workshop — AIBAST Agents Library</title>
 <meta name="description" content="The AIBAST Agent Workshop: pick your industry, pick your agent, and take it from intent to a published, verified Copilot Studio agent by talking to your AI. One page runs the whole session for every industry in the library.">
 <style>
 :root{
@@ -140,7 +140,7 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
   border-radius:4px;padding:2px 7px;color:#fff}
 .bx .status.u{background:#2b8a3e}.bx .status.d{background:#a07d1c}.bx .status.n{background:#8a8da0}
 .bx ul{list-style:none;margin-top:8px}
-.bx li{position:relative;padding-left:13px;margin-bottom:6px;color:#3c3f52;line-height:1.4}
+.bx li{position:relative;padding-left:13px;margin-bottom:6px;color:var(--dim);line-height:1.4}
 .bx li::before{content:"•";position:absolute;left:1px;color:currentColor;opacity:.55}
 .bx li b{color:var(--ink)}
 .bx.i{background:var(--instr);border-color:var(--instr-b)}.bx.i h4{color:var(--instr-b)}
@@ -156,7 +156,7 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
 @media(max-width:900px){.b-row5{grid-template-columns:repeat(2,1fr)}
   .b-mid{grid-template-columns:1fr}.b-row3{grid-template-columns:1fr}}
 /* skills band */
-.b-skills{border:1.6px solid var(--skill-b);border-radius:12px;background:#fdfafd;
+.b-skills{border:1.6px solid var(--skill-b);border-radius:12px;background:var(--paper);
   padding:13px 14px}
 .b-skills .head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:11px}
 .b-skills .pill{background:var(--skill-b);color:#fff;font-weight:800;font-size:14px;
@@ -169,10 +169,10 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
 .b-skills .sbox h5{font-size:13.5px;font-weight:800;margin-bottom:6px}
 .b-skills .sbox.l{background:var(--skill);border-color:var(--skill-b)}
 .b-skills .sbox.l h5{color:var(--skill-b)}
-.b-skills .sbox.r{background:#f2f3f7;border-color:#9aa0b5}
+.b-skills .sbox.r{background:var(--wash);border-color:#9aa0b5}
 .b-skills .sbox.r h5{color:#525a75}
 .b-skills .sbox ul{list-style:none}
-.b-skills .sbox li{position:relative;padding-left:12px;margin-bottom:5px;color:#3c3f52;line-height:1.38}
+.b-skills .sbox li{position:relative;padding-left:12px;margin-bottom:5px;color:var(--dim);line-height:1.38}
 .b-skills .sbox li::before{content:"•";position:absolute;left:0;opacity:.5}
 .b-skills .arrow{color:var(--skill-b);font-size:19px;font-weight:800;text-align:center}
 /* product jewels — official marks from assets/products (see its NOTICE.md) */
@@ -220,10 +220,11 @@ table.ladder td:first-child{font-weight:650;color:var(--ink);min-width:150px}
 @media(max-width:760px){.wall{grid-template-columns:1fr}}
 .wall .col{border-radius:10px;padding:14px;font-size:14px}
 .wall .col h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px}
-.wall .in{background:#e7f5e9;border:1px solid #b7dfc0}.wall .in h4{color:var(--ok)}
-.wall .out{background:var(--red-soft);border:1px solid #f0c4c4}.wall .out h4{color:var(--red)}
-.wall .park{background:#fdf6e3;border:1px solid #ecd9a0}.wall .park h4{color:#a07d1c}
+.wall .in{background:var(--tools);border:1px solid var(--tools-b)}.wall .in h4{color:var(--ok)}
+.wall .out{background:var(--red-soft);border:1px solid var(--red)}.wall .out h4{color:var(--red)}
+.wall .park{background:var(--sand);border:1px solid var(--sand-b)}.wall .park h4{color:#a07d1c}
 .wall li{margin:0 0 7px 16px;color:var(--dim)}
+.wall .col h4,.wall li{color:var(--dim)}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:760px){.grid2{grid-template-columns:1fr}}
@@ -245,7 +246,9 @@ html[data-theme=dark] body{--ink:#e6e8f2;--dim:#aab0c8;--faint:#7c86a8;--paper:#
 <script id="aibast-theme-boot">
 (function(){
   var k="aibast:theme";
-  var t=localStorage.getItem(k)||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  function get(){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function set(v){try{localStorage.setItem(k,v);}catch(e){}}
+  var t=get()||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
   document.documentElement.setAttribute("data-theme",t);
   addEventListener("DOMContentLoaded",function(){
     var nav=document.querySelector("#aibast-nav .in"); if(!nav) return;
@@ -255,22 +258,33 @@ html[data-theme=dark] body{--ink:#e6e8f2;--dim:#aab0c8;--faint:#7c86a8;--paper:#
     b.onclick=function(e){e.preventDefault();
       var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";
       document.documentElement.setAttribute("data-theme",n);
-      localStorage.setItem(k,n); paint();};
+      set(n); paint();};
     paint(); nav.appendChild(b);
   });
 })();
 </script>
+<style id="aibast-scroll">html{scroll-padding-top:118px}
+@media(max-width:520px){.b-row5,.b-mid,.b-row3{grid-template-columns:1fr!important}
+.board{padding:18px 14px}}
+</style>
 <style id="aibast-nav-css">
 body{padding-top:52px!important}
 #aibast-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
   font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
 #aibast-nav .in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:4px;
-  align-items:center;height:52px;overflow-x:auto}
+  align-items:center;height:52px;overflow-x:auto;scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch}
+#aibast-nav .in::after{content:'';flex:0 0 8px}
+@media(max-width:760px){#aibast-nav{position:relative}
+  #aibast-nav .in{height:auto;flex-wrap:wrap;padding:6px 14px 8px;gap:2px}
+  #aibast-nav a.l{padding:11px 10px;min-height:44px;display:flex;align-items:center}
+  body{padding-top:0!important}}
 #aibast-nav .brand{color:#fff;font-weight:750;font-size:14.5px;text-decoration:none;
   letter-spacing:-.01em;margin-right:14px;white-space:nowrap}
 #aibast-nav .brand b{color:#f291b6}
 #aibast-nav a.l{color:#c3cae6;text-decoration:none;font-size:13px;font-weight:600;
-  padding:6px 10px;border-radius:6px;white-space:nowrap}
+  padding:6px 10px;border-radius:6px;white-space:nowrap;min-height:32px;
+  display:inline-flex;align-items:center}
 #aibast-nav a.l:hover{background:rgba(255,255,255,.1);color:#fff}
 #aibast-nav a.l.now{background:rgba(255,255,255,.14);color:#fff}
 #aibast-nav .gh{margin-left:auto}
@@ -1067,7 +1081,18 @@ document.getElementById("modeTabs").onclick=function(e){
   var b=e.target.closest("button"); if(!b||b.dataset.mode===MODE) return;
   MODE=b.dataset.mode;
   this.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
+  // reset every selection-scoped surface — stale state across modes showed a
+  // first-party agent's copy under an industry pick and vice versa
+  SELECTED=null; STACK="none";
   document.getElementById("agentCards").innerHTML="";
+  document.getElementById("pickName").textContent="nothing yet — choose above";
+  document.getElementById("rcHost").innerHTML=
+    '<p style="color:var(--faint)">Pick an agent in Step 0 to load its verification questions.</p>';
+  document.getElementById("rc-tally").textContent="";
+  document.getElementById("missionSay").textContent="\u201cDeploy the \u2026 agent to Copilot Studio.\u201d";
+  document.getElementById("sorRow").style.display="none";
+  var rc=document.getElementById("rateCard"); if(rc) rc.style.display="none";
+  try{history.replaceState(null,"",location.pathname);}catch(e){}
   renderPills();
 };
 var FP={groups:[]};
@@ -1174,6 +1199,7 @@ function select(a){
 }
 function selectFP(a){
   SELECTED=null; STACK="fp-"+a._fp.id;
+  try{history.replaceState(null,"","?fp="+encodeURIComponent(a._fp.id));}catch(e){}
   document.getElementById("pickName").textContent=" "+a._fp.name+
     " — a Microsoft first-party agent: configured in-product from the official docs, nothing to deploy.";
   document.querySelectorAll("[data-dyn=name]").forEach(function(el){el.textContent=a._fp.name;});
@@ -1234,7 +1260,7 @@ Promise.all([fetchLib("registry.json",true),
   Object.keys(byStackDir).forEach(function(d){var a=byStackDir[d];
     (CATS[a.category]=CATS[a.category]||[]).push(a);});
   renderPills();
-  var want=(/[?&]agent=([^&]+)/.exec(location.search)||[])[1]||localStorage.getItem(LS+"pick");
+  var want=(/[?&]agent=([^&]+)/.exec(location.search)||[])[1];
   if(want){
     var found=null,cat=null;
     Object.keys(CATS).forEach(function(c){CATS[c].forEach(function(a){
@@ -1436,7 +1462,9 @@ window.addEventListener("scroll",spy,{passive:true}); spy();
 .aibast-foot{background:#0b1024;color:#8a90b8;font-family:"Segoe UI",system-ui,sans-serif;
   font-size:12.5px;padding:26px 22px;text-align:center;line-height:1.6}
 .aibast-foot b{color:#c3cae6}
-.aibast-foot a{color:#f291b6;text-decoration:none}
+.aibast-foot a{color:#f7a8c4!important;text-decoration:none}
+.aibast-foot,.aibast-foot *{color:#aab2d0}
+.aibast-foot b{color:#e6e8f2}
 </style>
 <div class="aibast-foot"><b>AIBAST</b> — the Microsoft AI Business Applications Specialist Team ·
   engine, not experience · agents that ship, patterns that hold, numbers you can audit ·

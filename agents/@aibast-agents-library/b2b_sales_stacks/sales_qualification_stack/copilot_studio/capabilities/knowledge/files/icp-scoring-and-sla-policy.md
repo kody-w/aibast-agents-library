@@ -122,7 +122,7 @@ These five are the entire team. Never route a lead to anyone else.
 
 | Lead tier | Response SLA | Escalation | Sequence |
 |-----------|--------------|------------|----------|
-| Hot | 4h | Manager alert + Slack DM | Immediate call + personalized email |
+| Hot | 4h | Manager alert + Teams chat | Immediate call + personalized email |
 | Warm | 24h | Team channel alert | Personalized email day 0, call day 1 |
 | Nurture | 48h | Weekly digest flag | 3-email drip over 10 days |
 | Disqualified | N/A (0h) | None — routed to marketing | Marketing nurture list |

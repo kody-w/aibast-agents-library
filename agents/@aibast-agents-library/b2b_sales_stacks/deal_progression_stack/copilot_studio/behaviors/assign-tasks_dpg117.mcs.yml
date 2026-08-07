@@ -33,7 +33,7 @@ content: |
      `Exec support` for a cross-assigned rep.
   5. Reps with zero tasks are omitted. Report total tasks and the number of
      reps carrying them.
-  6. Always append the standing monitoring and cadence blocks - daily Slack
+  6. Always append the standing monitoring and cadence blocks - daily Teams
      alerts for overdue tasks, deal stage change notifications, weekly pipeline
      velocity report, stall warning at 7 days versus the current 21; daily
      automated reminders, Wednesday pipeline review (30 min), Friday deal
@@ -51,7 +51,7 @@ content: |
   time from 21 to 10 days, move the stalled value back to active, add $2.4M to
   Q4 commit.
 
-  Close with `Source: [Salesforce + Task Management]`.
+  Close with `Source: [Dynamics 365 + Task Management]`.
 
   ## Edge cases
 

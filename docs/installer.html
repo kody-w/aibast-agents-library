@@ -39,7 +39,7 @@
     font-family: "SF Mono", "Fira Code", monospace; font-size: 15px;
     color: #e6edf3; word-break: break-all;
   }
-  .one-liner .hint { font-size: 11px; color: #484f58; margin-top: 8px; }
+  .one-liner .hint { font-size: 11px; color: #8b949e; margin-top: 8px; }
   .one-liner.copied .hint { color: #3fb950; }
 
   .tiers { max-width: 620px; width: 100%; }
@@ -65,7 +65,7 @@
   .tier-badge.next { background: #1f6feb33; color: #58a6ff; border: 1px solid #1f6feb; }
   .tier-badge.advanced { background: #8b5cf633; color: #a78bfa; border: 1px solid #8b5cf6; }
   .tier-arrow {
-    color: #484f58; font-size: 18px; transition: transform 0.2s; flex-shrink: 0;
+    color: #8b949e; font-size: 18px; transition: transform 0.2s; flex-shrink: 0;
   }
   .tier.open .tier-arrow { transform: rotate(90deg); }
   .tier-body {
@@ -121,7 +121,7 @@
   .install-tabs-left .dots span:nth-child(2) { background: #d29922; }
   .install-tabs-left .dots span:nth-child(3) { background: #3fb950; }
   .install-tab {
-    background: none; border: none; color: #484f58; font-size: 12px;
+    background: none; border: none; color: #8b949e; font-size: 12px;
     padding: 8px 14px; cursor: pointer; font-family: "SF Mono", "Fira Code", monospace;
     border-bottom: 2px solid transparent; margin-bottom: -1px;
     transition: color 0.15s, border-color 0.15s;
@@ -162,7 +162,7 @@
   .install-body:hover .copy-icon { opacity: 1; }
   .install-body.copied .copy-icon { opacity: 1; }
   .install-hint {
-    padding: 0 24px 14px; font-size: 11px; color: #484f58; text-align: center;
+    padding: 0 24px 14px; font-size: 11px; color: #8b949e; text-align: center;
   }
 
   .status-bar {
@@ -189,7 +189,7 @@
   .open-btn:disabled { opacity: 0.4; cursor: default; }
 
   .links {
-    margin-top: 32px; text-align: center; font-size: 13px; color: #484f58;
+    margin-top: 32px; text-align: center; font-size: 13px; color: #8b949e;
   }
   .links a { margin: 0 12px; }
 </style>
@@ -257,7 +257,9 @@ html[data-theme=light] pre code{background:transparent!important;color:#e6edf3!i
 <script id="aibast-theme-boot">
 (function(){
   var k="aibast:theme";
-  var t=localStorage.getItem(k)||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  function get(){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function set(v){try{localStorage.setItem(k,v);}catch(e){}}
+  var t=get()||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
   document.documentElement.setAttribute("data-theme",t);
   addEventListener("DOMContentLoaded",function(){
     var nav=document.querySelector("#aibast-nav .in"); if(!nav) return;
@@ -267,7 +269,7 @@ html[data-theme=light] pre code{background:transparent!important;color:#e6edf3!i
     b.onclick=function(e){e.preventDefault();
       var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";
       document.documentElement.setAttribute("data-theme",n);
-      localStorage.setItem(k,n); paint();};
+      set(n); paint();};
     paint(); nav.appendChild(b);
   });
 })();
@@ -277,12 +279,19 @@ body{padding-top:52px!important}
 #aibast-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
   font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
 #aibast-nav .in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:4px;
-  align-items:center;height:52px;overflow-x:auto}
+  align-items:center;height:52px;overflow-x:auto;scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch}
+#aibast-nav .in::after{content:'';flex:0 0 8px}
+@media(max-width:760px){#aibast-nav{position:relative}
+  #aibast-nav .in{height:auto;flex-wrap:wrap;padding:6px 14px 8px;gap:2px}
+  #aibast-nav a.l{padding:11px 10px;min-height:44px;display:flex;align-items:center}
+  body{padding-top:0!important}}
 #aibast-nav .brand{color:#fff;font-weight:750;font-size:14.5px;text-decoration:none;
   letter-spacing:-.01em;margin-right:14px;white-space:nowrap}
 #aibast-nav .brand b{color:#f291b6}
 #aibast-nav a.l{color:#c3cae6;text-decoration:none;font-size:13px;font-weight:600;
-  padding:6px 10px;border-radius:6px;white-space:nowrap}
+  padding:6px 10px;border-radius:6px;white-space:nowrap;min-height:32px;
+  display:inline-flex;align-items:center}
 #aibast-nav a.l:hover{background:rgba(255,255,255,.1);color:#fff}
 #aibast-nav a.l.now{background:rgba(255,255,255,.14);color:#fff}
 #aibast-nav .gh{margin-left:auto}
@@ -456,7 +465,7 @@ body{padding-top:52px!important}
 </div>
 
 <div class="links">
-  <a href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
+  GitHub
   <a href="../index.html">RAPP Production Guide</a>
   Issues &amp; Feedback
   <a href="workshop.html#pick">Contributing</a>
@@ -582,7 +591,7 @@ body{padding-top:52px!important}
     <li><strong style="color:#e6edf3;">The project is evolving quickly.</strong> We're actively improving it based on feedback.</li>
   </ul>
   <hr style="margin:30px 0;border:none;border-top:1px solid #21262d;">
-  <p style="color:#484f58;font-size:11px;line-height:1.6;">
+  <p style="color:#8b949e;font-size:11px;line-height:1.6;">
     This project has adopted the <a href="https://opensource.microsoft.com/codeofconduct/" style="color:#58a6ff;">Microsoft Open Source Code of Conduct</a>.
     This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow <a href="https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general" style="color:#58a6ff;">Microsoft's Trademark &amp; Brand Guidelines</a>.
     MIT License — Copyright (c) 2026 Microsoft.
@@ -600,7 +609,9 @@ body{padding-top:52px!important}
 .aibast-foot{background:#0b1024;color:#8a90b8;font-family:"Segoe UI",system-ui,sans-serif;
   font-size:12.5px;padding:26px 22px;text-align:center;line-height:1.6}
 .aibast-foot b{color:#c3cae6}
-.aibast-foot a{color:#f291b6;text-decoration:none}
+.aibast-foot a{color:#f7a8c4!important;text-decoration:none}
+.aibast-foot,.aibast-foot *{color:#aab2d0}
+.aibast-foot b{color:#e6e8f2}
 </style>
 <div class="aibast-foot"><b>AIBAST</b> — the Microsoft AI Business Applications Specialist Team ·
   engine, not experience · agents that ship, patterns that hold, numbers you can audit ·

@@ -2,12 +2,13 @@
 Permit and License Management Agent for Energy sector.
 
 Tracks permits and licenses across energy facilities, manages renewal
-calendars, identifies compliance gaps, and monitors application status
-for regulatory requirements.
+calendars, identifies compliance gaps, monitors application status, and
+assembles renewal work packets for a human to execute.
 """
 
 import sys
 import os
+import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates"))
 from basic_agent import BasicAgent
 
@@ -17,7 +18,7 @@ __manifest__ = {
     "name": "@aibast-agents-library/permit-license-management",
     "version": "1.0.0",
     "display_name": "Permit & License Management Agent",
-    "description": "Tracks permits and licenses across energy facilities, manages renewal calendars, identifies compliance gaps, and monitors applications.",
+    "description": "Tracks permits and licenses across energy facilities, manages renewal calendars, identifies compliance gaps, monitors applications, and assembles renewal work packets for a person to execute.",
     "author": "AIBAST",
     "tags": ["permits", "licenses", "compliance", "regulatory", "energy", "renewals"],
     "category": "energy",
@@ -150,28 +151,89 @@ REGULATORY_REQUIREMENTS = {
     "spill_prevention": ["Annual SPCC plan review", "Integrity testing of containers", "Discharge prevention briefings"],
 }
 
+# Accountable role for renewal work, set by permit type (policy, not per permit).
+OWNER_ROLES = {
+    "air_quality": "Sustainability Lead",
+    "water_discharge": "Compliance Manager",
+    "waste_management": "Compliance Manager",
+    "pipeline_operation": "Plant Manager / Reliability Engineer",
+    "spill_prevention": "Plant Manager / Reliability Engineer",
+}
+
+# Draft submission checklist. Identical for every permit; the person named as
+# owner executes it. Nothing here is performed by the agent.
+RENEWAL_CHECKLIST = [
+    "Confirm the issuing authority's current renewal form, fee, and filing channel",
+    "Assemble the compliance record since issuance, including the last inspection date",
+    "Attach current evidence for every recurring requirement of this permit type",
+    "Route the draft package for internal environmental and legal review",
+    "Hand the signed package to the accountable owner for submission before expiration",
+]
+
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _permit_inventory():
+def _matches_facility(name, facility):
+    """True when no filter is set, or when the filter text appears in the name."""
+    if not facility or not str(facility).strip():
+        return True
+    return str(facility).strip().lower() in name.lower()
+
+
+def _filtered_permits(facility=None):
+    return [(pid, p) for pid, p in PERMITS.items() if _matches_facility(p["facility"], facility)]
+
+
+def _filtered_applications(facility=None):
+    return [(aid, a) for aid, a in APPLICATIONS.items() if _matches_facility(a["facility"], facility)]
+
+
+def _renewal_start(expiration_date, lead_days):
+    """renewal start = expiration_date - renewal_lead_days (ISO in, ISO out)."""
+    expires = datetime.date.fromisoformat(expiration_date)
+    return (expires - datetime.timedelta(days=int(lead_days))).isoformat()
+
+
+def _filter_lines(facility):
+    """Filter banner lines, or an empty list when no filter is applied."""
+    if not facility or not str(facility).strip():
+        return []
+    return [
+        f"**Filter:** facility = {str(facility).strip()} - this view is filtered; "
+        "counts cover the filtered rows only.",
+        "",
+    ]
+
+
+def _empty_filter_block(heading, facility, kind):
+    return "\n".join([
+        heading,
+        "",
+        f"No {kind} match facility filter \"{str(facility).strip()}\". "
+        "Nothing else was withheld - the filter produced an empty view.",
+    ])
+
+
+def _permit_inventory(facility=None):
     inventory = []
-    for pid, p in PERMITS.items():
+    rows = _filtered_permits(facility)
+    for pid, p in rows:
         inventory.append({
             "id": pid, "name": p["name"], "facility": p["facility"],
             "authority": p["issuing_authority"], "permit_number": p["permit_number"],
             "status": p["status"], "type": p["type"],
             "expiration": p["expiration_date"], "conditions": p["conditions"],
         })
-    active = sum(1 for p in PERMITS.values() if p["status"] == "active")
-    expired = sum(1 for p in PERMITS.values() if p["status"] == "expired")
+    active = sum(1 for _, p in rows if p["status"] == "active")
+    expired = sum(1 for _, p in rows if p["status"] == "expired")
     return {"permits": inventory, "total": len(inventory), "active": active, "expired": expired}
 
 
-def _renewal_calendar():
+def _renewal_calendar(facility=None):
     calendar = []
-    for pid, p in PERMITS.items():
+    for pid, p in _filtered_permits(facility):
         calendar.append({
             "id": pid, "name": p["name"], "facility": p["facility"],
             "expiration": p["expiration_date"], "status": p["status"],
@@ -181,9 +243,9 @@ def _renewal_calendar():
     return {"calendar": calendar}
 
 
-def _compliance_gaps():
+def _compliance_gaps(facility=None):
     gaps = []
-    for pid, p in PERMITS.items():
+    for pid, p in _filtered_permits(facility):
         if p["status"] == "expired":
             gaps.append({
                 "id": pid, "name": p["name"], "facility": p["facility"],
@@ -201,9 +263,9 @@ def _compliance_gaps():
     return {"gaps": gaps, "total": len(gaps), "critical": sum(1 for g in gaps if g["severity"] == "critical")}
 
 
-def _application_status():
+def _application_status(facility=None):
     statuses = []
-    for aid, a in APPLICATIONS.items():
+    for aid, a in _filtered_applications(facility):
         statuses.append({
             "id": aid, "name": a["permit_name"], "facility": a["facility"],
             "authority": a["authority"], "submitted": a["submitted_date"],
@@ -211,6 +273,29 @@ def _application_status():
             "comments": a["comments_received"],
         })
     return {"applications": statuses, "total": len(statuses)}
+
+
+def _renewal_work_packet(facility=None):
+    """Assemble the renewal packet for each permit. Preparation only - no filing."""
+    packets = []
+    for pid, p in _filtered_permits(facility):
+        packets.append({
+            "id": pid, "name": p["name"], "facility": p["facility"],
+            "authority": p["issuing_authority"], "permit_number": p["permit_number"],
+            "type": p["type"], "status": p["status"],
+            "expiration": p["expiration_date"],
+            "renewal_lead_days": p["renewal_lead_days"],
+            "renewal_start": _renewal_start(p["expiration_date"], p["renewal_lead_days"]),
+            "owner": f"{OWNER_ROLES.get(p['type'], 'Compliance Manager')}, {p['facility']}",
+            "evidence": REGULATORY_REQUIREMENTS.get(p["type"], []),
+        })
+    packets.sort(key=lambda x: x["renewal_start"])
+    return {
+        "packets": packets,
+        "total": len(packets),
+        "expired": sum(1 for k in packets if k["status"] == "expired"),
+        "checklist": RENEWAL_CHECKLIST,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -235,12 +320,13 @@ class PermitLicenseManagementAgent(BasicAgent):
                             "renewal_calendar",
                             "compliance_gaps",
                             "application_status",
+                            "renewal_work_packet",
                         ],
                         "description": "The permit management operation to perform.",
                     },
                     "facility": {
                         "type": "string",
-                        "description": "Optional facility name to filter results.",
+                        "description": "Optional facility name to filter results (Riverside Generating Station, Bayshore Refinery, Northeast Corridor Pipeline, Ridgeline Coal Station). Applied to every row and every count.",
                     },
                 },
                 "required": ["operation"],
@@ -250,26 +336,34 @@ class PermitLicenseManagementAgent(BasicAgent):
 
     def perform(self, **kwargs) -> str:
         op = kwargs.get("operation", "permit_inventory")
+        facility = kwargs.get("facility")
         if op == "permit_inventory":
-            return self._permit_inventory()
+            return self._permit_inventory(facility)
         elif op == "renewal_calendar":
-            return self._renewal_calendar()
+            return self._renewal_calendar(facility)
         elif op == "compliance_gaps":
-            return self._compliance_gaps()
+            return self._compliance_gaps(facility)
         elif op == "application_status":
-            return self._application_status()
+            return self._application_status(facility)
+        elif op == "renewal_work_packet":
+            return self._renewal_work_packet(facility)
         return f"**Error:** Unknown operation `{op}`."
 
-    def _permit_inventory(self) -> str:
-        data = _permit_inventory()
+    def _permit_inventory(self, facility=None) -> str:
+        data = _permit_inventory(facility)
+        if data["total"] == 0:
+            return _empty_filter_block("# Permit & License Inventory", facility, "permits")
         lines = [
             "# Permit & License Inventory",
             "",
+        ]
+        lines.extend(_filter_lines(facility))
+        lines.extend([
             f"**Total Permits:** {data['total']} | **Active:** {data['active']} | **Expired:** {data['expired']}",
             "",
             "| ID | Permit | Facility | Authority | Status | Expiration | Conditions |",
             "|----|--------|----------|-----------|--------|-----------|-----------|",
-        ]
+        ])
         for p in data["permits"]:
             lines.append(
                 f"| {p['id']} | {p['name']} | {p['facility']} "
@@ -277,14 +371,19 @@ class PermitLicenseManagementAgent(BasicAgent):
             )
         return "\n".join(lines)
 
-    def _renewal_calendar(self) -> str:
-        data = _renewal_calendar()
+    def _renewal_calendar(self, facility=None) -> str:
+        data = _renewal_calendar(facility)
+        if not data["calendar"]:
+            return _empty_filter_block("# Permit Renewal Calendar", facility, "permits")
         lines = [
             "# Permit Renewal Calendar",
             "",
+        ]
+        lines.extend(_filter_lines(facility))
+        lines.extend([
             "| Permit | Facility | Expiration | Status | Lead Time |",
             "|--------|----------|-----------|--------|-----------|",
-        ]
+        ])
         for c in data["calendar"]:
             lines.append(
                 f"| {c['name']} | {c['facility']} | {c['expiration']} "
@@ -292,18 +391,26 @@ class PermitLicenseManagementAgent(BasicAgent):
             )
         return "\n".join(lines)
 
-    def _compliance_gaps(self) -> str:
-        data = _compliance_gaps()
+    def _compliance_gaps(self, facility=None) -> str:
+        if not _filtered_permits(facility):
+            return _empty_filter_block("# Compliance Gaps", facility, "permits")
+        data = _compliance_gaps(facility)
         if data["total"] == 0:
-            return "# Compliance Gaps\n\nNo compliance gaps identified."
+            head = ["# Compliance Gaps", ""]
+            head.extend(_filter_lines(facility))
+            head.append("No compliance gaps identified.")
+            return "\n".join(head)
         lines = [
             "# Compliance Gap Analysis",
             "",
+        ]
+        lines.extend(_filter_lines(facility))
+        lines.extend([
             f"**Total Gaps:** {data['total']} | **Critical:** {data['critical']}",
             "",
             "| Permit | Facility | Gap Type | Severity | Detail |",
             "|--------|----------|----------|----------|--------|",
-        ]
+        ])
         for g in data["gaps"]:
             lines.append(
                 f"| {g['name']} | {g['facility']} | {g['gap_type']} "
@@ -311,16 +418,21 @@ class PermitLicenseManagementAgent(BasicAgent):
             )
         return "\n".join(lines)
 
-    def _application_status(self) -> str:
-        data = _application_status()
+    def _application_status(self, facility=None) -> str:
+        data = _application_status(facility)
+        if data["total"] == 0:
+            return _empty_filter_block("# Permit Application Status", facility, "applications")
         lines = [
             "# Permit Application Status",
             "",
+        ]
+        lines.extend(_filter_lines(facility))
+        lines.extend([
             f"**Active Applications:** {data['total']}",
             "",
             "| ID | Application | Facility | Authority | Submitted | Status | Decision Date | Comments |",
             "|----|-------------|----------|-----------|-----------|--------|--------------|----------|",
-        ]
+        ])
         for a in data["applications"]:
             lines.append(
                 f"| {a['id']} | {a['name']} | {a['facility']} "
@@ -329,11 +441,53 @@ class PermitLicenseManagementAgent(BasicAgent):
             )
         return "\n".join(lines)
 
+    def _renewal_work_packet(self, facility=None) -> str:
+        data = _renewal_work_packet(facility)
+        if data["total"] == 0:
+            return _empty_filter_block("# Renewal Work Packet", facility, "permits")
+        lines = [
+            "# Renewal Work Packet",
+            "",
+        ]
+        lines.extend(_filter_lines(facility))
+        lines.extend([
+            f"**Packets:** {data['total']} | **Expired (act now):** {data['expired']}",
+            "",
+            "| Permit | ID | Facility | Authority | Permit Number | Expiration | Lead Time | Renewal Start | Owner | Status |",
+            "|--------|----|----------|-----------|---------------|-----------|-----------|--------------|-------|--------|",
+        ])
+        for k in data["packets"]:
+            lines.append(
+                f"| {k['name']} | {k['id']} | {k['facility']} | {k['authority']} "
+                f"| {k['permit_number']} | {k['expiration']} | {k['renewal_lead_days']} days "
+                f"| {k['renewal_start']} | {k['owner']} | {k['status'].upper()} |"
+            )
+        lines.extend(["", "## Draft submission checklist (same for every packet)", ""])
+        for i, step in enumerate(data["checklist"], start=1):
+            lines.append(f"{i}. {step}")
+        lines.extend([
+            "",
+            "## Evidence to attach, by permit",
+            "",
+            "| Permit | Type | Evidence required |",
+            "|--------|------|-------------------|",
+        ])
+        for k in data["packets"]:
+            evidence = "; ".join(k["evidence"]) if k["evidence"] else "None listed for this type"
+            lines.append(f"| {k['id']} | {k['type']} | {evidence} |")
+        lines.extend([
+            "",
+            "Nothing in this packet has been filed, submitted, or scheduled. Each packet is "
+            "prepared for the named owner to execute.",
+        ])
+        return "\n".join(lines)
+
 
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     agent = PermitLicenseManagementAgent()
-    for op in ["permit_inventory", "renewal_calendar", "compliance_gaps", "application_status"]:
+    for op in ["permit_inventory", "renewal_calendar", "compliance_gaps",
+               "application_status", "renewal_work_packet"]:
         print(f"\n{'='*60}")
         print(f"Operation: {op}")
         print("=" * 60)

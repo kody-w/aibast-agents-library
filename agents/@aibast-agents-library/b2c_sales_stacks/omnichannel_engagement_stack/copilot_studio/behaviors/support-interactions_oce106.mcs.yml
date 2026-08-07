@@ -1,0 +1,76 @@
+mcs.metadata:
+  componentName: support-interactions
+  description: Reports the support contact set - channel, intent, handle time, resolution status, and CSAT - with contact totals and the contacts still needing an owner.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: support-interactions
+  description: Reports the support contact set - channel, intent, handle time, resolution status, and CSAT - with contact totals and the contacts still needing an owner.
+  ---
+  <!-- bic:source=blank -->
+  # Support interactions
+
+  Use this skill when the user asks about support or service contacts, cases,
+  handle time, resolution, escalations, CSAT, what customers are contacting
+  support about, or which contacts still need attention.
+
+  ## Inputs
+
+  - The support contact set (knowledge/tools): CASE-501 through CASE-506, each
+    with a customer id, date, channel, intent, handle time in minutes,
+    resolution status, and CSAT.
+  - Optional: a customer id. Show that customer's rows and say the rows are
+    drawn from the all-contact set. Totals stay all-contact.
+
+  ## Procedure
+
+  1. Walk the contacts in recorded case-id order, CASE-501 to CASE-506. Do not
+     re-sort by handle time or CSAT unless the user asks for a ranking, and
+     say so when you do.
+  2. Compute `avg_handle_time = round(sum(handle_time_min) / total_contacts,
+     1)` = 23.0 min for the current set.
+  3. Compute `resolution_rate = round(resolved / total_contacts * 100, 1)` =
+     66.7% (4 of 6). Only "Resolved" counts; "Escalated" and "Open" do not.
+  4. Compute `avg_csat = round(sum(recorded csat) / count of recorded csat,
+     1)` = 3.8 across 5 scored contacts. A contact with no recorded CSAT is
+     excluded from both the numerator and the denominator.
+  5. Name every contact whose resolution status is not "Resolved" as still
+     needing an owner, with its customer, channel, intent, status, and handle
+     time.
+
+  ## Output format
+
+  One table, exactly these columns:
+
+  | Case | Customer | Date | Channel | Intent | Handle Time | Resolution | CSAT |
+
+  Then the totals, one per line:
+
+  - `**Total Contacts:** 6`
+  - `**Avg Handle Time:** 23.0 min`
+  - `**Resolution Rate:** 66.7% (4 of 6)`
+  - `**Avg CSAT:** 3.8 across 5 scored contacts`
+
+  Then `## Contacts Needing an Owner`, one bullet per unresolved contact.
+
+  Channel names in title case with underscores as spaces. Handle time with a
+  `min` suffix. CSAT as the recorded integer, or `no CSAT recorded`.
+
+  ## Edge cases
+
+  - CASE-506 has no recorded CSAT because the case is Open. Report it as "no
+    CSAT recorded", never as 0 and never as dissatisfaction, and keep it out
+    of the CSAT average.
+  - CASE-505 is Escalated and CASE-506 is Open. Both are honest findings the
+    data supports - surface them rather than reporting only the resolved
+    contacts. CASE-506 is also the longest handled contact at 47 minutes,
+    against a 23.0 min average; say so when the user asks what stands out.
+  - A support contact is not a session and not a conversion. Never add contact
+    counts to channel sessions, conversions, or revenue, and never compute a
+    contact rate against channel volume.
+  - Web Paid records no support contacts. Say so rather than reporting zero
+    as a service outcome.
+  - A customer id that is not CUST-401, CUST-402, or CUST-403 has no data. Say
+    so and list the three recorded customers.
+  - You flag contacts; a supervisor owns them. Never state or imply that you
+    have routed, assigned, replied to, escalated, or closed a case.

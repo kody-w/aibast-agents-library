@@ -1,0 +1,102 @@
+mcs.metadata:
+  componentName: activation-handoff
+  description: Assembles a launch-ready activation package - campaign, resolved audience, offer, sequence, channels, cost, projected revenue - for a named person to execute in the campaign platform.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: activation-handoff
+  description: Assembles a launch-ready activation package - campaign, resolved audience, offer, sequence, channels, cost, projected revenue - for a named person to execute in the campaign platform.
+  ---
+  <!-- bic:source=blank -->
+  # Activation handoff
+
+  Use this skill when the user asks to launch, send, schedule, activate, push
+  live, or hand off a campaign, asks what is needed to get a campaign out the
+  door, or asks for a brief, spec, or package the campaign team can execute.
+
+  You do not execute. This skill converts a designed campaign into a complete
+  package a person executes in the campaign platform of record, so the request
+  is answered rather than refused flat.
+
+  ## Inputs
+
+  - The campaign template library (four templates, CAMP- ids) and the customer
+    segment model, which supplies the audience size, avg_basket_size, and
+    preferred_channels.
+  - Optional: one `campaign_id`.
+
+  ## Procedure - exact rules
+
+  1. Scope selection, applied literally:
+     - If a `campaign_id` is given AND it exists in the template library,
+       package that one campaign only.
+     - Otherwise package all four in library order: CAMP-WINBACK, CAMP-LOYALTY,
+       CAMP-NEWWELCOME, CAMP-VIP. An unrecognized id falls back to the full
+       portfolio - say the id was not found before showing it.
+  2. Resolve the audience from the campaign's `target_segment`: emit the
+     segment display name, its SEG- id, and its `size` as the contact count.
+     Never resolve an audience the segment model does not hold.
+  3. Channels are reported, not chosen:
+     - Sequence channel is always `email` - the stored sequence is subject
+       lines.
+     - Also emit the target segment's `preferred_channels` in stored order.
+     - For a `multi_channel` campaign the non-email channels are NOT specified
+       in the data. Say so; never name a channel the segment does not list.
+  4. Money fields, all computed:
+     - `Contact Cost = audience size x $0.35`: CAMP-WINBACK **$11,970.00**,
+       CAMP-LOYALTY **$14,997.50**, CAMP-NEWWELCOME **$9,660.00**, CAMP-VIP
+       **$3,062.50**.
+     - `Projected Revenue = audience size x historical_conversion_rate x
+       segment avg_basket_size`: **$43,605.00**, **$351,232.88**,
+       **$135,815.46**, **$209,144.25** in library order.
+     - `Est. ROAS = Projected Revenue / Contact Cost`, 2 decimals, trailing
+       `x`: **3.64x**, **23.42x**, **14.06x**, **68.29x**.
+  5. Print the sequence in full, numbered 1..n in stored order, labelled as the
+     send order. The count equals the stage count: WINBACK 4, LOYALTY 3,
+     NEWWELCOME 5, VIP 2. Never add, reorder, reword, or trim a subject line.
+  6. Run shape is `N days, N stages` from the template. Never assign calendar
+     dates, send times, or a start date - none are in the data, and setting one
+     would be scheduling.
+  7. Every package carries `Destination System: not in this data - name the
+     campaign platform of record before execution` and
+     `Status: PREPARED - not sent. Requires a named human owner to execute.`
+
+  ## Output format
+
+  - `# Campaign Activation Handoff`
+  - One line: `Prepared for human execution. Nothing here has been sent,
+    scheduled, or enrolled.`
+  - Per campaign, `## <name> (`CAMP-ID`)` then bullets in this order:
+    `**Campaign Type:**`, `**Resolved Audience:**` (segment name, SEG- id,
+    contact count), `**Offer:**`, `**Run Shape:**`, `**Sequence Channel:**`,
+    `**Segment Preferred Channels:**`, `**Contact Cost @ $0.35:**`,
+    `**Projected Revenue:**`, `**Est. ROAS:**`, `**Destination System:**`,
+    `**Status:**`.
+  - `**Sequence (execute in this order):**` followed by the numbered subject
+    lines.
+
+  ## Edge cases
+
+  - If the user asks to launch with an offer, discount level, audience, channel,
+    or send date that is not in the data, do not build a package around it. Say
+    the variant is not in the data, then emit the package for the campaign as it
+    actually exists.
+  - CAMP-NEWWELCOME is automated_email into SEG-NEW, whose stored preferred
+    channels are social_media and mobile_app - flag that mismatch in the
+    package rather than silently packaging email as the segment's preference.
+  - CAMP-LOYALTY is multi_channel into SEG-LOYAL, whose stored preferred
+    channels are in_store and mobile_app; email is not among them. Report both
+    facts and let the marketer resolve it.
+  - SEG-ATRISK (18,420) has no campaign template. There is nothing to package
+    for it - say so; never assemble a package from a segment plus a campaign
+    designed for a different segment.
+
+  ## Boundaries
+
+  - Preparation only. Never say a campaign was launched, sent, scheduled,
+    queued, approved, paused, or enrolled, and never claim the package was
+    delivered into a platform. You produce the package; a person executes it.
+  - No individual targeting. The audience is a segment and a count, never a
+    list of people, addresses, or identifiers.
+  - Projected revenue is a model from historical rates, not booked revenue.
+    Label it as projected inside the package.

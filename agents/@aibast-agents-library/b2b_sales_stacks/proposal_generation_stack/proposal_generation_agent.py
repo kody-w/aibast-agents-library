@@ -289,6 +289,7 @@ def _compute_pricing(rfp):
     return {
         "line_items": line_items,
         "total_list": total_list, "total_proposed": total_proposed,
+        "total_cost": total_cost,
         "total_savings": total_list - total_proposed,
         "overall_discount_pct": overall_discount,
         "overall_margin_pct": overall_margin,
@@ -361,6 +362,61 @@ def _compute_win_probability(rfp, capability_score, pricing):
     }
 
 
+def _pipeline_rollup():
+    """Roll every RFP in the pipeline into one portfolio view.
+
+    No single deal is resolved -- this is the Sales Leader view. Every figure is
+    the same computation the single-deal operations run, aggregated.
+    """
+    rows = []
+    for key in _RFPS:
+        rfp = _RFPS[key]
+        _, overall = _match_capabilities(rfp)
+        pricing = _compute_pricing(rfp)
+        win_pct, factors = _compute_win_probability(rfp, overall, pricing)
+        rows.append({
+            "key": key,
+            "id": rfp["id"],
+            "account": rfp["account"],
+            "industry": rfp["industry"],
+            "deal_value": rfp["deal_value"],
+            "decision_timeline_days": rfp["decision_timeline_days"],
+            "competitors": len(rfp["competitors_shortlisted"]),
+            "fit_pct": overall,
+            "total_list": pricing["total_list"],
+            "total_proposed": pricing["total_proposed"],
+            "total_cost": pricing["total_cost"],
+            "budget_ceiling": pricing["budget_ceiling"],
+            "budget_headroom": pricing["budget_headroom"],
+            "within_budget": pricing["within_budget"],
+            "discount_pct": pricing["overall_discount_pct"],
+            "margin_pct": pricing["overall_margin_pct"],
+            "win_pct": win_pct,
+            "factors": factors,
+            "weighted_value": int(pricing["total_proposed"] * win_pct / 100),
+        })
+
+    rows.sort(key=lambda r: r["win_pct"], reverse=True)
+
+    total_list = sum(r["total_list"] for r in rows)
+    total_proposed = sum(r["total_proposed"] for r in rows)
+    total_cost = sum(r["total_cost"] for r in rows)
+    totals = {
+        "count": len(rows),
+        "deal_value": sum(r["deal_value"] for r in rows),
+        "total_list": total_list,
+        "total_proposed": total_proposed,
+        "total_cost": total_cost,
+        "total_savings": total_list - total_proposed,
+        "weighted_value": sum(r["weighted_value"] for r in rows),
+        "discount_pct": round((1 - total_proposed / total_list) * 100, 1) if total_list else 0,
+        "margin_pct": round((total_proposed - total_cost) / max(total_proposed, 1) * 100, 1),
+        "below_floor": [r["account"] for r in rows if r["margin_pct"] < 35],
+        "over_ceiling": [r["account"] for r in rows if not r["within_budget"]],
+    }
+    return rows, totals
+
+
 # ═══════════════════════════════════════════════════════════════
 # AGENT CLASS
 # ═══════════════════════════════════════════════════════════════
@@ -376,6 +432,8 @@ class ProposalGenerationAgent(BasicAgent):
         references_positioning - Best references + competitive differentiator matrix
         compile_proposal     - Assemble full proposal package with page counts
         delivery_summary     - Final summary with computed win probability
+        pipeline_review      - Portfolio roll-up across every pipeline RFP
+                               (Sales Leader view; ignores rfp_name)
     """
 
     def __init__(self):
@@ -392,12 +450,16 @@ class ProposalGenerationAgent(BasicAgent):
                             "analyze_rfp", "executive_summary",
                             "solution_pricing", "references_positioning",
                             "compile_proposal", "delivery_summary",
+                            "pipeline_review",
                         ],
                         "description": "The proposal operation to perform",
                     },
                     "rfp_name": {
                         "type": "string",
-                        "description": "RFP or account name (e.g. 'Meridian Healthcare')",
+                        "description": (
+                            "RFP or account name (e.g. 'Meridian Healthcare'). "
+                            "Ignored by pipeline_review, which always covers the whole pipeline."
+                        ),
                     },
                 },
                 "required": ["operation"],
@@ -415,6 +477,7 @@ class ProposalGenerationAgent(BasicAgent):
             "references_positioning": self._references_positioning,
             "compile_proposal": self._compile_proposal,
             "delivery_summary": self._delivery_summary,
+            "pipeline_review": self._pipeline_review,
         }
         handler = dispatch.get(op)
         if not handler:
@@ -662,6 +725,76 @@ class ProposalGenerationAgent(BasicAgent):
             f"Agents: ProposalAssemblyAgent (orchestrating all agents)"
         )
 
+    # ── pipeline_review ────────────────────────────────────────
+    def _pipeline_review(self, key=None):
+        """Portfolio roll-up across every pipeline RFP. rfp_name is ignored."""
+        rows, totals = _pipeline_rollup()
+
+        deal_table = (
+            "| RFP ID | Account | Industry | Fit | Proposed | Headroom | Margin | Win | Weighted | Decision |\n"
+            "|---|---|---|---|---|---|---|---|---|---|\n"
+        )
+        for r in rows:
+            deal_table += (
+                f"| {r['id']} | {r['account']} | {r['industry']} | {r['fit_pct']}% "
+                f"| ${r['total_proposed']:,} | ${r['budget_headroom']:,} | {r['margin_pct']}% "
+                f"| {r['win_pct']}% | ${r['weighted_value']:,} | {r['decision_timeline_days']} days |\n"
+            )
+        deal_table += (
+            f"| **Total** | **{totals['count']} RFPs** | -- | -- "
+            f"| **${totals['total_proposed']:,}** | -- | **{totals['margin_pct']}%** "
+            f"| -- | **${totals['weighted_value']:,}** | -- |\n"
+        )
+
+        factor_table = "| Account | Capability fit /30 | Pricing /25 | References /20 | Competitive /25 | Win |\n|---|---|---|---|---|---|\n"
+        for r in rows:
+            f = r["factors"]
+            factor_table += (
+                f"| {r['account']} | {f['capability_fit']} | {f['pricing_strength']} "
+                f"| {f['reference_strength']} | {f['competitive_position']} | {r['win_pct']}% |\n"
+            )
+
+        if totals["below_floor"]:
+            margin_flag = (
+                f"- **Margin floor (35%) breached on {len(totals['below_floor'])} of "
+                f"{totals['count']} deals:** {', '.join(totals['below_floor'])}. "
+                f"Blended pipeline margin is {totals['margin_pct']}%. Each one needs pricing approval.\n"
+            )
+        else:
+            margin_flag = "- Every deal clears the 35% margin floor.\n"
+
+        ceiling_flag = (
+            f"- Budget ceiling exceeded on: {', '.join(totals['over_ceiling'])}.\n"
+            if totals["over_ceiling"]
+            else "- Every deal prices within its RFP budget ceiling.\n"
+        )
+
+        soonest = min(rows, key=lambda r: r["decision_timeline_days"])
+        weakest = min(rows, key=lambda r: r["win_pct"])
+
+        return (
+            f"**Pipeline Review: {totals['count']} open RFPs**\n\n"
+            f"**Portfolio Position:**\n\n{deal_table}\n"
+            f"| Roll-up | Value |\n|---|---|\n"
+            f"| Stated deal value | ${totals['deal_value']:,} |\n"
+            f"| List price | ${totals['total_list']:,} |\n"
+            f"| Proposed total | ${totals['total_proposed']:,} |\n"
+            f"| Discount given | ${totals['total_savings']:,} ({totals['discount_pct']}%) |\n"
+            f"| Blended margin | {totals['margin_pct']}% (floor: 35%) |\n"
+            f"| Win-weighted value | ${totals['weighted_value']:,} |\n\n"
+            f"**Win Probability by Factor:**\n\n{factor_table}\n"
+            f"**Flags for the Sales Leader:**\n"
+            f"{margin_flag}"
+            f"{ceiling_flag}"
+            f"- Nearest decision: {soonest['account']} in {soonest['decision_timeline_days']} days.\n"
+            f"- Weakest position: {weakest['account']} at {weakest['win_pct']}% "
+            f"(competitive position {weakest['factors']['competitive_position']}/25 "
+            f"against {weakest['competitors']} shortlisted vendors).\n\n"
+            f"Ask for any single account by name for the full deal view.\n\n"
+            f"Source: [CRM Pipeline + Pricing Engine + Win Model]\n"
+            f"Agents: ProposalAssemblyAgent (rolling up all pipeline RFPs)"
+        )
+
 
 if __name__ == "__main__":
     agent = ProposalGenerationAgent()
@@ -670,3 +803,6 @@ if __name__ == "__main__":
         print("=" * 70)
         print(agent.perform(operation=op, rfp_name="Meridian Healthcare"))
         print()
+    print("=" * 70)
+    print(agent.perform(operation="pipeline_review"))
+    print()

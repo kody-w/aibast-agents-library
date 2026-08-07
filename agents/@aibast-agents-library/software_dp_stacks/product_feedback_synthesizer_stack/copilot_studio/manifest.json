@@ -8,7 +8,8 @@
   "behaviors/feedback-summary_pfs101.mcs.yml",
   "behaviors/feature-requests_pfs102.mcs.yml",
   "behaviors/sentiment-analysis_pfs103.mcs.yml",
-  "behaviors/roadmap-impact_pfs104.mcs.yml"
+  "behaviors/roadmap-impact_pfs104.mcs.yml",
+  "behaviors/churn-risk_pfs105.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/customer-feedback-and-nps-data.md",
@@ -32,6 +33,10 @@
   {
    "ask": "How is sentiment trending?",
    "expect": "33.3% positive and 33.3% negative; NPS 35 in 2025-Q4 to 36 in 2026-Q1 while detractors rose 45 to 51; Vanguard Logistics lowest at 1 (FB-5004, bug_report), Skyline Hospitality Group highest at 9 (FB-5003)"
+  },
+  {
+   "ask": "Which accounts are at risk and how much ARR is exposed?",
+   "expect": "4 of 6 accounts, $606,000 at risk of $1,278,000 (47.4%); CRITICAL FB-5001 Meridian Healthcare Systems $186,000 (FR-001) and FB-5004 Vanguard Logistics $84,000 (FR-004) = $270,000; WATCH FB-5002 Apex Financial Group $240,000 (FR-002) and FB-5005 BrightPath Education $96,000 (FR-005) = $336,000; detractors 45 to 51 while NPS moved 35 to 36; stated as a recorded-signal watchlist, not a churn prediction"
   },
   {
    "ask": "Move FR-002 Real-Time Alerting to Q2 and let engineering know.",

@@ -135,6 +135,65 @@ RETURN_REQUESTS = {
     },
 }
 
+# ---------------------------------------------------------------------------
+# Synthetic Data — Customer Return History (return-abuse / loss-prevention)
+# ---------------------------------------------------------------------------
+
+CUSTOMER_RETURN_HISTORY = {
+    "CUST-2041": {
+        "customer_name": "Sarah Mitchell",
+        "returns_12mo": 2,
+        "orders_12mo": 12,
+        "refunded_usd_12mo": 164.98,
+        "prior_denied_claims": 0,
+    },
+    "CUST-3178": {
+        "customer_name": "James Kowalski",
+        "returns_12mo": 1,
+        "orders_12mo": 9,
+        "refunded_usd_12mo": 74.50,
+        "prior_denied_claims": 0,
+    },
+    "CUST-1590": {
+        "customer_name": "Maria Chen",
+        "returns_12mo": 5,
+        "orders_12mo": 12,
+        "refunded_usd_12mo": 612.45,
+        "prior_denied_claims": 1,
+    },
+    "CUST-4422": {
+        "customer_name": "David Okafor",
+        "returns_12mo": 4,
+        "orders_12mo": 11,
+        "refunded_usd_12mo": 301.96,
+        "prior_denied_claims": 0,
+    },
+    "CUST-0887": {
+        "customer_name": "Linda Park",
+        "returns_12mo": 2,
+        "orders_12mo": 8,
+        "refunded_usd_12mo": 158.00,
+        "prior_denied_claims": 0,
+    },
+    "CUST-5610": {
+        "customer_name": "Robert Fernandez",
+        "returns_12mo": 1,
+        "orders_12mo": 6,
+        "refunded_usd_12mo": 61.25,
+        "prior_denied_claims": 0,
+    },
+}
+
+# Additive weights for the return-abuse screen. Signals are evidence for a
+# human reviewer, never a denial decision.
+ABUSE_SIGNAL_WEIGHTS = {
+    "high_return_frequency": 2,
+    "elevated_return_frequency": 1,
+    "prior_denied_claims": 2,
+    "used_item_claim": 1,
+    "out_of_policy_window": 1,
+}
+
 COMPLAINT_CATEGORIES = {
     "product_quality": {
         "label": "Product Quality",
@@ -303,6 +362,43 @@ def _recommend_resolution(ret):
     return best_match or "store_credit"
 
 
+def _customer_return_rate(customer_id):
+    """12-month return rate for a customer: returns divided by orders."""
+    hist = CUSTOMER_RETURN_HISTORY.get(customer_id)
+    if not hist or not hist["orders_12mo"]:
+        return 0.0
+    return hist["returns_12mo"] / hist["orders_12mo"]
+
+
+def _abuse_signals(ret):
+    """Score return-abuse signals for one return request.
+
+    Additive and deterministic. Produces evidence for a loss-prevention
+    reviewer — it never denies a return.
+    """
+    hist = CUSTOMER_RETURN_HISTORY.get(ret["customer_id"], {})
+    rate = _customer_return_rate(ret["customer_id"])
+    signals = []
+    if rate >= 0.40:
+        signals.append("high_return_frequency")
+    elif rate >= 0.25:
+        signals.append("elevated_return_frequency")
+    if hist.get("prior_denied_claims", 0) >= 1:
+        signals.append("prior_denied_claims")
+    if ret["condition"] in ("lightly_used", "damaged"):
+        signals.append("used_item_claim")
+    if _days_since_purchase(ret) > 90:
+        signals.append("out_of_policy_window")
+    score = sum(ABUSE_SIGNAL_WEIGHTS[s] for s in signals)
+    if score >= 4:
+        tier = "high"
+    elif score >= 2:
+        tier = "elevated"
+    else:
+        tier = "low"
+    return {"rate": rate, "signals": signals, "score": score, "tier": tier}
+
+
 def _return_rate_trend():
     """Calculate return-rate trend direction."""
     rates = TREND_DATA["return_rate_pct"]
@@ -337,6 +433,7 @@ class ReturnsComplaintsResolutionAgent(BasicAgent):
                             "complaint_classification",
                             "resolution_recommendation",
                             "trend_analysis",
+                            "fraud_risk",
                         ],
                     },
                     "return_id": {"type": "string"},
@@ -474,6 +571,62 @@ class ReturnsComplaintsResolutionAgent(BasicAgent):
         lines.append("- CSAT recovered to 4.1 after post-holiday dip to 3.6")
         return "\n".join(lines)
 
+    def _fraud_risk(self, **kwargs):
+        return_id = kwargs.get("return_id")
+        if return_id and return_id in RETURN_REQUESTS:
+            returns = {return_id: RETURN_REQUESTS[return_id]}
+        elif return_id:
+            return (
+                f"`{return_id}` is not in the return queue. "
+                f"Screened returns are: {', '.join(sorted(RETURN_REQUESTS))}."
+            )
+        else:
+            returns = RETURN_REQUESTS
+        lines = ["# Return Abuse & Fraud Risk Screening", ""]
+        lines.append("| Return ID | Customer | 12-mo Returns/Orders | Return Rate | Prior Denied | Signals | Score | Risk |")
+        lines.append("|-----------|----------|----------------------|-------------|--------------|---------|-------|------|")
+        flagged = []
+        for rid, ret in returns.items():
+            hist = CUSTOMER_RETURN_HISTORY.get(ret["customer_id"], {})
+            risk = _abuse_signals(ret)
+            if risk["tier"] != "low":
+                flagged.append((rid, ret, hist, risk))
+            signal_text = ", ".join(risk["signals"]) if risk["signals"] else "none"
+            lines.append(
+                f"| {rid} | {ret['customer_name']} (`{ret['customer_id']}`) "
+                f"| {hist.get('returns_12mo', 0)}/{hist.get('orders_12mo', 0)} "
+                f"| {risk['rate']*100:.1f}% "
+                f"| {hist.get('prior_denied_claims', 0)} "
+                f"| {signal_text} | {risk['score']} | {risk['tier']} |"
+            )
+        lines.append("")
+        for rid, ret, hist, risk in flagged:
+            lines.append(f"### {rid} — {ret['customer_name']} ({risk['tier']} risk)")
+            lines.append("")
+            lines.append(f"- **Product:** {ret['product']} (${ret['purchase_price']:.2f})")
+            lines.append(f"- **Reason / Condition:** {ret['reason'].replace('_', ' ')} / {ret['condition'].replace('_', ' ')}")
+            weighted = ", ".join(f"{s} (+{ABUSE_SIGNAL_WEIGHTS[s]})" for s in risk["signals"])
+            lines.append(f"- **Signals:** {weighted}")
+            lines.append(
+                f"- **12-Month History:** {hist.get('returns_12mo', 0)} returns across "
+                f"{hist.get('orders_12mo', 0)} orders ({risk['rate']*100:.1f}%), "
+                f"${hist.get('refunded_usd_12mo', 0):,.2f} refunded, "
+                f"{hist.get('prior_denied_claims', 0)} prior denied claim(s)"
+            )
+            lines.append("- **Next Step:** hold for loss-prevention review before a resolution playbook is applied.")
+            lines.append("")
+        at_risk = sum(ret["purchase_price"] for _, ret, _, _ in flagged)
+        lines.append(
+            f"**Screened:** {len(returns)} | **Elevated or Higher:** {len(flagged)} "
+            f"| **Refund Value Under Review:** ${at_risk:,.2f}"
+        )
+        lines.append("")
+        lines.append(
+            "Signals are evidence for a human reviewer. This agent does not deny "
+            "returns, block customers, or open fraud cases."
+        )
+        return "\n".join(lines)
+
     def perform(self, **kwargs):
         operation = kwargs.get("operation", "return_processing")
         dispatch = {
@@ -481,6 +634,7 @@ class ReturnsComplaintsResolutionAgent(BasicAgent):
             "complaint_classification": self._complaint_classification,
             "resolution_recommendation": self._resolution_recommendation,
             "trend_analysis": self._trend_analysis,
+            "fraud_risk": self._fraud_risk,
         }
         handler = dispatch.get(operation)
         if not handler:
@@ -502,4 +656,6 @@ if __name__ == "__main__":
     print(agent.perform(operation="resolution_recommendation", return_id="RET-4001"))
     print("\n" + "=" * 80)
     print(agent.perform(operation="trend_analysis"))
+    print("\n" + "=" * 80)
+    print(agent.perform(operation="fraud_risk"))
     print("=" * 80)

@@ -1,7 +1,7 @@
 {
  "schema": "aibast-copilot-studio-scaffold/1.0",
  "stack": "cross-selling",
- "display_name": "Cross-Selling Opportunities",
+ "display_name": "Expansion Opportunity Agent",
  "agent_intent": "../cross_selling_agent.py",
  "instructions": "instructions.md",
  "behaviors": [

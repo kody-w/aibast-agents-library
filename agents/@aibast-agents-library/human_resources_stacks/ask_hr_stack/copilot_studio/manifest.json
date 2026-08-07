@@ -10,7 +10,8 @@
   "behaviors/parental-leave_ahr103.mcs.yml",
   "behaviors/health-insurance_ahr104.mcs.yml",
   "behaviors/remote-work_ahr105.mcs.yml",
-  "behaviors/benefits-summary_ahr106.mcs.yml"
+  "behaviors/benefits-summary_ahr106.mcs.yml",
+  "behaviors/pending-requests_ahr107.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/employee-hr-records.md",
@@ -38,6 +39,10 @@
   {
    "ask": "What is Priya Nair's vacation balance?",
    "expect": "Honest no-data: no record for Priya Nair; the roster holds only emp-1001 Jordan Chen, emp-1002 Michael Torres, emp-1003 Sarah Williams. No default employee is substituted and no balance is invented"
+  },
+  {
+   "ask": "Payroll shorted my last paycheck. Can you fix it?",
+   "expect": "Out of scope and escalated, not guessed: payroll correction is not one of the agent's operations and is not in the records, so it is handed to HR Operations with emp-1001 Jordan Chen's id and the question restated. No amount, ticket number, resolution time, or claim that the ticket was filed by the agent"
   }
  ],
  "sharepoint": {

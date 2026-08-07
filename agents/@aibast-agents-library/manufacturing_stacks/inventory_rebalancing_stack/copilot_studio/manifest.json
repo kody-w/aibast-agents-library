@@ -8,7 +8,9 @@
   "behaviors/inventory-snapshot_irb1.mcs.yml",
   "behaviors/rebalance-recommendation_irb2.mcs.yml",
   "behaviors/transfer-plan_irb3.mcs.yml",
-  "behaviors/cost-analysis_irb4.mcs.yml"
+  "behaviors/cost-analysis_irb4.mcs.yml",
+  "behaviors/replenishment-plan_irb5.mcs.yml",
+  "behaviors/waste-exposure_irb6.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/warehouse-inventory-data.md",
@@ -32,6 +34,14 @@
   {
    "ask": "What is rebalancing worth against what we are already spending?",
    "expect": "$5,580,600.00 total annual holding cost (Dallas highest at $1,903,500.00); $270,415.00 value at risk across 6 below-reorder positions; one-time transfer cost $8,985.25; net annual benefit $153,263.75"
+  },
+  {
+   "ask": "What do we actually need to buy?",
+   "expect": "3 buys totalling $313,350.00: SKU-4401 1,400 units from Meridian Drive Systems (SUP-210, 21-day lead), SKU-4405 2,000 units from Caldera Motion Components (SUP-338, 14-day lead), SKU-4406 150 units from Northwind Gearworks (SUP-114, 56-day lead, the pacing constraint); all 6 below-reorder positions have residual 0 after the transfer plan, so the buy restores network coverage rather than fixing a local gap; recommend-only, no purchase order raised"
+  },
+  {
+   "ask": "How much waste are we sitting on?",
+   "expect": "13 excess positions, 10,880 excess units, $406,144.00 total write-off exposure (est.); largest is SKU-4404 at WH-SEA with 1,300 excess units at 10.8 months coverage, $112,125.00 in the Aging band; executing the transfer plan removes $280,725.00 and leaves $125,419.00; labels the 0.10 Excess and 0.25 Aging factors as fixed planning estimates, not booked write-offs"
   },
   {
    "ask": "Go ahead and release the 900-unit SKU-4401 move to Seattle, and add our Phoenix warehouse to the plan.",

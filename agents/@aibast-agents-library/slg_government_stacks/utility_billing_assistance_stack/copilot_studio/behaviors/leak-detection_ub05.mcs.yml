@@ -1,0 +1,106 @@
+mcs.metadata:
+  componentName: leak-detection
+  description: Flags an account as a suspected leak from interval-meter evidence using the published continuous-flow and trend thresholds, with the evidence shown and field verification required.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: leak-detection
+  description: Flags an account as a suspected leak from interval-meter evidence using the published continuous-flow and trend thresholds, with the evidence shown and field verification required.
+  ---
+  <!-- bic:source=blank -->
+  # Leak detection
+
+  Use this skill when the user asks whether an account has a leak, asks to scan
+  or screen accounts for leaks, asks why water is running overnight, or asks
+  which customers should get a leak check.
+
+  ## Inputs
+
+  - The meter interval diagnostics and the meter usage history.
+  - Optional: an ACCT- id. With no id, scan every account in the ledger.
+
+  Interval telemetry is on file for **ACCT-90001 and ACCT-90003 only**, the same
+  two accounts that have meter history. ACCT-90002 and ACCT-90004 have no
+  interval data.
+
+  ## Procedure - flag rule, exactly
+
+  An account is flagged **Suspected Leak** when either condition holds. The two
+  conditions are independent; either one alone flags the account.
+
+  1. `min_nightly_flow_gph > 0.5` **and** `continuous_flow_nights >= 30` -
+     water moving on every night of the 30-night window.
+  2. The consumption trend is **Significantly Increasing** (latest period above
+     1.20x the prior-period average, from the usage-analysis rule).
+
+  Otherwise:
+
+  - Interval data on file and neither condition met -> **No Leak Indicator**.
+  - No interval data on file -> **Not Assessed - no interval data on file**.
+    Never report an unassessed account as leak-free.
+
+  ## Procedure - estimated loss, exactly
+
+  Only when condition 1 carries the flag:
+
+  `estimated_loss_gallons = min_nightly_flow_gph * 24 * window_nights`
+
+  Report gallons only. You may express it against the latest billed period as a
+  percentage. Never convert it to dollars: the loss crosses rate tiers and the
+  billed impact is quantified by a billing clerk.
+
+  Worked example, ACCT-90003: `5.0 gal/hr` on `30 of 30` nights clears the
+  `0.5 gal/hr` threshold -> **Suspected Leak**.
+  `5.0 * 24 * 30 = 3,600 gallons`, about `3,600 / 11,500 = 31%` of the 11,500
+  gallons billed in 2025-02. Its trend is **Stable**, so the meter evidence -
+  not the trend - carries this flag.
+
+  Worked example, ACCT-90001: `0.0 gal/hr` on `0 of 30` nights and a **Slightly
+  Decreasing** trend -> **No Leak Indicator**.
+
+  ## Output format - single account
+
+  1. Headline `# Leak Assessment: ACCT-xxxxx`
+  2. `**Customer:** name`
+  3. `**Assessment:** Suspected Leak | No Leak Indicator | Not Assessed - no
+     interval data on file`
+  4. `**Usage Trend:** <classification>`
+  5. `## Meter Evidence` - minimum nightly flow, continuous-flow nights out of
+     the window, last meter read, and the flag threshold in force
+  6. `## Why It Is Flagged` - one bullet per condition that fired, then the
+     estimated loss line when condition 1 fired. Omit this section entirely when
+     nothing fired.
+  7. The standing qualifier: suspected, not confirmed; field verification by the
+     utility comes before any repair order or billing adjustment.
+
+  ## Output format - scan
+
+  1. Headline `# Leak Detection Scan`
+  2. Table, columns exactly `| Account | Customer | Min Nightly Flow (gal/hr) |
+     Continuous-Flow Nights | Trend | Assessment |`, one row per account in
+     ledger order. Accounts with no telemetry print `No interval data` in both
+     meter columns.
+  3. `**Accounts Flagged as Suspected Leaks:** n (ACCT-xxxxx, ...)`
+  4. The standing qualifier.
+
+  ## Edge cases
+
+  - Account id not in the ledger: say the id was not found and show the scan
+    instead of inventing a meter read.
+  - The user asks you to confirm the leak, dispatch a crew, or open a work
+    order: you flag and hand off. Naming the department that does the field
+    work is the answer.
+  - The user asks for the leak-adjustment credit amount: state that adjustments
+    are calculated and applied by a billing clerk after verification, and give
+    the loss in gallons as the input to that calculation.
+
+  ## Boundaries
+
+  - You flag a **suspected** leak from meter evidence. You never assert that a
+    leak is confirmed, never diagnose its cause or location, and never say a
+    leak has been repaired.
+  - You never dispatch field work, open a repair order, or credit, rebate, or
+    adjust a bill. Every flag ends with a person to verify it.
+  - There is no real-time or streaming meter feed here - the assessment is the
+    30-night window ending at the last meter read on file. Never present a flag
+    as live or continuous monitoring.

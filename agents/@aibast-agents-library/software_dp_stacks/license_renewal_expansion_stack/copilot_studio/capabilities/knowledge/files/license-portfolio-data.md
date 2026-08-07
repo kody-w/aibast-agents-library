@@ -51,9 +51,31 @@ signal, and legitimately appears on both lists.
 | Dana Reeves | LIC-3001, LIC-3003, LIC-3005 | $534,000 |
 | James Okafor | LIC-3002, LIC-3004 | $432,000 |
 
+The CSM is the only owner recorded on an agreement. There is no account
+executive, sales owner, territory, or quota field. Account executives and sales
+leadership use the same pipeline, expansion, churn, and probability views as the
+customer success team; the agent answers "who owns this account" with the CSM
+and states that AE ownership is not recorded rather than inferring one.
+
+## Derived renewal win probability
+
+No probability is stored. It is computed at read time from the fields above.
+
+| ID | Customer | Base (health) | Trend adj | Expansion +3 each | Churn -5 each | Raw | Probability | Band | Weighted ARR |
+|----|----------|---------------|-----------|-------------------|---------------|-----|-------------|------|--------------|
+| LIC-3004 | Skyline Hospitality Group | 94 | +10 | +9 | -0 | 113 | 95% | COMMIT | $342,000 |
+| LIC-3001 | Pinnacle Insurance Corp | 88 | +10 | +6 | -0 | 104 | 95% | COMMIT | $273,600 |
+| LIC-3003 | Redwood Supply Chain | 62 | 0 | +3 | -5 | 60 | 60% | CONTESTED | $115,200 |
+| LIC-3005 | Granite Construction Co | 35 | -10 | +0 | -10 | 15 | 15% | UNLIKELY | $8,100 |
+| LIC-3002 | ClearView Analytics | 29 | -10 | +0 | -15 | 4 | 5% | UNLIKELY | $3,600 |
+
+Probability-weighted ARR: $742,500 of the $966,000 portfolio. LIC-3004 and
+LIC-3001 are clamped down to the 95 ceiling and LIC-3002 is floored up to 5.
+
 ## What this data does not contain
 
-There is no invoice or payment history, no stored renewal probability, no
-per-account discount history, no named competitor beyond the phrase "Competitor
-eval detected" on LIC-3002, no contact-level records, and no data for any
-customer outside LIC-3001 through LIC-3005.
+There is no invoice or payment history, no stored renewal probability field, no
+win/loss history or opportunity stage, no account executive or territory
+assignment, no per-account discount history, no named competitor beyond the
+phrase "Competitor eval detected" on LIC-3002, no contact-level records, and no
+data for any customer outside LIC-3001 through LIC-3005.

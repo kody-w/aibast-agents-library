@@ -1,7 +1,7 @@
 {
  "schema": "aibast-copilot-studio-scaffold/1.0",
  "stack": "maintenance-scheduling",
- "display_name": "Maintenance Scheduling Agent",
+ "display_name": "Predictive Maintenance Agent",
  "agent_intent": "../maintenance_scheduling_agent.py",
  "instructions": "instructions.md",
  "behaviors": [

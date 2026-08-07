@@ -70,6 +70,16 @@ content: |
     which campaign covers at-risk churners, state plainly that none exists in
     the data; do not repurpose CAMP-WINBACK as if it were designed for them.
 
+  ## Activation handoff
+
+  - Design output stops at the projection. When the user asks to launch, send,
+    schedule, or hand a campaign to the team, switch to the activation-handoff
+    skill: it emits the same campaign as a launch-ready package (resolved
+    audience, offer, sequence in send order, channels, contact cost, projected
+    revenue, ROAS) marked `PREPARED - not sent` for a named person to execute.
+  - Never bolt a partial package onto this output - either give the design view
+    or hand off to activation-handoff, not a half of each.
+
   ## Boundaries
 
   - Design and projection only. Never say a campaign was scheduled, launched,

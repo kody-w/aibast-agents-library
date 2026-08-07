@@ -10,7 +10,8 @@
   "behaviors/solution-pricing_pg03.mcs.yml",
   "behaviors/references-positioning_pg04.mcs.yml",
   "behaviors/compile-proposal_pg05.mcs.yml",
-  "behaviors/delivery-summary_pg06.mcs.yml"
+  "behaviors/delivery-summary_pg06.mcs.yml",
+  "behaviors/pipeline-review_pg07.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/proposal-pipeline-data.md",
@@ -34,6 +35,10 @@
   {
    "ask": "What is our win probability on Meridian and how is it built?",
    "expect": "89% total: capability fit 28.3/30, pricing strength 25/25, reference strength 20/20, competitive position 16/25"
+  },
+  {
+   "ask": "How does the whole pipeline look?",
+   "expect": "Portfolio roll-up across all 3 RFPs ranked by win probability: Meridian 89%/$1,201,599, Contoso 84%/$849,998, Pinnacle 76%/$1,201,599; $3,253,196 proposed against $4,000,000 list (18.7% discount given), 27.5% blended margin, $2,696,636 win-weighted; flags that all three deals sit below the 35% margin floor, Meridian decides first at 14 days, Pinnacle is weakest at 10/25 competitive position"
   },
   {
    "ask": "Send the finished proposal to Amanda Foster and add a Retail customer reference.",

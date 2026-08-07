@@ -8,7 +8,8 @@
   "behaviors/return-processing_rcr1.mcs.yml",
   "behaviors/complaint-classification_rcr2.mcs.yml",
   "behaviors/resolution-recommendation_rcr3.mcs.yml",
-  "behaviors/trend-analysis_rcr4.mcs.yml"
+  "behaviors/trend-analysis_rcr4.mcs.yml",
+  "behaviors/fraud-risk-screening_rcr5.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/returns-and-complaints-data.md",
@@ -32,6 +33,10 @@
   {
    "ask": "How are returns trending?",
    "expect": "Overall trend STABLE; Dec 2025 peak of 498 returns at 6.2% with CSAT 3.6 and $34,200.00 refunded; wrong size highest at 715 total (119.2/month); total refunded over 6 months $140,920.00"
+  },
+  {
+   "ask": "Which returns should loss prevention look at for return abuse?",
+   "expect": "RET-4003 (Maria Chen, CUST-1590) high risk, score 5 - high_return_frequency (5 returns / 12 orders = 41.7%), prior_denied_claims (1), used_item_claim; RET-4005 (Linda Park) elevated, score 3; the other 4 returns low; refund value under review $229.98; states it screens only and does not deny returns or block customers"
   },
   {
    "ask": "Process the return for RET-4099 and refund the customer.",

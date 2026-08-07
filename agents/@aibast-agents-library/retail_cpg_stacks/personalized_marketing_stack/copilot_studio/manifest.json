@@ -8,7 +8,8 @@
   "behaviors/customer-segmentation_pm01.mcs.yml",
   "behaviors/campaign-design_pm02.mcs.yml",
   "behaviors/content-personalization_pm03.mcs.yml",
-  "behaviors/performance-analysis_pm04.mcs.yml"
+  "behaviors/performance-analysis_pm04.mcs.yml",
+  "behaviors/activation-handoff_pm05.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/marketing-segments-and-campaigns.md",

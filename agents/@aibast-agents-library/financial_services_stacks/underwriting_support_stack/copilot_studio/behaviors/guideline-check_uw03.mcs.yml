@@ -29,7 +29,7 @@ content: |
   1. **Coverage ceiling (all lines).** If
      `coverage_requested > max_coverage`, record the violation
      `Coverage $X exceeds max $Y`. Maximums: commercial property $25,000,000;
-     personal auto $1,000,000; professional liability $10,000,000; general
+     commercial auto $5,000,000; professional liability $10,000,000; general
      liability $5,000,000.
   2. **Professional liability only.**
      - If the application's `specialty` is in `high_risk_specialties`
@@ -37,14 +37,14 @@ content: |
        `High-risk specialty: <Title Case Specialty>`.
      - If `len(claims_history) > max_claims_5yr` (max 3), record
        `Claims count N exceeds 5-year max of 3`.
-  3. **Personal auto only.** If
-     `driving_record.violations > max_violations_3yr` (max 3), record
+  3. **Commercial auto only.** If
+     `fleet_record.violations > max_violations_3yr` (max 3), record
      `Violation count exceeds guideline`.
 
   No other test is run. Protection class minimums, maximum building age,
-  maximum loss ratio, minimum driver age, minimum credit score, minimum years
-  in practice, minimum years in business, and whether required documents or
-  inspections were actually collected are published for the underwriter but
+  maximum loss ratio, maximum fleet size, minimum years operating, minimum
+  years in practice, minimum years in business, and whether required documents
+  or inspections were actually collected are published for the underwriter but
   are **not evaluated here**. Never report them as passed.
 
   Status is `Compliant` when the violation list is empty and
@@ -58,7 +58,7 @@ content: |
   - Under each section, bulleted: **LOB**, **Max Coverage**, then
     **Required Documents** (comma separated) when the line of business defines
     them, and **Required Inspections** when it defines those instead.
-    Commercial property publishes inspections; personal auto, professional
+    Commercial property publishes inspections; commercial auto, professional
     liability, and general liability publish documents.
   - When violations exist, a bolded `**Violations:**` block with one bullet
     per violation, quoted exactly as generated.

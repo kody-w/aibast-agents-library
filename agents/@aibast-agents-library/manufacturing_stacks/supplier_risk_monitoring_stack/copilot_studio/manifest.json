@@ -57,6 +57,14 @@
   ],
   "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQD26zoTNiMPRZojNs_hKUDjASOyr0LCSBx5EGcYZF4bNVk?e=ofSGsP",
   "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBoaN23_6LPQJ9JcpAzXwIDAQ2BUqHvdezpfjlAIOv9P_8?e=lYeavV",
-  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCgw0tyyW7tRp0sVSwluV7rAWIkqdJ4ch4b1su3Lo9BsyQ?e=u7Z9Jt"
+  "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCgw0tyyW7tRp0sVSwluV7rAWIkqdJ4ch4b1su3Lo9BsyQ?e=u7Z9Jt",
+  "also_advertised_as": {
+   "name": "Supply Risk Intelligence Agent",
+   "exec_summary": "Deliver real-time risk intelligence and planning to protect production continuity and reduce disruption exposure.",
+   "personas": [
+    "Procurement Manager",
+    "Supply Chain Director"
+   ]
+  }
  }
 }

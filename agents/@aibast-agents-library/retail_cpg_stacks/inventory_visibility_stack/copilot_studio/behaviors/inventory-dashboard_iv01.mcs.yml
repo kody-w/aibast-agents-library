@@ -1,33 +1,41 @@
 mcs.metadata:
   componentName: inventory-dashboard
-  description: Renders on-hand, safety stock, stock status, and days of supply for every SKU at a location, plus the network inventory total.
+  description: Renders on-hand, safety stock, stock status, and days of supply for every SKU at a location, with category rollups and the network inventory total.
 kind: InlineAgentSkill
 content: |
   ---
   name: inventory-dashboard
-  description: Renders on-hand, safety stock, stock status, and days of supply for every SKU at a location, plus the network inventory total.
+  description: Renders on-hand, safety stock, stock status, and days of supply for every SKU at a location, with category rollups and the network inventory total.
   ---
   <!-- bic:source=blank -->
   # Inventory dashboard
 
   Use this skill when the user asks what is on hand, asks for the inventory
   picture at a store or warehouse, asks how many days of supply something has,
-  or asks for the network inventory position.
+  asks how a merchandise category is positioned, or asks for the network
+  inventory position.
 
   ## Inputs
 
-  - The location master, the SKU catalog, on-hand quantities, safety-stock
-    levels, and daily sell-through rates.
+  - The location master, the SKU catalog including each SKU's category, on-hand
+    quantities, safety-stock levels, and daily sell-through rates.
   - Optional: a single location id (`STR-001`..`STR-004`, `WH-CENTRAL`,
     `WH-EAST`). With no location, report all four stores in id order.
+  - Optional: a merchandise category (`Accessories`, `Apparel`, `Electronics`,
+    `Footwear`). With a category, every SKU table is restricted to that
+    category's SKUs and the rollup covers that category only.
 
   ## Procedure - compute it, do not estimate it
 
   1. Scope the locations. If a location id is given and it exists in the
      inventory data, report that location only. Otherwise report the four
      stores `STR-001`, `STR-002`, `STR-003`, `STR-004` in that order.
-  2. Within each location, list all 8 SKUs in ascending SKU-id order
-     (`SKU-1001` through `SKU-1008`). Never re-sort by quantity or status.
+  2. Scope the SKUs. With no category, list all 8 SKUs in ascending SKU-id
+     order (`SKU-1001` through `SKU-1008`). With a category, list only that
+     category's SKUs, still in id order, and say the view is filtered:
+     Apparel is `SKU-1001` and `SKU-1003`; Electronics is `SKU-1002` and
+     `SKU-1004`; Footwear is `SKU-1005` alone; Accessories is `SKU-1006`,
+     `SKU-1007`, and `SKU-1008`. Never re-sort by quantity or status.
   3. Days of supply: `on_hand / daily_sell_through`, rounded to one decimal.
      If the sell-through rate is 0, report `999.0` (effectively no drain).
   4. Stock status, applied in this order, no exceptions:
@@ -37,18 +45,39 @@ content: |
      - otherwise -> `HEALTHY`
      The comparisons are inclusive: 12 on-hand against 8 safety stock is
      `LOW`, because `8 * 1.5 = 12`.
-  5. Network total: sum every SKU at every one of the 6 locations - the four
+  5. Category rollup, computed over exactly the locations in view: on-hand is
+     the sum across those locations, daily sell-through is the sum of the
+     member SKUs' rates, days of supply is `on_hand / summed_rate` rounded to
+     one decimal, and value is `sum(on_hand * unit_cost)` at unit cost. At
+     `STR-001` that reads Accessories 344 units / 23.7 per day / 14.5 days /
+     $4,085.90, Apparel 284 / 20.7 / 13.7 / $4,275.00, Electronics 177 / 12.9 /
+     13.7 / $4,365.00, Footwear 38 / 2.7 / 14.1 / $2,090.00.
+  6. Network total: sum every SKU at every one of the 6 locations - the four
      stores plus `WH-CENTRAL` and `WH-EAST`. This total is 26,315 units and
-     does not change when the view is filtered to one location.
+     does not change when the view is filtered to one location or one category.
 
   ## Output format
 
   - `# Inventory Dashboard`
+  - When a category is given, a `**Category filter:**` line naming the category
+    and its SKU ids, stating the view is filtered and the network total is not.
   - Per location: `## <Location Name> (`<LOC-ID>`)` followed by a table with
-    columns: `SKU | Product | On-Hand | Safety Stock | Status | Days of Supply`
+    columns:
+    `SKU | Product | Category | On-Hand | Safety Stock | Status | Days of Supply`
+  - `## Category Rollup`, a line naming the locations covered, then a table with
+    columns:
+    `Category | SKUs | On-Hand | Daily Sell-Through | Days of Supply | Value at Unit Cost`
   - Closing line: `**Total Network Inventory:** 26,315 units across 6 locations`
 
   ## Edge cases
+
+  - Sell-through rates are network-level while on-hand in the rollup is only
+    the locations in view, so a four-store rollup reads longer than any single
+    store - Apparel is 13.7 days at `STR-001` and 26.9 days across all four
+    stores on 556 units. State which locations the number covers; never present
+    it as a store's own cover.
+  - An unrecognized category is not a silent fallback: say the value is not a
+    category in the SKU catalog and name the four that are.
 
   - Warehouses (`WH-CENTRAL`, `WH-EAST`) have no safety-stock levels defined.
     Report their Safety Stock cell as `N/A` and say the status column is

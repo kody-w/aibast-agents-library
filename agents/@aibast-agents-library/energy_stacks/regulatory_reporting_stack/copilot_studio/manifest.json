@@ -8,7 +8,8 @@
   "behaviors/report-status_reg101.mcs.yml",
   "behaviors/data-validation_reg102.mcs.yml",
   "behaviors/submission-tracker_reg103.mcs.yml",
-  "behaviors/audit-readiness_reg104.mcs.yml"
+  "behaviors/audit-readiness_reg104.mcs.yml",
+  "behaviors/remediation-package_reg105.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/regulatory-reporting-data.md",

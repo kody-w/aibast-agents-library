@@ -19,7 +19,7 @@
  "verification": [
   {
    "ask": "Show me the risk evaluation for the current applications.",
-   "expect": "4 applications: UW-2025-101 Riverside Manufacturing Inc. score 62 Substandard, UW-2025-102 Sarah Mitchell score 22 Preferred, UW-2025-103 Downtown Medical Associates score 75 Substandard, UW-2025-104 Harbor View Restaurant Group score 48 Standard"
+   "expect": "4 applications: UW-2025-101 Riverside Manufacturing Inc. score 62 Substandard, UW-2025-102 Cascade Freight Logistics LLC score 22 Preferred, UW-2025-103 Downtown Medical Associates score 75 Substandard, UW-2025-104 Harbor View Restaurant Group score 48 Standard"
   },
   {
    "ask": "Give me the pricing recommendation for UW-2025-101.",

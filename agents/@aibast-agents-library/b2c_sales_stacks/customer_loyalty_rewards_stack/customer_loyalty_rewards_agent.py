@@ -96,6 +96,12 @@ REDEMPTION_CATALOG = {
     "free_shipping_3mo": {"name": "Free Shipping for 3 Months", "points_cost": 1500, "category": "free_shipping", "value": 30},
 }
 
+ENGAGEMENT_BANDS = [
+    {"band": "Engaged", "min_score": 75, "max_score": 100, "retention_action": "No retention action required; keep in standard program communications."},
+    {"band": "Watch", "min_score": 50, "max_score": 74, "retention_action": "Review for a retention touch; engagement has slipped below the Engaged band."},
+    {"band": "At Risk", "min_score": 0, "max_score": 49, "retention_action": "Prioritize for retention outreach by the program team."},
+]
+
 ENGAGEMENT_ACTIVITIES = [
     {"activity": "Purchase", "points": "2 per $1 spent", "frequency": "per_transaction"},
     {"activity": "Product Review", "points": "100 bonus", "frequency": "per_review"},
@@ -136,6 +142,30 @@ def _recommended_rewards(member):
     return recs
 
 
+def _engagement_band(score):
+    """Return the published engagement band for a raw engagement score."""
+    for band in ENGAGEMENT_BANDS:
+        if band["min_score"] <= score <= band["max_score"]:
+            return band
+    return None
+
+
+def _retention_watchlist():
+    """Members below the Engaged band, in roster id order."""
+    watch = []
+    for mid, m in LOYALTY_MEMBERS.items():
+        band = _engagement_band(m["engagement_score"])
+        if band and band["band"] != "Engaged":
+            watch.append((mid, m, band))
+    return watch
+
+
+def _burnable_points(member):
+    """Points a member could redeem today under the two-part eligibility gate."""
+    recs = _recommended_rewards(member)
+    return recs, sum(reward["points_cost"] for _, reward in recs)
+
+
 # ---------------------------------------------------------------------------
 # Agent class
 # ---------------------------------------------------------------------------
@@ -159,6 +189,7 @@ class CustomerLoyaltyRewardsAgent(BasicAgent):
                             "points_summary",
                             "reward_recommendations",
                             "tier_analysis",
+                            "points_liability",
                         ],
                     },
                     "member_id": {"type": "string"},
@@ -175,6 +206,7 @@ class CustomerLoyaltyRewardsAgent(BasicAgent):
             "points_summary": self._points_summary,
             "reward_recommendations": self._reward_recommendations,
             "tier_analysis": self._tier_analysis,
+            "points_liability": self._points_liability,
         }
         handler = dispatch.get(operation)
         if not handler:
@@ -202,6 +234,21 @@ class CustomerLoyaltyRewardsAgent(BasicAgent):
             tier_counts[m["tier"]] = tier_counts.get(m["tier"], 0) + 1
         for tier in ["platinum", "gold", "silver", "bronze"]:
             lines.append(f"- {tier.title()}: {tier_counts.get(tier, 0)}")
+        watch = _retention_watchlist()
+        lines.append("\n## Retention Watchlist\n")
+        lines.append(
+            f"{len(watch)} of {total_members} members fall below the Engaged band "
+            f"(engagement 75-100)."
+        )
+        if watch:
+            lines.append("")
+            lines.append("| Member | Tier | Engagement | Band | Redeemed YTD |")
+            lines.append("|---|---|---|---|---|")
+            for mid, m, band in watch:
+                lines.append(
+                    f"| {m['name']} ({mid}) | {m['tier'].title()} | {m['engagement_score']} "
+                    f"| {band['band']} | {m['points_redeemed_ytd']:,} |"
+                )
         return "\n".join(lines)
 
     def _points_summary(self, **kwargs) -> str:
@@ -275,6 +322,44 @@ class CustomerLoyaltyRewardsAgent(BasicAgent):
             lines.append("")
         return "\n".join(lines)
 
+    def _points_liability(self, **kwargs) -> str:
+        total_points = sum(m["points_balance"] for m in LOYALTY_MEMBERS.values())
+        lines = ["# Points Liability\n"]
+        lines.append(f"**Points Outstanding:** {total_points:,}")
+        lines.append(f"**Liability at 1 point = $0.02:** ${_points_value(total_points):,.2f}\n")
+        lines.append("Outstanding points are an open program liability until they are")
+        lines.append("redeemed. The levers below are the redemptions each member is already")
+        lines.append("eligible for today under the two-part eligibility gate.\n")
+        lines.append("## Redemption Levers\n")
+        lines.append("| Member | Points | Eligible Rewards | Points Redeemable | Liability Addressed |")
+        lines.append("|---|---|---|---|---|")
+        addressable = 0
+        for mid, m in LOYALTY_MEMBERS.items():
+            recs, burn = _burnable_points(m)
+            addressable += burn
+            names = "; ".join(reward["name"] for _, reward in recs) if recs else "None eligible today"
+            lines.append(
+                f"| {m['name']} ({mid}) | {m['points_balance']:,} | {names} "
+                f"| {burn:,} | ${_points_value(burn):,.2f} |"
+            )
+        residual = total_points - addressable
+        pct = round((addressable / total_points) * 100, 1) if total_points else 0.0
+        lines.append("")
+        lines.append(
+            f"**Addressable now:** {addressable:,} points (${_points_value(addressable):,.2f}) "
+            f"— {pct}% of points outstanding."
+        )
+        lines.append(
+            f"**Residual liability if every eligible reward is taken:** {residual:,} points "
+            f"(${_points_value(residual):,.2f})."
+        )
+        lines.append("")
+        lines.append(
+            "These are levers, not actions. Redeeming, expiring, or adjusting points is "
+            "a step the program team takes in the loyalty platform."
+        )
+        return "\n".join(lines)
+
 
 # ---------------------------------------------------------------------------
 # Main
@@ -289,3 +374,5 @@ if __name__ == "__main__":
     print(agent.perform(operation="reward_recommendations"))
     print("\n" + "=" * 80 + "\n")
     print(agent.perform(operation="tier_analysis"))
+    print("\n" + "=" * 80 + "\n")
+    print(agent.perform(operation="points_liability"))

@@ -42,13 +42,21 @@ content: |
   - `**New Problems:**` - bullets of `- [<code>] <description>`; the whole
     section is omitted when the patient has none
 
+  Append ` (documented on <ENC-id>, <ENC-id>)` to a bullet only when that same
+  problem appears on more than one encounter. A problem documented once carries
+  no suffix.
+
   ## Edge cases
 
   - A patient with only new diagnoses renders no Active Problems section, and
     vice versa. An omitted section means zero entries - say "none on file"
     rather than leaving it ambiguous.
-  - A diagnosis appearing on two encounters for the same patient lands in the
-    combined list twice; report it once and note both encounters rather than
-    silently deduplicating a record difference.
+  - A diagnosis appearing on two encounters for the same patient with the same
+    status is one problem, not two: report it once and append
+    ` (documented on <ENC-id>, <ENC-id>)` so the duplication is visible rather
+    than silently dropped. A code with a single encounter gets no suffix.
+  - A code carrying different statuses on different encounters is not merged -
+    it appears in each bucket its status puts it in, each with its own
+    encounter attribution.
   - Do not rank, stage, or prioritize problems. The list is the record's
     contents, not a clinical assessment.

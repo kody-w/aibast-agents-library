@@ -35,6 +35,18 @@
 | SKU-1007 | Leather Crossbody Bag | Accessories | $27.50 | $79.99 |
 | SKU-1008 | UV Protection Sunglasses | Accessories | $12.30 | $44.99 |
 
+## Merchandise categories
+
+Four categories partition the eight SKUs. Category managers own these
+groupings; every dashboard, alert, and overstock view can be filtered to one.
+
+| Category | SKUs | Count |
+|----------|------|-------|
+| Accessories | SKU-1006, SKU-1007, SKU-1008 | 3 |
+| Apparel | SKU-1001, SKU-1003 | 2 |
+| Electronics | SKU-1002, SKU-1004 | 2 |
+| Footwear | SKU-1005 | 1 |
+
 ## On-hand inventory by location
 
 | Location | SKU-1001 | SKU-1002 | SKU-1003 | SKU-1004 | SKU-1005 | SKU-1006 | SKU-1007 | SKU-1008 |
@@ -47,6 +59,35 @@
 | WH-EAST | 820 | 1,100 | 2,200 | 410 | 350 | 2,600 | 530 | 900 |
 
 Total network inventory across all 6 locations: **26,315 units**.
+
+## Category rollups
+
+Derived from the tables above, not separately maintained. On-hand is the sum
+over the locations named; daily sell-through is the sum of the member SKUs'
+rates (a network-level figure); days of supply is on-hand divided by that rate;
+value is at unit cost, never retail.
+
+Across the four stores (1,705 units in total):
+
+| Category | SKUs | On-Hand | Daily Sell-Through | Days of Supply | Value at Unit Cost |
+|----------|------|---------|--------------------|----------------|--------------------|
+| Accessories | 3 | 735 | 23.7 | 31.0 | $8,382.10 |
+| Apparel | 2 | 556 | 20.7 | 26.9 | $8,214.90 |
+| Electronics | 2 | 350 | 12.9 | 27.1 | $8,469.00 |
+| Footwear | 1 | 64 | 2.7 | 23.7 | $3,520.00 |
+
+Across all 6 locations (26,315 units in total):
+
+| Category | SKUs | On-Hand | Daily Sell-Through | Days of Supply | Value at Unit Cost |
+|----------|------|---------|--------------------|----------------|--------------------|
+| Accessories | 3 | 11,515 | 23.7 | 485.9 | $126,622.10 |
+| Apparel | 2 | 8,826 | 20.7 | 426.4 | $135,729.90 |
+| Electronics | 2 | 4,940 | 12.9 | 382.9 | $122,199.00 |
+| Footwear | 1 | 1,034 | 2.7 | 383.0 | $56,870.00 |
+
+Because the sell-through rates are network-level, a rollup that spans more
+locations reads as more days of cover. Always say which locations a category
+number covers.
 
 ## Safety stock by store
 

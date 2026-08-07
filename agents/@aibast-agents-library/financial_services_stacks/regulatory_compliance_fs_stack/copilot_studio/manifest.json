@@ -8,7 +8,9 @@
   "behaviors/compliance-dashboard_frc101.mcs.yml",
   "behaviors/regulation-tracker_frc102.mcs.yml",
   "behaviors/remediation-plan_frc103.mcs.yml",
-  "behaviors/examiner-prep_frc104.mcs.yml"
+  "behaviors/examiner-prep_frc104.mcs.yml",
+  "behaviors/surveillance-alerts_frc105.mcs.yml",
+  "behaviors/desk-supervision_frc106.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/regulatory-compliance-data.md",

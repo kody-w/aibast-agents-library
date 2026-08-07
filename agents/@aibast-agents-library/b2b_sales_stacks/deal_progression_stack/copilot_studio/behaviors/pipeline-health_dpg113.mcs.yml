@@ -50,7 +50,7 @@ content: |
   `**<deal>** -- $<value> -- N days in <stage>`, then
   `**Root Cause Analysis:**` as `- N deals: <label>` lines.
 
-  Close with `Source: [Salesforce + Activity Analytics]`.
+  Close with `Source: [Dynamics 365 + Activity Analytics]`.
 
   ## Edge cases
 

@@ -41,7 +41,7 @@ class D365BaseAgent(BasicAgent):
                 "name": "PipelineAnalyticsAgent",
                 "description": "Analyzes full pipeline health with deal-level metrics and trends",
                 "data_sources": [
-                        "Salesforce CRM",
+                        "Dynamics 365 CRM",
                         "Pipeline Analytics"
                 ]
         },
@@ -99,7 +99,7 @@ class D365BaseAgent(BasicAgent):
         }
 ]
     
-    INTEGRATED_SYSTEMS = ["Activity Logs", "All Pipeline Systems", "Best Practices DB", "CRM", "Call Transcripts", "Capacity Dashboard", "Conversion Analytics", "Email Analytics", "Email Threads", "Historical Close Data", "Meeting Notes", "Pipeline Analytics", "Sales Playbook", "Salesforce CRM", "Skills Matrix", "Team Directory", "Win Patterns"]
+    INTEGRATED_SYSTEMS = ["Activity Logs", "All Pipeline Systems", "Best Practices DB", "CRM", "Call Transcripts", "Capacity Dashboard", "Conversion Analytics", "Dynamics 365 CRM", "Email Analytics", "Email Threads", "Historical Close Data", "Meeting Notes", "Pipeline Analytics", "Sales Playbook", "Skills Matrix", "Team Directory", "Win Patterns"]
     
     CONVERSATION_FLOW = [
         {
@@ -127,7 +127,7 @@ class D365BaseAgent(BasicAgent):
 - 4 deals: Competitor evaluation ongoing
 - 3 deals: Budget approval pending
 
-Source: [Salesforce + Activity Analytics]
+Source: [Dynamics 365 + Activity Analytics]
 Agents: PipelineAnalyticsAgent, StalledDealDetectionAgent
 
 Want detailed analysis on the top stalled deals?""",
@@ -256,7 +256,7 @@ Want me to assign tasks to the team?""",
 | Sarah Kim | 3 tasks | This week | Exec support |
 
 **Automated Monitoring:**
-- Daily Slack alerts for overdue tasks
+- Daily Teams alerts for overdue tasks
 - Deal stage change notifications
 - Weekly pipeline velocity report
 - Stall warning at 7 days (vs current 21)
@@ -271,7 +271,7 @@ Want me to assign tasks to the team?""",
 - Goal: Move $4.2M stalled back to active
 - Forecast: Add $2.4M to Q4 commit
 
-Source: [Salesforce + Task Management]
+Source: [Dynamics 365 + Task Management]
 Agents: TaskAssignmentAgent
 
 Generate the executive summary?""",

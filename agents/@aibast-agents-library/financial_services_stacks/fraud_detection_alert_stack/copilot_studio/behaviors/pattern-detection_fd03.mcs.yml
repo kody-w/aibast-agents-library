@@ -1,11 +1,11 @@
 mcs.metadata:
   componentName: pattern-detection
-  description: Describes the known fraud patterns with their indicators and frequency, then reports which active cases carry a pattern match.
+  description: Describes the known fraud patterns with their indicators and frequency, reports which active cases carry a pattern match, then recommends which rules and indicators would have caught the flagged transactions earlier.
 kind: InlineAgentSkill
 content: |
   ---
   name: pattern-detection
-  description: Describes the known fraud patterns with their indicators and frequency, then reports which active cases carry a pattern match.
+  description: Describes the known fraud patterns with their indicators and frequency, reports which active cases carry a pattern match, then recommends which rules and indicators would have caught the flagged transactions earlier.
   ---
   <!-- bic:source=blank -->
   # Pattern detection
@@ -33,6 +33,20 @@ content: |
     it is not evidence of anything and must not be assigned a pattern here.
   4. Each match line repeats the pattern's own description; do not restate it in
     your own words.
+  5. Close with detection coverage. For each flagged transaction
+    (`risk_score >= 70`), in TXN id order:
+     - Name the rules already recorded as triggered on the case that carries it.
+     - Then name any rule in the rule set whose recorded threshold the
+       transaction's own recorded fields or its case notes plainly satisfy but
+       which is not on that case's triggered list. Check the threshold against
+       the record - amount, timestamp, country, channel, category, notes - and
+       name a rule only when the record satisfies it on its face.
+     - Name the pattern indicators the recorded facts line up with, quoted from
+       the library, when the transaction sits on a case with a pattern.
+    If nothing beyond the recorded rules applies, say the rules already on the
+    case covered it. Never invent a rule, a threshold, or an indicator, never
+    restate a threshold in looser terms to make it fit, and never change a risk
+    score, a band, or the flagging threshold.
 
   ## Output format
 
@@ -46,6 +60,14 @@ content: |
   Then `## Pattern Matches in Active Cases`, one bullet per matched case:
   `- **INV-YYYY-NNN:** <Pattern Name> - <pattern description>`
 
+  Then `## Earlier-Catch Recommendations`, one bullet per flagged transaction:
+  `- **TXN-NNNNN** (INV-YYYY-NNN): already caught by RULE-00N <Name>. Earlier
+  catch: RULE-00N <Name> - <the recorded threshold> - <the recorded fact that
+  meets it>. Indicators: <indicator>.`
+
+  Close the section with one line stating these are recommendations for the
+  analyst of record and that no rule has been changed or enabled.
+
   ## Edge cases
 
   - A case with `pattern` unset is reported as Under Analysis if the user asks
@@ -54,3 +76,10 @@ content: |
   - Indicators are what the pattern looks like, not proof. Never state that a
     case is fraud, or that a cardholder committed it.
   - Pattern name not in the library: say so and list the patterns that exist.
+  - Scoped to one pattern or one case: the coverage section covers only the
+    flagged transactions in scope. A case with no pattern still gets its rule
+    coverage - rules only, never an inferred pattern or indicator.
+  - An earlier-catch recommendation is a rule-tuning candidate for the analyst,
+    not a finding of fraud and not an action. Never say a rule has been enabled,
+    tuned, or applied, and never state that the earlier rule would have stopped
+    the loss.

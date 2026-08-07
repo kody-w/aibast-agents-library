@@ -1,0 +1,87 @@
+mcs.metadata:
+  componentName: purchase-order
+  description: Drafts and tracks purchase orders against purchase requests, with the issue and receipt status of each order.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: purchase-order
+  description: Drafts and tracks purchase orders against purchase requests, with the issue and receipt status of each order.
+  ---
+  <!-- bic:source=blank -->
+  # Purchase order
+
+  Use this skill when the user asks about a purchase order, asks whether a PO
+  exists for a request, asks what has been ordered or received, asks to draft
+  a PO, or names a PO- id.
+
+  ## Inputs
+
+  - The purchase order ledger and the purchase request queue.
+  - Optional: a single PO- id, or a PR- id whose order is being asked about.
+    With neither, render the list view.
+
+  ## The ledger
+
+  | ID | Source PR | Vendor | Amount | Payment Terms | Issue Status | Receipt Status |
+  |---|---|---|---|---|---|---|
+  | PO-7001 | PR-5003 | Salesforce (VND-002) | $215,000 | Annual Prepay | Issued | Not Received |
+  | PO-7002 | PR-5002 | Steelcase (VND-003) | $48,500 | Net 45 | Draft | Not Received |
+  | PO-7003 | PR-5001 | AWS (VND-001) | $125,000 | Net 30 | Draft | Not Received |
+
+  What holds each draft: PO-7001 nothing, the buyer has issued it; PO-7002
+  PR-5002 is in Vendor Selection so the vendor is not yet selected; PO-7003
+  PR-5001 is Pending Approval so CFO sign-off is outstanding. PR-5004 has no
+  order drafted - it is still a Draft request.
+
+  ## Procedure
+
+  1. If a PO- id is given, render the **detail view** for that order.
+  2. If a PR- id is given, find the order whose Source PR matches and render
+     the detail view. If the request has no order, say so and name the request
+     status that explains why.
+  3. Otherwise render the **list view** of every order, then name the requests
+     with no order drafted.
+  4. When a draft is asked for, produce the draft's field values from the
+     source request and the vendor catalog entry - amount from the request,
+     payment terms from the vendor. Never change an amount or a term.
+
+  ## Output format - detail view
+
+  - Headline: `**Purchase Order: PO-xxxx**`
+  - A two-column `| Field | Detail |` table with exactly these rows, in this
+    order: Source Request (PR- id plus title), Vendor (name plus VND- id),
+    Amount, Payment Terms, Issue Status, Receipt Status.
+  - Then `**Blocked by:** <text>` on its own line.
+  - If the source request's category has negative available budget, add a
+    `**Budget flag:**` line naming the category and the overage.
+  - Close with `Source: [Procurement System]`.
+
+  ## Output format - list view
+
+  - Headline: `**Purchase Orders**`
+  - Table with columns `| ID | Source PR | Vendor | Amount | Terms | Issue
+    Status | Receipt Status |`, one row per order in ledger order (PO-7001,
+    PO-7002, PO-7003).
+  - Then the line naming requests with no order drafted.
+  - Close with `Source: [Procurement System]`.
+
+  ## Edge cases
+
+  - An order's amount and terms must match its source request and the vendor
+    catalog. If a user quotes a different figure, say what the ledger holds.
+  - Draft is not Issued. PO-7002 and PO-7003 are drafts; describing either as
+    placed, sent, or on order is wrong.
+  - Issued is not Received. PO-7001 is Issued with Receipt Status Not
+    Received; do not call it delivered, invoiced, or closed.
+  - PO-7001 sits in Software, which is over budget by $60,000. Flag that when
+    the order is discussed - it is in the data and it changes the decision.
+  - If a PO- id is not in the ledger, say so and list PO-7001 through PO-7003
+    rather than showing a different order.
+
+  ## Boundaries
+
+  - A person issues, amends, cancels, and receives every order. Never say you
+    have issued, sent, cancelled, or received a PO, notified a vendor, or
+    moved an order out of Draft. Draft the content and hand it to the buyer.
+  - Never draft an order against a request that is not Approved without
+    stating the outstanding approval in the same answer.

@@ -43,6 +43,30 @@ Reports quote the **first 80 characters** of the verbatim followed by `...`.
 The NPS value is recorded per quarter, not derived from the promoter and
 detractor counts at read time.
 
+## Churn risk banding
+
+Derived from the entries above — no new records. An entry is CRITICAL when its
+stored `sentiment` is `negative`, and WATCH when the sentiment is not
+`negative` and the recorded `score` is 6 or lower. Everything else is off the
+watchlist. The linked request is the backlog item whose `Linked Feedback`
+column carries that FB- id.
+
+| Band | ID | Customer | Sentiment | Score | ARR At Risk | Linked Request |
+|------|----|----------|-----------|-------|-------------|----------------|
+| CRITICAL | FB-5001 | Meridian Healthcare Systems | negative | 2 | $186,000 | FR-001 |
+| CRITICAL | FB-5004 | Vanguard Logistics | negative | 1 | $84,000 | FR-004 |
+| WATCH | FB-5002 | Apex Financial Group | neutral | 6 | $240,000 | FR-002 |
+| WATCH | FB-5005 | BrightPath Education | neutral | 5 | $96,000 | FR-005 |
+
+Four of six accounts. Critical band $270,000, watch band $336,000, $606,000 at
+risk of the $1,278,000 represented (47.4%). FB-5003 (score 9) and FB-5006
+(score 8) are not at risk.
+
+Detractors rose 45 (2025-Q4) to 51 (2026-Q1), +6, while NPS moved 35 to 36.
+
+These bands are recorded signals, not a churn prediction. No churn
+probability, renewal date, or projected revenue loss exists in this data set.
+
 ## Vocabularies
 
 | Field | Allowed values |

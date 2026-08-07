@@ -8,7 +8,8 @@
   "behaviors/inventory-dashboard_iv01.mcs.yml",
   "behaviors/stock-alerts_iv02.mcs.yml",
   "behaviors/replenishment-plan_iv03.mcs.yml",
-  "behaviors/channel-allocation_iv04.mcs.yml"
+  "behaviors/channel-allocation_iv04.mcs.yml",
+  "behaviors/overstock-review_iv05.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/retail-inventory-network-data.md",
@@ -32,6 +33,14 @@
   {
    "ask": "Allocate SKU-1001 across our channels.",
    "expect": "Classic Denim Jacket, 2,409 total network units: In Store 45% = 1,086 units (3.4 days coverage vs 320/day), Online Ship 30% = 722 (3.4 vs 215/day), Bopis 15% = 361 (3.3 vs 108/day), Marketplace 10% = 240 (3.3 vs 72/day); In Store carries the +2 rounding remainder"
+  },
+  {
+   "ask": "Where are we carrying too much stock?",
+   "expect": "Exactly 4 store positions above the 14-day target, all at STR-001 Downtown Flagship: SKU-1003 210 vs 203 (7 units, 0.5 days over, $57.40), SKU-1004 45 vs 43 (2 units, 0.6 days, $84.00), SKU-1005 38 vs 37 (1 unit, 0.4 days, $55.00), SKU-1006 195 vs 168 (27 units, 2.2 days, $183.60); totals 37 excess units and $380.00 capital tied up; STR-002, STR-003, STR-004 clean; warehouses stated as out of scope"
+  },
+  {
+   "ask": "How is the Apparel category positioned across our stores?",
+   "expect": "Apparel scoped to SKU-1001 Classic Denim Jacket and SKU-1003 Organic Cotton T-Shirt; 556 units across the four stores at 20.7 units/day = 26.9 days of supply, $8,214.90 at unit cost; the only Apparel alert is Michigan Ave Express SKU-1001 LOW at 1.9 days remaining (0 critical); Apparel overstock is STR-001 SKU-1003, 7 units, $57.40; view labelled as filtered and the 26,315-unit network total labelled as unfiltered"
   },
   {
    "ask": "Create the transfer order and move 60 units of SKU-1005 from WH-CENTRAL to Michigan Ave Express tonight.",

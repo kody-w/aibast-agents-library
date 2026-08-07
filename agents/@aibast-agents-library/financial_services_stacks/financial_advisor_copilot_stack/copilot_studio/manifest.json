@@ -5,6 +5,7 @@
  "agent_intent": "../financial_advisor_copilot_agent.py",
  "instructions": "instructions.md",
  "behaviors": [
+  "behaviors/branch-servicing_fac5.mcs.yml",
   "behaviors/client-review_fac1.mcs.yml",
   "behaviors/portfolio-summary_fac2.mcs.yml",
   "behaviors/recommendation-engine_fac3.mcs.yml",

@@ -16,7 +16,7 @@ __manifest__ = {
     "name": "@aibast-agents-library/emission-tracking",
     "version": "1.0.0",
     "display_name": "Emission Tracking Agent",
-    "description": "Monitors GHG emissions by facility, tracks regulatory compliance, develops reduction plans, and analyzes carbon offset opportunities.",
+    "description": "Monitors GHG emissions by facility, tracks regulatory compliance, develops reduction plans, analyzes carbon offset opportunities, and drafts the unsigned per-facility regulatory reporting package.",
     "author": "AIBAST",
     "tags": ["emissions", "carbon", "compliance", "ghg", "sustainability", "energy"],
     "category": "energy",
@@ -104,6 +104,15 @@ REGULATIONS = {
     "EPA_GHGRP": {"name": "EPA GHG Reporting Program", "threshold_co2": 25000, "deadline": "2026-03-31"},
     "CA_CAPANDTRADE": {"name": "California Cap-and-Trade", "threshold_co2": 25000, "deadline": "2026-04-01"},
     "EPA_NSPS": {"name": "EPA New Source Performance Standards", "threshold_co2": 0, "deadline": "2026-06-30"},
+}
+
+# Jurisdiction of each reporting program. None means federal -- every facility
+# in the inventory. A state code means the program only reaches facilities
+# located in that state.
+PROGRAM_JURISDICTION = {
+    "EPA_GHGRP": None,
+    "CA_CAPANDTRADE": "CA",
+    "EPA_NSPS": None,
 }
 
 
@@ -200,6 +209,94 @@ def _carbon_offset_analysis():
             "total_cost": total_cost, "emission_gap": total_gap}
 
 
+def _facility_state(location):
+    return location.rsplit(",", 1)[-1].strip()
+
+
+def _applicable_programs(facility):
+    """Programs a facility must report under, by threshold and jurisdiction."""
+    s1 = facility["emissions"]["scope_1"]["co2_tonnes"]
+    state = _facility_state(facility["location"])
+    applicable = []
+    for key, reg in REGULATIONS.items():
+        jurisdiction = PROGRAM_JURISDICTION.get(key)
+        if jurisdiction is not None and jurisdiction != state:
+            continue
+        if s1 < reg["threshold_co2"]:
+            continue
+        applicable.append({
+            "key": key, "name": reg["name"],
+            "program_threshold": reg["threshold_co2"],
+            "deadline": reg["deadline"],
+        })
+    applicable.sort(key=lambda p: p["deadline"])
+    return applicable
+
+
+def _reporting_package(facility_id=None):
+    """Assemble the unsigned submission draft for each in-scope facility."""
+    packages = []
+    for fid, f in FACILITIES.items():
+        if facility_id and fid != facility_id:
+            continue
+        s1 = f["emissions"]["scope_1"]["co2_tonnes"]
+        s2 = f["emissions"]["scope_2"]["co2_tonnes"]
+        s3 = f["emissions"]["scope_3"]["co2_tonnes"]
+        threshold = f["regulatory_threshold_co2"]
+        compliant = s1 <= threshold
+        gap = s1 - threshold if not compliant else 0
+        target = round(f["baseline_co2"] * (1 - f["reduction_target_pct"] / 100))
+        remaining = max(0, s1 - target)
+        actual_reduction = round((1 - s1 / f["baseline_co2"]) * 100, 1) if f["baseline_co2"] else 0
+        on_track = actual_reduction >= f["reduction_target_pct"]
+        programs = _applicable_programs(f)
+
+        open_items = [
+            "No CO2e conversion factor exists in this data set -- CH4 and N2O "
+            "are carried as recorded gases and no CO2e total is stated.",
+            "No third-party verification statement is present in this data "
+            "set; attach the verifier's letter before filing.",
+        ]
+        if not programs:
+            open_items.append(
+                "No reporting program is triggered at this facility's Scope 1 "
+                "CO2 and location -- confirm with counsel before filing nothing."
+            )
+        if not on_track:
+            open_items.append(
+                f"Reduction progress {actual_reduction}% is short of the "
+                f"{f['reduction_target_pct']}% target -- a narrative "
+                "explanation is required from the accountable owner."
+            )
+        if not compliant:
+            open_items.append(
+                f"Scope 1 CO2 exceeds the facility threshold by {gap:,} tonnes "
+                "-- this draft records the exceedance, it does not resolve it."
+            )
+
+        packages.append({
+            "id": fid, "name": f["name"], "location": f["location"],
+            "type": f["type"], "capacity_mw": f["capacity_mw"],
+            "scope_1": s1, "scope_2": s2, "scope_3": s3,
+            "ch4_scope_1": f["emissions"]["scope_1"]["ch4_tonnes"],
+            "n2o_scope_1": f["emissions"]["scope_1"]["n2o_tonnes"],
+            "threshold": threshold, "compliant": compliant, "gap_tonnes": gap,
+            "baseline_year": f["baseline_year"], "baseline_co2": f["baseline_co2"],
+            "target_co2": target, "remaining_reduction": remaining,
+            "target_reduction_pct": f["reduction_target_pct"],
+            "actual_reduction_pct": actual_reduction, "on_track": on_track,
+            "programs": programs,
+            "earliest_deadline": programs[0]["deadline"] if programs else None,
+            "open_items": open_items,
+            "status": "DRAFT -- UNSIGNED",
+        })
+    return {
+        "packages": packages,
+        "requested_facility": facility_id,
+        "not_found": bool(facility_id) and not packages,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Agent
 # ---------------------------------------------------------------------------
@@ -222,6 +319,7 @@ class EmissionTrackingAgent(BasicAgent):
                             "compliance_status",
                             "reduction_plan",
                             "carbon_offset_analysis",
+                            "draft_reporting_package",
                         ],
                         "description": "The emission tracking operation to perform.",
                     },
@@ -245,6 +343,8 @@ class EmissionTrackingAgent(BasicAgent):
             return self._reduction_plan()
         elif op == "carbon_offset_analysis":
             return self._carbon_offset_analysis()
+        elif op == "draft_reporting_package":
+            return self._draft_reporting_package(kwargs.get("facility_id"))
         return f"**Error:** Unknown operation `{op}`."
 
     def _emissions_dashboard(self) -> str:
@@ -316,11 +416,88 @@ class EmissionTrackingAgent(BasicAgent):
             )
         return "\n".join(lines)
 
+    def _draft_reporting_package(self, facility_id=None) -> str:
+        data = _reporting_package(facility_id)
+        if data["not_found"]:
+            return (
+                f"**Not in the inventory:** `{data['requested_facility']}` is not "
+                "a facility in this data set, so no reporting package can be drafted."
+            )
+        lines = [
+            "# Reporting Package Drafts",
+            "",
+            "**Status:** DRAFT -- UNSIGNED. Assembled from the inventory and the "
+            "reporting register for review. Nothing here has been filed, and "
+            "filing is a person's decision.",
+        ]
+        if facility_id:
+            lines.append("")
+            lines.append(f"View filtered to {facility_id}.")
+        for p in data["packages"]:
+            lines.append("")
+            lines.append(f"## {p['id']} -- {p['name']}")
+            lines.append(
+                f"{p['location']} | {p['type']} | capacity {p['capacity_mw']} MW "
+                f"| reporting basis: baseline year {p['baseline_year']} "
+                f"({p['baseline_co2']:,} tonnes)"
+            )
+            lines.append("")
+            if p["programs"]:
+                lines.append(
+                    f"**Earliest deadline:** {p['earliest_deadline']} "
+                    f"({len(p['programs'])} program(s) in scope)"
+                )
+                lines.append("")
+                lines.append("| Program | Program Threshold (t) | Deadline |")
+                lines.append("|---------|-----------------------|----------|")
+                for prog in p["programs"]:
+                    lines.append(
+                        f"| {prog['name']} | {prog['program_threshold']:,} | {prog['deadline']} |"
+                    )
+            else:
+                lines.append(
+                    "**No reporting program in scope.** Scope 1 CO2 of "
+                    f"{p['scope_1']:,} tonnes clears no program threshold that "
+                    "reaches this location."
+                )
+            lines.append("")
+            lines.append("| Section | Value |")
+            lines.append("|---------|-------|")
+            lines.append(f"| Scope 1 CO2 | {p['scope_1']:,} t |")
+            lines.append(f"| Scope 2 CO2 | {p['scope_2']:,} t |")
+            lines.append(f"| Scope 3 CO2 | {p['scope_3']:,} t |")
+            lines.append(f"| Scope 1 CH4 / N2O (recorded, not converted) | {p['ch4_scope_1']:,} t / {p['n2o_scope_1']:,} t |")
+            lines.append(f"| Facility threshold | {p['threshold']:,} t |")
+            lines.append(
+                f"| Threshold test | {'YES' if p['compliant'] else 'NO'} "
+                f"(gap {p['gap_tonnes']:,} t) |"
+            )
+            lines.append(
+                f"| Target progress | {p['actual_reduction_pct']}% actual vs "
+                f"{p['target_reduction_pct']}% target "
+                f"({'On Track' if p['on_track'] else 'Behind'}) |"
+            )
+            lines.append(
+                f"| Target tonnage / remaining | {p['target_co2']:,} t / "
+                f"{p['remaining_reduction']:,} t |"
+            )
+            lines.append("")
+            lines.append("**Open items before this draft can be signed:**")
+            for item in p["open_items"]:
+                lines.append(f"- {item}")
+            lines.append("")
+            lines.append(
+                f"**Sign-off:** {p['status']}. Preparer: Emission Tracking Agent. "
+                "Approver: the accountable owner for this facility -- name, "
+                "signature, and filing date are blank by design."
+            )
+        return "\n".join(lines)
+
 
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     agent = EmissionTrackingAgent()
-    for op in ["emissions_dashboard", "compliance_status", "reduction_plan", "carbon_offset_analysis"]:
+    for op in ["emissions_dashboard", "compliance_status", "reduction_plan", "carbon_offset_analysis", "draft_reporting_package"]:
         print(f"\n{'='*60}")
         print(f"Operation: {op}")
         print("=" * 60)

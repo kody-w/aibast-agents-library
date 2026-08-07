@@ -1,8 +1,9 @@
 """
 Financial Advisor Copilot Agent — Financial Services Stack
 
-Assists financial advisors with client reviews, portfolio summaries,
-investment recommendations, and compliance checks.
+Assists branch bankers and financial advisors with the branch servicing
+queue, client reviews, portfolio summaries, investment recommendations,
+and compliance checks.
 """
 
 import sys
@@ -16,9 +17,9 @@ __manifest__ = {
     "name": "@aibast-agents-library/financial-advisor-copilot",
     "version": "1.0.0",
     "display_name": "Financial Advisor Copilot Agent",
-    "description": "Financial advisor support with client reviews, portfolio summaries, recommendation engine, and compliance checks.",
+    "description": "Branch banking and advisory support with the branch servicing queue, client reviews, portfolio summaries, recommendation engine, and compliance checks.",
     "author": "AIBAST",
-    "tags": ["advisor", "portfolio", "investment", "compliance", "financial-services"],
+    "tags": ["advisor", "branch-banking", "portfolio", "investment", "compliance", "financial-services"],
     "category": "financial_services",
     "quality_tier": "verified",
     "requires_env": [],
@@ -107,6 +108,49 @@ INVESTMENT_RECOMMENDATIONS = {
     ],
 }
 
+BRANCH_REQUESTS = {
+    "BRQ-4001": {
+        "branch": "Downtown Seattle (BR-11)",
+        "banker": "Dana Okafor",
+        "customer": "Marcus Reyes",
+        "request_type": "Overdraft fee reversal",
+        "opened": "2025-03-03",
+        "status": "Open",
+        "next_best_action": "Offer overdraft protection linked to the existing savings account",
+        "referral": "None",
+    },
+    "BRQ-4002": {
+        "branch": "Bellevue Main (BR-04)",
+        "banker": "Dana Okafor",
+        "customer": "Priya Raghavan",
+        "request_type": "CD maturity - reinvest or withdraw",
+        "opened": "2025-03-05",
+        "status": "Awaiting customer",
+        "next_best_action": "Present the 12-month CD ladder option alongside the money market alternative",
+        "referral": "None",
+    },
+    "BRQ-4003": {
+        "branch": "Bellevue Main (BR-04)",
+        "banker": "Luis Ferrante",
+        "customer": "Harold & Ann Beckett",
+        "request_type": "Rollover question after retirement",
+        "opened": "2025-03-06",
+        "status": "Open",
+        "next_best_action": "Warm handoff to a licensed advisor; rollover guidance is outside branch scope",
+        "referral": "Wealth management",
+    },
+    "BRQ-4004": {
+        "branch": "Tacoma Union (BR-22)",
+        "banker": "Kim Sandoval",
+        "customer": "Nguyen Family LLC",
+        "request_type": "Small business treasury services setup",
+        "opened": "2025-03-07",
+        "status": "Open",
+        "next_best_action": "Schedule the treasury services specialist and collect the signed authorization list",
+        "referral": "Business banking",
+    },
+}
+
 COMPLIANCE_RULES = {
     "reg_bi": {"name": "Regulation Best Interest", "description": "Ensure recommendations are in client's best interest", "applies_to": "all"},
     "form_crs": {"name": "Form CRS Delivery", "description": "Relationship summary delivered at account opening and annually", "applies_to": "all"},
@@ -170,6 +214,7 @@ class FinancialAdvisorCopilotAgent(BasicAgent):
                     "operation": {
                         "type": "string",
                         "enum": [
+                            "branch_servicing",
                             "client_review",
                             "portfolio_summary",
                             "recommendation_engine",
@@ -177,6 +222,7 @@ class FinancialAdvisorCopilotAgent(BasicAgent):
                         ],
                     },
                     "client_id": {"type": "string"},
+                    "branch": {"type": "string"},
                 },
                 "required": ["operation"],
             },
@@ -186,6 +232,7 @@ class FinancialAdvisorCopilotAgent(BasicAgent):
     def perform(self, **kwargs) -> str:
         operation = kwargs.get("operation", "client_review")
         dispatch = {
+            "branch_servicing": self._branch_servicing,
             "client_review": self._client_review,
             "portfolio_summary": self._portfolio_summary,
             "recommendation_engine": self._recommendation_engine,
@@ -195,6 +242,42 @@ class FinancialAdvisorCopilotAgent(BasicAgent):
         if not handler:
             return f"**Error:** Unknown operation `{operation}`."
         return handler(**kwargs)
+
+    def _branch_servicing(self, **kwargs) -> str:
+        branch_filter = (kwargs.get("branch") or "").strip().lower()
+        rows = {
+            rid: r
+            for rid, r in BRANCH_REQUESTS.items()
+            if not branch_filter or branch_filter in r["branch"].lower()
+        }
+        if not rows:
+            branches = sorted({r["branch"] for r in BRANCH_REQUESTS.values()})
+            return (
+                f"**No branch requests on file for `{kwargs.get('branch')}`.** "
+                f"Branches in the queue: {', '.join(branches)}."
+            )
+        lines = ["# Branch Servicing Queue\n"]
+        lines.append("| Request | Branch | Banker | Customer | Type | Opened | Status | Next Best Action | Referral |")
+        lines.append("|---|---|---|---|---|---|---|---|---|")
+        for rid, r in rows.items():
+            lines.append(
+                f"| {rid} | {r['branch']} | {r['banker']} | {r['customer']} | {r['request_type']} "
+                f"| {r['opened']} | {r['status']} | {r['next_best_action']} | {r['referral']} |"
+            )
+        open_count = sum(1 for r in rows.values() if r["status"] == "Open")
+        awaiting = sum(1 for r in rows.values() if r["status"] == "Awaiting customer")
+        referrals = [r["referral"] for r in rows.values() if r["referral"] != "None"]
+        lines.append(f"\n**Requests:** {len(rows)}")
+        lines.append(f"**Open:** {open_count} — **Awaiting customer:** {awaiting}")
+        if referrals:
+            lines.append(f"**Referrals to route:** {len(referrals)} ({', '.join(referrals)})")
+        else:
+            lines.append("**Referrals to route:** 0")
+        lines.append(
+            "\nEvery next best action is a prompt for the banker. Nothing here has been "
+            "actioned, sent, or booked."
+        )
+        return "\n".join(lines)
 
     def _client_review(self, **kwargs) -> str:
         lines = ["# Client Review Summary\n"]
@@ -282,6 +365,8 @@ class FinancialAdvisorCopilotAgent(BasicAgent):
 
 if __name__ == "__main__":
     agent = FinancialAdvisorCopilotAgent()
+    print(agent.perform(operation="branch_servicing"))
+    print("\n" + "=" * 80 + "\n")
     print(agent.perform(operation="client_review"))
     print("\n" + "=" * 80 + "\n")
     print(agent.perform(operation="portfolio_summary", client_id="CLI-3001"))

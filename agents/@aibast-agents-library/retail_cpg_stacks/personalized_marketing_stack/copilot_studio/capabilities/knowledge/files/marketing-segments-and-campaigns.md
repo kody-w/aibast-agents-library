@@ -81,6 +81,33 @@ SEG-ATRISK has no campaign template in this library.
 1. VIP Only: private sale starts now
 2. Your exclusive early access ends tonight
 
+## Activation handoff reference
+
+The activation package is assembled from the rows above - it adds no new facts.
+Contact cost is `audience size x $0.35`, the only cost input in the model
+(no creative, discount margin, or platform fees). Projected revenue is
+`audience size x convert rate x segment avg basket`. Est. ROAS is projected
+revenue divided by contact cost.
+
+| Campaign | Type | Sequence channel | Segment preferred channels | Audience | Contact cost @ $0.35 | Projected revenue | Est. ROAS |
+|----------|------|------------------|----------------------------|----------|----------------------|-------------------|-----------|
+| CAMP-WINBACK | automated_email | email | email | 34,200 | $11,970.00 | $43,605.00 | 3.64x |
+| CAMP-LOYALTY | multi_channel | email | in_store, mobile_app | 42,850 | $14,997.50 | $351,232.88 | 23.42x |
+| CAMP-NEWWELCOME | automated_email | email | social_media, mobile_app | 27,600 | $9,660.00 | $135,815.46 | 14.06x |
+| CAMP-VIP | multi_channel | email | in_store, mobile_app, email | 8,750 | $3,062.50 | $209,144.25 | 68.29x |
+
+The sequence channel is email for every template because the stored sequences
+are subject lines. Non-email channels for the two multi_channel campaigns are
+not specified in this data. Email is not a stored preferred channel for
+SEG-LOYAL or SEG-NEW - that mismatch is reported in the package, not resolved
+by the agent.
+
+Not in this data, and therefore never filled in by the agent: the destination
+campaign platform, send dates and times, the human owner, and any offer,
+audience, or channel that does not appear above. A package is always marked
+`PREPARED - not sent`; execution is a person's action in the campaign platform
+of record.
+
 ## Content blocks
 
 ### Hero banner

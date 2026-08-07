@@ -31,6 +31,24 @@ WH-SEA. Utilization is `used / capacity`; a site is flagged only above 90.0%.
 
 SKUs are always processed in this order, SKU-4401 through SKU-4406.
 
+## Sourcing master (supplier and replenishment lead time)
+
+One supplier and one lead time per SKU. Four suppliers cover the catalog. No
+other supplier attribute exists in this data — no price breaks, no contract
+terms, no quality history, no second source.
+
+| SKU | Supplier ID | Supplier | Lead Time (days) |
+|-----|-------------|----------|------------------|
+| SKU-4401 | SUP-210 | Meridian Drive Systems | 21 |
+| SKU-4402 | SUP-114 | Northwind Gearworks | 35 |
+| SKU-4403 | SUP-338 | Caldera Motion Components | 28 |
+| SKU-4404 | SUP-402 | Vantage Control Electronics | 42 |
+| SKU-4405 | SUP-338 | Caldera Motion Components | 14 |
+| SKU-4406 | SUP-114 | Northwind Gearworks | 56 |
+
+Lead time is a duration only. This data carries no calendar, so no order date
+and no arrival date is ever asserted.
+
 ## On-hand levels by warehouse
 
 | SKU | WH-ATL | WH-ORD | WH-DFW | WH-SEA |
@@ -56,6 +74,50 @@ gaps in the current data.
 | SKU-4405 | 3,500 | 4,200 | 3,800 | 2,300 |
 | SKU-4406 | 300 | 250 | 400 | 280 |
 
+The forecast covers one 90-day planning horizon — three months. Every
+coverage, months-of-supply, and network-target figure is read against that
+horizon.
+
 `delta = on-hand - forecast` at each pair. That delta drives the
 surplus/deficit classification and the transfer matching; the reorder point in
 the SKU catalog is a separate, absolute floor used for value-at-risk.
+
+## Months of coverage by warehouse (excess and aging)
+
+`coverage_months = round(on_hand / forecast * 3, 1)` at each pair. A position
+over 3.0 months carries stock beyond the horizon's demand; that surplus is the
+excess exposed to write-off. Band: `E` = Excess (over 3.0, up to and including
+6.0 months), `A` = Aging (over 6.0 months). Unmarked pairs are Covered and
+carry no excess.
+
+| SKU | WH-ATL | WH-ORD | WH-DFW | WH-SEA |
+|-----|--------|--------|--------|--------|
+| SKU-4401 | 3.4 (E) | 2.1 | 4.1 (E) | 1.2 |
+| SKU-4402 | 2.0 | 8.0 (A) | 0.8 | 4.1 (E) |
+| SKU-4403 | 7.1 (A) | 1.1 | 7.1 (A) | 0.7 |
+| SKU-4404 | 1.7 | 6.0 (E) | 3.6 (E) | 10.8 (A) |
+| SKU-4405 | 4.3 (E) | 2.2 | 3.8 (E) | 1.2 |
+| SKU-4406 | 1.8 | 7.4 (A) | 0.7 | 3.6 (E) |
+
+`excess_units = on_hand - forecast` where that is positive; it is zero for
+every Covered pair. Thirteen of the twenty-four pairs carry excess, 10,880
+units in total. SKU-4404 at WH-ORD sits at exactly 6.0 months and is therefore
+Excess, not Aging — the aging test is strictly greater than 6.0.
+
+## Network position by SKU
+
+Sums across all four warehouses, used for replenishment rather than
+redistribution. `network_target = 90-day forecast + reorder point`;
+`buy_qty = max(0, network_target - network_on_hand)`.
+
+| SKU | Network On-Hand | 90-Day Forecast | Safety Floor | Target | Buy Qty |
+|-----|-----------------|-----------------|--------------|--------|---------|
+| SKU-4401 | 9,700 | 9,900 | 1,200 | 11,100 | 1,400 |
+| SKU-4402 | 4,550 | 4,000 | 500 | 4,500 | 0 |
+| SKU-4403 | 5,200 | 4,200 | 600 | 4,800 | 0 |
+| SKU-4404 | 4,350 | 2,600 | 350 | 2,950 | 0 |
+| SKU-4405 | 13,800 | 13,800 | 2,000 | 15,800 | 2,000 |
+| SKU-4406 | 1,230 | 1,230 | 150 | 1,380 | 150 |
+
+A SKU can be long at the network level and still short at a warehouse. The
+warehouse gap is closed by a transfer; only a network gap justifies a buy.

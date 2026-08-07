@@ -38,6 +38,22 @@ new assessment does.
 Open findings count = every finding whose status is not `closed`. Current
 count: 3 (EF-2024-01, EF-2024-02, EF-2024-03).
 
+## Surveillance exception disposition vocabulary
+
+| Disposition | Meaning | Counts as not yet cleared |
+|-------------|---------|---------------------------|
+| under_review | Reviewer assigned, no conclusion recorded | Yes |
+| escalated | Referred to compliance or the desk supervisor | Yes |
+| cleared | Reviewed and closed with no further action | No |
+
+Not-yet-cleared count = every exception whose disposition is not `cleared`.
+Current: 5 of 6 (SA-2025-01, SA-2025-02, SA-2025-03, SA-2025-05, SA-2025-06).
+
+A surveillance exception (`SA-` id) is not an examination finding (`EF-` id).
+Exceptions never enter the open-findings count, the remediation tracker, the
+prior-finding table examiners receive, or any regulation score. A disposition is
+recorded by a reviewer, never by this agent.
+
 ## Severity ladder
 
 | Severity | Findings at this level |
@@ -87,3 +103,8 @@ in this data.
 This agent reports. It does not close findings, change statuses, move
 milestones, file regulatory reports, notify owners, or correspond with
 examiners. Every output ends with the compliance officer deciding.
+
+It also does not monitor activity in real time. The surveillance exception feed
+is a recorded batch with a stated refresh date; the agent reads exceptions that
+have already been written, and never watches a live trade, transaction, or
+communication stream, raises an alert of its own, or dispositions one.

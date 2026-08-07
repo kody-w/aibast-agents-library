@@ -8,15 +8,28 @@
 
 ## Customer applications
 
-| App ID | Applicant | Type | Account Requested | Submitted | Status | Risk Rating | Relationship Manager | Est. Assets |
-|--------|-----------|------|-------------------|-----------|--------|-------------|----------------------|-------------|
-| APP-6001 | Sarah Chen | individual | premium_checking | 2025-02-20 | kyc_in_progress | low | Michael Torres | $250,000 |
-| APP-6002 | Blackwood Capital Partners LLC | business | commercial_checking | 2025-02-25 | document_review | medium | Jessica Nguyen | $2,400,000 |
-| APP-6003 | Ahmed Al-Rashid | individual | wealth_management | 2025-03-01 | enhanced_due_diligence | high | Jessica Nguyen | $5,800,000 |
-| APP-6004 | Maria Fontaine | individual | basic_savings | 2025-03-05 | approved | low | Michael Torres | $15,000 |
+| App ID | Applicant | Type | Account Requested | Submitted | Days in Pipeline | Status | Risk Rating | Relationship Manager | Est. Assets |
+|--------|-----------|------|-------------------|-----------|------------------|--------|-------------|----------------------|-------------|
+| APP-6001 | Sarah Chen | individual | premium_checking | 2025-02-20 | 13 | kyc_in_progress | low | Michael Torres | $250,000 |
+| APP-6002 | Blackwood Capital Partners LLC | business | commercial_checking | 2025-02-25 | 8 | document_review | medium | Jessica Nguyen | $2,400,000 |
+| APP-6003 | Ahmed Al-Rashid | individual | wealth_management | 2025-03-01 | 4 | enhanced_due_diligence | high | Jessica Nguyen | $5,800,000 |
+| APP-6004 | Maria Fontaine | individual | basic_savings | 2025-03-05 | 0 | approved | low | Michael Torres | $15,000 |
 
 Pipeline totals: 4 applications, $8,465,000 total estimated assets, one
 application in each of the four statuses.
+
+### Pipeline aging
+
+Days in pipeline is `as_of - submitted`, in whole days, where `as_of` is the
+most recent submission on file (2025-03-05). The reference date comes from the
+data snapshot, not from the current calendar date, so the aging numbers are the
+same every time this data is read. The newest application therefore reads 0
+days.
+
+Longest in pipeline: APP-6001 (Sarah Chen) at 13 days, still in
+`kyc_in_progress`. Only submission dates are recorded — there is no stage entry
+date, so days in pipeline is time since submission and never time in the
+current stage.
 
 ## KYC verification results
 

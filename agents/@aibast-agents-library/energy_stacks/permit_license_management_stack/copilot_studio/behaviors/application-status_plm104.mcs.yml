@@ -35,6 +35,12 @@ content: |
 
   Heading: `# Permit Application Status`
 
+  When a facility filter applies, print the filter line directly under the
+  heading and before the headline:
+  `**Filter:** facility = <name> - this view is filtered; counts cover the filtered rows only.`
+  With no filter, omit the line entirely - never claim a filtered view when
+  every record is shown.
+
   Headline: `**Active Applications:** N`
 
   Then one table, exactly these columns:

@@ -1,7 +1,7 @@
 {
  "schema": "rapp-registry/1.0",
  "version": "1.0.0",
- "generated_at": "2026-08-07T02:39:49.767600+00:00",
+ "generated_at": "2026-08-07T03:57:02.309725+00:00",
  "instance": "AIBAST RAR",
  "stats": {
   "total_agents": 105,
@@ -366,7 +366,7 @@
    "_file": "agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_progression_agent.py",
    "_size_kb": 41.6,
    "_lines": 643,
-   "_sha256": "12e641d32ba334b59b7f7b536d9d60a81883605b0be8f00b7a2ece52078167cc",
+   "_sha256": "68a9d3c0fbe340854ab33c13ed8f42a3a85ac1eeb135bbe1b916a67a154d26ac",
    "_install_filename": "deal_progression_agent.py"
   },
   {
@@ -573,9 +573,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/b2b_sales_stacks/proposal_generation_stack/proposal_generation_agent.py",
-   "_size_kb": 34.6,
-   "_lines": 673,
-   "_sha256": "d783a0b63424905664612a59b5e2dfb56534d09dc2ee69cf0d3166e4e902df63",
+   "_size_kb": 41.0,
+   "_lines": 809,
+   "_sha256": "f0d7561b51d9d78d36448b9b2190038f64be04101a0e7b52943d42f7f31b5808",
    "_install_filename": "proposal_generation_agent.py"
   },
   {
@@ -707,17 +707,17 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/b2c_sales_stacks/customer_loyalty_rewards_stack/customer_loyalty_rewards_agent.py",
-   "_size_kb": 13.0,
-   "_lines": 292,
-   "_sha256": "4ef7a5a981dd346ce02d3c2fa69258720d15e29e8557a903bb86647fa76b200a",
+   "_size_kb": 17.0,
+   "_lines": 379,
+   "_sha256": "a5fb126b9fe5c1fa880cae37ebfdb605807db0158480dbfecdbe7f6e5d2beab1",
    "_install_filename": "customer_loyalty_rewards_agent.py"
   },
   {
    "schema": "rapp-agent/1.0",
    "name": "@aibast-agents-library/omnichannel-engagement",
    "version": "1.0.0",
-   "display_name": "Omnichannel Engagement Agent",
-   "description": "Omnichannel engagement analytics with channel performance, journey mapping, optimization, and campaign attribution.",
+   "display_name": "Cross-Channel Engagement Agent",
+   "description": "Cross-channel engagement analytics: a unified per-customer interaction timeline, support-contact quality, channel performance, journey mapping, optimization, and campaign attribution.",
    "author": "AIBAST",
    "tags": [
     "omnichannel",
@@ -725,6 +725,7 @@
     "journey",
     "attribution",
     "campaign",
+    "support",
     "b2c"
    ],
    "category": "b2c_sales",
@@ -734,9 +735,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/b2c_sales_stacks/omnichannel_engagement_stack/omnichannel_engagement_agent.py",
-   "_size_kb": 12.9,
-   "_lines": 273,
-   "_sha256": "022656981cc6f832cf19771e9ec255492d33eada67feeff94c8a5d099b5b8def",
+   "_size_kb": 23.4,
+   "_lines": 461,
+   "_sha256": "be6adcd2ea6e4ba3873b1d7a33a31783d12daefb02bbc06dc55e7c8a7b5c833c",
    "_install_filename": "omnichannel_engagement_agent.py"
   },
   {
@@ -842,9 +843,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/energy_stacks/asset_maintenance_forecast_stack/asset_maintenance_forecast_agent.py",
-   "_size_kb": 13.3,
-   "_lines": 328,
-   "_sha256": "33877d64cf4d49cd1d8f39894e545611da91b4328fa78258d2ee94ffec9c2a3f",
+   "_size_kb": 13.9,
+   "_lines": 342,
+   "_sha256": "dcc093360dd4e453f5deedc1370abbc8aecb24ee9ed54e7d58d47a4da3b99799",
    "_install_filename": "asset_maintenance_forecast_agent.py"
   },
   {
@@ -852,7 +853,7 @@
    "name": "@aibast-agents-library/emission-tracking",
    "version": "1.0.0",
    "display_name": "Emission Tracking Agent",
-   "description": "Monitors GHG emissions by facility, tracks regulatory compliance, develops reduction plans, and analyzes carbon offset opportunities.",
+   "description": "Monitors GHG emissions by facility, tracks regulatory compliance, develops reduction plans, analyzes carbon offset opportunities, and drafts the unsigned per-facility regulatory reporting package.",
    "author": "AIBAST",
    "tags": [
     "emissions",
@@ -869,9 +870,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py",
-   "_size_kb": 13.8,
-   "_lines": 328,
-   "_sha256": "b89d159c1e3017bda99685b38a8cf15cc7bfa9fde47da8dd38f5968c6d2cc51d",
+   "_size_kb": 21.6,
+   "_lines": 505,
+   "_sha256": "d4bc651a26388a39111c5d95b3f1d8920e7827854adae4b3938292477aef318f",
    "_install_filename": "emission_tracking_agent.py"
   },
   {
@@ -906,7 +907,7 @@
    "name": "@aibast-agents-library/permit-license-management",
    "version": "1.0.0",
    "display_name": "Permit & License Management Agent",
-   "description": "Tracks permits and licenses across energy facilities, manages renewal calendars, identifies compliance gaps, and monitors applications.",
+   "description": "Tracks permits and licenses across energy facilities, manages renewal calendars, identifies compliance gaps, monitors applications, and assembles renewal work packets for a person to execute.",
    "author": "AIBAST",
    "tags": [
     "permits",
@@ -923,9 +924,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/energy_stacks/permit_license_management_stack/permit_license_management_agent.py",
-   "_size_kb": 12.9,
-   "_lines": 341,
-   "_sha256": "0194dc926d1ba862f379eb7f82319700d8dbcab24220fffbff24b32d7d760dd9",
+   "_size_kb": 19.7,
+   "_lines": 495,
+   "_sha256": "db845cff8f7ad8ac4fc95091244d23a6e28eeb3e1dc9dde2ad738285515387dd",
    "_install_filename": "permit_license_management_agent.py"
   },
   {
@@ -951,9 +952,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/energy_stacks/regulatory_reporting_stack/regulatory_reporting_agent.py",
-   "_size_kb": 12.8,
-   "_lines": 326,
-   "_sha256": "278d3048a76c665bd6c61d83603e1f0b31ebce9c212e126f9c59e44557d0910c",
+   "_size_kb": 16.3,
+   "_lines": 418,
+   "_sha256": "f03f8291dafd75511487013fe478ba5e77d90de7da91a302817bd3086c9f9d12",
    "_install_filename": "regulatory_reporting_agent.py"
   },
   {
@@ -1140,9 +1141,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/financial_services_stacks/customer_onboarding_fs_stack/customer_onboarding_fs_agent.py",
-   "_size_kb": 13.6,
-   "_lines": 317,
-   "_sha256": "60e4b53dc2e06113f10167613bef135ad8a312df107842415956eb976297b34f",
+   "_size_kb": 14.6,
+   "_lines": 345,
+   "_sha256": "e824bc427f41904f954b8175c0a12355f3879de1a2c3741ea3fdbcfaaf916a27",
    "_install_filename": "customer_onboarding_fs_agent.py"
   },
   {
@@ -1177,10 +1178,11 @@
    "name": "@aibast-agents-library/financial-advisor-copilot",
    "version": "1.0.0",
    "display_name": "Financial Advisor Copilot Agent",
-   "description": "Financial advisor support with client reviews, portfolio summaries, recommendation engine, and compliance checks.",
+   "description": "Branch banking and advisory support with the branch servicing queue, client reviews, portfolio summaries, recommendation engine, and compliance checks.",
    "author": "AIBAST",
    "tags": [
     "advisor",
+    "branch-banking",
     "portfolio",
     "investment",
     "compliance",
@@ -1193,9 +1195,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/financial_services_stacks/financial_advisor_copilot_stack/financial_advisor_copilot_agent.py",
-   "_size_kb": 13.2,
-   "_lines": 292,
-   "_sha256": "3883ab9ddac8b57a0d35ec9a380bd71e6d09146d8f8c27d5d83a026f00d6b34a",
+   "_size_kb": 16.9,
+   "_lines": 377,
+   "_sha256": "b6dd32ab407260e7b513237d6d2aa96cb7d3375eac2fa11de0c9fbd56d8a506b",
    "_install_filename": "financial_advisor_copilot_agent.py"
   },
   {
@@ -1284,7 +1286,7 @@
    "name": "@aibast-agents-library/fs-regulatory-compliance",
    "version": "1.0.0",
    "display_name": "FS Regulatory Compliance Agent",
-   "description": "Financial services regulatory compliance with SOX, Dodd-Frank, BSA tracking, remediation planning, and examiner preparation.",
+   "description": "Financial services regulatory compliance with SOX, Dodd-Frank, BSA tracking, remediation planning, examiner preparation, a recorded surveillance exception queue, and desk-level Volcker/Title VII supervision.",
    "author": "AIBAST",
    "tags": [
     "compliance",
@@ -1293,7 +1295,9 @@
     "BSA",
     "AML",
     "regulatory",
-    "financial-services"
+    "financial-services",
+    "surveillance",
+    "trading-desk"
    ],
    "category": "financial_services",
    "quality_tier": "verified",
@@ -1302,9 +1306,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/financial_services_stacks/regulatory_compliance_fs_stack/regulatory_compliance_fs_agent.py",
-   "_size_kb": 12.8,
-   "_lines": 268,
-   "_sha256": "ffaed0d70b8e7e7cc05eb83ecf01925984903d284d7277e919dd0430f0be69c3",
+   "_size_kb": 20.5,
+   "_lines": 400,
+   "_sha256": "eb05be1a945c21c53aea64f0306c06b66d6566d17826a1689161d255d1251349",
    "_install_filename": "regulatory_compliance_fs_agent.py"
   },
   {
@@ -1329,9 +1333,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/financial_services_stacks/underwriting_support_stack/underwriting_support_agent.py",
-   "_size_kb": 14.4,
-   "_lines": 329,
-   "_sha256": "242eb9a49c5cc58a232c15453f92b30927949348039c8f4acc7aeb5534c41af5",
+   "_size_kb": 14.5,
+   "_lines": 330,
+   "_sha256": "b2bec36466c34cf2ec07396b9447f63938e3c05b71d1d8e7d72e1ca19bce8a38",
    "_install_filename": "underwriting_support_agent.py"
   },
   {
@@ -1674,9 +1678,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/general_stacks/procurement_agent_stack/procurement_agent.py",
-   "_size_kb": 14.4,
-   "_lines": 250,
-   "_sha256": "95741ca7e787937e8a3c1dd99ce40fb620c874d424ce375885af387d3d54fffb",
+   "_size_kb": 18.2,
+   "_lines": 318,
+   "_sha256": "adbf8278c9af34d515e7261be6899e83a00a27694083b3239fab814513fa15fc",
    "_install_filename": "procurement_agent.py"
   },
   {
@@ -1780,8 +1784,8 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py",
-   "_size_kb": 14.2,
-   "_lines": 293,
+   "_size_kb": 17.4,
+   "_lines": 349,
    "_sha256": "35f37ba5a3103d0ac645826677fa242d918a6f031b29a1bf35d5ee654a3b3045",
    "_install_filename": "sales_specialist_twin_agent.py"
   },
@@ -2001,7 +2005,7 @@
    "name": "@aibast-agents-library/clinical-notes-summarizer",
    "version": "1.0.0",
    "display_name": "Clinical Notes Summarizer Agent",
-   "description": "Summarizes patient encounters, performs medication reviews, generates problem lists, and produces referral summaries.",
+   "description": "Summarizes patient encounters across visits, performs medication reviews, generates problem lists, produces referral summaries, and assembles the documented pre-operative picture.",
    "author": "AIBAST",
    "tags": [
     "clinical-notes",
@@ -2009,6 +2013,7 @@
     "encounters",
     "medications",
     "referrals",
+    "pre-operative",
     "healthcare"
    ],
    "category": "healthcare",
@@ -2018,9 +2023,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/healthcare_stacks/clinical_notes_summarizer_stack/clinical_notes_summarizer_agent.py",
-   "_size_kb": 15.8,
-   "_lines": 354,
-   "_sha256": "faf0ee52cd24738c53f1da5cf9304fe3b9259ea97295ff4d590899c9deb867b1",
+   "_size_kb": 25.8,
+   "_lines": 561,
+   "_sha256": "195fcd978fc0a13ae71fcd61bae4937451ba9b6bdbaa5c9aa2a103bdeeaa61bf",
    "_install_filename": "clinical_notes_summarizer_agent.py"
   },
   {
@@ -2125,9 +2130,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/human_resources_stacks/ask_hr_stack/ask_hr_agent.py",
-   "_size_kb": 17.3,
-   "_lines": 390,
-   "_sha256": "d447b3b07e8c31f053a3dde602ab7d0451e6e8752ccbbae825df84ffecb6f9f2",
+   "_size_kb": 20.6,
+   "_lines": 469,
+   "_sha256": "04d91f5362c5a72323fd7b3a563b3049aab8b158e72db9ee4c7226226197716c",
    "_install_filename": "ask_hr_agent.py"
   },
   {
@@ -2161,13 +2166,14 @@
    "name": "@aibast-agents-library/inventory-rebalancing",
    "version": "1.0.0",
    "display_name": "Inventory Rebalancing Agent",
-   "description": "Optimizes multi-warehouse inventory distribution by analyzing stock levels against demand forecasts and generating cost-effective transfer plans.",
+   "description": "Optimizes multi-warehouse inventory distribution by analyzing stock levels against demand forecasts, generating cost-effective transfer plans, recommending network replenishment buys, and valuing excess-stock waste exposure.",
    "author": "AIBAST",
    "tags": [
     "inventory",
     "warehouse",
     "supply-chain",
     "rebalancing",
+    "replenishment",
     "manufacturing"
    ],
    "category": "manufacturing",
@@ -2177,16 +2183,16 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/manufacturing_stacks/inventory_rebalancing_stack/inventory_rebalancing_agent.py",
-   "_size_kb": 15.0,
-   "_lines": 353,
-   "_sha256": "9226ca6a090ef17d955ca6ae2eb1aa82b67d575cbca191bc30ad6be5e638c86a",
+   "_size_kb": 24.9,
+   "_lines": 559,
+   "_sha256": "da63c39d1a5e359718f28fa5e569c5f4bc2173071e4703c89ac538a4dcb0d989",
    "_install_filename": "inventory_rebalancing_agent.py"
   },
   {
    "schema": "rapp-agent/1.0",
    "name": "@aibast-agents-library/maintenance-scheduling",
    "version": "1.0.0",
-   "display_name": "Maintenance Scheduling Agent",
+   "display_name": "Predictive Maintenance Agent",
    "description": "Generates predictive maintenance schedules from equipment telemetry and failure models, optimizing technician assignments to minimize unplanned downtime.",
    "author": "AIBAST",
    "tags": [
@@ -2203,9 +2209,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/manufacturing_stacks/maintenance_scheduling_stack/maintenance_scheduling_agent.py",
-   "_size_kb": 16.2,
+   "_size_kb": 16.3,
    "_lines": 367,
-   "_sha256": "d6a9ff28097fa3ffa26b826bc2d201a73cb66dd9fcacdf0f930779faa6580765",
+   "_sha256": "915d0726e1a0cfa307de452ec3f90bb806fd90e2b2beada00a7f0177b18d1b1b",
    "_install_filename": "maintenance_scheduling_agent.py"
   },
   {
@@ -2421,12 +2427,13 @@
    "name": "@aibast-agents-library/inventory-visibility",
    "version": "1.0.0",
    "display_name": "Inventory Visibility Agent",
-   "description": "Delivers real-time inventory dashboards, stock-out alerts, replenishment planning, and channel allocation optimization for omni-channel retail and CPG operations.",
+   "description": "Delivers real-time inventory dashboards, stock-out alerts, overstock review, replenishment planning, and channel allocation optimization for omni-channel retail and CPG operations, with category-level rollups for category managers.",
    "author": "AIBAST",
    "tags": [
     "inventory",
     "stock-management",
     "replenishment",
+    "overstock",
     "omni-channel",
     "retail"
    ],
@@ -2437,9 +2444,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/retail_cpg_stacks/inventory_visibility_stack/inventory_visibility_agent.py",
-   "_size_kb": 15.6,
-   "_lines": 370,
-   "_sha256": "fb93fed58eb1c09c1369f6b52fa5ba7a595666b1c9df50cd151f904f744552c2",
+   "_size_kb": 24.8,
+   "_lines": 593,
+   "_sha256": "474f4a3193efa58ef017eeb6f1ecac2685e6791d6735e3b8946fb01906d533ba",
    "_install_filename": "inventory_visibility_agent.py"
   },
   {
@@ -2463,9 +2470,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/retail_cpg_stacks/personalized_marketing_stack/personalized_marketing_agent.py",
-   "_size_kb": 17.2,
-   "_lines": 436,
-   "_sha256": "06f67c8f4d74c90f34c92f79ba7e3a6c511c12490b97b0eb912124685020e00e",
+   "_size_kb": 21.1,
+   "_lines": 526,
+   "_sha256": "3dfd3dd61268dd66aaa128c6457db27eca103624da365bf2b0d77116e074b15a",
    "_install_filename": "personalized_marketing_agent.py"
   },
   {
@@ -2489,9 +2496,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/retail_cpg_stacks/returns_complaints_resolution_stack/returns_complaints_resolution_agent.py",
-   "_size_kb": 20.4,
-   "_lines": 506,
-   "_sha256": "cbcc0c72e9e35465b5a3e002fda88b1722d438f8b85ec652d5090c68e7de3c49",
+   "_size_kb": 26.4,
+   "_lines": 662,
+   "_sha256": "1f02329e321dbcf35497be51b3f7897f992482cff4fb75d1e3e183fb5f6a9af4",
    "_install_filename": "returns_complaints_resolution_agent.py"
   },
   {
@@ -2499,13 +2506,14 @@
    "name": "@aibast-agents-library/store-associate-copilot",
    "version": "1.0.0",
    "display_name": "Store Associate Copilot Agent",
-   "description": "Provides store associates with instant product lookup, guided customer assistance scripts, daily task checklists, and real-time performance dashboards to improve in-store operations.",
+   "description": "Provides store associates with instant product lookup, guided customer assistance scripts, daily task checklists, receipt and return-eligibility lookup, and real-time performance dashboards to improve in-store operations.",
    "author": "AIBAST",
    "tags": [
     "store-operations",
     "associate",
     "copilot",
     "product-lookup",
+    "transaction-support",
     "retail"
    ],
    "category": "retail_cpg",
@@ -2515,9 +2523,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/retail_cpg_stacks/store_associate_copilot_stack/store_associate_copilot_agent.py",
-   "_size_kb": 22.4,
-   "_lines": 538,
-   "_sha256": "d1113750e2378b85eed5160f1345b945e1a924888f2bbcebd0602be0b4452494",
+   "_size_kb": 30.1,
+   "_lines": 756,
+   "_sha256": "4c64aec70f76ccbd3c6eeaad00f06697b3721ca1fd56adf59a31da7f77587f29",
    "_install_filename": "store_associate_copilot_agent.py"
   },
   {
@@ -2657,12 +2665,13 @@
    "name": "@aibast-agents-library/utility-billing-assistance",
    "version": "1.0.0",
    "display_name": "Utility Billing Assistance Agent",
-   "description": "Municipal utility billing support with account inquiries, usage analysis, payment plans, and assistance program eligibility.",
+   "description": "Municipal utility billing support with account inquiries, usage analysis, suspected-leak flagging, payment plans, and assistance program eligibility.",
    "author": "AIBAST",
    "tags": [
     "utility",
     "billing",
     "water",
+    "leak",
     "payment",
     "assistance",
     "municipal"
@@ -2674,9 +2683,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/slg_government_stacks/utility_billing_assistance_stack/utility_billing_assistance_agent.py",
-   "_size_kb": 16.3,
-   "_lines": 372,
-   "_sha256": "f09baff79727ad049b51fc54269236ea2f4662b4b1e5def5b8a2b4ecc931cf32",
+   "_size_kb": 23.9,
+   "_lines": 543,
+   "_sha256": "6d34b896df658ee32fa81f052714dccb2da0eb9265027f3140c93d4de2b897d0",
    "_install_filename": "utility_billing_assistance_agent.py"
   },
   {
@@ -2736,7 +2745,7 @@
    "name": "@aibast-agents-library/license-renewal-expansion",
    "version": "1.0.0",
    "display_name": "License Renewal & Expansion Agent",
-   "description": "Manages SaaS license renewal pipelines, expansion opportunities, churn risk analysis, and revenue impact projections.",
+   "description": "Manages SaaS license renewal pipelines, expansion opportunities, churn risk analysis, renewal win probability, and revenue impact projections.",
    "author": "AIBAST",
    "tags": [
     "license",
@@ -2744,7 +2753,8 @@
     "expansion",
     "churn",
     "revenue",
-    "saas"
+    "saas",
+    "probability"
    ],
    "category": "software_digital_products",
    "quality_tier": "verified",
@@ -2753,9 +2763,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/software_dp_stacks/license_renewal_expansion_stack/license_renewal_expansion_agent.py",
-   "_size_kb": 13.6,
-   "_lines": 351,
-   "_sha256": "ece11a920522b9d6f943635794079e70f42460d8bbac85718d2e54e26661e125",
+   "_size_kb": 17.2,
+   "_lines": 429,
+   "_sha256": "1b7dad314bed79c0eef4287867b9d823f5d974fd39d1d8bd94431b455eabc8a0",
    "_install_filename": "license_renewal_expansion_agent.py"
   },
   {
@@ -2780,9 +2790,9 @@
     "@rapp/basic-agent"
    ],
    "_file": "agents/@aibast-agents-library/software_dp_stacks/product_feedback_synthesizer_stack/product_feedback_synthesizer_agent.py",
-   "_size_kb": 13.1,
-   "_lines": 363,
-   "_sha256": "7d90cb323b424027f1eeb8655f2de42d3498400f100acc4cd38177e1a1c15848",
+   "_size_kb": 17.2,
+   "_lines": 453,
+   "_sha256": "36839eabdf3efcdf9e29984ab18d4170fe28cfb238cf460ba9b37b9149d5ffc0",
    "_install_filename": "product_feedback_synthesizer_agent.py"
   },
   {

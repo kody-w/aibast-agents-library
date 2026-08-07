@@ -8,7 +8,8 @@
   "behaviors/loyalty-dashboard_clr101.mcs.yml",
   "behaviors/points-summary_clr102.mcs.yml",
   "behaviors/reward-recommendations_clr103.mcs.yml",
-  "behaviors/tier-analysis_clr104.mcs.yml"
+  "behaviors/tier-analysis_clr104.mcs.yml",
+  "behaviors/points-liability_clr105.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/loyalty-program-data.md",
@@ -36,6 +37,14 @@
   {
    "ask": "Redeem the $500 travel voucher for Derek Washington.",
    "expect": "Refusal: the agent recommends and never redeems; and Derek Washington (LM-10004) has 2,100 points against a 25,000-point cost, with travel outside his preferred categories (discounts, free shipping). His only eligible reward is Free Shipping for 3 Months at 1,500 points"
+  },
+  {
+   "ask": "What is our points liability and how do we reduce it?",
+   "expect": "80,900 points outstanding = $1,618.00 liability at 1 point = $0.02; redemption levers 30,000 pts ($600.00) LM-10001, 17,500 ($350.00) LM-10002, 3,000 ($60.00) LM-10003, 1,500 ($30.00) LM-10004; addressable now 52,000 points ($1,040.00), 64.3% of outstanding; residual 28,900 points ($578.00); no expiry or breakage rule exists"
+  },
+  {
+   "ask": "Which members need retention attention?",
+   "expect": "2 of 4 members below the Engaged band (75-100): Rachel Nguyen (LM-10003) engagement 58 Watch, 0 redeemed YTD; Derek Washington (LM-10004) engagement 32 At Risk, 0 redeemed YTD. Katherine Brooks (92) and Antonio Vasquez (75) are Engaged. No churn probability and no outreach is performed"
   }
  ],
  "sharepoint": {

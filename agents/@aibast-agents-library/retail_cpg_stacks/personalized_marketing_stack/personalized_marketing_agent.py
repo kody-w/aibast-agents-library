@@ -257,6 +257,22 @@ def _campaign_projected_revenue(camp_id):
     return round(audience * conv_rate * basket, 2)
 
 
+# Only cost input in the model: outbound contact cost. No creative, discount
+# margin, or platform fees are modeled here.
+CONTACT_COST_PER_RECIPIENT = 0.35
+
+
+def _campaign_contact_cost(camp_id):
+    camp = CAMPAIGN_TEMPLATES.get(camp_id, {})
+    seg = CUSTOMER_SEGMENTS.get(camp.get("target_segment", ""), {})
+    return round(seg.get("size", 0) * CONTACT_COST_PER_RECIPIENT, 2)
+
+
+def _campaign_roas(camp_id):
+    cost = _campaign_contact_cost(camp_id)
+    return round(_campaign_projected_revenue(camp_id) / cost, 2) if cost > 0 else 0
+
+
 # ---------------------------------------------------------------------------
 # Agent Class
 # ---------------------------------------------------------------------------
@@ -279,6 +295,7 @@ class PersonalizedMarketingAgent(BasicAgent):
                             "campaign_design",
                             "content_personalization",
                             "performance_analysis",
+                            "activation_handoff",
                         ],
                     },
                     "segment_id": {"type": "string"},
@@ -393,8 +410,7 @@ class PersonalizedMarketingAgent(BasicAgent):
         for cid, camp in CAMPAIGN_TEMPLATES.items():
             seg = CUSTOMER_SEGMENTS.get(camp["target_segment"], {})
             rev = _campaign_projected_revenue(cid)
-            cost_estimate = seg.get("size", 0) * 0.35  # $0.35 per contact
-            roas = round(rev / cost_estimate, 2) if cost_estimate > 0 else 0
+            roas = _campaign_roas(cid)  # revenue / (audience x $0.35 per contact)
             lines.append(
                 f"| {camp['name']} | {seg.get('size', 0):,} | ${rev:,.2f} "
                 f"| {camp['historical_conversion_rate']*100:.1f}% | {roas}x |"
@@ -404,6 +420,77 @@ class PersonalizedMarketingAgent(BasicAgent):
         lines.append(f"**Total Projected Campaign Revenue:** ${total_rev:,.2f}")
         return "\n".join(lines)
 
+    def _activation_handoff(self, **kwargs):
+        """Launch-ready package for a human to execute. Prepares; never sends."""
+        campaign_id = kwargs.get("campaign_id")
+        lines = ["# Campaign Activation Handoff", ""]
+        if campaign_id and campaign_id in CAMPAIGN_TEMPLATES:
+            camps = {campaign_id: CAMPAIGN_TEMPLATES[campaign_id]}
+        else:
+            if campaign_id:
+                lines.append(
+                    f"`{campaign_id}` is not in the campaign template library - "
+                    "showing the full portfolio, not a filtered view."
+                )
+                lines.append("")
+            camps = CAMPAIGN_TEMPLATES
+        lines.append(
+            "_Prepared for human execution. Nothing here has been sent, "
+            "scheduled, or enrolled._"
+        )
+        lines.append("")
+        for cid, camp in camps.items():
+            seg_id = camp["target_segment"]
+            seg = CUSTOMER_SEGMENTS.get(seg_id, {})
+            channels = seg.get("preferred_channels", [])
+            lines.append(f"## {camp['name']} (`{cid}`)")
+            lines.append("")
+            lines.append(f"- **Campaign Type:** {camp['type']}")
+            lines.append(
+                f"- **Resolved Audience:** {seg.get('name', 'Unknown')} ({seg_id}) "
+                f"- {seg.get('size', 0):,} contacts"
+            )
+            lines.append(f"- **Offer:** {camp['discount_offer']}")
+            lines.append(
+                f"- **Run Shape:** {camp['duration_days']} days, {camp['stages']} stages "
+                "(no send dates in this data - the owner sets them)"
+            )
+            lines.append("- **Sequence Channel:** email")
+            lines.append(f"- **Segment Preferred Channels:** {', '.join(channels)}")
+            if camp["type"] == "multi_channel":
+                lines.append(
+                    "- **Note:** non-email channels for this multi_channel campaign "
+                    "are not specified in the data."
+                )
+            if "email" not in channels:
+                lines.append(
+                    f"- **Note:** email is not a stored preferred channel for {seg_id} "
+                    "- resolve before execution."
+                )
+            lines.append(
+                f"- **Contact Cost @ ${CONTACT_COST_PER_RECIPIENT:.2f}:** "
+                f"${_campaign_contact_cost(cid):,.2f}"
+            )
+            lines.append(
+                f"- **Projected Revenue:** ${_campaign_projected_revenue(cid):,.2f} "
+                "(projected from historical rates, not booked)"
+            )
+            lines.append(f"- **Est. ROAS:** {_campaign_roas(cid)}x")
+            lines.append(
+                "- **Destination System:** not in this data - name the campaign "
+                "platform of record before execution"
+            )
+            lines.append(
+                "- **Status:** PREPARED - not sent. Requires a named human owner "
+                "to execute."
+            )
+            lines.append("")
+            lines.append("**Sequence (execute in this order):**")
+            for i, subj in enumerate(camp["subject_lines"], 1):
+                lines.append(f"  {i}. {subj}")
+            lines.append("")
+        return "\n".join(lines)
+
     def perform(self, **kwargs):
         operation = kwargs.get("operation", "customer_segmentation")
         dispatch = {
@@ -411,6 +498,7 @@ class PersonalizedMarketingAgent(BasicAgent):
             "campaign_design": self._campaign_design,
             "content_personalization": self._content_personalization,
             "performance_analysis": self._performance_analysis,
+            "activation_handoff": self._activation_handoff,
         }
         handler = dispatch.get(operation)
         if not handler:
@@ -432,4 +520,6 @@ if __name__ == "__main__":
     print(agent.perform(operation="content_personalization", segment_id="SEG-LOYAL"))
     print("\n" + "=" * 80)
     print(agent.perform(operation="performance_analysis"))
+    print("\n" + "=" * 80)
+    print(agent.perform(operation="activation_handoff", campaign_id="CAMP-WINBACK"))
     print("=" * 80)

@@ -75,6 +75,12 @@ content: |
   - The net annual benefit compares a one-time transfer cost against an
     annualized risk figure. Call that out; it is not a like-for-like period
     comparison.
+  - This skill costs stock that is too low. Stock that is too high is the
+    waste-exposure skill's job -- excess and aging units valued at their
+    write-off factor. When the user asks what inventory costs overall, or asks
+    about waste, obsolescence, or dead stock, hand off to waste-exposure
+    rather than answering from holding cost alone. Holding cost is what the
+    excess costs to keep; waste exposure is what it costs to never sell.
   - If asked for a holding rate, unit cost, or reorder point that is not in
     the data, say so. Never interpolate one.
   - Analysis only. Never state that a budget has been committed, a transfer

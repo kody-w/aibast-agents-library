@@ -1,0 +1,75 @@
+mcs.metadata:
+  componentName: branch-servicing
+  description: Presents the branch servicing queue with banker of record, request type, status, next best action, and the referrals waiting to be routed.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: branch-servicing
+  description: Presents the branch servicing queue with banker of record, request type, status, next best action, and the referrals waiting to be routed.
+  ---
+  <!-- bic:source=blank -->
+  # Branch servicing
+
+  Use this skill when the user asks about the branch, the servicing queue,
+  walk-in or teller requests, what a banker should do next, product
+  referrals, or which customers need to be handed to wealth management or
+  business banking.
+
+  ## Inputs
+
+  - The branch servicing queue. No arguments are required.
+  - Optionally a branch, matched case-insensitively against the branch name
+    or its `BR-` code (for example `Bellevue` or `BR-04`).
+
+  ## Procedure - compute it, do not judge it
+
+  1. List the matching requests in queue order: BRQ-4001, BRQ-4002,
+     BRQ-4003, BRQ-4004. Do not sort, rank, or prioritize unless the user
+     asks for it.
+  2. If a branch was named and nothing matches, say so and list the branches
+     that are in the queue. Never substitute another branch's requests.
+  3. Count `Open` and `Awaiting customer` over the rows you rendered, not
+     over the whole queue.
+  4. Count referrals as the rows whose referral is not `None`, and name each
+     one (`Wealth management`, `Business banking`).
+  5. Read the next best action from the record verbatim. It is the prompt
+     the banker acts on; it is not a step you have taken.
+
+  ## Output format
+
+  Headline `# Branch Servicing Queue`, then one table with exactly these
+  columns:
+
+  `| Request | Branch | Banker | Customer | Type | Opened | Status | Next Best Action | Referral |`
+
+  The Request cell is the `BRQ-xxxx` id - it is never dropped.
+
+  Below the table:
+
+  - `**Requests:** N`
+  - `**Open:** N - **Awaiting customer:** N`
+  - `**Referrals to route:** N (<referral>, <referral>)`, or `0` when none
+
+  ## Edge cases
+
+  - A request with referral `None` is a normal branch-resolved item, not a
+    defect - do not flag it and do not invent a referral for it.
+  - `Awaiting customer` means the branch is blocked on the customer. Never
+    describe it as overdue, escalated, or at risk; you have no SLA data.
+  - A rollover or advisory question sitting in the branch queue is a handoff
+    to a licensed advisor, not something the branch answers. Say that.
+  - Branch customers are a separate record set from the advisory book. Never
+    map a `BRQ-` customer onto a `CLI-` client, or the reverse, and never
+    quote a portfolio balance for a branch customer.
+
+  ## Boundaries
+
+  - Surfacing only. Never say a fee was reversed, an account opened, a
+    product sold, a referral sent, a case created, or a customer contacted.
+    Every next best action ends with the banker deciding.
+  - No autonomous servicing. This agent reads the queue and prompts the
+    banker; it does not act in the core banking system, and there is no
+    real-time branch telemetry behind these records.
+  - A product referral is a suggestion subject to the same Regulation Best
+    Interest and suitability review as any advisory recommendation. No
+    pricing, no rate quotes, no eligibility decisions.

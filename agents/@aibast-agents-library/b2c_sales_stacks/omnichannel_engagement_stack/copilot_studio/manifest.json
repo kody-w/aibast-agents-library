@@ -1,14 +1,16 @@
 {
  "schema": "aibast-copilot-studio-scaffold/1.0",
  "stack": "omnichannel-engagement",
- "display_name": "Omnichannel Engagement Agent",
+ "display_name": "Cross-Channel Engagement Agent",
  "agent_intent": "../omnichannel_engagement_agent.py",
  "instructions": "instructions.md",
  "behaviors": [
   "behaviors/channel-performance_oce101.mcs.yml",
   "behaviors/journey-analysis_oce102.mcs.yml",
   "behaviors/engagement-optimization_oce103.mcs.yml",
-  "behaviors/campaign-attribution_oce104.mcs.yml"
+  "behaviors/campaign-attribution_oce104.mcs.yml",
+  "behaviors/unified-interaction-view_oce105.mcs.yml",
+  "behaviors/support-interactions_oce106.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/omnichannel-engagement-data.md",

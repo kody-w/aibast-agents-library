@@ -1,7 +1,7 @@
 # Procurement Requests and Vendors
 
-> SYNTHETIC — DEMO DATA. Every purchase request, requester, vendor, and dollar
-> figure in this document is fictional. This file exists so the agent has a
+> SYNTHETIC — DEMO DATA. Every purchase request, purchase order, requester,
+> vendor, and dollar figure in this document is fictional. This file exists so the agent has a
 > working world to answer from on day one. In production, replace this file
 > with tools that read your real ERP purchase requisitions and vendor master
 > (see the README's production section).
@@ -23,6 +23,32 @@
 | PR-5002 | 5th floor build-out for 30 new employees starting Q2 |
 | PR-5003 | Annual enterprise license renewal, 200 seats |
 | PR-5004 | Q2 leadership development program for 25 managers |
+
+## Purchase order ledger
+
+A purchase order is drafted against a purchase request. Only a person issues
+an order; the ledger records the state a person left it in.
+
+| ID | Source PR | Vendor | Amount | Payment Terms | Issue Status | Receipt Status |
+|----|-----------|--------|--------|---------------|--------------|----------------|
+| PO-7001 | PR-5003 | Salesforce (VND-002) | $215,000 | Annual Prepay | Issued | Not Received |
+| PO-7002 | PR-5002 | Steelcase (VND-003) | $48,500 | Net 45 | Draft | Not Received |
+| PO-7003 | PR-5001 | AWS (VND-001) | $125,000 | Net 30 | Draft | Not Received |
+
+### What holds each draft
+
+| ID | Blocked by |
+|----|------------|
+| PO-7001 | Nothing - the buyer has issued this order |
+| PO-7002 | PR-5002 is in Vendor Selection - vendor not yet selected |
+| PO-7003 | PR-5001 is Pending Approval - CFO sign-off outstanding |
+
+PR-5004 has no purchase order drafted; it is still a Draft request.
+
+Order amounts and payment terms match their source request and the vendor
+catalog entry. Committed spend in the category budget ledger covers both
+issued orders and approved-but-unordered requests, so a drafted order does
+not add to committed spend a second time.
 
 ## Vendor catalog
 
@@ -54,5 +80,5 @@ All catalogued vendors carry an Active contract status.
 | CRM Software | Salesforce (VND-002) only |
 | Training Services | FranklinCovey (VND-006) only |
 
-Source systems: Procurement System (requests), Vendor Management System
-(catalog).
+Source systems: Procurement System (requests and orders), Vendor Management
+System (catalog).

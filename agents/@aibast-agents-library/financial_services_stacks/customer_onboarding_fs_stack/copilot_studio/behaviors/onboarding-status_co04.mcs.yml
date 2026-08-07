@@ -1,11 +1,11 @@
 mcs.metadata:
   componentName: onboarding-status
-  description: Summarizes the onboarding pipeline - application count, total estimated assets, status distribution, and the full application detail table.
+  description: Summarizes the onboarding pipeline - application count, total estimated assets, status distribution, pipeline aging, and the full application detail table.
 kind: InlineAgentSkill
 content: |
   ---
   name: onboarding-status
-  description: Summarizes the onboarding pipeline - application count, total estimated assets, status distribution, and the full application detail table.
+  description: Summarizes the onboarding pipeline - application count, total estimated assets, status distribution, pipeline aging, and the full application detail table.
   ---
   <!-- bic:source=blank -->
   # Onboarding status
@@ -30,9 +30,18 @@ content: |
   - Status distribution: one line per distinct status with its count, in
     pipeline order - Kyc In Progress, Document Review, Enhanced Due Diligence,
     Approved. The current data holds exactly one application in each.
+  - `as_of = the latest submitted date across all applications` (2025-03-05 on
+    the current data). Every aging number is measured against this date, which
+    comes from the data itself - never from today's real-world date.
+  - `days_in_pipeline = as_of - that application's submitted date`, in whole
+    days. On the current data: APP-6001 13, APP-6002 8, APP-6003 4, APP-6004 0.
+  - Longest in pipeline: the application with the highest `days_in_pipeline`
+    (APP-6001 at 13 days on the current data). Name it, give its day count, and
+    state the as-of date beside it.
 
   Money is whole dollars with thousands separators. Statuses are title-cased
-  with underscores replaced by spaces.
+  with underscores replaced by spaces. Submitted dates are reported in
+  ISO form (YYYY-MM-DD) exactly as recorded.
 
   ### Ordering
 
@@ -46,15 +55,23 @@ content: |
   - `# Customer Onboarding Pipeline`
   - `**Applications:** N`
   - `**Total Estimated Assets:** $N`
+  - `**Longest in Pipeline:** APP-id - N days (aging measured as of <as_of>,
+    the most recent submission on file)`
   - `## Pipeline Status` - `- <Status>: N` per status
   - `## Application Details` - one table:
 
-  `| App ID | Applicant | Account | Risk | Est. Assets | Status | RM |`
+  `| App ID | Applicant | Account | Risk | Est. Assets | Submitted | Days in Pipeline | Status | RM |`
 
   ## Edge cases and boundaries
 
   - Estimated assets are the applicant's stated figure, not verified balances
     or funded deposits. Label them estimated whenever you total them.
+  - Days in pipeline is time since submission, not time in the current stage.
+    Stage entry dates are not recorded, so never claim an application has sat
+    in Document Review or Enhanced Due Diligence for a given number of days.
+  - The as-of date is the newest submission on file, so the newest application
+    reads 0 days. That is a property of the data snapshot, not a data error -
+    say so if asked, and never substitute today's date to make it look larger.
   - If the user scopes the ask to one relationship manager, risk rating, or
     status, filter every row, count, and total to that scope and say the view
     is filtered - never present a filtered total as the pipeline total.

@@ -102,3 +102,63 @@ HIGH work is done and the MEDIUM work is not. It is not a live task feed.
 These are three independent maxima over the same four associates. There is no
 combined score and no overall ranking. `Hours This Week` is roster context, not
 a dashboard column — it is never blended into a rate.
+
+## Receipt archive — transaction support
+
+The business date is fixed at **2026-07-24**. Every day count below is measured
+against that date, never against the clock.
+
+The archive holds exactly eight orders, ORD-5001 through ORD-5008. It is a
+lookup sample for register-side questions — it is **not** the store transaction
+log, and it does not reconcile with the 52 transactions on today's performance
+dashboard. Never total it into a sales figure or compare it with the dashboard.
+
+### Return window policy
+
+| Category | Return window |
+|----------|---------------|
+| Electronics | 15 days |
+| Apparel | 30 days |
+| Footwear | 30 days |
+| Accessories | 30 days |
+| Fitness | 30 days |
+| Home | 30 days |
+
+The window opens on the purchase date for an in-store order and on the pickup
+date for an online pickup (BOPIS) order. An order still awaiting pickup has no
+window yet.
+
+### Orders on file
+
+| Order | Date | SKU | Item | Qty | Price Paid | Order Total | Tender | Channel | Rung By | Status |
+|-------|------|-----|------|-----|------------|-------------|--------|---------|---------|--------|
+| ORD-5001 | 2026-07-22 | SKU-1005 | Premium Running Shoes | 1 | $149.99 | $149.99 | Credit Card | In-store | ASC-101 | Completed |
+| ORD-5002 | 2026-07-05 | SKU-1002 | Wireless Earbuds Pro | 1 | $59.99 | $59.99 | Debit Card | Online pickup (BOPIS) | ASC-102 | Completed |
+| ORD-5003 | 2026-06-28 | SKU-1001 | Classic Denim Jacket | 1 | $89.99 | $89.99 | Cash | In-store | ASC-103 | Completed |
+| ORD-5004 | 2026-07-19 | SKU-1003 | Organic Cotton T-Shirt | 2 | $23.99 | $47.98 | Credit Card | In-store | ASC-101 | Completed |
+| ORD-5005 | 2026-07-23 | SKU-1004 | Smart Fitness Tracker | 1 | $129.99 | $129.99 | Gift Card | Online pickup (BOPIS) | ASC-104 | Awaiting pickup |
+| ORD-5006 | 2026-07-10 | SKU-1007 | Leather Crossbody Bag | 1 | $79.99 | $79.99 | Store Credit | In-store | ASC-102 | Completed |
+| ORD-5007 | 2026-06-15 | SKU-1009 | Performance Yoga Mat | 1 | $54.99 | $54.99 | Credit Card | In-store | ASC-103 | Completed |
+| ORD-5008 | 2026-07-23 | SKU-1010 | Aromatherapy Candle Set | 1 | $34.99 | $34.99 | Mobile Wallet | Online pickup (BOPIS) | ASC-104 | Completed |
+
+Price paid equals the catalog retail price on every order except ORD-5004,
+which carries the **Summer Basics promotion, $6.00 off each** ($29.99 → $23.99).
+Order total is quantity × price paid.
+
+### Return eligibility as of 2026-07-24
+
+| Order | Category | Window | Window Opens | Window Closes | Eligibility |
+|-------|----------|--------|--------------|---------------|-------------|
+| ORD-5001 | Footwear | 30 days | 2026-07-22 | 2026-08-21 | Eligible — 28 days left |
+| ORD-5002 | Electronics | 15 days | 2026-07-05 | 2026-07-20 | Expired — closed 4 days ago |
+| ORD-5003 | Apparel | 30 days | 2026-06-28 | 2026-07-28 | Eligible — 4 days left |
+| ORD-5004 | Apparel | 30 days | 2026-07-19 | 2026-08-18 | Eligible — 25 days left |
+| ORD-5005 | Electronics | 15 days | not started | not started | Not started — awaiting pickup |
+| ORD-5006 | Accessories | 30 days | 2026-07-10 | 2026-08-09 | Eligible — 16 days left |
+| ORD-5007 | Fitness | 30 days | 2026-06-15 | 2026-07-15 | Expired — closed 9 days ago |
+| ORD-5008 | Home | 30 days | 2026-07-23 | 2026-08-22 | Eligible — 29 days left |
+
+Eligibility is a policy read against the archived record. Refunds go back to the
+original tender and are rung by an associate at the register — the agent never
+processes a return, issues a refund or store credit, adjusts a price, or
+approves an exception to the window.

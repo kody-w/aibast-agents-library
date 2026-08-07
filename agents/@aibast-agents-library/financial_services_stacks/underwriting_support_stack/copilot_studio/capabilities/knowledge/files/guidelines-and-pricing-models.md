@@ -28,16 +28,16 @@
 | Required inspections | fire_protection, electrical, roof_condition |
 | Prohibited risks | cannabis_operations, fireworks_storage |
 
-### personal_auto
+### commercial_auto
 
 | Guideline | Value |
 |-----------|-------|
-| Max coverage | $1,000,000 |
-| Min driver age | 16 |
+| Max coverage | $5,000,000 |
+| Max fleet size | 250 |
 | Max violations (3 yr) | 3 |
 | Max accidents (3 yr) | 2 |
-| Min credit score | 550 |
-| Required documents | MVR, prior_insurance_dec |
+| Min years operating | 2 |
+| Required documents | MVR_summary, vehicle_schedule, loss_runs |
 
 ### professional_liability
 
@@ -60,9 +60,9 @@
 
 Only four of these are machine-tested today: the coverage ceiling on every
 line, the professional liability high-risk specialty list, the professional
-liability 5-year claims maximum, and the personal auto 3-year violation
-maximum. The remaining guidelines are published for the underwriter and are
-not evaluated automatically.
+liability 5-year claims maximum, and the commercial auto 3-year fleet
+violation maximum. The remaining guidelines are published for the underwriter
+and are not evaluated automatically.
 
 ## Pricing models
 
@@ -86,26 +86,23 @@ not evaluated automatically.
 | 4 | 1.00 |
 | 5 | 1.10 |
 
-### personal_auto
+### commercial_auto
 
 | Factor | Value |
 |--------|-------|
-| Base premium | $1,200 |
+| Base rate per vehicle | $2,800 |
 
-| Driver age | Factor |
-|------------|--------|
-| 16 | 2.50 |
-| 25 | 1.30 |
-| 30 | 1.00 |
-| 50 | 0.95 |
-| 65 | 1.05 |
+| Vehicle class | Factor |
+|---------------|--------|
+| light_truck | 0.95 |
+| medium_truck | 1.20 |
+| heavy_truck | 1.55 |
 
-| Credit score | Factor |
-|--------------|--------|
-| 800 | 0.85 |
-| 700 | 1.00 |
-| 600 | 1.25 |
-| 500 | 1.60 |
+| Radius of operation | Factor |
+|---------------------|--------|
+| local | 0.90 |
+| intermediate | 1.15 |
+| long_haul | 1.45 |
 
 ### professional_liability
 

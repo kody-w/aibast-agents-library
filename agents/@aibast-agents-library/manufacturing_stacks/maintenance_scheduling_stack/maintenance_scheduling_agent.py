@@ -1,5 +1,5 @@
 """
-Maintenance Scheduling Agent
+Predictive Maintenance Agent (package slug: maintenance-scheduling)
 
 Manages predictive and preventive maintenance for manufacturing equipment.
 Analyzes sensor telemetry, failure probability models, and technician
@@ -17,7 +17,7 @@ __manifest__ = {
     "schema": "rapp-agent/1.0",
     "name": "@aibast-agents-library/maintenance-scheduling",
     "version": "1.0.0",
-    "display_name": "Maintenance Scheduling Agent",
+    "display_name": "Predictive Maintenance Agent",
     "description": "Generates predictive maintenance schedules from equipment telemetry and failure models, optimizing technician assignments to minimize unplanned downtime.",
     "author": "AIBAST",
     "tags": ["maintenance", "predictive", "scheduling", "manufacturing", "IoT"],

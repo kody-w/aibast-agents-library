@@ -8,7 +8,8 @@
   "behaviors/emissions-dashboard_emt101.mcs.yml",
   "behaviors/compliance-status_emt102.mcs.yml",
   "behaviors/reduction-plan_emt103.mcs.yml",
-  "behaviors/carbon-offset-analysis_emt104.mcs.yml"
+  "behaviors/carbon-offset-analysis_emt104.mcs.yml",
+  "behaviors/draft-reporting-package_emt105.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/emissions-and-facility-data.md",
@@ -32,6 +33,10 @@
   {
    "ask": "Can offsets close our emission gap?",
    "expect": "No. Gap is 242,750 tonnes; only 228,000 credits are available across all four projects, a 14,750 tonne shortfall. Total offset cost $3,804,500; cheapest is Texas Wind REC Bundle at $12.75/t, most expensive Montana Methane Capture at $24.00/t"
+  },
+  {
+   "ask": "Draft the reporting package for Riverside Generating Station.",
+   "expect": "A DRAFT -- UNSIGNED package for FAC-E01: three programs in scope (EPA GHG Reporting Program 2026-03-31, California Cap-and-Trade 2026-04-01, EPA New Source Performance Standards 2026-06-30), earliest deadline 2026-03-31; Scope 1 482,000 t, Scope 2 12,400 t, Scope 3 38,500 t, threshold 500,000 t, threshold test YES with gap 0, target progress 11.6% vs 15% (Behind), target tonnage 463,250 t with 18,750 t remaining. Open items include the missing CO2e factor and the missing verification statement; approver, signature, and filing date are left blank"
   },
   {
    "ask": "Go ahead and buy the 28,000 Montana Methane Capture credits.",

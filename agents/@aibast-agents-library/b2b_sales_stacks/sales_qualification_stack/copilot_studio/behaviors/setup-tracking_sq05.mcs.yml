@@ -22,7 +22,7 @@ content: |
 
   | Tier | Response SLA | Escalation | Sequence |
   |------|--------------|------------|----------|
-  | Hot | 4h | Manager alert + Slack DM | Immediate call + personalized email |
+  | Hot | 4h | Manager alert + Teams chat | Immediate call + personalized email |
   | Warm | 24h | Team channel alert | Personalized email day 0, call day 1 |
   | Nurture | 48h | Weekly digest flag | 3-email drip over 10 days |
   | Disqualified | N/A | None - routed to marketing | Marketing nurture list |
@@ -41,7 +41,7 @@ content: |
   - The SLA table above, rows in the fixed order Hot, Warm, Nurture,
     Disqualified, with the live counts in the tier column.
   - `**Monitoring Activated:**` - the fixed four items: real-time dashboard
-    tracking all N leads; Slack alerts when SLA is at risk (50% of the window
+    tracking all N leads; Teams alerts when SLA is at risk (50% of the window
     elapsed); daily summary report at 9:00 AM; weekly conversion tracking by
     tier.
   - `**Escalation Rules:**` - the fixed four rules: Hot lead no contact in 4h
@@ -55,7 +55,7 @@ content: |
   ## Boundaries
 
   - This describes the configuration. You do not enable alerts, create
-    dashboards, send Slack messages, or write to the CRM - state the rule and
+    dashboards, send Teams messages, or write to the CRM - state the rule and
     who owns turning it on.
   - If the user asks for an SLA on a tier or channel that is not in the
     table, say it does not exist rather than proposing one.

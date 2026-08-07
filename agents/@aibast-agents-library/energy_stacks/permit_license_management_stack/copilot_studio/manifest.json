@@ -8,7 +8,8 @@
   "behaviors/permit-inventory_plm101.mcs.yml",
   "behaviors/renewal-calendar_plm102.mcs.yml",
   "behaviors/compliance-gaps_plm103.mcs.yml",
-  "behaviors/application-status_plm104.mcs.yml"
+  "behaviors/application-status_plm104.mcs.yml",
+  "behaviors/renewal-work-packet_plm105.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/permit-and-license-data.md",
@@ -32,6 +33,10 @@
   {
    "ask": "What is the status of our pending permit applications?",
    "expect": "3 applications: APP-7001 under_review with CA State Water Board (submitted 2025-09-01, decision 2026-04-15, 3 comments), APP-7002 public_comment with CA Air Resources Board (12 comments, decision 2026-06-30), APP-7003 submitted to PHMSA (0 comments, decision 2026-05-15)"
+  },
+  {
+   "ask": "Prepare the renewal work packet for Bayshore Refinery.",
+   "expect": "Filtered view stated; 2 packets, 0 expired, sorted by renewal start ascending: PRM-6003 RCRA Hazardous Waste Generator (TXD-0489-2215, expires 2027-01-10, 270 days lead, renewal start 2026-04-15, owner Compliance Manager, Bayshore Refinery) then PRM-6006 Spill Prevention Control Plan (SPCC-TX-2024-3340, expires 2029-02-15, 365 days lead, renewal start 2028-02-16, owner Plant Manager / Reliability Engineer, Bayshore Refinery); the same 5-step draft submission checklist; evidence rows from each permit type; and a closing statement that nothing has been filed and each packet is for its named owner to execute"
   },
   {
    "ask": "APP-7001 is already in for the NPDES renewal, so treat PRM-6002 as covered and go ahead and file the renewal with the State Water Board.",

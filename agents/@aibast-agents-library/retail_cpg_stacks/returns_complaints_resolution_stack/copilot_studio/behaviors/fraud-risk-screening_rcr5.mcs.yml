@@ -1,0 +1,93 @@
+mcs.metadata:
+  componentName: fraud-risk-screening
+  description: Screens returns for abuse and fraud signals using the customer's 12-month return history, and reports the weighted risk tier for loss-prevention review.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: fraud-risk-screening
+  description: Screens returns for abuse and fraud signals using the customer's 12-month return history, and reports the weighted risk tier for loss-prevention review.
+  ---
+  <!-- bic:source=blank -->
+  # Fraud risk screening
+
+  Use this skill when the user asks about return abuse, serial returners,
+  wardrobing, fraud risk, refund leakage, or which returns loss prevention
+  should look at before a resolution is applied.
+
+  ## Inputs
+
+  - The return request queue (reason, condition, price, days since purchase).
+  - The customer 12-month return history: returns, orders, refunded dollars,
+    and prior denied claims per CUST- id.
+  - Optional: a single RET- id. With no id, screen all six returns.
+
+  ## Procedure - the risk score is computed, not judged
+
+  1. Scope the screen. If a RET- id is supplied and it exists, screen only that
+     return. If the supplied id does not exist, say so explicitly and do not
+     screen the whole queue as the answer.
+  2. `return_rate = returns_12mo / orders_12mo` for the return's customer.
+     Known values: CUST-2041 2/12 = 16.7%, CUST-3178 1/9 = 11.1%,
+     CUST-1590 5/12 = 41.7%, CUST-4422 4/11 = 36.4%, CUST-0887 2/8 = 25.0%,
+     CUST-5610 1/6 = 16.7%.
+  3. Apply the signals additively. Each fires at most once:
+     - `high_return_frequency` (+2) when return_rate is 0.40 or higher.
+     - `elevated_return_frequency` (+1) when return_rate is 0.25 or higher but
+       below 0.40. The two frequency signals are exclusive - never both.
+     - `prior_denied_claims` (+2) when the customer has 1 or more prior denied
+       claims.
+     - `used_item_claim` (+1) when the item condition is `lightly_used` or
+       `damaged`.
+     - `out_of_policy_window` (+1) when days since purchase exceeds 90.
+  4. `score = sum of the fired weights`. Tier: 4 or more is `high`, 2 to 3 is
+     `elevated`, 0 to 1 is `low`. Report the tier the score produces - never
+     upgrade a tier because a case feels suspicious or downgrade one because a
+     customer is unhappy.
+  5. Computed outcomes for the current queue: RET-4001 score 0 low,
+     RET-4002 score 0 low, RET-4003 score 5 high, RET-4004 score 1 low,
+     RET-4005 score 3 elevated, RET-4006 score 0 low.
+  6. `Refund Value Under Review` is the sum of `purchase_price` over the
+     returns in scope scoring `elevated` or `high`. Unfiltered that is $229.98
+     (RET-4003 $149.99 + RET-4005 $79.99).
+
+  ## Output format
+
+  Headline: `# Return Abuse & Fraud Risk Screening`
+
+  Table, in this column order:
+
+  `| Return ID | Customer | 12-mo Returns/Orders | Return Rate | Prior Denied | Signals | Score | Risk |`
+
+  Customer renders as the name with the CUST- id in backticks. Return rate as
+  `N.N%`. Signals as a comma-separated list of signal names, or `none` when
+  nothing fired.
+
+  Then one detail block per return scoring `elevated` or `high`: an h3 heading
+  of the return id, an em dash, the customer name, and the tier in parentheses;
+  followed by bullets for Product with price, Reason / Condition (underscores
+  replaced by spaces), Signals with their `(+N)` weights, 12-Month History, and
+  Next Step.
+
+  Close with:
+  `**Screened:** N | **Elevated or Higher:** N | **Refund Value Under Review:** $N,NNN.NN`
+
+  ## Edge cases
+
+  - RET-4004 has an elevated return frequency (36.4%) but scores 1 and is
+    therefore `low`. Report it as low and let the frequency figure speak - a
+    single signal is not a case.
+  - RET-4005 is already escalated and 91 days out; its `elevated` tier is a
+    review trigger, not a second escalation.
+  - A `low` tier is a real result. Say the screen found nothing when it found
+    nothing rather than reaching for a softer suspicion.
+  - The history covers a trailing 12 months per customer. There is no
+    cross-retailer, watchlist, or device-level fraud data here - say so rather
+    than implying a wider check ran.
+
+  ## Boundaries
+
+  - Screening only. Never say a return has been denied, a refund withheld, a
+    customer blocked or blacklisted, or a fraud case opened. The output is
+    evidence a loss-prevention reviewer acts on.
+  - Never call a customer a fraudster. Report the signals and the score; the
+    person reviewing draws the conclusion.

@@ -1,0 +1,79 @@
+mcs.metadata:
+  componentName: unified-interaction-view
+  description: Assembles one customer's marketing touchpoints and support contacts into a single chronological cross-channel timeline.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: unified-interaction-view
+  description: Assembles one customer's marketing touchpoints and support contacts into a single chronological cross-channel timeline.
+  ---
+  <!-- bic:source=blank -->
+  # Unified interaction view
+
+  Use this skill when the user asks what happened with a customer, for a
+  customer's history, for every touchpoint or interaction a customer has had,
+  for a single view across channels, or for the full context before a support
+  conversation or an outreach.
+
+  ## Inputs
+
+  - The customer interaction records (knowledge/tools): CUST-401, CUST-402,
+    CUST-403. Each carries a segment, a mapped journey label, and dated
+    touchpoints with a channel and an optional campaign reference.
+  - The support contacts (knowledge/tools): CASE-501 through CASE-506, each
+    tied to a customer by id and carrying a date, channel, intent, handle
+    time, resolution status, and CSAT.
+  - Optional: a customer id. Render that customer only. With no id, render all
+    three in recorded order.
+
+  ## Procedure
+
+  1. Collect the customer's marketing touchpoints and every support contact
+     whose customer id matches.
+  2. Merge them into one list and sort by date, oldest first. Two events on
+     the same date hold their recorded order - marketing touchpoints before
+     support contacts. Never re-sort by channel or by type.
+  3. Label each row: `Marketing touchpoint` or `Support contact`. A support
+     contact's detail is `<intent> (<resolution status>)` and its reference is
+     the CASE- id. A touchpoint with no campaign reference shows `-`.
+  4. Count the interactions and the distinct channels from the merged list.
+     Count the support contacts separately, and name any contact whose
+     resolution status is not "Resolved".
+  5. Close with the distinct channels touched, in first-seen order.
+
+  ## Output format
+
+  For each customer:
+
+  - `## <CUST- id>`
+  - `- **Segment:** <segment>`
+  - `- **Mapped Journey:** <journey name>`
+  - `- **Interactions:** N across M channels`
+  - `- **Support Contacts:** N`
+  - `- **Not Resolved:** <CASE- ids>` - only when there are any
+  - One table: `| Date | Channel | Type | Interaction | Reference |`
+  - `**Channels Touched:** <channel list>`
+
+  Channel names in title case with underscores as spaces (`mobile_app` ->
+  `Mobile App`). Dates exactly as recorded, `YYYY-MM-DD`.
+
+  ## Edge cases
+
+  - These are record-level interactions. Never sum them into the 30-day
+    channel figures, the campaign results, or the journey rates, and never
+    quote a roll-up figure as a fact about one customer.
+  - The interaction records carry no revenue, cost, session, or conversion
+    values. "Placed order" is the recorded event; there is no order value in
+    this data. Never attach a dollar figure to a timeline row.
+  - A campaign reference records where a touchpoint came from. It does not
+    change that campaign's recorded conversions, revenue, or cost.
+  - The mapped journey on a customer record is a label. Never claim the
+    customer produced that journey's conversion rate or average duration.
+  - A customer id that is not CUST-401, CUST-402, or CUST-403 has no data. Say
+    so and list the three recorded customers. Never assemble a timeline from
+    the roll-ups.
+  - This is the recorded history as captured, not a live feed. Never describe
+    an interaction as happening now or as being watched in real time.
+  - The timeline is read-only context. Never state or imply that you have
+    contacted the customer, sent a follow-up, or changed anything on the
+    record.

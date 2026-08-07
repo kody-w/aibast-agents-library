@@ -1,0 +1,85 @@
+mcs.metadata:
+  componentName: draft-reporting-package
+  description: Assembles the unsigned per-facility GHGRP and cap-and-trade submission draft from the emissions inventory and the reporting register, with deadlines, open items, and a blank sign-off block.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: draft-reporting-package
+  description: Assembles the unsigned per-facility GHGRP and cap-and-trade submission draft from the emissions inventory and the reporting register, with deadlines, open items, and a blank sign-off block.
+  ---
+  <!-- bic:source=blank -->
+  # Draft reporting package
+
+  Use this skill when the user asks to start, assemble, or draft a regulatory
+  submission -- the GHGRP filing, the cap-and-trade report, "what do we owe and
+  when", or the reporting packet for a facility. The output is a working draft
+  a person edits and files; it is never the filing itself.
+
+  ## Inputs
+
+  - The facility emissions inventory, including `location`,
+    `regulatory_threshold_co2`, `reduction_target_pct`, `baseline_year`, and
+    `baseline_co2`.
+  - The reporting program register (program threshold and deadline).
+  - Optional: a single FAC- id to draft one facility's package.
+
+  ## Procedure
+
+  For each facility in scope:
+
+  1. **Program applicability -- two conditions, both required.**
+     - Jurisdiction: `EPA_GHGRP` and `EPA_NSPS` are federal and reach every
+       facility. `CA_CAPANDTRADE` reaches only facilities whose `location`
+       state is `CA`.
+     - Threshold: the program applies when
+       `scope_1_co2 >= program_threshold_co2`.
+     List the applicable programs sorted by deadline; the first one is the
+     earliest deadline. A facility that clears no program is stated as having
+     no program in scope -- never assign it one to fill the section.
+  2. **Report sections.** Carry Scope 1, Scope 2, and Scope 3 CO2 as recorded,
+     plus Scope 1 CH4 and N2O labelled as recorded and not converted.
+  3. **Threshold test.** `compliant = scope_1_co2 <= regulatory_threshold_co2`,
+     `gap_tonnes = scope_1_co2 - regulatory_threshold_co2` when not compliant,
+     otherwise `0`. This is the facility's own threshold, not a program
+     threshold.
+  4. **Target progress.**
+     `actual_reduction_pct = round((1 - scope_1_co2 / baseline_co2) * 100, 1)`,
+     `target_co2 = round(baseline_co2 * (1 - reduction_target_pct / 100))`,
+     `remaining = max(0, scope_1_co2 - target_co2)`,
+     `on_track = actual_reduction_pct >= reduction_target_pct`.
+  5. **Open items.** Always list the two standing gaps: no CO2e conversion
+     factor exists in this data set, and no third-party verification statement
+     is present. Add an item when the facility is Behind target, when it is
+     over its threshold, and when no program is in scope.
+  6. **Sign-off block.** Status `DRAFT -- UNSIGNED`, preparer this agent,
+     approver the accountable owner. Name, signature, and filing date are left
+     blank by design.
+
+  ## Output format
+
+  - `# Reporting Package Drafts`
+  - A status line stating the draft is unsigned and unfiled.
+  - When a facility id was given, one line saying the view is filtered.
+  - Per facility, `## FAC-id -- Name`, a context line, the earliest deadline,
+    a program table (`Program | Program Threshold (t) | Deadline`), a section
+    table (`Section | Value`), the open items list, and the sign-off line.
+  - Tonnages with thousands separators; percentages to one decimal; deadlines
+    as `YYYY-MM-DD`.
+
+  ## Edge cases
+
+  - A facility with zero Scope 1 CO2 still clears the zero-threshold program.
+    Say the package is a nil return rather than presenting it as a full filing.
+  - A FAC- id that is not in the inventory yields no package -- say the
+    facility is not in the data set instead of drafting an empty one.
+  - Program thresholds decide applicability only. Never use them for the
+    compliance verdict; that test uses the facility's own threshold.
+
+  ## Boundaries
+
+  - This produces a draft for human review. Never state or imply that a
+    submission has been filed, transmitted, certified, signed, or accepted by
+    an agency, and never fill in the approver, signature, or filing date.
+  - Never invent a section, a figure, a verification statement, or a program
+    that is not in the inventory or the register. A missing input is an open
+    item, not something to complete.

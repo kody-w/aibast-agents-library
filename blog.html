@@ -83,7 +83,7 @@
   }
 
   .links {
-    margin-top: 32px; text-align: center; font-size: 13px; color: #484f58;
+    margin-top: 32px; text-align: center; font-size: 13px; color: #8b949e;
   }
   .links a { margin: 0 12px; }
 </style>
@@ -151,7 +151,9 @@ html[data-theme=light] pre code{background:transparent!important;color:#e6edf3!i
 <script id="aibast-theme-boot">
 (function(){
   var k="aibast:theme";
-  var t=localStorage.getItem(k)||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  function get(){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function set(v){try{localStorage.setItem(k,v);}catch(e){}}
+  var t=get()||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
   document.documentElement.setAttribute("data-theme",t);
   addEventListener("DOMContentLoaded",function(){
     var nav=document.querySelector("#aibast-nav .in"); if(!nav) return;
@@ -161,7 +163,7 @@ html[data-theme=light] pre code{background:transparent!important;color:#e6edf3!i
     b.onclick=function(e){e.preventDefault();
       var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";
       document.documentElement.setAttribute("data-theme",n);
-      localStorage.setItem(k,n); paint();};
+      set(n); paint();};
     paint(); nav.appendChild(b);
   });
 })();
@@ -171,12 +173,19 @@ body{padding-top:52px!important}
 #aibast-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
   font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
 #aibast-nav .in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:4px;
-  align-items:center;height:52px;overflow-x:auto}
+  align-items:center;height:52px;overflow-x:auto;scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch}
+#aibast-nav .in::after{content:'';flex:0 0 8px}
+@media(max-width:760px){#aibast-nav{position:relative}
+  #aibast-nav .in{height:auto;flex-wrap:wrap;padding:6px 14px 8px;gap:2px}
+  #aibast-nav a.l{padding:11px 10px;min-height:44px;display:flex;align-items:center}
+  body{padding-top:0!important}}
 #aibast-nav .brand{color:#fff;font-weight:750;font-size:14.5px;text-decoration:none;
   letter-spacing:-.01em;margin-right:14px;white-space:nowrap}
 #aibast-nav .brand b{color:#f291b6}
 #aibast-nav a.l{color:#c3cae6;text-decoration:none;font-size:13px;font-weight:600;
-  padding:6px 10px;border-radius:6px;white-space:nowrap}
+  padding:6px 10px;border-radius:6px;white-space:nowrap;min-height:32px;
+  display:inline-flex;align-items:center}
 #aibast-nav a.l:hover{background:rgba(255,255,255,.1);color:#fff}
 #aibast-nav a.l.now{background:rgba(255,255,255,.14);color:#fff}
 #aibast-nav .gh{margin-left:auto}
@@ -476,7 +485,7 @@ def login_poll():
 <div class="links">
   <a href="index.html">Home</a>
   <a href="release-notes.html">Release Notes</a>
-  <a href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
+  GitHub
 </div>
 
 
@@ -490,7 +499,9 @@ def login_poll():
 .aibast-foot{background:#0b1024;color:#8a90b8;font-family:"Segoe UI",system-ui,sans-serif;
   font-size:12.5px;padding:26px 22px;text-align:center;line-height:1.6}
 .aibast-foot b{color:#c3cae6}
-.aibast-foot a{color:#f291b6;text-decoration:none}
+.aibast-foot a{color:#f7a8c4!important;text-decoration:none}
+.aibast-foot,.aibast-foot *{color:#aab2d0}
+.aibast-foot b{color:#e6e8f2}
 </style>
 <div class="aibast-foot"><b>AIBAST</b> — the Microsoft AI Business Applications Specialist Team ·
   engine, not experience · agents that ship, patterns that hold, numbers you can audit ·

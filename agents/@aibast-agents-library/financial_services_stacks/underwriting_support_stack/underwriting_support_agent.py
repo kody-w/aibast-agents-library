@@ -49,14 +49,15 @@ APPLICATIONS = {
         "underwriter": "Patricia Graham",
     },
     "UW-2025-102": {
-        "applicant": "Sarah Mitchell",
-        "line_of_business": "personal_auto",
-        "coverage_requested": 500000,
-        "premium_indicated": 2400,
-        "vehicle": "2024 Toyota RAV4",
-        "driver_age": 34,
-        "driving_record": {"violations": 0, "accidents": 0, "years_licensed": 16},
-        "credit_score": 745,
+        "applicant": "Cascade Freight Logistics LLC",
+        "line_of_business": "commercial_auto",
+        "coverage_requested": 2000000,
+        "premium_indicated": 55000,
+        "fleet_size": 18,
+        "vehicle_class": "light_truck",
+        "radius_of_operation": "intermediate",
+        "dot_safety_rating": "satisfactory",
+        "fleet_record": {"violations": 0, "accidents": 0, "years_operating": 9},
         "loss_history": [],
         "risk_score": 22,
         "status": "approved",
@@ -105,13 +106,13 @@ UNDERWRITING_GUIDELINES = {
         "required_inspections": ["fire_protection", "electrical", "roof_condition"],
         "prohibited_risks": ["cannabis_operations", "fireworks_storage"],
     },
-    "personal_auto": {
-        "max_coverage": 1000000,
-        "min_driver_age": 16,
+    "commercial_auto": {
+        "max_coverage": 5000000,
+        "max_fleet_size": 250,
         "max_violations_3yr": 3,
         "max_accidents_3yr": 2,
-        "min_credit_score": 550,
-        "required_documents": ["MVR", "prior_insurance_dec"],
+        "min_years_operating": 2,
+        "required_documents": ["MVR_summary", "vehicle_schedule", "loss_runs"],
     },
     "professional_liability": {
         "max_coverage": 10000000,
@@ -130,7 +131,7 @@ UNDERWRITING_GUIDELINES = {
 
 PRICING_MODELS = {
     "commercial_property": {"base_rate_per_100": 0.85, "construction_factor": {"fire_resistive": 0.80, "masonry": 1.0, "frame": 1.35}, "protection_class_factor": {1: 0.75, 2: 0.80, 3: 0.90, 4: 1.0, 5: 1.10}},
-    "personal_auto": {"base_premium": 1200, "age_factor": {16: 2.5, 25: 1.3, 30: 1.0, 50: 0.95, 65: 1.05}, "credit_factor": {800: 0.85, 700: 1.0, 600: 1.25, 500: 1.60}},
+    "commercial_auto": {"base_rate_per_vehicle": 2800, "vehicle_class_factor": {"light_truck": 0.95, "medium_truck": 1.20, "heavy_truck": 1.55}, "radius_factor": {"local": 0.90, "intermediate": 1.15, "long_haul": 1.45}},
     "professional_liability": {"base_rate_per_practitioner": 8500, "specialty_factor": {"family_medicine": 0.60, "orthopedic_surgery": 2.10, "neurosurgery": 2.80, "obstetrics": 2.40}},
     "general_liability": {"base_rate_per_1000_revenue": 2.15, "industry_factor": {"restaurant_chain": 1.35, "office": 0.70, "retail": 1.10, "construction": 1.80}},
 }
@@ -165,8 +166,8 @@ def _guideline_check(app):
         claims_count = len(app.get("claims_history", []))
         if claims_count > guidelines.get("max_claims_5yr", 99):
             violations.append(f"Claims count {claims_count} exceeds 5-year max of {guidelines['max_claims_5yr']}")
-    if lob == "personal_auto":
-        record = app.get("driving_record", {})
+    if lob == "commercial_auto":
+        record = app.get("fleet_record", {})
         if record.get("violations", 0) > guidelines.get("max_violations_3yr", 99):
             violations.append("Violation count exceeds guideline")
     return violations

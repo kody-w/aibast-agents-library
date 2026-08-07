@@ -32,8 +32,8 @@ content: |
      report every factor it contains, unchanged:
      - `commercial_property`: `base_rate_per_100` plus the
        `construction_factor` and `protection_class_factor` tables.
-     - `personal_auto`: `base_premium` plus the `age_factor` and
-       `credit_factor` tables.
+     - `commercial_auto`: `base_rate_per_vehicle` plus the
+       `vehicle_class_factor` and `radius_factor` tables.
      - `professional_liability`: `base_rate_per_practitioner` plus the
        `specialty_factor` table.
      - `general_liability`: `base_rate_per_1000_revenue` plus the

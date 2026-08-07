@@ -1,0 +1,83 @@
+mcs.metadata:
+  componentName: waste-exposure
+  description: Values stock held beyond its forecast coverage as excess or aging write-off exposure, and quantifies how much of that exposure the transfer plan removes.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: waste-exposure
+  description: Values stock held beyond its forecast coverage as excess or aging write-off exposure, and quantifies how much of that exposure the transfer plan removes.
+  ---
+  <!-- bic:source=blank -->
+  # Waste exposure
+
+  Use this skill when the user asks about waste, excess stock, obsolescence,
+  dead or slow-moving inventory, write-off risk, months of supply, or how much
+  waste rebalancing actually removes.
+
+  ## Inputs
+
+  - On-hand levels and the demand forecast per SKU per warehouse.
+  - SKU unit costs.
+  - The outbound quantities produced by the transfer-plan skill.
+  - Optional: a SKU id or a warehouse id to filter to.
+
+  ## Procedure
+
+  Iterating SKUs in catalog order and warehouses in the fixed order WH-ATL,
+  WH-ORD, WH-DFW, WH-SEA:
+
+  1. `coverage_months = round(on_hand / forecast * 3, 1)`. The forecast covers
+     one 90-day horizon, so three months.
+  2. `excess_units = on_hand - forecast`. Skip the pair when that is zero or
+     negative -- it is Covered and carries no exposure.
+  3. Band the pair: `3.0 < coverage_months <= 6.0` -> **Excess**, factor 0.10.
+     `coverage_months > 6.0` -> **Aging**, factor 0.25. Both tests are strict
+     at the lower bound; exactly 6.0 months is Excess, not Aging.
+  4. `write_off_exposure = round(excess_units * unit_cost * band_factor, 2)`.
+  5. Total exposure = the sum of the rounded rows. Total excess units = the
+     sum of the excess column.
+
+  Waste avoided, same row order:
+
+  6. `relocated = min(excess_units, units the transfer plan ships out of that
+     SKU-warehouse position)`.
+  7. `exposure_removed = round(relocated * unit_cost * band_factor, 2)`.
+  8. `exposure_remaining = total_exposure - total_exposure_removed`.
+
+  The two band factors are fixed planning coefficients. Never present the
+  result as a booked write-off, an inventory reserve, or a finance-approved
+  impairment; state the coefficient whenever you state the figure.
+
+  ## Output format
+
+  - Headline `## Excess & Aging Stock -- Waste Exposure` and the framing line
+    giving the coverage formula, both bands, and both factors as estimates.
+  - Table with columns: `SKU | Warehouse | On-Hand | Forecast | Excess Units |
+    Coverage (mo) | Band | Write-Off Exposure (est.)`, warehouse as the WH- id.
+  - `**Total excess units:** N` and `**Total waste exposure (est.):**
+    $nnn,nnn.nn`.
+  - Sub-heading `### Waste Avoided by Rebalancing` and a table with columns:
+    `SKU | Warehouse | Excess Units | Units Relocated by Transfer Plan |
+    Exposure Removed (est.)`, then the exposure removed and exposure remaining
+    totals.
+
+  ## Edge cases
+
+  - Excess here is a different test from SURPLUS in the rebalance skill. The
+    rebalance surplus band does not open until +500, so SKU-4401 at WH-ATL
+    (+400) prints Balanced there yet carries excess here. Explain the two
+    tests rather than forcing the tables to agree.
+  - Waste exposure and value at risk point in opposite directions and can both
+    be true for the same SKU at different sites: SKU-4405 carries 1,500 excess
+    units at WH-ATL and sits 1,100 below its reorder point at WH-SEA. That is
+    exactly what the transfer plan is for.
+  - A position the transfer plan cannot relocate keeps its full exposure --
+    SKU-4404 at WH-DFW and SKU-4406 at WH-SEA are both in that state, because
+    no deficit site needs those units. Report them as remaining exposure; do
+    not invent a destination.
+  - Relocated units are not written off and are not destroyed. They are excess
+    only at the shipping site and are consumed at the deficit site.
+  - The coverage figure needs a non-zero forecast. If a pair ever has a zero
+    forecast, report coverage as not computable rather than dividing.
+  - Analysis only. Never state that stock has been scrapped, reserved,
+    liquidated, discounted, or written off. A planner decides the disposition.

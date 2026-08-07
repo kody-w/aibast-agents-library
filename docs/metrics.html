@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Library Metrics — AIBAST Agent Library</title>
+<title>Library Metrics — AIBAST Agents Library</title>
 <meta name="description" content="Public metrics for the AIBAST Agent Library: adoption, traffic, and per-agent downloads, ratings, and conversations — all GitHub-native data, refreshed daily.">
 <style>
 :root{
-  --ink:#1a1a2e; --dim:#5b5e6e; --faint:#8a8da0; --paper:#ffffff; --wash:#f6f7fa;
+  --ink:#1a1a2e; --dim:#4e5163; --faint:#5d6070; --paper:#ffffff; --wash:#f6f7fa;
   --line:#e3e5ec; --accent:#0f6cbd; --accent-soft:#e8f1fa; --radius:12px;
   --mono:Consolas,"SF Mono",ui-monospace,monospace;
 }
@@ -81,7 +81,9 @@ html[data-theme=dark] body{--ink:#e6e8f2;--dim:#aab0c8;--faint:#7c86a8;--paper:#
 <script id="aibast-theme-boot">
 (function(){
   var k="aibast:theme";
-  var t=localStorage.getItem(k)||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  function get(){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function set(v){try{localStorage.setItem(k,v);}catch(e){}}
+  var t=get()||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
   document.documentElement.setAttribute("data-theme",t);
   addEventListener("DOMContentLoaded",function(){
     var nav=document.querySelector("#aibast-nav .in"); if(!nav) return;
@@ -91,22 +93,30 @@ html[data-theme=dark] body{--ink:#e6e8f2;--dim:#aab0c8;--faint:#7c86a8;--paper:#
     b.onclick=function(e){e.preventDefault();
       var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";
       document.documentElement.setAttribute("data-theme",n);
-      localStorage.setItem(k,n); paint();};
+      set(n); paint();};
     paint(); nav.appendChild(b);
   });
 })();
 </script>
+<style id="aibast-scroll">html{scroll-padding-top:110px}</style>
 <style id="aibast-nav-css">
 body{padding-top:52px!important}
 #aibast-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
   font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
 #aibast-nav .in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:4px;
-  align-items:center;height:52px;overflow-x:auto}
+  align-items:center;height:52px;overflow-x:auto;scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch}
+#aibast-nav .in::after{content:'';flex:0 0 8px}
+@media(max-width:760px){#aibast-nav{position:relative}
+  #aibast-nav .in{height:auto;flex-wrap:wrap;padding:6px 14px 8px;gap:2px}
+  #aibast-nav a.l{padding:11px 10px;min-height:44px;display:flex;align-items:center}
+  body{padding-top:0!important}}
 #aibast-nav .brand{color:#fff;font-weight:750;font-size:14.5px;text-decoration:none;
   letter-spacing:-.01em;margin-right:14px;white-space:nowrap}
 #aibast-nav .brand b{color:#f291b6}
 #aibast-nav a.l{color:#c3cae6;text-decoration:none;font-size:13px;font-weight:600;
-  padding:6px 10px;border-radius:6px;white-space:nowrap}
+  padding:6px 10px;border-radius:6px;white-space:nowrap;min-height:32px;
+  display:inline-flex;align-items:center}
 #aibast-nav a.l:hover{background:rgba(255,255,255,.1);color:#fff}
 #aibast-nav a.l.now{background:rgba(255,255,255,.14);color:#fff}
 #aibast-nav .gh{margin-left:auto}
@@ -357,7 +367,9 @@ Promise.all([
 .aibast-foot{background:#0b1024;color:#8a90b8;font-family:"Segoe UI",system-ui,sans-serif;
   font-size:12.5px;padding:26px 22px;text-align:center;line-height:1.6}
 .aibast-foot b{color:#c3cae6}
-.aibast-foot a{color:#f291b6;text-decoration:none}
+.aibast-foot a{color:#f7a8c4!important;text-decoration:none}
+.aibast-foot,.aibast-foot *{color:#aab2d0}
+.aibast-foot b{color:#e6e8f2}
 </style>
 <div class="aibast-foot"><b>AIBAST</b> — the Microsoft AI Business Applications Specialist Team ·
   engine, not experience · agents that ship, patterns that hold, numbers you can audit ·

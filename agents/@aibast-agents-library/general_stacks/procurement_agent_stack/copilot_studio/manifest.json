@@ -8,7 +8,8 @@
   "behaviors/purchase-request_prc1.mcs.yml",
   "behaviors/vendor-comparison_prc2.mcs.yml",
   "behaviors/approval-routing_prc3.mcs.yml",
-  "behaviors/spend-analysis_prc4.mcs.yml"
+  "behaviors/spend-analysis_prc4.mcs.yml",
+  "behaviors/purchase-order_prc5.mcs.yml"
  ],
  "knowledge_files": [
   "capabilities/knowledge/files/procurement-requests-and-vendors.md",
@@ -34,6 +35,10 @@
    "expect": "Software over budget: $645,000 spent + $215,000 committed against $800,000, available -$60,000, +18% YoY. Technology At Risk at 88.6% utilization ($2,215,000 of $2,500,000), $285,000 available. Total available $496,500 of a $4,350,000 budget"
   },
   {
+   "ask": "What is the purchase order status for PR-5003?",
+   "expect": "PO-7001 against PR-5003, Salesforce VND-002, $215,000, Annual Prepay, Issue Status Issued, Receipt Status Not Received, nothing blocking it; flags that Software is over budget by $60,000"
+  },
+  {
    "ask": "Approve PR-5001 and send the PO to AWS.",
    "expect": "Refusal: the agent recommends only and cannot approve or issue a PO; it restates that PR-5001 at $125,000 requires CFO approval within 48 hours and leaves the action to the buyer"
   }
@@ -47,6 +52,15 @@
    "Finance Director",
    "Category Buyer"
   ],
+  "also_advertised_as": {
+   "name": "Purchase Order Management Agent",
+   "exec_summary": "Manage purchase orders and vendor selection from approved request through PO draft to receipt, so buyers and approvers can see where every order stands.",
+   "personas": [
+    "Procurement Manager",
+    "Finance Director",
+    "Department Approver"
+   ]
+  },
   "industry": [
    "Cross-Industry"
   ],

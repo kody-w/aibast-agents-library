@@ -1,8 +1,10 @@
 """
-Omnichannel Engagement Agent — B2C Sales Stack
+Cross-Channel Engagement Agent — B2C Sales Stack
 
-Analyzes channel performance, maps customer journeys, optimizes
-engagement strategies, and provides campaign attribution insights.
+Assembles a single, unified view of a customer's cross-channel interactions —
+marketing touchpoints and support contacts on one timeline — and backs it with
+channel performance, mapped customer journeys, support-contact quality, and
+campaign attribution.
 """
 
 import sys
@@ -15,10 +17,10 @@ __manifest__ = {
     "schema": "rapp-agent/1.0",
     "name": "@aibast-agents-library/omnichannel-engagement",
     "version": "1.0.0",
-    "display_name": "Omnichannel Engagement Agent",
-    "description": "Omnichannel engagement analytics with channel performance, journey mapping, optimization, and campaign attribution.",
+    "display_name": "Cross-Channel Engagement Agent",
+    "description": "Cross-channel engagement analytics: a unified per-customer interaction timeline, support-contact quality, channel performance, journey mapping, optimization, and campaign attribution.",
     "author": "AIBAST",
-    "tags": ["omnichannel", "engagement", "journey", "attribution", "campaign", "b2c"],
+    "tags": ["omnichannel", "engagement", "journey", "attribution", "campaign", "support", "b2c"],
     "category": "b2c_sales",
     "quality_tier": "verified",
     "requires_env": [],
@@ -78,6 +80,56 @@ CAMPAIGN_RESULTS = {
     "CAMP-305": {"name": "App Push — Loyalty Members", "channel": "mobile_app", "sent": 85000, "opens": 42500, "clicks": 17000, "conversions": 5100, "revenue": 765000, "cost": 2000},
 }
 
+# Record-level interaction histories. These are individual customer records, not
+# a roll-up: they are never summed into the channel or campaign totals above.
+CUSTOMER_INTERACTIONS = {
+    "CUST-401": {
+        "segment": "Loyalty - repeat purchaser",
+        "journey": "Repeat Purchase",
+        "touchpoints": [
+            {"date": "2026-07-06", "channel": "email", "interaction": "Opened promo email", "reference": "CAMP-301"},
+            {"date": "2026-07-06", "channel": "mobile_app", "interaction": "Browsed three product pages", "reference": ""},
+            {"date": "2026-07-08", "channel": "mobile_app", "interaction": "Placed order", "reference": ""},
+            {"date": "2026-07-09", "channel": "email", "interaction": "Received order confirmation", "reference": ""},
+            {"date": "2026-07-11", "channel": "in_store", "interaction": "Collected order at store pickup desk", "reference": ""},
+        ],
+    },
+    "CUST-402": {
+        "segment": "Lapsed - win-back target",
+        "journey": "Win-Back",
+        "touchpoints": [
+            {"date": "2026-06-24", "channel": "email", "interaction": "Opened win-back offer", "reference": ""},
+            {"date": "2026-06-27", "channel": "sms", "interaction": "Clicked offer link", "reference": "CAMP-302"},
+            {"date": "2026-07-01", "channel": "web_organic", "interaction": "Browsed site, no cart created", "reference": ""},
+            {"date": "2026-07-05", "channel": "web_paid", "interaction": "Returned to site from shopping ad", "reference": "CAMP-304"},
+            {"date": "2026-07-06", "channel": "web_organic", "interaction": "Placed order", "reference": ""},
+        ],
+    },
+    "CUST-403": {
+        "segment": "New - discovery",
+        "journey": "Discovery to Purchase",
+        "touchpoints": [
+            {"date": "2026-07-03", "channel": "social_media", "interaction": "Engaged with influencer post", "reference": "CAMP-303"},
+            {"date": "2026-07-03", "channel": "web_organic", "interaction": "Browsed site", "reference": ""},
+            {"date": "2026-07-04", "channel": "email", "interaction": "Signed up for newsletter", "reference": ""},
+            {"date": "2026-07-10", "channel": "email", "interaction": "Clicked promo email", "reference": "CAMP-301"},
+            {"date": "2026-07-17", "channel": "in_store", "interaction": "Completed purchase in store", "reference": ""},
+        ],
+    },
+}
+
+# Support contacts. Contacts are not sessions and are never added to the
+# channel session, conversion, or revenue figures. `csat` of None means no
+# score was recorded, not a score of zero.
+SUPPORT_INTERACTIONS = {
+    "CASE-501": {"customer_id": "CUST-401", "date": "2026-07-12", "channel": "mobile_app", "intent": "Order status", "handle_time_min": 6, "resolution_status": "Resolved", "csat": 5},
+    "CASE-502": {"customer_id": "CUST-402", "date": "2026-07-02", "channel": "sms", "intent": "Promo code not applying", "handle_time_min": 11, "resolution_status": "Resolved", "csat": 4},
+    "CASE-503": {"customer_id": "CUST-403", "date": "2026-07-19", "channel": "email", "intent": "Delivery delay", "handle_time_min": 34, "resolution_status": "Resolved", "csat": 3},
+    "CASE-504": {"customer_id": "CUST-403", "date": "2026-07-22", "channel": "in_store", "intent": "Return or exchange", "handle_time_min": 18, "resolution_status": "Resolved", "csat": 5},
+    "CASE-505": {"customer_id": "CUST-401", "date": "2026-07-15", "channel": "web_organic", "intent": "Account login", "handle_time_min": 22, "resolution_status": "Escalated", "csat": 2},
+    "CASE-506": {"customer_id": "CUST-402", "date": "2026-07-09", "channel": "social_media", "intent": "Damaged item", "handle_time_min": 47, "resolution_status": "Open", "csat": None},
+}
+
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -104,18 +156,50 @@ def _campaign_roi(campaign):
     return round(((campaign["revenue"] - campaign["cost"]) / campaign["cost"]) * 100, 1)
 
 
+def _label(value):
+    """Render a recorded snake_case name in title case."""
+    return value.replace("_", " ").title()
+
+
+def _cases_for(customer_id):
+    """Return this customer's support cases, in recorded case-id order."""
+    return [(cid, c) for cid, c in SUPPORT_INTERACTIONS.items() if c["customer_id"] == customer_id]
+
+
+def _merged_timeline(customer_id):
+    """Merge a customer's marketing touchpoints and support contacts by date."""
+    events = []
+    for tp in CUSTOMER_INTERACTIONS[customer_id]["touchpoints"]:
+        events.append({
+            "date": tp["date"],
+            "kind": "Marketing touchpoint",
+            "channel": tp["channel"],
+            "detail": tp["interaction"],
+            "reference": tp["reference"],
+        })
+    for cid, case in _cases_for(customer_id):
+        events.append({
+            "date": case["date"],
+            "kind": "Support contact",
+            "channel": case["channel"],
+            "detail": f"{case['intent']} ({case['resolution_status']})",
+            "reference": cid,
+        })
+    return sorted(events, key=lambda e: e["date"])
+
+
 # ---------------------------------------------------------------------------
 # Agent class
 # ---------------------------------------------------------------------------
 
 class OmnichannelEngagementAgent(BasicAgent):
-    """Omnichannel engagement analytics agent."""
+    """Cross-channel engagement analytics agent."""
 
     def __init__(self):
         self.name = "@aibast-agents-library/omnichannel-engagement"
         self.metadata = {
             "name": self.name,
-            "display_name": "Omnichannel Engagement Agent",
+            "display_name": "Cross-Channel Engagement Agent",
             "description": __manifest__["description"],
             "parameters": {
                 "type": "object",
@@ -123,6 +207,8 @@ class OmnichannelEngagementAgent(BasicAgent):
                     "operation": {
                         "type": "string",
                         "enum": [
+                            "unified_interaction_view",
+                            "support_interactions",
                             "channel_performance",
                             "journey_analysis",
                             "engagement_optimization",
@@ -131,6 +217,7 @@ class OmnichannelEngagementAgent(BasicAgent):
                     },
                     "channel": {"type": "string"},
                     "campaign_id": {"type": "string"},
+                    "customer_id": {"type": "string"},
                 },
                 "required": ["operation"],
             },
@@ -140,6 +227,8 @@ class OmnichannelEngagementAgent(BasicAgent):
     def perform(self, **kwargs) -> str:
         operation = kwargs.get("operation", "channel_performance")
         dispatch = {
+            "unified_interaction_view": self._unified_interaction_view,
+            "support_interactions": self._support_interactions,
             "channel_performance": self._channel_performance,
             "journey_analysis": self._journey_analysis,
             "engagement_optimization": self._engagement_optimization,
@@ -149,6 +238,101 @@ class OmnichannelEngagementAgent(BasicAgent):
         if not handler:
             return f"**Error:** Unknown operation `{operation}`."
         return handler(**kwargs)
+
+    def _unified_interaction_view(self, **kwargs) -> str:
+        requested = (kwargs.get("customer_id") or "").strip().upper()
+        if requested and requested not in CUSTOMER_INTERACTIONS:
+            return (
+                f"**No data:** `{requested}` has no recorded interaction history. "
+                f"The recorded customers are {', '.join(CUSTOMER_INTERACTIONS)}."
+            )
+        customer_ids = [requested] if requested else list(CUSTOMER_INTERACTIONS)
+        lines = ["# Unified Interaction View\n"]
+        lines.append(
+            "One customer's marketing touchpoints and support contacts on a single "
+            "timeline. These are record-level interactions and are never added to the "
+            "channel or campaign totals.\n"
+        )
+        for cust_id in customer_ids:
+            cust = CUSTOMER_INTERACTIONS[cust_id]
+            timeline = _merged_timeline(cust_id)
+            cases = _cases_for(cust_id)
+            channels = []
+            for event in timeline:
+                if event["channel"] not in channels:
+                    channels.append(event["channel"])
+            open_cases = [cid for cid, c in cases if c["resolution_status"] != "Resolved"]
+            lines.append(f"## {cust_id}\n")
+            lines.append(f"- **Segment:** {cust['segment']}")
+            lines.append(f"- **Mapped Journey:** {cust['journey']}")
+            lines.append(f"- **Interactions:** {len(timeline)} across {len(channels)} channels")
+            lines.append(f"- **Support Contacts:** {len(cases)}")
+            if open_cases:
+                lines.append(f"- **Not Resolved:** {', '.join(open_cases)}")
+            lines.append("")
+            lines.append("| Date | Channel | Type | Interaction | Reference |")
+            lines.append("|---|---|---|---|---|")
+            for event in timeline:
+                reference = event["reference"] if event["reference"] else "-"
+                lines.append(
+                    f"| {event['date']} | {_label(event['channel'])} | {event['kind']} "
+                    f"| {event['detail']} | {reference} |"
+                )
+            lines.append("")
+            lines.append(f"**Channels Touched:** {', '.join(_label(c) for c in channels)}\n")
+        return "\n".join(lines)
+
+    def _support_interactions(self, **kwargs) -> str:
+        requested = (kwargs.get("customer_id") or "").strip().upper()
+        if requested and requested not in CUSTOMER_INTERACTIONS:
+            return (
+                f"**No data:** `{requested}` has no recorded interaction history. "
+                f"The recorded customers are {', '.join(CUSTOMER_INTERACTIONS)}."
+            )
+        rows = [
+            (cid, c) for cid, c in SUPPORT_INTERACTIONS.items()
+            if not requested or c["customer_id"] == requested
+        ]
+        lines = ["# Support Interaction Report\n"]
+        if requested:
+            lines.append(
+                f"Rows for {requested} only; the totals below still cover all "
+                f"{len(SUPPORT_INTERACTIONS)} recorded contacts.\n"
+            )
+        lines.append("| Case | Customer | Date | Channel | Intent | Handle Time | Resolution | CSAT |")
+        lines.append("|---|---|---|---|---|---|---|---|")
+        for cid, case in rows:
+            csat = case["csat"] if case["csat"] is not None else "no CSAT recorded"
+            lines.append(
+                f"| {cid} | {case['customer_id']} | {case['date']} | {_label(case['channel'])} "
+                f"| {case['intent']} | {case['handle_time_min']} min | {case['resolution_status']} "
+                f"| {csat} |"
+            )
+        all_cases = list(SUPPORT_INTERACTIONS.values())
+        total_contacts = len(all_cases)
+        resolved = sum(1 for c in all_cases if c["resolution_status"] == "Resolved")
+        scored = [c["csat"] for c in all_cases if c["csat"] is not None]
+        avg_handle = round(sum(c["handle_time_min"] for c in all_cases) / total_contacts, 1)
+        avg_csat = round(sum(scored) / len(scored), 1) if scored else 0
+        resolution_rate = round((resolved / total_contacts) * 100, 1)
+        lines.append(f"\n**Total Contacts:** {total_contacts}")
+        lines.append(f"**Avg Handle Time:** {avg_handle} min")
+        lines.append(f"**Resolution Rate:** {resolution_rate}% ({resolved} of {total_contacts})")
+        lines.append(f"**Avg CSAT:** {avg_csat} across {len(scored)} scored contacts")
+        lines.append("\n## Contacts Needing an Owner\n")
+        unresolved = [(cid, c) for cid, c in SUPPORT_INTERACTIONS.items() if c["resolution_status"] != "Resolved"]
+        if not unresolved:
+            lines.append("- None: every recorded contact is Resolved.")
+        for cid, case in unresolved:
+            lines.append(
+                f"- {cid} ({case['customer_id']}, {_label(case['channel'])}): "
+                f"{case['intent']} - {case['resolution_status']}, {case['handle_time_min']} min handled"
+            )
+        lines.append(
+            "\nA supervisor assigns and works these. This report flags them; it does "
+            "not route, reply, or close a case."
+        )
+        return "\n".join(lines)
 
     def _channel_performance(self, **kwargs) -> str:
         total_revenue = sum(c["revenue_30d"] for c in CHANNELS.values())
@@ -263,6 +447,10 @@ class OmnichannelEngagementAgent(BasicAgent):
 
 if __name__ == "__main__":
     agent = OmnichannelEngagementAgent()
+    print(agent.perform(operation="unified_interaction_view", customer_id="CUST-401"))
+    print("\n" + "=" * 80 + "\n")
+    print(agent.perform(operation="support_interactions"))
+    print("\n" + "=" * 80 + "\n")
     print(agent.perform(operation="channel_performance"))
     print("\n" + "=" * 80 + "\n")
     print(agent.perform(operation="journey_analysis"))

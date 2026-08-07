@@ -1,9 +1,10 @@
 """
 Clinical Notes Summarizer Agent for Healthcare.
 
-Summarizes patient encounters, performs medication reviews, generates
-problem lists, and produces referral summaries from clinical documentation
-for healthcare providers and care coordinators.
+Summarizes patient encounters across visits, performs medication reviews,
+generates problem lists, produces referral summaries, and assembles the
+documented pre-operative picture from clinical documentation for primary care
+physicians, surgeons, anesthesia teams, and care coordinators.
 """
 
 import sys
@@ -17,9 +18,9 @@ __manifest__ = {
     "name": "@aibast-agents-library/clinical-notes-summarizer",
     "version": "1.0.0",
     "display_name": "Clinical Notes Summarizer Agent",
-    "description": "Summarizes patient encounters, performs medication reviews, generates problem lists, and produces referral summaries.",
+    "description": "Summarizes patient encounters across visits, performs medication reviews, generates problem lists, produces referral summaries, and assembles the documented pre-operative picture.",
     "author": "AIBAST",
-    "tags": ["clinical-notes", "ehr", "encounters", "medications", "referrals", "healthcare"],
+    "tags": ["clinical-notes", "ehr", "encounters", "medications", "referrals", "pre-operative", "healthcare"],
     "category": "healthcare",
     "quality_tier": "verified",
     "requires_env": [],
@@ -32,6 +33,38 @@ __manifest__ = {
 # ---------------------------------------------------------------------------
 
 PATIENT_ENCOUNTERS = {
+    "ENC-1990": {
+        "patient_id": "PT-10045",
+        "patient_name": "Margaret Sullivan",
+        "age": 68,
+        "gender": "Female",
+        "encounter_date": "2025-09-18",
+        "encounter_type": "Office Visit",
+        "provider": "Dr. Anita Patel",
+        "chief_complaint": "Routine diabetes and hypertension follow-up",
+        "clinical_notes": (
+            "Six-month diabetes follow-up. Patient reports good adherence to Metformin and "
+            "Lisinopril. No polyuria or polydipsia reported today. Weight 183 lbs, stable since "
+            "the prior year. Blood pressure 138/84. No joint complaints; gait normal, knees "
+            "without effusion. Trace pedal edema. Labs drawn today."
+        ),
+        "vital_signs": {
+            "bp_systolic": 138, "bp_diastolic": 84, "heart_rate": 76,
+            "temperature_f": 98.2, "respiratory_rate": 16, "weight_lbs": 183,
+            "bmi": 30.5, "spo2_pct": 98,
+        },
+        "diagnoses": [
+            {"code": "E11.65", "description": "Type 2 diabetes with hyperglycemia", "status": "active"},
+            {"code": "I10", "description": "Essential hypertension", "status": "active"},
+            {"code": "E66.01", "description": "Morbid obesity due to excess calories", "status": "active"},
+        ],
+        "lab_results": [
+            {"test": "HbA1c", "value": "7.4%", "reference": "<7.0%", "flag": "high"},
+            {"test": "Fasting Glucose", "value": "154 mg/dL", "reference": "70-100 mg/dL", "flag": "high"},
+            {"test": "eGFR", "value": "68 mL/min", "reference": ">60 mL/min", "flag": "normal"},
+            {"test": "Creatinine", "value": "1.0 mg/dL", "reference": "0.6-1.2 mg/dL", "flag": "normal"},
+        ],
+    },
     "ENC-2001": {
         "patient_id": "PT-10045",
         "patient_name": "Margaret Sullivan",
@@ -64,6 +97,37 @@ PATIENT_ENCOUNTERS = {
             {"test": "Fasting Glucose", "value": "182 mg/dL", "reference": "70-100 mg/dL", "flag": "high"},
             {"test": "eGFR", "value": "62 mL/min", "reference": ">60 mL/min", "flag": "borderline"},
             {"test": "Creatinine", "value": "1.1 mg/dL", "reference": "0.6-1.2 mg/dL", "flag": "normal"},
+        ],
+    },
+    "ENC-1991": {
+        "patient_id": "PT-10078",
+        "patient_name": "Robert Kim",
+        "age": 52,
+        "gender": "Male",
+        "encounter_date": "2025-10-02",
+        "encounter_type": "Office Visit",
+        "provider": "Dr. Anita Patel",
+        "chief_complaint": "Annual preventive visit with lipid screening",
+        "clinical_notes": (
+            "Annual preventive visit. GERD controlled on Omeprazole; anxiety stable on "
+            "Sertraline. Still smoking 1 PPD, declined cessation referral today. Denies chest "
+            "pain, chest tightness, exertional dyspnea, or palpitations. Cardiac exam normal, "
+            "lungs clear. Fasting lipid panel drawn. Weight 211 lbs. BP 132/84."
+        ),
+        "vital_signs": {
+            "bp_systolic": 132, "bp_diastolic": 84, "heart_rate": 80,
+            "temperature_f": 98.4, "respiratory_rate": 16, "weight_lbs": 211,
+            "bmi": 29.3, "spo2_pct": 97,
+        },
+        "diagnoses": [
+            {"code": "K21.0", "description": "GERD with esophagitis", "status": "active"},
+            {"code": "F41.1", "description": "Generalized anxiety disorder", "status": "active"},
+            {"code": "F17.210", "description": "Nicotine dependence, cigarettes", "status": "active"},
+        ],
+        "lab_results": [
+            {"test": "Total Cholesterol", "value": "232 mg/dL", "reference": "<200 mg/dL", "flag": "high"},
+            {"test": "LDL", "value": "152 mg/dL", "reference": "<100 mg/dL", "flag": "high"},
+            {"test": "Fasting Glucose", "value": "96 mg/dL", "reference": "70-100 mg/dL", "flag": "normal"},
         ],
     },
     "ENC-2002": {
@@ -104,19 +168,25 @@ PATIENT_ENCOUNTERS = {
 
 MEDICATIONS = {
     "PT-10045": [
-        {"name": "Metformin", "dose": "1000mg", "frequency": "BID", "route": "oral", "indication": "Type 2 Diabetes", "status": "active", "start_date": "2022-05-10"},
-        {"name": "Lisinopril", "dose": "20mg", "frequency": "daily", "route": "oral", "indication": "Hypertension", "status": "active", "start_date": "2021-03-15"},
-        {"name": "Atorvastatin", "dose": "40mg", "frequency": "daily", "route": "oral", "indication": "Hyperlipidemia", "status": "active", "start_date": "2023-01-20"},
-        {"name": "Aspirin", "dose": "81mg", "frequency": "daily", "route": "oral", "indication": "Cardiovascular prevention", "status": "active", "start_date": "2023-01-20"},
-        {"name": "Meloxicam", "dose": "15mg", "frequency": "daily", "route": "oral", "indication": "Osteoarthritis", "status": "new", "start_date": "2026-03-12"},
+        {"name": "Metformin", "dose": "1000mg", "frequency": "BID", "route": "oral", "indication": "Type 2 Diabetes", "status": "active", "start_date": "2022-05-10", "periop_class": "biguanide"},
+        {"name": "Lisinopril", "dose": "20mg", "frequency": "daily", "route": "oral", "indication": "Hypertension", "status": "active", "start_date": "2021-03-15", "periop_class": "ace-inhibitor"},
+        {"name": "Atorvastatin", "dose": "40mg", "frequency": "daily", "route": "oral", "indication": "Hyperlipidemia", "status": "active", "start_date": "2023-01-20", "periop_class": "statin"},
+        {"name": "Aspirin", "dose": "81mg", "frequency": "daily", "route": "oral", "indication": "Cardiovascular prevention", "status": "active", "start_date": "2023-01-20", "periop_class": "antiplatelet"},
+        {"name": "Meloxicam", "dose": "15mg", "frequency": "daily", "route": "oral", "indication": "Osteoarthritis", "status": "new", "start_date": "2026-03-12", "periop_class": "nsaid"},
     ],
     "PT-10078": [
-        {"name": "Omeprazole", "dose": "20mg", "frequency": "daily", "route": "oral", "indication": "GERD", "status": "active", "start_date": "2024-08-05"},
-        {"name": "Sertraline", "dose": "100mg", "frequency": "daily", "route": "oral", "indication": "Anxiety", "status": "active", "start_date": "2023-11-12"},
-        {"name": "Atorvastatin", "dose": "80mg", "frequency": "daily", "route": "oral", "indication": "Hyperlipidemia", "status": "new", "start_date": "2026-03-14"},
-        {"name": "Aspirin", "dose": "81mg", "frequency": "daily", "route": "oral", "indication": "Cardiovascular prevention", "status": "new", "start_date": "2026-03-14"},
+        {"name": "Omeprazole", "dose": "20mg", "frequency": "daily", "route": "oral", "indication": "GERD", "status": "active", "start_date": "2024-08-05", "periop_class": "ppi"},
+        {"name": "Sertraline", "dose": "100mg", "frequency": "daily", "route": "oral", "indication": "Anxiety", "status": "active", "start_date": "2023-11-12", "periop_class": "ssri"},
+        {"name": "Atorvastatin", "dose": "80mg", "frequency": "daily", "route": "oral", "indication": "Hyperlipidemia", "status": "new", "start_date": "2026-03-14", "periop_class": "statin"},
+        {"name": "Aspirin", "dose": "81mg", "frequency": "daily", "route": "oral", "indication": "Cardiovascular prevention", "status": "new", "start_date": "2026-03-14", "periop_class": "antiplatelet"},
     ],
 }
+
+# Documented peri-operative review classes. A medication appears in the
+# pre-operative summary if and only if its recorded `periop_class` is in this
+# list. This is a documented record-set policy, not a clinical judgment made by
+# the agent, and it is never a hold/stop instruction.
+PERIOP_REVIEW_CLASSES = ["antiplatelet", "nsaid", "ace-inhibitor", "biguanide"]
 
 REFERRALS = {
     "REF-3001": {
@@ -196,12 +266,70 @@ def _problem_list():
         if pid not in problems:
             problems[pid] = {"patient": enc["patient_name"], "active": [], "new": []}
         for dx in enc["diagnoses"]:
-            entry = {"code": dx["code"], "description": dx["description"]}
-            if dx["status"] == "new":
-                problems[pid]["new"].append(entry)
+            bucket = problems[pid]["new"] if dx["status"] == "new" else problems[pid]["active"]
+            existing = next((e for e in bucket if e["code"] == dx["code"]), None)
+            if existing:
+                # Same problem carried across two encounters: report it once and
+                # note every encounter it appears on. Never silently drop it.
+                existing["encounters"].append(eid)
             else:
-                problems[pid]["active"].append(entry)
+                bucket.append({
+                    "code": dx["code"],
+                    "description": dx["description"],
+                    "encounters": [eid],
+                })
     return {"patients": problems}
+
+
+def _latest_encounter(patient_id):
+    """The patient's most recent encounter by encounter_date, or None."""
+    encs = [
+        (eid, enc) for eid, enc in PATIENT_ENCOUNTERS.items()
+        if enc["patient_id"] == patient_id
+    ]
+    if not encs:
+        return None, None
+    return max(encs, key=lambda item: item[1]["encounter_date"])
+
+
+def _preop_summary(patient_id=None):
+    patient_ids = [patient_id] if patient_id else list(MEDICATIONS.keys())
+    problems = _problem_list()["patients"]
+    summaries = []
+    for pid in patient_ids:
+        eid, enc = _latest_encounter(pid)
+        if enc is None:
+            summaries.append({"patient_id": pid, "latest_encounter": None})
+            continue
+        meds = [
+            m for m in MEDICATIONS.get(pid, [])
+            if m.get("periop_class") in PERIOP_REVIEW_CLASSES
+        ]
+        summaries.append({
+            "patient_id": pid,
+            "patient": enc["patient_name"],
+            "age": enc["age"],
+            "latest_encounter": eid,
+            "date": enc["encounter_date"],
+            "type": enc["encounter_type"],
+            "provider": enc["provider"],
+            "vitals": enc["vital_signs"],
+            "periop_medications": meds,
+            "comorbidities": problems.get(pid, {}).get("active", []),
+            "new_problems": problems.get(pid, {}).get("new", []),
+            "abnormal_labs": [l for l in enc["lab_results"] if l["flag"] != "normal"],
+            "referrals": [
+                dict(ref, id=rid) for rid, ref in REFERRALS.items()
+                if ref["patient_id"] == pid
+            ],
+        })
+    return {"summaries": summaries}
+
+
+def _encounter_note(problem):
+    """Encounter attribution, shown only when a problem spans more than one."""
+    encs = problem.get("encounters", [])
+    return f" (documented on {', '.join(encs)})" if len(encs) > 1 else ""
 
 
 def _referral_summary():
@@ -238,6 +366,7 @@ class ClinicalNotesSummarizerAgent(BasicAgent):
                             "medication_review",
                             "problem_list",
                             "referral_summary",
+                            "preop_summary",
                         ],
                         "description": "The clinical notes operation to perform.",
                     },
@@ -265,6 +394,8 @@ class ClinicalNotesSummarizerAgent(BasicAgent):
             return self._problem_list()
         elif op == "referral_summary":
             return self._referral_summary()
+        elif op == "preop_summary":
+            return self._preop_summary()
         return f"**Error:** Unknown operation `{op}`."
 
     def _summarize_encounter(self) -> str:
@@ -317,11 +448,11 @@ class ClinicalNotesSummarizerAgent(BasicAgent):
             if pl["active"]:
                 lines.append("\n**Active Problems:**")
                 for p in pl["active"]:
-                    lines.append(f"- [{p['code']}] {p['description']}")
+                    lines.append(f"- [{p['code']}] {p['description']}{_encounter_note(p)}")
             if pl["new"]:
                 lines.append("\n**New Problems:**")
                 for p in pl["new"]:
-                    lines.append(f"- [{p['code']}] {p['description']}")
+                    lines.append(f"- [{p['code']}] {p['description']}{_encounter_note(p)}")
             lines.append("")
         return "\n".join(lines)
 
@@ -342,11 +473,87 @@ class ClinicalNotesSummarizerAgent(BasicAgent):
             )
         return "\n".join(lines)
 
+    def _preop_summary(self) -> str:
+        data = _preop_summary()
+        lines = ["# Pre-Operative Summary", ""]
+        for s in data["summaries"]:
+            if not s.get("latest_encounter"):
+                lines.append(f"## {s['patient_id']}")
+                lines.append("No encounter on file for this patient.")
+                lines.append("")
+                continue
+            v = s["vitals"]
+            lines.append(f"## {s['patient']} ({s['patient_id']}, Age {s['age']})")
+            lines.append(
+                f"**Latest encounter:** {s['latest_encounter']} - {s['date']} "
+                f"{s['type']} with {s['provider']}"
+            )
+            lines.append(
+                f"**Vitals:** BP {v['bp_systolic']}/{v['bp_diastolic']} "
+                f"| HR {v['heart_rate']} | RR {v['respiratory_rate']} "
+                f"| SpO2 {v['spo2_pct']}% | BMI {v['bmi']}"
+            )
+            lines.append(
+                "**ASA class:** not assigned in this record set - the anesthesia "
+                "team assigns it."
+            )
+            lines.append("")
+            lines.append("**Medications in a peri-operative review class:**")
+            lines.append("")
+            if s["periop_medications"]:
+                lines.append("| Medication | Dose | Frequency | Class | Status |")
+                lines.append("|-----------|------|-----------|-------|--------|")
+                for m in s["periop_medications"]:
+                    lines.append(
+                        f"| {m['name']} | {m['dose']} | {m['frequency']} "
+                        f"| {m['periop_class']} | {m['status'].upper()} |"
+                    )
+            else:
+                lines.append(
+                    "None of this patient's medications carry a peri-operative "
+                    "review class."
+                )
+            lines.append("")
+            lines.append("**Comorbidities on the problem list:**")
+            for p in s["comorbidities"] + s["new_problems"]:
+                lines.append(f"- [{p['code']}] {p['description']}{_encounter_note(p)}")
+            if s["abnormal_labs"]:
+                lines.append("")
+                lines.append(f"**Abnormal labs ({s['latest_encounter']}):**")
+                lines.append("")
+                lines.append("| Test | Value | Reference | Flag |")
+                lines.append("|------|-------|-----------|------|")
+                for lab in s["abnormal_labs"]:
+                    lines.append(
+                        f"| {lab['test']} | {lab['value']} | {lab['reference']} "
+                        f"| {lab['flag'].upper()} |"
+                    )
+            lines.append("")
+            lines.append("**Referrals on file:**")
+            lines.append("")
+            if s["referrals"]:
+                lines.append("| Referral | To Specialty | To Provider | Urgency | Reason |")
+                lines.append("|----------|--------------|-------------|---------|--------|")
+                for r in s["referrals"]:
+                    lines.append(
+                        f"| {r['id']} | {r['to_specialty']} | {r['to_provider']} "
+                        f"| {r['urgency'].upper()} | {r['reason']} |"
+                    )
+            else:
+                lines.append("No referrals on file for this patient.")
+            lines.append("")
+            lines.append(
+                "Documentation only - no medication is held, stopped, or changed "
+                "here. The surgical and anesthesia teams decide."
+            )
+            lines.append("")
+        return "\n".join(lines)
+
 
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     agent = ClinicalNotesSummarizerAgent()
-    for op in ["summarize_encounter", "medication_review", "problem_list", "referral_summary"]:
+    for op in ["summarize_encounter", "medication_review", "problem_list", "referral_summary", "preop_summary"]:
         print(f"\n{'='*60}")
         print(f"Operation: {op}")
         print("=" * 60)

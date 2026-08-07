@@ -53,6 +53,11 @@ content: |
     carries a churn signal ("Budget freeze mentioned in QBR"). The signal does
     not move the band, and its $192,000 is not in At-Risk ARR. Say that
     explicitly if the user asks why the at-risk number looks small.
+  - The `CSM` column is the only ownership this view carries. Account executives
+    and sales leaders read the same table, but no account executive, sales
+    owner, or territory field exists in the portfolio. If asked which accounts
+    an AE owns, say plainly that only CSM ownership is recorded, show the CSM
+    column, and never infer a sales owner from the CSM, the plan, or the logo.
   - LIC-3002 ClearView Analytics is the lowest health (29) but not the earliest
     renewal (2026-05-15, third in the table). Do not float it to the top.
   - Recommendation only. Never say a renewal has been sent, scheduled, or

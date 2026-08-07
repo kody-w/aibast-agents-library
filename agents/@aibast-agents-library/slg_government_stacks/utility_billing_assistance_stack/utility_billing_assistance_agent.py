@@ -2,8 +2,9 @@
 Utility Billing Assistance Agent — SLG Government Stack
 
 Provides utility billing support including account inquiries, usage
-analysis, payment plan management, and assistance program eligibility
-for municipal utility departments.
+analysis, suspected-leak flagging from interval-meter evidence, payment
+plan management, and assistance program eligibility for municipal utility
+departments.
 """
 
 import sys
@@ -17,9 +18,9 @@ __manifest__ = {
     "name": "@aibast-agents-library/utility-billing-assistance",
     "version": "1.0.0",
     "display_name": "Utility Billing Assistance Agent",
-    "description": "Municipal utility billing support with account inquiries, usage analysis, payment plans, and assistance program eligibility.",
+    "description": "Municipal utility billing support with account inquiries, usage analysis, suspected-leak flagging, payment plans, and assistance program eligibility.",
     "author": "AIBAST",
-    "tags": ["utility", "billing", "water", "payment", "assistance", "municipal"],
+    "tags": ["utility", "billing", "water", "leak", "payment", "assistance", "municipal"],
     "category": "slg_government",
     "quality_tier": "verified",
     "requires_env": [],
@@ -94,6 +95,33 @@ USAGE_HISTORY = {
         {"period": "2025-01", "water_gallons": 13200, "sewer_gallons": 11880, "amount": 215.40},
         {"period": "2025-02", "water_gallons": 11500, "sewer_gallons": 10350, "amount": 189.80},
     ],
+}
+
+# Interval-meter diagnostics. Only accounts with metered history carry interval
+# telemetry; the other accounts are reported as not assessed rather than guessed.
+METER_DIAGNOSTICS = {
+    "ACCT-90001": {
+        "interval_meter": True,
+        "window_nights": 30,
+        "min_nightly_flow_gph": 0.0,
+        "continuous_flow_nights": 0,
+        "last_read": "2025-02-28",
+    },
+    "ACCT-90003": {
+        "interval_meter": True,
+        "window_nights": 30,
+        "min_nightly_flow_gph": 5.0,
+        "continuous_flow_nights": 30,
+        "last_read": "2025-02-28",
+    },
+}
+
+# Published leak-flag rule. A flag is a suspected leak pending field verification,
+# never a confirmed leak and never a billing adjustment.
+LEAK_THRESHOLDS = {
+    "min_nightly_flow_gph": 0.5,
+    "window_nights": 30,
+    "trend_flag": "significantly_increasing",
 }
 
 RATE_STRUCTURES = {
@@ -205,6 +233,48 @@ def _usage_trend(account_id):
     return "stable"
 
 
+def _leak_assessment(account_id):
+    """Flag an account as a suspected leak from interval-meter evidence.
+
+    Two published conditions, either of which flags the account:
+      1. minimum nightly flow above the threshold on every night of the window
+         (continuous flow - water moving when nobody is drawing it)
+      2. a Significantly Increasing consumption trend
+
+    A flag is a suspected leak pending field verification by the utility.
+    """
+    diag = METER_DIAGNOSTICS.get(account_id)
+    trend = _usage_trend(account_id)
+    result = {
+        "status": "not_assessed",
+        "trend": trend,
+        "reasons": [],
+        "estimated_loss_gallons": 0,
+    }
+    if not diag:
+        return result
+    result["status"] = "no_indicator"
+    if (
+        diag["min_nightly_flow_gph"] > LEAK_THRESHOLDS["min_nightly_flow_gph"]
+        and diag["continuous_flow_nights"] >= LEAK_THRESHOLDS["window_nights"]
+    ):
+        result["reasons"].append(
+            f"Continuous flow: minimum nightly flow {diag['min_nightly_flow_gph']:,.1f} gal/hr "
+            f"on {diag['continuous_flow_nights']} of {diag['window_nights']} nights "
+            f"(threshold {LEAK_THRESHOLDS['min_nightly_flow_gph']:,.1f} gal/hr)"
+        )
+        result["estimated_loss_gallons"] = int(
+            round(diag["min_nightly_flow_gph"] * 24 * diag["window_nights"])
+        )
+    if trend == LEAK_THRESHOLDS["trend_flag"]:
+        result["reasons"].append(
+            "Consumption trend: Significantly Increasing (latest period above 1.20x the prior-period average)"
+        )
+    if result["reasons"]:
+        result["status"] = "suspected_leak"
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Agent class
 # ---------------------------------------------------------------------------
@@ -226,6 +296,7 @@ class UtilityBillingAssistanceAgent(BasicAgent):
                         "enum": [
                             "billing_inquiry",
                             "usage_analysis",
+                            "leak_detection",
                             "payment_plan",
                             "assistance_programs",
                         ],
@@ -242,6 +313,7 @@ class UtilityBillingAssistanceAgent(BasicAgent):
         dispatch = {
             "billing_inquiry": self._billing_inquiry,
             "usage_analysis": self._usage_analysis,
+            "leak_detection": self._leak_detection,
             "payment_plan": self._payment_plan,
             "assistance_programs": self._assistance_programs,
         }
@@ -309,6 +381,101 @@ class UtilityBillingAssistanceAgent(BasicAgent):
             lines.append("")
         return "\n".join(lines)
 
+    def _leak_detection(self, **kwargs) -> str:
+        account_id = kwargs.get("account_id")
+        label = {
+            "suspected_leak": "Suspected Leak",
+            "no_indicator": "No Leak Indicator",
+            "not_assessed": "Not Assessed - no interval data on file",
+        }
+
+        if account_id and account_id in UTILITY_ACCOUNTS:
+            acct = UTILITY_ACCOUNTS[account_id]
+            diag = METER_DIAGNOSTICS.get(account_id)
+            assessment = _leak_assessment(account_id)
+            lines = [f"# Leak Assessment: {account_id}\n"]
+            lines.append(f"**Customer:** {acct['customer']}")
+            lines.append(f"**Assessment:** {label[assessment['status']]}")
+            lines.append(f"**Usage Trend:** {assessment['trend'].replace('_', ' ').title()}\n")
+            if not diag:
+                lines.append(
+                    "No interval-meter data is on file for this account, so no leak "
+                    "assessment can be made. Interval data is on file for "
+                    f"{', '.join(sorted(METER_DIAGNOSTICS))} only."
+                )
+                return "\n".join(lines)
+            lines.append("## Meter Evidence\n")
+            lines.append(f"- **Minimum Nightly Flow:** {diag['min_nightly_flow_gph']:,.1f} gal/hr")
+            lines.append(
+                f"- **Continuous-Flow Nights:** {diag['continuous_flow_nights']} of {diag['window_nights']}"
+            )
+            lines.append(f"- **Last Meter Read:** {diag['last_read']}")
+            lines.append(
+                f"- **Flag Threshold:** minimum nightly flow above "
+                f"{LEAK_THRESHOLDS['min_nightly_flow_gph']:,.1f} gal/hr on all "
+                f"{LEAK_THRESHOLDS['window_nights']} nights, or a Significantly Increasing trend"
+            )
+            if assessment["reasons"]:
+                lines.append("\n## Why It Is Flagged\n")
+                for reason in assessment["reasons"]:
+                    lines.append(f"- {reason}")
+                if assessment["estimated_loss_gallons"]:
+                    est = assessment["estimated_loss_gallons"]
+                    lines.append(
+                        f"- **Estimated loss at the continuous-flow rate:** {est:,} gallons "
+                        f"over {diag['window_nights']} days "
+                        f"({diag['min_nightly_flow_gph']:,.1f} gal/hr x 24 x {diag['window_nights']})"
+                    )
+                    history = USAGE_HISTORY.get(account_id, [])
+                    if history:
+                        latest = history[-1]
+                        pct = est / latest["water_gallons"] * 100
+                        lines.append(
+                            f"- That is about {pct:,.0f}% of the {latest['water_gallons']:,} gallons "
+                            f"billed in {latest['period']}."
+                        )
+                lines.append(
+                    "\n**Suspected, not confirmed.** This is a meter reading, not a "
+                    "diagnosis. The utility must verify in the field before any repair "
+                    "order or billing adjustment. The dollar impact crosses rate tiers "
+                    "and is quantified by a billing clerk."
+                )
+            else:
+                lines.append(
+                    "\nNo flag condition is met: nightly flow stays at or below the "
+                    "threshold and the trend is not Significantly Increasing."
+                )
+            return "\n".join(lines)
+
+        lines = ["# Leak Detection Scan\n"]
+        lines.append("| Account | Customer | Min Nightly Flow (gal/hr) | Continuous-Flow Nights | Trend | Assessment |")
+        lines.append("|---|---|---|---|---|---|")
+        flagged = []
+        for aid, acct in UTILITY_ACCOUNTS.items():
+            diag = METER_DIAGNOSTICS.get(aid)
+            assessment = _leak_assessment(aid)
+            if assessment["status"] == "suspected_leak":
+                flagged.append(aid)
+            if diag:
+                flow = f"{diag['min_nightly_flow_gph']:,.1f}"
+                nights = f"{diag['continuous_flow_nights']} of {diag['window_nights']}"
+            else:
+                flow = "No interval data"
+                nights = "No interval data"
+            lines.append(
+                f"| {aid} | {acct['customer']} | {flow} | {nights} "
+                f"| {assessment['trend'].replace('_', ' ').title()} | {label[assessment['status']]} |"
+            )
+        lines.append(
+            f"\n**Accounts Flagged as Suspected Leaks:** {len(flagged)}"
+            + (f" ({', '.join(flagged)})" if flagged else "")
+        )
+        lines.append(
+            "\nA flag is a suspected leak pending field verification by the utility, "
+            "not a confirmed leak and not a billing adjustment."
+        )
+        return "\n".join(lines)
+
     def _payment_plan(self, **kwargs) -> str:
         account_id = kwargs.get("account_id", "ACCT-90003")
         acct = UTILITY_ACCOUNTS.get(account_id, list(UTILITY_ACCOUNTS.values())[2])
@@ -365,6 +532,10 @@ if __name__ == "__main__":
     print(agent.perform(operation="billing_inquiry", account_id="ACCT-90002"))
     print("\n" + "=" * 80 + "\n")
     print(agent.perform(operation="usage_analysis", account_id="ACCT-90003"))
+    print("\n" + "=" * 80 + "\n")
+    print(agent.perform(operation="leak_detection"))
+    print("\n" + "=" * 80 + "\n")
+    print(agent.perform(operation="leak_detection", account_id="ACCT-90003"))
     print("\n" + "=" * 80 + "\n")
     print(agent.perform(operation="payment_plan", account_id="ACCT-90003"))
     print("\n" + "=" * 80 + "\n")

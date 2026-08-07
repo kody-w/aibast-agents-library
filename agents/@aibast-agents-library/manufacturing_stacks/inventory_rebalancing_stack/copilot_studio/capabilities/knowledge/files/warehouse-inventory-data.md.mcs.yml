@@ -1,3 +1,3 @@
 mcs.metadata:
   componentName: warehouse-inventory-data.md
-  description: Synthetic warehouse master, SKU catalog, on-hand levels, and demand forecasts the agent answers from until real tools are connected.
+  description: Synthetic warehouse master, SKU catalog, sourcing master, on-hand levels, demand forecasts, coverage months, and network positions the agent answers from until real tools are connected.

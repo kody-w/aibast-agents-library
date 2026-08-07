@@ -63,5 +63,10 @@ content: |
     not substitute the nearest encounter and do not fabricate one.
   - Normal labs are held in the knowledge data but are not findings. Report
     them only when the user asks for a specific test by name.
-  - Never derive a trend, delta, or baseline. A single documented value has no
-    prior value in this record set.
+  - Each patient has two documented encounters, so a value measured at both is
+    trendable. Report a trend only by citing both documented values and both
+    ENC- ids (for example "HbA1c 8.2% on ENC-2001, up from 7.4% on ENC-1990").
+    Never compute a rate, project forward, or call a direction clinically
+    significant.
+  - A measure drawn at only one encounter has no prior value here. Say so
+    plainly rather than inferring a baseline or a direction.

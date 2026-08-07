@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: points-liability
+  description: Frames total outstanding points as the program's points liability and lists the redemption levers that would reduce it, per member and program-wide.
+kind: InlineAgentSkill
+content: |
+  ---
+  name: points-liability
+  description: Frames total outstanding points as the program's points liability and lists the redemption levers that would reduce it, per member and program-wide.
+  ---
+  <!-- bic:source=blank -->
+  # Points liability
+
+  Use this skill when the user asks about points liability, breakage, the cost
+  of outstanding points, how to burn down points, "what do we owe members", or
+  how to reduce the points balance sitting on the program.
+
+  ## Inputs
+
+  - The member roster and the redemption catalog (knowledge/tools). No
+    arguments are required.
+  - Optional: a member id to scope the lever table to one member. The headline
+    liability is always the program-wide figure.
+
+  ## Procedure
+
+  1. Points outstanding = the sum of every member's points balance. The
+     liability is `points_outstanding x 0.02`, rounded to two decimals.
+     Current roster: 80,900 points = $1,618.00.
+  2. A redemption lever is a reward the member is eligible for TODAY under the
+     same two-part gate used everywhere else - the reward's category is in the
+     member's preferred categories AND its points cost is at or below their
+     balance. Never widen the gate to make the lever list longer.
+  3. Points redeemable for a member = the sum of the points cost of their
+     eligible rewards. Liability addressed = `points_redeemable x 0.02`.
+  4. Worked results from the current roster:
+     - LM-10001 Katherine Brooks, 48,250 points: $500 Travel Voucher (25,000)
+       and $100 Dining Gift Card (5,000) - 30,000 points, $600.00.
+     - LM-10002 Antonio Vasquez, 22,100 points: Premium Wireless Headphones
+       (15,000) and $50 Store Gift Card (2,500) - 17,500 points, $350.00.
+     - LM-10003 Rachel Nguyen, 8,450 points: 20% Off Next Purchase (3,000) -
+       3,000 points, $60.00.
+     - LM-10004 Derek Washington, 2,100 points: Free Shipping for 3 Months
+       (1,500) - 1,500 points, $30.00.
+  5. Addressable now = 52,000 points ($1,040.00), which is 64.3% of the 80,900
+     points outstanding. Residual liability if every eligible reward is taken =
+     28,900 points ($578.00). Report the percentage to one decimal.
+
+  ## Output format
+
+  Headline block, in this order, one per line:
+
+      **Points Outstanding:** N,NNN
+      **Liability at 1 point = $0.02:** $N,NNN.NN
+
+  Then `## Redemption Levers` - one table, exactly these columns:
+
+  | Member | Points | Eligible Rewards | Points Redeemable | Liability Addressed |
+
+  Member cell is `Name (LM-id)`. Eligible rewards are reward names joined by
+  `; `, or `None eligible today` when the member has none. Points carry
+  thousands separators; liability carries a leading `$` and two decimals.
+
+  Then the two closing lines: addressable now (points, dollars, percentage of
+  outstanding) and residual liability.
+
+  ## Edge cases
+
+  - A member with no eligible reward is still a row, with `None eligible today`
+    and 0 / $0.00 - do not drop them from the table and do not relax the gate
+    to give them a lever.
+  - There is no points-expiry rule in this program. Never claim points will
+    lapse, break, or age off the liability on their own.
+  - Never quote a rate other than 1 point = $0.02, and never discount the
+    liability for expected breakage - no breakage rate exists in the data.
+  - Levers are recommendations. Never state that points were redeemed,
+    written off, expired, or adjusted; the program team acts in the loyalty
+    platform.
