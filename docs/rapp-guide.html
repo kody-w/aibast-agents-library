@@ -1093,7 +1093,11 @@
 
     <!-- Top Bar -->
     <div class="top-bar">
-        <h1>
+        <div style="background:linear-gradient(135deg,#0b1f4b,#3a1f66);color:#fff;border-radius:12px;padding:18px 24px;margin:18px 0">
+  <b style="color:#f291b6">START HERE:</b> The hands-on path through everything in this guide is
+  <a href="workshop.html" style="color:#fff;font-weight:700">the RAPP Workshop</a> — one page, every
+  industry, built by talking to your AI. This guide is the reference behind it.</div>
+<h1>
             <span>Rapid Agent Prototype Pattern (RAPP)</span>
         </h1>
         <div class="top-bar-controls">
@@ -1652,10 +1656,10 @@ def handle_request(user_message, user_guid):
             </div>
 
             <div class="highlight-box">
-                <h4>💡 Why Not Use Copilot Studio's Built-In AI Capabilities?</h4>
-                <p><strong>Problem:</strong> No access to the full system message in Copilot Studio. Can't fully control the prompt engineering that makes agents work reliably.</p>
-                <p><strong>Key insight:</strong> The fundamental limitation of Copilot Studio's built-in AI is the lack of system message control. Without access to customize the system message, you cannot fine-tune the prompt engineering that makes agents perform reliably in this RAPP framework.</p>
-                <p><strong>Solution:</strong> Use Copilot Studio for what it's great at (channels, UI, routing) and keep intelligence in a custom Azure Function where you have full control.</p>
+                <h4>💡 Copilot Studio's Built-In AI: What Changed</h4>
+                <p><strong>Then:</strong> Classic Copilot Studio gave no access to the full system message, so this guide historically kept the intelligence in a custom Azure Function where the prompt engineering could be controlled.</p>
+                <p><strong>Now:</strong> CLI-authored agentic-loop agents changed this. Instructions (the full system message), per-operation skills, and knowledge are all first-class, version-controlled YAML — the <a href="workshop.html">RAPP Workshop</a> deploys library agents natively into Copilot Studio this way, with complete control over the rules the agent never relaxes.</p>
+                <p><strong>Where the Function pattern still earns its place:</strong> custom code execution, non-Microsoft model choice, or serving many channels from one backend. Use Copilot Studio natively when its component model covers the behavior; use the Function tier when it doesn't. Both remain valid RAPP deployment targets.</p>
             </div>
 
             <div class="nav-controls">
