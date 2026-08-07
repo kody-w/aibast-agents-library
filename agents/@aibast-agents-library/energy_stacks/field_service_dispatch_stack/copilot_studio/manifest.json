@@ -1,0 +1,30 @@
+{
+  "schema": "aibast-copilot-studio-scaffold/1.0",
+  "stack": "field-service-dispatch",
+  "display_name": "Field Service Dispatch Agent",
+  "agent_intent": "../field_service_dispatch_agent.py",
+  "instructions": "instructions.md",
+  "behaviors": [
+    "behaviors/dispatch-dashboard_fsd101.mcs.yml",
+    "behaviors/route-optimization_fsd102.mcs.yml",
+    "behaviors/technician-assignment_fsd103.mcs.yml",
+    "behaviors/emergency-response_fsd104.mcs.yml"
+  ],
+  "knowledge_files": [
+    "capabilities/knowledge/files/field-service-operations-data.md",
+    "capabilities/knowledge/files/field-service-operations-data.md.mcs.yml",
+    "capabilities/knowledge/files/certification-and-dispatch-policy.md",
+    "capabilities/knowledge/files/certification-and-dispatch-policy.md.mcs.yml"
+  ],
+  "data_files": [
+    "data/technicians.csv",
+    "data/service_requests.csv"
+  ],
+  "verification": [
+    {"ask": "Show me the dispatch dashboard.", "expect": "5 requests, SR-4005 (CRITICAL) first, 4 unassigned, 3 available technicians"},
+    {"ask": "Who should take SR-4001?", "expect": "Marcus Thompson (TECH-205), score 107, beating Carlos Rivera (TECH-201) at 99"},
+    {"ask": "Who can respond to the SCADA emergency?", "expect": "Exactly one eligible responder: Marcus Thompson (on break, Denver, CO)"},
+    {"ask": "Assign the pipeline survey to Carlos Rivera.", "expect": "Refusal: Carlos lacks pipeline_inspection, and the agent recommends rather than assigns"},
+    {"ask": "Show the dashboard for the Central zone only.", "expect": "3 requests; counts reflect the filter (2 unassigned, 0 available)"}
+  ]
+}

@@ -1,9 +1,9 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-08-07T00:21:19.213379+00:00",
+  "generated_at": "2026-08-07T00:46:08.865289+00:00",
   "stats": {
-    "total_agents": 104,
+    "total_agents": 105,
     "publishers": 1,
     "categories": 14,
     "publisher_list": [
@@ -1305,6 +1305,31 @@
       "_file": "agents/@aibast-agents-library/general_stacks/ask_hr_stack/ask_hr_agent.py",
       "_size_kb": 18.9,
       "_lines": 402
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/copilot-studio-builder",
+      "version": "1.0.0",
+      "display_name": "Copilot Studio Builder Agent",
+      "description": "Builds library agents into Microsoft Copilot Studio through conversation: fetches a stack's component scaffold from the public repo, drives the pac CLI (init, install, push), and returns verification questions with computed expected answers.",
+      "author": "AIBAST",
+      "tags": [
+        "copilot-studio",
+        "builder",
+        "deployment",
+        "pac",
+        "bootstrap",
+        "natural-language"
+      ],
+      "category": "general",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/general_stacks/copilot_studio_builder_stack/copilot_studio_builder_agent.py",
+      "_size_kb": 23.5,
+      "_lines": 485
     },
     {
       "schema": "rapp-agent/1.0",

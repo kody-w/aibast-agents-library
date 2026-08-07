@@ -153,16 +153,13 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
 .b-skills .sbox li{position:relative;padding-left:12px;margin-bottom:5px;color:#3c3f52;line-height:1.38}
 .b-skills .sbox li::before{content:"•";position:absolute;left:0;opacity:.5}
 .b-skills .arrow{color:var(--skill-b);font-size:19px;font-weight:800;text-align:center}
-/* product jewels */
+/* product jewels — official marks from assets/products (see its NOTICE.md) */
 .jewels{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .jw{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);
-  border-radius:6px;padding:3px 9px 3px 4px;font-size:11.5px;font-weight:700;color:#33364a;
+  border-radius:6px;padding:3px 9px 3px 5px;font-size:11.5px;font-weight:700;color:#33364a;
   white-space:nowrap}
-.jw i{width:17px;height:17px;border-radius:4px;color:#fff;font-style:normal;font-size:9px;
-  font-weight:800;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
-.jw.mcs i{background:#7444c0}.jw.sp i{background:#036c70}.jw.dv i{background:#088142}
-.jw.fs i{background:#0b53ce}.jw.tm i{background:#6264a7}.jw.id i{background:#0078d4}
-.jw.pa i{background:#005fe0}.jw.m365 i{background:#d83b01}
+.jw img{width:17px;height:17px;object-fit:contain;display:block}
+.jw small{font-weight:600;color:var(--faint);margin-left:2px}
 .rule-banner{margin-top:16px;background:#101a35;color:#fff;border-radius:10px;padding:14px 20px;
   font-size:15px;font-weight:600;text-align:center}
 .rule-banner b{color:#f291b6}
@@ -326,7 +323,7 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
           <li>Everything <b>general</b>: dispatcher role, scope, operational tone</li>
           <li>The six never-relaxed rules — cert gating, recommend-don't-dispatch, priority order, cite IDs, missing-data honesty, zone filters</li>
         </ul>
-        <div class="jewels"><span class="jw mcs"><i>CS</i>Copilot Studio</span></div></div>
+        <div class="jewels"><span class="jw"><img src="../assets/products/copilot-studio.svg" alt="">Copilot Studio</span></div></div>
 
       <div class="bx k"><h4>Knowledge <span class="status u">Used</span></h4>
         <ul>
@@ -334,14 +331,14 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
           <li>Operations data — synthetic, prototype tier</li>
           <li>Certification &amp; dispatch policy — the citable authority behind every refusal</li>
         </ul>
-        <div class="jewels"><span class="jw mcs"><i>CS</i>File knowledge</span><span class="jw sp"><i>SP</i>SharePoint <small>later</small></span></div></div>
+        <div class="jewels"><span class="jw"><img src="../assets/products/copilot-studio.svg" alt="">File knowledge</span><span class="jw"><img src="../assets/products/sharepoint.svg" alt="">SharePoint <small>later</small></span></div></div>
 
       <div class="bx t"><h4>Tools <span class="status d">Step 7</span></h4>
         <ul>
           <li><b>Live lookups</b> — roster and work orders queried, never RAG-searched</li>
           <li>Acts as the <b>signed-in user</b>; a service principal reads the whole tenant</li>
         </ul>
-        <div class="jewels"><span class="jw sp"><i>SP</i>SharePoint</span><span class="jw dv"><i>DV</i>Dataverse</span><span class="jw fs"><i>FS</i>D365 Field Service</span><span class="jw id"><i>ID</i>Entra ID</span></div></div>
+        <div class="jewels"><span class="jw"><img src="../assets/products/sharepoint.svg" alt="">SharePoint</span><span class="jw"><img src="../assets/products/dataverse.svg" alt="">Dataverse</span><span class="jw"><img src="../assets/products/d365-field-service.svg" alt="">D365 Field Service</span><span class="jw"><img src="../assets/products/entra-id.svg" alt="">Entra ID</span></div></div>
 
       <div class="bx m"><h4>Memory <span class="status n">Not used</span></h4>
         <ul>
@@ -389,7 +386,7 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
           <li>Test pane during the build</li>
           <li>Teams at pilot — sharing is a decision, not a default</li>
         </ul>
-        <div class="jewels"><span class="jw tm"><i>T</i>Microsoft Teams</span><span class="jw m365"><i>M</i>M365 Copilot</span></div></div>
+        <div class="jewels"><span class="jw"><img src="../assets/products/teams.svg" alt="">Microsoft Teams</span><span class="jw"><img src="../assets/products/m365-copilot.svg" alt="">M365 Copilot</span></div></div>
       <div class="bx ch"><h4>Evaluations <span class="status u">Step 6</span></h4>
         <ul>
           <li>Five checks with <b>computed</b> expected answers — wrong is visible, not arguable</li>
