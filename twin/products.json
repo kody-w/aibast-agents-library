@@ -23,7 +23,26 @@
     "license-renewal-expansion",
     "software-competitive-intel",
     "proposal-copilot",
-    "client-health-score"
+    "client-health-score",
+    "portfolio-rebalancing",
+    "personalized-marketing",
+    "energy-regulatory-reporting",
+    "store-associate-copilot",
+    "product-feedback-synthesizer",
+    "utility-billing-assistance",
+    "procurement-agent",
+    "omnichannel-engagement",
+    "underwriting-support",
+    "customer-sentiment-churn",
+    "claims-processing",
+    "loan-origination-assistant",
+    "personalized-shopping-assistant",
+    "wealth-insights-generator",
+    "returns-complaints-resolution",
+    "order-status-communication",
+    "customer-loyalty-rewards",
+    "building-permit-processing",
+    "financial-advisor-copilot"
    ]
   },
   {
@@ -44,7 +63,14 @@
     "order-status-communication",
     "store-associate-copilot",
     "customer-loyalty-rewards",
-    "software-customer-onboarding"
+    "software-customer-onboarding",
+    "maintenance-scheduling",
+    "emission-tracking",
+    "patient-intake",
+    "care-gap-closure",
+    "claims-processing",
+    "wealth-insights-generator",
+    "building-permit-processing"
    ]
   },
   {
@@ -66,7 +92,29 @@
     "inventory-rebalancing",
     "inventory-visibility",
     "supply-chain-disruption-alert",
-    "production-line-optimization"
+    "production-line-optimization",
+    "fs-customer-onboarding",
+    "time-entry-billing",
+    "resource-utilization",
+    "asset-maintenance-forecast",
+    "permit-license-management",
+    "maintenance-scheduling",
+    "energy-regulatory-reporting",
+    "emission-tracking",
+    "store-associate-copilot",
+    "cart-abandonment-recovery",
+    "product-feedback-synthesizer",
+    "utility-billing-assistance",
+    "patient-intake",
+    "care-gap-closure",
+    "underwriting-support",
+    "fraud-detection-alert",
+    "loan-origination-assistant",
+    "wealth-insights-generator",
+    "returns-complaints-resolution",
+    "customer-loyalty-rewards",
+    "clinical-notes-summarizer",
+    "financial-advisor-copilot"
    ]
   },
   {
@@ -103,7 +151,9 @@
     "product-feedback-synthesizer",
     "contract-risk-review",
     "time-entry-billing",
-    "resource-utilization"
+    "resource-utilization",
+    "portfolio-rebalancing",
+    "proposal-generation"
    ]
   },
   {
@@ -183,7 +233,18 @@
     "staff-credentialing",
     "acquisition-support",
     "fs-regulatory-compliance",
-    "regulatory-compliance-fed"
+    "regulatory-compliance-fed",
+    "fs-customer-onboarding",
+    "time-entry-billing",
+    "asset-maintenance-forecast",
+    "permit-license-management",
+    "deal-progression",
+    "energy-regulatory-reporting",
+    "emission-tracking",
+    "account-intelligence",
+    "patient-intake",
+    "returns-complaints-resolution",
+    "building-permit-processing"
    ]
   },
   {
@@ -247,7 +308,74 @@
     "sales-chat",
     "omnichannel-engagement",
     "ai-customer-assistant",
-    "customer-loyalty-rewards"
+    "customer-loyalty-rewards",
+    "fs-customer-onboarding",
+    "portfolio-rebalancing",
+    "procurement-agent",
+    "inventory-rebalancing",
+    "time-entry-billing",
+    "resource-utilization",
+    "asset-maintenance-forecast",
+    "permit-license-management",
+    "deal-progression",
+    "proposal-generation",
+    "personalized-marketing",
+    "client-health-score",
+    "energy-regulatory-reporting",
+    "emission-tracking",
+    "account-intelligence",
+    "supplier-risk-monitoring",
+    "cart-abandonment-recovery",
+    "product-feedback-synthesizer",
+    "utility-billing-assistance",
+    "cross-selling",
+    "care-gap-closure",
+    "underwriting-support",
+    "inventory-visibility",
+    "license-renewal-expansion",
+    "customer-sentiment-churn",
+    "fraud-detection-alert",
+    "loan-origination-assistant",
+    "fs-regulatory-compliance",
+    "returns-complaints-resolution",
+    "building-permit-processing",
+    "prior-authorization",
+    "ask-hr",
+    "financial-advisor-copilot"
+   ]
+  },
+  {
+   "id": "azure-iot",
+   "name": "Azure IoT Hub",
+   "stacks": [
+    "production-line-optimization"
+   ]
+  },
+  {
+   "id": "d365-commerce",
+   "name": "Dynamics 365 Commerce",
+   "stacks": [
+    "inventory-rebalancing",
+    "procurement-agent",
+    "omnichannel-engagement",
+    "underwriting-support",
+    "inventory-visibility"
+   ]
+  },
+  {
+   "id": "outlook",
+   "name": "Microsoft Outlook",
+   "stacks": [
+    "client-health-score",
+    "store-associate-copilot",
+    "cart-abandonment-recovery",
+    "utility-billing-assistance",
+    "omnichannel-engagement",
+    "personalized-shopping-assistant",
+    "wealth-insights-generator",
+    "returns-complaints-resolution",
+    "customer-loyalty-rewards",
+    "ask-hr"
    ]
   }
  ]

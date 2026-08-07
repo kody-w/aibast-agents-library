@@ -14,7 +14,18 @@
     "agent_page": "https://microsoft.sharepoint.com/sites/AIBAST/SitePages/Agents%20Library%20Listings/Product%20Line%20Optimization%20Agent.aspx",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDGahQZ6trGRpvOp3KQ-9NyASN3b8fbo4JhbyvLmV3vLug?e=fbKBFe",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAYxt9f287pR57rl2oIW3DlAdE4InRZXHLQBfbQfIDiCx8?e=1PcWzK"
-   }
+   },
+   "exec_summary": "Provide intelligent production capacity analysis and optimization planning to boost throughput and efficiency while maintaining quality.",
+   "personas": [
+    "Plant Manager",
+    "Production Engineer",
+    "Operations Director"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "PowerBI",
+    "Azure IoT Hub"
+   ]
   },
   {
    "sharepoint_name": "Contract Review Agent",
@@ -28,7 +39,17 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBitvkypNHIS5MJVqB5WAcyASeWkqtVOZubToNMJ0VoO-Q?e=x2yWGc",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDhgCWVeHSKS46lKcTCM2onAcDW8-mxL17a8cJlmaB1Vr0?e=4VbMnd"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate contract review processes to enable faster, lower-risk, and more successful negotiations.",
+   "personas": [
+    "Legal Operations",
+    "Attorneys",
+    "Executives"
+   ],
+   "featured_tools": [
+    "SharePoint",
+    "Microsoft Word"
+   ]
   },
   {
    "sharepoint_name": "Client Onboarding Agent",
@@ -43,7 +64,18 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBsEN4m7Jq4SYA5DFLxEkmrAQ-aD5YYOtazGA9PjWbEd4A?e=ST6Nfk",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBX4yb0bRKdTIMkxqwGKoKBAXAK7vTB5wdmGthU_s-6md0?e=ghYwgE"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Orchestrate client onboarding journeys with unified workflows to accelerate revenue and mitigate compliance risk.",
+   "personas": [
+    "Onboarding Specialist",
+    "Relationship Manager",
+    "Compliance Officer"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "SharePoint",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Contact Center Escalation Agent",
@@ -58,7 +90,20 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDlmCEf3cUURbDQvO-dkDRiARH-4RuHc-vhZWdzdSvl43g?e=rPugLM",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDSBGqhwM2MRbwlmM2I97beAR2tvMXoCTO2YGr_4t8mIdg?e=wro8k5"
    },
-   "status": "unmapped \u2014 Customer/Contact-Center Escalations: decision pending (build a stack or declare ai-customer-assistant successor)"
+   "status": "unmapped \u2014 Customer/Contact-Center Escalations: decision pending (build a stack or declare ai-customer-assistant successor)",
+   "exec_summary": "Automate back-office contact center escalation workflows to deliver better service outcomes and retention rates.",
+   "personas": [
+    "Back-Office Agent",
+    "Escalation Manager",
+    "Quality Analyst"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CcaaS",
+    "Dynamics 365 CRM",
+    "SharePoint",
+    "Microsoft Teams",
+    "Microsoft Outlook"
+   ]
   },
   {
    "sharepoint_name": "Portfolio Rebalancing Agent",
@@ -71,7 +116,18 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBytvP2-JPJTZ3S9AFH4xsOAWQR1OGf9yJclCXNbGgdBcI?e=qNDpgk",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDjBybdy-gyQqIxlm-Jcf5FARAsTWwOWwGoYAO_VcfjAwI?e=nSgdRn",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQB903GIYQS1RZlBMAmVr4drAfFBFwgnRxwEf5sDtUurGPY?e=Ip0MXX"
-   }
+   },
+   "exec_summary": "Provide intelligent, automated portfolio rebalancing that streamlines manual reviews and improves wealth management outcomes.",
+   "personas": [
+    "Financial Advisor",
+    "Portfolio Manager",
+    "Paraplanner"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Microsoft Teams",
+    "Microsoft PowerPoint"
+   ]
   },
   {
    "sharepoint_name": "Purchase Order Management Agent",
@@ -84,7 +140,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQD_DAAZTitiSoH5cg60Cx-PAS3EkzfIaBVoChs5sMOr4HU?e=UyswIG",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDHF7seWz5NSJcA-avsL_hyAe1rwwm7cyK-CCSlHxRrnZw?e=bv3oE8",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDf21LFQIXJSYRSXMcpUZK9AZYLxNLaZcJFhBGmRlwJUFI?e=9CFsx0"
-   }
+   },
+   "exec_summary": "Automate purchase order management and vendor selection to enable faster and more cost-effective purchasing.",
+   "personas": [
+    "Procurement Manager",
+    "Finance Director",
+    "Department Approver"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Inventory Optimization Agent",
@@ -98,7 +164,18 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDqawnT2sX4RKg1byNmiTpkAd6NyTxPEhA8JdjgxuXWmPg?e=Gxlog9",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAgJe4e9MlrSafHHRnc95UbAV1KEpIav3SzaP8XxTooNbE?e=PdvdPO"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Intelligently optimize inventory portfolios to improve cash flow and warehouse efficiency while reducing waste.",
+   "personas": [
+    "Supply Chain Managers",
+    "Inventory Managers",
+    "Procurement Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Teams",
+    "Dynamics 365 Commerce"
+   ]
   },
   {
    "sharepoint_name": "Month-End Billing Agent",
@@ -111,7 +188,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAXFTkdMsBZTIx8cQfJJx_mAfYjxGTo0llnLTABbDj-FZg?e=aD51e0",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQANEOmBor3mRL_xq2XejoB1ARsYwV7kE_hsNoILJsHizmI?e=kc0tMZ",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBS-EDV3mymTqf-8Sbpihp1ATmDOksQwLfEEtJN7x0SKpE?e=iAX94o"
-   }
+   },
+   "exec_summary": "Automate month-end billing cycles to accelerate invoicing, reduce risk, and ensure audit-ready compliance.",
+   "personas": [
+    "Finance VP",
+    "Billing Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "SharePoint",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Resource Utilization Agent",
@@ -124,7 +211,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAJMLDtv94tTYpHmYV33xUBAQBk7CEIZbV-DMydHSFeR3Y?e=8WFUMy",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQA83328UpvlR6vAVSuI611gAa-ZjwIyoqX7XIASkQOfOD0?e=AxHJf6",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDnOvUJ-axZS4aoydjBLF1wAXvPLzkeuPgQHGMKf_4pzt0?e=pwpvAz"
-   }
+   },
+   "exec_summary": "Provide intelligent resource analysis and recommendations to maximize billable utilization and reduce costs.",
+   "personas": [
+    "Operations Leader",
+    "Resource Manager",
+    "Finance Director"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Energy Operations Agent (a)",
@@ -138,7 +235,19 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+   "personas": [
+    "Plant Manager / Reliability Engineer",
+    "Compliance Manager",
+    "Sustainability Lead",
+    "Data Analyst"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "SharePoint",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Energy Operations Agent (b)",
@@ -152,7 +261,19 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+   "personas": [
+    "Plant Manager / Reliability Engineer",
+    "Compliance Manager",
+    "Sustainability Lead",
+    "Data Analyst"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "SharePoint",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Sales Pipeline Management Agent",
@@ -166,7 +287,17 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCKUM2u3gHQTpvYpAm5kgJQAcmIEvc2kmOLxcya0OOFHk4?e=7ahMdb",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAgxJTzh1KjSooXLWM3Fd-5Ackzz7rQX4rYsIcGB2t6o0w?e=ERAucm"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate sales pipeline management to keep deals moving, increase forecast confidence, and improve team productivity.",
+   "personas": [
+    "Account Executive",
+    "Sales Director"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "SharePoint",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Proposal Creation Agent",
@@ -180,7 +311,19 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC1_lrpdZ9fQJacZ6TV1Nh4AYw8vl9q90dvjpzuQs-dS1U?e=D3xTUe",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBCwoYEyuOpTZOrY97n6x8IAZtzLxQuJ8B_69_mfbt8PrQ?e=iz5ow0"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate proposal creation to accelerate deal cycles, improve win rates, and deliver consistent, high-quality responses.",
+   "personas": [
+    "Account Executive",
+    "Sales Leader",
+    "Bid Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Microsoft Teams",
+    "Microsoft Word",
+    "Microsoft PowerPoint"
+   ]
   },
   {
    "sharepoint_name": "Campaign Design Agent",
@@ -194,7 +337,16 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCMkih_PLebSZ3Nop13RekcARX-VQbBajelxmxmMGxVCl0?e=vMHsU8",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDms2zdAFJuTY6XUy-R4XvsAT_el0Ym0KVfeddUqaFTY4w?e=qtd9No"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate personalized campaign design and execution to boost engagement, accelerate revenue, and strengthen customer loyalty.",
+   "personas": [
+    "Marketing Director",
+    "Campaign Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Predictive Maintenance Agent",
@@ -207,7 +359,18 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDiY4XbGu1nQqPE03behT38ARp3D8SsZh3uQVE66PWKzOI?e=ffCxTU",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCjL0_hyDU6SrXdvz74nSH8AeoAL7YL5R7Y2bGty9fauRY?e=9xaleW",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCMzd9R8lYoT7f2BwlFbTvCARFSew7Eqinrcg_qchdF-MI?e=DqYKw8"
-   }
+   },
+   "exec_summary": "Perform predictive maintenance analysis and scheduling orchestration to prevent unplanned downtime and protect production capacity.",
+   "personas": [
+    "Maintenance Manager",
+    "Production Supervisor",
+    "Operation Leader"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Dynamics 365 CcaaS",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Client Health Score Agent",
@@ -220,7 +383,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBuLK2V7PYHRYXe41gv8QouAcQx3-lSlBO_1kH6Z1ai7ko?e=5EAgbs",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC6gqm6fQPgTZ53HSiv2JHaAXNjIo0hl0HozEcH0XjMo9M?e=ZAZp2H",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDdqFhvHuL8T5yLh5k7vpFiAfGPEN7oE6o8JBc0f-J1mP4?e=peefxr"
-   }
+   },
+   "exec_summary": "Automate client portfolio health monitoring and planning to improve client relationships, protect revenue, and optimize financial performance.",
+   "personas": [
+    "Client Success Leaders",
+    "Account Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Microsoft Teams",
+    "Microsoft Outlook"
+   ]
   },
   {
    "sharepoint_name": "Energy Operations Agent (c)",
@@ -234,7 +407,20 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+   "personas": [
+    "Plant Manager / Reliability Engineer",
+    "Compliance Manager",
+    "Sustainability Lead",
+    "Data Analyst"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Dynamics 365 CRM",
+    "SharePoint",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Energy Operations Agent (d)",
@@ -248,7 +434,20 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD899ybzLDST6UGLDkWM066ATJEuffBVJWmsMU5IQM9CRA?e=X5ggbF",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCcSvpYMImzRqd8M3w9bvL5AR5BFzwr_TvTGtKcAEzAvqM?e=jN1aQG"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Deliver real-time insights, automate critical workflows, and enable guided decision making\u2014boosting efficiency while reducing operational and compliance risk for energy organizations.",
+   "personas": [
+    "Plant Manager / Reliability Engineer",
+    "Compliance Manager",
+    "Sustainability Lead",
+    "Data Analyst"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CcaaS",
+    "Dynamics 365 ERP",
+    "Microsoft Teams",
+    "SharePoint"
+   ]
   },
   {
    "sharepoint_name": "Account Research Agent",
@@ -261,7 +460,18 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBArThPryZlTIcvTkT00TFGAVifqaV1poxW3nKBgVWM710?e=oErSUI",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCfPWBeGRqaRZTEAoPu6_Y2AZLwlfAnINP5ENfZn3H6K6k?e=MGrnFb",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAK2P_gycblRqM6tmGPLP7wAboMiyIti9x_2RilQfIpIPs?e=k0743H"
-   }
+   },
+   "exec_summary": "Automate account research and strategy planning to help sellers prepare faster, win more, and elevate deal quality.",
+   "personas": [
+    "Account Executive",
+    "Sales Director",
+    "Customer Success Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "SharePoint",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Supply Risk Intelligence Agent",
@@ -274,7 +484,16 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDTCB1XU732TK6R0TzcdExxAUdgaOoJ_A2j0oZzJgJVmlY?e=1ojOZ3",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBpA4t2BA_nTaQmC_n0yDUNAV-pP-wfDPYVLGchqK5QPKA?e=gdtBJ8",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBwLCpnD0kLR4dsnUUXbx-QAbu0WbEM7tbU8kYiN_DvoIk?e=hfWRwp"
-   }
+   },
+   "exec_summary": "Deliver real-time risk intelligence and planning to protect production continuity and reduce disruption exposure.",
+   "personas": [
+    "Procurement Manager",
+    "Supply Chain Director"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Store Associate Agent",
@@ -288,7 +507,19 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBRRxAS22uvSbkagY3SUsmvAX7lZTab9axWc3ZoobH32HI?e=ouNyFO",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBtX-yzUaU8SItrjt3PowKPARPx9jRnfDkUz9eFQUaUWrk?e=7tNBKl"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Deliver real-time product intelligence and transaction support to deliver faster service and boost sales performance.",
+   "personas": [
+    "Store Associate",
+    "Sales Manager",
+    "Floor Specialist"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 ERP",
+    "Microsoft Teams",
+    "Microsoft Outlook"
+   ]
   },
   {
    "sharepoint_name": "Abandoned Cart Recovery Agent",
@@ -303,7 +534,18 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCpogAtlwOURqJVHmoIzwOqAaaUxMPnBkxWGC41YVdyyvQ?e=WC0hFw",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQA2HbHtbXcnR41uulokoCtOAa-YsWYsnkjOe1xXQ__ZGkQ?e=tXxwDU"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate abandoned cart analysis and recovery campaigns to convert lost sales, protect margins, and improve customer engagement.",
+   "personas": [
+    "Marketing Manager",
+    "Digital Marketing Lead",
+    "Growth Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Outlook",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Product Feedback Insights Agent",
@@ -317,7 +559,18 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDxEOinIzy4QY9rKh8onSNAAVKP52Y4mAKv0-lYta4bCzo?e=HfPd3T",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCYmMzME2JYTqL-wQXJvqMYAT3hkzE1TdSxlnCnWnKWJTA?e=sxygnV"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Turn fragmented feedback into actionable insights that accelerate product improvements, prevent churn, and optimize engineering priorities.",
+   "personas": [
+    "Product Manager",
+    "Engineering Lead",
+    "Director of Product"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Teams",
+    "Dynamics 365 CRM"
+   ]
   },
   {
    "sharepoint_name": "Utility Leak Detection & Billing Agent",
@@ -332,7 +585,20 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCVszeYCXmlR6BPhIK3enphAUn-RGrNaxgDomm7Cle5tAQ?e=rBsAIe",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQC1qPv97mRrQbKiy9jDLIsYAfcn7sFc3D43lFJKkT6psz0?e=F8xvZs"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate leak detection and billing processes to improve customer satisfaction, ensure policy compliance, and protect municipal revenue.",
+   "personas": [
+    "Customer Service Rep",
+    "Billing Specialist",
+    "Assistance Coordinator"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Dynamics 365 CRM",
+    "Dynamics 365 CcaaS",
+    "Microsoft Outlook",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Expansion Opportunity Agent",
@@ -345,7 +611,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCFt_qhDKzDQJ1UVhmb9eayAVc0PEen_-FWOSyq7aFueCY?e=bAnNiP",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDVx3gbj-DiRLgXmThlIq5HAWMRpcs_RkFZTI5426lOEI4?e=rOxLw5",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQC6pTBVVlDKRobEVrDOJdA8ASMl0kaHefo62y0jru8Kt6g?e=vMgBrW"
-   }
+   },
+   "exec_summary": "Identify and prioritize expansion opportunities to drive revenue growth and strengthen customer relationships.",
+   "personas": [
+    "Sales Leader",
+    "Sales Operations Manager",
+    "Enablement Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Procurement Savings Agent",
@@ -358,7 +634,19 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAlXoAQtkddTq6k678Z-QhtAVSQLBkIGNd8oLYZXvPvi48?e=cXAOwB",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCSuNQ5FsQoRrmKCBXdrSE0Aa60xqFMTCBeTgTj95Ql9Es?e=JsUkb1",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQA1pL8N_FvPTLC4rVbXfgPKAZCu2YkBFLmoY-eNOr8JaeQ?e=6dKml0"
-   }
+   },
+   "exec_summary": "Identify and optimize savings opportunities across vendors, contracts, and purchasing cycles to reduce costs and increase procurement efficiency.",
+   "personas": [
+    "Procurement Manager",
+    "Finance Director",
+    "Category Buyer"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Dynamics 365 CRM",
+    "Dynamics 365 Commerce",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Cross-Channel Engagement Agent",
@@ -373,7 +661,18 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQA9-V_ymAzUQqOJzbwRNNZnAZ2rRf6JX6Msp2QXhgCvovY?e=QMgTCt",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQD86lSksTOsS5V0hFHMYl9dAcvu3n5D9nf040Cpm4ZTyjs?e=DLx5no"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Deliver a single, unified view of cross-channel interactions for more strategic, streamlined support and stronger engagement.",
+   "personas": [
+    "Customer Experience Leader",
+    "Digital Engagement Manager",
+    "Contact Center Supervisor"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 Commerce",
+    "Microsoft Outlook"
+   ]
   },
   {
    "sharepoint_name": "Patient Intake Agent",
@@ -386,7 +685,18 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDL5ysEWeI9SLhuys1zG028AZKQVMkiZI39ji_7-Yn0oi4?e=cyZJef",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDx4BpGeq8iTrOrDOmD9mEiAV13SHvrgc2VwNy2no-vh70?e=oI10Y4",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQABt8CYMzKmTasAi6KXUPduAUEa31XnGgCtheHrb4T0ZyI?e=cAeecG"
-   }
+   },
+   "exec_summary": "Automate patient intake workflows to streamline operations, protect revenue from avoidable losses, and deliver a smoother patient experience.",
+   "personas": [
+    "Front Desk Staff",
+    "Scheduling Coordinators",
+    "Patient Access Reps"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Dynamics 365 CcaaS",
+    "SharePoint"
+   ]
   },
   {
    "sharepoint_name": "Care Gap Closure Agent",
@@ -399,7 +709,18 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBo8CxcmSWiS5pPPlXAUFCkAavjZXzYAzA8VYWNi7U1IqE?e=IwlmMO",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQAzqdVeBaVvS6mPtPpbYbGoAUu9YKxrZOubriki7b88b-I?e=QS5EWr",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCza-D6oHcwSq_2uCLd_m7hAaNFuXdh1AZXX0lxblgGpLY?e=C708Q1"
-   }
+   },
+   "exec_summary": "Automate quality gap analysis and targeted outreach to improve HEDIS performance, campaign ROI, and care gap closure efficiency.",
+   "personas": [
+    "Quality Managers",
+    "Care Coordinators",
+    "Clinical Operation Leads"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Teams",
+    "Dynamics 365 CcaaS"
+   ]
   },
   {
    "sharepoint_name": "Commercial Underwriting Agent",
@@ -412,7 +733,18 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBCQFJPWMWaRLvTuIWgZRqSAXfMUpeVoYhsR7FwihYTKwI?e=4ucNf8",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBptnEFAihvSqTCzLIutSPKAcdus0AmVqkTi_4FSrbf3Hk?e=etSNDe",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDfXRfFVrPzQowfHujOtplWAdZiCXuFHwm4HT20NvtMA10?e=SY1Yfc"
-   }
+   },
+   "exec_summary": "Automate commercial underwriting analysis to accelerate evaluations, improve pricing accuracy, and maintain full compliance.",
+   "personas": [
+    "Underwriter",
+    "Risk Analyst"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Dynamics 365 CRM",
+    "Dynamics 365 Commerce",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Omnichannel Inventory Agent",
@@ -425,7 +757,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDril00d0rKSZbIJe8NCiVQAcpolzjSy2-ZUMaNSVVgXZY?e=FbL7UD",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD9L4wWVExaT5LJG8wz0a1EAVGMAZ-OszQ3_BcvxSbS7Vw?e=xgISdH",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCXYKpoqtcWSaX-geu_JmJDAcd5EofHFvCTMNj2lWktdAY?e=I71CK4"
-   }
+   },
+   "exec_summary": "Deliver real-time cross-channel inventory intelligence to prevent stockouts, reduce overstock, and maximize omnichannel retail performance.",
+   "personas": [
+    "Inventory Planners",
+    "Store Managers",
+    "Category Managers"
+   ],
+   "featured_tools": [
+    "Dynamics 365 Commerce",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Supply Chain Risk Agent",
@@ -439,7 +781,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQD26zoTNiMPRZojNs_hKUDjASOyr0LCSBx5EGcYZF4bNVk?e=ofSGsP",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBoaN23_6LPQJ9JcpAzXwIDAQ2BUqHvdezpfjlAIOv9P_8?e=lYeavV",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCgw0tyyW7tRp0sVSwluV7rAWIkqdJ4ch4b1su3Lo9BsyQ?e=u7Z9Jt"
-   }
+   },
+   "exec_summary": "Detect and manage supply chain risks to defend against disruptions, protect revenue, and maintain operational continuity.",
+   "personas": [
+    "Supply Chain Planner",
+    "Operations Leader",
+    "Procurement Manager"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Subscription Renewal Agent",
@@ -452,7 +804,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDP19Zuu3neRY1rZnBdJyIyAYv0PCpsl-3M6sXtpQnG3p8?e=KCQrZ3",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC6Byo3cs4oTrtsJN-z9CsQAf7jt3llhwgINVT7wDd-t1o?e=nop4wS",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCnytSsbQ_LQJKUrrIYrBuzAaRu09DjsmNRojLeXsvJzrI?e=hYh0Yb"
-   }
+   },
+   "exec_summary": "Streamline subscription renewal management and expansion planning, turning risk into growth opportunities while increasing win probability.",
+   "personas": [
+    "Account Executives",
+    "Customer Success Managers",
+    "Sales Leadership"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Customer Sentiment & Churn Agent",
@@ -465,7 +827,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQA--YnH7xXUQ7S2zy8QfJcUAVWidEGmXhX8qgyC1Y6qino?e=uTHhw7",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCsPaJdo2r3TZ6sGzq_vPCTATVSfoQ09sVKFS3BOKdNHK0?e=tWio2h",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQA2xwek9XQDQacG5CYLPM0RAZ02Q-XD3bGxzsk-HHW5MqQ?e=xuUyAm"
-   }
+   },
+   "exec_summary": "Deliver AI-powered sentiment intelligence that detects churn risk early and enables proactive retention strategies.",
+   "personas": [
+    "Relationship Managers",
+    "Retention Specialists",
+    "Customer Success Teams"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Fraud Detection & Alert Agent",
@@ -478,7 +850,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQDI7GOKd20sTLWdajeLcF6mAeKY4LvAlhvg18Iwb4Wbh38?e=oxL0V2",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC-XFkLfywZS43ZbOUD27sdAaW6fyExOT_ETljvpVEbgeg?e=fgH9vq",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBjHjFZ-yDOQ4j8Ik9HcHh9AV6WQqGMyHiHfujgkGjUXBw?e=gb0gDF"
-   }
+   },
+   "exec_summary": "Deploy AI-driven fraud monitoring and identification to accelerate investigations, enhance detection rates, and improve prevention.",
+   "personas": [
+    "Fraud Analysts",
+    "SIU Investigators",
+    "Risk Leaders"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Claims Processing Agent",
@@ -491,7 +873,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCIjN1GekGQQon2Licf2RLyAV9M4U7kNtZzzwM5SjWcdrI?e=7glExt",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQAIluQq3MLGS4ZJRsxJ5_ehAYBMVQ_WH87u_TbB0UwHuiY?e=IOAczd",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQD_iKx4YhAmSZG_PsiKFTKMATvCMTvDHYDXHhD0qJ1dZDo?e=m7yaMz"
-   }
+   },
+   "exec_summary": "Automate claims processing workflows to deliver faster, consistent, and more compliant claim outcomes.",
+   "personas": [
+    "Claims Adjusters / Managers",
+    "SIU Teams",
+    "Operations Leaders"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 CcaaS"
+   ]
   },
   {
    "sharepoint_name": "Mortgage Origination Agent",
@@ -504,7 +896,18 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQC_vHxGnL_BTJgFQEeVOoLpAUoXkXnJHIucCDn9_rajGuk?e=ceEl2n",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQARSEabWuTpQ54-ozQ3cgQCAYlELp52StX506hYI3H3zXM?e=x2C6tu",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCNu6kOHREaQrsQJTxhpn7-AeYR7UcW6lZo_rWwE_NgBjY?e=bV1Kfy"
-   }
+   },
+   "exec_summary": "Streamline mortgage origination with intelligent automation, enabling faster, more accurate loan decisions.",
+   "personas": [
+    "Loan Officers",
+    "Processors",
+    "Underwriters"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 ERP",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Personal Styling Agent",
@@ -517,7 +920,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQByz_fK_zniSZ0TLOGZwlviASRU8lqaT30VDQwnjbetof4?e=jU8aNq",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQALfoI8DpsISJfuQaQTxqwZAcELMa9KDYc6Sm6EhVxx0e4?e=7ORaCH",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCNiUjr4l2bQY6lLWqqywO1AUmLZZVc_TC2rcXqHKWBgak?e=h6IbFa"
-   }
+   },
+   "exec_summary": "Deliver intelligent personal styling to strengthen customer experience, increase revenue, and elevate associate efficiency at scale.",
+   "personas": [
+    "Personal Shoppers",
+    "Clienteling Specialists",
+    "Retail Managers"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Microsoft Outlook"
+   ]
   },
   {
    "sharepoint_name": "Wealth Insights Agent",
@@ -531,7 +944,19 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC4pfmkzF2jQ6zD6kk4fhA9AYhdkV1biNlR92EhFqLcZjY?e=2gjW6N",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCId4GiauzTRZdSwrf7IuFkAdu6b0-YtJoASQJeOmifbFs?e=XaV3bG"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Deliver AI-powered portfolio intelligence to uncover hidden asset opportunities, strengthen client relationships, and drive advisory growth at scale.",
+   "personas": [
+    "Wealth Advisor",
+    "Relationship Managers",
+    "Advisory Directors"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 ERP",
+    "Dynamics 365 CcaaS",
+    "Microsoft Outlook"
+   ]
   },
   {
    "sharepoint_name": "Regulatory Compliance Agent",
@@ -544,7 +969,16 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAYuB4KWfc4S5qcRcE9BLAiASA0G3aBzyIDKb2sRR-FS6I?e=hBxMyg",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQBK_CaOVwmLS4GPRvwpSl6EAdx2t_MvVUVBiIEM7WjWrMY?e=GRomjq",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCIHJQ-8AnaSpS0wg_-OKeyAeg_Wfi-Ae6cHbC1RQ3oU5c?e=Oj4bqg"
-   }
+   },
+   "exec_summary": "Automate compliance monitoring and regulatory reporting to achieve proactive risk management with real-time surveillance.",
+   "personas": [
+    "Chief Compliance Officers",
+    "Compliance Managers",
+    "Trading Desk Supervisors"
+   ],
+   "featured_tools": [
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Returns & Complaints Agent",
@@ -559,7 +993,21 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQAWkBfgkTAFQJ22FRw9Xu9fATaefdzEG9If3qKwVLs4CRI?e=Qb6Lpk",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQAJSQIR9rQhQKdR4k7u6e83AZrb6ki6v7lNRNawTu68kQc?e=GbRnT3"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate return decisions and complaint handling to speed resolution, reduce fraud, and protect customer loyalty.",
+   "personas": [
+    "Customer Service Agents",
+    "Quality Teams",
+    "Loss Prevention Teams"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 CcaaS",
+    "Dynamics 365 ERP",
+    "Microsoft Outlook",
+    "Microsoft Teams",
+    "SharePoint"
+   ]
   },
   {
    "sharepoint_name": "Order Status & Delay Agent",
@@ -573,7 +1021,18 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQC7aHBMwy7BQY9FUdS1zjVZAY9s26h4LcB318rTEBFDnDc?e=G3Trey",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCyfNa2st-KQKMtPGQEKmC1AZU2AbIkI1Ca8t8mpxn4RaI?e=CDhwHO"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate proactive order updates, delay management, and customer communications to protect relationships and revenue.",
+   "personas": [
+    "Customer Service Rep",
+    "Account Manager",
+    "Operations Leader"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 CcaaS",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Loyalty Insights Agent",
@@ -587,7 +1046,19 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQB9e1IuAmr6TI9FINT_Bd11AVpJKocEbsAA4BUgrO_axfw?e=GIGVwB",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCoYSAYsgQtTZcL6hV_kpQJATEOmPRgwpbEyKezmTvRTrw?e=5Hagw2"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Deliver AI-driven loyalty insights and planning to reduce points liability, improve engagement results, and boost member retention.",
+   "personas": [
+    "Loyalty Program Director",
+    "CRM Manager",
+    "Marketing Leader"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 ERP",
+    "Microsoft Outlook",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Building Permit Review Agent",
@@ -601,7 +1072,19 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDWi21w0VuPT6oYsq8eeyrFAX8Mf8AbVCL70e4uG_FAxYQ?e=Zzqi1Q",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQCwxmw9ft_mR4o9yjHsEXcrAX3jGFDNV5GxwViN1WJPgsk?e=T3T8Fd"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Automate building permit review processes to enable faster service, lower operational costs, and higher citizen satisfaction.",
+   "personas": [
+    "Permit Technicians",
+    "Plan Reviewers",
+    "Inspectors"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 CcaaS",
+    "Microsoft Teams",
+    "SharePoint"
+   ]
   },
   {
    "sharepoint_name": "Prior Authorization Agent",
@@ -615,7 +1098,16 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQBb7hty6dOXTqBBlLfy7S5ZAc6ZhL8FIEcOt8Tn3yfn0BM?e=x3AtAA",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQB7NhXMEk8xQ5QOhWk-Klg9AaKLLW_R28EnS6j_YNmT1MQ?e=7f7Y01",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBXZ2AqZTEPS5HzQuBksawcAbOzKH1AsDHmdkZ75v8isRk?e=cZsbmY"
-   }
+   },
+   "exec_summary": "Automate insurance approval workflows to accelerate authorization processes, improve documentation accuracy, and reduce care delays.",
+   "personas": [
+    "Utilization Management Coordinators",
+    "Nurse Case Managers",
+    "Radiology Schedulers"
+   ],
+   "featured_tools": [
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "HR Self-Service Agent",
@@ -628,7 +1120,17 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQAbCBP-artsRaxzsA5tw8L_AbCxslf9kNZlUb8dciRBOPo?e=A9N3HJ",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQDd6hKnvmyIT4DKMQeXhoHtAbk6I17EeYvej2FkwJMEYqg?e=UyivvB",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBvJDcJZKqCQbUggCttLtHyAWdrpoB8NIEVDe1HfkBqcQE?e=9KqamD"
-   }
+   },
+   "exec_summary": "Provide self-service HR inquiry handling that transforms the process from a manual ticket-based system to intelligent, automated resolutions.",
+   "personas": [
+    "Employees",
+    "Managers",
+    "HR Operations Staff"
+   ],
+   "featured_tools": [
+    "Microsoft Outlook",
+    "Microsoft Teams"
+   ]
   },
   {
    "sharepoint_name": "Clinical Summary Agent",
@@ -642,7 +1144,16 @@
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQD7DynxBPIsRJWfWgk1DvVYAVWruPeAXiYEPxXLufLt1WE?e=fo7r3j",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQBXzb2qhiSQQoh1vzaaKDU0ATM_2Pu02biDtmml-EUv3Uw?e=vZFQpG"
    },
-   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)"
+   "status": "unmapped \u2014 decision pending (build a stack or declare a successor)",
+   "exec_summary": "Transform complex clinical histories into clear, actionable summaries for faster decision-making, better coordination, and safer care.",
+   "personas": [
+    "Primary care physicians",
+    "Surgeons",
+    "Anesthesia teams"
+   ],
+   "featured_tools": [
+    "Dynamics 365 ERP"
+   ]
   },
   {
    "sharepoint_name": "Branch Banking Advisory Agent",
@@ -655,7 +1166,18 @@
     "agent_page": "https://microsoft.sharepoint.com/:u:/s/AIBAST/IQCtjqXaijCERpNnSXLm1Cq2AUwre9OMC6vEdG2YFQ-IfVE?e=gl2kFY",
     "one_pager": "https://microsoft.sharepoint.com/:p:/s/AIBAST/IQCPx28Ql8ZHSpoh-Hv7BfWuAdsal2g1QzUjjxaxxbosXjo?e=sJWSPT",
     "video": "https://microsoft.sharepoint.com/:v:/s/AIBAST/IQDjPDhv7IYgTJiVLsiOYwvTAY6syNexWMXzOtJYK-KBoRw?e=lFBHY9"
-   }
+   },
+   "exec_summary": "Automate branch banking and advisory workflows to streamline customer interactions, strengthen compliance, and improve financial guidance.",
+   "personas": [
+    "Branch Bankers",
+    "Financial Advisors",
+    "Compliance Officers"
+   ],
+   "featured_tools": [
+    "Dynamics 365 CRM",
+    "Dynamics 365 ERP",
+    "Microsoft Teams"
+   ]
   }
  ]
 }

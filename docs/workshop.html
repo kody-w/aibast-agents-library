@@ -1055,7 +1055,10 @@ function fetchLib(path,asJson){
   return tryAt(order,0);
 }
 function slugOf(a){return a.name.split("/")[1];}
-function agentTitle(a){return (a.display_name||a.name).replace(/ Agent$/,"");}
+function advOf(a){return ADV[slugOf(a)];}
+function agentName(a){var v=advOf(a);return (v&&v.sharepoint_name)||a.display_name||a.name;}
+function agentDesc(a){var v=advOf(a);return (v&&v.exec_summary)||a.description||"";}
+function agentTitle(a){return agentName(a).replace(/ Agent$/,"");}
 function esc2(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 
@@ -1100,9 +1103,9 @@ function renderAgents(cat){
   host.innerHTML=agentsForGroup(cat).map(function(a){
     var s=slugOf(a), r=RATINGS[s]||0, d=DOWNLOADS[s]||0;
     var chips=(r>0?' 👍'+r:'')+(d>0?' ⬇'+d:'');
-    return '<button data-slug="'+esc2(s)+'"><b>'+esc2(a.display_name||a.name)+
+    return '<button data-slug="'+esc2(s)+'"><b>'+esc2(agentName(a))+
       (chips?'<span style="float:right;font-weight:600;color:var(--faint);font-size:12px">'+chips+'</span>':'')+
-      "</b><span>"+esc2((a.description||"").slice(0,110))+"…</span></button>";}).join("");
+      "</b><span>"+esc2((agentDesc(a)||"").slice(0,110))+"…</span></button>";}).join("");
   host.onclick=function(e){var b=e.target.closest("button"); if(!b)return;
     host.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
     var a=agentsForGroup(cat).filter(function(x){return slugOf(x)===b.dataset.slug;})[0];
@@ -1144,10 +1147,13 @@ function select(a){
   SELECTED=a; STACK=slugOf(a);
   localStorage.setItem(LS+"pick",STACK);
   try{history.replaceState(null,"","?agent="+encodeURIComponent(STACK));}catch(e){}
-  document.getElementById("pickName").textContent=" "+(a.display_name||a.name)+
-    " — everything on this page is now about this agent.";
+  var v=advOf(a);
+  document.getElementById("pickName").innerHTML=" "+esc2(agentName(a))+
+    " — everything on this page is now about this agent."+
+    (v&&v.personas&&v.personas.length?'<br><span style="font-weight:500">Who it\u2019s for: '+
+      esc2(v.personas.join(" · "))+"</span>":"");
   document.querySelectorAll("[data-dyn=name]").forEach(function(el){
-    el.textContent=a.display_name||a.name;});
+    el.textContent=agentName(a);});
   renderSor(); updateMission(); mountGiscus(slugOf(a));
   var dir=a._file.substring(0,a._file.lastIndexOf("/"));
   fetchLib(dir+"/copilot_studio/manifest.json",true).then(function(man){
@@ -1201,21 +1207,32 @@ function renderChecks(vs){
       '<span class="st"></span></div></div>';}).join("");
   wireVerdicts(); tally();
 }
-var RATINGS={}, DOWNLOADS={}, GISCUS=null;
+var RATINGS={}, DOWNLOADS={}, GISCUS=null, ADV={};
 fetchLib("rar/ratings.json",true).then(function(r){RATINGS=r||{};}).catch(function(){});
 fetchLib("rar/downloads.json",true).then(function(r){DOWNLOADS=r||{};}).catch(function(){});
 fetchLib("rar/discussions.json",true).then(function(c){GISCUS=c;}).catch(function(){});
 Promise.all([fetchLib("registry.json",true),
              fetchLib("twin/products.json",true).catch(function(){return {products:[]};}),
-             fetchLib("twin/first_party.json",true).catch(function(){return {groups:[]};})
+             fetchLib("twin/first_party.json",true).catch(function(){return {groups:[]};}),
+             fetchLib("twin/sharepoint_crosswalk.json",true).catch(function(){return {entries:[]};})
 ]).then(function(rr){
   FP=rr[2]&&rr[2].groups?rr[2]:{groups:[]};
+  (rr[3].entries||[]).forEach(function(e){ if(e.b_slug&&!ADV[e.b_slug]) ADV[e.b_slug]=e; });
   var reg=rr[0]; REG=reg; PRODUCTS=(rr[1]&&rr[1].products)||[];
+  var byStackDir={};
   (reg.agents||[]).forEach(function(a){
     if(a.name==="@aibast-agents-library/sales-specialist-twin") return;
-    (CATS[a.category]=CATS[a.category]||[]).push(a);
     BYSLUG[slugOf(a)]=a;
+    var dir=a._file.substring(0,a._file.lastIndexOf("/"));
+    // one card per use case (stack): the advertised/primary member wins,
+    // suite internals stay reachable via deep links but don't clutter the picker
+    var cur=byStackDir[dir];
+    var better=!cur || ADV[slugOf(a)] ||
+      dir.indexOf(slugOf(a).replace(/-/g,"_"))>=0;
+    if(better && !(cur && ADV[slugOf(cur)])) byStackDir[dir]=a;
   });
+  Object.keys(byStackDir).forEach(function(d){var a=byStackDir[d];
+    (CATS[a.category]=CATS[a.category]||[]).push(a);});
   renderPills();
   var want=(/[?&]agent=([^&]+)/.exec(location.search)||[])[1]||localStorage.getItem(LS+"pick");
   if(want){
