@@ -1,0 +1,40 @@
+{
+  "schema": "aibast-twin-missions/1.0",
+  "missions": [
+    {
+      "slug": "deploy-copilot-studio",
+      "title": "Deploy a library agent to Copilot Studio",
+      "summary": "Takes any Copilot-Studio-ready library agent from name to published, verified agent in the user's environment — machine checks, project, components, instructions, push, publish, verification.",
+      "triggers": "deploy copilot studio publish build ship stand up teams production tenant environment",
+      "playbook": "deploy-copilot-studio.md",
+      "needs_stack": true,
+      "requires_scaffold": true
+    },
+    {
+      "slug": "install-local",
+      "title": "Install a library agent into the local brainstem",
+      "summary": "Downloads any of the library's agents from the public repo and drops it into the running brainstem — live on the next message, no restart.",
+      "triggers": "install local locally brainstem add agent download try run",
+      "playbook": "install-local.md",
+      "needs_stack": true,
+      "requires_scaffold": false
+    },
+    {
+      "slug": "setup-machine",
+      "title": "Set up this machine for AIBAST agent work",
+      "summary": "Installs and checks everything a build needs: the Power Platform CLI, the one-time sign-in, the Copilot Studio plugin, and the connection to the public library.",
+      "triggers": "setup set up machine prerequisites prereqs install pac cli tools ready prepare onboarding start getting started",
+      "playbook": "setup-machine.md",
+      "needs_stack": false
+    },
+    {
+      "slug": "verify-agent",
+      "title": "Verify a deployed agent",
+      "summary": "Runs the deployed agent through its computed verification questions and reports pass/fail honestly — the difference between a demo and a liability.",
+      "triggers": "verify test check validate questions working proof demo ready",
+      "playbook": "verify-agent.md",
+      "needs_stack": true,
+      "requires_scaffold": true
+    }
+  ]
+}

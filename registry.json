@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-08-07T00:46:08.865289+00:00",
+  "generated_at": "2026-08-07T01:16:40.215822+00:00",
   "stats": {
     "total_agents": 105,
     "publishers": 1,
@@ -1308,31 +1308,6 @@
     },
     {
       "schema": "rapp-agent/1.0",
-      "name": "@aibast-agents-library/copilot-studio-builder",
-      "version": "1.0.0",
-      "display_name": "Copilot Studio Builder Agent",
-      "description": "Builds library agents into Microsoft Copilot Studio through conversation: fetches a stack's component scaffold from the public repo, drives the pac CLI (init, install, push), and returns verification questions with computed expected answers.",
-      "author": "AIBAST",
-      "tags": [
-        "copilot-studio",
-        "builder",
-        "deployment",
-        "pac",
-        "bootstrap",
-        "natural-language"
-      ],
-      "category": "general",
-      "quality_tier": "verified",
-      "requires_env": [],
-      "dependencies": [
-        "@rapp/basic-agent"
-      ],
-      "_file": "agents/@aibast-agents-library/general_stacks/copilot_studio_builder_stack/copilot_studio_builder_agent.py",
-      "_size_kb": 23.5,
-      "_lines": 485
-    },
-    {
-      "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/bulk-crm-data-generator",
       "version": "1.0.0",
       "display_name": "Bulk CRM Data Generator",
@@ -1647,6 +1622,32 @@
       "_file": "agents/@aibast-agents-library/general_stacks/sales_coach_stack/sales_coach_agent.py",
       "_size_kb": 15.9,
       "_lines": 283
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/sales-specialist-twin",
+      "version": "1.0.0",
+      "display_name": "Sales Specialist Twin Agent",
+      "description": "The one agent for the whole AIBAST library: matches any plain-language request to an authored mission playbook fetched from the public repo, injects live library context, and hands GitHub Copilot everything it needs to execute the mission end to end \u2014 machine setup, local installs, Copilot Studio deployment, and verification.",
+      "author": "AIBAST",
+      "tags": [
+        "twin",
+        "sales-specialist",
+        "deploy",
+        "copilot-studio",
+        "bootstrap",
+        "personless-harness",
+        "one-command"
+      ],
+      "category": "general",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py",
+      "_size_kb": 11.6,
+      "_lines": 249
     },
     {
       "schema": "rapp-agent/1.0",
