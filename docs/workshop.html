@@ -208,7 +208,7 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
 #rc-tally.good{background:#e7f5e9;color:var(--ok)}
 
 /* production table */
-table.ladder{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--paper);
+table.ladder{width:100%;min-width:520px;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--paper);
   border-radius:11px;overflow:hidden;border:1px solid var(--line)}
 table.ladder th{background:#101a35;color:#fff;text-align:left;padding:11px 14px;font-size:12px;
   letter-spacing:.07em;text-transform:uppercase}
@@ -831,7 +831,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
 
   <div class="card">
     <h3>The five pillars, answered — Microsoft Well-Architected Framework</h3>
-    <table class="ladder">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="ladder">
       <thead><tr><th>Pillar</th><th>How this design answers it</th><th>What to concede honestly</th></tr></thead>
       <tbody>
         <tr><td>Reliability</td>
@@ -877,7 +877,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
             expectation. RAG over file knowledge is for curated corpora; large document estates
             belong in indexed sources (SharePoint), not uploaded files.</td></tr>
       </tbody>
-    </table>
+    </table></div>
     <p style="font-size:13px;color:var(--faint)">Failure modes and their prevent/detect/respond
       controls are in the production step's table above — bring both to the architecture review.</p>
   </div>
@@ -947,7 +947,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
 
   <div class="card">
     <h3>Know your failure modes before someone else finds them</h3>
-    <table class="ladder">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="ladder">
       <thead><tr><th>Risk</th><th>Prevent</th><th>Detect</th><th>Respond</th></tr></thead>
       <tbody>
         <tr><td>Uncertified technician recommended</td>
@@ -971,7 +971,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
           <td>Any added tool shows up in the YAML diff at pull/push</td>
           <td>A new write action goes back through this table before it ships</td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 </section>
 
