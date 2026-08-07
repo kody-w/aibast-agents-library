@@ -141,6 +141,13 @@ html[data-theme=light] .container a,html[data-theme=light] .content a{color:#0b5
 html[data-theme=dark] .footer p,html[data-theme=dark] footer p,
 html[data-theme=dark] .container > p:last-of-type{color:#aab0c8!important}
 </style>
+<style id="aibast-inline-ink">
+/* #b3bcc9 is correct on the dark terminal, unreadable on light page ground */
+html[data-theme=light] [style*="#b3bcc9"]{color:#4a4d5e!important}
+html[data-theme=light] .install-widget [style*="#b3bcc9"],
+html[data-theme=light] .one-liner [style*="#b3bcc9"],
+html[data-theme=light] .install-body [style*="#b3bcc9"]{color:#c7ccd6!important}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
