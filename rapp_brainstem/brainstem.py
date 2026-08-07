@@ -466,10 +466,11 @@ COPILOT_TOKEN_URL = "https://api.github.com/copilot_internal/v2/token"
 # Where the in-app "Get Help" flow files issues. Users' help requests go to the
 # support repo, keeping the engineering tracker (this repo) clean.
 SUPPORT_REPO = "microsoft/aibast-agents-library"
-# Immutable RAR release used by the built-in catalog. The browser verifies each
-# downloaded agent against the registry's SHA-256, and the import route verifies
-# the same digest before writing or importing any bytes.
-RAR_REVISION = "241c6191736a856b6837ef2398447a25710b8d72"
+# Immutable AIBAST RAR release used by the built-in catalog (rar/registry.json
+# in this repository, pinned by commit). The browser verifies each downloaded
+# agent against the registry's SHA-256, and the import route verifies the same
+# digest before writing or importing any bytes.
+RAR_REVISION = "12c37cd895098748e8618774159a589ffacb58f6"
 
 
 def _atomic_write_json(path, data):

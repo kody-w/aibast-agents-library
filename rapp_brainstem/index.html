@@ -1876,14 +1876,16 @@
     }
   }
 
-  // ── RAR Registry Browser ──
-  // Search a public catalog of agents and hot-load any of them into this
-  // brainstem by fetching the raw .py and POSTing it to /agents/import.
-  const RAR_REVISION = '241c6191736a856b6837ef2398447a25710b8d72';
-  const RAR_BASE = `https://raw.githubusercontent.com/kody-w/RAR/${RAR_REVISION}`;
-  // Same static files via the jsdelivr CDN mirror — used only when raw
-  // rate-limits (HTTP 429) or hiccups. Plain file hosting, no API.
-  const RAR_MIRROR = `https://cdn.jsdelivr.net/gh/kody-w/RAR@${RAR_REVISION}`;
+  // ── AIBAST RAR Registry Browser ──
+  // Search the AIBAST RAR — the business-focused agent catalog served from
+  // this library's own repo — and hot-load any agent into this brainstem by
+  // fetching the raw .py and POSTing it to /agents/import. (The community
+  // catalog lives in the kody-w RAR upstream.)
+  const RAR_REVISION = '12c37cd895098748e8618774159a589ffacb58f6';
+  const RAR_BASE = `https://raw.githubusercontent.com/microsoft/aibast-agents-library/${RAR_REVISION}`;
+  // Same revision via the staging mirror — used when the upstream repo does
+  // not yet carry this commit (pre-merge) or raw rate-limits.
+  const RAR_MIRROR = `https://raw.githubusercontent.com/kody-w/aibast-agents-library/${RAR_REVISION}`;
   async function rarFetch(path) {
     try {
       const r = await fetch(encodeURI(`${RAR_BASE}/${path}`));
@@ -1919,7 +1921,7 @@
   function loadRarRegistry() {
     if (rarRegistry) return Promise.resolve(rarRegistry);
     if (rarLoading) return rarLoading;
-    rarLoading = rarFetch('registry.json')
+    rarLoading = rarFetch('rar/registry.json')
       .then(r => r.json())
       .then(data => {
         rarRegistry = (Array.isArray(data.agents) ? data.agents : []).filter(isLoadableAgent);
