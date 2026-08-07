@@ -1,39 +1,74 @@
 {
   "schema": "aibast-twin-first-party/1.0",
-  "note": "Microsoft first-party agents from the PRO-ENG curriculum. These are configured in-product, not deployed — the twin drives the session from the official docs links below (extracted from the facilitator deck).",
+  "note": "Microsoft first-party agents. These are configured in-product, not deployed. Every URL, status, name, surface and prerequisite here was verified against Microsoft Learn on 2026-08-07; the workshop's first-party track renders this file, so corrections belong here, not in the page.",
   "groups": [
     {
       "id": "d365-sales-1p",
       "name": "Dynamics 365 Sales — first-party agents",
       "agents": [
-        {"id": "sales-qualification-1p", "name": "Sales Qualification Agent", "status": "GA",
-         "summary": "Researches leads, evaluates fit, autonomous outreach.",
-         "overview": "https://learn.microsoft.com/dynamics365/sales/sales-qualification-agent",
-         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-sales-qualification-agent"},
-        {"id": "sales-opportunity-1p", "name": "Sales Opportunity Agent", "status": "GA",
-         "summary": "Continuous opportunity research, risk and stakeholder intelligence.",
-         "overview": "https://learn.microsoft.com/dynamics365/sales/sales-opportunity-agent",
-         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-sales-opportunity-agent"},
-        {"id": "sales-research-1p", "name": "Sales Research Agent", "status": "GA",
-         "summary": "Natural-language dialog with sales data.",
-         "overview": "https://learn.microsoft.com/dynamics365/sales/sales-research-agent",
-         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-sales-research-agent"},
-        {"id": "sales-development-1p", "name": "Sales Development Agent", "status": "Preview",
-         "summary": "Automates sales outreach and prospect management (Agent 365).",
-         "overview": "https://learn.microsoft.com/en-us/microsoft-agent-365/use",
-         "configure": "https://learn.microsoft.com/en-us/microsoft-agent-365/use#deploy-and-create-the-sales-development-agent"},
-        {"id": "recommended-actions-1p", "name": "Recommended Actions Agent", "status": "Preview",
-         "summary": "Prioritized seller actions based on opportunity context.",
-         "overview": "https://learn.microsoft.com/dynamics365/sales/recommended-actions-overview",
-         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-recommended-actions"},
-        {"id": "sales-agent-m365-1p", "name": "Sales Agent (M365 Copilot)", "status": "GA",
-         "summary": "Search, synthesize and act on sales data in M365 apps.",
-         "overview": "https://learn.microsoft.com/microsoft-sales-copilot/sales-chat-overview",
-         "configure": "https://learn.microsoft.com/microsoft-sales-copilot/m365-admin-setting"},
-        {"id": "data-enrichment-1p", "name": "AI-powered Data Enrichment", "status": "GA",
-         "summary": "Enriches opportunity data from email interactions.",
-         "overview": "https://learn.microsoft.com/dynamics365/sales/data-enrichment-agent-overview",
-         "configure": "https://learn.microsoft.com/dynamics365/sales/configure-data-enrichment-agent"}
+        {
+          "id": "sales-qualification-1p",
+          "name": "Sales Qualification Agent",
+          "status": "GA",
+          "summary": "Researches leads against your ideal-customer profile and drafts outreach; in Research-and-engage mode it also sends, follows up and hands over.",
+          "overview": "https://learn.microsoft.com/dynamics365/sales/sales-qualification-agent",
+          "configure": "https://learn.microsoft.com/dynamics365/sales/configure-sales-qualification-agent",
+          "warn": "Two things you can't undo: the docs state you can't delete this agent once configured (you must contact Microsoft support), and you can upgrade from Research-only to Research-and-engage but never back. In Research-and-engage mode it autonomously sends real email. Microsoft's guidance is to test on a smaller scale first."
+        },
+        {
+          "id": "sales-opportunity-1p",
+          "name": "Sales Opportunity Agent",
+          "status": "GA",
+          "summary": "Continuous opportunity research, risk and stakeholder intelligence.",
+          "overview": "https://learn.microsoft.com/dynamics365/sales/sales-opportunity-agent",
+          "configure": "https://learn.microsoft.com/dynamics365/sales/configure-opportunity-research-agent",
+          "warn": "Runs on a schedule. The docs warn that initial research results can take time to appear depending on matching opportunity volume and refresh frequency — check the refresh setting before concluding it's broken."
+        },
+        {
+          "id": "sales-research-1p",
+          "name": "Sales Research Agent",
+          "status": "GA",
+          "summary": "Natural-language dialog with sales data.",
+          "overview": "https://learn.microsoft.com/dynamics365/sales/sales-research-agent",
+          "configure": "https://learn.microsoft.com/dynamics365/sales/configure-sales-research-agent",
+          "surface": "Configured from the Power Platform admin center — not the Sales Hub app. Roles: system administrators and makers; readers need the Sales Research Agent Reader role."
+        },
+        {
+          "id": "recommended-actions-1p",
+          "name": "Recommended Actions Agent",
+          "status": "Preview",
+          "summary": "Aggregates and ranks seller actions surfaced by other agents. Turned on as a toggle inside the Sales Opportunity Agent or Data Enrichment configuration — you need one of those running first.",
+          "overview": "https://learn.microsoft.com/dynamics365/sales/recommended-actions-overview",
+          "configure": "https://learn.microsoft.com/dynamics365/sales/configure-recommended-actions",
+          "surface": "Not independently enabled: it is a toggle inside the Sales Opportunity Agent or AI-powered Data Enrichment configuration page."
+        },
+        {
+          "id": "sales-agent-m365-1p",
+          "name": "Sales agent in Microsoft 365 Copilot",
+          "status": "GA",
+          "summary": "Search, synthesize and act on sales data in M365 apps.",
+          "overview": "https://learn.microsoft.com/microsoft-sales-copilot/sales-chat-overview",
+          "configure": "https://learn.microsoft.com/microsoft-sales-copilot/set-up-sales-chat",
+          "surface": "Configured from the Microsoft 365 Copilot for Sales administrator settings, plus Copilot Studio for synonyms and glossary terms — not the Sales Hub app."
+        },
+        {
+          "id": "data-enrichment-1p",
+          "name": "AI-powered Data Enrichment",
+          "status": "GA",
+          "summary": "Suggests or applies opportunity-field updates from recent seller emails and Teams meeting conversations.",
+          "overview": "https://learn.microsoft.com/dynamics365/sales/data-enrichment-agent-overview",
+          "configure": "https://learn.microsoft.com/dynamics365/sales/data-enrichment-agent-configure",
+          "warn": "Grounds itself in each seller's Outlook and Teams data — an admin cannot point it elsewhere, and it analyses nothing until that seller consents."
+        }
+      ],
+      "surface": "Dynamics 365 Sales. Most of these are created and configured in the Sales Hub app under App Settings → General Settings → Dynamics 365 AI hub → Agent manager, by someone with the Power Platform administrator role plus admin permissions in Dynamics 365 Sales. You don't author these agents in Copilot Studio, but Copilot Studio is a hard dependency — a licence and capacity are required, and its connectors must be allowed in your data policies. Three agents are configured somewhere else entirely; each says so on its own card.",
+      "prereq": [
+        "The Power Platform administrator role plus admin permissions in Dynamics 365 Sales — or an admin who will sit with you and turn it on",
+        "A Copilot Studio licence and capacity (prepaid or pay-as-you-go) — these agents consume credits every time they run",
+        "The one-time common prerequisites marked Done in the Dynamics 365 AI hub: Copilot Studio capacity, “Move data across regions” accepted, AI prompts on, AI insight cards on, AI agents on",
+        "Data policies that allow the Copilot Studio, Dataverse, Direct Line and knowledge-source connectors, and the modern UI enabled for the Sales Hub app",
+        "Sales data already in Dataverse — plus, for the Sales Qualification Agent, Exchange server-side sync, a shared mailbox, and an Azure app registration with a Dataverse app user in the AISalesPerson role",
+        "Availability varies by region and by agent — confirm on the overview doc before you promise a date"
       ]
     },
     {
@@ -42,27 +77,84 @@
       "umbrella_overview": "https://learn.microsoft.com/dynamics365/contact-center/use/overview-ai-agents-copilot-features",
       "responsible_ai_faq": "https://learn.microsoft.com/dynamics365/contact-center/implement/faq-rai-ai-agents",
       "agents": [
-        {"id": "case-management-1p", "name": "Case Management Agent", "status": "GA",
-         "summary": "Automates the case lifecycle — create, update, resolve, close.",
-         "overview": "https://learn.microsoft.com/dynamics365/customer-service/use/use-case-creation-agent",
-         "configure": "https://learn.microsoft.com/dynamics365/customer-service/administer/set-up-autonomous-case-agents"},
-        {"id": "knowledge-management-1p", "name": "Customer Knowledge Management Agent", "status": "GA",
-         "summary": "Extracts knowledge from closed cases, fills gaps.",
-         "overview": "https://learn.microsoft.com/dynamics365/contact-center/use/overview-ai-agents-copilot-features",
-         "configure": "https://learn.microsoft.com/dynamics365/customer-service/administer/admin-km-agent"},
-        {"id": "quality-evaluation-1p", "name": "Quality Evaluation Agent", "status": "GA",
-         "summary": "AI-scored assessments of cases and conversations.",
-         "overview": "https://learn.microsoft.com/dynamics365/contact-center/use/evaluation-plan",
-         "configure": "https://learn.microsoft.com/dynamics365/contact-center/administer/manage-quality-evaluation-agent"},
-        {"id": "customer-intent-1p", "name": "Customer Intent Agent", "status": "GA",
-         "summary": "Discovers intents from cases and conversations, builds the intent library.",
-         "overview": "https://learn.microsoft.com/dynamics365/contact-center/administer/overview-customer-intent-agent",
-         "configure": "https://learn.microsoft.com/dynamics365/contact-center/administer/enable-intent-for-service-reps"},
-        {"id": "customer-intent-voice-1p", "name": "Customer Intent Agent (Voice)", "status": "GA",
-         "summary": "Autonomous voice resolution using the intent library and playbooks.",
-         "overview": "https://learn.microsoft.com/dynamics365/contact-center/administer/overview-customer-intent-agent",
-         "configure": "https://learn.microsoft.com/dynamics365/contact-center/use/use-intent-suggestions"}
+        {
+          "id": "case-management-1p",
+          "name": "Case Management Agent",
+          "status": "GA",
+          "summary": "Autonomously creates and updates cases from conversations and emails.",
+          "overview": "https://learn.microsoft.com/dynamics365/customer-service/use/use-case-creation-agent",
+          "configure": "https://learn.microsoft.com/dynamics365/customer-service/administer/set-up-autonomous-case-agents",
+          "warn": "Requires pay-as-you-go backed by an Azure subscription. Microsoft ships a sanctioned test path — simulation on historical records, then shadow mode — use it rather than improvising."
+        },
+        {
+          "id": "knowledge-management-1p",
+          "name": "Customer Knowledge Management Agent",
+          "status": "GA",
+          "summary": "Creates and maintains knowledge articles from cases, conversations, emails and notes — in real time as cases close, and in bulk from history.",
+          "overview": "https://learn.microsoft.com/dynamics365/contact-center/use/overview-ai-agents-copilot-features",
+          "configure": "https://learn.microsoft.com/dynamics365/customer-service/administer/admin-km-agent",
+          "warn": "Requires pay-as-you-go backed by an Azure subscription. Its setup wizard ends by publishing a Copilot Studio agent."
+        },
+        {
+          "id": "quality-evaluation-1p",
+          "name": "Quality Evaluation Agent",
+          "status": "GA (email evaluation in Preview)",
+          "summary": "AI-scored assessments of cases and conversations.",
+          "overview": "https://learn.microsoft.com/dynamics365/contact-center/use/overview-ai-agents-copilot-features",
+          "configure": "https://learn.microsoft.com/dynamics365/contact-center/administer/manage-quality-evaluation-agent",
+          "warn": "Legal notice from the docs, and a seller must not get this wrong: it isn't intended to be used to make decisions that affect the employment of an employee, and customers must adequately notify users that their communications might be monitored, recorded or stored. Learn also refers to this as a skill of the Quality Management Agent."
+        },
+        {
+          "id": "customer-intent-1p",
+          "name": "Customer Intent Agent",
+          "status": "GA",
+          "summary": "Discovers intents from cases and conversations, builds the intent library.",
+          "overview": "https://learn.microsoft.com/dynamics365/contact-center/administer/overview-customer-intent-agent",
+          "configure": "https://learn.microsoft.com/dynamics365/contact-center/administer/manage-customer-intent-agent",
+          "warn": "Grounds itself: it autonomously discovers intents from your historical conversations to build the intent library. There is no data source for you to point it at."
+        },
+        {
+          "id": "customer-intent-voice-1p",
+          "name": "Customer Intent Agent for voice",
+          "status": "GA",
+          "summary": "Autonomous voice resolution in Contact Center, using the intent library, business instructions, connectors and knowledge.",
+          "overview": "https://learn.microsoft.com/dynamics365/contact-center/administer/overview-customer-intent-agent",
+          "configure": "https://learn.microsoft.com/dynamics365/contact-center/administer/set-up-voice-agents-to-use-intents",
+          "warn": "Requires Copilot Studio voice agents. Grounds itself from the discovered intent library."
+        }
+      ],
+      "surface": "Dynamics 365 Customer Service and Contact Center. Turned on by an admin from the Copilot Service admin center (still labelled Customer Service admin center in some tenants and some docs). Evaluation plans are authored separately in Copilot Service workspace, and Case Management also needs settings in the Power Platform admin center. You don't author these agents, but the Knowledge and Quality setups both finish by publishing a Copilot Studio agent from the wizard.",
+      "prereq": [
+        "Admin rights in the Copilot Service admin center, plus the role each agent names — CSR Manager or Customer Service Representative for Case Management, Quality Administrator / Manager / Evaluator for quality evaluation",
+        "Pay-as-you-go set up with an Azure subscription — Case Management, Customer Knowledge Management and quality evaluation all require it, and the agents consume Copilot credits when they run",
+        "“Enable AI agents” turned on in the Power Platform admin center, and consent given for moving data across regions",
+        "Connection references, Power Automate flows, and the Copilot Studio agent published from each agent's setup wizard",
+        "Cases and a configured Dynamics 365 knowledge base already in place — plus, for case creation from conversations, provisioned channels, authenticated chat, workstreams and queues",
+        "These agents currently support English only, per Microsoft's Responsible AI FAQ"
+      ]
+    },
+    {
+      "id": "agent365-1p",
+      "name": "Microsoft 365 / Agent 365 — first-party agents",
+      "surface": "Microsoft 365 and Teams — this is an Agent 365 template agent, not a Dynamics 365 Sales agent. You deploy it from the Teams or Microsoft 365 Copilot agent store, onboard it by chatting with it in a Teams 1:1 chat, and licence it in the Microsoft 365 admin center. CRM integration comes from publishing a Dataverse MCP server, which needs Global Admin or AI Admin approval.",
+      "prereq": [
+        "Microsoft 365 Targeted release opted in, and enrolment in the Frontier preview program",
+        "A licence assigned in the Microsoft 365 admin center",
+        "Global Admin or AI Admin approval to publish the Dataverse MCP server that gives it CRM access",
+        "Product knowledge to upload — and note that knowledge changes apply immediately and cannot be tested first"
+      ],
+      "agents": [
+        {
+          "id": "sales-development-1p",
+          "name": "Sales Development agent",
+          "status": "Preview (Frontier program; requires Microsoft 365 Targeted release)",
+          "summary": "Automates sales outreach and prospect management (Agent 365).",
+          "overview": "https://learn.microsoft.com/en-us/microsoft-agent-365/use",
+          "configure": "https://learn.microsoft.com/en-us/microsoft-agent-365/use#deploy-and-create-the-sales-development-agent",
+          "warn": "Once you type “Go live” it starts sending emails immediately, at all hours including weekends. Microsoft's guidance: start small, fewer than 25 prospects. Knowledge changes take effect immediately and cannot be tested first, and shared content might be summarised into responses for users who don't have access to that content."
+        }
       ]
     }
-  ]
+  ],
+  "verified": "2026-08-07"
 }

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Library Metrics — AIBAST Agents Library</title>
-<meta name="description" content="Public metrics for the AIBAST Agent Library: adoption, traffic, and per-agent downloads, ratings, and conversations — all GitHub-native data, refreshed daily.">
+<meta name="description" content="Public metrics for the AIBAST Agents Library: adoption, traffic, and per-agent downloads, ratings, and conversations — all GitHub-native data, refreshed daily.">
 <style>
 :root{
   --ink:#1a1a2e; --dim:#4e5163; --faint:#5d6070; --paper:#ffffff; --wash:#f6f7fa;
@@ -140,7 +140,7 @@ body{padding-top:52px!important}
 <!-- /aibast-shared-nav -->
 
 <div class="hero"><div class="wrap">
-  <div class="kicker">AIBAST Agent Library · Public metrics</div>
+  <div class="kicker">AIBAST Agents Library · Public metrics</div>
   <h1>What the library is doing in the world</h1>
   <p>Every number here is GitHub-native — release-asset download counts, Discussion reactions,
     Traffic API history — refreshed daily by one daily workflow
@@ -157,13 +157,12 @@ body{padding-top:52px!important}
   <div class="grid2">
     <div class="card chart"><h3>Daily views</h3><div class="cap" id="viewsCap"></div>
       <svg class="spark" id="viewsSpark" role="img" aria-label="Daily repository views"></svg>
-      <div class="dormant" id="viewsDormant" style="display:none">Activates when the
-        <code>TRAFFIC_TOKEN</code> secret is added — the Traffic API needs a PAT the Actions token
-        doesn't carry.</div></div>
+      <div class="dormant" id="viewsDormant">Traffic history begins accumulating once daily
+        collection is enabled on the repository.</div></div>
     <div class="card chart"><h3>Stars over time</h3><div class="cap" id="starsCap"></div>
       <svg class="spark" id="starsSpark" role="img" aria-label="Stars over time"></svg>
-      <div class="dormant" id="starsDormant" style="display:none">Accumulates from the first daily
-        community snapshot.</div></div>
+      <div class="dormant" id="starsDormant">A trend appears once there are at least two daily
+        snapshots to compare.</div></div>
   </div>
   <div class="grid2">
     <div class="card chart"><h3>Top pages (14 days)</h3>
@@ -201,7 +200,7 @@ body{padding-top:52px!important}
 
   <div class="foot">Data files: rar/
     (ratings.json · downloads.json · traffic.json · community.json) · pattern per the
-    Microsoft-approved cat-agent-skills metrics model, GitHub-native throughout ·
+    GitHub-native throughout — the same measurement model as Microsoft's public agent-skills catalog ·
     <a href="index.html">AIBAST Agents Library</a></div>
 </main>
 <div class="tip" id="tip"></div>
@@ -230,7 +229,8 @@ function fmt(n){return n>=1000?(n/1000).toFixed(1).replace(/\.0$/,"")+"k":String
 /* single-series sparkline: 2px line, soft area, min/max axis text, crosshair tooltip */
 function spark(svgId, series, label){
   var svg=document.getElementById(svgId);
-  if(!series.length){return false;}
+  // a trend needs two points: one drew a degenerate polyline and rendered blank
+  if(series.length<2){return false;}
   var W=svg.clientWidth||420, H=96, padL=6, padR=6, padT=10, padB=16;
   svg.setAttribute("viewBox","0 0 "+W+" "+H);
   var vals=series.map(function(d){return d.v;});
@@ -295,7 +295,8 @@ Promise.all([
   var wild=community&&community.in_the_wild?community.in_the_wild:{};
   var wDays=Object.keys(wild).sort();
   var tiles=[
-    {lab:"Agents in the library", val:agents.length, note:"across "+reg.stats.categories+" industries"},
+    {lab:"Agents in the library", val:agents.length, note:"across "+reg.stats.categories+
+     " industries · excludes the Sales Specialist Twin, which drives the workshop rather than being deployed by it"},
     {lab:"Total downloads", val:fmt(totDl), note: totDl?"":"activates at first release"},
     {lab:"Community upvotes", val:fmt(totRate), note: totRate?"":"activates with Discussions"},
     {lab:"Stars", val:(latest.stars!=null?fmt(latest.stars):"—"), note:(latest.stars!=null?"":"first snapshot pending")},
@@ -310,14 +311,21 @@ Promise.all([
   var dKeys=Object.keys(days).sort();
   var vSeries=dKeys.filter(function(d){return days[d].views!=null;})
     .map(function(d){return {d:d.slice(5), v:days[d].views};});
-  if(!spark("viewsSpark", vSeries, "views"))
+  if(!spark("viewsSpark", vSeries, "views")){
     document.getElementById("viewsDormant").style.display="block";
-  else document.getElementById("viewsCap").textContent=
-    vSeries.length+" days · unique visitors in tooltip data files";
+  } else {
+    document.getElementById("viewsDormant").style.display="none";
+    document.getElementById("viewsCap").textContent=
+      vSeries.length+" day"+(vSeries.length===1?"":"s")+" · unique visitors in tooltip data files";
+  }
   var sSeries=aDays.map(function(d){return {d:d.slice(5), v:adoption[d].stars};});
-  if(!spark("starsSpark", sSeries, "stars"))
+  if(!spark("starsSpark", sSeries, "stars")){
     document.getElementById("starsDormant").style.display="block";
-  else document.getElementById("starsCap").textContent=sSeries.length+" daily snapshots";
+  } else {
+    document.getElementById("starsDormant").style.display="none";
+    document.getElementById("starsCap").textContent=
+      sSeries.length+" daily snapshot"+(sSeries.length===1?"":"s");
+  }
   barlist("pathsList",
     ((traffic&&traffic.popular_paths_latest)||[]).map(function(p){return {k:p.path, v:p.views_14d};}),
     "pathsDormant");
@@ -382,5 +390,9 @@ Promise.all([
   engine, not experience · agents that ship, patterns that hold, numbers you can audit ·
   <a href="https://github.com/microsoft/aibast-agents-library">github.com/microsoft/aibast-agents-library</a></div>
 <!-- /aibast-theme -->
+
+<div class="aibast-disclaimer" style="max-width:900px;margin:32px auto 0;padding:12px 16px;border:1px solid #d29922;border-radius:8px;background:rgba(210,153,34,.08);color:#8a6d1f;font-size:12.5px;line-height:1.6">
+  <strong>Note:</strong> an experimental project from a v-team in the Microsoft AI Business Applications Specialist Team (AIBAST) — not an officially supported Microsoft product.
+</div>
 </body>
 </html>

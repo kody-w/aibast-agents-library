@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAPP Production Guide — AIBAST Agents Library</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        /* third-party font import removed: no external requests from a Microsoft-branded page */
 
         :root {
             --primary: #0078d4;
@@ -1255,7 +1255,7 @@ body{padding-top:52px!important}
 
     <!-- Experimental Disclaimer Banner -->
     <div style="background: #fff3cd; border-bottom: 2px solid #ffc107; padding: 12px 20px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; color: #856404; z-index: 9999;">
-        ⚠️ <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product. Agent templates are starting points — human review remains important. File an issue to help us improve.
+        ⚠️ <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the AI Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product. Agent templates are starting points — human review remains important. File an issue to help us improve.
     </div>
 
         <!-- Top Bar -->
@@ -1357,10 +1357,6 @@ body{padding-top:52px!important}
             <a href="#scaling" class="nav-item" onclick="navigateToSection('scaling'); return false;">
                 <span class="nav-icon">📈</span>
                 <span>Scaling to 20+ Projects</span>
-            </a>
-            <a href="#roadmap" class="nav-item" onclick="navigateToSection('roadmap'); return false;">
-                <span class="nav-icon">🗺️</span>
-                <span>Roadmap - EOY 2025</span>
             </a>
         </div>
 
@@ -2244,7 +2240,7 @@ def handle_request(user_message, user_guid):
             <div class="tool-card">
                 <h4>🤖 Automation Tool: Transcript-to-Project Agent</h4>
                 <p><strong>Type:</strong> M365 Copilot Studio Declarative Agent</p>
-                <p><strong>Location:</strong> <a href="https://m365.cloud.microsoft:443/chat/?titleId=T_afded7db-f8c5-703a-5502-2cc9f31b66da&source=embedded-builder" target="_blank">Open Transcript-to-Project Agent</a></p>
+                <p><strong>Location:</strong> <span class="agent-loc">Transcript-to-Project Agent — build this from the prompt below in Copilot Studio; the agent is not shared publicly.</span></p>
 
                 <div class="code-block" style="background: #fff3e0; border-left: 4px solid #f57c00; margin-top: 15px;">
                     <div class="code-header" style="background: #ffb74d; border-bottom: 1px solid #f57c00; cursor: pointer;" onclick="toggleFallback('transcript-fallback')">
@@ -2263,9 +2259,9 @@ Return valid JSON with this exact structure (copy this template and fill in the 
     "status": "[MUST be one of: planning, poc, active, production, completed]",
     "type": "[MUST be one of: legal, hr, it, compliance, customer-service, sales, finance, other]",
     "description": "[One sentence describing the overall AI implementation]",
-    "stakeholders": "[Names with titles, comma-separated. Example: John Smith (VP Legal), Jane Doe (IT Director)]",
+    "stakeholders": "[Roles and titles only, comma-separated. Example: VP Legal, IT Director. Do not record individuals' names.]",
     "competingSolution": "[What solution are they comparing us to? e.g., Salesforce, ServiceNow, or leave empty if none]",
-    "contractDetails": "[EA details, license counts, budget/ACV, discounts - everything commercial]",
+    "contractDetails": "[Only the licensing that affects what you can build — e.g. which products they already have. Never record pricing, discounts, or budget figures.]",
     "agents": ["[AgentName1]", "[AgentName2]", "[etc - PascalCase, no spaces]"],
     "mvpUseCase": "[The single focused first use case name, e.g., 'NDA Automation Bot']",
     "mvpDescription": "[2-3 sentences: What will the MVP specifically do?]",
@@ -2308,7 +2304,7 @@ After you provide the JSON, I will copy it and import it into the Project Tracke
 VP Legal and Legal Operations Manager discussed
 replacing their current Salesforce contract system. They have an EA with 150
 Copilot Studio licenses and want to start with NDA automation as the MVP.
-Budget approved at $450K ACV. Main concern is contract routing and approval
+Main concern is contract routing and approval
 workflows. They want a POC in 6 weeks focusing on contract generation,
 analysis, and automated routing.</pre>
                 </div>
@@ -2326,7 +2322,7 @@ analysis, and automated routing.</pre>
   "description": "Legal operations AI bot for contract automation",
   "stakeholders": "VP Legal, Legal Operations Manager",
   "competingSolution": "Salesforce",
-  "contractDetails": "EA with 150 Copilot Studio licenses, $450K ACV",
+  "contractDetails": "EA with 150 Copilot Studio licenses",
   "agents": ["ContractTemplate", "ContractAnalysis", "ContractRouting"],
   "mvpUseCase": "NDA Automation Bot",
   "mvpDescription": "Automated NDA generation, analysis, and routing with approval workflows",
@@ -2758,14 +2754,14 @@ Tone: Professional but approachable. We're confirming we heard them correctly, n
 
             <div class="tool-card">
                 <h4>🛠️ Development Tool: RAPP Agent Generator</h4>
-                <p><strong>Location:</strong> <a href="https://m365.cloud.microsoft/chat/?titleId=T_04778775-1214-29c8-3bc4-218e26088499&source=embedded-builder&auth=2" target="_blank">Open RAPP Agent Generator</a></p>
+                <p><strong>Location:</strong> <span class="agent-loc">RAPP Agent Generator — build this from the prompt below in Copilot Studio; the agent is not shared publicly.</span></p>
 
                 <div class="code-block" style="background: #fff3e0; border-left: 4px solid #f57c00; margin-top: 15px;">
                     <div class="code-header" style="background: #ffb74d; border-bottom: 1px solid #f57c00; cursor: pointer;" onclick="toggleFallback('agent-generator-fallback')">
                         <span class="code-language" style="color: #1a1a1a; font-weight: 600;">⚠️ Manual Fallback: Click to expand prompt (paste into Copilot if agent link isn't working)</span>
                         <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this.parentElement.nextElementSibling)">Copy</button>
                     </div>
-                    <pre id="agent-generator-fallback" style="display: none; white-space: pre-wrap; word-wrap: break-word; color: #1a1a1a; background: #fff; padding: 20px; margin: 0; border-top: 2px solid #f57c00;">You are a Python agent code generator for the Microsoft AI BAST RAPP framework. Generate production-ready agent code that follows the BasicAgent pattern and can be deployed to Azure Functions.
+                    <pre id="agent-generator-fallback" style="display: none; white-space: pre-wrap; word-wrap: break-word; color: #1a1a1a; background: #fff; padding: 20px; margin: 0; border-top: 2px solid #f57c00;">You are a Python agent code generator for the Microsoft AIBAST RAPP framework. Generate production-ready agent code that follows the BasicAgent pattern and can be deployed to Azure Functions.
 
 **CRITICAL REQUIREMENTS:**
 1. Each agent must inherit from BasicAgent
@@ -3933,7 +3929,7 @@ scope a Phase 2 project with those additional capabilities. Sound good?"</code><
                 <div class="tool-card">
                     <h4>🤖 Automation Tool: Video Demo Generator</h4>
                     <p><strong>Type:</strong> M365 Copilot Studio Declarative Agent</p>
-                    <p><strong>Location:</strong> <a href="https://m365.cloud.microsoft:443/chat/?titleId=T_9c21fece-1d32-64df-b68d-db4d0a3cc446&source=embedded-builder" target="_blank">Open Video Demo Generator</a></p>
+                    <p><strong>Location:</strong> <span class="agent-loc">Video Demo Generator — build this from the prompt below in Copilot Studio; the agent is not shared publicly.</span></p>
                     <p><strong>Local Tool:</strong> <a href="../tools/localfirst_chat_animation_studio_tool.html" target="_blank">Open Local-First Chat Animation Studio</a></p>
 
                     <div class="code-block" style="background: #fff3e0; border-left: 4px solid #f57c00; margin-top: 15px;">
@@ -3941,7 +3937,7 @@ scope a Phase 2 project with those additional capabilities. Sound good?"</code><
                             <span class="code-language" style="color: #1a1a1a; font-weight: 600;">⚠️ Manual Fallback: Click to expand prompt (paste into Copilot if agent link isn't working)</span>
                             <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this.parentElement.nextElementSibling)">Copy</button>
                         </div>
-                        <pre id="video-demo-fallback" style="display: none; white-space: pre-wrap; word-wrap: break-word; color: #1a1a1a; background: #fff; padding: 20px; margin: 0; border-top: 2px solid #f57c00;">You are a demo video JSON generator for the Microsoft AI BAST RAPP framework. Generate structured demo configurations that work with the Local-First Chat Animation Studio tool.
+                        <pre id="video-demo-fallback" style="display: none; white-space: pre-wrap; word-wrap: break-word; color: #1a1a1a; background: #fff; padding: 20px; margin: 0; border-top: 2px solid #f57c00;">You are a demo video JSON generator for the Microsoft AIBAST RAPP framework. Generate structured demo configurations that work with the Local-First Chat Animation Studio tool.
 
 **YOUR TASK:**
 Create a complete JSON demo configuration that tells a compelling story about the customer's AI agent implementation.
@@ -5344,179 +5340,6 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
         </div>
 
         <!-- ROADMAP -->
-        <div class="content-section" id="roadmap">
-            <h1 class="section-title">Roadmap - EOY 2025</h1>
-            <p class="section-subtitle">Next release wave priorities and strategic focus areas</p>
-
-            <div class="highlight-box" style="background: linear-gradient(135deg, #0b1f4b 0%, #3a1f66 100%); color: white; border: none;">
-                <h4 style="color: white;">🎯 Strategic Shift: From Prototypes to Production</h4>
-                <p style="color: rgba(255,255,255,0.95); margin-bottom: 0;">The strategic imperative is to transform conceptual ideas into production-ready solutions that field teams can deploy immediately. The focus is on creating demos that not only impress in presentations but can also be reliably reproduced and reused across multiple customer engagements to accelerate deal closure.</p>
-            </div>
-
-            <div class="step-section">
-                <h3>🥇 Top 3 Priorities (In Order)</h3>
-
-                <div class="priority-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
-                    <h4 style="color: white; margin-top: 0;">1. SPUR Committed Work - Agents & Videos</h4>
-                    <p style="color: rgba(255,255,255,0.95);"><strong>What:</strong> Deliver committed agents and videos for SPUR engagement</p>
-                    <p style="color: rgba(255,255,255,0.95);"><strong>Impact:</strong> Revenue-generating, already committed to customer</p>
-                    <p style="color: rgba(255,255,255,0.95); margin-bottom: 0;"><strong>Status to Track:</strong> Completion of agent builds and video production</p>
-                </div>
-
-                <div class="priority-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
-                    <h4 style="color: white; margin-top: 0;">2. Enable Team Members - Documentation & Tools</h4>
-                    <p style="color: rgba(255,255,255,0.95);"><strong>What:</strong> Create "station-based" guide enabling team to work independently on 2+ process stations</p>
-                    <p style="color: rgba(255,255,255,0.95);"><strong>Deliverables:</strong></p>
-                    <ul style="color: rgba(255,255,255,0.95); margin-bottom: 15px;">
-                        <li>14-step process guide (the "Bible") with audit trails</li>
-                        <li>M365 agents for discovery calls and MVP generation</li>
-                        <li>Clear input/output documentation for each station</li>
-                    </ul>
-                    <p style="color: rgba(255,255,255,0.95);"><strong>Impact:</strong> Team scalability - enable team members to handle 20+ customer engagements concurrently</p>
-                    <p style="color: rgba(255,255,255,0.95); margin-bottom: 0;"><strong>Key Requirement:</strong> "Less code-dependent, more tool-based" - team uses tools, not raw code</p>
-                </div>
-
-                <div class="priority-card" style="background: linear-gradient(135deg, #0b1f4b 0%, #3a1f66 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
-                    <h4 style="color: white; margin-top: 0;">3. AI Agents Library Infrastructure</h4>
-                    <p style="color: rgba(255,255,255,0.95);"><strong>What:</strong> Azure environment architecture where field can demo live agents</p>
-                    <p style="color: rgba(255,255,255,0.95);"><strong>Deliverables:</strong></p>
-                    <ul style="color: rgba(255,255,255,0.95); margin-bottom: 15px;">
-                        <li>Shared Azure tenant (non-expiring) for all agents</li>
-                        <li>Live endpoint demos accessible by entire field</li>
-                        <li>No per-demo deployment needed</li>
-                    </ul>
-                    <p style="color: rgba(255,255,255,0.95); margin-bottom: 0;"><strong>Impact:</strong> Field enablement at scale - eliminate deployment friction for demos</p>
-                </div>
-            </div>
-
-            <div class="step-section">
-                <h3>⚡ Specific Action Items</h3>
-
-                <h4 style="color: var(--primary); margin-top: 25px;">Immediate (Next 1-2 Weeks)</h4>
-                <table class="comparison-table" data-wrapped="1">
-                    <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>Description</th>
-                            <th>Owner</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Hardware Procurement</strong></td>
-                            <td>Procure 2TB external drive for video storage (via Juke Room Store or procurement)</td>
-                            <td>Infrastructure Team</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Video Automation</strong></td>
-                            <td>Implement speech-to-text solution for audio timing (double API call for duration data)</td>
-                            <td>Automation Team</td>
-                        </tr>
-                        <tr>
-                            <td><strong>PII Gate</strong></td>
-                            <td>Create review process and tagging system (PII/PII-removed/Public-ready) for agent library</td>
-                            <td>Security/Compliance</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h4 style="color: var(--primary); margin-top: 35px;">Short-term (This Cycle)</h4>
-                <table class="comparison-table" data-wrapped="1">
-                    <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>Description</th>
-                            <th>Owner</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Documentation</strong></td>
-                            <td>Complete station-based guide with examples and prompts</td>
-                            <td>Documentation Team</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Agent Deployment</strong></td>
-                            <td>Simplify ARM scripts for one-click deployment</td>
-                            <td>Technical Team</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Library Architecture</strong></td>
-                            <td>Design structure for field-accessible agent demos with live endpoints</td>
-                            <td>Architecture Team</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="step-section">
-                <h3>📊 Success Metrics</h3>
-                <div class="grid-2">
-                    <div class="metric-card" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); padding: 20px; border-radius: 12px;">
-                        <div class="metric-icon" style="font-size: 2rem; margin-bottom: 10px;">👥</div>
-                        <h4 style="color: var(--primary); margin-bottom: 10px;">Team Independence</h4>
-                        <p style="margin-bottom: 5px;"><strong>Metric:</strong> Number of stations team members can operate independently</p>
-                        <p style="margin-bottom: 0; color: var(--text-secondary);"><strong>Target:</strong> 2+ stations by end of cycle</p>
-                    </div>
-
-                    <div class="metric-card" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); padding: 20px; border-radius: 12px;">
-                        <div class="metric-icon" style="font-size: 2rem; margin-bottom: 10px;">⚡</div>
-                        <h4 style="color: var(--primary); margin-bottom: 10px;">Process Efficiency</h4>
-                        <p style="margin-bottom: 5px;"><strong>Metric:</strong> Time reduction from manual process to tool-based process</p>
-                        <p style="margin-bottom: 0; color: var(--text-secondary);"><strong>Target:</strong> 50% reduction in manual steps</p>
-                    </div>
-
-                    <div class="metric-card" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); padding: 20px; border-radius: 12px;">
-                        <div class="metric-icon" style="font-size: 2rem; margin-bottom: 10px;">🚀</div>
-                        <h4 style="color: var(--primary); margin-bottom: 10px;">Field Adoption</h4>
-                        <p style="margin-bottom: 5px;"><strong>Metric:</strong> Number of demos running from shared Azure environment</p>
-                        <p style="margin-bottom: 0; color: var(--text-secondary);"><strong>Target:</strong> 10+ field-accessible demos</p>
-                    </div>
-
-                    <div class="metric-card" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); padding: 20px; border-radius: 12px;">
-                        <div class="metric-icon" style="font-size: 2rem; margin-bottom: 10px;">💰</div>
-                        <h4 style="color: var(--primary); margin-bottom: 10px;">Customer Conversion</h4>
-                        <p style="margin-bottom: 5px;"><strong>Metric:</strong> Demos converted to deployed agents</p>
-                        <p style="margin-bottom: 0; color: var(--text-secondary);"><strong>Target:</strong> 30% conversion rate</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step-section">
-                <h3>🎯 Connect Format Alignment</h3>
-
-                <h4 style="color: var(--primary);">Results You Deliver:</h4>
-                <ul>
-                    <li><strong>Business Impact:</strong> Accelerating deals through reproducible AI agent demos</li>
-                    <li><strong>Team Impact:</strong> Enabling team members to scale from individual work to managing 20+ concurrent engagements</li>
-                    <li><strong>Customer Impact:</strong> Moving from "amazing demos" to deployed, production-ready solutions</li>
-                </ul>
-
-                <h4 style="color: var(--primary); margin-top: 25px;">How You Deliver:</h4>
-                <ul>
-                    <li><strong>From Research to Production:</strong> Grounding prototypes into field-usable tools</li>
-                    <li><strong>Incremental Delivery:</strong> "Don't wait for the whole project" - ship station 1 & 2, then expand</li>
-                    <li><strong>Team Enablement:</strong> Growth mindset - building framework that helps others succeed, not just solo innovation</li>
-                </ul>
-            </div>
-
-            <div class="step-section">
-                <h3>🔒 Security & Governance Goals</h3>
-                <ul>
-                    <li><strong>PII Detection & Tagging:</strong> Implement systematic PII detection and classification for agent library</li>
-                    <li><strong>Governance Gates:</strong> Establish review gates before public consumption of agents</li>
-                    <li><strong>Data Handling Best Practices:</strong> Document security protocols in team documentation</li>
-                    <li><strong>Compliance Alignment:</strong> Ensure all agents meet enterprise security standards before field deployment</li>
-                </ul>
-            </div>
-
-            <div class="highlight-box" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none;">
-                <h4 style="color: white; margin-top: 0;">💡 Pro Tip for Connect</h4>
-                <p style="color: rgba(255,255,255,0.95); margin-bottom: 0;">When writing your Connect, emphasize the shift from "200 amazing prototypes" to "2 production-ready tools the field can use tomorrow." This directly addresses the strategic feedback about moving from ideation to realization.</p>
-            </div>
-        </div>
-
-        <!-- TOOLS BROWSER SECTION -->
         <div class="content-section" id="tools">
             <h1 class="section-title">Tool Browser</h1>
             <p class="section-subtitle">Interactive tools for project management and agent development</p>
@@ -5530,7 +5353,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
 
                 <!-- Project Tracker Tool -->
                 <div class="tool-card" style="background: white; border-radius: 12px; padding: 30px; box-shadow: var(--shadow); transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent;"
-                     onclick="window.open('tools/localfirst_project_tracker_tool.html', '_blank')"
+                     onclick="window.open('../tools/localfirst_project_tracker_tool.html', '_blank')"
                      onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-lg)'; this.style.borderColor='var(--primary)';"
                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow)'; this.style.borderColor='transparent';">
 
@@ -5550,7 +5373,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
 
                     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
                         <span style="background: var(--bg-light); color: var(--primary); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">Project Management</span>
-                        <span style="background: var(--bg-light); color: var(--primary); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">Agent Library</span>
+                        <span style="background: var(--bg-light); color: var(--primary); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">Agents Library</span>
                         <span style="background: var(--bg-light); color: var(--primary); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">Timeline Tracking</span>
                         <span style="background: var(--bg-light); color: var(--primary); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">Word Export</span>
                     </div>
@@ -5647,7 +5470,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
             'overview', 'architecture', 'principles',
             'step1', 'step2', 'step3', 'step4', 'step5', 'step6', 'step7',
             'step8', 'step9', 'step10', 'step11', 'step12', 'step13', 'step14',
-            'team-setup', 'scaling', 'roadmap', 'tools'
+            'team-setup', 'scaling', 'tools'
         ];
 
         // Navigation Functions

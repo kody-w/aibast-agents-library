@@ -145,10 +145,12 @@ body{padding-top:52px!important}
   </div>
 
   <div class="principle">
-    <h3><span class="num">02</span>One command, maximum</h3>
-    <p>Count the commands a participant must run. The target is one. Ours is the install
-      one-liner, and even that has a path that avoids it. Everything else is conversation or a
-      button.</p>
+    <h3><span class="num">02</span>Count the commands, and keep the count honest</h3>
+    <p>Count the commands a participant must run, then publish the number. Ours is two: the
+      install one-liner, and a one-time <code>pac auth create</code> sign-in the first time they
+      ever authenticate. The one-liner has a path that avoids it entirely. Everything else is
+      conversation or a button — and if the count creeps to three, something in the design is
+      wrong, not something in the room.</p>
     <div class="why"><b>Why</b> Every additional command multiplies the ways a room can
       fragment — wrong shell, wrong directory, wrong OS, a copied line that lost its newline.</div>
   </div>
@@ -184,7 +186,7 @@ body{padding-top:52px!important}
 
   <div class="principle">
     <h3><span class="num">06</span>Never show an empty room</h3>
-    <p>A participant who scrolls before reading should see a working example, clearly labelled as
+    <p>A participant who scrolls before reading should see a working example, clearly labeled as
       one, not blank panels. Ours loads a default agent and says “Example shown — pick yours
       above.”</p>
     <div class="why"><b>Why</b> Blank space reads as broken. People assume they missed something
@@ -193,9 +195,10 @@ body{padding-top:52px!important}
 
   <div class="principle">
     <h3><span class="num">07</span>Verification with computed answers</h3>
-    <p>Every agent in this library ships test questions whose expected answers are derived from
-      its data — a specific name, a specific ranking, a specific refusal. Not “check that it
-      responds sensibly.”</p>
+    <p>Every library stack ships test questions whose expected answers are computed from its
+      <b>synthetic</b> data — a specific name, a specific ranking, a specific refusal. Not “check
+      that it responds sensibly.” First-party agents ship none, by design: Microsoft documents
+      their validation, so the workshop links that instead of inventing its own.</p>
     <blockquote>A wrong answer becomes visible, not arguable. That is the difference between a
       demo and a liability.</blockquote>
     <div class="why"><b>Why</b> Rooms cannot judge quality by feel, and neither can the person
@@ -206,8 +209,8 @@ body{padding-top:52px!important}
     <h3><span class="num">08</span>State the boundary instead of faking the capability</h3>
     <p>When the marketing promised something the build cannot honestly do — autonomous action,
       real-time telemetry that does not exist — write the boundary into the agent's instructions
-      rather than simulating it. Our compliance pass declined a dozen such asks on purpose, each
-      with a stated reason.</p>
+      rather than simulating it, and say so out loud. A declined capability with a stated reason
+      survives a customer conversation; a simulated one does not.</p>
     <div class="why"><b>Why</b> The faked capability always surfaces in front of the customer,
       and it takes the credible parts down with it.</div>
   </div>
@@ -235,7 +238,7 @@ body{padding-top:52px!important}
   <table>
     <thead><tr><th>Symptom</th><th>What it usually is</th><th>Say this</th></tr></thead>
     <tbody>
-      <tr><td>Nothing loads</td><td>The venue's network blocks the public file host</td>
+      <tr><td>Nothing loads</td><td>The venue's network blocks <code>raw.githubusercontent.com</code> — ask IT to allowlist it the week before</td>
         <td>“Open the metrics page — if the table fills in, we're fine.” Test it the day before.</td></tr>
       <tr><td>“It says I don't have permission”</td><td>No security role in the environment</td>
         <td>Name it as an admin task, not their mistake, and pair them with someone who has access.</td></tr>
@@ -254,9 +257,10 @@ body{padding-top:52px!important}
     found bugs no demo would ever surface — an agent name that routed to the wrong stack, a share
     link the page could not read back, a button that told people to pick something they had just
     picked. Every one of those would have hit a room instead.</p>
-  <p><b>Let an independent reviewer attack it.</b> We ran five adversarial passes against the
-    live site. Three of the worst problems in round four were regressions introduced by the fixes
-    in round three. You do not catch that by re-reading your own work.</p>
+  <p><b>Let an independent reviewer attack it.</b> We ran repeated adversarial passes against
+    the live site, and several of the worst problems in the later rounds were regressions
+    introduced by the fixes in the earlier ones. You do not catch that by re-reading your own
+    work — and the fix is a regression test per defect, not a more careful re-read.</p>
   <p><b>Write the doctrine down where the AI can read it.</b> The difference between an AI that
     helps and an AI that improvises is whether you gave it your actual procedure — including the
     parts where things break. That document is the real deliverable; the slides are a summary
@@ -286,5 +290,9 @@ body{padding-top:52px!important}
   engine, not experience · agents that ship, patterns that hold, numbers you can audit ·
   <a href="https://github.com/microsoft/aibast-agents-library">github.com/microsoft/aibast-agents-library</a></div>
 <!-- /aibast-theme -->
+
+<div class="aibast-disclaimer" style="max-width:900px;margin:32px auto 0;padding:12px 16px;border:1px solid #d29922;border-radius:8px;background:rgba(210,153,34,.08);color:#8a6d1f;font-size:12.5px;line-height:1.6">
+  <strong>Note:</strong> an experimental project from a v-team in the Microsoft AI Business Applications Specialist Team (AIBAST) — not an officially supported Microsoft product.
+</div>
 </body>
 </html>

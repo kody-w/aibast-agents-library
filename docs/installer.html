@@ -431,6 +431,11 @@ body{padding-top:52px!important}
     </div>
     <div class="tier-body">
       <p class="metaphor">The biological brainstem keeps you alive — breathing, heartbeat, reflexes. Your AI brainstem does the same: it runs the core agent loop, calls tools, and responds. Everything else builds on top of this.</p>
+      <details style="margin-top:16px">
+      <summary style="color:#b3bcc9;font-size:13px;cursor:pointer;user-select:none">Advanced — manual steps</summary>
+      <p style="color:#b3bcc9;font-size:13px;margin:10px 0">These run <em>after</em> the one-liner
+        above — it is what puts <code>brainstem</code> on your PATH. You do not need any of them
+        unless you want to see what it did.</p>
       <div class="steps">
         <div class="step">
           <h3>1. Authenticate with GitHub</h3>
@@ -452,6 +457,7 @@ body{padding-top:52px!important}
           <p>Write a <code>soul.md</code> to define its personality. Drop <code>*_agent.py</code> files into the agents folder to give it skills. Point <code>SOUL_PATH</code> and <code>AGENTS_PATH</code> in <code>.env</code> to your private files.</p>
         </div>
       </div>
+      </details>
     </div>
   </div>
 
@@ -460,8 +466,8 @@ body{padding-top:52px!important}
     <div class="tier-header">
       <div class="tier-icon">☁️</div>
       <div class="tier-title">
-        <h2>The Spinal Cord</h2>
-        <div class="subtitle">Deploy RAPP to Azure — give it a cloud body</div>
+        <h2>The Hippocampus</h2>
+        <div class="subtitle">Persistent memory — runs local, deploys to Azure (the Spinal Cord tier)</div>
       </div>
       <span class="tier-badge next">Next step</span>
       <span class="tier-arrow">▶</span>
@@ -509,7 +515,7 @@ body{padding-top:52px!important}
         <div class="step" style="border:1px solid #238636;border-radius:10px;padding:20px;background:#0d1117;">
           <h3 style="color:#3fb950;">Option A: Azure Function → Copilot Studio</h3>
           <p>Wire your deployed Azure Function to Copilot Studio. Import the Power Platform solution, point it at your endpoint, publish. Same RAPP agents, now in Teams and M365 Copilot.</p>
-          <p style="font-size:13px;color:#b3bcc9;margin:8px 0;"><strong>Requires:</strong> Tier 2 (Spinal Cord) completed</p>
+          <p style="font-size:13px;color:#b3bcc9;margin:8px 0;"><strong>Requires:</strong> Tier 2 (the Hippocampus) completed</p>
           <div class="cmd" onclick="copyCmd(event, this)">curl -fsSL -o MSFTAIBASMultiAgentCopilot.zip https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/MSFTAIBASMultiAgentCopilot_1_0_0_5.zip</div>
           <p style="margin-top:8px;font-size:13px;color:#b3bcc9;">Import at <a href="https://make.powerapps.com" target="_blank" style="color:#58a6ff;">make.powerapps.com</a> → Solutions → Import. Update the HTTP action URL to your Azure Function. Publish.</p>
         </div>
@@ -657,7 +663,7 @@ body{padding-top:52px!important}
 <div style="max-width:620px;width:100%;margin:40px auto;padding:0 0 60px;">
   <h2 style="font-size:1.3em;margin-bottom:16px;color:#e6edf3;font-weight:600;">Current Limitations</h2>
   <div style="background:#1c1f26;border:1px solid #d29922;border-radius:8px;padding:14px 18px;margin-bottom:16px;color:#d29922;font-size:13px;line-height:1.6;">
-    ⚠️ <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product.
+    ⚠️ <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the AI Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product.
   </div>
   <p style="color:#b3bcc9;line-height:1.7;font-size:14px;margin-bottom:12px;">This project is still in beta. Even if we're optimizing it for best-practice adherence, by using it you might sometimes experience unwanted patterns, errors, or simply bad architectures. By filing a GitHub issue you will help us improve these tools.</p>
   <ul style="color:#b3bcc9;line-height:1.9;margin-left:20px;font-size:13px;">

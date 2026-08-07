@@ -361,7 +361,7 @@ body{padding-top:52px!important}
       build it by talking, not by typing commands. Every industry in the AIBAST library runs
       through this same page.</p>
     <div class="goal"><b>When you finish</b>
-      A working dispatch agent in your Copilot Studio environment that passes five computed
+      A working agent in your Copilot Studio environment that passes its computed
       verification checks — and a clear path from prototype to production.<br><br>
       <b>The short version</b>
       Start the install, pick your agent while it runs, then tell your AI to build it.</div>
@@ -389,6 +389,12 @@ body{padding-top:52px!important}
     you've chosen, your AI is ready to build it.</p>
 
   <div class="card">
+    <div class="callout"><b>Two things you need first.</b> A <b>GitHub Copilot subscription</b> —
+      that is the AI engine the brainstem runs on, and without it the sign-in step fails. And
+      <b><a href="https://code.visualstudio.com/download" target="_blank" rel="noopener"
+      style="color:#0b5da6">VS Code</a></b> with the GitHub Copilot extension, which is where you
+      talk to it. Both are free to install; the Copilot subscription may already be on your work
+      account — check before the session, not during it.</div>
     <ol class="steps">
       <li><b>Easiest of all: download the agent and drop it in your AI chat</b>
         <p>Nothing installed yet? Doesn't matter. Download the file, drag it into
@@ -400,7 +406,7 @@ body{padding-top:52px!important}
         prompt and nothing else.</p>
         <p style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px">
           <a id="twinDl" class="dlbtn" href="#">⬇ Download sales_specialist_twin_agent.py</a>
-          <span id="twinDlNote" style="font-size:13px;color:var(--faint)">~21 KB · Python · no dependencies</span>
+          <span id="twinDlNote" style="font-size:13px;color:var(--faint)">Python · no dependencies</span>
         </p></li>
 
       <li><b>Rather run the one-liner yourself?</b>
@@ -416,8 +422,10 @@ body{padding-top:52px!important}
         <code>localhost:7071</code> has a built-in registry — search <b>“Sales Specialist Twin”</b>
         and install with one click.</p></li>
       <li><b>Open VS Code and start talking</b>
-        <p>Open GitHub Copilot Chat in VS Code, connected to your brainstem (the tutorial's chat
-        step). Everything from here is conversation.</p></li>
+        <p>Open GitHub Copilot Chat in VS Code and ask it anything about your agents — the twin
+        answers through the brainstem you just installed. Step by step, with screenshots:
+        <a href="tutorial.html" style="color:#0b5da6">the tutorial's chat walkthrough</a>.
+        Everything from here is conversation.</p></li>
     </ol>
     <div class="done-line"><b>Done when</b> you ask “what agents can I deploy?” in chat and the
       library catalog comes back.</div>
@@ -452,34 +460,107 @@ body{padding-top:52px!important}
 </section>
 
 <!-- ═══════════ 2 UNDERSTAND ═══════════ -->
+<style id="fp-track-css">
+  .fpdocs{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .fpdoc{display:block;padding:16px 18px;border:1px solid var(--line,#d8dce6);border-radius:10px;
+    text-decoration:none;background:var(--accent-soft,#e8f1fa);transition:border-color .15s}
+  .fpdoc:hover{border-color:var(--accent,#0f6cbd)}
+  .fpdoc b{display:block;font-size:15px;color:var(--accent,#0f6cbd);margin-bottom:4px}
+  .fpdoc span{display:block;font-size:13.5px;line-height:1.5;color:var(--ink,#1a1a2e)}
+  .fpdoc em{display:block;margin-top:8px;font-size:12px;font-style:normal;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--faint,#5b5e6e)}
+  #fpTrack .callout i{font-style:normal}
+</style>
+
+<!-- ═══════════ 3F · FIRST-PARTY TRACK (shown only for a 1P pick) ═══════════ -->
+<section class="phase" id="fpTrack" style="display:none">
+  <div class="phead"><span class="pk">Step 3 · First-party track</span><span class="time">plan an hour, with an admin</span></div>
+  <h2>Turn on <span data-fp="name">this agent</span></h2>
+  <p class="goal-line">You picked a <b>Microsoft first-party agent</b>. Microsoft already built this one —
+    there is no scaffold to install, no CLI, and nothing to publish. Your job is shorter and different:
+    confirm it can run in this tenant, turn it on correctly, ground it in real data, and prove it works.
+    That is the whole track, and it is the one sellers get asked about most.</p>
+
+  <div class="card">
+    <h3>What it does</h3>
+    <p id="fpSummary" style="margin:0 0 12px"></p>
+    <p style="margin:0"><b>Where it lives:</b> <span id="fpSurface"></span></p>
+  </div>
+
+  <div class="card">
+    <h3>Check these before you start</h3>
+    <ul class="tight" id="fpPrereq"></ul>
+    <div class="callout" id="fpStatusNote"></div>
+    <div class="callout" id="fpWarn" style="display:none"></div>
+    <div class="callout"><b>Don't turn one on in a customer's production tenant to see what it does.</b>
+      Some of these can't be deleted once configured — Microsoft support has to remove them — and some
+      send real email to real people the moment they go live. Microsoft's own guidance is to test on a
+      small scale first. Read the agent-specific warning above before you touch anything.</div>
+  </div>
+
+  <div class="card">
+    <h3>What you're going to do</h3>
+    <ol class="steps">
+      <li><b>Read what it actually does.</b>
+        <p>Five minutes on the overview. First-party agents have a fixed scope — knowing the edge of it
+        is what keeps you out of trouble when a customer asks "can it also…".</p></li>
+      <li><b>Turn it on.</b>
+        <p>The configure doc is the authority. This needs admin rights on the environment — if you don't
+        have them, get your admin on the call now rather than after you've promised a demo.</p></li>
+      <li><b>Connect its knowledge — if it has that step.</b>
+        <p>Some of these agents have an explicit knowledge-source or data-source step in the configure
+        doc. Do it there, and only there. Others ground themselves: the Customer Intent Agent discovers
+        intents from your historical conversations on its own, and AI-powered Data Enrichment reads each
+        seller's Outlook and Teams data only after that seller consents. <b>If the configure doc has no
+        grounding step, there isn't one</b> — don't go looking for one to click.</p></li>
+      <li><b>Exercise it the way the doc says to.</b>
+        <p>Most of these run on a schedule and write into records — there is no chat box. Several ship a
+        sanctioned test path (simulation, shadow mode, role-play). Step 4 below.</p></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>The two official docs</h3>
+    <p style="margin:0 0 14px">These are the source of truth — not this page. Microsoft updates them as
+      the agents ship, so read them fresh every time you run this.</p>
+    <div id="fpDocs" class="fpdocs"></div>
+  </div>
+
+  <div class="card">
+    <h3>Or have your AI walk them with you</h3>
+    <p style="margin:0 0 12px">If the brainstem is running with the twin loaded, you don't have to read
+      these alone. Say this:</p>
+    <div class="callout"><i id="fpSay"></i></div>
+    <p style="margin:12px 0 0">It reads both pages, tells you which parts apply to your tenant, and stops
+      at every step that needs your decision or your admin's.</p>
+  </div>
+</section>
+
 <section class="phase" id="understand">
   <div class="phead"><span class="pk">Step 3 · Know what you're getting</span><span class="time">read first</span></div>
   <h2>What you're building</h2>
-  <p class="goal-line">A dispatch agent for energy field operations: the queue, the zones, who takes
-    which job, and who responds when a SCADA alarm fires. Before touching the CLI, know where each
-    behavior lives — and what this prototype deliberately leaves out.</p>
+  <p class="goal-line"><b><span data-dyn="name">Your agent</span></b> — <span id="wallWhat"></span>
+    Before touching the CLI, know where each behavior lives, and what this prototype deliberately
+    leaves out. Every stack in this library draws the same three lines.</p>
 
   <div class="card">
     <h3>Scope — decided up front, not discovered later</h3>
     <div class="wall">
       <div class="col in"><h4>In — this build</h4><ul id="wallIn">
-        <li>Dispatch dashboard, priority-ranked</li>
-        <li>Zone capacity &amp; utilization analysis</li>
-        <li>Technician recommendations via a deterministic scoring rule</li>
-        <li>Emergency responder identification</li>
-        <li>Certification gating that cannot be talked out of</li>
+        <li>Loading this agent's declared behaviors…</li>
         <li>Synthetic data: 5 technicians, 5 requests, 3 zones</li>
       </ul></div>
       <div class="col out"><h4>Out — deliberately</h4><ul>
-        <li>Actually assigning or dispatching anyone — the agent recommends, a person acts</li>
+        <li>Taking the action itself — the agent recommends and explains, a person decides</li>
         <li>Writing to any system of record</li>
-        <li>Real operational data of any kind</li>
-        <li>Notifications or messages to technicians</li>
+        <li>Real customer or operational data of any kind</li>
+        <li>Sending any message, email or notification to a real person</li>
       </ul></div>
       <div class="col park"><h4>Later — production</h4><ul>
-        <li>Live data via SharePoint / Dataverse / D365 Field Service tools</li>
+        <li>Live data via <span data-dyn="sorName">Dynamics 365</span>, Dataverse or SharePoint</li>
         <li>Teams channel rollout</li>
-        <li>Per-dispatcher memory</li>
+        <li>Per-user memory</li>
+        <li>The Well-Architected review in Step 6</li>
       </ul></div>
     </div>
   </div>
@@ -491,81 +572,78 @@ body{padding-top:52px!important}
     <div class="b-row5">
       <div class="bx i"><h4>Instructions <span class="status u">Used</span></h4>
         <ul>
-          <li>Everything <b>general</b>: dispatcher role, scope, operational tone</li>
-          <li>The six never-relaxed rules — cert gating, recommend-don't-dispatch, priority order, cite IDs, missing-data honesty, zone filters</li>
+          <li>Everything <b>general</b>: the agent's role, its scope, and the tone it answers in</li>
+          <li>Its never-relaxed rules — the eligibility gates, the recommend-don't-act boundary, cite-your-IDs, and honesty about missing data. These are the lines it may not be talked out of.</li>
         </ul>
         <div class="jewels"><span class="jw"><img src="../assets/products/copilot-studio.svg" alt="">Copilot Studio</span></div></div>
 
       <div class="bx k"><h4>Knowledge <span class="status u">Used</span></h4>
         <ul>
           <li><b>Searchable facts</b> the agent grounds and cites</li>
-          <li>Operations data — synthetic, prototype tier</li>
-          <li>Certification &amp; dispatch policy — the citable authority behind every refusal</li>
+          <li>Its domain data — synthetic at prototype tier, stamped as such</li>
+          <li>Its policy file — the citable authority behind every refusal it makes</li>
         </ul>
         <div class="jewels"><span class="jw"><img src="../assets/products/copilot-studio.svg" alt="">File knowledge</span><span class="jw"><img src="../assets/products/sharepoint.svg" alt="">SharePoint <small>later</small></span></div></div>
 
       <div class="bx t"><h4>Tools <span class="status d">the production step</span></h4>
         <ul>
-          <li><b>Live lookups</b> — roster and work orders queried, never RAG-searched</li>
+          <li><b>Live lookups</b> — records queried directly, never RAG-searched</li>
           <li>Acts as the <b>signed-in user</b>; a service principal reads the whole tenant</li>
         </ul>
-        <div class="jewels"><span class="jw"><img src="../assets/products/sharepoint.svg" alt="">SharePoint</span><span class="jw"><img src="../assets/products/dataverse.svg" alt="">Dataverse</span><span class="jw"><img src="../assets/products/d365-field-service.svg" alt="">D365 Field Service</span><span class="jw"><img src="../assets/products/entra-id.svg" alt="">Entra ID</span></div></div>
+        <div class="jewels"><span class="jw"><img src="../assets/products/sharepoint.svg" alt="">SharePoint</span><span class="jw"><img src="../assets/products/dataverse.svg" alt="">Dataverse</span><span class="jw"><img src="../assets/products/dataverse.svg" alt=""><span data-dyn="sorName">Dynamics 365</span></span><span class="jw"><img src="../assets/products/entra-id.svg" alt="">Entra ID</span></div></div>
 
       <div class="bx m"><h4>Memory <span class="status n">Not used</span></h4>
         <ul>
-          <li>No per-dispatcher history is needed to prove dispatch behavior</li>
+          <li>No per-user history is needed to prove this agent's behavior</li>
           <li>Every component you add is a surface you must inspect and secure</li>
         </ul></div>
 
       <div class="bx s"><h4>Sandboxed Code Interpreter <span class="status n">Not yet</span></h4>
         <ul>
-          <li>Scoring arithmetic is simple enough for skill-directed computation</li>
-          <li>The named upgrade if verification shows score drift — <b>data manipulation</b> in a sandbox</li>
+          <li>Its arithmetic is simple enough for skill-directed computation</li>
+          <li>The named upgrade if verification shows numeric drift — <b>data manipulation</b> in a sandbox</li>
         </ul></div>
     </div>
 
     <div class="b-mid">
       <div class="b-skills">
         <div class="head"><span class="pill">Skills</span>
-          <span class="cap">Reusable procedures the loop invokes when dispatch needs a specific workflow — one per declared operation.</span></div>
+          <span class="cap">Reusable procedures the loop invokes when the agent needs a specific workflow — one per declared operation.</span></div>
         <div class="duo">
           <div class="sbox l"><h5>SKILL.md × <span data-dyn="skillCount">4</span></h5>
             <ul id="skillList">
-              <li><b>dispatch-dashboard</b> — priority-ranked queue, filter-aware counts</li>
-              <li><b>route-optimization</b> — capacity &amp; the exact utilization formula</li>
-              <li><b>technician-assignment</b> — hard gates + <b>score = efficiency + 10 in-zone + 5 not-on-a-job</b></li>
-              <li><b>emergency-response</b> — every certified responder, regardless of status</li>
+              <li>Loading this agent's skills…</li>
             </ul></div>
           <div class="arrow">⟶</div>
           <div class="sbox r"><h5>Skill supporting files</h5>
             <ul>
               <li>None ship today — the procedures are declarative and auditable as text</li>
-              <li>First candidate: a sandboxed Python helper that computes assignment scores, if the model ever drifts on arithmetic</li>
+              <li>First candidate: a sandboxed Python helper for any computation the model drifts on</li>
             </ul></div>
         </div>
       </div>
       <div class="bx c"><h4>Connected agents <span class="status n">Not used</span></h4>
         <ul>
           <li>One domain, one orchestration</li>
-          <li>Delegate specialized scope <b>only if needed</b> — splitting small tasks across agents does not increase accuracy, and dispatch is exactly that case</li>
+          <li>Delegate specialized scope <b>only if needed</b> — splitting small tasks across agents does not increase accuracy, and a single-domain prototype is exactly that case</li>
         </ul></div>
     </div>
 
     <div class="b-row3">
-      <div class="bx ch"><h4>Channels <span class="status d">Step 5–7</span></h4>
+      <div class="bx ch"><h4>Channels <span class="status d">the production step</span></h4>
         <ul>
           <li>Test pane during the build</li>
           <li>Teams at pilot — sharing is a decision, not a default</li>
         </ul>
         <div class="jewels"><span class="jw"><img src="../assets/products/teams.svg" alt="">Microsoft Teams</span><span class="jw"><img src="../assets/products/m365-copilot.svg" alt="">M365 Copilot</span></div></div>
-      <div class="bx ch"><h4>Evaluations <span class="status u">Step 6</span></h4>
+      <div class="bx ch"><h4>Evaluations <span class="status u">Step 5</span></h4>
         <ul>
-          <li>Five checks with <b>computed</b> expected answers — wrong is visible, not arguable</li>
+          <li><span data-dyn="skillCount">Several</span>+ checks with <b>computed</b> expected answers — wrong is visible, not arguable</li>
           <li>Rerun on every change, forever</li>
         </ul></div>
       <div class="bx ch"><h4>Analytics <span class="status d">the production step</span></h4>
         <ul>
-          <li>Transcript spot-audits against the roster</li>
+          <li>Transcript spot-audits against the source records</li>
           <li>The failure-mode table drives continuous improvement</li>
         </ul></div>
     </div>
@@ -598,7 +676,7 @@ body{padding-top:52px!important}
         <p>Publishing makes the agent live for everyone it's shared with — so that call is always
         yours.</p></li>
       <li><b>It hands you the test script.</b>
-        <p>Five questions with computed expected answers — that's step 4, and it's yours to click
+        <p>Questions with computed expected answers — that's Step 5, and it's yours to click
         through.</p></li>
     </ol>
     <div class="callout"><b>Works for the whole library.</b> Swap the agent name and the same
@@ -610,8 +688,8 @@ body{padding-top:52px!important}
 <!-- ═══════════ 6 VERIFY ═══════════ -->
 <section class="phase" id="verify">
   <div class="phead"><span class="pk">Step 5</span><span class="time">~15 min · you, clicking</span></div>
-  <h2>Test it yourself in Copilot Studio</h2>
-  <p class="goal-line">No automation here — this part is you, in the product. Open
+  <h2 id="verifyH2">Test it yourself in Copilot Studio</h2>
+  <p class="goal-line" id="verifyLead">No automation here — this part is you, in the product. Open
     <a href="https://copilotstudio.microsoft.com">copilotstudio.microsoft.com</a> → <b>Agents</b> →
     <b><span data-dyn="name">your agent</span></b> → the <b>Test</b> button (top right). Ask these questions. Every expected answer is <b>computed from the synthetic data</b>, so a wrong answer
     is visible, not arguable. Record each verdict — the page remembers.</p>
@@ -627,8 +705,8 @@ body{padding-top:52px!important}
       <span id="sumStatus" style="font-size:13px;color:var(--faint)"></span>
     </div>
     <p style="margin-top:14px">The refusal and computed-ranking checks are the gate. If any of them fail, the build is
-      not done: re-read the skill file for that behavior, confirm it pushed (a no-op push in step 5
-      is the usual culprit), fix, push, publish, and re-run all five. These five prompts are also
+      not done: re-read the skill file for that behavior, confirm it pushed (a no-op push in Step 6
+      is the usual culprit), fix, push, publish, and re-run them all. These prompts are also
       your starting <b>evaluation set</b> — rerun them after every change you ever make to this
       agent.</p>
   </div>
@@ -691,14 +769,14 @@ body{padding-top:52px!important}
 
       <li><b>Initialize the agent project</b>
         <p>Replace the environment ID with yours. This creates the
-        <code>field-service-dispatch/</code> project: <code>settings.mcs.yml</code> plus the
+        <code data-dyn="dir">field-service-dispatch</code>/ project: <code>settings.mcs.yml</code> plus the
         <code>behaviors/</code> and <code>capabilities/</code> folders you'll fill next.</p>
         <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
 <pre>pac copilot init \
-  --name "Field Service Dispatch Agent" \
+  --name "<span data-dyn="name">Field Service Dispatch Agent</span>" \
   --publisher-prefix aibast \
   --authoring-mode cli-copilot \
-  --project-dir field-service-dispatch \
+  --project-dir <span data-dyn="dir">field-service-dispatch</span> \
   --environment "&lt;your-environment-id&gt;"</pre></div></li>
 
       <li><b>Confirm the scaffold</b>
@@ -708,7 +786,7 @@ body{padding-top:52px!important}
     <div class="callout"><b>Never hand-edit <code>.mcs/</code>.</b> It is CLI-managed sync state.
       Everything you author lives in <code>settings.mcs.yml</code>, <code>behaviors/</code>, and
       <code>capabilities/</code>.</div>
-    <div class="done-line"><b>Done when</b> <code>field-service-dispatch/settings.mcs.yml</code>
+    <div class="done-line"><b>Done when</b> <code><span data-dyn="dir">field-service-dispatch</span>/settings.mcs.yml</code>
       exists and carries your environment binding and a generated <code>schemaName</code> — note
       that schemaName, you need it to publish.</div>
   </div>
@@ -730,24 +808,13 @@ body{padding-top:52px!important}
         <p>Run from the stack folder (where <code>copilot_studio/</code> lives), with your project
         as the destination:</p>
         <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
-<pre>cp copilot_studio/behaviors/*.mcs.yml            field-service-dispatch/behaviors/
-cp copilot_studio/capabilities/knowledge/files/*  field-service-dispatch/capabilities/knowledge/files/</pre></div>
+<pre>cp copilot_studio/behaviors/*.mcs.yml            <span data-dyn="dir">field-service-dispatch</span>/behaviors/
+cp copilot_studio/capabilities/knowledge/files/*  <span data-dyn="dir">field-service-dispatch</span>/capabilities/knowledge/files/</pre></div>
         <p>What just landed:</p>
-        <ul class="tight">
-          <li><code>dispatch-dashboard_fsd101.mcs.yml</code> — priority-ranked queue with
-            filter-aware counts</li>
-          <li><code>route-optimization_fsd102.mcs.yml</code> — per-zone capacity and the exact
-            utilization formula</li>
-          <li><code>technician-assignment_fsd103.mcs.yml</code> — the eligibility gates and the
-            scoring rule: <code>score&nbsp;=&nbsp;efficiency&nbsp;+&nbsp;10&nbsp;in-zone&nbsp;+&nbsp;5&nbsp;not-on-a-job</code></li>
-          <li><code>emergency-response_fsd104.mcs.yml</code> — every certified responder listed
-            regardless of status</li>
-          <li>Two knowledge files + sidecars: the synthetic operations data and the certification
-            policy</li>
-        </ul></li>
+        <ul class="tight" id="landedList"></ul></li>
 
       <li><b>Set the instructions</b>
-        <p>Open <code>field-service-dispatch/settings.mcs.yml</code>. <b>Keep every generated field
+        <p>Open <code><span data-dyn="dir">field-service-dispatch</span>/settings.mcs.yml</code>. <b>Keep every generated field
         exactly as pac wrote it</b> — you are only filling the instructions segment with the full
         contents of the stack's <code>instructions.md</code>:</p>
         <div class="code"><div class="bar">settings.mcs.yml — the segment shape<button data-copy>Copy</button></div>
@@ -758,22 +825,17 @@ cp copilot_studio/capabilities/knowledge/files/*  field-service-dispatch/capabil
         - kind: StaticSegment
           value: |
             &lt;paste the full contents of instructions.md, indented to match&gt;</pre></div>
-        <details class="filebox"><summary>The six never-relaxed rules you are pasting — know them
+        <details class="filebox"><summary>The never-relaxed rules you are pasting — read them
           before you paste them</summary>
-        <ul class="tight">
-          <li><b>Certification gating is absolute.</b> Never recommend a technician for work
-            requiring a certification they don't hold — not for emergencies, not when nobody else
-            is available, not when asked directly.</li>
-          <li><b>The agent recommends; a person dispatches.</b> It never states or implies an
-            assignment or notification happened.</li>
-          <li><b>Critical and emergency work always ranks first.</b></li>
-          <li><b>Every claim cites record IDs</b> (TECH-, SR-); the agent never invents records.</li>
-          <li><b>Missing data is a finding</b> — said plainly, never guessed around.</li>
-          <li><b>Zone filters apply to everything</b> — tables, counts, and recommendations.</li>
-        </ul></details></li>
+        <ul class="tight" id="ruleList"><li>Loading this agent's rules…</li></ul>
+        <p style="font-size:13px;color:var(--faint);margin:10px 0 0">These come from this stack's
+          own <code>instructions.md</code>. They are the lines the agent may not be talked out of —
+          if one of them is wrong for your customer, change it here, not in the demo.</p>
+        </details></li>
     </ol>
-    <div class="done-line"><b>Done when</b> the project holds 4 skill files, 2 knowledge files with
-      their <code>.mcs.yml</code> sidecars, and instructions in the StaticSegment.</div>
+    <div class="done-line"><b>Done when</b> the project holds its
+      <span data-dyn="skillCount">…</span> skill files, its knowledge files with their
+      <code>.mcs.yml</code> sidecars, and instructions in the StaticSegment.</div>
   </div>
 </div>
 </details>
@@ -790,10 +852,10 @@ cp copilot_studio/capabilities/knowledge/files/*  field-service-dispatch/capabil
     <ol class="steps">
       <li><b>Pull, then push</b>
         <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
-<pre>pac copilot pull --project-dir field-service-dispatch
-pac copilot push --project-dir field-service-dispatch</pre></div>
+<pre>pac copilot pull --project-dir <span data-dyn="dir">field-service-dispatch</span>
+pac copilot push --project-dir <span data-dyn="dir">field-service-dispatch</span></pre></div>
         <p>If push reports a conflict, pull again, resolve, and retry. If it reports nothing to
-        send, your components didn't land — go back to step 4.</p></li>
+        send, your components didn't land — go back to the copy step above.</p></li>
       <li><b>Publish</b>
         <p>Use the <code>schemaName</code> from <code>settings.mcs.yml</code>:</p>
         <div class="code"><div class="bar">terminal<button data-copy>Copy</button></div>
@@ -948,7 +1010,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
         and you want to know that with a day in hand, not live.</p></li>
       <li><b>Shared training environment = name collisions</b>
         <p>If attendees deploy into one shared environment, tell them to give their AI their
-        initials ("call it Field Service Dispatch — KW"). The playbook handles it; the room just
+        initials ("call it <span data-dyn="name">Field Service Dispatch</span> — KW"). The playbook handles it; the room just
         needs the one sentence. And confirm every attendee has a security role in that environment
         beforehand — the missing-role 403 is the most common first-step failure.</p></li>
       <li><b>Know the outage signature</b>
@@ -978,10 +1040,11 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
     <h3>Swap file knowledge for live tools</h3>
     <ol class="steps">
       <li><b>Put the data where it lives</b>
-        <p>The stack ships <code>data/technicians.csv</code> and
-        <code>data/service_requests.csv</code> — import them as SharePoint lists to start, or map
-        to where this data already exists: Dynamics 365 Field Service tenants have the roster and
-        work orders in Dataverse (<code>bookableresource</code>, <code>msdyn_workorder</code>).</p></li>
+        <p>Every stack ships its synthetic data as CSVs under <code>data/</code>. Import them as
+        SharePoint lists to start, or map each one to where that data already lives in your
+        tenant — for most of this library that is a Dataverse table in
+        <span data-dyn="sorName">Dynamics 365</span>. Keep the column names; the skills reference
+        them by name.</p></li>
       <li><b>Add connector tools in the portal</b>
         <p>Copilot Studio → your agent → Tools → Add → Connector (SharePoint <i>Get items</i>, or
         Dataverse). The portal binds the connection and generates the
@@ -992,12 +1055,12 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
         A service-principal connection reads everything in the tenant — the most common and most
         expensive mistake in this pattern.</div></li>
       <li><b>Retire the demo file</b>
-        <p>Remove <code>field-service-operations-data.md</code> and its sidecar from
+        <p>Remove this stack's synthetic knowledge file and its sidecar from
         <code>capabilities/knowledge/files/</code>, push, publish — the skills don't change; they
         define the procedure regardless of where the rows come from.</p></li>
       <li><b>Re-verify</b>
-        <p>Run all five checks again against live data — recompute the expected answers from the
-        real roster first. Then share to the Teams channel, deliberately.</p></li>
+        <p>Run every check again against live data — recompute the expected answers from the
+        real records first. Then share to the Teams channel, deliberately.</p></li>
     </ol>
   </div>
 
@@ -1006,23 +1069,23 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="ladder">
       <thead><tr><th>Risk</th><th>Prevent</th><th>Detect</th><th>Respond</th></tr></thead>
       <tbody>
-        <tr><td>Uncertified technician recommended</td>
-          <td>The gate lives in instructions <i>and</i> the assignment skill; check 4 in every run</td>
-          <td>Spot-audit transcripts against the roster</td>
+        <tr><td>The agent recommends something its rules forbid</td>
+          <td>The gate lives in the instructions <i>and</i> in the skill that applies it — and a verification check exercises it every run</td>
+          <td>Spot-audit transcripts against the source records</td>
           <td>Treat as a sev-1 defect; fix and re-verify before any demo</td></tr>
         <tr><td>Agent reads data the caller shouldn't see</td>
           <td>Tools authenticate as the signed-in user — never a service principal</td>
           <td>Test with an ordinary account, not your admin account</td>
           <td>Revoke the connection, re-scope the source, re-run verification</td></tr>
-        <tr><td>Stale roster → wrong availability</td>
+        <tr><td>Stale data → confidently wrong answers</td>
           <td>Live tools before rollout (that's this step)</td>
           <td>Answers cite their data source; cross-check during the pilot</td>
           <td>Until swapped: the agent states it is answering from a static file</td></tr>
-        <tr><td>Hallucinated technicians or requests</td>
-          <td>Instructions require TECH-/SR- IDs on every claim</td>
+        <tr><td>Invented records</td>
+          <td>Instructions require a record ID on every claim</td>
           <td>Keep asking questions with exactly one computable answer (check 3 pattern)</td>
           <td>Tighten skill output formats; consider a code-interpreter scoring helper</td></tr>
-        <tr><td>Scope creep into real dispatch actions</td>
+        <tr><td>Scope creep into real write actions</td>
           <td>No write tools exist; the Out list in the scope wall is the contract</td>
           <td>Any added tool shows up in the YAML diff at pull/push</td>
           <td>A new write action goes back through this table before it ships</td></tr>
@@ -1038,11 +1101,15 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
 
 <footer><div class="wrap">
   Microsoft AI Business Applications Specialist Team (AIBAST) · End-to-end configuration guide for
-  the Field Service Dispatch stack. All data in this guide is synthetic. Agent templates are
+  every stack in the AIBAST Agents Library. All data in this guide is synthetic. Agent templates are
   starting points that must be customized and reviewed before production use. Component layout
   follows the Copilot Studio CLI authoring format
   (microsoft/copilot-studio-plugin).
-</div></footer>
+</div>
+<div class="aibast-disclaimer" style="max-width:900px;margin:32px auto 0;padding:12px 16px;border:1px solid #d29922;border-radius:8px;background:rgba(210,153,34,.08);color:#8a6d1f;font-size:12.5px;line-height:1.6">
+  <strong>Note:</strong> an experimental project from a v-team in the Microsoft AI Business Applications Specialist Team (AIBAST) — not an officially supported Microsoft product.
+</div>
+</footer>
 
 <script>
 /* copy buttons */
@@ -1084,7 +1151,7 @@ function tally(){
   el.textContent=p+" pass · "+f+" fail · "+(cards.length-p-f)+" not yet run";
   el.className = f>0 ? "bad" : (p===cards.length ? "good" : "");
   if(f>0) el.textContent+=" — a failing gate check means the build is not done.";
-  if(p===cards.length) el.textContent+=" — all five green. This is a working prototype.";
+  if(p===cards.length) el.textContent+=" — all "+cards.length+" green. This is a working prototype.";
 }
 function wireVerdicts(){
 document.querySelectorAll(".rc").forEach(function(c){
@@ -1133,8 +1200,15 @@ function fetchLib(path,asJson){
 }
 function slugOf(a){return a._slug||a.name.split("/")[1];}
 function advOf(a){return ADV[slugOf(a)];}
-function agentName(a){var v=advOf(a);return (v&&v.sharepoint_name)||a.display_name||a.name;}
-function agentDesc(a){var v=advOf(a);return (v&&v.exec_summary)||a.description||"";}
+// An "unmapped — decision pending" crosswalk row records a SharePoint entry we
+// have NOT confirmed belongs to this stack. Its name and summary are provenance,
+// not advertising: four Energy rows share one placeholder name and one summary,
+// and letting them win rendered the picker as "Energy Operations Agent (a)-(d)"
+// with identical descriptions. Only a mapped row may rename a card.
+function advNamed(a){var v=advOf(a);
+  return (v && String(v.status||"").indexOf("unmapped")!==0) ? v : null;}
+function agentName(a){var v=advNamed(a);return (v&&v.sharepoint_name)||a.display_name||a.name;}
+function agentDesc(a){var v=advNamed(a);return (v&&v.exec_summary)||a.description||"";}
 function agentTitle(a){return agentName(a).replace(/ Agent$/,"");}
 function esc2(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -1155,10 +1229,11 @@ document.getElementById("modeTabs").onclick=function(e){
   document.getElementById("missionSay").textContent="\u201cDeploy the \u2026 agent to Copilot Studio.\u201d";
   document.getElementById("sorRow").style.display="none";
   var rc=document.getElementById("rateCard"); if(rc) rc.style.display="none";
+  AUTOPICK=true;
   try{history.replaceState(null,"",location.pathname);}catch(e){}
   renderPills();
 };
-var FP={groups:[]};
+var FP={groups:[]}, AUTOPICK=false, BADFP=false;
 function groupsForMode(){
   if(MODE==="industry") return Object.keys(CATS).sort().map(function(c){
     return {key:c, label:CATNAMES[c]||c};});
@@ -1185,8 +1260,13 @@ function renderPills(){
   host.onclick=function(e){var b=e.target.closest("button"); if(!b)return;
     host.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
     renderAgents(b.dataset.cat);};
+  // never leave the room empty: a mode switch opens the first group and picks
+  // its first agent, so Steps 3-7 always describe something real
+  if(AUTOPICK){ AUTOPICK=false;
+    var f=host.querySelector("button");
+    if(f){ f.classList.add("on"); renderAgents(f.dataset.cat,true); } }
 }
-function renderAgents(cat){
+function renderAgents(cat,auto){
   var host=document.getElementById("agentCards");
   host.innerHTML=agentsForGroup(cat).map(function(a){
     var s=slugOf(a), r=RATINGS[s]||0, d=DOWNLOADS[s]||0;
@@ -1198,6 +1278,9 @@ function renderAgents(cat){
     host.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
     var a=agentsForGroup(cat).filter(function(x){return slugOf(x)===b.dataset.slug;})[0];
     select(a);};
+  if(auto){ var fc=host.querySelector("button");
+    if(fc){ fc.classList.add("on");
+      var first=agentsForGroup(cat)[0]; if(first) select(first); } }
 }
 var SORS=[{id:"d365",name:"Dynamics 365 (default)"},{id:"salesforce",name:"Salesforce"},
   {id:"servicenow",name:"ServiceNow"},{id:"sap",name:"SAP"},{id:"workday",name:"Workday"},
@@ -1225,13 +1308,23 @@ function updateMission(){
   if(sb&&SORMAP[SOR]){sb.textContent=SORMAP[SOR][0];sc.textContent=SORMAP[SOR][1];}
   var ns=document.querySelectorAll("[data-dyn=nameShort]");
   ns.forEach(function(el){el.textContent=agentTitle(SELECTED);});
-  var base="\u201cDeploy the "+agentTitle(SELECTED).toLowerCase()+" agent to Copilot Studio";
+  // this is the line people say out loud: blanket-lowercasing turned "IT Helpdesk"
+  // into "it helpdesk" and "FOIA" into "foia". Keep the authored casing.
+  var base="\u201cDeploy the "+agentTitle(SELECTED)+" agent to Copilot Studio";
   var s=SORS.filter(function(x){return x.id===SOR;})[0];
+  document.querySelectorAll("[data-dyn=sorName]").forEach(function(el){
+    el.textContent=s.name.replace(" (default)","").replace(" (REST)","");});
   document.getElementById("missionSay").textContent=
     base+(SOR==="d365"?".":" \u2014 adapted for "+s.name.replace(" (REST)","")+".")+"\u201d";
 }
+// captured before any pick rewrites it, so switching 1P -> custom restores exactly
+var VERIFY_LEAD=(document.getElementById("verifyLead")||{}).innerHTML||"";
 function select(a){
   if(a._fp){ selectFP(a); return; }
+  setTrack(false);
+  // switching back from a 1P pick must undo everything selectFP rewrote
+  document.getElementById("verifyH2").textContent="Test it yourself in Copilot Studio";
+  document.getElementById("verifyLead").innerHTML=VERIFY_LEAD;
   SELECTED=a; STACK=slugOf(a);
   localStorage.setItem(LS+"pick",STACK);
   try{history.replaceState(null,"","?agent="+encodeURIComponent(STACK));}catch(e){}
@@ -1245,19 +1338,51 @@ function select(a){
   renderSor(); updateMission(); mountGiscus(slugOf(a));
   var ss=document.getElementById("shareStatus"); if(ss) ss.textContent="";
   var sm=document.getElementById("sumStatus"); if(sm) sm.textContent="";
+  document.querySelectorAll("[data-dyn=dir]").forEach(function(el){el.textContent=STACK;});
+  var ww=document.getElementById("wallWhat");
+  if(ww){var dsc=(agentDesc(a)||"").trim();
+    ww.textContent=dsc?(dsc.charAt(0).toLowerCase()+dsc.slice(1)).replace(/\.?$/,"."):
+      "what this stack builds is described in its scaffold.";}
   var dir=a._file.substring(0,a._file.lastIndexOf("/"));
   fetchLib(dir+"/copilot_studio/manifest.json",true).then(function(man){
     var names=(man.behaviors||[]).map(function(b){
       return b.split("/").pop().replace(/_[a-z0-9]+\.mcs\.yml$/,"");});
-    var sc=document.querySelector("[data-dyn=skillCount]");
-    if(sc) sc.textContent=names.length;
+    // querySelector (singular) updated only the first of four labels, so the
+    // architecture diagram said "4 skills" for every agent in the library
+    document.querySelectorAll("[data-dyn=skillCount]").forEach(function(el){
+      el.textContent=names.length;});
     var sl=document.getElementById("skillList");
     if(sl) sl.innerHTML=names.map(function(n){return "<li><b>"+esc2(n)+"</b></li>";}).join("");
+    // the hard-way panels used to name Field Service Dispatch's four files for
+    // every agent in the library — bind them to what this stack actually ships
+    var ll=document.getElementById("landedList");
+    if(ll) ll.innerHTML=(man.behaviors||[]).map(function(bf){
+      return "<li><code>"+esc2(bf.split("/").pop())+"</code></li>";}).join("")+
+      "<li>Its knowledge files and sidecars</li>";
+
     var wi=document.getElementById("wallIn");
     if(wi) wi.innerHTML=names.map(function(n){
-      return "<li>"+esc2(n.replace(/-/g," "))+"</li>";}).join("")+
+      var t=n.replace(/-/g," ");
+      return "<li>"+esc2(t.charAt(0).toUpperCase()+t.slice(1))+"</li>";}).join("")+
       "<li>Synthetic data only — nothing real, stamped as such</li>";
     renderChecks(man.verification||[]);
+  }).then(function(){
+    return fetchLib(dir+"/copilot_studio/instructions.md",false).then(function(md){
+      var rl=document.getElementById("ruleList"); if(!rl) return;
+      // the authored rules are the bold/bulleted lines under the constraints
+      // heading; fall back to every bullet if the file isn't sectioned
+      var lines=md.split("\n").filter(function(x){return /^\s*[-*]\s+/.test(x);})
+        .map(function(x){return x.replace(/^\s*[-*]\s+/,"").trim();})
+        .filter(function(x){return x.length>25;});
+      if(!lines.length){rl.parentNode.style.display="none";return;}
+      rl.innerHTML=lines.slice(0,8).map(function(x){
+        var m=/^\*\*(.+?)\*\*[.:]?\s*(.*)$/.exec(x);
+        return "<li>"+(m?"<b>"+esc2(m[1])+"</b> "+esc2(m[2]):esc2(x))+"</li>";}).join("");
+    }).catch(function(){
+      var rl=document.getElementById("ruleList");
+      if(rl) rl.innerHTML="<li>Open this stack's <code>instructions.md</code> and read its "+
+        "constraints before you paste them — they are the lines the agent may not cross.</li>";
+    });
   }).catch(function(){
     renderChecks(null);
   });
@@ -1267,20 +1392,92 @@ function selectFP(a){
   // guard on SELECTED, and a first-party pick IS a selection.
   SELECTED={name:"@1p/"+a._fp.id, display_name:a._fp.name, _fp:a._fp,
             _file:"", description:a._fp.summary};
-  STACK="fp-"+a._fp.id;
-  try{history.replaceState(null,"","?fp="+encodeURIComponent(a._fp.id));}catch(e){}
-  document.getElementById("pickName").textContent=" "+a._fp.name+
-    " — a Microsoft first-party agent: configured in-product from the official docs, nothing to deploy.";
-  document.querySelectorAll("[data-dyn=name]").forEach(function(el){el.textContent=a._fp.name;});
+  var f=a._fp, g=fpGroupOf(f.id), prev=(f.status||"").toLowerCase().indexOf("preview")>=0;
+  STACK="fp-"+f.id;
+  localStorage.setItem(LS+"pick",STACK);
+  try{history.replaceState(null,"","?fp="+encodeURIComponent(f.id));}catch(e){}
+  document.getElementById("pickName").textContent=" "+f.name+
+    " — a Microsoft first-party agent. Nothing to build: you turn it on, ground it, and prove "+
+    "it works. Step 3 below is that track, with the official docs.";
+  document.querySelectorAll("[data-dyn=name]").forEach(function(el){el.textContent=f.name;});
+  document.querySelectorAll("[data-fp=name]").forEach(function(el){el.textContent=f.name;});
   document.getElementById("sorRow").style.display="none";
+  setTrack(true);
+
+  document.getElementById("fpSummary").textContent=f.summary||"";
+  // three Sales agents are configured somewhere other than the Sales Hub, so a
+  // per-agent surface always wins over the group's
+  var SURF=f.surface||g.surface||"A Microsoft product surface — see the configure doc below.";
+  document.getElementById("fpSurface").textContent=SURF;
+  document.getElementById("fpPrereq").innerHTML=(g.prereq||[]).map(function(p){
+    return "<li>"+esc2(p)+"</li>";}).join("");
+  document.getElementById("fpStatusNote").innerHTML=prev
+    ? "<b>This one is in Preview.</b> Demo it, scope it, gather feedback — but don’t hang a "+
+      "customer commitment or a go-live date on it. Preview behaviour and availability can change "+
+      "before it ships."
+    : "<b>This one is GA.</b> You can put it in front of a customer and commit to it, subject to the "+
+      "regional availability the overview doc states.";
+  var wn=document.getElementById("fpWarn");
+  if(f.warn){ wn.style.display=""; wn.innerHTML="<b>Before you touch this one.</b> "+esc2(f.warn); }
+  else wn.style.display="none";
+  document.getElementById("fpDocs").innerHTML=
+    '<a class="fpdoc" href="'+esc2(f.overview)+'" target="_blank" rel="noopener">'+
+      "<b>Read this first — what it does</b><span>Its scope, its limits, and where it’s "+
+      "available. This is the doc that answers “can it also…”</span>"+
+      "<em>Microsoft Learn</em></a>"+
+    '<a class="fpdoc" href="'+esc2(f.configure)+'" target="_blank" rel="noopener">'+
+      "<b>Then this — turn it on</b><span>The admin steps to enable it and connect it to your "+
+      "data. Needs admin rights on the environment.</span><em>Microsoft Learn</em></a>";
+  document.getElementById("fpSay").textContent=
+    "“Walk me through setting up the "+f.name+" in "+
+    (g.name||"Dynamics 365").replace(/ — first-party agents$/,"")+
+    ". Read the Microsoft Learn overview and configure docs first, tell me what applies to my "+
+    "tenant, and stop whenever you need a decision from me.”";
   document.getElementById("missionSay").textContent=
-    "\u201cSet up the "+a._fp.name+" first-party agent \u2014 drive it from the official docs.\u201d";
+    "“Walk me through setting up the "+f.name+" — drive it from the official docs.”";
+
+  document.getElementById("verifyH2").textContent="Exercise it once, in the product";
+  document.getElementById("verifyLead").innerHTML=
+    "Most of these agents run on a <b>schedule</b> and write into records — there is no chat box, "+
+    "so “ask it a question” is the wrong test for eight of the twelve. Use the path Microsoft "+
+    "sanctions for this agent, then check its output against what you know to be true.";
   document.getElementById("rcHost").innerHTML=
-    '<p style="color:var(--dim)">First-party agents validate per their own documentation \u2014 '+
-    'your AI walks you through it and has you exercise the agent once:</p>'+
-    '<ul class="tight"><li><a href="'+esc2(a._fp.overview)+'">Overview (Microsoft Learn)</a></li>'+
-    '<li><a href="'+esc2(a._fp.configure)+'">Configure (Microsoft Learn)</a></li></ul>';
+    '<ol class="steps">'+
+    "<li><b>Open it where it lives.</b><p>"+esc2(SURF)+"</p></li>"+
+    "<li><b>Use the sanctioned test path if this agent has one.</b><p>Microsoft ships them for "+
+    "several of these — Run simulation for the Sales Qualification Agent’s outreach, "+
+    "simulation on historical records plus shadow mode for Case Management, test-in-chat and "+
+    "role-play for the Sales Development agent. Use those rather than improvising.</p></li>"+
+    "<li><b>Open one record that meets its selection criteria.</b><p>Check the agent’s output "+
+    "against what you know to be true. If nothing has appeared yet, check the refresh frequency "+
+    "before concluding it’s broken — the docs warn that initial results can take time.</p></li>"+
+    "<li><b>If it’s one you can actually talk to, push past the edge of the data.</b><p>Only "+
+    "four are conversational. See whether it says it doesn’t know, or invents. Microsoft does "+
+    "not promise these agents decline out-of-scope questions — so don’t promise a customer "+
+    "that they do.</p></li></ol>"+
+    '<p style="margin-top:14px">Full validation steps live in the official docs: '+
+    '<a href="'+esc2(f.overview)+'" target="_blank" rel="noopener">Overview</a> · '+
+    '<a href="'+esc2(f.configure)+'" target="_blank" rel="noopener">Configure</a>.</p>';
   document.getElementById("rc-tally").textContent="";
+  mountGiscus(STACK);
+  var ss=document.getElementById("shareStatus"); if(ss) ss.textContent="";
+  var sm=document.getElementById("sumStatus"); if(sm) sm.textContent="";
+}
+function fpGroupOf(id){
+  var g={}; (FP.groups||[]).forEach(function(x){
+    (x.agents||[]).forEach(function(y){ if(y.id===id) g=x; });});
+  return g;
+}
+// The custom-build steps (scope wall, component board, CLI mission, the hard way)
+// are meaningless for an agent Microsoft already shipped. Swap the track, and
+// renumber the test step so it doesn't read "Step 5" as the third thing you do.
+function setTrack(isFP){
+  var t=document.getElementById("fpTrack");
+  if(t) t.style.display=isFP?"block":"none";
+  ["understand","mission","underhood"].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.style.display=isFP?"none":"";});
+  var pk=document.querySelector("#verify .pk");
+  if(pk) pk.textContent=isFP?"Step 4":"Step 5";
 }
 function mountGiscus(slug){
   var card=document.getElementById("rateCard"), link=document.getElementById("rateLink");
@@ -1345,6 +1542,7 @@ Promise.all([fetchLib("registry.json",true),
       selectFP({_fp:hit});
       return;
     }
+    BADFP=true;
   }
   var want=(/[?&]agent=([^&]+)/.exec(location.search)||[])[1];
   var isDefault=false;
@@ -1363,9 +1561,24 @@ Promise.all([fetchLib("registry.json",true),
       if(isDefault){
         try{history.replaceState(null,"",location.pathname);}catch(e){}
         var pn=document.getElementById("pickName");
-        pn.innerHTML='<b style="color:var(--accent)">Example shown</b> — '+pn.innerHTML+
+        pn.innerHTML=(BADFP?'<b style="color:#b3261e">That first-party link didn\u2019t match an '+
+          'agent</b> \u2014 showing an example instead. ':
+          '<b style="color:var(--accent)">Example shown</b> — ')+pn.innerHTML+
           ' <span style="color:var(--faint)">Pick yours above and everything re-personalizes.</span>';
       }
+    } else if(BYSLUG[decodeURIComponent(want)]){
+      // a real agent that no industry group lists (suite members reachable only
+      // by link, and every product-tab-only slug) — honour the link anyway
+      select(BYSLUG[decodeURIComponent(want)]);
+    } else {
+      // an unreadable share link used to produce a dead page. Say so, then fall
+      // back to the example rather than leaving the room empty.
+      select(BYSLUG["field-service-dispatch"]||CATS[Object.keys(CATS)[0]][0]);
+      try{history.replaceState(null,"",location.pathname);}catch(e){}
+      var pn2=document.getElementById("pickName");
+      pn2.innerHTML='<b style="color:#b3261e">That link didn\u2019t match an agent</b> \u2014 '+
+        'showing an example instead. '+pn2.innerHTML+
+        ' <span style="color:var(--faint)">Pick yours above.</span>';
     }
   }
 }).catch(function(){
