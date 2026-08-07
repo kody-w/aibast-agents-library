@@ -286,7 +286,28 @@ class SalesSpecialistTwinAgent(BasicAgent):
         arepo, aref = _active[0]
         araw = f"https://raw.githubusercontent.com/{arepo}/{aref}"
         playbook = playbook.replace("{{REPO}}", arepo).replace("{{REF}}", aref).replace("{{RAW}}", araw)
+
+        # Choose-your-own-adventure: if the request names a system of record
+        # (Salesforce, ServiceNow, SAP, Workday, a custom API), append the
+        # authored mutation directive — same generic use case, Dynamics 365
+        # default swapped for the system the customer actually runs.
+        mutation = self._mutation_for(request)
+        if mutation is not None:
+            playbook += (f"\n\n---\n\n# MUTATION — adapt for {mutation['name']}\n\n"
+                         f"{mutation['directive']}\n")
         return HARNESS_HEADER + "\n---\n\n" + playbook
+
+    # ------------------------------------------------------------------
+    def _mutation_for(self, request):
+        words = set(re.sub(r"[^a-z0-9 ]", " ", (request or "").lower()).split())
+        try:
+            muts = json.loads(_fetch("twin/mutations.json")).get("mutations", [])
+        except Exception:  # noqa: BLE001 — mutations are optional sugar
+            return None
+        for m in muts:
+            if words & set(m.get("triggers", "").split()):
+                return m
+        return None
 
 
 # ---------------------------------------------------------------------------

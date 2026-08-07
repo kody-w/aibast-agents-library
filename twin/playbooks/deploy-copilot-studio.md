@@ -68,6 +68,16 @@ project at its listed path (create directories as needed). These are public
 raw URLs — no auth. Remember to encode `@` as `%40` in the URL path or the
 fetch 404s.
 
+## Step 5b — Apply the mutation, if the briefing carries one
+
+If this briefing ends with a **MUTATION** section, apply it now, before the
+push: edit the downloaded instructions and skill files per the directive —
+terminology and the production/tools guidance change; the rules, formulas,
+and verification stay exactly as authored. The default hookup is Dynamics
+365; a mutation retargets the same generic use case at the system the
+customer actually runs. Never mix: after mutation, no Dataverse-default
+language should remain in the files you push.
+
 ## Step 6 — Set the instructions
 
 Download the instructions file (context block above). Open

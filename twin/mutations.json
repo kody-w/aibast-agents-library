@@ -1,0 +1,41 @@
+{
+  "schema": "aibast-twin-mutations/1.0",
+  "note": "System-of-record mutations. Every library use case is generic business logic with Dynamics 365 as the default hookup. A mutation adapts terminology and the production tool path to the system the customer actually runs — the agent still deploys into Copilot Studio, the synthetic demo data and verification stay identical.",
+  "mutations": [
+    {
+      "id": "salesforce",
+      "name": "Salesforce",
+      "triggers": "salesforce sfdc",
+      "domains": "sales service crm accounts opportunities pipeline customer",
+      "directive": "Adapt the agent for a Salesforce shop. In the instructions and every skill: keep the business logic and all rules IDENTICAL, but use Salesforce terms where the text names CRM concepts (records live in Salesforce; Opportunities, Accounts, Contacts, Cases; owners not sellers' 'assigned to'; no Dataverse mentions). In the production section: the live-data tools are the Power Platform **Salesforce connector** (standard objects: Account, Opportunity, Contact, Case) added in Copilot Studio → Tools → Connector, authenticating as the signed-in user via the customer's Salesforce OAuth. Do not claim native Dataverse tables exist for this data."
+    },
+    {
+      "id": "servicenow",
+      "name": "ServiceNow",
+      "triggers": "servicenow snow itsm",
+      "domains": "ticket helpdesk incident it service request support case",
+      "directive": "Adapt the agent for a ServiceNow shop. Keep every rule and computation identical; use ServiceNow terms (incidents, requests, CMDB, assignment groups, sys_id as the record id convention). Production tools: the Power Platform **ServiceNow connector** (Incident, Request tables) added in Copilot Studio → Tools → Connector, acting as the signed-in user. Escalation language should reference assignment groups rather than named queues."
+    },
+    {
+      "id": "sap",
+      "name": "SAP",
+      "triggers": "sap s4 s4hana erp",
+      "domains": "supply chain procurement inventory orders manufacturing supplier purchase",
+      "directive": "Adapt the agent for an SAP shop. Keep the logic identical; use SAP terms (purchase orders, materials, plants, vendors, MRP). Production tools: the Power Platform **SAP ERP connector** (or the customer's OData services for S/4HANA) added in Copilot Studio → Tools, with the note that SAP connections typically need an integration owner from the customer's basis team — name that dependency honestly in the go-to-production step."
+    },
+    {
+      "id": "workday",
+      "name": "Workday",
+      "triggers": "workday hcm",
+      "domains": "hr human resources employee onboarding benefits leave workforce",
+      "directive": "Adapt the agent for a Workday shop. Keep the logic identical; use Workday terms (workers, business processes, positions). Production tools: the Power Platform **Workday HCM connector** added in Copilot Studio → Tools, acting as the signed-in user; note that many HR fields are sensitive and the connector inherits Workday's own security groups — say so in the production section."
+    },
+    {
+      "id": "generic-rest",
+      "name": "Another system (REST API)",
+      "triggers": "rest api custom other homegrown proprietary",
+      "domains": "",
+      "directive": "Adapt the agent for a custom system of record reached over REST. Keep the logic identical and terminology neutral. Production tools: a **custom connector** in Power Platform wrapping the customer's API (OpenAPI definition preferred), added in Copilot Studio → Tools, with authentication decided with their API owner — never a shared static key baked into the agent."
+    }
+  ]
+}
