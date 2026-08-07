@@ -283,7 +283,6 @@ body{padding-top:52px!important}
   <a class="l" data-p="guide" href="../docs/rapp-guide.html">Production Guide</a>
   <a class="l" data-p="metrics" href="../docs/metrics.html">Metrics</a>
   <a class="l" data-p="blog" href="../blog.html">Blog</a>
-  <a class="l gh" href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
 </div></nav>
 <!-- /aibast-shared-nav -->
 
@@ -871,9 +870,9 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
   <div class="phase"><div class="card">
     <ol class="steps">
       <li><b>Test the room's network the day before</b>
-        <p>Everything loads from <code>raw.githubusercontent.com</code>. Open
-        <a href="https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/registry.json">the registry</a>
-        from the venue's Wi-Fi. Corporate proxies that block raw GitHub kill the whole session —
+        <p>Everything loads from GitHub's public file host. From the venue's Wi-Fi, open the
+        <a href="metrics.html">library metrics page</a> — if the agent table fills in, the host is
+        reachable; if it shows "offline", the network blocks it. Corporate proxies that block raw GitHub kill the whole session —
         and you want to know that with a day in hand, not live.</p></li>
       <li><b>Shared training environment = name collisions</b>
         <p>If attendees deploy into one shared environment, tell them to give their AI their
@@ -967,7 +966,7 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
   the Field Service Dispatch stack. All data in this guide is synthetic. Agent templates are
   starting points that must be customized and reviewed before production use. Component layout
   follows the Copilot Studio CLI authoring format
-  (<a href="https://github.com/microsoft/copilot-studio-plugin" style="color:inherit">microsoft/copilot-studio-plugin</a>).
+  (microsoft/copilot-studio-plugin).
 </div></footer>
 
 <script>
