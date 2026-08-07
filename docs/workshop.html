@@ -248,6 +248,9 @@ html[data-theme=dark] body{--ink:#e6e8f2;--dim:#b6bcd2;--faint:#98a1bd;--paper:#
   --skill:#2a1626;--conn:#122622;--chan:#131f30;--red-soft:#2c1517}
 </style>
 <style id="aibast-workshop-final">
+html[data-theme=dark] .jw small{color:#5a6070!important}
+html[data-theme=dark] details.uh>summary::before{color:#6ea8e8!important}
+:root{--faint:#6a6d80}
 html[data-theme=dark] .mlink{color:#8fc0f5!important}
 html[data-theme=dark] #ol-switch,html[data-theme=dark] a[style*="0b5da6"]{color:#8fc0f5!important}
 html[data-theme=dark] .b-skills .cap{color:#f0a8d4!important}
@@ -1110,7 +1113,7 @@ function fetchLib(path,asJson){
   var order=[ACTIVE].concat([0,1,2].filter(function(i){return i!==ACTIVE;}));
   return tryAt(order,0);
 }
-function slugOf(a){return a.name.split("/")[1];}
+function slugOf(a){return a._slug||a.name.split("/")[1];}
 function advOf(a){return ADV[slugOf(a)];}
 function agentName(a){var v=advOf(a);return (v&&v.sharepoint_name)||a.display_name||a.name;}
 function agentDesc(a){var v=advOf(a);return (v&&v.exec_summary)||a.description||"";}
@@ -1149,7 +1152,7 @@ function agentsForGroup(key){
     var g=FP.groups.filter(function(x){return x.id===key;})[0];
     return (g?g.agents:[]).map(function(a){
       return {name:"@1p/"+a.id, display_name:a.name+" ("+a.status+")",
-              description:a.summary, _fp:a};});
+              description:a.summary, _fp:a, _slug:a.id};});
   }
   if(MODE==="industry") return CATS[key]||[];
   var prod=PRODUCTS.filter(function(p){return p.id===key;})[0];
@@ -1240,7 +1243,11 @@ function select(a){
   });
 }
 function selectFP(a){
-  SELECTED=null; STACK="fp-"+a._fp.id;
+  // Keep a selection object so the summary/share CTAs work here too — they
+  // guard on SELECTED, and a first-party pick IS a selection.
+  SELECTED={name:"@1p/"+a._fp.id, display_name:a._fp.name, _fp:a._fp,
+            _file:"", description:a._fp.summary};
+  STACK="fp-"+a._fp.id;
   try{history.replaceState(null,"","?fp="+encodeURIComponent(a._fp.id));}catch(e){}
   document.getElementById("pickName").textContent=" "+a._fp.name+
     " — a Microsoft first-party agent: configured in-product from the official docs, nothing to deploy.";
@@ -1302,6 +1309,23 @@ Promise.all([fetchLib("registry.json",true),
   Object.keys(byStackDir).forEach(function(d){var a=byStackDir[d];
     (CATS[a.category]=CATS[a.category]||[]).push(a);});
   renderPills();
+  var wantFP=(/[?&]fp=([^&]+)/.exec(location.search)||[])[1];
+  if(wantFP){
+    var fpid=decodeURIComponent(wantFP), grp=null, hit=null;
+    FP.groups.forEach(function(g){g.agents.forEach(function(x){if(x.id===fpid){grp=g;hit=x;}});});
+    if(hit){
+      MODE="firstparty";
+      document.querySelectorAll('#modeTabs button').forEach(function(x){
+        x.classList.toggle("on",x.dataset.mode==="firstparty");});
+      renderPills();
+      var pb=document.querySelector('#indPills button[data-cat="'+grp.id+'"]');
+      if(pb){pb.classList.add("on"); renderAgents(grp.id);}
+      var ab=document.querySelector('#agentCards button[data-slug="'+fpid+'"]');
+      if(ab) ab.classList.add("on");
+      selectFP({_fp:hit});
+      return;
+    }
+  }
   var want=(/[?&]agent=([^&]+)/.exec(location.search)||[])[1];
   if(want){
     var found=null,cat=null;
@@ -1358,6 +1382,8 @@ function pascal(s){return s.split(/[^a-zA-Z0-9]+/).map(function(w){
   return w.charAt(0).toUpperCase()+w.slice(1);}).join("");}
 document.getElementById("shareBtn").onclick=function(){
   if(!SELECTED){document.getElementById("shareStatus").textContent="Pick an agent first.";return;}
+  if(SELECTED._fp){document.getElementById("shareStatus").textContent=
+    "First-party agents are configured in-product — share the two Microsoft Learn links above instead.";return;}
   var slug=slugOf(SELECTED), disp=SELECTED.display_name||SELECTED.name;
   var dir=SELECTED._file.substring(0,SELECTED._file.lastIndexOf("/"))+"/copilot_studio";
   var cls="Deploy"+pascal(agentTitle(SELECTED));

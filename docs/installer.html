@@ -317,9 +317,13 @@ html[data-theme=light] p[style*="color:var(--text-light)"]{color:#4a4d5e!importa
 <style id="aibast-inline-ink">
 /* #b3bcc9 is correct on the dark terminal, unreadable on light page ground */
 html[data-theme=light] [style*="#b3bcc9"]{color:#4a4d5e!important}
-html[data-theme=light] .install-widget [style*="#b3bcc9"],
-html[data-theme=light] .one-liner [style*="#b3bcc9"],
-html[data-theme=light] .install-body [style*="#b3bcc9"]{color:#c7ccd6!important}
+html[data-theme=light] .install-widget > [style*="#b3bcc9"],
+html[data-theme=light] .install-body > [style*="#b3bcc9"]{color:#c7ccd6!important}
+</style>
+<style id="aibast-foot-guard">
+/* The footer is a navy bar like the nav — body link rules must not reach it. */
+.aibast-foot a,html[data-theme=light] .aibast-foot a{color:#f7a8c4!important}
+.copy-icon,#copy-icon{opacity:.8!important}
 </style>
 </head>
 <body>

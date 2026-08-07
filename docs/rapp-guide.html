@@ -1167,6 +1167,12 @@ html[data-never] .nav-item span,html[data-never] .nav-icon{color:#ffc933!importa
 [style*="#10b981"],[style*="#059669"]{background:#0b6b52!important}
 [style*="#10b981"] *,[style*="#059669"] *{color:#ffffff!important}
 </style>
+<style id="aibast-guide-mobile">
+.comparison-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+.stat-card .stat-label{color:#ffffff!important}
+ul>li::before{color:#0067b8!important}
+@media(max-width:520px){.content-wrapper,.main-content{padding-left:12px;padding-right:12px}}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
@@ -1436,7 +1442,7 @@ body{padding-top:52px!important}
                 <h3>🔄 RAPP 14-Step Process</h3>
                 <p>Every project follows this standardized workflow, with 6 human quality gates preventing scope creep and ensuring value:</p>
 
-                <table class="comparison-table">
+                <table class="comparison-table" data-wrapped="1">
                     <thead>
                         <tr>
                             <th>Step</th>
@@ -1579,7 +1585,7 @@ body{padding-top:52px!important}
                 <h3>🏗️ The Four Layers</h3>
                 <p>The architecture separates concerns into four distinct, independently scalable layers. This design allows agents to hot-load without redeployment, context to persist across all channels, and the system to degrade gracefully when components fail.</p>
 
-                <table class="comparison-table">
+                <table class="comparison-table" data-wrapped="1">
                     <thead>
                         <tr>
                             <th>Layer</th>
@@ -1884,7 +1890,7 @@ def handle_request(user_message, user_guid):
 
                 <h4>The 6 Quality Gates:</h4>
 
-                <table class="comparison-table">
+                <table class="comparison-table" data-wrapped="1">
                     <thead>
                         <tr>
                             <th>Gate</th>
@@ -5377,7 +5383,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
                 <h3>⚡ Specific Action Items</h3>
 
                 <h4 style="color: var(--primary); margin-top: 25px;">Immediate (Next 1-2 Weeks)</h4>
-                <table class="comparison-table">
+                <table class="comparison-table" data-wrapped="1">
                     <thead>
                         <tr>
                             <th>Action</th>
@@ -5405,7 +5411,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
                 </table>
 
                 <h4 style="color: var(--primary); margin-top: 35px;">Short-term (This Cycle)</h4>
-                <table class="comparison-table">
+                <table class="comparison-table" data-wrapped="1">
                     <thead>
                         <tr>
                             <th>Action</th>
