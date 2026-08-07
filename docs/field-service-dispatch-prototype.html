@@ -223,7 +223,10 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
       every component chosen deliberately, every step paste-ready, every result checkable.</p>
     <div class="goal"><b>When you finish</b>
       A working dispatch agent in your Copilot Studio environment that passes five computed
-      verification checks — and a clear path from prototype to production.</div>
+      verification checks — and a clear path from prototype to production.<br><br>
+      <b>The short version</b>
+      Download the Sales Specialist Twin agent. Load it into the brainstem. Go to town —
+      GitHub Copilot runs every step of this guide for you.</div>
   </div>
 </div>
 
@@ -272,10 +275,13 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
         <div class="ag"><span class="t">6</span><span><b>Verify</b> — five checks with computed answers</span><span class="d">~15 min</span></div>
         <div class="ag"><span class="t">7</span><span><b>Go to production</b> — real data, real channels</span><span class="d">when ready</span></div>
       </div>
-      <p style="margin-top:12px;font-size:14px">Prefer an assisted build? With Claude Code, install
-        Microsoft's plugin — <code>/plugin install mcs-assistant@copilot-studio-plugin</code> — and
-        hand it <code>field_service_dispatch_agent.py</code> as the behavior spec. It authors this
-        same component set. This guide is the manual path, and the one that teaches you the pieces.</p>
+      <div class="callout" style="margin-top:14px"><b>The fast path — no commands, just conversation.</b>
+        Download the library's <a href="https://github.com/microsoft/aibast-agents-library/blob/main/agents/%40aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py">Sales
+        Specialist Twin agent</a>, drop it into your brainstem's <code>agents/</code> folder, and say
+        <i>“deploy the field service dispatch agent to Copilot Studio.”</i> GitHub Copilot fetches the
+        mission playbook from this library and executes every step below itself — you only answer the
+        sign-in and the go-live question. Steps 3–7 of this guide are what the twin does under the
+        hood, documented so you can see (and audit) exactly what runs.</div>
     </div>
   </div>
 </section>

@@ -37,11 +37,14 @@ model judgment. In production they move into tools (last section).
   CLI-authoring commands used here.
 - Copilot Studio licensing in the tenant.
 
-Assisted path: if you use Claude Code, install Microsoft's Copilot Studio
-plugin — `/plugin marketplace add microsoft/copilot-studio-plugin`, then
-`/plugin install mcs-assistant@copilot-studio-plugin` — and hand it
-`field_service_dispatch_agent.py` as the behavior spec. It will author and
-sync this same component set for you. The steps below are the manual path.
+**The fast path — no commands, just conversation.** Download the library's
+Sales Specialist Twin agent
+(`agents/@aibast-agents-library/general_stacks/sales_specialist_twin_stack/sales_specialist_twin_agent.py`),
+drop it into your brainstem's `agents/` folder, and say *"deploy the field
+service dispatch agent to Copilot Studio."* GitHub Copilot fetches this
+mission's playbook from the library (`twin/playbooks/deploy-copilot-studio.md`)
+and executes every step below itself. The steps that follow are what the twin
+does under the hood, documented so you can audit exactly what runs.
 
 ## Build
 
