@@ -141,7 +141,7 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
 .bx .status{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
   border-radius:4px;padding:2px 7px;color:#fff}
 .bx .status.u{background:#166b2a}.bx .status.d{background:#7d6014}
-.bx .status.u{background:#2b8a3e}.bx .status.d{background:#a07d1c}.bx .status.n{background:#8a8da0}
+.bx .status.u{background:#166b2a}.bx .status.d{background:#6b520f}.bx .status.n{background:#5f6478}
 .bx ul{list-style:none;margin-top:8px}
 .bx li{position:relative;padding-left:13px;margin-bottom:6px;color:var(--dim);line-height:1.4}
 .bx li::before{content:"•";position:absolute;left:1px;color:currentColor;opacity:.55}
@@ -250,6 +250,12 @@ html[data-theme=dark] body{--ink:#e6e8f2;--dim:#b6bcd2;--faint:#98a1bd;--paper:#
 <style id="aibast-workshop-final">
 html[data-theme=dark] #ol-switch,html[data-theme=dark] a[style*="0b5da6"]{color:#8fc0f5!important}
 html[data-theme=dark] .b-skills .cap{color:#f0a8d4!important}
+</style>
+<style id="aibast-nav-guard">
+/* The shared nav sits on its own navy bar — body link rules must never reach it. */
+#aibast-nav a.l,#aibast-nav a.brand{color:#dfe4f5!important}
+#aibast-nav a.l.now,#aibast-nav a.l:hover{color:#ffffff!important}
+#aibast-nav a.brand b{color:#f7a8c4!important}
 </style>
 </head>
 <body>

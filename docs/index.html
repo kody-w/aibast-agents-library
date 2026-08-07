@@ -302,6 +302,12 @@ html[data-theme=light] .install-widget summary,html[data-theme=light] .one-liner
 html[data-theme=light] a,html[data-theme=light] .tier a,html[data-theme=light] .step a,
 html[data-theme=light] .container a{color:#0b5da6!important}
 </style>
+<style id="aibast-nav-guard">
+/* The shared nav sits on its own navy bar — body link rules must never reach it. */
+#aibast-nav a.l,#aibast-nav a.brand{color:#dfe4f5!important}
+#aibast-nav a.l.now,#aibast-nav a.l:hover{color:#ffffff!important}
+#aibast-nav a.brand b{color:#f7a8c4!important}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->

@@ -1149,6 +1149,16 @@ html[data-never] .nav-item span,html[data-never] .nav-icon{color:#ffc933!importa
 [style*="background:#e"] p,[style*="background: #e"] p,[style*="background:#d"] p,
 [style*="background: #d"] p{color:#241a00!important}
 </style>
+<style id="aibast-nav-guard">
+/* The shared nav sits on its own navy bar — body link rules must never reach it. */
+#aibast-nav a.l,#aibast-nav a.brand{color:#dfe4f5!important}
+#aibast-nav a.l.now,#aibast-nav a.l:hover{color:#ffffff!important}
+#aibast-nav a.brand b{color:#f7a8c4!important}
+</style>
+<style id="aibast-guide-statcards">
+.stat-card,.stat-card p,.stat-card .stat-label,.stat-card .stat-number{color:#ffffff!important}
+.stat-card p{opacity:1!important}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->

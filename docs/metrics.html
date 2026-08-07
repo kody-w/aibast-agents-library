@@ -75,6 +75,12 @@ html[data-theme=dark] body{--ink:#e6e8f2;--dim:#aab0c8;--faint:#7c86a8;--paper:#
   --instr:#2a1f18;--know:#241a2c;--tools:#14261a;--mem:#1b1830;--sand:#2a2113;
   --skill:#2a1626;--conn:#122622;--chan:#131f30;--red-soft:#2c1517}
 </style>
+<style id="aibast-nav-guard">
+/* The shared nav sits on its own navy bar — body link rules must never reach it. */
+#aibast-nav a.l,#aibast-nav a.brand{color:#dfe4f5!important}
+#aibast-nav a.l.now,#aibast-nav a.l:hover{color:#ffffff!important}
+#aibast-nav a.brand b{color:#f7a8c4!important}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
