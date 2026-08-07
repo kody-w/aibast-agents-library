@@ -140,7 +140,7 @@ details.filebox summary{cursor:pointer;font-weight:650;font-size:14.5px;color:va
   flex-wrap:wrap}
 .bx .status{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
   border-radius:4px;padding:2px 7px;color:#fff}
-.bx .status.u{background:#1f7a33}.bx .status.d{background:#7d6014}
+.bx .status.u{background:#166b2a}.bx .status.d{background:#7d6014}
 .bx .status.u{background:#2b8a3e}.bx .status.d{background:#a07d1c}.bx .status.n{background:#8a8da0}
 .bx ul{list-style:none;margin-top:8px}
 .bx li{position:relative;padding-left:13px;margin-bottom:6px;color:var(--dim);line-height:1.4}
@@ -223,9 +223,12 @@ table.ladder td:first-child{font-weight:650;color:var(--ink);min-width:150px}
 @media(max-width:760px){.wall{grid-template-columns:1fr}}
 .wall .col{border-radius:10px;padding:14px;font-size:14px}
 .wall .col h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px}
-.wall .in{background:var(--tools);border:1px solid var(--tools-b)}.wall .in h4{color:#1f7a33}
-.wall .out{background:var(--red-soft);border:1px solid var(--red)}.wall .out h4{color:var(--red)}
-.wall .park{background:var(--sand);border:1px solid var(--sand-b)}.wall .park h4{color:#7d6014}
+.wall .in{background:var(--tools);border:1px solid var(--tools-b)}.wall .in h4{color:#166b2a}
+html[data-theme=dark] .wall .in h4{color:#7ddb96}
+.wall .out{background:var(--red-soft);border:1px solid var(--red)}.wall .out h4{color:#a11b1b}
+html[data-theme=dark] .wall .out h4{color:#ff9d9d}
+.wall .park{background:var(--sand);border:1px solid var(--sand-b)}.wall .park h4{color:#6b520f}
+html[data-theme=dark] .wall .park h4{color:#e8c977}
 .wall li{margin:0 0 7px 16px;color:var(--dim)}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -243,6 +246,10 @@ html[data-theme=dark] body{--ink:#e6e8f2;--dim:#b6bcd2;--faint:#98a1bd;--paper:#
   --chan-b:#7fb3ee;--conn-b:#5fc9ad;--instr-b:#f0a377;--know-b:#d79ce8;--mem-b:#a79bf0;
   --instr:#2a1f18;--know:#241a2c;--tools:#14261a;--mem:#1b1830;--sand:#2a2113;
   --skill:#2a1626;--conn:#122622;--chan:#131f30;--red-soft:#2c1517}
+</style>
+<style id="aibast-workshop-final">
+html[data-theme=dark] #ol-switch,html[data-theme=dark] a[style*="0b5da6"]{color:#8fc0f5!important}
+html[data-theme=dark] .b-skills .cap{color:#f0a8d4!important}
 </style>
 </head>
 <body>
@@ -383,7 +390,7 @@ body{padding-top:52px!important}
         <div class="code" id="ol-win" style="display:none"><div class="bar">PowerShell<button data-copy>Copy</button></div>
 <pre>irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex</pre></div>
         <p id="ol-note" style="font-size:12.5px;color:var(--faint)">Showing the macOS / Linux line ·
-          <a href="#" id="ol-switch" style="color:var(--accent)">on Windows? switch</a></p></li>
+          <a href="#" id="ol-switch" style="color:#0b5da6">on Windows? switch</a></p></li>
       <li><b>Add the one agent that does everything</b>
         <p>The Sales Specialist Twin. Easiest way — no terminal: open the brainstem page at
         <code>localhost:7071</code>, search the built-in agent registry for
