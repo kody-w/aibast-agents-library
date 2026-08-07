@@ -68,11 +68,37 @@ td a{color:var(--accent);text-decoration:none;font-weight:600}
   padding:5px 10px;font-size:12.5px;display:none;z-index:50;white-space:nowrap;
   font-variant-numeric:tabular-nums}
 </style>
+<style id="aibast-dark-vars">
+html[data-theme=dark]{color-scheme:dark}
+html[data-theme=dark] body{--ink:#e6e8f2;--dim:#aab0c8;--faint:#7c86a8;--paper:#141a30;
+  --wash:#0b1024;--line:#26304f;--accent:#4da3ff;--accent-soft:#14263f;
+  --instr:#2a1f18;--know:#241a2c;--tools:#14261a;--mem:#1b1830;--sand:#2a2113;
+  --skill:#2a1626;--conn:#122622;--chan:#131f30;--red-soft:#2c1517}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
+<script id="aibast-theme-boot">
+(function(){
+  var k="aibast:theme";
+  var t=localStorage.getItem(k)||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  document.documentElement.setAttribute("data-theme",t);
+  addEventListener("DOMContentLoaded",function(){
+    var nav=document.querySelector("#aibast-nav .in"); if(!nav) return;
+    var b=document.createElement("a"); b.href="#"; b.className="l"; b.id="aibast-theme-btn";
+    b.setAttribute("aria-label","Toggle light or dark theme");
+    function paint(){b.textContent=document.documentElement.getAttribute("data-theme")==="dark"?"\u2600\uFE0E":"\uD83C\uDF19";}
+    b.onclick=function(e){e.preventDefault();
+      var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";
+      document.documentElement.setAttribute("data-theme",n);
+      localStorage.setItem(k,n); paint();};
+    paint(); nav.appendChild(b);
+  });
+})();
+</script>
 <style id="aibast-nav-css">
-#aibast-nav{position:relative;left:50%;margin-left:-50vw;width:100vw;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
+body{padding-top:52px!important}
+#aibast-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
   font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
 #aibast-nav .in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:4px;
   align-items:center;height:52px;overflow-x:auto}

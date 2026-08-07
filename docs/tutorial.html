@@ -45,13 +45,64 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 <style id="aibast-font-unify">body{font-family:"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif!important}</style>
 <style id="aibast-dark-tint">
-body{background:#0b1024!important}
+html[data-theme=dark] body{background:#0b1024!important}
+</style>
+<style id="aibast-light-invert">
+/* Light theme for this dark-native page — real overrides, no filter tricks.
+   Terminal surfaces (.install-widget, .one-liner, code) stay dark: terminals
+   should look like terminals, and the one-liner pops harder on light. */
+html[data-theme=light] body{background:#f6f7fa!important;color:#1a1a2e!important}
+html[data-theme=light] h1,html[data-theme=light] h2,html[data-theme=light] h3,
+html[data-theme=light] h4{color:#1a1a2e!important;background:none!important;
+  -webkit-text-fill-color:#1a1a2e!important}
+html[data-theme=light] p,html[data-theme=light] li,html[data-theme=light] .tagline,
+html[data-theme=light] .subtitle,html[data-theme=light] span:not(.cmd span):not(.one-liner span){color:inherit}
+html[data-theme=light] .tier,html[data-theme=light] .step,html[data-theme=light] .post,
+html[data-theme=light] .release,html[data-theme=light] .note,html[data-theme=light] .success,
+html[data-theme=light] .next-steps,html[data-theme=light] .agent-example,
+html[data-theme=light] .post-body .callout,html[data-theme=light] .release-body .highlight,
+html[data-theme=light] .post-body .diagram{
+  background:#ffffff!important;border-color:#e3e5ec!important;color:#3c3f52!important}
+html[data-theme=light] .tier *,html[data-theme=light] .step *,html[data-theme=light] .post *,
+html[data-theme=light] .release *{color:#3c3f52}
+html[data-theme=light] .tier h1,html[data-theme=light] .tier h2,html[data-theme=light] .tier h3,
+html[data-theme=light] .tier b,html[data-theme=light] .tier strong,
+html[data-theme=light] .post h1,html[data-theme=light] .post h2,html[data-theme=light] .post h3,
+html[data-theme=light] .release h2,html[data-theme=light] .release h3,
+html[data-theme=light] .step b,html[data-theme=light] .step strong{color:#1a1a2e!important}
+html[data-theme=light] .post-meta .tag{background:#e8f1fa!important;color:#0f6cbd!important}
+html[data-theme=light] .header{background:linear-gradient(135deg,#0b1f4b,#16307a)!important}
+html[data-theme=light] a{color:#0f6cbd}
+html[data-theme=light] .hero-action{border-color:#c9cede!important;color:#1a1a2e!important}
+html[data-theme=light] .hero-action.primary{background:#0f6cbd!important;color:#fff!important}
+/* terminal family stays dark on purpose — no overrides needed, plus a lift: */
+html[data-theme=light] .install-widget,html[data-theme=light] .one-liner{
+  box-shadow:0 10px 30px rgba(11,16,36,.18)}
 </style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
+<script id="aibast-theme-boot">
+(function(){
+  var k="aibast:theme";
+  var t=localStorage.getItem(k)||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  document.documentElement.setAttribute("data-theme",t);
+  addEventListener("DOMContentLoaded",function(){
+    var nav=document.querySelector("#aibast-nav .in"); if(!nav) return;
+    var b=document.createElement("a"); b.href="#"; b.className="l"; b.id="aibast-theme-btn";
+    b.setAttribute("aria-label","Toggle light or dark theme");
+    function paint(){b.textContent=document.documentElement.getAttribute("data-theme")==="dark"?"\u2600\uFE0E":"\uD83C\uDF19";}
+    b.onclick=function(e){e.preventDefault();
+      var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";
+      document.documentElement.setAttribute("data-theme",n);
+      localStorage.setItem(k,n); paint();};
+    paint(); nav.appendChild(b);
+  });
+})();
+</script>
 <style id="aibast-nav-css">
-#aibast-nav{position:relative;left:50%;margin-left:-50vw;width:100vw;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
+body{padding-top:52px!important}
+#aibast-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
   font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
 #aibast-nav .in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:4px;
   align-items:center;height:52px;overflow-x:auto}
