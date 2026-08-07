@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Running an AI-First Workshop — AIBAST Agents Library</title>
+<meta name="description" content="The facilitator's guide to AI-first workshops: the ten principles behind the RAPP Workshop, why each one exists, and how to recover a room when something goes wrong.">
+<style>
+:root{
+  --ink:#1a1a2e; --dim:#4a4d5e; --faint:#6a6d80; --paper:#ffffff; --wash:#f6f7fa;
+  --line:#e3e5ec; --accent:#0b5da6; --accent-soft:#e8f1fa; --radius:12px;
+  --mono:Consolas,"SF Mono",ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink);
+  background:var(--wash);line-height:1.62;font-size:16.5px}
+.wrap{max-width:820px;margin:0 auto;padding:0 28px}
+.band{background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);color:#fff;
+  padding:56px 0 50px;border-bottom:2px solid #f291b6}
+.band .kick{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:#f291b6;margin-bottom:12px}
+.band h1{font-size:clamp(30px,4.6vw,44px);font-weight:750;letter-spacing:-.025em;line-height:1.12}
+.band p{color:#c3cae6;margin-top:14px;max-width:64ch;font-size:17px}
+main{padding:44px 0 70px}
+h2{font-size:26px;font-weight:730;letter-spacing:-.02em;margin:46px 0 10px}
+h3{font-size:19px;font-weight:700;margin:30px 0 6px}
+p{color:var(--dim);margin-bottom:14px}
+p b,li b{color:var(--ink)}
+.lede{font-size:18px;color:var(--dim);border-left:3px solid var(--accent);padding-left:18px;
+  margin:0 0 30px}
+.principle{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px 24px;margin:16px 0;box-shadow:0 1px 4px rgba(15,20,40,.04)}
+.principle h3{margin-top:0;display:flex;gap:12px;align-items:baseline}
+.principle h3 .num{font-size:12px;font-weight:800;color:#fff;background:var(--accent);
+  border-radius:6px;padding:3px 9px;letter-spacing:.06em;flex:0 0 auto}
+.principle .why{font-size:14.5px;color:var(--faint);border-top:1px dashed var(--line);
+  margin-top:12px;padding-top:11px}
+.principle .why b{color:var(--dim);text-transform:uppercase;font-size:11px;letter-spacing:.08em;
+  margin-right:8px}
+blockquote{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 9px 9px 0;
+  padding:14px 18px;margin:16px 0;color:#123f6b;font-size:16px}
+ul{margin:0 0 16px 22px;color:var(--dim)}
+li{margin-bottom:8px}
+code{background:#eef1f7;border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+  font-family:var(--mono);font-size:14px;color:var(--ink)}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:15px;background:var(--paper);
+  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+th{background:#101a35;color:#fff;text-align:left;padding:11px 14px;font-size:11.5px;
+  letter-spacing:.07em;text-transform:uppercase}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top;color:var(--dim)}
+td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+.cta{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px;margin:34px 0 0;text-align:center}
+.cta a{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;
+  font-weight:700;border-radius:9px;padding:12px 24px;margin-top:10px}
+@media(max-width:620px){table{display:block;overflow-x:auto}}
+</style>
+<style id="aibast-nav-guard">
+/* The shared nav sits on its own navy bar — body link rules must never reach it. */
+#aibast-nav a.l,#aibast-nav a.brand{color:#dfe4f5!important}
+#aibast-nav a.l.now,#aibast-nav a.l:hover{color:#ffffff!important}
+#aibast-nav a.brand b{color:#f7a8c4!important}
+</style>
+</head>
+<body>
+<script id="aibast-theme-boot">
+(function(){
+  var k="aibast:theme";
+  function get(){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function set(v){try{localStorage.setItem(k,v);}catch(e){}}
+  var t=get()||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  document.documentElement.setAttribute("data-theme",t);
+  addEventListener("DOMContentLoaded",function(){
+    var nav=document.querySelector("#aibast-nav .in"); if(!nav) return;
+    var b=document.createElement("a"); b.href="#"; b.className="l"; b.id="aibast-theme-btn";
+    b.setAttribute("aria-label","Toggle light or dark theme");
+    function paint(){b.textContent=document.documentElement.getAttribute("data-theme")==="dark"?"\u2600\uFE0E":"\uD83C\uDF19";}
+    b.onclick=function(e){e.preventDefault();
+      var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";
+      document.documentElement.setAttribute("data-theme",n);
+      set(n); paint();};
+    paint(); nav.appendChild(b);
+  });
+})();
+</script>
+<!-- aibast-shared-nav -->
+
+<style id="aibast-scroll">html{scroll-padding-top:110px}</style>
+<style id="aibast-nav-css">
+body{padding-top:52px!important}
+#aibast-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66);
+  font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
+#aibast-nav .in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:4px;
+  align-items:center;height:52px;overflow-x:auto;scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch}
+#aibast-nav .in::after{content:'';flex:0 0 8px}
+@media(max-width:760px){#aibast-nav{position:relative}
+  #aibast-nav .in{height:auto;flex-wrap:wrap;padding:6px 14px 8px;gap:2px}
+  #aibast-nav a.l{padding:11px 10px;min-height:44px!important;display:flex;align-items:center}
+  body{padding-top:0!important}}
+#aibast-nav .brand{color:#fff;font-weight:750;font-size:14.5px;text-decoration:none;
+  letter-spacing:-.01em;margin-right:14px;white-space:nowrap}
+#aibast-nav .brand b{color:#f291b6}
+#aibast-nav a.l{color:#c3cae6;text-decoration:none;font-size:13px;font-weight:600;
+  padding:6px 10px;border-radius:6px;white-space:nowrap;min-height:32px;
+  display:inline-flex;align-items:center}
+#aibast-nav a.l:hover{background:rgba(255,255,255,.1);color:#fff}
+#aibast-nav a.l.now{background:rgba(255,255,255,.14);color:#fff}
+#aibast-nav .gh{margin-left:auto}
+</style>
+<nav id="aibast-nav"><div class="in">
+  <a class="brand" href="../index.html"><b>AIBAST</b> Agents Library</a>
+  <a class="l" data-p="workshop" href="../docs/workshop.html">Workshop</a>
+  <a class="l" data-p="index" href="../index.html#install">Install</a>
+  <a class="l" data-p="quickstart" href="../docs/index.html">Quick Start</a>
+  <a class="l" data-p="guide" href="../docs/rapp-guide.html">Production Guide</a>
+  <a class="l now" data-p="facilitator" href="../docs/facilitator.html">Facilitator</a>
+  <a class="l now" data-p="metrics" href="../docs/metrics.html">Metrics</a>
+  <a class="l" data-p="blog" href="../blog.html">Blog</a>
+</div></nav>
+<!-- /aibast-shared-nav -->
+<div class="band"><div class="wrap">
+  <div class="kick">AIBAST · Facilitator Guide</div>
+  <h1>Running an AI-first workshop</h1>
+  <p>Ten principles for teaching people to build with AI — what we learned shipping a
+    workshop that takes a seller from nothing to a published agent, and how to rescue a room
+    when it goes sideways.</p>
+</div></div>
+
+<main class="wrap">
+  <p class="lede">The old workshop contract was: follow these steps exactly, and if you fall
+    behind, you are lost. The AI-first contract is different — <b>the participant can be wrong
+    and still arrive</b>, because the artifacts steer them back. That single shift is what these
+    principles protect.</p>
+
+  <h2>The ten principles</h2>
+
+  <div class="principle">
+    <h3><span class="num">01</span>The person steers, the AI executes</h3>
+    <p>The participant's job is to say what outcome they want and judge what comes back. Every
+      command, file edit, and deployment step belongs to their AI. If your agenda has a slide
+      where forty people type the same thing, you have built a typing class, not a workshop.</p>
+    <div class="why"><b>Why</b> Typing is where rooms diverge. One typo in row three and that
+      person spends the rest of the session behind, quietly, and doesn't tell you.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">02</span>One command, maximum</h3>
+    <p>Count the commands a participant must run. The target is one. Ours is the install
+      one-liner, and even that has a path that avoids it. Everything else is conversation or a
+      button.</p>
+    <div class="why"><b>Why</b> Every additional command multiplies the ways a room can
+      fragment — wrong shell, wrong directory, wrong OS, a copied line that lost its newline.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">03</span>Make the artifact its own on-ramp</h3>
+    <p>The file you hand out should contain the instructions for its own setup, written for an
+      AI to read. Ours opens with a block addressed to whatever assistant receives it: check
+      whether the server is running, install it if not, put me in this folder, confirm I loaded,
+      then tell the person what to say next.</p>
+    <blockquote>A participant with nothing installed can drag the file into GitHub Copilot Chat,
+      say “set this up for me,” and arrive at the same place as everyone else.</blockquote>
+    <div class="why"><b>Why</b> It collapses the entire setup phase into an action people
+      already know how to do — drag a file into a chat.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">04</span>Auto-steer, don't restart</h3>
+    <p>People arrive half-configured and mid-stream. The artifact should diagnose the actual
+      state and fix it from there — server missing, server down, agent not loaded, loaded but the
+      person is lost, or a step that failed halfway. Each state gets its own next action.</p>
+    <div class="why"><b>Why</b> “Start over” is where people quit. Diagnosis costs the AI a few
+      seconds and saves the participant their dignity.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">05</span>Meet them on their machine</h3>
+    <p>Detect the platform and show one line — the Windows user should never scroll past a macOS
+      command wondering if it matters. Same for anything else you can infer.</p>
+    <div class="why"><b>Why</b> Every irrelevant instruction on screen is a decision you handed
+      someone who came to learn, not to choose.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">06</span>Never show an empty room</h3>
+    <p>A participant who scrolls before reading should see a working example, clearly labelled as
+      one, not blank panels. Ours loads a default agent and says “Example shown — pick yours
+      above.”</p>
+    <div class="why"><b>Why</b> Blank space reads as broken. People assume they missed something
+      and stop, instead of scrolling on.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">07</span>Verification with computed answers</h3>
+    <p>Every agent in this library ships test questions whose expected answers are derived from
+      its data — a specific name, a specific ranking, a specific refusal. Not “check that it
+      responds sensibly.”</p>
+    <blockquote>A wrong answer becomes visible, not arguable. That is the difference between a
+      demo and a liability.</blockquote>
+    <div class="why"><b>Why</b> Rooms cannot judge quality by feel, and neither can the person
+      demoing this to a customer next week.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">08</span>State the boundary instead of faking the capability</h3>
+    <p>When the marketing promised something the build cannot honestly do — autonomous action,
+      real-time telemetry that does not exist — write the boundary into the agent's instructions
+      rather than simulating it. Our compliance pass declined a dozen such asks on purpose, each
+      with a stated reason.</p>
+    <div class="why"><b>Why</b> The faked capability always surfaces in front of the customer,
+      and it takes the credible parts down with it.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">09</span>Carry the friction, don't hide it</h3>
+    <p>Our deployment playbooks contain the actual failures we hit and the actual fixes: the
+      security-role error, the CLI defect that crashes after a successful publish, the sync order
+      that silently erases your work. The AI reads them and applies the fix instead of guessing.</p>
+    <div class="why"><b>Why</b> The failure a room hits is almost never novel. Writing it down
+      once turns a twenty-minute derailment into a sentence.</div>
+  </div>
+
+  <div class="principle">
+    <h3><span class="num">10</span>Honest reporting, always</h3>
+    <p>Instruct the AI to report what actually happened, including failures, and never to present
+      an unverified step as complete. Then hold yourself to it in the room: if a check fails, say
+      so and fix it in front of people.</p>
+    <div class="why"><b>Why</b> A participant who catches you glossing over a failure stops
+      believing the parts that worked.</div>
+  </div>
+
+  <h2>When it goes wrong in the room</h2>
+  <p>It will. Here is the triage, in the order that resolves fastest.</p>
+  <table>
+    <thead><tr><th>Symptom</th><th>What it usually is</th><th>Say this</th></tr></thead>
+    <tbody>
+      <tr><td>Nothing loads</td><td>The venue's network blocks the public file host</td>
+        <td>“Open the metrics page — if the table fills in, we're fine.” Test it the day before.</td></tr>
+      <tr><td>“It says I don't have permission”</td><td>No security role in the environment</td>
+        <td>Name it as an admin task, not their mistake, and pair them with someone who has access.</td></tr>
+      <tr><td>Two people, one agent name</td><td>Shared training tenant</td>
+        <td>“Tell your AI to add your initials to the name.” Say it once, up front.</td></tr>
+      <tr><td>The test pane won't open</td><td>A service outage, not their build</td>
+        <td>Show them the Build page proving the components landed, then carry on.</td></tr>
+      <tr><td>Someone is far behind</td><td>They fell off during setup and didn't say</td>
+        <td>Hand them the file and one sentence: drop it in your AI chat, say “set this up for me.”</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What we would tell another team</h2>
+  <p>Building this surfaced three lessons that generalize past our subject matter.</p>
+  <p><b>Test the artifact, not the demo.</b> We ran the whole path end to end repeatedly and
+    found bugs no demo would ever surface — an agent name that routed to the wrong stack, a share
+    link the page could not read back, a button that told people to pick something they had just
+    picked. Every one of those would have hit a room instead.</p>
+  <p><b>Let an independent reviewer attack it.</b> We ran five adversarial passes against the
+    live site. Three of the worst problems in round four were regressions introduced by the fixes
+    in round three. You do not catch that by re-reading your own work.</p>
+  <p><b>Write the doctrine down where the AI can read it.</b> The difference between an AI that
+    helps and an AI that improvises is whether you gave it your actual procedure — including the
+    parts where things break. That document is the real deliverable; the slides are a summary
+    of it.</p>
+
+  <div class="cta">
+    <p style="margin:0"><b>The workshop these principles produced</b><br>
+      One page, every industry, built by talking to your AI.</p>
+    <a href="workshop.html">Open the RAPP Workshop →</a>
+  </div>
+</main>
+<!-- aibast-theme -->
+<style id="aibast-theme">
+/* AIBAST signature layer: navy family, pink hairline, Segoe display type */
+#aibast-nav{border-bottom:2px solid #f291b6;box-shadow:0 2px 14px rgba(11,31,75,.35)}
+#aibast-nav .brand b{letter-spacing:.02em}
+::selection{background:#f291b6;color:#0b1f4b}
+:focus-visible{outline:2px solid #f291b6;outline-offset:2px}
+.aibast-foot{background:#0b1024;color:#8a90b8;font-family:"Segoe UI",system-ui,sans-serif;
+  font-size:12.5px;padding:26px 22px;text-align:center;line-height:1.6}
+.aibast-foot b{color:#c3cae6}
+.aibast-foot a{color:#f7a8c4!important;text-decoration:none}
+.aibast-foot,.aibast-foot *{color:#aab2d0}
+.aibast-foot b{color:#e6e8f2}
+</style>
+<div class="aibast-foot"><b>AIBAST</b> — the Microsoft AI Business Applications Specialist Team ·
+  engine, not experience · agents that ship, patterns that hold, numbers you can audit ·
+  <a href="https://github.com/microsoft/aibast-agents-library">github.com/microsoft/aibast-agents-library</a></div>
+<!-- /aibast-theme -->
+</body>
+</html>
