@@ -39,3 +39,11 @@ assert "win_loss" in r5.split("**Scaffold base URL:**")[1][:200], "win-loss matc
 r6 = a.perform(operation="mission", request="deploy the deal progression agent to copilot studio")
 assert "deal_progression" in r6.split("**Scaffold base URL:**")[1][:200], "deal-progression broken"
 print("matcher_priority_test: PASS")
+
+# advertised names are what sellers see on the workshop card — they must route
+for ask, want in [("deploy the Expansion Opportunity agent to copilot studio", "cross_selling"),
+                  ("deploy the Account Research agent to copilot studio", "account_intelligence"),
+                  ("deploy the Mortgage Origination agent to copilot studio", "loan_origination")]:
+    rr = a.perform(operation="mission", request=ask)
+    assert want in rr.split("Scaffold base URL:**")[1][:220], f"advertised name misrouted: {ask}"
+print("advertised_alias_test: PASS")

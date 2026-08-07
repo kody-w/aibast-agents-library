@@ -133,16 +133,32 @@ def _stack_context(request):
                             if w not in MISSION_WORDS)
     candidates = [a for a in reg.get("agents", [])
                   if a.get("name") != "@aibast-agents-library/sales-specialist-twin"]
+    # The workshop shows sellers the ADVERTISED name, so that is what they say.
+    # Fold the SharePoint crosswalk's names in as matchable aliases.
+    aliases = {}
+    try:
+        cw = json.loads(_fetch("twin/sharepoint_crosswalk.json"))
+        for e in cw.get("entries", []):
+            if e.get("b_slug"):
+                aliases.setdefault(e["b_slug"], []).append(e.get("sharepoint_name", ""))
+    except Exception:  # noqa: BLE001 — aliases are a convenience, not a dependency
+        pass
     # Slug tokens decide; description words only break ties. A big multi-agent
     # stack's rich description must never outscore an exact-name match (seen
     # live: "win loss analysis" landing on the deal-progression suite).
     words = set(domain_words.split())
     entry, score = None, 0
     for a in candidates:
-        slug_tokens = set(re.split(r"[^a-z0-9]+", a["name"].split("/")[1].lower())) - {""}
+        slug = a["name"].split("/")[1]
+        slug_tokens = set(re.split(r"[^a-z0-9]+", slug.lower())) - {""}
+        alias_names = aliases.get(slug, [])
+        alias_tokens = set()
+        for an in alias_names:
+            alias_tokens |= set(re.split(r"[^a-z0-9]+", an.lower())) - {"", "agent"}
         hay = (a.get("display_name", "") + " " + " ".join(a.get("tags", [])) + " " +
-               a.get("description", "")).lower()
-        sc = 10 * len(words & slug_tokens) + sum(1 for w in words if w in hay)
+               a.get("description", "") + " " + " ".join(alias_names)).lower()
+        sc = (10 * len(words & slug_tokens) + 10 * len(words & alias_tokens)
+              + sum(1 for w in words if w in hay))
         if sc > score:
             entry, score = a, sc
     if not entry or score == 0:
