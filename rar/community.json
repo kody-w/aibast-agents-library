@@ -1,6 +1,12 @@
 {
  "_note": "Daily community snapshot: adoption, conversations, in-the-wild mentions. Populates on the first workflow run.",
- "adoption": {},
+ "adoption": {
+  "2026-08-07": {
+   "stars": 4,
+   "forks": 2,
+   "watchers": 0
+  }
+ },
  "conversations": {},
  "in_the_wild": {}
 }
