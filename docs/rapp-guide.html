@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapid Agent Prototype Pattern (RAPP) - Production Guide</title>
+    <title>RAPP Production Guide — AIBAST Agents Library</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -126,7 +126,7 @@
         }
 
         .track-badge.technical {
-            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            background: linear-gradient(135deg, #0b1f4b 0%, #3a1f66 100%);
             color: white;
         }
 
@@ -1070,8 +1070,38 @@
             }
         }
     </style>
+
+<style id="aibast-font-unify">body{font-family:"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif!important}</style>
+<style id="aibast-guide-offset">#aibast-nav{position:fixed!important;top:0;left:0!important;margin-left:0!important}.top-bar{top:52px!important}.sidebar{top:122px!important;height:calc(100vh - 122px)!important}</style>
 </head>
 <body>
+<!-- aibast-shared-nav -->
+<style id="aibast-nav-css">
+#aibast-nav{position:relative;left:50%;margin-left:-50vw;width:100vw;z-index:1001;background:linear-gradient(135deg,#0b1f4b,#16307a 55%,#3a1f66)!important;
+  font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
+#aibast-nav .in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:4px;
+  align-items:center;height:52px;overflow-x:auto}
+#aibast-nav .brand{color:#fff;font-weight:750;font-size:14.5px;text-decoration:none;
+  letter-spacing:-.01em;margin-right:14px;white-space:nowrap}
+#aibast-nav .brand b{color:#f291b6}
+#aibast-nav a.l{color:#c3cae6;text-decoration:none;font-size:13px;font-weight:600;
+  padding:6px 10px;border-radius:6px;white-space:nowrap}
+#aibast-nav a.l:hover{background:rgba(255,255,255,.1);color:#fff}
+#aibast-nav a.l.now{background:rgba(255,255,255,.14);color:#fff}
+#aibast-nav .gh{margin-left:auto}
+</style>
+<nav id="aibast-nav"><div class="in">
+  <a class="brand" href="../index.html"><b>AIBAST</b> Agents Library</a>
+  <a class="l" data-p="workshop" href="../docs/workshop.html">Workshop</a>
+  <a class="l" data-p="index" href="../index.html#install">Install</a>
+  <a class="l" data-p="quickstart" href="../docs/index.html">Quick Start</a>
+  <a class="l now" data-p="guide" href="../docs/rapp-guide.html">Production Guide</a>
+  <a class="l" data-p="metrics" href="../docs/metrics.html">Metrics</a>
+  <a class="l" data-p="blog" href="../blog.html">Blog</a>
+  <a class="l gh" href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
+</div></nav>
+<!-- /aibast-shared-nav -->
+
     <!-- Enable JavaScript mode -->
     <script>
         // Add js-enabled class immediately to prevent flash of all content
@@ -1091,13 +1121,9 @@
         ⚠️ <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product. Agent templates are starting points — human review remains important. <a href="https://github.com/microsoft/aibast-agents-library/issues" style="color: #0d6efd;">File an issue</a> to help us improve.
     </div>
 
-    <!-- Top Bar -->
+        <!-- Top Bar -->
     <div class="top-bar">
-        <div style="background:linear-gradient(135deg,#0b1f4b,#3a1f66);color:#fff;border-radius:12px;padding:18px 24px;margin:18px 0">
-  <b style="color:#f291b6">START HERE:</b> The hands-on path through everything in this guide is
-  <a href="workshop.html" style="color:#fff;font-weight:700">the RAPP Workshop</a> — one page, every
-  industry, built by talking to your AI. This guide is the reference behind it.</div>
-<h1>
+        <h1>
             <span>Rapid Agent Prototype Pattern (RAPP)</span>
         </h1>
         <div class="top-bar-controls">
@@ -1227,7 +1253,12 @@
                 <div class="breadcrumb">
                     <span class="breadcrumb-item">Framework Overview</span>
                 </div>
-                <h1 class="section-title">Rapid Agent Prototype Pattern (RAPP)</h1>
+                <div style="background:linear-gradient(135deg,#0b1f4b,#3a1f66);color:#fff;border-radius:12px;padding:18px 24px;margin:18px 0">
+  <b style="color:#f291b6">START HERE:</b> The hands-on path through everything in this guide is
+  <a href="workshop.html" style="color:#fff;font-weight:700">the RAPP Workshop</a> — one page, every
+  industry, built by talking to your AI. This guide is the reference behind it.</div>
+
+<h1 class="section-title">Rapid Agent Prototype Pattern (RAPP)</h1>
                 <p class="section-subtitle">Compress 3-6 month development cycles into days using the "Buzz Saw + Human Taste" methodology.</p>
             </div>
 
@@ -1257,7 +1288,7 @@
                 </div>
             </div>
 
-            <div class="highlight-box" style="background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%); color: white; border: none;">
+            <div class="highlight-box" style="background: linear-gradient(135deg, #0b1f4b 0%, #3a1f66 100%); color: white; border: none;">
                 <h4 style="color: white;">📚 Comprehensive Documentation</h4>
                 <p style="color: rgba(255,255,255,0.95);">This documentation provides a complete view of the Rapid Agent Prototype Pattern (RAPP), combining:</p>
                 <ul style="color: rgba(255,255,255,0.95); margin-bottom: 0;">
@@ -5180,7 +5211,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
             <h1 class="section-title">Roadmap - EOY 2025</h1>
             <p class="section-subtitle">Next release wave priorities and strategic focus areas</p>
 
-            <div class="highlight-box" style="background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%); color: white; border: none;">
+            <div class="highlight-box" style="background: linear-gradient(135deg, #0b1f4b 0%, #3a1f66 100%); color: white; border: none;">
                 <h4 style="color: white;">🎯 Strategic Shift: From Prototypes to Production</h4>
                 <p style="color: rgba(255,255,255,0.95); margin-bottom: 0;">The strategic imperative is to transform conceptual ideas into production-ready solutions that field teams can deploy immediately. The focus is on creating demos that not only impress in presentations but can also be reliably reproduced and reused across multiple customer engagements to accelerate deal closure.</p>
             </div>
@@ -5208,7 +5239,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
                     <p style="color: rgba(255,255,255,0.95); margin-bottom: 0;"><strong>Key Requirement:</strong> "Less code-dependent, more tool-based" - team uses tools, not raw code</p>
                 </div>
 
-                <div class="priority-card" style="background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                <div class="priority-card" style="background: linear-gradient(135deg, #0b1f4b 0%, #3a1f66 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
                     <h4 style="color: white; margin-top: 0;">3. AI Agents Library Infrastructure</h4>
                     <p style="color: rgba(255,255,255,0.95);"><strong>What:</strong> Azure environment architecture where field can demo live agents</p>
                     <p style="color: rgba(255,255,255,0.95);"><strong>Deliverables:</strong></p>
