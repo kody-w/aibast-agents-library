@@ -39,6 +39,12 @@ pac copilot init \
   --environment <ENVIRONMENT-GUID>
 ```
 
+**Shared environment?** If other people deploy into this same environment
+(a training tenant), ask the person for their initials and append them to the
+display name (`--name "… Agent — KW"`). Otherwise the second attendee's init
+hits the first attendee's agent and "reconnect and update" would update
+someone else's work — the one collision a workshop room reliably produces.
+
 Friction, seen live:
 - **`403 … prvReadbot`** → the person has no security role in that environment.
   Tell them plainly: an admin must give them a role (Environment Maker is

@@ -44,6 +44,15 @@
    "playbook": "architecture-review.md",
    "needs_stack": true,
    "requires_scaffold": false
+  },
+  {
+   "slug": "cleanup",
+   "title": "Remove a deployed agent",
+   "summary": "Tears down an agent cleanly \u2014 portal deletion with explicit confirmation, keeping the local YAML so redeploying later stays a five-minute job.",
+   "triggers": "remove delete teardown tear down clean cleanup uninstall undeploy",
+   "playbook": "cleanup.md",
+   "needs_stack": true,
+   "requires_scaffold": false
   }
  ]
 }

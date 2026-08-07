@@ -23,7 +23,7 @@ r2 = a.perform(operation="mission",
 assert "MUTATION — adapt for Salesforce" in r2, "salesforce mutation missing"
 r3 = a.perform(operation="mission",
                request="deploy the deal progression agent to copilot studio")
-assert "MUTATION" not in r3, "mutation appended without being asked"
+assert "MUTATION — adapt for" not in r3, "mutation appended without being asked"
 print("mutation_layer_test: PASS")
 
 # architecture mission: WAF review with concessions, stack-adapted

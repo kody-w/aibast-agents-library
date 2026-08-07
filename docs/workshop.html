@@ -494,6 +494,12 @@ footer{margin-top:70px;padding:30px 0 46px;border-top:1px solid var(--line);
     <div id="rcHost"><p style="color:var(--faint)">Pick an agent in Step 0 to load its verification questions.</p></div>
 
     <div id="rc-tally">No verdicts recorded yet.</div>
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+      <button id="sumBtn" style="background:var(--accent);color:#fff;border:0;border-radius:8px;
+        padding:9px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">
+        Copy my session summary</button>
+      <span id="sumStatus" style="font-size:13px;color:var(--faint)"></span>
+    </div>
     <p style="margin-top:14px">Checks 2, 3, and 4 are the gate. If any of them fail, the build is
       not done: re-read the skill file for that behavior, confirm it pushed (a no-op push in step 5
       is the usual culprit), fix, push, publish, and re-run all five. These five prompts are also
@@ -779,6 +785,32 @@ pac copilot push --project-dir field-service-dispatch</pre></div>
       controls are in the production step's table above — bring both to the architecture review.</p>
   </div>
   </div>
+</details>
+
+<details class="uh" id="facilitator">
+  <summary><span class="eng">For the facilitator</span>Running this session for a room — the three things that sink workshops</summary>
+  <div class="phase"><div class="card">
+    <ol class="steps">
+      <li><b>Test the room's network the day before</b>
+        <p>Everything loads from <code>raw.githubusercontent.com</code>. Open
+        <a href="https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/registry.json">the registry</a>
+        from the venue's Wi-Fi. Corporate proxies that block raw GitHub kill the whole session —
+        and you want to know that with a day in hand, not live.</p></li>
+      <li><b>Shared training environment = name collisions</b>
+        <p>If attendees deploy into one shared environment, tell them to give their AI their
+        initials ("call it Field Service Dispatch — KW"). The playbook handles it; the room just
+        needs the one sentence. And confirm every attendee has a security role in that environment
+        beforehand — the missing-role 403 is the most common first-step failure.</p></li>
+      <li><b>Know the outage signature</b>
+        <p>If the Copilot Studio Test pane bounces to the home page or shows a script error with an
+        empty chat, that's a Microsoft service issue, not the attendees' builds — the Build page
+        still proves everything landed. Say so, carry on with the architecture review, and test
+        when it clears.</p></li>
+    </ol>
+    <p style="font-size:13px;color:var(--faint)">Ahead-of-time savers: have attendees run the
+      install one-liner and <code>pac auth create</code> before the session; both are
+      wait-then-click steps that eat room time.</p>
+  </div></div>
 </details>
 
 <!-- ═══════════ 7 PRODUCTION ═══════════ -->
@@ -1084,6 +1116,22 @@ Promise.all([fetchLib("registry.json",true),
     '<span class="pill-hint">Could not reach the library \u2014 check your connection and reload.</span>';
 });
 
+document.getElementById("sumBtn").onclick=function(){
+  if(!SELECTED){document.getElementById("sumStatus").textContent="Pick an agent first.";return;}
+  var lines=["# AIBAST Agent Workshop — session summary","",
+    "**Agent:** "+(SELECTED.display_name||SELECTED.name),
+    "**System of record:** "+(SORS.filter(function(s){return s.id===SOR;})[0]||{}).name,
+    "**Verification:**"];
+  var cards=document.querySelectorAll("#rcHost .rc");
+  cards.forEach(function(c){
+    var v=localStorage.getItem(rcKey(c.dataset.rc));
+    var ask=c.querySelector(".ask").textContent.trim();
+    lines.push("- "+(v==="p"?"✅ PASS":v==="f"?"❌ FAIL":"⬜ not run")+" — "+ask);});
+  lines.push("","Built by talking to my AI — AIBAST Agent Workshop.");
+  navigator.clipboard.writeText(lines.join("\n")).then(function(){
+    document.getElementById("sumStatus").textContent="Copied — paste it into the session chat.";
+  }).catch(function(){document.getElementById("sumStatus").textContent="Select + copy manually.";});
+};
 /* scrollspy */
 var links=[].slice.call(document.querySelectorAll(".rail a"));
 var secs=links.map(function(a){return document.querySelector(a.getAttribute("href"));});
