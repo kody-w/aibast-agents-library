@@ -15,11 +15,19 @@ if ! echo "$PAYLOAD" | grep -q "MISSION BRIEFING"; then
 fi
 # Guard: the briefing must be about the agent we asked for (live defect: a
 # fuzzy-match miss once routed win-loss to the deal-progression suite).
-SLUG_DIR=$(echo "$SLUG" | tr '-' '_')
+# Resolve the stack's TRUE directory from the repo — slugs and directory
+# names are not always the same shape (sales-simulation lives in
+# simulation_sales_stack), so deriving the dir from the slug misfires.
+SLUG_DIR=$(cd "$R" && python3 -c "
+import json, glob, sys
+for m in glob.glob('agents/@aibast-agents-library/*/*/copilot_studio/manifest.json'):
+    if json.load(open(m))['stack'] == '$SLUG':
+        print(m.split('/')[-3]); break
+")
 if ! echo "$PAYLOAD" | grep -q "Scaffold base URL"; then
   echo "MISSION RESULT: FAILURE — no scaffold context for $SLUG"; exit 1
 fi
-if ! echo "$PAYLOAD" | grep "Scaffold base URL" | grep -q "$SLUG_DIR"; then
+if [ -n "$SLUG_DIR" ] && ! echo "$PAYLOAD" | grep "Scaffold base URL" | grep -q "$SLUG_DIR"; then
   echo "MISSION RESULT: FAILURE — briefing routed to the wrong stack for $SLUG"; exit 1
 fi
 DIRECTIVE="Operator directives for this run (they override PERSON pauses — the operator has pre-approved):
