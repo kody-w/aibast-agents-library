@@ -5,8 +5,17 @@
    "stars": 4,
    "forks": 2,
    "watchers": 0
+  },
+  "2026-08-08": {
+   "stars": 4,
+   "forks": 2,
+   "watchers": 0
   }
  },
  "conversations": {},
- "in_the_wild": {}
+ "in_the_wild": {
+  "2026-08-08": {
+   "code_mentions_outside_repo": 1756
+  }
+ }
 }
