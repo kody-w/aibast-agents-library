@@ -2,7 +2,7 @@
 
 # AIBAST - Weekly & Monthly Impact
 
-**Snapshot:** `2026-08-12T02:11:18Z`
+**Snapshot:** `2026-08-12T02:34:45Z`
 **Site:** https://kody-w.github.io/aibast-agents-library/
 
 ## Reach and consumption
@@ -29,7 +29,7 @@
 | GitHub forks | 0 | Baseline pending | Baseline pending |
 | GitHub watchers | 0 | Baseline pending | Baseline pending |
 | Open GitHub issues | 3 | Baseline pending | Baseline pending |
-| Agent upvotes | 0 | Baseline pending | Baseline pending |
+| Agent upvotes | 1 | Baseline pending | Baseline pending |
 | Signed-in agent acquisitions | 0 | Baseline pending | Baseline pending |
 | Workshop usage events | 1 | Baseline pending | Baseline pending |
 | Workshop views (14-day top paths) | Unavailable | Unavailable | Unavailable |
@@ -55,8 +55,8 @@
 
 | Metric | Current | 7-day impact | 30-day impact |
 |---|---:|---:|---:|
-| Tracked repository files | 5,403 | Baseline pending | Baseline pending |
-| Files covered by download observations | 5,403 | Baseline pending | Baseline pending |
+| Tracked repository files | 5,406 | Baseline pending | Baseline pending |
+| Files covered by download observations | 5,406 | Baseline pending | Baseline pending |
 | Catalog agents | 72 | Baseline pending | Baseline pending |
 | Tracked SKILL.md files | 234 | Baseline pending | Baseline pending |
 | Canonical workshops | 51 | Baseline pending | Baseline pending |

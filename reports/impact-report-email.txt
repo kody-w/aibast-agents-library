@@ -1,7 +1,7 @@
 Subject: AIBAST weekly and monthly impact report - August 12, 2026
 
 AIBAST - WEEKLY & MONTHLY IMPACT
-Snapshot: 2026-08-12T02:11:18Z
+Snapshot: 2026-08-12T02:34:45Z
 Site: https://kody-w.github.io/aibast-agents-library/
 
 Weekly compares the current snapshot with a snapshot at least 7 days old.
@@ -30,7 +30,7 @@ GitHub stars                                                  0                 
 GitHub forks                                                  0                 Baseline pending                 Baseline pending
 GitHub watchers                                               0                 Baseline pending                 Baseline pending
 Open GitHub issues                                            3                 Baseline pending                 Baseline pending
-Agent upvotes                                                 0                 Baseline pending                 Baseline pending
+Agent upvotes                                                 1                 Baseline pending                 Baseline pending
 Signed-in agent acquisitions                                  0                 Baseline pending                 Baseline pending
 Workshop usage events                                         1                 Baseline pending                 Baseline pending
 Workshop views (14-day top paths)                   Unavailable                      Unavailable                      Unavailable
@@ -54,8 +54,8 @@ Achievement completion rate                               16.7%                 
 LIBRARY FOOTPRINT
 -----------------
 Metric                                                  Current                            7-day                           30-day
-Tracked repository files                                  5,403                 Baseline pending                 Baseline pending
-Files covered by download observations                    5,403                 Baseline pending                 Baseline pending
+Tracked repository files                                  5,406                 Baseline pending                 Baseline pending
+Files covered by download observations                    5,406                 Baseline pending                 Baseline pending
 Catalog agents                                               72                 Baseline pending                 Baseline pending
 Tracked SKILL.md files                                      234                 Baseline pending                 Baseline pending
 Canonical workshops                                          51                 Baseline pending                 Baseline pending
@@ -72,12 +72,12 @@ No complete dated baseline or non-zero movers yet.
 
 MEASUREMENT STATUS
 ------------------
-- Traffic: live (as of 2026-08-12T02:11:18Z)
-- File Downloads: complete (as of 2026-08-12T02:11:18Z)
-- Agent Upvotes: available (as of 2026-08-12T02:11:18Z)
-- Agent Acquisitions: available (as of 2026-08-12T02:11:18Z)
-- Workshops: partial (as of 2026-08-12T02:11:18Z)
-- Achievements: available (as of 2026-08-12T02:11:18Z)
+- Traffic: live (as of 2026-08-12T02:34:45Z)
+- File Downloads: complete (as of 2026-08-12T02:34:45Z)
+- Agent Upvotes: available (as of 2026-08-12T02:34:45Z)
+- Agent Acquisitions: available (as of 2026-08-12T02:34:45Z)
+- Workshops: partial (as of 2026-08-12T02:34:45Z)
+- Achievements: available (as of 2026-08-12T02:34:45Z)
 
 IMPORTANT NOTES
 ---------------
