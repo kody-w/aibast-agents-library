@@ -393,4 +393,5 @@ def test_windows_preflight_expects_public_iex_failure_to_be_nonzero():
     text = PREFLIGHT.read_text(encoding="utf-8")
     assert "$ErrorActionPreference = 'Continue'" in text
     assert "$failureExitCode = $LASTEXITCODE" in text
+    assert "$global:LASTEXITCODE = 0" in text
     assert "if ($failureExitCode -eq 0)" in text
