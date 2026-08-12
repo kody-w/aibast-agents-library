@@ -2,7 +2,7 @@
 
 # AIBAST - Weekly & Monthly Impact
 
-**Snapshot:** `2026-08-12T01:40:18Z`
+**Snapshot:** `2026-08-12T02:03:51Z`
 **Site:** https://kody-w.github.io/aibast-agents-library/
 
 ## Reach and consumption
@@ -28,28 +28,28 @@
 | GitHub stars | 0 | Baseline pending | Baseline pending |
 | GitHub forks | 0 | Baseline pending | Baseline pending |
 | GitHub watchers | 0 | Baseline pending | Baseline pending |
-| Open GitHub issues | 2 | Baseline pending | Baseline pending |
+| Open GitHub issues | 3 | Baseline pending | Baseline pending |
 | Agent upvotes | 0 | Baseline pending | Baseline pending |
 | Signed-in agent acquisitions | 0 | Baseline pending | Baseline pending |
-| Workshop usage events | 0 | Baseline pending | Baseline pending |
+| Workshop usage events | 1 | Baseline pending | Baseline pending |
 | Workshop views (14-day top paths) | Unavailable | Unavailable | Unavailable |
 | Workshop file downloads | 0 | Baseline pending | Baseline pending |
 | Workshop bundle downloads | 0 | Baseline pending | Baseline pending |
-| Workshop feedback reports | 0 | Baseline pending | Baseline pending |
+| Workshop feedback reports | 1 | Baseline pending | Baseline pending |
 
 ## Learning impact
 
 | Metric | Current | 7-day impact | 30-day impact |
 |---|---:|---:|---:|
-| Verified achievement participants | 0 | Baseline pending | Baseline pending |
-| Verified achievement points | 0 | Baseline pending | Baseline pending |
-| Verified achievements | 0 | Baseline pending | Baseline pending |
-| Workshop starts | 0 | Baseline pending | Baseline pending |
+| Verified achievement participants | 1 | Baseline pending | Baseline pending |
+| Verified achievement points | 5 | Baseline pending | Baseline pending |
+| Verified achievements | 1 | Baseline pending | Baseline pending |
+| Workshop starts | 1 | Baseline pending | Baseline pending |
 | Workshop completions | 0 | Baseline pending | Baseline pending |
 | Manual-mode completions | 0 | Baseline pending | Baseline pending |
 | Workshop completion rate | 0.0% | Baseline pending | Baseline pending |
 | Manual-mode completion rate | 0.0% | Baseline pending | Baseline pending |
-| Achievement completion rate | 0.0% | Baseline pending | Baseline pending |
+| Achievement completion rate | 16.7% | Baseline pending | Baseline pending |
 
 ## Library footprint
 

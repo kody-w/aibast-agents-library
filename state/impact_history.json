@@ -6736,11 +6736,11 @@
           "upvotes": 0
         }
       },
-      "at": "2026-08-12T01:40:18Z",
+      "at": "2026-08-12T02:03:51Z",
       "metrics": {
         "achievement_achievement_rate": {
           "status": "available",
-          "value": 0.0
+          "value": 16.7
         },
         "achievement_completion_rate": {
           "status": "available",
@@ -6760,15 +6760,15 @@
         },
         "achievement_participants": {
           "status": "available",
-          "value": 0
+          "value": 1
         },
         "achievement_points": {
           "status": "available",
-          "value": 0
+          "value": 5
         },
         "achievement_starts": {
           "status": "available",
-          "value": 0
+          "value": 1
         },
         "agent_acquisitions": {
           "status": "available",
@@ -6816,7 +6816,7 @@
         },
         "open_issues": {
           "status": "available",
-          "value": 2
+          "value": 3
         },
         "page_views": {
           "status": "available",
@@ -6852,7 +6852,7 @@
         },
         "verified_achievements": {
           "status": "available",
-          "value": 0
+          "value": 1
         },
         "verticals": {
           "status": "available",
@@ -6872,7 +6872,7 @@
         },
         "workshop_feedback": {
           "status": "available",
-          "value": 0
+          "value": 1
         },
         "workshop_file_downloads": {
           "status": "available",
@@ -6880,7 +6880,7 @@
         },
         "workshop_usage_events": {
           "status": "partial",
-          "value": 0
+          "value": 1
         },
         "workshop_views_14d": {
           "status": "unavailable",
@@ -6899,14 +6899,14 @@
         "account-intelligence": {
           "achievement_completions": 0,
           "achievement_hard_completions": 0,
-          "achievement_points": 0,
-          "achievement_starts": 0,
+          "achievement_points": 5,
+          "achievement_starts": 1,
           "agent_upvotes": 0,
           "bundle_downloads": 0,
           "display_name": "Account Intelligence Agent",
-          "feedback_reports": 0,
+          "feedback_reports": 1,
           "file_downloads": 0,
-          "usage_events": 0,
+          "usage_events": 1,
           "views_14d": null
         },
         "ai-customer-assistant": {

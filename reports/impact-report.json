@@ -9,28 +9,28 @@
   ],
   "coverage": {
     "achievements": {
-      "as_of": "2026-08-12T01:40:18Z",
+      "as_of": "2026-08-12T02:03:51Z",
       "status": "available"
     },
     "agent_acquisitions": {
-      "as_of": "2026-08-12T01:40:18Z",
+      "as_of": "2026-08-12T02:03:51Z",
       "status": "available"
     },
     "agent_upvotes": {
-      "as_of": "2026-08-12T01:40:18Z",
+      "as_of": "2026-08-12T02:03:51Z",
       "status": "available"
     },
     "file_downloads": {
-      "as_of": "2026-08-12T01:40:18Z",
+      "as_of": "2026-08-12T02:03:51Z",
       "status": "complete"
     },
     "traffic": {
-      "as_of": "2026-08-12T01:40:18Z",
+      "as_of": "2026-08-12T02:03:51Z",
       "reason": null,
       "status": "live"
     },
     "workshops": {
-      "as_of": "2026-08-12T01:40:18Z",
+      "as_of": "2026-08-12T02:03:51Z",
       "status": "partial"
     }
   },
@@ -691,7 +691,7 @@
         "source": "repo",
         "status": "available",
         "unit": "count",
-        "value": 2
+        "value": 3
       },
       {
         "id": "agent_upvotes",
@@ -734,7 +734,7 @@
         "source": "workshops",
         "status": "partial",
         "unit": "count",
-        "value": 0
+        "value": 1
       },
       {
         "id": "workshop_views_14d",
@@ -794,7 +794,7 @@
         "source": "workshop_feedback",
         "status": "available",
         "unit": "count",
-        "value": 0
+        "value": 1
       },
       {
         "id": "achievement_participants",
@@ -809,7 +809,7 @@
         "source": "achievements",
         "status": "available",
         "unit": "count",
-        "value": 0
+        "value": 1
       },
       {
         "id": "achievement_points",
@@ -824,7 +824,7 @@
         "source": "achievements",
         "status": "available",
         "unit": "count",
-        "value": 0
+        "value": 5
       },
       {
         "id": "verified_achievements",
@@ -839,7 +839,7 @@
         "source": "achievements",
         "status": "available",
         "unit": "count",
-        "value": 0
+        "value": 1
       },
       {
         "id": "achievement_starts",
@@ -854,7 +854,7 @@
         "source": "achievements",
         "status": "available",
         "unit": "count",
-        "value": 0
+        "value": 1
       },
       {
         "id": "achievement_completions",
@@ -929,7 +929,7 @@
         "source": "achievements",
         "status": "available",
         "unit": "percent",
-        "value": 0.0
+        "value": 16.7
       },
       {
         "id": "tracked_files",
@@ -1040,14 +1040,14 @@
       "account-intelligence": {
         "achievement_completions": 0,
         "achievement_hard_completions": 0,
-        "achievement_points": 0,
-        "achievement_starts": 0,
+        "achievement_points": 5,
+        "achievement_starts": 1,
         "agent_upvotes": 0,
         "bundle_downloads": 0,
         "display_name": "Account Intelligence Agent",
-        "feedback_reports": 0,
+        "feedback_reports": 1,
         "file_downloads": 0,
-        "usage_events": 0,
+        "usage_events": 1,
         "views_14d": null
       },
       "ai-customer-assistant": {
@@ -1702,7 +1702,7 @@
       }
     }
   },
-  "generated_at": "2026-08-12T01:40:18Z",
+  "generated_at": "2026-08-12T02:03:51Z",
   "links": {
     "email": "https://kody-w.github.io/aibast-agents-library/reports/impact-report-email.txt",
     "html": "https://kody-w.github.io/aibast-agents-library/reports/impact-report.html",
@@ -1722,7 +1722,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0.0
+          "value": 16.7
         },
         "achievement_completion_rate": {
           "baseline": null,
@@ -1762,7 +1762,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "achievement_points": {
           "baseline": null,
@@ -1770,7 +1770,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 5
         },
         "achievement_starts": {
           "baseline": null,
@@ -1778,7 +1778,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "agent_acquisitions": {
           "baseline": null,
@@ -1874,7 +1874,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 2
+          "value": 3
         },
         "page_views": {
           "baseline": null,
@@ -1946,7 +1946,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "verticals": {
           "baseline": null,
@@ -1986,7 +1986,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "workshop_file_downloads": {
           "baseline": null,
@@ -2002,7 +2002,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "workshop_views_14d": {
           "baseline": null,
@@ -2042,7 +2042,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0.0
+          "value": 16.7
         },
         "achievement_completion_rate": {
           "baseline": null,
@@ -2082,7 +2082,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "achievement_points": {
           "baseline": null,
@@ -2090,7 +2090,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 5
         },
         "achievement_starts": {
           "baseline": null,
@@ -2098,7 +2098,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "agent_acquisitions": {
           "baseline": null,
@@ -2194,7 +2194,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 2
+          "value": 3
         },
         "page_views": {
           "baseline": null,
@@ -2266,7 +2266,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "verticals": {
           "baseline": null,
@@ -2306,7 +2306,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "workshop_file_downloads": {
           "baseline": null,
@@ -2322,7 +2322,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 0
+          "value": 1
         },
         "workshop_views_14d": {
           "baseline": null,
@@ -2354,18 +2354,18 @@
     }
   },
   "repo": {
-    "as_of": "2026-08-12T01:40:18Z",
+    "as_of": "2026-08-12T02:03:51Z",
     "carried_forward": false,
     "created_at": "2025-10-20T18:22:14Z",
     "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
     "forks": 0,
     "homepage": null,
     "name": "aibast-agents-library",
-    "open_issues": 2,
+    "open_issues": 3,
     "owner": "kody-w",
-    "pushed_at": "2026-08-12T01:22:06Z",
+    "pushed_at": "2026-08-12T01:40:29Z",
     "site": "https://kody-w.github.io/aibast-agents-library/",
-    "size_kb": 5812716,
+    "size_kb": 5812730,
     "stars": 0,
     "url": "https://github.com/kody-w/aibast-agents-library",
     "watchers": 0

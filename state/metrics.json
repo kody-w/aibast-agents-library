@@ -1,17 +1,17 @@
 {
  "schema": "aibast-metrics/1.0",
- "generated_at": "2026-08-12T01:40:18Z",
+ "generated_at": "2026-08-12T02:03:51Z",
  "repo": {
   "stars": 0,
   "forks": 0,
   "watchers": 0,
-  "open_issues": 2,
-  "size_kb": 5812716,
+  "open_issues": 3,
+  "size_kb": 5812730,
   "created_at": "2025-10-20T18:22:14Z",
-  "pushed_at": "2026-08-12T01:22:06Z",
+  "pushed_at": "2026-08-12T01:40:29Z",
   "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
   "homepage": null,
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "carried_forward": false,
   "owner": "kody-w",
   "name": "aibast-agents-library",
@@ -208,7 +208,7 @@
   "clones_14d": 1560,
   "views_14d": 11,
   "live": true,
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "unavailable_reason": null,
   "carried_forward": false
  },
@@ -219,7 +219,7 @@
   "agent_hits": 82,
   "installer_hits": 0,
   "files": [],
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "carried_forward": false
  },
  "releases": {
@@ -603,7 +603,7 @@
     "assets": []
    }
   ],
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "carried_forward": false
  },
  "leaderboards": {
@@ -2790,7 +2790,7 @@
  ],
  "agent_discussion_coverage": {
   "status": "available",
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "pages": 3,
   "discussions_scanned": 144,
   "diagnostics": {
@@ -2817,7 +2817,7 @@
  },
  "agent_upvote_coverage": {
   "status": "available",
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "pages": 3,
   "discussions_scanned": 144,
   "discussions": 72,
@@ -2834,7 +2834,7 @@
  },
  "agent_acquisition_coverage": {
   "status": "available",
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "pages": 3,
   "discussions_scanned": 144,
   "discussions": 72,
@@ -2852,7 +2852,7 @@
  "file_metrics": {
   "schema": "aibast-file-metrics/1.0",
   "source_status": "complete",
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "carried_forward": false,
   "totals": {
    "files": 5403,
@@ -46144,13 +46144,13 @@
  "workshops": {
   "totals": {
    "workshops": 51,
-   "usage_events": 0,
+   "usage_events": 1,
    "views_14d": null,
    "view_uniques_14d": null,
    "file_downloads": 0,
    "bundle_downloads": 0,
-   "feedback_reports": 0,
-   "feedback_open": 0,
+   "feedback_reports": 1,
+   "feedback_open": 1,
    "feedback_closed": 0,
    "agent_upvotes": 0
   },
@@ -46158,7 +46158,7 @@
    "views_14d": null,
    "file_downloads": 0,
    "bundle_downloads": 0,
-   "feedback_reports": 0
+   "feedback_reports": 1
   },
   "rows": [
    {
@@ -46172,11 +46172,11 @@
     "view_observed": false,
     "file_downloads": 0,
     "bundle_downloads": 0,
-    "feedback_reports": 0,
-    "feedback_open": 0,
+    "feedback_reports": 1,
+    "feedback_open": 1,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 1
    },
    {
     "catalog_key": "@aibast-agents-library/ask-hr",
@@ -47035,7 +47035,7 @@
    "mixed_windows": true,
    "views": {
     "status": "live popular-path response",
-    "as_of": "2026-08-12T01:40:18Z",
+    "as_of": "2026-08-12T02:03:51Z",
     "censored": true,
     "diagnostics": {
      "duplicate_rows": 0,
@@ -47049,7 +47049,7 @@
    },
    "downloads": {
     "status": "complete paginated jsDelivr file response",
-    "as_of": "2026-08-12T01:40:18Z",
+    "as_of": "2026-08-12T02:03:51Z",
     "pages": 1,
     "pagination": "complete",
     "diagnostics": {
@@ -47062,8 +47062,8 @@
    },
    "feedback": {
     "status": "workshop-feedback label + body marker union",
-    "as_of": "2026-08-12T01:40:18Z",
-    "issues_scanned": 0,
+    "as_of": "2026-08-12T02:03:51Z",
+    "issues_scanned": 1,
     "pages": 2,
     "diagnostics": {
      "duplicate_issues": 0,
@@ -47074,7 +47074,7 @@
    },
    "agent_upvotes": {
     "status": "available",
-    "as_of": "2026-08-12T01:40:18Z",
+    "as_of": "2026-08-12T02:03:51Z",
     "scope": "Native upvotes on each primary agent's canonical rating Discussion. This preference signal is separate from usage_events and acquisition Discussions."
    }
   },
@@ -47105,40 +47105,60 @@
     "url": "https://kody-w.github.io/aibast-agents-library/registry.json"
    }
   ],
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "carried_forward": false
  },
  "achievements": {
   "schema": "aibast-achievements/2.0",
   "status": "available",
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "carried_forward": false,
   "caveat": "Verified achievement points are server-scored from opt-in public GitHub progress claims. Each explicitly claimed achievement has a fixed value: started 5, local-proof 15, draft-builder 20, preview-proven 25, workshop-completed 35, and hard-mode-completed 50, for at most 150 points per workshop. Re-syncing unions achievement IDs without duplicating points. Profiles are public by explicit submission consent. GitHub verification confirms authenticated issue authorship and canonical claim format only; achievement completion remains self-reported and is not independently proven. Verified public achievements remain separate from local self-paced state, repository stars, agent upvotes, downloads, and workshop usage events.",
   "totals": {
-   "participants": 0,
-   "points": 0,
-   "achievements": 0,
-   "starts": 0,
+   "participants": 1,
+   "points": 5,
+   "achievements": 1,
+   "starts": 1,
    "workshop_completions": 0,
    "hard_completions": 0,
    "completion_rate": 0.0,
    "hard_completion_rate": 0.0,
-   "achievement_completion_rate": 0.0
+   "achievement_completion_rate": 16.7
   },
-  "profiles": [],
+  "profiles": [
+   {
+    "login": "kody-w",
+    "points": 5,
+    "achievement_count": 1,
+    "starts": 1,
+    "workshop_completions": 0,
+    "hard_completions": 0,
+    "badges": [
+     {
+      "workshop": "account-intelligence",
+      "achievement": "started",
+      "points": 5
+     }
+    ],
+    "achievement_ids": [
+     "account-intelligence:started"
+    ],
+    "completed_workshops": []
+   }
+  ],
   "workshops": [
    {
     "slug": "account-intelligence",
     "display_name": "Account Intelligence Agent",
     "agent_name": "@aibast-agents-library/account-intelligence",
-    "participants": 0,
-    "points": 0,
-    "achievements": 0,
-    "starts": 0,
+    "participants": 1,
+    "points": 5,
+    "achievements": 1,
+    "starts": 1,
     "workshop_completions": 0,
     "hard_completions": 0,
     "achievement_counts": {
-     "started": 0,
+     "started": 1,
      "local-proof": 0,
      "draft-builder": 0,
      "preview-proven": 0,
@@ -47147,7 +47167,7 @@
     },
     "completion_rate": 0.0,
     "hard_completion_rate": 0.0,
-    "achievement_completion_rate": 0.0
+    "achievement_completion_rate": 16.7
    },
    {
     "slug": "ask-hr",
@@ -48255,10 +48275,10 @@
     "id": "started",
     "label": "Started",
     "points": 5,
-    "claims": 0,
-    "participants": 0,
-    "workshops": 0,
-    "attainment_rate": 0.0
+    "claims": 1,
+    "participants": 1,
+    "workshops": 1,
+    "attainment_rate": 100.0
    },
    {
     "id": "local-proof",
@@ -48310,43 +48330,60 @@
    "status": "available",
    "scope": "Public state=all GitHub issues whose body begins with the achievement progress marker and passes the exact schema, canonical workshop-primary-agent, ordered achievement subset, dependency, source, and public-login checks. Open, closed, and edited claims union by case-insensitive login/workshop/achievement.",
    "diagnostics": {
-    "accepted_issues": 0,
-    "accepted_achievements": 0,
+    "accepted_issues": 1,
+    "accepted_achievements": 1,
     "duplicate_achievements": 0,
     "invalid_issues": 0,
     "invalid_users": 0,
     "pull_requests": 0
    },
    "pages": 1,
-   "issues_scanned": 0
+   "issues_scanned": 1
   }
  },
  "workshop_certification": {
   "schema": "aibast-workshop-certification/1.0",
   "status": "available",
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "carried_forward": false,
   "totals": {
-   "cohort_submissions": 0,
-   "verified_cohorts": 0,
-   "facilitators": 0,
-   "attendees_reported": 0,
-   "qualification_submissions": 0,
-   "qualified_modules": 0,
-   "qualified_profiles": 0
+   "cohort_submissions": 1,
+   "verified_cohorts": 1,
+   "facilitators": 1,
+   "attendees_reported": 1,
+   "qualification_submissions": 1,
+   "qualified_modules": 1,
+   "qualified_profiles": 1
   },
-  "facilitators": [],
-  "candidates": [],
+  "facilitators": [
+   {
+    "login": "kody-w",
+    "verified_cohorts": 1,
+    "attendees_reported": 1,
+    "workshops": [
+     "account-intelligence"
+    ]
+   }
+  ],
+  "candidates": [
+   {
+    "login": "kody-w",
+    "qualified_modules": 1,
+    "workshops": [
+     "account-intelligence"
+    ]
+   }
+  ],
   "workshops": [
    {
     "slug": "account-intelligence",
     "display_name": "Account Intelligence Agent",
     "agent_name": "@aibast-agents-library/account-intelligence",
-    "cohort_submissions": 0,
-    "verified_cohorts": 0,
-    "attendees_reported": 0,
-    "qualification_submissions": 0,
-    "qualified_profiles": 0
+    "cohort_submissions": 1,
+    "verified_cohorts": 1,
+    "attendees_reported": 1,
+    "qualification_submissions": 1,
+    "qualified_profiles": 1
    },
    {
     "slug": "ask-hr",
@@ -48853,23 +48890,23 @@
    "status": "available",
    "scope": "Public GitHub issues with exact cohort or badge qualification markers. Private Microsoft identity, MSIX, customer, roster, and test-answer data are deliberately excluded. Cohorts count only with cohort-verified; qualifications count only with badge-qualified.",
    "diagnostics": {
-    "cohort_submissions": 0,
-    "qualification_submissions": 0,
-    "verified_cohorts": 0,
-    "qualified_modules": 0,
+    "cohort_submissions": 1,
+    "qualification_submissions": 1,
+    "verified_cohorts": 1,
+    "qualified_modules": 1,
     "duplicate_submissions": 0,
     "invalid_issues": 0,
     "invalid_users": 0,
     "pull_requests": 0
    },
    "pages": 1,
-   "issues_scanned": 0
+   "issues_scanned": 2
   }
  },
  "ecosystem": {
   "schema": "aibast-ecosystem-metrics/1.0",
   "status": "available",
-  "as_of": "2026-08-12T01:40:18Z",
+  "as_of": "2026-08-12T02:03:51Z",
   "sources": {
    "aibast": {
     "status": "available",
