@@ -437,15 +437,18 @@
     const bashOverrides = staging
       ? `BRAINSTEM_REPO_URL=${repoUrl} BRAINSTEM_REPO_REF=${ref} BRAINSTEM_VERSION_URL=${versionUrl} `
       : '';
-    const powershellOverrides = staging
-      ? `$env:BRAINSTEM_REPO_URL='${repoUrl}'; $env:BRAINSTEM_REPO_REF='${ref}'; $env:BRAINSTEM_VERSION_URL='${versionUrl}'; `
-      : '';
+    const windowsScript = staging
+      ? `$env:BRAINSTEM_REPO_URL="${repoUrl}"; $env:BRAINSTEM_REPO_REF="${ref}"; $env:BRAINSTEM_VERSION_URL="${versionUrl}"; irm "${base}install.ps1" | iex`
+      : `irm "${base}install.ps1" | iex`;
     return {
       staging,
       owner,
       ref,
       bash: `curl -fsSL ${base}install.sh | ${bashOverrides}bash`,
-      windows: `${powershellOverrides}irm ${base}install.ps1 | iex`,
+      windowsScript,
+      windows: staging
+        ? `powershell -NoProfile -ExecutionPolicy Bypass -Command '& { ${windowsScript} }'`
+        : `irm ${base}install.ps1 | iex`,
       macManual: `git clone --branch ${ref} ${repoUrl} ~/.brainstem/src && cd ~/.brainstem/src/rapp_brainstem && pip3 install -r requirements.txt && ./start.sh`,
       windowsManual: `git clone --branch ${ref} ${repoUrl} %USERPROFILE%\\.brainstem\\src && cd %USERPROFILE%\\.brainstem\\src\\rapp_brainstem && pip install -r requirements.txt && python brainstem.py`
     };
@@ -499,7 +502,7 @@
     const macPayload = `#!/bin/bash\n${commands.bash}\n`;
     const windowsPayload = [
       '@echo off',
-      'powershell -NoProfile -ExecutionPolicy Bypass -Command "' + commands.windows + '"',
+      'powershell -NoProfile -ExecutionPolicy Bypass -Command "& { ' + commands.windowsScript + ' }"',
       'if %ERRORLEVEL% neq 0 exit /b 1',
       ''
     ].join('\r\n');

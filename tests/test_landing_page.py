@@ -80,7 +80,11 @@ def test_staging_install_commands_pin_the_staging_repository_and_ref():
     assert "BRAINSTEM_REPO_URL" in staging["bash"]
     assert "BRAINSTEM_REPO_REF" in staging["bash"]
     assert "BRAINSTEM_VERSION_URL" in staging["bash"]
-    assert "$env:BRAINSTEM_REPO_URL" in staging["windows"]
+    assert "$env:BRAINSTEM_REPO_URL" in staging["windowsScript"]
+    assert staging["windows"].startswith(
+        "powershell -NoProfile -ExecutionPolicy Bypass -Command '& { "
+    )
+    assert not staging["windows"].startswith("$env:")
 
 
 def test_staging_download_wrappers_embed_the_same_pinned_commands():
@@ -117,3 +121,6 @@ console.log(JSON.stringify(buildInstallerDownloads(commands)));
         payload = downloads[platform]["href"]
         assert "kody-w/aibast-agents-library" in payload
         assert "easy-mode-copilot-chat-pilot" in payload
+    assert downloads["Windows"]["href"].startswith(
+        '@echo off\r\npowershell -NoProfile -ExecutionPolicy Bypass -Command "& { '
+    )

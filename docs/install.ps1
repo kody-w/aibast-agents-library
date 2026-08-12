@@ -16,11 +16,13 @@ try {
 
 $BRAINSTEM_HOME = "$env:USERPROFILE\.brainstem"
 $BRAINSTEM_BIN = "$env:USERPROFILE\.local\bin"
+$SOURCE_ID_FILE = "$BRAINSTEM_HOME\source"
 $SOURCE_OVERRIDE_REQUESTED = [bool](
     $env:BRAINSTEM_REPO_URL -or
     $env:BRAINSTEM_REPO_REF -or
     $env:BRAINSTEM_VERSION_URL
 )
+$SOURCE_REFRESH_REQUIRED = $false
 $REPO_URL = if ($env:BRAINSTEM_REPO_URL) { $env:BRAINSTEM_REPO_URL } else { "https://github.com/microsoft/aibast-agents-library.git" }
 $REPO_REF = if ($env:BRAINSTEM_REPO_REF) { $env:BRAINSTEM_REPO_REF } else { "main" }
 $REMOTE_VERSION_URL = if ($env:BRAINSTEM_VERSION_URL) { $env:BRAINSTEM_VERSION_URL } else { "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/VERSION" }
@@ -63,12 +65,35 @@ function Compare-SemVer {
     return 0  # equal
 }
 
+function Test-SourceIdentity {
+    if (-not (Test-Path $SOURCE_ID_FILE)) { return $false }
+    $lines = @(Get-Content $SOURCE_ID_FILE -ErrorAction SilentlyContinue)
+    return (
+        $lines.Count -ge 2 -and
+        $lines[0] -eq $REPO_URL -and
+        $lines[1] -eq $REPO_REF
+    )
+}
+
+function Write-SourceIdentity {
+    New-Item -ItemType Directory -Force -Path $BRAINSTEM_HOME | Out-Null
+    $tempPath = "$SOURCE_ID_FILE.tmp.$PID"
+    Set-Content -Path $tempPath -Value @($REPO_URL, $REPO_REF) -Encoding Ascii
+    Move-Item -Force $tempPath $SOURCE_ID_FILE
+}
+
 function Check-ForUpgrade {
     $versionFile = "$BRAINSTEM_HOME\src\rapp_brainstem\VERSION"
 
     if (-not (Test-Path $versionFile)) { return $true }
 
     $localVersion = (Get-Content $versionFile -Raw).Trim()
+
+    if ($SOURCE_OVERRIDE_REQUESTED -or (-not (Test-SourceIdentity))) {
+        $script:SOURCE_REFRESH_REQUIRED = $true
+        Write-Host "  [..] Refreshing the requested repository/ref" -ForegroundColor Yellow
+        return $true
+    }
 
     try {
         $remoteVersion = (Invoke-WebRequest -Uri $REMOTE_VERSION_URL -UseBasicParsing -TimeoutSec 10).Content.Trim()
@@ -79,11 +104,6 @@ function Check-ForUpgrade {
 
     Write-Host "  Local version:  $localVersion" -ForegroundColor Cyan
     Write-Host "  Remote version: $remoteVersion" -ForegroundColor Cyan
-
-    if ($SOURCE_OVERRIDE_REQUESTED) {
-        Write-Host "  [..] Refreshing the explicitly requested repository/ref" -ForegroundColor Yellow
-        return $true
-    }
 
     if ($localVersion -eq $remoteVersion) {
         Write-Host ""
@@ -528,6 +548,9 @@ function Repair-BrainstemSource {
 function Install-Brainstem {
     Write-Host ""
     Write-Host "Installing RAPP Brainstem..."
+    if ($SOURCE_OVERRIDE_REQUESTED -or (-not (Test-SourceIdentity))) {
+        $script:SOURCE_REFRESH_REQUIRED = $true
+    }
 
     if (-not (Test-Path $BRAINSTEM_HOME)) {
         New-Item -ItemType Directory -Force -Path $BRAINSTEM_HOME | Out-Null
@@ -560,7 +583,7 @@ function Install-Brainstem {
         if (
             ($LocalVer -eq $RemoteVer) -and
             (Test-BrainstemSourceReady "$BRAINSTEM_HOME\src") -and
-            (-not $SOURCE_OVERRIDE_REQUESTED)
+            (-not $SOURCE_REFRESH_REQUIRED)
         ) {
             Write-Host "  [OK] Already up to date (v$LocalVer)" -ForegroundColor Green
         } else {
@@ -701,7 +724,7 @@ function Install-Brainstem {
                 }
             }
             Remove-Item -Recurse -Force $Backup -ErrorAction SilentlyContinue
-            if ((-not $pullOk) -and $SOURCE_OVERRIDE_REQUESTED) {
+            if ((-not $pullOk) -and $SOURCE_REFRESH_REQUIRED) {
                 throw "Could not refresh the requested repository/ref; existing files were restored"
             }
             # Report the version actually on disk after the pull, not the remote string —
@@ -847,6 +870,7 @@ function Install-Brainstem {
     if (-not (Test-BrainstemSourceReady "$BRAINSTEM_HOME\src")) {
         throw "Brainstem source is incomplete after install; rapp_brainstem\brainstem.py is missing"
     }
+    Write-SourceIdentity
     Write-Host "  [OK] Source code ready" -ForegroundColor Green
 }
 
@@ -1001,18 +1025,6 @@ function Create-Env {
 }
 
 function Launch-Brainstem {
-    # Refresh from this installer's repo before launching (no-op if already current).
-    # Skip when a version is pinned — pulling main would move off the pinned tag.
-    if ((-not $PIN_VERSION) -and (Test-Path "$BRAINSTEM_HOME\src\.git")) {
-        Push-Location "$BRAINSTEM_HOME\src"
-        $prevEAP = $ErrorActionPreference
-        $ErrorActionPreference = 'Continue'
-        git remote set-url origin $REPO_URL 2>&1 | Out-Null
-        git pull --quiet origin $REPO_REF 2>&1 | Out-Null
-        $ErrorActionPreference = $prevEAP
-        Pop-Location
-    }
-
     # Dependencies BEFORE auth: if they cannot be installed, fail now — not after
     # walking the user through a GitHub device-code authorization they can't use.
     Push-Location "$BRAINSTEM_HOME\src\rapp_brainstem"
@@ -1271,7 +1283,5 @@ try {
     Write-Host "      Nothing was launched. Fix the issue above and re-run the installer." -ForegroundColor Yellow
     Write-Host "      Need help? Open an issue at https://github.com/microsoft/aibast-agents-library/issues" -ForegroundColor Gray
     Write-Host ""
-    # `irm | iex` has no $PSCommandPath — return to the prompt quietly. A file-based
-    # run (CI, a saved script) must still report failure through the exit code.
-    if ($PSCommandPath) { exit 1 }
+    throw
 }

@@ -9,7 +9,9 @@ umask 077
 BRAINSTEM_HOME="$HOME/.brainstem"
 BRAINSTEM_BIN="$HOME/.local/bin"
 VENV_DIR="$BRAINSTEM_HOME/venv"
+SOURCE_ID_FILE="$BRAINSTEM_HOME/source"
 SOURCE_OVERRIDE_REQUESTED=false
+SOURCE_REFRESH_REQUIRED=false
 if [[ -n "${BRAINSTEM_REPO_URL:-}" || -n "${BRAINSTEM_REPO_REF:-}" || -n "${BRAINSTEM_VERSION_URL:-}" ]]; then
     SOURCE_OVERRIDE_REQUESTED=true
 fi
@@ -227,6 +229,20 @@ version_gt() {
     return 1  # equal
 }
 
+source_identity_matches() {
+    [ -f "$SOURCE_ID_FILE" ] \
+        && [ "$(sed -n '1p' "$SOURCE_ID_FILE" 2>/dev/null)" = "$REPO_URL" ] \
+        && [ "$(sed -n '2p' "$SOURCE_ID_FILE" 2>/dev/null)" = "$REPO_REF" ]
+}
+
+write_source_identity() {
+    mkdir -p "$BRAINSTEM_HOME"
+    local tmp="${SOURCE_ID_FILE}.tmp.$$"
+    printf '%s\n%s\n' "$REPO_URL" "$REPO_REF" > "$tmp"
+    chmod 600 "$tmp" 2>/dev/null || true
+    mv "$tmp" "$SOURCE_ID_FILE"
+}
+
 check_for_upgrade() {
     local version_file="$BRAINSTEM_HOME/src/rapp_brainstem/VERSION"
 
@@ -237,6 +253,12 @@ check_for_upgrade() {
 
     local local_version
     local_version=$(cat "$version_file" 2>/dev/null | tr -d '[:space:]')
+
+    if [[ "$SOURCE_OVERRIDE_REQUESTED" == true ]] || ! source_identity_matches; then
+        SOURCE_REFRESH_REQUIRED=true
+        echo -e "  ${YELLOW}↻${NC} Refreshing the requested repository/ref"
+        return 0
+    fi
 
     # Fetch remote version
     local remote_version
@@ -249,11 +271,6 @@ check_for_upgrade() {
 
     echo -e "  Local version:  ${CYAN}${local_version}${NC}"
     echo -e "  Remote version: ${CYAN}${remote_version}${NC}"
-
-    if [[ "$SOURCE_OVERRIDE_REQUESTED" == true ]]; then
-        echo -e "  ${YELLOW}↻${NC} Refreshing the explicitly requested repository/ref"
-        return 0
-    fi
 
     if [[ "$local_version" == "$remote_version" ]]; then
         echo ""
@@ -427,6 +444,9 @@ install_brainstem() {
     local ENV_FILE="$BRAINSTEM_HOME/src/rapp_brainstem/.env"
     local DATA_DIR="$BRAINSTEM_HOME/src/rapp_brainstem/.brainstem_data"
     local LOCAL_VERSION_FILE="$BRAINSTEM_HOME/src/rapp_brainstem/VERSION"
+    if [[ "$SOURCE_OVERRIDE_REQUESTED" == true ]] || ! source_identity_matches; then
+        SOURCE_REFRESH_REQUIRED=true
+    fi
 
     if [ -d "$BRAINSTEM_HOME/src/.git" ]; then
         echo "  Limiting the install source to the Brainstem runtime..."
@@ -453,7 +473,7 @@ install_brainstem() {
 
         if [ "$LOCAL_VER" = "$TARGET_VER" ] \
             && brainstem_source_ready "$BRAINSTEM_HOME/src" \
-            && [[ "$SOURCE_OVERRIDE_REQUESTED" != true ]]; then
+            && [[ "$SOURCE_REFRESH_REQUIRED" != true ]]; then
             echo -e "  ${GREEN}✓${NC} Already on v${LOCAL_VER}"
         else
             echo "  Switching v${LOCAL_VER} → v${TARGET_VER}..."
@@ -566,7 +586,7 @@ install_brainstem() {
             rm -rf "$BACKUP"
             if [[ "$update_succeeded" == true ]]; then
                 echo -e "  ${GREEN}✓${NC} ${PIN_VERSION:+Pinned to}${PIN_VERSION:-Upgrade complete:} v${TARGET_VER}"
-            elif [[ "$SOURCE_OVERRIDE_REQUESTED" == true ]]; then
+            elif [[ "$SOURCE_REFRESH_REQUIRED" == true ]]; then
                 echo -e "  ${RED}✗${NC} Could not refresh the requested repository/ref; existing files were restored"
                 return 1
             else
@@ -688,6 +708,7 @@ install_brainstem() {
         echo "    Missing: $BRAINSTEM_HOME/src/rapp_brainstem/brainstem.py"
         exit 1
     fi
+    write_source_identity
     echo -e "  ${GREEN}✓${NC} Source code ready"
 }
 
@@ -814,12 +835,6 @@ create_env() {
 
 launch_brainstem() {
     export PATH="$BRAINSTEM_BIN:/opt/homebrew/bin:/usr/local/bin:$PATH"
-
-    # Always pull latest code before launching
-    if [ -d "$BRAINSTEM_HOME/src/.git" ]; then
-        cd "$BRAINSTEM_HOME/src"
-        git pull --quiet 2>/dev/null || true
-    fi
 
     local venv_python="$VENV_DIR/bin/python"
 

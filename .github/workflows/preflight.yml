@@ -485,9 +485,18 @@ jobs:
               git -C "$HOME/.brainstem/src" rev-parse FETCH_HEAD:rapp_brainstem
             )"
             if [[ "$production_tree" != "$expected_runtime_tree" ]]; then
-              git -C "$HOME/.brainstem/src" reset --hard --quiet FETCH_HEAD
-              printf '\nONE-LINER-SOUL-MARKER\n' >> "$HOME/.brainstem/src/rapp_brainstem/soul.md"
-              run_installer | tee "$RUNNER_TEMP/source-switch-install.log"
+              env -u BRAINSTEM_REPO_URL -u BRAINSTEM_REPO_REF \
+                -u BRAINSTEM_VERSION_URL bash -c \
+                "curl -fsSL '$installer' | bash -s -- --no-launch" \
+                | tee "$RUNNER_TEMP/production-switch-install.log"
+              test "$(
+                git -C "$HOME/.brainstem/src" rev-parse HEAD:rapp_brainstem
+              )" = "$production_tree"
+              grep -q ONE-LINER-SOUL-MARKER "$HOME/.brainstem/src/rapp_brainstem/soul.md"
+              test -f "$HOME/.brainstem/src/rapp_brainstem/agents/one_liner_custom_agent.py"
+              grep -q ONE-LINER-TOKEN "$HOME/.brainstem/src/rapp_brainstem/.copilot_token"
+
+              run_installer | tee "$RUNNER_TEMP/staging-switch-install.log"
               test "$(
                 git -C "$HOME/.brainstem/src" rev-parse HEAD:rapp_brainstem
               )" = "$expected_runtime_tree"
@@ -557,10 +566,26 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw 'could not fetch production source-switch fixture' }
             $productionTree = (git -C $sourceRoot rev-parse 'FETCH_HEAD:rapp_brainstem').Trim()
             if ($productionTree -ne $expectedRuntimeTree) {
-              git -C $sourceRoot reset --hard --quiet FETCH_HEAD
-              if ($LASTEXITCODE -ne 0) { throw 'could not stage production source tree' }
-              Add-Content -Path (Join-Path $runtime 'soul.md') -Value 'ONE-LINER-SOUL-MARKER'
-              Invoke-OneLiner (Join-Path $env:RUNNER_TEMP 'source-switch-install.log')
+              $savedRepo = $env:BRAINSTEM_REPO_URL
+              $savedRef = $env:BRAINSTEM_REPO_REF
+              $savedVersion = $env:BRAINSTEM_VERSION_URL
+              try {
+                Remove-Item Env:BRAINSTEM_REPO_URL -ErrorAction SilentlyContinue
+                Remove-Item Env:BRAINSTEM_REPO_REF -ErrorAction SilentlyContinue
+                Remove-Item Env:BRAINSTEM_VERSION_URL -ErrorAction SilentlyContinue
+                Invoke-OneLiner (Join-Path $env:RUNNER_TEMP 'production-switch-install.log')
+              } finally {
+                $env:BRAINSTEM_REPO_URL = $savedRepo
+                $env:BRAINSTEM_REPO_REF = $savedRef
+                $env:BRAINSTEM_VERSION_URL = $savedVersion
+              }
+              $productionInstalledTree = (git -C $sourceRoot rev-parse 'HEAD:rapp_brainstem').Trim()
+              if ($productionInstalledTree -ne $productionTree) { throw 'default production command did not replace staging runtime' }
+              if ((Get-Content (Join-Path $runtime 'soul.md') -Raw) -notmatch 'ONE-LINER-SOUL-MARKER') { throw 'soul marker lost during production switch' }
+              if (-not (Test-Path (Join-Path $runtime 'agents\one_liner_custom_agent.py'))) { throw 'custom agent lost during production switch' }
+              if ((Get-Content (Join-Path $runtime '.copilot_token') -Raw) -notmatch 'ONE-LINER-TOKEN') { throw 'token marker lost during production switch' }
+
+              Invoke-OneLiner (Join-Path $env:RUNNER_TEMP 'staging-switch-install.log')
               $switchedTree = (git -C $sourceRoot rev-parse 'HEAD:rapp_brainstem').Trim()
               if ($switchedTree -ne $expectedRuntimeTree) { throw 'same-version source switch did not install candidate runtime' }
               if ((Get-Content (Join-Path $runtime 'brainstem.py') -Raw) -notmatch 'health/public') { throw 'candidate readiness endpoint missing after source switch' }
@@ -569,6 +594,20 @@ jobs:
               if ((Get-Content (Join-Path $runtime '.copilot_token') -Raw) -notmatch 'ONE-LINER-TOKEN') { throw 'token marker lost during source switch' }
             }
           }
+
+          $failureHome = Join-Path $env:RUNNER_TEMP 'iex-failure-home'
+          $failureCommand = @"
+          `$env:USERPROFILE = "$failureHome"
+          `$env:BRAINSTEM_REPO_URL = "https://github.com/$($env:CANDIDATE_REPO)-does-not-exist.git"
+          `$env:BRAINSTEM_REPO_REF = "$env:CANDIDATE_REF"
+          `$env:BRAINSTEM_VERSION_URL = "$env:BRAINSTEM_VERSION_URL"
+          irm "$installer" | iex
+          "@
+          $encodedFailure = [Convert]::ToBase64String(
+            [Text.Encoding]::Unicode.GetBytes($failureCommand)
+          )
+          & powershell -NoProfile -EncodedCommand $encodedFailure
+          if ($LASTEXITCODE -eq 0) { throw 'public irm | iex failure path returned success' }
 
       - uses: actions/upload-artifact@v4
         if: always()

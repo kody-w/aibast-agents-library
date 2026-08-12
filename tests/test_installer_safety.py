@@ -141,6 +141,43 @@ install_brainstem
     assert (installed / "rapp_brainstem/brainstem.py").read_text(
         encoding="utf-8"
     ) == "print('staging health public')\n"
+    assert (tmp_path / ".brainstem/source").read_text(
+        encoding="utf-8"
+    ).splitlines() == [str(staging), "easy-mode-copilot-chat-pilot"]
+
+
+def test_same_version_default_production_replaces_staging_runtime(tmp_path):
+    installed = tmp_path / ".brainstem/src"
+    production = tmp_path / "production-source"
+    init_source_repo(
+        installed,
+        "easy-mode-copilot-chat-pilot",
+        "print('staging health public')\n",
+    )
+    init_source_repo(production, "main", "print('production')\n")
+
+    result = run_harness(
+        tmp_path,
+        f"""
+REPO_URL={str(installed)!r}
+REPO_REF=easy-mode-copilot-chat-pilot
+write_source_identity
+SOURCE_OVERRIDE_REQUESTED=false
+REPO_URL={str(production)!r}
+REPO_REF=main
+REMOTE_VERSION_URL=https://example.invalid/VERSION
+curl() {{ printf '0.6.16\\n'; }}
+install_brainstem
+""",
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert (installed / "rapp_brainstem/brainstem.py").read_text(
+        encoding="utf-8"
+    ) == "print('production')\n"
+    assert (tmp_path / ".brainstem/source").read_text(
+        encoding="utf-8"
+    ).splitlines() == [str(production), "main"]
 
 
 def test_requested_source_failure_keeps_runtime_and_fails_closed(tmp_path):
@@ -154,6 +191,7 @@ SOURCE_OVERRIDE_REQUESTED=true
 REPO_URL={str(tmp_path / "missing-source")!r}
 REPO_REF=easy-mode-copilot-chat-pilot
 REMOTE_VERSION_URL=https://example.invalid/VERSION
+printf '%s\\n%s\\n' 'https://github.com/microsoft/aibast-agents-library.git' main > "$SOURCE_ID_FILE"
 curl() {{ printf '0.6.16\\n'; }}
 install_brainstem
 """,
@@ -164,6 +202,12 @@ install_brainstem
     assert (installed / "rapp_brainstem/brainstem.py").read_text(
         encoding="utf-8"
     ) == "print('production preserved')\n"
+    assert (tmp_path / ".brainstem/source").read_text(
+        encoding="utf-8"
+    ).splitlines() == [
+        "https://github.com/microsoft/aibast-agents-library.git",
+        "main",
+    ]
 
 
 def test_same_version_without_explicit_override_stays_current(tmp_path):
@@ -198,6 +242,7 @@ def test_same_version_without_explicit_override_stays_current(tmp_path):
 REPO_URL={str(staging)!r}
 REPO_REF=easy-mode-copilot-chat-pilot
 REMOTE_VERSION_URL=https://example.invalid/VERSION
+write_source_identity
 curl() {{ printf '0.6.16\\n'; }}
 if check_for_upgrade; then echo REFRESH; else echo CURRENT; fi
 """,
@@ -319,5 +364,23 @@ def test_windows_repair_and_port_paths_match_safety_contract():
     assert "Get-CimInstance Win32_Process" in text
     assert "Port 7071 is already used by another process" in text
     assert "$SOURCE_OVERRIDE_REQUESTED" in text
-    assert "Refreshing the explicitly requested repository/ref" in text
+    assert "Test-SourceIdentity" in text
+    assert "Write-SourceIdentity" in text
+    assert "Refreshing the requested repository/ref" in text
     assert "Could not refresh the requested repository/ref" in text
+    assert "if ($PSCommandPath) { exit 1 }" not in text
+    assert text.rstrip().endswith("throw\n}")
+
+
+def test_install_launch_does_not_pull_an_implicit_branch():
+    unix = INSTALLER.read_text(encoding="utf-8")
+    windows = WINDOWS_INSTALLER.read_text(encoding="utf-8")
+    unix_launch = unix[unix.index("launch_brainstem()"):unix.index(
+        "\nmain()"
+    )]
+    windows_launch = windows[windows.index("function Launch-Brainstem"):windows.index(
+        "\nfunction Main"
+    )]
+
+    assert "git pull" not in unix_launch
+    assert "git pull" not in windows_launch
