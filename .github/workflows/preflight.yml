@@ -606,8 +606,12 @@ jobs:
           $encodedFailure = [Convert]::ToBase64String(
             [Text.Encoding]::Unicode.GetBytes($failureCommand)
           )
+          $previousErrorAction = $ErrorActionPreference
+          $ErrorActionPreference = 'Continue'
           & powershell -NoProfile -EncodedCommand $encodedFailure
-          if ($LASTEXITCODE -eq 0) { throw 'public irm | iex failure path returned success' }
+          $failureExitCode = $LASTEXITCODE
+          $ErrorActionPreference = $previousErrorAction
+          if ($failureExitCode -eq 0) { throw 'public irm | iex failure path returned success' }
 
       - uses: actions/upload-artifact@v4
         if: always()

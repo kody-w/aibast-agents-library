@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 INSTALLER = ROOT / "install.sh"
 WINDOWS_INSTALLER = ROOT / "install.ps1"
 LANDING_PAGE = ROOT / "index.html"
+PREFLIGHT = ROOT / ".github/workflows/preflight.yml"
 
 
 def installer_functions():
@@ -386,3 +387,10 @@ def test_install_launch_does_not_pull_an_implicit_branch():
 
     assert "git pull" not in unix_launch
     assert "git pull" not in windows_launch
+
+
+def test_windows_preflight_expects_public_iex_failure_to_be_nonzero():
+    text = PREFLIGHT.read_text(encoding="utf-8")
+    assert "$ErrorActionPreference = 'Continue'" in text
+    assert "$failureExitCode = $LASTEXITCODE" in text
+    assert "if ($failureExitCode -eq 0)" in text
