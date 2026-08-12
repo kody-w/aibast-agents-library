@@ -9,28 +9,28 @@
   ],
   "coverage": {
     "achievements": {
-      "as_of": "2026-08-11T23:58:53Z",
+      "as_of": "2026-08-12T00:29:17Z",
       "status": "available"
     },
     "agent_acquisitions": {
-      "as_of": "2026-08-11T23:58:53Z",
+      "as_of": "2026-08-12T00:29:17Z",
       "status": "available"
     },
     "agent_upvotes": {
-      "as_of": "2026-08-11T23:58:53Z",
+      "as_of": "2026-08-12T00:29:17Z",
       "status": "available"
     },
     "file_downloads": {
-      "as_of": "2026-08-11T23:58:53Z",
+      "as_of": "2026-08-12T00:29:17Z",
       "status": "complete"
     },
     "traffic": {
-      "as_of": "2026-08-11T23:58:53Z",
+      "as_of": "2026-08-12T00:29:17Z",
       "reason": null,
       "status": "live"
     },
     "workshops": {
-      "as_of": "2026-08-11T23:58:53Z",
+      "as_of": "2026-08-12T00:29:17Z",
       "status": "partial"
     }
   },
@@ -39,13 +39,13 @@
       "@aibast-agents-library/account-intelligence": {
         "acquisitions": 0,
         "display_name": "Account Intelligence Agent",
-        "downloads": 1,
+        "downloads": 2,
         "upvotes": 0
       },
       "@aibast-agents-library/account-intelligence-orchestrator": {
         "acquisitions": 0,
         "display_name": "Account Intelligence Orchestrator",
-        "downloads": 7,
+        "downloads": 8,
         "upvotes": 0
       },
       "@aibast-agents-library/account-messaging": {
@@ -486,7 +486,7 @@
         "source": "downloads",
         "status": "available",
         "unit": "count",
-        "value": 2032
+        "value": 2034
       },
       {
         "daily_fields": [
@@ -565,7 +565,7 @@
         "source": "releases",
         "status": "available",
         "unit": "count",
-        "value": 79
+        "value": 81
       },
       {
         "id": "agent_file_downloads",
@@ -579,7 +579,7 @@
         "source": "file_metrics",
         "status": "available",
         "unit": "count",
-        "value": 79
+        "value": 81
       },
       {
         "id": "skill_downloads",
@@ -1702,7 +1702,7 @@
       }
     }
   },
-  "generated_at": "2026-08-11T23:58:53Z",
+  "generated_at": "2026-08-12T00:29:17Z",
   "links": {
     "email": "https://kody-w.github.io/aibast-agents-library/reports/impact-report-email.txt",
     "html": "https://kody-w.github.io/aibast-agents-library/reports/impact-report.html",
@@ -1794,7 +1794,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 79
+          "value": 81
         },
         "agent_upvotes": {
           "baseline": null,
@@ -1890,7 +1890,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 79
+          "value": 81
         },
         "skill_downloads": {
           "baseline": null,
@@ -1930,7 +1930,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 2032
+          "value": 2034
         },
         "tracked_files": {
           "baseline": null,
@@ -2114,7 +2114,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 79
+          "value": 81
         },
         "agent_upvotes": {
           "baseline": null,
@@ -2134,10 +2134,10 @@
         },
         "cdn_hits": {
           "baseline": null,
-          "calculation": "snapshot_change",
-          "change": null,
+          "calculation": "period_activity",
+          "change": 388,
           "change_percent": null,
-          "status": "baseline_pending",
+          "status": "available",
           "value": 388
         },
         "clone_uniques_14d": {
@@ -2167,10 +2167,10 @@
         "git_clones": {
           "baseline": null,
           "calculation": "period_activity",
-          "change": 1467,
+          "change": 1240,
           "change_percent": null,
           "status": "available",
-          "value": 1467
+          "value": 1240
         },
         "installer_downloads": {
           "baseline": null,
@@ -2210,7 +2210,7 @@
           "change": null,
           "change_percent": null,
           "status": "baseline_pending",
-          "value": 79
+          "value": 81
         },
         "skill_downloads": {
           "baseline": null,
@@ -2247,10 +2247,10 @@
         "total_downloads": {
           "baseline": null,
           "calculation": "period_activity",
-          "change": 1467,
+          "change": 1628,
           "change_percent": null,
           "status": "partial",
-          "value": 1467
+          "value": 1628
         },
         "tracked_files": {
           "baseline": null,
@@ -2354,7 +2354,7 @@
     }
   },
   "repo": {
-    "as_of": "2026-08-11T23:58:53Z",
+    "as_of": "2026-08-12T00:29:17Z",
     "carried_forward": false,
     "created_at": "2025-10-20T18:22:14Z",
     "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
@@ -2363,7 +2363,7 @@
     "name": "aibast-agents-library",
     "open_issues": 2,
     "owner": "kody-w",
-    "pushed_at": "2026-08-11T23:54:21Z",
+    "pushed_at": "2026-08-12T00:01:07Z",
     "site": "https://kody-w.github.io/aibast-agents-library/",
     "size_kb": 5812539,
     "stars": 0,
@@ -2371,5 +2371,5 @@
     "watchers": 0
   },
   "schema": "aibast-impact-report/1.0",
-  "subject": "AIBAST weekly and monthly impact report - August 11, 2026"
+  "subject": "AIBAST weekly and monthly impact report - August 12, 2026"
 }
