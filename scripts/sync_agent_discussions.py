@@ -500,7 +500,10 @@ def apply_operation(
             )
 
     discussion["_author_upvote_removed"] = False
-    if discussion.get("viewerHasUpvoted"):
+    if (
+        operation["action"] == "create"
+        and discussion.get("viewerHasUpvoted")
+    ):
         data = _request_mutation(
             REMOVE_UPVOTE_MUTATION,
             {"subjectId": discussion["id"]},

@@ -1,3 +1,5 @@
+import pytest
+
 from scripts import build_metrics, sync_agent_discussions
 
 REVISION = "b" * 40
@@ -258,39 +260,26 @@ def test_prior_number_must_match_canonical_agent_or_file():
     assert rating["existing"] is None
 
 
-def test_apply_operation_removes_sync_author_upvote(monkeypatch):
+def test_unchanged_discussion_preserves_signed_in_upvote(monkeypatch):
     row = agent()
     existing = remote_discussion(
         row,
-        "acquisition",
+        "upvote",
         number=2,
         viewer_has_upvoted=True,
     )
     operation = {
         "action": "unchanged",
-        "signal": "acquisition",
+        "signal": "upvote",
         "agent": row["name"],
         "existing": existing,
     }
-    calls = []
-
-    def request_graphql(query, variables, token):
-        calls.append((query, variables, token))
-        return (
-            {
-                "removeUpvote": {
-                    "subject": {
-                        "id": existing["id"],
-                        "upvoteCount": 0,
-                        "viewerHasUpvoted": False,
-                    }
-                }
-            },
-            None,
-        )
-
     monkeypatch.setattr(
-        build_metrics, "request_graphql", request_graphql
+        build_metrics,
+        "request_graphql",
+        lambda *_args, **_kwargs: pytest.fail(
+            "unchanged Discussion must not mutate a signed-in upvote"
+        ),
     )
 
     result = sync_agent_discussions.apply_operation(
@@ -300,9 +289,65 @@ def test_apply_operation_removes_sync_author_upvote(monkeypatch):
         token="token",
     )
 
-    assert len(calls) == 1
-    assert "removeUpvote" in calls[0][0]
-    assert calls[0][1] == {"subjectId": existing["id"]}
+    assert result["upvoteCount"] == existing["upvoteCount"]
+    assert result["viewerHasUpvoted"] is True
+    assert result["_author_upvote_removed"] is False
+
+
+def test_new_discussion_removes_automatic_sync_author_upvote(monkeypatch):
+    row = agent()
+    created = remote_discussion(
+        row,
+        "upvote",
+        number=2,
+        viewer_has_upvoted=True,
+    )
+    operation = {
+        "action": "create",
+        "signal": "upvote",
+        "agent": row["name"],
+        "existing": None,
+        "title": sync_agent_discussions.discussion_title(row, "upvote"),
+        "body": sync_agent_discussions.discussion_body(
+            row,
+            "upvote",
+            "example",
+            "library",
+            REVISION,
+        ),
+    }
+    calls = []
+
+    def request_graphql(query, variables, token):
+        calls.append((query, variables, token))
+        if "createDiscussion" in query:
+            return ({"createDiscussion": {"discussion": created}}, None)
+        return (
+            {
+                "removeUpvote": {
+                    "subject": {
+                        "id": created["id"],
+                        "upvoteCount": 0,
+                        "viewerHasUpvoted": False,
+                    }
+                }
+            },
+            None,
+        )
+
+    monkeypatch.setattr(build_metrics, "request_graphql", request_graphql)
+
+    result = sync_agent_discussions.apply_operation(
+        operation,
+        repository_id="repository",
+        category_id="category",
+        token="token",
+    )
+
+    assert len(calls) == 2
+    assert "createDiscussion" in calls[0][0]
+    assert "removeUpvote" in calls[1][0]
+    assert calls[1][1] == {"subjectId": created["id"]}
     assert result["upvoteCount"] == 0
     assert result["viewerHasUpvoted"] is False
     assert result["_author_upvote_removed"] is True

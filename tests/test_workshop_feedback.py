@@ -341,6 +341,34 @@ def test_metrics_dispatch_cannot_retrigger_from_snapshot_state_commits():
     assert "state/metrics_history.json" not in push_paths
 
 
+def test_metrics_snapshot_writer_retries_non_fast_forward_races():
+    text = METRICS_WORKFLOW.read_text(encoding="utf-8")
+    commit_step = text.split("- name: Commit snapshot", 1)[1]
+
+    assert "for attempt in 1 2 3" in commit_step
+    assert 'git push origin "HEAD:$GITHUB_REF_NAME"' in commit_step
+    assert 'git fetch origin "$GITHUB_REF_NAME"' in commit_step
+    assert 'git rebase -X theirs "origin/$GITHUB_REF_NAME"' in commit_step
+    assert "Concurrent non-metrics changes require a clean rerun" in commit_step
+    assert commit_step.count("verify_snapshot") >= 2
+    assert 'test "$pushed" = true' in commit_step
+
+
+def test_metrics_workflow_runs_the_promotion_sanity_gate():
+    text = METRICS_WORKFLOW.read_text(encoding="utf-8")
+    step = text.split("- name: Verify metrics promotion invariants", 1)[1].split(
+        "- name: Report traffic source",
+        1,
+    )[0]
+
+    assert "python scripts/verify_metrics_sanity.py" in step
+    assert 'release_tag="agent-downloads-staging"' in step
+    assert 'sentinel_args=(--require-sentinels)' in step
+    assert "--snapshot state/metrics.json" in step
+    assert "--registry registry.json" in step
+    assert "--impact reports/impact-report.json" in step
+
+
 def test_metrics_workflow_compiles_issues_from_its_own_repository():
     text = METRICS_WORKFLOW.read_text(encoding="utf-8")
     collect_step = text.split("- name: Collect public metrics", 1)[1].split(

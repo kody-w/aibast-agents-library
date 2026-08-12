@@ -8,6 +8,7 @@ on:
     branches: [main, easy-mode-copilot-chat-pilot]
     paths:
       - 'scripts/build_metrics.py'
+      - 'scripts/verify_metrics_sanity.py'
       - 'scripts/sync_agent_discussions.py'
       - 'scripts/build_impact_report.py'
       - 'scripts/impact-report-requirements.txt'
@@ -104,6 +105,27 @@ jobs:
           ).read_text()
           assert '<table>' in Path('reports/impact-report.html').read_text()
           PY
+
+      - name: Verify metrics promotion invariants
+        env:
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            release_tag="agent-downloads"
+            sentinel_args=()
+          else
+            release_tag="agent-downloads-staging"
+            sentinel_args=(--require-sentinels)
+          fi
+          python scripts/verify_metrics_sanity.py \
+            --owner "$GITHUB_REPOSITORY_OWNER" \
+            --repo "${GITHUB_REPOSITORY#*/}" \
+            --ref "$GITHUB_REF_NAME" \
+            --release-tag "$release_tag" \
+            --snapshot state/metrics.json \
+            --registry registry.json \
+            --impact reports/impact-report.json \
+            "${sentinel_args[@]}"
 
       - name: Report traffic source
         run: |
@@ -474,7 +496,27 @@ jobs:
             reports/impact-report.json
 
       - name: Commit snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
+          verify_snapshot() {
+            if [ "$GITHUB_REF_NAME" = "main" ]; then
+              release_tag="agent-downloads"
+              sentinel_args=()
+            else
+              release_tag="agent-downloads-staging"
+              sentinel_args=(--require-sentinels)
+            fi
+            python scripts/verify_metrics_sanity.py \
+              --owner "$GITHUB_REPOSITORY_OWNER" \
+              --repo "${GITHUB_REPOSITORY#*/}" \
+              --ref "$GITHUB_REF_NAME" \
+              --release-tag "$release_tag" \
+              --snapshot state/metrics.json \
+              --registry registry.json \
+              --impact reports/impact-report.json \
+              "${sentinel_args[@]}"
+          }
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
@@ -491,5 +533,26 @@ jobs:
             echo "No metrics change"
           else
             git commit -m "chore: metrics snapshot $(date -u +%Y-%m-%d)"
-            git push
+            pushed=false
+            for attempt in 1 2 3; do
+              if git push origin "HEAD:$GITHUB_REF_NAME"; then
+                pushed=true
+                break
+              fi
+              echo "Metrics push attempt $attempt lost a race; rebasing"
+              git fetch origin "$GITHUB_REF_NAME"
+              unexpected="$(
+                git diff --name-only HEAD.."origin/$GITHUB_REF_NAME" |
+                  grep -Ev '^(state/(agent_discussions|metrics|metrics_history|impact_history)\.json|reports/impact-report\.(pdf|html|json)|reports/impact-report-email\.(txt|md))$' ||
+                  true
+              )"
+              if [ -n "$unexpected" ]; then
+                echo "Concurrent non-metrics changes require a clean rerun:"
+                echo "$unexpected"
+                exit 1
+              fi
+              git rebase -X theirs "origin/$GITHUB_REF_NAME"
+              verify_snapshot
+            done
+            test "$pushed" = true
           fi
