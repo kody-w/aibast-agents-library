@@ -116,7 +116,37 @@ def test_gate_fails_when_workshop_scope_is_incomplete():
 
 
 def test_sentinel_mode_fails_closed_without_behavioral_proof():
-    report = run_gate(require_sentinels=True)
+    snapshot, registry, release, repo_api, impact, traffic_api = fixture()
+    snapshot = copy.deepcopy(snapshot)
+    sentinel = next(
+        row for row in snapshot["agent_metrics"]
+        if row["name"] == "@aibast-agents-library/account-intelligence"
+    )
+    sentinel["upvotes"] = 0
+    snapshot["workshops"]["totals"]["feedback_reports"] = 0
+    snapshot["achievements"]["totals"].update({
+        "participants": 0,
+        "starts": 0,
+        "points": 0,
+    })
+    snapshot["workshop_certification"]["totals"].update({
+        "verified_cohorts": 0,
+        "qualified_modules": 0,
+    })
+
+    report = verify_metrics(
+        snapshot,
+        registry,
+        release,
+        repo_api,
+        impact,
+        traffic_api=traffic_api,
+        expected_owner="kody-w",
+        expected_repo="aibast-agents-library",
+        release_tag="agent-downloads-staging",
+        max_age_hours=24 * 365,
+        require_sentinels=True,
+    )
 
     failures = {row["name"] for row in report["failures"]}
     assert "signed-in upvote sentinel present" in failures
