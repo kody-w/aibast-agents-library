@@ -22,7 +22,6 @@ $SOURCE_OVERRIDE_REQUESTED = [bool](
     $env:BRAINSTEM_REPO_REF -or
     $env:BRAINSTEM_VERSION_URL
 )
-$SOURCE_REFRESH_REQUIRED = $false
 $REPO_URL = if ($env:BRAINSTEM_REPO_URL) { $env:BRAINSTEM_REPO_URL } else { "https://github.com/microsoft/aibast-agents-library.git" }
 $REPO_REF = if ($env:BRAINSTEM_REPO_REF) { $env:BRAINSTEM_REPO_REF } else { "main" }
 $REMOTE_VERSION_URL = if ($env:BRAINSTEM_VERSION_URL) { $env:BRAINSTEM_VERSION_URL } else { "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/VERSION" }
@@ -90,7 +89,6 @@ function Check-ForUpgrade {
     $localVersion = (Get-Content $versionFile -Raw).Trim()
 
     if ($SOURCE_OVERRIDE_REQUESTED -or (-not (Test-SourceIdentity))) {
-        $script:SOURCE_REFRESH_REQUIRED = $true
         Write-Host "  [..] Refreshing the requested repository/ref" -ForegroundColor Yellow
         return $true
     }
@@ -548,9 +546,10 @@ function Repair-BrainstemSource {
 function Install-Brainstem {
     Write-Host ""
     Write-Host "Installing RAPP Brainstem..."
-    if ($SOURCE_OVERRIDE_REQUESTED -or (-not (Test-SourceIdentity))) {
-        $script:SOURCE_REFRESH_REQUIRED = $true
-    }
+    $sourceRefreshRequired = (
+        $SOURCE_OVERRIDE_REQUESTED -or
+        (-not (Test-SourceIdentity))
+    )
 
     if (-not (Test-Path $BRAINSTEM_HOME)) {
         New-Item -ItemType Directory -Force -Path $BRAINSTEM_HOME | Out-Null
@@ -583,7 +582,7 @@ function Install-Brainstem {
         if (
             ($LocalVer -eq $RemoteVer) -and
             (Test-BrainstemSourceReady "$BRAINSTEM_HOME\src") -and
-            (-not $SOURCE_REFRESH_REQUIRED)
+            (-not $sourceRefreshRequired)
         ) {
             Write-Host "  [OK] Already up to date (v$LocalVer)" -ForegroundColor Green
         } else {
@@ -724,7 +723,7 @@ function Install-Brainstem {
                 }
             }
             Remove-Item -Recurse -Force $Backup -ErrorAction SilentlyContinue
-            if ((-not $pullOk) -and $SOURCE_REFRESH_REQUIRED) {
+            if ((-not $pullOk) -and $sourceRefreshRequired) {
                 throw "Could not refresh the requested repository/ref; existing files were restored"
             }
             # Report the version actually on disk after the pull, not the remote string —

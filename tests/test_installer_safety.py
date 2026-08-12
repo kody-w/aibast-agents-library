@@ -368,6 +368,8 @@ def test_windows_repair_and_port_paths_match_safety_contract():
     assert "Write-SourceIdentity" in text
     assert "Refreshing the requested repository/ref" in text
     assert "Could not refresh the requested repository/ref" in text
+    assert "$sourceRefreshRequired" in text
+    assert "$script:SOURCE_REFRESH_REQUIRED" not in text
     assert "if ($PSCommandPath) { exit 1 }" not in text
     assert text.rstrip().endswith("throw\n}")
 
