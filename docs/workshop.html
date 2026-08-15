@@ -1287,6 +1287,12 @@ function fetchLib(path,asJson){
   return tryAt(order,0);
 }
 function slugOf(a){return a._slug||a.name.split("/")[1];}
+function metricOf(values,a){
+  if(values && a && a.name && Object.prototype.hasOwnProperty.call(values,a.name)){
+    return values[a.name];
+  }
+  return values&&a?values[slugOf(a)]:undefined;
+}
 function advOf(a){return ADV[slugOf(a)];}
 // An "unmapped — decision pending" crosswalk row records a SharePoint entry we
 // have NOT confirmed belongs to this stack. Its name and summary are provenance,
@@ -1301,7 +1307,7 @@ function agentTitle(a){return agentName(a).replace(/ Agent$/,"");}
 function esc2(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 
-var MODE="industry", PRODUCTS=[], BYSLUG={};
+var MODE="industry", PRODUCTS=[], BYSLUG={}, BYNAME={};
 document.getElementById("modeTabs").onclick=function(e){
   var b=e.target.closest("button"); if(!b||b.dataset.mode===MODE) return;
   MODE=b.dataset.mode;
@@ -1338,8 +1344,8 @@ function agentsForGroup(key){
   if(MODE==="industry") return CATS[key]||[];
   var prod=PRODUCTS.filter(function(p){return p.id===key;})[0];
   if(!prod) return [];
-  if(prod.stacks.indexOf("*")>=0) return Object.keys(BYSLUG).sort().map(function(s){return BYSLUG[s];});
-  return prod.stacks.map(function(s){return BYSLUG[s];}).filter(Boolean);
+  if(prod.stacks.indexOf("*")>=0) return Object.keys(BYNAME).sort().map(function(s){return BYNAME[s];});
+  return prod.stacks.map(function(s){return BYNAME[s]||BYSLUG[s];}).filter(Boolean);
 }
 function renderPills(){
   var host=document.getElementById("indPills");
@@ -1357,14 +1363,14 @@ function renderPills(){
 function renderAgents(cat,auto){
   var host=document.getElementById("agentCards");
   host.innerHTML=agentsForGroup(cat).map(function(a){
-    var s=slugOf(a), r=RATINGS[s]||0, d=DOWNLOADS[s]||0;
+    var s=slugOf(a), r=metricOf(RATINGS,a)||0, d=metricOf(DOWNLOADS,a)||0;
     var chips=(r>0?' 👍'+r:'')+(d>0?' ⬇'+d:'');
-    return '<button data-slug="'+esc2(s)+'"><b>'+esc2(agentName(a))+
+    return '<button data-agent="'+esc2(a.name)+'"><b>'+esc2(agentName(a))+
       (chips?'<span style="float:right;font-weight:600;color:var(--faint);font-size:12px">'+chips+'</span>':'')+
       "</b><span>"+esc2((agentDesc(a)||"").slice(0,110))+"…</span></button>";}).join("");
   host.onclick=function(e){var b=e.target.closest("button"); if(!b)return;
     host.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
-    var a=agentsForGroup(cat).filter(function(x){return slugOf(x)===b.dataset.slug;})[0];
+    var a=agentsForGroup(cat).filter(function(x){return x.name===b.dataset.agent;})[0];
     select(a);};
   if(auto){ var fc=host.querySelector("button");
     if(fc){ fc.classList.add("on");
@@ -1423,7 +1429,7 @@ function select(a){
       esc2(v.personas.join(" · "))+"</span>":"");
   document.querySelectorAll("[data-dyn=name]").forEach(function(el){
     el.textContent=agentName(a);});
-  renderSor(); updateMission(); mountGiscus(slugOf(a));
+  renderSor(); updateMission();   mountGiscus(a);
   var ss=document.getElementById("shareStatus"); if(ss) ss.textContent="";
   var sm=document.getElementById("sumStatus"); if(sm) sm.textContent="";
   document.querySelectorAll("[data-dyn=dir]").forEach(function(el){el.textContent=STACK;});
@@ -1567,9 +1573,11 @@ function setTrack(isFP){
   var pk=document.querySelector("#verify .pk");
   if(pk) pk.textContent=isFP?"Step 4":"Step 5";
 }
-function mountGiscus(slug){
+function mountGiscus(agent){
   var card=document.getElementById("rateCard"), link=document.getElementById("rateLink");
-  var url=GISCUS&&GISCUS[slug];
+  var url=typeof agent==="string"
+    ? (GISCUS&&GISCUS[agent])
+    : metricOf(GISCUS,agent);
   if(!url){card.style.display="none";return;}
   card.style.display="block"; link.href=url;
 }
@@ -1602,7 +1610,10 @@ Promise.all([fetchLib("registry.json",true),
   var byStackDir={};
   (reg.agents||[]).forEach(function(a){
     if(a.name==="@aibast-agents-library/sales-specialist-twin") return;
-    BYSLUG[slugOf(a)]=a;
+    BYNAME[a.name]=a;
+    var slug=slugOf(a);
+    if(!Object.prototype.hasOwnProperty.call(BYSLUG,slug)) BYSLUG[slug]=a;
+    else BYSLUG[slug]=null;
     var dir=a._file.substring(0,a._file.lastIndexOf("/"));
     // one card per use case (stack): the advertised/primary member wins,
     // suite internals stay reachable via deep links but don't clutter the picker
@@ -1625,7 +1636,7 @@ Promise.all([fetchLib("registry.json",true),
       renderPills();
       var pb=document.querySelector('#indPills button[data-cat="'+grp.id+'"]');
       if(pb){pb.classList.add("on"); renderAgents(grp.id);}
-      var ab=document.querySelector('#agentCards button[data-slug="'+fpid+'"]');
+      var ab=document.querySelector('#agentCards button[data-agent="@1p/'+fpid+'"]');
       if(ab) ab.classList.add("on");
       selectFP({_fp:hit});
       return;
@@ -1638,12 +1649,13 @@ Promise.all([fetchLib("registry.json",true),
   if(want){
     var found=null,cat=null;
     Object.keys(CATS).forEach(function(c){CATS[c].forEach(function(a){
-      if(slugOf(a)===decodeURIComponent(want)){found=a;cat=c;}});});
+      var decoded=decodeURIComponent(want);
+      if(a.name===decoded||slugOf(a)===decoded){found=a;cat=c;}});});
     if(found){
       var pb=document.querySelector('#indPills button[data-cat="'+cat+'"]');
       if(pb) pb.classList.add("on");
       renderAgents(cat);
-      var ab=document.querySelector('#agentCards button[data-slug="'+slugOf(found)+'"]');
+      var ab=document.querySelector('#agentCards button[data-agent="'+found.name+'"]');
       if(ab) ab.classList.add("on");
       select(found);
       if(isDefault){
@@ -1654,10 +1666,10 @@ Promise.all([fetchLib("registry.json",true),
           '<b style="color:var(--accent)">Example shown</b> — ')+pn.innerHTML+
           ' <span style="color:var(--faint)">Pick yours above and everything re-personalizes.</span>';
       }
-    } else if(BYSLUG[decodeURIComponent(want)]){
+    } else if(BYNAME[decodeURIComponent(want)]||BYSLUG[decodeURIComponent(want)]){
       // a real agent that no industry group lists (suite members reachable only
       // by link, and every product-tab-only slug) — honour the link anyway
-      select(BYSLUG[decodeURIComponent(want)]);
+      select(BYNAME[decodeURIComponent(want)]||BYSLUG[decodeURIComponent(want)]);
     } else {
       // an unreadable share link used to produce a dead page. Say so, then fall
       // back to the example rather than leaving the room empty.

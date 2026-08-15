@@ -69,9 +69,11 @@ def test_rar_browser_is_aibast_owned_and_supports_direct_upvotes():
 
     assert "const RAR_REPOSITORY = 'microsoft/aibast-agents-library'" in registry
     assert "data.instance !== 'AIBAST RAR'" in registry
-    assert "data.repository !== RAR_REPOSITORY" in registry
+    assert "data.repository && data.repository !== RAR_REPOSITORY" in registry
+    assert "data.catalog_path && data.catalog_path !== 'rar/registry.json'" in registry
     assert "rarLiveJson('ratings.json')" in registry
     assert "rarLiveJson('discussions.json')" in registry
+    assert "rarValueForAgent" in registry
     assert "fetch(`${API}/rar/upvote`" in registry
     assert "Open the AIBAST Discussion to vote on GitHub?" in registry
     assert "public/global RAR" in registry

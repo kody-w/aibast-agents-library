@@ -2,7 +2,7 @@
  "note": "AIBAST-owned RAR ratings \u2014 GitHub-native, no third-party apps or embeds and no public/global RAR dependency. One canonical Discussion per agent in the announcement-type category; Brainstem can add a thumbs-up directly and tools/fetch_ratings.py harvests positive reactions daily.",
  "repo": "microsoft/aibast-agents-library",
  "category": "Announcements",
- "title_format": "@aibast-agents-library/{slug}",
+ "title_rule": "Complete publisher-qualified agent name",
  "positive_reactions": [
   "THUMBS_UP",
   "HEART",

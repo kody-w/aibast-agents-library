@@ -78,11 +78,11 @@ def main():
                 total = n["comments"]["totalCount"]
                 if not total:
                     continue
-                slug, is_canonical = catalog_discussion(n["title"])
-                if not slug:
+                agent_name, is_canonical = catalog_discussion(n["title"])
+                if not agent_name:
                     continue
                 destination = canonical_convo if is_canonical else legacy_convo
-                destination[slug] = total
+                destination[agent_name] = total
             if not d["pageInfo"]["hasNextPage"]:
                 break
             after = d["pageInfo"]["endCursor"]

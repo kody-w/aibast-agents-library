@@ -5,7 +5,8 @@ cat-agent-skills metrics pattern, ported faithfully.
 One canonical GitHub Discussion per agent, whose title is its complete
 publisher-qualified AIBAST catalog name. Legacy slug-only threads remain
 readable during migration. This script harvests positive reactions into
-rar/ratings.json. Deliberate properties copied from the pattern:
+rar/ratings.json keyed by publisher-qualified agent name. Deliberate properties
+copied from the pattern:
 - Only positive reactions count; a downvote can never reduce a score.
 - Discussions outside the configured category, or with non-slug titles,
   are ignored.
@@ -25,11 +26,10 @@ CFG = json.loads((ROOT / "rar" / "ratings-config.json").read_text())
 SLUG_RE = re.compile(r"(?!-)(?!.*--)[a-z0-9-]{1,64}(?<!-)")
 POSITIVE = set(CFG["positive_reactions"])
 CATALOG = json.loads((ROOT / "rar" / "registry.json").read_text())
-CATALOG_NAMES = {
-    agent["name"]: agent["name"].split("/", maxsplit=1)[1]
-    for agent in CATALOG["agents"]
-}
-CATALOG_SLUGS = set(CATALOG_NAMES.values())
+CATALOG_NAMES = {agent["name"] for agent in CATALOG["agents"]}
+SLUG_TO_NAMES = {}
+for _name in CATALOG_NAMES:
+    SLUG_TO_NAMES.setdefault(_name.split("/", maxsplit=1)[1], []).append(_name)
 QUERY = """
 query($owner:String!,$repo:String!,$after:String){
   repository(owner:$owner,name:$repo){
@@ -42,9 +42,10 @@ query($owner:String!,$repo:String!,$after:String){
 
 def catalog_discussion(title):
     if title in CATALOG_NAMES:
-        return CATALOG_NAMES[title], True
-    if title in CATALOG_SLUGS and SLUG_RE.fullmatch(title):
-        return title, False
+        return title, True
+    candidates = SLUG_TO_NAMES.get(title, [])
+    if len(candidates) == 1 and SLUG_RE.fullmatch(title):
+        return candidates[0], False
     return None, False
 
 
@@ -71,10 +72,10 @@ def main():
                 title = (node.get("title") or "").strip()
                 if (node.get("category") or {}).get("name") != CFG["category"]:
                     continue
-                slug, is_canonical = catalog_discussion(title)
+                agent_name, is_canonical = catalog_discussion(title)
                 if is_canonical:
                     destination = canonical_ratings
-                elif slug:
+                elif agent_name:
                     destination = legacy_ratings
                 else:
                     continue
@@ -82,7 +83,7 @@ def main():
                             for g in node.get("reactionGroups", [])
                             if g["content"] in POSITIVE)
                 if score > 0:
-                    destination[slug] = score
+                    destination[agent_name] = score
             if not disc["pageInfo"]["hasNextPage"]:
                 break
             after = disc["pageInfo"]["endCursor"]

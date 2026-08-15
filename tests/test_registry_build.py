@@ -2,6 +2,8 @@
 
 import hashlib
 import json
+import re
+import subprocess
 from collections import Counter
 from pathlib import Path
 
@@ -35,6 +37,12 @@ def _checked_in_registry():
 def _checked_in_rar_registry():
     return json.loads(
         (REPO_ROOT / "rar" / "registry.json").read_text(encoding="utf-8")
+    )
+
+
+def _checked_in_discussions():
+    return json.loads(
+        (REPO_ROOT / "rar" / "discussions.json").read_text(encoding="utf-8")
     )
 
 
@@ -238,23 +246,105 @@ def test_checked_in_frontier_channel_matches_kernel_version():
     assert checked_in["subscription"]["default"] == "follow"
 
 
+def test_brainstem_pinned_rar_snapshot_has_compatible_aibast_identity():
+    source = (
+        REPO_ROOT / "rapp_brainstem" / "brainstem.py"
+    ).read_text(encoding="utf-8")
+    revision = re.search(
+        r'^RAR_REVISION = "([0-9a-f]{40})"$',
+        source,
+        flags=re.MULTILINE,
+    )
+    assert revision
+    pinned = json.loads(
+        subprocess.check_output(
+            [
+                "git",
+                "show",
+                f"{revision.group(1)}:rar/registry.json",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            encoding="utf-8",
+        )
+    )
+
+    assert pinned["instance"] == build_rar.AIBAST_RAR_INSTANCE
+    assert pinned.get(
+        "repository", build_rar.AIBAST_RAR_REPOSITORY
+    ) == build_rar.AIBAST_RAR_REPOSITORY
+    assert pinned.get(
+        "catalog_path", build_rar.AIBAST_RAR_CATALOG_PATH
+    ) == build_rar.AIBAST_RAR_CATALOG_PATH
+
+
 def test_ratings_use_canonical_aibast_discussion_titles():
     name = "@aibast-agents-library/account-intelligence"
     slug = "account-intelligence"
 
-    assert create_discussions.canonical_title(slug) == name
-    assert fetch_ratings.catalog_discussion(name) == (slug, True)
-    assert fetch_ratings.catalog_discussion(slug) == (slug, False)
+    assert create_discussions.canonical_title(name) == name
+    assert fetch_ratings.catalog_discussion(name) == (name, True)
+    assert fetch_ratings.catalog_discussion(slug) == (name, False)
     assert fetch_ratings.catalog_discussion(f"[Acquisition] {name}") == (
         None,
         False,
     )
 
 
-def test_release_assets_map_to_catalog_slugs_without_collisions():
+def test_legacy_discussion_slug_is_ignored_when_publishers_collide(monkeypatch):
+    name = "@aibast-agents-library/account-intelligence"
+    partner = "@partner/account-intelligence"
+    monkeypatch.setattr(fetch_ratings, "CATALOG_NAMES", {name, partner})
+    monkeypatch.setattr(
+        fetch_ratings,
+        "SLUG_TO_NAMES",
+        {"account-intelligence": [name, partner]},
+    )
+
+    assert fetch_ratings.catalog_discussion(name) == (name, True)
+    assert fetch_ratings.catalog_discussion(partner) == (partner, True)
+    assert fetch_ratings.catalog_discussion("account-intelligence") == (
+        None,
+        False,
+    )
+
+
+def test_checked_in_discussion_map_uses_publisher_qualified_names():
+    catalog_names = {
+        agent["name"] for agent in _checked_in_rar_registry()["agents"]
+    }
+    discussions = _checked_in_discussions()
+
+    assert set(discussions).issubset(catalog_names)
+    assert all(name.startswith("@") and "/" in name for name in discussions)
+    assert all(
+        url.startswith(
+            "https://github.com/microsoft/aibast-agents-library/discussions/"
+        )
+        for url in discussions.values()
+    )
+
+
+def test_release_assets_map_to_catalog_names_without_collisions():
     agents = _checked_in_rar_registry()["agents"]
-    mapping = fetch_release_downloads.build_asset_slug_map(agents)
+    mapping = fetch_release_downloads.build_asset_agent_map(agents)
 
     for agent in agents:
-        slug = agent["name"].split("/", maxsplit=1)[1]
-        assert mapping[agent["_install_filename"]] == slug
+        assert mapping[agent["_install_filename"]] == agent["name"]
+
+
+def test_static_metric_consumers_prefer_canonical_names_with_legacy_fallback():
+    metrics = (REPO_ROOT / "docs" / "metrics.html").read_text(encoding="utf-8")
+    workshop = (REPO_ROOT / "docs" / "workshop.html").read_text(encoding="utf-8")
+    brainstem = (
+        REPO_ROOT / "rapp_brainstem" / "index.html"
+    ).read_text(encoding="utf-8")
+
+    assert "hasOwnProperty.call(values,a.name)" in metrics
+    assert "return values[slug(a)]" in metrics
+    assert "encodeURIComponent(r.key)" in metrics
+    assert "hasOwnProperty.call(values,a.name)" in workshop
+    assert "return values&&a?values[slugOf(a)]" in workshop
+    assert "BYNAME[a.name]=a" in workshop
+    assert "function rarValueForAgent(values, agent)" in brainstem
+    assert "hasOwnProperty.call(values, agent.name)" in brainstem

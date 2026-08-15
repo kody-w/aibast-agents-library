@@ -2154,8 +2154,8 @@
     ])
       .then(([data, ratings, discussions]) => {
         if (data.instance !== 'AIBAST RAR'
-            || data.repository !== RAR_REPOSITORY
-            || data.catalog_path !== 'rar/registry.json') {
+            || (data.repository && data.repository !== RAR_REPOSITORY)
+            || (data.catalog_path && data.catalog_path !== 'rar/registry.json')) {
           throw new Error('The catalog is not the trusted AIBAST RAR.');
         }
         rarRatings = ratings && typeof ratings === 'object' ? ratings : {};
@@ -2218,9 +2218,17 @@
     for (const a of matches) results.appendChild(buildRarItem(a));
   }
 
-  function rarDiscussionNumber(agent) {
+  function rarValueForAgent(values, agent) {
+    if (!values || !agent) return undefined;
+    if (agent.name && Object.prototype.hasOwnProperty.call(values, agent.name)) {
+      return values[agent.name];
+    }
     const slug = (agent.name || '').split('/')[1];
-    const raw = slug ? rarDiscussions[slug] : null;
+    return slug ? values[slug] : undefined;
+  }
+
+  function rarDiscussionNumber(agent) {
+    const raw = rarValueForAgent(rarDiscussions, agent);
     if (typeof raw !== 'string') return null;
     try {
       const url = new URL(raw);
@@ -2239,7 +2247,7 @@
   async function upvoteRarAgent(agent, btn) {
     const discussionNumber = rarDiscussionNumber(agent);
     if (!discussionNumber) return;
-    const slug = agent.name.split('/')[1];
+    const agentName = agent.name;
     const original = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Voting\u2026';
@@ -2265,8 +2273,9 @@
         btn.textContent = original;
         return;
       }
-      const score = Number.isInteger(data.score) ? data.score : (rarRatings[slug] || 0);
-      rarRatings[slug] = score;
+      const priorScore = Number(rarValueForAgent(rarRatings, agent)) || 0;
+      const score = Number.isInteger(data.score) ? data.score : priorScore;
+      rarRatings[agentName] = score;
       btn.textContent = `\ud83d\udc4d ${score}`;
       btn.title = data.already_voted
         ? 'You already recommended this AIBAST agent'
@@ -2309,10 +2318,9 @@
       download: () => installRarAgent(a, addBtn)
     });
 
-    const slug = (a.name || '').split('/')[1];
     const voteBtn = document.createElement('button');
     voteBtn.className = 'rar-vote-btn';
-    voteBtn.textContent = `\ud83d\udc4d ${Number(rarRatings[slug]) || 0}`;
+    voteBtn.textContent = `\ud83d\udc4d ${Number(rarValueForAgent(rarRatings, a)) || 0}`;
     voteBtn.title = 'Recommend this agent after trying it';
     voteBtn.disabled = !rarDiscussionNumber(a);
     if (voteBtn.disabled) {

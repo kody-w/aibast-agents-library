@@ -286,9 +286,13 @@ Promise.all([
   var agents=(reg.agents||[]).filter(function(a){
     return a.name!=="@aibast-agents-library/sales-specialist-twin";});
   var slug=function(a){return a.name.split("/")[1];};
-  var dl=function(s){return (typeof downloads[s]==="number")?downloads[s]:0;};
-  var totDl=agents.reduce(function(t,a){return t+dl(slug(a));},0);
-  var totRate=agents.reduce(function(t,a){return t+(ratings[slug(a)]||0);},0);
+  var metric=function(values,a){
+    if(Object.prototype.hasOwnProperty.call(values,a.name)) return values[a.name];
+    return values[slug(a)];
+  };
+  var dl=function(a){var value=metric(downloads,a);return typeof value==="number"?value:0;};
+  var totDl=agents.reduce(function(t,a){return t+dl(a);},0);
+  var totRate=agents.reduce(function(t,a){return t+(metric(ratings,a)||0);},0);
   var adoption=community&&community.adoption?community.adoption:{};
   var aDays=Object.keys(adoption).sort();
   var latest=aDays.length?adoption[aDays[aDays.length-1]]:{};
@@ -337,7 +341,8 @@ Promise.all([
   function rowData(){
     return agents.map(function(a){
       var s=slug(a);
-      return {a:a, s:s, dl:dl(s), rate:ratings[s]||0, conv:convos[s]||0};});
+      return {a:a, s:s, key:a.name, dl:dl(a), rate:metric(ratings,a)||0,
+              conv:metric(convos,a)||0};});
   }
   var maxDl=Math.max.apply(null, rowData().map(function(r){return r.dl;}).concat([1]));
   function draw(){
@@ -351,13 +356,13 @@ Promise.all([
              (x[sort==="downloads"?"dl":sort==="rating"?"rate":"conv"]||0) ||
              (x.a.display_name||"").localeCompare(y.a.display_name||"");});
     document.getElementById("rows").innerHTML=rows.map(function(r){
-      var disc=discussions[r.s];
+      var disc=metric(discussions,r.a);
       return "<tr><td>"+esc(r.a.display_name||r.s)+'<span class="cat">'+esc(r.a.category)+"</span></td>"+
         '<td class="num">'+r.dl.toLocaleString()+
           '<span class="mini"><i style="width:'+Math.max(r.dl?2:0,100*r.dl/maxDl)+'%"></i></span></td>'+
         '<td class="num">'+(r.rate?("👍 "+r.rate):"—")+"</td>"+
         '<td class="num">'+(r.conv?("💬 "+r.conv):"—")+"</td>"+
-        '<td><a href="workshop.html?agent='+encodeURIComponent(r.s)+'">workshop</a>'+
+        '<td><a href="workshop.html?agent='+encodeURIComponent(r.key)+'">workshop</a>'+
         (disc?' · <a href="'+esc(disc)+'">discussion</a>':"")+"</td></tr>";
     }).join("");
     document.getElementById("count").textContent=rows.length+" agents";

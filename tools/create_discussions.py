@@ -5,8 +5,8 @@ There is one canonical GitHub Discussion per agent. Its title is the complete
 publisher-qualified catalog name (for example
 @aibast-agents-library/account-intelligence) in the configured announcement
 category. Existing canonical or legacy slug-only threads are reused, missing
-canonical threads are created, and rar/discussions.json remains {slug: url} for
-the workshop and Brainstem.
+canonical threads are created, and rar/discussions.json is keyed by the complete
+publisher-qualified agent name for the workshop and Brainstem.
 
 Usage: GITHUB_TOKEN=<maintainer token> python3 tools/create_discussions.py
 """
@@ -47,8 +47,8 @@ def gql(token, query, variables):
     return out["data"]
 
 
-def canonical_title(slug):
-    return CFG["title_format"].format(slug=slug)
+def canonical_title(agent_name):
+    return agent_name
 
 
 def main(*, map_only=False):
@@ -90,12 +90,13 @@ def main(*, map_only=False):
     agents = json.loads((ROOT / "rar" / "registry.json").read_text())["agents"]
     urls, created, missing = {}, 0, []
     for a in agents:
-        slug = a["name"].split("/")[1]
+        agent_name = a["name"]
+        slug = agent_name.split("/")[1]
         disp = a.get("display_name", slug)
-        title = canonical_title(slug)
+        title = canonical_title(agent_name)
         existing_url = existing.get(title) or existing.get(slug)
         if existing_url:
-            urls[slug] = existing_url
+            urls[agent_name] = existing_url
             continue
         if map_only:
             missing.append(title)
@@ -113,7 +114,7 @@ def main(*, map_only=False):
                 "title": title,
                 "body": body,
             })
-        urls[slug] = out["createDiscussion"]["discussion"]["url"]
+        urls[agent_name] = out["createDiscussion"]["discussion"]["url"]
         created += 1
     (ROOT / "rar" / "discussions.json").write_text(
         json.dumps(dict(sorted(urls.items())), indent=1) + "\n")

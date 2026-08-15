@@ -16,17 +16,18 @@ OUT = ROOT / "rar" / "downloads.json"
 CFG = json.loads((ROOT / "rar" / "ratings-config.json").read_text())
 
 
-def build_asset_slug_map(agents):
+def build_asset_agent_map(agents):
     """Map current and legacy release filenames when they identify one agent."""
     candidates = {}
     for agent in agents:
+        agent_name = agent["name"]
         slug = agent["name"].split("/", maxsplit=1)[1]
         filenames = {
             agent["_install_filename"],
             f"{slug.replace('-', '_')}_agent.py",
         }
         for filename in filenames:
-            candidates.setdefault(filename, set()).add(slug)
+            candidates.setdefault(filename, set()).add(agent_name)
     return {
         filename: next(iter(slugs))
         for filename, slugs in candidates.items()
@@ -47,7 +48,7 @@ def main():
         agents = json.loads(
             (ROOT / "rar" / "registry.json").read_text()
         )["agents"]
-        asset_slugs = build_asset_slug_map(agents)
+        asset_agents = build_asset_agent_map(agents)
         by_tag = {}
         for rel in releases:
             tag = rel.get("tag_name", "untagged")
@@ -55,9 +56,12 @@ def main():
                 by_tag.setdefault(tag, 0)
                 by_tag[tag] += asset.get("download_count", 0)
                 asset_name = asset.get("name", "")
-                slug = asset_slugs.get(asset_name)
-                if slug:
-                    counts[slug] = counts.get(slug, 0) + asset.get("download_count", 0)
+                agent_name = asset_agents.get(asset_name)
+                if agent_name:
+                    counts[agent_name] = (
+                        counts.get(agent_name, 0)
+                        + asset.get("download_count", 0)
+                    )
                 else:
                     key = "_other:" + asset_name
                     counts[key] = counts.get(key, 0) + asset.get("download_count", 0)
