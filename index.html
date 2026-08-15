@@ -470,12 +470,11 @@
     const ref = staging ? 'easy-mode-copilot-chat-pilot' : 'main';
     const repoUrl = `https://github.com/${owner}/aibast-agents-library.git`;
     const versionUrl = `https://raw.githubusercontent.com/${owner}/aibast-agents-library/${ref}/rapp_brainstem/VERSION`;
-    const bashOverrides = staging
-      ? `BRAINSTEM_REPO_URL=${repoUrl} BRAINSTEM_REPO_REF=${ref} BRAINSTEM_VERSION_URL=${versionUrl} `
-      : '';
-    const powershellOverrides = staging
-      ? `$env:BRAINSTEM_REPO_URL='${repoUrl}'; $env:BRAINSTEM_REPO_REF='${ref}'; $env:BRAINSTEM_VERSION_URL='${versionUrl}'; `
-      : '';
+    // The public one-liner always uses the installer defaults. Staging may still
+    // expose its branch in the Manual tab, but must not turn the primary install
+    // path into a Frontier/source-override install.
+    const bashOverrides = '';
+    const powershellOverrides = '';
     return {
       staging,
       owner,

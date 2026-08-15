@@ -64,26 +64,27 @@ def test_landing_page_installer_uses_current_pages_host():
     )
 
 
-def test_staging_install_commands_pin_the_staging_repository_and_ref():
+def test_staging_one_liners_use_plain_installer_defaults():
     staging = install_commands(
         "kody-w.github.io",
         "https://kody-w.github.io/aibast-agents-library/",
     )
-    for command in (
-        staging["bash"],
-        staging["windows"],
-        staging["macManual"],
-        staging["windowsManual"],
-    ):
-        assert "kody-w/aibast-agents-library" in command
-        assert "easy-mode-copilot-chat-pilot" in command
-    assert "BRAINSTEM_REPO_URL" in staging["bash"]
-    assert "BRAINSTEM_REPO_REF" in staging["bash"]
-    assert "BRAINSTEM_VERSION_URL" in staging["bash"]
-    assert "$env:BRAINSTEM_REPO_URL" in staging["windows"]
+    assert staging["bash"] == (
+        "curl -fsSL https://kody-w.github.io/aibast-agents-library/"
+        "install.sh | bash"
+    )
+    assert staging["windows"] == (
+        "irm https://kody-w.github.io/aibast-agents-library/install.ps1 | iex"
+    )
+    assert "BRAINSTEM_" not in staging["bash"]
+    assert "BRAINSTEM_" not in staging["windows"]
+    assert "kody-w/aibast-agents-library" in staging["macManual"]
+    assert "easy-mode-copilot-chat-pilot" in staging["macManual"]
+    assert "kody-w/aibast-agents-library" in staging["windowsManual"]
+    assert "easy-mode-copilot-chat-pilot" in staging["windowsManual"]
 
 
-def test_staging_download_wrappers_embed_the_same_pinned_commands():
+def test_staging_download_wrappers_embed_plain_one_liners():
     text = (ROOT / "index.html").read_text(encoding="utf-8")
     commands_start = text.index("function buildInstallCommands")
     commands_end = text.index("const installCommands")
@@ -115,5 +116,8 @@ console.log(JSON.stringify(buildInstallerDownloads(commands)));
     downloads = json.loads(result.stdout)
     for platform in ("macOS/Linux", "Windows"):
         payload = downloads[platform]["href"]
-        assert "kody-w/aibast-agents-library" in payload
-        assert "easy-mode-copilot-chat-pilot" in payload
+        assert "kody-w.github.io/aibast-agents-library/install." in payload
+        assert "BRAINSTEM_REPO_URL" not in payload
+        assert "BRAINSTEM_REPO_REF" not in payload
+        assert "BRAINSTEM_VERSION_URL" not in payload
+        assert "easy-mode-copilot-chat-pilot" not in payload
