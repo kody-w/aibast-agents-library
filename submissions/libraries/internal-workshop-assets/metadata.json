@@ -1,0 +1,42 @@
+{
+  "schema": "aibast-library-source/2.0",
+  "contribution_type": "library_source",
+  "slug": "internal-workshop-assets",
+  "name": "Internal workshop videos & one-pagers (SharePoint)",
+  "canonical_url": null,
+  "public_catalog_id": "internal-workshop-assets",
+  "source_type": "limited internal workshop assets",
+  "source_format": "owner-granted demo videos and one-pagers",
+  "owner": "AIBAST workshop asset owners",
+  "spdx_license": "NOASSERTION",
+  "trust_review_notes": "Limited/internal materials are not publicly redistributed. Access is discretionary, least-privilege, and granted manually through an approved private channel after the public request is reviewed.",
+  "review_cadence": "Owner-reviewed per request and quarterly access review",
+  "why_useful": "Provides approved workshop demo material and one-pagers for internal learning scenarios without exposing private locations or distributing assets through public Pages.",
+  "status": "first_party",
+  "trust_tier": "first_party",
+  "enabled": true,
+  "immutable_ref": "owner-managed-private",
+  "manifest_locator": "public-safe-asset-index",
+  "source_digest": "95eeb90fddb42b0d12ae62dd243852f50b6ce83acae3e09a27e8d0019bc6c693",
+  "fetch_policy": "owner_private_channel_only",
+  "browser_execution": "never",
+  "discussion_url": null,
+  "access_flow": "owner_manual_private_channel",
+  "acknowledgement_terms_version": "2026-08-15",
+  "sort_order": 0,
+  "public_safe_assets": [
+    {
+      "id": "workshop-demo-001",
+      "kind": "demo_video",
+      "title": "Workshop demo overview",
+      "description": "A public-safe request option for an internal workshop demonstration video."
+    },
+    {
+      "id": "workshop-onepager-001",
+      "kind": "one_pager",
+      "title": "Workshop one-pager",
+      "description": "A public-safe request option for an internal workshop summary one-pager."
+    }
+  ],
+  "items": []
+}

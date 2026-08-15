@@ -183,7 +183,8 @@ class TestToolCallMerging(unittest.TestCase):
 class TestUnsupportedModelFallback(unittest.TestCase):
     def test_non_200_raises_streaming_unsupported_before_any_delta(self):
         resp = FakeStreamResp([], status=400, text='{"error":"model does not support streaming"}')
-        with mock.patch.object(brainstem, "get_copilot_token", return_value=("tok", "https://ep/v1")), \
+        with mock.patch.object(brainstem, "get_copilot_token", return_value=(
+                "tok", "https://api.individual.githubcopilot.com/v1")), \
              mock.patch.object(brainstem.requests, "post", return_value=resp) as post:
             gen = brainstem.call_copilot_stream([{"role": "user", "content": "hi"}], model="o1-preview")
             with self.assertRaises(brainstem.StreamingUnsupported) as ctx:
@@ -199,7 +200,8 @@ class TestUnsupportedModelFallback(unittest.TestCase):
         resp = FakeStreamResp(["data: [DONE]"], status=200)
         brainstem._NO_TOOL_CHOICE_MODELS.add("o1-mini")
         try:
-            with mock.patch.object(brainstem, "get_copilot_token", return_value=("tok", "https://ep/v1")), \
+            with mock.patch.object(brainstem, "get_copilot_token", return_value=(
+                    "tok", "https://api.individual.githubcopilot.com/v1")), \
                  mock.patch.object(brainstem.requests, "post", return_value=resp) as post:
                 gen = brainstem.call_copilot_stream(
                     [{"role": "user", "content": "hi"}],
@@ -223,7 +225,8 @@ class TestDisconnectCleanup(unittest.TestCase):
             lines.append('data: {"choices":[{"delta":{"content":"tok%d"}}]}' % i)
             lines.append("")
         resp = FakeStreamResp(lines, status=200)
-        with mock.patch.object(brainstem, "get_copilot_token", return_value=("tok", "https://ep/v1")), \
+        with mock.patch.object(brainstem, "get_copilot_token", return_value=(
+                "tok", "https://api.individual.githubcopilot.com/v1")), \
              mock.patch.object(brainstem.requests, "post", return_value=resp):
             gen = brainstem.call_copilot_stream([{"role": "user", "content": "hi"}], model="gpt-4o")
             first = next(gen)
@@ -238,7 +241,8 @@ class TestDisconnectCleanup(unittest.TestCase):
             "data: [DONE]",
         ]
         resp = FakeStreamResp(lines, status=200)
-        with mock.patch.object(brainstem, "get_copilot_token", return_value=("tok", "https://ep/v1")), \
+        with mock.patch.object(brainstem, "get_copilot_token", return_value=(
+                "tok", "https://api.individual.githubcopilot.com/v1")), \
              mock.patch.object(brainstem.requests, "post", return_value=resp):
             events = list(brainstem.call_copilot_stream([{"role": "user", "content": "hi"}], model="gpt-4o"))
         kinds = [e[0] for e in events]

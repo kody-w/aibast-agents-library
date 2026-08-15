@@ -3283,7 +3283,7 @@ def render_completion_state(ctx: JourneyContext) -> str:
         screenshot = ""
     return f"""
       <section class="learn-step" id="easy-step-5">
-        <header class="learn-step-header"><span>5</span><div><p>Recognize completion</p><h3>Know what “done” looks like</h3></div>{report_button(ctx, location="Easy mode — final completion verdict", expected=f"Local {case_total}/{case_total}; Preview {case_total}/{case_total}; Draft {pilot.get('display_name') or ctx.title}; published false.", evidence=report_evidence)}</header>
+        <header class="learn-step-header"><span>5</span><div><p>Recognize completion</p><h3>Know what “done” looks like</h3></div></header>
         <div class="learn-step-body">
           <p>The workshop is complete only when both the portable agent and the Copilot Studio front door prove the same behavior.</p>
           <div class="done-grid">
@@ -3429,8 +3429,8 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
     .done-grid article {{ padding: 14px; border: 1px solid var(--cp-border); border-radius: 10px; background: var(--cp-surface-soft); }}
     .done-grid strong, .done-grid span {{ display: block; }}
     .done-grid span {{ margin-top: 5px; color: var(--cp-text-muted); }}
-    .troubleshooting-table {{ width: 100%; border-collapse: collapse; }}
-    .troubleshooting-table th, .troubleshooting-table td {{ padding: 12px; border: 1px solid var(--cp-border); text-align: left; vertical-align: top; }}
+    .troubleshooting-table {{ width: 100%; max-width: 100%; box-sizing: border-box; table-layout: fixed; border-collapse: collapse; }}
+    .troubleshooting-table th, .troubleshooting-table td {{ padding: 12px; border: 1px solid var(--cp-border); text-align: left; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }}
     .troubleshooting-table th {{ background: var(--cp-surface-soft); }}
     .hard-overview {{ margin-top: 20px; }}
     .hard-overview h2 {{ margin-top: 0; }}
@@ -4159,6 +4159,72 @@ def normalize_generated_text(content: str) -> str:
     return "\n".join(line.rstrip() for line in content.strip().splitlines()) + "\n"
 
 
+TRUST_ASSET_MARKER = "data-aibast-trust-assets"
+TRUST_ANCHOR = re.compile(r"<a\b(?P<attrs>[^>]*)>", re.IGNORECASE | re.DOTALL)
+
+
+def trust_download_kind(attrs: str) -> str | None:
+    href_match = re.search(r"""href\s*=\s*["']([^"']+)["']""", attrs, re.IGNORECASE | re.DOTALL)
+    href = href_match.group(1).lower() if href_match else ""
+    download_match = re.search(r"""download\s*=\s*["']([^"']+)["']""", attrs, re.IGNORECASE | re.DOTALL)
+    download = download_match.group(1).lower() if download_match else ""
+    if "/blob/" in href:
+        return None
+    has_download = bool(re.search(r"\bdownload(?:\s*=|\s|$)", attrs, re.IGNORECASE))
+    value = " ".join([href, download]).strip()
+    export_zip = re.search(r"(?:^|/)exports/[^/?#]+\.zip(?:[?#]|$)", value)
+    source_zip = re.search(r"(?:^|[/?._-])[^/?#]*-source\.zip(?:[?#]|$)", value)
+    if export_zip or source_zip:
+        return "solution"
+    if not has_download:
+        return None
+    if "skill.md" in value:
+        return "skill"
+    if re.search(r"(?:^|[/?._-])[^/\s]*\.py(?:$|[?#\s])", value):
+        return "agent"
+    if ".zip" in value and re.search(r"(copilot|solution|powerplatform|msft|agent)", value):
+        return "solution"
+    return None
+
+
+def gate_download_anchor(match: re.Match[str]) -> str:
+    attrs = match.group("attrs")
+    if "data-download-gated" in attrs:
+        return match.group(0)
+    kind = trust_download_kind(attrs)
+    if not kind:
+        return match.group(0)
+    class_match = re.search(r"""class\s*=\s*(["'])(.*?)\1""", attrs, re.DOTALL)
+    locked = "pointer-events-none opacity-50 cursor-not-allowed"
+    if class_match:
+        classes = class_match.group(2).split()
+        for name in locked.split():
+            if name not in classes:
+                classes.append(name)
+        attrs = attrs[:class_match.start(2)] + " ".join(classes) + attrs[class_match.end(2):]
+    else:
+        attrs += f' class="{locked}"'
+    attrs = re.sub(r"""\saria-disabled\s*=\s*(["']).*?\1""", "", attrs, flags=re.DOTALL)
+    return f'<a{attrs} data-download-gated data-download-kind="{kind}" aria-disabled="true">'
+
+
+def apply_trust_gate(ctx: JourneyContext, path: Path, content: str) -> str:
+    """Emit generated pages with the shared versioned acknowledgement gate."""
+    if path.suffix != ".html":
+        return content
+    updated = TRUST_ANCHOR.sub(gate_download_anchor, content)
+    if "data-download-gated" not in updated or TRUST_ASSET_MARKER in updated:
+        return updated
+    relative = os.path.relpath(ctx.root / "assets", path.parent).replace(os.sep, "/")
+    updated = updated.replace(
+        "</head>",
+        f'\n<link rel="stylesheet" href="{relative}/trust-gate.css" {TRUST_ASSET_MARKER}>\n'
+        f'<script defer src="{relative}/trust-gate.js" {TRUST_ASSET_MARKER}></script>\n</head>',
+        1,
+    )
+    return updated
+
+
 def generated_outputs(
     ctx: JourneyContext,
     resources: list[Resource] | None = None,
@@ -4181,7 +4247,10 @@ def generated_outputs(
         outputs[ctx.package / "screenshots" / "assisted" / "README.md"] = render_film_readme(
             ctx, "assisted"
         )
-    return resources, outputs
+    return resources, {
+        path: apply_trust_gate(ctx, path, content)
+        for path, content in outputs.items()
+    }
 
 
 def write_outputs(ctx: JourneyContext) -> list[Resource]:

@@ -163,6 +163,35 @@
   .install-hint {
     padding: 0 24px 14px; font-size: 11px; color: #484f58; text-align: center;
   }
+  .trust-download {
+    margin-top: 12px; padding: 16px; background: #0d1117;
+    border: 1px solid #30363d; border-radius: 10px;
+  }
+  .trust-download__notice {
+    padding: 14px; border: 1px solid #30363d; border-radius: 8px;
+    background: #161b22;
+  }
+  .trust-download__heading {
+    display: flex; align-items: center; gap: 8px; color: #e6edf3;
+    font-size: 14px; font-weight: 700;
+  }
+  .trust-download__warning { color: #f0883e; font-size: 18px; }
+  .trust-download__ack {
+    display: flex; align-items: flex-start; gap: 10px; margin-top: 10px;
+    color: #c9d1d9; font-size: 13px; line-height: 1.55; cursor: pointer;
+  }
+  .trust-download__ack input {
+    width: 18px; height: 18px; margin-top: 2px; accent-color: #1f6feb; flex: 0 0 auto;
+  }
+  .trust-download__button {
+    width: 100%; min-height: 44px; margin-top: 12px; border: 0; border-radius: 8px;
+    background: #1f6feb; color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .trust-download__button:hover:not(:disabled) { background: #388bfd; }
+  .trust-download__button:disabled { background: #484f58; color: #c9d1d9; cursor: not-allowed; }
+  .trust-download__status { margin: 8px 0 0; color: #8b949e; font-size: 12px; }
+  .trust-download__ack input:focus-visible,
+  .trust-download__button:focus-visible { outline: 2px solid #f291b6; outline-offset: 2px; }
   .install-download {
     padding: 0 24px 16px; text-align: center;
   }
@@ -204,6 +233,9 @@
   }
   .links a { margin: 0 12px; }
 </style>
+
+<link rel="stylesheet" href="../assets/trust-gate.css" data-aibast-trust-assets>
+<script defer src="../assets/trust-gate.js" data-aibast-trust-assets></script>
 </head>
 <body>
 
@@ -359,7 +391,10 @@
         <div class="step">
           <h3>1. Download the solution</h3>
           <p>Grab the Power Platform solution package from the repo. This <code>.zip</code> contains the declarative agent, connectors, and flows preconfigured for your Azure Function.</p>
-          <div class="cmd" onclick="copyCmd(event, this)">curl -fsSL -o MSFTAIBASMultiAgentCopilot.zip https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/MSFTAIBASMultiAgentCopilot_1_0_0_5.zip</div>
+          <a class="trust-download__button pointer-events-none opacity-50 cursor-not-allowed"
+            href="https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/MSFTAIBASMultiAgentCopilot_1_0_0_5.zip"
+            download="MSFTAIBASMultiAgentCopilot_1_0_0_5.zip"
+            data-download-gated data-download-kind="solution" aria-disabled="true">↓ Download Copilot Studio solution ZIP</a>
         </div>
         <div class="step">
           <h3>2. Import into Power Platform</h3>
@@ -390,6 +425,7 @@
 <div class="links">
   <a href="../index.html">Agents Library</a>
   <a href="rapp-guide.html">Production Guide</a>
+  <a href="../blog.html">Engineering Notes</a>
   <a href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
   <a href="https://github.com/microsoft/aibast-agents-library/issues">Issues &amp; Feedback</a>
   <a href="https://github.com/kody-w/CommunityRAPP">Hippocampus Repo</a>
@@ -536,6 +572,7 @@
   }
   applyHash();
   window.addEventListener('hashchange', applyHash);
+
 </script>
 
 <div style="max-width:620px;width:100%;margin:40px auto;padding:0 0 60px;">
@@ -551,6 +588,7 @@
     MIT License — Copyright (c) 2026 Microsoft.
   </p>
 </div>
+
 
 </body>
 </html>

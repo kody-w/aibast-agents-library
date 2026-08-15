@@ -17,6 +17,7 @@ import os
 import sys
 import json
 import re
+import copy
 import uuid
 import glob
 import time
@@ -29,10 +30,11 @@ import hmac
 import functools
 import tempfile
 import ipaddress
+import socket
 import hashlib
 import platform
 from datetime import datetime, timezone
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import urlencode, urlsplit, urlunsplit
 
 import requests
 from flask import Flask, request, jsonify, redirect, send_from_directory, Response
@@ -1214,6 +1216,18 @@ def _get_copilot_token_locked():
     # 2. Try a disk-cached Copilot session token bound to this GitHub credential.
     disk_cache = _load_copilot_cache(github_token)
     if disk_cache:
+        try:
+            disk_cache = dict(disk_cache)
+            normalized_endpoint = _normalize_inference_endpoint(disk_cache.get("endpoint"))
+            if not _is_known_copilot_endpoint(normalized_endpoint):
+                # Disk data is attacker-controlled state, even when it carries a
+                # matching credential fingerprint. Custom enterprise endpoints are
+                # trusted only in memory immediately after a fresh token exchange.
+                raise ValueError("custom endpoint cannot be restored from disk")
+            disk_cache["endpoint"] = normalized_endpoint
+        except Exception:
+            disk_cache = None
+    if disk_cache:
         _copilot_token_cache = disk_cache
         _clear_no_copilot()
         _tlog("auth.copilot_restored", {"expires_in": int(disk_cache['expires_at'] - time.time())})
@@ -1274,7 +1288,8 @@ def _get_copilot_token_locked():
     
     data = resp.json()
     copilot_token = data.get("token")
-    endpoint = data.get("endpoints", {}).get("api", "https://api.individual.githubcopilot.com")
+    endpoint = _normalize_inference_endpoint(
+        data.get("endpoints", {}).get("api", "https://api.individual.githubcopilot.com"))
     expires_at = data.get("expires_at", time.time() + 600)
     
     if not copilot_token:
@@ -1284,6 +1299,9 @@ def _get_copilot_token_locked():
     _copilot_token_cache = {
         "token": copilot_token,
         "endpoint": endpoint,
+        # This marker is intentionally memory-only. It is never persisted, so a
+        # tampered .copilot_session cannot bless a custom endpoint after restart.
+        "live_exchange_endpoint": True,
         "expires_at": expires_at,
     }
     _save_copilot_cache(copilot_token, endpoint, expires_at, exchange_github_token)
@@ -1874,11 +1892,428 @@ _STREAM_INTERRUPTED_USER_MSG = (
 )
 
 
+class FrontierBlockedError(RuntimeError):
+    """A raw-value-free rejection from the Brainstem-owned intelligence boundary."""
+
+    def __init__(self, message, summary):
+        super().__init__(message)
+        # The aggregate report belongs only to this rejected request. It contains
+        # categories/counts, never a raw match or the caller's payload.
+        self.summary = copy.deepcopy(summary)
+
+
+# ── Brainstem Frontier: outbound intelligence boundary ───────────────────────
+#
+# This is deliberately a local safety net, not a compliance claim. It protects
+# only Brainstem-owned Copilot inference egress; user-installed Python agents
+# still execute locally and can make their own network calls.
+_FRONTIER_MASK = "[REDACTED]"
+_FRONTIER_SEVERITY_RANK = {"high": 3, "medium": 2, "low": 1}
+_KNOWN_COPILOT_INFERENCE_HOSTS = frozenset({
+    "api.githubcopilot.com",
+    "api.individual.githubcopilot.com",
+    "api.business.githubcopilot.com",
+    "api.enterprise.githubcopilot.com",
+})
+
+# Secret/credential patterns are intentionally shape- or context-qualified to
+# avoid treating ordinary prose as a credential. Match values remain local to a
+# single preparation call and are replaced with a fixed-width mask.
+_FRONTIER_PRIVATE_KEY_RE = re.compile(
+    r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----[\s\S]{0,200000}?"
+    r"-----END (?:[A-Z0-9 ]+ )?PRIVATE KEY-----",
+    re.IGNORECASE,
+)
+_FRONTIER_GITHUB_TOKEN_RE = re.compile(
+    r"(?<![A-Za-z0-9_])(?:gh[pousr]_[A-Za-z0-9]{20,}|"
+    r"github_pat_[A-Za-z0-9_]{20,})(?![A-Za-z0-9_])"
+)
+_FRONTIER_JWT_RE = re.compile(
+    r"(?<![A-Za-z0-9_-])eyJ[A-Za-z0-9_-]{8,}\."
+    r"[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}(?![A-Za-z0-9_-])"
+)
+_FRONTIER_BEARER_RE = re.compile(
+    r"\bauthorization\s*[:=]\s*(?:(?:bearer|basic|token)\s+)?"
+    r"(?P<value>[A-Za-z0-9._~+/=-]{8,})",
+    re.IGNORECASE,
+)
+_FRONTIER_ASSIGNMENT_RE = re.compile(
+    r"\b(?:api[-_ ]?key|subscription[-_ ]?key|account[-_ ]?key|"
+    r"client[-_ ]?secret|access[-_ ]?token|refresh[-_ ]?token|"
+    r"password|passwd|pwd|secret|token)\b\s*[:=]\s*"
+    r"(?P<quote>[\"']?)(?P<value>[^\s,;\"'`]{8,})(?P=quote)",
+    re.IGNORECASE,
+)
+_FRONTIER_COMMON_TOKEN_PATTERNS = (
+    ("api-token", "high", 96, re.compile(
+        r"(?<![A-Za-z0-9_-])sk-(?:proj-)?[A-Za-z0-9_-]{20,}(?![A-Za-z0-9_-])")),
+    ("api-token", "high", 96, re.compile(
+        r"(?<![A-Za-z0-9_-])AIza[A-Za-z0-9_-]{30,}(?![A-Za-z0-9_-])")),
+    ("api-token", "high", 96, re.compile(
+        r"(?<![A-Za-z0-9_-])xox[baprs]-[A-Za-z0-9-]{12,}(?![A-Za-z0-9_-])")),
+    ("api-token", "high", 96, re.compile(
+        r"(?<![A-Za-z0-9_-])(?:AKIA|ASIA)[A-Z0-9]{16}(?![A-Za-z0-9_-])")),
+    ("api-token", "high", 96, re.compile(
+        r"(?<![A-Za-z0-9_-])(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{16,}"
+        r"(?![A-Za-z0-9_-])")),
+)
+_FRONTIER_EMAIL_RE = re.compile(
+    r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
+_FRONTIER_CARD_RE = re.compile(r"\b\d(?:[ -]?\d){12,18}\b")
+_FRONTIER_SSN_RE = re.compile(r"\b(\d{3})-(\d{2})-(\d{4})\b")
+_FRONTIER_GROUPED_PHONE_RE = re.compile(
+    r"(?<!\d)(?:\+?1[\s.-]?)?(?:\(\d{3}\)[\s.-]?|\d{3}[\s.-])"
+    r"\d{3}[\s.-]\d{4}(?!\d)")
+_FRONTIER_E164_PHONE_RE = re.compile(r"\+\d(?:[\s.-]?\d){7,14}(?!\d)")
+_FRONTIER_DATA_IMAGE_RE = re.compile(
+    r"data:image/[a-z0-9.+-]+(?:;[^,\s]*)?,", re.IGNORECASE)
+
+
+def _frontier_empty_summary():
+    """Create a JSON-safe, raw-value-free protection summary."""
+    return {
+        "enabled": True,
+        "counts_by_category": {},
+        "counts_by_severity": {"high": 0, "medium": 0, "low": 0},
+        "images_withheld": False,
+        "blocked": False,
+    }
+
+
+def _frontier_health_status():
+    """Return static boundary capability state without another request's report."""
+    return {
+        "enabled": True,
+        "report_scope": "request_local",
+        "image_policy": "withhold_without_local_sanitizer",
+    }
+
+
+def _record_frontier_summary(summary):
+    """Flight-log only aggregate request-local metadata, never a mutable last result."""
+    safe = {
+        "enabled": True,
+        "counts_by_category": dict(summary.get("counts_by_category") or {}),
+        "counts_by_severity": dict(summary.get("counts_by_severity") or {}),
+        "images_withheld": bool(summary.get("images_withheld")),
+        "blocked": bool(summary.get("blocked")),
+    }
+    if summary.get("reason"):
+        safe["reason"] = str(summary["reason"])
+    if safe["blocked"]:
+        _tlog("frontier.blocked", safe, level="warn")
+    elif safe["counts_by_category"]:
+        _tlog("frontier.redacted", safe, level="warn")
+
+
+def _frontier_luhn_valid(value):
+    digits = value.replace(" ", "").replace("-", "")
+    if not 13 <= len(digits) <= 19 or not digits.isdigit():
+        return False
+    total = 0
+    double = False
+    for char in reversed(digits):
+        digit = ord(char) - ord("0")
+        if double:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+        total += digit
+        double = not double
+    return total % 10 == 0
+
+
+def _frontier_match(matches, start, end, category, severity, rank, value):
+    """Keep raw match text only within this in-memory preparation call."""
+    if end > start and value:
+        matches.append({
+            "start": start,
+            "end": end,
+            "category": category,
+            "severity": severity,
+            "rank": rank,
+            "value": value,
+        })
+
+
+def _frontier_resolve_overlaps(matches):
+    """Keep the strongest match for every overlapping range."""
+    ordered = sorted(
+        matches,
+        key=lambda item: (
+            -_FRONTIER_SEVERITY_RANK[item["severity"]],
+            -item["rank"],
+            -(item["end"] - item["start"]),
+            item["start"],
+        ),
+    )
+    kept = []
+    for item in ordered:
+        if any(item["start"] < other["end"] and other["start"] < item["end"]
+               for other in kept):
+            continue
+        kept.append(item)
+    return sorted(kept, key=lambda item: item["start"])
+
+
+def _frontier_scan_text(text):
+    """Detect high-precision local secret and structured-PII spans in one string."""
+    if not isinstance(text, str):
+        raise TypeError("Frontier can only scan text strings")
+    matches = []
+
+    for match in _FRONTIER_PRIVATE_KEY_RE.finditer(text):
+        _frontier_match(
+            matches, match.start(), match.end(), "private-key", "high", 100, match.group(0))
+    for match in _FRONTIER_GITHUB_TOKEN_RE.finditer(text):
+        _frontier_match(
+            matches, match.start(), match.end(), "github-token", "high", 99, match.group(0))
+    for match in _FRONTIER_JWT_RE.finditer(text):
+        _frontier_match(
+            matches, match.start(), match.end(), "jwt", "high", 98, match.group(0))
+    for category, severity, rank, pattern in _FRONTIER_COMMON_TOKEN_PATTERNS:
+        for match in pattern.finditer(text):
+            _frontier_match(
+                matches, match.start(), match.end(), category, severity, rank, match.group(0))
+    for match in _FRONTIER_BEARER_RE.finditer(text):
+        value = match.group("value")
+        _frontier_match(
+            matches, match.start("value"), match.end("value"),
+            "authorization", "high", 97, value)
+    for match in _FRONTIER_ASSIGNMENT_RE.finditer(text):
+        value = match.group("value")
+        _frontier_match(
+            matches, match.start("value"), match.end("value"),
+            "credential-assignment", "high", 95, value)
+
+    for match in _FRONTIER_EMAIL_RE.finditer(text):
+        _frontier_match(
+            matches, match.start(), match.end(), "email", "medium", 60, match.group(0))
+    for match in _FRONTIER_CARD_RE.finditer(text):
+        value = match.group(0)
+        if _frontier_luhn_valid(value):
+            _frontier_match(
+                matches, match.start(), match.end(), "credit-card", "high", 70, value)
+    for match in _FRONTIER_SSN_RE.finditer(text):
+        area, group, serial = match.groups()
+        if area not in {"000", "666"} and area[0] != "9" and group != "00" and serial != "0000":
+            _frontier_match(
+                matches, match.start(), match.end(), "ssn", "high", 70, match.group(0))
+    for pattern in (_FRONTIER_GROUPED_PHONE_RE, _FRONTIER_E164_PHONE_RE):
+        for match in pattern.finditer(text):
+            digits = re.sub(r"\D", "", match.group(0))
+            if 8 <= len(digits) <= 15:
+                _frontier_match(
+                    matches, match.start(), match.end(), "phone", "low", 50, match.group(0))
+    return _frontier_resolve_overlaps(matches)
+
+
+def _frontier_redact_text(text, findings):
+    """Redact one string and collect only category/severity metadata."""
+    matches = _frontier_scan_text(text)
+    if not matches:
+        return text
+    parts = []
+    cursor = 0
+    for match in matches:
+        parts.append(text[cursor:match["start"]])
+        parts.append(_FRONTIER_MASK)
+        cursor = match["end"]
+        findings.append((match["category"], match["severity"]))
+    parts.append(text[cursor:])
+    return "".join(parts)
+
+
+def _frontier_sanitize_value(value, findings):
+    """Recursively scan every JSON value that can leave in an inference payload."""
+    if isinstance(value, str):
+        return _frontier_redact_text(value, findings)
+    if isinstance(value, list):
+        return [_frontier_sanitize_value(item, findings) for item in value]
+    if isinstance(value, dict):
+        sanitized = {}
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise TypeError("Frontier requires JSON object keys to be strings")
+            sanitized[_frontier_redact_text(key, findings)] = _frontier_sanitize_value(
+                item, findings)
+        return sanitized
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    raise TypeError("Frontier cannot safely scan a non-JSON outbound value")
+
+
+def _frontier_contains_image(value):
+    """Whether any outbound payload value contains raw image data or an image part."""
+    if isinstance(value, str):
+        return bool(_FRONTIER_DATA_IMAGE_RE.search(value))
+    if isinstance(value, list):
+        return any(_frontier_contains_image(item) for item in value)
+    if not isinstance(value, dict):
+        return False
+    part_type = value.get("type")
+    if isinstance(part_type, str) and part_type.lower() in {
+            "image", "image_url", "input_image"}:
+        return True
+    for key, item in value.items():
+        if str(key).lower() in {"image", "image_url", "input_image"}:
+            return True
+        if _frontier_contains_image(item):
+            return True
+    return False
+
+
+def _literal_endpoint_addresses(hostname):
+    """Resolve only numeric host spellings, without making a DNS request."""
+    try:
+        return [ipaddress.ip_address(hostname)]
+    except ValueError:
+        pass
+    try:
+        infos = socket.getaddrinfo(
+            hostname,
+            None,
+            type=socket.SOCK_STREAM,
+            flags=socket.AI_NUMERICHOST,
+        )
+    except (OSError, ValueError):
+        return []
+    addresses = []
+    for _, _, _, _, sockaddr in infos:
+        try:
+            address = ipaddress.ip_address(sockaddr[0])
+        except ValueError:
+            continue
+        if address not in addresses:
+            addresses.append(address)
+    return addresses
+
+
+def _normalize_inference_endpoint(endpoint):
+    """Normalize one HTTPS Copilot base endpoint without accepting URL tricks."""
+    if not isinstance(endpoint, str) or not endpoint.strip():
+        raise ValueError("missing endpoint")
+    parsed = urlsplit(endpoint.strip())
+    if (
+            parsed.scheme.lower() != "https"
+            or not parsed.netloc
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.query
+            or parsed.fragment):
+        raise ValueError("unsafe endpoint shape")
+    try:
+        hostname = (parsed.hostname or "").lower()
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError("invalid endpoint port") from exc
+    if not hostname or hostname == "localhost" or hostname.endswith(".localhost") or hostname.endswith(".local"):
+        raise ValueError("local endpoint host")
+    literal_addresses = _literal_endpoint_addresses(hostname)
+    if any(not address.is_global for address in literal_addresses):
+        raise ValueError("non-public endpoint address")
+    netloc = f"[{hostname}]" if ":" in hostname else hostname
+    if port is not None:
+        netloc += f":{port}"
+    path = parsed.path.rstrip("/")
+    return urlunsplit(("https", netloc, path, "", ""))
+
+
+def _is_known_copilot_endpoint(endpoint):
+    hostname = urlsplit(endpoint).hostname
+    return bool(hostname and hostname.lower() in _KNOWN_COPILOT_INFERENCE_HOSTS)
+
+
+def _is_current_exchange_endpoint(endpoint):
+    """Whether a custom endpoint belongs to the active exchange-bound session."""
+    cache = _copilot_token_cache
+    if cache.get("live_exchange_endpoint") is not True:
+        return False
+    try:
+        cached_endpoint = _normalize_inference_endpoint(cache.get("endpoint"))
+    except Exception:
+        return False
+    return hmac.compare_digest(endpoint, cached_endpoint)
+
+
+def _validate_inference_endpoint(endpoint):
+    """Allow known Copilot hosts or the active token-exchange-bound enterprise base."""
+    normalized = _normalize_inference_endpoint(endpoint)
+    if _is_known_copilot_endpoint(normalized):
+        return normalized
+    if _is_current_exchange_endpoint(normalized):
+        return normalized
+    raise ValueError("untrusted inference endpoint")
+
+
+def _prepare_copilot_inference(endpoint, body):
+    """Central, fail-closed pre-send firewall for every Copilot inference request."""
+    summary = _frontier_empty_summary()
+    try:
+        normalized_endpoint = _validate_inference_endpoint(endpoint)
+    except Exception:
+        summary.update({"blocked": True, "reason": "endpoint_rejected"})
+        _record_frontier_summary(summary)
+        raise FrontierBlockedError(
+            "Brainstem Frontier blocked this request because the inference endpoint was unsafe.",
+            summary)
+
+    try:
+        if not isinstance(body, dict):
+            raise TypeError("inference body must be an object")
+        if _frontier_contains_image(body):
+            summary.update({
+                "blocked": True,
+                "images_withheld": True,
+                "reason": "image_withheld",
+            })
+            _record_frontier_summary(summary)
+            raise FrontierBlockedError(
+                "Brainstem Frontier withheld this request because image content cannot be safely sanitized locally.",
+                summary)
+        findings = []
+        # Work on a deep copy: Frontier must never alter caller-owned conversation
+        # history, agent results, or any other in-process state it is protecting.
+        prepared = _frontier_sanitize_value(copy.deepcopy(body), findings)
+    except FrontierBlockedError:
+        raise
+    except Exception:
+        summary.update({"blocked": True, "reason": "scanner_failed"})
+        _record_frontier_summary(summary)
+        raise FrontierBlockedError(
+            "Brainstem Frontier blocked this request because local safety scanning failed.",
+            summary)
+
+    for category, severity in findings:
+        summary["counts_by_category"][category] = (
+            summary["counts_by_category"].get(category, 0) + 1)
+        summary["counts_by_severity"][severity] += 1
+    _record_frontier_summary(summary)
+    return normalized_endpoint, prepared, summary
+
+
+def _post_copilot_inference(endpoint, headers, body, *, timeout, stream=False):
+    """Prepare, validate, and send exactly one Brainstem-owned inference request."""
+    normalized_endpoint, prepared_body, _ = _prepare_copilot_inference(endpoint, body)
+    kwargs = {
+        "headers": headers,
+        "json": prepared_body,
+        "timeout": timeout,
+        # Never follow an inference redirect to an unvalidated target.
+        "allow_redirects": False,
+    }
+    if stream:
+        kwargs["stream"] = True
+    return requests.post(
+        f"{normalized_endpoint}/chat/completions",
+        **kwargs,
+    )
+
+
 def call_copilot(messages, tools=None):
     """Call the Copilot chat completions API."""
     copilot_token, endpoint = get_copilot_token()
-    
-    url = f"{endpoint}/chat/completions"
+
     headers = {
         "Authorization": f"Bearer {copilot_token}",
         "Content-Type": "application/json",
@@ -1901,12 +2336,14 @@ def call_copilot(messages, tools=None):
     # transient hiccup or a cold model, so retry ONCE (mirroring the 401 path) before
     # giving up — and never let the raw urllib3 timeout text escape to the user.
     try:
-        resp = requests.post(url, headers=headers, json=body, timeout=(10, 120))
+        resp = _post_copilot_inference(
+            endpoint, headers, body, timeout=(10, 120))
     except requests.exceptions.Timeout:
         _tlog("api.timeout_retry", {"model": MODEL}, level="warn")
         print("[brainstem] Copilot request timed out — retrying once")
         try:
-            resp = requests.post(url, headers=headers, json=body, timeout=(10, 120))
+            resp = _post_copilot_inference(
+                endpoint, headers, body, timeout=(10, 120))
         except requests.exceptions.Timeout as e:
             _tlog("api.timeout", {"model": MODEL, "detail": str(e)[:300]}, level="error")
             print(f"[brainstem] Copilot request timed out again, giving up: {e}")
@@ -1923,9 +2360,10 @@ def call_copilot(messages, tools=None):
         _invalidate_copilot_token()
         try:
             copilot_token, endpoint = get_copilot_token()
-            url = f"{endpoint}/chat/completions"
             headers["Authorization"] = f"Bearer {copilot_token}"
-            resp = requests.post(url, headers=headers, json=body, timeout=60)
+            resp = _post_copilot_inference(endpoint, headers, body, timeout=60)
+        except FrontierBlockedError:
+            raise
         except Exception as e:
             print(f"[brainstem] Token refresh after 401 failed: {e}")
 
@@ -1952,7 +2390,7 @@ def call_copilot(messages, tools=None):
                     body.pop("tool_choice", None)
                 elif tools and "tool_choice" not in body:
                     body["tool_choice"] = "auto"
-                resp = requests.post(url, headers=headers, json=body, timeout=60)
+                resp = _post_copilot_inference(endpoint, headers, body, timeout=60)
                 if resp.status_code == 200:
                     break
                 print(f"[brainstem] {fallback_model} also failed ({resp.status_code})")
@@ -2121,7 +2559,6 @@ def call_copilot_stream(messages, tools=None, model=None):
     """
     use_model = model or MODEL
     copilot_token, endpoint = get_copilot_token()
-    url = f"{endpoint}/chat/completions"
     headers = {
         "Authorization": f"Bearer {copilot_token}",
         "Content-Type": "application/json",
@@ -2135,8 +2572,8 @@ def call_copilot_stream(messages, tools=None, model=None):
             body["tool_choice"] = "auto"
 
     print(f"[brainstem] STREAM call: model={use_model}, tools={len(tools) if tools else 0}")
-
-    resp = requests.post(url, headers=headers, json=body, stream=True, timeout=(10, 30))
+    resp = _post_copilot_inference(
+        endpoint, headers, body, stream=True, timeout=(10, 30))
 
     # Self-heal a server-side-rejected cached token exactly once, like call_copilot.
     if resp.status_code == 401:
@@ -2144,9 +2581,9 @@ def call_copilot_stream(messages, tools=None, model=None):
         resp.close()
         _invalidate_copilot_token()
         copilot_token, endpoint = get_copilot_token()
-        url = f"{endpoint}/chat/completions"
         headers["Authorization"] = f"Bearer {copilot_token}"
-        resp = requests.post(url, headers=headers, json=body, stream=True, timeout=(10, 30))
+        resp = _post_copilot_inference(
+            endpoint, headers, body, stream=True, timeout=(10, 30))
 
     if resp.status_code != 200:
         detail = ""
@@ -3167,6 +3604,7 @@ def health():
             "copilot": "no_access" if no_copilot else ("\u2713" if copilot_ok else "pending"),
             "copilot_username": _no_copilot_access.get("username") if no_copilot else None,
             "brainstem_dir": os.path.dirname(os.path.abspath(__file__)),
+            "frontier": _frontier_health_status(),
         })
     else:
         return jsonify({
@@ -3177,6 +3615,7 @@ def health():
             "agents": list(agents.keys()),
             "quarantined": _quarantine_snapshot(),
             "auth_error": "invalid_credentials" if invalid_credential else None,
+            "frontier": _frontier_health_status(),
         })
 
 

@@ -1,0 +1,14 @@
+{
+  "schema": "aibast-librarian-giscus-config/1.0",
+  "enabled": false,
+  "repo": null,
+  "repo_id": null,
+  "source_category": "Ideas",
+  "source_category_id": null,
+  "item_category": "Announcements",
+  "item_category_id": null,
+  "mapping": "specific",
+  "reactions_enabled": true,
+  "strict": true,
+  "notes": "Placeholder only. An approved deployment supplies the Pages-host-derived distribution repo plus verified GitHub App/Giscus IDs. Pages never stores a GitHub token."
+}

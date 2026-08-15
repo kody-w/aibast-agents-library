@@ -1208,7 +1208,8 @@ class TestCopilotTimeout(unittest.TestCase):
         from unittest.mock import patch
         brainstem = self.brainstem
         ok = self._ok_response()
-        with patch.object(brainstem, "get_copilot_token", return_value=("tok", "https://api.example")), \
+        with patch.object(brainstem, "get_copilot_token", return_value=(
+                "tok", "https://api.individual.githubcopilot.com")), \
              patch.object(brainstem, "_tlog") as mock_tlog, \
              patch("requests.post", side_effect=[requests.exceptions.ReadTimeout("boom"), ok]) as mock_post:
             result, model = brainstem.call_copilot([{"role": "user", "content": "hi"}])
@@ -1224,7 +1225,8 @@ class TestCopilotTimeout(unittest.TestCase):
         brainstem = self.brainstem
         raw = ("HTTPSConnectionPool(host='api.enterprise.githubcopilot.com', port=443): "
                "Read timed out. (read timeout=60)")
-        with patch.object(brainstem, "get_copilot_token", return_value=("tok", "https://api.example")), \
+        with patch.object(brainstem, "get_copilot_token", return_value=(
+                "tok", "https://api.individual.githubcopilot.com")), \
              patch.object(brainstem, "_tlog") as mock_tlog, \
              patch("requests.post", side_effect=requests.exceptions.ReadTimeout(raw)) as mock_post:
             with self.assertRaises(RuntimeError) as ctx:
@@ -1242,7 +1244,8 @@ class TestCopilotTimeout(unittest.TestCase):
         import requests
         from unittest.mock import patch
         brainstem = self.brainstem
-        with patch.object(brainstem, "get_copilot_token", return_value=("tok", "https://api.example")), \
+        with patch.object(brainstem, "get_copilot_token", return_value=(
+                "tok", "https://api.individual.githubcopilot.com")), \
              patch("requests.post", side_effect=requests.exceptions.ConnectionError("down")) as mock_post:
             with self.assertRaises(requests.exceptions.ConnectionError):
                 brainstem.call_copilot([{"role": "user", "content": "hi"}])

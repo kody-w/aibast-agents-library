@@ -290,8 +290,8 @@
     .done-grid article { padding: 14px; border: 1px solid var(--cp-border); border-radius: 10px; background: var(--cp-surface-soft); }
     .done-grid strong, .done-grid span { display: block; }
     .done-grid span { margin-top: 5px; color: var(--cp-text-muted); }
-    .troubleshooting-table { width: 100%; border-collapse: collapse; }
-    .troubleshooting-table th, .troubleshooting-table td { padding: 12px; border: 1px solid var(--cp-border); text-align: left; vertical-align: top; }
+    .troubleshooting-table { width: 100%; max-width: 100%; box-sizing: border-box; table-layout: fixed; border-collapse: collapse; }
+    .troubleshooting-table th, .troubleshooting-table td { padding: 12px; border: 1px solid var(--cp-border); text-align: left; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
     .troubleshooting-table th { background: var(--cp-surface-soft); }
     .hard-overview { margin-top: 20px; }
     .hard-overview h2 { margin-top: 0; }
@@ -338,6 +338,9 @@
     @media (max-width: 760px) { .engine-flow, .outcome-grid, .skill-onboarding, .module-summary, .preview-grid, .done-grid, .achievements-panel { grid-template-columns: 1fr; } .achievements-claims { padding: 16px 0 0; border-top: 1px solid var(--cp-border); border-left: 0; } }
     @media (max-width: 620px) { .resource-list { columns: 1; } .prompt-heading { display: block; } .prompt-heading .button { margin-top: 12px; } .instruction-grid { grid-template-columns: 1fr; } .step header { grid-template-columns: 36px 1fr; } .step header .report-button { grid-column: 1 / -1; } }
   </style>
+
+<link rel="stylesheet" href="../../assets/trust-gate.css" data-aibast-trust-assets>
+<script defer src="../../assets/trust-gate.js" data-aibast-trust-assets></script>
 </head>
 <body data-workshop-slug="inventory-rebalancing">
   <header class="topbar">
@@ -441,7 +444,7 @@
         <header class="learn-step-header"><span>2</span><div><p>Prepare your Copilot</p><h3>Download and attach the Brainstem skill</h3></div><button class="button report-button" type="button" data-report-location="brainstem lane — step 2: attach skill" data-report-expected="The lane-specific SKILL.md is attached in a fresh GitHub Copilot Agent-mode chat." data-report-evidence="">Report an issue</button></header>
         <div class="learn-step-body">
           <p>This file fixes the workshop to Brainstem. Copilot remains the work surface while the learner&#x27;s on-device training AI persists state, loads the generic workshop engine, and continues every handoff.</p>
-          <div class="action-panel"><strong>Do this</strong><ol><li>Download the lane-specific <code>SKILL.md</code>.</li><li>Open GitHub Copilot Chat in VS Code.</li><li>Select <strong>Agent mode</strong>.</li><li>Drag the downloaded file into the chat.</li></ol><a class="button primary" href="../../skills/aibast-easy-mode-brainstem/SKILL.md" download="SKILL.md">Download Brainstem SKILL.md</a></div>
+          <div class="action-panel"><strong>Do this</strong><ol><li>Download the lane-specific <code>SKILL.md</code>.</li><li>Open GitHub Copilot Chat in VS Code.</li><li>Select <strong>Agent mode</strong>.</li><li>Drag the downloaded file into the chat.</li></ol><a class="button primary pointer-events-none opacity-50 cursor-not-allowed" href="../../skills/aibast-easy-mode-brainstem/SKILL.md" download="SKILL.md" data-download-gated data-download-kind="skill" aria-disabled="true">Download Brainstem SKILL.md</a></div>
           <div class="expected-panel"><strong>Expected result</strong><p>The attachment appears in Copilot Chat. From this point forward, the selected skill—not extra wording in your prompts—determines which harness runs.</p></div>
           <label class="step-complete"><input type="checkbox" data-checkpoint="brainstem-skill" data-achievements-group="onboarding" data-achievements-path="brainstem"><span>I attached the correct lane skill.</span></label>
         </div>
@@ -477,7 +480,7 @@
         <header class="learn-step-header"><span>2</span><div><p>Prepare your Copilot</p><h3>Download and attach the Copilot-only skill</h3></div><button class="button report-button" type="button" data-report-location="copilot lane — step 2: attach skill" data-report-expected="The lane-specific SKILL.md is attached in a fresh GitHub Copilot Agent-mode chat." data-report-evidence="">Report an issue</button></header>
         <div class="learn-step-body">
           <p>This file fixes the workshop to GitHub Copilot alone. The skill carries the same discovery, testing, deployment, and validation contract directly in the active Copilot session and bootstraps the official Microsoft Copilot Studio plugin.</p>
-          <div class="action-panel"><strong>Do this</strong><ol><li>Download the lane-specific <code>SKILL.md</code>.</li><li>Open GitHub Copilot Chat in VS Code.</li><li>Select <strong>Agent mode</strong>.</li><li>Drag the downloaded file into the chat.</li></ol><a class="button primary" href="../../skills/aibast-easy-mode-copilot/SKILL.md" download="SKILL.md">Download Copilot-only SKILL.md</a></div>
+          <div class="action-panel"><strong>Do this</strong><ol><li>Download the lane-specific <code>SKILL.md</code>.</li><li>Open GitHub Copilot Chat in VS Code.</li><li>Select <strong>Agent mode</strong>.</li><li>Drag the downloaded file into the chat.</li></ol><a class="button primary pointer-events-none opacity-50 cursor-not-allowed" href="../../skills/aibast-easy-mode-copilot/SKILL.md" download="SKILL.md" data-download-gated data-download-kind="skill" aria-disabled="true">Download Copilot-only SKILL.md</a></div>
           <div class="expected-panel"><strong>Expected result</strong><p>The attachment appears in Copilot Chat. From this point forward, the selected skill—not extra wording in your prompts—determines which harness runs.</p></div>
           <label class="step-complete"><input type="checkbox" data-checkpoint="copilot-skill" data-achievements-group="onboarding" data-achievements-path="copilot"><span>I attached the correct lane skill.</span></label>
         </div>
@@ -555,7 +558,7 @@
 
 
       <section class="learn-step" id="easy-step-5">
-        <header class="learn-step-header"><span>5</span><div><p>Recognize completion</p><h3>Know what “done” looks like</h3></div><button class="button report-button" type="button" data-report-location="Easy mode — final completion verdict" data-report-expected="Local 4/4; Preview 4/4; Draft Inventory Manual Build; published false." data-report-evidence="solutions/inventory-rebalancing/screenshots/assisted/06-confirm-draft.annotated.png">Report an issue</button></header>
+        <header class="learn-step-header"><span>5</span><div><p>Recognize completion</p><h3>Know what “done” looks like</h3></div></header>
         <div class="learn-step-body">
           <p>The workshop is complete only when both the portable agent and the Copilot Studio front door prove the same behavior.</p>
           <div class="done-grid">
@@ -595,9 +598,9 @@
           <a class="button" href="evidence-report.html#locked-cases">Locked evidence</a>
           <a class="button" href="evidence-report.html">Evidence report</a>
           <a class="button" href="export-manifest.json" download>Download audit manifest</a>
-          <a class="button" href="exports/inventory-rebalancing-source.zip" download>Download portable bundle</a>
-          <a class="button primary" href="exports/inventory-rebalancing-copilot-studio-solution.zip" download>Download Copilot Studio solution</a><a class="button" href="exports/inventory-rebalancing-deployment-settings.json" download>Deployment settings</a><a class="button" href="exports/inventory-rebalancing-solution-export.json" download>Export details</a>
-          <a class="button" href="../../agents/@aibast-agents-library/templates/workshop_agent.py" download>Download generic workshop agent</a>
+          <a class="button pointer-events-none opacity-50 cursor-not-allowed" href="exports/inventory-rebalancing-source.zip" download data-download-gated data-download-kind="solution" aria-disabled="true">Download portable bundle</a>
+          <a class="button primary pointer-events-none opacity-50 cursor-not-allowed" href="exports/inventory-rebalancing-copilot-studio-solution.zip" download data-download-gated data-download-kind="solution" aria-disabled="true">Download Copilot Studio solution</a><a class="button" href="exports/inventory-rebalancing-deployment-settings.json" download>Deployment settings</a><a class="button" href="exports/inventory-rebalancing-solution-export.json" download>Export details</a>
+          <a class="button pointer-events-none opacity-50 cursor-not-allowed" href="../../agents/@aibast-agents-library/templates/workshop_agent.py" download data-download-gated data-download-kind="agent" aria-disabled="true">Download generic workshop agent</a>
           <a class="button" href="https://kodyw.com/the-personless-harness/" target="_blank" rel="noopener">Personless harness article ↗</a>
         </div>
       </details>
@@ -613,8 +616,8 @@
         <!-- No pending evidence. -->
         <div class="hard-actions">
           <a class="button" href="manual-tutorial.html" target="_blank" rel="noopener">Open standalone Manual-mode guide ↗</a>
-          <a class="button primary" href="exports/inventory-rebalancing-source.zip">Download source bundle</a>
-          <a class="button primary" href="exports/inventory-rebalancing-copilot-studio-solution.zip" download>Download Copilot Studio solution</a><a class="button" href="exports/inventory-rebalancing-deployment-settings.json" download>Deployment settings</a><a class="button" href="exports/inventory-rebalancing-solution-export.json" download>Export details</a>
+          <a class="button primary pointer-events-none opacity-50 cursor-not-allowed" href="exports/inventory-rebalancing-source.zip" data-download-gated data-download-kind="solution" aria-disabled="true">Download source bundle</a>
+          <a class="button primary pointer-events-none opacity-50 cursor-not-allowed" href="exports/inventory-rebalancing-copilot-studio-solution.zip" download data-download-gated data-download-kind="solution" aria-disabled="true">Download Copilot Studio solution</a><a class="button" href="exports/inventory-rebalancing-deployment-settings.json" download>Deployment settings</a><a class="button" href="exports/inventory-rebalancing-solution-export.json" download>Export details</a>
         </div>
       </section>
 

@@ -80,12 +80,15 @@ def test_toolbar_only_links_agent_library_and_industry_workshops():
         text.index("</nav>", text.index('<nav class="nav" aria-label="Primary navigation">'))
     ]
 
-    assert nav.count("<a ") == 2
+    assert nav.count("<a ") == 5
     assert ">Agent Library</a>" in nav
     assert (
         'href="library.html?view=solutions#workshops">'
         "Industry Workshops</a>"
     ) in nav
+    assert 'href="libraries.html">Librarian</a>' in nav
+    assert 'href="blog.html">Engineering Notes</a>' in nav
+    assert 'href="#contribute">Contribute</a>' in nav
     for removed in (
         "Workshop settings",
         "Guide",

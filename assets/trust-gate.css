@@ -1,0 +1,55 @@
+/* Central acknowledgement treatment for code-bearing downloads. */
+#trust-gate {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9999;
+  width: min(410px, calc(100vw - 36px));
+  padding: 16px;
+  border: 1px solid #c9c9c9;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #242424;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, .22);
+  font: 14px/1.5 "Segoe UI", Aptos, system-ui, sans-serif;
+}
+#trust-gate h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+#trust-artifact {
+  margin: 0 0 12px;
+  color: #555;
+  font-size: 13px;
+}
+#trust-gate label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid #dedede;
+  border-radius: 10px;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+#trust-ack {
+  width: 19px;
+  height: 19px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+  accent-color: #0078d4;
+}
+#trust-gate strong { color: #a15c00; }
+#trust-gate :focus-visible {
+  outline: 3px solid #b11f4b;
+  outline-offset: 2px;
+}
+.pointer-events-none { pointer-events: none !important; }
+.opacity-50 { opacity: .5 !important; }
+.cursor-not-allowed { cursor: not-allowed !important; }
+@media (prefers-color-scheme: dark) {
+  #trust-gate { background: #292929; color: #eee; border-color: #555; }
+  #trust-artifact { color: #c7c7c7; }
+  #trust-gate label { background: #353535; border-color: #555; }
+  #trust-gate strong { color: #fbbf24; }
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "aibast-internal-workshop-access-metrics/1.0",
+  "aggregate_only": true,
+  "identity_fields_published": false,
+  "analytics_collection_status": "deferred_no_active_collector",
+  "analytics_requires_explicit_opt_in": true,
+  "minimum_public_cohort": 5,
+  "counts": {
+    "asset": {
+      "workshop-demo-001": null,
+      "workshop-onepager-001": null
+    },
+    "status": {
+      "requested": null,
+      "approved": null,
+      "denied": null,
+      "fulfilled": null,
+      "open": null,
+      "closed": null
+    },
+    "impact_band": {
+      "learning": null,
+      "demo": null,
+      "enablement": null,
+      "other": null
+    }
+  },
+  "suppressed": {
+    "asset": [
+      "workshop-demo-001",
+      "workshop-onepager-001"
+    ],
+    "status": [
+      "requested",
+      "approved",
+      "denied",
+      "fulfilled",
+      "open",
+      "closed"
+    ],
+    "impact_band": [
+      "learning",
+      "demo",
+      "enablement",
+      "other"
+    ]
+  },
+  "notes": "No collector is active. A future approved collector may count only requests whose versioned optional_aggregate_metrics_consent marker is true. This sidecar never publishes requester identities, free text, private links, asset locations, customer data, PII, or confidential data; GitHub retains public issue authorship under its own service terms."
+}

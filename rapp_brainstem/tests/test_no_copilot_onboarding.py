@@ -185,7 +185,7 @@ class TestCopilotCacheIdentity(_AuthTestBase):
     def _write_cache(self, github_token=None):
         cache = {
             "token": "cop_cached_account_a",
-            "endpoint": "https://cached.example",
+            "endpoint": "https://api.individual.githubcopilot.com",
             "expires_at": time.time() + 1800,
         }
         if github_token:
@@ -203,7 +203,7 @@ class TestCopilotCacheIdentity(_AuthTestBase):
         token, endpoint = self.brainstem.get_copilot_token()
 
         self.assertEqual(token, "cop_cached_account_a")
-        self.assertEqual(endpoint, "https://cached.example")
+        self.assertEqual(endpoint, "https://api.individual.githubcopilot.com")
 
     def test_other_account_or_legacy_cache_is_exchanged_fresh(self):
         current_token = "ghu_account_b"

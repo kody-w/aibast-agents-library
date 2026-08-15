@@ -1,0 +1,43 @@
+{
+  "schema": "aibast-blog/1.0",
+  "contribution_type": "blog_post",
+  "slug": "local-agent-boundaries",
+  "title": "Why remote agent loading became an install-time concern",
+  "author": "Kody Wildfeuer (@kody-w)",
+  "date": "2026-03-05",
+  "status": "published",
+  "publication": "generated-from-canonical-submission",
+  "legacy_html": true,
+  "summary": "A historical architecture decision moved agent acquisition away from runtime hot loading and toward reviewable local files with explicit installation boundaries.",
+  "audience": "Agent authors and runtime contributors deciding where package acquisition, review, dependency resolution, and execution should occur.",
+  "prerequisites": "A local Brainstem install plus a basic understanding of Python imports, file review, and serverless execution boundaries.",
+  "applicability": "Applies to contributors deciding whether an agent should be acquired during installation or dynamically at runtime.",
+  "support_boundary": "This is an architectural rationale, not a commitment to add remote-agent loading or a support promise for external package ecosystems.",
+  "limitations": "This is a local-first runtime decision, not a universal package-management rule. Signed package ecosystems or managed deployment pipelines can make different trade-offs.",
+  "status_note": "Status as of 2026-08-15: no remote-agent return is scheduled or committed. Treat this as a historical design note; consult current release notes and source before planning work.",
+  "tags": [
+    "agent-loading",
+    "local-first",
+    "architecture"
+  ],
+  "evidence": [
+    {
+      "label": "Published agent discovery implementation",
+      "url": "https://github.com/microsoft/aibast-agents-library/blob/main/rapp_brainstem/brainstem.py"
+    },
+    {
+      "label": "Local agent behavior tests",
+      "url": "https://github.com/microsoft/aibast-agents-library/blob/main/rapp_brainstem/tests/test_local_agents.py"
+    }
+  ],
+  "links": [
+    {
+      "label": "Agent contribution contract",
+      "url": "https://github.com/microsoft/aibast-agents-library/blob/main/CONTRIBUTING.md"
+    },
+    {
+      "label": "Local agent tests",
+      "url": "https://github.com/microsoft/aibast-agents-library/blob/main/rapp_brainstem/tests/test_local_agents.py"
+    }
+  ]
+}

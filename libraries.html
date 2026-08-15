@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Librarian — AIBAST Agent Libraries</title>
+  <meta name="description" content="A staging librarian for first-party, subscribed, quarantined, and community-suggested agent and skill libraries.">
+  <style>
+    :root {
+      --bg: #f7f4ef; --surface: #fff; --soft: #f4f4f4; --ink: #242424;
+      --muted: #5c5c5c; --line: #dedede; --accent: #b11f4b; --accent-fg: #fff;
+      --first: #156c3f; --subscribed: #0f6cbd; --quarantined: #a15c00; --community: #6b4fc9;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #343231; --surface: #292929; --soft: #333; --ink: #eee; --muted: #b8b8b8; --line: #515151; --accent: #fd8ea1; --accent-fg: #1a1a1a; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 "Segoe UI", Aptos, system-ui, sans-serif; }
+    a { color: inherit; }
+    a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    header { border-bottom: 1px solid var(--line); background: var(--surface); }
+    .bar, main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+    .brand { color: var(--ink); font-weight: 800; text-decoration: none; }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav a { border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; text-decoration: none; font-size: .84rem; }
+    main { padding: 44px 0 72px; }
+    .eyebrow { color: var(--accent); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .73rem; }
+    h1 { margin: 7px 0 10px; font-size: clamp(2rem, 6vw, 4rem); line-height: 1; letter-spacing: -.05em; }
+    .lede { max-width: 780px; color: var(--muted); }
+    .policy { margin: 26px 0; padding: 16px 18px; border-left: 4px solid var(--accent); border-radius: 0 10px 10px 0; background: var(--surface); }
+    .policy strong { display: block; margin-bottom: 5px; }
+    .controls { display: flex; gap: 12px; align-items: center; margin: 24px 0; }
+    .controls label { font-weight: 700; font-size: .86rem; }
+    .controls input { width: min(460px, 100%); border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); padding: 10px; }
+    .status { color: var(--muted); font-size: .85rem; }
+    .groups { display: grid; gap: 22px; }
+    .group { padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    .group h2 { margin: 0 0 4px; font-size: 1.1rem; }
+    .group > p { margin: 0 0 16px; color: var(--muted); font-size: .9rem; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); }
+    .card h3 { margin: 0 0 7px; font-size: 1rem; }
+    .card p { margin: 8px 0; color: var(--muted); font-size: .86rem; }
+    .meta { min-width: 0; margin-top: 12px; display: grid; gap: 7px; font-size: .79rem; overflow-wrap: anywhere; word-break: break-word; }
+    .meta > div { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .meta strong { color: var(--ink); }
+    .badge { display: inline-flex; align-items: center; width: fit-content; border-radius: 999px; padding: 4px 8px; color: #fff; font-size: .72rem; font-weight: 800; }
+    .badge.first_party { background: var(--first); } .badge.subscribed { background: var(--subscribed); }
+    .badge.quarantined { background: var(--quarantined); } .badge.community_suggested { background: var(--community); }
+    .empty { padding: 14px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-size: .86rem; }
+    .source-link { display: inline-flex; margin-top: 10px; color: var(--accent); font-size: .84rem; font-weight: 750; }
+    .access-button { margin-top: 10px; border: 1px solid var(--accent); border-radius: 8px; background: var(--accent); color: var(--accent-fg); padding: 8px 10px; font: 700 .84rem inherit; cursor: pointer; }
+    .discussion-button { margin-top: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); padding: 8px 10px; font: 700 .84rem inherit; cursor: pointer; }
+    .discussion-button:disabled { opacity: .55; cursor: not-allowed; }
+    #internal-access-dialog { width: min(620px, calc(100vw - 32px)); margin: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 18px 48px rgba(0,0,0,.28); }
+    #internal-access-dialog::backdrop { background: rgba(0,0,0,.5); }
+    #librarian-discussion-dialog { width: min(760px, calc(100vw - 32px)); margin: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 18px 48px rgba(0,0,0,.28); }
+    #librarian-discussion-dialog::backdrop { background: rgba(0,0,0,.5); }
+    .discussion-body { padding: 24px; }
+    .discussion-body h2 { margin: 0 0 8px; }
+    .discussion-body p { color: var(--muted); }
+    #giscus-root { min-height: 48px; margin-top: 16px; }
+    .access-body { padding: 24px; }
+    .access-body h2 { margin: 0 0 8px; }
+    .access-body > p { color: var(--muted); }
+    .access-assets { display: grid; gap: 9px; margin: 18px 0; }
+    .access-assets label, .access-ack label { display: flex; align-items: flex-start; gap: 9px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--soft); cursor: pointer; font-size: .88rem; }
+    .access-assets strong { display: block; }
+    .access-assets span { color: var(--muted); font-size: .8rem; }
+    .access-field { display: grid; gap: 6px; margin: 16px 0; font-weight: 700; font-size: .86rem; }
+    .access-field textarea, .access-field select { min-height: 40px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); resize: vertical; }
+    .access-ack { display: grid; gap: 8px; margin: 16px 0; }
+    .access-forms-path { margin: 16px 0; padding: 14px; border: 1px solid var(--accent); border-radius: 10px; background: var(--soft); }
+    .access-forms-path strong { display: block; margin-bottom: 5px; }
+    .access-forms-path p { color: var(--muted); font-size: .84rem; }
+    #access-forms { border: 1px solid var(--accent); border-radius: 8px; background: var(--accent); color: var(--accent-fg); padding: 8px 12px; font: 700 .84rem inherit; cursor: pointer; }
+    #access-forms:disabled { opacity: .55; cursor: not-allowed; }
+    .access-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .access-actions button { min-height: 40px; border-radius: 8px; padding: 8px 12px; font: 700 .84rem inherit; cursor: pointer; }
+    #access-cancel { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+    #access-prepare { border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); }
+    #access-prepare:disabled { opacity: .55; cursor: not-allowed; }
+    .access-note { padding: 12px; border-left: 4px solid var(--warning, #a15c00); border-radius: 0 8px 8px 0; background: var(--soft); color: var(--muted); font-size: .84rem; }
+    footer { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+    @media (max-width: 640px) { .bar { align-items: flex-start; flex-direction: column; padding: 12px 0; } .controls { align-items: stretch; flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <a class="brand" href="library.html">AI BAST Agent Library</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="library.html">Agent library</a>
+        <a href="library.html#contribute">Suggest a source</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="eyebrow">Staging librarian</div>
+    <h1>Curate sources before they curate you.</h1>
+    <p class="lede">This librarian is a Reddit-style review surface for agent and skill libraries. It separates first-party sources from subscribed, quarantined, and community-suggested sources so trust state is explicit rather than inferred from a link. Every discovered item is namespaced as <code>library-slug:item-slug</code>; bare slugs are never globally trusted.</p>
+    <section class="policy" aria-labelledby="policy-title">
+      <strong id="policy-title">Browser safety boundary</strong>
+      This page reads only generated local catalogs and committed metric/Discussion sidecars. It never fetches, imports, renders, or executes content from a source URL. Remote acquisition and validation belong to approved CI or a trusted backend after maintainer review; this browser has no client token. Existing agent ratings or Discussions are not treated as a trust signal for an external library source. Authenticated library-source suggestions belong in <strong>Ideas</strong>; approved namespaced catalog item threads belong in <strong>Announcements</strong>.
+    </section>
+    <div class="controls">
+      <label for="source-filter">Filter sources</label>
+      <input id="source-filter" type="search" placeholder="Search name, owner, format, or trust note">
+    </div>
+    <p class="status" id="catalog-status" role="status" aria-live="polite">Loading generated catalog…</p>
+    <div class="groups" id="groups"></div>
+  </main>
+  <dialog id="librarian-discussion-dialog" aria-modal="true" aria-labelledby="discussion-title">
+    <div class="discussion-body">
+      <h2 id="discussion-title">Discuss this library source</h2>
+      <p id="discussion-term"></p>
+      <p class="access-note">GitHub App-backed comments and reactions are curation signals only. They do not record legal acknowledgement, grant access, approve restricted materials, or replace a Forms or public-Issue access request.</p>
+      <div id="giscus-root"></div>
+      <div class="access-actions"><button id="discussion-close" type="button">Close</button></div>
+    </div>
+  </dialog>
+  <dialog id="internal-access-dialog" aria-modal="true" aria-labelledby="access-title">
+    <div class="access-body">
+      <h2 id="access-title">Request limited internal workshop material</h2>
+      <p id="access-source-name"></p>
+      <p class="access-note">This acknowledgement is an engineering control pending organizational legal/privacy review; it is not a contract or legal compliance determination. This public request must never include private links, location details, customer data, PII, or confidential information. Pages cannot create access or call GraphQL; it prepares a raw, marker-first GitHub issue for the signed-in requester. No public analytics collector is active. Any future aggregate-only metrics require the optional analytics acknowledgement, suppress small cohorts, and never publish free text or requester identities.</p>
+      <div class="access-assets" id="access-assets"></div>
+      <div class="access-forms-path" id="access-forms-path" hidden>
+        <strong>Recommended for internal users: Microsoft Forms</strong>
+        <p>The configured tenant-restricted form keeps business justification, identity, expected audience/reach, usefulness/impact category, and follow-up permission private. It is not stored in this public site.</p>
+        <button id="access-forms" type="button" disabled>Request through Microsoft Forms</button>
+      </div>
+      <label class="access-field" for="access-intended-use">Public-safe intended use (GitHub fallback)
+        <select id="access-intended-use">
+          <option value="">Select intended use</option>
+          <option value="learning">Learning</option>
+          <option value="demonstration">Demonstration</option>
+          <option value="enablement">Enablement</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label class="access-field" for="access-impact">Public-safe impact band
+        <select id="access-impact">
+          <option value="">Select a band</option>
+          <option value="learning">Learning</option>
+          <option value="demo">Demo</option>
+          <option value="enablement">Enablement</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <div class="access-ack">
+        <p><strong>Required acknowledgement statements · terms version 2026-08-15</strong></p>
+        <label><input id="access-ack-limited" type="checkbox"> <span>I understand this content is limited/internal and may not be reshared.</span></label>
+        <label><input id="access-ack-least" type="checkbox"> <span>I understand access is discretionary and least-privilege.</span></label>
+        <label><input id="access-ack-terms" type="checkbox"> <span>I acknowledge the engineering use/risk boundary: materials are provided as-is/use-at-own-risk under <a href="LICENSE" target="_blank" rel="noopener noreferrer">repo terms</a>; this is not a binding contract.</span></label>
+        <label><input id="access-ack-data" type="checkbox"> <span>I will not enter customer, PII, or confidential data in this public request.</span></label>
+        <p><strong>Optional consent</strong></p>
+        <label><input id="access-ack-metrics" type="checkbox"> <span>I consent to aggregate-only counting of my request status and selected asset IDs; no identity profiling or free-text analytics.</span></label>
+        <label><input id="access-ack-follow-up" type="checkbox"> <span>I consent to an owner following up through an approved private channel if access review needs clarification.</span></label>
+      </div>
+      <p class="access-note">Read <a href="LICENSE" target="_blank" rel="noopener noreferrer">LICENSE</a>, <a href="SECURITY.md" target="_blank" rel="noopener noreferrer">SECURITY.md</a>, <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer">Microsoft Privacy Statement</a>, and <a href="https://www.microsoft.com/legal/terms-of-use" target="_blank" rel="noopener noreferrer">Microsoft legal terms</a>. Organizational legal/privacy review governs any actual access program.</p>
+      <p class="status" id="access-status" role="status" aria-live="polite">Select an asset and choose only public-safe categories for the GitHub fallback; business justification belongs in the configured private Form.</p>
+      <div class="access-actions">
+        <button id="access-cancel" type="button">Cancel</button>
+        <button id="access-prepare" type="button" disabled>Prepare public GitHub issue (fallback)</button>
+      </div>
+    </div>
+  </dialog>
+  <footer>Source status is metadata, not an endorsement. A <em>subscribed</em> source still requires CI validation before any remote content becomes available to a runtime.</footer>
+  <script>
+    const GROUPS = [
+      ["first_party", "First-party", "Maintained by AIBAST or an approved first-party owner."],
+      ["subscribed", "Subscribed", "Maintainer-approved metadata; content acquisition remains CI or trusted-backend work."],
+      ["quarantined", "Quarantined", "Recorded for review but blocked from acquisition and execution."],
+      ["community_suggested", "Community-suggested", "A proposal only. No browser fetch, subscription, or execution occurs."]
+    ];
+    const groups = document.getElementById("groups");
+    const status = document.getElementById("catalog-status");
+    const filter = document.getElementById("source-filter");
+    let sources = [];
+    let itemCount = 0;
+    let metrics = {};
+    let snapshot = {};
+    let discussions = {};
+    let accessSource = null;
+    let accessOpener = null;
+    const ACCESS_TERMS_VERSION = "2026-08-15";
+    const DISTRIBUTION_OWNER = location.hostname.endsWith(".github.io")
+      ? location.hostname.split(".")[0]
+      : "microsoft";
+    const DISTRIBUTION_REPO = "aibast-agents-library";
+    const accessDialog = document.getElementById("internal-access-dialog");
+    const accessAssets = document.getElementById("access-assets");
+    const accessIntendedUse = document.getElementById("access-intended-use");
+    const accessImpact = document.getElementById("access-impact");
+    const accessFormsPath = document.getElementById("access-forms-path");
+    const accessForms = document.getElementById("access-forms");
+    const accessPrepare = document.getElementById("access-prepare");
+    const accessStatus = document.getElementById("access-status");
+    const accessChecks = [
+      document.getElementById("access-ack-limited"),
+      document.getElementById("access-ack-least"),
+      document.getElementById("access-ack-terms"),
+      document.getElementById("access-ack-data"),
+    ];
+    const optionalAccessConsents = [
+      document.getElementById("access-ack-metrics"),
+      document.getElementById("access-ack-follow-up")
+    ];
+    const discussionDialog = document.getElementById("librarian-discussion-dialog");
+    const discussionRoot = document.getElementById("giscus-root");
+    const discussionTerm = document.getElementById("discussion-term");
+    let discussionOpener = null;
+
+    function giscusConfig(kind) {
+      const config = window.AIBAST_LIBRARIAN_GISCUS_CONFIG;
+      if (!config || config.enabled !== true || config.repo !== `${DISTRIBUTION_OWNER}/${DISTRIBUTION_REPO}`) return null;
+      const categoryId = kind === "item" ? config.item_category_id : config.source_category_id;
+      const category = kind === "item" ? config.item_category : config.source_category;
+      const expectedCategory = kind === "item" ? "Announcements" : "Ideas";
+      if (!config.repo_id || !categoryId || category !== expectedCategory || config.mapping !== "specific") return null;
+      return { ...config, categoryId, category };
+    }
+
+    function distributionDiscussionUrl(value) {
+      if (typeof value !== "string") return "";
+      try {
+        const url = new URL(value);
+        const prefix = `/${DISTRIBUTION_OWNER}/${DISTRIBUTION_REPO}/discussions/`;
+        const number = url.pathname.startsWith(prefix) ? url.pathname.slice(prefix.length) : "";
+        return url.protocol === "https:"
+          && url.hostname === "github.com"
+          && !url.username
+          && !url.password
+          && !url.port
+          && !url.search
+          && !url.hash
+          && /^[1-9]\d*$/.test(number)
+          ? url.href
+          : "";
+      } catch {
+        return "";
+      }
+    }
+
+    function mountGiscus(term, kind) {
+      const config = giscusConfig(kind);
+      if (!config) return false;
+      discussionRoot.textContent = "";
+      const script = document.createElement("script");
+      script.src = "https://giscus.app/client.js";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.setAttribute("data-repo", config.repo);
+      script.setAttribute("data-repo-id", config.repo_id);
+      script.setAttribute("data-category", config.category);
+      script.setAttribute("data-category-id", config.categoryId);
+      script.setAttribute("data-mapping", "specific");
+      script.setAttribute("data-term", term);
+      script.setAttribute("data-strict", config.strict ? "1" : "0");
+      script.setAttribute("data-reactions-enabled", config.reactions_enabled ? "1" : "0");
+      script.setAttribute("data-emit-metadata", "0");
+      script.setAttribute("data-input-position", "top");
+      script.setAttribute("data-theme", document.documentElement.dataset.theme === "dark" ? "dark_dimmed" : "light");
+      script.setAttribute("data-lang", "en");
+      discussionRoot.appendChild(script);
+      return true;
+    }
+
+    function openDiscussion(term, kind, label) {
+      if (!giscusConfig(kind)) return;
+      discussionOpener = document.activeElement;
+      document.getElementById("discussion-title").textContent = `Discuss ${label}`;
+      discussionTerm.textContent = `Namespaced discussion term: ${term} · Category: ${kind === "item" ? "Announcements" : "Ideas"}`;
+      discussionDialog.showModal();
+      mountGiscus(term, kind);
+    }
+    document.getElementById("discussion-close").addEventListener("click", () => discussionDialog.close("close"));
+    discussionDialog.addEventListener("close", () => {
+      discussionRoot.textContent = "";
+      if (discussionOpener && typeof discussionOpener.focus === "function") discussionOpener.focus();
+      discussionOpener = null;
+    });
+
+    function configuredFormsUrl() {
+      const config = window.AIBAST_INTERNAL_ACCESS_CONFIG;
+      if (!config || config.forms_enabled !== true || typeof config.microsoft_forms_url !== "string") return null;
+      const required = ["asset_ids", "intended_use", "expected_audience_reach", "impact_band", "acknowledgements", "follow_up_permission", "analytics_consent"];
+      if (config.terms_version !== ACCESS_TERMS_VERSION || !Array.isArray(config.required_fields) || !required.every(field => config.required_fields.includes(field))) return null;
+      try {
+        const url = new URL(config.microsoft_forms_url);
+        return url.protocol === "https:" && (url.hostname === "forms.office.com" || url.hostname.endsWith(".forms.office.com"))
+          ? url
+          : null;
+      } catch {
+        return null;
+      }
+    }
+
+    const text = value => String(value || "");
+    function selectedAssets() {
+      return [...accessAssets.querySelectorAll("input:checked")].map(input => input.value);
+    }
+    function syncAccessRequest() {
+      const ready = selectedAssets().length > 0
+        && accessIntendedUse.value
+        && accessImpact.value
+        && accessChecks.every(check => check.checked);
+      const formsReady = selectedAssets().length > 0 && accessChecks.every(check => check.checked);
+      accessPrepare.disabled = !ready;
+      accessForms.disabled = !formsReady;
+      accessStatus.textContent = ready
+        ? "Ready to prepare the signed-in public GitHub issue. The browser will not create access."
+        : "Select an asset, choose public-safe intended-use and impact categories, and complete every required acknowledgement.";
+    }
+    function resetAccessRequest() {
+      accessSource = null;
+      accessAssets.textContent = "";
+      accessIntendedUse.value = "";
+      accessImpact.value = "";
+      accessChecks.forEach(check => { check.checked = false; });
+      optionalAccessConsents.forEach(check => { check.checked = false; });
+      accessPrepare.disabled = true;
+    }
+    function openInternalAccess(source) {
+      accessSource = source;
+      accessOpener = document.activeElement;
+      document.getElementById("access-source-name").textContent = source.name;
+      accessAssets.textContent = "";
+      (source.public_safe_assets || []).forEach(asset => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.value = asset.id;
+        input.addEventListener("change", syncAccessRequest);
+        const textNode = document.createElement("span");
+        const title = document.createElement("strong");
+        title.textContent = `${asset.id} — ${asset.title}`;
+        const description = document.createElement("span");
+        description.textContent = asset.description;
+        textNode.append(title, description);
+        label.append(input, textNode);
+        accessAssets.appendChild(label);
+      });
+      accessIntendedUse.value = "";
+      accessImpact.value = "";
+      accessChecks.forEach(check => { check.checked = false; });
+      optionalAccessConsents.forEach(check => { check.checked = false; });
+      const forms = configuredFormsUrl();
+      accessFormsPath.hidden = !forms;
+      accessForms.dataset.url = forms ? forms.toString() : "";
+      syncAccessRequest();
+      accessDialog.showModal();
+      const firstAsset = accessAssets.querySelector("input");
+      if (firstAsset) firstAsset.focus();
+    }
+    document.getElementById("access-cancel").addEventListener("click", () => accessDialog.close("cancel"));
+    accessIntendedUse.addEventListener("change", syncAccessRequest);
+    accessImpact.addEventListener("change", syncAccessRequest);
+    accessChecks.forEach(check => check.addEventListener("change", syncAccessRequest));
+    optionalAccessConsents.forEach(check => check.addEventListener("change", syncAccessRequest));
+    accessForms.addEventListener("click", () => {
+      if (accessForms.disabled || !accessForms.dataset.url) return;
+      window.open(accessForms.dataset.url, "_blank", "noopener,noreferrer");
+    });
+    function openInternalAccessGitHubHandoff() {
+      if (accessPrepare.disabled || !accessSource) return;
+      const assets = selectedAssets();
+      const body = [
+        "<!-- aibast-internal-workshop-access:v1 -->",
+        "## Requested asset IDs",
+        ...assets.map(id => `- ${id}`),
+        "",
+        "## Intended use",
+        accessIntendedUse.value,
+        "",
+        "## Impact band",
+        accessImpact.value,
+        "",
+        "## Acknowledgement schema",
+        `- terms_version: ${ACCESS_TERMS_VERSION}`,
+        "- required: limited_internal_no_reshare",
+        "- required: discretionary_least_privilege",
+        "- required: engineering_use_risk_boundary",
+        "- required: no_customer_pii_confidential_data",
+        `- optional_aggregate_metrics_consent: ${document.getElementById("access-ack-metrics").checked}`,
+        `- optional_follow_up_consent: ${document.getElementById("access-ack-follow-up").checked}`,
+        "",
+        "## Public safety boundary",
+        "- Owners must never post private links, location details, customer data, PII, or confidential information.",
+        "- Owners record only approved, denied, or fulfilled status publicly.",
+        "- Access, if granted, is manual and least-privilege through an approved private channel."
+      ].join("\n");
+      const issue = new URL(`https://github.com/${DISTRIBUTION_OWNER}/${DISTRIBUTION_REPO}/issues/new`);
+      issue.searchParams.set("title", `[Internal workshop access] ${assets.join(", ")}`);
+      issue.searchParams.set("body", body);
+      window.open(issue.toString(), "_blank", "noopener,noreferrer");
+      accessDialog.close("prepared");
+    }
+    accessPrepare.addEventListener("click", openInternalAccessGitHubHandoff);
+    accessDialog.addEventListener("close", () => {
+      resetAccessRequest();
+      if (accessOpener && typeof accessOpener.focus === "function") accessOpener.focus();
+      accessOpener = null;
+    });
+    function matchesSource(source, query) {
+      const haystack = [
+        source.name, source.owner, source.source_type, source.source_format,
+        source.license, source.trust_review_notes, source.why_useful
+      ].join(" ").toLowerCase();
+      return haystack.includes(query.toLowerCase());
+    }
+    function card(source) {
+      const article = document.createElement("article");
+      article.className = "card";
+      const badge = document.createElement("span");
+      badge.className = `badge ${source.status}`;
+      badge.textContent = source.status.replace(/_/g, " ");
+      const title = document.createElement("h3");
+      title.textContent = text(source.name);
+      const useful = document.createElement("p");
+      useful.textContent = text(source.why_useful);
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const metric = metrics.sources && metrics.sources[source.slug];
+      const stale = Array.isArray(snapshot.stale_sources) && snapshot.stale_sources.includes(source.slug);
+      for (const [label, value] of [
+        ["Owner", source.owner],
+        ["Format", `${text(source.source_type)} · ${text(source.source_format)}`],
+        ["SPDX license", source.spdx_license],
+        ["Immutable ref", source.immutable_ref],
+        ["Manifest", source.manifest_locator],
+        ["Digest", source.source_digest],
+        ["Cadence", source.review_cadence],
+        ["Review", source.trust_review_notes],
+        ["Enabled", source.enabled ? "Yes" : "No"],
+        ["Snapshot", stale ? "Stale — last known good preserved" : "Current metadata snapshot"],
+        ["Metric sidecar", metric ? "Namespaced metrics present; no external trust score" : "No metric sidecar yet"]
+      ]) {
+        const row = document.createElement("div");
+        const strong = document.createElement("strong");
+        strong.textContent = `${label}: `;
+        row.append(strong, document.createTextNode(text(value)));
+        meta.appendChild(row);
+      }
+      article.append(badge, title, useful, meta);
+      const discuss = document.createElement("button");
+      discuss.className = "discussion-button";
+      discuss.type = "button";
+      discuss.textContent = "Discuss / react";
+      if (giscusConfig("source")) {
+        discuss.addEventListener("click", () => openDiscussion(`${source.slug}:source`, "source", source.name));
+      } else {
+        discuss.disabled = true;
+        discuss.title = "Discussion configuration is not enabled in this deployment.";
+      }
+      article.appendChild(discuss);
+      if (source.access_flow === "owner_manual_private_channel") {
+        const request = document.createElement("button");
+        request.className = "access-button";
+        request.type = "button";
+        request.textContent = "Request access";
+        request.addEventListener("click", () => openInternalAccess(source));
+        article.appendChild(request);
+      } else {
+        const link = document.createElement("a");
+        link.className = "source-link";
+        link.href = text(source.canonical_url);
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Open canonical URL ↗";
+        article.appendChild(link);
+      }
+      const metricDiscussion = metric && distributionDiscussionUrl(metric.discussion_url);
+      if (metricDiscussion) {
+        const discussion = document.createElement("a");
+        discussion.className = "source-link";
+        discussion.href = metricDiscussion;
+        discussion.target = "_blank";
+        discussion.rel = "noopener noreferrer";
+        discussion.textContent = "Open namespaced Discussion ↗";
+        article.appendChild(discussion);
+      }
+      const sourceThread = distributionDiscussionUrl(
+        discussions.source_suggestion_threads && discussions.source_suggestion_threads[source.slug]
+      );
+      if (sourceThread) {
+        const idea = document.createElement("a");
+        idea.className = "source-link";
+        idea.href = sourceThread;
+        idea.target = "_blank";
+        idea.rel = "noopener noreferrer";
+        idea.textContent = "Open Ideas thread ↗";
+        article.appendChild(idea);
+      }
+      return article;
+    }
+    function render() {
+      const query = filter.value.trim();
+      groups.textContent = "";
+      for (const [key, label, description] of GROUPS) {
+        const section = document.createElement("section");
+        section.className = "group";
+        const heading = document.createElement("h2");
+        heading.textContent = label;
+        const intro = document.createElement("p");
+        intro.textContent = description;
+        const cards = document.createElement("div");
+        cards.className = "cards";
+        const records = sources.filter(source => source.status === key && (!query || matchesSource(source, query)));
+        if (records.length) records.forEach(source => cards.appendChild(card(source)));
+        else {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = query ? "No matching sources in this trust state." : "No sources currently in this trust state.";
+          cards.appendChild(empty);
+        }
+        section.append(heading, intro, cards);
+        groups.appendChild(section);
+      }
+      status.textContent = `${sources.length} generated source record${sources.length === 1 ? "" : "s"} and ${itemCount} namespaced item${itemCount === 1 ? "" : "s"} available.`;
+    }
+    function localJson(path) {
+      return fetch(path, { cache: "no-store" }).then(response => response.ok ? response.json() : {});
+    }
+    Promise.all([
+      localJson("state/libraries.json"),
+      localJson("state/libraries.metrics.json"),
+      localJson("state/libraries.snapshot.json"),
+      localJson("state/library_discussions.json")
+    ])
+      .then(([catalog, metricSidecar, snapshotSidecar, discussionSidecar]) => {
+        sources = Array.isArray(catalog.sources) ? catalog.sources : [];
+        itemCount = Array.isArray(catalog.items) ? catalog.items.length : 0;
+        metrics = metricSidecar || {};
+        snapshot = snapshotSidecar || {};
+        discussions = discussionSidecar || {};
+        render();
+      })
+      .catch(() => {
+        status.textContent = "The generated librarian catalog is unavailable. No external source content was fetched.";
+        render();
+      });
+    filter.addEventListener("input", render);
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "schema": "aibast-library-metrics/1.0",
+  "generated_at": "2026-08-15T19:53:21.722320+00:00",
+  "item_namespace": "library-slug:item-slug",
+  "sources": {
+    "internal-workshop-assets": {
+      "status": "first_party",
+      "trust_tier": "first_party",
+      "enabled": true,
+      "immutable_ref": "owner-managed-private",
+      "source_digest": "95eeb90fddb42b0d12ae62dd243852f50b6ce83acae3e09a27e8d0019bc6c693",
+      "discussion_url": null,
+      "downloads": null,
+      "upvotes": null
+    },
+    "aibast-agents-library": {
+      "status": "first_party",
+      "trust_tier": "first_party",
+      "enabled": true,
+      "immutable_ref": "8c1e875b5fe26361e400ffc15196e5bdfc98e188",
+      "source_digest": "dc4c255df1e93970f57fa2a3f999d4311968a020bd0270174d65dea6788e21e7",
+      "discussion_url": null,
+      "downloads": null,
+      "upvotes": null
+    }
+  },
+  "items": {},
+  "notes": "No external source content was fetched, imported, or executed by this snapshot."
+}

@@ -539,7 +539,9 @@ def test_loader_ignores_imported_class_alias(tmp_path):
 # ── call_copilot: an empty "choices" array is a clean error, not an IndexError ──
 
 def test_call_copilot_empty_choices_raises_runtimeerror(monkeypatch):
-    monkeypatch.setattr(bs, "get_copilot_token", lambda: ("tok", "https://ep"))
+    monkeypatch.setattr(
+        bs, "get_copilot_token",
+        lambda: ("tok", "https://api.individual.githubcopilot.com"))
 
     class FakeResp:
         status_code = 200

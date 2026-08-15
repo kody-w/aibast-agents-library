@@ -1,0 +1,43 @@
+{
+  "schema": "aibast-blog/1.0",
+  "contribution_type": "blog_post",
+  "slug": "version-file-release-signal",
+  "title": "Why a plain VERSION file remains a useful release signal",
+  "author": "Kody Wildfeuer (@kody-w)",
+  "date": "2026-03-05",
+  "status": "published",
+  "publication": "generated-from-canonical-submission",
+  "legacy_html": true,
+  "summary": "A plain semantic-version file gives installers, the runtime, and reviewers one inspectable release signal without turning a version lookup into a hidden service dependency.",
+  "audience": "Release owners and contributors who need a transparent, repeatable upgrade signal for a local-first runtime.",
+  "prerequisites": "A local clone, Git, and permission to inspect the release branch and installer diff before promotion.",
+  "applicability": "Applies when one local-first runtime needs one inspectable version signal shared by installers, health checks, and release reviewers.",
+  "support_boundary": "Version comparison is informational; support and compatibility decisions still require reviewed release notes, tests, and environment-specific validation.",
+  "limitations": "A version comparison does not replace release notes, compatibility testing, security review, or inspection of configuration and dependency changes.",
+  "status_note": "Status as of 2026-08-15: the command output preserved below is historical v0.1.0 context. Current published VERSION is v0.6.16; model, agent, and health fields vary by installation.",
+  "tags": [
+    "release-engineering",
+    "versioning",
+    "developer-experience"
+  ],
+  "evidence": [
+    {
+      "label": "Published version source",
+      "url": "https://github.com/microsoft/aibast-agents-library/blob/main/rapp_brainstem/VERSION"
+    },
+    {
+      "label": "Published installer",
+      "url": "https://github.com/microsoft/aibast-agents-library/blob/main/install.sh"
+    }
+  ],
+  "links": [
+    {
+      "label": "Current VERSION file",
+      "url": "https://github.com/microsoft/aibast-agents-library/blob/main/rapp_brainstem/VERSION"
+    },
+    {
+      "label": "Installer source",
+      "url": "https://github.com/microsoft/aibast-agents-library/blob/main/install.sh"
+    }
+  ]
+}

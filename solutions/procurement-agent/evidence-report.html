@@ -212,6 +212,9 @@
     .downloads { display: flex; flex-wrap: wrap; gap: 8px; }
     @media (max-width: 760px) { .summary-grid { grid-template-columns: 1fr; } }
   </style>
+
+<link rel="stylesheet" href="../../assets/trust-gate.css" data-aibast-trust-assets>
+<script defer src="../../assets/trust-gate.js" data-aibast-trust-assets></script>
 </head>
 <body>
   <header class="topbar">
@@ -417,8 +420,8 @@
       <a class="button" href="evals/transcripts.json" download>Download locked transcripts</a>
       <a class="button" href="evals/visual-checkpoints.json" download>Download visual checkpoint contract</a>
       <a class="button" href="export-manifest.json" download>Download export manifest</a>
-      <a class="button" href="exports/procurement-agent-source.zip" download>Download portable bundle</a>
-      <a class="button primary" href="exports/procurement-agent-copilot-studio-solution.zip" download>Download Copilot Studio solution</a><a class="button" href="exports/procurement-agent-deployment-settings.json" download>Deployment settings</a><a class="button" href="exports/procurement-agent-solution-export.json" download>Export details</a>
+      <a class="button pointer-events-none opacity-50 cursor-not-allowed" href="exports/procurement-agent-source.zip" download data-download-gated data-download-kind="solution" aria-disabled="true">Download portable bundle</a>
+      <a class="button primary pointer-events-none opacity-50 cursor-not-allowed" href="exports/procurement-agent-copilot-studio-solution.zip" download data-download-gated data-download-kind="solution" aria-disabled="true">Download Copilot Studio solution</a><a class="button" href="exports/procurement-agent-deployment-settings.json" download>Deployment settings</a><a class="button" href="exports/procurement-agent-solution-export.json" download>Export details</a>
 
     </section>
   </main>

@@ -100,6 +100,22 @@ Returns server status, loaded agents, model, and auth state.
 
 Returns `"status": "unauthenticated"` (still 200) if the Copilot token is missing — the web UI detects this and shows the login overlay.
 
+### Brainstem Frontier outbound safety net
+
+Immediately before every Brainstem-owned GitHub Copilot inference request, the
+local Frontier boundary scans the complete outgoing payload and replaces
+high-confidence credential shapes and structured PII with a fixed-width mask.
+It blocks raw image parts/data-image URLs because this runtime has no local image
+sanitizer, validates the inference endpoint, and never follows inference
+redirects. Protection summaries are aggregate and request-local; `/health`
+exposes only static Frontier capability status rather than another request's
+findings.
+
+This is a defense-in-depth safety net, **not** a legal-compliance guarantee or an
+in-process sandbox. User-installed agents still run local Python and can make
+their own network calls; Frontier governs Brainstem-owned Copilot intelligence
+egress only.
+
 ### `GET /version`
 
 ```json

@@ -1,0 +1,14 @@
+{
+  "schema": "aibast-library-discussions/1.0",
+  "source_suggestion_category": "Ideas",
+  "approved_item_category": "Announcements",
+  "item_namespace": "library-slug:item-slug",
+  "giscus": {
+    "enabled": false,
+    "authentication": "GitHub App/GraphQL via Giscus",
+    "pages_token": false
+  },
+  "source_suggestion_threads": {},
+  "approved_item_threads": {},
+  "notes": "Committed public-safe sidecar only. No live Discussions were created by this staging prototype. Authenticated comments and reactions occur only in GitHub UI."
+}

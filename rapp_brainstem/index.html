@@ -964,6 +964,52 @@
   }
   body.light-mode .version-disclaimer strong { color: #9a6700; }
 
+  /* Trust acknowledgement gate for downloadable agent code. */
+  #trust-download-dialog {
+    width: min(540px, calc(100vw - 32px)); margin: auto; padding: 0;
+    color: #e6edf3; background: #161b22; border: 1px solid #30363d;
+    border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  #trust-download-dialog::backdrop { background: rgba(0,0,0,0.65); }
+  .trust-download-dialog__body { padding: 24px; }
+  .trust-download-dialog__eyebrow {
+    margin-bottom: 12px; color: #8b949e; font-size: 12px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .trust-download-dialog__body h2 { margin-bottom: 8px; color: #e6edf3; font-size: 22px; }
+  .trust-download-dialog__body > p { margin-bottom: 18px; color: #8b949e; line-height: 1.55; }
+  .trust-download-dialog__notice {
+    padding: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 10px;
+  }
+  .trust-download-dialog__notice h3 { margin-bottom: 10px; color: #e6edf3; font-size: 16px; }
+  .trust-download-dialog__notice h3 span { color: #f0883e; margin-right: 6px; }
+  .trust-download-dialog__ack {
+    display: flex; align-items: flex-start; gap: 11px; color: #c9d1d9;
+    font-size: 14px; line-height: 1.55; cursor: pointer;
+  }
+  .trust-download-dialog__ack input {
+    width: 19px; height: 19px; margin-top: 2px; accent-color: #1f6feb; flex: 0 0 auto;
+  }
+  .trust-download-dialog__actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap;
+  }
+  .trust-download-dialog__actions button {
+    min-height: 42px; padding: 8px 16px; border-radius: 7px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  #trust-download-cancel { color: #c9d1d9; background: #21262d; border: 1px solid #30363d; }
+  #trust-download-confirm { color: #fff; background: #1f6feb; border: 1px solid #1f6feb; }
+  #trust-download-confirm:disabled { opacity: .5; cursor: not-allowed; }
+  #trust-download-dialog button:focus-visible,
+  #trust-download-dialog input:focus-visible { outline: 2px solid #f291b6; outline-offset: 2px; }
+  body.light-mode #trust-download-dialog { color: #24292e; background: #f6f8fa; border-color: #d0d7de; }
+  body.light-mode .trust-download-dialog__body h2,
+  body.light-mode .trust-download-dialog__notice h3 { color: #24292e; }
+  body.light-mode .trust-download-dialog__body > p,
+  body.light-mode .trust-download-dialog__eyebrow { color: #57606a; }
+  body.light-mode .trust-download-dialog__notice { background: #fff; border-color: #d0d7de; }
+  body.light-mode .trust-download-dialog__ack { color: #424a53; }
+  body.light-mode #trust-download-cancel { color: #24292e; background: #f6f8fa; border-color: #d0d7de; }
+
   /* ── Pearl polish ─────────────────────────────────────────────────────────
      Additive refinements only — no new elements, no changed interactions. */
 
@@ -1252,6 +1298,25 @@
   </div>
 </footer>
 
+<dialog id="trust-download-dialog" aria-modal="true" aria-labelledby="trust-download-title" aria-describedby="trust-download-copy">
+  <div class="trust-download-dialog__body">
+    <div class="trust-download-dialog__eyebrow">Before you download</div>
+    <h2 id="trust-download-title">Add only what you trust</h2>
+    <p id="trust-download-artifact">Review this artifact before downloading it.</p>
+    <div class="trust-download-dialog__notice">
+      <h3><span aria-hidden="true">⚠</span> Add only what you trust</h3>
+      <label class="trust-download-dialog__ack" for="trust-ack">
+        <input id="trust-ack" type="checkbox" aria-describedby="trust-download-copy">
+        <span id="trust-download-copy">I understand that this is a community-provided, code-bearing artifact. It runs with my permissions or may affect my environment. I will review it carefully and download it only from a trusted source.</span>
+      </label>
+    </div>
+    <div class="trust-download-dialog__actions">
+      <button id="trust-download-cancel" type="button">Cancel</button>
+      <button id="trust-download-confirm" type="button" disabled>Download</button>
+    </div>
+  </div>
+</dialog>
+
 <script>
   // ── Safe localStorage ──
   // Reads/writes are wrapped so a storage failure (Safari private mode, quota,
@@ -1263,6 +1328,64 @@
   function safeGet(k) { try { return _ls ? _ls.getItem(k) : null; } catch (e) { return null; } }
   function safeSet(k, v) { try { if (_ls) _ls.setItem(k, v); } catch (e) {} }
   function safeRemove(k) { try { if (_ls) _ls.removeItem(k); } catch (e) {} }
+
+  // Every agent export or catalog install is mediated by this unchecked-by-default gate.
+  const trustDownloadDialog = document.getElementById('trust-download-dialog');
+  const trustDownloadAck = document.getElementById('trust-ack');
+  const trustDownloadConfirm = document.getElementById('trust-download-confirm');
+  const trustDownloadCancel = document.getElementById('trust-download-cancel');
+  const trustDownloadArtifact = document.getElementById('trust-download-artifact');
+  let trustDownloadAction = null;
+  let trustDownloadOpener = null;
+
+  function resetTrustedDownload() {
+    trustDownloadAck.checked = false;
+    trustDownloadConfirm.disabled = true;
+    trustDownloadAction = null;
+    trustDownloadOpener = null;
+  }
+
+  function finishTrustedDownload() {
+    const opener = trustDownloadOpener;
+    resetTrustedDownload();
+    if (opener && typeof opener.focus === 'function') opener.focus();
+  }
+
+  function closeTrustedDownload(value) {
+    if (typeof trustDownloadDialog.close === 'function') {
+      trustDownloadDialog.close(value);
+    } else {
+      trustDownloadDialog.removeAttribute('open');
+      finishTrustedDownload();
+    }
+  }
+
+  function requestTrustedDownload({ artifactName, actionLabel, opener, download }) {
+    trustDownloadAction = download;
+    trustDownloadOpener = opener || document.activeElement;
+    trustDownloadArtifact.textContent = `Review ${artifactName} before downloading it.`;
+    trustDownloadConfirm.textContent = actionLabel || `Download ${artifactName}`;
+    trustDownloadAck.checked = false;
+    trustDownloadConfirm.disabled = true;
+    if (typeof trustDownloadDialog.showModal === 'function') {
+      trustDownloadDialog.showModal();
+    } else {
+      trustDownloadDialog.setAttribute('open', '');
+    }
+    trustDownloadAck.focus();
+  }
+
+  trustDownloadAck.addEventListener('change', () => {
+    trustDownloadConfirm.disabled = !trustDownloadAck.checked;
+  });
+  trustDownloadCancel.addEventListener('click', () => closeTrustedDownload('cancel'));
+  trustDownloadConfirm.addEventListener('click', () => {
+    if (trustDownloadConfirm.disabled || !trustDownloadAction) return;
+    const download = trustDownloadAction;
+    closeTrustedDownload('confirmed');
+    download();
+  });
+  trustDownloadDialog.addEventListener('close', finishTrustedDownload);
 
   // ── XSS-safe DOM helpers ──
   // Server errors, usernames, model ids and agent/model output are UNTRUSTED
@@ -1840,9 +1963,12 @@
         const expBtn = document.createElement('button');
         expBtn.className = 'export-btn';
         expBtn.textContent = 'Export';
-        expBtn.onclick = () => {
-          window.open(`${API}/agents/export/${encodeURIComponent(item.filename)}`, '_blank');
-        };
+        expBtn.onclick = () => requestTrustedDownload({
+          artifactName: item.filename,
+          actionLabel: 'Download agent.py',
+          opener: expBtn,
+          download: () => window.open(`${API}/agents/export/${encodeURIComponent(item.filename)}`, '_blank', 'noopener')
+        });
 
         const delBtn = document.createElement('button');
         delBtn.className = 'export-btn del-btn';
@@ -2000,7 +2126,12 @@
     btn.className = 'rar-add-btn';
     btn.textContent = 'Add';
     btn.title = a._file || '';
-    btn.onclick = () => installRarAgent(a, btn);
+    btn.onclick = () => requestTrustedDownload({
+      artifactName: (a._file || 'agent.py').split('/').pop(),
+      actionLabel: 'Download and add agent',
+      opener: btn,
+      download: () => installRarAgent(a, btn)
+    });
 
     item.appendChild(meta);
     item.appendChild(btn);

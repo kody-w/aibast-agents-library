@@ -133,3 +133,154 @@ This validates your manifest and ensures the registry builds cleanly.
 - [ ] `python build_registry.py` passes with no errors
 - [ ] No secrets, API keys, or customer data in code
 - [ ] `requires_env` lists all needed environment variables
+
+---
+
+## Staging contributions
+
+### Blog posts
+
+Use the **Contribute** panel on the public [Agent Library](library.html#contribute)
+when you do not want to work directly with Markdown and JSON. The page validates
+your article, produces a staging preview, and downloads two files:
+
+```text
+submissions/blog/<slug>/post.md
+submissions/blog/<slug>/metadata.json
+```
+
+`post.md` is the canonical article. `metadata.json` is its sidecar record:
+author, audience, prerequisites, evidence, limitations, tags, and current
+links. This follows the same review boundary as a portable RAR agent: one
+canonical artifact plus metadata that makes validation deterministic.
+
+### Quality bar
+
+Every submission must state:
+
+1. A concrete problem and intended audience
+2. Prerequisites before a reader starts
+3. Technical approach and reproducible evidence
+4. Explicit limitations and boundaries
+5. An actionable next step
+6. A named author, publication date, lowercase tags, and current HTTPS links
+
+Validate and render locally:
+
+```bash
+python scripts/blog_pipeline.py validate
+python scripts/blog_pipeline.py render
+python scripts/blog_pipeline.py check
+```
+
+`blog.html` contains a generated region. Do not hand-edit that region; update
+the canonical files and re-run the generator. `check` fails when generated
+output drifts from the canonical submissions.
+
+### Secure handoff
+
+GitHub Pages cannot safely authenticate an API write. The contributor downloads
+the canonical submission and metadata sidecar, then attaches both files to the
+prefilled public GitHub issue body while signed in. The marker
+`<!-- aibast-blog-submission:v1 -->` is the first body line so it survives the
+raw `?body=` handoff. Pages contains no PAT, client secret, app private key, or
+privileged browser token.
+
+Automated issue-to-PR ingestion is deliberately deferred: staging Pages events
+run from the default branch rather than the live staging branch, and untrusted
+attachments must not be processed in a write-token job. A maintainer manually
+validates canonical files in staging before any review or promotion.
+
+## Library-source contributions
+
+The same Pages form supports a **library source** contribution. Its canonical
+shape is:
+
+```text
+submissions/libraries/<slug>/metadata.json
+submissions/libraries/<slug>/source.md
+```
+
+Capture the schema version, source name, canonical GitHub HTTPS URL pinned to a
+repository commit, source type and format, owner, SPDX license, immutable ref,
+manifest locator, SHA-256 digest, trust tier/status, enabled state, review
+cadence, trust/review notes, and why it is useful. New sources begin as
+`community_suggested` with `enabled: false`; a browser displays metadata only.
+It never fetches, imports, renders, or executes source content from the
+submitted URL.
+
+Every discovered item is namespaced as `library-slug:item-slug`; bare item slugs
+are rejected because they collide across sources. First-party and subscribed
+sources must be GitHub repositories, releases, or raw files bound to a
+repo+commit. Mutable branches, opaque web pages, file/SSH/private-IP targets,
+and executable installers are rejected before any ingestion attempt.
+
+### GitHub Discussions curation
+
+The optional Giscus integration uses GitHub’s App/GraphQL authentication flow;
+Pages holds no token. The deployment-only
+`aibast-librarian-giscus-config/1.0` placeholder is disabled until verified
+Giscus repo/category IDs are supplied. Library-source suggestions use
+**Ideas** with a term such as `library-slug:source`. Approved item curation uses
+**Announcements** with `library-slug:item-slug`. Comments and reactions are
+curation signals only: they do not acknowledge terms, grant access, approve
+restricted material, or replace Forms/Issue access requests.
+
+Validate and regenerate the staging librarian catalog:
+
+```bash
+python scripts/librarian_pipeline.py validate
+python scripts/librarian_pipeline.py render
+python scripts/librarian_pipeline.py check
+```
+
+Automated source ingestion is deferred pending a reviewed staging deployment
+gate. Any remote acquisition must run in reviewed CI or a trusted backend,
+never in the browser.
+
+### Internal workshop access configuration
+
+`Internal workshop videos & one-pagers (SharePoint)` intentionally has no
+public location URL. The public librarian lists only safe asset IDs, titles,
+and descriptions. A tenant-approved Microsoft Forms URL may be supplied only
+by trusted deployment configuration using the
+`aibast-internal-workshop-access-config/1.0` schema in
+`assets/internal-workshop-access-config.example.js`. The checked-in value is
+always disabled with a `null` URL.
+
+When configured, Forms is the preferred path for internal users because it
+keeps identity, business justification, expected reach, impact, and follow-up
+permission private. GitHub Issues remain the public/community fallback and
+accept only asset IDs, a non-sensitive purpose, an impact band, and legal/trust
+acknowledgements. Do not create a Form, submit a Form, or add a private URL
+without owner and tenant approval.
+
+The acknowledgement text is versioned (`terms_version: 2026-08-15`) and is an
+engineering control pending organizational legal/privacy review. It does not
+make a binding contract or determine legal compliance. Required
+use/risk/confidentiality statements are separate from optional aggregate
+analytics and follow-up consent.
+
+### Deferred staging automation design
+
+The public fallback is a raw, marker-first `?body=` GitHub issue handoff, not
+an Issue Form. There is intentionally no active
+`internal-workshop-access.yml` or `librarian-snapshot.yml` workflow in this
+staging branch. GitHub issue, schedule, and manual-dispatch workflows are
+loaded from the repository default branch rather than this live Pages branch,
+so this staging prototype must not claim automatic triage, comments, metrics,
+source synchronization, or access approval.
+
+The committed schemas, validation scripts, and aggregate-only metric shape are
+deferred design inputs for a separately reviewed deployment. Until then,
+maintainers manually review public-safe issues, grant any approved access only
+through an approved private channel, and record only approved, denied, or
+fulfilled status publicly.
+
+No active collector reads public access requests. If a separately approved
+collector is introduced, it must parse the versioned
+`optional_aggregate_metrics_consent: true` marker and exclude requests that
+are false or missing from analytics. Operational owner review may still record
+public-safe request status separately. The aggregate sidecar must never publish
+requester identities; GitHub itself retains public issue authorship under its
+own service terms.
