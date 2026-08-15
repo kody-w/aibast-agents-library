@@ -283,12 +283,16 @@ Promise.all([
 ]).then(function(rr){
   var reg=rr[0], ratings=rr[1]||{}, downloads=rr[2]||{}, traffic=rr[3],
       community=rr[4], discussions=rr[5]||{};
-  var agents=(reg.agents||[]).filter(function(a){
+  var allAgents=reg.agents||[];
+  var agents=allAgents.filter(function(a){
     return a.name!=="@aibast-agents-library/sales-specialist-twin";});
   var slug=function(a){return a.name.split("/")[1];};
+  var slugCounts={};
+  allAgents.forEach(function(a){
+    var s=slug(a); slugCounts[s]=(slugCounts[s]||0)+1;});
   var metric=function(values,a){
     if(Object.prototype.hasOwnProperty.call(values,a.name)) return values[a.name];
-    return values[slug(a)];
+    var s=slug(a); return slugCounts[s]===1?values[s]:undefined;
   };
   var dl=function(a){var value=metric(downloads,a);return typeof value==="number"?value:0;};
   var totDl=agents.reduce(function(t,a){return t+dl(a);},0);

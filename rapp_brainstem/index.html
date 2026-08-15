@@ -2126,6 +2126,7 @@
   let rarSearchTimer = null;
   let rarRatings = {};
   let rarDiscussions = {};
+  let rarUniqueLegacySlugs = new Set();
 
   // Only standalone *_agent.py files can be hot-loaded. The registry also carries
   // stacks/swarms (bundles, no single .py) and stub/card entries (.py.stub, .py.card,
@@ -2160,7 +2161,16 @@
         }
         rarRatings = ratings && typeof ratings === 'object' ? ratings : {};
         rarDiscussions = discussions && typeof discussions === 'object' ? discussions : {};
-        rarRegistry = (Array.isArray(data.agents) ? data.agents : []).filter(isLoadableAgent);
+        const allAgents = Array.isArray(data.agents) ? data.agents : [];
+        const slugCounts = {};
+        allAgents.forEach(agent => {
+          const slug = (agent.name || '').split('/')[1];
+          if (slug) slugCounts[slug] = (slugCounts[slug] || 0) + 1;
+        });
+        rarUniqueLegacySlugs = new Set(
+          Object.keys(slugCounts).filter(slug => slugCounts[slug] === 1)
+        );
+        rarRegistry = allAgents.filter(isLoadableAgent);
         return rarRegistry;
       })
       .finally(() => { rarLoading = null; });
@@ -2224,7 +2234,7 @@
       return values[agent.name];
     }
     const slug = (agent.name || '').split('/')[1];
-    return slug ? values[slug] : undefined;
+    return slug && rarUniqueLegacySlugs.has(slug) ? values[slug] : undefined;
   }
 
   function rarDiscussionNumber(agent) {

@@ -309,6 +309,22 @@ def test_legacy_discussion_slug_is_ignored_when_publishers_collide(monkeypatch):
     )
 
 
+def test_discussion_creator_reuses_legacy_slug_only_when_unique():
+    existing = {
+        "account-intelligence": "https://example.test/discussions/1",
+    }
+    unique = Counter({"account-intelligence": 1})
+    colliding = Counter({"account-intelligence": 2})
+    name = "@aibast-agents-library/account-intelligence"
+
+    assert create_discussions.existing_discussion_url(
+        existing, name, unique
+    ) == existing["account-intelligence"]
+    assert create_discussions.existing_discussion_url(
+        existing, name, colliding
+    ) is None
+
+
 def test_checked_in_discussion_map_uses_publisher_qualified_names():
     catalog_names = {
         agent["name"] for agent in _checked_in_rar_registry()["agents"]
@@ -341,10 +357,12 @@ def test_static_metric_consumers_prefer_canonical_names_with_legacy_fallback():
     ).read_text(encoding="utf-8")
 
     assert "hasOwnProperty.call(values,a.name)" in metrics
-    assert "return values[slug(a)]" in metrics
+    assert "slugCounts[s]===1?values[s]:undefined" in metrics
     assert "encodeURIComponent(r.key)" in metrics
     assert "hasOwnProperty.call(values,a.name)" in workshop
-    assert "return values&&a?values[slugOf(a)]" in workshop
+    assert "LEGACY_SLUG_COUNTS[slug]===1" in workshop
     assert "BYNAME[a.name]=a" in workshop
+    assert 'encodeURIComponent(a.name)' in workshop
     assert "function rarValueForAgent(values, agent)" in brainstem
     assert "hasOwnProperty.call(values, agent.name)" in brainstem
+    assert "rarUniqueLegacySlugs.has(slug)" in brainstem

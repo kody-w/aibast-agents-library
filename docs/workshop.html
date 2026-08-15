@@ -1291,7 +1291,9 @@ function metricOf(values,a){
   if(values && a && a.name && Object.prototype.hasOwnProperty.call(values,a.name)){
     return values[a.name];
   }
-  return values&&a?values[slugOf(a)]:undefined;
+  var slug=a?slugOf(a):"";
+  return values&&a&&BYNAME[a.name]===a&&LEGACY_SLUG_COUNTS[slug]===1
+    ? values[slug] : undefined;
 }
 function advOf(a){return ADV[slugOf(a)];}
 // An "unmapped — decision pending" crosswalk row records a SharePoint entry we
@@ -1307,7 +1309,7 @@ function agentTitle(a){return agentName(a).replace(/ Agent$/,"");}
 function esc2(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 
-var MODE="industry", PRODUCTS=[], BYSLUG={}, BYNAME={};
+var MODE="industry", PRODUCTS=[], BYSLUG={}, BYNAME={}, LEGACY_SLUG_COUNTS={};
 document.getElementById("modeTabs").onclick=function(e){
   var b=e.target.closest("button"); if(!b||b.dataset.mode===MODE) return;
   MODE=b.dataset.mode;
@@ -1420,8 +1422,8 @@ function select(a){
   document.getElementById("verifyH2").textContent="Test it yourself in Copilot Studio";
   document.getElementById("verifyLead").innerHTML=VERIFY_LEAD;
   SELECTED=a; STACK=slugOf(a);
-  localStorage.setItem(LS+"pick",STACK);
-  try{history.replaceState(null,"","?agent="+encodeURIComponent(STACK));}catch(e){}
+  localStorage.setItem(LS+"pick",a.name);
+  try{history.replaceState(null,"","?agent="+encodeURIComponent(a.name));}catch(e){}
   var v=advOf(a);
   document.getElementById("pickName").innerHTML=" "+esc2(agentName(a))+
     " — everything on this page is now about this agent."+
@@ -1609,9 +1611,10 @@ Promise.all([fetchLib("registry.json",true),
   var reg=rr[0]; REG=reg; PRODUCTS=(rr[1]&&rr[1].products)||[];
   var byStackDir={};
   (reg.agents||[]).forEach(function(a){
+    var slug=slugOf(a);
+    LEGACY_SLUG_COUNTS[slug]=(LEGACY_SLUG_COUNTS[slug]||0)+1;
     if(a.name==="@aibast-agents-library/sales-specialist-twin") return;
     BYNAME[a.name]=a;
-    var slug=slugOf(a);
     if(!Object.prototype.hasOwnProperty.call(BYSLUG,slug)) BYSLUG[slug]=a;
     else BYSLUG[slug]=null;
     var dir=a._file.substring(0,a._file.lastIndexOf("/"));

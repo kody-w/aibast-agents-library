@@ -15,6 +15,7 @@ import json
 import os
 import sys
 import urllib.request
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,6 +50,16 @@ def gql(token, query, variables):
 
 def canonical_title(agent_name):
     return agent_name
+
+
+def existing_discussion_url(existing, agent_name, slug_counts):
+    slug = agent_name.split("/", maxsplit=1)[1]
+    canonical = existing.get(agent_name)
+    if canonical:
+        return canonical
+    if slug_counts[slug] == 1:
+        return existing.get(slug)
+    return None
 
 
 def main(*, map_only=False):
@@ -88,13 +99,18 @@ def main(*, map_only=False):
         if (node.get("category") or {}).get("name") == CFG["category"]
     }
     agents = json.loads((ROOT / "rar" / "registry.json").read_text())["agents"]
+    slug_counts = Counter(
+        agent["name"].split("/", maxsplit=1)[1] for agent in agents
+    )
     urls, created, missing = {}, 0, []
     for a in agents:
         agent_name = a["name"]
         slug = agent_name.split("/")[1]
         disp = a.get("display_name", slug)
         title = canonical_title(agent_name)
-        existing_url = existing.get(title) or existing.get(slug)
+        existing_url = existing_discussion_url(
+            existing, agent_name, slug_counts
+        )
         if existing_url:
             urls[agent_name] = existing_url
             continue
