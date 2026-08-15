@@ -105,6 +105,6 @@ Only repository-identity references are rewritten mechanically: `kody-w/rapp-ins
 
 - **Python 3.11** target; venv at `~/.brainstem/venv`
 - **No API keys** for local dev — GitHub Copilot token exchange handles auth
-- **Config via `.env`** in `rapp_brainstem/` — `GITHUB_TOKEN`, `GITHUB_MODEL` (default `auto`), `SOUL_PATH`, `AGENTS_PATH`, `PORT`, `BRAINSTEM_LAN_MODE`, `BRAINSTEM_ALLOWED_HOSTS`, and `VOICE_ZIP_PASSWORD`
+- **Config via `.env`** in `rapp_brainstem/` — `GITHUB_TOKEN`, `GITHUB_MODEL` (default `auto`), `SOUL_PATH`, `AGENTS_PATH`, `PORT`, `BRAINSTEM_LAN_MODE`, `BRAINSTEM_ALLOWED_HOSTS`, `BRAINSTEM_UPDATE_CHANNEL_URL`, and `VOICE_ZIP_PASSWORD`
 - Two install paths exist and must never cross-contaminate: brainstem (`install.sh`) and hippocampus (`community_rapp/install.sh`)
 - The landing page (`index.html`) and `docs/` are static HTML — no build step

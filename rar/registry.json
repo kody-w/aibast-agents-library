@@ -1,8 +1,11 @@
 {
  "schema": "rapp-registry/1.0",
  "version": "1.0.0",
- "generated_at": "2026-08-07T14:22:13.528763+00:00",
+ "generated_at": "2026-08-07T14:22:13.450913+00:00",
  "instance": "AIBAST RAR",
+ "repository": "microsoft/aibast-agents-library",
+ "catalog_path": "rar/registry.json",
+ "scope": "business-curated",
  "stats": {
   "total_agents": 105,
   "publishers": 1,
@@ -1416,7 +1419,7 @@
    "_size_kb": 18.9,
    "_lines": 402,
    "_sha256": "09a715ef42d1f9220b9d5ffc3de2228ab209bd8f7d02a0770204e6ea2e34054c",
-   "_install_filename": "ask_hr_agent.py"
+   "_install_filename": "aibast_agents_library__general_ask_hr_agent.py"
   },
   {
    "schema": "rapp-agent/1.0",
@@ -1470,7 +1473,7 @@
    "_size_kb": 16.8,
    "_lines": 325,
    "_sha256": "a13e1831077b440b544ee2cc8e33190284b688d066e885c31c8794332c71590c",
-   "_install_filename": "dynamics_365_agent.py"
+   "_install_filename": "aibast_agents_library__dynamics_365_connector_agent.py"
   },
   {
    "schema": "rapp-agent/1.0",
@@ -1575,7 +1578,7 @@
    "_size_kb": 14.7,
    "_lines": 284,
    "_sha256": "b3796f06d6d77bcdc2a0f6d011e103a84c1c29a5b203f7b3fd42586dd1ce48d6",
-   "_install_filename": "email_drafting_agent.py"
+   "_install_filename": "aibast_agents_library__email_drafting_agent.py"
   },
   {
    "schema": "rapp-agent/1.0",
@@ -1893,7 +1896,7 @@
    "_size_kb": 12.8,
    "_lines": 253,
    "_sha256": "31cf691fa3b792015c4c3a4ca723b5eb19c50d1c7f2bcb303a57618609c12ae1",
-   "_install_filename": "dynamics_365_agent.py"
+   "_install_filename": "aibast_agents_library__voice_to_crm_d365_agent.py"
   },
   {
    "schema": "rapp-agent/1.0",
@@ -1919,7 +1922,7 @@
    "_size_kb": 12.9,
    "_lines": 258,
    "_sha256": "f1590393b43e4edd5334c57fb02f1aed228339b2549b7ea4b2d9e486b08d9791",
-   "_install_filename": "email_drafting_agent.py"
+   "_install_filename": "aibast_agents_library__voice_to_crm_email_agent.py"
   },
   {
    "schema": "rapp-agent/1.0",
@@ -2133,7 +2136,7 @@
    "_size_kb": 20.6,
    "_lines": 469,
    "_sha256": "04d91f5362c5a72323fd7b3a563b3049aab8b158e72db9ee4c7226226197716c",
-   "_install_filename": "ask_hr_agent.py"
+   "_install_filename": "aibast_agents_library__ask_hr_agent.py"
   },
   {
    "schema": "rapp-agent/1.0",

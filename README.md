@@ -43,7 +43,11 @@ irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/commu
 
 Creates `~/rapp-projects/my-project/` — isolated project with its own venv, agents, and local storage. Auth happens through the chat UI (GitHub device code flow). No API keys needed to start.
 
-[Onboarding guide](https://kody-w.github.io/CommunityRAPP/onboard.html) | [CommunityRAPP repo](https://github.com/kody-w/CommunityRAPP)
+[External CommunityRAPP onboarding guide](https://kody-w.github.io/CommunityRAPP/onboard.html) |
+[External CommunityRAPP dependency](https://github.com/kody-w/CommunityRAPP)
+
+CommunityRAPP is reviewed as a separate content dependency and is not a
+Microsoft-maintained property of this repository.
 
 ---
 
@@ -131,7 +135,8 @@ The same agent logic you tested locally now answers in Microsoft Teams and M365 
 
 ## Configuration
 
-All config via `.env` (see `.env.example`):
+All Brainstem config uses `.env` (see
+[`rapp_brainstem/.env.example`](rapp_brainstem/.env.example)):
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -178,8 +183,17 @@ rm -rf ~/.brainstem ~/.local/bin/brainstem
 
 ## Attribution
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+Public questions, bugs, and feature requests follow [SUPPORT.md](SUPPORT.md) and
+the structured GitHub issue forms. Security vulnerabilities follow
+[SECURITY.md](SECURITY.md) and must not be reported publicly.
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
+This project has adopted the [Microsoft Open Source Code of Conduct](CODE_OF_CONDUCT.md).
 
-MIT License — Copyright (c) 2026 Microsoft.
+This project may contain trademarks or logos for projects, products, or
+services. Authorized use of Microsoft trademarks or logos is subject to and
+must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
+Use of Microsoft trademarks or logos in modified versions of this project must
+not cause confusion or imply Microsoft sponsorship. Any use of third-party
+trademarks or logos is subject to those third parties' policies.
+
+[MIT License](LICENSE).

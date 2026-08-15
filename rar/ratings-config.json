@@ -1,12 +1,20 @@
 {
- "note": "Public wiring for AIBAST RAR ratings \u2014 GitHub-native, no third-party apps or embeds. One Discussion per agent (title = slug) in the announcement-type category; visitors react on GitHub; tools/fetch_ratings.py harvests daily.",
+ "note": "AIBAST-owned RAR ratings \u2014 GitHub-native, no third-party apps or embeds and no public/global RAR dependency. One canonical Discussion per agent in the announcement-type category; Brainstem can add a thumbs-up directly and tools/fetch_ratings.py harvests positive reactions daily.",
  "repo": "microsoft/aibast-agents-library",
  "category": "Announcements",
+ "title_format": "@aibast-agents-library/{slug}",
+ "positive_reactions": [
+  "THUMBS_UP",
+  "HEART",
+  "HOORAY",
+  "ROCKET",
+  "LAUGH"
+ ],
  "enable_checklist": [
   "Repo Settings -> enable Discussions",
   "Create/confirm the Announcements category (announcement type: only maintainers open threads \u2014 the anti-spam property)",
-  "Run: GITHUB_TOKEN=<maintainer token> python3 tools/create_discussions.py  (idempotent; writes rar/discussions.json)",
-  "The daily ratings workflow and the workshop's rate links activate on their own",
+  "Run: GITHUB_TOKEN=<maintainer token> python3 tools/create_discussions.py (idempotent; reuses canonical discussions, creates missing ones, and writes rar/discussions.json)",
+  "Brainstem's integrated library can then upvote directly; the daily ratings workflow refreshes the public count snapshot",
   "At the first release with agent assets: brainstem installs become countable automatically (release-first fetch is already wired); also flip the workshop Step 1 curl to https://github.com/microsoft/aibast-agents-library/releases/latest/download/sales_specialist_twin_agent.py so twin downloads count too"
  ]
 }

@@ -6,13 +6,14 @@ name: preflight
 
 on:
   push:
-    branches-ignore: [main]
+    # main included on purpose: the install one-liner serves whatever is on main,
+    # so the branch users actually install from must be gated too.
   pull_request:
     branches: [main]
   workflow_dispatch:
 
 concurrency:
-  group: preflight-${{ github.ref }}
+  group: preflight-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -35,6 +36,20 @@ jobs:
           bash -n tests/test_installer.sh
           bash -n tests/preflight_local.sh
           bash -n tests/gen_soul_hashes.sh
+
+      - name: Public governance syntax
+        run: |
+          ruby -e '
+            require "yaml"
+            Dir[".github/ISSUE_TEMPLATE/*.yml"].sort.each do |file|
+              YAML.load_file(file)
+              puts "validated #{file}"
+            end
+          '
+          grep -Eq '^[[:space:]]*\*[[:space:]]+@[^[:space:]]+' .github/CODEOWNERS
+          test -s .github/pull_request_template.md
+          test -s SUPPORT.md
+          test -s CODE_OF_CONDUCT.md
 
       - name: Pages installer mirrors
         run: |

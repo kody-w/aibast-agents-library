@@ -44,7 +44,7 @@
         "o3-mini"
       ],
       "metadata": {
-        "description": "Azure OpenAI Model to deploy. All models use the tools API format."
+        "description": "Azure OpenAI Model to deploy. All models use the tools API format. The model version is intentionally not pinned so each allowed model deploys at its own default version."
       }
     },
     "openAIDeploymentName": {
@@ -219,8 +219,7 @@
       "properties": {
         "model": {
           "format": "OpenAI",
-          "name": "[parameters('openAIModelName')]",
-          "version": "2024-08-06"
+          "name": "[parameters('openAIModelName')]"
         },
         "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
         "raiPolicyName": "Microsoft.Default"
@@ -332,6 +331,14 @@
             {
               "name": "CHARACTERISTIC_DESCRIPTION",
               "value": "[parameters('characteristicDescription')]"
+            },
+            {
+              "name": "USE_CLOUD_STORAGE",
+              "value": "true"
+            },
+            {
+              "name": "USE_IDENTITY_BASED_STORAGE",
+              "value": "true"
             }
           ]
         }

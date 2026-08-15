@@ -60,6 +60,185 @@ fi
 
 echo ""
 
+# ── install.sh behaviour ─────────────────────────────────────────────────────
+# These drive the REAL install.sh: its pure helpers are loaded by evaluating the
+# script with its `main "$@"` invocation replaced by a no-op, and its argument
+# parsing is exercised end to end (both cases exit before touching the disk).
+
+echo "--- install.sh behaviour ---"
+
+# Scratch space. Override with BRAINSTEM_TEST_TMP to keep temp files off /tmp.
+SANDBOX_ROOT="${BRAINSTEM_TEST_TMP:-${TMPDIR:-/tmp}}"
+
+load_installer() {
+    # $1 = probe body, run in a throwaway shell with install.sh's functions loaded.
+    bash -s "$REPO_ROOT/install.sh" "$1" <<'PROBE'
+eval "$(grep -v '^main "\$@"$' "$1")"
+set +e
+eval "$2"
+PROBE
+}
+
+VERSION_PROBE=$(load_installer '
+    looks_like_version "0.7.12"          || { echo "rejected a real version"; exit 1; }
+    looks_like_version "<!DOCTYPE html>" && { echo "accepted an HTML body"; exit 1; }
+    looks_like_version ""                && { echo "accepted an empty version"; exit 1; }
+    looks_like_version "0.7.12-rc1"      && { echo "accepted a non-numeric version"; exit 1; }
+    version_gt "0.7.2" "0.7.1"           || { echo "0.7.2 should be newer"; exit 1; }
+    version_gt "0.7.1" "0.7.2"           && { echo "0.7.1 is not newer"; exit 1; }
+    noise=$(version_gt "<html>" "0.7.1" 2>&1)
+    [ -z "$noise" ]                      || { echo "arithmetic noise: $noise"; exit 1; }
+    echo ok
+' 2>&1) || true
+if [ "$(printf '%s' "$VERSION_PROBE" | tail -1)" = "ok" ]; then
+    pass "remote version is validated before it is compared"
+else
+    fail "version guard: $VERSION_PROBE"
+fi
+
+ARG_RC=0
+ARG_OUT=$(bash "$REPO_ROOT/install.sh" --verison --version 2>&1) || ARG_RC=$?
+if [ "$ARG_RC" -eq 2 ] \
+   && printf '%s' "$ARG_OUT" | grep -q -- '--version needs a value' \
+   && printf '%s' "$ARG_OUT" | grep -q 'Ignoring unknown option'; then
+    pass "bad arguments fail loudly instead of dying silently"
+else
+    fail "argument handling (rc=$ARG_RC): $ARG_OUT"
+fi
+
+HELP_RC=0
+HELP_OUT=$(bash "$REPO_ROOT/install.sh" --help 2>&1) || HELP_RC=$?
+if [ "$HELP_RC" -eq 0 ] && printf '%s' "$HELP_OUT" | grep -q 'Usage:'; then
+    pass "--help prints usage and exits cleanly"
+else
+    fail "--help (rc=$HELP_RC): $HELP_OUT"
+fi
+
+# An aborted upgrade must put the user's files back. Build a throwaway repo,
+# seed it like a real install (custom agent + edited soul + .env), then ask the
+# installer for a version that does not exist and prove nothing was lost.
+ROLLBACK=$(
+    set +e
+    SANDBOX=$(mktemp -d "$SANDBOX_ROOT/brainstem-rollback-XXXXXX") || { echo "no sandbox"; exit 1; }
+    ORIGIN="$SANDBOX/origin"
+    FAKE_HOME="$SANDBOX/home"
+    SRC="$FAKE_HOME/.brainstem/src/rapp_brainstem"
+    mkdir -p "$ORIGIN/rapp_brainstem/agents" "$FAKE_HOME"
+    printf '0.1.0\n' > "$ORIGIN/rapp_brainstem/VERSION"
+    printf 'default soul\n' > "$ORIGIN/rapp_brainstem/soul.md"
+    printf 'class BasicAgent: pass\n' > "$ORIGIN/rapp_brainstem/agents/basic_agent.py"
+    git -C "$ORIGIN" init -q
+    git -C "$ORIGIN" symbolic-ref HEAD refs/heads/main
+    git -C "$ORIGIN" config user.email t@localhost
+    git -C "$ORIGIN" config user.name t
+    git -C "$ORIGIN" add -A
+    git -C "$ORIGIN" commit -qm init
+    git clone -q "$ORIGIN" "$FAKE_HOME/.brainstem/src"
+    git -C "$FAKE_HOME/.brainstem/src" config user.email t@localhost
+    git -C "$FAKE_HOME/.brainstem/src" config user.name t
+    printf 'MY CUSTOM SOUL\n' > "$SRC/soul.md"
+    printf 'GITHUB_MODEL=my-model\n' > "$SRC/.env"
+    printf '# mine\n' > "$SRC/agents/my_custom_agent.py"
+
+    HOME="$FAKE_HOME" TMPDIR="$SANDBOX" TEST_REPO_URL="$ORIGIN" \
+        bash -s "$REPO_ROOT/install.sh" >/dev/null 2>&1 <<'PROBE'
+eval "$(grep -v '^main "\$@"$' "$1")"
+REPO_URL="$TEST_REPO_URL"
+PIN_VERSION="99.99.99"
+install_brainstem
+PROBE
+    rc=$?
+    problem=""
+    [ "$rc" -ne 0 ] || problem="installer did not fail on a missing version"
+    grep -q 'MY CUSTOM SOUL' "$SRC/soul.md" 2>/dev/null || problem="${problem:-soul.md lost}"
+    grep -q 'my-model' "$SRC/.env" 2>/dev/null || problem="${problem:-.env lost}"
+    [ -f "$SRC/agents/my_custom_agent.py" ] || problem="${problem:-custom agent lost}"
+    if ls -d "$SANDBOX"/brainstem-upgrade-* >/dev/null 2>&1; then
+        problem="${problem:-backup dir leaked}"
+    fi
+    rm -rf "$SANDBOX"
+    if [ -n "$problem" ]; then echo "$problem"; else echo ok; fi
+) || true
+if [ "$(printf '%s' "$ROLLBACK" | tail -1)" = "ok" ]; then
+    pass "aborted upgrade restores soul, .env, and custom agents"
+else
+    fail "upgrade rollback: $ROLLBACK"
+fi
+
+# Backups carry the user's .env (their GITHUB_TOKEN). A predictable /tmp path is
+# pre-creatable by any other account on the machine.
+if ! grep -q 'brainstem-upgrade-\$\$' "$REPO_ROOT/install.sh" \
+   && grep -q 'new_backup_dir' "$REPO_ROOT/install.sh" \
+   && grep -q 'chmod 700' "$REPO_ROOT/install.sh"; then
+    pass "install.sh backups use private, unpredictable temp dirs"
+else
+    fail "install.sh should back up into a mktemp dir with 0700 permissions"
+fi
+
+# A pinned install must stay pinned — a pull at launch would move it to main.
+if grep -qF 'if [ -z "$PIN_VERSION" ] && [ -d "$SRC_DIR/.git" ]; then' "$REPO_ROOT/install.sh" \
+   && grep -qF '(-not $PIN_VERSION) -and (Test-Path' "$REPO_ROOT/install.ps1"; then
+    pass "launch does not pull over a pinned version"
+else
+    fail "launch should skip the git pull when --version is pinned"
+fi
+
+# The installer must never take down an unrelated process holding port 7071.
+if grep -q 'brainstem.py\*)' "$REPO_ROOT/install.sh" \
+   && grep -q 'Not stopping it' "$REPO_ROOT/install.sh"; then
+    pass "only a brainstem is killed to free port 7071"
+else
+    fail "install.sh should identify the port 7071 owner before killing it"
+fi
+
+# A PyPI outage must not leave the user without the `brainstem` command: the CLI
+# wrapper and .env are written before dependencies on BOTH installers, in both
+# the full-install and already-up-to-date paths.
+if "$PYTHON_BIN" - "$REPO_ROOT" <<'PY'
+import pathlib
+import re
+import sys
+
+root = pathlib.Path(sys.argv[1])
+
+
+def code(path, start):
+    text = path.read_text(encoding="utf-8")
+    body = text[text.index(start):]
+    return "\n".join(
+        line for line in body.splitlines() if not line.lstrip().startswith("#")
+    )
+
+
+for name, body, cli, deps in (
+    ("install.sh", code(root / "install.sh", "\nmain() {"),
+     r"install_cli", r"setup_deps|ensure_deps"),
+    ("install.ps1", code(root / "install.ps1", "\nfunction Main {"),
+     r"Install-CLI", r"Setup-Dependencies|Ensure-Dependencies"),
+):
+    cli_at = [m.start() for m in re.finditer(cli, body)]
+    dep_at = [m.start() for m in re.finditer(deps, body)]
+    assert len(cli_at) >= 2 and len(dep_at) >= 2, (name, cli_at, dep_at)
+    assert min(cli_at) < min(dep_at), f"{name}: fast path installs deps before the CLI"
+    assert max(cli_at) < max(dep_at), f"{name}: full path installs deps before the CLI"
+print("ok")
+PY
+then
+    pass "CLI wrapper and .env are installed before dependencies"
+else
+    fail "a dependency failure would leave the user without the brainstem command"
+fi
+
+# An interrupted fresh install must not be able to delete the only checkout.
+if grep -q 'NEW_SRC="\$SRC_DIR.new' "$REPO_ROOT/install.sh" \
+   && grep -q 'mv "\$NEW_SRC" "\$SRC_DIR"' "$REPO_ROOT/install.sh"; then
+    pass "fresh install clones to staging before replacing src"
+else
+    fail "fresh install should not remove src before the clone succeeds"
+fi
+
+echo ""
+
 # ── install.ps1 tests ────────────────────────────────────────────────────────
 
 echo "--- install.ps1 ---"

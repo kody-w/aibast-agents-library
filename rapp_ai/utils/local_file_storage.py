@@ -9,6 +9,7 @@ import json
 import os
 import logging
 import re
+import threading
 from typing import Optional, Union, Any, List
 from datetime import datetime
 
@@ -52,6 +53,11 @@ class LocalFileStorageManager:
         Args:
             base_path: Optional custom base path. Defaults to .local_storage in project root.
         """
+        # The manager is a process-wide singleton but each HTTP request is served on its
+        # own worker thread, so the active memory context must never be shared between
+        # threads or one user's request can read/write another user's memory.
+        self._memory_context = threading.local()
+
         if base_path:
             self.base_path = base_path
         else:
@@ -71,6 +77,24 @@ class LocalFileStorageManager:
 
         # Ensure default directories and files exist
         self._ensure_defaults()
+
+    @property
+    def current_guid(self) -> Optional[str]:
+        """GUID of the memory context active on the calling thread."""
+        return getattr(self._memory_context, 'guid', None)
+
+    @current_guid.setter
+    def current_guid(self, value: Optional[str]) -> None:
+        self._memory_context.guid = value
+
+    @property
+    def current_memory_path(self) -> str:
+        """Memory directory active on the calling thread (shared memory by default)."""
+        return getattr(self._memory_context, 'memory_path', None) or self.shared_memory_path
+
+    @current_memory_path.setter
+    def current_memory_path(self, value: str) -> None:
+        self._memory_context.memory_path = value
 
     def _ensure_defaults(self):
         """Ensure default directories and files exist."""

@@ -228,6 +228,19 @@ class TestCopilotCacheIdentity(_AuthTestBase):
                 )
 
 
+class TestTokenFileValidation(_AuthTestBase):
+
+    def test_non_token_json_documents_are_ignored(self):
+        """Corrupted token state must not become a non-string credential."""
+        for payload in ("[]", '{"access_token": ["not-a-token"]}'):
+            with self.subTest(payload=payload):
+                with open(self.brainstem._token_file, "w", encoding="utf-8") as handle:
+                    handle.write(payload)
+
+                self.assertIsNone(self.brainstem._read_token_file())
+                self.assertIsNone(self.brainstem.get_github_token())
+
+
 class TestHealthNoCopilot(_AuthTestBase):
 
     def test_rejected_credential_reports_sign_in_not_connected(self):
@@ -304,6 +317,28 @@ class TestChatNoCopilot(_AuthTestBase):
         self.brainstem._exchange_github_for_copilot = leaky_exchange
         r = self.client.post("/chat", json={"user_input": "hello"})
         self.assertNotIn(RAW_SECRET_MARKER, r.get_data(as_text=True))
+
+    def test_chat_and_flight_log_redact_credential_like_exchange_errors(self):
+        """A rejected exchange must not expose a token-like error message."""
+        marker = "RAW_EXCHANGE_SECRET_123"
+        self._write_token()
+        original_flight_log = list(self.brainstem._flight_log)
+
+        def rejected_exchange(github_token):
+            return FakeResp(401, {"message": f"token={marker}"})
+
+        self.brainstem._exchange_github_for_copilot = rejected_exchange
+        try:
+            response = self.client.post("/chat", json={"user_input": "hello"})
+            with self.brainstem._flight_log_lock:
+                recorded = json.dumps(self.brainstem._flight_log)
+        finally:
+            with self.brainstem._flight_log_lock:
+                self.brainstem._flight_log[:] = original_flight_log
+
+        self.assertNotIn(marker, response.get_data(as_text=True))
+        self.assertNotIn(marker, recorded)
+        self.assertIn("REDACTED", response.get_data(as_text=True))
 
     def test_chat_self_heals_after_entitlement(self):
         """No-Copilot /chat, then entitlement, then a canned model reply — the second

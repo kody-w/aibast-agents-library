@@ -175,6 +175,11 @@ _DIAGNOSTIC_PRIVATE_KEYS = {
 }
 _EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)
 _IPV4_RE = re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.])")
+_IPV6_CANDIDATE_RE = re.compile(
+    r"(?<![0-9A-Fa-f:.])"
+    r"(?:[0-9A-Fa-f]{0,4}:){2,}[0-9A-Fa-f:.]*(?:%[0-9A-Za-z_.-]+)?"
+    r"(?![0-9A-Fa-f:.])"
+)
 _URL_PRIVATE_RE = re.compile(r"(https?://[^\s?#]+)[?#][^\s]*", re.IGNORECASE)
 _WINDOWS_USER_PATH_RE = re.compile(
     r"\b[A-Z]:\\Users\\[^\\\s\"'<>|]+(?:\\[^\s\"'<>|]*)?",
@@ -186,6 +191,20 @@ _POSIX_USER_PATH_RE = re.compile(
 )
 _SUPPORT_TRANSCRIPT_MAX_TURNS = 16
 _SUPPORT_TRANSCRIPT_MAX_CHARS = 12000
+
+
+def _scrub_ipv6_addresses(text):
+    """Redact valid IPv6 literals while leaving unrelated colon-delimited text."""
+    def replace(match):
+        candidate = match.group(0)
+        try:
+            if ipaddress.ip_address(candidate).version == 6:
+                return "<REDACTED_IP>"
+        except ValueError:
+            pass
+        return candidate
+
+    return _IPV6_CANDIDATE_RE.sub(replace, text)
 
 
 def _scrub_diagnostic_text(text):
@@ -202,6 +221,7 @@ def _scrub_diagnostic_text(text):
     scrubbed = _WINDOWS_USER_PATH_RE.sub("<REDACTED_PATH>", scrubbed)
     scrubbed = _POSIX_USER_PATH_RE.sub("<REDACTED_PATH>", scrubbed)
     scrubbed = _EMAIL_RE.sub("<REDACTED_EMAIL>", scrubbed)
+    scrubbed = _scrub_ipv6_addresses(scrubbed)
     scrubbed = _IPV4_RE.sub("<REDACTED_IP>", scrubbed)
     return _URL_PRIVATE_RE.sub(r"\1?<REDACTED_QUERY>", scrubbed)
 
@@ -367,7 +387,9 @@ def _reject_untrusted_host():
         hostname = (urlsplit(f"//{request.host}").hostname or "").lower()
     except ValueError:
         hostname = ""
-    if hostname in _ALLOWED_HOSTS:
+    # Configured names are LAN-only. Accepting one while bound to loopback would
+    # let a DNS-rebound page make its attacker-controlled Origin appear same-origin.
+    if hostname == "localhost" or (LAN_MODE and hostname in _ALLOWED_HOSTS):
         return None
     try:
         address = ipaddress.ip_address(hostname)
@@ -471,6 +493,57 @@ SUPPORT_REPO = "microsoft/aibast-agents-library"
 # agent against the registry's SHA-256, and the import route verifies the same
 # digest before writing or importing any bytes.
 RAR_REVISION = "12c37cd895098748e8618774159a589ffacb58f6"
+RAR_REPOSITORY = "microsoft/aibast-agents-library"
+RAR_DISCUSSION_CATEGORY = "Announcements"
+RAR_AGENT_NAME_RE = re.compile(
+    r"^@aibast-agents-library/[a-z0-9]+(?:-[a-z0-9]+)*$"
+)
+RAR_POSITIVE_REACTIONS = {"THUMBS_UP", "HEART", "HOORAY", "ROCKET", "LAUGH"}
+_DEFAULT_UPDATE_CHANNEL_URL = (
+    "https://raw.githubusercontent.com/microsoft/aibast-agents-library/"
+    "main/rapp_brainstem/frontier-channel.json"
+)
+_configured_update_channel = os.getenv("BRAINSTEM_UPDATE_CHANNEL_URL")
+if _configured_update_channel is None:
+    UPDATE_CHANNEL_URL = _DEFAULT_UPDATE_CHANNEL_URL
+else:
+    _configured_update_channel = _configured_update_channel.strip()
+    if _configured_update_channel.lower() in {"", "off", "false", "none"}:
+        UPDATE_CHANNEL_URL = None
+    elif _configured_update_channel.startswith("https://"):
+        UPDATE_CHANNEL_URL = _configured_update_channel
+    else:
+        print(
+            "[brainstem] Invalid BRAINSTEM_UPDATE_CHANNEL_URL; "
+            "only HTTPS URLs or 'off' are accepted"
+        )
+        UPDATE_CHANNEL_URL = None
+
+_RAR_DISCUSSION_QUERY = """
+query($owner:String!,$repo:String!,$number:Int!){
+  repository(owner:$owner,name:$repo){
+    discussion(number:$number){
+      id
+      title
+      url
+      viewerCanReact
+      category{name}
+      reactionGroups{
+        content
+        viewerHasReacted
+        reactors{totalCount}
+      }
+    }
+  }
+}
+"""
+_RAR_ADD_REACTION_MUTATION = """
+mutation($subjectId:ID!,$content:ReactionContent!){
+  addReaction(input:{subjectId:$subjectId,content:$content}){
+    reaction{content}
+  }
+}
+"""
 
 
 def _atomic_write_json(path, data):
@@ -536,7 +609,9 @@ AVAILABLE_MODELS = [
     {"id": "gpt-3.5-turbo",   "name": "GPT-3.5 Turbo"},
 ]
 
-# Models that don't support OpenAI-style tool_choice parameter
+# Models discovered from the catalog that don't support OpenAI-style tool_choice.
+# The o1 family is also recognized directly below so an explicit model pin works
+# before the first catalog fetch.
 _NO_TOOL_CHOICE_MODELS = set()
 _models_fetched = False
 _default_model_selected = False  # one-shot guard for _auto_select_default_model
@@ -572,6 +647,21 @@ def _clear_sticky_model():
             os.remove(_model_file)
     except Exception:
         pass
+
+
+def _model_omits_tool_choice(model_id):
+    """Whether a model rejects OpenAI-style ``tool_choice``.
+
+    Catalog metadata is populated lazily, but users may pin an o1 model before
+    that request succeeds. Recognize the documented o1 family directly rather
+    than relying on a later /models fetch to populate the compatibility set.
+    """
+    normalized = str(model_id or "").lower()
+    return (
+        "o1" in normalized
+        or normalized in {str(model).lower() for model in _NO_TOOL_CHOICE_MODELS}
+    )
+
 
 # A persisted manual pick wins over the env default resolved above.
 MODEL = _load_sticky_model() or MODEL
@@ -818,6 +908,7 @@ def _fetch_copilot_models():
 
 _flight_log = []
 _flight_log_lock = threading.Lock()
+_flight_log_save_lock = threading.Lock()
 _FLIGHT_LOG_MAX = 2000
 _flight_log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".brainstem_book.json")
 
@@ -837,12 +928,16 @@ def _tlog(event_type, data=None, level="info"):
 
 def _tlog_save():
     """Persist flight log to disk (called periodically and on export)."""
-    try:
-        with _flight_log_lock:
-            snapshot = list(_flight_log)
-        _atomic_write_json(_flight_log_file, snapshot)
-    except Exception:
-        pass
+    # Serialize saves independently from event appends. In particular, a clear
+    # that starts while autosave holds an older snapshot must write *after* that
+    # stale snapshot, otherwise a restart resurrects cleared diagnostics.
+    with _flight_log_save_lock:
+        try:
+            with _flight_log_lock:
+                snapshot = list(_flight_log)
+            _atomic_write_json(_flight_log_file, snapshot)
+        except Exception:
+            pass
 
 def _tlog_load():
     """Load previous flight log from disk on startup."""
@@ -935,30 +1030,29 @@ def _read_token_file():
             raw = f.read().strip()
         if not raw:
             return None
-        # New JSON format: {"access_token": ..., "refresh_token": ...}
-        if raw.startswith("{"):
-            return json.loads(raw)
-        # Legacy plain-text format: just the token string
-        return {"access_token": raw}
+        # New JSON format: {"access_token": ..., "refresh_token": ...}. Parse every
+        # valid JSON document rather than treating a corrupt list/scalar as a legacy
+        # token, and reject a non-string credential before it reaches auth headers.
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            # Legacy plain-text format: just the token string.
+            return {"access_token": raw}
+        if not isinstance(data, dict):
+            return None
+        token = data.get("access_token")
+        if not isinstance(token, str) or not token.strip():
+            return None
+        data["access_token"] = token.strip()
+        if "refresh_token" in data and data["refresh_token"] is not None:
+            if not isinstance(data["refresh_token"], str):
+                data.pop("refresh_token")
+        return data
     except Exception:
         return None
 
-def get_github_token():
-    """Get GitHub token from env, saved file, or gh CLI.
-    
-    Only returns tokens that work with the Copilot token exchange API.
-    Tokens from 'gh auth token' (gho_ prefix) don't have Copilot access,
-    so we skip them and only use ghu_ tokens from our device code flow.
-    """
-    # 1. Env var
-    token = os.getenv("GITHUB_TOKEN", "").strip()
-    if token:
-        return token
-    # 2. Saved token from device code login (ghu_ tokens)
-    data = _read_token_file()
-    if data and data.get("access_token"):
-        return data["access_token"]
-    # 3. gh CLI — only use if it returns a Copilot-compatible token (not gho_)
+def _gh_cli_token():
+    """Return the active gh CLI token without applying Copilot compatibility rules."""
     try:
         env = os.environ.copy()
         if sys.platform == "win32":
@@ -987,11 +1081,110 @@ def get_github_token():
             env=env,
         )
         token = result.stdout.strip()
-        if token and not token.startswith("gho_"):
-            return token
+        return token or None
     except Exception:
-        pass
+        return None
+
+
+def get_github_token():
+    """Get a Copilot-compatible GitHub token from env, saved file, or gh CLI.
+
+    Tokens from ``gh auth token`` commonly use the gho_ prefix and do not work
+    with the Copilot exchange API, so this path intentionally skips them.
+    """
+    token = os.getenv("GITHUB_TOKEN", "").strip()
+    if token:
+        return token
+    data = _read_token_file()
+    if data and data.get("access_token"):
+        return data["access_token"]
+    token = _gh_cli_token()
+    if token and not token.startswith("gho_"):
+        return token
     return None
+
+
+def get_github_api_token():
+    """Get a GitHub API token, preferring the account signed into Brainstem."""
+    token = os.getenv("GITHUB_TOKEN", "").strip()
+    if token:
+        return token
+    data = _read_token_file()
+    if data and data.get("access_token"):
+        return data["access_token"]
+    return _gh_cli_token()
+
+
+class _GitHubGraphQLError(RuntimeError):
+    def __init__(self, message, status_code=502, code="github_error"):
+        super().__init__(message)
+        self.status_code = status_code
+        self.code = code
+
+
+def _rar_graphql(token, query, variables):
+    """Call GitHub GraphQL without ever logging or returning credential material."""
+    try:
+        response = requests.post(
+            "https://api.github.com/graphql",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent": "aibast-brainstem-rar",
+            },
+            json={"query": query, "variables": variables},
+            timeout=15,
+        )
+    except requests.RequestException as error:
+        raise _GitHubGraphQLError(
+            "GitHub could not be reached. Try again shortly."
+        ) from error
+
+    if response.status_code == 401:
+        raise _GitHubGraphQLError(
+            "GitHub authentication expired. Sign in again or vote on GitHub.",
+            status_code=401,
+            code="github_auth_required",
+        )
+    if response.status_code == 403:
+        raise _GitHubGraphQLError(
+            "This GitHub token cannot add Discussion reactions.",
+            status_code=403,
+            code="github_permission_required",
+        )
+    if not response.ok:
+        raise _GitHubGraphQLError(
+            f"GitHub returned HTTP {response.status_code}. Try again shortly."
+        )
+
+    try:
+        payload = response.json()
+    except ValueError as error:
+        raise _GitHubGraphQLError("GitHub returned an invalid response.") from error
+
+    errors = payload.get("errors")
+    if errors:
+        messages = "; ".join(
+            str(item.get("message") or "GitHub rejected the request")
+            for item in errors
+            if isinstance(item, dict)
+        )[:500]
+        forbidden = any(
+            str((item.get("extensions") or {}).get("type", "")).upper()
+            in {"FORBIDDEN", "UNAUTHORIZED"}
+            for item in errors
+            if isinstance(item, dict)
+        )
+        raise _GitHubGraphQLError(
+            messages or "GitHub rejected the request.",
+            status_code=403 if forbidden else 502,
+            code="github_permission_required" if forbidden else "github_error",
+        )
+    data = payload.get("data")
+    if not isinstance(data, dict):
+        raise _GitHubGraphQLError("GitHub returned no data.")
+    return data
 
 
 def save_github_token(token, refresh_token=None):
@@ -1020,23 +1213,26 @@ def save_github_token(token, refresh_token=None):
 def refresh_github_token():
     """Try to refresh an expired GitHub token using the stored refresh_token."""
     data = _read_token_file()
-    if not data or not data.get("refresh_token"):
+    refresh_token = data.get("refresh_token") if isinstance(data, dict) else None
+    if not isinstance(refresh_token, str) or not refresh_token:
         return None
     try:
         resp = requests.post(
             "https://github.com/login/oauth/access_token",
             headers={"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"},
-            data=(
-                f"client_id={COPILOT_CLIENT_ID}"
-                f"&grant_type=refresh_token"
-                f"&refresh_token={data['refresh_token']}"
-            ),
+            data={
+                "client_id": COPILOT_CLIENT_ID,
+                "grant_type": "refresh_token",
+                "refresh_token": refresh_token,
+            },
             timeout=10,
         )
         result = resp.json()
         if result.get("access_token"):
             new_token = result["access_token"]
-            new_refresh = result.get("refresh_token", data.get("refresh_token"))
+            new_refresh = result.get("refresh_token")
+            if not isinstance(new_refresh, str) or not new_refresh:
+                new_refresh = refresh_token
             save_github_token(new_token, new_refresh)
             print(f"[brainstem] GitHub token refreshed successfully")
             return new_token
@@ -1262,10 +1458,14 @@ def _get_copilot_token_locked():
                 err_msg = err_body.get("message", resp.text[:200])
             except Exception:
                 err_msg = resp.text[:200]
-            _tlog("auth.copilot_exchange_error", {"status": resp.status_code, "error": err_msg[:200]}, level="error")
-            print(f"[brainstem] Copilot token exchange failed (HTTP {resp.status_code}): {_scrub_secrets(err_msg)}")
+            safe_err_msg = _scrub_secrets(str(err_msg))
+            _tlog("auth.copilot_exchange_error", {
+                "status": resp.status_code,
+                "error": safe_err_msg[:200],
+            }, level="error")
+            print(f"[brainstem] Copilot token exchange failed (HTTP {resp.status_code}): {safe_err_msg}")
             raise RuntimeError(
-                f"Copilot auth failed ({resp.status_code}): {err_msg}. Sign in with GitHub to retry."
+                f"Copilot auth failed ({resp.status_code}): {safe_err_msg}. Sign in with GitHub to retry."
             )
     resp.raise_for_status()
     
@@ -1438,11 +1638,11 @@ def poll_device_code():
     resp = requests.post(
         "https://github.com/login/oauth/access_token",
         headers={"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"},
-        data=(
-            f"client_id={COPILOT_CLIENT_ID}"
-            f"&device_code={_pending_login['device_code']}"
-            f"&grant_type=urn:ietf:params:oauth:grant-type:device_code"
-        ),
+        data={
+            "client_id": COPILOT_CLIENT_ID,
+            "device_code": _pending_login["device_code"],
+            "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+        },
         timeout=10,
     )
     data = resp.json()
@@ -1462,6 +1662,7 @@ def poll_device_code():
     if error == "slow_down":
         _tlog("login.slow_down", level="warn")
         _pending_login["interval"] = _pending_login.get("interval", 5) + 5
+        _save_pending_login()
         return None
     if error == "authorization_pending":
         return None  # Keep polling
@@ -1609,6 +1810,51 @@ def _validate_agent_schema(schema, path):
             if reason:
                 return reason
     return None
+
+
+def _validate_tool_definition(tool, agent_name):
+    """Return a reason when an agent's final tool payload would poison /chat."""
+    if not isinstance(tool, dict) or tool.get("type") != "function":
+        return "to_tool() must return a function tool object"
+    function = tool.get("function")
+    if not isinstance(function, dict):
+        return "to_tool().function must be an object"
+    tool_name = function.get("name")
+    if not isinstance(tool_name, str) or not _AGENT_NAME_RE.match(tool_name):
+        return "to_tool().function.name is not tool-safe"
+    if tool_name != agent_name:
+        return "to_tool().function.name does not match the registered agent name"
+    if "description" in function and not isinstance(function["description"], str):
+        return "to_tool().function.description must be a string"
+    if "parameters" in function:
+        params = function["parameters"]
+        if not isinstance(params, dict) or params.get("type") != "object":
+            return "to_tool().function.parameters must be an object schema"
+        reason = _validate_agent_schema(params, "to_tool().function.parameters")
+        if reason:
+            return reason
+    try:
+        json.dumps(tool)
+    except (TypeError, ValueError):
+        return "to_tool() returned a non-JSON-serializable payload"
+    return None
+
+
+def _build_tools(agents):
+    """Build only provider-safe tool definitions from the freshly loaded agents."""
+    tools = []
+    for agent in agents.values():
+        name = getattr(agent, "name", "?")
+        try:
+            tool = agent.to_tool()
+            reason = _validate_tool_definition(tool, name)
+            if reason:
+                print(f"[brainstem] Skipping agent with bad tool definition ({name}): {reason}")
+                continue
+            tools.append(tool)
+        except Exception as e:
+            print(f"[brainstem] Skipping agent with bad tool definition ({name}): {e}")
+    return tools or None
 
 
 def _quarantine_agent(filepath, cls_name, reason):
@@ -1766,6 +2012,8 @@ def _register_shims():
     ds_mod = types.ModuleType("utils.dynamics_storage")
     ds_mod.DynamicsStorageManager = _LSM
     sys.modules["utils.dynamics_storage"] = ds_mod
+    if hasattr(sys.modules["utils"], "__path__"):
+        sys.modules["utils"].dynamics_storage = ds_mod
     
     # Shim: utils.storage_factory → returns local storage manager
     sf_mod = types.ModuleType("utils.storage_factory")
@@ -1888,7 +2136,7 @@ def call_copilot(messages, tools=None):
     }
     if tools:
         body["tools"] = tools
-        if MODEL not in _NO_TOOL_CHOICE_MODELS:
+        if not _model_omits_tool_choice(MODEL):
             body["tool_choice"] = "auto"
 
     print(f"[brainstem] API call: model={MODEL}, tools={len(tools) if tools else 0}, tool_choice={body.get('tool_choice', 'NONE')}")
@@ -1945,7 +2193,7 @@ def call_copilot(messages, tools=None):
                 tried.add(fallback_model)
                 print(f"[brainstem] Retrying with {fallback_model}...")
                 body["model"] = fallback_model
-                if fallback_model in _NO_TOOL_CHOICE_MODELS:
+                if _model_omits_tool_choice(fallback_model):
                     body.pop("tool_choice", None)
                 elif tools and "tool_choice" not in body:
                     body["tool_choice"] = "auto"
@@ -2128,7 +2376,7 @@ def call_copilot_stream(messages, tools=None, model=None):
     body = {"model": use_model, "messages": messages, "stream": True}
     if tools:
         body["tools"] = tools
-        if use_model not in _NO_TOOL_CHOICE_MODELS:
+        if not _model_omits_tool_choice(use_model):
             body["tool_choice"] = "auto"
 
     print(f"[brainstem] STREAM call: model={use_model}, tools={len(tools) if tools else 0}")
@@ -2174,6 +2422,9 @@ def call_copilot_stream(messages, tools=None, model=None):
 # ── Agent execution ───────────────────────────────────────────────────────────
 
 
+_MEMORY_AGENT_NAMES = frozenset({"ManageMemory", "ContextMemory"})
+
+
 def run_tool_calls(tool_calls, agents, session_id=None):
     results = []
     logs = []
@@ -2201,6 +2452,13 @@ def run_tool_calls(tool_calls, agents, session_id=None):
                 "content": result
             })
             continue
+
+        # The model has no authenticated user identity and may hallucinate a
+        # user_guid. Letting that choose a storage namespace would mix or expose
+        # local memory across users, so memory cartridges always use their default
+        # local context for tool-driven calls.
+        if fn_name in _MEMORY_AGENT_NAMES:
+            args.pop("user_guid", None)
 
         print(f"[brainstem] {fn_name} args: {json.dumps(args)[:200]}")
 
@@ -2270,15 +2528,9 @@ def chat():
     try:
         soul   = load_soul()
         agents = load_agents()
-        # Build tools per-agent so one agent with malformed metadata is skipped
-        # (and just not offered to the model) instead of 500-ing every /chat request.
-        tools = []
-        for a in agents.values():
-            try:
-                tools.append(a.to_tool())
-            except Exception as e:
-                print(f"[brainstem] Skipping agent with bad metadata ({getattr(a, 'name', '?')}): {e}")
-        tools = tools or None
+        # One malformed custom to_tool() implementation must not make the provider
+        # reject every request; _build_tools skips only that cartridge.
+        tools = _build_tools(agents)
 
         # ── Collect system context from any agent that provides it ──
         extra_context = ""
@@ -2420,7 +2672,7 @@ def chat():
 def chat_stream():
     data = request.get_json(force=True, silent=True)
     if not isinstance(data, dict):
-        data = {}
+        return jsonify({"error": "Request body must be a JSON object"}), 400
 
     user_input = data.get("user_input", "")
     if not isinstance(user_input, str):
@@ -2438,35 +2690,36 @@ def chat_stream():
     _tlog("chat_stream.request", {"session_id": session_id, "input_len": len(user_input),
                                   "history_len": len(history)})
 
-    # Resolve soul / agents / tools OUTSIDE the generator so a config error returns
-    # a clean JSON 400/500 instead of a half-open event stream the client can't read.
-    # This mirrors /chat's setup exactly.
-    soul = load_soul()
-    agents = load_agents()
-    tools = []
-    for a in agents.values():
-        try:
-            tools.append(a.to_tool())
-        except Exception as e:
-            print(f"[brainstem] Skipping agent with bad metadata ({getattr(a, 'name', '?')}): {e}")
-    tools = tools or None
+    # Resolve soul / agents / tools OUTSIDE the generator so a configuration failure
+    # remains a clean JSON response instead of a half-open event stream (or Flask's
+    # default HTML error page). This mirrors /chat's setup exactly.
+    try:
+        soul = load_soul()
+        agents = load_agents()
+        tools = _build_tools(agents)
 
-    extra_context = ""
-    for agent in agents.values():
-        try:
-            ctx = agent.system_context()
-            if ctx:
-                extra_context += "\n" + ctx
-        except Exception as e:
-            print(f"[brainstem] system_context failed for {agent.name}: {e}")
+        extra_context = ""
+        for agent in agents.values():
+            try:
+                ctx = agent.system_context()
+                if ctx:
+                    extra_context += "\n" + ctx
+            except Exception as e:
+                print(f"[brainstem] system_context failed for {agent.name}: {e}")
 
-    system_content = soul + extra_context
-    if VOICE_MODE:
-        system_content += "\n\nIMPORTANT: End every response with |||VOICE||| followed by a concise, conversational version of your answer suitable for text-to-speech. Keep the voice version under 2-3 sentences. The part before |||VOICE||| should be the full formatted response."
+        system_content = soul + extra_context
+        if VOICE_MODE:
+            system_content += "\n\nIMPORTANT: End every response with |||VOICE||| followed by a concise, conversational version of your answer suitable for text-to-speech. Keep the voice version under 2-3 sentences. The part before |||VOICE||| should be the full formatted response."
 
-    messages = [{"role": "system", "content": system_content}]
-    messages += [m for m in history if m.get("role") in ("user", "assistant", "tool")]
-    messages.append({"role": "user", "content": user_input})
+        messages = [{"role": "system", "content": system_content}]
+        messages += [m for m in history if m.get("role") in ("user", "assistant", "tool")]
+        messages.append({"role": "user", "content": user_input})
+    except Exception as e:
+        _tlog("chat_stream.setup_error", {"error_type": type(e).__name__}, level="error")
+        print(f"[brainstem] Chat stream setup failed: {type(e).__name__}")
+        return jsonify({
+            "error": "Unable to prepare chat stream. Check the server configuration and try again.",
+        }), 500
 
     requested_model = MODEL
 
@@ -2973,8 +3226,129 @@ def voice_toggle():
 
 @app.route("/version", methods=["GET"])
 def version():
-    """Return the current brainstem version."""
-    return jsonify({"version": VERSION})
+    """Return the current version and the opt-in frontier update broadcast."""
+    return jsonify({
+        "version": VERSION,
+        "update_channel_url": UPDATE_CHANNEL_URL,
+    })
+
+
+@app.route("/rar/upvote", methods=["POST"])
+@_require_secret
+def rar_upvote():
+    """Add one GitHub thumbs-up to an AIBAST catalog Discussion."""
+    data = request.get_json(force=True, silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "Request body must be a JSON object"}), 400
+
+    agent_name = data.get("agent_name")
+    discussion_number = data.get("discussion_number")
+    if not isinstance(agent_name, str) or not RAR_AGENT_NAME_RE.fullmatch(
+        agent_name
+    ):
+        return jsonify({"error": "Invalid AIBAST agent name."}), 400
+    if (
+        isinstance(discussion_number, bool)
+        or not isinstance(discussion_number, int)
+        or discussion_number < 1
+    ):
+        return jsonify({"error": "discussion_number must be a positive integer"}), 400
+
+    discussion_url = (
+        f"https://github.com/{RAR_REPOSITORY}/discussions/{discussion_number}"
+    )
+    token = get_github_api_token()
+    if not token:
+        return jsonify({
+            "error": "GitHub authentication is required to upvote.",
+            "code": "github_auth_required",
+            "discussion_url": discussion_url,
+        }), 401
+
+    owner, repo = RAR_REPOSITORY.split("/", maxsplit=1)
+    variables = {
+        "owner": owner,
+        "repo": repo,
+        "number": discussion_number,
+    }
+    try:
+        result = _rar_graphql(token, _RAR_DISCUSSION_QUERY, variables)
+        discussion = (result.get("repository") or {}).get("discussion")
+        if not isinstance(discussion, dict):
+            return jsonify({
+                "error": "The AIBAST rating Discussion was not found.",
+                "discussion_url": discussion_url,
+            }), 404
+
+        slug = agent_name.split("/", maxsplit=1)[1]
+        if discussion.get("title") not in {agent_name, slug}:
+            return jsonify({
+                "error": "The Discussion does not match this AIBAST agent.",
+                "discussion_url": discussion_url,
+            }), 400
+        if (discussion.get("category") or {}).get("name") != RAR_DISCUSSION_CATEGORY:
+            return jsonify({
+                "error": "The Discussion is not an AIBAST rating thread.",
+                "discussion_url": discussion_url,
+            }), 400
+        if discussion.get("url") != discussion_url:
+            return jsonify({
+                "error": "The Discussion URL is not trusted.",
+                "discussion_url": discussion_url,
+            }), 400
+
+        score = 0
+        already_voted = False
+        for group in discussion.get("reactionGroups") or []:
+            if group.get("content") not in RAR_POSITIVE_REACTIONS:
+                continue
+            reactors = group.get("reactors") or {}
+            total = reactors.get("totalCount", 0)
+            if isinstance(total, int) and total > 0:
+                score += total
+            already_voted = already_voted or bool(group.get("viewerHasReacted"))
+
+        if already_voted:
+            return jsonify({
+                "status": "ok",
+                "already_voted": True,
+                "score": score,
+                "discussion_url": discussion_url,
+            })
+        if not discussion.get("viewerCanReact"):
+            return jsonify({
+                "error": "This GitHub account cannot react to the Discussion.",
+                "code": "github_permission_required",
+                "discussion_url": discussion_url,
+            }), 403
+
+        _rar_graphql(
+            token,
+            _RAR_ADD_REACTION_MUTATION,
+            {
+                "subjectId": discussion["id"],
+                "content": "THUMBS_UP",
+            },
+        )
+    except _GitHubGraphQLError as error:
+        _tlog(
+            "rar.upvote_failed",
+            {"agent": agent_name, "code": error.code},
+            level="warn",
+        )
+        return jsonify({
+            "error": str(error),
+            "code": error.code,
+            "discussion_url": discussion_url,
+        }), error.status_code
+
+    _tlog("rar.upvote", {"agent": agent_name})
+    return jsonify({
+        "status": "ok",
+        "already_voted": False,
+        "score": score + 1,
+        "discussion_url": discussion_url,
+    })
 
 @app.route("/agents", methods=["GET"])
 @_require_secret
@@ -3164,6 +3538,7 @@ def health():
             "copilot": "no_access" if no_copilot else ("\u2713" if copilot_ok else "pending"),
             "copilot_username": _no_copilot_access.get("username") if no_copilot else None,
             "brainstem_dir": os.path.dirname(os.path.abspath(__file__)),
+            "update_channel_url": UPDATE_CHANNEL_URL,
         })
     else:
         return jsonify({
@@ -3174,6 +3549,7 @@ def health():
             "agents": list(agents.keys()),
             "quarantined": _quarantine_snapshot(),
             "auth_error": "invalid_credentials" if invalid_credential else None,
+            "update_channel_url": UPDATE_CHANNEL_URL,
         })
 
 @app.route("/debug/auth", methods=["GET"])

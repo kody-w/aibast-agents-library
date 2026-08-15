@@ -103,7 +103,28 @@ Returns `"status": "unauthenticated"` (still 200) if the Copilot token is missin
 ### `GET /version`
 
 ```json
-{ "version": "0.1.0" }
+{
+  "version": "0.6.16",
+  "update_channel_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/frontier-channel.json"
+}
+```
+
+The frontier channel is a notification-only, local-first update broadcast.
+Forked distros can follow the canonical channel, pin an immutable manifest URL,
+or disable it without changing their catalogs, workshops, soul, agents, or
+memories.
+
+### `POST /rar/upvote`
+
+Records a thumbs-up on the canonical AIBAST GitHub Discussion for an agent.
+The integrated library calls this directly and falls back to opening the same
+Discussion when the available GitHub token lacks reaction permission.
+
+```json
+{
+  "agent_name": "@aibast-agents-library/account-intelligence",
+  "discussion_number": 42
+}
 ```
 
 ### `GET /models`
@@ -161,6 +182,7 @@ All config is via environment variables in `.env` (auto-created from `.env.examp
 | `PORT` | `7071` | Server port. |
 | `BRAINSTEM_LAN_MODE` | `false` | Set `true` to bind all interfaces. Non-loopback capability routes require the per-install secret. |
 | `BRAINSTEM_ALLOWED_HOSTS` | *(empty)* | Optional comma-separated LAN hostnames. Loopback and private IP literals are handled automatically. |
+| `BRAINSTEM_UPDATE_CHANNEL_URL` | AIBAST frontier channel | Follow the canonical kernel broadcast; use an immutable tag/commit URL to pin, or `off` for a fully independent fork. |
 | `VOICE_ZIP_PASSWORD` | *(empty)* | Optional password used to unlock the encrypted `voice.zip` config for Azure Speech or ElevenLabs at startup. |
 
 ### LAN access
@@ -191,6 +213,10 @@ The brainstem uses GitHub Copilot's API — no OpenAI keys needed. It resolves a
 3. **`gh auth token` CLI** — only when it returns a Copilot-compatible token; the common `gho_` token is ignored
 
 The GitHub token is exchanged for a short-lived Copilot API token (auto-refreshed, cached to disk across restarts). If the token expires and a refresh token is available, it auto-refreshes without user interaction.
+
+RAR upvotes are normal GitHub API operations. For that route, the brainstem can
+use the active `gh auth token` even when its common `gho_` form is not suitable
+for the separate Copilot token exchange.
 
 **Device-code login (no `gh` needed):**
 

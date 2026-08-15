@@ -31,7 +31,6 @@ from azure.identity import (
 from datetime import datetime
 import time
 import threading
-from utils.azure_file_storage import safe_json_loads
 from utils.storage_factory import get_storage_manager
 from utils.result import Result, Success, Failure, AgentLoadError, APIError
 
@@ -51,6 +50,24 @@ from utils.result import Result, Success, Failure, AgentLoadError, APIError
 #   3. UUID parsing libraries reject it, surfacing issues early
 #   4. Memory isolation: storage managers route to shared memory
 DEFAULT_USER_GUID = "c0p110t0-aaaa-bbbb-cccc-123456789abc"
+
+# Canonical GUID shape used to partition memory. A value that does not match this
+# pattern is NOT a private partition: the storage managers silently route it to the
+# shared memory that every caller can read, so unvalidated values must be rejected
+# at the API boundary instead of being written to the shared store.
+GUID_PATTERN = re.compile(
+    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    re.IGNORECASE
+)
+
+
+def is_valid_user_guid(value) -> bool:
+    """True when value can be used as a memory partition key."""
+    if not isinstance(value, str):
+        return False
+    value = value.strip()
+    return value == DEFAULT_USER_GUID or bool(GUID_PATTERN.match(value))
+
 
 # Singleton OpenAI client - created once, reused across requests
 _openai_client = None
@@ -339,10 +356,21 @@ class Assistant:
         self.client = _get_openai_client()
         self.known_agents = self.reload_agents(declared_agents)
         self.user_guid = DEFAULT_USER_GUID
+        # Set when the caller supplied an explicit user_guid; conversation content is
+        # then not allowed to repoint the session at another memory partition.
+        self.guid_is_pinned = False
         self.shared_memory = None
         self.user_memory = None
         self.storage_manager = get_storage_manager()
         self._initialize_context_memory(DEFAULT_USER_GUID)
+
+    def set_user_guid(self, user_guid):
+        """Pin the session to a caller-supplied GUID and load its memory context."""
+        if not is_valid_user_guid(user_guid):
+            raise ValueError(f"Invalid user_guid: {user_guid!r}")
+        self.user_guid = str(user_guid).strip()
+        self.guid_is_pinned = True
+        self._initialize_context_memory(self.user_guid)
 
     def reload_agents(self, agent_objects):
         known_agents = {}
@@ -362,16 +390,17 @@ class Assistant:
 
     def _check_first_message_for_guid(self, conversation_history):
         """Check if the first message contains only a GUID."""
-        if not conversation_history or len(conversation_history) == 0:
+        if not isinstance(conversation_history, list) or len(conversation_history) == 0:
             return None
         first_message = conversation_history[0]
+        if not isinstance(first_message, dict):
+            return None
         if first_message.get('role') == 'user':
             content = first_message.get('content')
             if content is None:
                 return None
             content = str(content).strip()
-            guid_pattern = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', re.IGNORECASE)
-            if guid_pattern.match(content):
+            if GUID_PATTERN.match(content):
                 return content
         return None
 
@@ -405,8 +434,7 @@ class Assistant:
 
         text_str = str(text).strip()
 
-        guid_pattern = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', re.IGNORECASE)
-        match = guid_pattern.match(text_str)
+        match = GUID_PATTERN.match(text_str)
         if match:
             return match.group(0)
 
@@ -549,12 +577,25 @@ Revenue's up 12 percent and customers are happier - looking good for Q3.
         if not agent:
             return None, f"Agent '{agent_name}' does not exist"
 
-        try:
-            agent_parameters = safe_json_loads(json_data)
+        # Parse strictly: a lenient parse turns a malformed tool-call payload into an
+        # {"error": ...} dict, which would then be splatted into the agent as a real
+        # parameter and silently produce a wrong answer instead of an error.
+        if isinstance(json_data, dict):
+            agent_parameters = json_data
+        else:
+            try:
+                agent_parameters = json.loads(json_data or "{}")
+            except (json.JSONDecodeError, ValueError, TypeError):
+                logging.error(f"Malformed arguments for agent '{agent_name}': {json_data!r}")
+                return None, f"Agent '{agent_name}' was called with malformed arguments"
 
+        if not isinstance(agent_parameters, dict):
+            return None, f"Agent '{agent_name}' was called with malformed arguments"
+
+        try:
             sanitized_parameters = {}
             for key, value in agent_parameters.items():
-                sanitized_parameters[key] = "" if value is None else value
+                sanitized_parameters[str(key)] = "" if value is None else value
 
             if agent_name in ['ManageMemory', 'ContextMemory']:
                 sanitized_parameters['user_guid'] = self.user_guid
@@ -641,9 +682,19 @@ Revenue's up 12 percent and customers are happier - looking good for Q3.
 
     def run(self, prompt, conversation_history, max_retries=3, retry_delay=2):
         """Main conversation loop: call OpenAI → execute agents → return response."""
+        if not isinstance(conversation_history, list):
+            conversation_history = []
+
         guid_from_history = self._check_first_message_for_guid(conversation_history)
         guid_from_prompt = self.extract_user_guid(prompt)
         target_guid = guid_from_history or guid_from_prompt
+
+        # A caller-supplied user_guid is authoritative. Conversation content must never
+        # be able to repoint the session at a different user's memory partition.
+        if target_guid and self.guid_is_pinned:
+            if target_guid != self.user_guid:
+                logging.warning("Ignoring GUID found in conversation content - request pinned to caller-supplied user_guid")
+            target_guid = None
 
         if target_guid and target_guid != self.user_guid:
             self.user_guid = target_guid
@@ -667,6 +718,8 @@ Revenue's up 12 percent and customers are happier - looking good for Q3.
 
         last_user_msg = None
         for msg in reversed(conversation_history):
+            if not isinstance(msg, dict):
+                continue
             if msg.get('role') == 'user':
                 last_user_msg = str(msg.get('content', '')).strip()
                 break
@@ -889,18 +942,65 @@ def copilot_studio_trigger(req: func.HttpRequest) -> func.HttpResponse:
 
     try:
         payload = req.get_json()
+    except ValueError:
+        return func.HttpResponse(
+            json.dumps({"error": "Invalid JSON in request body"}),
+            status_code=400, mimetype="application/json", headers=cors_headers
+        )
 
-        if 'agent' not in payload or 'action' not in payload:
+    if not isinstance(payload, dict):
+        return func.HttpResponse(
+            json.dumps({"error": "Request body must be a JSON object"}),
+            status_code=400, mimetype="application/json", headers=cors_headers
+        )
+
+    if 'agent' not in payload or 'action' not in payload:
+        return func.HttpResponse(
+            json.dumps({"error": "Missing required 'agent' and 'action' fields in payload"}),
+            status_code=400, mimetype="application/json", headers=cors_headers
+        )
+
+    agent_name = payload['agent']
+    action = payload['action']
+
+    if not isinstance(agent_name, str) or not isinstance(action, str):
+        return func.HttpResponse(
+            json.dumps({"error": "'agent' and 'action' must be strings"}),
+            status_code=400, mimetype="application/json", headers=cors_headers
+        )
+
+    raw_parameters = payload.get('parameters')
+    if raw_parameters is None:
+        raw_parameters = {}
+
+    if not isinstance(raw_parameters, dict):
+        return func.HttpResponse(
+            json.dumps({"error": "'parameters' must be a JSON object"}),
+            status_code=400, mimetype="application/json", headers=cors_headers
+        )
+
+    if any(not isinstance(key, str) for key in raw_parameters):
+        return func.HttpResponse(
+            json.dumps({"error": "'parameters' keys must be strings"}),
+            status_code=400, mimetype="application/json", headers=cors_headers
+        )
+
+    parameters = dict(raw_parameters)
+    parameters['action'] = action
+
+    # An invalid GUID is not a private partition - it silently resolves to the shared
+    # memory every caller can read, so reject it rather than leaking memories.
+    if 'user_guid' in parameters and parameters['user_guid'] is not None:
+        if not is_valid_user_guid(parameters['user_guid']):
             return func.HttpResponse(
-                json.dumps({"error": "Missing required 'agent' and 'action' fields in payload"}),
+                json.dumps({
+                    "error": "Invalid user_guid",
+                    "details": "user_guid must be a GUID in the form 00000000-0000-0000-0000-000000000000."
+                }),
                 status_code=400, mimetype="application/json", headers=cors_headers
             )
 
-        agent_name = payload['agent']
-        action = payload['action']
-        parameters = payload.get('parameters', {})
-        parameters['action'] = action
-
+    try:
         agents = _get_cached_agents()
         if agent_name not in agents:
             return func.HttpResponse(
@@ -959,6 +1059,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not req_body:
         return func.HttpResponse("Missing JSON payload in request body", status_code=400, headers=cors_headers)
 
+    if not isinstance(req_body, dict):
+        return func.HttpResponse(
+            json.dumps({"error": "Request body must be a JSON object"}),
+            status_code=400, mimetype="application/json", headers=cors_headers
+        )
+
     user_input = req_body.get('user_input')
     user_input = str(user_input) if user_input is not None else ""
 
@@ -967,8 +1073,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conversation_history = []
 
     user_guid = req_body.get('user_guid')
+    if isinstance(user_guid, str) and not user_guid.strip():
+        user_guid = None
 
-    is_guid_only = re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', user_input.strip(), re.IGNORECASE)
+    # A user_guid that is not a GUID is not a private partition - the storage managers
+    # silently route it to shared memory, which would publish this caller's memories to
+    # every other caller. Reject it instead of leaking.
+    if user_guid is not None and not is_valid_user_guid(user_guid):
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Invalid user_guid",
+                "details": "user_guid must be a GUID in the form 00000000-0000-0000-0000-000000000000."
+            }),
+            status_code=400, mimetype="application/json", headers=cors_headers
+        )
+
+    is_guid_only = GUID_PATTERN.match(user_input.strip())
 
     if not is_guid_only and not user_input.strip():
         return func.HttpResponse(
@@ -981,11 +1101,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         assistant = Assistant(agents)
 
         if user_guid:
-            assistant.user_guid = user_guid
-            assistant._initialize_context_memory(user_guid)
+            assistant.set_user_guid(user_guid)
         elif is_guid_only:
-            assistant.user_guid = user_input.strip()
-            assistant._initialize_context_memory(user_input.strip())
+            assistant.set_user_guid(user_input.strip())
 
         assistant_response, voice_response, agent_logs = assistant.run(user_input, conversation_history)
 

@@ -5,10 +5,13 @@ Tests for the core memory agent platform:
 - Agent loading and discovery
 - Memory read (ContextMemory) and write (ManageMemory)
 - Storage backend (local file storage)
+- Per-request memory isolation (tenancy)
 - API contract (request/response format)
+- ARM deployment template invariants
 """
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -436,6 +439,437 @@ class TestMemoryReadWriteIntegration(unittest.TestCase):
 
         result = self.reader.perform(keywords=["Python"])
         self.assertIn("Python", result)
+
+
+class TestMemoryContextThreadIsolation(unittest.TestCase):
+    """Regression: the storage manager is a process-wide singleton but every HTTP
+    request is served on its own worker thread. The active memory context must be
+    per-thread or one user's request reads/writes another user's memory."""
+
+    GUID_A = "11111111-1111-1111-1111-111111111111"
+    GUID_B = "22222222-2222-2222-2222-222222222222"
+
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+        from utils.local_file_storage import LocalFileStorageManager
+        self.storage = LocalFileStorageManager(base_path=self.test_dir)
+        self.storage.set_memory_context(self.GUID_A)
+        self.storage.write_json({"a": {"message": "A-secret", "theme": "fact"}})
+        self.storage.set_memory_context(self.GUID_B)
+        self.storage.write_json({"b": {"message": "B-secret", "theme": "fact"}})
+        self.storage.set_memory_context(None)
+
+    def tearDown(self):
+        shutil.rmtree(self.test_dir, ignore_errors=True)
+
+    def test_concurrent_contexts_do_not_leak_between_threads(self):
+        """Two threads holding different GUID contexts read only their own memory."""
+        import threading
+
+        seen = {}
+        errors = []
+        # Both threads set their context, then wait for each other before reading, so a
+        # shared (non thread-local) context is guaranteed to have been clobbered.
+        barrier = threading.Barrier(2, timeout=10)
+
+        def worker(guid, key):
+            try:
+                self.storage.set_memory_context(guid)
+                barrier.wait()
+                seen[key] = self.storage.read_json()
+            except Exception as exc:  # pragma: no cover - surfaced via assertion
+                errors.append(exc)
+
+        threads = [
+            threading.Thread(target=worker, args=(self.GUID_A, "A")),
+            threading.Thread(target=worker, args=(self.GUID_B, "B")),
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=15)
+
+        self.assertEqual(errors, [])
+        self.assertIn("a", seen["A"], "thread A read another user's memory")
+        self.assertNotIn("b", seen["A"], "thread A leaked thread B's memory")
+        self.assertIn("b", seen["B"], "thread B read another user's memory")
+        self.assertNotIn("a", seen["B"], "thread B leaked thread A's memory")
+
+    def test_concurrent_writes_land_in_own_partition(self):
+        """A write on one thread never lands in the other thread's partition."""
+        import threading
+
+        barrier = threading.Barrier(2, timeout=10)
+        errors = []
+
+        def writer(guid, payload):
+            try:
+                self.storage.set_memory_context(guid)
+                barrier.wait()
+                self.storage.write_json(payload)
+            except Exception as exc:  # pragma: no cover - surfaced via assertion
+                errors.append(exc)
+
+        threads = [
+            threading.Thread(target=writer, args=(self.GUID_A, {"a2": {"message": "A-only"}})),
+            threading.Thread(target=writer, args=(self.GUID_B, {"b2": {"message": "B-only"}})),
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=15)
+
+        self.assertEqual(errors, [])
+        self.storage.set_memory_context(self.GUID_A)
+        self.assertEqual(list(self.storage.read_json().keys()), ["a2"])
+        self.storage.set_memory_context(self.GUID_B)
+        self.assertEqual(list(self.storage.read_json().keys()), ["b2"])
+
+    def test_unset_thread_defaults_to_shared_memory(self):
+        """A thread that never set a context sees shared memory, not a stale GUID."""
+        import threading
+
+        self.storage.set_memory_context(self.GUID_A)
+        observed = {}
+
+        def worker():
+            observed['guid'] = self.storage.current_guid
+            observed['path'] = self.storage.current_memory_path
+
+        t = threading.Thread(target=worker)
+        t.start()
+        t.join(timeout=10)
+
+        self.assertIsNone(observed['guid'])
+        self.assertEqual(observed['path'], self.storage.shared_memory_path)
+
+    def test_azure_manager_uses_thread_local_context(self):
+        """The Azure manager exposes the same thread-local context contract."""
+        from utils.azure_file_storage import AzureFileStorageManager
+        self.assertIsInstance(AzureFileStorageManager.current_guid, property)
+        self.assertIsInstance(AzureFileStorageManager.current_memory_path, property)
+
+
+class TestUserGuidValidation(unittest.TestCase):
+    """Regression: a user_guid that is not a GUID is not a private partition — the
+    storage managers silently route it to shared memory, publishing that caller's
+    memories to everyone. It must be rejected at the API boundary."""
+
+    def test_is_valid_user_guid_accepts_guids_and_default_marker(self):
+        from function_app import is_valid_user_guid, DEFAULT_USER_GUID
+        self.assertTrue(is_valid_user_guid("550e8400-e29b-41d4-a716-446655440000"))
+        self.assertTrue(is_valid_user_guid("550E8400-E29B-41D4-A716-446655440000"))
+        self.assertTrue(is_valid_user_guid("  550e8400-e29b-41d4-a716-446655440000  "))
+        self.assertTrue(is_valid_user_guid(DEFAULT_USER_GUID))
+
+    def test_is_valid_user_guid_rejects_non_guids(self):
+        from function_app import is_valid_user_guid
+        for bad in ["", "   ", "not-a-guid", "../../shared_memories", "memory/../..",
+                    "550e8400-e29b-41d4-a716", None, 12345, {"a": 1}, ["guid"]]:
+            self.assertFalse(is_valid_user_guid(bad), f"{bad!r} must not be a valid partition key")
+
+    def test_main_rejects_malformed_user_guid(self):
+        import azure.functions as func
+        from function_app import main
+
+        handler = main._function.get_user_function()
+        for bad in ["../../shared_memories", "not-a-guid", 42, {"a": 1}]:
+            body = json.dumps({"user_input": "hello", "user_guid": bad}).encode()
+            req = func.HttpRequest(method='POST', url='http://localhost/api/businessinsightbot_function',
+                                   body=body, headers={})
+            resp = handler(req)
+            self.assertEqual(resp.status_code, 400, f"user_guid={bad!r} should be rejected")
+            self.assertIn("Invalid user_guid", resp.get_body().decode())
+
+    def test_main_rejects_non_object_body(self):
+        import azure.functions as func
+        from function_app import main
+
+        handler = main._function.get_user_function()
+        req = func.HttpRequest(method='POST', url='http://localhost/api/businessinsightbot_function',
+                               body=b'[1, 2, 3]', headers={})
+        resp = handler(req)
+        self.assertEqual(resp.status_code, 400)
+
+    def test_main_pins_valid_user_guid(self):
+        import azure.functions as func
+        import function_app as fa
+
+        handler = fa.main._function.get_user_function()
+        guid = "550e8400-e29b-41d4-a716-446655440000"
+        assistant = MagicMock()
+        assistant.user_guid = guid
+        assistant.run.return_value = ("formatted", "voice", "logs")
+
+        with patch.object(fa, 'Assistant', return_value=assistant), \
+                patch.object(fa, '_get_cached_agents', return_value={}):
+            body = json.dumps({"user_input": "hello", "user_guid": guid}).encode()
+            req = func.HttpRequest(method='POST', url='http://localhost/api/businessinsightbot_function',
+                                   body=body, headers={})
+            resp = handler(req)
+
+        self.assertEqual(resp.status_code, 200)
+        assistant.set_user_guid.assert_called_once_with(guid)
+        self.assertEqual(json.loads(resp.get_body())["user_guid"], guid)
+
+
+class TestAssistantConversationHistoryRobustness(unittest.TestCase):
+    """Regression: conversation_history entries are attacker/client controlled and are
+    not guaranteed to be objects. Non-dict entries used to raise AttributeError and
+    surface as HTTP 500."""
+
+    GUID_A = "11111111-1111-1111-1111-111111111111"
+    GUID_B = "22222222-2222-2222-2222-222222222222"
+
+    def _assistant(self):
+        from function_app import Assistant, DEFAULT_USER_GUID
+        assistant = Assistant.__new__(Assistant)
+        assistant.config = {'assistant_name': 'Test', 'characteristic_description': 'test'}
+        assistant.client = MagicMock()
+        assistant.known_agents = {}
+        assistant.user_guid = DEFAULT_USER_GUID
+        assistant.guid_is_pinned = False
+        assistant.shared_memory = "none"
+        assistant.user_memory = "none"
+        assistant.storage_manager = MagicMock()
+        assistant._initialize_context_memory = MagicMock()
+        return assistant
+
+    def _stub_reply(self, assistant, content="All done.|||VOICE|||Done."):
+        from utils.result import Success
+        message = MagicMock()
+        message.content = content
+        message.tool_calls = None
+        message.function_call = None
+        response = MagicMock()
+        response.choices = [MagicMock(message=message)]
+        assistant._get_openai_api_call = MagicMock(return_value=Success(response))
+        return assistant
+
+    def test_first_message_guid_check_tolerates_non_dict_entries(self):
+        assistant = self._assistant()
+        self.assertIsNone(assistant._check_first_message_for_guid(["just a string"]))
+        self.assertIsNone(assistant._check_first_message_for_guid([None]))
+        self.assertIsNone(assistant._check_first_message_for_guid([42]))
+        self.assertIsNone(assistant._check_first_message_for_guid("not a list"))
+        self.assertIsNone(assistant._check_first_message_for_guid(None))
+
+    def test_first_message_guid_still_detected(self):
+        assistant = self._assistant()
+        self.assertEqual(
+            assistant._check_first_message_for_guid([{"role": "user", "content": self.GUID_A}]),
+            self.GUID_A
+        )
+
+    def test_prepare_messages_tolerates_non_dict_entries(self):
+        assistant = self._assistant()
+        messages = assistant._prepare_messages(["a string", 42, None, {"role": "user", "content": "hi"}])
+        self.assertTrue(all(isinstance(m, dict) and isinstance(m["content"], str) for m in messages))
+
+    def test_run_tolerates_non_dict_history(self):
+        assistant = self._stub_reply(self._assistant())
+        formatted, voice, logs = assistant.run("hello", ["a string", 42, {"role": "user", "content": "hi"}])
+        self.assertEqual(formatted, "All done.")
+        self.assertEqual(voice, "Done.")
+
+    def test_run_tolerates_non_list_history(self):
+        assistant = self._stub_reply(self._assistant())
+        formatted, _, _ = assistant.run("hello", None)
+        self.assertEqual(formatted, "All done.")
+
+    def test_pinned_guid_is_not_overridden_by_conversation_content(self):
+        """A caller-supplied user_guid must win over a GUID embedded in the history."""
+        assistant = self._stub_reply(self._assistant())
+        assistant.user_guid = self.GUID_A
+        assistant.guid_is_pinned = True
+
+        assistant.run("hello", [{"role": "user", "content": self.GUID_B}])
+
+        self.assertEqual(assistant.user_guid, self.GUID_A)
+        assistant._initialize_context_memory.assert_not_called()
+
+    def test_unpinned_guid_still_adopted_from_history(self):
+        """Without an explicit user_guid the legacy GUID-first-message flow still works."""
+        assistant = self._stub_reply(self._assistant())
+        assistant.run("hello", [{"role": "user", "content": self.GUID_B}])
+        self.assertEqual(assistant.user_guid, self.GUID_B)
+        assistant._initialize_context_memory.assert_called_once_with(self.GUID_B)
+
+    def test_malformed_tool_arguments_are_reported_not_splatted(self):
+        """A malformed tool-call payload must not be passed to the agent as parameters."""
+        agent = MagicMock()
+        agent.perform.return_value = "should not run"
+        assistant = self._assistant()
+        assistant.known_agents = {"Echo": agent}
+
+        result, error = assistant._execute_agent("Echo", "{not valid json")
+
+        self.assertIsNone(result)
+        self.assertIn("malformed arguments", error)
+        agent.perform.assert_not_called()
+
+    def test_non_object_tool_arguments_are_reported(self):
+        agent = MagicMock()
+        assistant = self._assistant()
+        assistant.known_agents = {"Echo": agent}
+
+        result, error = assistant._execute_agent("Echo", "[1, 2, 3]")
+
+        self.assertIsNone(result)
+        self.assertIn("malformed arguments", error)
+        agent.perform.assert_not_called()
+
+    def test_valid_tool_arguments_still_execute(self):
+        agent = MagicMock()
+        agent.perform.return_value = "ok"
+        assistant = self._assistant()
+        assistant.known_agents = {"Echo": agent}
+
+        result, error = assistant._execute_agent("Echo", '{"content": "hi", "empty": null}')
+
+        self.assertIsNone(error)
+        self.assertEqual(result, "ok")
+        agent.perform.assert_called_once_with(content="hi", empty="")
+
+    def test_memory_agent_user_guid_is_forced_to_session_guid(self):
+        """A model-invented user_guid must never override the session's partition."""
+        agent = MagicMock()
+        agent.perform.return_value = "stored"
+        assistant = self._assistant()
+        assistant.known_agents = {"ManageMemory": agent}
+        assistant.user_guid = self.GUID_A
+
+        assistant._execute_agent("ManageMemory", json.dumps({
+            "memory_type": "fact", "content": "x", "user_guid": self.GUID_B
+        }))
+
+        agent.perform.assert_called_once_with(
+            memory_type="fact", content="x", user_guid=self.GUID_A
+        )
+
+
+class TestCopilotStudioTriggerContract(unittest.TestCase):
+    """Regression: the documented contract is 400 for invalid request format or
+    parameters. Malformed payloads used to raise and surface as HTTP 500."""
+
+    def _call(self, body):
+        import azure.functions as func
+        from function_app import copilot_studio_trigger
+
+        handler = copilot_studio_trigger._function.get_user_function()
+        if not isinstance(body, bytes):
+            body = json.dumps(body).encode()
+        req = func.HttpRequest(method='POST', url='http://localhost/api/trigger/copilot-studio',
+                               body=body, headers={})
+        return handler(req)
+
+    def test_invalid_json_is_bad_request(self):
+        self.assertEqual(self._call(b'not json at all').status_code, 400)
+
+    def test_non_object_body_is_bad_request(self):
+        self.assertEqual(self._call(b'null').status_code, 400)
+        self.assertEqual(self._call(b'[1, 2]').status_code, 400)
+        self.assertEqual(self._call(b'"a string"').status_code, 400)
+
+    def test_missing_fields_is_bad_request(self):
+        self.assertEqual(self._call({"agent": "ContextMemory"}).status_code, 400)
+
+    def test_non_string_agent_or_action_is_bad_request(self):
+        self.assertEqual(self._call({"agent": {"a": 1}, "action": "x"}).status_code, 400)
+        self.assertEqual(self._call({"agent": "ContextMemory", "action": ["x"]}).status_code, 400)
+
+    def test_non_object_parameters_is_bad_request(self):
+        resp = self._call({"agent": "ContextMemory", "action": "recall", "parameters": "oops"})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("parameters", resp.get_body().decode())
+
+    def test_malformed_user_guid_is_bad_request(self):
+        resp = self._call({"agent": "ContextMemory", "action": "recall",
+                           "parameters": {"user_guid": "../../shared_memories"}})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Invalid user_guid", resp.get_body().decode())
+
+    def test_null_parameters_is_treated_as_empty(self):
+        resp = self._call({"agent": "NoSuchAgent", "action": "x", "parameters": None})
+        self.assertEqual(resp.status_code, 404)
+
+    def test_unknown_agent_is_not_found(self):
+        resp = self._call({"agent": "NoSuchAgent", "action": "x"})
+        self.assertEqual(resp.status_code, 404)
+
+    def test_valid_invocation_succeeds(self):
+        import function_app as fa
+
+        agent = MagicMock()
+        agent.perform.return_value = "done"
+        with patch.object(fa, '_get_cached_agents', return_value={"Echo": agent}):
+            resp = self._call({"agent": "Echo", "action": "run", "parameters": {"content": "hi"}})
+
+        self.assertEqual(resp.status_code, 200)
+        agent.perform.assert_called_once_with(content="hi", action="run")
+        self.assertEqual(json.loads(resp.get_body())["status"], "success")
+
+
+class TestDeploymentTemplate(unittest.TestCase):
+    """Regression: the ARM template must be deployable for every model it allows and
+    must configure the auth mode the storage account it creates actually supports."""
+
+    @classmethod
+    def setUpClass(cls):
+        template_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            'azuredeploy.json'
+        )
+        with open(template_path, 'r', encoding='utf-8') as handle:
+            cls.template = json.load(handle)
+
+    def _resource(self, resource_type):
+        matches = [r for r in self.template['resources'] if r['type'] == resource_type]
+        self.assertTrue(matches, f"no {resource_type} resource in template")
+        return matches[0]
+
+    def test_model_version_is_not_pinned_to_a_single_model(self):
+        """A hardcoded version only exists for one model, so every other allowed value fails."""
+        allowed = self.template['parameters']['openAIModelName']['allowedValues']
+        self.assertGreater(len(allowed), 1)
+        model = self._resource('Microsoft.CognitiveServices/accounts/deployments')['properties']['model']
+        self.assertNotIn(
+            'version', model,
+            "model.version must stay unset so each allowed model deploys at its own default version"
+        )
+
+    def test_default_model_is_an_allowed_value(self):
+        params = self.template['parameters']['openAIModelName']
+        self.assertIn(params['defaultValue'], params['allowedValues'])
+
+    def test_identity_based_storage_is_configured(self):
+        """Shared key auth is disabled on the storage account, so the app must use Entra ID."""
+        storage = self._resource('Microsoft.Storage/storageAccounts')
+        self.assertFalse(storage['properties']['allowSharedKeyAccess'])
+
+        site = self._resource('Microsoft.Web/sites')
+        settings = {s['name']: s['value'] for s in site['properties']['siteConfig']['appSettings']}
+        self.assertEqual(settings.get('USE_IDENTITY_BASED_STORAGE'), 'true')
+        self.assertEqual(settings.get('USE_CLOUD_STORAGE'), 'true')
+
+    def test_storage_settings_match_runtime_expectations(self):
+        site = self._resource('Microsoft.Web/sites')
+        settings = {s['name'] for s in site['properties']['siteConfig']['appSettings']}
+        for required in ('AZURE_OPENAI_ENDPOINT', 'AZURE_OPENAI_DEPLOYMENT_NAME',
+                         'AZURE_STORAGE_ACCOUNT_NAME', 'AZURE_FILES_SHARE_NAME'):
+            self.assertIn(required, settings)
+
+    def test_role_assignments_reference_defined_variables(self):
+        variables = self.template['variables']
+        assignments = [r for r in self.template['resources']
+                       if r['type'] == 'Microsoft.Authorization/roleAssignments']
+        self.assertTrue(assignments)
+        for assignment in assignments:
+            role_definition = assignment['properties']['roleDefinitionId']
+            referenced = re.findall(r"variables\('([^']+)'\)", role_definition)
+            self.assertTrue(referenced, f"role assignment has no variable reference: {role_definition}")
+            for name in referenced:
+                self.assertIn(name, variables, f"undefined variable in template: {name}")
 
 
 if __name__ == '__main__':

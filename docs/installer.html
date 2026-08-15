@@ -165,6 +165,45 @@
     padding: 0 24px 14px; font-size: 11px; color: #b3bcc9; text-align: center;
   }
 
+  .trust-download {
+    margin-top: 12px; padding: 16px; background: #0d1117;
+    border: 1px solid #30363d; border-radius: 10px;
+  }
+  .trust-download__notice {
+    padding: 14px; border: 1px solid #30363d; border-radius: 8px;
+    background: #161b22;
+  }
+  .trust-download__heading {
+    display: flex; align-items: center; gap: 8px; color: #e6edf3;
+    font-size: 14px; font-weight: 700;
+  }
+  .trust-download__warning { color: #f0883e; font-size: 18px; }
+  .trust-download__ack {
+    display: flex; align-items: flex-start; gap: 10px; margin-top: 10px;
+    color: #c9d1d9; font-size: 13px; line-height: 1.55; cursor: pointer;
+  }
+  .trust-download__ack input {
+    width: 18px; height: 18px; margin-top: 2px; accent-color: #1f6feb;
+    flex: 0 0 auto;
+  }
+  .trust-download__button {
+    width: 100%; min-height: 44px; margin-top: 12px; border: 0; border-radius: 8px;
+    background: #1f6feb; color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .trust-download__button:hover:not(:disabled) { background: #388bfd; }
+  .trust-download__button:disabled { background: #484f58; color: #c9d1d9; cursor: not-allowed; }
+  .trust-download__status { margin: 8px 0 0; color: #8b949e; font-size: 12px; }
+  .trust-download__ack input:focus-visible,
+  .trust-download__button:focus-visible { outline: 2px solid #f291b6; outline-offset: 2px; }
+  html[data-theme=light] .trust-download { background: #fff!important; border-color: #c9cede!important; }
+  html[data-theme=light] .trust-download__notice { background: #f6f7fa!important; border-color: #dfe2ea!important; }
+  html[data-theme=light] .trust-download__heading { color: #1a1a2e!important; }
+  html[data-theme=light] .trust-download__warning { color: #b94c00!important; }
+  html[data-theme=light] .trust-download__ack { color: #3c3f52!important; }
+  html[data-theme=light] .trust-download__button { background: #0f6cbd!important; color: #fff!important; }
+  html[data-theme=light] .trust-download__button:disabled { background: #626979!important; color: #fff!important; }
+  html[data-theme=light] .trust-download__status { color: #5b5e6e!important; }
+
   .status-bar {
     max-width: 620px; width: 100%; margin-top: 16px;
     background: #161b22; border: 1px solid #21262d; border-radius: 12px;
@@ -516,7 +555,17 @@ body{padding-top:52px!important}
           <h3 style="color:#3fb950;">Option A: Azure Function → Copilot Studio</h3>
           <p>Wire your deployed Azure Function to Copilot Studio. Import the Power Platform solution, point it at your endpoint, publish. Same RAPP agents, now in Teams and M365 Copilot.</p>
           <p style="font-size:13px;color:#b3bcc9;margin:8px 0;"><strong>Requires:</strong> Tier 2 (the Hippocampus) completed</p>
-          <div class="cmd" onclick="copyCmd(event, this)">curl -fsSL -o MSFTAIBASMultiAgentCopilot.zip https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/MSFTAIBASMultiAgentCopilot_1_0_0_5.zip</div>
+          <div class="trust-download" data-solution-download>
+            <div class="trust-download__notice">
+              <div class="trust-download__heading"><span class="trust-download__warning" aria-hidden="true">⚠</span> Add only what you trust</div>
+              <label class="trust-download__ack" for="solution-download-ack">
+                <input id="solution-download-ack" type="checkbox" aria-describedby="solution-download-ack-copy">
+                <span id="solution-download-ack-copy">I understand that this is a community-provided, code-bearing artifact. It runs with my permissions or may affect my environment. I will review it carefully and download it only from a trusted source.</span>
+              </label>
+            </div>
+            <button class="trust-download__button" id="solution-download-button" type="button" disabled aria-describedby="solution-download-ack-copy solution-download-status">↓ Download Copilot Studio solution ZIP</button>
+            <p class="trust-download__status" id="solution-download-status" role="status" aria-live="polite">Check the acknowledgement to enable this download.</p>
+          </div>
           <p style="margin-top:8px;font-size:13px;color:#b3bcc9;">Import at <a href="https://make.powerapps.com" target="_blank" style="color:#58a6ff;">make.powerapps.com</a> → Solutions → Import. Update the HTTP action URL to your Azure Function. Publish.</p>
         </div>
         <div class="step" style="border:1px solid #58a6ff;border-radius:10px;padding:20px;background:#0d1117;">
@@ -658,6 +707,26 @@ body{padding-top:52px!important}
   }
   checkBrainstem();
   setInterval(checkBrainstem, 5000);
+
+  const solutionTrust = document.querySelector('[data-solution-download]');
+  if (solutionTrust) {
+    const acknowledgement = solutionTrust.querySelector('#solution-download-ack');
+    const downloadButton = solutionTrust.querySelector('#solution-download-button');
+    const status = solutionTrust.querySelector('#solution-download-status');
+    const syncSolutionDownload = () => {
+      downloadButton.disabled = !acknowledgement.checked;
+      status.textContent = acknowledgement.checked
+        ? 'Acknowledged. The solution download is enabled.'
+        : 'Check the acknowledgement to enable this download.';
+    };
+    acknowledgement.addEventListener('change', syncSolutionDownload);
+    downloadButton.addEventListener('click', () => {
+      if (downloadButton.disabled) return;
+      window.open('https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/MSFTAIBASMultiAgentCopilot_1_0_0_5.zip', '_blank', 'noopener,noreferrer');
+      acknowledgement.checked = false;
+      syncSolutionDownload();
+    });
+  }
 </script>
 
 <div style="max-width:620px;width:100%;margin:40px auto;padding:0 0 60px;">

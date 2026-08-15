@@ -195,22 +195,24 @@ class TestUnsupportedModelFallback(unittest.TestCase):
         # stream:true was actually requested
         self.assertTrue(post.call_args.kwargs["json"]["stream"])
 
-    def test_o1_model_omits_tool_choice(self):
+    def test_o1_model_omits_tool_choice_before_catalog_fetch(self):
         resp = FakeStreamResp(["data: [DONE]"], status=200)
-        brainstem._NO_TOOL_CHOICE_MODELS.add("o1-mini")
+        original = set(brainstem._NO_TOOL_CHOICE_MODELS)
+        brainstem._NO_TOOL_CHOICE_MODELS.clear()
         try:
             with mock.patch.object(brainstem, "get_copilot_token", return_value=("tok", "https://ep/v1")), \
                  mock.patch.object(brainstem.requests, "post", return_value=resp) as post:
                 gen = brainstem.call_copilot_stream(
-                    [{"role": "user", "content": "hi"}],
-                    tools=[{"type": "function", "function": {"name": "X"}}],
-                    model="o1-mini",
+                   [{"role": "user", "content": "hi"}],
+                   tools=[{"type": "function", "function": {"name": "X"}}],
+                   model="o1-preview",
                 )
                 list(gen)
             body = post.call_args.kwargs["json"]
             self.assertNotIn("tool_choice", body)
         finally:
-            brainstem._NO_TOOL_CHOICE_MODELS.discard("o1-mini")
+            brainstem._NO_TOOL_CHOICE_MODELS.clear()
+            brainstem._NO_TOOL_CHOICE_MODELS.update(original)
 
 
 class TestDisconnectCleanup(unittest.TestCase):
@@ -428,6 +430,25 @@ class TestChatStreamEndpoint(unittest.TestCase):
     def test_missing_user_input_is_400(self):
         resp = self.client.post("/chat/stream", json={"user_input": "   "})
         self.assertEqual(resp.status_code, 400)
+
+    def test_stream_rejects_non_object_json_with_chat_contract_error(self):
+        response = self.client.post(
+            "/chat/stream", data="[]", content_type="application/json")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.is_json)
+        self.assertEqual(
+            response.get_json()["error"], "Request body must be a JSON object")
+
+    def test_stream_setup_failure_is_a_safe_json_response(self):
+        with mock.patch.object(
+                brainstem, "load_soul", side_effect=OSError("private soul path")):
+            response = self.client.post("/chat/stream", json={"user_input": "hi"})
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue(response.is_json)
+        self.assertIn("Unable to prepare chat stream", response.get_json()["error"])
+        self.assertNotIn("private soul path", response.get_data(as_text=True))
 
     def test_disconnect_stops_generation_promptly(self):
         # Closing the client-side response iterator must propagate GeneratorExit into

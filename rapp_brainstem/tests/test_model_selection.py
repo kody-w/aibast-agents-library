@@ -8,6 +8,7 @@ Runs two ways:
 import os
 import sys
 import tempfile
+from unittest import mock
 
 BRAINSTEM_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BRAINSTEM_DIR not in sys.path:
@@ -146,6 +147,42 @@ def test_available_picker_and_caps():
 def test_available_conservative_on_garbage():
     assert bs._model_is_available({}) is True            # unknown => available
     assert bs._model_is_available("not-a-dict") is False  # malformed => unavailable
+
+
+def test_pinned_o1_omits_tool_choice_before_catalog_fetch():
+    """An o1 pin must work before /models can populate compatibility metadata."""
+    class FakeResponse:
+        status_code = 200
+        text = ""
+        encoding = None
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "choices": [{
+                    "message": {"role": "assistant", "content": "ok"},
+                    "finish_reason": "stop",
+                }],
+            }
+
+    original_model = bs.MODEL
+    original_no_tool_choice = set(bs._NO_TOOL_CHOICE_MODELS)
+    try:
+        bs.MODEL = "o1-preview"
+        bs._NO_TOOL_CHOICE_MODELS.clear()
+        with mock.patch.object(bs, "get_copilot_token", return_value=("token", "https://api.example")), \
+                mock.patch.object(bs.requests, "post", return_value=FakeResponse()) as post:
+            bs.call_copilot(
+                [{"role": "user", "content": "hi"}],
+                tools=[{"type": "function", "function": {"name": "Tool"}}],
+            )
+        assert "tool_choice" not in post.call_args.kwargs["json"]
+    finally:
+        bs.MODEL = original_model
+        bs._NO_TOOL_CHOICE_MODELS.clear()
+        bs._NO_TOOL_CHOICE_MODELS.update(original_no_tool_choice)
 
 
 # ── _auto_select_default_model ────────────────────────────────────────────────

@@ -1378,7 +1378,7 @@ body{padding-top:52px!important}
     </div>
 
     <!-- Main Content -->
-    <div class="main-content" id="mainContent">
+    <main class="main-content" id="mainContent">
 
         <!-- OVERVIEW SECTION -->
         <div class="content-section active" id="overview">
@@ -2019,27 +2019,27 @@ def handle_request(user_message, user_guid):
 
             <!-- GUT CHECK QUIZ -->
             <div class="gut-check" id="quiz-principles">
-                <div class="gut-check-header" onclick="toggleQuiz('quiz-principles')">
+                <div class="gut-check-header">
                     <h4>🧠 Gut Check: Core Principles</h4>
-                    <button class="gut-check-toggle">Take Quiz</button>
+                    <button class="gut-check-toggle" type="button" onclick="toggleQuiz('quiz-principles')" aria-controls="quiz-principles-content" aria-expanded="false">Take Quiz</button>
                 </div>
-                <div class="gut-check-content">
+                <div class="gut-check-content" id="quiz-principles-content">
                     <p class="quiz-question">What is the PRIMARY purpose of the 6 human quality gates in this framework?</p>
                     <div class="quiz-options">
-                        <label class="quiz-option" onclick="selectQuizOption('quiz-principles', 0)">
-                            <input type="radio" name="quiz-principles" value="0">
+                        <label class="quiz-option">
+                            <input type="radio" name="quiz-principles" value="0" onchange="selectQuizOption('quiz-principles', 0)">
                             <span>To slow down the process so AI doesn't make too many mistakes</span>
                         </label>
-                        <label class="quiz-option" onclick="selectQuizOption('quiz-principles', 1)">
-                            <input type="radio" name="quiz-principles" value="1">
+                        <label class="quiz-option">
+                            <input type="radio" name="quiz-principles" value="1" onchange="selectQuizOption('quiz-principles', 1)">
                             <span>To apply human judgment and prevent wasted cycles by catching problems early</span>
                         </label>
-                        <label class="quiz-option" onclick="selectQuizOption('quiz-principles', 2)">
-                            <input type="radio" name="quiz-principles" value="2">
+                        <label class="quiz-option">
+                            <input type="radio" name="quiz-principles" value="2" onchange="selectQuizOption('quiz-principles', 2)">
                             <span>To replace AI completely for critical decisions</span>
                         </label>
-                        <label class="quiz-option" onclick="selectQuizOption('quiz-principles', 3)">
-                            <input type="radio" name="quiz-principles" value="3">
+                        <label class="quiz-option">
+                            <input type="radio" name="quiz-principles" value="3" onchange="selectQuizOption('quiz-principles', 3)">
                             <span>To generate documentation for compliance purposes</span>
                         </label>
                     </div>
@@ -2243,8 +2243,8 @@ def handle_request(user_message, user_guid):
                 <p><strong>Location:</strong> <span class="agent-loc">Transcript-to-Project Agent — build this from the prompt below in Copilot Studio; the agent is not shared publicly.</span></p>
 
                 <div class="code-block" style="background: #fff3e0; border-left: 4px solid #f57c00; margin-top: 15px;">
-                    <div class="code-header" style="background: #ffb74d; border-bottom: 1px solid #f57c00; cursor: pointer;" onclick="toggleFallback('transcript-fallback')">
-                        <span class="code-language" style="color: #1a1a1a; font-weight: 600;">⚠️ Manual Fallback: Click to expand prompt (paste into Copilot if agent link isn't working)</span>
+                    <div class="code-header" style="background: #ffb74d; border-bottom: 1px solid #f57c00;">
+                        <button type="button" class="code-language" onclick="toggleFallback('transcript-fallback')" aria-controls="transcript-fallback" aria-expanded="false" style="color: #1a1a1a; font-weight: 600; background: transparent; border: 0; padding: 0; text-align: left; font: inherit; cursor: pointer;">⚠️ Manual Fallback: Click to expand prompt (paste into Copilot if agent link isn't working)</button>
                         <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this.parentElement.nextElementSibling)">Copy</button>
                     </div>
                     <pre id="transcript-fallback" style="display: none; white-space: pre-wrap; word-wrap: break-word; color: #1a1a1a; background: #fff; padding: 20px; margin: 0; border-top: 2px solid #f57c00;">You are a project data extraction assistant. Analyze the meeting transcript below and extract structured project information in JSON format that can be imported into the AI Agent Implementation Tracker.
@@ -2757,8 +2757,8 @@ Tone: Professional but approachable. We're confirming we heard them correctly, n
                 <p><strong>Location:</strong> <span class="agent-loc">RAPP Agent Generator — build this from the prompt below in Copilot Studio; the agent is not shared publicly.</span></p>
 
                 <div class="code-block" style="background: #fff3e0; border-left: 4px solid #f57c00; margin-top: 15px;">
-                    <div class="code-header" style="background: #ffb74d; border-bottom: 1px solid #f57c00; cursor: pointer;" onclick="toggleFallback('agent-generator-fallback')">
-                        <span class="code-language" style="color: #1a1a1a; font-weight: 600;">⚠️ Manual Fallback: Click to expand prompt (paste into Copilot if agent link isn't working)</span>
+                    <div class="code-header" style="background: #ffb74d; border-bottom: 1px solid #f57c00;">
+                        <button type="button" class="code-language" onclick="toggleFallback('agent-generator-fallback')" aria-controls="agent-generator-fallback" aria-expanded="false" style="color: #1a1a1a; font-weight: 600; background: transparent; border: 0; padding: 0; text-align: left; font: inherit; cursor: pointer;">⚠️ Manual Fallback: Click to expand prompt (paste into Copilot if agent link isn't working)</button>
                         <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this.parentElement.nextElementSibling)">Copy</button>
                     </div>
                     <pre id="agent-generator-fallback" style="display: none; white-space: pre-wrap; word-wrap: break-word; color: #1a1a1a; background: #fff; padding: 20px; margin: 0; border-top: 2px solid #f57c00;">You are a Python agent code generator for the Microsoft AIBAST RAPP framework. Generate production-ready agent code that follows the BasicAgent pattern and can be deployed to Azure Functions.
@@ -3930,11 +3930,11 @@ scope a Phase 2 project with those additional capabilities. Sound good?"</code><
                     <h4>🤖 Automation Tool: Video Demo Generator</h4>
                     <p><strong>Type:</strong> M365 Copilot Studio Declarative Agent</p>
                     <p><strong>Location:</strong> <span class="agent-loc">Video Demo Generator — build this from the prompt below in Copilot Studio; the agent is not shared publicly.</span></p>
-                    <p><strong>Local Tool:</strong> <a href="../tools/localfirst_chat_animation_studio_tool.html" target="_blank">Open Local-First Chat Animation Studio</a></p>
+                    <p><strong>Local Tool:</strong> <a href="../tools/localfirst_chat_animation_studio_tool.html" target="_blank" rel="noopener noreferrer">Open Local-First Chat Animation Studio</a></p>
 
                     <div class="code-block" style="background: #fff3e0; border-left: 4px solid #f57c00; margin-top: 15px;">
-                        <div class="code-header" style="background: #ffb74d; border-bottom: 1px solid #f57c00; cursor: pointer;" onclick="toggleFallback('video-demo-fallback')">
-                            <span class="code-language" style="color: #1a1a1a; font-weight: 600;">⚠️ Manual Fallback: Click to expand prompt (paste into Copilot if agent link isn't working)</span>
+                        <div class="code-header" style="background: #ffb74d; border-bottom: 1px solid #f57c00;">
+                            <button type="button" class="code-language" onclick="toggleFallback('video-demo-fallback')" aria-controls="video-demo-fallback" aria-expanded="false" style="color: #1a1a1a; font-weight: 600; background: transparent; border: 0; padding: 0; text-align: left; font: inherit; cursor: pointer;">⚠️ Manual Fallback: Click to expand prompt (paste into Copilot if agent link isn't working)</button>
                             <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this.parentElement.nextElementSibling)">Copy</button>
                         </div>
                         <pre id="video-demo-fallback" style="display: none; white-space: pre-wrap; word-wrap: break-word; color: #1a1a1a; background: #fff; padding: 20px; margin: 0; border-top: 2px solid #f57c00;">You are a demo video JSON generator for the Microsoft AIBAST RAPP framework. Generate structured demo configurations that work with the Local-First Chat Animation Studio tool.
@@ -5352,8 +5352,9 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; margin-top: 30px;">
 
                 <!-- Project Tracker Tool -->
-                <div class="tool-card" style="background: white; border-radius: 12px; padding: 30px; box-shadow: var(--shadow); transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent;"
-                     onclick="window.open('../tools/localfirst_project_tracker_tool.html', '_blank')"
+                <div class="tool-card" role="link" tabindex="0" aria-label="Open Project Tracker" style="background: white; border-radius: 12px; padding: 30px; box-shadow: var(--shadow); transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent;"
+                     onclick="window.open('../tools/localfirst_project_tracker_tool.html', '_blank', 'noopener,noreferrer')"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('../tools/localfirst_project_tracker_tool.html','_blank','noopener,noreferrer');}"
                      onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-lg)'; this.style.borderColor='var(--primary)';"
                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow)'; this.style.borderColor='transparent';">
 
@@ -5392,8 +5393,9 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
                 </div>
 
                 <!-- Chat Animation Studio Tool -->
-                <div class="tool-card" style="background: white; border-radius: 12px; padding: 30px; box-shadow: var(--shadow); transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent;"
-                     onclick="window.open('../tools/localfirst_chat_animation_studio_tool.html', '_blank')"
+                <div class="tool-card" role="link" tabindex="0" aria-label="Open Chat Animation Studio" style="background: white; border-radius: 12px; padding: 30px; box-shadow: var(--shadow); transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent;"
+                     onclick="window.open('../tools/localfirst_chat_animation_studio_tool.html', '_blank', 'noopener,noreferrer')"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('../tools/localfirst_chat_animation_studio_tool.html','_blank','noopener,noreferrer');}"
                      onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-lg)'; this.style.borderColor='var(--primary)';"
                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow)'; this.style.borderColor='transparent';">
 
@@ -5461,7 +5463,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
             </div>
         </div>
 
-    </div>
+    </main>
 
     <script>
         // State Management
@@ -5672,9 +5674,11 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
             if (fallbackElement.style.display === 'none') {
                 fallbackElement.style.display = 'block';
                 headerText.innerHTML = headerText.innerHTML.replace('Click to expand', 'Click to collapse');
+                headerText.setAttribute('aria-expanded', 'true');
             } else {
                 fallbackElement.style.display = 'none';
                 headerText.innerHTML = headerText.innerHTML.replace('Click to collapse', 'Click to expand');
+                headerText.setAttribute('aria-expanded', 'false');
             }
         }
 
@@ -5687,9 +5691,11 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
             if (content.classList.contains('expanded')) {
                 content.classList.remove('expanded');
                 toggle.textContent = 'Take Quiz';
+                toggle.setAttribute('aria-expanded', 'false');
             } else {
                 content.classList.add('expanded');
                 toggle.textContent = 'Hide Quiz';
+                toggle.setAttribute('aria-expanded', 'true');
             }
         }
 
@@ -5746,7 +5752,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' && tags.LastUsed<'2024-09
             } else {
                 feedbackHTML = `<div class="quiz-feedback-title">${incorrectFeedback.split('.')[0]}.</div><div class="quiz-feedback-text">${incorrectFeedback.split('.')[1] || incorrectFeedback}`;
                 if (reviewSection) {
-                    feedbackHTML += ` <span class="quiz-review-link" onclick="scrollToSection('${reviewSection}')">Review this section</span>.`;
+                    feedbackHTML += ` <a class="quiz-review-link" href="#${reviewSection}" onclick="scrollToSection('${reviewSection}'); return false;">Review this section</a>.`;
                 }
                 feedbackHTML += '</div>';
             }

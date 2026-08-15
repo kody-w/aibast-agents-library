@@ -211,8 +211,14 @@ class TestShimRegistration(unittest.TestCase):
         import brainstem
         brainstem._shims_registered = False
         for mod in list(sys.modules):
-            if mod.startswith("utils.azure") or mod.startswith("utils.dynamics"):
+            if (mod.startswith("utils.azure") or mod.startswith("utils.dynamics")
+                    or mod.startswith("utils.storage_factory")):
                 del sys.modules[mod]
+        utils_mod = sys.modules.get("utils")
+        if utils_mod:
+            for attr in ("azure_file_storage", "dynamics_storage", "storage_factory"):
+                if hasattr(utils_mod, attr):
+                    delattr(utils_mod, attr)
 
     def test_azure_storage_shim_imports(self):
         """After _register_shims(), `from utils.azure_file_storage import AzureFileStorageManager` should work."""
@@ -242,6 +248,18 @@ class TestShimRegistration(unittest.TestCase):
         from utils.dynamics_storage import DynamicsStorageManager
         mgr = DynamicsStorageManager()
         self.assertTrue(hasattr(mgr, "read_json"))
+
+    def test_dynamics_storage_shim_is_exposed_on_parent_package(self):
+        """Standard ``import utils.dynamics_storage`` must expose the child module."""
+        import importlib
+        import brainstem
+
+        brainstem._register_shims()
+        import utils
+        dynamics = importlib.import_module("utils.dynamics_storage")
+
+        self.assertIs(utils.dynamics_storage, dynamics)
+        self.assertTrue(hasattr(utils.dynamics_storage, "DynamicsStorageManager"))
 
 
 class TestAgentLoading(unittest.TestCase):
@@ -555,6 +573,70 @@ class TestLoginStateCleanup(unittest.TestCase):
         self.assertEqual(token, "ghu_new_account")
         self.assertIsNone(self.brainstem._copilot_token_cache["token"])
         self.assertFalse(os.path.exists(self.brainstem._copilot_cache_file))
+
+    def test_device_code_poll_encodes_opaque_device_code(self):
+        import time
+        from unittest.mock import MagicMock, patch
+
+        opaque_code = "device+code&with=reserved"
+        self.brainstem._pending_login = {
+            "device_code": opaque_code,
+            "expires_at": time.time() + 60,
+        }
+        response = MagicMock()
+        response.json.return_value = {"error": "authorization_pending"}
+
+        with patch.object(self.brainstem.requests, "post", return_value=response) as post:
+            self.assertIsNone(self.brainstem.poll_device_code())
+
+        self.assertEqual(post.call_args.kwargs["data"], {
+            "client_id": self.brainstem.COPILOT_CLIENT_ID,
+            "device_code": opaque_code,
+            "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+        })
+
+    def test_slow_down_interval_is_persisted_for_login_resume(self):
+        import time
+        from unittest.mock import MagicMock, patch
+
+        self.brainstem._pending_login = {
+            "device_code": "device-code",
+            "user_code": "USER-CODE",
+            "verification_uri": "https://github.com/login/device",
+            "interval": 5,
+            "expires_at": time.time() + 60,
+        }
+        self.brainstem._save_pending_login()
+        response = MagicMock()
+        response.json.return_value = {"error": "slow_down"}
+
+        with patch.object(self.brainstem.requests, "post", return_value=response):
+            self.assertIsNone(self.brainstem.poll_device_code())
+
+        with open(self.brainstem._pending_login_file, encoding="utf-8") as handle:
+            saved = json.load(handle)
+        self.assertEqual(saved["interval"], 10)
+
+    def test_refresh_encodes_opaque_refresh_token(self):
+        from unittest.mock import MagicMock, patch
+
+        opaque_token = "refresh+token&with=reserved"
+        response = MagicMock()
+        response.json.return_value = {"access_token": "ghu_replacement"}
+
+        with patch.object(self.brainstem, "_read_token_file", return_value={
+            "access_token": "ghu_old",
+            "refresh_token": opaque_token,
+        }), patch.object(self.brainstem.requests, "post", return_value=response) as post, \
+                patch.object(self.brainstem, "save_github_token") as save:
+            self.assertEqual(self.brainstem.refresh_github_token(), "ghu_replacement")
+
+        self.assertEqual(post.call_args.kwargs["data"], {
+            "client_id": self.brainstem.COPILOT_CLIENT_ID,
+            "grant_type": "refresh_token",
+            "refresh_token": opaque_token,
+        })
+        save.assert_called_once_with("ghu_replacement", opaque_token)
 
     def test_reuse_existing_code_preserves_login_result(self):
         """When reusing a non-expired code, _login_result should NOT be cleared."""

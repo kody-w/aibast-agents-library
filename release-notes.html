@@ -225,7 +225,7 @@ body{padding-top:52px!important}
 <!-- /aibast-shared-nav -->
 
 
-<div class="container">
+<main id="main" class="container">
 
   <div class="nav">
     <a class="back" href="index.html">← Home</a>
@@ -238,6 +238,32 @@ body{padding-top:52px!important}
   <div class="page-header">
     <h1>📋 Release Notes</h1>
     <p>Changelog for the RAPP Brainstem project.</p>
+  </div>
+
+  <!-- ── v0.6.16 ── -->
+  <div class="release">
+    <div class="release-header">
+      <span class="release-version">v0.6.16</span>
+      <span class="release-date">July 10, 2026</span>
+      <span class="release-tag">Current</span>
+    </div>
+    <div class="release-body">
+      <div class="highlight">
+        Current RAPP Brainstem release. The version is read from <code>rapp_brainstem/VERSION</code> and is also available from <code>GET /version</code>.
+      </div>
+
+      <h3>🔒 Secure-by-Default Local Operation</h3>
+      <ul>
+        <li>The server binds to loopback by default; LAN exposure is an explicit opt-in.</li>
+        <li>Browser access is limited to localhost origins, and LAN capability routes require the per-install secret for non-loopback callers.</li>
+      </ul>
+
+      <h3>🛠️ Reliability and Support</h3>
+      <ul>
+        <li>Request bodies are bounded to protect the local server from oversized uploads.</li>
+        <li>Diagnostic reports scrub secrets, likely personal data, local paths, and URL query strings before preparing an issue draft.</li>
+      </ul>
+    </div>
   </div>
 
   <!-- ── v0.6.0 ── -->
@@ -336,7 +362,7 @@ body{padding-top:52px!important}
     </div>
   </div>
 
-</div>
+</main>
 
 <div class="links">
   <a href="index.html">Home</a>

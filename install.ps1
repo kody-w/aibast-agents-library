@@ -54,16 +54,53 @@ function Compare-SemVer {
     return 0  # equal
 }
 
+function Test-VersionString {
+    # A version we can actually compare: digits and dots, nothing else. A captive
+    # portal, a corporate proxy error page, or a 404 body all come back as HTTP 200
+    # with HTML — casting that to [int] in Compare-SemVer throws, and under the
+    # script's $ErrorActionPreference='Stop' it kills the whole installer.
+    param([string]$Value)
+    if (-not $Value) { return $false }
+    return ($Value -match '^[0-9]+(\.[0-9]+)*$')
+}
+
+function Get-RemoteVersion {
+    # The released version, or "" when it cannot be determined (offline, blocked
+    # DNS, captive portal, garbage body). Never throws.
+    try {
+        $raw = (Invoke-WebRequest -Uri $REMOTE_VERSION_URL -UseBasicParsing -TimeoutSec 10).Content
+    } catch {
+        return ""
+    }
+    $value = "$raw".Trim()
+    if (Test-VersionString $value) { return $value }
+    return ""
+}
+
+function Get-LocalVersion {
+    # -Raw on an empty file returns $null; "$null".Trim() is "" but $null.Trim()
+    # is a terminating "you cannot call a method on a null-valued expression".
+    param([string]$Path)
+    if (-not (Test-Path $Path)) { return "" }
+    return "$(Get-Content $Path -Raw -ErrorAction SilentlyContinue)".Trim()
+}
+
 function Check-ForUpgrade {
     $versionFile = "$BRAINSTEM_HOME\src\rapp_brainstem\VERSION"
 
     if (-not (Test-Path $versionFile)) { return $true }
 
-    $localVersion = (Get-Content $versionFile -Raw).Trim()
+    $localVersion = Get-LocalVersion $versionFile
 
-    try {
-        $remoteVersion = (Invoke-WebRequest -Uri $REMOTE_VERSION_URL -UseBasicParsing -TimeoutSec 10).Content.Trim()
-    } catch {
+    # A missing or corrupt VERSION means we cannot reason about the install —
+    # take the full path and let it repair itself rather than claiming "up to date".
+    if (-not (Test-VersionString $localVersion)) {
+        Write-Host "  [!] Local version unreadable - reinstalling" -ForegroundColor Yellow
+        return $true
+    }
+
+    $remoteVersion = Get-RemoteVersion
+    if (-not $remoteVersion) {
         Write-Host "  [!] Could not check remote version - upgrading anyway" -ForegroundColor Yellow
         return $true
     }
@@ -444,27 +481,32 @@ function Install-Brainstem {
 
     if (Test-Path "$BRAINSTEM_HOME\src\.git") {
         # Smart update — preserve soul, agents, config
-        $LocalVer = "0.0.0"
         $VerFile = "$BRAINSTEM_HOME\src\rapp_brainstem\VERSION"
-        if (Test-Path $VerFile) { $LocalVer = (Get-Content $VerFile -Raw).Trim() }
+        $LocalVer = Get-LocalVersion $VerFile
+        if (-not $LocalVer) { $LocalVer = "0.0.0" }
+        # Empty means "could not be determined" (offline, captive portal, blocked
+        # DNS). We still refresh from origin — the git remote may be reachable when
+        # raw.githubusercontent.com is not — but we never print an unverified version.
         if ($PIN_VERSION) {
             $RemoteVer = ($PIN_VERSION -replace '^v', '')
         } else {
-            try { $RemoteVer = (Invoke-WebRequest -Uri $REMOTE_VERSION_URL -UseBasicParsing -TimeoutSec 5).Content.Trim() } catch { $RemoteVer = "0.0.0" }
+            $RemoteVer = Get-RemoteVersion
         }
 
         Write-Host "  Local:  v$LocalVer"
         if ($PIN_VERSION) {
             Write-Host "  Target: v$RemoteVer (pinned)"
-        } else {
+        } elseif ($RemoteVer) {
             Write-Host "  Remote: v$RemoteVer"
+        } else {
+            Write-Host "  Remote: unknown (could not reach github.com) - refreshing from origin"
         }
 
-        if ($LocalVer -eq $RemoteVer) {
+        if ($RemoteVer -and ($LocalVer -eq $RemoteVer)) {
             Write-Host "  [OK] Already up to date (v$LocalVer)" -ForegroundColor Green
         } else {
-            Write-Host "  Upgrading v$LocalVer -> v$RemoteVer..."
-            $Backup = "$env:TEMP\brainstem-upgrade-$(Get-Random)"
+            if ($RemoteVer) { Write-Host "  Upgrading v$LocalVer -> v$RemoteVer..." }
+            $Backup = Join-Path $env:TEMP "brainstem-upgrade-$([guid]::NewGuid().ToString('N'))"
             New-Item -ItemType Directory -Force -Path $Backup | Out-Null
 
             # Backup user files
@@ -566,8 +608,8 @@ function Install-Brainstem {
             Remove-Item -Recurse -Force $Backup -ErrorAction SilentlyContinue
             # Report the version actually on disk after the pull, not the remote string —
             # if the pull failed the banner must not claim a successful upgrade.
-            $NewVer = $LocalVer
-            if (Test-Path $VerFile) { $NewVer = (Get-Content $VerFile -Raw).Trim() }
+            $NewVer = Get-LocalVersion $VerFile
+            if (-not $NewVer) { $NewVer = $LocalVer }
             if ($pullOk -and $NewVer -ne $LocalVer) {
                 Write-Host "  [OK] Upgrade complete: v$LocalVer -> v$NewVer" -ForegroundColor Green
             } elseif ($pullOk) {
@@ -582,7 +624,7 @@ function Install-Brainstem {
         $FreshBackup = $null
         $srcRapp = "$BRAINSTEM_HOME\src\rapp_brainstem"
         if (Test-Path $srcRapp) {
-            $FreshBackup = "$env:TEMP\brainstem-fresh-$(Get-Random)"
+            $FreshBackup = Join-Path $env:TEMP "brainstem-fresh-$([guid]::NewGuid().ToString('N'))"
             New-Item -ItemType Directory -Force -Path "$FreshBackup\agents" | Out-Null
             if (Test-Path "$srcRapp\soul.md") { Copy-Item "$srcRapp\soul.md" "$FreshBackup\soul.md" -Force -ErrorAction SilentlyContinue }
             if (Test-Path "$srcRapp\.env") { Copy-Item "$srcRapp\.env" "$FreshBackup\.env" -Force -ErrorAction SilentlyContinue }
@@ -590,35 +632,60 @@ function Install-Brainstem {
             if (Test-Path "$srcRapp\.brainstem_data") { Copy-Item "$srcRapp\.brainstem_data" "$FreshBackup\.brainstem_data" -Recurse -Force -ErrorAction SilentlyContinue }
         }
 
-        if (Test-Path "$BRAINSTEM_HOME\src") {
-            Remove-Item -Recurse -Force "$BRAINSTEM_HOME\src" -ErrorAction SilentlyContinue
-        }
+        # Clone into a staging directory and only swap it in once it is complete.
+        # Deleting src first would mean a failed download (offline, proxy, disk
+        # full) leaves the user with no install at all — and nothing to re-run.
+        $NewSrc = "$BRAINSTEM_HOME\src.new"
+        if (Test-Path $NewSrc) { Remove-Item -Recurse -Force $NewSrc -ErrorAction SilentlyContinue }
         Write-Host "  Cloning repository..."
-        git clone --quiet $REPO_URL "$BRAINSTEM_HOME\src" 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "  [X] Failed to clone repository" -ForegroundColor Red
+        # Native stderr under the script's $ErrorActionPreference='Stop' is promoted
+        # to a terminating NativeCommandError, which would skip the friendly message
+        # below and surface git's raw output instead. Drop to Continue and inspect
+        # the exit code ourselves (same pattern as Run-PipInstall/Check-PythonDeps).
+        $prevEAP = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        git clone --quiet $REPO_URL $NewSrc 2>&1 | ForEach-Object { "$_" }
+        $cloneOk = ($LASTEXITCODE -eq 0)
+        $ErrorActionPreference = $prevEAP
+        if (-not $cloneOk) {
+            Remove-Item -Recurse -Force $NewSrc -ErrorAction SilentlyContinue
+            Write-Host "  [X] Could not download RAPP Brainstem from GitHub." -ForegroundColor Red
+            Write-Host "      Check your network/proxy and re-run the installer." -ForegroundColor Yellow
+            if ($FreshBackup) {
+                Write-Host "      Your existing files were left untouched (copy also at $FreshBackup)." -ForegroundColor Yellow
+            }
             throw "git clone failed"
         }
 
         if ($PIN_VERSION) {
             # Pin/RC-test: check out the requested release tag after cloning
             # (accepts v0.6.14 / 0.6.14 / brainstem-v0.6.14 forms like install.sh).
-            Push-Location "$BRAINSTEM_HOME\src"
+            Push-Location $NewSrc
             $prevEAP = $ErrorActionPreference
             $ErrorActionPreference = 'Continue'
             git fetch --tags --quiet origin 2>&1 | Out-Null
             $TagRef = Resolve-PinnedTag $PIN_VERSION
             if ($TagRef) {
                 git checkout --quiet $TagRef 2>&1 | Out-Null
+                if ($LASTEXITCODE -ne 0) { $TagRef = $null }
             } else {
                 Write-Host "  [X] Version $PIN_VERSION not found. Available versions:" -ForegroundColor Red
                 git tag -l 'brainstem-v*' 'v*' 2>&1 | Sort-Object | ForEach-Object { Write-Host "    $_" }
             }
             $ErrorActionPreference = $prevEAP
             Pop-Location
-            if (-not $TagRef) { throw "pinned version $PIN_VERSION not found" }
+            if (-not $TagRef) {
+                # The existing install is still intact — throw before the swap.
+                Remove-Item -Recurse -Force $NewSrc -ErrorAction SilentlyContinue
+                throw "pinned version $PIN_VERSION not found"
+            }
             Write-Host "  [OK] Checked out $TagRef" -ForegroundColor Green
         }
+
+        if (Test-Path "$BRAINSTEM_HOME\src") {
+            Remove-Item -Recurse -Force "$BRAINSTEM_HOME\src" -ErrorAction SilentlyContinue
+        }
+        Move-Item $NewSrc "$BRAINSTEM_HOME\src"
 
         # Restore any preserved user files over the fresh checkout.
         if ($FreshBackup) {
@@ -761,14 +828,20 @@ goto :eof
 :RAPP_VENV
 "$venvPy" brainstem.py %*
 "@
-    Set-Content -Path "$BRAINSTEM_BIN\brainstem.cmd" -Value $cmdContent
+    # cmd.exe reads .cmd files in the OEM code page, but Set-Content defaults to
+    # ANSI — the two disagree for any non-ASCII character, so a profile path like
+    # C:\Users\José\... came back mojibake and the wrapper could not cd into it.
+    Set-Content -Path "$BRAINSTEM_BIN\brainstem.cmd" -Value $cmdContent -Encoding Oem
 
     # PowerShell wrapper
     $psContent = @"
 Set-Location "$BRAINSTEM_HOME\src\rapp_brainstem"
 if (Test-Path "$venvPy") { & "$venvPy" brainstem.py @args } else { & "$sysPy" brainstem.py @args }
 "@
-    Set-Content -Path "$BRAINSTEM_BIN\brainstem.ps1" -Value $psContent
+    # UTF8 (with BOM, which is what PS 5.1 writes): 5.1 assumes ANSI for a BOM-less
+    # script and PowerShell 7 assumes UTF-8, so only the BOM makes a non-ASCII path
+    # in this wrapper readable by both.
+    Set-Content -Path "$BRAINSTEM_BIN\brainstem.ps1" -Value $psContent -Encoding UTF8
 
     # Add to PATH if not already there
     $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
@@ -841,8 +914,20 @@ function Launch-Brainstem {
                         $needsAuth = $false
                     }
                 } catch {
-                    Write-Host "  [..] Saved token expired - re-authenticating..." -ForegroundColor Yellow
-                    Remove-Item $tokenFile -Force -ErrorAction SilentlyContinue
+                    # A request that never reached GitHub (offline, captive portal,
+                    # proxy, DNS, timeout) carries no HTTP response and says NOTHING
+                    # about the token. Deleting it there would log the user out every
+                    # time they run the installer on a plane. Only a real HTTP
+                    # rejection means the token is dead. (Matches install.sh.)
+                    $status = $null
+                    if ($_.Exception.Response) { $status = $_.Exception.Response.StatusCode.value__ }
+                    if ($status) {
+                        Write-Host "  [..] Saved token expired - re-authenticating..." -ForegroundColor Yellow
+                        Remove-Item $tokenFile -Force -ErrorAction SilentlyContinue
+                    } else {
+                        Write-Host "  [!] Couldn't verify the saved token (no network) - keeping it" -ForegroundColor Yellow
+                        $needsAuth = $false
+                    }
                 }
             }
         } catch {
@@ -992,13 +1077,15 @@ function Main {
         Write-Host "Checking for updates..."
         if (-not (Check-ForUpgrade)) {
             # Already up to date — still re-heal the environment before launching,
-            # exactly like install.sh's fast path: verify prerequisites, the venv and
-            # deps, rewrite the CLI wrappers, and restore a missing .env (issues #9, #3).
+            # exactly like install.sh's fast path: verify prerequisites and the venv,
+            # rewrite the CLI wrappers, restore a missing .env (issues #9, #3), and
+            # only then check dependencies — a PyPI outage must not be the reason a
+            # user is left without a `brainstem` command on every single run.
             Check-Prerequisites
             Setup-Venv
-            Ensure-Dependencies
             Install-CLI
             Create-Env
+            Ensure-Dependencies
             Launch-Brainstem
             return
         }
@@ -1016,9 +1103,7 @@ function Main {
     Create-Env
     Setup-Dependencies
 
-    $installedVersion = ""
-    $vf = "$BRAINSTEM_HOME\src\rapp_brainstem\VERSION"
-    if (Test-Path $vf) { $installedVersion = (Get-Content $vf -Raw).Trim() }
+    $installedVersion = Get-LocalVersion "$BRAINSTEM_HOME\src\rapp_brainstem\VERSION"
 
     Write-Host ""
     Write-Host "===================================================" -ForegroundColor Cyan

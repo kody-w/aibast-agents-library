@@ -1,24 +1,34 @@
 # AIBAST RAR ratings refresh — the approved cat-agent-skills pattern:
-# harvest positive Discussion reactions (title = agent slug) into
-# rar/ratings.json daily; commit only when counts actually moved.
-# This bot commit to main is the sanctioned exception to the
-# no-direct-push rule (CLAUDE.md), scoped to exactly one file.
+# reconcile canonical per-agent Discussions, harvest positive reactions into
+# rar/ratings.json, and refresh the other GitHub-native snapshots daily.
+# This generated-data bot commit is the sanctioned exception to the
+# no-direct-push rule (CLAUDE.md).
 name: metrics
 on:
   workflow_dispatch:
   schedule:
     - cron: "0 6 * * *"
 permissions:
-  contents: write
-  discussions: read
+  contents: read
+# A manual run must not race the nightly one into the same commit.
+concurrency:
+  group: metrics
+  cancel-in-progress: false
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      discussions: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Reconcile AIBAST rating discussions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/create_discussions.py
       - name: Fetch ratings snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,12 +47,18 @@ jobs:
         run: python tools/fetch_traffic.py
       - name: Commit if changed
         run: |
-          if git diff --quiet -- rar/ratings.json rar/downloads.json rar/traffic.json rar/community.json; then
+          set -euo pipefail
+          if git diff --quiet -- rar/discussions.json rar/ratings.json rar/downloads.json rar/traffic.json rar/community.json; then
             echo "no rating movement — nothing to commit"
           else
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add rar/ratings.json rar/downloads.json rar/traffic.json rar/community.json
-            git commit -m "chore(metrics): refresh ratings, downloads, traffic"
-            git push
+            git add rar/discussions.json rar/ratings.json rar/downloads.json rar/traffic.json rar/community.json
+            git commit -m "chore(metrics): refresh discussions, ratings, downloads, traffic"
+            for attempt in 1 2 3; do
+              if git push; then exit 0; fi
+              git pull --rebase --autostash origin main
+            done
+            echo "::error::could not push metrics after 3 attempts"
+            exit 1
           fi

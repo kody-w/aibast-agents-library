@@ -37,6 +37,7 @@ import json
 import os
 import logging
 import re
+import threading
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Union, Any, List
 
@@ -83,6 +84,11 @@ class AzureFileStorageManager:
         """
         Initialize the storage manager with Entra ID authentication.
         """
+        # The manager is a process-wide singleton but each HTTP request is served on its
+        # own worker thread, so the active memory context must never be shared between
+        # threads or one user's request can read/write another user's memory.
+        self._memory_context = threading.local()
+
         # Get required configuration
         self.account_name = os.environ.get('AZURE_STORAGE_ACCOUNT_NAME')
         if not self.account_name:
@@ -103,7 +109,25 @@ class AzureFileStorageManager:
         
         # Ensure share and directories exist
         self._ensure_share_exists()
-    
+
+    @property
+    def current_guid(self) -> Optional[str]:
+        """GUID of the memory context active on the calling thread."""
+        return getattr(self._memory_context, 'guid', None)
+
+    @current_guid.setter
+    def current_guid(self, value: Optional[str]) -> None:
+        self._memory_context.guid = value
+
+    @property
+    def current_memory_path(self) -> str:
+        """Memory directory active on the calling thread (shared memory by default)."""
+        return getattr(self._memory_context, 'memory_path', None) or self.shared_memory_path
+
+    @current_memory_path.setter
+    def current_memory_path(self, value: str) -> None:
+        self._memory_context.memory_path = value
+
     def _init_auth(self):
         """
         Initialize authentication for Azure Files.

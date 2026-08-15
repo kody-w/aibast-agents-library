@@ -4,19 +4,36 @@ on:
   push:
     paths:
       - 'agents/**/*.py'
+      - 'agents/**/copilot_studio/manifest.json'
       - 'build_registry.py'
+      - 'build_rar.py'
+      - 'rapp_brainstem/VERSION'
       - '.github/workflows/build-registry.yml'
   pull_request:
     paths:
       - 'agents/**/*.py'
+      - 'agents/**/copilot_studio/manifest.json'
+      - 'build_registry.py'
+      - 'build_rar.py'
+      - 'rapp_brainstem/VERSION'
+      - '.github/workflows/build-registry.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+# Two pushes landing together would both try to commit registry.json and the
+# loser's push would be rejected. Serialise instead — and never cancel a run
+# that may be mid-push.
+concurrency:
+  group: build-registry-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build-registry:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -24,14 +41,28 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Build registry
-        run: python build_registry.py
+      - name: Build AIBAST registries and channel
+        run: |
+          python build_registry.py
+          python build_rar.py
 
-      - name: Commit registry.json
+      - name: Commit generated AIBAST artifacts
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
+          set -euo pipefail
           git config user.name "RAPP Registry Bot"
           git config user.email "rapp-bot@users.noreply.github.com"
-          git add registry.json
-          git diff --cached --quiet || git commit -m "Auto-build registry.json [skip ci]"
-          git push
+          git add registry.json rar/registry.json twin/stack_names.json \
+            rapp_brainstem/frontier-channel.json
+          if git diff --cached --quiet; then
+            echo "generated artifacts unchanged — nothing to commit"
+            exit 0
+          fi
+          git commit -m "Auto-build AIBAST registry artifacts [skip ci]"
+          # main can move while this job runs; rebase onto it rather than failing.
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            git pull --rebase --autostash origin main
+          done
+          echo "::error::could not push generated artifacts after 3 attempts"
+          exit 1

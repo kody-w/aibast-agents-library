@@ -12,6 +12,20 @@ REPO_URL="https://github.com/microsoft/aibast-agents-library.git"
 REMOTE_VERSION_URL="https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/VERSION"
 PIN_VERSION=""
 
+# The user's files live inside the checkout but are NOT in git. Every path the
+# backup/restore logic touches is defined once, here, so the exit trap can put
+# them back without depending on any function's locals.
+SRC_DIR="$BRAINSTEM_HOME/src"
+BRAINSTEM_SRC="$SRC_DIR/rapp_brainstem"
+AGENTS_DIR="$BRAINSTEM_SRC/agents"
+SOUL_FILE="$BRAINSTEM_SRC/soul.md"
+ENV_FILE="$BRAINSTEM_SRC/.env"
+DATA_DIR="$BRAINSTEM_SRC/.brainstem_data"
+LOCAL_VERSION_FILE="$BRAINSTEM_SRC/VERSION"
+# Outstanding backup directories — non-empty only while an install is mid-flight.
+UPGRADE_BACKUP=""
+FRESH_BACKUP=""
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -27,6 +41,108 @@ read_input() {
         read -p "$prompt" result < /dev/tty
     fi
     echo "${result:-$default}"
+}
+
+usage() {
+    cat <<'USAGE'
+  RAPP Brainstem installer
+
+  Usage:
+    curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash
+    curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash -s -- --version v0.6.0
+
+  Options:
+    --version <vX.Y.Z>   Install/pin a specific release instead of the latest
+    -h, --help           Show this help and exit
+
+  The installer preserves your soul.md, .env, custom agents, and memories.
+USAGE
+}
+
+# ── temp-file safety ──────────────────────────────────────────────────────────
+# Backups hold the user's .env — which carries their GITHUB_TOKEN — so they must
+# never land on a predictable, world-readable path (the old /tmp/...-$$ form was
+# guessable and pre-creatable by any other user on the box). mktemp gives us an
+# unguessable name we know we created; 700 keeps the contents ours.
+new_backup_dir() {
+    local d
+    d=$(mktemp -d "${TMPDIR:-/tmp}/brainstem-$1-XXXXXX") || return 1
+    chmod 700 "$d" 2>/dev/null || true
+    printf '%s' "$d"
+}
+
+# Put the user's files back from a backup, then delete it. Used both by the happy
+# path's caller (after which the global is cleared) and by the exit trap, so an
+# install that dies mid-upgrade can never leave the user without their soul,
+# config, or custom agents — and never leaves their token sitting in /tmp.
+restore_backup() {
+    local backup="$1"
+    [ -n "$backup" ] && [ -d "$backup" ] || return 0
+    if [ ! -d "$BRAINSTEM_SRC" ]; then
+        # There is no checkout to restore into (the install died between removing
+        # the old tree and moving the new one in). This backup is the only copy of
+        # the user's work — park it somewhere they can find, never delete it.
+        local rescue="$BRAINSTEM_HOME/rescued-$(basename "$backup")"
+        if mkdir -p "$BRAINSTEM_HOME" 2>/dev/null && mv "$backup" "$rescue" 2>/dev/null; then
+            echo -e "  ${YELLOW}⚠${NC} Saved your soul, config, and agents to ${rescue}"
+        else
+            echo -e "  ${YELLOW}⚠${NC} Your soul, config, and agents are still at ${backup}"
+        fi
+        return 0
+    fi
+    [ -f "$backup/soul.md" ] && cp "$backup/soul.md" "$SOUL_FILE" 2>/dev/null || true
+    [ -f "$backup/.env" ] && cp "$backup/.env" "$ENV_FILE" 2>/dev/null || true
+    if [ -d "$backup/agents" ] && [ -d "$AGENTS_DIR" ]; then
+        local af fn
+        for af in "$backup/agents"/*.py; do
+            [ -f "$af" ] || continue
+            fn=$(basename "$af")
+            # Never clobber a file the checkout ships — only fill in what is gone.
+            [ -e "$AGENTS_DIR/$fn" ] || cp "$af" "$AGENTS_DIR/$fn" 2>/dev/null || true
+        done
+    fi
+    [ -d "$backup/.brainstem_data" ] && [ ! -d "$DATA_DIR" ] && \
+        cp -R "$backup/.brainstem_data" "$DATA_DIR" 2>/dev/null || true
+    rm -rf "$backup" 2>/dev/null || true
+}
+
+# Runs on every exit path (including a `set -e` abort). No-op once the install
+# has cleared its backups; bash restores the original exit status afterwards.
+installer_exit_trap() {
+    local rc=$?
+    if [ -n "$UPGRADE_BACKUP" ] || [ -n "$FRESH_BACKUP" ]; then
+        echo ""
+        echo -e "  ${YELLOW}⚠${NC} Install interrupted — restoring your soul, config, and custom agents..."
+        restore_backup "$UPGRADE_BACKUP"
+        restore_backup "$FRESH_BACKUP"
+        UPGRADE_BACKUP=""
+        FRESH_BACKUP=""
+    fi
+    return $rc
+}
+trap installer_exit_trap EXIT
+
+# A version string we can actually compare: digits and dots, nothing else. A
+# captive portal, a proxy error page, or a 404 body all return HTTP 200 with
+# HTML — feeding that to the comparison prints bash arithmetic errors and
+# "upgrades" the user to garbage. Anything unparseable is treated as unknown.
+looks_like_version() {
+    local v="$1"
+    [ -n "$v" ] && [ "${#v}" -le 32 ] || return 1
+    case "$v" in
+        *[!0-9.]*|.*|*.) return 1 ;;
+    esac
+    return 0
+}
+
+# Echo the released version, or nothing (and return 1) when it can't be
+# determined. --max-time is mandatory: a black-holed DNS or a captive portal
+# that swallows packets would otherwise hang the installer indefinitely.
+fetch_remote_version() {
+    local v
+    v=$(curl -fsSL --max-time 15 "$REMOTE_VERSION_URL" 2>/dev/null | head -1 | tr -d '[:space:]') || true
+    looks_like_version "$v" || return 1
+    printf '%s' "$v"
 }
 
 print_banner() {
@@ -102,6 +218,7 @@ install_python() {
 
 # Compare two semver strings. Returns 0 if $1 > $2, 1 otherwise.
 version_gt() {
+    looks_like_version "$1" && looks_like_version "$2" || return 1
     local IFS=.
     local i a=($1) b=($2)
     for ((i=0; i<${#a[@]}; i++)); do
@@ -114,7 +231,7 @@ version_gt() {
 }
 
 check_for_upgrade() {
-    local version_file="$BRAINSTEM_HOME/src/rapp_brainstem/VERSION"
+    local version_file="$LOCAL_VERSION_FILE"
 
     # No existing install — always proceed
     if [ ! -f "$version_file" ]; then
@@ -124,9 +241,16 @@ check_for_upgrade() {
     local local_version
     local_version=$(cat "$version_file" 2>/dev/null | tr -d '[:space:]')
 
+    # A missing or corrupt VERSION means we cannot reason about the install —
+    # take the full path and let it repair itself rather than claiming "up to date".
+    if ! looks_like_version "$local_version"; then
+        echo -e "  ${YELLOW}⚠${NC} Local version unreadable — reinstalling"
+        return 0
+    fi
+
     # Fetch remote version
     local remote_version
-    remote_version=$(curl -fsSL "$REMOTE_VERSION_URL" 2>/dev/null | tr -d '[:space:]') || true
+    remote_version=$(fetch_remote_version) || true
 
     if [[ -z "$remote_version" ]]; then
         echo -e "  ${YELLOW}⚠${NC} Could not check remote version — upgrading anyway"
@@ -278,36 +402,44 @@ install_brainstem() {
     echo "Installing RAPP Brainstem..."
     mkdir -p "$BRAINSTEM_HOME"
 
-    local AGENTS_DIR="$BRAINSTEM_HOME/src/rapp_brainstem/agents"
-    local SOUL_FILE="$BRAINSTEM_HOME/src/rapp_brainstem/soul.md"
-    local ENV_FILE="$BRAINSTEM_HOME/src/rapp_brainstem/.env"
-    local DATA_DIR="$BRAINSTEM_HOME/src/rapp_brainstem/.brainstem_data"
-    local LOCAL_VERSION_FILE="$BRAINSTEM_HOME/src/rapp_brainstem/VERSION"
-
-    if [ -d "$BRAINSTEM_HOME/src/.git" ]; then
+    if [ -d "$SRC_DIR/.git" ]; then
         # ── SMART UPDATE: preserve local files, upgrade framework ──
         local LOCAL_VER="0.0.0"
-        [ -f "$LOCAL_VERSION_FILE" ] && LOCAL_VER=$(cat "$LOCAL_VERSION_FILE" 2>/dev/null || echo "0.0.0")
+        [ -f "$LOCAL_VERSION_FILE" ] && LOCAL_VER=$(tr -d '[:space:]' < "$LOCAL_VERSION_FILE" 2>/dev/null || echo "0.0.0")
+        [ -n "$LOCAL_VER" ] || LOCAL_VER="0.0.0"
 
-        local TARGET_VER
+        # Empty means "couldn't be determined" (offline, captive portal, blocked
+        # DNS). We still refresh from origin — the git remote may be reachable
+        # even when raw.githubusercontent.com is not — but we never print a
+        # version we did not verify.
+        local TARGET_VER=""
         if [ -n "$PIN_VERSION" ]; then
             # Strip leading 'v' for comparison (v0.6.0 → 0.6.0)
             TARGET_VER="${PIN_VERSION#v}"
         else
-            TARGET_VER=$(curl -sf "$REMOTE_VERSION_URL" 2>/dev/null || echo "0.0.0")
+            TARGET_VER=$(fetch_remote_version) || true
         fi
 
         echo "  Local:  v${LOCAL_VER}"
-        echo "  Target: v${TARGET_VER}${PIN_VERSION:+ (pinned)}"
+        if [ -n "$TARGET_VER" ]; then
+            echo "  Target: v${TARGET_VER}${PIN_VERSION:+ (pinned)}"
+        else
+            echo "  Target: unknown (could not reach github.com) — refreshing from origin"
+        fi
 
-        if [ "$LOCAL_VER" = "$TARGET_VER" ]; then
+        if [ -n "$TARGET_VER" ] && [ "$LOCAL_VER" = "$TARGET_VER" ]; then
             echo -e "  ${GREEN}✓${NC} Already on v${LOCAL_VER}"
         else
-            echo "  Switching v${LOCAL_VER} → v${TARGET_VER}..."
+            if [ -n "$TARGET_VER" ]; then
+                echo "  Switching v${LOCAL_VER} → v${TARGET_VER}..."
+            fi
 
             # 1. Backup user's local files (soul, custom agents, .env)
-            local BACKUP="/tmp/brainstem-upgrade-$$"
-            mkdir -p "$BACKUP"
+            UPGRADE_BACKUP=$(new_backup_dir upgrade) || {
+                echo -e "  ${RED}✗${NC} Could not create a temporary backup directory"
+                exit 1
+            }
+            local BACKUP="$UPGRADE_BACKUP"
             [ -f "$SOUL_FILE" ] && cp "$SOUL_FILE" "$BACKUP/soul.md"
             [ -f "$ENV_FILE" ] && cp "$ENV_FILE" "$BACKUP/.env"
             if [ -d "$AGENTS_DIR" ]; then
@@ -318,11 +450,17 @@ install_brainstem() {
             echo -e "  ${GREEN}✓${NC} Backed up soul, agents, config"
 
             # 2. Fetch and checkout target version.
-            # Guard the fetch: offline (or a black-holed github) must not abort the
-            # whole script under `set -e` — we fall back to whatever is already local.
-            cd "$BRAINSTEM_HOME/src"
+            # Guard every git call: offline (or a black-holed github) must not abort
+            # the whole script under `set -e` — we fall back to whatever is already
+            # local and say so, instead of claiming an upgrade that never happened.
+            cd "$SRC_DIR"
+            # An install cloned from an older origin (a fork, or this project's
+            # pre-Microsoft home) would otherwise keep pulling the wrong repository
+            # forever. Point it at the repo this installer belongs to.
+            git remote set-url origin "$REPO_URL" 2>/dev/null || true
             git stash --quiet 2>/dev/null || true
             git fetch origin --tags --quiet 2>/dev/null || true
+            local UPDATE_OK=false
             if [ -n "$PIN_VERSION" ]; then
                 # Resolve the pin against every tag form we ship: the documented
                 # v0.6.0 UX, a bare 0.6.0, and the actual release tag brainstem-v0.6.0.
@@ -330,24 +468,39 @@ install_brainstem() {
                 for cand in "$PIN_VERSION" "v${PIN_VERSION#v}" "brainstem-${PIN_VERSION#v}" "brainstem-v${PIN_VERSION#v}"; do
                     if git rev-parse "$cand" >/dev/null 2>&1; then TAG_REF="$cand"; break; fi
                 done
-                if [ -n "$TAG_REF" ]; then
-                    git checkout "$TAG_REF" --quiet 2>/dev/null
-                    echo -e "  ${GREEN}✓${NC} Checked out ${TAG_REF}"
-                else
+                if [ -z "$TAG_REF" ]; then
                     echo -e "  ${RED}✗${NC} Version ${PIN_VERSION} not found. Available versions:"
                     git tag -l 'brainstem-v*' 'v*' | sort -V | sed 's/^/    /'
+                    # The exit trap restores the backup taken above, so a bad pin
+                    # never costs the user their soul, config, or agents.
                     exit 1
                 fi
+                if git checkout "$TAG_REF" --quiet 2>/dev/null; then
+                    UPDATE_OK=true
+                    echo -e "  ${GREEN}✓${NC} Checked out ${TAG_REF}"
+                else
+                    echo -e "  ${YELLOW}⚠${NC} Could not check out ${TAG_REF} — keeping v${LOCAL_VER}"
+                fi
             else
-                git pull --quiet 2>/dev/null || git reset --hard origin/main --quiet 2>/dev/null || echo -e "  ${YELLOW}Warning: Could not update${NC}"
-                echo -e "  ${GREEN}✓${NC} Framework updated"
+                # fetch + reset, not pull: it survives a detached HEAD (left by an
+                # earlier --version pin) and an unrelated history (an old fork).
+                if git fetch origin main --quiet 2>/dev/null && \
+                   git reset --hard FETCH_HEAD --quiet 2>/dev/null; then
+                    UPDATE_OK=true
+                    echo -e "  ${GREEN}✓${NC} Framework updated"
+                elif git pull --quiet 2>/dev/null; then
+                    UPDATE_OK=true
+                    echo -e "  ${GREEN}✓${NC} Framework updated"
+                else
+                    echo -e "  ${YELLOW}⚠${NC} Could not download the update — keeping v${LOCAL_VER}"
+                fi
             fi
 
             # 3. Restore user's local files (merge, don't overwrite)
             # soul.md: refresh it only when the pre-upgrade file was an unmodified
             # historical default (issue #40); any customization is preserved as-is.
             if [ -f "$BACKUP/soul.md" ]; then
-                if ! maybe_refresh_soul "$BACKUP/soul.md" "$SOUL_FILE"; then
+                if ! { [ "$UPDATE_OK" = true ] && maybe_refresh_soul "$BACKUP/soul.md" "$SOUL_FILE"; }; then
                     cp "$BACKUP/soul.md" "$SOUL_FILE"
                 fi
             fi
@@ -378,9 +531,24 @@ install_brainstem() {
                 echo -e "  ${GREEN}✓${NC} Restored custom agents + soul + config"
             fi
 
-            # 4. Clean up backup
+            # 4. Clean up backup — the user's files are back in place, so the exit
+            # trap has nothing left to restore.
             rm -rf "$BACKUP"
-            echo -e "  ${GREEN}✓${NC} ${PIN_VERSION:+Pinned to}${PIN_VERSION:-Upgrade complete:} v${TARGET_VER}"
+            UPGRADE_BACKUP=""
+
+            # 5. Report the version that is actually on disk. Announcing the target
+            # would claim a successful upgrade even when the download failed.
+            local NEW_VER="$LOCAL_VER"
+            [ -f "$LOCAL_VERSION_FILE" ] && NEW_VER=$(tr -d '[:space:]' < "$LOCAL_VERSION_FILE" 2>/dev/null || echo "$LOCAL_VER")
+            if [ "$UPDATE_OK" = true ] && [ -n "$PIN_VERSION" ]; then
+                echo -e "  ${GREEN}✓${NC} Pinned to v${NEW_VER}"
+            elif [ "$UPDATE_OK" = true ] && [ "$NEW_VER" != "$LOCAL_VER" ]; then
+                echo -e "  ${GREEN}✓${NC} Upgrade complete: v${LOCAL_VER} → v${NEW_VER}"
+            elif [ "$UPDATE_OK" = true ]; then
+                echo -e "  ${GREEN}✓${NC} Already at the latest framework (v${NEW_VER})"
+            else
+                echo -e "  ${YELLOW}⚠${NC} Still on v${NEW_VER} — re-run the installer when you're back online"
+            fi
         fi
     else
         echo "  Fresh install — cloning repository..."
@@ -388,34 +556,53 @@ install_brainstem() {
         # soul, .env, and custom agents — none of which are in git. Preserve them
         # before wiping so a re-run can't silently destroy the user's work. The common
         # case (no existing src) leaves FRESH_BACKUP empty and skips all of this.
-        local FRESH_BACKUP=""
-        if [ -d "$BRAINSTEM_HOME/src/rapp_brainstem" ]; then
-            FRESH_BACKUP=$(mktemp -d "${TMPDIR:-/tmp}/brainstem-fresh-XXXXXX")
+        FRESH_BACKUP=""
+        if [ -d "$BRAINSTEM_SRC" ]; then
+            FRESH_BACKUP=$(new_backup_dir fresh) || {
+                echo -e "  ${RED}✗${NC} Could not create a temporary backup directory"
+                exit 1
+            }
             mkdir -p "$FRESH_BACKUP/agents"
             [ -f "$SOUL_FILE" ] && cp "$SOUL_FILE" "$FRESH_BACKUP/soul.md" 2>/dev/null || true
             [ -f "$ENV_FILE" ] && cp "$ENV_FILE" "$FRESH_BACKUP/.env" 2>/dev/null || true
             [ -d "$AGENTS_DIR" ] && cp "$AGENTS_DIR"/*.py "$FRESH_BACKUP/agents/" 2>/dev/null || true
             [ -d "$DATA_DIR" ] && cp -R "$DATA_DIR" "$FRESH_BACKUP/.brainstem_data" 2>/dev/null || true
         fi
-        rm -rf "$BRAINSTEM_HOME/src" 2>/dev/null || true
-        git clone --quiet "$REPO_URL" "$BRAINSTEM_HOME/src"
+
+        # Clone into a staging directory and only swap it in once it is complete.
+        # Deleting src first would mean a failed download (offline, proxy, disk
+        # full) leaves the user with no install at all — and nothing to re-run.
+        local NEW_SRC="$SRC_DIR.new.$$"
+        rm -rf "$NEW_SRC" 2>/dev/null || true
+        if ! git clone --quiet "$REPO_URL" "$NEW_SRC"; then
+            rm -rf "$NEW_SRC" 2>/dev/null || true
+            echo -e "  ${RED}✗${NC} Could not download RAPP Brainstem from GitHub."
+            echo "    Check your network/proxy and re-run the installer."
+            echo "    Your existing files were left untouched."
+            exit 1
+        fi
         # If pinning, checkout the specific tag after clone (accepts every tag form).
         if [ -n "$PIN_VERSION" ]; then
-            cd "$BRAINSTEM_HOME/src"
+            cd "$NEW_SRC"
             git fetch origin --tags --quiet 2>/dev/null || true
             TAG_REF=""
             for cand in "$PIN_VERSION" "v${PIN_VERSION#v}" "brainstem-${PIN_VERSION#v}" "brainstem-v${PIN_VERSION#v}"; do
                 if git rev-parse "$cand" >/dev/null 2>&1; then TAG_REF="$cand"; break; fi
             done
-            if [ -n "$TAG_REF" ]; then
-                git checkout "$TAG_REF" --quiet 2>/dev/null
+            if [ -n "$TAG_REF" ] && git checkout "$TAG_REF" --quiet 2>/dev/null; then
                 echo -e "  ${GREEN}✓${NC} Checked out ${TAG_REF}"
             else
                 echo -e "  ${RED}✗${NC} Version ${PIN_VERSION} not found. Available versions:"
                 git tag -l 'brainstem-v*' 'v*' | sort -V | sed 's/^/    /'
+                cd "$BRAINSTEM_HOME"
+                rm -rf "$NEW_SRC" 2>/dev/null || true
                 exit 1
             fi
+            cd "$BRAINSTEM_HOME"
         fi
+        rm -rf "$SRC_DIR" 2>/dev/null || true
+        mv "$NEW_SRC" "$SRC_DIR"
+
         # Restore any preserved user files over the fresh checkout.
         if [ -n "$FRESH_BACKUP" ]; then
             local FRESH_SHIPPED=""
@@ -434,6 +621,7 @@ install_brainstem() {
             done
             [ -d "$FRESH_BACKUP/.brainstem_data" ] && cp -R "$FRESH_BACKUP/.brainstem_data" "$DATA_DIR" 2>/dev/null || true
             rm -rf "$FRESH_BACKUP"
+            FRESH_BACKUP=""
             echo -e "  ${GREEN}✓${NC} Preserved your soul, agents, memories, and config"
         fi
     fi
@@ -512,12 +700,22 @@ install_cli() {
 #!/bin/bash
 BRAINSTEM_HOME="$HOME/.brainstem"
 VENV_PYTHON="$BRAINSTEM_HOME/venv/bin/python"
-cd "$BRAINSTEM_HOME/src/rapp_brainstem"
+# Never fall through to the caller's directory: `python brainstem.py` there fails
+# with a bare "can't open file" instead of telling the user what is wrong.
+cd "$BRAINSTEM_HOME/src/rapp_brainstem" 2>/dev/null || {
+    echo "brainstem: no install found at $BRAINSTEM_HOME/src/rapp_brainstem" >&2
+    echo "  Reinstall: curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash" >&2
+    exit 1
+}
 
 # Use venv Python; fall back to creating venv if missing
 if [ ! -x "$VENV_PYTHON" ]; then
     echo "  Setting up environment..."
     PYTHON_CMD=$(command -v python3.11 || command -v python3.12 || command -v python3.13 || command -v python3)
+    if [ -z "$PYTHON_CMD" ]; then
+        echo "brainstem: no Python 3.11+ found on PATH" >&2
+        exit 1
+    fi
     "$PYTHON_CMD" -m venv "$BRAINSTEM_HOME/venv" 2>/dev/null
     "$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || \
         "$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt
@@ -561,9 +759,10 @@ create_env() {
 launch_brainstem() {
     export PATH="$BRAINSTEM_BIN:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-    # Always pull latest code before launching
-    if [ -d "$BRAINSTEM_HOME/src/.git" ]; then
-        cd "$BRAINSTEM_HOME/src"
+    # Always pull latest code before launching — but never when a version is
+    # pinned, or the pull would silently drag the user off the tag they asked for.
+    if [ -z "$PIN_VERSION" ] && [ -d "$SRC_DIR/.git" ]; then
+        cd "$SRC_DIR"
         git pull --quiet 2>/dev/null || true
     fi
 
@@ -736,16 +935,34 @@ with open(sys.argv[2], 'w') as f: json.dump(out, f)
     echo -e "  ${CYAN}Starting RAPP Brainstem...${NC}"
     echo ""
 
-    cd "$BRAINSTEM_HOME/src/rapp_brainstem"
+    cd "$BRAINSTEM_SRC"
 
-    # Kill any existing brainstem on port 7071 before starting
-    local existing_pid
-    existing_pid=$(lsof -ti:7071 2>/dev/null | head -1)
-    if [ -n "$existing_pid" ]; then
-        echo -e "  ${YELLOW}⚠${NC} Stopping existing server (PID $existing_pid)..."
-        kill "$existing_pid" 2>/dev/null
-        sleep 1
-    fi
+    # Free port 7071 — but only from a brainstem. Killing whatever happens to hold
+    # the port would take down an unrelated dev server without warning.
+    local existing_pid existing_cmd
+    for existing_pid in $(lsof -ti:7071 2>/dev/null || true); do
+        [ -n "$existing_pid" ] || continue
+        existing_cmd=$(ps -p "$existing_pid" -o command= 2>/dev/null || true)
+        case "$existing_cmd" in
+            *brainstem.py*)
+                echo -e "  ${YELLOW}⚠${NC} Stopping existing brainstem (PID $existing_pid)..."
+                kill "$existing_pid" 2>/dev/null || true
+                # Wait for the port to actually free instead of guessing.
+                local _w
+                for _w in 1 2 3 4 5; do
+                    kill -0 "$existing_pid" 2>/dev/null || break
+                    sleep 1
+                done
+                ;;
+            "")
+                # Couldn't identify it (no ps, or it exited already) — leave it alone.
+                ;;
+            *)
+                echo -e "  ${YELLOW}⚠${NC} Port 7071 is in use by PID $existing_pid ($(echo "$existing_cmd" | cut -c1-60))"
+                echo -e "     Not stopping it — quit that process first if brainstem fails to start."
+                ;;
+        esac
+    done
 
     # Open the browser once the server actually answers (#14) — a fixed delay
     # races cold startups (token exchange, dep installs) and lands the user on
@@ -789,11 +1006,37 @@ main() {
     # Parse arguments (e.g. --version v0.6.0)
     while [ $# -gt 0 ]; do
         case "$1" in
+            --version=*)
+                PIN_VERSION="${1#*=}"
+                if [ -z "$PIN_VERSION" ]; then
+                    echo -e "  ${RED}✗${NC} --version needs a value, e.g. --version v0.6.0" >&2
+                    exit 2
+                fi
+                shift
+                ;;
             --version)
-                PIN_VERSION="$2"
+                # A bare `--version` used to run off the end of the argument list:
+                # `shift 2` failed and `set -e` killed the installer with no output
+                # at all. Say what is wrong instead.
+                PIN_VERSION="${2:-}"
+                case "$PIN_VERSION" in
+                    ""|-*)
+                        echo -e "  ${RED}✗${NC} --version needs a value, e.g. --version v0.6.0" >&2
+                        echo "" >&2
+                        usage >&2
+                        exit 2
+                        ;;
+                esac
                 shift 2
                 ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
             *)
+                # Never silently swallow a typo like `--verison v0.6.0` — the user
+                # would get the latest release while believing they pinned one.
+                echo -e "  ${YELLOW}⚠${NC} Ignoring unknown option: $1" >&2
                 shift
                 ;;
         esac
@@ -808,15 +1051,18 @@ main() {
 
     # Check if this is an upgrade of an existing install
     # Skip the shortcut when --version is specified (always go through install_brainstem)
-    if [ -z "$PIN_VERSION" ] && [ -d "$BRAINSTEM_HOME/src/.git" ]; then
+    if [ -z "$PIN_VERSION" ] && [ -d "$SRC_DIR/.git" ]; then
         echo "Checking for updates..."
         if ! check_for_upgrade; then
-            # Already up to date — still verify everything works before launching
+            # Already up to date — still verify everything works before launching.
+            # The CLI wrapper and .env come BEFORE dependencies: they are cheap and
+            # offline-safe, and a PyPI outage must not leave the user without a
+            # `brainstem` command every single run.
             check_prereqs
             setup_venv
-            ensure_deps
             install_cli
             create_env
+            ensure_deps
             export PATH="$BRAINSTEM_BIN:/opt/homebrew/bin:/usr/local/bin:$PATH"
             launch_brainstem
             exit $?  # launch uses exec, but guard against fall-through
@@ -827,15 +1073,18 @@ main() {
     check_prereqs
     install_brainstem
     setup_venv
-    setup_deps
+    # Same ordering as the fast path: if setup_deps fails, VERSION already matches
+    # the remote, so a re-run takes the "already up to date" path — which must not
+    # be the only thing that ever installs the CLI wrapper and .env.
     install_cli
     create_env
+    setup_deps
 
     # Make sure brainstem and gh are on PATH for this session
     export PATH="$BRAINSTEM_BIN:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
     local installed_version
-    installed_version=$(cat "$BRAINSTEM_HOME/src/rapp_brainstem/VERSION" 2>/dev/null | tr -d '[:space:]')
+    installed_version=$(cat "$LOCAL_VERSION_FILE" 2>/dev/null | tr -d '[:space:]')
 
     echo ""
     echo "═══════════════════════════════════════════════════"

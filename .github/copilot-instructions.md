@@ -123,7 +123,7 @@ class MyAgent(BasicAgent):
 
 - **Python 3.11** target runtime; venv at `~/.brainstem/venv`
 - **No API keys** for local dev — GitHub Copilot token exchange handles auth
-- **Config via `.env`** — `GITHUB_TOKEN`, `GITHUB_MODEL` (`auto` by default), `SOUL_PATH`, `AGENTS_PATH`, `PORT`, `BRAINSTEM_LAN_MODE`, `BRAINSTEM_ALLOWED_HOSTS`, `VOICE_ZIP_PASSWORD` (see `.env.example`)
+- **Config via `.env`** — `GITHUB_TOKEN`, `GITHUB_MODEL` (`auto` by default), `SOUL_PATH`, `AGENTS_PATH`, `PORT`, `BRAINSTEM_LAN_MODE`, `BRAINSTEM_ALLOWED_HOSTS`, `BRAINSTEM_UPDATE_CHANNEL_URL`, `VOICE_ZIP_PASSWORD` (see `rapp_brainstem/.env.example`)
 - **Local-first storage**: `local_storage.py` stores to `.brainstem_data/` on disk, mirroring the CommunityRAPP Azure File Storage layout (`shared_memories/memory.json` for shared, `memory/{guid}/user_memory.json` for per-user)
 - **Soul file** (`soul.md`): System prompt loaded as the first message in every conversation. Users customize by editing it or pointing `SOUL_PATH` to their own
 - **Skill-based onboarding**: `skill.md` uses the Moltbook pattern — YAML frontmatter, autonomous execution steps, ⏸️ pause points for user input, state saved to `~/.config/brainstem/state.json`

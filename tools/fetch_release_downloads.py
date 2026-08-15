@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Harvest per-asset download counts from GitHub Releases into
 rar/downloads.json — real, GitHub-native numbers (an upgrade over the
-upstream pattern's hand-maintained Clarity CSV). Asset filename stem maps
-to the agent slug (underscores normalized to hyphens, _agent/_team suffixes
-dropped). Non-fatal; never clobbers non-empty data with empty."""
+upstream pattern's hand-maintained Clarity CSV). Assets map through the
+catalog's collision-safe _install_filename, with the original slug-derived
+release name retained for historical counts. Non-fatal; never clobbers
+non-empty data with empty."""
 import json
 import os
-import re
 import sys
 import urllib.request
 from pathlib import Path
@@ -14,6 +14,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "rar" / "downloads.json"
 CFG = json.loads((ROOT / "rar" / "ratings-config.json").read_text())
+
+
+def build_asset_slug_map(agents):
+    """Map current and legacy release filenames when they identify one agent."""
+    candidates = {}
+    for agent in agents:
+        slug = agent["name"].split("/", maxsplit=1)[1]
+        filenames = {
+            agent["_install_filename"],
+            f"{slug.replace('-', '_')}_agent.py",
+        }
+        for filename in filenames:
+            candidates.setdefault(filename, set()).add(slug)
+    return {
+        filename: next(iter(slugs))
+        for filename, slugs in candidates.items()
+        if len(slugs) == 1
+    }
 
 
 def main():
@@ -26,20 +44,23 @@ def main():
             **({"Authorization": f"bearer {token}"} if token else {})})
         with urllib.request.urlopen(req, timeout=30) as r:
             releases = json.load(r)
-        slugs = {a["name"].split("/")[1] for a in
-                 json.loads((ROOT / "rar" / "registry.json").read_text())["agents"]}
+        agents = json.loads(
+            (ROOT / "rar" / "registry.json").read_text()
+        )["agents"]
+        asset_slugs = build_asset_slug_map(agents)
         by_tag = {}
         for rel in releases:
             tag = rel.get("tag_name", "untagged")
             for asset in rel.get("assets", []):
                 by_tag.setdefault(tag, 0)
                 by_tag[tag] += asset.get("download_count", 0)
-                stem = re.sub(r"\.(py|zip|md)$", "", asset["name"])
-                stem = re.sub(r"_(team_workshop_)?agent$", "", stem).replace("_", "-")
-                if stem in slugs:
-                    counts[stem] = counts.get(stem, 0) + asset.get("download_count", 0)
+                asset_name = asset.get("name", "")
+                slug = asset_slugs.get(asset_name)
+                if slug:
+                    counts[slug] = counts.get(slug, 0) + asset.get("download_count", 0)
                 else:
-                    counts.setdefault("_other:" + asset["name"], asset.get("download_count", 0))
+                    key = "_other:" + asset_name
+                    counts[key] = counts.get(key, 0) + asset.get("download_count", 0)
     except Exception as e:  # noqa: BLE001 — non-fatal by design
         print(f"[downloads] fetch failed, file unchanged: {e}")
         return 0

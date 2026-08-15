@@ -289,6 +289,9 @@
   }
 
   /* ── Chat ── */
+  .chat-main {
+    flex: 1; min-height: 0; display: flex;
+  }
   #chat {
     flex: 1; overflow-y: auto; padding: 24px;
     display: flex; flex-direction: column; gap: 16px;
@@ -543,13 +546,18 @@
     border: 1px solid #3d3522; border-top-color: #d29922; border-radius: 6px;
     background: #161b22; color: #b1bac4; box-shadow: 0 10px 28px rgba(0,0,0,0.32);
     font-size: 13px; font-weight: 400; line-height: 1.5; text-align: left;
-    opacity: 0; visibility: hidden; pointer-events: none;
+    opacity: 0; visibility: hidden; pointer-events: auto;
     transform: translate(-50%, -4px);
     transition: opacity 0.15s, visibility 0.15s, transform 0.15s;
   }
   .version-disclaimer strong {
     display: block; margin-bottom: 3px; color: #f2cc60; font-size: 12px;
   }
+  .frontier-update-notice {
+    display: block; margin-top: 10px; padding-top: 9px;
+    border-top: 1px solid #30363d; color: #3fb950;
+  }
+  .frontier-update-notice a { color: #58a6ff; }
   .version-disclaimer-wrap:hover .version-disclaimer,
   .version-disclaimer-wrap:focus-within .version-disclaimer {
     opacity: 1; visibility: visible; transform: translate(-50%, 0);
@@ -701,14 +709,26 @@
     display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; overflow: hidden;
   }
+  .rar-actions {
+    display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;
+    align-items: stretch;
+  }
   .rar-add-btn {
-    flex-shrink: 0; background: #238636; color: #fff; border: 1px solid #238636;
+    background: #238636; color: #fff; border: 1px solid #238636;
     border-radius: 4px; padding: 3px 10px; font-size: 10px; cursor: pointer;
     transition: all 0.15s; white-space: nowrap;
   }
   .rar-add-btn:hover { background: #2ea043; }
   .rar-add-btn:disabled { opacity: 0.6; cursor: default; }
   .rar-add-btn.added { background: transparent; color: #3fb950; border-color: #238636; }
+  .rar-vote-btn {
+    background: #21262d; color: #c9d1d9; border: 1px solid #30363d;
+    border-radius: 4px; padding: 3px 8px; font-size: 10px; cursor: pointer;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .rar-vote-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+  .rar-vote-btn:disabled { opacity: 0.55; cursor: default; }
+  .rar-vote-btn.voted { color: #3fb950; border-color: #238636; }
   .rar-browse-all {
     display: block; width: 100%; margin-top: 10px;
     background: transparent; color: #58a6ff; border: 1px solid #30363d;
@@ -909,6 +929,11 @@
   body.light-mode .rar-results:not(:empty) { border-bottom-color: #d0d7de; }
   body.light-mode .rar-item { border-color: #d0d7de; }
   body.light-mode .rar-name { color: #24292e; }
+  body.light-mode .rar-vote-btn {
+    background: #f6f8fa; color: #424a53; border-color: #d0d7de;
+  }
+  body.light-mode .rar-vote-btn:hover { color: #0969da; border-color: #0969da; }
+  body.light-mode .rar-vote-btn.voted { color: #1a7f37; border-color: #1a7f37; }
   body.light-mode .rar-desc,
   body.light-mode .rar-status,
   body.light-mode .rar-section-label { color: #57606a; }
@@ -963,6 +988,54 @@
     border-top-color: #bf8700; box-shadow: 0 10px 28px rgba(31,35,40,0.16);
   }
   body.light-mode .version-disclaimer strong { color: #9a6700; }
+  body.light-mode .frontier-update-notice { border-top-color: #d0d7de; color: #1a7f37; }
+  body.light-mode .frontier-update-notice a { color: #0969da; }
+
+  /* ── Trust acknowledgement gate for downloadable agent code ── */
+  #trust-download-dialog {
+    width: min(540px, calc(100vw - 32px)); margin: auto; padding: 0;
+    color: #e6edf3; background: #161b22; border: 1px solid #30363d;
+    border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  #trust-download-dialog::backdrop { background: rgba(0,0,0,0.65); }
+  .trust-download-dialog__body { padding: 24px; }
+  .trust-download-dialog__eyebrow {
+    margin-bottom: 12px; color: #8b949e; font-size: 12px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .trust-download-dialog__body h2 { margin-bottom: 8px; color: #e6edf3; font-size: 22px; }
+  .trust-download-dialog__body > p { margin-bottom: 18px; color: #8b949e; line-height: 1.55; }
+  .trust-download-dialog__notice {
+    padding: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 10px;
+  }
+  .trust-download-dialog__notice h3 { margin-bottom: 10px; color: #e6edf3; font-size: 16px; }
+  .trust-download-dialog__notice h3 span { color: #f0883e; margin-right: 6px; }
+  .trust-download-dialog__ack {
+    display: flex; align-items: flex-start; gap: 11px; color: #c9d1d9;
+    font-size: 14px; line-height: 1.55; cursor: pointer;
+  }
+  .trust-download-dialog__ack input {
+    width: 19px; height: 19px; margin-top: 2px; accent-color: #1f6feb; flex: 0 0 auto;
+  }
+  .trust-download-dialog__actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap;
+  }
+  .trust-download-dialog__actions button {
+    min-height: 42px; padding: 8px 16px; border-radius: 7px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  #trust-download-cancel { color: #c9d1d9; background: #21262d; border: 1px solid #30363d; }
+  #trust-download-confirm { color: #fff; background: #1f6feb; border: 1px solid #1f6feb; }
+  #trust-download-confirm:disabled { opacity: .5; cursor: not-allowed; }
+  #trust-download-dialog button:focus-visible,
+  #trust-download-dialog input:focus-visible { outline: 2px solid #f291b6; outline-offset: 2px; }
+  body.light-mode #trust-download-dialog { color: #24292e; background: #f6f8fa; border-color: #d0d7de; }
+  body.light-mode .trust-download-dialog__body h2,
+  body.light-mode .trust-download-dialog__notice h3 { color: #24292e; }
+  body.light-mode .trust-download-dialog__body > p,
+  body.light-mode .trust-download-dialog__eyebrow { color: #57606a; }
+  body.light-mode .trust-download-dialog__notice { background: #fff; border-color: #d0d7de; }
+  body.light-mode .trust-download-dialog__ack { color: #424a53; }
+  body.light-mode #trust-download-cancel { color: #24292e; background: #f6f8fa; border-color: #d0d7de; }
 
   /* ── Pearl polish ─────────────────────────────────────────────────────────
      Additive refinements only — no new elements, no changed interactions. */
@@ -981,6 +1054,7 @@
   /* Consistent keyboard-focus ring across interactive chrome (accessibility). */
   .icon-btn:focus-visible, #model-select:focus-visible, #send:focus-visible,
   .starter-btn:focus-visible, .toolbar-link:focus-visible, .rar-add-btn:focus-visible,
+  .rar-vote-btn:focus-visible,
   .rar-group-chip:focus-visible, #rar-search-input:focus-visible {
     outline: 2px solid #58a6ff; outline-offset: 1px;
   }
@@ -1022,7 +1096,7 @@
   <span class="icon" style="vertical-align:middle;margin-right:6px"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8.22 1.75a.25.25 0 00-.44 0L1.7 13.5a.25.25 0 00.22.37h12.16a.25.25 0 00.22-.37L8.22 1.75zM6.9 1.03c.5-.87 1.7-.87 2.2 0l6.09 11.75c.48.83-.12 1.85-1.1 1.85H1.91c-.98 0-1.58-1.02-1.1-1.85L6.9 1.03zM8 5a.75.75 0 01.75.75v3a.75.75 0 01-1.5 0v-3A.75.75 0 018 5zm0 7a1 1 0 100-2 1 1 0 000 2z"/></svg></span>
   <span id="copilot-banner-text">This GitHub account doesn't have Copilot access yet.</span>
   <button id="copilot-retry-btn" onclick="retryCopilot()" style="margin-left:10px;background:#f2cc60;color:#3d2c00;border:none;border-radius:5px;padding:4px 12px;font-size:13px;font-weight:600;cursor:pointer">Retry</button>
-  <a href="https://github.com/github-copilot/signup" target="_blank" style="color:#f2cc60;margin-left:10px;text-decoration:underline">Enable Copilot &rarr;</a>
+  <a href="https://github.com/github-copilot/signup" target="_blank" rel="noopener noreferrer" style="color:#f2cc60;margin-left:10px;text-decoration:underline">Enable Copilot &rarr;</a>
 </div>
 
 <div id="drop-overlay">
@@ -1050,7 +1124,7 @@
         </button>
       </div>
       <div class="copy-toast" id="copy-toast">&nbsp;</div>
-      <a id="verify-link" href="#" target="_blank" style="color:#58a6ff;font-size:14px">Open GitHub &rarr;</a>
+      <a id="verify-link" href="#" target="_blank" rel="noopener noreferrer" style="color:#58a6ff;font-size:14px">Open GitHub &rarr;</a>
       <div style="font-size:11px;color:#8b949e;margin-top:4px">Code copied to your clipboard — click the link above, then paste it on GitHub</div>
       <div class="login-status" id="login-status">Waiting for authorization...</div>
     </div>
@@ -1077,6 +1151,7 @@
       <span id="version-disclaimer" class="version-disclaimer" role="tooltip">
         <strong>Experimental by design.</strong>
         RAPP Brainstem is a local-first space for exploring the AI frontier. AI can be incomplete or wrong, so verify important results. Our mission is to make hands-on AI accessible to everyone, on a device they control.
+        <span id="frontier-update-notice" class="frontier-update-notice" hidden></span>
       </span>
     </span>
   </h1>
@@ -1099,7 +1174,7 @@
           RAR Agent Registry
         </h3>
         <div class="rar-search">
-          <input id="rar-search-input" type="text" placeholder="Search the RAR agent registry…"
+          <input id="rar-search-input" type="text" aria-label="Search the AIBAST RAR agent registry" placeholder="Search the AIBAST agent library…"
                  oninput="rarSearch()" autocomplete="off" spellcheck="false">
         </div>
         <div id="rar-results" class="rar-results"></div>
@@ -1201,6 +1276,7 @@
   </div>
 </header>
 
+<main class="chat-main" id="main">
 <div id="chat" role="log" aria-live="polite" aria-relevant="additions text">
   <!-- Subtle Drop Watermark -->
   <div id="chat-watermark">
@@ -1222,6 +1298,7 @@
     </div>
   </div>
 </div>
+</main>
 
 <footer>
   <div id="starter-prompts">
@@ -1241,7 +1318,7 @@
       <button class="toolbar-link" onclick="document.getElementById('chat-import').click()" title="Import transcript">Import</button>
       <input type="file" id="chat-import" accept=".json" style="display:none" onchange="importChat(event)">
       <button class="toolbar-link" onclick="clearChat()">Clear</button>
-      <a class="toolbar-link" href="https://blazingbeard.github.io/quests/rapp-brainstem.html" target="_blank" title="Guided training quest with checkpoints" onclick="showTourInvite()">📚 Tutorial</a>
+      <a class="toolbar-link" href="https://blazingbeard.github.io/quests/rapp-brainstem.html" target="_blank" rel="noopener noreferrer" title="Guided training quest with checkpoints" onclick="showTourInvite()">📚 Tutorial</a>
       <button class="toolbar-link" onclick="shareWithAdmin()" title="Share diagnostics with admin for help" style="color:#f0883e">🆘 Get Help</button>
       <button class="toolbar-link dev-only" onclick="toggleDevMode()" id="dev-toggle">Dev</button>
     </div>
@@ -1251,6 +1328,25 @@
     <button id="send" onclick="handleSendButton()" aria-label="Send message">Send</button>
   </div>
 </footer>
+
+<dialog id="trust-download-dialog" aria-modal="true" aria-labelledby="trust-download-title" aria-describedby="trust-download-copy">
+  <div class="trust-download-dialog__body">
+    <div class="trust-download-dialog__eyebrow">Before you download</div>
+    <h2 id="trust-download-title">Add only what you trust</h2>
+    <p id="trust-download-artifact">Review this artifact before downloading it.</p>
+    <div class="trust-download-dialog__notice">
+      <h3><span aria-hidden="true">⚠</span> Add only what you trust</h3>
+      <label class="trust-download-dialog__ack" for="trust-download-ack">
+        <input id="trust-download-ack" type="checkbox" aria-describedby="trust-download-copy">
+        <span id="trust-download-copy">I understand that this is a community-provided, code-bearing artifact. It runs with my permissions or may affect my environment. I will review it carefully and download it only from a trusted source.</span>
+      </label>
+    </div>
+    <div class="trust-download-dialog__actions">
+      <button id="trust-download-cancel" type="button">Cancel</button>
+      <button id="trust-download-confirm" type="button" disabled>Download</button>
+    </div>
+  </div>
+</dialog>
 
 <script>
   // ── Safe localStorage ──
@@ -1263,6 +1359,64 @@
   function safeGet(k) { try { return _ls ? _ls.getItem(k) : null; } catch (e) { return null; } }
   function safeSet(k, v) { try { if (_ls) _ls.setItem(k, v); } catch (e) {} }
   function safeRemove(k) { try { if (_ls) _ls.removeItem(k); } catch (e) {} }
+
+  // Every agent export or catalog install is mediated by this unchecked-by-default gate.
+  const trustDownloadDialog = document.getElementById('trust-download-dialog');
+  const trustDownloadAck = document.getElementById('trust-download-ack');
+  const trustDownloadConfirm = document.getElementById('trust-download-confirm');
+  const trustDownloadCancel = document.getElementById('trust-download-cancel');
+  const trustDownloadArtifact = document.getElementById('trust-download-artifact');
+  let trustDownloadAction = null;
+  let trustDownloadOpener = null;
+
+  function resetTrustedDownload() {
+    trustDownloadAck.checked = false;
+    trustDownloadConfirm.disabled = true;
+    trustDownloadAction = null;
+    trustDownloadOpener = null;
+  }
+
+  function finishTrustedDownload() {
+    const opener = trustDownloadOpener;
+    resetTrustedDownload();
+    if (opener && typeof opener.focus === 'function') opener.focus();
+  }
+
+  function closeTrustedDownload(value) {
+    if (typeof trustDownloadDialog.close === 'function') {
+      trustDownloadDialog.close(value);
+    } else {
+      trustDownloadDialog.removeAttribute('open');
+      finishTrustedDownload();
+    }
+  }
+
+  function requestTrustedDownload({ artifactName, actionLabel, opener, download }) {
+    trustDownloadAction = download;
+    trustDownloadOpener = opener || document.activeElement;
+    trustDownloadArtifact.textContent = `Review ${artifactName} before downloading it.`;
+    trustDownloadConfirm.textContent = actionLabel || `Download ${artifactName}`;
+    trustDownloadAck.checked = false;
+    trustDownloadConfirm.disabled = true;
+    if (typeof trustDownloadDialog.showModal === 'function') {
+      trustDownloadDialog.showModal();
+    } else {
+      trustDownloadDialog.setAttribute('open', '');
+    }
+    trustDownloadAck.focus();
+  }
+
+  trustDownloadAck.addEventListener('change', () => {
+    trustDownloadConfirm.disabled = !trustDownloadAck.checked;
+  });
+  trustDownloadCancel.addEventListener('click', () => closeTrustedDownload('cancel'));
+  trustDownloadConfirm.addEventListener('click', () => {
+    if (trustDownloadConfirm.disabled || !trustDownloadAction) return;
+    const download = trustDownloadAction;
+    closeTrustedDownload('confirmed');
+    download();
+  });
+  trustDownloadDialog.addEventListener('close', finishTrustedDownload);
 
   // ── XSS-safe DOM helpers ──
   // Server errors, usernames, model ids and agent/model output are UNTRUSTED
@@ -1379,6 +1533,56 @@
     if (headerClicks >= 3) { toggleDevMode(); headerClicks = 0; }
   });
 
+  function versionParts(value) {
+    if (!/^[0-9]+(?:\.[0-9]+)*$/.test(value || '')) return null;
+    return value.split('.').map(Number);
+  }
+
+  function versionIsNewer(candidate, current) {
+    const next = versionParts(candidate);
+    const local = versionParts(current);
+    if (!next || !local) return false;
+    const count = Math.max(next.length, local.length);
+    for (let i = 0; i < count; i++) {
+      const a = next[i] || 0;
+      const b = local[i] || 0;
+      if (a !== b) return a > b;
+    }
+    return false;
+  }
+
+  async function checkFrontierChannel(localVersion, channelUrl) {
+    if (!channelUrl || !channelUrl.startsWith('https://')) return;
+    try {
+      const response = await fetch(channelUrl, { cache: 'no-store' });
+      if (!response.ok) return;
+      const channel = await response.json();
+      if (channel.schema !== 'aibast-brainstem-channel/1.0'
+          || channel.channel !== 'frontier'
+          || !versionIsNewer(channel.version, localVersion)
+          || !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(channel.repository || '')) {
+        return;
+      }
+      const notice = document.getElementById('frontier-update-notice');
+      const versionTag = document.getElementById('version-tag');
+      notice.textContent = `Frontier kernel v${channel.version} is available. `;
+      const link = document.createElement('a');
+      link.href = typeof channel.update_url === 'string'
+          && channel.update_url.startsWith('https://')
+        ? channel.update_url
+        : `https://github.com/${channel.repository}`;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'Re-run the local-first installer to update.';
+      notice.appendChild(link);
+      notice.hidden = false;
+      versionTag.textContent = `v${localVersion} \u2191`;
+      versionTag.title = `Frontier kernel v${channel.version} is available`;
+    } catch (e) {
+      // Offline-first: channel checks never block or degrade the local brainstem.
+    }
+  }
+
   // Fix VS Code link and show version
   fetch(`${API}/health`).then(r => r.json()).then(d => {
     if (d.brainstem_dir) {
@@ -1386,6 +1590,7 @@
     }
     if (d.version) {
       document.getElementById('version-tag').textContent = 'v' + d.version;
+      checkFrontierChannel(d.version, d.update_channel_url);
     }
   }).catch(() => {});
 
@@ -1840,9 +2045,12 @@
         const expBtn = document.createElement('button');
         expBtn.className = 'export-btn';
         expBtn.textContent = 'Export';
-        expBtn.onclick = () => {
-          window.open(`${API}/agents/export/${encodeURIComponent(item.filename)}`, '_blank');
-        };
+        expBtn.onclick = () => requestTrustedDownload({
+          artifactName: item.filename,
+          actionLabel: 'Download agent.py',
+          opener: expBtn,
+          download: () => window.open(`${API}/agents/export/${encodeURIComponent(item.filename)}`, '_blank', 'noopener')
+        });
 
         const delBtn = document.createElement('button');
         delBtn.className = 'export-btn del-btn';
@@ -1879,13 +2087,16 @@
   // ── AIBAST RAR Registry Browser ──
   // Search the AIBAST RAR — the business-focused agent catalog served from
   // this library's own repo — and hot-load any agent into this brainstem by
-  // fetching the raw .py and POSTing it to /agents/import. (The community
-  // catalog lives in the kody-w RAR upstream.)
+  // fetching the raw .py and POSTing it to /agents/import. There is no fallback
+  // to the public/global RAR: both sources below are mirrors of this AIBAST repo.
+  const RAR_REPOSITORY = 'microsoft/aibast-agents-library';
   const RAR_REVISION = '12c37cd895098748e8618774159a589ffacb58f6';
-  const RAR_BASE = `https://raw.githubusercontent.com/microsoft/aibast-agents-library/${RAR_REVISION}`;
+  const RAR_BASE = `https://raw.githubusercontent.com/${RAR_REPOSITORY}/${RAR_REVISION}`;
   // Same revision via the staging mirror — used when the upstream repo does
   // not yet carry this commit (pre-merge) or raw rate-limits.
   const RAR_MIRROR = `https://raw.githubusercontent.com/kody-w/aibast-agents-library/${RAR_REVISION}`;
+  const RAR_LIVE_BASE = `https://raw.githubusercontent.com/${RAR_REPOSITORY}/main/rar`;
+  const RAR_LIVE_MIRROR = 'https://raw.githubusercontent.com/kody-w/aibast-agents-library/main/rar';
   // Release assets carry native download counts, so installs are measurable.
   // Integrity does NOT depend on the source: the SHA-256 pinned in the RAR
   // catalog is verified below regardless of where the bytes came from.
@@ -1901,9 +2112,20 @@
       return r;
     }
   }
+  async function rarLiveJson(filename) {
+    for (const base of [RAR_LIVE_BASE, RAR_LIVE_MIRROR]) {
+      try {
+        const response = await fetch(`${base}/${filename}`, { cache: 'no-store' });
+        if (response.ok) return await response.json();
+      } catch (e) { /* try the next AIBAST mirror */ }
+    }
+    return {};
+  }
   let rarRegistry = null;     // cached agents array (lazy-loaded on first search)
   let rarLoading = null;      // in-flight promise, to dedupe concurrent loads
   let rarSearchTimer = null;
+  let rarRatings = {};
+  let rarDiscussions = {};
 
   // Only standalone *_agent.py files can be hot-loaded. The registry also carries
   // stacks/swarms (bundles, no single .py) and stub/card entries (.py.stub, .py.card,
@@ -1925,9 +2147,19 @@
   function loadRarRegistry() {
     if (rarRegistry) return Promise.resolve(rarRegistry);
     if (rarLoading) return rarLoading;
-    rarLoading = rarFetch('rar/registry.json')
-      .then(r => r.json())
-      .then(data => {
+    rarLoading = Promise.all([
+      rarFetch('rar/registry.json').then(r => r.json()),
+      rarLiveJson('ratings.json'),
+      rarLiveJson('discussions.json')
+    ])
+      .then(([data, ratings, discussions]) => {
+        if (data.instance !== 'AIBAST RAR'
+            || data.repository !== RAR_REPOSITORY
+            || data.catalog_path !== 'rar/registry.json') {
+          throw new Error('The catalog is not the trusted AIBAST RAR.');
+        }
+        rarRatings = ratings && typeof ratings === 'object' ? ratings : {};
+        rarDiscussions = discussions && typeof discussions === 'object' ? discussions : {};
         rarRegistry = (Array.isArray(data.agents) ? data.agents : []).filter(isLoadableAgent);
         return rarRegistry;
       })
@@ -1947,7 +2179,7 @@
     // Featured agents are the empty-state browse view — hide them once a search starts.
     if (featured) featured.style.display = q ? 'none' : '';
     if (!q) { results.innerHTML = ''; return; }
-    results.innerHTML = '<div class="rar-status">Searching the RAR registry…</div>';
+    results.innerHTML = '<div class="rar-status">Searching the AIBAST RAR…</div>';
     loadRarRegistry().then(agents => {
       // Bail if the query changed while the registry was downloading.
       if (document.getElementById('rar-search-input').value.trim().toLowerCase() !== q) return;
@@ -1973,8 +2205,8 @@
     const label = document.createElement('div');
     label.className = 'rar-section-label';
     label.textContent = matches.length
-      ? `RAR registry — ${matches.length} match${matches.length === 1 ? '' : 'es'}`
-      : 'RAR registry';
+      ? `AIBAST RAR — ${matches.length} match${matches.length === 1 ? '' : 'es'}`
+      : 'AIBAST RAR';
     results.appendChild(label);
     if (!matches.length) {
       const none = document.createElement('div');
@@ -1984,6 +2216,67 @@
       return;
     }
     for (const a of matches) results.appendChild(buildRarItem(a));
+  }
+
+  function rarDiscussionNumber(agent) {
+    const slug = (agent.name || '').split('/')[1];
+    const raw = slug ? rarDiscussions[slug] : null;
+    if (typeof raw !== 'string') return null;
+    try {
+      const url = new URL(raw);
+      const [owner, repo] = RAR_REPOSITORY.split('/');
+      const match = url.pathname.match(
+        new RegExp(`^/${owner}/${repo}/discussions/([1-9][0-9]*)/?$`)
+      );
+      if (url.origin !== 'https://github.com' || !match) return null;
+      const number = Number(match[1]);
+      return Number.isSafeInteger(number) ? number : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function upvoteRarAgent(agent, btn) {
+    const discussionNumber = rarDiscussionNumber(agent);
+    if (!discussionNumber) return;
+    const slug = agent.name.split('/')[1];
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Voting\u2026';
+    try {
+      const response = await fetch(`${API}/rar/upvote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agent_name: agent.name,
+          discussion_number: discussionNumber
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const message = data.error || `Vote failed (HTTP ${response.status}).`;
+        if (data.discussion_url
+            && confirm(`${message}\n\nOpen the AIBAST Discussion to vote on GitHub?`)) {
+          window.open(data.discussion_url, '_blank', 'noopener,noreferrer');
+        } else if (!data.discussion_url) {
+          alert(message);
+        }
+        btn.disabled = false;
+        btn.textContent = original;
+        return;
+      }
+      const score = Number.isInteger(data.score) ? data.score : (rarRatings[slug] || 0);
+      rarRatings[slug] = score;
+      btn.textContent = `\ud83d\udc4d ${score}`;
+      btn.title = data.already_voted
+        ? 'You already recommended this AIBAST agent'
+        : 'Recommendation recorded on the AIBAST GitHub Discussion';
+      btn.classList.add('voted');
+    } catch (e) {
+      alert(`Could not record the vote: ${e.message}`);
+      btn.disabled = false;
+      btn.textContent = original;
+    }
   }
 
   // Shared row used by both search results and the featured list.
@@ -2002,14 +2295,35 @@
     meta.appendChild(name);
     if (desc.textContent) meta.appendChild(desc);
 
-    const btn = document.createElement('button');
-    btn.className = 'rar-add-btn';
-    btn.textContent = 'Add';
-    btn.title = a._file || '';
-    btn.onclick = () => installRarAgent(a, btn);
+    const actions = document.createElement('div');
+    actions.className = 'rar-actions';
 
+    const addBtn = document.createElement('button');
+    addBtn.className = 'rar-add-btn';
+    addBtn.textContent = 'Add';
+    addBtn.title = a._file || '';
+    addBtn.onclick = () => requestTrustedDownload({
+      artifactName: (a._file || 'agent.py').split('/').pop(),
+      actionLabel: 'Download and add agent',
+      opener: addBtn,
+      download: () => installRarAgent(a, addBtn)
+    });
+
+    const slug = (a.name || '').split('/')[1];
+    const voteBtn = document.createElement('button');
+    voteBtn.className = 'rar-vote-btn';
+    voteBtn.textContent = `\ud83d\udc4d ${Number(rarRatings[slug]) || 0}`;
+    voteBtn.title = 'Recommend this agent after trying it';
+    voteBtn.disabled = !rarDiscussionNumber(a);
+    if (voteBtn.disabled) {
+      voteBtn.title = 'The AIBAST rating Discussion is not available yet';
+    } else {
+      voteBtn.onclick = () => upvoteRarAgent(a, voteBtn);
+    }
+
+    actions.append(addBtn, voteBtn);
     item.appendChild(meta);
-    item.appendChild(btn);
+    item.appendChild(actions);
     return item;
   }
 
@@ -4148,7 +4462,7 @@
             <p class="tc-punch">Interview it. Teach it. Correct it. Trade agents.</p>
             <p>That method never changes, no matter how good the models get.</p>
             <p>Ready for the deep end? The <strong>VS Code button</strong> up top opens the workshop — GitHub Copilot builds new agents on this brainstem while you watch. It can't even tell Copilot and you apart.</p>
-            <p><em>Want to go further? The <a href="https://blazingbeard.github.io/quests/rapp-brainstem.html" target="_blank" style="color:#58a6ff">full Training Quest</a> picks up where this tour ends.</em></p>`,
+            <p><em>Want to go further? The <a href="https://blazingbeard.github.io/quests/rapp-brainstem.html" target="_blank" rel="noopener noreferrer" style="color:#58a6ff">full Training Quest</a> picks up where this tour ends.</em></p>`,
           last: true
         }
       ];

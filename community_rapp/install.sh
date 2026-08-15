@@ -108,7 +108,13 @@ echo -e "${YELLOW}Creating virtual environment...${NC}"
 "$PYTHON_CMD" -m venv "$PROJECT_DIR/.venv"
 
 echo -e "${YELLOW}Installing dependencies...${NC}"
-"$PROJECT_DIR/.venv/bin/pip" install -r "$PROJECT_DIR/requirements.txt" --quiet 2>/dev/null
+# Never swallow the failure: a silent `set -e` abort here left the user staring at
+# "Installing dependencies..." with no idea what went wrong. Retry loudly, then say so.
+if ! "$PROJECT_DIR/.venv/bin/pip" install -r "$PROJECT_DIR/requirements.txt" --quiet 2>/dev/null; then
+    echo -e "${YELLOW}Retrying with full output...${NC}"
+    "$PROJECT_DIR/.venv/bin/pip" install -r "$PROJECT_DIR/requirements.txt" || \
+        die "Dependency install failed. Retry with: $PROJECT_DIR/.venv/bin/pip install -r $PROJECT_DIR/requirements.txt"
+fi
 echo -e "${GREEN}[OK] Dependencies installed${NC}"
 
 # ── Settings ────────────────────────────────────────────────

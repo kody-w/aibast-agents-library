@@ -3,9 +3,12 @@ Contract tests — parametrized over ALL agents.
 Validates manifest, class structure, perform() return type, and standalone execution.
 """
 
+import inspect
 import subprocess
 import sys
 from pathlib import Path
+
+import build_registry
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -32,8 +35,16 @@ def test_manifest_name_format(agent_info):
     mod, cls, path = agent_info
     manifest = getattr(mod, "__manifest__", {})
     name = manifest.get("name", "")
-    assert name.startswith("@"), f"{path.name}: name must start with @, got '{name}'"
-    assert "/" in name, f"{path.name}: name must contain /, got '{name}'"
+    assert build_registry.MANIFEST_NAME_RE.fullmatch(name), (
+        f"{path.name}: name must be @publisher/kebab-case-slug, got '{name}'"
+    )
+
+
+def test_manifest_matches_registry_schema(agent_info):
+    mod, cls, path = agent_info
+    errors = build_registry.validate_manifest(path, getattr(mod, "__manifest__", {}))
+
+    assert not errors, f"{path.name}: invalid registry manifest: {'; '.join(errors)}"
 
 
 def test_class_inherits_basic_agent(agent_info):
@@ -48,6 +59,17 @@ def test_instantiation(agent_info):
     assert cls is not None, f"{path.name}: no agent class found"
     instance = cls()
     assert instance is not None
+
+
+def test_perform_accepts_unexpected_keyword_arguments(agent_info):
+    mod, cls, path = agent_info
+    assert cls is not None, f"{path.name}: no agent class found"
+
+    accepts_kwargs = any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD
+        for parameter in inspect.signature(cls.perform).parameters.values()
+    )
+    assert accepts_kwargs, f"{path.name}: perform() must accept **kwargs"
 
 
 def test_perform_returns_str(agent_info):

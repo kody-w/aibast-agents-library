@@ -285,6 +285,28 @@ html[data-theme=dark] .bx h4{filter:brightness(1.15)}
 .dlbtn:hover{background:#094e8c}
 html[data-theme=dark] .dlbtn{background:#2a6fbd}
 </style>
+<style id="trust-download-gate">
+#trust-download-dialog{width:min(520px,calc(100vw - 32px));margin:auto;padding:0;border:1px solid var(--line);
+  border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:0 20px 60px rgba(11,16,36,.28)}
+#trust-download-dialog::backdrop{background:rgba(11,16,36,.55)}
+.trust-download-dialog__body{padding:24px}
+.trust-download-dialog__eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:14px}
+.trust-download-dialog__body h2{font-size:23px;margin-bottom:8px}
+.trust-download-dialog__body>p{color:var(--dim);margin-bottom:18px}
+.trust-download-dialog__notice{border:1px solid var(--line);border-radius:10px;background:var(--wash);padding:16px}
+.trust-download-dialog__notice h3{font-size:17px;margin-bottom:10px}
+.trust-download-dialog__notice h3 span{color:#d97706;margin-right:7px}
+.trust-download-dialog__ack{display:flex;align-items:flex-start;gap:11px;color:var(--dim);font-size:15px;line-height:1.55;cursor:pointer}
+.trust-download-dialog__ack input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex:0 0 auto}
+.trust-download-dialog__actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.trust-download-dialog__actions button{min-height:44px;border-radius:8px;padding:9px 16px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+#trust-download-cancel{background:var(--paper);border:1px solid var(--line);color:var(--ink)}
+#trust-download-confirm{background:var(--accent);border:1px solid var(--accent);color:#fff}
+#trust-download-confirm:disabled{opacity:.55;cursor:not-allowed}
+#trust-download-dialog button:focus-visible,#trust-download-dialog input:focus-visible{outline:3px solid #f291b6;outline-offset:2px}
+@media(max-width:520px){.trust-download-dialog__body{padding:20px}.trust-download-dialog__actions button{width:100%}}
+</style>
 </head>
 <body>
 <!-- aibast-shared-nav -->
@@ -1111,7 +1133,73 @@ pac copilot push --project-dir <span data-dyn="dir">field-service-dispatch</span
 </div>
 </footer>
 
+<dialog id="trust-download-dialog" aria-modal="true" aria-labelledby="trust-download-title" aria-describedby="trust-download-copy">
+  <div class="trust-download-dialog__body">
+    <div class="trust-download-dialog__eyebrow">Before you download</div>
+    <h2 id="trust-download-title">Add only what you trust</h2>
+    <p id="trust-download-artifact">Review this artifact before adding it to your environment.</p>
+    <div class="trust-download-dialog__notice">
+      <h3><span aria-hidden="true">⚠</span> Add only what you trust</h3>
+      <label class="trust-download-dialog__ack" for="trust-download-ack">
+        <input id="trust-download-ack" type="checkbox" aria-describedby="trust-download-copy">
+        <span id="trust-download-copy">I understand that this is a community-provided, code-bearing artifact. It runs with my permissions or may affect my environment. I will review it carefully and download it only from a trusted source.</span>
+      </label>
+    </div>
+    <div class="trust-download-dialog__actions">
+      <button id="trust-download-cancel" type="button">Cancel</button>
+      <button id="trust-download-confirm" type="button" disabled>Download</button>
+    </div>
+  </div>
+</dialog>
+
 <script>
+/* Trust acknowledgement for every downloadable code-bearing artifact on this page. */
+var trustDownloadDialog=document.getElementById("trust-download-dialog");
+var trustDownloadAck=document.getElementById("trust-download-ack");
+var trustDownloadConfirm=document.getElementById("trust-download-confirm");
+var trustDownloadCancel=document.getElementById("trust-download-cancel");
+var trustDownloadArtifact=document.getElementById("trust-download-artifact");
+var trustDownloadAction=null,trustDownloadOpener=null;
+function resetTrustedDownload(){
+  trustDownloadAck.checked=false;
+  trustDownloadConfirm.disabled=true;
+  trustDownloadAction=null;
+  trustDownloadOpener=null;
+}
+function finishTrustedDownload(){
+  var opener=trustDownloadOpener;
+  resetTrustedDownload();
+  if(opener&&typeof opener.focus==="function") opener.focus();
+}
+function closeTrustedDownload(value){
+  if(typeof trustDownloadDialog.close==="function") trustDownloadDialog.close(value);
+  else {trustDownloadDialog.removeAttribute("open");finishTrustedDownload();}
+}
+function requestTrustedDownload(options){
+  trustDownloadAction=options.download;
+  trustDownloadOpener=options.opener||document.activeElement;
+  trustDownloadArtifact.textContent="Review "+options.artifactName+" before downloading it.";
+  trustDownloadConfirm.textContent="↓ Download "+options.artifactName;
+  trustDownloadAck.checked=false;
+  trustDownloadConfirm.disabled=true;
+  if(typeof trustDownloadDialog.showModal==="function") trustDownloadDialog.showModal();
+  else trustDownloadDialog.setAttribute("open","");
+  trustDownloadAck.focus();
+}
+trustDownloadAck.addEventListener("change",function(){
+  trustDownloadConfirm.disabled=!trustDownloadAck.checked;
+});
+trustDownloadCancel.addEventListener("click",function(){closeTrustedDownload("cancel");});
+trustDownloadConfirm.addEventListener("click",function(){
+  if(trustDownloadConfirm.disabled||!trustDownloadAction) return;
+  var action=trustDownloadAction;
+  closeTrustedDownload("confirmed");
+  action();
+});
+trustDownloadDialog.addEventListener("close",function(){
+  finishTrustedDownload();
+});
+
 /* copy buttons */
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-copy]"); if(!b) return;
@@ -1621,10 +1709,7 @@ function sessionRecord(){
 }
 function pascal(s){return s.split(/[^a-zA-Z0-9]+/).map(function(w){
   return w.charAt(0).toUpperCase()+w.slice(1);}).join("");}
-document.getElementById("shareBtn").onclick=function(){
-  if(!SELECTED){document.getElementById("shareStatus").textContent="Pick an agent first.";return;}
-  if(SELECTED._fp){document.getElementById("shareStatus").textContent=
-    "First-party agents are configured in-product — share the two Microsoft Learn links above instead.";return;}
+function downloadTeamWorkshopAgent(){
   var slug=slugOf(SELECTED), disp=SELECTED.display_name||SELECTED.name;
   var dir=SELECTED._file.substring(0,SELECTED._file.lastIndexOf("/"))+"/copilot_studio";
   var cls="Deploy"+pascal(agentTitle(SELECTED));
@@ -1740,6 +1825,16 @@ disp+' — team workshop agent.',
   a.click();
   document.getElementById("shareStatus").textContent=
     "Downloaded — send it to a teammate with one line: drop into your brainstem agents folder and say “deploy our agent.”";
+}
+document.getElementById("shareBtn").onclick=function(){
+  if(!SELECTED){document.getElementById("shareStatus").textContent="Pick an agent first.";return;}
+  if(SELECTED._fp){document.getElementById("shareStatus").textContent=
+    "First-party agents are configured in-product — share the two Microsoft Learn links above instead.";return;}
+  requestTrustedDownload({
+    artifactName:agentTitle(SELECTED)+" team workshop agent (.py)",
+    opener:this,
+    download:downloadTeamWorkshopAgent
+  });
 };
 
 (function(){
@@ -1766,8 +1861,7 @@ disp+' — team workshop agent.',
     return fetch(SRC[i]).then(function(r){ if(!r.ok) throw 0; return r.text(); })
       .catch(function(){ return grab(i+1); });
   }
-  a.onclick=function(e){
-    e.preventDefault();
+  function downloadTwinAgent(){
     var label=a.textContent; a.textContent="⬇ Fetching…"; note.textContent="";
     grab(0).then(function(src){
       var url=URL.createObjectURL(new Blob([src],{type:"text/x-python"}));
@@ -1780,6 +1874,14 @@ disp+' — team workshop agent.',
     }).catch(function(){
       a.textContent=label;
       note.textContent="Could not reach GitHub — check your network and try again.";
+    });
+  }
+  a.onclick=function(e){
+    e.preventDefault();
+    requestTrustedDownload({
+      artifactName:"sales_specialist_twin_agent.py",
+      opener:a,
+      download:downloadTwinAgent
     });
   };
 })();

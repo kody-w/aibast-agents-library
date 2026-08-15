@@ -1,0 +1,96 @@
+name: Bug Report
+description: Report a reproducible problem in an AIBAST Agents Library surface
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue will be public. Do not include credentials, internal URLs,
+        tenant IDs, customer data, proprietary code, or other sensitive content.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which authoritative surface is affected?
+      options:
+        - Brainstem
+        - AIBAST RAR or registry
+        - Agent or industry stack
+        - Twin or workshop
+        - Installer or upgrade
+        - Azure or RAPP AI
+        - Copilot Studio or Power Platform
+        - Badge or public profile workflow
+        - Documentation or GitHub Pages
+        - Governance or contribution process
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or revision
+      description: Brainstem version, agent version, commit, workflow run, or badge issue URL
+      placeholder: e.g. 0.6.16, 1.0.0, or a GitHub URL
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: Describe the problem clearly and concisely.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start from...
+        2. Run or select...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Scrubbed logs or screenshots
+      description: Remove secrets, tenant identifiers, customer data, and private paths first.
+      render: shell
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include only relevant, non-sensitive runtime details.
+      placeholder: |
+        - OS:
+        - Python:
+        - Browser:
+        - Installation path: local / Azure / Copilot Studio
+
+  - type: checkboxes
+    id: disclosure
+    attributes:
+      label: Public disclosure confirmation
+      options:
+        - label: I reviewed the final public payload and removed credentials, internal URLs, tenant IDs, customer data, proprietary code, private paths, and unnecessary personal information.
+          required: true

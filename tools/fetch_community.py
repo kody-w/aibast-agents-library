@@ -11,6 +11,11 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from .fetch_ratings import catalog_discussion
+except ImportError:
+    from fetch_ratings import catalog_discussion
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "rar" / "community.json"
 CFG = json.loads((ROOT / "rar" / "ratings-config.json").read_text())
@@ -53,7 +58,7 @@ def main():
         print(f"[community] code search skipped: {e}")
     try:
         owner, name = CFG["repo"].split("/")
-        convo, after = {}, None
+        canonical_convo, legacy_convo, after = {}, {}, None
         while True:
             body = json.dumps({"query": """
               query($o:String!,$r:String!,$a:String){
@@ -68,11 +73,21 @@ def main():
             with urllib.request.urlopen(req, timeout=30) as r:
                 d = json.load(r)["data"]["repository"]["discussions"]
             for n in d["nodes"]:
-                if (n.get("category") or {}).get("name") == CFG["category"] and n["comments"]["totalCount"]:
-                    convo[n["title"]] = n["comments"]["totalCount"]
+                if (n.get("category") or {}).get("name") != CFG["category"]:
+                    continue
+                total = n["comments"]["totalCount"]
+                if not total:
+                    continue
+                slug, is_canonical = catalog_discussion(n["title"])
+                if not slug:
+                    continue
+                destination = canonical_convo if is_canonical else legacy_convo
+                destination[slug] = total
             if not d["pageInfo"]["hasNextPage"]:
                 break
             after = d["pageInfo"]["endCursor"]
+        convo = dict(legacy_convo)
+        convo.update(canonical_convo)
         if convo or not hist["conversations"]:
             hist["conversations"] = dict(sorted(convo.items()))
     except Exception as e:  # noqa: BLE001

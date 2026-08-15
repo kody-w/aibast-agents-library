@@ -9,10 +9,15 @@ on:
         description: "Existing release tag to attach agent assets to"
         required: true
 permissions:
-  contents: write
+  contents: read
+concurrency:
+  group: release-assets-${{ inputs.tag }}
+  cancel-in-progress: false
 jobs:
   attach:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Collect agent files
@@ -21,13 +26,29 @@ jobs:
           python3 - <<'PY'
           import json, shutil, pathlib
           reg = json.loads(pathlib.Path("rar/registry.json").read_text())
+          seen = set()
           for a in reg["agents"]:
               src = pathlib.Path(a["_file"])
-              slug = a["name"].split("/")[1]
-              shutil.copy(src, f"out/{slug.replace('-', '_')}_agent.py")
-          print("assets:", len(list(pathlib.Path('out').glob('*.py'))))
+              filename = a["_install_filename"]
+              if pathlib.PurePath(filename).name != filename:
+                  raise SystemExit(f"unsafe asset filename: {filename}")
+              if not filename.endswith("_agent.py"):
+                  raise SystemExit(f"invalid agent asset filename: {filename}")
+              if filename in seen:
+                  raise SystemExit(f"duplicate agent asset filename: {filename}")
+              if not src.is_file():
+                  raise SystemExit(f"missing agent source: {src}")
+              shutil.copyfile(src, pathlib.Path("out") / filename)
+              seen.add(filename)
+          count = len(list(pathlib.Path('out').glob('*.py')))
+          print("assets:", count)
+          if not count:
+              raise SystemExit("no agent assets were collected")
           PY
       - name: Upload to release
+        # The tag reaches the shell through the environment, never through ${{ }}
+        # interpolation into the script body.
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ inputs.tag }}" out/*.py --clobber
+          TAG: ${{ inputs.tag }}
+        run: gh release upload "$TAG" out/*.py --clobber

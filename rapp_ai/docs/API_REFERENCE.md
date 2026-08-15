@@ -69,7 +69,7 @@ x-functions-key: YOUR_FUNCTION_KEY (optional if using query param)
 |-------|------|----------|---------|-------------|
 | `user_input` | string | Yes | - | User's message or query |
 | `conversation_history` | array | No | `[]` | Previous conversation messages |
-| `user_guid` | string | No | `c0p110t0-aaaa-bbbb-cccc-123456789abc` | Unique user identifier for memory |
+| `user_guid` | string | No | `c0p110t0-aaaa-bbbb-cccc-123456789abc` | Unique user identifier for memory. Must be a GUID (`00000000-0000-0000-0000-000000000000`); any other value is rejected with `400` because it would resolve to shared memory instead of a private partition. |
 | `user_context` | object | No | `null` | User profile information from Office 365 |
 
 **conversation_history format:**

@@ -157,18 +157,36 @@ while [ "$DEPLOYMENT_SUCCESS" = false ] && [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     echo "  - Application Insights"
     echo ""
 
-    # Capture both stdout and stderr, don't exit on error
+    DEPLOYMENT_NAME="rapp-$(date +%Y%m%d%H%M%S)-$RETRY_COUNT"
+
+    # Run the deployment with no stdout payload so the captured text is purely
+    # diagnostics. Outputs are read back separately below - merging az's stderr into
+    # the JSON would corrupt everything downstream (jq parsing and the saved file).
     set +e
-    DEPLOYMENT_OUTPUT=$(az deployment group create \
+    DEPLOYMENT_LOG=$(az deployment group create \
+        --name "$DEPLOYMENT_NAME" \
         --resource-group "$RESOURCE_GROUP" \
         --template-uri "$TEMPLATE_URL" \
         --parameters openAILocation="$OPENAI_LOCATION" \
-        --query "properties.outputs" \
-        --output json 2>&1)
+        --output none 2>&1)
     DEPLOYMENT_EXIT_CODE=$?
     set -e
 
     if [ $DEPLOYMENT_EXIT_CODE -eq 0 ]; then
+        set +e
+        DEPLOYMENT_OUTPUT=$(az deployment group show \
+            --name "$DEPLOYMENT_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "properties.outputs" \
+            --output json 2>/dev/null)
+        OUTPUT_EXIT_CODE=$?
+        set -e
+
+        if [ $OUTPUT_EXIT_CODE -ne 0 ] || [ -z "$DEPLOYMENT_OUTPUT" ]; then
+            echo -e "${YELLOW}Deployment succeeded but outputs could not be read.${NC}"
+            DEPLOYMENT_OUTPUT="{}"
+        fi
+
         DEPLOYMENT_SUCCESS=true
     else
         RETRY_COUNT=$((RETRY_COUNT + 1))
@@ -176,11 +194,11 @@ while [ "$DEPLOYMENT_SUCCESS" = false ] && [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         echo -e "${RED}Deployment failed!${NC}"
 
         # Check if it's a quota/capacity error
-        if echo "$DEPLOYMENT_OUTPUT" | grep -qi "quota\|capacity\|InsufficientQuota\|sku.*not available\|not available in"; then
+        if echo "$DEPLOYMENT_LOG" | grep -qi "quota\|capacity\|InsufficientQuota\|sku.*not available\|not available in"; then
             echo -e "${YELLOW}This appears to be a quota or capacity issue for region: $OPENAI_LOCATION${NC}"
             echo ""
             echo "Error details:"
-            echo "$DEPLOYMENT_OUTPUT" | grep -i "message\|error" | head -5
+            echo "$DEPLOYMENT_LOG" | grep -i "message\|error" | head -5
             echo ""
 
             if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
@@ -198,7 +216,7 @@ while [ "$DEPLOYMENT_SUCCESS" = false ] && [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         else
             # Not a quota error, show full error and exit
             echo "Error details:"
-            echo "$DEPLOYMENT_OUTPUT"
+            echo "$DEPLOYMENT_LOG"
             exit 1
         fi
     fi

@@ -1,0 +1,19 @@
+{
+ "schema": "aibast-brainstem-channel/1.0",
+ "channel": "frontier",
+ "kernel": "rapp_brainstem",
+ "repository": "microsoft/aibast-agents-library",
+ "version": "0.6.16",
+ "channel_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/frontier-channel.json",
+ "update_url": "https://microsoft.github.io/aibast-agents-library/",
+ "install": {
+  "bash": "curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash",
+  "powershell": "irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex"
+ },
+ "subscription": {
+  "default": "follow",
+  "pin": "Use an immutable tag or commit URL for this manifest.",
+  "off": "Set BRAINSTEM_UPDATE_CHANNEL_URL=off.",
+  "boundary": "The channel advertises the canonical Brainstem kernel. Forks that modify the kernel should pin or disable it; distro-owned catalogs and workshops should stay outside the kernel overlay."
+ }
+}

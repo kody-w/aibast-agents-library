@@ -13,6 +13,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Remember whether the caller supplied everything up front so a fully parameterized
+# run stays non-interactive (matches deploy.sh).
+$allArgsProvided = [bool]$ResourceGroup -and [bool]$Location -and [bool]$OpenAILocation
+
 $TemplateUrl = "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/azuredeploy.json"
 
 # Available OpenAI regions
@@ -119,8 +123,12 @@ Write-Host "  Location:        $Location"
 Write-Host "  OpenAI Location: $OpenAILocation"
 Write-Host ""
 
-$confirm = Read-Host "Proceed with deployment? (y/n) [y]"
-if (-not $confirm) { $confirm = "y" }
+if ($allArgsProvided) {
+    $confirm = "y"
+} else {
+    $confirm = Read-Host "Proceed with deployment? (y/n) [y]"
+    if (-not $confirm) { $confirm = "y" }
+}
 
 if ($confirm -notin @("y", "Y")) {
     Write-Host "Deployment cancelled."
@@ -148,30 +156,57 @@ while (-not $deploymentSuccess -and $retryCount -lt $maxRetries) {
     Write-Host "  - Application Insights"
     Write-Host ""
 
-    try {
-        $deploymentOutput = az deployment group create `
-            --resource-group $ResourceGroup `
-            --template-uri $TemplateUrl `
-            --parameters openAILocation=$OpenAILocation `
-            --query "properties.outputs" `
-            --output json 2>&1
+    $deploymentName = "rapp-$(Get-Date -Format 'yyyyMMddHHmmss')-$retryCount"
 
-        # Check if output is valid JSON (success)
-        $null = $deploymentOutput | ConvertFrom-Json
+    # az is a native command: it reports failure through the exit code, not a
+    # PowerShell exception, and $ErrorActionPreference='Stop' turns its stderr into a
+    # terminating error that would leave the output variable unassigned. Relax the
+    # preference around the call and branch on $LASTEXITCODE instead.
+    $previousErrorAction = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+
+    $deploymentLog = az deployment group create `
+        --name $deploymentName `
+        --resource-group $ResourceGroup `
+        --template-uri $TemplateUrl `
+        --parameters openAILocation=$OpenAILocation `
+        --output none 2>&1 | Out-String
+    $deploymentExitCode = $LASTEXITCODE
+
+    if ($deploymentExitCode -eq 0) {
+        # Read outputs in a separate call so az warnings on stderr can never corrupt
+        # the JSON document.
+        $outputsJson = az deployment group show `
+            --name $deploymentName `
+            --resource-group $ResourceGroup `
+            --query "properties.outputs" `
+            --output json 2>$null | Out-String
+        $outputsExitCode = $LASTEXITCODE
+    }
+
+    $ErrorActionPreference = $previousErrorAction
+
+    if ($deploymentExitCode -eq 0) {
+        if ($outputsExitCode -ne 0 -or [string]::IsNullOrWhiteSpace($outputsJson)) {
+            Write-Host "Deployment succeeded but outputs could not be read." -ForegroundColor Yellow
+            $deploymentOutput = [pscustomobject]@{}
+        } else {
+            $deploymentOutput = $outputsJson | ConvertFrom-Json
+        }
         $deploymentSuccess = $true
-    } catch {
+    } else {
         $retryCount++
         Write-Host ""
         Write-Host "Deployment failed!" -ForegroundColor Red
 
-        $errorMessage = $deploymentOutput -join "`n"
+        $errorMessage = $deploymentLog
 
         # Check if it's a quota/capacity error
         if ($errorMessage -match "quota|capacity|InsufficientQuota|sku.*not available|not available in") {
             Write-Host "This appears to be a quota or capacity issue for region: $OpenAILocation" -ForegroundColor Yellow
             Write-Host ""
             Write-Host "Error details:"
-            $errorMessage | Select-String -Pattern "message|error" | Select-Object -First 5 | ForEach-Object { Write-Host $_.Line }
+            $errorMessage -split "\r?\n" | Select-String -Pattern "message|error" | Select-Object -First 5 | ForEach-Object { Write-Host $_.Line }
             Write-Host ""
 
             if ($retryCount -lt $maxRetries) {
@@ -201,8 +236,6 @@ if (-not $deploymentSuccess) {
     Write-Host "Please check your Azure subscription quotas or try again later."
     exit 1
 }
-
-$deploymentOutput = $deploymentOutput | ConvertFrom-Json
 
 Write-Host "Deployment complete!" -ForegroundColor Green
 Write-Host ""

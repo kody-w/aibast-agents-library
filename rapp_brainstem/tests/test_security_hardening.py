@@ -104,6 +104,19 @@ def test_scrub_secrets_redacts_json_token_and_bearer():
     assert "QUOTED_AUTH_SECRET" not in out3 and "REDACTED" in out3
 
 
+def test_diagnostic_scrubber_redacts_ipv6_addresses():
+    full = "2001:db8:85a3::8a2e:370:7334"
+    bracketed = "2001:db8::1"
+    scoped = "fe80::1%en0"
+
+    scrubbed = bs._scrub_diagnostic_text(
+        f"failed from {full} via http://[{bracketed}]:7071 and {scoped}")
+
+    for address in (full, bracketed, scoped):
+        assert address not in scrubbed
+    assert scrubbed.count("<REDACTED_IP>") >= 3
+
+
 def test_diagnostics_report_scrubs_all_published_content(client, monkeypatch):
     monkeypatch.setattr(bs, "_tlog_save", lambda: None)
     monkeypatch.setattr(bs, "load_agents", lambda: {})
@@ -179,6 +192,60 @@ def test_diagnostics_report_scrubs_all_published_content(client, monkeypatch):
     assert form_response.headers["Location"].startswith(
         "https://github.com/microsoft/aibast-agents-library/issues/new?"
     )
+
+
+def test_diagnostics_clear_wins_over_concurrent_autosave(monkeypatch):
+    """A stale autosave cannot restore events after the user clears diagnostics."""
+    import threading
+
+    old_event = {"type": "old-event"}
+    writes = []
+    first_write_started = threading.Event()
+    allow_first_write = threading.Event()
+    cleared = threading.Event()
+    clear_finished = threading.Event()
+    state = {"blocked": False}
+
+    def fake_atomic_write(path, data):
+        if data == [old_event] and not state["blocked"]:
+            state["blocked"] = True
+            first_write_started.set()
+            assert allow_first_write.wait(timeout=5)
+        writes.append(data)
+
+    with bs._flight_log_lock:
+        original_log = list(bs._flight_log)
+        bs._flight_log[:] = [old_event]
+    monkeypatch.setattr(bs, "_atomic_write_json", fake_atomic_write)
+
+    def clear_and_save():
+        with bs._flight_log_lock:
+            bs._flight_log.clear()
+        cleared.set()
+        bs._tlog_save()
+        clear_finished.set()
+
+    stale_save = threading.Thread(target=bs._tlog_save)
+    clear_save = threading.Thread(target=clear_and_save)
+    try:
+        stale_save.start()
+        assert first_write_started.wait(timeout=5)
+        clear_save.start()
+        assert cleared.wait(timeout=5)
+        # Without serialization the clear save completes before the stale writer is
+        # released, making the stale snapshot the final durable state.
+        clear_finished.wait(timeout=1)
+        allow_first_write.set()
+        stale_save.join(timeout=5)
+        clear_save.join(timeout=5)
+        assert not stale_save.is_alive() and not clear_save.is_alive()
+        assert writes[-1] == []
+    finally:
+        allow_first_write.set()
+        stale_save.join(timeout=5)
+        clear_save.join(timeout=5)
+        with bs._flight_log_lock:
+            bs._flight_log[:] = original_log
 
 
 def test_support_report_synthesis_uses_scrubbed_transcript_without_tools(monkeypatch):
@@ -400,6 +467,28 @@ def test_matching_untrusted_host_and_origin_are_rejected(client):
     assert r.status_code == 400
 
 
+def test_configured_lan_hostname_is_rejected_when_lan_mode_is_disabled(client, monkeypatch):
+    """A LAN hostname must not re-enable same-origin loopback access by itself."""
+    called = {"agents": False}
+
+    def fake_load_agents():
+        called["agents"] = True
+        return {}
+
+    monkeypatch.setattr(bs, "LAN_MODE", False)
+    monkeypatch.setattr(bs, "_ALLOWED_HOSTS", {"localhost", "trusted.example"})
+    monkeypatch.setattr(bs, "load_agents", fake_load_agents)
+
+    response = client.get(
+        "/agents",
+        headers={"Host": "trusted.example", "Origin": "http://trusted.example"},
+        environ_overrides={"REMOTE_ADDR": "127.0.0.1"},
+    )
+
+    assert response.status_code == 400
+    assert called["agents"] is False
+
+
 def test_stream_get_is_method_not_allowed(client):
     r = client.get("/chat/stream")
     assert r.status_code == 405
@@ -421,6 +510,142 @@ def test_agent_import_rejects_digest_mismatch(client, monkeypatch, tmp_path):
     assert r.status_code == 400
     assert "integrity" in r.get_json()["error"].lower()
     assert not (tmp_path / "catalog_agent.py").exists()
+
+
+def _rar_discussion(*, reacted=False, title="@aibast-agents-library/test-agent"):
+    return {
+        "repository": {
+            "discussion": {
+                "id": "D_test",
+                "title": title,
+                "url": (
+                    "https://github.com/microsoft/"
+                    "aibast-agents-library/discussions/42"
+                ),
+                "viewerCanReact": True,
+                "category": {"name": "Announcements"},
+                "reactionGroups": [
+                    {
+                        "content": "THUMBS_UP",
+                        "viewerHasReacted": reacted,
+                        "reactors": {"totalCount": 3},
+                    },
+                    {
+                        "content": "THUMBS_DOWN",
+                        "viewerHasReacted": False,
+                        "reactors": {"totalCount": 9},
+                    },
+                ],
+            }
+        }
+    }
+
+
+def test_rar_upvote_requires_github_auth(client, monkeypatch):
+    monkeypatch.setattr(bs, "get_github_api_token", lambda: None)
+
+    response = client.post(
+        "/rar/upvote",
+        json={
+            "agent_name": "@aibast-agents-library/test-agent",
+            "discussion_number": 42,
+        },
+    )
+
+    assert response.status_code == 401
+    assert response.get_json()["code"] == "github_auth_required"
+    assert response.get_json()["discussion_url"].endswith("/discussions/42")
+
+
+def test_rar_upvote_records_one_positive_reaction(client, monkeypatch):
+    calls = []
+
+    def fake_graphql(token, query, variables):
+        calls.append((token, query, variables))
+        if query == bs._RAR_DISCUSSION_QUERY:
+            return _rar_discussion()
+        return {"addReaction": {"reaction": {"content": "THUMBS_UP"}}}
+
+    monkeypatch.setattr(bs, "get_github_api_token", lambda: "gho_test")
+    monkeypatch.setattr(bs, "_rar_graphql", fake_graphql)
+
+    response = client.post(
+        "/rar/upvote",
+        json={
+            "agent_name": "@aibast-agents-library/test-agent",
+            "discussion_number": 42,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["score"] == 4
+    assert response.get_json()["already_voted"] is False
+    assert len(calls) == 2
+    assert calls[1][2]["content"] == "THUMBS_UP"
+
+
+def test_rar_upvote_does_not_duplicate_a_positive_reaction(client, monkeypatch):
+    calls = []
+
+    def fake_graphql(token, query, variables):
+        calls.append(query)
+        return _rar_discussion(reacted=True)
+
+    monkeypatch.setattr(bs, "get_github_api_token", lambda: "gho_test")
+    monkeypatch.setattr(bs, "_rar_graphql", fake_graphql)
+
+    response = client.post(
+        "/rar/upvote",
+        json={
+            "agent_name": "@aibast-agents-library/test-agent",
+            "discussion_number": 42,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["already_voted"] is True
+    assert response.get_json()["score"] == 3
+    assert calls == [bs._RAR_DISCUSSION_QUERY]
+
+
+def test_rar_upvote_rejects_a_mismatched_discussion(client, monkeypatch):
+    monkeypatch.setattr(bs, "get_github_api_token", lambda: "gho_test")
+    monkeypatch.setattr(
+        bs,
+        "_rar_graphql",
+        lambda *_args, **_kwargs: _rar_discussion(
+            title="@aibast-agents-library/another-agent"
+        ),
+    )
+
+    response = client.post(
+        "/rar/upvote",
+        json={
+            "agent_name": "@aibast-agents-library/test-agent",
+            "discussion_number": 42,
+        },
+    )
+
+    assert response.status_code == 400
+    assert "does not match" in response.get_json()["error"]
+
+
+def test_github_api_token_prefers_the_brainstem_login_account(monkeypatch):
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.setattr(bs, "_gh_cli_token", lambda: "gho_write_capable")
+    monkeypatch.setattr(
+        bs, "_read_token_file", lambda: {"access_token": "ghu_copilot_only"}
+    )
+
+    assert bs.get_github_api_token() == "ghu_copilot_only"
+
+
+def test_github_api_token_uses_gh_cli_when_no_brainstem_login_exists(monkeypatch):
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.setattr(bs, "_read_token_file", lambda: None)
+    monkeypatch.setattr(bs, "_gh_cli_token", lambda: "gho_write_capable")
+
+    assert bs.get_github_api_token() == "gho_write_capable"
 
 
 # ── #4 MEDIUM: request size cap configured ─────────────────────────────────────

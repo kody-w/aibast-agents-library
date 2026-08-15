@@ -1,0 +1,63 @@
+name: Feature Request
+description: Propose an improvement to an AIBAST Agents Library surface
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This proposal will be public. Do not include credentials, internal URLs,
+        tenant IDs, customer data, proprietary code, private paths, or
+        unnecessary personal information.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Brainstem
+        - AIBAST RAR or registry
+        - Agent or industry stack
+        - Twin or workshop
+        - Installer or update channel
+        - Azure or RAPP AI
+        - Copilot Studio or Power Platform
+        - Badge or public profile workflow
+        - Documentation or GitHub Pages
+        - Governance or contribution process
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem should be solved, and for whom?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior and its source authority.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: textarea
+    id: public_interaction
+    attributes:
+      label: Public interaction and attribution
+      description: Explain any GitHub identity, publisher, badge, issue, workflow, or public Pages impact.
+
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundary confirmation
+      options:
+        - label: I reviewed the final public payload, removed prohibited information, and confirmed this proposal does not depend on automatic tenant or SharePoint authorization.
+          required: true

@@ -63,6 +63,34 @@ def test_rar_browser_pins_and_verifies_catalog_agents():
     assert "This executes Python code on your machine" in registry
 
 
+def test_rar_browser_is_aibast_owned_and_supports_direct_upvotes():
+    index = open(os.path.join(bs._BASE_DIR, "index.html"), encoding="utf-8").read()
+    registry = index[index.index("// ── AIBAST RAR Registry Browser"):index.index("async function copyDeviceCode")]
+
+    assert "const RAR_REPOSITORY = 'microsoft/aibast-agents-library'" in registry
+    assert "data.instance !== 'AIBAST RAR'" in registry
+    assert "data.repository !== RAR_REPOSITORY" in registry
+    assert "rarLiveJson('ratings.json')" in registry
+    assert "rarLiveJson('discussions.json')" in registry
+    assert "fetch(`${API}/rar/upvote`" in registry
+    assert "Open the AIBAST Discussion to vote on GitHub?" in registry
+    assert "public/global RAR" in registry
+
+
+def test_frontier_channel_is_opt_in_and_non_blocking():
+    index = open(os.path.join(bs._BASE_DIR, "index.html"), encoding="utf-8").read()
+    helper = index[index.index("function versionParts"):index.index("// ── Client-side flight recorder")]
+
+    assert "aibast-brainstem-channel/1.0" in helper
+    assert "channel.channel !== 'frontier'" in helper
+    assert "checkFrontierChannel(d.version, d.update_channel_url)" in helper
+    assert "channel checks never block" in helper
+
+    data = bs.app.test_client().get("/version").get_json()
+    assert data["version"] == bs.VERSION
+    assert data["update_channel_url"] == bs.UPDATE_CHANNEL_URL
+
+
 def test_stream_fallback_stops_after_response_is_accepted():
     index = open(os.path.join(bs._BASE_DIR, "index.html"), encoding="utf-8").read()
     send = index[index.index("async function sendMessage"):index.index("async function sendViaPost")]
@@ -363,6 +391,64 @@ def test_stream_rejects_malformed_history_as_json():
     r = bs.app.test_client().post(
         "/chat/stream", json={"user_input": "hi", "conversation_history": [None]})
     assert r.status_code == 400 and r.is_json
+
+
+def test_chat_skips_agent_with_malformed_custom_tool_definition(monkeypatch):
+    """A custom to_tool override cannot poison every chat request."""
+    class MalformedToolAgent:
+        name = "SafeAgent"
+
+        def to_tool(self):
+            return {"type": "function", "function": {"name": "not a valid tool name"}}
+
+        def system_context(self):
+            return ""
+
+    captured = {}
+
+    def fake_copilot(messages, tools=None):
+        captured["tools"] = tools
+        return ({
+            "choices": [{
+                "message": {"role": "assistant", "content": "still works"},
+                "finish_reason": "stop",
+            }],
+        }, "gpt-4o")
+
+    monkeypatch.setattr(bs, "load_soul", lambda: "SOUL")
+    monkeypatch.setattr(bs, "load_agents", lambda: {"SafeAgent": MalformedToolAgent()})
+    monkeypatch.setattr(bs, "call_copilot", fake_copilot)
+
+    response = bs.app.test_client().post("/chat", json={"user_input": "hi"})
+
+    assert response.status_code == 200
+    assert response.get_json()["response"] == "still works"
+    assert captured["tools"] is None
+
+
+@pytest.mark.parametrize("agent_name", ["ManageMemory", "ContextMemory"])
+def test_memory_tool_calls_ignore_model_invented_user_guid(agent_name):
+    """Tool output cannot choose another user's local memory namespace."""
+    received = {}
+
+    class MemoryAgent:
+        def perform(self, **kwargs):
+            received.update(kwargs)
+            return "ok"
+
+    results, _ = bs.run_tool_calls([{
+        "id": "call-1",
+        "function": {
+            "name": agent_name,
+            "arguments": json.dumps({
+                "content": "remember this",
+                "user_guid": "another-user",
+            }),
+        },
+    }], {agent_name: MemoryAgent()})
+
+    assert received == {"content": "remember this"}
+    assert results[0]["content"] == "ok"
 
 
 @pytest.mark.parametrize("arguments", ["{not json", "[]"])
