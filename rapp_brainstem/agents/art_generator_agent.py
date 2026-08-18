@@ -1,6 +1,11 @@
 import base64
+import hashlib
 import json
 import os
+import re
+import subprocess
+import time
+import uuid
 import webbrowser
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,6 +19,10 @@ from agents.basic_agent import BasicAgent
 _TOKEN_SCOPE = "https://cognitiveservices.azure.com/.default"
 _DEFAULT_API_VERSION = "2025-04-01-preview"
 _DEFAULT_DEPLOYMENT = "gpt-image-2"
+_DEFAULT_COMMONS_REPOSITORY = "kody-w/rapp-commons"
+_GITHUB_API_ROOT = "https://api.github.com"
+_COMMONS_LICENSE = "CC0-1.0"
+_MAX_COMMONS_IMAGE_BYTES = 20 * 1024 * 1024
 _ART_DIR = (
     Path(__file__).resolve().parents[1]
     / ".brainstem_data"
@@ -26,6 +35,18 @@ _SUPPORTED_SIZES = frozenset({
     "1536x1024",
 })
 _SUPPORTED_QUALITIES = frozenset({"low", "medium", "high"})
+_GITHUB_LOGIN_PATTERN = re.compile(
+    r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
+)
+_GITHUB_REPOSITORY_PATTERN = re.compile(
+    r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+)
+
+
+class _GitHubApiError(RuntimeError):
+    def __init__(self, status_code, message):
+        self.status_code = status_code
+        super().__init__(message)
 
 
 def _get_access_token():
@@ -176,6 +197,323 @@ def _save_image(image_bytes):
     return image_path
 
 
+def _get_github_token():
+    for variable in ("GH_TOKEN", "GITHUB_TOKEN"):
+        token = os.getenv(variable, "").strip()
+        if token:
+            return token
+
+    try:
+        result = subprocess.run(
+            ["gh", "auth", "token"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise RuntimeError(
+            "RAPP Commons publishing requires `gh auth login` or GH_TOKEN."
+        ) from exc
+
+    token = result.stdout.strip() if result.returncode == 0 else ""
+    if not token:
+        raise RuntimeError(
+            "RAPP Commons publishing requires `gh auth login` or GH_TOKEN."
+        )
+    return token
+
+
+def _github_response_message(response):
+    try:
+        payload = response.json()
+    except requests.exceptions.JSONDecodeError:
+        return response.text[:500].strip() or response.reason
+    if isinstance(payload, dict):
+        return str(payload.get("message") or payload)[:500]
+    return str(payload)[:500]
+
+
+def _github_request(
+    method,
+    path,
+    token,
+    payload=None,
+    expected=(200, 201),
+):
+    response = requests.request(
+        method,
+        f"{_GITHUB_API_ROOT}{path}",
+        headers={
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {token}",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "rapp-brainstem-art-generator",
+        },
+        json=payload,
+        timeout=30,
+    )
+    if response.status_code not in expected:
+        raise _GitHubApiError(
+            response.status_code,
+            f"GitHub API failed ({response.status_code}): "
+            f"{_github_response_message(response)}",
+        )
+    if response.status_code == 204 or not response.content:
+        return {}
+    try:
+        return response.json()
+    except requests.exceptions.JSONDecodeError as exc:
+        raise RuntimeError("GitHub API returned invalid JSON.") from exc
+
+
+def _commons_slug(title):
+    slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+    return (slug or "generated-art")[:40].rstrip("-")
+
+
+def _commons_repository():
+    repository = os.getenv(
+        "RAPP_COMMONS_REPOSITORY",
+        _DEFAULT_COMMONS_REPOSITORY,
+    ).strip()
+    if not _GITHUB_REPOSITORY_PATTERN.fullmatch(repository):
+        raise RuntimeError(
+            "RAPP_COMMONS_REPOSITORY must use the owner/repository format."
+        )
+    return repository
+
+
+def _target_repository(token, upstream_repository, login, repository_name):
+    upstream_owner = upstream_repository.split("/", 1)[0]
+    if login.lower() == upstream_owner.lower():
+        return upstream_repository
+
+    target_repository = f"{login}/{repository_name}"
+    try:
+        _github_request("GET", f"/repos/{target_repository}", token)
+        return target_repository
+    except _GitHubApiError as exc:
+        if exc.status_code != 404:
+            raise
+
+    _github_request(
+        "POST",
+        f"/repos/{upstream_repository}/forks",
+        token,
+        expected=(202,),
+    )
+    for _ in range(10):
+        try:
+            _github_request("GET", f"/repos/{target_repository}", token)
+            return target_repository
+        except _GitHubApiError as exc:
+            if exc.status_code != 404:
+                raise
+            time.sleep(1)
+    raise RuntimeError(
+        f"GitHub fork {target_repository} was not ready in time."
+    )
+
+
+def _publish_to_commons(
+    image_bytes,
+    title,
+    artist_statement,
+    deployment,
+    size,
+    quality,
+):
+    if len(image_bytes) > _MAX_COMMONS_IMAGE_BYTES:
+        raise RuntimeError(
+            "Generated image exceeds the 20 MB RAPP Commons submission limit."
+        )
+
+    token = _get_github_token()
+    user = _github_request("GET", "/user", token)
+    login = str(user.get("login") or "").strip()
+    if not _GITHUB_LOGIN_PATTERN.fullmatch(login):
+        raise RuntimeError("GitHub did not return a valid authenticated login.")
+
+    upstream_repository = _commons_repository()
+    repository_name = upstream_repository.split("/", 1)[1]
+    upstream = _github_request(
+        "GET",
+        f"/repos/{upstream_repository}",
+        token,
+    )
+    base_branch = str(upstream.get("default_branch") or "main")
+    cubby_path = f"cubbies/{login}/cubby.json"
+    try:
+        _github_request(
+            "GET",
+            f"/repos/{upstream_repository}/contents/"
+            f"{quote(cubby_path, safe='/')}?ref={quote(base_branch, safe='')}",
+            token,
+        )
+    except _GitHubApiError as exc:
+        if exc.status_code == 404:
+            raise RuntimeError(
+                f"Claim the {login} cubby in {upstream_repository} before "
+                "submitting generated art."
+            ) from exc
+        raise
+
+    target_repository = _target_repository(
+        token,
+        upstream_repository,
+        login,
+        repository_name,
+    )
+    target = _github_request("GET", f"/repos/{target_repository}", token)
+    target_base = str(target.get("default_branch") or base_branch)
+    base_ref = _github_request(
+        "GET",
+        f"/repos/{target_repository}/git/ref/heads/"
+        f"{quote(target_base, safe='')}",
+        token,
+    )
+    base_commit_sha = base_ref.get("object", {}).get("sha")
+    if not base_commit_sha:
+        raise RuntimeError("GitHub did not return the Commons base commit.")
+    base_commit = _github_request(
+        "GET",
+        f"/repos/{target_repository}/git/commits/{base_commit_sha}",
+        token,
+    )
+    base_tree_sha = base_commit.get("tree", {}).get("sha")
+    if not base_tree_sha:
+        raise RuntimeError("GitHub did not return the Commons base tree.")
+
+    submitted_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    digest = hashlib.sha256(image_bytes).hexdigest()[:8]
+    submission_id = uuid.uuid4().hex[:8]
+    artifact_slug = (
+        f"{submitted_at[:10]}-{_commons_slug(title)}-{digest}-{submission_id}"
+    )
+    asset_path = f"cubbies/{login}/show-and-tell/{artifact_slug}.png"
+    metadata_path = f"cubbies/{login}/show-and-tell/{artifact_slug}.md"
+    statement = artist_statement.strip() or (
+        "An original AI-assisted image shared with the RAPP Commons."
+    )
+    asset_name = asset_path.rsplit("/", 1)[1]
+    metadata = (
+        "---\n"
+        "schema: rapp-commons-art/1.0\n"
+        f"title: {json.dumps(title, ensure_ascii=False)}\n"
+        f"contributor: {json.dumps(login)}\n"
+        f"submitted_at: {json.dumps(submitted_at)}\n"
+        f"license: {_COMMONS_LICENSE}\n"
+        f"generator: {json.dumps(f'Azure GPT Image ({deployment})')}\n"
+        f"size: {json.dumps(size)}\n"
+        f"quality: {json.dumps(quality)}\n"
+        f"asset: {json.dumps(asset_name)}\n"
+        "---\n\n"
+        f"# {title}\n\n"
+        f"{statement}\n\n"
+        f"![{title}](./{asset_name})\n\n"
+        "This piece is dedicated to the public domain under CC0-1.0.\n"
+    ).encode("utf-8")
+
+    image_blob = _github_request(
+        "POST",
+        f"/repos/{target_repository}/git/blobs",
+        token,
+        {
+            "content": base64.b64encode(image_bytes).decode("ascii"),
+            "encoding": "base64",
+        },
+    )
+    metadata_blob = _github_request(
+        "POST",
+        f"/repos/{target_repository}/git/blobs",
+        token,
+        {
+            "content": base64.b64encode(metadata).decode("ascii"),
+            "encoding": "base64",
+        },
+    )
+    tree = _github_request(
+        "POST",
+        f"/repos/{target_repository}/git/trees",
+        token,
+        {
+            "base_tree": base_tree_sha,
+            "tree": [
+                {
+                    "path": asset_path,
+                    "mode": "100644",
+                    "type": "blob",
+                    "sha": image_blob["sha"],
+                },
+                {
+                    "path": metadata_path,
+                    "mode": "100644",
+                    "type": "blob",
+                    "sha": metadata_blob["sha"],
+                },
+            ],
+        },
+    )
+    commit = _github_request(
+        "POST",
+        f"/repos/{target_repository}/git/commits",
+        token,
+        {
+            "message": f"art: submit {title}",
+            "tree": tree["sha"],
+            "parents": [base_commit_sha],
+        },
+    )
+    branch = f"art/{_commons_slug(title)}-{submission_id}"
+    _github_request(
+        "POST",
+        f"/repos/{target_repository}/git/refs",
+        token,
+        {
+            "ref": f"refs/heads/{branch}",
+            "sha": commit["sha"],
+        },
+    )
+    head = (
+        branch
+        if target_repository == upstream_repository
+        else f"{login}:{branch}"
+    )
+    pull_request = _github_request(
+        "POST",
+        f"/repos/{upstream_repository}/pulls",
+        token,
+        {
+            "title": f"Art: {title}",
+            "head": head,
+            "base": base_branch,
+            "body": (
+                "## Generated art submission\n\n"
+                f"- Contributor: @{login}\n"
+                f"- License: `{_COMMONS_LICENSE}`\n"
+                f"- Image: `{asset_path}`\n"
+                f"- Statement: {statement}\n\n"
+                "Created by the RAPP Brainstem ArtGenerator agent."
+            ),
+        },
+    )
+    return {
+        "status": "pr_opened",
+        "repository": upstream_repository,
+        "branch": branch,
+        "pull_request_number": pull_request.get("number"),
+        "pull_request_url": pull_request.get("html_url"),
+        "asset_path": asset_path,
+        "metadata_path": metadata_path,
+        "license": _COMMONS_LICENSE,
+        "artifact_url_after_merge": (
+            f"https://raw.githubusercontent.com/{upstream_repository}/"
+            f"{base_branch}/{asset_path}"
+        ),
+    }
+
+
 class ArtGeneratorAgent(BasicAgent):
     def __init__(self):
         self.name = "ArtGenerator"
@@ -217,6 +555,36 @@ class ArtGeneratorAgent(BasicAgent):
                             "Open the saved image in the local default browser."
                         ),
                     },
+                    "publish_to_commons": {
+                        "type": "boolean",
+                        "default": False,
+                        "description": (
+                            "Open a public RAPP Commons pull request containing "
+                            "the generated PNG. Requires commons_title and "
+                            "cc0_confirmed=true."
+                        ),
+                    },
+                    "commons_title": {
+                        "type": "string",
+                        "maxLength": 120,
+                        "description": (
+                            "Public title for the piece. Required when "
+                            "publish_to_commons is true."
+                        ),
+                    },
+                    "commons_description": {
+                        "type": "string",
+                        "maxLength": 2000,
+                        "description": "Optional public artist statement.",
+                    },
+                    "cc0_confirmed": {
+                        "type": "boolean",
+                        "default": False,
+                        "description": (
+                            "Confirm the user owns the generated piece and "
+                            "dedicates it to the public domain under CC0-1.0."
+                        ),
+                    },
                 },
                 "required": ["description"],
             },
@@ -229,6 +597,10 @@ class ArtGeneratorAgent(BasicAgent):
         size="1024x1024",
         quality="medium",
         open_in_browser=True,
+        publish_to_commons=False,
+        commons_title="",
+        commons_description="",
+        cc0_confirmed=False,
         **kwargs,
     ):
         if not isinstance(description, str) or not description.strip():
@@ -244,19 +616,77 @@ class ArtGeneratorAgent(BasicAgent):
             raise ValueError(f"Unsupported image quality: {quality}")
         if not isinstance(open_in_browser, bool):
             raise ValueError("open_in_browser must be a boolean.")
+        if not isinstance(publish_to_commons, bool):
+            raise ValueError("publish_to_commons must be a boolean.")
+        if not isinstance(cc0_confirmed, bool):
+            raise ValueError("cc0_confirmed must be a boolean.")
+        if publish_to_commons:
+            if not cc0_confirmed:
+                raise ValueError(
+                    "CC0 confirmation is required before publishing publicly."
+                )
+            if not isinstance(commons_title, str) or not commons_title.strip():
+                raise ValueError(
+                    "commons_title is required when publish_to_commons is true."
+                )
+            if "\n" in commons_title or "\r" in commons_title:
+                raise ValueError("commons_title must be a single line.")
+            if len(commons_title.strip()) > 120:
+                raise ValueError("commons_title must be 120 characters or fewer.")
+            if not isinstance(commons_description, str):
+                raise ValueError("commons_description must be a string.")
+            if len(commons_description.strip()) > 2000:
+                raise ValueError(
+                    "commons_description must be 2000 characters or fewer."
+                )
 
         image_bytes, deployment = _request_image(prompt, size, quality)
         image_path = _save_image(image_bytes)
+        commons_submission = None
+        if publish_to_commons:
+            try:
+                commons_submission = _publish_to_commons(
+                    image_bytes=image_bytes,
+                    title=commons_title.strip(),
+                    artist_statement=commons_description.strip(),
+                    deployment=deployment,
+                    size=size,
+                    quality=quality,
+                )
+            except (
+                OSError,
+                RuntimeError,
+                ValueError,
+                requests.exceptions.RequestException,
+            ) as exc:
+                commons_submission = {
+                    "status": "error",
+                    "message": str(exc),
+                    "license": _COMMONS_LICENSE,
+                }
         browser_opened = (
             webbrowser.open_new_tab(image_path.as_uri())
             if open_in_browser
             else False
         )
 
-        return json.dumps({
+        result = {
             "status": "saved",
             "file_path": str(image_path),
             "deployment": deployment,
             "browser_opened": browser_opened,
             "message": "Generated art was saved locally.",
-        })
+        }
+        if commons_submission is not None:
+            result["commons_submission"] = commons_submission
+            if commons_submission["status"] == "pr_opened":
+                result["message"] = (
+                    "Generated art was saved locally and submitted to the "
+                    "RAPP Commons for review."
+                )
+            else:
+                result["message"] = (
+                    "Generated art was saved locally, but the RAPP Commons "
+                    "submission failed."
+                )
+        return json.dumps(result)
