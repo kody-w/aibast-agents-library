@@ -95,7 +95,14 @@ const packageDir = path.resolve(dirname, "..");
 // The blue-brain app icon (build/icon.png), used for the window, the dock, and
 // the taskbar so the running app never shows the default Electron icon. Packaged
 // builds pick up build/icon.icns / .ico / icons/ via package.json.
-const appIconFile = path.join(packageDir, "build", "icon.png");
+// A rappid-first estate wears its own mark: when the species engine is on this
+// machine the tile goes hatch-green (build/icon-rappid.png — same brain glyph,
+// egg-cracked), so a rappid Frontier and a stock Brainstem Frontier are
+// distinguishable in the dock at a glance.
+const rappidIconFile = path.join(packageDir, "build", "icon-rappid.png");
+const appIconFile = resolveRappidEngine() && existsSync(rappidIconFile)
+  ? rappidIconFile
+  : path.join(packageDir, "build", "icon.png");
 const appIcon = existsSync(appIconFile) ? nativeImage.createFromPath(appIconFile) : null;
 const uiFile = path.join(dirname, "..", "ui", "index.html");
 const uiUrl = pathToFileURL(uiFile).href;
