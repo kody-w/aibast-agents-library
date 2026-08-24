@@ -647,3 +647,27 @@ test("a trace that cannot be written does not turn a finished command into a fai
     rmSync(root, { force: true, recursive: true });
   }
 });
+
+test("loopback mic permission: audio-only, own window, loopback frame — nothing else", async () => {
+  const { allowsLoopbackMicPermission } = await import("../electron/ui-driver-server.mjs");
+  const win = { id: 1 };
+  const opts = {
+    windowWebContents: win,
+    isLoopbackUrl: (url) => url.startsWith("http://127.0.0.1:7071/"),
+  };
+  const audio = { mediaTypes: ["audio"], requestingUrl: "http://127.0.0.1:7071/" };
+  assert.equal(allowsLoopbackMicPermission(win, "media", audio, opts), true);
+  // every gate fails closed
+  assert.equal(allowsLoopbackMicPermission(win, "geolocation", audio, opts), false);
+  assert.equal(allowsLoopbackMicPermission({ id: 2 }, "media", audio, opts), false);
+  assert.equal(allowsLoopbackMicPermission(win, "media",
+    { ...audio, mediaTypes: ["audio", "video"] }, opts), false);
+  assert.equal(allowsLoopbackMicPermission(win, "media",
+    { ...audio, mediaTypes: ["video"] }, opts), false);
+  assert.equal(allowsLoopbackMicPermission(win, "media",
+    { ...audio, requestingUrl: "https://evil.example/" }, opts), false);
+  assert.equal(allowsLoopbackMicPermission(win, "media", { mediaTypes: ["audio"] }, opts), false);
+  assert.equal(allowsLoopbackMicPermission(win, "media", undefined, opts), false);
+  assert.equal(allowsLoopbackMicPermission(win, "media", audio, {}), false);
+  assert.equal(allowsLoopbackMicPermission(win, "media", audio), false);
+});

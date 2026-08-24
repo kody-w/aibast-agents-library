@@ -2737,3 +2737,18 @@ export const uiDriverInternals = {
 export function allowsUiDriverMediaPermission(webContents, permission) {
   return permission === "media" && webContents === recordingPermissionWebContents;
 }
+
+// Conversation mode in the hosted Brainstem chat needs the microphone. Grant
+// media ONLY when: it is the app's own window, the request asks for audio and
+// nothing else, and the requesting frame is the local loopback UI. Video and
+// remote pages stay denied.
+export function allowsLoopbackMicPermission(webContents, permission, details, {
+  windowWebContents = null,
+  isLoopbackUrl = () => false,
+} = {}) {
+  if (permission !== "media") return false;
+  if (!windowWebContents || webContents !== windowWebContents) return false;
+  const types = details?.mediaTypes;
+  if (!Array.isArray(types) || types.length !== 1 || types[0] !== "audio") return false;
+  return Boolean(isLoopbackUrl(details?.requestingUrl || ""));
+}

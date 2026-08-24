@@ -58,6 +58,7 @@ import {
 import { isAllowedStoreSourceUrl, RappStoreClient, STORE_SOURCES } from "./rapp-store.mjs";
 import { TwinManager } from "./twin-manager.mjs";
 import {
+  allowsLoopbackMicPermission,
   allowsUiDriverMediaPermission,
   startUiDriverServer,
 } from "./ui-driver-server.mjs";
@@ -2745,8 +2746,16 @@ if (!hasLock) {
     if (appIcon && !appIcon.isEmpty() && process.platform === "darwin" && app.dock) {
       app.dock.setIcon(appIcon);
     }
-    session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
-      callback(allowsUiDriverMediaPermission(webContents, permission));
+    session.defaultSession.setPermissionRequestHandler((webContents, permission, callback, details) => {
+      callback(
+        allowsUiDriverMediaPermission(webContents, permission)
+        // audio-only, own window, loopback frame: the Brainstem chat's
+        // conversation mode microphone — video and remote pages stay denied
+        || allowsLoopbackMicPermission(webContents, permission, details, {
+          windowWebContents: mainWindow?.webContents ?? null,
+          isLoopbackUrl: loopbackUrl,
+        }),
+      );
     });
     registerIpc();
     installApplicationMenu();
