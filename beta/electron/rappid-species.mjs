@@ -11,7 +11,15 @@
 // `frontier-twin:<storeId>` and an installed rapplication to
 // `frontier-rapplication:<storeId>`, so the same citizen is the same creature
 // across sessions and re-hatch is idempotent.
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { homedir } from "node:os";
 import { createHash } from "node:crypto";
 import path from "node:path";
@@ -27,6 +35,32 @@ export const RAPPID_KINDS = Object.freeze({
   rapplication: {},
 });
 export const HOST_SPECIES = "brainstem";
+
+// Creature cries are DEVICE state, not app state: one flag in the rapp home,
+// shared with the engine's `rappidex mute` and the `roar mute` hook wrapper,
+// so muting anywhere mutes everywhere (a surprise roar mid-demo is worse than
+// none). RAPPID_MUTE=1 overrides read-only, exactly as the engine treats it.
+// Mute silences audio only — every rite still runs, seals, and records.
+export function muteFlagPath({ env = process.env, home = homedir() } = {}) {
+  return path.join(env.RAPP_HOME || path.join(home, ".rapp"), "mute");
+}
+
+export function criesMuted({ env = process.env, home = homedir() } = {}) {
+  const override = env.RAPPID_MUTE;
+  if (override !== undefined && override !== "" && override !== "0") return true;
+  return existsSync(muteFlagPath({ env, home }));
+}
+
+export function setCriesMuted(on, { env = process.env, home = homedir() } = {}) {
+  const flag = muteFlagPath({ env, home });
+  if (on) {
+    mkdirSync(path.dirname(flag), { recursive: true });
+    writeFileSync(flag, `${new Date().toISOString()}\n`);
+  } else {
+    rmSync(flag, { force: true });
+  }
+  return criesMuted({ env, home });
+}
 
 export function resolveRappidEngine({ env = process.env, home = homedir() } = {}) {
   const candidates = [];

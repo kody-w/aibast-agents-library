@@ -49,9 +49,11 @@ import {
 } from "./log-redaction.mjs";
 import { BetaRouteManager } from "./route-manager.mjs";
 import {
+  criesMuted,
   hatchCitizen,
   resolveRappidEngine,
   rosterFor,
+  setCriesMuted,
 } from "./rappid-species.mjs";
 import { isAllowedStoreSourceUrl, RappStoreClient, STORE_SOURCES } from "./rapp-store.mjs";
 import { TwinManager } from "./twin-manager.mjs";
@@ -2337,6 +2339,15 @@ function installApplicationMenu() {
     submenu: [
       chatLookMenu,
       { type: "separator" },
+      {
+        id: "mute-creature-cries",
+        label: "Mute Creature Cries",
+        type: "checkbox",
+        // one device-wide flag, shared with `rappidex mute` / `roar mute`
+        checked: criesMuted(),
+        click: (item) => { item.checked = setCriesMuted(item.checked); },
+      },
+      { type: "separator" },
       { role: "reload" },
       { role: "forceReload" },
       { role: "toggleDevTools" },
@@ -2784,6 +2795,13 @@ if (!hasLock) {
   app.on("activate", () => {
     if (!mainWindow || mainWindow.isDestroyed()) mainWindow = createWindow();
     mainWindow.show();
+  });
+
+  // the mute flag is device state (`roar mute` in a terminal changes it while
+  // the app is open) — re-read it whenever the app comes back to front
+  app.on("browser-window-focus", () => {
+    const item = Menu.getApplicationMenu()?.getMenuItemById("mute-creature-cries");
+    if (item) item.checked = criesMuted();
   });
 
   app.on("window-all-closed", () => {

@@ -6,11 +6,14 @@ import test from "node:test";
 
 import {
   anchorSha,
+  criesMuted,
   hatchCitizen,
   loadRoster,
+  muteFlagPath,
   rappidAnchor,
   resolveRappidEngine,
   rosterFor,
+  setCriesMuted,
 } from "../electron/rappid-species.mjs";
 
 // These tests exercise the BRIDGE contract only. The engine below is a stub
@@ -208,4 +211,19 @@ json.dump({"rappid": "rappid:@test/brainstem-racer:ff", "species": "brainstem",
     if (previous === undefined) delete process.env.RAPP_HOME;
     else process.env.RAPP_HOME = previous;
   }
+});
+
+test("mute is one device-wide flag shared with the engine, env-overridable", () => {
+  const rappHome = mkdtempSync(path.join(tmpdir(), "rappid-mute-"));
+  const env = { RAPP_HOME: rappHome };
+  assert.equal(muteFlagPath({ env }), path.join(rappHome, "mute"));
+  assert.equal(criesMuted({ env }), false);
+  assert.equal(setCriesMuted(true, { env }), true);
+  assert.equal(criesMuted({ env }), true);                       // flag written
+  assert.equal(setCriesMuted(false, { env }), false);
+  assert.equal(criesMuted({ env }), false);                      // flag removed
+  assert.equal(setCriesMuted(false, { env }), false);            // idempotent off
+  assert.equal(criesMuted({ env: { ...env, RAPPID_MUTE: "1" } }), true);
+  assert.equal(criesMuted({ env: { ...env, RAPPID_MUTE: "0" } }), false);
+  assert.equal(criesMuted({ env: { ...env, RAPPID_MUTE: "" } }), false);
 });
