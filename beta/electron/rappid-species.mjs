@@ -11,7 +11,7 @@
 // `frontier-twin:<storeId>` and an installed rapplication to
 // `frontier-rapplication:<storeId>`, so the same citizen is the same creature
 // across sessions and re-hatch is idempotent.
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { createHash } from "node:crypto";
 import path from "node:path";
@@ -39,6 +39,11 @@ export function resolveRappidEngine({ env = process.env, home = homedir() } = {}
   return null;
 }
 
+// ANCHOR CONTRACT (one-way door — sealed creatures carry these strings):
+// `frontier-<kind>:<id>` where <id> is the citizen's stable identity — the
+// catalog storeId for store citizens (the same id in two catalog sources IS
+// the same citizen), else the citizen's own rapp/1 mint for egg twins, else
+// its name. Changing this format orphans every creature already born of it.
 export function rappidAnchor(kind, id) {
   if (!RAPPID_KINDS[kind]) throw new Error(`Unknown rappid kind: ${kind}`);
   return `frontier-${kind}:${id}`;
@@ -62,14 +67,24 @@ function recordSummary(record) {
 }
 
 // Roster = every anchored, sealed record in the rapp home, keyed by anchor sha.
+// Cached per home, validated by the rappids directory's mtime (a new creature
+// is a new subdirectory), and busted explicitly after a hatch — tile repaints
+// and store renders must not re-read every record file.
+const rosterCache = new Map();   // rappidsDir -> { mtimeMs, byAnchor }
+
 export function loadRoster({ env = process.env, home = homedir() } = {}) {
   const rappHome = env.RAPP_HOME || path.join(home, ".rapp");
   const rappidsDir = path.join(rappHome, "rappids");
   const byAnchor = new Map();
   let entries = [];
   try {
+    const mtimeMs = statSync(rappidsDir).mtimeMs;
+    const cached = rosterCache.get(rappidsDir);
+    if (cached && cached.mtimeMs === mtimeMs) return cached.byAnchor;
     entries = readdirSync(rappidsDir, { withFileTypes: true });
+    rosterCache.set(rappidsDir, { mtimeMs, byAnchor });
   } catch {
+    rosterCache.delete(rappidsDir);
     return byAnchor;
   }
   for (const entry of entries) {
@@ -89,10 +104,45 @@ export function loadRoster({ env = process.env, home = homedir() } = {}) {
   return byAnchor;
 }
 
+// The engine's owner resolution depends on launch environment (a shell export,
+// a file a brainstem reinstall wipes) — creatures were forking between
+// @<owner> and @local. The existing sealed records are the durable source:
+// pass their majority owner explicitly, unless the environment already says.
+export function resolveOwner({ env = process.env, home = homedir() } = {}) {
+  if (env.RAPPIDEX_OWNER) return env.RAPPIDEX_OWNER;
+  const counts = new Map();
+  const rappHome = env.RAPP_HOME || path.join(home, ".rapp");
+  let entries = [];
+  try {
+    entries = readdirSync(path.join(rappHome, "rappids"), { withFileTypes: true });
+  } catch {
+    return null;
+  }
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    try {
+      const record = JSON.parse(readFileSync(
+        path.join(rappHome, "rappids", entry.name, "rappid.json"), "utf8",
+      ));
+      const match = /^rappid:@([^/]+)\//.exec(record.rappid || "");
+      if (match && match[1] !== "local") {
+        counts.set(match[1], (counts.get(match[1]) || 0) + 1);
+      }
+    } catch { /* not a record */ }
+  }
+  let best = null;
+  for (const [owner, count] of counts) {
+    if (!best || count > counts.get(best)) best = owner;
+  }
+  return best;
+}
+
 function runEngine(engine, args, { timeoutMs = 320000 } = {}) {
+  const owner = resolveOwner();
   return new Promise((resolve) => {
     const child = spawn("python3", [engine.script, ...args], {
       cwd: engine.dir,
+      env: owner ? { ...process.env, RAPPIDEX_OWNER: owner } : process.env,
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stdout = "";
@@ -115,27 +165,38 @@ function runEngine(engine, args, { timeoutMs = 320000 } = {}) {
 // existing sealed record for the anchor is returned without a new rite. The
 // species is the HOST AI running the citizen (brainstem here), so the species
 // itself attests the birth — no stand-in midwife.
-export async function hatchCitizen({ engine, kind, id, title, species = HOST_SPECIES }) {
-  if (!engine) return { ok: false, error: "no-engine" };
+const inFlightRites = new Map();   // anchor sha -> pending hatch promise
+
+export function hatchCitizen({ engine, kind, id, title, species = HOST_SPECIES }) {
+  if (!engine) return Promise.resolve({ ok: false, error: "no-engine" });
   if (!RAPPID_KINDS[kind]) throw new Error(`Unknown rappid kind: ${kind}`);
   const anchor = rappidAnchor(kind, id);
   const sha = anchorSha(anchor);
-  const existing = loadRoster().get(sha);
-  if (existing) return { ok: true, record: existing, hatched: false };
-  const result = await runEngine(engine, [
-    "hatch", species,
-    "--anchor", anchor,
-    "--anchor-title", title || id,
-  ]);
-  const record = loadRoster().get(sha);
-  if (!record) {
-    return {
-      ok: false,
-      error: "unsealed",
-      detail: (result.stderr || result.stdout).slice(-400),
-    };
-  }
-  return { ok: true, record, hatched: true };
+  // Two concurrent requests for one anchor must share one rite — otherwise
+  // both pass the roster check and two creatures race for the same identity.
+  const pending = inFlightRites.get(sha);
+  if (pending) return pending;
+  const rite = (async () => {
+    const existing = loadRoster().get(sha);
+    if (existing) return { ok: true, record: existing, hatched: false };
+    const result = await runEngine(engine, [
+      "hatch", species,
+      "--anchor", anchor,
+      "--anchor-title", title || id,
+    ]);
+    rosterCache.clear();
+    const record = loadRoster().get(sha);
+    if (!record) {
+      return {
+        ok: false,
+        error: "unsealed",
+        detail: (result.stderr || result.stdout).slice(-400),
+      };
+    }
+    return { ok: true, record, hatched: true };
+  })();
+  inFlightRites.set(sha, rite);
+  return rite.finally(() => inFlightRites.delete(sha));
 }
 
 // Answer the renderer's roster query: [{kind, id}] -> { "kind:id": record|null }.

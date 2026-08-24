@@ -22,7 +22,13 @@ const rappidRecords = new Map();   // "kind:id" -> record | null
 const rappidHatching = new Set();  // in-flight rites, so a rite runs once
 
 function twinRappidId(twin) {
-  return twin.storeId || twin.name || twin.id;
+  // Anchor contract (matches electron/rappid-species.mjs): storeId for store
+  // citizens; an egg twin (storeId null) anchors on its own rapp/1 mint so
+  // two different eggs sharing a display name stay two creatures. Never the
+  // per-session twin.id — that would mint a new creature every launch.
+  if (twin.storeId) return twin.storeId;
+  if (twin.rappid) return `rapp-${twin.rappid.slice(-16)}`;
+  return twin.name || twin.id;
 }
 
 async function refreshRappidRoster(extraKeys = []) {
@@ -47,8 +53,14 @@ async function ensureCitizenRappid(kind, id, title) {
   rappidHatching.add(key);
   try {
     const result = await window.brainstemBeta.rappidHatch(kind, id, title);
-    if (result?.ok) rappidRecords.set(key, result.record);
-  } catch { /* an unsealed egg stays an egg */ }
+    if (result?.ok) {
+      rappidRecords.set(key, result.record);
+    } else if (result && result.error !== "no-engine" && surgeonGridEl) {
+      // A failed rite must be seen, not swallowed — same line every other
+      // herd failure uses. (No engine on the machine is not a failure.)
+      flashHerdError(surgeonGridEl, `The rite for ${title || id} did not seal: ${result.detail || result.error}`);
+    }
+  } catch { /* IPC failure — the egg stays an egg */ }
   finally {
     rappidHatching.delete(key);
     await refreshRappidRoster([{ kind, id }]);

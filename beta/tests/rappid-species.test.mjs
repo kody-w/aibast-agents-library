@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, writeFileSync, chmodSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, chmodSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -146,6 +146,64 @@ if sys.argv[1] == "hatch":
     });
     assert.equal(again.ok, true);
     assert.equal(again.hatched, false);   // one creature per anchor
+  } finally {
+    if (previous === undefined) delete process.env.RAPP_HOME;
+    else process.env.RAPP_HOME = previous;
+  }
+});
+
+test("resolveOwner prefers env, else the majority owner of sealed records", async () => {
+  const { resolveOwner } = await import("../electron/rappid-species.mjs");
+  const temporary = mkdtempSync(path.join(tmpdir(), "rappid-owner-"));
+  for (const [dir, owner] of [["a", "kody-w"], ["b", "kody-w"], ["c", "local"]]) {
+    writeRecord(temporary, dir, { rappid: `rappid:@${owner}/${dir}:ee` });
+  }
+  assert.equal(resolveOwner({ env: { RAPP_HOME: temporary } }), "kody-w");
+  assert.equal(
+    resolveOwner({ env: { RAPP_HOME: temporary, RAPPIDEX_OWNER: "override" } }),
+    "override",
+  );
+  assert.equal(
+    resolveOwner({ env: { RAPP_HOME: path.join(temporary, "empty") } }),
+    null,
+  );
+});
+
+test("concurrent hatches of one anchor share a single rite", async () => {
+  const temporary = mkdtempSync(path.join(tmpdir(), "rappid-race-"));
+  const rappHome = path.join(temporary, "rapp-home");
+  const engineDir = path.join(temporary, "engine");
+  mkdirSync(path.join(engineDir, "species"), { recursive: true });
+  const sha = anchorSha(rappidAnchor("twin", "racer"));
+  const stub = `#!/usr/bin/env python3
+import json, os, sys, time
+time.sleep(0.3)
+with open(os.path.join(os.environ["RAPP_HOME"], "runs.log"), "a") as f:
+    f.write("run\\n")
+home = os.path.join(os.environ["RAPP_HOME"], "rappids", "brainstem-racer")
+os.makedirs(home, exist_ok=True)
+json.dump({"rappid": "rappid:@test/brainstem-racer:ff", "species": "brainstem",
+           "genome_id": "aaaabbbbcccc",
+           "birth": {"seal": "s" * 64, "anchor": {"sha256": "__SHA__"}}},
+          open(os.path.join(home, "rappid.json"), "w"))
+`.replace("__SHA__", sha);
+  const script = path.join(engineDir, "species", "rappidex.py");
+  mkdirSync(rappHome, { recursive: true });
+  writeFileSync(script, stub);
+  chmodSync(script, 0o755);
+  const previous = process.env.RAPP_HOME;
+  process.env.RAPP_HOME = rappHome;
+  try {
+    const engine = { dir: engineDir, script };
+    const [first, second] = await Promise.all([
+      hatchCitizen({ engine, kind: "twin", id: "racer", title: "Racer" }),
+      hatchCitizen({ engine, kind: "twin", id: "racer", title: "Racer" }),
+    ]);
+    assert.equal(first.ok, true);
+    assert.equal(second.ok, true);
+    assert.equal(first.record.genome_id, second.record.genome_id);
+    const runs = readFileSync(path.join(rappHome, "runs.log"), "utf8").trim().split("\n");
+    assert.equal(runs.length, 1);   // one rite, not two
   } finally {
     if (previous === undefined) delete process.env.RAPP_HOME;
     else process.env.RAPP_HOME = previous;
