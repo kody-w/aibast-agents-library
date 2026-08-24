@@ -48,6 +48,11 @@ import {
   redactSensitiveValue,
 } from "./log-redaction.mjs";
 import { BetaRouteManager } from "./route-manager.mjs";
+import {
+  hatchCitizen,
+  resolveRappidEngine,
+  rosterFor,
+} from "./rappid-species.mjs";
 import { isAllowedStoreSourceUrl, RappStoreClient, STORE_SOURCES } from "./rapp-store.mjs";
 import { TwinManager } from "./twin-manager.mjs";
 import {
@@ -2620,6 +2625,19 @@ function registerIpc() {
     assertTrustedIpc(event);
     twinManager.loop(id, goal).catch(() => {});   // errors surface as a twin-message in the room
     return { ok: true, looping: id };
+  });
+  // ── rappid-first citizenship: twins and rapplications are BORN creatures ──
+  // (rappidex/1 — the Brainstem kernel itself is the midwife; no engine on
+  // this machine simply means the capability reports itself off.)
+  ipcMain.handle("beta:rappid-roster", async (event, keys) => {
+    assertTrustedIpc(event);
+    const engine = resolveRappidEngine();
+    return { engine: Boolean(engine), records: rosterFor(keys) };
+  });
+  ipcMain.handle("beta:rappid-hatch", async (event, kind, id, title) => {
+    assertTrustedIpc(event);
+    const engine = resolveRappidEngine();
+    return hatchCitizen({ engine, kind, id, title });
   });
   ipcMain.handle("beta:twin-close", async (event, id) => {
     assertTrustedIpc(event);

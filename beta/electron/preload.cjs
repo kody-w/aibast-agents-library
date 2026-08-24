@@ -79,6 +79,10 @@ contextBridge.exposeInMainWorld("brainstemBeta", {
   storeList: () => ipcRenderer.invoke("beta:store-list"),
   storeSource: (next) => ipcRenderer.invoke("beta:store-source", next || null),
   storeInstallAgent: (id) => ipcRenderer.invoke("beta:store-install-agent", id),
+  rappidRoster: (keys) => ipcRenderer.invoke("beta:rappid-roster", keys || []),
+  rappidHatch: (kind, id, title) => (
+    ipcRenderer.invoke("beta:rappid-hatch", kind, id, title)
+  ),
   twinList: () => ipcRenderer.invoke("beta:twin-list"),
   twinHatch: (storeId, instruction) => ipcRenderer.invoke("beta:twin-hatch", storeId, instruction),
   twinHatchEgg: (payload) => ipcRenderer.invoke("beta:twin-hatch-egg", payload),

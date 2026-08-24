@@ -13,6 +13,51 @@ let surgeonHerdEl = null;
 let surgeonGridEl = null;
 // RAPPlication twins hatched into the herd (id -> {descriptor, tileEl}).
 const twins = new Map();
+// ── rappid-first UI/UX ──────────────────────────────────────────────────────
+// Twins and rapplications are rappids (rappidex/1): born creatures with a
+// genome, a rarity, and a cry — attested by the Brainstem kernel itself. The
+// roster below mirrors the device's rapp home; hatching happens through the
+// same UI a person (or a fellow rappid driving this UI headlessly) can watch.
+const rappidRecords = new Map();   // "kind:id" -> record | null
+const rappidHatching = new Set();  // in-flight rites, so a rite runs once
+
+function twinRappidId(twin) {
+  return twin.storeId || twin.name || twin.id;
+}
+
+async function refreshRappidRoster(extraKeys = []) {
+  const keys = [...extraKeys];
+  for (const entry of twins.values()) {
+    keys.push({ kind: "twin", id: twinRappidId(entry.descriptor) });
+  }
+  try {
+    const { records } = await window.brainstemBeta.rappidRoster(keys);
+    for (const [key, record] of Object.entries(records || {})) {
+      rappidRecords.set(key, record);
+    }
+  } catch { /* capability off — badges simply stay in the egg state */ }
+  for (const entry of twins.values()) {
+    if (entry.tileEl) updateTwinTile(entry.tileEl, entry.descriptor);
+  }
+}
+
+function rappidBadgeText(record) {
+  return `\u{1F423} ${record.rarity || "?"} \u00B7 ${record.genome_id || "?"}`;
+}
+
+async function ensureCitizenRappid(kind, id, title) {
+  const key = `${kind}:${id}`;
+  if (rappidRecords.get(key) || rappidHatching.has(key)) return;
+  rappidHatching.add(key);
+  try {
+    const result = await window.brainstemBeta.rappidHatch(kind, id, title);
+    if (result?.ok) rappidRecords.set(key, result.record);
+  } catch { /* an unsealed egg stays an egg */ }
+  finally {
+    rappidHatching.delete(key);
+    await refreshRappidRoster([{ kind, id }]);
+  }
+}
 const surgeonHistoryKey = "rapp-brainstem-beta-surgeon-sessions-v1";
 const surgeonOpenKey = "rapp-brainstem-beta-surgeon-open-v1";
 const explorer = document.getElementById("explorer");
@@ -1196,6 +1241,11 @@ async function renderStorePicker(panel, herd) {
   try { source = await window.brainstemBeta.storeSource(); } catch { /* defaults */ }
   const head = document.createElement("div");
   head.className = "store-sources";
+  const creed = document.createElement("div");
+  creed.className = "rappid-first-creed";
+  creed.dataset.drive = "shell.rappidCreed";
+  creed.textContent = "\u{1F996} rappid-first \u2014 every twin and rapplication here is a born creature, and rappids drive this same UI beside you.";
+  head.appendChild(creed);
   const mkTab = (label, active, onPick, title) => {
     const b = document.createElement("button");
     b.type = "button";
@@ -1264,6 +1314,27 @@ async function renderStorePicker(panel, herd) {
         try { await window.brainstemBeta.twinHatch(entry.id); }
         catch (cause) { flashHerdError(herd, `Couldn't hatch ${entry.name}: ${cause?.message || cause}`); }
       });
+      const citizen = document.createElement("button");
+      citizen.type = "button";
+      citizen.className = "store-rappid";
+      citizen.dataset.drive = `store[${driveKey(entry.id)}].rappid`;
+      const paintCitizen = () => {
+        const record = rappidRecords.get(`rapplication:${entry.id}`);
+        const hatching = rappidHatching.has(`rapplication:${entry.id}`);
+        citizen.textContent = record ? rappidBadgeText(record)
+          : hatching ? "\u{1F95A}\u2026" : "\u{1F95A} hatch";
+        citizen.disabled = Boolean(record) || hatching;
+        citizen.title = record
+          ? `${record.display_name || ""} \u2014 ${record.rappid || ""}`
+          : "Hatch this rapplication's rappid (the Brainstem attests the birth)";
+      };
+      paintCitizen();
+      citizen.addEventListener("paint", paintCitizen);
+      citizen.addEventListener("click", async () => {
+        paintCitizen();
+        await ensureCitizenRappid("rapplication", entry.id, entry.name);
+        paintCitizen();
+      });
       const install = document.createElement("button");
       install.type = "button";
       install.className = "store-install";
@@ -1276,15 +1347,24 @@ async function renderStorePicker(panel, herd) {
         try {
           const r = await window.brainstemBeta.storeInstallAgent(entry.id);
           install.textContent = "✓ Installed";
+          // Rappid-first: an installed rapplication is a citizen — born, not minted.
+          void ensureCitizenRappid("rapplication", entry.id, entry.name).then(paintCitizen);
           flashHerdError(herd, `${entry.name} installed into the Brainstem as ${r.filename} — ready on your next message.`);
         } catch (cause) {
           install.disabled = false; install.textContent = "⇣ Install";
           flashHerdError(herd, `Couldn't install ${entry.name}: ${cause?.message || cause}`);
         }
       });
-      row.append(hatch, install);
+      row.append(hatch, install, citizen);
       panel.appendChild(row);
     }
+    // Paint any already-born rapplications on this shelf.
+    void refreshRappidRoster(live.map((entry) => ({ kind: "rapplication", id: entry.id })))
+      .then(() => {
+        for (const row of panel.querySelectorAll(".store-row")) {
+          row.querySelector(".store-rappid")?.dispatchEvent(new Event("paint"));
+        }
+      });
   } catch (cause) {
     panel.replaceChildren(head, customRow);
     panel.append(`This RAR source is unavailable: ${cause?.message || cause}`);
@@ -1435,6 +1515,7 @@ function twinTileFor(twin) {
       <span class="cl" title="Close twin">×</span>
     </div>
     <div class="twin-meta"></div>
+    <button class="twin-rappid" type="button" title="This twin's rappid (rappidex/1)"></button>
     <div class="twin-chat" aria-live="polite"></div>
     <button class="twin-signin" type="button" hidden>Sign in to continue →</button>
     <div class="twin-comp">
@@ -1469,6 +1550,11 @@ function twinTileFor(twin) {
   tile.querySelector(".tw-loop").dataset.drive = `twin[${driveKey(twin.id)}].loop`;
   textarea.dataset.drive = `twin[${driveKey(twin.id)}].composer`;
   tile.querySelector(".tw-send").dataset.drive = `twin[${driveKey(twin.id)}].send`;
+  const rappidBtn = tile.querySelector(".twin-rappid");
+  rappidBtn.dataset.drive = `twin[${driveKey(twin.id)}].rappid`;
+  rappidBtn.addEventListener("click", () => {
+    void ensureCitizenRappid("twin", twinRappidId(twin), twin.name || twin.storeId || twin.id);
+  });
   const send = () => {
     const text = textarea.value.trim();
     if (!text) return;
@@ -1566,6 +1652,17 @@ function updateTwinTile(tile, twin) {
   if (loopBtn) loopBtn.disabled = twin.status === "working";
   const meta = tile.querySelector(".twin-meta");
   meta.textContent = `:${twin.port} · ${twin.license || "unlicensed"}${twin.rappid ? " · " + twin.rappid.slice(0, 22) + "…" : ""}`;
+  const rappidEl = tile.querySelector(".twin-rappid");
+  if (rappidEl) {
+    const record = rappidRecords.get(`twin:${twinRappidId(twin)}`);
+    const hatching = rappidHatching.has(`twin:${twinRappidId(twin)}`);
+    rappidEl.textContent = record
+      ? `${rappidBadgeText(record)} \u2014 ${record.display_name || ""}`
+      : hatching ? "\u{1F95A} the rite is running\u2026 (the Brainstem attests this birth)"
+        : "\u{1F95A} hatch this twin's rappid";
+    rappidEl.disabled = Boolean(record) || hatching;
+    if (record) rappidEl.title = record.rappid || "";
+  }
   tile.querySelector(".twin-signin").hidden = !needsAuth;
   renderTwinChat(tile, twin);
 }
@@ -1598,6 +1695,12 @@ function handleTwinEvent(event) {
     upsertTwin(event.twin);
     if (!surgeonHerd) enterSurgeonHerd();   // twins live in the herd — show it
     else syncTwinTiles();
+    // Rappid-first: the twin's creature is born alongside its worker.
+    void ensureCitizenRappid(
+      "twin",
+      twinRappidId(event.twin),
+      event.twin.name || event.twin.storeId || event.twin.id,
+    );
   } else if (event.type === "twin-status") {
     // Only UPDATE a twin we already know — never let a late status (e.g. from a
     // loop's finally after close()) resurrect a dismissed tile. Creation is
