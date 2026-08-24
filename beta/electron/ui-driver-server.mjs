@@ -2738,10 +2738,10 @@ export function allowsUiDriverMediaPermission(webContents, permission) {
   return permission === "media" && webContents === recordingPermissionWebContents;
 }
 
-// Conversation mode in the hosted Brainstem chat needs the microphone. Grant
-// media ONLY when: it is the app's own window, the request asks for audio and
-// nothing else, and the requesting frame is the local loopback UI. Video and
-// remote pages stay denied.
+// Conversation mode needs the microphone and Show and Tell adds the webcam.
+// Grant media ONLY when: it is the app's own window, the request asks for
+// audio and/or video and nothing else, and the requesting frame is the local
+// loopback UI. Remote pages and every other capability stay denied.
 export function allowsLoopbackMicPermission(webContents, permission, details, {
   windowWebContents = null,
   isLoopbackUrl = () => false,
@@ -2749,6 +2749,7 @@ export function allowsLoopbackMicPermission(webContents, permission, details, {
   if (permission !== "media") return false;
   if (!windowWebContents || webContents !== windowWebContents) return false;
   const types = details?.mediaTypes;
-  if (!Array.isArray(types) || types.length !== 1 || types[0] !== "audio") return false;
+  if (!Array.isArray(types) || types.length === 0) return false;
+  if (!types.every((t) => t === "audio" || t === "video")) return false;
   return Boolean(isLoopbackUrl(details?.requestingUrl || ""));
 }

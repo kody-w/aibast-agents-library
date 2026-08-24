@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   app,
   BrowserWindow,
+  desktopCapturer,
   dialog,
   ipcMain,
   Menu,
@@ -2756,6 +2757,15 @@ if (!hasLock) {
           isLoopbackUrl: loopbackUrl,
         }),
       );
+    });
+    // Show and Tell screen share: ONLY the loopback Brainstem frame may see
+    // the screen, and it gets the primary screen outright — no window picking,
+    // no system audio. Everything else is denied.
+    session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
+      if (!loopbackUrl(request.frame?.url || "")) { callback({}); return; }
+      desktopCapturer.getSources({ types: ["screen"] })
+        .then((sources) => callback(sources.length ? { video: sources[0] } : {}))
+        .catch(() => callback({}));
     });
     registerIpc();
     installApplicationMenu();

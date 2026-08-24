@@ -657,13 +657,18 @@ test("loopback mic permission: audio-only, own window, loopback frame — nothin
   };
   const audio = { mediaTypes: ["audio"], requestingUrl: "http://127.0.0.1:7071/" };
   assert.equal(allowsLoopbackMicPermission(win, "media", audio, opts), true);
+  // Show and Tell: webcam and mic+cam are loopback-grantable too
+  assert.equal(allowsLoopbackMicPermission(win, "media",
+    { ...audio, mediaTypes: ["audio", "video"] }, opts), true);
+  assert.equal(allowsLoopbackMicPermission(win, "media",
+    { ...audio, mediaTypes: ["video"] }, opts), true);
   // every gate fails closed
   assert.equal(allowsLoopbackMicPermission(win, "geolocation", audio, opts), false);
   assert.equal(allowsLoopbackMicPermission({ id: 2 }, "media", audio, opts), false);
   assert.equal(allowsLoopbackMicPermission(win, "media",
-    { ...audio, mediaTypes: ["audio", "video"] }, opts), false);
+    { ...audio, mediaTypes: [] }, opts), false);
   assert.equal(allowsLoopbackMicPermission(win, "media",
-    { ...audio, mediaTypes: ["video"] }, opts), false);
+    { ...audio, mediaTypes: ["audio", "displayCapture"] }, opts), false);
   assert.equal(allowsLoopbackMicPermission(win, "media",
     { ...audio, requestingUrl: "https://evil.example/" }, opts), false);
   assert.equal(allowsLoopbackMicPermission(win, "media", { mediaTypes: ["audio"] }, opts), false);
