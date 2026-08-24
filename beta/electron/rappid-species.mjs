@@ -17,18 +17,16 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { spawn } from "node:child_process";
 
+// A twin or rapplication is not a species — it is a creature OF the AI that
+// animates it. Everything Frontier hatches runs on the Brainstem kernel, so
+// its citizens are brainstem-species rappids; the anchor (one creature per
+// anchor) is what makes each twin/rapplication its OWN creature. A future
+// host running citizens on a different AI passes that species instead.
 export const RAPPID_KINDS = Object.freeze({
-  twin: { species: "twin", name: "Twin", genus: "Frontier" },
-  rapplication: { species: "rapplication", name: "Rapplication", genus: "Frontier" },
+  twin: {},
+  rapplication: {},
 });
-
-// The Brainstem midwife shape, mirrored from the engine's shipped
-// species/hatchers.json — the kernel this very app runs on attests the birth.
-const BRAINSTEM_RITE_COMMAND = "python3 -c 'import json,sys,urllib.request;"
-  + "r=urllib.request.urlopen(urllib.request.Request(\"http://127.0.0.1:7071/chat\","
-  + "json.dumps({\"user_input\":json.loads(sys.argv[1])}).encode(),"
-  + "{\"Content-Type\":\"application/json\"}),timeout=240);"
-  + "print(json.load(r).get(\"response\",\"\"))' {prompt_json}";
+export const HOST_SPECIES = "brainstem";
 
 export function resolveRappidEngine({ env = process.env, home = homedir() } = {}) {
   const candidates = [];
@@ -113,41 +111,19 @@ function runEngine(engine, args, { timeoutMs = 320000 } = {}) {
   });
 }
 
-// Make sure the kind's species exists in this device's dex; discovery itself is
-// a rite — the species must answer for itself through the Brainstem shape.
-async function ensureSpecies(engine, kind) {
-  const spec = RAPPID_KINDS[kind];
-  const probe = await runEngine(
-    engine,
-    ["hatch", spec.species, "--attempts", "0"],
-    { timeoutMs: 30000 },
-  );
-  const missing = /unknown species/i.test(`${probe.stdout}\n${probe.stderr}`);
-  if (!missing) return { ok: true, discovered: false };
-  const found = await runEngine(engine, [
-    "discover", spec.name,
-    "--command", BRAINSTEM_RITE_COMMAND,
-    "--shape", "http",
-    "--model", "brainstem",
-    "--genus", spec.genus,
-  ]);
-  if (/NEW SPECIES RECORDED/i.test(found.stdout)) return { ok: true, discovered: true };
-  return { ok: false, discovered: false, detail: (found.stderr || found.stdout).slice(-400) };
-}
-
 // Hatch (or find) the one creature anchored to this citizen. Idempotent: an
-// existing sealed record for the anchor is returned without a new rite.
-export async function hatchCitizen({ engine, kind, id, title }) {
+// existing sealed record for the anchor is returned without a new rite. The
+// species is the HOST AI running the citizen (brainstem here), so the species
+// itself attests the birth — no stand-in midwife.
+export async function hatchCitizen({ engine, kind, id, title, species = HOST_SPECIES }) {
   if (!engine) return { ok: false, error: "no-engine" };
+  if (!RAPPID_KINDS[kind]) throw new Error(`Unknown rappid kind: ${kind}`);
   const anchor = rappidAnchor(kind, id);
   const sha = anchorSha(anchor);
   const existing = loadRoster().get(sha);
   if (existing) return { ok: true, record: existing, hatched: false };
-  const species = await ensureSpecies(engine, kind);
-  if (!species.ok) return { ok: false, error: "species-rite-failed", detail: species.detail };
   const result = await runEngine(engine, [
-    "hatch", RAPPID_KINDS[kind].species,
-    "--midwife", "brainstem",
+    "hatch", species,
     "--anchor", anchor,
     "--anchor-title", title || id,
   ]);

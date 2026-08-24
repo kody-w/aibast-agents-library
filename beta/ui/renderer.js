@@ -42,7 +42,10 @@ async function refreshRappidRoster(extraKeys = []) {
 }
 
 function rappidBadgeText(record) {
-  return `\u{1F423} ${record.rarity || "?"} \u00B7 ${record.genome_id || "?"}`;
+  // Species, not rarity: the species slug is the dex key (shape/holodex/adapters
+  // resolve on it). Rareness is earned from wild encounters — asserting it at
+  // birth would be noise, so the record keeps it but the badge doesn't.
+  return `\u{1F423} ${record.species || "?"} \u00B7 ${record.genome_id || "?"}`;
 }
 
 async function ensureCitizenRappid(kind, id, title) {
