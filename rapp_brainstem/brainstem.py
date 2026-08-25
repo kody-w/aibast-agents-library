@@ -2232,6 +2232,28 @@ def run_tool_calls(tool_calls, agents, session_id=None):
 _HISTORY_ROLES = {"user", "assistant", "tool"}
 
 
+def _showtell_user_message(user_input, data):
+    """Show and Tell: the chat UI may attach up to two JPEG data-URL frames
+    (screen, webcam) alongside a voice utterance. Bounded and validated here;
+    invalid or oversized frames are dropped, never fatal. Text-only requests
+    keep the plain-string content shape unchanged."""
+    images = data.get("images")
+    if not isinstance(images, list):
+        return {"role": "user", "content": user_input}
+    parts = [{"type": "text", "text": user_input}]
+    kept = 0
+    for item in images:
+        if kept >= 2:
+            break
+        if (isinstance(item, str) and item.startswith("data:image/")
+                and ";base64," in item[:64] and len(item) <= 2_500_000):
+            parts.append({"type": "image_url", "image_url": {"url": item}})
+            kept += 1
+    if kept == 0:
+        return {"role": "user", "content": user_input}
+    return {"role": "user", "content": parts}
+
+
 def _validate_conversation_history(value):
     """Return (history, error) for the public conversation-history contract."""
     if value is None:
@@ -2299,7 +2321,7 @@ def chat():
 
         messages = [{"role": "system", "content": system_content}]
         messages += [m for m in history if m.get("role") in ("user", "assistant", "tool")]
-        messages.append({"role": "user", "content": user_input})
+        messages.append(_showtell_user_message(user_input, data))
 
         all_logs = []
         responded_model = MODEL
@@ -2469,7 +2491,7 @@ def chat_stream():
 
     messages = [{"role": "system", "content": system_content}]
     messages += [m for m in history if m.get("role") in ("user", "assistant", "tool")]
-    messages.append({"role": "user", "content": user_input})
+    messages.append(_showtell_user_message(user_input, data))
 
     requested_model = MODEL
 

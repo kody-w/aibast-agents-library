@@ -1129,7 +1129,7 @@
     </div>
 
     <div class="voice-wrapper">
-      <button class="icon-btn" id="voice-btn" onclick="toggleVoice()" title="Voice mode off">
+      <button class="icon-btn" id="voice-btn" onclick="toggleVoice()" title="Ambient mode off">
         <span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></span>
       </button>
       <button class="icon-btn" id="voice-settings-btn" onclick="toggleVoicePanel()" title="Voice settings">
@@ -1140,6 +1140,8 @@
           <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></span>
           Voice Settings
         </h3>
+        <div id="ambient-senses" style="margin:6px 0 10px;padding:8px 10px;border:1px solid var(--border,#30363d);border-radius:8px">
+          <div style="font-weight:600;margin-bottom:6px">Ambient senses</div>
         <label for="voice-provider">Provider</label>
         <select id="voice-provider" onchange="switchVoiceProvider()">
           <option value="browser">Browser (free)</option>
@@ -1239,7 +1241,7 @@
         Export
       </button>
       <button class="toolbar-link" onclick="document.getElementById('chat-import').click()" title="Import transcript">Import</button>
-      <input type="file" id="chat-import" accept=".json" style="display:none" onchange="importChat(event)">
+      <input type="file" id="chat-import" accept=".json,.tile" style="display:none" onchange="importChat(event)">
       <button class="toolbar-link" onclick="clearChat()">Clear</button>
       <a class="toolbar-link" href="https://blazingbeard.github.io/quests/rapp-brainstem.html" target="_blank" title="Guided training quest with checkpoints" onclick="showTourInvite()">📚 Tutorial</a>
       <button class="toolbar-link" onclick="shareWithAdmin()" title="Share diagnostics with admin for help" style="color:#f0883e">🆘 Get Help</button>
@@ -2705,6 +2707,7 @@
     try {
       // Send a capped copy of history (on-screen transcript is untouched).
       const body = { user_input: payload, conversation_history: requestHistory };
+      if (showTellImages.length) body.images = showTellImages.splice(0, 2);
       if (sessionId) body.session_id = sessionId;
 
       const r = await fetch(`${API}/chat`, {
@@ -2797,6 +2800,7 @@
     try {
       // Send a capped copy of history (on-screen transcript is untouched).
       const body = { user_input: payload, conversation_history: requestHistory };
+      if (showTellImages.length) body.images = showTellImages.splice(0, 2);
       if (sessionId) body.session_id = sessionId;
 
       const r = await fetch(`${API}/chat/stream`, {
@@ -3419,13 +3423,13 @@
         const names = { azure: 'Azure Speech', elevenlabs: 'ElevenLabs', browser: 'browser' };
         const name = names[voiceProvider] || 'browser';
         setChildren(last, [
-          el('strong', { text: 'Voice mode enabled' }),
+          el('strong', { text: 'Ambient mode' }),
           ' — using ' + name + ' TTS. Click ⚙ to change voice settings.'
         ]);
-        speakText('Voice mode enabled.');
+        speakText('Ambient mode on.');
       } else {
         stopSpeaking();
-        appendMsg('system', 'Voice mode disabled.');
+        appendMsg('system', 'Ambient mode off.');
       }
     } catch(e) { console.error('Voice toggle failed:', e); }
   }
@@ -3433,7 +3437,7 @@
   function updateVoiceBtn() {
     const btn = document.getElementById('voice-btn');
     btn.className = voiceMode ? 'icon-btn active' : 'icon-btn';
-    btn.title = voiceMode ? 'Voice mode on' : 'Voice mode off';
+    btn.title = voiceMode ? 'Ambient mode on' : 'Ambient mode off';
   }
 
   function stopSpeaking() {
@@ -3619,20 +3623,55 @@
     document.getElementById('starter-prompts')?.classList.remove('hidden-prompts');
   }
 
-  function exportChat() {
+  // ── .tile export: every turn is a rapp/1-compliant rappid-frame ──
+  // A .tile is a portable chat artifact: rapp-tile/1 wrapping one
+  // rappid-frame/1 per turn. Frame identity is the content hash (sorted keys,
+  // compact JSON, id excluded — the species engine's frame_id rule), so tiles
+  // union like molt frames: re-importing the same turn never duplicates it.
+  // `turns` stays alongside `frames` so existing transcript importers and
+  // human readers keep working unchanged.
+  async function chatFrameId(frame) {
+    const body = {};
+    for (const k of Object.keys(frame).sort()) if (k !== 'id') body[k] = frame[k];
+    const bytes = new TextEncoder().encode(JSON.stringify(body));
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest))
+      .map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+  }
+
+  async function turnFrames(turns) {
+    const frames = [];
+    for (const t of turns) {
+      const frame = {
+        schema: 'rappid-frame/1',
+        kind: 'chat-turn',
+        role: t.role === 'assistant' ? 'assistant' : 'user',
+        at: t.timestamp || '',
+        host: sessionId || '',
+        content: String(t.content ?? '')
+      };
+      frame.id = await chatFrameId(frame);
+      frames.push(frame);
+    }
+    return frames;
+  }
+
+  async function exportChat() {
     if (!fullTranscript.length) { alert('Nothing to export yet.'); return; }
     const payload = {
+      schema: 'rapp-tile/1',
       exported_at: new Date().toISOString(),
       session_id: sessionId,
       brainstem_version: (document.getElementById('version-tag')?.textContent || '').replace(/^v/, '') || 'unknown',
       model: document.getElementById('model-select')?.value || 'unknown',
-      turns: fullTranscript
+      turns: fullTranscript,
+      frames: await turnFrames(fullTranscript)
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `brainstem-chat-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.json`;
+    a.download = `brainstem-chat-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.tile`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -4326,6 +4365,386 @@
       setTimeout(() => window.startTour(saved), 600);
     }
   })();
+
+  // ── Ambient mode: built on voice mode — ears, voice, and eyes ──
+  // The auto back-and-forth loop from the localFirstTools slim-cloud voice
+  // pattern: listen → final transcript → send → the reply speaks (voice-mode
+  // TTS, auto-speak) → when the voice ends, listen again. Turning voice mode
+  // on IS turning conversation on; off is off. It never listens while speaking
+  // or while a request is in flight, so the assistant cannot hear itself.
+  // Speech-to-text prefers the browser engine (Chrome); inside the Frontier
+  // shell that engine has no backend, so it falls over to Azure Speech STT
+  // using the same key the voice settings already hold. Holding Space
+  // (outside the input box) forces listening immediately.
+  let convMode = false;
+  let convState = 'idle';          // idle | listening | thinking | speaking
+  let convRec = null;
+  let convRecBroken = false;       // recognition exists but has no backend here
+  let convCapture = null;          // active Azure mic capture, if any
+  let convTimer = null;
+  let convCooldownUntil = 0;
+  let convWasSpeaking = false;
+  let convWasThinking = false;
+
+  function convTtsBusy() {
+    return (window.speechSynthesis && window.speechSynthesis.speaking)
+        || !!(currentAudio && !currentAudio.paused && !currentAudio.ended);
+  }
+
+  function convStopListening() {
+    if (convRec) { const r = convRec; convRec = null; try { r.abort(); } catch (e) {} }
+    if (convCapture) { const c = convCapture; convCapture = null; c.stop(true); }
+    if (convState === 'listening') convState = 'idle';
+  }
+
+  function convSubmit(text) {
+    const clean = (text || '').trim();
+    if (!clean) { convState = 'idle'; return; }
+    convState = 'thinking';
+    input.value = clean;
+    sendMessage();
+  }
+
+  function convStartRecognition() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR || convRecBroken) { convStartAzure(); return; }
+    const rec = new SR();
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.lang = 'en-US';
+    rec.onresult = (event) => {
+      let interim = '', final = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) final += t; else interim += t;
+      }
+      if (interim) input.value = interim;
+      if (final) { convRec = null; convSubmit(final); }
+    };
+    rec.onerror = (event) => {
+      convRec = null;
+      if (convState === 'listening') convState = 'idle';
+      if (['network', 'service-not-allowed', 'not-allowed', 'audio-capture'].includes(event.error)) {
+        convRecBroken = true;   // no backend in this shell — the loop retries via Azure
+      }
+    };
+    rec.onend = () => {
+      if (convRec === rec) convRec = null;
+      if (convState === 'listening') convState = 'idle';
+    };
+    try { rec.start(); convRec = rec; convState = 'listening'; }
+    catch (e) { convState = 'idle'; }
+  }
+
+  // Azure Speech STT: capture PCM behind a simple energy gate, close the
+  // utterance after ~1.2s of trailing silence, ship 16k mono WAV to the
+  // same-region REST endpoint the TTS key already serves.
+  async function convStartAzure() {
+    if (!azSpeechKey) {
+      appendMsg('system', 'Ambient mode needs a speech engine: this window has no browser speech recognition, so add an Azure Speech key in voice settings.');
+      convDisable();
+      return;
+    }
+    convState = 'listening';
+    let stream, ctx;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true }
+      });
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      appendMsg('system', 'Microphone unavailable: ' + (e.message || e.name || e));
+      convDisable();
+      return;
+    }
+    if (!convMode) {   // mode ended while the mic was opening
+      stream.getTracks().forEach(t => t.stop());
+      try { ctx.close(); } catch (e) {}
+      return;
+    }
+    const source = ctx.createMediaStreamSource(stream);
+    const node = ctx.createScriptProcessor(4096, 1, 1);
+    const chunks = [];
+    const chunkMs = 4096 / ctx.sampleRate * 1000;
+    let voiced = false, silentChunks = 0, totalChunks = 0, done = false;
+    const capture = {
+      stop(discard) {
+        if (done) return; done = true;
+        try { node.disconnect(); source.disconnect(); } catch (e) {}
+        try { stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+        try { ctx.close(); } catch (e) {}
+        if (convCapture === capture) convCapture = null;
+        if (!discard && voiced && chunks.length) convAzureRecognize(chunks, ctx.sampleRate);
+        else if (convState === 'listening') convState = 'idle';
+      }
+    };
+    node.onaudioprocess = (e) => {
+      if (done) return;
+      const data = e.inputBuffer.getChannelData(0);
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+      const rms = Math.sqrt(sum / data.length);
+      chunks.push(new Float32Array(data));
+      totalChunks++;
+      if (rms > 0.012) { voiced = true; silentChunks = 0; }
+      else if (voiced) silentChunks++;
+      if (!voiced && chunks.length * chunkMs > 4000) {
+        chunks.splice(0, chunks.length - Math.ceil(600 / chunkMs));   // keep a short pre-roll
+      }
+      if ((voiced && silentChunks * chunkMs > 1200) || totalChunks * chunkMs > 20000) {
+        capture.stop(false);
+      }
+    };
+    source.connect(node);
+    node.connect(ctx.destination);
+    convCapture = capture;
+  }
+
+  async function convAzureRecognize(chunks, sampleRate) {
+    convState = 'thinking';
+    try {
+      const wav = convEncodeWav(chunks, sampleRate);
+      const r = await fetch(
+        `https://${azSpeechRegion}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US&format=simple`,
+        { method: 'POST',
+          headers: { 'Ocp-Apim-Subscription-Key': azSpeechKey,
+                     'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000',
+                     'Accept': 'application/json' },
+          body: wav });
+      if (!r.ok) throw new Error('Azure STT HTTP ' + r.status);
+      const d = await r.json();
+      const text = d.RecognitionStatus === 'Success' ? (d.DisplayText || '') : '';
+      if (text) convSubmit(text); else convState = 'idle';
+    } catch (e) {
+      console.warn('Azure STT failed:', e);
+      convState = 'idle';
+    }
+  }
+
+  function convEncodeWav(chunks, sampleRate) {
+    let length = 0;
+    for (const c of chunks) length += c.length;
+    const joined = new Float32Array(length);
+    let off = 0;
+    for (const c of chunks) { joined.set(c, off); off += c.length; }
+    const ratio = sampleRate / 16000;
+    const n = Math.floor(joined.length / ratio);
+    const pcm = new Int16Array(n);
+    for (let i = 0; i < n; i++) {
+      const s = Math.max(-1, Math.min(1, joined[Math.floor(i * ratio)]));
+      pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+    const buf = new ArrayBuffer(44 + pcm.length * 2);
+    const v = new DataView(buf);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    w(0, 'RIFF'); v.setUint32(4, 36 + pcm.length * 2, true); w(8, 'WAVE');
+    w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, 16000, true); v.setUint32(28, 32000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    w(36, 'data'); v.setUint32(40, pcm.length * 2, true);
+    new Int16Array(buf, 44).set(pcm);
+    return buf;
+  }
+
+  function convTick() {
+    if (!convMode) return;
+    if (convTtsBusy()) {
+      convWasSpeaking = true;
+      convStopListening();
+      convState = 'speaking';
+      return;
+    }
+    if (convWasSpeaking) {   // just finished speaking: brief cooldown so the
+      convWasSpeaking = false;                 // mic never catches the tail
+      convCooldownUntil = Date.now() + 600;
+      convState = 'idle';
+      return;
+    }
+    if (activeRequests.size > 0) { convWasThinking = true; convState = 'thinking'; return; }
+    if (convWasThinking) {   // reply just landed: give its TTS time to start
+      convWasThinking = false;
+      convCooldownUntil = Date.now() + 1500;
+      return;
+    }
+    if (Date.now() < convCooldownUntil) return;
+    if (ambientSenses.listen && convState !== 'listening') convStartRecognition();
+  }
+
+  function convEnable() {
+    if (convMode) return;
+    convMode = true;
+    convState = 'idle';
+    convRecBroken = false;
+    convCooldownUntil = 0;
+    convWasSpeaking = false;
+    convWasThinking = false;
+    convTimer = setInterval(convTick, 350);
+    updateVoiceBtn();
+    ambientSensesReset();   // every ambient start opens at the full sensory ceiling
+    showTellStart();        // eyes come with the ears; degrades to voice-only if denied
+    appendMsg('system', 'Ambient mode — just talk; the Brainstem answers out loud, listens again when it finishes, and sees your screen. Hold Space to talk immediately. Click the mic to end.');
+  }
+
+  function convDisable() {
+    if (!convMode && !convTimer) { updateVoiceBtn(); return; }
+    convMode = false;
+    if (convTimer) { clearInterval(convTimer); convTimer = null; }
+    convStopListening();
+    showTellStop();
+    convState = 'idle';
+    updateVoiceBtn();
+  }
+
+  // Voice mode IS conversation mode: the server voice_mode toggle stays the
+  // source of truth for speaking, and the listening loop follows it.
+  const convServerToggle = toggleVoice;
+  toggleVoice = async function () {
+    await convServerToggle();
+    if (voiceMode) convEnable(); else convDisable();
+  };
+  const convBaseUpdateBtn = updateVoiceBtn;
+  updateVoiceBtn = function () {
+    convBaseUpdateBtn();
+    const btn = document.getElementById('voice-btn');
+    if (!btn) return;
+    btn.style.boxShadow = convMode ? '0 0 0 2px #3fb950 inset' : '';
+    if (convMode) btn.title = 'Ambient mode on — click to end';
+  };
+
+  // Push-to-talk (Space, held outside the input box): skip any cooldown and
+  // listen right now — the slim-cloud default, kept as the manual override.
+  window.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' || e.repeat || !convMode) return;
+    const a = document.activeElement;
+    if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable)) return;
+    e.preventDefault();
+    convCooldownUntil = 0;
+    if (convState !== 'listening' && !convTtsBusy() && activeRequests.size === 0) {
+      convStartRecognition();
+    }
+  });
+
+  // ── Show and Tell: eyes on top of ears (ambient senses) ──
+  // Ambient mode starts with EVERY sense on at full quality; the checkboxes
+  // in the voice panel only downgrade. Senses reset to all-on at every
+  // ambient start — a downgrade is for this session, never a stored setting.
+  let showTellOn = false;
+  let showTellImages = [];
+  const ambientSenses = { listen: true, speak: true, screen: true, webcam: true };
+  const stByKind = { screen: null, webcam: null };   // kind -> {stream, video}
+
+  function ambientSensesReset() {
+    for (const k of Object.keys(ambientSenses)) {
+      ambientSenses[k] = true;
+      const box = document.getElementById('amb-' + k);
+      if (box) box.checked = true;
+    }
+  }
+
+  function stFrame(video, maxW, quality) {
+    if (!video || video.readyState < 2 || !video.videoWidth) return null;
+    const scale = Math.min(1, maxW / video.videoWidth);
+    const c = document.createElement('canvas');
+    c.width = Math.round(video.videoWidth * scale);
+    c.height = Math.round(video.videoHeight * scale);
+    c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+    try { return c.toDataURL('image/jpeg', quality); } catch (e) { return null; }
+  }
+
+  function showTellCapture() {
+    if (!showTellOn) return [];
+    const frames = [];
+    if (ambientSenses.screen && stByKind.screen) {
+      const f = stFrame(stByKind.screen.video, 1600, 0.8);   // ceiling: on-screen text stays legible
+      if (f) frames.push(f);
+    }
+    if (ambientSenses.webcam && stByKind.webcam) {
+      const f = stFrame(stByKind.webcam.video, 960, 0.75);
+      if (f) frames.push(f);
+    }
+    return frames;
+  }
+
+  function stAttach(kind, stream) {
+    const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.style.display = 'none';
+    v.srcObject = stream;
+    document.body.appendChild(v);
+    v.play().catch(() => {});
+    stByKind[kind] = { stream, video: v };
+    for (const track of stream.getTracks()) {
+      track.onended = () => stStop(kind);   // OS "stop sharing" downgrades just that sense
+    }
+  }
+
+  function stStop(kind) {
+    const held = stByKind[kind];
+    if (!held) return;
+    stByKind[kind] = null;
+    try { held.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+    try { held.video.remove(); } catch (e) {}
+  }
+
+  async function stAcquire(kind) {
+    if (stByKind[kind]) return true;
+    try {
+      const stream = kind === 'screen'
+        ? await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
+        : await navigator.mediaDevices.getUserMedia({ video: { width: 1280 }, audio: false });
+      if (!convMode) { stream.getTracks().forEach(t => t.stop()); return false; }
+      stAttach(kind, stream);
+      return true;
+    } catch (e) {
+      appendMsg('system', (kind === 'screen' ? 'Screen' : 'Webcam') + ' unavailable: ' + (e.message || e.name || e));
+      return false;
+    }
+  }
+
+  async function showTellStart() {
+    if (showTellOn) return;
+    showTellOn = true;
+    const gotScreen = ambientSenses.screen ? await stAcquire('screen') : false;
+    const gotCam = ambientSenses.webcam ? await stAcquire('webcam') : false;
+    if (gotScreen || gotCam) {
+      appendMsg('system', 'Show and Tell — every message now carries a live frame of ' +
+        [gotScreen && 'your screen', gotCam && 'your webcam'].filter(Boolean).join(' and ') +
+        '. Untick a sense in voice settings to downgrade.');
+    }
+  }
+
+  function showTellStop() {
+    showTellOn = false;
+    stStop('screen');
+    stStop('webcam');
+    showTellImages = [];
+  }
+
+  // The voice-panel checkboxes: downgrade (or restore) one sense while
+  // ambient mode runs. Everything re-enables at the next ambient start.
+  async function ambientSense(kind, on) {
+    ambientSenses[kind] = on;
+    if (!convMode) return;
+    if (kind === 'screen' || kind === 'webcam') {
+      if (!on) stStop(kind);
+      else if (showTellOn) await stAcquire(kind);
+    } else if (kind === 'listen' && !on) {
+      convStopListening();
+    } else if (kind === 'speak' && !on) {
+      stopSpeaking();
+    }
+  }
+
+  // Spoken replies obey their sense toggle while ambient mode runs.
+  const ambBaseSpeakText = speakText;
+  speakText = function (text, force) {
+    if (convMode && !ambientSenses.speak && !force) return;
+    return ambBaseSpeakText(text, force);
+  };
+
+  const stBaseSendMessage = sendMessage;
+  sendMessage = async function () {
+    if (showTellOn) showTellImages = showTellCapture();
+    return stBaseSendMessage();
+  };
 </script>
 </body>
 </html>
