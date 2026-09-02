@@ -349,9 +349,9 @@ def check_common_html(
         failures.add(f"{label}: contains stale Clawpilot branding")
     raw_link_failures(label, parser, failures)
     scripts = [
-        tag.text
+        "".join(tag.text_parts)
         for tag in parser.find("script")
-        if not tag.attrs.get("src") and tag.text.strip()
+        if not tag.attrs.get("src") and "".join(tag.text_parts).strip()
     ]
     metrics.setdefault("inline_scripts", 0)
     metrics["inline_scripts"] += len(scripts)
@@ -361,6 +361,7 @@ def check_common_html(
         error = checker.check(script)
         if error:
             failures.add(f"{label}: inline script {index}: {error}")
+    check_generated_surface_contract(label, text, parser, failures)
 
 
 def has_href(parser: DocumentParser, needle: str) -> bool:
@@ -368,6 +369,371 @@ def has_href(parser: DocumentParser, needle: str) -> bool:
         needle.lower() in (tag.attrs.get("href") or "").lower()
         for tag in parser.find("a")
     )
+
+
+def script_source(parser: DocumentParser) -> str:
+    return "\n".join(
+        "".join(tag.text_parts)
+        for tag in parser.find("script")
+        if not tag.attrs.get("src") and "".join(tag.text_parts).strip()
+    )
+
+
+def style_source(parser: DocumentParser) -> str:
+    return "\n".join(
+        "".join(tag.text_parts)
+        for tag in parser.find("style")
+        if "".join(tag.text_parts).strip()
+    )
+
+
+def _masked_javascript(source: str) -> str:
+    masked = list(source)
+    index = 0
+    state = "code"
+    while index < len(source):
+        char = source[index]
+        next_char = source[index + 1] if index + 1 < len(source) else ""
+        if state == "code":
+            if char == "'" or char == '"':
+                state = char
+                masked[index] = " "
+            elif char == "`":
+                state = "`"
+                masked[index] = " "
+            elif char == "/" and next_char == "/":
+                state = "line-comment"
+                masked[index] = masked[index + 1] = " "
+                index += 1
+            elif char == "/" and next_char == "*":
+                state = "block-comment"
+                masked[index] = masked[index + 1] = " "
+                index += 1
+        elif state in {"'", '"', "`"}:
+            if char == "\\":
+                masked[index] = " "
+                if index + 1 < len(source):
+                    masked[index + 1] = " "
+                    index += 1
+            elif char == state:
+                masked[index] = " "
+                state = "code"
+            elif char != "\n":
+                masked[index] = " "
+        elif state == "line-comment":
+            if char == "\n":
+                state = "code"
+            else:
+                masked[index] = " "
+        elif state == "block-comment":
+            if char == "*" and next_char == "/":
+                masked[index] = masked[index + 1] = " "
+                index += 1
+                state = "code"
+            elif char != "\n":
+                masked[index] = " "
+        index += 1
+    return "".join(masked)
+
+
+def _matching_brace(masked: str, opening: int) -> int | None:
+    depth = 0
+    for index in range(opening, len(masked)):
+        if masked[index] == "{":
+            depth += 1
+        elif masked[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
+
+def javascript_function_source(
+    source: str,
+    name_pattern: str,
+) -> str:
+    match = re.search(
+        rf"function\s+{name_pattern}\s*\([^)]*\)\s*\{{",
+        source,
+        re.IGNORECASE,
+    )
+    if not match:
+        return ""
+    masked = _masked_javascript(source)
+    opening = masked.find("{", match.start())
+    closing = _matching_brace(masked, opening)
+    return source[match.start() : closing + 1] if closing is not None else ""
+
+
+def unguarded_storage_calls(source: str) -> list[str]:
+    masked = _masked_javascript(source)
+    guarded: list[tuple[int, int]] = []
+    for match in re.finditer(r"\btry\s*\{", masked):
+        opening = masked.find("{", match.start())
+        closing = _matching_brace(masked, opening)
+        if closing is None:
+            continue
+        if not re.match(r"\s*catch\b", masked[closing + 1 :]):
+            continue
+        guarded.append((opening, closing))
+    failures = []
+    for match in re.finditer(
+        r"\b(?:window\.)?localStorage\s*\.\s*"
+        r"(getItem|setItem|removeItem|clear)\s*\(",
+        masked,
+    ):
+        if not any(start < match.start() < end for start, end in guarded):
+            line = source.count("\n", 0, match.start()) + 1
+            failures.append(f"{match.group(1)} at inline-script line {line}")
+    return failures
+
+
+def _ancestor_tags(parser: DocumentParser, tag: Tag) -> list[Tag]:
+    ancestors: list[Tag] = []
+    index = parser.tags.index(tag)
+    parent = parser.tags[index].parent
+    while parent is not None:
+        ancestors.append(parser.tags[parent])
+        parent = parser.tags[parent].parent
+    return ancestors
+
+
+def check_generated_surface_contract(
+    label: str,
+    text: str,
+    parser: DocumentParser,
+    failures: Failures,
+) -> None:
+    academy_links = [
+        tag
+        for tag in parser.find("a")
+        if urlparse(tag.attrs.get("href") or "").path.endswith("/academy.html")
+        and "academy" in tag.text.lower()
+    ]
+    if not academy_links:
+        failures.add(f"{label}: missing visible Academy link")
+
+    skip_links = [
+        tag
+        for tag in parser.find("a")
+        if "skip-link" in tag.classes
+        and (tag.attrs.get("href") or "").startswith("#")
+    ]
+    if len(skip_links) != 1:
+        failures.add(f"{label}: expected exactly one skip link")
+    else:
+        target_id = (skip_links[0].attrs.get("href") or "")[1:]
+        targets = [
+            tag for tag in parser.tags if tag.attrs.get("id") == target_id
+        ]
+        if len(targets) != 1:
+            failures.add(f"{label}: skip link target #{target_id} is missing")
+        elif targets[0].attrs.get("tabindex") != "-1":
+            failures.add(
+                f"{label}: skip link target #{target_id} must be programmatically focusable"
+            )
+
+    css = style_source(parser)
+    compact_css = re.sub(r"\s+", "", css.lower())
+    if ".skip-link" not in css:
+        failures.add(f"{label}: skip link has no measurable styling")
+    if "min-width:0" not in compact_css:
+        failures.add(f"{label}: responsive min-width containment is missing")
+    if not (
+        "overflow-wrap:anywhere" in compact_css
+        or "word-break:break-word" in compact_css
+    ):
+        failures.add(f"{label}: responsive long-content wrapping is missing")
+
+    tables = parser.find("table")
+    if tables:
+        table_rule = any(
+            "table" in selector.lower()
+            and "overflow-x:auto" in re.sub(r"\s+", "", body.lower())
+            and (
+                "max-width:100%" in re.sub(r"\s+", "", body.lower())
+                or "width:100%" in re.sub(r"\s+", "", body.lower())
+            )
+            for selector, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+        )
+        wrappers = {
+            "table-scroll",
+            "table-wrap",
+            "table-wrapper",
+            "responsive-table",
+        }
+        wrapped = all(
+            any(ancestor.classes & wrappers for ancestor in _ancestor_tags(parser, table))
+            for table in tables
+        )
+        wrapper_rule = any(
+            f".{class_name}" in css
+            and re.search(
+                rf"\.{re.escape(class_name)}[^{{]*\{{[^}}]*overflow-x\s*:\s*auto",
+                css,
+                re.IGNORECASE,
+            )
+            for class_name in wrappers
+        )
+        if not table_rule and not (wrapped and wrapper_rule):
+            failures.add(f"{label}: tables lack responsive overflow containment")
+
+    unguarded = unguarded_storage_calls(script_source(parser))
+    if unguarded:
+        failures.add(
+            f"{label}: unguarded localStorage access ({'; '.join(unguarded)})"
+        )
+
+
+def check_tab_contract(
+    parser: DocumentParser,
+    failures: Failures,
+) -> None:
+    label = "quest.html"
+    tablists = [
+        tag for tag in parser.tags if (tag.attrs.get("role") or "").lower() == "tablist"
+    ]
+    if len(tablists) != 1:
+        failures.add(f"{label}: expected exactly one mode tablist")
+        return
+    tabs = [
+        tag
+        for tag in parser.descendants(tablists[0])
+        if (tag.attrs.get("role") or "").lower() == "tab"
+    ]
+    if len(tabs) != 2:
+        failures.add(f"{label}: mode tablist must contain exactly two tabs")
+        return
+    selected = [
+        tab for tab in tabs if (tab.attrs.get("aria-selected") or "").lower() == "true"
+    ]
+    if len(selected) != 1:
+        failures.add(f"{label}: exactly one mode tab must be selected")
+    for tab in tabs:
+        expected_tabindex = "0" if tab in selected else "-1"
+        if tab.attrs.get("tabindex") != expected_tabindex:
+            failures.add(
+                f"{label}: tab {tab.attrs.get('id') or tab.text!r} must use "
+                f'tabindex="{expected_tabindex}"'
+            )
+        tab_id = tab.attrs.get("id")
+        panel_id = tab.attrs.get("aria-controls")
+        panels = [
+            candidate
+            for candidate in parser.tags
+            if candidate.attrs.get("id") == panel_id
+        ]
+        if not tab_id or len(panels) != 1:
+            failures.add(
+                f"{label}: tab {tab_id or tab.text!r} has no unique controlled panel"
+            )
+            continue
+        panel = panels[0]
+        if (panel.attrs.get("role") or "").lower() != "tabpanel":
+            failures.add(f"{label}: #{panel_id} is not a tabpanel")
+        if panel.attrs.get("aria-labelledby") != tab_id:
+            failures.add(
+                f"{label}: #{panel_id} is not labelled by #{tab_id}"
+            )
+    source = script_source(parser)
+    for token in ("ArrowLeft", "ArrowRight", "Home", "End"):
+        if token not in source:
+            failures.add(f"{label}: mode tabs lack {token} keyboard behavior")
+    if "preventDefault" not in source or ".focus(" not in source:
+        failures.add(f"{label}: mode tabs lack focus-managed keyboard behavior")
+    if not re.search(r"\btabIndex\b|setAttribute\(\s*['\"]tabindex['\"]", source):
+        failures.add(f"{label}: mode tabs do not maintain roving tabindex")
+
+
+def check_quest_runtime_contract(
+    text: str,
+    parser: DocumentParser,
+    failures: Failures,
+) -> None:
+    label = "quest.html"
+    source = script_source(parser)
+    engine_defaults = re.findall(
+        r"===\s*['\"]copilot['\"]\s*\?\s*['\"]copilot['\"]"
+        r"\s*:\s*['\"]brainstem['\"]",
+        source,
+    )
+    if len(engine_defaults) < 2:
+        failures.add(
+            f"{label}: visual and achievement engines must both default to brainstem"
+        )
+    if re.search(
+        r"===\s*['\"]brainstem['\"]\s*\?\s*['\"]brainstem['\"]"
+        r"\s*:\s*['\"]copilot['\"]",
+        source,
+    ):
+        failures.add(f"{label}: legacy Copilot-default engine selection remains")
+
+    checkpoint_tags = [
+        tag
+        for tag in parser.tags
+        if tag.name == "input" and "data-achievements-path" in tag.attrs
+    ]
+    if not checkpoint_tags:
+        failures.add(f"{label}: no achievement checkpoint path attributes")
+    if any("data-achievements-group" not in tag.attrs for tag in checkpoint_tags):
+        failures.add(f"{label}: achievement checkpoints lack group attributes")
+    for expected in ("dataset.achievementsPath", "dataset.achievementsGroup"):
+        if expected not in source:
+            failures.add(f"{label}: runtime lacks exact {expected} mapping")
+    for forbidden in ("dataset.achievementPath", "dataset.achievementGroup"):
+        if forbidden in source:
+            failures.add(f"{label}: singular dataset spelling remains ({forbidden})")
+
+    status_regions = [
+        tag
+        for tag in parser.tags
+        if (
+            (tag.attrs.get("role") or "").lower() == "status"
+            or "aria-live" in tag.attrs
+        )
+    ]
+    persistence_copy = re.search(
+        r"(?:storage|persist)[\s\S]{0,160}"
+        r"(?:unavailable|failed|not saved|in memory|this (?:tab|session))",
+        source,
+        re.IGNORECASE,
+    )
+    if not status_regions or not persistence_copy:
+        failures.add(
+            f"{label}: persistence failure has no visible live-region announcement"
+        )
+
+    hard_source = javascript_function_source(source, "updateHardProgress")
+    if not hard_source:
+        failures.add(f"{label}: Manual progress transition cannot be measured")
+    else:
+        if "setAchievementWorkshopProgress(profile, activeMode" in hard_source:
+            failures.add(
+                f"{label}: zero Hard progress can overwrite the Easy achievement mode"
+            )
+        if not re.search(
+            r"done\.length\s*>\s*0[\s\S]*"
+            r"setAchievementWorkshopProgress\(\s*profile\s*,\s*['\"]hard['\"]",
+            hard_source,
+        ):
+            failures.add(
+                f"{label}: first real Hard check does not explicitly own the Hard transition"
+            )
+
+    resume_source = javascript_function_source(source, r"\w*resume\w*")
+    if (
+        "#resume" not in source
+        or not resume_source
+        or ".focus(" not in resume_source
+        or "checked" not in resume_source
+    ):
+        failures.add(
+            f"{label}: #resume does not focus an incomplete checkpoint or step"
+        )
+    elif re.search(r"\.checked\s*=\s*true|\.click\s*\(", resume_source):
+        failures.add(f"{label}: #resume awards or completes its focus target")
+
+    check_tab_contract(parser, failures)
 
 
 def has_per_page_lane_selector(parser: DocumentParser) -> bool:
@@ -428,18 +794,7 @@ def check_quest(
         failures.add(f"{label}: missing visible GitHub Copilot or Brainstem lane")
     if has_per_page_lane_selector(parser):
         failures.add(f"{label}: contains a forbidden per-page lane selector")
-    script_text = "\n".join(tag.text for tag in parser.find("script"))
-    default_script = (
-        re.search(
-            r"localStorage\.getItem\(\s*['\"]aibast:workshop-engine['\"]\s*\)",
-            script_text,
-        )
-        and re.search(r"===\s*['\"]brainstem['\"]", script_text)
-        and re.search(r":\s*['\"]copilot['\"]", script_text)
-        and "data-workshop-engine" in script_text
-    )
-    if not default_script:
-        failures.add(f"{label}: Copilot-default global engine script is not measurable")
+    check_quest_runtime_contract(text, parser, failures)
     if parser.find("iframe"):
         failures.add(f"{label}: Manual mode must not use an iframe")
     hard_paths = [
@@ -699,10 +1054,22 @@ def check_field_guide(
         tag.text.strip() for tag in parser.find("style")
     ):
         failures.add(f"{label}: missing styled HTML")
-    script_text = "\n".join(tag.text for tag in parser.find("script"))
+    script_text = script_source(parser)
     for token in ("data-theme", "aibast:workshop-engine", "data-workshop-engine"):
         if token not in script_text:
             failures.add(f"{label}: theme/global engine script lacks {token}")
+    if not re.search(
+        r"===\s*['\"]copilot['\"]\s*\?\s*['\"]copilot['\"]"
+        r"\s*:\s*['\"]brainstem['\"]",
+        script_text,
+    ):
+        failures.add(f"{label}: visual engine does not default to brainstem")
+    if re.search(
+        r"===\s*['\"]brainstem['\"]\s*\?\s*['\"]brainstem['\"]"
+        r"\s*:\s*['\"]copilot['\"]",
+        script_text,
+    ):
+        failures.add(f"{label}: legacy Copilot-default engine selection remains")
     if "aibast field guide" not in parser.visible_text.lower():
         failures.add(f"{label}: missing AIBAST field-guide branding")
     if not has_href(parser, "workshop-settings.html"):
