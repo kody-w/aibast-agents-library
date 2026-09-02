@@ -61,30 +61,27 @@ def valid_pages() -> dict[str, str]:
     </style>
     """
     storage = """
+    const localStorage = globalThis.aibastWorkshopStorage;
     function readWorkshopStorage(key, fallback = null) {
-      try {
-        const value = localStorage.getItem(key);
-        return value === null ? fallback : value;
-      } catch (_error) {
-        return fallback;
-      }
+      const value = localStorage.getItem(key);
+      return value === null ? fallback : value;
     }
     function writeWorkshopStorage(key, value) {
-      try {
-        localStorage.setItem(key, value);
-        return true;
-      } catch (_error) {
+      const stored = localStorage.setItem(key, value);
+      if (stored === false) {
         announcePersistenceFailure();
-        return false;
       }
+      return stored !== false;
     }
     """
     engine = f"""
     <script>
+    (() => {{
     {storage}
     const engine = readWorkshopStorage("aibast:workshop-engine") === "copilot"
       ? "copilot" : "brainstem";
     document.documentElement.setAttribute("data-workshop-engine", engine);
+    }})();
     </script>
     """
     reports = "".join(report_button(f"base-{index}") for index in range(7))
@@ -145,6 +142,7 @@ def valid_pages() -> dict[str, str]:
 <p id="persistence-status" role="status" aria-live="polite"></p>
 {feedback}
 <script>
+(() => {{
 {storage}
 const globalEngineKey = "aibast:workshop-engine";
 const modeKey = "aibast:{SLUG}:quest-mode";
@@ -176,12 +174,19 @@ function achievementGroupComplete(group) {{
       box.dataset.achievementsPath === "shared"));
   return members.length > 0 && members.every((box) => box.checked);
 }}
+let hardProgressActivated = false;
 function updateHardProgress(announce = false, persist = false) {{
   const done = hardBoxes.filter((box) => box.checked).map((box) => box.dataset.step);
-  if (done.length > 0) {{
-    if (persist) writeWorkshopStorage(hardProgressKey, JSON.stringify(done));
+  if (announce && done.length > 0) {{
+    hardProgressActivated = true;
+  }}
+  if (persist && hardProgressActivated) {{
+    writeWorkshopStorage(hardProgressKey, JSON.stringify(done));
+  }}
+  const activeMode = hardProgressActivated ? "hard" : "easy";
+  if (hardProgressActivated) {{
     let profile = readAchievementProfile();
-    profile = setAchievementWorkshopProgress(profile, "hard", {{
+    profile = setAchievementWorkshopProgress(profile, activeMode, {{
       hardChecked: done.length,
       hardTotal: hardBoxes.length,
       hardComplete: done.length === hardBoxes.length,
@@ -217,6 +222,7 @@ buttons.forEach((button, index) => {{
   }});
 }});
 resumeWorkshop();
+}})();
 </script>
 </body></html>"""
     manual = f"""<!doctype html>
@@ -232,6 +238,7 @@ resumeWorkshop();
 <p id="persistence-status" role="status" aria-live="polite"></p>
 {feedback}
 <script>
+(() => {{
 function announcePersistenceFailure() {{
   document.getElementById("persistence-status").textContent =
     "Storage unavailable; Manual progress is not saved but remains in memory.";
@@ -242,6 +249,7 @@ const badgeIds = [];
 badgeIds.push("hard-mode-complete");
 const hardProgress = {{hardComplete: complete}};
 writeWorkshopStorage(key, JSON.stringify([]));
+}})();
 </script></body></html>"""
     field = f"""<!doctype html>
 <html><head><title>Field guide</title>{engine}<script>
@@ -729,8 +737,55 @@ def test_mutation_catches_unguarded_storage_access(tmp_path):
     path = package / "quest.html"
     source = path.read_text(encoding="utf-8").replace(
         "resumeWorkshop();",
-        'const unsafeProgress = localStorage.getItem("unsafe-progress");\n'
+        'const unsafeProgress = globalThis.localStorage.getItem("unsafe-progress");\n'
         "resumeWorkshop();",
+    )
+    path.write_text(source, encoding="utf-8")
+    build_zip(tmp_path)
+
+    assert_failure(
+        audit_fixture(tmp_path),
+        "unguarded localStorage access",
+    )
+
+
+def test_storage_alias_audit_distinguishes_safe_and_raw_calls():
+    safe = """
+    (() => {
+      const localStorage = globalThis.aibastWorkshopStorage;
+      localStorage.getItem("progress");
+      function persist() {
+        localStorage.setItem("progress", "{}");
+      }
+      persist();
+    })();
+    """
+    assert AUDIT.unguarded_storage_calls(safe) == []
+
+    for raw in (
+        'globalThis.localStorage.getItem("progress");',
+        'window.localStorage.setItem("progress", "{}");',
+        'localStorage.removeItem("progress");',
+    ):
+        assert AUDIT.unguarded_storage_calls(raw), raw
+
+    guarded_raw = """
+    try {
+      window.localStorage.getItem("progress");
+      globalThis.localStorage.setItem("progress", "{}");
+    } catch (_error) {
+      // Denial is handled.
+    }
+    """
+    assert AUDIT.unguarded_storage_calls(guarded_raw) == []
+
+
+def test_mutation_catches_removed_safe_storage_alias(tmp_path):
+    package = create_fixture(tmp_path)
+    path = package / "quest.html"
+    source = path.read_text(encoding="utf-8").replace(
+        "const localStorage = globalThis.aibastWorkshopStorage;",
+        "",
     )
     path.write_text(source, encoding="utf-8")
     build_zip(tmp_path)
@@ -745,8 +800,10 @@ def test_mutation_catches_manual_initial_profile_mutation(tmp_path):
     package = create_fixture(tmp_path)
     path = package / "quest.html"
     source = path.read_text(encoding="utf-8").replace(
-        'setAchievementWorkshopProgress(profile, "hard"',
-        "setAchievementWorkshopProgress(profile, activeMode",
+        """if (announce && done.length > 0) {
+    hardProgressActivated = true;
+  }""",
+        "hardProgressActivated = true;",
         1,
     )
     path.write_text(source, encoding="utf-8")
@@ -754,7 +811,26 @@ def test_mutation_catches_manual_initial_profile_mutation(tmp_path):
 
     assert_failure(
         audit_fixture(tmp_path),
-        "zero Hard progress can overwrite the Easy achievement mode",
+        "Manual progress activation lacks a checked-progress guard",
+    )
+
+
+def test_mutation_catches_removed_hard_persistence_guard(tmp_path):
+    package = create_fixture(tmp_path)
+    path = package / "quest.html"
+    source = path.read_text(encoding="utf-8").replace(
+        """if (persist && hardProgressActivated) {
+    writeWorkshopStorage(hardProgressKey, JSON.stringify(done));
+  }""",
+        "writeWorkshopStorage(hardProgressKey, JSON.stringify(done));",
+        1,
+    )
+    path.write_text(source, encoding="utf-8")
+    build_zip(tmp_path)
+
+    assert_failure(
+        audit_fixture(tmp_path),
+        "Manual progress persistence lacks an activation guard",
     )
 
 
@@ -837,6 +913,24 @@ def test_mutation_catches_removed_skip_link(tmp_path):
     assert_failure(audit_fixture(tmp_path), "expected exactly one skip link")
 
 
+def test_mutation_catches_non_focusable_skip_target(tmp_path):
+    package = create_fixture(tmp_path)
+    path = package / "evidence-report.html"
+    path.write_text(
+        path.read_text(encoding="utf-8").replace(
+            '<main id="main-content" tabindex="-1">',
+            '<main id="main-content">',
+        ),
+        encoding="utf-8",
+    )
+    build_zip(tmp_path)
+
+    assert_failure(
+        audit_fixture(tmp_path),
+        "must be programmatically focusable",
+    )
+
+
 def test_mutation_catches_incomplete_tab_keyboard_semantics(tmp_path):
     package = create_fixture(tmp_path)
     path = package / "quest.html"
@@ -905,5 +999,6 @@ def test_playwright_academy_gate_is_exact_and_fail_closed():
     assert "attempts === expectedWorkshops * auditedPages.length" in source
     assert "document.documentElement.scrollWidth" in source
     assert "result.overflow === 0" in source
+    assert 'target.getAttribute("tabindex") === "-1"' in source
     assert "A Chromium-compatible browser is required" in source
     assert "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" in source

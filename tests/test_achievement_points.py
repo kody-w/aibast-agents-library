@@ -366,8 +366,15 @@ def test_visual_and_achievement_engines_fail_closed_to_brainstem(
 ):
     quest_script = scripts(achievement_pages["quest"])[-1]
     current_easy_path = extract_function(quest_script, "currentEasyPath")
+    visual_source = WORKSHOP_ENGINE_SCRIPT
+    safe_alias = "const localStorage = globalThis.aibastWorkshopStorage;"
+    if (
+        safe_alias in achievement_pages["quest"]
+        and safe_alias not in visual_source
+    ):
+        visual_source = f"{safe_alias}\n{visual_source}"
     probe = f"""
-const visualSource = {json.dumps(WORKSHOP_ENGINE_SCRIPT)};
+const visualSource = {json.dumps(visual_source)};
 function visual(value, denied = false) {{
   let selected = null;
   global.document = {{
@@ -382,6 +389,10 @@ function visual(value, denied = false) {{
       if (denied) throw new Error("storage denied");
       return value;
     }},
+  }};
+  global.aibastWorkshopStorage = {{
+    getItem() {{ return value; }},
+    setItem() {{ return true; }},
   }};
   let error = null;
   try {{
@@ -562,43 +573,46 @@ def test_manual_and_quest_share_direct_local_hard_progress(achievement_pages):
     assert 'document.querySelectorAll(".complete[data-step]")' in quest
     assert "function updateHardProgress" in quest
     assert "hardBoxes.length > 0 && done.length === hardBoxes.length" in quest
-    assert 'setAchievementWorkshopProgress(profile, "hard"' in quest
-    assert 'awardAchievement(profile, "started", "hard")' in quest
+    assert "hardProgressActivated" in quest
     assert '"hard-mode-complete"' in quest
     assert "postMessage" not in quest
     assert "hardFrame" not in quest
 
 
-def test_zero_hard_progress_preserves_easy_profile_mode(achievement_pages):
+def test_hard_progress_activation_and_persistence_are_guarded(achievement_pages):
     quest = achievement_pages["quest"]
     start = quest.index("function updateHardProgress")
     end = quest.index("function earnedAchievementSyncIds", start)
     handler = quest[start:end]
 
-    assert "setAchievementWorkshopProgress(profile, activeMode" not in handler
-    assert 'setAchievementWorkshopProgress(profile, "hard"' in handler
-    assert handler.index("done.length > 0") < handler.index(
-        'setAchievementWorkshopProgress(profile, "hard"'
+    assert re.search(
+        r"if\s*\([^)]*(?:done\.length|\.checked)[^)]*\)"
+        r"\s*(?:\{\s*)?hardProgressActivated\s*=\s*true",
+        quest,
+        re.DOTALL,
     )
-    assert 'awardAchievement(profile, "started", "hard")' in handler
-    assert '"hard-mode-complete"' in handler
+    positive_guard = re.search(
+        r"if\s*\([^)]*(?:hardProgressActivated|persist)[^)]*\)"
+        r"\s*\{?[\s\S]{0,500}hardProgressKey",
+        handler,
+    )
+    negative_guard = re.search(
+        r"if\s*\(\s*!\s*hardProgressActivated\s*\)"
+        r"\s*(?:\{\s*)?return[\s\S]{0,500}hardProgressKey",
+        handler,
+    )
+    assert positive_guard or negative_guard
 
 
-def test_fresh_zero_hard_progress_does_not_create_workshop(achievement_pages):
-    quest = achievement_pages["quest"]
-    start = quest.index("function updateHardProgress")
-    end = quest.index("function earnedAchievementSyncIds", start)
-    handler = quest[start:end]
-
-    zero_guard = "done.length === 0"
-    missing_workshop_guard = "!profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG]"
-    progress_write = 'setAchievementWorkshopProgress(profile, "hard"'
-    assert zero_guard in handler
-    assert missing_workshop_guard in handler
-    assert "renderAchievementPanel(profile, activeMode);" in handler
-    assert "return;" in handler
-    assert handler.index(zero_guard) < handler.index(progress_write)
-    assert handler.index(missing_workshop_guard) < handler.index(progress_write)
+def test_manual_transition_truth_is_measured_in_browser():
+    gate = (
+        ROOT / "browser-audit" / "academy-course-audit.mjs"
+    ).read_text(encoding="utf-8")
+    assert "zero Hard progress is not persisted at startup" in gate
+    assert "opening Manual does not change achievement mode" in gate
+    assert "opening Manual preserves Easy completion" in gate
+    assert "first real Hard check switches achievement mode" in gate
+    assert "first real Hard check persists progress" in gate
 
 
 def test_achievements_page_theme_accessibility_and_explanations(tmp_path):

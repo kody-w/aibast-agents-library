@@ -229,7 +229,11 @@ async function inspectSurface(page) {
       overflow: Math.max(0, scrollWidth - viewport),
       offenders,
       academy,
-      skip: Boolean(skip && target && target.tabIndex === -1),
+      skip: Boolean(
+        skip
+        && target
+        && target.getAttribute("tabindex") === "-1"
+      ),
     };
   });
 }

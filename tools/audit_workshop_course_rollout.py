@@ -348,11 +348,7 @@ def check_common_html(
     if "clawpilot" in lowered:
         failures.add(f"{label}: contains stale Clawpilot branding")
     raw_link_failures(label, parser, failures)
-    scripts = [
-        "".join(tag.text_parts)
-        for tag in parser.find("script")
-        if not tag.attrs.get("src") and "".join(tag.text_parts).strip()
-    ]
+    scripts = inline_script_sources(parser)
     metrics.setdefault("inline_scripts", 0)
     metrics["inline_scripts"] += len(scripts)
     if not scripts:
@@ -371,12 +367,16 @@ def has_href(parser: DocumentParser, needle: str) -> bool:
     )
 
 
-def script_source(parser: DocumentParser) -> str:
-    return "\n".join(
+def inline_script_sources(parser: DocumentParser) -> list[str]:
+    return [
         "".join(tag.text_parts)
         for tag in parser.find("script")
         if not tag.attrs.get("src") and "".join(tag.text_parts).strip()
-    )
+    ]
+
+
+def script_source(parser: DocumentParser) -> str:
+    return "\n".join(inline_script_sources(parser))
 
 
 def style_source(parser: DocumentParser) -> str:
@@ -448,6 +448,31 @@ def _matching_brace(masked: str, opening: int) -> int | None:
     return None
 
 
+def _brace_spans(masked: str) -> list[tuple[int, int]]:
+    stack: list[int] = []
+    spans: list[tuple[int, int]] = []
+    for index, char in enumerate(masked):
+        if char == "{":
+            stack.append(index)
+        elif char == "}" and stack:
+            spans.append((stack.pop(), index))
+    return spans
+
+
+def _lexical_scope(
+    spans: list[tuple[int, int]],
+    position: int,
+    source_length: int,
+) -> tuple[int, int]:
+    containing = [
+        span for span in spans if span[0] < position < span[1]
+    ]
+    return min(containing, key=lambda span: span[1] - span[0]) if containing else (
+        0,
+        source_length,
+    )
+
+
 def javascript_function_source(
     source: str,
     name_pattern: str,
@@ -467,6 +492,7 @@ def javascript_function_source(
 
 def unguarded_storage_calls(source: str) -> list[str]:
     masked = _masked_javascript(source)
+    brace_spans = _brace_spans(masked)
     guarded: list[tuple[int, int]] = []
     for match in re.finditer(r"\btry\s*\{", masked):
         opening = masked.find("{", match.start())
@@ -476,15 +502,52 @@ def unguarded_storage_calls(source: str) -> list[str]:
         if not re.match(r"\s*catch\b", masked[closing + 1 :]):
             continue
         guarded.append((opening, closing))
+
+    aliases = []
+    for declaration in re.finditer(
+        r"\b(?:const|let|var)\s+localStorage\s*=\s*([^;]+);",
+        masked,
+    ):
+        right_hand_side = re.sub(r"\s+", "", declaration.group(1))
+        aliases.append(
+            {
+                "position": declaration.start(),
+                "scope": _lexical_scope(
+                    brace_spans,
+                    declaration.start(),
+                    len(masked),
+                ),
+                "safe": right_hand_side == "globalThis.aibastWorkshopStorage",
+            }
+        )
+
     failures = []
     for match in re.finditer(
-        r"\b(?:window\.)?localStorage\s*\.\s*"
+        r"(?:(?P<qualifier>\b(?:window|globalThis)\s*\.\s*)?"
+        r"\blocalStorage)\s*\.\s*"
         r"(getItem|setItem|removeItem|clear)\s*\(",
         masked,
     ):
+        if match.group("qualifier") is None:
+            bindings = [
+                alias
+                for alias in aliases
+                if alias["position"] < match.start()
+                and alias["scope"][0] < match.start() < alias["scope"][1]
+            ]
+            if bindings:
+                binding = min(
+                    bindings,
+                    key=lambda alias: (
+                        alias["scope"][1] - alias["scope"][0],
+                        -alias["position"],
+                    ),
+                )
+                if binding["safe"]:
+                    continue
         if not any(start < match.start() < end for start, end in guarded):
             line = source.count("\n", 0, match.start()) + 1
-            failures.append(f"{match.group(1)} at inline-script line {line}")
+            failures.append(f"{match.group(2)} at inline-script line {line}")
     return failures
 
 
@@ -578,7 +641,11 @@ def check_generated_surface_contract(
         if not table_rule and not (wrapped and wrapper_rule):
             failures.add(f"{label}: tables lack responsive overflow containment")
 
-    unguarded = unguarded_storage_calls(script_source(parser))
+    unguarded = [
+        f"script {index}: {failure}"
+        for index, source in enumerate(inline_script_sources(parser), start=1)
+        for failure in unguarded_storage_calls(source)
+    ]
     if unguarded:
         failures.add(
             f"{label}: unguarded localStorage access ({'; '.join(unguarded)})"
@@ -707,17 +774,42 @@ def check_quest_runtime_contract(
     if not hard_source:
         failures.add(f"{label}: Manual progress transition cannot be measured")
     else:
-        if "setAchievementWorkshopProgress(profile, activeMode" in hard_source:
+        activation_declared = re.search(
+            r"\b(?:let|var)\s+hardProgressActivated\s*=",
+            source,
+        )
+        activation_guarded = re.search(
+            r"\bif\s*\([^)]*(?:done\.length|\.checked)[^)]*\)"
+            r"\s*(?:\{\s*)?hardProgressActivated\s*=\s*true\b",
+            source,
+            re.DOTALL,
+        )
+        if not activation_declared or not activation_guarded:
             failures.add(
-                f"{label}: zero Hard progress can overwrite the Easy achievement mode"
+                f"{label}: Manual progress activation lacks a checked-progress guard"
             )
-        if not re.search(
-            r"done\.length\s*>\s*0[\s\S]*"
-            r"setAchievementWorkshopProgress\(\s*profile\s*,\s*['\"]hard['\"]",
+        persistence_call = re.search(
+            r"(?:localStorage\s*\.\s*setItem|"
+            r"[A-Za-z_$][\w$]*Storage[A-Za-z_$\w]*)"
+            r"\s*\(\s*hardProgressKey\b",
             hard_source,
+        )
+        positive_persist_guard = re.search(
+            r"\bif\s*\([^)]*(?:hardProgressActivated|persist)[^)]*\)"
+            r"\s*\{?[\s\S]{0,500}\bhardProgressKey\b",
+            hard_source,
+        )
+        negative_persist_guard = re.search(
+            r"\bif\s*\(\s*!\s*hardProgressActivated\s*\)"
+            r"\s*(?:\{\s*)?return\b[\s\S]{0,500}\bhardProgressKey\b",
+            hard_source,
+        )
+        if (
+            not persistence_call
+            or not (positive_persist_guard or negative_persist_guard)
         ):
             failures.add(
-                f"{label}: first real Hard check does not explicitly own the Hard transition"
+                f"{label}: Manual progress persistence lacks an activation guard"
             )
 
     resume_source = javascript_function_source(source, r"\w*resume\w*")
