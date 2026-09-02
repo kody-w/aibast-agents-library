@@ -1129,8 +1129,8 @@ def _check_shell_links(
     if unexpected:
         failures.add(
             "content.shell_links",
-            "shell links are limited to guide fragments, Library, Workshop "
-            "settings, and GitHub issues feedback: "
+            "shell links are limited to guide fragments, Library, Academy, "
+            "Workshop settings, and GitHub issues feedback: "
             + "; ".join(unexpected[:4]),
         )
 
@@ -2631,6 +2631,145 @@ def _find_topbar(soup: BeautifulSoup) -> Tag | None:
     return None
 
 
+def _media_applies_at_width(context: str, width: int) -> bool:
+    lowered = context.lower()
+    if not lowered.lstrip().startswith("@media"):
+        return True
+    if "print" in lowered and "screen" not in lowered:
+        return False
+    conditions = re.findall(
+        r"\(\s*(min|max)-width\s*:\s*"
+        r"([0-9]+(?:\.[0-9]+)?)\s*(px|rem)\s*\)",
+        lowered,
+    )
+    for boundary, raw_value, unit in conditions:
+        pixels = float(raw_value) * (16 if unit == "rem" else 1)
+        if boundary == "max" and width > pixels:
+            return False
+        if boundary == "min" and width < pixels:
+            return False
+    return True
+
+
+def _declaration_selector(declaration: CssDeclaration) -> str | None:
+    selectors = [
+        context
+        for context in declaration.contexts
+        if not context.lstrip().startswith("@")
+    ]
+    return selectors[-1] if selectors else None
+
+
+def _matches_selector(
+    soup: BeautifulSoup,
+    node: Tag,
+    selector: str,
+) -> bool:
+    return any(candidate is node for candidate in soup.select(selector))
+
+
+def _academy_link_hidden_at_width(
+    soup: BeautifulSoup,
+    link: Tag,
+    topbar: Tag,
+    declarations: list[CssDeclaration],
+    width: int,
+) -> bool:
+    nodes = [link]
+    for parent in link.parents:
+        if not isinstance(parent, Tag):
+            continue
+        nodes.append(parent)
+        if parent is topbar:
+            break
+    for node in nodes:
+        if (
+            _is_initially_hidden(node)
+            or node.get("aria-hidden") == "true"
+            or re.search(
+                r"(?:^|;)\s*(?:visibility\s*:\s*(?:hidden|collapse)|"
+                r"opacity\s*:\s*0(?:\.0+)?)\s*(?:!important)?\s*(?:;|$)",
+                node.get("style", ""),
+                re.IGNORECASE,
+            )
+        ):
+            return True
+    for declaration in declarations:
+        value = _css_value_without_important(declaration.value).lower()
+        hides = (
+            (declaration.property == "display" and value == "none")
+            or (
+                declaration.property == "visibility"
+                and value in {"hidden", "collapse"}
+            )
+            or (
+                declaration.property == "opacity"
+                and value in {"0", "0.0"}
+            )
+        )
+        if not hides or not all(
+            _media_applies_at_width(context, width)
+            for context in declaration.contexts
+            if context.lstrip().startswith("@media")
+        ):
+            continue
+        selector = _declaration_selector(declaration)
+        if selector and any(
+            _matches_selector(soup, node, selector) for node in nodes
+        ):
+            return True
+    return False
+
+
+def _check_mobile_academy_reachability(
+    soup: BeautifulSoup,
+    declarations: list[CssDeclaration],
+    failures: FailureCollector,
+) -> list[int]:
+    widths = (700, 375)
+    topbar = _find_topbar(soup)
+    if topbar is None:
+        failures.add(
+            "behavior.mobile_academy",
+            "the topbar Academy link cannot be measured without a topbar",
+        )
+        return []
+    links = [
+        link
+        for link in topbar.select('a[href="../academy.html"]')
+        if normalized_visible_text(link) == "Academy"
+    ]
+    body = soup.body
+    original_classes = list(body.get("class", [])) if body else []
+    if body and "js-enabled" not in original_classes:
+        body["class"] = [*original_classes, "js-enabled"]
+    try:
+        visible_widths = [
+            width
+            for width in widths
+            if any(
+                not _academy_link_hidden_at_width(
+                    soup, link, topbar, declarations, width
+                )
+                for link in links
+            )
+        ]
+    finally:
+        if body:
+            if original_classes:
+                body["class"] = original_classes
+            else:
+                del body["class"]
+    if visible_widths != list(widths):
+        missing = sorted(set(widths) - set(visible_widths), reverse=True)
+        failures.add(
+            "behavior.mobile_academy",
+            "at least one topbar Academy link must remain visible at "
+            + " and ".join(f"{width}px" for width in missing),
+        )
+    return visible_widths
+
+
 def _check_topbar_feedback_accessibility(
     text: str,
     soup: BeautifulSoup,
@@ -2640,6 +2779,7 @@ def _check_topbar_feedback_accessibility(
     topbar = _find_topbar(soup)
     required_labels = (
         "Library",
+        "Academy",
         "Production Guide",
         "Workshop settings",
         "Report an issue",
@@ -2874,6 +3014,9 @@ def audit_text(
     _check_topbar_feedback_accessibility(
         text, soup, declarations, failures
     )
+    academy_widths = _check_mobile_academy_reachability(
+        soup, declarations, failures
+    )
     _check_components_and_tracks(text, soup, declarations, failures)
     _check_post_migration_interactions(text, soup, failures)
     _check_static_behavior_semantics(text, soup, failures)
@@ -2881,6 +3024,7 @@ def audit_text(
         {
             "inline_scripts_checked": checked_scripts,
             "css_declarations_measured": len(declarations),
+            "academy_mobile_widths_checked": academy_widths,
         }
     )
     categories = sorted(

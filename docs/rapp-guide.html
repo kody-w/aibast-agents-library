@@ -1229,7 +1229,7 @@ body:not(.js-enabled) .quiz-option input {
     clip-path: inset(50%);
   }
 
-  .topbar-link:not([aria-current="page"]) {
+  .topbar-link:not([aria-current="page"]):not(.topbar-link-academy) {
     display: none;
   }
 
@@ -1265,7 +1265,7 @@ body:not(.js-enabled) .quiz-option input {
 </a>
 <nav aria-label="AIBAST resources" class="topbar-nav">
 <a class="topbar-link topbar-link-secondary" href="../library.html">Library</a>
-<a class="topbar-link topbar-link-secondary" href="../academy.html">Academy</a>
+<a class="topbar-link topbar-link-academy" href="../academy.html">Academy</a>
 <a aria-current="page" class="topbar-link" href="#overview" onclick="navigateToSection('overview'); return false;">Production Guide</a>
 <a class="topbar-link topbar-link-secondary" href="../solutions/_shared/workshop-settings.html">Workshop settings</a>
 </nav>
