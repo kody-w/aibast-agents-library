@@ -1,3 +1,4 @@
+import json
 import re
 from pathlib import Path
 
@@ -5,6 +6,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 BUILD_WORKFLOW = ROOT / ".github/workflows/build-registry.yml"
 ASSET_WORKFLOW = ROOT / ".github/workflows/agent-download-assets.yml"
+PREFLIGHT_WORKFLOW = ROOT / ".github/workflows/preflight.yml"
+BROWSER_PACKAGE = ROOT / "browser-audit/package.json"
+ACADEMY_BROWSER_AUDIT = ROOT / "browser-audit/academy-course-audit.mjs"
 SKIP_MARKERS = (
     "[skip ci]",
     "[ci skip]",
@@ -140,3 +144,37 @@ def test_asset_workflow_consumes_committed_registry_with_integrity_checks():
         assert token in build_step
     assert "gh release upload" in assets
     assert 'workflow_id: "metrics.yml"' in assets
+
+
+def test_browser_certification_includes_the_academy_gate():
+    package = json.loads(BROWSER_PACKAGE.read_text(encoding="utf-8"))
+    scripts = package["scripts"]
+
+    assert ACADEMY_BROWSER_AUDIT.is_file()
+    assert scripts["academy"] == "node academy-course-audit.mjs"
+    assert scripts["certify"].split(" && ") == [
+        "npm run mutations",
+        "npm run audit",
+        "npm run academy",
+        "npm run attest",
+    ]
+
+
+def test_preflight_runs_the_academy_browser_contract_fail_closed():
+    workflow = PREFLIGHT_WORKFLOW.read_text(encoding="utf-8")
+    academy_step = _step(workflow, "Academy browser contract")
+
+    assert workflow.index("actions/setup-node@") < workflow.index(
+        "- name: Academy browser contract"
+    )
+    assert "working-directory: browser-audit" in academy_step
+    assert "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'" in academy_step
+    assert "AIBAST_CHROME_PATH: /usr/bin/google-chrome" in academy_step
+    assert (
+        "npm install --no-audit --no-fund --ignore-scripts "
+        "--no-save --package-lock=false"
+    ) in academy_step
+    assert "test -f academy-course-audit.mjs" in academy_step
+    assert "npm run academy" in academy_step
+    assert "continue-on-error" not in academy_step
+    assert "|| true" not in academy_step
