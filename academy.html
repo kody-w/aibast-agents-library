@@ -1809,7 +1809,7 @@
       <div class="section-head">
         <div>
           <p class="section-kicker">Course catalog</p>
-          <h2 id="catalog-title">Build something real.</h2>
+          <h2 id="catalog-title" tabindex="-1">Build something real.</h2>
           <p class="section-intro">Search the complete Academy, narrow by path or industry, and compare demo cases, manual steps, skills, video availability, outcomes, and proof milestones.</p>
         </div>
       </div>
@@ -1926,6 +1926,7 @@
       const VALID_PROGRESS = new Set(["all", "not-started", "in-progress", "completed"]);
       const VALID_SORTS = new Set(["recommended", "most-practice", "a-z", "most-skills"]);
       const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+      const MODAL_HISTORY_KEY = "aibastAcademyCourseModal";
       const BADGE_POINTS = Object.freeze({
         "started": 5,
         "local-proof": 15,
@@ -1992,6 +1993,8 @@
         profileMessage: "",
         activeCourseSlug: null,
         returnFocus: null,
+        modalHistoryOwned: false,
+        historyClosePending: false,
         filters: {
           q: cleanQuery(query.get("q")),
           path: cleanFilter(query.get("path")),
@@ -3082,7 +3085,7 @@
         else url.searchParams.delete("industry");
         url.searchParams.set("progress", state.filters.progress);
         url.searchParams.set("sort", state.filters.sort);
-        history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+        history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
       }
 
       function applyFilterControls() {
@@ -3385,47 +3388,170 @@
         )].filter((node) => !node.hidden && !node.closest("[hidden]") && node.getAttribute("aria-hidden") !== "true");
       }
 
+      function modalHistorySlug() {
+        const candidate = isRecord(history.state)
+          ? history.state[MODAL_HISTORY_KEY]
+          : null;
+        return typeof candidate === "string" && SLUG_PATTERN.test(candidate)
+          ? candidate
+          : null;
+      }
+
+      function historyStateForCourse(slug) {
+        const next = isRecord(history.state) ? { ...history.state } : {};
+        next[MODAL_HISTORY_KEY] = slug;
+        return next;
+      }
+
+      function historyStateWithoutCourse() {
+        if (!isRecord(history.state)) return null;
+        const next = { ...history.state };
+        delete next[MODAL_HISTORY_KEY];
+        return Object.keys(next).length ? next : null;
+      }
+
+      function isUsefulFocusTarget(node) {
+        if (
+          !node ||
+          !node.isConnected ||
+          typeof node.focus !== "function" ||
+          node.hidden ||
+          node.closest("[hidden]")
+        ) {
+          return false;
+        }
+        const style = window.getComputedStyle(node);
+        return style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          node.getClientRects().length > 0;
+      }
+
+      function restoreCourseFocus(slug, retainedTrigger) {
+        window.requestAnimationFrame(() => {
+          const matchingLink = slug
+            ? [...document.querySelectorAll(`[data-course-link="${slug}"]`)]
+              .find((node) => isUsefulFocusTarget(node))
+            : null;
+          const target = isUsefulFocusTarget(retainedTrigger)
+            ? retainedTrigger
+            : matchingLink || document.getElementById("catalog-title");
+          if (isUsefulFocusTarget(target)) {
+            target.focus({ preventScroll: true });
+            return;
+          }
+          const catalogHeading = document.getElementById("catalog-title");
+          if (catalogHeading) catalogHeading.focus({ preventScroll: true });
+        });
+      }
+
       function openCourse(course) {
         state.activeCourseSlug = course.slug;
+        state.historyClosePending = false;
         renderModal(course);
         elements.courseModal.hidden = false;
         document.body.classList.add("modal-open");
         window.requestAnimationFrame(() => elements.modalClose.focus());
       }
 
-      function closeCourse({ clearHash = true, restoreFocus = true } = {}) {
-        if (elements.courseModal.hidden) return;
+      function hideCourseModal({ restoreFocus = true, focusSlug = state.activeCourseSlug } = {}) {
+        const retainedTrigger = state.returnFocus;
+        const wasOpen = !elements.courseModal.hidden;
         elements.courseModal.hidden = true;
         elements.modalContent.replaceChildren();
         document.body.classList.remove("modal-open");
         state.activeCourseSlug = null;
-        if (clearHash && window.location.hash.startsWith("#course/")) {
+        state.modalHistoryOwned = false;
+        state.historyClosePending = false;
+        state.returnFocus = null;
+        if (restoreFocus && (wasOpen || retainedTrigger)) {
+          restoreCourseFocus(focusSlug, retainedTrigger);
+        }
+      }
+
+      function closeCourse() {
+        if (elements.courseModal.hidden) return;
+        const focusSlug = state.activeCourseSlug;
+        const retainedTrigger = state.returnFocus;
+        if (
+          state.modalHistoryOwned &&
+          modalHistorySlug() === focusSlug
+        ) {
+          if (state.historyClosePending) return;
+          state.historyClosePending = true;
+          history.back();
+          return;
+        }
+        if (window.location.hash.startsWith("#course/")) {
           const url = new URL(window.location.href);
           url.hash = "";
-          history.replaceState(null, "", `${url.pathname}${url.search}`);
+          history.replaceState(
+            historyStateWithoutCourse(),
+            "",
+            `${url.pathname}${url.search}`
+          );
         }
-        if (restoreFocus && state.returnFocus?.isConnected) {
-          state.returnFocus.focus();
+        elements.courseModal.hidden = true;
+        hideCourseModal({ restoreFocus: false, focusSlug });
+        if (isUsefulFocusTarget(retainedTrigger)) {
+          window.requestAnimationFrame(() => retainedTrigger.focus({ preventScroll: true }));
+        } else {
+          restoreCourseFocus(focusSlug, null);
         }
-        state.returnFocus = null;
+      }
+
+      function navigateToCourse(slug, trigger) {
+        const course = state.courseBySlug.get(slug);
+        if (!course) return;
+        state.returnFocus = isUsefulFocusTarget(trigger) ? trigger : null;
+        elements.catalogNotice.hidden = true;
+        const hash = `#course/${encodeURIComponent(slug)}`;
+        if (window.location.hash === hash) {
+          state.modalHistoryOwned = modalHistorySlug() === slug;
+          openCourse(course);
+          return;
+        }
+        const url = new URL(window.location.href);
+        url.hash = hash;
+        history.pushState(
+          historyStateForCourse(slug),
+          "",
+          `${url.pathname}${url.search}${url.hash}`
+        );
+        state.modalHistoryOwned = true;
+        openCourse(course);
       }
 
       function routeHash() {
         if (!state.data) return;
+        state.historyClosePending = false;
         const match = window.location.hash.match(/^#course\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
         if (!match) {
           elements.catalogNotice.hidden = true;
-          closeCourse({ clearHash: false });
+          const focusSlug = state.activeCourseSlug;
+          hideCourseModal({
+            restoreFocus: Boolean(focusSlug),
+            focusSlug
+          });
           return;
         }
         const course = state.courseBySlug.get(match[1]);
         if (!course) {
-          closeCourse({ clearHash: false, restoreFocus: false });
+          const focusSlug = state.activeCourseSlug || match[1];
+          hideCourseModal({ focusSlug });
           elements.catalogNotice.textContent = "That Academy course could not be found.";
           elements.catalogNotice.hidden = false;
           return;
         }
         elements.catalogNotice.hidden = true;
+        const owned = modalHistorySlug() === course.slug;
+        if (
+          state.activeCourseSlug === course.slug &&
+          !elements.courseModal.hidden
+        ) {
+          state.modalHistoryOwned = owned;
+          return;
+        }
+        state.modalHistoryOwned = owned;
         openCourse(course);
       }
 
@@ -3530,7 +3656,7 @@
         const url = new URL(window.location.href);
         if (url.searchParams.has("scoutTheme")) {
           url.searchParams.set("scoutTheme", next);
-          history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+          history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
         }
         window.dispatchEvent(new CustomEvent("aibast:theme", { detail: { theme: next } }));
       }
@@ -3557,8 +3683,6 @@
       });
 
       elements.courseGrid.addEventListener("click", (event) => {
-        const courseLink = event.target.closest("[data-course-link]");
-        if (courseLink) state.returnFocus = courseLink;
         const action = event.target.closest("button[data-action='clear-filters']");
         if (action) clearFilters();
       });
@@ -3593,6 +3717,7 @@
       });
 
       window.addEventListener("hashchange", routeHash);
+      window.addEventListener("popstate", routeHash);
       window.addEventListener("storage", (event) => {
         if (event.key === PROFILE_KEY && state.data) {
           refreshProfile();
@@ -3623,14 +3748,22 @@
           return;
         }
         const modalLink = event.target.closest("a[data-course-link]");
-        if (!modalLink || !state.data) return;
-        state.returnFocus = modalLink;
-        const slug = modalLink.dataset.courseLink;
-        if (window.location.hash === `#course/${slug}`) {
-          event.preventDefault();
-          const course = state.courseBySlug.get(slug);
-          if (course) openCourse(course);
+        if (
+          !modalLink ||
+          !state.data ||
+          event.defaultPrevented ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return;
         }
+        const slug = modalLink.dataset.courseLink;
+        if (!state.courseBySlug.has(slug)) return;
+        event.preventDefault();
+        navigateToCourse(slug, modalLink);
       });
 
       syncThemeButton();
