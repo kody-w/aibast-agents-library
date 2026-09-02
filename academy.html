@@ -2222,7 +2222,14 @@
         if (!workshop) {
           return {
             started: false,
+            active: false,
             completed: false,
+            easyCompleted: false,
+            manualStarted: false,
+            manualCompleted: false,
+            activeTrack: "easy",
+            activeTrackCompleted: false,
+            overallAchievementCompleted: false,
             easyComplete: false,
             hardComplete: false,
             mode: "easy",
@@ -2236,43 +2243,60 @@
           };
         }
         const points = pointsForWorkshop(workshop);
-        const easyComplete = workshop.progress.easyComplete ||
+        const easyCompleted = workshop.progress.easyComplete ||
           workshop.achievements["workshop-complete"]?.earned === true;
-        const hardComplete = workshop.progress.hardComplete ||
+        const manualCompleted = workshop.progress.hardComplete ||
           workshop.achievements["hard-mode-complete"]?.earned === true;
-        const mode = workshop.mode === "hard" ? "hard" : "easy";
-        const rawChecked = mode === "hard"
+        const manualStarted = workshop.progress.hardChecked > 0 || manualCompleted;
+        const manualIncomplete = manualStarted && !manualCompleted;
+        const activeTrack = manualIncomplete ||
+          (workshop.mode === "hard" && (!easyCompleted || manualCompleted))
+          ? "manual"
+          : "easy";
+        const mode = activeTrack === "manual" ? "hard" : "easy";
+        const rawChecked = activeTrack === "manual"
           ? workshop.progress.hardChecked
           : workshop.progress.easyChecked;
-        const total = mode === "hard"
+        const total = activeTrack === "manual"
           ? workshop.progress.hardTotal
           : workshop.progress.easyTotal;
         const checked = total > 0 ? Math.min(rawChecked, total) : rawChecked;
-        const activeComplete = mode === "hard" ? hardComplete : easyComplete;
-        const percent = activeComplete
+        const activeTrackCompleted = activeTrack === "manual"
+          ? manualCompleted
+          : easyCompleted;
+        const overallAchievementCompleted = easyCompleted || manualCompleted;
+        const active = !activeTrackCompleted;
+        const percent = activeTrackCompleted
           ? 100
           : total > 0
             ? clamp(Math.round((checked / total) * 100), 0, 100)
             : 0;
         const checkpointText = total > 0 ? ` · ${checked}/${total}` : "";
         let label;
-        if (mode === "hard" && hardComplete) {
+        if (activeTrack === "manual" && manualCompleted) {
           label = "Manual complete";
-        } else if (mode === "hard") {
-          label = easyComplete
+        } else if (activeTrack === "manual") {
+          label = easyCompleted
             ? `Manual in progress${checkpointText} · Easy complete`
             : `Manual in progress${checkpointText}`;
-        } else if (easyComplete) {
+        } else if (easyCompleted) {
           label = "Easy complete";
         } else {
           label = `Easy in progress${checkpointText}`;
         }
         return {
           started: true,
-          completed: easyComplete || hardComplete,
-          easyComplete,
-          hardComplete,
-          activeComplete,
+          active,
+          completed: overallAchievementCompleted,
+          easyCompleted,
+          manualStarted,
+          manualCompleted,
+          activeTrack,
+          activeTrackCompleted,
+          overallAchievementCompleted,
+          easyComplete: easyCompleted,
+          hardComplete: manualCompleted,
+          activeComplete: activeTrackCompleted,
           mode,
           checked,
           total,
@@ -2316,30 +2340,58 @@
         return url.href;
       }
 
+      function manualResumeNavigationHref(rawHref, progress) {
+        const href = withResumeFragment(rawHref);
+        if (!href || progress.total <= 0 || progress.checked >= progress.total) return href;
+        const nextStep = progress.checked + 1;
+        const targetText = encodeURIComponent(`Step ${nextStep} of ${progress.total}`);
+        // Keep #resume as the fallback while Chrome lands on the next numbered Manual step.
+        return `${href}:~:text=${targetText}`;
+      }
+
       function courseAction(course, progress) {
-        if (progress.completed) {
+        if (progress.active) {
+          const manual = progress.activeTrack === "manual";
+          return {
+            label: manual ? "Resume Manual" : "Resume",
+            dashboardLabel: manual ? "Resume Manual" : "Resume Easy course",
+            resourceLabel: manual ? "Resume Manual" : "Resume Easy course",
+            href: withResumeFragment(manual ? course.manual_url : course.quest_url),
+            navigationHref: manual
+              ? manualResumeNavigationHref(course.manual_url, progress)
+              : null
+          };
+        }
+        if (progress.overallAchievementCompleted) {
           return {
             label: "Review",
             dashboardLabel: "Review course",
             resourceLabel: "Review workshop quest",
-            href: course.quest_url
-          };
-        }
-        if (progress.started) {
-          const manual = progress.mode === "hard";
-          return {
-            label: "Resume",
-            dashboardLabel: manual ? "Resume Manual course" : "Resume Easy course",
-            resourceLabel: manual ? "Resume Manual course" : "Resume Easy course",
-            href: withResumeFragment(manual ? course.manual_url : course.quest_url)
+            href: course.quest_url,
+            navigationHref: null
           };
         }
         return {
           label: "Start",
           dashboardLabel: "Start course",
           resourceLabel: "Start workshop quest",
-          href: course.quest_url
+          href: course.quest_url,
+          navigationHref: null
         };
+      }
+
+      function configureCourseActionLink(link, actionInfo) {
+        delete link.dataset.manualResumeUrl;
+        if (!configureLink(link, actionInfo.href)) return false;
+        const navigationHref = safeHref(actionInfo.navigationHref);
+        if (
+          "fragmentDirective" in document &&
+          navigationHref &&
+          new URL(navigationHref).origin === window.location.origin
+        ) {
+          link.dataset.manualResumeUrl = navigationHref;
+        }
+        return true;
       }
 
       function safeRepositorySkillPath(value) {
@@ -2441,7 +2493,7 @@
           "aria-label",
           `${actionInfo.label} ${text(row.course.title, row.course.slug)}`
         );
-        if (!configureLink(action, actionInfo.href)) {
+        if (!configureCourseActionLink(action, actionInfo)) {
           action.href = `#course/${encodeURIComponent(row.course.slug)}`;
           action.dataset.courseLink = row.course.slug;
           action.textContent = "Details";
@@ -2468,13 +2520,13 @@
           return;
         }
         const active = progressRows
-          .filter((row) => !row.progress.completed)
+          .filter((row) => row.progress.active)
           .sort((left, right) =>
             right.progress.updatedAt - left.progress.updatedAt ||
             text(left.course.title).localeCompare(text(right.course.title))
           );
         const completed = progressRows
-          .filter((row) => row.progress.completed)
+          .filter((row) => row.progress.completed && !row.progress.active)
           .sort((left, right) =>
             right.progress.updatedAt - left.progress.updatedAt ||
             text(left.course.title).localeCompare(text(right.course.title))
@@ -2510,7 +2562,7 @@
           )
           : 0;
         const recent = progressRows
-          .filter((row) => !row.progress.completed)
+          .filter((row) => row.progress.active)
           .sort((left, right) =>
             right.progress.updatedAt - left.progress.updatedAt ||
             text(left.course.title).localeCompare(text(right.course.title))
@@ -2541,6 +2593,7 @@
             progressRows.length ? "Choose the next Academy course" : "Find an Academy course"
           );
           delete elements.continueAction.dataset.courseLink;
+          delete elements.continueAction.dataset.manualResumeUrl;
           elements.continueAction.removeAttribute("target");
           elements.continueAction.removeAttribute("rel");
           return;
@@ -2560,7 +2613,7 @@
           "aria-label",
           `${actionInfo.dashboardLabel}: ${text(recent.course.title, recent.course.slug)}`
         );
-        if (!configureLink(elements.continueAction, actionInfo.href)) {
+        if (!configureCourseActionLink(elements.continueAction, actionInfo)) {
           elements.continueAction.textContent = "View course details";
           elements.continueAction.href = `#course/${encodeURIComponent(recent.course.slug)}`;
           elements.continueAction.dataset.courseLink = recent.course.slug;
@@ -2666,7 +2719,8 @@
         const percent = rows.length
           ? clamp(Math.round((completedCount / rows.length) * 100), 0, 100)
           : 0;
-        const next = rows.find((row) => !row.progress.completed);
+        const next = rows.find((row) => row.progress.active) ||
+          rows.find((row) => !row.progress.completed);
         const fragment = document.createDocumentFragment();
 
         const header = document.createElement("header");
@@ -2729,13 +2783,13 @@
           const item = document.createElement("li");
           item.className = [
             "path-course-item",
-            row.progress.completed ? "completed" : "",
+            row.progress.completed && !row.progress.active ? "completed" : "",
             row === next ? "next" : ""
           ].filter(Boolean).join(" ");
           appendText(
             item,
             "span",
-            row.progress.completed ? "✓" : String(index + 1),
+            row.progress.completed && !row.progress.active ? "✓" : String(index + 1),
             "path-course-number"
           );
           const courseCopy = document.createElement("div");
@@ -2755,10 +2809,10 @@
           appendText(
             item,
             "span",
-            row.progress.completed
-              ? "Completed"
-              : row.progress.started
-                ? `${row.progress.percent}% · Active`
+            row.progress.active
+              ? `${row.progress.percent}% · ${row.progress.activeTrack === "manual" ? "Manual" : "Easy"} active`
+              : row.progress.completed
+                ? "Completed"
                 : "Not started",
             "path-course-status"
           );
@@ -2871,7 +2925,7 @@
             if (state.filters.path && !coursePathIds(course).includes(state.filters.path)) return false;
             if (state.filters.industry && text(course.industry) !== state.filters.industry) return false;
             if (state.filters.progress === "not-started" && progress.started) return false;
-            if (state.filters.progress === "in-progress" && (!progress.started || progress.completed)) return false;
+            if (state.filters.progress === "in-progress" && !progress.active) return false;
             if (state.filters.progress === "completed" && !progress.completed) return false;
             return true;
           });
@@ -2897,7 +2951,7 @@
             return rightCount - leftCount || text(left.course.title).localeCompare(text(right.course.title));
           }
           const progressRank = (row) => {
-            if (row.progress.started && !row.progress.completed) return 0;
+            if (row.progress.active) return 0;
             if (!row.progress.started) return 1;
             return 2;
           };
@@ -3006,7 +3060,7 @@
           "aria-label",
           `${actionInfo.label} ${text(course.title, course.slug)}`
         );
-        if (configureLink(action, actionInfo.href)) {
+        if (configureCourseActionLink(action, actionInfo)) {
           actions.append(action);
         } else {
           action.href = `#course/${encodeURIComponent(course.slug)}`;
@@ -3118,10 +3172,10 @@
         return BADGE_POINTS[badgeId] || 0;
       }
 
-      function createResource(label, rawHref) {
+      function createResource(label, rawHref, navigationHref = null) {
         const link = document.createElement("a");
         link.className = "button";
-        if (!configureLink(link, rawHref)) {
+        if (!configureCourseActionLink(link, { href: rawHref, navigationHref })) {
           const unavailable = document.createElement("span");
           unavailable.className = "resource-unavailable";
           unavailable.textContent = `${label} not available`;
@@ -3362,14 +3416,14 @@
         const resources = document.createElement("div");
         resources.className = "resource-list";
         const actionInfo = courseAction(course, progress);
-        const secondaryLabel = progress.started && !progress.completed && progress.mode === "hard"
+        const secondaryLabel = progress.active && progress.activeTrack === "manual"
           ? "Open Easy quest"
           : "Open manual";
-        const secondaryHref = progress.started && !progress.completed && progress.mode === "hard"
+        const secondaryHref = progress.active && progress.activeTrack === "manual"
           ? course.quest_url
           : course.manual_url;
         resources.append(
-          createResource(actionInfo.resourceLabel, actionInfo.href),
+          createResource(actionInfo.resourceLabel, actionInfo.href, actionInfo.navigationHref),
           createResource("Open field guide", course.field_guide_url),
           createResource(secondaryLabel, secondaryHref),
           createResource("View evidence", course.evidence_url)
@@ -3745,6 +3799,20 @@
           );
           elements.catalogCount.textContent = "Loading Academy courses…";
           loadAcademy().catch(renderLoadError);
+          return;
+        }
+        const manualResumeLink = event.target.closest("a[data-manual-resume-url]");
+        if (
+          manualResumeLink &&
+          !event.defaultPrevented &&
+          event.button === 0 &&
+          !event.metaKey &&
+          !event.ctrlKey &&
+          !event.shiftKey &&
+          !event.altKey
+        ) {
+          event.preventDefault();
+          window.location.assign(manualResumeLink.dataset.manualResumeUrl);
           return;
         }
         const modalLink = event.target.closest("a[data-course-link]");
