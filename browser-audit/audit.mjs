@@ -2015,7 +2015,22 @@ async function fileArtifact(relative) {
 async function buildContactSheet(context, mode, workshopSlugs) {
   const cards = await Promise.all(workshopSlugs.map(async (slug) => {
     const relative = `screenshots/${slug}-${mode}.png`;
-    const source = await fs.readFile(path.join(out, relative));
+    const absolute = path.join(out, relative);
+    let source;
+    try {
+      source = await fs.readFile(absolute);
+    } catch (error) {
+      throw new Error(
+        `Cannot assemble ${mode} contact sheet: screenshot for ${slug} `
+        + `was not written at ${relative} (${error.code || error.message})`,
+      );
+    }
+    if (!source.length) {
+      throw new Error(
+        `Cannot assemble ${mode} contact sheet: screenshot for ${slug} `
+        + `is empty at ${relative}`,
+      );
+    }
     return {
       slug,
       source: `data:image/png;base64,${source.toString("base64")}`,
@@ -2245,9 +2260,18 @@ for (const slug of slugs) {
     '[data-path="easy"] img[data-evidence-status="reusable"]',
   ).first();
   const easyFallback = page.locator(
-    '[data-path="easy"] .withheld-checkpoint',
+    '[data-path="easy"]:not([hidden]) .withheld-checkpoint:visible',
   ).first();
+  const easyTextEvidence = page.locator(
+    '[data-path="easy"]:not([hidden]) .verification-evidence:visible',
+  ).first();
+  const activeEasyPanel = page.locator(
+    '[data-path="easy"]:not([hidden])',
+  ).first();
+  const easyFallbackCount = await easyFallback.count();
+  const easyTextEvidenceCount = await easyTextEvidence.count();
   let easyCaptureArtifact = null;
+  let easyCaptureKind = null;
   if (easyImages.length) {
     await easyImage.scrollIntoViewIfNeeded();
     easyCaptureArtifact = await captureContext(
@@ -2255,14 +2279,41 @@ for (const slug of slugs) {
       path.join(out, easyScreenshotRelative),
       easyScreenshotRelative,
     );
-  } else if (await easyFallback.count()) {
+    easyCaptureKind = "reusable-image";
+  } else if (easyFallbackCount) {
     await easyFallback.scrollIntoViewIfNeeded();
     easyCaptureArtifact = await captureContext(
       easyFallback,
       path.join(out, easyScreenshotRelative),
       easyScreenshotRelative,
     );
+    easyCaptureKind = "withheld-checkpoint";
+  } else if (easyTextEvidenceCount) {
+    await easyTextEvidence.scrollIntoViewIfNeeded();
+    easyCaptureArtifact = await captureContext(
+      easyTextEvidence,
+      path.join(out, easyScreenshotRelative),
+      easyScreenshotRelative,
+    );
+    easyCaptureKind = "verification-evidence";
+  } else if (await activeEasyPanel.count()) {
+    await activeEasyPanel.scrollIntoViewIfNeeded();
+    easyCaptureArtifact = await captureContext(
+      activeEasyPanel,
+      path.join(out, easyScreenshotRelative),
+      easyScreenshotRelative,
+    );
+    easyCaptureKind = "active-easy-panel";
   }
+  const easyCaptureSemantics = Boolean(
+    easyImages.length
+      ? easyCaptureKind === "reusable-image"
+      : easyFallbackCount
+        ? easyCaptureKind === "withheld-checkpoint"
+        : easyTextEvidenceCount
+          ? easyCaptureKind === "verification-evidence"
+          : easyCaptureKind === "active-easy-panel"
+  );
 
   const manualTab = page.getByRole("tab", { name: "Manual", exact: true });
   const manualTabCount = await manualTab.count();
@@ -2493,6 +2544,7 @@ for (const slug of slugs) {
     && mobileEasy.horizontalOverflow <= 4
     && mobileHard.horizontalOverflow <= 4
     && serviceWorkerAttempts.length === 0
+    && easyCaptureSemantics
     && screenshotsBound
     && errors.length === 0
   );
@@ -2513,6 +2565,7 @@ for (const slug of slugs) {
     screenshotArtifacts,
     writtenScreenshotArtifacts,
     screenshotsBound,
+    easyCaptureSemantics,
     referenceOnly,
     hardTabIdentity,
     easy,
@@ -2528,6 +2581,7 @@ for (const slug of slugs) {
     mobileImageFailures,
     errors,
     capturedEasy: Boolean(easyCaptureArtifact),
+    easyCaptureKind,
     capturedHard: Boolean(hardImages.length),
   });
   await page.close();
