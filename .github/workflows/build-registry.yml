@@ -5,10 +5,34 @@ on:
     paths:
       - 'agents/**/*.py'
       - 'build_registry.py'
+      - 'registry.json'
+      - 'academy/catalog.json'
+      - 'academy.json'
+      - 'scripts/build_academy.py'
+      - 'solutions/catalog.json'
+      - 'state/workshop_course_rollout.json'
+      - 'solutions/*/quest.html'
+      - 'solutions/*/manual-tutorial.html'
+      - 'solutions/*/field-guide.html'
+      - 'solutions/*/evidence-report.html'
+      - 'solutions/*/manual/skills/*/SKILL.md'
       - '.github/workflows/build-registry.yml'
   pull_request:
     paths:
       - 'agents/**/*.py'
+      - 'build_registry.py'
+      - 'registry.json'
+      - 'academy/catalog.json'
+      - 'academy.json'
+      - 'scripts/build_academy.py'
+      - 'solutions/catalog.json'
+      - 'state/workshop_course_rollout.json'
+      - 'solutions/*/quest.html'
+      - 'solutions/*/manual-tutorial.html'
+      - 'solutions/*/field-guide.html'
+      - 'solutions/*/evidence-report.html'
+      - 'solutions/*/manual/skills/*/SKILL.md'
+      - '.github/workflows/build-registry.yml'
   workflow_dispatch:
 
 permissions:
@@ -24,14 +48,21 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Check committed academy catalog
+        if: github.event_name == 'pull_request'
+        run: python scripts/build_academy.py --check
+
       - name: Build registry
         run: python build_registry.py
 
-      - name: Commit registry.json
+      - name: Build academy catalog
+        run: python scripts/build_academy.py
+
+      - name: Commit generated catalogs
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "RAPP Registry Bot"
           git config user.email "rapp-bot@users.noreply.github.com"
-          git add registry.json
-          git diff --cached --quiet || git commit -m "Auto-build registry.json [skip ci]"
+          git add registry.json academy.json
+          git diff --cached --quiet || git commit -m "Auto-build generated catalogs [skip ci]"
           git push
