@@ -297,6 +297,7 @@ STORAGE_RE = re.compile(
 )
 SHELL_INTERNAL_LINK_ALLOWLIST = {
     ("Library", "../library.html"),
+    ("Academy", "../academy.html"),
     ("Workshop settings", "../solutions/_shared/workshop-settings.html"),
 }
 SHELL_GITHUB_ISSUES_PATHS = {

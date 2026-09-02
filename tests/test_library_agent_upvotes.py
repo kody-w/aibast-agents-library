@@ -73,15 +73,16 @@ def test_library_scripts_parse_with_node():
     assert result.returncode == 0, result.stderr
 
 
-def test_toolbar_only_links_agent_library_and_industry_workshops():
+def test_toolbar_links_library_academy_and_industry_workshops():
     text = library_text()
     nav = text[
         text.index('<nav class="nav" aria-label="Primary navigation">'):
         text.index("</nav>", text.index('<nav class="nav" aria-label="Primary navigation">'))
     ]
 
-    assert nav.count("<a ") == 2
+    assert nav.count("<a ") == 3
     assert ">Agent Library</a>" in nav
+    assert 'href="academy.html">Academy</a>' in nav
     assert (
         'href="library.html?view=solutions#workshops">'
         "Industry Workshops</a>"
