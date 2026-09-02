@@ -163,12 +163,8 @@ WORKSHOP_STORAGE_SCRIPT = """(() => {
 WORKSHOP_ENGINE_SCRIPT = """(() => {
       const storedEngine =
         globalThis.aibastWorkshopStorage.getItem("aibast:workshop-engine");
-      const recognizedEngine =
-        storedEngine === "brainstem" ? "brainstem" : "copilot";
       const engine =
-        storedEngine === "brainstem" || storedEngine === "copilot"
-          ? recognizedEngine
-          : "brainstem";
+        storedEngine === "copilot" ? "copilot" : "brainstem";
       document.documentElement.setAttribute("data-workshop-engine", engine);
     })();"""
 
@@ -2471,7 +2467,7 @@ def render_field_guide_html(ctx: JourneyContext) -> str:
     </div>
     <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button" href="../_shared/workshop-settings.html?return=../{html.escape(ctx.slug)}/field-guide.html">Workshop settings</a><a class="button primary" href="quest.html">Back to workshop</a></div>
   </header>
-  <main class="page" id="course-content">
+  <main class="page" id="course-content" tabindex="-1">
     <section class="hero">
       <p class="eyebrow">Facilitator and learner guide</p>
       <h1 id="course-title" tabindex="-1">{html.escape(ctx.title)}</h1>
@@ -2630,7 +2626,7 @@ def render_evidence_report_html(ctx: JourneyContext) -> str:
     </div>
     <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button primary" href="quest.html">Back to workshop</a></div>
   </header>
-  <main class="page" id="course-content">
+  <main class="page" id="course-content" tabindex="-1">
     <section class="hero">
       <p class="eyebrow">Workshop evidence</p>
       <h1 id="course-title" tabindex="-1">{html.escape(ctx.title)}</h1>
@@ -2959,7 +2955,7 @@ def render_manual_tutorial(
       <p class="achievements-manual-note" id="achievements-manual-toast" role="status" aria-live="polite" aria-atomic="true"></p>
       <nav class="toc" aria-label="Tutorial actions">{toc_markup}</nav>
     </aside>
-    <main id="course-content">
+    <main id="course-content" tabindex="-1">
       <section class="hero">
         <p class="eyebrow">Manual mode · literal browser construction</p>
         <h1 id="course-title" tabindex="-1">Build {html.escape(ctx.title)} manually.</h1>
@@ -3692,7 +3688,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
     </div>
     <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button" href="../_shared/workshop-settings.html?return=../{html.escape(ctx.slug)}/quest.html">Workshop settings</a><a class="button primary" href="field-guide.html">Open field guide</a></div>
   </header>
-  <main class="page" id="course-content">
+  <main class="page" id="course-content" tabindex="-1">
     <section class="hero">
       <p class="eyebrow">Evidence-grounded customer journey</p>
       <h1 id="course-title" tabindex="-1">{html.escape(ctx.title)}</h1>

@@ -123,12 +123,8 @@
     (() => {
       const storedEngine =
         globalThis.aibastWorkshopStorage.getItem("aibast:workshop-engine");
-      const recognizedEngine =
-        storedEngine === "brainstem" ? "brainstem" : "copilot";
       const engine =
-        storedEngine === "brainstem" || storedEngine === "copilot"
-          ? recognizedEngine
-          : "brainstem";
+        storedEngine === "copilot" ? "copilot" : "brainstem";
       document.documentElement.setAttribute("data-workshop-engine", engine);
     })();
   </script>
@@ -350,7 +346,7 @@
     </div>
     <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button" href="../_shared/workshop-settings.html?return=../inventory-rebalancing/field-guide.html">Workshop settings</a><a class="button primary" href="quest.html">Back to workshop</a></div>
   </header>
-  <main class="page" id="course-content">
+  <main class="page" id="course-content" tabindex="-1">
     <section class="hero">
       <p class="eyebrow">Facilitator and learner guide</p>
       <h1 id="course-title" tabindex="-1">Inventory Rebalancing Agent</h1>
