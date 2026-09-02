@@ -1857,9 +1857,34 @@ async function modeSnapshot(page, mode, images) {
     const selectedTab = document.querySelector(
       `[role="tab"][data-mode="${expectedMode}"][aria-selected="true"]`,
     );
+    const idCounts = new Map();
+    document.querySelectorAll("[id]").forEach((element) => {
+      idCounts.set(element.id, (idCounts.get(element.id) || 0) + 1);
+    });
+    const duplicateIds = [...idCounts]
+      .filter(([, count]) => count > 1)
+      .map(([id, count]) => ({ id, count }));
+    const visibleLearnSteps = path
+      ? [...path.querySelectorAll(".learn-step")].filter(visible)
+      : [];
+    const previewSteps = path
+      ? [...path.querySelectorAll('[id="easy-step-5"]')]
+      : [];
+    const completionSteps = path
+      ? [...path.querySelectorAll('[id="easy-step-6"]')]
+      : [];
+    const easyStepSemantics = Boolean(
+      visibleLearnSteps.length > 0
+      && previewSteps.length === 1
+      && completionSteps.length === 1
+      && previewSteps[0].classList.contains("learn-step")
+      && completionSteps[0].classList.contains("learn-step")
+      && visible(previewSteps[0])
+      && visible(completionSteps[0])
+    );
     const semanticAnchor = expectedMode === "easy"
-      ? path?.querySelector("#easy-step-4")
-      : path?.querySelector(".hard-overview");
+      ? easyStepSemantics
+      : visible(path?.querySelector(".hard-overview"));
     return {
       activeMode: document.querySelector("[data-mode].active")?.getAttribute("data-mode"),
       selectedTabs: [...document.querySelectorAll('[role="tab"][aria-selected="true"]')]
@@ -1872,7 +1897,13 @@ async function modeSnapshot(page, mode, images) {
       oppositeComputedDisplay: opposite ? getComputedStyle(opposite).display : null,
       oppositeRenderedDescendants: oppositeRenderedDescendants.length,
       oppositeHitTargets: oppositeHitTargets.length,
-      semanticAnchor: visible(semanticAnchor),
+      semanticAnchor: semanticAnchor && duplicateIds.length === 0,
+      visibleLearnSteps: visibleLearnSteps.map((element) => element.id || null),
+      easyStepAnchors: {
+        preview: previewSteps.length,
+        completion: completionSteps.length,
+      },
+      duplicateIds,
       tabSemantics: Boolean(
         panels.length === 2
         && visiblePanels.length === 1
@@ -2233,7 +2264,15 @@ for (const slug of slugs) {
     );
   }
 
-  const hardTab = page.getByRole("tab", { name: "Hard", exact: true });
+  const manualTab = page.getByRole("tab", { name: "Manual", exact: true });
+  const manualTabCount = await manualTab.count();
+  const hardTabIdentity = Boolean(
+    manualTabCount === 1
+    && await manualTab.getAttribute("data-mode") === "hard"
+  );
+  const hardTab = hardTabIdentity
+    ? manualTab
+    : page.locator('[role="tab"][data-mode="hard"]').first();
   await hardTab.click();
   await page.waitForFunction((mode) => {
     const selected = [...document.querySelectorAll('[role="tab"][aria-selected="true"]')]
@@ -2298,6 +2337,8 @@ for (const slug of slugs) {
     && hard.oppositeHidden
     && easy.semanticAnchor
     && hard.semanticAnchor
+    && easy.duplicateIds.length === 0
+    && hard.duplicateIds.length === 0
     && easy.tabSemantics
     && hard.tabSemantics
     && (easySources.length > 0 || expectedEasyRows.length === 0)
@@ -2437,6 +2478,7 @@ for (const slug of slugs) {
     && mission
     && completeImageInventory
     && referenceOnly === 0
+    && hardTabIdentity
     && distinctModes
     && mobileEasy.tabSemantics
     && mobileHard.tabSemantics
@@ -2472,6 +2514,7 @@ for (const slug of slugs) {
     writtenScreenshotArtifacts,
     screenshotsBound,
     referenceOnly,
+    hardTabIdentity,
     easy,
     hard,
     mobileEasy,
