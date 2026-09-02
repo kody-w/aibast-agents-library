@@ -296,7 +296,7 @@ def test_quest_exposes_beta_course_shell_and_global_easy_lanes():
     assert 'data-easy-lane="copilot"' in quest
     assert 'data-easy-lane="brainstem"' in quest
     assert 'localStorage.getItem("aibast:workshop-engine") === "copilot"' in quest
-    assert re.search(r'\?\s*"brainstem"\s*:\s*"copilot"', quest)
+    assert re.search(r'\?\s*"copilot"\s*:\s*"brainstem"', quest)
     assert "GitHub Copilot only" in quest
     assert "GitHub Copilot + Brainstem" in quest
     assert len(re.findall(r"<[^>]+\bdata-report-location=", quest)) == (
