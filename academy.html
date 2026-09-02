@@ -591,6 +591,70 @@
       font-size: 0.73rem;
     }
     .privacy-note strong { color: var(--text); }
+    .learning-lists {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .learning-list-panel {
+      min-width: 0;
+      padding: 18px 22px 20px;
+    }
+    .learning-list-panel + .learning-list-panel {
+      border-left: 1px solid var(--border);
+    }
+    .learning-list-panel h3 {
+      margin: 0 0 10px;
+      font-size: 0.86rem;
+    }
+    .learning-course-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .learning-course {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-soft);
+    }
+    .learning-course-copy {
+      min-width: 0;
+    }
+    .learning-course-copy a,
+    .learning-course-copy span {
+      display: block;
+    }
+    .learning-course-copy a {
+      overflow: hidden;
+      color: var(--text);
+      font-size: 0.76rem;
+      font-weight: 760;
+      text-decoration: none;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .learning-course-copy a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .learning-course-copy span {
+      margin-top: 2px;
+      color: var(--soft-text);
+      font-size: 0.65rem;
+    }
+    .learning-list-empty {
+      margin: 0;
+      color: var(--soft-text);
+      font-size: 0.72rem;
+    }
 
     .ecosystem-strip {
       display: grid;
@@ -749,6 +813,128 @@
       background: var(--accent-soft);
       color: var(--accent);
     }
+    .path-overview {
+      margin-top: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+    }
+    .path-overview-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: start;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--border);
+      background:
+        radial-gradient(circle at 92% 20%, var(--accent-soft), transparent 34%),
+        var(--surface-soft);
+    }
+    .path-overview-kicker {
+      margin: 0 0 4px;
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .path-overview h3 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -0.025em;
+    }
+    .path-overview-description {
+      max-width: 820px;
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .path-overview-meta {
+      margin: 8px 0 0;
+      color: var(--soft-text);
+      font-size: 0.7rem;
+    }
+    .path-overview-progress {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      max-width: 520px;
+      align-items: center;
+      margin-top: 14px;
+    }
+    .path-overview-progress span {
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 740;
+      white-space: nowrap;
+    }
+    .path-course-list {
+      display: grid;
+      max-height: 430px;
+      margin: 0;
+      padding: 12px;
+      overflow-y: auto;
+      list-style: none;
+    }
+    .path-course-item {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: center;
+      padding: 10px 11px;
+      border-radius: 10px;
+    }
+    .path-course-item + .path-course-item {
+      border-top: 1px solid var(--border);
+    }
+    .path-course-item.next {
+      background: var(--accent-soft);
+    }
+    .path-course-number {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--surface-strong);
+      color: var(--muted);
+      font-size: 0.66rem;
+      font-weight: 850;
+    }
+    .path-course-item.completed .path-course-number {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+    .path-course-copy {
+      min-width: 0;
+    }
+    .path-course-copy a,
+    .path-course-copy span {
+      display: block;
+    }
+    .path-course-copy a {
+      color: var(--text);
+      font-size: 0.78rem;
+      font-weight: 760;
+      text-decoration: none;
+    }
+    .path-course-copy a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .path-course-copy span {
+      margin-top: 2px;
+      color: var(--soft-text);
+      font-size: 0.66rem;
+    }
+    .path-course-status {
+      color: var(--muted);
+      font-size: 0.67rem;
+      font-weight: 740;
+      white-space: nowrap;
+    }
 
     .catalog-shell {
       border: 1px solid var(--border);
@@ -866,7 +1052,60 @@
       font-size: 0.7rem;
     }
     .course-facts strong { color: var(--text); }
-    .course-card .chip-row { margin-top: 12px; }
+    .course-depth {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 14px;
+    }
+    .depth-fact {
+      min-width: 0;
+      padding: 8px 9px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+    .depth-fact strong,
+    .depth-fact span {
+      display: block;
+    }
+    .depth-fact strong {
+      font-size: 0.76rem;
+      line-height: 1.25;
+    }
+    .depth-fact span {
+      margin-top: 2px;
+      color: var(--soft-text);
+      font-size: 0.62rem;
+      line-height: 1.25;
+    }
+    .depth-fact.path-level {
+      grid-column: 1 / -1;
+    }
+    .course-context {
+      margin-top: 12px;
+    }
+    .context-label {
+      margin: 0;
+      color: var(--soft-text);
+      font-size: 0.63rem;
+      font-weight: 820;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .course-context .chip-row {
+      margin-top: 6px;
+    }
+    .skill-match {
+      margin: 11px 0 0;
+      padding: 8px 10px;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 740;
+    }
     .course-progress {
       margin-top: auto;
       padding-top: 18px;
@@ -882,6 +1121,11 @@
       font-weight: 700;
     }
     .progress-label strong { color: var(--text); }
+    .achievement-points {
+      margin: 7px 0 0;
+      color: var(--soft-text);
+      font-size: 0.66rem;
+    }
     .course-actions {
       display: flex;
       gap: 8px;
@@ -1085,6 +1329,17 @@
     .skill-item span { display: block; }
     .skill-item strong { font-size: 0.85rem; }
     .skill-item span { margin-top: 4px; color: var(--muted); font-size: 0.76rem; }
+    .skill-title-link {
+      display: inline-block;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 780;
+      text-decoration: none;
+    }
+    .skill-title-link:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
     .skill-name {
       margin-top: 8px;
       color: var(--soft-text);
@@ -1152,6 +1407,78 @@
       border-radius: 9px;
       color: var(--soft-text);
       font-size: 0.73rem;
+    }
+    .detail-fact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .detail-fact {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+    }
+    .detail-fact strong,
+    .detail-fact span {
+      display: block;
+    }
+    .detail-fact strong {
+      font-size: 0.9rem;
+    }
+    .detail-fact span {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+    .build-path {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .build-path li {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+    }
+    .build-path-index {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 0.7rem;
+      font-weight: 850;
+    }
+    .build-path li + li .build-path-index {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .build-path strong,
+    .build-path span {
+      display: block;
+    }
+    .build-path strong {
+      font-size: 0.8rem;
+    }
+    .build-path span {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+    .detail-note {
+      margin: 10px 0 0;
+      color: var(--soft-text);
+      font-size: 0.7rem;
     }
 
     @media (max-width: 1100px) {
@@ -1239,11 +1566,33 @@
       .learning-stat:nth-child(5) { grid-column: 1 / -1; border-right: 0; }
       .continue-row { grid-template-columns: 1fr; padding: 20px 16px; }
       .continue-row .button { width: 100%; }
+      .learning-lists { grid-template-columns: 1fr; }
+      .learning-list-panel { padding: 16px; }
+      .learning-list-panel + .learning-list-panel {
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
       .privacy-note { padding: 12px 16px; }
       .path-grid,
       .course-grid,
       .next-grid { grid-template-columns: 1fr; }
       .path-description { min-height: 0; }
+      .path-overview-head {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 19px 17px;
+      }
+      .path-overview-head .button { width: 100%; }
+      .path-course-list { padding: 8px; }
+      .path-course-item {
+        grid-template-columns: 28px minmax(0, 1fr);
+        gap: 9px;
+        padding: 9px 8px;
+      }
+      .path-course-status {
+        grid-column: 2;
+        white-space: normal;
+      }
       .filter-tray { padding: 15px; }
       .filters { grid-template-columns: 1fr; }
       .filter-field.search-field { grid-column: auto; }
@@ -1266,6 +1615,7 @@
       .modal-hero { padding: 70px 18px 24px; }
       .modal-main,
       .modal-aside { padding: 24px 18px 30px; }
+      .detail-fact-grid { grid-template-columns: 1fr; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1399,7 +1749,7 @@
           </div>
           <div class="learning-stat">
             <strong id="overallProgress">0%</strong>
-            <span>average mastery of started courses</span>
+            <span>average active-mode checkpoint completion</span>
           </div>
         </div>
         <div class="continue-row">
@@ -1413,6 +1763,16 @@
           </div>
           <a class="button primary" id="continueAction" href="#catalog">Find a course</a>
         </div>
+        <div class="learning-lists" id="myLearningLists" hidden>
+          <section class="learning-list-panel" aria-labelledby="active-courses-title">
+            <h3 id="active-courses-title">Active courses</h3>
+            <ul class="learning-course-list" id="activeCourseList"></ul>
+          </section>
+          <section class="learning-list-panel" aria-labelledby="completed-courses-title">
+            <h3 id="completed-courses-title">Completed courses</h3>
+            <ul class="learning-course-list" id="completedCourseList"></ul>
+          </section>
+        </div>
         <p class="privacy-note" id="profileNotice" role="status" aria-live="polite"><strong>Private by default:</strong> only approved workshop progress fields are read; unknown fields are discarded in memory.</p>
       </div>
     </section>
@@ -1422,7 +1782,7 @@
         <div>
           <p class="section-kicker">Capability journey</p>
           <h2 id="ecosystem-title">From hosted skill to Microsoft impact.</h2>
-          <p class="section-intro">Each course follows the same durable arc: discover a reusable capability, practice it, prove it, and move it into the tools where work happens.</p>
+          <p class="section-intro">Each course builds and tests through GitHub Copilot or RAPP Brainstem, then stops at a reviewed Copilot Studio Draft. Product names on course cards describe business context, not a promise that every integration is taught.</p>
         </div>
       </div>
       <ol class="ecosystem-strip" id="ecosystemStrip" aria-live="polite" aria-busy="true">
@@ -1442,6 +1802,7 @@
       <div class="path-grid" id="pathGrid" aria-live="polite" aria-busy="true">
         <div class="inline-state"><span class="loading-dots">Loading learning paths</span></div>
       </div>
+      <section class="path-overview" id="pathOverview" aria-live="polite" hidden></section>
     </section>
 
     <section class="section" id="catalog" aria-labelledby="catalog-title">
@@ -1449,7 +1810,7 @@
         <div>
           <p class="section-kicker">Course catalog</p>
           <h2 id="catalog-title">Build something real.</h2>
-          <p class="section-intro">Search the complete Academy, narrow by path or industry, and open any course to see its skills, outcomes, proof milestones, and Microsoft journey.</p>
+          <p class="section-intro">Search the complete Academy, narrow by path or industry, and compare demo cases, manual steps, skills, video availability, outcomes, and proof milestones.</p>
         </div>
       </div>
 
@@ -1486,7 +1847,7 @@
               <label for="sortFilter">Sort</label>
               <select id="sortFilter" name="sort">
                 <option value="recommended">Recommended</option>
-                <option value="newest">Newest</option>
+                <option value="most-practice">Most practice</option>
                 <option value="a-z">A–Z</option>
                 <option value="most-skills">Most skills</option>
               </select>
@@ -1563,7 +1924,7 @@
       const THEME_KEY = "aibast:theme";
       const VALID_THEMES = new Set(["light", "dark"]);
       const VALID_PROGRESS = new Set(["all", "not-started", "in-progress", "completed"]);
-      const VALID_SORTS = new Set(["recommended", "newest", "a-z", "most-skills"]);
+      const VALID_SORTS = new Set(["recommended", "most-practice", "a-z", "most-skills"]);
       const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
       const BADGE_POINTS = Object.freeze({
         "started": 5,
@@ -1599,9 +1960,13 @@
         continueProgress: document.getElementById("continueProgress"),
         continueProgressLabel: document.getElementById("continueProgressLabel"),
         continueAction: document.getElementById("continueAction"),
+        myLearningLists: document.getElementById("myLearningLists"),
+        activeCourseList: document.getElementById("activeCourseList"),
+        completedCourseList: document.getElementById("completedCourseList"),
         profileNotice: document.getElementById("profileNotice"),
         ecosystemStrip: document.getElementById("ecosystemStrip"),
         pathGrid: document.getElementById("pathGrid"),
+        pathOverview: document.getElementById("pathOverview"),
         filterForm: document.getElementById("filterForm"),
         filterFieldset: document.getElementById("filterFieldset"),
         searchInput: document.getElementById("searchInput"),
@@ -1765,13 +2130,15 @@
             ? rawWorkshop.achievements
             : {};
           const achievements = {};
-          BADGE_ORDER.forEach((badgeId) => {
-            const rawBadge = rawAchievements[badgeId];
+          Object.entries(rawAchievements).slice(0, 50).forEach(([rawBadgeId, rawBadge]) => {
+            const badgeId = BADGE_ALIASES[rawBadgeId] || rawBadgeId;
+            if (!BADGE_ORDER.includes(badgeId)) return;
             const earned = rawBadge === true || (isRecord(rawBadge) && rawBadge.earned === true);
             if (!earned) return;
             achievements[badgeId] = {
               earned: true,
-              earnedAt: validTimestamp(isRecord(rawBadge) ? rawBadge.earnedAt : null)
+              earnedAt: achievements[badgeId]?.earnedAt ||
+                validTimestamp(isRecord(rawBadge) ? rawBadge.earnedAt : null)
             };
           });
           clean.workshops[slug] = {
@@ -1849,13 +2216,15 @@
 
       function progressForCourse(course) {
         const workshop = state.profile.workshops[course.slug];
-        const maximum = state.data ? state.data.summary.points_per_course : 0;
         if (!workshop) {
           return {
             started: false,
             completed: false,
             easyComplete: false,
             hardComplete: false,
+            mode: "easy",
+            checked: 0,
+            total: 0,
             points: 0,
             percent: 0,
             label: "Not started",
@@ -1864,26 +2233,46 @@
           };
         }
         const points = pointsForWorkshop(workshop);
-        const percent = maximum > 0 ? clamp(Math.round((points / maximum) * 100), 0, 100) : 0;
-        const activeComplete = workshop.progress.hardComplete ||
-          (workshop.mode === "easy" && workshop.progress.easyComplete);
-        let label = "Started";
-        if (workshop.progress.hardComplete) {
+        const easyComplete = workshop.progress.easyComplete ||
+          workshop.achievements["workshop-complete"]?.earned === true;
+        const hardComplete = workshop.progress.hardComplete ||
+          workshop.achievements["hard-mode-complete"]?.earned === true;
+        const mode = workshop.mode === "hard" ? "hard" : "easy";
+        const rawChecked = mode === "hard"
+          ? workshop.progress.hardChecked
+          : workshop.progress.easyChecked;
+        const total = mode === "hard"
+          ? workshop.progress.hardTotal
+          : workshop.progress.easyTotal;
+        const checked = total > 0 ? Math.min(rawChecked, total) : rawChecked;
+        const activeComplete = mode === "hard" ? hardComplete : easyComplete;
+        const percent = activeComplete
+          ? 100
+          : total > 0
+            ? clamp(Math.round((checked / total) * 100), 0, 100)
+            : 0;
+        const checkpointText = total > 0 ? ` · ${checked}/${total}` : "";
+        let label;
+        if (mode === "hard" && hardComplete) {
           label = "Manual complete";
-        } else if (workshop.mode === "hard" && !workshop.progress.hardComplete) {
-          label = workshop.progress.easyComplete ? "Manual in progress · Easy complete" : "Manual in progress";
-        } else if (workshop.progress.easyComplete) {
+        } else if (mode === "hard") {
+          label = easyComplete
+            ? `Manual in progress${checkpointText} · Easy complete`
+            : `Manual in progress${checkpointText}`;
+        } else if (easyComplete) {
           label = "Easy complete";
         } else {
-          const checked = workshop.progress.easyChecked;
-          const total = workshop.progress.easyTotal;
-          label = total > 0 ? `Easy in progress · ${checked}/${total}` : "Easy in progress";
+          label = `Easy in progress${checkpointText}`;
         }
         return {
           started: true,
-          completed: activeComplete,
-          easyComplete: workshop.progress.easyComplete,
-          hardComplete: workshop.progress.hardComplete,
+          completed: easyComplete || hardComplete,
+          easyComplete,
+          hardComplete,
+          activeComplete,
+          mode,
+          checked,
+          total,
           points,
           percent,
           label,
@@ -1916,6 +2305,103 @@
         return true;
       }
 
+      function withResumeFragment(rawHref) {
+        const href = safeHref(rawHref);
+        if (!href) return null;
+        const url = new URL(href);
+        url.hash = "resume";
+        return url.href;
+      }
+
+      function courseAction(course, progress) {
+        if (progress.completed) {
+          return {
+            label: "Review",
+            dashboardLabel: "Review course",
+            resourceLabel: "Review workshop quest",
+            href: course.quest_url
+          };
+        }
+        if (progress.started) {
+          const manual = progress.mode === "hard";
+          return {
+            label: "Resume",
+            dashboardLabel: manual ? "Resume Manual course" : "Resume Easy course",
+            resourceLabel: manual ? "Resume Manual course" : "Resume Easy course",
+            href: withResumeFragment(manual ? course.manual_url : course.quest_url)
+          };
+        }
+        return {
+          label: "Start",
+          dashboardLabel: "Start course",
+          resourceLabel: "Start workshop quest",
+          href: course.quest_url
+        };
+      }
+
+      function safeRepositorySkillPath(value) {
+        if (typeof value !== "string" || !value || value !== value.trim()) return null;
+        if (
+          value.length > 500 ||
+          value.startsWith("/") ||
+          value.startsWith("//") ||
+          value.includes("\\") ||
+          value.includes("?") ||
+          value.includes("#") ||
+          /[\u0000-\u001f\u007f]/.test(value)
+        ) {
+          return null;
+        }
+        let decoded = value;
+        try {
+          for (let index = 0; index < 3; index += 1) {
+            const next = decodeURIComponent(decoded);
+            if (next === decoded) break;
+            decoded = next;
+          }
+        } catch (_decodeError) {
+          return null;
+        }
+        if (
+          !decoded.startsWith("solutions/") ||
+          !decoded.endsWith("/SKILL.md") ||
+          decoded.includes("\\") ||
+          decoded.includes(":")
+        ) {
+          return null;
+        }
+        const parts = decoded.split("/");
+        return parts.some((part) => !part || part === "." || part === "..")
+          ? null
+          : value;
+      }
+
+      function primaryPathForCourse(course) {
+        const primaryId = text(course.primary_path);
+        return state.data?.paths.find((path) => text(path.id) === primaryId) || null;
+      }
+
+      function courseDepth(course) {
+        return {
+          demoCases: safeCount(course.demo_cases),
+          manualSteps: safeCount(course.manual_steps),
+          skillCount: Number.isInteger(course.skill_count)
+            ? safeCount(course.skill_count)
+            : course.skills.length,
+          hasVideo: course.has_demo_video === true,
+          path: primaryPathForCourse(course)
+        };
+      }
+
+      function appendDepthFact(parent, value, label, className = "") {
+        const item = document.createElement("div");
+        item.className = ["depth-fact", className].filter(Boolean).join(" ");
+        appendText(item, "strong", value);
+        appendText(item, "span", label);
+        parent.append(item);
+        return item;
+      }
+
       function renderSummary() {
         const summary = state.data.summary;
         elements.summaryCourses.textContent = numberFormat.format(summary.courses);
@@ -1927,6 +2413,81 @@
         elements.dataDisclaimer.textContent = text(state.data.disclaimer);
       }
 
+      function createLearningCourseItem(row) {
+        const item = document.createElement("li");
+        item.className = "learning-course";
+        const copy = document.createElement("div");
+        copy.className = "learning-course-copy";
+        const titleLink = document.createElement("a");
+        titleLink.href = `#course/${encodeURIComponent(row.course.slug)}`;
+        titleLink.dataset.courseLink = row.course.slug;
+        titleLink.textContent = text(row.course.title, row.course.slug);
+        copy.append(titleLink);
+        appendText(
+          copy,
+          "span",
+          `${row.progress.label} · ${row.progress.percent}% checkpoints · ${numberFormat.format(row.progress.points)} pts`
+        );
+        item.append(copy);
+
+        const actionInfo = courseAction(row.course, row.progress);
+        const action = document.createElement("a");
+        action.className = "button small";
+        action.textContent = actionInfo.label;
+        action.setAttribute(
+          "aria-label",
+          `${actionInfo.label} ${text(row.course.title, row.course.slug)}`
+        );
+        if (!configureLink(action, actionInfo.href)) {
+          action.href = `#course/${encodeURIComponent(row.course.slug)}`;
+          action.dataset.courseLink = row.course.slug;
+          action.textContent = "Details";
+        }
+        item.append(action);
+        return item;
+      }
+
+      function renderLearningCourseList(list, rows, emptyMessage) {
+        const fragment = document.createDocumentFragment();
+        if (!rows.length) {
+          appendText(fragment, "li", emptyMessage, "learning-list-empty");
+        } else {
+          rows.forEach((row) => fragment.append(createLearningCourseItem(row)));
+        }
+        list.replaceChildren(fragment);
+      }
+
+      function renderLearningLists(progressRows) {
+        elements.myLearningLists.hidden = progressRows.length === 0;
+        if (!progressRows.length) {
+          elements.activeCourseList.replaceChildren();
+          elements.completedCourseList.replaceChildren();
+          return;
+        }
+        const active = progressRows
+          .filter((row) => !row.progress.completed)
+          .sort((left, right) =>
+            right.progress.updatedAt - left.progress.updatedAt ||
+            text(left.course.title).localeCompare(text(right.course.title))
+          );
+        const completed = progressRows
+          .filter((row) => row.progress.completed)
+          .sort((left, right) =>
+            right.progress.updatedAt - left.progress.updatedAt ||
+            text(left.course.title).localeCompare(text(right.course.title))
+          );
+        renderLearningCourseList(
+          elements.activeCourseList,
+          active,
+          "No active courses. Choose a capability to begin."
+        );
+        renderLearningCourseList(
+          elements.completedCourseList,
+          completed,
+          "No completed courses yet."
+        );
+      }
+
       function renderDashboard() {
         const courses = state.data.courses;
         const progressRows = courses
@@ -1935,11 +2496,22 @@
         const easyComplete = progressRows.filter((row) => row.progress.easyComplete).length;
         const hardComplete = progressRows.filter((row) => row.progress.hardComplete).length;
         const points = progressRows.reduce((total, row) => total + row.progress.points, 0);
-        const possible = progressRows.length * state.data.summary.points_per_course;
-        const percent = possible > 0 ? clamp(Math.round((points / possible) * 100), 0, 100) : 0;
+        const percent = progressRows.length
+          ? clamp(
+            Math.round(
+              progressRows.reduce((total, row) => total + row.progress.percent, 0) /
+              progressRows.length
+            ),
+            0,
+            100
+          )
+          : 0;
         const recent = progressRows
           .filter((row) => !row.progress.completed)
-          .sort((left, right) => right.progress.updatedAt - left.progress.updatedAt)[0];
+          .sort((left, right) =>
+            right.progress.updatedAt - left.progress.updatedAt ||
+            text(left.course.title).localeCompare(text(right.course.title))
+          )[0];
 
         elements.startedCount.textContent = numberFormat.format(progressRows.length);
         elements.easyCount.textContent = numberFormat.format(easyComplete);
@@ -1947,6 +2519,7 @@
         elements.pointCount.textContent = numberFormat.format(points);
         elements.overallProgress.textContent = `${percent}%`;
         elements.profileNotice.textContent = state.profileMessage;
+        renderLearningLists(progressRows);
 
         if (!recent) {
           elements.continueTitle.textContent = progressRows.length
@@ -1960,6 +2533,10 @@
           elements.continueProgressLabel.textContent = `${percent}%`;
           elements.continueAction.textContent = progressRows.length ? "Choose next course" : "Find a course";
           elements.continueAction.href = "#catalog";
+          elements.continueAction.setAttribute(
+            "aria-label",
+            progressRows.length ? "Choose the next Academy course" : "Find an Academy course"
+          );
           delete elements.continueAction.dataset.courseLink;
           elements.continueAction.removeAttribute("target");
           elements.continueAction.removeAttribute("rel");
@@ -1967,15 +2544,20 @@
         }
 
         elements.continueTitle.textContent = `Continue: ${text(recent.course.title, recent.course.slug)}`;
-        elements.continueDescription.textContent = `${recent.progress.label}. Return to the workshop and complete the next proof milestone.`;
+        elements.continueDescription.textContent = `${recent.progress.label}. Return to the active ${recent.progress.mode === "hard" ? "Manual" : "Easy"} course and complete the next checkpoint.`;
         elements.continueProgress.value = recent.progress.percent;
         elements.continueProgress.setAttribute(
           "aria-label",
           `${text(recent.course.title)} progress: ${recent.progress.percent}%`
         );
         elements.continueProgressLabel.textContent = `${recent.progress.percent}%`;
-        elements.continueAction.textContent = "Resume workshop";
-        if (!configureLink(elements.continueAction, recent.course.quest_url)) {
+        const actionInfo = courseAction(recent.course, recent.progress);
+        elements.continueAction.textContent = actionInfo.dashboardLabel;
+        elements.continueAction.setAttribute(
+          "aria-label",
+          `${actionInfo.dashboardLabel}: ${text(recent.course.title, recent.course.slug)}`
+        );
+        if (!configureLink(elements.continueAction, actionInfo.href)) {
           elements.continueAction.textContent = "View course details";
           elements.continueAction.href = `#course/${encodeURIComponent(recent.course.slug)}`;
           elements.continueAction.dataset.courseLink = recent.course.slug;
@@ -2064,6 +2646,128 @@
         elements.pathGrid.setAttribute("aria-busy", "false");
       }
 
+      function renderPathOverview() {
+        const path = state.data.paths.find((item) => text(item.id) === state.filters.path);
+        if (!path) {
+          elements.pathOverview.hidden = true;
+          elements.pathOverview.replaceChildren();
+          elements.pathOverview.removeAttribute("aria-labelledby");
+          return;
+        }
+
+        const rows = path.course_slugs
+          .map((slug) => state.courseBySlug.get(text(slug)))
+          .filter(Boolean)
+          .map((course) => ({ course, progress: progressForCourse(course) }));
+        const completedCount = rows.filter((row) => row.progress.completed).length;
+        const percent = rows.length
+          ? clamp(Math.round((completedCount / rows.length) * 100), 0, 100)
+          : 0;
+        const next = rows.find((row) => !row.progress.completed);
+        const fragment = document.createDocumentFragment();
+
+        const header = document.createElement("header");
+        header.className = "path-overview-head";
+        const copy = document.createElement("div");
+        appendText(
+          copy,
+          "p",
+          [text(path.level), "Selected learning path"].filter(Boolean).join(" · "),
+          "path-overview-kicker"
+        );
+        const title = appendText(copy, "h3", text(path.title, "Learning path"));
+        title.id = "selectedPathTitle";
+        appendText(copy, "p", text(path.description), "path-overview-description");
+        appendText(
+          copy,
+          "p",
+          [
+            text(path.audience),
+            `${numberFormat.format(completedCount)} of ${numberFormat.format(rows.length)} courses completed`
+          ].filter(Boolean).join(" · "),
+          "path-overview-meta"
+        );
+        const progressWrap = document.createElement("div");
+        progressWrap.className = "path-overview-progress";
+        const progressBar = document.createElement("progress");
+        progressBar.max = 100;
+        progressBar.value = percent;
+        progressBar.setAttribute(
+          "aria-label",
+          `${text(path.title, "Learning path")} progress: ${completedCount} of ${rows.length} courses completed`
+        );
+        progressWrap.append(progressBar);
+        appendText(progressWrap, "span", `${percent}%`);
+        copy.append(progressWrap);
+        header.append(copy);
+
+        const actionRow = next || rows[0];
+        if (actionRow) {
+          const action = document.createElement("a");
+          action.className = "button primary";
+          action.href = `#course/${encodeURIComponent(actionRow.course.slug)}`;
+          action.dataset.courseLink = actionRow.course.slug;
+          action.textContent = next
+            ? next.progress.started
+              ? "Open active course"
+              : "Open next course"
+            : "Review first course";
+          action.setAttribute(
+            "aria-label",
+            `${action.textContent}: ${text(actionRow.course.title, actionRow.course.slug)}`
+          );
+          header.append(action);
+        }
+        fragment.append(header);
+
+        const list = document.createElement("ol");
+        list.className = "path-course-list";
+        rows.forEach((row, index) => {
+          const item = document.createElement("li");
+          item.className = [
+            "path-course-item",
+            row.progress.completed ? "completed" : "",
+            row === next ? "next" : ""
+          ].filter(Boolean).join(" ");
+          appendText(
+            item,
+            "span",
+            row.progress.completed ? "✓" : String(index + 1),
+            "path-course-number"
+          );
+          const courseCopy = document.createElement("div");
+          courseCopy.className = "path-course-copy";
+          const courseLink = document.createElement("a");
+          courseLink.href = `#course/${encodeURIComponent(row.course.slug)}`;
+          courseLink.dataset.courseLink = row.course.slug;
+          courseLink.textContent = text(row.course.title, row.course.slug);
+          courseCopy.append(courseLink);
+          const depth = courseDepth(row.course);
+          appendText(
+            courseCopy,
+            "span",
+            `${numberFormat.format(depth.demoCases)} demo cases · ${numberFormat.format(depth.manualSteps)} manual steps`
+          );
+          item.append(courseCopy);
+          appendText(
+            item,
+            "span",
+            row.progress.completed
+              ? "Completed"
+              : row.progress.started
+                ? `${row.progress.percent}% · Active`
+                : "Not started",
+            "path-course-status"
+          );
+          list.append(item);
+        });
+        fragment.append(list);
+
+        elements.pathOverview.replaceChildren(fragment);
+        elements.pathOverview.hidden = false;
+        elements.pathOverview.setAttribute("aria-labelledby", "selectedPathTitle");
+      }
+
       function replaceSelectOptions(select, placeholder, options) {
         const fragment = document.createDocumentFragment();
         const first = document.createElement("option");
@@ -2129,6 +2833,16 @@
         ].map((value) => text(value).toLocaleLowerCase()).join(" ");
       }
 
+      function matchingSkill(course, needle) {
+        if (!needle) return null;
+        return course.skills.find((skill) => {
+          if (!isRecord(skill)) return false;
+          return [skill.title, skill.name, skill.description, skill.path]
+            .map((value) => text(value).toLocaleLowerCase())
+            .some((value) => value.includes(needle));
+        }) || null;
+      }
+
       function coursePathIds(course) {
         const ids = textList(course.path_ids);
         const primary = text(course.primary_path);
@@ -2143,7 +2857,12 @@
           (selectedPath?.course_slugs || []).map((slug, index) => [text(slug), index])
         );
         const rows = state.data.courses
-          .map((course, index) => ({ course, index, progress: progressForCourse(course) }))
+          .map((course, index) => ({
+            course,
+            index,
+            progress: progressForCourse(course),
+            matchedSkill: matchingSkill(course, needle)
+          }))
           .filter(({ course, progress }) => {
             if (needle && !courseSearchText(course).includes(needle)) return false;
             if (state.filters.path && !coursePathIds(course).includes(state.filters.path)) return false;
@@ -2158,10 +2877,12 @@
           if (state.filters.sort === "a-z") {
             return text(left.course.title).localeCompare(text(right.course.title));
           }
-          if (state.filters.sort === "newest") {
-            const leftDate = Date.parse(left.course.added_at || "") || 0;
-            const rightDate = Date.parse(right.course.added_at || "") || 0;
-            return rightDate - leftDate || left.index - right.index;
+          if (state.filters.sort === "most-practice") {
+            const leftPractice = safeCount(left.course.demo_cases) + safeCount(left.course.manual_steps);
+            const rightPractice = safeCount(right.course.demo_cases) + safeCount(right.course.manual_steps);
+            return rightPractice - leftPractice ||
+              text(left.course.title).localeCompare(text(right.course.title)) ||
+              text(left.course.slug).localeCompare(text(right.course.slug));
           }
           if (state.filters.sort === "most-skills") {
             const leftCount = Number.isInteger(left.course.skill_count)
@@ -2193,7 +2914,7 @@
         return rows;
       }
 
-      function createCourseCard(course, progress) {
+      function createCourseCard(course, progress, matchedSkill = null) {
         const card = document.createElement("article");
         card.className = "course-card";
 
@@ -2212,26 +2933,38 @@
         card.append(heading);
         appendText(card, "p", text(course.description), "course-description");
 
+        const depth = courseDepth(course);
         const facts = document.createElement("div");
-        facts.className = "course-facts";
-        const skillCount = Number.isInteger(course.skill_count)
-          ? course.skill_count
-          : course.skills.length;
-        const skillFact = document.createElement("span");
-        const skillStrong = document.createElement("strong");
-        skillStrong.textContent = numberFormat.format(skillCount);
-        skillFact.append(skillStrong, ` included skill${skillCount === 1 ? "" : "s"}`);
-        facts.append(skillFact);
-        const pathTitle = state.data.paths.find((path) => text(path.id) === text(course.primary_path))?.title;
-        if (pathTitle) appendText(facts, "span", text(pathTitle));
+        facts.className = "course-depth";
+        appendDepthFact(facts, numberFormat.format(depth.demoCases), "demo cases");
+        appendDepthFact(facts, numberFormat.format(depth.manualSteps), "manual steps");
+        appendDepthFact(facts, numberFormat.format(depth.skillCount), "reusable skills");
+        appendDepthFact(facts, depth.hasVideo ? "Available" : "Not listed", "demo video");
+        appendDepthFact(
+          facts,
+          text(depth.path?.title, "Independent course"),
+          `${text(depth.path?.level, "Level not specified")} learning path`,
+          "path-level"
+        );
         card.append(facts);
 
         const platforms = textList(course.platforms);
         if (platforms.length) {
+          const context = document.createElement("div");
+          context.className = "course-context";
+          appendText(context, "p", "Microsoft context", "context-label");
           const chips = document.createElement("div");
           chips.className = "chip-row";
           platforms.slice(0, 5).forEach((platform) => appendText(chips, "span", platform, "chip platform"));
-          card.append(chips);
+          context.append(chips);
+          card.append(context);
+        }
+
+        if (matchedSkill) {
+          const matchedTitle = text(matchedSkill.title) ||
+            text(matchedSkill.name) ||
+            "Included skill";
+          appendText(card, "p", `Matched skill: ${matchedTitle}`, "skill-match");
         }
 
         const progressWrap = document.createElement("div");
@@ -2239,12 +2972,18 @@
         const progressLabel = document.createElement("div");
         progressLabel.className = "progress-label";
         appendText(progressLabel, "strong", progress.label);
-        appendText(progressLabel, "span", `${progress.percent}% · ${numberFormat.format(progress.points)} pts`);
+        appendText(progressLabel, "span", `${progress.percent}% checkpoints`);
         const progressBar = document.createElement("progress");
         progressBar.max = 100;
         progressBar.value = progress.percent;
         progressBar.setAttribute("aria-label", `${text(course.title)} progress: ${progress.percent}%`);
         progressWrap.append(progressLabel, progressBar);
+        appendText(
+          progressWrap,
+          "p",
+          `${numberFormat.format(progress.points)} achievement points`,
+          "achievement-points"
+        );
 
         const actions = document.createElement("div");
         actions.className = "course-actions";
@@ -2258,12 +2997,13 @@
 
         const action = document.createElement("a");
         action.className = "button primary";
-        action.textContent = progress.completed ? "Review" : progress.started ? "Resume" : "Start";
+        const actionInfo = courseAction(course, progress);
+        action.textContent = actionInfo.label;
         action.setAttribute(
           "aria-label",
-          `${progress.completed ? "Review" : progress.started ? "Resume" : "Start"} ${text(course.title, course.slug)}`
+          `${actionInfo.label} ${text(course.title, course.slug)}`
         );
-        if (configureLink(action, course.quest_url)) {
+        if (configureLink(action, actionInfo.href)) {
           actions.append(action);
         } else {
           action.href = `#course/${encodeURIComponent(course.slug)}`;
@@ -2304,11 +3044,14 @@
           stateCard.append(inner);
           fragment.append(stateCard);
         } else {
-          rows.forEach(({ course, progress }) => fragment.append(createCourseCard(course, progress)));
+          rows.forEach(({ course, progress, matchedSkill }) => {
+            fragment.append(createCourseCard(course, progress, matchedSkill));
+          });
         }
         elements.courseGrid.replaceChildren(fragment);
         elements.courseGrid.setAttribute("aria-busy", "false");
         renderPaths();
+        renderPathOverview();
       }
 
       function clearFilters() {
@@ -2392,6 +3135,7 @@
 
       function renderModal(course) {
         const progress = progressForCourse(course);
+        const depth = courseDepth(course);
         const fragment = document.createDocumentFragment();
 
         const hero = document.createElement("header");
@@ -2400,6 +3144,14 @@
         overline.className = "modal-overline";
         appendText(overline, "span", text(course.industry, "Cross-industry"), "chip");
         appendText(overline, "span", text(course.journey_stage, "Build"), "chip stage");
+        if (depth.path) {
+          appendText(
+            overline,
+            "span",
+            `${text(depth.path.title)} · ${text(depth.path.level, "Level not specified")}`,
+            "chip"
+          );
+        }
         hero.append(overline);
         const title = appendText(hero, "h2", text(course.title, course.slug));
         title.id = "courseModalTitle";
@@ -2410,12 +3162,18 @@
         const progressLabel = document.createElement("div");
         progressLabel.className = "progress-label";
         appendText(progressLabel, "strong", progress.label);
-        appendText(progressLabel, "span", `${progress.percent}% · ${numberFormat.format(progress.points)} points`);
+        appendText(progressLabel, "span", `${progress.percent}% checkpoints`);
         const progressBar = document.createElement("progress");
         progressBar.max = 100;
         progressBar.value = progress.percent;
         progressBar.setAttribute("aria-label", `${text(course.title)} progress: ${progress.percent}%`);
         progressWrap.append(progressLabel, progressBar);
+        appendText(
+          progressWrap,
+          "p",
+          `${numberFormat.format(progress.points)} achievement points`,
+          "achievement-points"
+        );
         hero.append(progressWrap);
         fragment.append(hero);
 
@@ -2425,6 +3183,80 @@
         main.className = "modal-main";
         const aside = document.createElement("aside");
         aside.className = "modal-aside";
+
+        const depthSection = document.createElement("section");
+        depthSection.className = "detail-section";
+        appendText(depthSection, "h3", "Course depth");
+        const depthGrid = document.createElement("div");
+        depthGrid.className = "detail-fact-grid";
+        [
+          [numberFormat.format(depth.demoCases), "guided demo cases"],
+          [numberFormat.format(depth.manualSteps), "manual build steps"],
+          [numberFormat.format(depth.skillCount), "repository skills"],
+          [depth.hasVideo ? "Available" : "Not listed", "demo video"],
+          [
+            text(depth.path?.level, "Level not specified"),
+            `${text(depth.path?.title, "Independent course")} learning path`
+          ]
+        ].forEach(([value, label]) => {
+          const fact = document.createElement("div");
+          fact.className = "detail-fact";
+          appendText(fact, "strong", value);
+          appendText(fact, "span", label);
+          depthGrid.append(fact);
+        });
+        depthSection.append(depthGrid);
+        main.append(depthSection);
+
+        const buildSection = document.createElement("section");
+        buildSection.className = "detail-section";
+        appendText(buildSection, "h3", "Build and deployment path");
+        appendText(
+          buildSection,
+          "p",
+          "GitHub Copilot / RAPP Brainstem → Copilot Studio Draft",
+          "context-label"
+        );
+        const buildPath = document.createElement("ol");
+        buildPath.className = "build-path";
+        [
+          ["1", "Build and test", "GitHub Copilot or RAPP Brainstem with synthetic, reviewable evidence."],
+          ["2", "Deploy for review", "Copilot Studio Draft, kept unpublished unless separate approval is granted."]
+        ].forEach(([index, titleText, descriptionText]) => {
+          const item = document.createElement("li");
+          appendText(item, "span", index, "build-path-index");
+          const copy = document.createElement("div");
+          appendText(copy, "strong", titleText);
+          appendText(copy, "span", descriptionText);
+          item.append(copy);
+          buildPath.append(item);
+        });
+        buildSection.append(buildPath);
+        appendText(
+          buildSection,
+          "p",
+          "This is the implementation route taught by the Academy; it is distinct from the business products named by the scenario.",
+          "detail-note"
+        );
+        main.append(buildSection);
+
+        const platforms = textList(course.platforms);
+        if (platforms.length) {
+          const contextSection = document.createElement("section");
+          contextSection.className = "detail-section";
+          appendText(contextSection, "h3", "Microsoft context");
+          const chips = document.createElement("div");
+          chips.className = "chip-row";
+          platforms.forEach((platform) => appendText(chips, "span", platform, "chip platform"));
+          contextSection.append(chips);
+          appendText(
+            contextSection,
+            "p",
+            "These products frame the source business scenario; the course does not claim to teach every named product as an integration.",
+            "detail-note"
+          );
+          main.append(contextSection);
+        }
 
         const outcomesSection = document.createElement("section");
         outcomesSection.className = "detail-section";
@@ -2454,11 +3286,20 @@
             const item = document.createElement("article");
             item.className = "skill-item";
             const skillRecord = isRecord(skill) ? skill : {};
-            appendText(
-              item,
-              "strong",
-              text(skillRecord.title) || text(skillRecord.name) || `Skill ${index + 1}`
-            );
+            const skillTitle = text(skillRecord.title) ||
+              text(skillRecord.name) ||
+              `Skill ${index + 1}`;
+            const skillPath = safeRepositorySkillPath(skillRecord.path);
+            if (skillPath) {
+              const link = document.createElement("a");
+              link.className = "skill-title-link";
+              link.setAttribute("href", skillPath);
+              link.textContent = skillTitle;
+              link.setAttribute("aria-label", `Open ${skillTitle} SKILL.md`);
+              item.append(link);
+            } else {
+              appendText(item, "strong", skillTitle);
+            }
             const skillDescription = text(skillRecord.description);
             if (skillDescription) appendText(item, "span", skillDescription);
             const skillName = text(skillRecord.name);
@@ -2517,10 +3358,17 @@
         appendText(resourceSection, "h3", "Course resources");
         const resources = document.createElement("div");
         resources.className = "resource-list";
+        const actionInfo = courseAction(course, progress);
+        const secondaryLabel = progress.started && !progress.completed && progress.mode === "hard"
+          ? "Open Easy quest"
+          : "Open manual";
+        const secondaryHref = progress.started && !progress.completed && progress.mode === "hard"
+          ? course.quest_url
+          : course.manual_url;
         resources.append(
-          createResource(progress.completed ? "Review workshop quest" : progress.started ? "Resume workshop quest" : "Start workshop quest", course.quest_url),
+          createResource(actionInfo.resourceLabel, actionInfo.href),
           createResource("Open field guide", course.field_guide_url),
-          createResource("Open manual", course.manual_url),
+          createResource(secondaryLabel, secondaryHref),
           createResource("View evidence", course.evidence_url)
         );
         resourceSection.append(resources);
@@ -2624,6 +3472,8 @@
         elements.pathGrid.replaceChildren(
           createStateCard("Learning paths unavailable", "Paths appear after academy.json loads successfully.")
         );
+        elements.pathOverview.hidden = true;
+        elements.pathOverview.replaceChildren();
         elements.ecosystemStrip.setAttribute("aria-busy", "false");
         const ecosystemError = document.createElement("li");
         ecosystemError.className = "inline-state";
@@ -2700,7 +3550,10 @@
         elements.pathFilter.value = state.filters.path;
         syncFilterUrl();
         renderCatalog();
-        document.getElementById("catalog-title").scrollIntoView({ block: "start" });
+        const target = state.filters.path
+          ? elements.pathOverview
+          : document.getElementById("catalog-title");
+        window.requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
       });
 
       elements.courseGrid.addEventListener("click", (event) => {
