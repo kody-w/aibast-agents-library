@@ -3905,15 +3905,17 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
           evaluateAchievement(true, true);
         }});
       }});
-      let hardSaved = [];
-      try {{
-        const parsed = JSON.parse(localStorage.getItem(hardProgressKey) || "[]");
-        hardSaved = Array.isArray(parsed)
-          ? parsed.filter((step) => typeof step === "string")
-          : [];
-      }} catch (_error) {{
-        hardSaved = [];
+      function readHardProgress() {{
+        try {{
+          const parsed = JSON.parse(localStorage.getItem(hardProgressKey) || "[]");
+          return Array.isArray(parsed)
+            ? parsed.filter((step) => typeof step === "string")
+            : [];
+        }} catch (_error) {{
+          return [];
+        }}
       }}
+      let hardSaved = readHardProgress();
       const initialWorkshop =
         readAchievementProfile().workshops[ACHIEVEMENT_WORKSHOP_SLUG];
       let hardProgressActivated =
@@ -3921,7 +3923,6 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
         (initialWorkshop?.progress?.hardChecked || 0) > 0 ||
         initialWorkshop?.progress?.hardComplete === true;
       hardBoxes.forEach((box) => {{
-        box.checked = hardSaved.includes(box.dataset.step);
         box.addEventListener("change", () => {{
           if (box.checked) hardProgressActivated = true;
           updateHardProgress(true, hardProgressActivated);
@@ -4023,6 +4024,38 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
         renderAchievementPanel(profile, activeMode);
       }}
 
+      function refreshHardProgress() {{
+        hardSaved = readHardProgress();
+        const profile = readAchievementProfile();
+        const storedProgress =
+          profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG]?.progress;
+        if (
+          hardSaved.length > 0 ||
+          (storedProgress?.hardChecked || 0) > 0 ||
+          storedProgress?.hardComplete === true
+        ) {{
+          hardProgressActivated = true;
+        }}
+        hardBoxes.forEach((box) => {{
+          box.checked = hardSaved.includes(box.dataset.step);
+        }});
+        updateHardProgress(false, false);
+      }}
+
+      window.addEventListener("storage", (event) => {{
+        if (
+          event.key === null ||
+          event.key === hardProgressKey ||
+          event.key === ACHIEVEMENT_PROFILE_KEY
+        ) {{
+          refreshHardProgress();
+        }}
+      }});
+      window.addEventListener("focus", refreshHardProgress);
+      document.addEventListener("visibilitychange", () => {{
+        if (document.visibilityState === "visible") refreshHardProgress();
+      }});
+
       function earnedAchievementSyncIds(achievements) {{
         return ACHIEVEMENT_SYNC_ORDER.filter(
           (entry) => achievements[entry.localId]?.earned,
@@ -4041,8 +4074,9 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
         achievementWorkshopScore.textContent = String(workshopPoints);
         const easyRequired = requiredEasyBoxes();
         const easyChecked = easyRequired.filter((box) => box.checked).length;
-        const hardChecked = workshop?.progress?.hardChecked || 0;
-        const hardTotal = workshop?.progress?.hardTotal || 0;
+        const hardChecked = hardBoxes.filter((box) => box.checked).length;
+        const hardTotal =
+          workshop?.progress?.hardTotal || hardBoxes.length;
         const checked = mode === "hard" ? hardChecked : easyChecked;
         const total = mode === "hard" ? hardTotal : easyRequired.length;
         achievementProgressLabel.textContent =
@@ -4240,7 +4274,7 @@ Opening this form does not sync anything. Submit the issue to sync these earned 
       const initialMode =
         localStorage.getItem(modeKey) === "hard" ? "hard" : "easy";
       selectMode(initialMode, false);
-      updateHardProgress(false, false);
+      refreshHardProgress();
       window.requestAnimationFrame(() => {{
         window.requestAnimationFrame(resumeCourse);
       }});
