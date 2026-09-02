@@ -14,13 +14,34 @@ from tools import audit_academy
 ROOT = Path(__file__).resolve().parent.parent
 PATH_IDS = (
     "start-here",
-    "build-agents",
-    "serve-customers",
-    "run-operations",
-    "govern-ai",
-    "grow-business",
+    "sales-customer-growth",
+    "operations-supply-chain",
+    "regulated-public-services",
+    "workforce-professional-productivity",
+    "cross-industry-ai",
 )
-MILESTONE_POINTS = (10, 15, 20, 25, 30, 50)
+PATH_CATEGORIES = {
+    "sales-customer-growth": {"b2b_sales", "b2c_sales", "retail_cpg"},
+    "operations-supply-chain": {"energy", "manufacturing"},
+    "regulated-public-services": {
+        "financial_services",
+        "healthcare",
+        "slg_government",
+    },
+    "workforce-professional-productivity": {
+        "human_resources",
+        "professional_services",
+        "software_digital_products",
+    },
+    "cross-industry-ai": {"general"},
+}
+START_HERE_SLUGS = {
+    "account-intelligence",
+    "ai-customer-assistant",
+    "ask-hr",
+    "building-permit-processing",
+}
+MILESTONE_POINTS = (5, 15, 20, 25, 35, 50)
 
 
 def _catalog_context():
@@ -36,12 +57,17 @@ def synthetic_academy():
     catalog, registry = _catalog_context()
     categories = sorted({registry[key]["category"] for key in catalog})
     courses = []
-    for index, key in enumerate(catalog):
+    for key in catalog:
         row = registry[key]
         slug = (row.get("_demo") or {}).get("slug") or key.rsplit("/", 1)[-1]
-        primary = PATH_IDS[1 + index % (len(PATH_IDS) - 1)]
+        category = row["category"]
+        primary = next(
+            path_id
+            for path_id, categories_for_path in PATH_CATEGORIES.items()
+            if category in categories_for_path
+        )
         path_ids = [primary]
-        if index < len(PATH_IDS) - 1:
+        if slug in START_HERE_SLUGS:
             path_ids.insert(0, "start-here")
         skill_paths = sorted(
             path.relative_to(ROOT).as_posix()
@@ -52,18 +78,18 @@ def synthetic_academy():
         courses.append(
             {
                 "slug": slug,
-                "catalog_key": key,
+                "agent": key,
                 "title": row["display_name"],
-                "industry_id": row["category"],
+                "category": category,
+                "industry": category.replace("_", " ").title(),
                 "path_ids": path_ids,
-                "primary_path_id": primary,
-                "resources": {
-                    "quest": f"solutions/{slug}/quest.html",
-                    "manual_tutorial": f"solutions/{slug}/manual-tutorial.html",
-                    "field_guide": f"solutions/{slug}/field-guide.html",
-                    "evidence_report": f"solutions/{slug}/evidence-report.html",
-                },
+                "primary_path": primary,
+                "quest_url": f"solutions/{slug}/quest.html",
+                "manual_url": f"solutions/{slug}/manual-tutorial.html",
+                "field_guide_url": f"solutions/{slug}/field-guide.html",
+                "evidence_url": f"solutions/{slug}/evidence-report.html",
                 "skills": [{"path": path} for path in skill_paths],
+                "skill_count": len(skill_paths),
             }
         )
 
@@ -72,12 +98,16 @@ def synthetic_academy():
         paths.append(
             {
                 "id": path_id,
-                "name": path_id.replace("-", " ").title(),
+                "title": path_id.replace("-", " ").title(),
+                "categories": sorted(PATH_CATEGORIES.get(path_id, set())),
                 "course_slugs": [
                     course["slug"]
                     for course in courses
                     if path_id in course["path_ids"]
                 ],
+                "course_count": sum(
+                    path_id in course["path_ids"] for course in courses
+                ),
             }
         )
     skill_count = sum(len(course["skills"]) for course in courses)
@@ -88,14 +118,9 @@ def synthetic_academy():
             "skills": skill_count,
             "paths": len(paths),
             "industries": len(categories),
-            "milestones": len(MILESTONE_POINTS),
-            "points": sum(MILESTONE_POINTS),
+            "points_per_course": sum(MILESTONE_POINTS),
         },
         "paths": paths,
-        "categories": [
-            {"id": category, "name": category.replace("_", " ").title()}
-            for category in categories
-        ],
         "milestones": [
             {
                 "id": f"milestone-{index}",
@@ -142,19 +167,29 @@ def synthetic_academy_html():
     <label for="path-filter">Learning path</label>
     <select id="path-filter"><option value="">All paths</option></select>
     <button id="reset-filters" type="button">Reset filters</button>
-    <div id="loading-state" role="status" aria-live="polite">Loading courses…</div>
-    <div id="empty-state" hidden>No courses match these filters.</div>
-    <div id="error-state" hidden>Unable to load the Academy catalog.</div>
-    <section class="course-grid" aria-label="Academy courses"></section>
+    <section id="course-grid" class="course-grid" aria-label="Academy courses" aria-live="polite">
+      <div class="state-card" role="status">
+        <h2 class="loading-dots">Loading the Academy catalog</h2>
+        <p>Reading the local course index.</p>
+      </div>
+    </section>
   </main>
-  <dialog id="course-dialog" aria-labelledby="course-title">
-    <h2 id="course-title">Course detail</h2>
-    <button id="close-course" type="button" aria-label="Close course detail">Close</button>
-  </dialog>
+  <div id="course-modal" class="modal-layer" hidden>
+    <section role="dialog" aria-modal="true" aria-labelledby="course-title">
+      <h2 id="course-title">Course detail</h2>
+      <button id="close-course" type="button" aria-label="Close course detail">Close</button>
+    </section>
+  </div>
   <script>
     const STORAGE_KEY = 'aibast:achievement-profile:v1';
-    const academyState = {};
-    let returnFocus = null;
+    const elements = {
+      courseModal: document.getElementById('course-modal'),
+      courseGrid: document.getElementById('course-grid')
+    };
+    const state = {
+      data: null,
+      returnFocus: null
+    };
 
     function sanitizeAchievementProfile(value) {
       const source = value && typeof value === 'object' ? value : {};
@@ -193,14 +228,17 @@ def synthetic_academy_html():
     }
 
     function openCourse(slug, trigger) {
-      returnFocus = trigger;
+      state.returnFocus = trigger;
       location.hash = `#course/${encodeURIComponent(slug)}`;
-      document.getElementById('course-dialog').showModal();
+      elements.courseModal.hidden = false;
     }
 
     function closeCourse() {
-      document.getElementById('course-dialog').close();
-      if (returnFocus && typeof returnFocus.focus === 'function') returnFocus.focus();
+      elements.courseModal.hidden = true;
+      if (state.returnFocus && typeof state.returnFocus.focus === 'function') {
+        state.returnFocus.focus();
+      }
+      state.returnFocus = null;
     }
 
     document.addEventListener('keydown', event => {
@@ -211,25 +249,59 @@ def synthetic_academy_html():
     });
     document.getElementById('close-course').addEventListener('click', closeCourse);
 
-    async function loadAcademy() {
-      const loading = document.getElementById('loading-state');
-      const empty = document.getElementById('empty-state');
-      const errorState = document.getElementById('error-state');
-      try {
-        const response = await fetch('academy.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error('Academy request failed');
-        const academy = await response.json();
-        loading.hidden = true;
-        empty.hidden = Array.isArray(academy.courses) && academy.courses.length > 0;
-      } catch (error) {
-        loading.hidden = true;
-        errorState.hidden = false;
+    function createStateCard(title, message, retry = false) {
+      const card = document.createElement('div');
+      card.className = 'state-card';
+      const heading = document.createElement('h2');
+      heading.textContent = title;
+      const copy = document.createElement('p');
+      copy.textContent = message;
+      card.append(heading, copy);
+      if (retry) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = 'Try loading again';
+        card.append(button);
       }
+      return card;
+    }
+
+    function renderCatalog(courses = []) {
+      const fragment = document.createDocumentFragment();
+      if (!courses.length) {
+        fragment.append(
+          createStateCard(
+            'No courses match these filters',
+            'Try a broader search or clear the filters to see the full Academy.'
+          )
+        );
+      }
+      elements.courseGrid.replaceChildren(fragment);
+    }
+
+    function renderLoadError(error) {
+      const detail = error instanceof Error
+        ? error.message
+        : 'The Academy catalog could not be loaded.';
+      elements.courseGrid.replaceChildren(
+        createStateCard(
+          'The Academy catalog did not load',
+          `${detail} Check the connection, then try again.`,
+          true
+        )
+      );
+    }
+
+    async function loadAcademy() {
+      const response = await fetch('academy.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Academy request failed');
+      state.data = await response.json();
+      renderCatalog(state.data.courses);
     }
 
     readAchievementProfile();
     writeUrlState(urlState);
-    loadAcademy();
+    loadAcademy().catch(renderLoadError);
   </script>
 </body>
 </html>
@@ -323,7 +395,16 @@ def test_synthetic_fixture_passes_complete_gate(academy_fixture):
     assert report["status"] == "pass", json.dumps(report["failures"], indent=2)
     assert report["measurements"]["academy_courses"] == 51
     assert report["measurements"]["academy_skills"] == 229
+    assert report["measurements"]["industries"] == 12
     assert report["measurements"]["milestone_points"] == 150
+    assert set(data["summary"]) == {
+        "courses",
+        "skills",
+        "paths",
+        "industries",
+        "points_per_course",
+    }
+    assert "industries" not in data
 
 
 def test_mutation_removing_course_fails_catalog_gate(academy_fixture):
@@ -335,6 +416,26 @@ def test_mutation_removing_course_fails_catalog_gate(academy_fixture):
     assert_failure_category(report, "catalog")
 
 
+def test_mutation_wrong_agent_key_fails_catalog_gate(academy_fixture):
+    data, html, integrations = copy.deepcopy(academy_fixture)
+    first = data["courses"][0]["agent"]
+    data["courses"][0]["agent"] = data["courses"][1]["agent"]
+    data["courses"][1]["agent"] = first
+
+    report = run_fixture(data, html, integrations)
+
+    assert_failure_category(report, "catalog")
+
+
+def test_mutation_extra_summary_measurement_fails_summary_gate(academy_fixture):
+    data, html, integrations = copy.deepcopy(academy_fixture)
+    data["summary"]["milestones"] = len(data["milestones"])
+
+    report = run_fixture(data, html, integrations)
+
+    assert_failure_category(report, "summary")
+
+
 def test_mutation_corrupting_milestone_total_fails_points_gate(academy_fixture):
     data, html, integrations = copy.deepcopy(academy_fixture)
     data["milestones"][0]["points"] += 1
@@ -342,6 +443,18 @@ def test_mutation_corrupting_milestone_total_fails_points_gate(academy_fixture):
     report = run_fixture(data, html, integrations)
 
     assert_failure_category(report, "milestones")
+
+
+def test_mutation_uncovered_category_fails_industry_gate(academy_fixture):
+    data, html, integrations = copy.deepcopy(academy_fixture)
+    path = next(
+        row for row in data["paths"] if row["id"] == "cross-industry-ai"
+    )
+    path["categories"].remove("general")
+
+    report = run_fixture(data, html, integrations)
+
+    assert_failure_category(report, "industries")
 
 
 def test_mutation_missing_skill_path_fails_skill_gate(academy_fixture):
@@ -356,17 +469,59 @@ def test_mutation_missing_skill_path_fails_skill_gate(academy_fixture):
     assert_failure_category(report, "skills")
 
 
+def test_mutation_course_skill_count_fails_skill_gate(academy_fixture):
+    data, html, integrations = copy.deepcopy(academy_fixture)
+    data["courses"][0]["skill_count"] += 1
+
+    report = run_fixture(data, html, integrations)
+
+    assert_failure_category(report, "skills")
+
+
 def test_mutation_broken_javascript_fails_syntax_gate(academy_fixture):
     data, html, integrations = copy.deepcopy(academy_fixture)
     html = audit_academy.normalize_source(html).replace(
-        "const academyState = {};",
-        "const academyState = {;",
+        "const state = {",
+        "const state = {;",
         1,
     )
 
     report = run_fixture(data, html, integrations)
 
     assert_failure_category(report, "javascript")
+
+
+def test_mutation_custom_modal_not_hidden_fails_dialog_gate(academy_fixture):
+    data, html, integrations = copy.deepcopy(academy_fixture)
+    html = audit_academy.normalize_source(html).replace(
+        "elements.courseModal.hidden = true;",
+        "elements.courseModal.hidden = false;",
+        1,
+    )
+
+    report = run_fixture(data, html, integrations)
+
+    assert_failure_category(report, "dialog")
+
+
+@pytest.mark.parametrize(
+    ("old", "new"),
+    [
+        ("No courses match these filters", "Nothing to report"),
+        ("function renderLoadError", "function renderLoadFailure"),
+    ],
+)
+def test_mutation_dynamic_state_output_fails_states_gate(
+    academy_fixture,
+    old,
+    new,
+):
+    data, html, integrations = copy.deepcopy(academy_fixture)
+    html = audit_academy.normalize_source(html).replace(old, new, 1)
+
+    report = run_fixture(data, html, integrations)
+
+    assert_failure_category(report, "states")
 
 
 def test_mutation_removed_navigation_link_fails_navigation_gate(academy_fixture):

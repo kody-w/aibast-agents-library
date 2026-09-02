@@ -86,20 +86,12 @@ RESOURCE_ALIASES = {
         "report_url",
     },
 }
-SUMMARY_ALIASES = {
-    "courses": ("courses", "course_count", "total_courses"),
-    "skills": ("skills", "skill_count", "total_skills"),
-    "paths": ("paths", "path_count", "total_paths"),
-    "industries": (
-        "industries",
-        "industry_count",
-        "categories",
-        "category_count",
-        "total_industries",
-        "total_categories",
-    ),
-    "milestones": ("milestones", "milestone_count", "total_milestones"),
-    "points": ("points", "point_total", "total_points"),
+SUMMARY_FIELDS = {
+    "courses",
+    "skills",
+    "paths",
+    "industries",
+    "points_per_course",
 }
 VOID_ELEMENTS = {
     "area",
@@ -365,28 +357,10 @@ def _summary_value(
     field_name: str,
     result: AuditResult,
 ) -> int | None:
-    found = [
-        (key, summary[key])
-        for key in SUMMARY_ALIASES[field_name]
-        if key in summary
-    ]
-    if not found:
+    if field_name not in summary:
         result.fail("summary", f"summary is missing its {field_name} measurement")
         return None
-    if not all(_nonnegative_integer(value) for _, value in found):
-        result.fail(
-            "summary",
-            f"summary {field_name} measurements are invalid or inconsistent: {found}",
-        )
-        return None
-    values = {value for _, value in found}
-    if len(values) != 1:
-        result.fail(
-            "summary",
-            f"summary {field_name} measurements are invalid or inconsistent: {found}",
-        )
-        return None
-    value = found[0][1]
+    value = summary[field_name]
     if not _nonnegative_integer(value):
         result.fail("summary", f"summary {field_name} must be an integer")
         return None
@@ -426,8 +400,20 @@ def _catalog_solutions(
                 if not isinstance(row, Mapping):
                     continue
                 name = row.get("name")
+                solution = row.get("_solution")
+                package = (
+                    solution.get("package")
+                    if isinstance(solution, Mapping)
+                    else None
+                )
                 demo = row.get("_demo")
-                slug = demo.get("slug") if isinstance(demo, Mapping) else None
+                slug = (
+                    package.get("slug")
+                    if isinstance(package, Mapping)
+                    else None
+                )
+                if not isinstance(slug, str) and isinstance(demo, Mapping):
+                    slug = demo.get("slug")
                 if isinstance(name, str) and isinstance(slug, str):
                     registry_slugs[name] = slug
 
@@ -564,24 +550,6 @@ def _course_skill_paths(
     return paths
 
 
-def _course_industries(course: Mapping[str, Any]) -> list[str]:
-    for key in (
-        "industry_id",
-        "category_id",
-        "industry",
-        "category",
-        "industries",
-        "categories",
-    ):
-        if key not in course:
-            continue
-        value = course[key]
-        if isinstance(value, list):
-            return [_identifier(item) for item in value]
-        return [_identifier(value)]
-    return []
-
-
 def _declared_path_courses(path: Mapping[str, Any]) -> list[str] | None:
     for key in ("course_slugs", "courses", "course_ids"):
         if key not in path:
@@ -625,10 +593,10 @@ def _audit_paths(
     raw_paths: Any,
     courses: list[Mapping[str, Any]],
     result: AuditResult,
-) -> list[str]:
+) -> tuple[list[str], list[str]]:
     if not isinstance(raw_paths, list):
         result.fail("paths", "academy paths must be a list")
-        return []
+        return [], []
     result.measure("paths", len(raw_paths))
     require(
         result,
@@ -647,10 +615,71 @@ def _audit_paths(
         result.fail("paths", f"the {START_PATH_ID!r} path is required")
 
     known = set(path_ids)
+    category_owners: dict[str, str] = {}
+    for raw_path in raw_paths:
+        if not isinstance(raw_path, Mapping):
+            continue
+        path_id = _identifier(raw_path)
+        categories = raw_path.get("categories")
+        if not isinstance(categories, list) or any(
+            not isinstance(category, str) or not category
+            for category in categories
+        ):
+            result.fail(
+                "industries",
+                f"{path_id or '<unknown path>'}: categories must be a string list",
+            )
+            continue
+        if len(categories) != len(set(categories)):
+            result.fail("industries", f"{path_id}: path categories contain duplicates")
+        if path_id == START_PATH_ID:
+            if categories:
+                result.fail("industries", "start-here must not own categories")
+            continue
+        if not categories:
+            result.fail("industries", f"{path_id}: non-start path must own categories")
+        for category in categories:
+            previous = category_owners.get(category)
+            if previous is not None:
+                result.fail(
+                    "industries",
+                    f"category {category!r} belongs to multiple paths: {previous}, {path_id}",
+                )
+                continue
+            category_owners[category] = path_id
+
+    course_categories: list[str] = []
+    for course in courses:
+        category = course.get("category")
+        slug = course.get("slug", "<unknown course>")
+        if not isinstance(category, str) or not category:
+            result.fail("industries", f"{slug}: category is missing")
+            continue
+        course_categories.append(category)
+    unique_categories = sorted(set(course_categories))
+    result.measure("industries", len(unique_categories))
+    require(
+        result,
+        len(unique_categories) == EXPECTED_INDUSTRIES,
+        "industries",
+        f"expected exactly {EXPECTED_INDUSTRIES} course categories, "
+        f"found {len(unique_categories)}",
+        f"derived {EXPECTED_INDUSTRIES} course categories",
+    )
+    missing_owners = sorted(set(unique_categories) - set(category_owners))
+    unused_owners = sorted(set(category_owners) - set(unique_categories))
+    if missing_owners or unused_owners:
+        result.fail(
+            "industries",
+            "path category coverage is not exact "
+            f"(missing={missing_owners}, unused={unused_owners})",
+        )
+
     derived_members: dict[str, set[str]] = {path_id: set() for path_id in known}
     for course in courses:
         slug = course.get("slug")
         label = slug if isinstance(slug, str) else "<unknown course>"
+        category = course.get("category")
         course_path_ids = course.get("path_ids")
         if not isinstance(course_path_ids, list) or not course_path_ids:
             result.fail("paths", f"{label}: path_ids must be a non-empty list")
@@ -687,6 +716,26 @@ def _audit_paths(
                     "paths",
                     f"{label}: primary path {primary_id!r} is not declared",
                 )
+            expected_primary = (
+                category_owners.get(category)
+                if isinstance(category, str)
+                else None
+            )
+            if expected_primary is not None and primary_id != expected_primary:
+                result.fail(
+                    "paths",
+                    f"{label}: primary path {primary_id!r} does not own category {category!r}",
+                )
+
+        if isinstance(category, str) and category in category_owners:
+            expected_non_start = {category_owners[category]}
+            actual_non_start = set(course_path_ids) - {START_PATH_ID}
+            if actual_non_start != expected_non_start:
+                result.fail(
+                    "paths",
+                    f"{label}: non-start path_ids {sorted(actual_non_start)} "
+                    f"do not match category owner {sorted(expected_non_start)}",
+                )
 
     for raw_path in raw_paths:
         if not isinstance(raw_path, Mapping):
@@ -706,61 +755,20 @@ def _audit_paths(
                 "paths",
                 f"{path_id}: declared courses do not match course path_ids",
             )
+        course_count = raw_path.get("course_count")
+        if course_count is not None and course_count != len(derived_members[path_id]):
+            result.fail(
+                "paths",
+                f"{path_id}: course_count={course_count!r}, "
+                f"measured {len(derived_members[path_id])}",
+            )
 
     unreferenced = sorted(
         path_id for path_id, members in derived_members.items() if not members
     )
     if unreferenced:
         result.fail("paths", f"unreferenced paths: {unreferenced}")
-    return path_ids
-
-
-def _audit_industries(
-    data: Mapping[str, Any],
-    courses: list[Mapping[str, Any]],
-    result: AuditResult,
-) -> list[str]:
-    raw = data.get("industries")
-    if raw is None:
-        raw = data.get("categories")
-    if not isinstance(raw, list):
-        result.fail("industries", "academy industries/categories must be a list")
-        return []
-    result.measure("industries", len(raw))
-    require(
-        result,
-        len(raw) == EXPECTED_INDUSTRIES,
-        "industries",
-        f"expected exactly {EXPECTED_INDUSTRIES} industries/categories, found {len(raw)}",
-        f"found {EXPECTED_INDUSTRIES} industries/categories",
-    )
-    industry_ids = _identifiers(raw)
-    if any(not identifier for identifier in industry_ids):
-        result.fail("industries", "every industry/category must have an id")
-    if len(industry_ids) != len(set(industry_ids)):
-        result.fail("industries", "industry/category IDs must be unique")
-
-    known = set(industry_ids)
-    referenced: set[str] = set()
-    for course in courses:
-        slug = course.get("slug", "<unknown course>")
-        values = _course_industries(course)
-        if not values or any(not value for value in values):
-            result.fail("industries", f"{slug}: industry/category is missing")
-            continue
-        unknown = sorted(set(values) - known)
-        if unknown:
-            result.fail(
-                "industries",
-                f"{slug}: unknown industry/category IDs {unknown}",
-            )
-        referenced.update(set(values) & known)
-    if referenced != known:
-        result.fail(
-            "industries",
-            f"unreferenced industries/categories: {sorted(known - referenced)}",
-        )
-    return industry_ids
+    return path_ids, unique_categories
 
 
 def _audit_milestones(
@@ -898,9 +906,16 @@ def audit_academy_data(
     if not isinstance(summary, Mapping):
         result.fail("summary", "academy.json must contain a summary object")
         summary = {}
+    elif set(summary) != SUMMARY_FIELDS:
+        result.fail(
+            "summary",
+            "summary keys must be exactly "
+            + ", ".join(sorted(SUMMARY_FIELDS))
+            + f" (found {sorted(summary)})",
+        )
     summary_values = {
         name: _summary_value(summary, name, result)
-        for name in SUMMARY_ALIASES
+        for name in SUMMARY_FIELDS
     }
 
     raw_courses = data.get("courses")
@@ -916,34 +931,34 @@ def audit_academy_data(
             courses.append(course)
 
     catalog, expected_slug_map = _catalog_solutions(root, result)
-    catalog_keys = [
-        course.get("catalog_key")
+    course_agents = [
+        course.get("agent")
         for course in courses
-        if isinstance(course.get("catalog_key"), str)
+        if isinstance(course.get("agent"), str)
     ]
     course_slugs = [
         course.get("slug")
         for course in courses
         if isinstance(course.get("slug"), str)
     ]
-    if len(catalog_keys) != len(courses):
-        result.fail("catalog", "every course must have a catalog_key")
+    if len(course_agents) != len(courses):
+        result.fail("catalog", "every course must have an agent catalog key")
     if len(course_slugs) != len(courses):
         result.fail("catalog", "every course must have a slug")
-    if len(catalog_keys) != len(set(catalog_keys)):
-        result.fail("catalog", "course catalog keys must be unique")
+    if len(course_agents) != len(set(course_agents)):
+        result.fail("catalog", "course agent keys must be unique")
     if len(course_slugs) != len(set(course_slugs)):
         result.fail("catalog", "course slugs must be unique")
     if any(not SLUG_RE.fullmatch(slug) for slug in course_slugs):
         result.fail("catalog", "course slugs must use lowercase kebab-case")
     if "grid-outage-response" in course_slugs:
         result.fail("catalog", "grid-outage-response must remain excluded")
-    if set(catalog_keys) != set(catalog):
-        missing = sorted(set(catalog) - set(catalog_keys))
-        extra = sorted(set(catalog_keys) - set(catalog))
+    if set(course_agents) != set(catalog):
+        missing = sorted(set(catalog) - set(course_agents))
+        extra = sorted(set(course_agents) - set(catalog))
         result.fail(
             "catalog",
-            f"Academy catalog keys differ (missing={missing}, extra={extra})",
+            f"Academy agent keys differ (missing={missing}, extra={extra})",
         )
     if set(course_slugs) != set(expected_slug_map.values()):
         missing = sorted(set(expected_slug_map.values()) - set(course_slugs))
@@ -953,7 +968,7 @@ def audit_academy_data(
             f"Academy course slugs differ (missing={missing}, extra={extra})",
         )
     for course in courses:
-        key = course.get("catalog_key")
+        key = course.get("agent")
         slug = course.get("slug")
         if (
             isinstance(key, str)
@@ -965,12 +980,11 @@ def audit_academy_data(
                 f"{key}: slug {slug!r} does not match {expected_slug_map.get(key)!r}",
             )
 
-    path_ids = _audit_paths(
+    path_ids, industry_ids = _audit_paths(
         data.get("paths", data.get("learning_paths")),
         courses,
         result,
     )
-    industry_ids = _audit_industries(data, courses, result)
     _, milestone_points = _audit_milestones(data.get("milestones"), result)
 
     discovered = _discover_skills(root, course_slugs, result)
@@ -994,6 +1008,12 @@ def audit_academy_data(
                 result.fail("artifacts", f"{expected}: required artifact is missing")
 
         paths = _course_skill_paths(course, result, slug)
+        if course.get("skill_count") != len(paths):
+            result.fail(
+                "skills",
+                f"{slug}: skill_count={course.get('skill_count')!r}, "
+                f"measured {len(paths)}",
+            )
         academy_skill_paths.extend(paths)
         prefix = f"solutions/{slug}/manual/skills/"
         for path in paths:
@@ -1021,12 +1041,7 @@ def audit_academy_data(
         "skills": len(discovered_paths),
         "paths": len(path_ids),
         "industries": len(industry_ids),
-        "milestones": (
-            len(data.get("milestones"))
-            if isinstance(data.get("milestones"), list)
-            else None
-        ),
-        "points": milestone_points,
+        "points_per_course": milestone_points,
     }
     for name, expected in expected_summary.items():
         actual = summary_values.get(name)
@@ -1238,22 +1253,75 @@ def _validate_javascript(
     return "\n".join("".join(script.text_parts) for script in executable)
 
 
-def _state_elements(
-    parser: AcademyHTMLParser,
-    state_name: str,
-) -> list[ParsedElement]:
-    return [
-        element
-        for element in parser.elements
-        if state_name
-        in " ".join(
+def javascript_function_body(source: str, name: str) -> str | None:
+    source = normalize_source(source)
+    match = re.search(
+        rf"\bfunction\s+{re.escape(name)}\s*\([^)]*\)\s*\{{",
+        source,
+    )
+    if not match:
+        return None
+    start = match.end()
+    depth = 1
+    quote: str | None = None
+    escaped = False
+    line_comment = False
+    block_comment = False
+    index = start
+    while index < len(source):
+        char = source[index]
+        following = source[index + 1] if index + 1 < len(source) else ""
+        if line_comment:
+            if char == "\n":
+                line_comment = False
+        elif block_comment:
+            if char == "*" and following == "/":
+                block_comment = False
+                index += 1
+        elif quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+        elif char in {"'", '"', "`"}:
+            quote = char
+        elif char == "/" and following == "/":
+            line_comment = True
+            index += 1
+        elif char == "/" and following == "*":
+            block_comment = True
+            index += 1
+        elif char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return source[start:index]
+        index += 1
+    return None
+
+
+def _visible_static_loading(parser: AcademyHTMLParser) -> bool:
+    excluded = {"html", "head", "body", "main", "script", "style"}
+    for element in parser.elements:
+        if element.tag in excluded:
+            continue
+        attrs = element.attrs
+        if "hidden" in attrs or attrs.get("aria-hidden") == "true":
+            continue
+        marker = " ".join(
             (
-                element.attrs.get("id", ""),
-                element.attrs.get("class", ""),
-                element.attrs.get("data-state", ""),
+                attrs.get("id", ""),
+                attrs.get("class", ""),
+                attrs.get("data-state", ""),
+                element.text,
             )
         ).casefold()
-    ]
+        if "loading" in marker:
+            return True
+    return False
 
 
 def audit_academy_html(
@@ -1455,37 +1523,89 @@ def audit_academy_html(
 
     if "escape" not in lower_script:
         result.fail("dialog", "Escape-to-close handling is missing")
-    if not re.search(r"\.close\s*\(", script):
-        result.fail("dialog", "course detail close behavior is missing")
-    if not re.search(r"\.focus\s*\(", script):
-        result.fail("dialog", "focus is not returned after closing course detail")
-    if not re.search(
-        r"returnFocus|previousFocus|lastFocused|focusReturn|opener|trigger",
-        script,
-        re.I,
-    ):
-        result.fail("dialog", "focus-return target is not retained")
-
-    for state_name in ("loading", "empty", "error"):
-        elements = _state_elements(parser, state_name)
-        if not elements:
-            result.fail("states", f"{state_name} state element is missing")
-            continue
-        state_source = " ".join(
-            element.text + " " + " ".join(element.attrs.values())
-            for element in elements
+    close_body = javascript_function_body(script, "closeCourse")
+    if close_body is None:
+        result.fail("dialog", "function closeCourse is missing or unparseable")
+    else:
+        native_close = re.search(r"\.close\s*\(", close_body)
+        hidden_close = re.search(
+            r"\b(?:elements\.)?[A-Za-z_$][\w$]*modal[\w$]*"
+            r"\.hidden\s*=\s*true",
+            close_body,
+            re.I,
         )
-        if not state_source.strip():
-            result.fail("states", f"{state_name} state has no user-facing content")
-        identifiers = {
-            element.attrs.get("id", "")
-            for element in elements
-            if element.attrs.get("id")
-        }
-        if identifiers and not any(identifier in script for identifier in identifiers):
+        if not native_close and not hidden_close:
+            result.fail(
+                "dialog",
+                "closeCourse neither closes a dialog nor hides the custom modal",
+            )
+        if not re.search(
+            r"(?:state\.)?returnFocus|previousFocus|lastFocused|focusReturn|opener|trigger",
+            close_body,
+            re.I,
+        ) or not re.search(r"\.focus\s*\(", close_body):
+            result.fail(
+                "dialog",
+                "closeCourse does not restore focus to its retained trigger",
+            )
+
+    if not _visible_static_loading(parser):
+        result.fail("states", "a visible static loading state is missing")
+
+    create_state_body = javascript_function_body(script, "createStateCard")
+    if (
+        create_state_body is None
+        or "document.createElement" not in create_state_body
+        or "title" not in create_state_body
+        or "message" not in create_state_body
+    ):
+        result.fail(
+            "states",
+            "createStateCard must construct user-facing dynamic state output",
+        )
+
+    render_catalog_body = javascript_function_body(script, "renderCatalog")
+    if render_catalog_body is None:
+        result.fail("states", "function renderCatalog is missing or unparseable")
+    else:
+        if not re.search(
+            r"No courses (?:match|are available)",
+            render_catalog_body,
+            re.I,
+        ):
             result.fail(
                 "states",
-                f"{state_name} state is never addressed by JavaScript",
+                "renderCatalog lacks user-facing empty-result text",
+            )
+        if not re.search(
+            r"(?:replaceChildren|append)\s*\(",
+            render_catalog_body,
+        ):
+            result.fail(
+                "states",
+                "renderCatalog does not place its empty state in the page",
+            )
+
+    load_error_body = javascript_function_body(script, "renderLoadError")
+    if load_error_body is None:
+        result.fail("states", "function renderLoadError is missing or unparseable")
+    else:
+        if "createStateCard" not in load_error_body or not re.search(
+            r"(?:replaceChildren|append)\s*\(",
+            load_error_body,
+        ):
+            result.fail(
+                "states",
+                "renderLoadError does not render a dynamic error card",
+            )
+        if not re.search(
+            r"did not load|could not be loaded|unavailable|failed to load",
+            load_error_body,
+            re.I,
+        ):
+            result.fail(
+                "states",
+                "renderLoadError lacks user-facing failure text",
             )
 
     viewport = next(
