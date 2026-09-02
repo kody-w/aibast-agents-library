@@ -87,10 +87,87 @@ THEME_PREFERENCE_SCRIPT = """(() => {
       });
     })();"""
 
+WORKSHOP_STORAGE_SCRIPT = """(() => {
+      const memory = new Map();
+      const unavailableListeners = new Set();
+      const engineKey = "aibast:workshop-engine";
+      let backend = null;
+      let persistent = true;
+
+      function markUnavailable() {
+        if (!persistent) return;
+        persistent = false;
+        backend = null;
+        document.documentElement.setAttribute("data-workshop-storage", "memory");
+        unavailableListeners.forEach((listener) => listener());
+      }
+
+      try {
+        backend = globalThis.localStorage;
+        const storedEngine =
+          localStorage.getItem("aibast:workshop-engine") === "copilot"
+            ? "copilot"
+            : "brainstem";
+        memory.set(engineKey, storedEngine);
+        const probeKey = "aibast:workshop-storage-probe";
+        backend.setItem(probeKey, "1");
+        backend.removeItem(probeKey);
+      } catch (_error) {
+        persistent = false;
+        backend = null;
+      }
+
+      document.documentElement.setAttribute(
+        "data-workshop-storage",
+        persistent ? "persistent" : "memory",
+      );
+
+      globalThis.aibastWorkshopStorage = Object.freeze({
+        getItem(key) {
+          if (persistent && backend) {
+            try {
+              const value = backend.getItem(key);
+              if (value !== null) memory.set(key, value);
+              return value;
+            } catch (_error) {
+              markUnavailable();
+            }
+          }
+          return memory.has(key) ? memory.get(key) : null;
+        },
+        setItem(key, value) {
+          const serialized = String(value);
+          memory.set(key, serialized);
+          if (persistent && backend) {
+            try {
+              backend.setItem(key, serialized);
+              return true;
+            } catch (_error) {
+              markUnavailable();
+            }
+          }
+          return false;
+        },
+        isPersistent() {
+          return persistent;
+        },
+        onUnavailable(listener) {
+          if (typeof listener !== "function") return () => {};
+          unavailableListeners.add(listener);
+          if (!persistent) listener();
+          return () => unavailableListeners.delete(listener);
+        },
+      });
+    })();"""
+
 WORKSHOP_ENGINE_SCRIPT = """(() => {
+      const storedEngine =
+        globalThis.aibastWorkshopStorage.getItem("aibast:workshop-engine");
+      const recognizedEngine =
+        storedEngine === "brainstem" ? "brainstem" : "copilot";
       const engine =
-        localStorage.getItem("aibast:workshop-engine") === "copilot"
-          ? "copilot"
+        storedEngine === "brainstem" || storedEngine === "copilot"
+          ? recognizedEngine
           : "brainstem";
       document.documentElement.setAttribute("data-workshop-engine", engine);
     })();"""
@@ -180,18 +257,35 @@ COMMON_CSS = f"""
     html {{ scroll-behavior: smooth; }}
     body {{
       margin: 0;
+      min-width: 0;
       background: var(--cp-bg);
       color: var(--cp-text);
       font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.55;
+      overflow-wrap: anywhere;
     }}
     a {{ color: var(--cp-link); }}
-    button, .button {{ font: inherit; }}
+    button, .button {{ max-width: 100%; font: inherit; overflow-wrap: anywhere; white-space: normal; }}
+    code {{ overflow-wrap: anywhere; word-break: break-word; }}
+    img, svg {{ max-width: 100%; }}
+    .skip-link {{
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 100;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      transform: translateY(-160%);
+    }}
+    .skip-link:focus {{ transform: translateY(0); }}
     .topbar {{
       position: sticky;
       top: 0;
       z-index: 20;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
@@ -199,10 +293,14 @@ COMMON_CSS = f"""
       border-bottom: 1px solid var(--cp-border);
       background: var(--cp-panel-strong);
     }}
-    .topbar-actions {{ display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }}
+    .topbar > *, .topbar-actions, .topbar-identity, .page, .hero, .card, .grid > * {{ min-width: 0; }}
+    .topbar-identity {{ display: grid; gap: 2px; }}
+    .topbar-actions {{ display: flex; max-width: 100%; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }}
     .brand {{ display: flex; align-items: center; gap: 10px; font-weight: 750; }}
+    .academy-breadcrumb {{ color: var(--cp-text-muted); font-size: 13px; }}
     .brand-mark {{
       display: grid;
+      flex: 0 0 auto;
       width: 32px;
       height: 32px;
       place-items: center;
@@ -265,10 +363,24 @@ COMMON_CSS = f"""
     .status {{ color: var(--cp-accent); font-weight: 750; }}
     .progress {{ height: 8px; overflow: hidden; border-radius: 999px; background: var(--cp-border); }}
     .progress span {{ display: block; width: 0; height: 100%; background: var(--cp-accent); }}
+    .table-scroll {{
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scrollbar-gutter: stable;
+      -webkit-overflow-scrolling: touch;
+    }}
+    .table-scroll:focus-visible {{
+      outline: 3px solid var(--cp-link);
+      outline-offset: 3px;
+    }}
+    .table-scroll > table {{ min-width: 640px; }}
     @media (max-width: 760px) {{
       .grid {{ grid-template-columns: 1fr; }}
       .topbar {{ align-items: flex-start; padding: 12px 16px; }}
-      .topbar-actions {{ justify-content: flex-start; }}
+      .topbar-actions {{ width: 100%; justify-content: flex-start; }}
       .page {{ width: min(100% - 24px, 1120px); padding-top: 24px; }}
       .hero {{ padding: 24px 20px; }}
     }}
@@ -286,6 +398,32 @@ def render_achievement_runtime(slug: str) -> str:
       const ACHIEVEMENT_WORKSHOP_SLUG = __WORKSHOP_SLUG__;
       const ACHIEVEMENT_BADGES = Object.freeze(__BADGES__);
       const ACHIEVEMENT_BADGE_IDS = new Set(ACHIEVEMENT_BADGES.map((badge) => badge.id));
+      const achievementMemory = new Map();
+      const achievementStorage = globalThis.aibastWorkshopStorage || Object.freeze({
+        getItem(key) {
+          try {
+            const value = globalThis.localStorage?.getItem(key) ?? null;
+            if (value !== null) achievementMemory.set(key, value);
+            return value !== null
+              ? value
+              : achievementMemory.has(key)
+                ? achievementMemory.get(key)
+                : null;
+          } catch (_error) {
+            return achievementMemory.has(key) ? achievementMemory.get(key) : null;
+          }
+        },
+        setItem(key, value) {
+          const serialized = String(value);
+          achievementMemory.set(key, serialized);
+          try {
+            globalThis.localStorage?.setItem(key, serialized);
+            return true;
+          } catch (_error) {
+            return false;
+          }
+        },
+      });
 
       function emptyAchievementProfile() {
         return { score: 0, workshops: {}, updatedAt: null };
@@ -370,7 +508,7 @@ def render_achievement_runtime(slug: str) -> str:
       function readAchievementProfile() {
         try {
           return sanitizeAchievementProfile(
-            JSON.parse(localStorage.getItem(ACHIEVEMENT_PROFILE_KEY) || "{}"),
+            JSON.parse(achievementStorage.getItem(ACHIEVEMENT_PROFILE_KEY) || "{}"),
           );
         } catch (_error) {
           return emptyAchievementProfile();
@@ -380,7 +518,7 @@ def render_achievement_runtime(slug: str) -> str:
       function writeAchievementProfile(profile) {
         const clean = sanitizeAchievementProfile(profile);
         clean.updatedAt = new Date().toISOString();
-        localStorage.setItem(ACHIEVEMENT_PROFILE_KEY, JSON.stringify(clean));
+        achievementStorage.setItem(ACHIEVEMENT_PROFILE_KEY, JSON.stringify(clean));
         return clean;
       }
 
@@ -408,11 +546,14 @@ def render_achievement_runtime(slug: str) -> str:
 
       function setAchievementWorkshopProgress(profile, mode, patch) {
         const workshop = ensureAchievementWorkshop(profile, mode);
-        workshop.progress = {
+        const nextProgress = {
           ...workshop.progress,
           ...patch,
           updatedAt: new Date().toISOString(),
         };
+        if (workshop.progress.easyComplete) nextProgress.easyComplete = true;
+        if (workshop.progress.hardComplete) nextProgress.hardComplete = true;
+        workshop.progress = nextProgress;
         return writeAchievementProfile(profile);
       }
 
@@ -1979,17 +2120,19 @@ def facilitator_certification_html(ctx: JourneyContext) -> str:
         </ol>
 
         <h3>Public and private data boundary</h3>
-        <table class="privacy-boundary">
-          <thead><tr><th>Public GitHub record</th><th>Private Microsoft Forms record</th></tr></thead>
-          <tbody>
-            <tr><td>GitHub issue author/login</td><td>Microsoft identity and MSIX ID</td></tr>
-            <tr><td>Non-identifying cohort code</td><td>Customer, organization, or audience details</td></tr>
-            <tr><td>Workshop slug and canonical agent</td><td>Roster matching and internal notes</td></tr>
-            <tr><td>Session date and attendee count</td><td>Module-test answers and reviewer scoring</td></tr>
-            <tr><td>Canonical achievement IDs or issue URL</td><td>Email and other contact details</td></tr>
-            <tr><td>Processing and reviewer labels</td><td>Approved retention and deletion record</td></tr>
-          </tbody>
-        </table>
+        <div class="table-scroll privacy-boundary" role="region" aria-label="Public and private data boundary table" tabindex="0">
+          <table>
+            <thead><tr><th>Public GitHub record</th><th>Private Microsoft Forms record</th></tr></thead>
+            <tbody>
+              <tr><td>GitHub issue author/login</td><td>Microsoft identity and MSIX ID</td></tr>
+              <tr><td>Non-identifying cohort code</td><td>Customer, organization, or audience details</td></tr>
+              <tr><td>Workshop slug and canonical agent</td><td>Roster matching and internal notes</td></tr>
+              <tr><td>Session date and attendee count</td><td>Module-test answers and reviewer scoring</td></tr>
+              <tr><td>Canonical achievement IDs or issue URL</td><td>Email and other contact details</td></tr>
+              <tr><td>Processing and reviewer labels</td><td>Approved retention and deletion record</td></tr>
+            </tbody>
+          </table>
+        </div>
         <div class="notice"><strong>Never publish private enrollment data:</strong> credentials, tokens, customer data, MSIX IDs, email addresses, private rosters, and test answers do not belong in a GitHub issue. Facilitator expertise counts only after <code>cohort-verified</code>; candidate qualification counts only after <code>badge-qualified</code>.</div>
       </div>
     </details>
@@ -2132,18 +2275,20 @@ def brainstem_facilitator_html() -> str:
         <p>Participants choosing the optional Brainstem lane select <strong>GitHub Copilot + Brainstem</strong> in Workshop settings and use the Brainstem Easy-mode skill linked below. Brainstem preserves local training context and hot-loads specialized instructors; GitHub Copilot still performs build and deployment work. Both lanes retain the same synthetic evidence, deterministic tests, and Draft-only publication boundary.</p>
 
         <h3>Facilitator recovery</h3>
-        <table>
-          <thead><tr><th>Symptom</th><th>Recovery</th></tr></thead>
-          <tbody>
-            <tr><td><code>brainstem</code> is not found</td><td>Open a new terminal so the installer-updated PATH is loaded, then retry.</td></tr>
-            <tr><td>GitHub authentication fails</td><td>Run <code>gh auth login</code>; never ask a participant to share a token.</td></tr>
-            <tr><td>The UI does not open</td><td>Start <code>brainstem</code>, then visit <code>http://localhost:7071</code>.</td></tr>
-            <tr><td>Health check fails</td><td>Read the terminal error, correct the local prerequisite, and rerun the health check.</td></tr>
-            <tr><td>Port 7071 is occupied</td><td>Stop the conflicting local process or use the Brainstem <code>PORT</code> setting deliberately.</td></tr>
-            <tr><td>No removable agent exists</td><td>Continue; the built-in tour skips the surgery sequence.</td></tr>
-            <tr><td>Registry or creation is unavailable</td><td>Skip the optional step and preserve the interview, memory, reset, inspect, and verify loop.</td></tr>
-          </tbody>
-        </table>
+        <div class="table-scroll" role="region" aria-label="Facilitator recovery table" tabindex="0">
+          <table>
+            <thead><tr><th>Symptom</th><th>Recovery</th></tr></thead>
+            <tbody>
+              <tr><td><code>brainstem</code> is not found</td><td>Open a new terminal so the installer-updated PATH is loaded, then retry.</td></tr>
+              <tr><td>GitHub authentication fails</td><td>Run <code>gh auth login</code>; never ask a participant to share a token.</td></tr>
+              <tr><td>The UI does not open</td><td>Start <code>brainstem</code>, then visit <code>http://localhost:7071</code>.</td></tr>
+              <tr><td>Health check fails</td><td>Read the terminal error, correct the local prerequisite, and rerun the health check.</td></tr>
+              <tr><td>Port 7071 is occupied</td><td>Stop the conflicting local process or use the Brainstem <code>PORT</code> setting deliberately.</td></tr>
+              <tr><td>No removable agent exists</td><td>Continue; the built-in tour skips the surgery sequence.</td></tr>
+              <tr><td>Registry or creation is unavailable</td><td>Skip the optional step and preserve the interview, memory, reset, inspect, and verify loop.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </details>
 """
@@ -2289,6 +2434,7 @@ def render_field_guide_html(ctx: JourneyContext) -> str:
   <script>
     {THEME_SCRIPT}
     {THEME_PREFERENCE_SCRIPT}
+    {WORKSHOP_STORAGE_SCRIPT}
     {WORKSHOP_ENGINE_SCRIPT}
   </script>
   <style>
@@ -2297,6 +2443,7 @@ def render_field_guide_html(ctx: JourneyContext) -> str:
     .engine-panel {{ display: none; }}
     html[data-workshop-engine="copilot"] .engine-panel.copilot {{ display: block; }}
     html[data-workshop-engine="brainstem"] .engine-panel.brainstem {{ display: block; }}
+    html[data-workshop-storage="memory"] .engine-panel {{ display: block; }}
     .prompt {{ padding: 14px; border: 1px solid var(--cp-border); border-radius: 10px; background: var(--cp-surface-soft); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; font-family: Consolas, "Courier New", Courier, monospace; }}
     table {{ width: 100%; border-collapse: collapse; }}
     th, td {{ padding: 11px; border: 1px solid var(--cp-border); text-align: left; vertical-align: top; }}
@@ -2316,14 +2463,18 @@ def render_field_guide_html(ctx: JourneyContext) -> str:
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#course-content">Skip to course content</a>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark">A</span><span>AIBAST field guide</span></div>
+    <div class="topbar-identity">
+      <div class="brand"><span class="brand-mark">A</span><span>AIBAST field guide</span></div>
+      <a class="academy-breadcrumb" href="../../academy.html#course/{html.escape(ctx.slug)}">Academy / {html.escape(ctx.title)}</a>
+    </div>
     <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button" href="../_shared/workshop-settings.html?return=../{html.escape(ctx.slug)}/field-guide.html">Workshop settings</a><a class="button primary" href="quest.html">Back to workshop</a></div>
   </header>
-  <main class="page">
+  <main class="page" id="course-content">
     <section class="hero">
       <p class="eyebrow">Facilitator and learner guide</p>
-      <h1>{html.escape(ctx.title)}</h1>
+      <h1 id="course-title" tabindex="-1">{html.escape(ctx.title)}</h1>
       <p class="lede">Use this guide to understand the workshop boundary, expected proof, production seams, and recovery paths before or during the hands-on module.</p>
       <div class="notice"><strong>Workshop mission:</strong> {html.escape(WORKSHOP_MISSION)}</div>
       <div class="notice"><strong>Evidence boundary:</strong> all packaged records and outcomes are synthetic qualitative evidence—not customer KPIs, measured production results, live connections, or publication approval.</div>
@@ -2352,10 +2503,12 @@ def render_field_guide_html(ctx: JourneyContext) -> str:
     <h2>Locked Preview corpus</h2>
     <section class="card">
       <p>Run every case in a fresh Copilot Studio Preview conversation. The deterministic validator—not phrasing similarity—defines the complete pass.</p>
-      <table>
-        <thead><tr><th>Case</th><th>Persona</th><th>Prompt</th></tr></thead>
-        <tbody>{rows}</tbody>
-      </table>
+      <div class="table-scroll" role="region" aria-label="Locked Preview corpus table" tabindex="0">
+        <table>
+          <thead><tr><th>Case</th><th>Persona</th><th>Prompt</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>
     </section>
 
     <div class="grid">
@@ -2379,16 +2532,18 @@ def render_field_guide_html(ctx: JourneyContext) -> str:
 
     <h2>Failure recovery</h2>
     <section class="card">
-      <table>
-        <thead><tr><th>Symptom</th><th>Recovery</th></tr></thead>
-        <tbody>
-          <tr><td>A required source is missing</td><td>Stop. Restore the reviewed file; never substitute invented content.</td></tr>
-          <tr><td>Knowledge is still processing</td><td>Wait for ingestion before Preview. A partial answer is not evidence.</td></tr>
-          <tr><td>A case misses a marker</td><td>Keep the case failed and inspect the package. Never retry until it happens to pass.</td></tr>
-          <tr><td>The existing Draft is found</td><td>The harness should clone and reconnect automatically.</td></tr>
-          <tr><td>The agent appears Published</td><td>Stop immediately. This workshop ends at Draft.</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll" role="region" aria-label="Failure recovery table" tabindex="0">
+        <table>
+          <thead><tr><th>Symptom</th><th>Recovery</th></tr></thead>
+          <tbody>
+            <tr><td>A required source is missing</td><td>Stop. Restore the reviewed file; never substitute invented content.</td></tr>
+            <tr><td>Knowledge is still processing</td><td>Wait for ingestion before Preview. A partial answer is not evidence.</td></tr>
+            <tr><td>A case misses a marker</td><td>Keep the case failed and inspect the package. Never retry until it happens to pass.</td></tr>
+            <tr><td>The existing Draft is found</td><td>The harness should clone and reconnect automatically.</td></tr>
+            <tr><td>The agent appears Published</td><td>Stop immediately. This workshop ends at Draft.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <p class="downloads"><a class="button primary" href="quest.html">Start the workshop</a><a class="button" href="manual-tutorial.html">Open Manual mode directly</a>{solution_downloads}</p>
@@ -2467,14 +2622,18 @@ def render_evidence_report_html(ctx: JourneyContext) -> str:
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#course-content">Skip to course content</a>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark">A</span><span>AIBAST evidence report</span></div>
+    <div class="topbar-identity">
+      <div class="brand"><span class="brand-mark">A</span><span>AIBAST evidence report</span></div>
+      <a class="academy-breadcrumb" href="../../academy.html#course/{html.escape(ctx.slug)}">Academy / {html.escape(ctx.title)}</a>
+    </div>
     <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button primary" href="quest.html">Back to workshop</a></div>
   </header>
-  <main class="page">
+  <main class="page" id="course-content">
     <section class="hero">
       <p class="eyebrow">Workshop evidence</p>
-      <h1>{html.escape(ctx.title)}</h1>
+      <h1 id="course-title" tabindex="-1">{html.escape(ctx.title)}</h1>
       <p class="lede">This report separates the deterministic machine gate from learner-facing visual checkpoints. A screenshot can support a positive observation; it never replaces the full locked-case validation.</p>
     </section>
 
@@ -2486,28 +2645,34 @@ def render_evidence_report_html(ctx: JourneyContext) -> str:
 
     <h2>Deterministic case contract</h2>
     <section class="card" id="locked-cases">
-      <table>
-        <thead><tr><th>Case</th><th>Must include</th><th>Must not claim</th></tr></thead>
-        <tbody>{case_rows}</tbody>
-      </table>
+      <div class="table-scroll" role="region" aria-label="Deterministic case contract table" tabindex="0">
+        <table>
+          <thead><tr><th>Case</th><th>Must include</th><th>Must not claim</th></tr></thead>
+          <tbody>{case_rows}</tbody>
+        </table>
+      </div>
     </section>
 
     <h2>Displayed visual checkpoints</h2>
     <section class="card">
       <p>Only approved positive checkpoints count as learner proof. Annotated paths are included for facilitator traceability.</p>
-      <table>
-        <thead><tr><th>Checkpoint</th><th>Mode</th><th>Visible evidence</th><th>Annotated asset</th></tr></thead>
-        <tbody>{reusable_rows}</tbody>
-      </table>
+      <div class="table-scroll" role="region" aria-label="Displayed visual checkpoints table" tabindex="0">
+        <table>
+          <thead><tr><th>Checkpoint</th><th>Mode</th><th>Visible evidence</th><th>Annotated asset</th></tr></thead>
+          <tbody>{reusable_rows}</tbody>
+        </table>
+      </div>
     </section>
 
     <h2>Reference-only visual gaps</h2>
     <section class="card">
       <p>These real source captures are inventoried for facilitators but withheld from learner pages until their review or reshoot requirement is resolved.</p>
-      <table>
-        <thead><tr><th>Checkpoint</th><th>Mode</th><th>Source asset</th><th>Reason</th></tr></thead>
-        <tbody>{gap_rows}</tbody>
-      </table>
+      <div class="table-scroll" role="region" aria-label="Reference-only visual gaps table" tabindex="0">
+        <table>
+          <thead><tr><th>Checkpoint</th><th>Mode</th><th>Source asset</th><th>Reason</th></tr></thead>
+          <tbody>{gap_rows}</tbody>
+        </table>
+      </div>
     </section>
 
     <h2>Downloads for audit</h2>
@@ -2733,10 +2898,12 @@ def render_manual_tutorial(
   <script>
     {THEME_SCRIPT}
     {THEME_PREFERENCE_SCRIPT}
+    {WORKSHOP_STORAGE_SCRIPT}
   </script>
   <style>
 {COMMON_CSS}
-    .layout {{ display: grid; grid-template-columns: 270px minmax(0, 840px); gap: 32px; max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }}
+    .layout {{ display: grid; grid-template-columns: 270px minmax(0, 840px); gap: 32px; width: 100%; max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }}
+    .layout > *, .step, .step-body, .instruction-grid > * {{ min-width: 0; }}
     .sidebar {{ position: sticky; top: 82px; align-self: start; max-height: calc(100vh - 104px); overflow: auto; }}
     .toc {{ display: grid; gap: 4px; margin-top: 14px; }}
     .toc a {{ padding: 7px 9px; border-left: 3px solid var(--cp-border); color: var(--cp-text-muted); text-decoration: none; font-size: 13px; }}
@@ -2776,9 +2943,13 @@ def render_manual_tutorial(
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#course-content">Skip to course content</a>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark">A</span><span>AIBAST manual workshop</span></div>
-    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button>{gif_button} <a class="button primary" href="exports/{html.escape(ctx.slug)}-source.zip">Download source bundle</a></div>
+    <div class="topbar-identity">
+      <div class="brand"><span class="brand-mark">A</span><span>AIBAST manual workshop</span></div>
+      <a class="academy-breadcrumb" href="../../academy.html#course/{html.escape(ctx.slug)}">Academy / {html.escape(ctx.title)}</a>
+    </div>
+    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button>{gif_button} <a class="button" href="quest.html">Back to workshop</a><a class="button primary" href="exports/{html.escape(ctx.slug)}-source.zip">Download source bundle</a></div>
   </header>
   <div class="layout">
     <aside class="sidebar">
@@ -2788,12 +2959,13 @@ def render_manual_tutorial(
       <p class="achievements-manual-note" id="achievements-manual-toast" role="status" aria-live="polite" aria-atomic="true"></p>
       <nav class="toc" aria-label="Tutorial actions">{toc_markup}</nav>
     </aside>
-    <main>
+    <main id="course-content">
       <section class="hero">
         <p class="eyebrow">Manual mode · literal browser construction</p>
-        <h1>Build {html.escape(ctx.title)} manually.</h1>
+        <h1 id="course-title" tabindex="-1">Build {html.escape(ctx.title)} manually.</h1>
         <p class="lede">No PAC CLI, YAML import, or plugin architect. Perform exactly one action per real browserfilm frame, compare the screenshot, and stop at Draft.</p>
         <div class="notice"><strong>Synthetic disclosure:</strong> this is qualitative workflow evidence using packaged synthetic inputs. It is not a customer KPI or a live-system result.</div>
+        <div class="notice" data-storage-notice role="status" aria-live="polite" aria-atomic="true" hidden>Progress will remain available on this page, but it will not persist after you leave.</div>
         <div class="feedback-notice"><strong>Found something inaccurate?</strong> Use <em>Report an issue</em> on that step. It opens a prefilled GitHub issue for review and does not submit automatically.</div>
         {pending_notice}
       </section>
@@ -2814,48 +2986,76 @@ def render_manual_tutorial(
     (() => {{
 {render_achievement_runtime(ctx.slug)}
       const key = "aibast:{html.escape(ctx.slug)}:manual-progress";
+      const storage = globalThis.aibastWorkshopStorage;
       const boxes = Array.from(document.querySelectorAll(".complete"));
       const label = document.getElementById("progress-label");
       const bar = document.getElementById("progress-bar");
       const achievementToast = document.getElementById("achievements-manual-toast");
+      storage.onUnavailable(() => {{
+        document.querySelectorAll("[data-storage-notice]").forEach((notice) => {{
+          notice.hidden = false;
+        }});
+      }});
       let saved = [];
       try {{
-        const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+        const parsed = JSON.parse(storage.getItem(key) || "[]");
         saved = Array.isArray(parsed)
           ? parsed.filter((step) => typeof step === "string")
           : [];
       }} catch (_error) {{
         saved = [];
       }}
+      const initialWorkshop =
+        readAchievementProfile().workshops[ACHIEVEMENT_WORKSHOP_SLUG];
+      let hardProgressActivated =
+        saved.length > 0 ||
+        (initialWorkshop?.progress?.hardChecked || 0) > 0 ||
+        initialWorkshop?.progress?.hardComplete === true;
       boxes.forEach((box) => {{
         box.checked = saved.includes(box.dataset.step);
-        box.addEventListener("change", update);
+        box.addEventListener("change", () => {{
+          if (box.checked) hardProgressActivated = true;
+          update({{ persist: hardProgressActivated, announce: true }});
+        }});
       }});
-      function update() {{
+      function update({{ persist = false, announce = false }} = {{}}) {{
         const done = boxes.filter((box) => box.checked).map((box) => box.dataset.step);
         const complete = boxes.length > 0 && done.length === boxes.length;
-        localStorage.setItem(key, JSON.stringify(done));
         label.textContent = `${{done.length}} of ${{boxes.length}} complete`;
         bar.style.width = boxes.length ? `${{(done.length / boxes.length) * 100}}%` : "0%";
+        if (!persist) return;
+        storage.setItem(key, JSON.stringify(done));
         let profile = readAchievementProfile();
-        if (done.length > 0 || profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG]) {{
-          profile = setAchievementWorkshopProgress(profile, "hard", {{
+        const existingHardComplete =
+          profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG]?.progress?.hardComplete === true;
+        if (hardProgressActivated) {{
+          const hardProgress = {{
             hardChecked: done.length,
             hardTotal: boxes.length,
             hardComplete: complete,
-          }});
+          }};
+          if (existingHardComplete) hardProgress.hardComplete = true;
+          profile = setAchievementWorkshopProgress(profile, "hard", hardProgress);
           const badgeIds = [];
           if (done.length > 0) badgeIds.push("started");
           if (complete) badgeIds.push("hard-mode-complete");
           badgeIds.forEach((badgeId) => {{
             const result = awardAchievement(profile, badgeId, "hard");
             profile = result.profile;
-            if (result.awarded && achievementToast) {{
+            if (announce && result.awarded && achievementToast) {{
               achievementToast.textContent =
                 `${{result.awarded.label}} earned: +${{result.awarded.points}} local achievement points.`;
             }}
           }});
         }}
+      }}
+      function resumeManualCourse() {{
+        if (window.location.hash !== "#resume") return;
+        const next = boxes.find((box) => !box.checked);
+        const target = next || document.getElementById("course-title");
+        const scrollTarget = next?.closest(".step") || target;
+        scrollTarget?.scrollIntoView({{ block: "center" }});
+        target?.focus({{ preventScroll: true }});
       }}
       document.querySelectorAll("[data-copy-target]").forEach((button) => {{
         button.addEventListener("click", () => {{
@@ -2913,6 +3113,9 @@ Describe what was inaccurate or missing.
         }});
       }});
       update();
+      window.requestAnimationFrame(() => {{
+        window.requestAnimationFrame(resumeManualCourse);
+      }});
     }})();
   </script>
 </body>
@@ -3342,6 +3545,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
   <script>
     {THEME_SCRIPT}
     {THEME_PREFERENCE_SCRIPT}
+    {WORKSHOP_STORAGE_SCRIPT}
     {WORKSHOP_ENGINE_SCRIPT}
   </script>
   <style>
@@ -3357,6 +3561,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
     .easy-lane {{ display: none; }}
     html[data-workshop-engine="brainstem"] .easy-lane[data-easy-lane="brainstem"] {{ display: block; }}
     html[data-workshop-engine="copilot"] .easy-lane[data-easy-lane="copilot"] {{ display: block; }}
+    html[data-workshop-storage="memory"] .easy-lane {{ display: block; }}
     .engine-label {{ display: none; color: var(--cp-accent); }}
     html[data-workshop-engine="brainstem"] .engine-label.brainstem {{ display: inline; }}
     html[data-workshop-engine="copilot"] .engine-label.copilot {{ display: inline; }}
@@ -3396,7 +3601,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
     .step-complete input {{ width: 20px; height: 20px; accent-color: var(--cp-accent); }}
     .preview-intro {{ display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 16px; }}
     .preview-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }}
-    .preview-case {{ padding: 16px; border: 1px solid var(--cp-border); border-radius: 14px; background: var(--cp-bg-elevated); }}
+    .preview-case {{ min-width: 0; padding: 16px; border: 1px solid var(--cp-border); border-radius: 14px; background: var(--cp-bg-elevated); }}
     .preview-case-wide {{ grid-column: 1 / -1; }}
     .preview-case header {{ display: flex; justify-content: space-between; gap: 12px; align-items: start; }}
     .preview-case h4 {{ margin: 0; }}
@@ -3475,25 +3680,30 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
     .resource-list {{ columns: 2; padding-left: 22px; }}
     .resource-list li {{ break-inside: avoid; margin-bottom: 10px; }}
     @media (max-width: 760px) {{ .engine-flow, .outcome-grid, .skill-onboarding, .module-summary, .preview-grid, .done-grid, .achievements-panel {{ grid-template-columns: 1fr; }} .achievements-claims {{ padding: 16px 0 0; border-top: 1px solid var(--cp-border); border-left: 0; }} }}
-    @media (max-width: 620px) {{ .resource-list {{ columns: 1; }} .prompt-heading {{ display: block; }} .prompt-heading .button {{ margin-top: 12px; }} .instruction-grid {{ grid-template-columns: 1fr; }} .step header {{ grid-template-columns: 36px 1fr; }} .step header .report-button {{ grid-column: 1 / -1; }} }}
+    @media (max-width: 620px) {{ .resource-list {{ columns: 1; }} .prompt-heading {{ display: block; }} .prompt-heading .button {{ margin-top: 12px; }} .instruction-grid {{ grid-template-columns: 1fr; }} .learn-step-header, .step header {{ grid-template-columns: 36px minmax(0, 1fr); }} .learn-step-header .report-button, .step header .report-button {{ grid-column: 1 / -1; }} .preview-case header {{ flex-wrap: wrap; }} .report-actions {{ justify-content: flex-start; }} }}
   </style>
 </head>
 <body data-workshop-slug="{html.escape(ctx.slug)}">
+  <a class="skip-link" href="#course-content">Skip to course content</a>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark">A</span><span>AIBAST guided workshop</span></div>
+    <div class="topbar-identity">
+      <div class="brand"><span class="brand-mark">A</span><span>AIBAST guided workshop</span></div>
+      <a class="academy-breadcrumb" href="../../academy.html#course/{html.escape(ctx.slug)}">Academy / {html.escape(ctx.title)}</a>
+    </div>
     <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button" href="../_shared/workshop-settings.html?return=../{html.escape(ctx.slug)}/quest.html">Workshop settings</a><a class="button primary" href="field-guide.html">Open field guide</a></div>
   </header>
-  <main class="page">
+  <main class="page" id="course-content">
     <section class="hero">
       <p class="eyebrow">Evidence-grounded customer journey</p>
-      <h1>{html.escape(ctx.title)}</h1>
+      <h1 id="course-title" tabindex="-1">{html.escape(ctx.title)}</h1>
       <p class="lede">Use your globally configured Easy-mode harness, or reproduce every action directly in Manual mode.</p>
       <div class="notice"><strong>Workshop mission:</strong> {html.escape(WORKSHOP_MISSION)}</div>
       <div class="notice"><strong>Boundary:</strong> synthetic qualitative evidence only—not a customer KPI, measured production result, live connection, or publication approval.</div>
+      <div class="notice" data-storage-notice role="status" aria-live="polite" aria-atomic="true" hidden>Progress will remain available on this page, but it will not persist after you leave. Both Easy lanes remain available.</div>
       <div class="feedback-notice"><strong>Found something inaccurate?</strong> Use <em>Report an issue</em> at that point. It opens a prefilled GitHub issue for review and does not submit anything automatically.</div>
       <div class="mode-switch" role="tablist">
-        <button class="mode active" id="mode-tab-easy" data-mode="easy" role="tab" aria-controls="mode-panel-easy" aria-selected="true">Easy</button>
-        <button class="mode" id="mode-tab-hard" data-mode="hard" role="tab" aria-controls="mode-panel-hard" aria-selected="false">Manual</button>
+        <button class="mode active" id="mode-tab-easy" data-mode="easy" role="tab" aria-controls="mode-panel-easy" aria-selected="true" tabindex="0">Easy</button>
+        <button class="mode" id="mode-tab-hard" data-mode="hard" role="tab" aria-controls="mode-panel-hard" aria-selected="false" tabindex="-1">Manual</button>
       </div>
     </section>
 
@@ -3575,17 +3785,19 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
 
       <section class="card">
         <h3>Troubleshooting</h3>
-        <table class="troubleshooting-table">
-          <thead><tr><th>What you see</th><th>What it means</th><th>What to do</th></tr></thead>
-          <tbody>
-            <tr><td>Copilot ignores the lane</td><td>The wrong skill is attached, or the chat began before attachment.</td><td>Start a new Agent-mode chat and attach the correct lane-specific <code>SKILL.md</code> first.</td></tr>
-            <tr><td>Local validation is not {len(easy_case_records(ctx))}/{len(easy_case_records(ctx))}</td><td>The portable source, package, or locked behavior does not match.</td><td>Stop. Do not deploy. Let the harness report the exact failed case and marker.</td></tr>
-            <tr><td>No active Copilot Studio environment</td><td>PAC has no selected environment.</td><td>Sign in or select the intended environment, then resend the deploy message.</td></tr>
-            <tr><td>The Draft already exists</td><td>The recorded schema is already in the environment.</td><td>The harness should clone and reconnect automatically. Treat an attendee choice prompt as a harness defect.</td></tr>
-            <tr><td>A Preview case misses a marker</td><td>The real front door does not match the reviewed contract.</td><td>Keep the case failed. Inspect instructions and assets; do not retry until it happens to pass.</td></tr>
-            <tr><td>The agent is Published</td><td>The workshop crossed its safety boundary.</td><td>Stop immediately. The module must end at Draft with <code>published: false</code>.</td></tr>
-          </tbody>
-        </table>
+        <div class="table-scroll" role="region" aria-label="Easy-mode troubleshooting table" tabindex="0">
+          <table class="troubleshooting-table">
+            <thead><tr><th>What you see</th><th>What it means</th><th>What to do</th></tr></thead>
+            <tbody>
+              <tr><td>Copilot ignores the lane</td><td>The wrong skill is attached, or the chat began before attachment.</td><td>Start a new Agent-mode chat and attach the correct lane-specific <code>SKILL.md</code> first.</td></tr>
+              <tr><td>Local validation is not {len(easy_case_records(ctx))}/{len(easy_case_records(ctx))}</td><td>The portable source, package, or locked behavior does not match.</td><td>Stop. Do not deploy. Let the harness report the exact failed case and marker.</td></tr>
+              <tr><td>No active Copilot Studio environment</td><td>PAC has no selected environment.</td><td>Sign in or select the intended environment, then resend the deploy message.</td></tr>
+              <tr><td>The Draft already exists</td><td>The recorded schema is already in the environment.</td><td>The harness should clone and reconnect automatically. Treat an attendee choice prompt as a harness defect.</td></tr>
+              <tr><td>A Preview case misses a marker</td><td>The real front door does not match the reviewed contract.</td><td>Keep the case failed. Inspect instructions and assets; do not retry until it happens to pass.</td></tr>
+              <tr><td>The agent is Published</td><td>The workshop crossed its safety boundary.</td><td>Stop immediately. The module must end at Draft with <code>published: false</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <details class="facilitator-details">
@@ -3660,6 +3872,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
       const globalEngineKey = "aibast:workshop-engine";
       const progressKey = "aibast:{html.escape(ctx.slug)}:quest-progress";
       const hardProgressKey = "aibast:{html.escape(ctx.slug)}:manual-progress";
+      const localStorage = globalThis.aibastWorkshopStorage;
       const buttons = Array.from(document.querySelectorAll("[data-mode]"));
       const paths = Array.from(document.querySelectorAll("[data-path]"));
       const boxes = Array.from(document.querySelectorAll("[data-checkpoint]"));
@@ -3673,6 +3886,11 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
       const hardProgressLabel = document.getElementById("hard-progress-label");
       const hardProgressBar = document.getElementById("hard-progress-bar");
       const hardProgressToast = document.getElementById("hard-progress-toast");
+      localStorage.onUnavailable(() => {{
+        document.querySelectorAll("[data-storage-notice]").forEach((notice) => {{
+          notice.hidden = false;
+        }});
+      }});
       let saved = {{}};
       try {{
         const parsed = JSON.parse(localStorage.getItem(progressKey) || "{{}}");
@@ -3688,7 +3906,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
         box.addEventListener("change", () => {{
           saved[box.dataset.checkpoint] = box.checked;
           localStorage.setItem(progressKey, JSON.stringify(saved));
-          evaluateAchievement(true);
+          evaluateAchievement(true, true);
         }});
       }});
       let hardSaved = [];
@@ -3700,21 +3918,30 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
       }} catch (_error) {{
         hardSaved = [];
       }}
+      const initialWorkshop =
+        readAchievementProfile().workshops[ACHIEVEMENT_WORKSHOP_SLUG];
+      let hardProgressActivated =
+        hardSaved.length > 0 ||
+        (initialWorkshop?.progress?.hardChecked || 0) > 0 ||
+        initialWorkshop?.progress?.hardComplete === true;
       hardBoxes.forEach((box) => {{
         box.checked = hardSaved.includes(box.dataset.step);
-        box.addEventListener("change", () => updateHardProgress(true));
+        box.addEventListener("change", () => {{
+          if (box.checked) hardProgressActivated = true;
+          updateHardProgress(true, hardProgressActivated);
+        }});
       }});
 
       function currentEasyPath() {{
-        return localStorage.getItem(globalEngineKey) === "brainstem"
-          ? "brainstem"
-          : "copilot";
+        return localStorage.getItem(globalEngineKey) === "copilot"
+          ? "copilot"
+          : "brainstem";
       }}
 
       function requiredEasyBoxes() {{
         const path = currentEasyPath();
         return boxes.filter(
-          (box) => box.dataset.achievementPath === path || box.dataset.achievementPath === "shared",
+          (box) => box.dataset.achievementsPath === path || box.dataset.achievementsPath === "shared",
         );
       }}
 
@@ -3722,8 +3949,8 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
         const path = currentEasyPath();
         const members = boxes.filter(
           (box) =>
-            box.dataset.achievementGroup === group &&
-            (box.dataset.achievementPath === path || box.dataset.achievementPath === "shared"),
+            box.dataset.achievementsGroup === group &&
+            (box.dataset.achievementsPath === path || box.dataset.achievementsPath === "shared"),
         );
         return members.length > 0 && members.every((box) => box.checked);
       }}
@@ -3737,13 +3964,13 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
         }}, 5000);
       }}
 
-      function updateHardProgress(announce = false) {{
+      function updateHardProgress(announce = false, persist = false) {{
         const done = hardBoxes
           .filter((box) => box.checked)
           .map((box) => box.dataset.step);
         const complete =
           hardBoxes.length > 0 && done.length === hardBoxes.length;
-        localStorage.setItem(hardProgressKey, JSON.stringify(done));
+        if (persist) localStorage.setItem(hardProgressKey, JSON.stringify(done));
         if (hardProgressLabel) {{
           hardProgressLabel.textContent =
             `${{done.length}} of ${{hardBoxes.length}} complete`;
@@ -3753,18 +3980,29 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
             ? `${{(done.length / hardBoxes.length) * 100}}%`
             : "0%";
         }}
-        const activeMode =
+        const selectedMode =
           localStorage.getItem(modeKey) === "hard" ? "hard" : "easy";
+        const activeMode =
+          persist && hardProgressActivated ? "hard" : selectedMode;
         let profile = readAchievementProfile();
-        if (done.length === 0 && !profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG]) {{
+        if (
+          !persist ||
+          (done.length === 0 &&
+            !profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG] &&
+            !hardProgressActivated)
+        ) {{
           renderAchievementPanel(profile, activeMode);
           return;
         }}
-        profile = setAchievementWorkshopProgress(profile, activeMode, {{
+        const existingHardComplete =
+          profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG]?.progress?.hardComplete === true;
+        const hardProgress = {{
           hardChecked: done.length,
           hardTotal: hardBoxes.length,
           hardComplete: complete,
-        }});
+        }};
+        if (existingHardComplete) hardProgress.hardComplete = true;
+        profile = setAchievementWorkshopProgress(profile, activeMode, hardProgress);
         if (done.length > 0) {{
           const result = awardAchievement(profile, "started", activeMode);
           profile = result.profile;
@@ -3781,7 +4019,9 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
         }}
         if (hardProgressToast) {{
           hardProgressToast.textContent = complete
-            ? "Manual mode complete. The achievement is saved in this device's achievement profile."
+            ? localStorage.isPersistent()
+              ? "Manual mode complete. The achievement is saved in this device's achievement profile."
+              : "Manual mode complete for this page. Progress will not persist after you leave."
             : "";
         }}
         renderAchievementPanel(profile, activeMode);
@@ -3833,15 +4073,20 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
           earnedAchievementSyncIds(achievements).length === 0;
       }}
 
-      function evaluateAchievement(announce = false) {{
-        const mode = localStorage.getItem(modeKey) === "hard" ? "hard" : "easy";
+      function activeDisplayMode() {{
+        return buttons.find(
+          (button) => button.getAttribute("aria-selected") === "true",
+        )?.dataset.mode || "easy";
+      }}
+
+      function evaluateAchievement(announce = false, persist = false) {{
         const easyRequired = requiredEasyBoxes();
         const easyChecked = easyRequired.filter((box) => box.checked).length;
         const hasCheckpoint = boxes.some((box) => box.checked);
         let profile = readAchievementProfile();
         const existing = profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG];
-        if (hasCheckpoint || existing) {{
-          profile = setAchievementWorkshopProgress(profile, mode, {{
+        if (persist && (hasCheckpoint || existing)) {{
+          profile = setAchievementWorkshopProgress(profile, "easy", {{
             easyChecked,
             easyTotal: easyRequired.length,
             easyComplete:
@@ -3859,25 +4104,40 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
           ];
           earnedByCondition.forEach(([badgeId, condition]) => {{
             if (!condition) return;
-            const result = awardAchievement(profile, badgeId, mode);
+            const result = awardAchievement(profile, badgeId, "easy");
             profile = result.profile;
             if (announce) announceAchievementBadge(result.awarded);
           }});
         }}
-        renderAchievementPanel(profile, mode);
+        renderAchievementPanel(profile, activeDisplayMode());
       }}
 
-      function selectMode(mode) {{
+      function selectMode(mode, persist = true) {{
         buttons.forEach((button) => {{
           const selected = button.dataset.mode === mode;
           button.classList.toggle("active", selected);
           button.setAttribute("aria-selected", String(selected));
+          button.tabIndex = selected ? 0 : -1;
         }});
         paths.forEach((path) => {{ path.hidden = path.dataset.path !== mode; }});
-        localStorage.setItem(modeKey, mode);
-        evaluateAchievement(false);
+        if (persist) localStorage.setItem(modeKey, mode);
+        evaluateAchievement(false, false);
       }}
       buttons.forEach((button) => button.addEventListener("click", () => selectMode(button.dataset.mode)));
+      buttons.forEach((button, index) => {{
+        button.addEventListener("keydown", (event) => {{
+          let nextIndex = null;
+          if (event.key === "ArrowRight") nextIndex = (index + 1) % buttons.length;
+          if (event.key === "ArrowLeft") nextIndex = (index - 1 + buttons.length) % buttons.length;
+          if (event.key === "Home") nextIndex = 0;
+          if (event.key === "End") nextIndex = buttons.length - 1;
+          if (nextIndex === null) return;
+          event.preventDefault();
+          const nextButton = buttons[nextIndex];
+          selectMode(nextButton.dataset.mode);
+          nextButton.focus();
+        }});
+      }});
       document.querySelectorAll("[data-copy-target]").forEach((button) => {{
         button.addEventListener("click", () => {{
           const target = document.getElementById(button.dataset.copyTarget);
@@ -3901,9 +4161,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
           const evidence = button.dataset.reportEvidence || "No evidence path supplied.";
           const reportMode = button.closest('[data-path="hard"]')
             ? "hard"
-            : localStorage.getItem(globalEngineKey) === "brainstem"
-              ? "brainstem"
-              : "copilot";
+            : currentEasyPath();
           const title = `[Workshop feedback] {ctx.title}: ${{locationLabel}}`;
           const body = `<!-- aibast-workshop-feedback:v1 -->
 ## Workshop signal
@@ -3970,8 +4228,26 @@ Opening this form does not sync anything. Submit the issue to sync these earned 
       document.querySelector("[data-achievements-sync]").addEventListener("click", () => {{
         openAchievementSync();
       }});
-      selectMode(localStorage.getItem(modeKey) === "hard" ? "hard" : "easy");
-      updateHardProgress(false);
+      function resumeCourse() {{
+        if (window.location.hash !== "#resume") return;
+        const activeMode =
+          buttons.find((button) => button.getAttribute("aria-selected") === "true")
+            ?.dataset.mode || "easy";
+        const candidates = activeMode === "hard" ? hardBoxes : requiredEasyBoxes();
+        const next = candidates.find((box) => !box.checked);
+        const target = next || document.getElementById("course-title");
+        const scrollTarget =
+          next?.closest(activeMode === "hard" ? ".step" : ".learn-step") || target;
+        scrollTarget?.scrollIntoView({{ block: "center" }});
+        target?.focus({{ preventScroll: true }});
+      }}
+      const initialMode =
+        localStorage.getItem(modeKey) === "hard" ? "hard" : "easy";
+      selectMode(initialMode, false);
+      updateHardProgress(false, false);
+      window.requestAnimationFrame(() => {{
+        window.requestAnimationFrame(resumeCourse);
+      }});
     }})();
   </script>
 </body>

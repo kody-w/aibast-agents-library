@@ -107,18 +107,35 @@
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
+      min-width: 0;
       background: var(--cp-bg);
       color: var(--cp-text);
       font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.55;
+      overflow-wrap: anywhere;
     }
     a { color: var(--cp-link); }
-    button, .button { font: inherit; }
+    button, .button { max-width: 100%; font: inherit; overflow-wrap: anywhere; white-space: normal; }
+    code { overflow-wrap: anywhere; word-break: break-word; }
+    img, svg { max-width: 100%; }
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 100;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
     .topbar {
       position: sticky;
       top: 0;
       z-index: 20;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
@@ -126,10 +143,14 @@
       border-bottom: 1px solid var(--cp-border);
       background: var(--cp-panel-strong);
     }
-    .topbar-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .topbar > *, .topbar-actions, .topbar-identity, .page, .hero, .card, .grid > * { min-width: 0; }
+    .topbar-identity { display: grid; gap: 2px; }
+    .topbar-actions { display: flex; max-width: 100%; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 750; }
+    .academy-breadcrumb { color: var(--cp-text-muted); font-size: 13px; }
     .brand-mark {
       display: grid;
+      flex: 0 0 auto;
       width: 32px;
       height: 32px;
       place-items: center;
@@ -192,10 +213,24 @@
     .status { color: var(--cp-accent); font-weight: 750; }
     .progress { height: 8px; overflow: hidden; border-radius: 999px; background: var(--cp-border); }
     .progress span { display: block; width: 0; height: 100%; background: var(--cp-accent); }
+    .table-scroll {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scrollbar-gutter: stable;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table-scroll:focus-visible {
+      outline: 3px solid var(--cp-link);
+      outline-offset: 3px;
+    }
+    .table-scroll > table { min-width: 640px; }
     @media (max-width: 760px) {
       .grid { grid-template-columns: 1fr; }
       .topbar { align-items: flex-start; padding: 12px 16px; }
-      .topbar-actions { justify-content: flex-start; }
+      .topbar-actions { width: 100%; justify-content: flex-start; }
       .page { width: min(100% - 24px, 1120px); padding-top: 24px; }
       .hero { padding: 24px 20px; }
     }
@@ -214,14 +249,18 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#course-content">Skip to course content</a>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark">A</span><span>AIBAST evidence report</span></div>
+    <div class="topbar-identity">
+      <div class="brand"><span class="brand-mark">A</span><span>AIBAST evidence report</span></div>
+      <a class="academy-breadcrumb" href="../../academy.html#course/maintenance-scheduling">Academy / Maintenance Scheduling Agent</a>
+    </div>
     <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button primary" href="quest.html">Back to workshop</a></div>
   </header>
-  <main class="page">
+  <main class="page" id="course-content">
     <section class="hero">
       <p class="eyebrow">Workshop evidence</p>
-      <h1>Maintenance Scheduling Agent</h1>
+      <h1 id="course-title" tabindex="-1">Maintenance Scheduling Agent</h1>
       <p class="lede">This report separates the deterministic machine gate from learner-facing visual checkpoints. A screenshot can support a positive observation; it never replaces the full locked-case validation.</p>
     </section>
 
@@ -233,9 +272,10 @@
 
     <h2>Deterministic case contract</h2>
     <section class="card" id="locked-cases">
-      <table>
-        <thead><tr><th>Case</th><th>Must include</th><th>Must not claim</th></tr></thead>
-        <tbody><tr>
+      <div class="table-scroll" role="region" aria-label="Deterministic case contract table" tabindex="0">
+        <table>
+          <thead><tr><th>Case</th><th>Must include</th><th>Must not claim</th></tr></thead>
+          <tbody><tr>
           <td><code>MS-01</code></td>
           <td><span class="marker-chip">EQ-INJ-01</span><span class="marker-chip">Technician Availability</span></td>
           <td><span class="marker-chip">I do not have access to the synthetic pilot data</span></td>
@@ -255,15 +295,17 @@
           <td><span class="marker-chip">Modeled avoided-cost opportunity</span><span class="marker-chip">synthetic planning estimates</span></td>
           <td><span class="marker-chip">I do not have access to the synthetic pilot data</span></td>
         </tr></tbody>
-      </table>
+        </table>
+      </div>
     </section>
 
     <h2>Displayed visual checkpoints</h2>
     <section class="card">
       <p>Only approved positive checkpoints count as learner proof. Annotated paths are included for facilitator traceability.</p>
-      <table>
-        <thead><tr><th>Checkpoint</th><th>Mode</th><th>Visible evidence</th><th>Annotated asset</th></tr></thead>
-        <tbody><tr>
+      <div class="table-scroll" role="region" aria-label="Displayed visual checkpoints table" tabindex="0">
+        <table>
+          <thead><tr><th>Checkpoint</th><th>Mode</th><th>Visible evidence</th><th>Annotated asset</th></tr></thead>
+          <tbody><tr>
           <td><code>easy-ms-02</code></td>
           <td>easy</td>
           <td>Priority 3 — Monitor; No Immediate Intervention Indicated; EQ-CNC-01; Spindle bearing wear</td>
@@ -329,15 +371,17 @@
           <td>Key Trade-Off Principles (Synthetic Planning Estimates); Unplanned Failure Path; Preventive Intervention Path</td>
           <td>solutions/maintenance-scheduling/screenshots/manual/annotated/17-ms-04.png</td>
         </tr></tbody>
-      </table>
+        </table>
+      </div>
     </section>
 
     <h2>Reference-only visual gaps</h2>
     <section class="card">
       <p>These real source captures are inventoried for facilitators but withheld from learner pages until their review or reshoot requirement is resolved.</p>
-      <table>
-        <thead><tr><th>Checkpoint</th><th>Mode</th><th>Source asset</th><th>Reason</th></tr></thead>
-        <tbody><tr>
+      <div class="table-scroll" role="region" aria-label="Reference-only visual gaps table" tabindex="0">
+        <table>
+          <thead><tr><th>Checkpoint</th><th>Mode</th><th>Source asset</th><th>Reason</th></tr></thead>
+          <tbody><tr>
           <td><code>easy-review-build</code></td>
           <td>easy</td>
           <td>solutions/maintenance-scheduling/screenshots/assisted/01-review-build.jpg</td>
@@ -415,7 +459,8 @@
           <td>solutions/maintenance-scheduling/screenshots/manual/18-confirm-draft.jpg</td>
           <td>The Agents list does not visibly contain Maintenance Scheduling Manual, so it cannot prove that the validated manual agent remains Draft.</td>
         </tr></tbody>
-      </table>
+        </table>
+      </div>
     </section>
 
     <h2>Downloads for audit</h2>

@@ -48,6 +48,78 @@
         render();
       });
     })();
+    (() => {
+      const memory = new Map();
+      const unavailableListeners = new Set();
+      const engineKey = "aibast:workshop-engine";
+      let backend = null;
+      let persistent = true;
+
+      function markUnavailable() {
+        if (!persistent) return;
+        persistent = false;
+        backend = null;
+        document.documentElement.setAttribute("data-workshop-storage", "memory");
+        unavailableListeners.forEach((listener) => listener());
+      }
+
+      try {
+        backend = globalThis.localStorage;
+        const storedEngine =
+          localStorage.getItem("aibast:workshop-engine") === "copilot"
+            ? "copilot"
+            : "brainstem";
+        memory.set(engineKey, storedEngine);
+        const probeKey = "aibast:workshop-storage-probe";
+        backend.setItem(probeKey, "1");
+        backend.removeItem(probeKey);
+      } catch (_error) {
+        persistent = false;
+        backend = null;
+      }
+
+      document.documentElement.setAttribute(
+        "data-workshop-storage",
+        persistent ? "persistent" : "memory",
+      );
+
+      globalThis.aibastWorkshopStorage = Object.freeze({
+        getItem(key) {
+          if (persistent && backend) {
+            try {
+              const value = backend.getItem(key);
+              if (value !== null) memory.set(key, value);
+              return value;
+            } catch (_error) {
+              markUnavailable();
+            }
+          }
+          return memory.has(key) ? memory.get(key) : null;
+        },
+        setItem(key, value) {
+          const serialized = String(value);
+          memory.set(key, serialized);
+          if (persistent && backend) {
+            try {
+              backend.setItem(key, serialized);
+              return true;
+            } catch (_error) {
+              markUnavailable();
+            }
+          }
+          return false;
+        },
+        isPersistent() {
+          return persistent;
+        },
+        onUnavailable(listener) {
+          if (typeof listener !== "function") return () => {};
+          unavailableListeners.add(listener);
+          if (!persistent) listener();
+          return () => unavailableListeners.delete(listener);
+        },
+      });
+    })();
   </script>
   <style>
 
@@ -107,18 +179,35 @@
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
+      min-width: 0;
       background: var(--cp-bg);
       color: var(--cp-text);
       font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.55;
+      overflow-wrap: anywhere;
     }
     a { color: var(--cp-link); }
-    button, .button { font: inherit; }
+    button, .button { max-width: 100%; font: inherit; overflow-wrap: anywhere; white-space: normal; }
+    code { overflow-wrap: anywhere; word-break: break-word; }
+    img, svg { max-width: 100%; }
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 100;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
     .topbar {
       position: sticky;
       top: 0;
       z-index: 20;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
@@ -126,10 +215,14 @@
       border-bottom: 1px solid var(--cp-border);
       background: var(--cp-panel-strong);
     }
-    .topbar-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .topbar > *, .topbar-actions, .topbar-identity, .page, .hero, .card, .grid > * { min-width: 0; }
+    .topbar-identity { display: grid; gap: 2px; }
+    .topbar-actions { display: flex; max-width: 100%; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 750; }
+    .academy-breadcrumb { color: var(--cp-text-muted); font-size: 13px; }
     .brand-mark {
       display: grid;
+      flex: 0 0 auto;
       width: 32px;
       height: 32px;
       place-items: center;
@@ -192,15 +285,30 @@
     .status { color: var(--cp-accent); font-weight: 750; }
     .progress { height: 8px; overflow: hidden; border-radius: 999px; background: var(--cp-border); }
     .progress span { display: block; width: 0; height: 100%; background: var(--cp-accent); }
+    .table-scroll {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scrollbar-gutter: stable;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table-scroll:focus-visible {
+      outline: 3px solid var(--cp-link);
+      outline-offset: 3px;
+    }
+    .table-scroll > table { min-width: 640px; }
     @media (max-width: 760px) {
       .grid { grid-template-columns: 1fr; }
       .topbar { align-items: flex-start; padding: 12px 16px; }
-      .topbar-actions { justify-content: flex-start; }
+      .topbar-actions { width: 100%; justify-content: flex-start; }
       .page { width: min(100% - 24px, 1120px); padding-top: 24px; }
       .hero { padding: 24px 20px; }
     }
 
-    .layout { display: grid; grid-template-columns: 270px minmax(0, 840px); gap: 32px; max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+    .layout { display: grid; grid-template-columns: 270px minmax(0, 840px); gap: 32px; width: 100%; max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+    .layout > *, .step, .step-body, .instruction-grid > * { min-width: 0; }
     .sidebar { position: sticky; top: 82px; align-self: start; max-height: calc(100vh - 104px); overflow: auto; }
     .toc { display: grid; gap: 4px; margin-top: 14px; }
     .toc a { padding: 7px 9px; border-left: 3px solid var(--cp-border); color: var(--cp-text-muted); text-decoration: none; font-size: 13px; }
@@ -240,9 +348,13 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#course-content">Skip to course content</a>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark">A</span><span>AIBAST manual workshop</span></div>
-    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button> <a class="button primary" href="exports/wealth-insights-generator-source.zip">Download source bundle</a></div>
+    <div class="topbar-identity">
+      <div class="brand"><span class="brand-mark">A</span><span>AIBAST manual workshop</span></div>
+      <a class="academy-breadcrumb" href="../../academy.html#course/wealth-insights-generator">Academy / Wealth Insights Generator Agent</a>
+    </div>
+    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button> <a class="button" href="quest.html">Back to workshop</a><a class="button primary" href="exports/wealth-insights-generator-source.zip">Download source bundle</a></div>
   </header>
   <div class="layout">
     <aside class="sidebar">
@@ -271,12 +383,13 @@
 <a href="#step-19">19. Pass WIG-05: Wealth Advisor</a>
 <a href="#step-20">20. Confirm Draft and stop before publish</a></nav>
     </aside>
-    <main>
+    <main id="course-content">
       <section class="hero">
         <p class="eyebrow">Manual mode · literal browser construction</p>
-        <h1>Build Wealth Insights Generator Agent manually.</h1>
+        <h1 id="course-title" tabindex="-1">Build Wealth Insights Generator Agent manually.</h1>
         <p class="lede">No PAC CLI, YAML import, or plugin architect. Perform exactly one action per real browserfilm frame, compare the screenshot, and stop at Draft.</p>
         <div class="notice"><strong>Synthetic disclosure:</strong> this is qualitative workflow evidence using packaged synthetic inputs. It is not a customer KPI or a live-system result.</div>
+        <div class="notice" data-storage-notice role="status" aria-live="polite" aria-atomic="true" hidden>Progress will remain available on this page, but it will not persist after you leave.</div>
         <div class="feedback-notice"><strong>Found something inaccurate?</strong> Use <em>Report an issue</em> on that step. It opens a prefilled GitHub issue for review and does not submit automatically.</div>
         <!-- No pending evidence. -->
       </section>
@@ -660,6 +773,32 @@ These phrases are acceptance evidence for the fixed synthetic cases. Preserve th
       const ACHIEVEMENT_WORKSHOP_SLUG = "wealth-insights-generator";
       const ACHIEVEMENT_BADGES = Object.freeze([{"id":"started","label":"Started","points":5},{"id":"local-proof","label":"Local proof","points":15},{"id":"draft-builder","label":"Draft builder","points":20},{"id":"preview-proven","label":"Preview proven","points":25},{"id":"workshop-complete","label":"Workshop complete","points":35},{"id":"hard-mode-complete","label":"Manual mode complete","points":50}]);
       const ACHIEVEMENT_BADGE_IDS = new Set(ACHIEVEMENT_BADGES.map((badge) => badge.id));
+      const achievementMemory = new Map();
+      const achievementStorage = globalThis.aibastWorkshopStorage || Object.freeze({
+        getItem(key) {
+          try {
+            const value = globalThis.localStorage?.getItem(key) ?? null;
+            if (value !== null) achievementMemory.set(key, value);
+            return value !== null
+              ? value
+              : achievementMemory.has(key)
+                ? achievementMemory.get(key)
+                : null;
+          } catch (_error) {
+            return achievementMemory.has(key) ? achievementMemory.get(key) : null;
+          }
+        },
+        setItem(key, value) {
+          const serialized = String(value);
+          achievementMemory.set(key, serialized);
+          try {
+            globalThis.localStorage?.setItem(key, serialized);
+            return true;
+          } catch (_error) {
+            return false;
+          }
+        },
+      });
 
       function emptyAchievementProfile() {
         return { score: 0, workshops: {}, updatedAt: null };
@@ -744,7 +883,7 @@ These phrases are acceptance evidence for the fixed synthetic cases. Preserve th
       function readAchievementProfile() {
         try {
           return sanitizeAchievementProfile(
-            JSON.parse(localStorage.getItem(ACHIEVEMENT_PROFILE_KEY) || "{}"),
+            JSON.parse(achievementStorage.getItem(ACHIEVEMENT_PROFILE_KEY) || "{}"),
           );
         } catch (_error) {
           return emptyAchievementProfile();
@@ -754,7 +893,7 @@ These phrases are acceptance evidence for the fixed synthetic cases. Preserve th
       function writeAchievementProfile(profile) {
         const clean = sanitizeAchievementProfile(profile);
         clean.updatedAt = new Date().toISOString();
-        localStorage.setItem(ACHIEVEMENT_PROFILE_KEY, JSON.stringify(clean));
+        achievementStorage.setItem(ACHIEVEMENT_PROFILE_KEY, JSON.stringify(clean));
         return clean;
       }
 
@@ -782,11 +921,14 @@ These phrases are acceptance evidence for the fixed synthetic cases. Preserve th
 
       function setAchievementWorkshopProgress(profile, mode, patch) {
         const workshop = ensureAchievementWorkshop(profile, mode);
-        workshop.progress = {
+        const nextProgress = {
           ...workshop.progress,
           ...patch,
           updatedAt: new Date().toISOString(),
         };
+        if (workshop.progress.easyComplete) nextProgress.easyComplete = true;
+        if (workshop.progress.hardComplete) nextProgress.hardComplete = true;
+        workshop.progress = nextProgress;
         return writeAchievementProfile(profile);
       }
 
@@ -818,48 +960,76 @@ These phrases are acceptance evidence for the fixed synthetic cases. Preserve th
       }
 
       const key = "aibast:wealth-insights-generator:manual-progress";
+      const storage = globalThis.aibastWorkshopStorage;
       const boxes = Array.from(document.querySelectorAll(".complete"));
       const label = document.getElementById("progress-label");
       const bar = document.getElementById("progress-bar");
       const achievementToast = document.getElementById("achievements-manual-toast");
+      storage.onUnavailable(() => {
+        document.querySelectorAll("[data-storage-notice]").forEach((notice) => {
+          notice.hidden = false;
+        });
+      });
       let saved = [];
       try {
-        const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+        const parsed = JSON.parse(storage.getItem(key) || "[]");
         saved = Array.isArray(parsed)
           ? parsed.filter((step) => typeof step === "string")
           : [];
       } catch (_error) {
         saved = [];
       }
+      const initialWorkshop =
+        readAchievementProfile().workshops[ACHIEVEMENT_WORKSHOP_SLUG];
+      let hardProgressActivated =
+        saved.length > 0 ||
+        (initialWorkshop?.progress?.hardChecked || 0) > 0 ||
+        initialWorkshop?.progress?.hardComplete === true;
       boxes.forEach((box) => {
         box.checked = saved.includes(box.dataset.step);
-        box.addEventListener("change", update);
+        box.addEventListener("change", () => {
+          if (box.checked) hardProgressActivated = true;
+          update({ persist: hardProgressActivated, announce: true });
+        });
       });
-      function update() {
+      function update({ persist = false, announce = false } = {}) {
         const done = boxes.filter((box) => box.checked).map((box) => box.dataset.step);
         const complete = boxes.length > 0 && done.length === boxes.length;
-        localStorage.setItem(key, JSON.stringify(done));
         label.textContent = `${done.length} of ${boxes.length} complete`;
         bar.style.width = boxes.length ? `${(done.length / boxes.length) * 100}%` : "0%";
+        if (!persist) return;
+        storage.setItem(key, JSON.stringify(done));
         let profile = readAchievementProfile();
-        if (done.length > 0 || profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG]) {
-          profile = setAchievementWorkshopProgress(profile, "hard", {
+        const existingHardComplete =
+          profile.workshops[ACHIEVEMENT_WORKSHOP_SLUG]?.progress?.hardComplete === true;
+        if (hardProgressActivated) {
+          const hardProgress = {
             hardChecked: done.length,
             hardTotal: boxes.length,
             hardComplete: complete,
-          });
+          };
+          if (existingHardComplete) hardProgress.hardComplete = true;
+          profile = setAchievementWorkshopProgress(profile, "hard", hardProgress);
           const badgeIds = [];
           if (done.length > 0) badgeIds.push("started");
           if (complete) badgeIds.push("hard-mode-complete");
           badgeIds.forEach((badgeId) => {
             const result = awardAchievement(profile, badgeId, "hard");
             profile = result.profile;
-            if (result.awarded && achievementToast) {
+            if (announce && result.awarded && achievementToast) {
               achievementToast.textContent =
                 `${result.awarded.label} earned: +${result.awarded.points} local achievement points.`;
             }
           });
         }
+      }
+      function resumeManualCourse() {
+        if (window.location.hash !== "#resume") return;
+        const next = boxes.find((box) => !box.checked);
+        const target = next || document.getElementById("course-title");
+        const scrollTarget = next?.closest(".step") || target;
+        scrollTarget?.scrollIntoView({ block: "center" });
+        target?.focus({ preventScroll: true });
       }
       document.querySelectorAll("[data-copy-target]").forEach((button) => {
         button.addEventListener("click", () => {
@@ -917,6 +1087,9 @@ Describe what was inaccurate or missing.
         });
       });
       update();
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(resumeManualCourse);
+      });
     })();
   </script>
 </body>
