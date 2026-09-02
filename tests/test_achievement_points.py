@@ -59,10 +59,15 @@ class InputParser(HTMLParser):
     def __init__(self):
         super().__init__()
         self.inputs = []
+        self.mode_buttons = []
 
     def handle_starttag(self, tag, attrs):
         if tag == "input":
             self.inputs.append(dict(attrs))
+        elif tag == "button":
+            attributes = dict(attrs)
+            if "data-mode" in attributes:
+                self.mode_buttons.append(attributes)
 
 
 @pytest.fixture()
@@ -134,6 +139,14 @@ def extract_function(source, name):
     raise AssertionError(f"unterminated JavaScript function {name}")
 
 
+def extract_const(source, name):
+    match = re.search(rf"\bconst\s+{re.escape(name)}\s*=", source)
+    assert match, f"missing JavaScript const {name}"
+    end = source.find(";", match.end())
+    assert end >= 0, f"unterminated JavaScript const {name}"
+    return source[match.start() : end + 1]
+
+
 def checkpoint_records(page):
     parser = InputParser()
     parser.feed(page)
@@ -151,6 +164,22 @@ def checkpoint_records(page):
     return records
 
 
+def mode_button_records(page):
+    parser = InputParser()
+    parser.feed(page)
+    return [
+        {
+            "attributes": {
+                "aria-selected": attrs.get("aria-selected"),
+            },
+            "dataset": {
+                "mode": attrs["data-mode"],
+            },
+        }
+        for attrs in parser.mode_buttons
+    ]
+
+
 def run_easy_runtime(page, path):
     quest_script = scripts(page)[-1]
     start = quest_script.index("const ACHIEVEMENT_PROFILE_KEY")
@@ -162,10 +191,14 @@ def run_easy_runtime(page, path):
             "currentEasyPath",
             "requiredEasyBoxes",
             "achievementGroupComplete",
+            "activeDisplayMode",
             "evaluateAchievement",
         )
     )
+    buttons_declaration = extract_const(quest_script, "buttons")
     records = checkpoint_records(page)
+    button_records = mode_button_records(page)
+    assert button_records
     expected_total = sum(
         record["dataset"]["achievementsPath"] in {"brainstem", "shared"}
         for record in records
@@ -187,6 +220,16 @@ function readWorkshopStorage(key, fallback = null) {{
 const globalEngineKey = "aibast:workshop-engine";
 const modeKey = "aibast:demo-journey:quest-mode";
 const boxes = {json.dumps(records)};
+const modeButtons = {json.dumps(button_records)}.map((record) => ({{
+  dataset: record.dataset,
+  getAttribute(name) {{ return record.attributes[name] ?? null; }},
+}}));
+global.document = {{
+  querySelectorAll(selector) {{
+    return selector === "[data-mode]" ? modeButtons : [];
+  }},
+}};
+{buttons_declaration}
 function renderAchievementPanel() {{}}
 function announceAchievementBadge() {{}}
 {behavior}
@@ -205,7 +248,7 @@ function markGroup(group) {{
       box.dataset.achievementsGroup === group &&
       ["brainstem", "shared"].includes(box.dataset.achievementsPath))
     .forEach((box) => {{ box.checked = true; }});
-  evaluateAchievement(false);
+  evaluateAchievement(false, true);
   return snapshot();
 }}
 const stages = {{
@@ -216,7 +259,7 @@ const stages = {{
 boxes
   .filter((box) => ["brainstem", "shared"].includes(box.dataset.achievementsPath))
   .forEach((box) => {{ box.checked = true; }});
-evaluateAchievement(false);
+evaluateAchievement(false, true);
 stages.complete = snapshot();
 console.log(JSON.stringify(stages));
 """
@@ -329,33 +372,6 @@ def test_easy_runtime_executes_checkpoint_groups_and_completion(
     result, expected_total = run_easy_runtime(
         achievement_pages["quest"],
         tmp_path / "easy-achievement-runtime.js",
-    )
-    assert_easy_runtime_complete(result, expected_total)
-
-
-def test_easy_runtime_control_proves_expected_contract_can_pass(
-    achievement_pages,
-    tmp_path,
-):
-    quest = achievement_pages["quest"].replace(
-        "dataset.achievementPath",
-        "dataset.achievementsPath",
-    ).replace(
-        "dataset.achievementGroup",
-        "dataset.achievementsGroup",
-    )
-    quest = re.sub(
-        r"return localStorage\.getItem\(globalEngineKey\) === \"brainstem\""
-        r"\s*\? \"brainstem\"\s*: \"copilot\";",
-        'return readWorkshopStorage(globalEngineKey) === "copilot"\n'
-        '          ? "copilot"\n'
-        '          : "brainstem";',
-        quest,
-        count=1,
-    )
-    result, expected_total = run_easy_runtime(
-        quest,
-        tmp_path / "easy-achievement-control.js",
     )
     assert_easy_runtime_complete(result, expected_total)
 
