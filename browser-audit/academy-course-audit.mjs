@@ -345,6 +345,28 @@ async function profileState(page, slug) {
   }, slug);
 }
 
+async function completeEasyCourse(page, baseUrl, slug) {
+  await page.goto(
+    `${baseUrl}/solutions/${slug}/quest.html`,
+    { waitUntil: "domcontentloaded" },
+  );
+  await settle(page);
+  const required = page.locator(
+    '[data-checkpoint][data-achievements-path="brainstem"], '
+    + '[data-checkpoint][data-achievements-path="shared"]',
+  );
+  const total = await required.count();
+  for (let index = 0; index < total; index += 1) {
+    const checkbox = required.nth(index);
+    if (!(await checkbox.isChecked())) await checkbox.check();
+  }
+  await settle(page);
+  return {
+    total,
+    profile: await profileState(page, slug),
+  };
+}
+
 async function checkGroup(page, group) {
   const locator = page.locator(
     `[data-checkpoint][data-achievements-group="${group}"]`
@@ -693,6 +715,297 @@ async function auditManualTransition(browser, baseUrl, slug) {
   await context.close();
 }
 
+async function auditAcademyManualResumeLifecycle(browser, baseUrl, slug) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  await context.addInitScript(() => {
+    localStorage.setItem("aibast:workshop-engine", "brainstem");
+  });
+  const questPage = await context.newPage();
+  const questErrors = pageErrorCollector(questPage);
+  const easy = await completeEasyCourse(questPage, baseUrl, slug);
+  record(
+    "Manual resume lifecycle starts from real Easy completion",
+    easy.total > 0
+      && easy.profile.workshop?.progress?.easyComplete === true,
+    JSON.stringify(easy),
+  );
+
+  const manualPage = await context.newPage();
+  const manualErrors = pageErrorCollector(manualPage);
+  await manualPage.goto(
+    `${baseUrl}/solutions/${slug}/manual-tutorial.html`,
+    { waitUntil: "domcontentloaded" },
+  );
+  await settle(manualPage);
+  const manualBoxes = manualPage.locator(".complete[data-step]");
+  const manualTotal = await manualBoxes.count();
+  if (manualTotal > 0) await manualBoxes.first().check();
+  await settle(manualPage);
+  const manualProgress = await profileState(manualPage, slug);
+  record(
+    "standalone Manual step creates real Hard progress",
+    manualTotal > 1
+      && manualProgress.workshop?.mode === "hard"
+      && manualProgress.workshop?.progress?.hardChecked === 1
+      && manualProgress.workshop?.progress?.hardTotal === manualTotal
+      && manualProgress.workshop?.progress?.easyComplete === true,
+    JSON.stringify({ manualTotal, manualProgress }),
+  );
+
+  const academyPage = await context.newPage();
+  const academyErrors = pageErrorCollector(academyPage);
+  await academyPage.goto(`${baseUrl}/academy.html`, {
+    waitUntil: "domcontentloaded",
+  });
+  await academyPage.waitForFunction(() => (
+    document.getElementById("courseGrid")?.getAttribute("aria-busy") === "false"
+  ));
+  await settle(academyPage);
+  const academy = await academyPage.evaluate((workshopSlug) => {
+    const describe = (anchor) => {
+      if (!anchor) return null;
+      const url = new URL(anchor.href, document.baseURI);
+      return {
+        text: (anchor.textContent || "").trim(),
+        pathname: url.pathname,
+        hash: url.hash,
+      };
+    };
+    const activeTitle = [...document.querySelectorAll(
+      "#activeCourseList a[data-course-link]",
+    )].find((anchor) => anchor.dataset.courseLink === workshopSlug);
+    const completedTitle = [...document.querySelectorAll(
+      "#completedCourseList a[data-course-link]",
+    )].find((anchor) => anchor.dataset.courseLink === workshopSlug);
+    const activeItem = activeTitle?.closest(".learning-course") || null;
+    const catalogTitle = [...document.querySelectorAll(
+      "#courseGrid .course-card h3 a[data-course-link]",
+    )].find((anchor) => anchor.dataset.courseLink === workshopSlug);
+    const catalogCard = catalogTitle?.closest(".course-card") || null;
+    return {
+      activeListed: Boolean(activeTitle),
+      completedListed: Boolean(completedTitle),
+      activeAction: describe(activeItem?.querySelector("a.button")),
+      catalogAction: describe(
+        catalogCard?.querySelector(".course-actions a.button.primary"),
+      ),
+      continueAction: describe(document.getElementById("continueAction")),
+    };
+  }, slug);
+  const expectedPath = `/solutions/${slug}/manual-tutorial.html`;
+  const isResumeManual = (action) => (
+    action?.text === "Resume Manual"
+    && action.pathname === expectedPath
+    && action.hash === "#resume"
+  );
+  record(
+    "Academy classifies Easy-complete Manual progress as Active",
+    academy.activeListed && !academy.completedListed,
+    JSON.stringify(academy),
+  );
+  record(
+    "Academy Active list action is Resume Manual",
+    isResumeManual(academy.activeAction),
+    JSON.stringify(academy.activeAction),
+  );
+  record(
+    "Academy primary actions resume standalone Manual",
+    isResumeManual(academy.catalogAction)
+      && isResumeManual(academy.continueAction),
+    JSON.stringify({
+      catalog: academy.catalogAction,
+      continue: academy.continueAction,
+    }),
+  );
+
+  let followed = false;
+  let resumeState = null;
+  if (isResumeManual(academy.continueAction)) {
+    await Promise.all([
+      academyPage.waitForURL(
+        (url) => (
+          url.pathname === expectedPath
+          && url.hash === "#resume"
+        ),
+      ),
+      academyPage.locator("#continueAction").click(),
+    ]);
+    await settle(academyPage);
+    followed = true;
+    resumeState = await academyPage.evaluate(() => {
+      const boxes = [...document.querySelectorAll(".complete[data-step]")];
+      const next = boxes.find((box) => !box.checked) || null;
+      return {
+        total: boxes.length,
+        firstChecked: boxes[0]?.checked === true,
+        nextStep: next?.dataset.step || null,
+        focusedStep: document.activeElement?.dataset?.step || null,
+        focused: document.activeElement === next,
+      };
+    });
+  }
+  record(
+    "Academy Resume Manual action follows manual-tutorial.html#resume",
+    followed,
+    JSON.stringify(academy.continueAction),
+  );
+  record(
+    "Academy Resume Manual focuses the next standalone step",
+    resumeState?.total === manualTotal
+      && resumeState?.firstChecked === true
+      && resumeState?.nextStep === "2"
+      && resumeState?.focusedStep === "2"
+      && resumeState?.focused === true,
+    JSON.stringify(resumeState),
+  );
+  record(
+    "Academy Manual resume lifecycle has no uncaught errors",
+    [...questErrors, ...manualErrors, ...academyErrors].length === 0,
+    [...questErrors, ...manualErrors, ...academyErrors].join(" | "),
+  );
+  await context.close();
+}
+
+async function auditQuestStandaloneManualRefresh(browser, baseUrl, slug) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  await context.addInitScript(() => {
+    localStorage.setItem("aibast:workshop-engine", "brainstem");
+  });
+  const questPage = await context.newPage();
+  const questErrors = pageErrorCollector(questPage);
+  const easy = await completeEasyCourse(questPage, baseUrl, slug);
+  record(
+    "cross-tab Manual refresh starts Easy-complete",
+    easy.total > 0
+      && easy.profile.workshop?.progress?.easyComplete === true,
+    JSON.stringify(easy),
+  );
+  const before = easy.profile;
+
+  await questPage.locator('[role="tab"][data-mode="hard"]').click();
+  await settle(questPage);
+  const initial = await questPage.evaluate(() => {
+    const boxes = [...document.querySelectorAll(
+      '[data-path="hard"] .complete[data-step]',
+    )];
+    return {
+      total: boxes.length,
+      checked: boxes.filter((box) => box.checked).length,
+      label: document.getElementById("hard-progress-label")?.textContent?.trim()
+        || "",
+    };
+  });
+  record(
+    "embedded Manual initial display uses actual step total",
+    initial.total > 1
+      && initial.checked === 0
+      && initial.label === `0 of ${initial.total} complete`
+      && initial.label !== "0 of 0 complete",
+    JSON.stringify(initial),
+  );
+
+  const manualPage = await context.newPage();
+  const manualErrors = pageErrorCollector(manualPage);
+  await manualPage.goto(
+    `${baseUrl}/solutions/${slug}/manual-tutorial.html`,
+    { waitUntil: "domcontentloaded" },
+  );
+  await settle(manualPage);
+  const standaloneTotal = await manualPage.locator(
+    ".complete[data-step]",
+  ).count();
+  if (standaloneTotal > 0) {
+    await manualPage.locator('.complete[data-step="1"]').check();
+  }
+  await settle(manualPage);
+  const standalone = await manualPage.evaluate((workshopSlug) => {
+    const profile = JSON.parse(
+      globalThis.aibastWorkshopStorage.getItem(
+        "aibast:achievement-profile:v1",
+      ) || "{}",
+    );
+    return {
+      label: document.getElementById("progress-label")?.textContent?.trim() || "",
+      workshop: profile.workshops?.[workshopSlug] || null,
+      score: profile.score || 0,
+      achievements: Object.keys(
+        profile.workshops?.[workshopSlug]?.achievements || {},
+      ).filter(
+        (id) => profile.workshops[workshopSlug].achievements[id]?.earned,
+      ).sort(),
+    };
+  }, slug);
+  record(
+    "standalone Manual tab persists exactly step 1",
+    standaloneTotal === initial.total
+      && standalone.label === `1 of ${standaloneTotal} complete`
+      && standalone.workshop?.progress?.hardChecked === 1
+      && standalone.workshop?.progress?.hardTotal === standaloneTotal,
+    JSON.stringify(standalone),
+  );
+  record(
+    "standalone Manual step preserves Easy completion without duplicate awards",
+    standalone.workshop?.progress?.easyComplete === true
+      && standalone.score === before.score
+      && JSON.stringify(standalone.achievements)
+        === JSON.stringify(before.achievements),
+    JSON.stringify({ before, standalone }),
+  );
+
+  await manualPage.close();
+  await questPage.bringToFront();
+  await questPage.evaluate(() => {
+    window.dispatchEvent(new Event("focus"));
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await settle(questPage);
+  const refreshed = await questPage.evaluate((workshopSlug) => {
+    const boxes = [...document.querySelectorAll(
+      '[data-path="hard"] .complete[data-step]',
+    )];
+    const profile = JSON.parse(
+      globalThis.aibastWorkshopStorage.getItem(
+        "aibast:achievement-profile:v1",
+      ) || "{}",
+    );
+    const workshop = profile.workshops?.[workshopSlug] || null;
+    return {
+      total: boxes.length,
+      checked: boxes.filter((box) => box.checked).length,
+      firstChecked: boxes[0]?.checked === true,
+      label: document.getElementById("hard-progress-label")?.textContent?.trim()
+        || "",
+      workshop,
+      score: profile.score || 0,
+      achievements: Object.keys(workshop?.achievements || {})
+        .filter((id) => workshop.achievements[id]?.earned)
+        .sort(),
+    };
+  }, slug);
+  record(
+    "quest refreshes embedded Manual checkbox and progress on return",
+    refreshed.total === initial.total
+      && refreshed.checked === 1
+      && refreshed.firstChecked === true
+      && refreshed.label === `1 of ${initial.total} complete`,
+    JSON.stringify(refreshed),
+  );
+  record(
+    "quest cross-tab refresh preserves Easy completion and award identity",
+    refreshed.workshop?.progress?.easyComplete === true
+      && refreshed.score === before.score
+      && JSON.stringify(refreshed.achievements)
+        === JSON.stringify(before.achievements),
+    JSON.stringify({ before, refreshed }),
+  );
+  record(
+    "quest standalone Manual refresh has no uncaught errors",
+    [...questErrors, ...manualErrors].length === 0,
+    [...questErrors, ...manualErrors].join(" | "),
+  );
+  await context.close();
+}
+
 async function auditResume(browser, baseUrl, slug) {
   const context = await browser.newContext({ viewport: { width: 1024, height: 900 } });
   await context.addInitScript((workshopSlug) => {
@@ -832,6 +1145,8 @@ async function auditRepresentativeRuntime(browser, baseUrl, slugs) {
   await auditAchievementRuntime(browser, baseUrl, slug);
   await auditStorageDenial(browser, baseUrl, slug);
   await auditManualTransition(browser, baseUrl, slug);
+  await auditAcademyManualResumeLifecycle(browser, baseUrl, slug);
+  await auditQuestStandaloneManualRefresh(browser, baseUrl, slug);
   await auditResume(browser, baseUrl, slug);
   await auditTabs(browser, baseUrl, slug);
 }

@@ -1000,5 +1000,10 @@ def test_playwright_academy_gate_is_exact_and_fail_closed():
     assert "document.documentElement.scrollWidth" in source
     assert "result.overflow === 0" in source
     assert 'target.getAttribute("tabindex") === "-1"' in source
+    assert "auditAcademyManualResumeLifecycle" in source
+    assert "Academy classifies Easy-complete Manual progress as Active" in source
+    assert "Academy Resume Manual focuses the next standalone step" in source
+    assert "embedded Manual initial display uses actual step total" in source
+    assert "quest refreshes embedded Manual checkbox and progress on return" in source
     assert "A Chromium-compatible browser is required" in source
     assert "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" in source
