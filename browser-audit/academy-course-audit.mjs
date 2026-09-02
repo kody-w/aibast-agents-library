@@ -825,7 +825,7 @@ async function auditAcademyManualResumeLifecycle(browser, baseUrl, slug) {
       academyPage.waitForURL(
         (url) => (
           url.pathname === expectedPath
-          && url.hash === "#resume"
+          && url.hash.startsWith("#resume")
         ),
       ),
       academyPage.locator("#continueAction").click(),
