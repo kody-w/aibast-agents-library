@@ -1,6 +1,7 @@
 {
  "cdn": {
-  "2026-08-06": 388
+  "2026-08-06": 388,
+  "2026-09-02": 26
  },
  "clones": {
   "2026-07-26": {
@@ -150,50 +151,52 @@
   "2026-08-31": {
    "count": 24,
    "uniques": 12
+  },
+  "2026-09-01": {
+   "count": 54,
+   "uniques": 20
+  },
+  "2026-09-02": {
+   "count": 152,
+   "uniques": 20
   }
  },
  "installer_assets": {
   "community_rapp-install.ps1": {
-   "all_time": 3,
-   "last": 3
+   "all_time": 5,
+   "last": 5
   },
   "community_rapp-install.sh": {
-   "all_time": 4,
-   "last": 4
+   "all_time": 6,
+   "last": 6
   },
   "install.ps1": {
-   "all_time": 3,
-   "last": 3
+   "all_time": 10,
+   "last": 10
   }
  },
  "last_known": {
-  "at": "2026-09-02T05:33:47Z",
-  "clone_uniques_14d": 176,
-  "clones_14d": 2344,
+  "at": "2026-09-04T05:30:08Z",
+  "clone_uniques_14d": 164,
+  "clones_14d": 2215,
   "paths": [
    {
-    "count": 61,
+    "count": 48,
     "path": "/microsoft/aibast-agents-library",
     "title": "Overview",
-    "uniques": 20
+    "uniques": 22
    },
    {
-    "count": 29,
+    "count": 28,
     "path": "/microsoft/aibast-agents-library/pull/170",
     "title": "/pull/170",
-    "uniques": 1
-   },
-   {
-    "count": 10,
-    "path": "/microsoft/aibast-agents-library/issues",
-    "title": "/issues",
-    "uniques": 8
+    "uniques": 2
    },
    {
     "count": 8,
-    "path": "/microsoft/aibast-agents-library/issues/177",
-    "title": "/issues/177",
-    "uniques": 2
+    "path": "/microsoft/aibast-agents-library/tree/main/skills",
+    "title": "/tree/main/skills",
+    "uniques": 3
    },
    {
     "count": 8,
@@ -202,56 +205,62 @@
     "uniques": 1
    },
    {
-    "count": 6,
+    "count": 7,
+    "path": "/microsoft/aibast-agents-library/issues",
+    "title": "/issues",
+    "uniques": 6
+   },
+   {
+    "count": 7,
+    "path": "/microsoft/aibast-agents-library/issues/177",
+    "title": "/issues/177",
+    "uniques": 1
+   },
+   {
+    "count": 3,
+    "path": "/microsoft/aibast-agents-library/tree/main",
+    "title": "/tree/main",
+    "uniques": 3
+   },
+   {
+    "count": 3,
+    "path": "/microsoft/aibast-agents-library/tree/main/solutions/fraud-detection-alert",
+    "title": "/tree/main/solutions/fraud-detection-alert",
+    "uniques": 1
+   },
+   {
+    "count": 2,
+    "path": "/microsoft/aibast-agents-library/issues/new",
+    "title": "/issues/new",
+    "uniques": 2
+   },
+   {
+    "count": 2,
     "path": "/microsoft/aibast-agents-library/pulls",
     "title": "/pulls",
-    "uniques": 4
-   },
-   {
-    "count": 6,
-    "path": "/microsoft/aibast-agents-library/pull/180",
-    "title": "/pull/180",
-    "uniques": 3
-   },
-   {
-    "count": 5,
-    "path": "/microsoft/aibast-agents-library/tree/main/skills",
-    "title": "/tree/main/skills",
-    "uniques": 3
-   },
-   {
-    "count": 4,
-    "path": "/microsoft/aibast-agents-library/tree/main/agents/@aibast-agents-library",
-    "title": "/tree/main/agents/@aibast-agents-library",
-    "uniques": 3
-   },
-   {
-    "count": 4,
-    "path": "/microsoft/aibast-agents-library/blob/main/agents/@aibast-agents-library/general_stacks/ai_customer_assistant_stack/ai_customer_assistant_agent.py",
-    "title": "/blob/main/agents/@aibast-agents-library/general_stacks/ai_customer_assistant_stack/ai_customer_assistant_agent.py",
     "uniques": 2
    }
   ],
-  "paths_at": "2026-09-02T05:33:47Z",
+  "paths_at": "2026-09-04T05:30:08Z",
   "referrers": [
    {
-    "count": 129,
+    "count": 83,
     "referrer": "github.com",
     "uniques": 10
    },
    {
-    "count": 53,
+    "count": 33,
     "referrer": "microsoft.github.io",
     "uniques": 5
    },
    {
-    "count": 9,
+    "count": 7,
     "referrer": "Google",
-    "uniques": 6
+    "uniques": 4
    }
   ],
-  "view_uniques_14d": 41,
-  "views_14d": 307
+  "view_uniques_14d": 37,
+  "views_14d": 166
  },
  "snapshots": [
   {
@@ -847,14 +856,58 @@
    "installer_release_downloads_all_time": 10,
    "view_uniques_all_time": 127,
    "views_all_time": 686
+  },
+  {
+   "at": "2026-09-03T05:45:01Z",
+   "cdn_all_time": 388,
+   "clone_uniques_all_time": 793,
+   "clones_all_time": 4525,
+   "days_tracked": 38,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 13,
+   "view_uniques_all_time": 134,
+   "views_all_time": 701
+  },
+  {
+   "at": "2026-09-03T05:51:02Z",
+   "cdn_all_time": 388,
+   "clone_uniques_all_time": 793,
+   "clones_all_time": 4525,
+   "days_tracked": 38,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 13,
+   "view_uniques_all_time": 134,
+   "views_all_time": 701
+  },
+  {
+   "at": "2026-09-04T05:16:56Z",
+   "cdn_all_time": 414,
+   "clone_uniques_all_time": 793,
+   "clones_all_time": 4525,
+   "days_tracked": 38,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 18,
+   "view_uniques_all_time": 134,
+   "views_all_time": 701
+  },
+  {
+   "at": "2026-09-04T05:30:01Z",
+   "cdn_all_time": 414,
+   "clone_uniques_all_time": 813,
+   "clones_all_time": 4677,
+   "days_tracked": 39,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 21,
+   "view_uniques_all_time": 138,
+   "views_all_time": 714
   }
  ],
  "tracking": {
-  "cdn_last": "2026-09-02",
+  "cdn_last": "2026-09-04",
   "cdn_since": "2026-08-06",
-  "clones_last": "2026-09-02",
+  "clones_last": "2026-09-04",
   "clones_since": "2026-07-26",
-  "views_last": "2026-09-02",
+  "views_last": "2026-09-04",
   "views_since": "2026-07-26"
  },
  "views": {
@@ -1005,6 +1058,14 @@
   "2026-08-31": {
    "count": 4,
    "uniques": 3
+  },
+  "2026-09-01": {
+   "count": 15,
+   "uniques": 7
+  },
+  "2026-09-02": {
+   "count": 13,
+   "uniques": 4
   }
  }
 }
