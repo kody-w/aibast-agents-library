@@ -403,6 +403,92 @@ class PagesBuilderFixtureTests(unittest.TestCase):
                 pages.build_site(root, root / "_site", OWNER, REPO, REF)
 
 
+INSTALLER_SH = (
+    "#!/bin/bash\n"
+    "# Usage: curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash\n"
+    'REPO_URL="${BRAINSTEM_REPO_URL:-https://github.com/microsoft/aibast-agents-library.git}"\n'
+    'REPO_REF="${BRAINSTEM_REPO_REF:-main}"\n'
+    'REMOTE_VERSION_URL="${BRAINSTEM_VERSION_URL:-https://raw.githubusercontent.com/'
+    'microsoft/aibast-agents-library/main/rapp_brainstem/VERSION}"\n'
+)
+INSTALLER_PS1 = (
+    "\ufeff# Usage: irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex\r\n"
+    '$REPO_URL = if ($env:BRAINSTEM_REPO_URL) { $env:BRAINSTEM_REPO_URL } else { "https://github.com/microsoft/aibast-agents-library.git" }\r\n'
+    '$REPO_REF = if ($env:BRAINSTEM_REPO_REF) { $env:BRAINSTEM_REPO_REF } else { "main" }\r\n'
+    '$REMOTE_VERSION_URL = if ($env:BRAINSTEM_VERSION_URL) { $env:BRAINSTEM_VERSION_URL } else { "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/VERSION" }\r\n'
+)
+INSTALLER_CMD = (
+    '@echo off\r\n'
+    'powershell -ExecutionPolicy Bypass -Command "& { irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex }"\r\n'
+)
+
+
+def write_installers(root: Path) -> None:
+    for prefix in ("", "docs/"):
+        write_text(root, f"{prefix}install.sh", INSTALLER_SH)
+        write_bytes(root, f"{prefix}install.ps1", INSTALLER_PS1.encode("utf-8"))
+        write_bytes(root, f"{prefix}install.cmd", INSTALLER_CMD.encode("utf-8"))
+
+
+class RingInstallerRenderTests(unittest.TestCase):
+    """The published one-liner must install the ring that serves it."""
+
+    def test_production_identity_leaves_installers_byte_identical(self):
+        with fixture_root() as root:
+            write_installers(root)
+            output = root / "_site"
+            manifest = pages.build_site(
+                root, output, pages.CANONICAL_OWNER, pages.CANONICAL_REPO, REF,
+                ring_branch=pages.CANONICAL_BRANCH,
+            )
+            self.assertEqual(manifest["ring"], {"branch": "main", "rendered_installers": []})
+            for name in ("install.sh", "install.ps1", "install.cmd", "docs/install.sh"):
+                self.assertEqual((output / name).read_bytes(), (root / name).read_bytes())
+
+    def test_staging_ring_renders_every_installer_to_the_fork(self):
+        with fixture_root() as root:
+            write_installers(root)
+            output = root / "_site"
+            manifest = pages.build_site(
+                root, output, "staging-owner", "staging-repo", REF, ring_branch="staging"
+            )
+            self.assertEqual(manifest["ring"]["branch"], "staging")
+            self.assertEqual(
+                manifest["ring"]["rendered_installers"],
+                ["docs/install.cmd", "docs/install.ps1", "docs/install.sh",
+                 "install.cmd", "install.ps1", "install.sh"],
+            )
+            sh = (output / "install.sh").read_text(encoding="utf-8")
+            self.assertIn('REPO_URL="${BRAINSTEM_REPO_URL:-https://github.com/staging-owner/staging-repo.git}"', sh)
+            self.assertIn('REPO_REF="${BRAINSTEM_REPO_REF:-staging}"', sh)
+            self.assertIn("https://raw.githubusercontent.com/staging-owner/staging-repo/staging/rapp_brainstem/VERSION", sh)
+            self.assertIn("https://staging-owner.github.io/staging-repo/install.sh", sh)
+            self.assertNotIn("microsoft/aibast-agents-library", sh)
+            ps1 = (output / "install.ps1").read_bytes()
+            self.assertTrue(ps1.startswith("\ufeff".encode("utf-8")), "BOM must survive rendering")
+            self.assertIn(b'else { "https://github.com/staging-owner/staging-repo.git" }', ps1)
+            self.assertIn(b'else { "staging" }', ps1)
+            self.assertIn(b"\r\n", ps1, "CRLF must survive rendering")
+            cmd = (output / "install.cmd").read_text(encoding="utf-8")
+            self.assertIn("https://raw.githubusercontent.com/staging-owner/staging-repo/staging/install.ps1", cmd)
+            self.assertEqual((output / "docs/install.sh").read_bytes(), (output / "install.sh").read_bytes())
+            # Source files are never touched.
+            self.assertEqual((root / "install.sh").read_text(encoding="utf-8"), INSTALLER_SH)
+
+    def test_installer_refactor_that_drops_the_default_fails_the_build(self):
+        with fixture_root() as root:
+            write_installers(root)
+            write_text(root, "install.sh", INSTALLER_SH.replace('REPO_REF="${BRAINSTEM_REPO_REF:-main}"', 'REPO_REF=main'))
+            with self.assertRaisesRegex(pages.BuildError, "install.sh no longer contains"):
+                pages.build_site(root, root / "_site", "staging-owner", "staging-repo", REF, ring_branch="staging")
+
+    def test_invalid_ring_branch_is_refused(self):
+        with fixture_root() as root:
+            write_installers(root)
+            with self.assertRaisesRegex(pages.BuildError, "Invalid GitHub branch"):
+                pages.build_site(root, root / "_site", "staging-owner", "staging-repo", REF, ring_branch="../evil")
+
+
 class FullRepositoryArtifactTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -496,6 +582,19 @@ class FullRepositoryArtifactTests(unittest.TestCase):
 
     def test_complete_artifact_has_no_broken_relative_links(self):
         self.assertEqual(pages.validate_html_links(self.site), [])
+
+    def test_served_installers_match_the_manifest_ring(self):
+        manifest = json.loads((self.site / pages.MANIFEST_NAME).read_text(encoding="utf-8"))
+        ring = manifest["ring"]
+        owner, repo = manifest["source"]["owner"], manifest["source"]["repo"]
+        sh = (self.site / "install.sh").read_text(encoding="utf-8")
+        self.assertIn(f'REPO_URL="${{BRAINSTEM_REPO_URL:-https://github.com/{owner}/{repo}.git}}"', sh)
+        self.assertIn(f'REPO_REF="${{BRAINSTEM_REPO_REF:-{ring["branch"]}}}"', sh)
+        self.assertEqual((self.site / "docs/install.sh").read_bytes(), (self.site / "install.sh").read_bytes())
+        if (owner, repo, ring["branch"]) == (pages.CANONICAL_OWNER, pages.CANONICAL_REPO, pages.CANONICAL_BRANCH):
+            self.assertEqual(ring["rendered_installers"], [])
+        else:
+            self.assertIn("install.sh", ring["rendered_installers"])
 
     def test_library_dynamic_solution_download_uses_immutable_raw_url(self):
         library = (self.site / "library.html").read_text(encoding="utf-8")

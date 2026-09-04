@@ -70,6 +70,24 @@ BETA_PUBLIC_FILES = frozenset(
         "beta/ui/show-mode-tour.js",
     }
 )
+# The installers are vendored with the production identity baked in. When the
+# artifact is built for any other ring (a staging fork, or a non-main branch),
+# their defaults are rendered to that ring so the served one-liner installs the
+# ring's own kernel. The repository files themselves are never modified.
+CANONICAL_OWNER = "microsoft"
+CANONICAL_REPO = "aibast-agents-library"
+CANONICAL_BRANCH = "main"
+INSTALLER_PATHS = frozenset(
+    {
+        "install.sh",
+        "install.ps1",
+        "install.cmd",
+        "docs/install.sh",
+        "docs/install.ps1",
+        "docs/install.cmd",
+    }
+)
+
 RAPP_BRAINSTEM_PUBLIC_FILES = frozenset(
     {"rapp_brainstem/README.md", "rapp_brainstem/VERSION"}
 )
@@ -876,6 +894,89 @@ def prepare_html(
     return prepared, rewritten_count
 
 
+def _installer_substitutions(
+    suffix: str, owner: str, repo: str, branch: str
+) -> list[tuple[str, str, bool]]:
+    """(canonical text, ring text, required) for one installer flavour."""
+    canonical = f"{CANONICAL_OWNER}/{CANONICAL_REPO}"
+    ring = f"{owner}/{repo}"
+    subs: list[tuple[str, str, bool]] = [
+        (f"https://github.com/{canonical}.git", f"https://github.com/{ring}.git", suffix != ".cmd"),
+        (
+            f"https://raw.githubusercontent.com/{canonical}/{CANONICAL_BRANCH}/",
+            f"https://raw.githubusercontent.com/{ring}/{branch}/",
+            True,
+        ),
+        (
+            f"https://{CANONICAL_OWNER}.github.io/{CANONICAL_REPO}/",
+            f"https://{owner}.github.io/{repo}/",
+            False,
+        ),
+    ]
+    if suffix == ".sh":
+        subs.append(
+            (
+                'REPO_REF="${BRAINSTEM_REPO_REF:-' + CANONICAL_BRANCH + '}"',
+                'REPO_REF="${BRAINSTEM_REPO_REF:-' + branch + '}"',
+                True,
+            )
+        )
+    elif suffix == ".ps1":
+        subs.append(
+            (
+                '$REPO_REF = if ($env:BRAINSTEM_REPO_REF) { $env:BRAINSTEM_REPO_REF } else { "'
+                + CANONICAL_BRANCH
+                + '" }',
+                '$REPO_REF = if ($env:BRAINSTEM_REPO_REF) { $env:BRAINSTEM_REPO_REF } else { "'
+                + branch
+                + '" }',
+                True,
+            )
+        )
+    return subs
+
+
+def render_installer(
+    path: PurePosixPath, text: str, owner: str, repo: str, branch: str
+) -> str:
+    """Point an installer's defaults at the ring being published."""
+    for canonical, ring, required in _installer_substitutions(
+        path.suffix.lower(), owner, repo, branch
+    ):
+        if canonical not in text:
+            if required:
+                raise BuildError(
+                    f"Installer {path} no longer contains {canonical!r}; "
+                    "update the ring identity render before publishing"
+                )
+            continue
+        text = text.replace(canonical, ring)
+    return text
+
+
+def prepare_installers(
+    root: Path,
+    included: frozenset[PurePosixPath],
+    entries: dict[PurePosixPath, SourceEntry],
+    owner: str,
+    repo: str,
+    branch: str,
+) -> dict[PurePosixPath, bytes]:
+    if (owner, repo, branch) == (CANONICAL_OWNER, CANONICAL_REPO, CANONICAL_BRANCH):
+        return {}
+    prepared: dict[PurePosixPath, bytes] = {}
+    for path in sorted(included, key=lambda item: item.as_posix()):
+        if path.as_posix() not in INSTALLER_PATHS:
+            continue
+        source = _assert_regular_source(root, entries[path])
+        try:
+            text = source.read_bytes().decode("utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            raise BuildError(f"Could not read installer {path}: {exc}") from exc
+        prepared[path] = render_installer(path, text, owner, repo, branch).encode("utf-8")
+    return prepared
+
+
 def _assert_no_symlink_components(root: Path, candidate: Path) -> None:
     relative = candidate.relative_to(root)
     current = root
@@ -935,7 +1036,7 @@ def _copy_artifact(
     root: Path,
     output: Path,
     included: frozenset[PurePosixPath],
-    prepared_html: dict[PurePosixPath, bytes],
+    prepared: dict[PurePosixPath, bytes],
 ) -> None:
     output.mkdir(parents=True, exist_ok=False)
     for path in sorted(included, key=lambda item: item.as_posix()):
@@ -944,8 +1045,8 @@ def _copy_artifact(
         destination.parent.mkdir(parents=True, exist_ok=True)
         if source.is_symlink() or not source.is_file():
             raise BuildError(f"Source changed during build: {path}")
-        if path in prepared_html:
-            destination.write_bytes(prepared_html[path])
+        if path in prepared:
+            destination.write_bytes(prepared[path])
         else:
             shutil.copyfile(source, destination)
         destination.chmod(0o644)
@@ -962,12 +1063,18 @@ def _write_manifest(
     ref: str,
     rewritten_count: int,
     excluded: dict[str, dict[str, int]],
+    ring_branch: str = CANONICAL_BRANCH,
+    rendered_installers: Iterable[str] = (),
 ) -> dict[str, object]:
     artifact_files = sorted(path for path in output.rglob("*") if path.is_file())
     copied_bytes = sum(path.stat().st_size for path in artifact_files)
     manifest: dict[str, object] = {
         "schema": MANIFEST_SCHEMA,
         "source": {"owner": owner, "repo": repo, "ref": ref},
+        "ring": {
+            "branch": ring_branch,
+            "rendered_installers": sorted(rendered_installers),
+        },
         "file_count": len(artifact_files) + 1,
         "total_bytes": 0,
         "rewritten_link_count": rewritten_count,
@@ -1115,11 +1222,7 @@ def validate_artifact(output: Path, check_links: bool = True) -> dict[str, objec
     return manifest
 
 
-def _validate_source_identity(owner: str, repo: str, ref: str) -> None:
-    if not OWNER_REPO_RE.fullmatch(owner):
-        raise BuildError(f"Invalid GitHub owner: {owner!r}")
-    if not OWNER_REPO_RE.fullmatch(repo):
-        raise BuildError(f"Invalid GitHub repository: {repo!r}")
+def _validate_ref(ref: str, label: str = "ref") -> None:
     if (
         not ref
         or not REF_RE.fullmatch(ref)
@@ -1127,7 +1230,18 @@ def _validate_source_identity(owner: str, repo: str, ref: str) -> None:
         or ref.endswith("/")
         or ".." in ref.split("/")
     ):
-        raise BuildError(f"Invalid GitHub ref: {ref!r}")
+        raise BuildError(f"Invalid GitHub {label}: {ref!r}")
+
+
+def _validate_source_identity(
+    owner: str, repo: str, ref: str, ring_branch: str = CANONICAL_BRANCH
+) -> None:
+    if not OWNER_REPO_RE.fullmatch(owner):
+        raise BuildError(f"Invalid GitHub owner: {owner!r}")
+    if not OWNER_REPO_RE.fullmatch(repo):
+        raise BuildError(f"Invalid GitHub repository: {repo!r}")
+    _validate_ref(ref)
+    _validate_ref(ring_branch, "branch")
 
 
 def build_site(
@@ -1137,6 +1251,7 @@ def build_site(
     repo: str,
     ref: str,
     check_links: bool = True,
+    ring_branch: str = CANONICAL_BRANCH,
 ) -> dict[str, object]:
     root_input = Path(root_value).expanduser()
     if root_input.is_symlink():
@@ -1148,7 +1263,7 @@ def build_site(
     if not root.is_dir():
         raise BuildError(f"Repository root is not a directory: {root}")
 
-    _validate_source_identity(owner, repo, ref)
+    _validate_source_identity(owner, repo, ref, ring_branch)
     output = resolve_output_path(root, output_value)
     entries = collect_source_entries(root)
     entries = hydrate_excluded_sizes(root, entries, owner, repo, ref)
@@ -1157,12 +1272,24 @@ def build_site(
     prepared_html, rewritten_count = prepare_html(
         root, included, entries, owner, repo, ref
     )
+    prepared_installers = prepare_installers(
+        root, included, entries, owner, repo, ring_branch
+    )
 
     _clean_output(output)
     try:
-        _copy_artifact(root, output, included, prepared_html)
+        _copy_artifact(
+            root, output, included, {**prepared_html, **prepared_installers}
+        )
         _write_manifest(
-            output, owner, repo, ref, rewritten_count, excluded
+            output,
+            owner,
+            repo,
+            ref,
+            rewritten_count,
+            excluded,
+            ring_branch=ring_branch,
+            rendered_installers=[p.as_posix() for p in prepared_installers],
         )
         return validate_artifact(output, check_links=check_links)
     except Exception:
@@ -1178,6 +1305,15 @@ def parse_args(arguments: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--owner", required=True, help="GitHub repository owner")
     parser.add_argument("--repo", required=True, help="GitHub repository name")
     parser.add_argument("--ref", required=True, help="Immutable source ref or SHA")
+    parser.add_argument(
+        "--ring-branch",
+        default=CANONICAL_BRANCH,
+        help=(
+            "Branch the published installers should install from (default: main). "
+            "Any ring other than microsoft/aibast-agents-library@main gets its "
+            "installers rendered to that identity."
+        ),
+    )
     parser.add_argument(
         "--check-links",
         action=argparse.BooleanOptionalAction,
@@ -1197,12 +1333,19 @@ def main(arguments: Iterable[str] | None = None) -> int:
             args.repo,
             args.ref,
             check_links=args.check_links,
+            ring_branch=args.ring_branch,
         )
     except (BuildError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
     excluded = manifest["excluded"]
+    rendered = manifest["ring"]["rendered_installers"]
+    if rendered:
+        print(
+            f"Rendered {len(rendered)} installer(s) for "
+            f"{args.owner}/{args.repo}@{args.ring_branch}: {', '.join(rendered)}"
+        )
     print(
         f"Built {args.out}: {manifest['file_count']} files, "
         f"{manifest['total_bytes']} bytes, "

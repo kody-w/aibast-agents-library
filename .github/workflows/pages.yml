@@ -99,6 +99,7 @@ jobs:
           --owner "${{ github.repository_owner }}"
           --repo "${{ github.event.repository.name }}"
           --ref "${{ github.sha }}"
+          --ring-branch "${{ github.ref_name }}"
           --check-links
 
       - name: Run Pages artifact tests
