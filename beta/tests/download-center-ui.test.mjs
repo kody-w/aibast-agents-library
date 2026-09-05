@@ -6,8 +6,14 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const betaRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const page = readFileSync(path.join(betaRoot, "index.html"), "utf8");
-const downloadCenter = readFileSync(path.join(betaRoot, "download-center.js"), "utf8");
+const page = readFileSync(path.join(betaRoot, "index.html"), "utf8").replace(
+  /\r\n/g,
+  "\n",
+);
+const downloadCenter = readFileSync(
+  path.join(betaRoot, "download-center.js"),
+  "utf8",
+).replace(/\r\n/g, "\n");
 const scripts = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
 const style = page.match(/<style>([\s\S]*?)<\/style>/)?.[1] || "";
 const unsupportedWindowsArchitecture = `ARM${64}`;
@@ -378,6 +384,23 @@ test("download center UI checks reject representative regressions", () => {
       `mutation was not detected: ${mutation.expected}`,
     );
   }
+});
+
+test("download center UI checks are stable with CRLF source", () => {
+  const crlfPage = page.replace(/\n/g, "\r\n");
+  const normalizedPage = crlfPage.replace(/\r\n/g, "\n");
+  assert.equal(normalizedPage, page);
+  assert.deepEqual(validateDownloadCenter(normalizedPage), []);
+
+  const mutated = normalizedPage.replace(
+    "white-space: pre-wrap;",
+    "white-space: pre;",
+  );
+  assert.ok(
+    validateDownloadCenter(mutated).includes(
+      "mobile commands must wrap without horizontal overflow",
+    ),
+  );
 });
 
 test("all inline scripts remain valid JavaScript", () => {
