@@ -152,8 +152,11 @@ The dedicated Download Center-style GitHub Pages installer is published at
 release metadata, requirements, and installation guidance. The page resolves
 the latest `brainstem-beta-v*` release from the fork serving it, so staging and
 production remain separate. If that release includes packaged `.exe` or `.dmg`
-assets, the page labels each architecture, recommends a compatible package
-ahead of the source bootstrap, and keeps other published architectures visible.
+assets, the page exposes them only when one fenced
+`rapp-frontier-release-manifest` object binds the exact filename, platform,
+architecture, GitHub SHA-256 digest, verified signing identity, compatible
+runtime, and successful package gate. Missing or mismatched provenance fails
+closed to the source bootstrap.
 
 ### Windows 11
 

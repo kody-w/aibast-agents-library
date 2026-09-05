@@ -158,6 +158,11 @@ test("dedicated beta page uses the Download Center details structure", () => {
   assert.match(downloadCenter, /\\\.exe\$/);
   assert.match(downloadCenter, /\\\.dmg\$/);
   assert.match(downloadCenter, /browser_download_url/);
+  assert.match(downloadCenter, /rapp-brainstem-frontier-release-manifest\/v1/);
+  assert.match(downloadCenter, /rapp-frontier-release-manifest/);
+  assert.match(downloadCenter, /signing\.status !== "verified"/);
+  assert.match(downloadCenter, /gate\.status !== "passed"/);
+  assert.match(installerPage, /Only provenance-verified application installers/);
 });
 
 test("stable Frontier bootstraps resolve and run the latest published release", () => {

@@ -1,5 +1,11 @@
 export const TAG_PREFIX = "brainstem-beta-v";
 export const DEFAULT_REPOSITORY = "microsoft/aibast-agents-library";
+export const RELEASE_MANIFEST_SCHEMA =
+  "rapp-brainstem-frontier-release-manifest/v1";
+export const RELEASE_MANIFEST_FENCE = "rapp-frontier-release-manifest";
+
+const MAX_RELEASE_MANIFEST_BYTES = 128 * 1024;
+const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 
 const PLATFORM_LABELS = Object.freeze({
   windows: "Windows 11",
@@ -226,7 +232,7 @@ export function assetArchitecture(name) {
 
   const arm64 = ARM64_ASSET_PATTERN.test(value);
   const x64 = X64_ASSET_PATTERN.test(value);
-  if (arm64 && x64) return "unknown";
+  if (arm64 && x64) return "ambiguous";
   if (arm64) return "arm64";
   if (x64) return "x64";
   if (X86_ASSET_PATTERN.test(value)) return "x86";
@@ -295,11 +301,13 @@ function platformForAssetName(name) {
   return null;
 }
 
-export function safeReleaseAssetUrl(value, repository) {
+export function safeReleaseAssetUrl(value, repository, tag = null, fileName = null) {
   if (!validRepository(repository)) return null;
   try {
     const url = new URL(String(value || ""));
-    const expectedPath = `/${repository}/releases/download/`.toLowerCase();
+    const expectedPath = tag
+      ? `/${repository}/releases/download/${encodeURIComponent(tag)}/`.toLowerCase()
+      : `/${repository}/releases/download/`.toLowerCase();
     if (
       url.protocol !== "https:"
       || url.username
@@ -308,6 +316,10 @@ export function safeReleaseAssetUrl(value, repository) {
       || !url.pathname.toLowerCase().startsWith(expectedPath)
     ) {
       return null;
+    }
+    if (fileName) {
+      const encodedName = url.pathname.split("/").pop() || "";
+      if (decodeURIComponent(encodedName) !== fileName) return null;
     }
     return url.href;
   } catch {
@@ -332,13 +344,135 @@ function comparePackagedDownloads(left, right) {
 
 function binaryDescription(platform, architecture) {
   const platformLabel = PLATFORM_LABELS[platform];
-  if (architecture === "unknown") {
-    return `${platformLabel} application installer (architecture not specified)`;
-  }
-  return `${platformLabel} ${ARCHITECTURE_LABELS[architecture]} application installer`;
+  return `${platformLabel} ${ARCHITECTURE_LABELS[architecture]} provenance-verified installer`;
 }
 
-export function analyzePackagedDownloads(release, { repository } = {}) {
+function manifestError(message, code = "INVALID_RELEASE_MANIFEST") {
+  return new DownloadCenterError(message, { code });
+}
+
+export function parseReleaseManifest(body) {
+  if (typeof body !== "string" || !body.trim()) {
+    throw manifestError(
+      "This release does not publish the required binary provenance manifest.",
+      "MISSING_RELEASE_MANIFEST",
+    );
+  }
+
+  const fence = RELEASE_MANIFEST_FENCE.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = "```" + fence + "[ \\t]*\\r?\\n([\\s\\S]*?)\\r?\\n```";
+  const blocks = [
+    ...body.matchAll(new RegExp(pattern, "g")),
+  ];
+  if (blocks.length === 0) {
+    throw manifestError(
+      "This release does not publish the required binary provenance manifest.",
+      "MISSING_RELEASE_MANIFEST",
+    );
+  }
+  if (blocks.length !== 1) {
+    throw manifestError("The release contains multiple binary provenance manifests.");
+  }
+
+  const source = blocks[0][1].trim();
+  if (!source || new TextEncoder().encode(source).byteLength > MAX_RELEASE_MANIFEST_BYTES) {
+    throw manifestError("The binary provenance manifest is empty or too large.");
+  }
+
+  let manifest;
+  try {
+    manifest = JSON.parse(source);
+  } catch {
+    throw manifestError("The binary provenance manifest is not valid JSON.");
+  }
+  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
+    throw manifestError("The binary provenance manifest must be a JSON object.");
+  }
+  return manifest;
+}
+
+function manifestText(value, label, maximum = 500) {
+  if (
+    typeof value !== "string"
+    || !value.trim()
+    || value !== value.trim()
+    || value.length > maximum
+    || /[\u0000-\u001f\u007f]/.test(value)
+  ) {
+    throw manifestError(`Manifest ${label} is invalid.`);
+  }
+  return value;
+}
+
+function packageFileName(value) {
+  const fileName = manifestText(value, "filename", 255);
+  if (!/^[A-Za-z0-9][A-Za-z0-9 ._()+-]*\.(?:exe|dmg)$/i.test(fileName)) {
+    throw manifestError(`Manifest filename ${fileName} is unsafe.`);
+  }
+  const stem = fileName.replace(/\.(?:exe|dmg)$/i, "");
+  if (
+    /[ .]$/.test(stem)
+    || /\.(?:exe|dmg)(?:$|[ ._()+-])/i.test(stem)
+    || /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(stem)
+  ) {
+    throw manifestError(`Manifest filename ${fileName} uses a deceptive extension.`);
+  }
+  return fileName;
+}
+
+function safeGateRunUrl(value, repository) {
+  try {
+    const url = new URL(String(value || ""));
+    const [owner, project] = repository.toLowerCase().split("/");
+    const segments = url.pathname.split("/").filter(Boolean);
+    if (
+      url.protocol !== "https:"
+      || url.username
+      || url.password
+      || url.hostname.toLowerCase() !== "github.com"
+      || segments[0]?.toLowerCase() !== owner
+      || segments[1]?.toLowerCase() !== project
+      || segments[2]?.toLowerCase() !== "actions"
+      || segments[3]?.toLowerCase() !== "runs"
+      || !/^[0-9]+$/.test(segments[4] || "")
+    ) {
+      return null;
+    }
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function validateReleaseBinding(manifest, { release, commit, version }) {
+  if (manifest.schema !== RELEASE_MANIFEST_SCHEMA) {
+    throw manifestError(`Manifest schema must be ${RELEASE_MANIFEST_SCHEMA}.`);
+  }
+  if (!manifest.release || typeof manifest.release !== "object") {
+    throw manifestError("Manifest release binding is missing.");
+  }
+  if (manifest.release.tag !== release.tag_name) {
+    throw manifestError("Manifest release tag does not match the selected release.");
+  }
+  if (String(manifest.release.commit || "").toLowerCase() !== commit) {
+    throw manifestError("Manifest release commit does not match the resolved tag.");
+  }
+  if (manifest.release.version !== version) {
+    throw manifestError("Manifest runtime version does not match the selected release.");
+  }
+  if (
+    !Array.isArray(manifest.artifacts)
+    || manifest.artifacts.length === 0
+    || manifest.artifacts.length > 100
+  ) {
+    throw manifestError("Manifest artifacts must be a non-empty bounded array.");
+  }
+}
+
+export function analyzePackagedDownloads(
+  release,
+  { repository, commit, version, manifest } = {},
+) {
   if (!validRepository(repository)) {
     throw new DownloadCenterError("A valid repository is required to verify release assets.", {
       code: "INVALID_REPOSITORY",
@@ -349,85 +483,189 @@ export function analyzePackagedDownloads(release, { repository } = {}) {
       code: "INVALID_RELEASE_ASSETS",
     });
   }
+  if (!/^[0-9a-f]{40}$/.test(commit || "") || typeof version !== "string" || !version) {
+    throw manifestError("Verified release identity is required before evaluating binaries.");
+  }
+  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
+    throw manifestError("The binary provenance manifest is missing.");
+  }
+
+  validateReleaseBinding(manifest, { release, commit, version });
+  const assetsByName = new Map();
+  for (const asset of release.assets) {
+    if (typeof asset?.name !== "string") continue;
+    const matches = assetsByName.get(asset.name) || [];
+    matches.push(asset);
+    assetsByName.set(asset.name, matches);
+  }
 
   const candidates = [];
-  const rejected = [];
+  const allowlistedNames = new Set();
+  const allowlistedKeys = new Set();
+  for (const entry of manifest.artifacts) {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      throw manifestError("Every manifest artifact must be an object.");
+    }
 
-  for (const asset of release.assets) {
-    const rawName = typeof asset?.name === "string" ? asset.name.trim() : "";
-    const platform = platformForAssetName(rawName);
-    if (!platform) continue;
+    const fileName = packageFileName(entry.filename);
+    const fileNameKey = fileName.toLowerCase();
+    if (allowlistedKeys.has(fileNameKey)) {
+      throw manifestError(`Manifest filename ${fileName} is duplicated.`);
+    }
+    allowlistedNames.add(fileName);
+    allowlistedKeys.add(fileNameKey);
 
-    const reject = (reason) => {
-      rejected.push({ fileName: rawName || "(unnamed asset)", reason });
-    };
+    const matches = assetsByName.get(fileName) || [];
+    if (matches.length !== 1) {
+      throw manifestError(
+        `Manifest filename ${fileName} must match exactly one release asset.`,
+      );
+    }
+    const asset = matches[0];
+    const platform = platformForAssetName(fileName);
+    if (entry.platform !== platform) {
+      throw manifestError(`Manifest platform does not match ${fileName}.`);
+    }
+
+    const architecture = entry.architecture;
+    if (
+      !["x64", "arm64", "universal"].includes(architecture)
+      || (platform === "windows" && architecture === "universal")
+    ) {
+      throw manifestError(`Manifest architecture is invalid for ${fileName}.`);
+    }
+    const nameArchitecture = assetArchitecture(fileName);
+    if (
+      nameArchitecture === "ambiguous"
+      || nameArchitecture === "x86"
+      || (nameArchitecture !== "unknown" && nameArchitecture !== architecture)
+    ) {
+      throw manifestError(`Manifest architecture does not match ${fileName}.`);
+    }
 
     if (
-      !rawName
-      || rawName.length > 255
-      || /[\\/\u0000-\u001f\u007f]/.test(rawName)
+      !Number.isSafeInteger(entry.size)
+      || entry.size <= 0
+      || entry.size !== asset.size
     ) {
-      reject("invalid file name");
-      continue;
+      throw manifestError(`Manifest size does not match ${fileName}.`);
+    }
+    const size = formatBytes(entry.size);
+    if (asset.state !== "uploaded") {
+      throw manifestError(`Release asset ${fileName} is not uploaded.`);
     }
 
-    if (asset.state !== undefined && asset.state !== "uploaded") {
-      reject("asset is not uploaded");
-      continue;
-    }
-
-    let size;
-    try {
-      size = formatBytes(asset.size);
-    } catch {
-      reject("missing or invalid size");
-      continue;
-    }
-
-    const href = safeReleaseAssetUrl(asset.browser_download_url, repository);
+    const href = safeReleaseAssetUrl(
+      asset.browser_download_url,
+      repository,
+      release.tag_name,
+      fileName,
+    );
     if (!href) {
-      reject("unsafe or invalid download URL");
-      continue;
+      throw manifestError(`Release asset URL is invalid for ${fileName}.`);
     }
 
-    const architecture = assetArchitecture(rawName);
-    if (architecture === "x86") {
-      reject("32-bit x86 packages are unsupported");
-      continue;
+    const sha256 = String(entry.sha256 || "").toLowerCase();
+    if (!SHA256_PATTERN.test(sha256)) {
+      throw manifestError(`Manifest SHA-256 is invalid for ${fileName}.`);
+    }
+    if (String(asset.digest || "").toLowerCase() !== `sha256:${sha256}`) {
+      throw manifestError(`GitHub digest does not match the manifest for ${fileName}.`);
+    }
+
+    if (
+      !entry.signing
+      || entry.signing.status !== "verified"
+    ) {
+      throw manifestError(`Verified signing status is required for ${fileName}.`);
+    }
+    const signingIdentity = manifestText(
+      entry.signing.identity,
+      `signing identity for ${fileName}`,
+    );
+    if (/^(?:unknown|none|unsigned|n\/a)$/i.test(signingIdentity)) {
+      throw manifestError(`Signing identity is not trustworthy for ${fileName}.`);
+    }
+
+    if (
+      !entry.runtime
+      || entry.runtime.compatible !== true
+      || entry.runtime.version !== version
+      || String(entry.runtime.commit || "").toLowerCase() !== commit
+    ) {
+      throw manifestError(`Runtime compatibility does not match ${fileName}.`);
+    }
+    const nodeCompatibility = manifestText(
+      entry.runtime.node,
+      `Node compatibility for ${fileName}`,
+      100,
+    );
+    const electronCompatibility = manifestText(
+      entry.runtime.electron,
+      `Electron compatibility for ${fileName}`,
+      100,
+    );
+    if (
+      !/\d+\.\d+\.\d+/.test(nodeCompatibility)
+      || !/\d+\.\d+\.\d+/.test(electronCompatibility)
+    ) {
+      throw manifestError(`Runtime compatibility ranges are invalid for ${fileName}.`);
+    }
+
+    if (
+      !entry.gate
+      || entry.gate.status !== "passed"
+      || String(entry.gate.commit || "").toLowerCase() !== commit
+    ) {
+      throw manifestError(`Successful package gate evidence is required for ${fileName}.`);
+    }
+    const gateName = manifestText(entry.gate.name, `gate name for ${fileName}`, 200);
+    if (!/gate/i.test(gateName)) {
+      throw manifestError(`Package gate name is invalid for ${fileName}.`);
+    }
+    const gateUrl = safeGateRunUrl(entry.gate.run_url, repository);
+    if (!gateUrl) {
+      throw manifestError(`Package gate URL is invalid for ${fileName}.`);
     }
 
     candidates.push({
       platform,
       architecture,
-      fileName: rawName,
+      fileName,
       description: binaryDescription(platform, architecture),
       size,
-      sizeBytes: asset.size,
+      sizeBytes: entry.size,
       href,
-      downloadName: rawName,
+      downloadName: fileName,
       command: "",
       kind: "binary",
+      sha256,
+      signingIdentity,
+      runtimeCompatibility: {
+        node: nodeCompatibility,
+        electron: electronCompatibility,
+      },
+      gate: { name: gateName, url: gateUrl },
     });
   }
 
   candidates.sort(comparePackagedDownloads);
-  const seenNames = new Set();
-  const downloads = [];
-  for (const candidate of candidates) {
-    const key = `${candidate.platform}:${candidate.fileName.toLowerCase()}`;
-    if (seenNames.has(key)) {
-      rejected.push({ fileName: candidate.fileName, reason: "duplicate asset name" });
-      continue;
-    }
-    seenNames.add(key);
-    downloads.push({
-      ...candidate,
-      id: `release-${candidate.platform}-${candidate.architecture}-${downloads.length + 1}`,
-      platforms: [candidate.platform],
-    });
-  }
+  const downloads = candidates.map((candidate, index) => ({
+    ...candidate,
+    id: `release-${candidate.platform}-${candidate.architecture}-${index + 1}`,
+    platforms: [candidate.platform],
+  }));
+  const ignored = release.assets
+    .filter((asset) => {
+      const name = typeof asset?.name === "string" ? asset.name : "";
+      return platformForAssetName(name) && !allowlistedNames.has(name);
+    })
+    .map((asset) => ({
+      fileName: asset.name,
+      reason: "not allowlisted by the provenance manifest",
+    }));
 
-  return { downloads, rejected };
+  return { downloads, ignored };
 }
 
 function releaseWebUrl(repository, tag) {
@@ -465,8 +703,12 @@ function normalizeReleaseMetadata(release, { repository, requestedTag }) {
       code: "INVALID_RELEASE_DATE",
     });
   }
+  if (!Array.isArray(release.assets)) {
+    throw new DownloadCenterError("GitHub release asset metadata was not an array.", {
+      code: "INVALID_RELEASE_ASSETS",
+    });
+  }
 
-  const { downloads, rejected } = analyzePackagedDownloads(release, { repository });
   return {
     tag,
     version: tag.startsWith(TAG_PREFIX) ? tag.slice(TAG_PREFIX.length) : tag,
@@ -475,8 +717,6 @@ function normalizeReleaseMetadata(release, { repository, requestedTag }) {
     releaseUrl: releaseWebUrl(repository, tag),
     sourceUrl: sourceTreeUrl(repository, tag),
     goldenPathUrl: goldenPathUrl(repository, tag),
-    packagedDownloads: downloads,
-    rejectedAssets: rejected,
   };
 }
 
@@ -523,11 +763,48 @@ export async function discoverRelease({
     `https://api.github.com/repos/${repository}/commits/${encodeURIComponent(metadata.tag)}`,
     { fetchImpl, operation: `resolving ${metadata.tag} to a commit` },
   );
+  const commit = normalizeCommit(commitData);
+  let packagedDownloads = [];
+  let rejectedAssets = [];
+  let binaryAvailability;
+  try {
+    const manifest = parseReleaseManifest(release.body);
+    const analysis = analyzePackagedDownloads(release, {
+      repository,
+      commit,
+      version: metadata.version,
+      manifest,
+    });
+    packagedDownloads = analysis.downloads;
+    rejectedAssets = analysis.ignored;
+    binaryAvailability = {
+      available: true,
+      code: "VERIFIED_PACKAGES_AVAILABLE",
+      message:
+        `${packagedDownloads.length} provenance-verified packaged installer`
+        + `${packagedDownloads.length === 1 ? "" : "s"} available.`,
+    };
+  } catch (error) {
+    if (
+      !(error instanceof DownloadCenterError)
+      || !["MISSING_RELEASE_MANIFEST", "INVALID_RELEASE_MANIFEST"].includes(error.code)
+    ) {
+      throw error;
+    }
+    binaryAvailability = {
+      available: false,
+      code: error.code,
+      message: error.message,
+    };
+  }
 
   return {
     ...metadata,
     repository,
-    commit: normalizeCommit(commitData),
+    commit,
+    packagedDownloads,
+    rejectedAssets,
+    binaryAvailability,
   };
 }
 
@@ -996,6 +1273,14 @@ export function presentReleaseFailure(elements, error) {
   elements.error.hidden = false;
 }
 
+export function presentBinaryUnavailable(elements, availability) {
+  const reason = availability?.message || "Release provenance could not be verified.";
+  elements.error.textContent =
+    `Packaged installers are unavailable: ${reason} `
+    + "The inspectable source bootstraps remain available.";
+  elements.error.hidden = false;
+}
+
 function formatPublishedDate(date, locale) {
   if (!(date instanceof Date) || !Number.isFinite(date.getTime())) {
     throw new DownloadCenterError("The release date could not be measured.", {
@@ -1062,7 +1347,16 @@ export async function initializeDownloadCenter({
 
     elements.sourceLink.href = release.sourceUrl;
     elements.goldenPathLink.href = release.goldenPathUrl;
-    elements.status.textContent = release.prerelease ? "Prerelease ready" : "Release ready";
+    if (release.binaryAvailability.available) {
+      elements.status.textContent = release.prerelease ? "Prerelease ready" : "Release ready";
+      elements.error.textContent = "";
+      elements.error.hidden = true;
+    } else {
+      elements.status.textContent = release.prerelease
+        ? "Source prerelease ready"
+        : "Source release ready";
+      presentBinaryUnavailable(elements, release.binaryAvailability);
+    }
     elements.statusDot.className = "status-dot ready";
     elements.version.textContent = release.version;
     elements.date.textContent = publishedLabel;

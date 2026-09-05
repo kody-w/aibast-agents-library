@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 
 import {
   DownloadCenterError,
+  RELEASE_MANIFEST_FENCE,
+  RELEASE_MANIFEST_SCHEMA,
   analyzePackagedDownloads,
   buildBootstrapDownloads,
   claimDownloadCenterInitialization,
@@ -16,7 +18,9 @@ import {
   goldenPathUrl,
   initializeDownloadCenter,
   orderDownloadsForPlatform,
+  parseReleaseManifest,
   platformRecommendation,
+  presentBinaryUnavailable,
   presentReleaseFailure,
   resolveDownloadContext,
   safeReleaseAssetUrl,
@@ -28,6 +32,7 @@ const betaRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const repository = "octo/frontier";
 const tag = "brainstem-beta-v1.2.3";
 const commit = "a".repeat(40);
+const artifactSha = "b".repeat(64);
 
 function asset(name, options = {}) {
   const size = Object.hasOwn(options, "size") ? options.size : 4_194_304;
@@ -35,10 +40,14 @@ function asset(name, options = {}) {
   const url = Object.hasOwn(options, "url")
     ? options.url
     : `https://github.com/${repository}/releases/download/${tag}/${encodeURIComponent(name)}`;
+  const digest = Object.hasOwn(options, "digest")
+    ? options.digest
+    : `sha256:${artifactSha}`;
   return {
     name,
     size,
     state,
+    digest,
     browser_download_url: url,
   };
 }
@@ -51,8 +60,91 @@ function release(overrides = {}) {
     prerelease: true,
     published_at: "2026-09-04T20:00:00Z",
     assets: [],
+    body: "",
     ...overrides,
   };
+}
+
+function manifestEntry(releaseAsset, overrides = {}) {
+  const platform = /\.dmg$/i.test(releaseAsset.name) ? "macos" : "windows";
+  const architecture = /arm64|aarch64/i.test(releaseAsset.name)
+    ? "arm64"
+    : /universal/i.test(releaseAsset.name)
+      ? "universal"
+      : "x64";
+  const base = {
+    filename: releaseAsset.name,
+    platform,
+    architecture,
+    size: releaseAsset.size,
+    sha256: artifactSha,
+    signing: {
+      status: "verified",
+      identity: platform === "macos"
+        ? "Developer ID Application: Contoso Corporation (ABCDE12345)"
+        : "Contoso Corporation",
+    },
+    runtime: {
+      compatible: true,
+      version: "1.2.3",
+      commit,
+      node: ">=24.19.0 <26",
+      electron: "43.0.0",
+    },
+    gate: {
+      status: "passed",
+      name: "package-gate",
+      commit,
+      run_url: `https://github.com/${repository}/actions/runs/123456`,
+    },
+  };
+  return {
+    ...base,
+    ...overrides,
+    signing: { ...base.signing, ...overrides.signing },
+    runtime: { ...base.runtime, ...overrides.runtime },
+    gate: { ...base.gate, ...overrides.gate },
+  };
+}
+
+function manifestFor(releaseAssets, overrides = {}) {
+  const base = {
+    schema: RELEASE_MANIFEST_SCHEMA,
+    release: {
+      tag,
+      commit,
+      version: "1.2.3",
+    },
+    artifacts: releaseAssets.map((releaseAsset) => manifestEntry(releaseAsset)),
+  };
+  return {
+    ...base,
+    ...overrides,
+    release: { ...base.release, ...overrides.release },
+    artifacts: overrides.artifacts || base.artifacts,
+  };
+}
+
+function manifestBody(manifest) {
+  return [
+    "Release notes.",
+    "",
+    `\`\`\`${RELEASE_MANIFEST_FENCE}`,
+    JSON.stringify(manifest),
+    "\`\`\`",
+  ].join("\n");
+}
+
+function analyze(releaseAssets, manifest = manifestFor(releaseAssets)) {
+  return analyzePackagedDownloads(
+    release({ assets: releaseAssets }),
+    {
+      repository,
+      commit,
+      version: "1.2.3",
+      manifest,
+    },
+  );
 }
 
 function jsonResponse(value, { status = 200, headers = {} } = {}) {
@@ -127,6 +219,17 @@ test("release selection is deterministic and an explicit tag wins", () => {
 
 test("release discovery executes the real API selection and commit validation", async () => {
   const olderTag = "brainstem-beta-v1.0.0";
+  const olderAsset = asset("Frontier-1.0.0-win-x64.exe", {
+    url: `https://github.com/${repository}/releases/download/${olderTag}/Frontier-1.0.0-win-x64.exe`,
+  });
+  const olderManifest = manifestFor([olderAsset], {
+    release: { tag: olderTag, version: "1.0.0" },
+    artifacts: [
+      manifestEntry(olderAsset, {
+        runtime: { version: "1.0.0" },
+      }),
+    ],
+  });
   const calls = [];
   const releases = [
     release({ tag_name: tag, published_at: "2026-09-04T20:00:00Z" }),
@@ -134,9 +237,8 @@ test("release discovery executes the real API selection and commit validation", 
       id: 10,
       tag_name: olderTag,
       published_at: "2026-08-01T00:00:00Z",
-      assets: [asset("Frontier-1.0.0-win-x64.exe", {
-        url: `https://github.com/${repository}/releases/download/${olderTag}/Frontier.exe`,
-      })],
+      assets: [olderAsset],
+      body: manifestBody(olderManifest),
     }),
   ];
   const fetchImpl = async (url, options) => {
@@ -156,6 +258,7 @@ test("release discovery executes the real API selection and commit validation", 
   assert.equal(result.version, "1.0.0");
   assert.equal(result.commit, commit);
   assert.equal(result.packagedDownloads.length, 1);
+  assert.equal(result.binaryAvailability.available, true);
   assert.equal(
     result.goldenPathUrl,
     `https://github.com/${repository}/blob/${olderTag}/beta/GOLDEN_PATH.md`,
@@ -171,31 +274,29 @@ test("release discovery executes the real API selection and commit validation", 
   assert.equal(calls[0].options.headers.Accept, "application/vnd.github+json");
 });
 
-test("packaged asset classification rejects unsafe or unmeasured files deterministically", () => {
+test("only manifest-allowlisted packaged assets are promoted deterministically", () => {
   const validAssets = [
     asset("Frontier-2.0.0-mac-arm64.dmg"),
     asset("Frontier-2.0.0-win-arm64.exe"),
     asset("Frontier-2.0.0-win-x64.exe"),
     asset("Frontier-2.0.0-mac-x64.dmg"),
   ];
-  const invalidAssets = [
-    asset("Frontier-2.0.0-win-x64-zero.exe", { size: 0 }),
-    asset("Frontier-2.0.0-win-x64-missing.exe", { size: undefined }),
-    asset("Frontier-2.0.0-win-x64-unsafe.exe", { url: "javascript:alert(1)" }),
-    asset("Frontier-2.0.0-win-ia32.exe"),
-    asset("Frontier-2.0.0-mac-arm64.dmg", {
-      url: `https://github.com/${repository}/releases/download/${tag}/duplicate.dmg`,
-    }),
+  const hostileAssets = [
+    asset("Calculator-win-x64.exe"),
+    asset("Frontier-2.0.0-mac-arm64.dmg.exe"),
+    asset("Frontier-2.0.0-win-x64\u202Ecod.exe"),
     asset("Frontier-2.0.0-win-x64.exe.blockmap"),
   ];
 
-  const first = analyzePackagedDownloads(
-    release({ assets: [...validAssets, ...invalidAssets] }),
-    { repository },
+  const first = analyze(
+    [...validAssets, ...hostileAssets],
+    manifestFor(validAssets),
   );
-  const second = analyzePackagedDownloads(
-    release({ assets: [...invalidAssets].reverse().concat([...validAssets].reverse()) }),
-    { repository },
+  const second = analyze(
+    [...hostileAssets].reverse().concat([...validAssets].reverse()),
+    manifestFor(validAssets, {
+      artifacts: validAssets.map((item) => manifestEntry(item)).reverse(),
+    }),
   );
 
   const expectedNames = [
@@ -206,23 +307,158 @@ test("packaged asset classification rejects unsafe or unmeasured files determini
   ];
   assert.deepEqual(first.downloads.map((item) => item.fileName), expectedNames);
   assert.deepEqual(second.downloads.map((item) => item.fileName), expectedNames);
-  assert.equal(first.rejected.length, 5);
-  assert.equal(second.rejected.length, 5);
+  assert.deepEqual(
+    first.ignored.map((item) => item.fileName),
+    hostileAssets.slice(0, 3).map((item) => item.name),
+  );
+  assert.deepEqual(
+    second.ignored.map((item) => item.fileName).sort(),
+    hostileAssets.slice(0, 3).map((item) => item.name).sort(),
+  );
   assert.ok(first.downloads.every((item) => item.size === "4.0 MB"));
   assert.ok(first.downloads.every((item) => item.href.startsWith("https://github.com/")));
+  assert.ok(first.downloads.every((item) => item.sha256 === artifactSha));
+  assert.ok(first.downloads.every((item) => item.signingIdentity.includes("Contoso")));
+});
+
+test("hostile package names cannot enter the manifest allowlist", async (t) => {
+  for (const fileName of [
+    "../Frontier-win-x64.exe",
+    "Frontier-mac-arm64.dmg.exe",
+    "Frontier-win-x64\u202Ecod.exe",
+    "CON.exe",
+  ]) {
+    await t.test(fileName, () => {
+      const releaseAsset = asset(fileName);
+      assert.throws(
+        () => analyze([releaseAsset], manifestFor([releaseAsset])),
+        (error) => error instanceof DownloadCenterError
+          && error.code === "INVALID_RELEASE_MANIFEST"
+          && /filename/.test(error.message),
+      );
+    });
+  }
+
+  const releaseAsset = asset("Frontier-win-x64.exe");
+  const mismatchedCase = manifestFor([releaseAsset], {
+    artifacts: [
+      manifestEntry(releaseAsset, { filename: "frontier-win-x64.exe" }),
+    ],
+  });
+  assert.throws(
+    () => analyze([releaseAsset], mismatchedCase),
+    /must match exactly one release asset/,
+  );
+
+  const redirectedName = asset("Frontier-win-x64.exe", {
+    url: `https://github.com/${repository}/releases/download/${tag}/Other.exe`,
+  });
+  assert.throws(
+    () => analyze([redirectedName], manifestFor([redirectedName])),
+    /asset URL is invalid/,
+  );
+
+  const missingDigest = asset("Frontier-win-x64.exe", { digest: null });
+  assert.throws(
+    () => analyze([missingDigest], manifestFor([missingDigest])),
+    /GitHub digest does not match/,
+  );
+});
+
+test("every provenance binding fails closed on manifest mismatch", async (t) => {
+  const releaseAsset = asset("Frontier-win-x64.exe");
+  const cases = [
+    ["release tag", (value) => { value.release.tag = "brainstem-beta-v9.9.9"; }],
+    ["release commit", (value) => { value.release.commit = "c".repeat(40); }],
+    ["release version", (value) => { value.release.version = "9.9.9"; }],
+    ["platform", (value) => { value.artifacts[0].platform = "macos"; }],
+    ["architecture", (value) => { value.artifacts[0].architecture = "arm64"; }],
+    ["size", (value) => { value.artifacts[0].size += 1; }],
+    ["SHA-256", (value) => { value.artifacts[0].sha256 = "c".repeat(64); }],
+    ["signing status", (value) => { value.artifacts[0].signing.status = "unsigned"; }],
+    ["signing identity", (value) => { value.artifacts[0].signing.identity = "unknown"; }],
+    ["runtime flag", (value) => { value.artifacts[0].runtime.compatible = false; }],
+    ["runtime version", (value) => { value.artifacts[0].runtime.version = "9.9.9"; }],
+    ["runtime commit", (value) => { value.artifacts[0].runtime.commit = "c".repeat(40); }],
+    ["runtime details", (value) => { value.artifacts[0].runtime.node = ""; }],
+    ["runtime range", (value) => { value.artifacts[0].runtime.electron = "latest"; }],
+    ["gate status", (value) => { value.artifacts[0].gate.status = "failed"; }],
+    ["gate commit", (value) => { value.artifacts[0].gate.commit = "c".repeat(40); }],
+    ["gate name", (value) => { value.artifacts[0].gate.name = "smoke"; }],
+    ["gate URL", (value) => { value.artifacts[0].gate.run_url = "https://evil.example/run/1"; }],
+  ];
+
+  for (const [name, mutate] of cases) {
+    await t.test(name, () => {
+      const candidate = structuredClone(manifestFor([releaseAsset]));
+      mutate(candidate);
+      assert.throws(
+        () => analyze([releaseAsset], candidate),
+        (error) => error instanceof DownloadCenterError
+          && error.code === "INVALID_RELEASE_MANIFEST",
+      );
+    });
+  }
+});
+
+test("missing or invalid provenance falls back visibly to source bootstraps", async () => {
+  const releaseAsset = asset("Frontier-win-x64.exe");
+  const invalidManifest = manifestFor([releaseAsset]);
+  invalidManifest.artifacts[0].gate.status = "failed";
+  const candidates = [
+    release({ assets: [releaseAsset], body: "" }),
+    release({ assets: [releaseAsset], body: manifestBody(invalidManifest) }),
+    release({
+      assets: [releaseAsset],
+      body: `\`\`\`${RELEASE_MANIFEST_FENCE}\n{not json}\n\`\`\``,
+    }),
+  ];
+
+  for (const candidate of candidates) {
+    const result = await discoverRelease({
+      repository,
+      fetchImpl: async (url) => url.includes("/releases?")
+        ? jsonResponse([candidate])
+        : jsonResponse({ sha: commit }),
+    });
+    assert.equal(result.packagedDownloads.length, 0);
+    assert.equal(result.binaryAvailability.available, false);
+    assert.match(result.binaryAvailability.message, /manifest|gate/i);
+    const sourceFallback = buildBootstrapDownloads({
+      repository,
+      baseUrl: "https://contoso.github.io/frontier/beta/",
+    });
+    assert.deepEqual(
+      orderDownloadsForPlatform(
+        [...result.packagedDownloads, ...sourceFallback],
+        "windows",
+        "x64",
+      ).map((item) => item.fileName),
+      ["frontier.ps1"],
+    );
+
+    const elements = { error: { textContent: "", hidden: true } };
+    presentBinaryUnavailable(elements, result.binaryAvailability);
+    assert.equal(elements.error.hidden, false);
+    assert.match(elements.error.textContent, /Packaged installers are unavailable/);
+    assert.match(elements.error.textContent, /source bootstraps remain available/);
+  }
+
+  assert.throws(
+    () => parseReleaseManifest(
+      `\`\`\`${RELEASE_MANIFEST_FENCE}\n{not json}\n\`\`\``,
+    ),
+    (error) => error.code === "INVALID_RELEASE_MANIFEST",
+  );
 });
 
 test("architecture-aware ordering recommends a compatible package before source fallback", () => {
-  const { downloads } = analyzePackagedDownloads(
-    release({
-      assets: [
-        asset("Frontier-win-arm64.exe"),
-        asset("Frontier-win-x64.exe"),
-        asset("Frontier-mac-arm64.dmg"),
-      ],
-    }),
-    { repository },
-  );
+  const packagedAssets = [
+    asset("Frontier-win-arm64.exe"),
+    asset("Frontier-win-x64.exe"),
+    asset("Frontier-mac-arm64.dmg"),
+  ];
+  const { downloads } = analyze(packagedAssets);
   const catalog = [
     ...downloads,
     ...buildBootstrapDownloads({
@@ -248,9 +484,12 @@ test("architecture-aware ordering recommends a compatible package before source 
     ["frontier.sh"],
   );
 
-  const unspecified = analyzePackagedDownloads(
-    release({ assets: [asset("Frontier-Setup.exe")] }),
-    { repository },
+  const unspecifiedAsset = asset("Frontier-Setup.exe");
+  const unspecified = analyze(
+    [unspecifiedAsset],
+    manifestFor([unspecifiedAsset], {
+      artifacts: [manifestEntry(unspecifiedAsset, { architecture: "arm64" })],
+    }),
   ).downloads;
   assert.deepEqual(
     orderDownloadsForPlatform(
@@ -263,19 +502,10 @@ test("architecture-aware ordering recommends a compatible package before source 
 });
 
 test("Windows ARM64 is only advertised when an ARM64 package exists", () => {
-  const x64Only = analyzePackagedDownloads(
-    release({ assets: [asset("Frontier-win-x64.exe")] }),
-    { repository },
-  ).downloads;
-  const withArm64 = analyzePackagedDownloads(
-    release({
-      assets: [
-        asset("Frontier-win-x64.exe"),
-        asset("Frontier-win-arm64.exe"),
-      ],
-    }),
-    { repository },
-  ).downloads;
+  const x64Asset = asset("Frontier-win-x64.exe");
+  const arm64Asset = asset("Frontier-win-arm64.exe");
+  const x64Only = analyze([x64Asset]).downloads;
+  const withArm64 = analyze([x64Asset, arm64Asset]).downloads;
 
   assert.equal(windowsSupportLabel(x64Only), "Windows 11 x64");
   assert.doesNotMatch(windowsSupportLabel(x64Only), /ARM64/);
@@ -295,15 +525,16 @@ test("missing and invalid size measurements fail instead of being skipped", () =
     );
   }
 
-  const result = analyzePackagedDownloads(
-    release({ assets: [asset("Frontier-win-x64.exe", { size: undefined })] }),
-    { repository },
+  const unmeasuredAsset = asset("Frontier-win-x64.exe", { size: undefined });
+  assert.throws(
+    () => analyze(
+      [unmeasuredAsset],
+      manifestFor([unmeasuredAsset]),
+    ),
+    (error) => error instanceof DownloadCenterError
+      && error.code === "INVALID_RELEASE_MANIFEST"
+      && /size does not match/.test(error.message),
   );
-  assert.equal(result.downloads.length, 0);
-  assert.deepEqual(result.rejected, [{
-    fileName: "Frontier-win-x64.exe",
-    reason: "missing or invalid size",
-  }]);
 });
 
 test("GitHub rate limits and malformed commit data surface actionable failures", async () => {
@@ -401,8 +632,18 @@ test("download URLs and DOM wiring reject executable injection surfaces", () => 
     safeReleaseAssetUrl(
       `https://github.com/${repository}/releases/download/${tag}/Frontier.exe`,
       repository,
+      tag,
+      "Frontier.exe",
     ),
     `https://github.com/${repository}/releases/download/${tag}/Frontier.exe`,
+  );
+  assert.equal(
+    safeReleaseAssetUrl(
+      `https://github.com/${repository}/releases/download/other-tag/Frontier.exe`,
+      repository,
+      tag,
+    ),
+    null,
   );
 
   const moduleSource = readFileSync(path.join(betaRoot, "download-center.js"), "utf8");

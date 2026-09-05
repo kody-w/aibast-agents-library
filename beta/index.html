@@ -1024,8 +1024,8 @@
         <div class="download-copy">
           <h2 id="download-heading">Download RAPP Brainstem Frontier</h2>
           <p>
-            Choose your operating system. Published application installers appear here
-            automatically, with the verified source bootstrap preserved as a fallback.
+            Choose your operating system. Only provenance-verified application installers
+            appear here, with the inspectable source bootstrap preserved as a fallback.
           </p>
         </div>
 
@@ -1255,9 +1255,9 @@
                 Frontier always publishes small source bootstraps that verify the release
                 tag, pin the exact source commit, and keep the launcher removable from the
                 shared Brainstem runtime. When a release also contains packaged
-                <code>.exe</code> or <code>.dmg</code> installers, this page lists those
-                assets by architecture, recommends a compatible package first, and
-                retains the source route alongside them.
+                <code>.exe</code> or <code>.dmg</code> installers, this page lists only
+                assets allowlisted by the release provenance manifest, recommends a
+                compatible package first, and retains the source route alongside them.
               </p>
 
               <div class="boundary">
@@ -1302,8 +1302,9 @@
         </button>
       </div>
       <p class="dialog-intro">
-        Choose a packaged application installer when one is published, or use the source
-        bootstrap that resolves and pins the same verified Frontier release.
+        Choose a packaged application installer only when its release manifest verifies
+        the exact artifact, signing identity, runtime, and gate, or use the source bootstrap
+        that resolves and pins the same Frontier release.
       </p>
 
       <fieldset class="file-options">
