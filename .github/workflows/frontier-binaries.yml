@@ -1891,3 +1891,38 @@ jobs:
             "$final_release" >/dev/null
           trap - ERR EXIT
           echo "Published immutable $TAG at $COMMIT after native redownload verification."
+
+      - name: Recover interrupted mutable release transition
+        if: ${{ failure() || cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.context.outputs.release_id }}
+          RELEASE_FINGERPRINT: ${{ needs.stage-release.outputs.release_fingerprint }}
+          TAG: ${{ needs.context.outputs.tag }}
+          TAG_OBJECT: ${{ needs.context.outputs.tag_object }}
+          COMMIT: ${{ needs.context.outputs.commit }}
+        run: |
+          set -euo pipefail
+          transition_state="$RUNNER_TEMP/frontier-release-transition-state.json"
+          recovery_output="$RUNNER_TEMP/frontier-recovered-release.json"
+          if [ ! -s "$transition_state" ]; then
+            echo "No publication transition state exists; no recovery PATCH is required."
+            exit 0
+          fi
+          if ! jq -e '.transitionAttempted == true' "$transition_state" >/dev/null; then
+            echo "Publication transition was not attempted; no recovery PATCH is required."
+            exit 0
+          fi
+          node beta/scripts/publish-release-state-machine.mjs \
+            --recover-only \
+            --repository "$GITHUB_REPOSITORY" \
+            --release-id "$RELEASE_ID" \
+            --tag "$TAG" \
+            --tag-object "$TAG_OBJECT" \
+            --commit "$COMMIT" \
+            --release-fingerprint "$RELEASE_FINGERPRINT" \
+            --state-file "$transition_state" \
+            --output "$recovery_output"
+          jq -e \
+            '.immutable == true or .draft == true' \
+            "$recovery_output" >/dev/null

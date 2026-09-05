@@ -7,6 +7,9 @@ import {
 } from "node:fs";
 import path from "node:path";
 import test from "node:test";
+import {
+  validateConfiguration,
+} from "app-builder-lib/out/util/config/config.js";
 
 import {
   createBuilderConfiguration,
@@ -59,9 +62,14 @@ import {
   verifyWindowsSigningInput,
 } from "../scripts/windows-signing-input.mjs";
 import {
+  recoverInterruptedRelease,
+  recoveryRequiredFromState,
   ReleaseTransitionError,
   runReleaseTransition,
 } from "../scripts/publish-release-state-machine.mjs";
+import {
+  createValidatedWindowsBuilderConfiguration,
+} from "../scripts/sign-validated-windows-input.mjs";
 import {
   selectPreviousWindowsBinary,
 } from "../scripts/windows-upgrade-policy.mjs";
@@ -1008,7 +1016,7 @@ test("blocked native media permits report-only unsigned uploads", () => {
   }
 });
 
-test("Windows NSIS identity and production signing policy are frozen", () => {
+test("Windows NSIS identity and production signing policy are frozen", async () => {
   const packageMetadata = JSON.parse(
     readFileSync(path.join(betaDir, "package.json"), "utf8"),
   );
@@ -1104,6 +1112,29 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
   assert.match(signingHook, /Invoke-ArtifactSigning/);
   assert.match(signingHook, /Import-Module ArtifactSigning/);
   assert.doesNotMatch(signingHook, /Install-Module|Save-Module/);
+  const validBuilderConfig = createValidatedWindowsBuilderConfiguration({
+    packageMetadata,
+    hookPath: path.join(betaDir, "scripts", "artifact-signing-hook.cjs"),
+    publisher: "CN=Microsoft Corporation",
+    outputDirectory: path.join(betaDir, "release", "schema-test"),
+  });
+  const debugLogger = { isEnabled: false, add() {} };
+  await validateConfiguration(validBuilderConfig, debugLogger);
+  assert.equal(
+    validBuilderConfig.win.signtoolOptions.signingHashAlgorithms[0],
+    "sha256",
+  );
+  assert.equal(validBuilderConfig.win.sign, undefined);
+  const invalidDirectShape = structuredClone(validBuilderConfig);
+  Object.assign(
+    invalidDirectShape.win,
+    invalidDirectShape.win.signtoolOptions,
+  );
+  delete invalidDirectShape.win.signtoolOptions;
+  await assert.rejects(
+    () => validateConfiguration(invalidDirectShape, debugLogger),
+    /unknown property 'sign'|invalid configuration/i,
+  );
   const stagedVerifier = readFileSync(
     path.join(betaDir, "scripts", "verify-staged-release.mjs"),
     "utf8",
@@ -1504,6 +1535,7 @@ test("publication state machine recovers from ambiguous API outcomes", async () 
   const immutable = { id: 1, draft: false, immutable: true };
   const verifySnapshot = async (release) => {
     assert.equal(release.id, 1);
+    return true;
   };
 
   {
@@ -1530,7 +1562,7 @@ test("publication state machine recovers from ambiguous API outcomes", async () 
     assert.equal(result.release.immutable, true);
     assert.match(
       JSON.stringify(result.state.history),
-      /publish-response-lost-or-failed/,
+      /publish-transport-failed/,
     );
   }
 
@@ -1556,7 +1588,10 @@ test("publication state machine recovers from ambiguous API outcomes", async () 
       sleep: async () => {},
     });
     assert.equal(result.release.immutable, true);
-    assert.match(JSON.stringify(result.state.history), /poll-1-failed/);
+    assert.match(
+      JSON.stringify(result.state.history),
+      /poll-1-transport-failed/,
+    );
   }
 
   {
@@ -1589,7 +1624,10 @@ test("publication state machine recovers from ambiguous API outcomes", async () 
       (error) => {
         assert.ok(error instanceof ReleaseTransitionError);
         assert.equal(error.code, "ROLLED_BACK");
-        assert.match(JSON.stringify(error.state.history), /initial-read-failed/);
+        assert.match(
+          JSON.stringify(error.state.history),
+          /initial-read-transport-failed/,
+        );
         return true;
       },
     );
@@ -1667,24 +1705,146 @@ test("publication state machine rolls back mutable content drift", async () => {
         current = structuredClone(baseRelease);
         return structuredClone(current);
       },
-      verifySnapshot: async (release) => verifyReleaseSnapshot(expected, {
-        tag: release.tag_name,
-        tagObject: expected.tagObject,
-        commit: expected.commit,
-        releaseId: String(release.id),
-        releaseFingerprint: releaseContentFingerprint(release),
-      }),
+      verifySnapshot: async (release) => {
+        verifyReleaseSnapshot(expected, {
+          tag: release.tag_name,
+          tagObject: expected.tagObject,
+          commit: expected.commit,
+          releaseId: String(release.id),
+          releaseFingerprint: releaseContentFingerprint(release),
+        });
+        return true;
+      },
       maxPolls: 1,
       maxRollbackAttempts: 1,
       pollDelayMs: 0,
       sleep: async () => {},
     }),
     (error) => {
-      assert.equal(error.code, "ROLLED_BACK");
+      assert.equal(error.code, "INTEGRITY_ROLLED_BACK");
       assert.equal(current.draft, true);
       return true;
     },
   );
+});
+
+test("integrity drift stays latched even if a later response is canonical immutable", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const mutable = { id: 1, draft: false, immutable: false };
+  const immutable = { id: 1, draft: false, immutable: true };
+  let phase = "draft";
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => {
+        if (phase === "draft") return { ...draft };
+        if (phase === "drift") {
+          phase = "immutable";
+          return { ...mutable, drifted: true };
+        }
+        return { ...immutable };
+      },
+      publishRelease: async () => {
+        phase = "drift";
+        return { ...mutable };
+      },
+      rollbackRelease: async () => ({ ...immutable }),
+      verifySnapshot: async (release) => {
+        if (release.drifted) throw new Error("fingerprint mismatch");
+        return true;
+      },
+      maxPolls: 1,
+      maxRollbackAttempts: 1,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "INCIDENT");
+      assert.equal(error.state.integrityViolation, true);
+      assert.match(error.state.integrityDetail, /fingerprint mismatch/);
+      return true;
+    },
+  );
+});
+
+test("snapshot verification cannot be mutated into a no-op", async () => {
+  let publishCalled = false;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => ({ id: 1, draft: true, immutable: false }),
+      publishRelease: async () => {
+        publishCalled = true;
+        return { id: 1, draft: false, immutable: false };
+      },
+      rollbackRelease: async () => ({ id: 1, draft: true, immutable: false }),
+      verifySnapshot: async () => undefined,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "INTEGRITY");
+      assert.match(error.message, /verifier did not return an explicit true proof/);
+      return true;
+    },
+  );
+  assert.equal(publishCalled, false);
+});
+
+test("signal recovery retries until release ID is proven draft or immutable", async () => {
+  assert.equal(
+    recoveryRequiredFromState({
+      phase: "interrupted-recovery-started",
+      transitionAttempted: true,
+    }),
+    true,
+  );
+  assert.equal(
+    recoveryRequiredFromState({
+      phase: "prepublication-failure",
+      transitionAttempted: false,
+    }),
+    false,
+  );
+
+  let release = { id: 1, draft: false, immutable: false };
+  let reads = 0;
+  const draftRecovery = await recoverInterruptedRelease({
+    getRelease: async () => {
+      reads += 1;
+      if (reads === 1) throw new Error("initial recovery GET unavailable");
+      return { ...release };
+    },
+    rollbackRelease: async () => {
+      release = { id: 1, draft: true, immutable: false };
+      throw new Error("rollback response lost");
+    },
+    verifySnapshot: async () => true,
+    maxAttempts: 2,
+    pollDelayMs: 0,
+    sleep: async () => {},
+  });
+  assert.equal(draftRecovery.status, "draft");
+  assert.equal(draftRecovery.release.draft, true);
+
+  const immutableRecovery = await recoverInterruptedRelease({
+    getRelease: async () => ({ id: 1, draft: false, immutable: true }),
+    rollbackRelease: async () => {
+      throw new Error("rollback must not run for immutable release");
+    },
+    verifySnapshot: async () => true,
+    maxAttempts: 1,
+    pollDelayMs: 0,
+    sleep: async () => {},
+  });
+  assert.equal(immutableRecovery.status, "immutable");
+
+  const workflow = readFileSync(
+    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+    "utf8",
+  );
+  const publish = workflowJob(workflow, "publish");
+  assert.match(publish, /if: \$\{\{ failure\(\) \|\| cancelled\(\) \}\}/);
+  assert.match(publish, /Recover interrupted mutable release transition/);
+  assert.match(publish, /--recover-only/);
 });
 
 test("second Windows binary release requires immutable N-1 evidence", () => {

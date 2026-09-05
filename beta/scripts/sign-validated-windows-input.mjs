@@ -49,6 +49,38 @@ function collectSignableFiles(root) {
   return files.sort();
 }
 
+export function createValidatedWindowsBuilderConfiguration({
+  packageMetadata,
+  hookPath,
+  publisher,
+  outputDirectory = signedDir,
+}) {
+  return {
+    appId: packageMetadata.build.appId,
+    productName: packageMetadata.build.productName,
+    forceCodeSigning: true,
+    npmRebuild: false,
+    directories: {
+      output: outputDirectory,
+      buildResources: path.join(betaDir, "build"),
+    },
+    win: {
+      target: [{ target: "nsis", arch: ["x64"] }],
+      icon: path.join(betaDir, "build", "icon.ico"),
+      requestedExecutionLevel: "asInvoker",
+      signtoolOptions: {
+        sign: hookPath,
+        publisherName: publisher,
+        signingHashAlgorithms: ["sha256"],
+      },
+      signExts: [".exe", ".dll", ".node"],
+      artifactName:
+        "RAPP-Brainstem-Frontier-${version}-windows-x64-setup.${ext}",
+    },
+    nsis: packageMetadata.build.nsis,
+  };
+}
+
 export async function signValidatedWindowsInput() {
   if (process.platform !== "win32" || process.arch !== "x64") {
     fail("Validated Windows signing requires a native x64 Windows host.");
@@ -109,28 +141,11 @@ export async function signValidatedWindowsInput() {
     targets: Platform.WINDOWS.createTarget(["nsis"], Arch.x64),
     publish: "never",
     prepackaged: prepackagedApp,
-    config: {
-      appId: packageMetadata.build.appId,
-      productName: packageMetadata.build.productName,
-      forceCodeSigning: true,
-      npmRebuild: false,
-      directories: {
-        output: signedDir,
-        buildResources: path.join(betaDir, "build"),
-      },
-      win: {
-        target: [{ target: "nsis", arch: ["x64"] }],
-        icon: path.join(betaDir, "build", "icon.ico"),
-        requestedExecutionLevel: "asInvoker",
-        sign: hook,
-        publisherName: publisher,
-        signingHashAlgorithms: ["sha256"],
-        signExts: [".exe", ".dll", ".node"],
-        artifactName:
-          "RAPP-Brainstem-Frontier-${version}-windows-x64-setup.${ext}",
-      },
-      nsis: packageMetadata.build.nsis,
-    },
+    config: createValidatedWindowsBuilderConfiguration({
+      packageMetadata,
+      hookPath: hook,
+      publisher,
+    }),
   });
   if (!existsSync(outputPath)) fail(`Signed NSIS output is missing: ${outputPath}`);
   for (const entry of readdirSync(signedDir)) {

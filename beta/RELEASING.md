@@ -474,7 +474,12 @@ Ambiguous PATCH responses and failed polling reads do not imply success or
 failure: the workflow retries ID-bound reads until the release is proven
 immutable or, while still mutable, retries an ID-bound rollback until
 `draft:true` is re-read. If neither state can be proven, the job emits a loud
-release incident and exits nonzero.
+release incident and exits nonzero. Tag, release-ID, body, or asset fingerprint
+drift is a sticky integrity incident, not a retryable transport failure; a
+later canonical immutable response cannot erase it. SIGINT/SIGTERM starts a
+bounded ID-based recovery before the process exits, and a
+`failure() || cancelled()` workflow step re-runs recovery from the durable
+transition state if the Node process could not finish.
 
 The release includes:
 
