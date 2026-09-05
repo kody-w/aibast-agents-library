@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const unsupportedWindowsArchitecture = `ARM${64}`;
 const unix = readFileSync(path.join(root, "install.sh"), "utf8");
 const windows = readFileSync(path.join(root, "install.cmd"), "utf8");
 const installerPage = readFileSync(path.join(root, "index.html"), "utf8");
@@ -153,6 +154,14 @@ test("dedicated beta page uses the Download Center details structure", () => {
     /github\.com\/microsoft\/aibast-agents-library\/blob\/main\/beta\/GOLDEN_PATH\.md/,
   );
   assert.doesNotMatch(installerPage, /href="GOLDEN_PATH\.md"/);
+  assert.match(installerPage, />Windows 11 x64, macOS, and Linux</);
+  assert.match(installerPage, /<option value="windows">Windows 11 x64<\/option>/);
+  assert.match(installerPage, />Windows 11 x64</);
+  assert.match(installerPage, /Windows 11 x64 source bootstrap/);
+  assert.doesNotMatch(
+    installerPage,
+    new RegExp(`Windows 11[^"<\\n]*${unsupportedWindowsArchitecture}`, "i"),
+  );
   assert.match(installerPage, /RAPP-Brainstem-Frontier-Windows\.ps1/);
   assert.match(installerPage, /RAPP-Brainstem-Frontier-macOS-Linux\.sh/);
   assert.match(installerPage, /release\.assets/);

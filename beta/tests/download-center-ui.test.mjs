@@ -9,6 +9,7 @@ const betaRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const page = readFileSync(path.join(betaRoot, "index.html"), "utf8");
 const scripts = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
 const style = page.match(/<style>([\s\S]*?)<\/style>/)?.[1] || "";
+const unsupportedWindowsArchitecture = `ARM${64}`;
 
 function removeCssBlock(source, selector) {
   const start = source.indexOf(selector);
@@ -72,6 +73,21 @@ function validateDownloadCenter(source) {
         source,
       ),
     "golden path link must remain Pages-safe and release-pinned",
+  );
+  add(
+    source.includes("<span>Windows 11 x64, macOS, and Linux</span>") &&
+      source.includes('<option value="windows">Windows 11 x64</option>') &&
+      source.includes('<span class="os-pill">Windows 11 x64</span>') &&
+      /<span class="platform-icon" aria-hidden="true">PS<\/span>\s*Windows 11 x64/.test(
+        source,
+      ) &&
+      source.includes('windows: "Windows 11 x64"') &&
+      source.includes('description: "Windows 11 x64 source bootstrap"') &&
+      !new RegExp(
+        `Windows 11[^"<\\n]*${unsupportedWindowsArchitecture}`,
+        "i",
+      ).test(source),
+    "Windows support copy must remain x64-only",
   );
   add(
     /id="expand-all"[\s\S]*?aria-controls="panel-details panel-requirements panel-install panel-additional"[\s\S]*?aria-expanded="false"/.test(
@@ -203,6 +219,13 @@ test("download center UI checks reject representative regressions", () => {
       source: page.replace(
         'href="https://github.com/microsoft/aibast-agents-library/blob/main/beta/GOLDEN_PATH.md"',
         'href="GOLDEN_PATH.md"',
+      ),
+    },
+    {
+      expected: "Windows support copy must remain x64-only",
+      source: page.replace(
+        'description: "Windows 11 x64 source bootstrap"',
+        `description: "Windows 11 ${unsupportedWindowsArchitecture} source bootstrap"`,
       ),
     },
     {
