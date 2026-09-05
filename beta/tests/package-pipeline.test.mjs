@@ -191,6 +191,47 @@ test("Windows package inspection normalizes ASAR paths and reads PE signatures",
   );
 });
 
+test("Windows trust verification blocks every packaged binary execution boundary", () => {
+  const source = readFileSync(
+    path.join(betaDir, "scripts", "package-gate.mjs"),
+    "utf8",
+  );
+  const gate = source.slice(
+    source.indexOf("async function gateWindows"),
+    source.indexOf("export function defaultGatePaths"),
+  );
+  const stagingBarrier = gate.indexOf(
+    'verificationBarrier("staging Windows trust verification"',
+  );
+  const stagingInspection = gate.indexOf("const staging = inspectPackagedApp");
+  const installerExecution = gate.indexOf("const install = command(artifactPath");
+  assert.ok(
+    0 <= stagingBarrier &&
+      stagingBarrier < stagingInspection &&
+      stagingInspection < installerExecution,
+  );
+
+  const installedBarrier = gate.indexOf(
+    'verificationBarrier("installed Windows trust verification"',
+  );
+  const installedInspection = gate.indexOf("const installed = inspectPackagedApp");
+  assert.ok(
+    installerExecution < installedBarrier &&
+      installedBarrier < installedInspection,
+  );
+
+  const uninstallerBarrier = gate.indexOf(
+    'verificationBarrier("NSIS uninstaller trust verification"',
+  );
+  const uninstallerExecution = gate.indexOf(
+    "const uninstall = command(uninstaller",
+  );
+  assert.ok(
+    installedInspection < uninstallerBarrier &&
+      uninstallerBarrier < uninstallerExecution,
+  );
+});
+
 test("packaging refuses Windows ARM64 and cross-architecture hosts", () => {
   assert.throws(
     () => parsePackagingArguments(["--platform", "windows", "--arch", "arm64"]),

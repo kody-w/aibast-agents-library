@@ -52,6 +52,19 @@ function requirement(name, pass, detail = "") {
   );
 }
 
+function verificationBarrier(label, verify) {
+  const start = results.length;
+  verify();
+  const failures = results.slice(start).filter((result) => !result.pass);
+  if (failures.length) {
+    fail(
+      `${label} failed; refusing to execute package code: ${
+        failures.map((result) => result.name).join(", ")
+      }`,
+    );
+  }
+}
+
 function command(commandName, args, options = {}) {
   const result = spawnSync(commandName, args, {
     encoding: "utf8",
@@ -1196,6 +1209,29 @@ function verifyUnsignedWindowsFile(filePath, label) {
   }
 }
 
+function verifyUnsignedWindowsTree(root, label) {
+  const files = collectFiles(root, (filePath) =>
+    [".exe", ".dll", ".node"].includes(path.extname(filePath).toLowerCase()),
+  );
+  const failures = [];
+  for (const filePath of files) {
+    try {
+      if (hasEmbeddedPeSignature(readHeader(filePath))) {
+        failures.push(`${filePath}: embedded signature present`);
+      }
+    } catch (error) {
+      failures.push(`${filePath}: ${String(error.message || error)}`);
+    }
+  }
+  requirement(
+    `${label} PE files are unsigned`,
+    files.length >= 3 && failures.length === 0,
+    failures.length
+      ? failures.slice(0, 8).join(" | ")
+      : `${files.length} files checked`,
+  );
+}
+
 function verifyNativeMediaPublication(options, packagedApp) {
   const media = evaluateNativeMedia({
     ffmpegPath: packagedApp.ffmpeg,
@@ -1873,30 +1909,31 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
     updaterMetadata.length === 0,
     updaterMetadata.join(", "),
   );
-  const stagingExecutable = appLayout(appDir, "windows").executable;
-  if (options.mode === "signed") {
-    requirement(
-      "Windows signing configuration uses Azure Public Trust",
-      process.env.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE === "PublicTrust" &&
-        Boolean(process.env.AZURE_ARTIFACT_SIGNING_ENDPOINT) &&
-        Boolean(process.env.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME) &&
-        Boolean(process.env.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME),
-      process.env.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE || "missing",
-    );
-    requirement(
-      "Windows publisher is compatible with the application ID",
-      publisherMatchesApplicationId(
-        options.applicationId,
-        options.expectedPublisher,
-      ),
-      `${options.applicationId}; ${options.expectedPublisher}`,
-    );
-    verifySignedWindowsFile(artifactPath, "NSIS installer", options.expectedPublisher);
-    verifySignedWindowsTree(appDir, "staging Windows app", options.expectedPublisher);
-  } else {
-    verifyUnsignedWindowsFile(artifactPath, "NSIS installer");
-    verifyUnsignedWindowsFile(stagingExecutable, "staging Windows app");
-  }
+  verificationBarrier("staging Windows trust verification", () => {
+    if (options.mode === "signed") {
+      requirement(
+        "Windows signing configuration uses Azure Public Trust",
+        process.env.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE === "PublicTrust" &&
+          Boolean(process.env.AZURE_ARTIFACT_SIGNING_ENDPOINT) &&
+          Boolean(process.env.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME) &&
+          Boolean(process.env.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME),
+        process.env.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE || "missing",
+      );
+      requirement(
+        "Windows publisher is compatible with the application ID",
+        publisherMatchesApplicationId(
+          options.applicationId,
+          options.expectedPublisher,
+        ),
+        `${options.applicationId}; ${options.expectedPublisher}`,
+      );
+      verifySignedWindowsFile(artifactPath, "NSIS installer", options.expectedPublisher);
+      verifySignedWindowsTree(appDir, "staging Windows app", options.expectedPublisher);
+    } else {
+      verifyUnsignedWindowsFile(artifactPath, "NSIS installer");
+      verifyUnsignedWindowsTree(appDir, "staging Windows app");
+    }
+  });
   const staging = inspectPackagedApp(
     appDir,
     "staging Windows app",
@@ -1916,17 +1953,21 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
   mkdirSync(installDir, { recursive: true });
   if (options.mode === "signed" && options.previousInstaller) {
     const previousInstaller = path.resolve(options.previousInstaller);
-    requirement(
-      "N-1 Windows installer exists",
-      existsSync(previousInstaller),
-      previousInstaller,
-    );
-    if (existsSync(previousInstaller)) {
-      verifySignedWindowsFile(
+    verificationBarrier("N-1 Windows installer trust verification", () => {
+      requirement(
+        "N-1 Windows installer exists",
+        existsSync(previousInstaller),
         previousInstaller,
-        "N-1 NSIS installer",
-        options.expectedPublisher,
       );
+      if (existsSync(previousInstaller)) {
+        verifySignedWindowsFile(
+          previousInstaller,
+          "N-1 NSIS installer",
+          options.expectedPublisher,
+        );
+      }
+    });
+    if (existsSync(previousInstaller)) {
       const previousInstall = command(
         previousInstaller,
         ["/S", `/D=${installDir}`],
@@ -2016,21 +2057,25 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
       installedState.value?.MachineEntries?.length ?? null,
     shortcuts: installedState.value?.Shortcuts || [],
   };
+  if (options.mode === "signed") {
+    verificationBarrier("installed Windows trust verification", () => {
+      verifySignedWindowsTree(
+        installedAppDir,
+        "installed Windows app",
+        options.expectedPublisher,
+      );
+    });
+  } else {
+    verificationBarrier("installed Windows trust verification", () => {
+      verifyUnsignedWindowsTree(installedAppDir, "installed Windows app");
+    });
+  }
   const installed = inspectPackagedApp(
     installedAppDir,
     "installed Windows app",
     "windows",
     options.arch,
   );
-  if (options.mode === "signed") {
-    verifySignedWindowsTree(
-      installedAppDir,
-      "installed Windows app",
-      options.expectedPublisher,
-    );
-  } else if (installed.executable) {
-    verifyUnsignedWindowsFile(installed.executable, "installed Windows app");
-  }
   verifyNativeMediaPublication(options, installed);
   if (installedExecutable) {
     await smokeApp({
@@ -2094,13 +2139,17 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
   )[0];
   requirement("NSIS uninstaller exists", Boolean(uninstaller), uninstaller || "missing");
   if (uninstaller) {
-    if (options.mode === "signed") {
-      verifySignedWindowsFile(
-        uninstaller,
-        "NSIS uninstaller",
-        options.expectedPublisher,
-      );
-    }
+    verificationBarrier("NSIS uninstaller trust verification", () => {
+      if (options.mode === "signed") {
+        verifySignedWindowsFile(
+          uninstaller,
+          "NSIS uninstaller",
+          options.expectedPublisher,
+        );
+      } else {
+        verifyUnsignedWindowsFile(uninstaller, "NSIS uninstaller");
+      }
+    });
     const uninstall = command(uninstaller, ["/S"], { timeout: 120000 });
     requirement("NSIS uninstaller completes silently", uninstall.status === 0, uninstall.output);
   } else {
