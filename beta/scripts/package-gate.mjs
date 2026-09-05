@@ -23,11 +23,12 @@ import {
   publisherMatchesApplicationId,
 } from "./package-contract.mjs";
 import { evaluateNativeMedia } from "./native-media-gate.mjs";
+import { loadBootstrapBundle } from "../electron/brainstem-provisioner.mjs";
 
 
 const betaDir = path.resolve(import.meta.dirname, "..");
 const releaseDir = path.join(betaDir, "release");
-const productName = "RAPP Brainstem Frontier";
+let productName = "RAPP Brainstem Frontier";
 const results = [];
 const evidence = {
   bootstrap: null,
@@ -975,303 +976,6 @@ function delay(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-function prepareBrainstemWithBundledBootstrap({
-  scratchDir,
-  sourceRoot,
-  pythonPath,
-  packagedResources,
-  applicationId,
-  platform,
-  releaseTag,
-  releaseCommit,
-  runtimeVersionUrl,
-}) {
-  const home = path.join(scratchDir, "home");
-  const brainstemHome = path.join(home, ".brainstem");
-  const isolatedSource = path.join(brainstemHome, "src", "rapp_brainstem");
-  requirement("Brainstem package-gate source exists", existsSync(sourceRoot), sourceRoot);
-  requirement("Brainstem package-gate Python exists", existsSync(pythonPath), pythonPath);
-  if (!existsSync(sourceRoot) || !existsSync(pythonPath)) return null;
-
-  const python = command(
-    pythonPath,
-    [
-      "-c",
-      "import flask, flask_cors, requests, dotenv, pyzipper, sys; "
-        + "print(f'{sys.version_info.major}.{sys.version_info.minor}')",
-    ],
-    { timeout: 30000 },
-  );
-  requirement(
-    "Brainstem package-gate Python is ready",
-    python.status === 0 && String(python.stdout || "").trim() === "3.11",
-    python.output,
-  );
-  if (python.status !== 0 || String(python.stdout || "").trim() !== "3.11") {
-    return null;
-  }
-
-  requirement(
-    "package bootstrap begins without BRAINSTEM_HOME",
-    !existsSync(brainstemHome),
-    brainstemHome,
-  );
-  if (existsSync(brainstemHome)) return null;
-
-  const bootstrapRoot = path.join(packagedResources, "package-bootstrap");
-  const bootstrapManifestPath = path.join(bootstrapRoot, "manifest.json");
-  const bootstrapName = platform === "windows" ? "install.ps1" : "install.sh";
-  const bootstrapPath = path.join(bootstrapRoot, bootstrapName);
-  requirement(
-    "real bundled Brainstem bootstrap exists",
-    existsSync(bootstrapManifestPath) && existsSync(bootstrapPath),
-    bootstrapPath,
-  );
-  if (!existsSync(bootstrapManifestPath) || !existsSync(bootstrapPath)) return null;
-
-  const bootstrapManifest = JSON.parse(
-    readFileSync(bootstrapManifestPath, "utf8"),
-  );
-  const bootstrapDigest = sha256(bootstrapPath);
-  requirement(
-    "bundled bootstrap authority and checksum verify",
-    bootstrapManifest.schema ===
-      "https://github.com/microsoft/aibast-agents-library/frontier-package-bootstrap/v1" &&
-      bootstrapManifest.authority?.repository ===
-        "microsoft/aibast-agents-library" &&
-      bootstrapManifest.authority?.repository_url ===
-        "https://github.com/microsoft/aibast-agents-library.git" &&
-      bootstrapManifest.package_identity?.application_id === applicationId &&
-      bootstrapManifest.files?.[bootstrapName]?.sha256 === bootstrapDigest &&
-      bootstrapManifest.files?.[bootstrapName]?.size ===
-        statSync(bootstrapPath).size,
-    JSON.stringify(bootstrapManifest),
-  );
-  if (bootstrapManifest.mode === "release") {
-    requirement(
-      "package bootstrap policy permits binary publication",
-      bootstrapManifest.publication?.ready === true,
-      (bootstrapManifest.publication?.blockers || []).join(" | "),
-    );
-  } else {
-    requirement(
-      "package bootstrap publication status is recorded",
-      true,
-      bootstrapManifest.publication?.ready
-        ? "approved"
-        : `BLOCKED: ${(bootstrapManifest.publication?.blockers || []).join(" | ")}`,
-    );
-  }
-
-  const expectedVersion = readFileSync(
-    path.join(sourceRoot, "VERSION"),
-    "utf8",
-  ).trim();
-  let authorityMode;
-  let bootstrapRepositoryUrl;
-  let bootstrapRef;
-  let bootstrapVersionUrl = null;
-  let bootstrapArguments;
-  let expectedCommit;
-  let fixtureTag = null;
-  if (bootstrapManifest.mode === "release") {
-    const expectedRuntimeVersionUrl =
-      `https://raw.githubusercontent.com/microsoft/aibast-agents-library/` +
-      `${releaseCommit}/rapp_brainstem/VERSION`;
-    const canonicalRelease =
-      /^brainstem-beta-v[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+$/.test(
-        releaseTag || "",
-      ) &&
-      /^[0-9a-f]{40}$/i.test(releaseCommit || "") &&
-      runtimeVersionUrl === expectedRuntimeVersionUrl &&
-      bootstrapManifest.source_commit === releaseCommit &&
-      bootstrapManifest.release_tag === releaseTag &&
-      bootstrapManifest.source_repository ===
-        "microsoft/aibast-agents-library" &&
-      bootstrapManifest.package_identity?.product_name ===
-        "RAPP Brainstem Frontier";
-    requirement(
-      "sealed release bootstrap uses canonical immutable authority",
-      canonicalRelease,
-      `${releaseTag || "missing"}@${releaseCommit || "missing"}`,
-    );
-    if (!canonicalRelease) return null;
-    authorityMode = "canonical-release";
-    bootstrapRepositoryUrl =
-      "https://github.com/microsoft/aibast-agents-library.git";
-    bootstrapRef = releaseTag;
-    bootstrapVersionUrl = runtimeVersionUrl;
-    bootstrapArguments = ["--no-launch"];
-    expectedCommit = releaseCommit;
-  } else {
-    const repositoryRootResult = command("git", [
-      "-C",
-      sourceRoot,
-      "rev-parse",
-      "--show-toplevel",
-    ]);
-    if (repositoryRootResult.status !== 0) {
-      requirement(
-        "controlled bootstrap fixture source resolves",
-        false,
-        repositoryRootResult.output,
-      );
-      return null;
-    }
-    const repositoryRoot = String(repositoryRootResult.stdout || "").trim();
-    const fixtureCommitResult = command("git", [
-      "-C",
-      repositoryRoot,
-      "rev-parse",
-      "HEAD",
-    ]);
-    const fixtureCommit = String(fixtureCommitResult.stdout || "").trim();
-    fixtureTag = `brainstem-v${expectedVersion}`;
-    const fixture = path.join(scratchDir, "immutable-bootstrap-fixture.git");
-    const clone = command("git", ["clone", "--bare", repositoryRoot, fixture], {
-      timeout: 120000,
-    });
-    const tag = clone.status === 0
-      ? command("git", [
-          `--git-dir=${fixture}`,
-          "update-ref",
-          `refs/tags/${fixtureTag}`,
-          fixtureCommit,
-        ])
-      : { status: 1, output: clone.output };
-    const fixtureReady =
-      clone.status === 0 &&
-      tag.status === 0 &&
-      /^[0-9a-f]{40}$/i.test(fixtureCommit) &&
-      bootstrapManifest.source_commit === fixtureCommit;
-    requirement(
-      "controlled immutable bootstrap fixture is commit-pinned",
-      fixtureReady,
-      `${fixtureTag}@${fixtureCommit}`,
-    );
-    if (!fixtureReady) return null;
-    authorityMode = "controlled-development-fixture";
-    bootstrapRepositoryUrl = pathToFileURL(fixture).href;
-    bootstrapRef = fixtureTag;
-    bootstrapArguments = [
-      "--no-launch",
-      "--version",
-      expectedVersion,
-    ];
-    expectedCommit = fixtureCommit;
-  }
-
-  mkdirSync(home, { recursive: true });
-  const bootstrapTemp = path.join(scratchDir, "bootstrap-tmp");
-  mkdirSync(bootstrapTemp, { recursive: true });
-  const bootstrapEnvironment = { ...process.env };
-  delete bootstrapEnvironment.BRAINSTEM_HOME;
-  delete bootstrapEnvironment.GITHUB_TOKEN;
-  delete bootstrapEnvironment.GH_TOKEN;
-  Object.assign(bootstrapEnvironment, {
-    HOME: home,
-    USERPROFILE: home,
-    TMPDIR: bootstrapTemp,
-    TEMP: bootstrapTemp,
-    TMP: bootstrapTemp,
-    BRAINSTEM_REPO_URL: bootstrapRepositoryUrl,
-    BRAINSTEM_REPO_REF: bootstrapRef,
-    PATH: `${path.dirname(pythonPath)}${path.delimiter}${process.env.PATH || ""}`,
-  });
-  if (bootstrapVersionUrl) {
-    bootstrapEnvironment.BRAINSTEM_VERSION_URL = bootstrapVersionUrl;
-  }
-  const bootstrap =
-    platform === "windows"
-      ? command(
-          "powershell.exe",
-          [
-            "-NoLogo",
-            "-NoProfile",
-            "-NonInteractive",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            bootstrapPath,
-            ...bootstrapArguments,
-          ],
-          {
-            env: bootstrapEnvironment,
-            timeout: 15 * 60 * 1000,
-            maxBuffer: 20 * 1024 * 1024,
-          },
-        )
-      : command(
-          "bash",
-          [
-            bootstrapPath,
-            ...bootstrapArguments,
-          ],
-          {
-            env: bootstrapEnvironment,
-            timeout: 15 * 60 * 1000,
-            maxBuffer: 20 * 1024 * 1024,
-          },
-        );
-  requirement(
-    "real bundled bootstrap installs the immutable fixture",
-    bootstrap.status === 0,
-    bootstrap.output.slice(-4000),
-  );
-
-  const installedPython =
-    platform === "windows"
-      ? path.join(brainstemHome, "venv", "Scripts", "python.exe")
-      : path.join(brainstemHome, "venv", "bin", "python");
-  const installedCommit = existsSync(path.join(brainstemHome, "src", ".git"))
-    ? command("git", [
-        "-C",
-        path.join(brainstemHome, "src"),
-        "rev-parse",
-        "HEAD",
-      ])
-    : { status: 1, stdout: "", output: "installed source missing" };
-  const bootstrapReady =
-    bootstrap.status === 0 &&
-    existsSync(path.join(isolatedSource, "brainstem.py")) &&
-    existsSync(installedPython) &&
-    String(installedCommit.stdout || "").trim() === expectedCommit;
-  requirement(
-    "bootstrap output is ready at the required commit",
-    bootstrapReady,
-    String(installedCommit.stdout || installedCommit.output || "").trim(),
-  );
-  evidence.bootstrap = {
-    executed: bootstrapReady,
-    authority_mode: authorityMode,
-    installed_commit: expectedCommit,
-    fixture_commit:
-      authorityMode === "controlled-development-fixture"
-        ? expectedCommit
-        : null,
-    fixture_tag: fixtureTag,
-    release_tag:
-      authorityMode === "canonical-release" ? releaseTag : null,
-    manifest: bootstrapManifest,
-  };
-  if (!bootstrapReady) return null;
-  requirement(
-    "HOME and BRAINSTEM_HOME are isolated under package-gate scratch",
-    home.startsWith(`${scratchDir}${path.sep}`) &&
-      brainstemHome.startsWith(`${scratchDir}${path.sep}`),
-    `${home}; ${brainstemHome}`,
-  );
-  return {
-    home,
-    brainstemHome,
-    betaHome: path.join(brainstemHome, "beta-launcher"),
-    isolatedSource,
-    pythonPath: installedPython,
-    expectedVersion,
-    bootstrap: evidence.bootstrap,
-  };
-}
-
 function sanitizedSmokeEnvironment(runtime, metadataPath, statusPath) {
   const env = { ...process.env };
   for (const name of Object.keys(env)) {
@@ -1293,8 +997,15 @@ function sanitizedSmokeEnvironment(runtime, metadataPath, statusPath) {
     BRAINSTEM_BETA_HOME: runtime.betaHome,
     BRAINSTEM_BETA_PYTHON: runtime.pythonPath,
     BRAINSTEM_BETA_SOURCE_DIR: runtime.isolatedSource,
-    BRAINSTEM_BETA_SMOKE_EXIT_MS: "45000",
+    BRAINSTEM_BETA_SMOKE_EXIT_MS: "840000",
+    BRAINSTEM_BETA_SMOKE_EXIT_ON_READY: "1",
+    BRAINSTEM_BETA_SMOKE_REQUIRE_READY: "1",
     BRAINSTEM_BETA_SMOKE_STATUS_FILE: statusPath,
+    BRAINSTEM_BETA_CAPTURE_USER_DATA_PATH: "1",
+    BRAINSTEM_BETA_USER_DATA_DIR: path.join(
+      runtime.home,
+      "electron-user-data",
+    ),
     BRAINSTEM_BETA_UI_DRIVER_FILE: metadataPath,
     BRAINSTEM_LAN_MODE: "0",
   };
@@ -1370,7 +1081,7 @@ async function waitForUiDriver(metadataPath, child, timeoutMs = 25000) {
 
 async function waitForSmokeStatus(statusPath, child, timeoutMs = 30000) {
   const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline && child.exitCode === null) {
+  while (Date.now() < deadline) {
     if (existsSync(statusPath)) {
       try {
         return JSON.parse(readFileSync(statusPath, "utf8"));
@@ -1378,6 +1089,7 @@ async function waitForSmokeStatus(statusPath, child, timeoutMs = 30000) {
         // The status file might still be settling.
       }
     }
+    if (child.exitCode !== null) break;
     await delay(250);
   }
   return null;
@@ -1422,26 +1134,147 @@ async function smokeApp({
   packagedResources,
   applicationId,
   platform,
+  arch,
+  mode,
+  appDir,
   releaseTag,
   releaseCommit,
   runtimeVersionUrl,
 }) {
-  const runtime = prepareBrainstemWithBundledBootstrap({
-    scratchDir,
-    sourceRoot: brainstemSource,
-    pythonPath: brainstemPython,
-    packagedResources,
-    applicationId,
-    platform,
-    releaseTag,
-    releaseCommit,
-    runtimeVersionUrl,
-  });
-  if (!runtime) {
-    requirement("packaged app starts a ready Brainstem service", false, "runtime unavailable");
-    requirement("final installed app exits cleanly", false, "runtime unavailable");
+  if (platform === "macos" && mode === "unsigned") {
+    const canonicalGate = command(
+      process.execPath,
+      [path.join(betaDir, "scripts", "package-first-run-gate.mjs")],
+      {
+        env: {
+          ...process.env,
+          FRONTIER_FIRST_RUN_APP_DIR: appDir,
+          FRONTIER_FIRST_RUN_ARCH: arch,
+          FRONTIER_FIRST_RUN_PRODUCT_NAME: productName,
+        },
+        timeout: 4 * 60 * 1000,
+        maxBuffer: 4 * 1024 * 1024,
+      },
+    );
+    const summary = canonicalGate.output.match(
+      /PACKAGE READY — (\d+)\/(\d+) pass/,
+    );
+    requirement(
+      "canonical first-run/concurrent package gate passes",
+      canonicalGate.status === 0
+        && Boolean(summary)
+        && summary[1] === summary[2],
+      canonicalGate.output.slice(-12000),
+    );
+    const provenance = JSON.parse(
+      readFileSync(
+        path.join(packagedResources, "bootstrap", "provenance.json"),
+        "utf8",
+      ),
+    );
+    evidence.bootstrap = {
+      executed: canonicalGate.status === 0,
+      authority_mode: "controlled-development-fixture",
+      installed_commit: provenance.commit,
+      manifest: provenance,
+      canonical_first_run_checks: summary
+        ? { passed: Number(summary[1]), total: Number(summary[2]) }
+        : null,
+    };
+    evidence.runtime = {
+      service_ready: canonicalGate.status === 0,
+      service_stopped: canonicalGate.status === 0,
+      isolated_home: true,
+      first_run_fixture: true,
+      concurrent_smokes: 2,
+      user_data_measured: true,
+      copilot_auth_startup: canonicalGate.status === 0,
+    };
     return;
   }
+
+  const bootstrapDirectory = path.join(packagedResources, "bootstrap");
+  let bundle = null;
+  let rawProvenance = null;
+  try {
+    rawProvenance = JSON.parse(
+      readFileSync(path.join(bootstrapDirectory, "provenance.json"), "utf8"),
+    );
+    bundle = loadBootstrapBundle({
+      directory: bootstrapDirectory,
+      platform: platform === "windows" ? "win32" : "darwin",
+    });
+    requirement(
+      "packaged bootstrap bytes match immutable provenance",
+      true,
+      `${bundle.provenance.mode}:${bundle.provenance.commit}`,
+    );
+  } catch (error) {
+    requirement(
+      "packaged bootstrap bytes match immutable provenance",
+      false,
+      String(error.message || error),
+    );
+  }
+  if (!bundle) {
+    requirement("packaged app starts a ready Brainstem service", false, "bootstrap unavailable");
+    requirement("final installed app exits cleanly", false, "bootstrap unavailable");
+    return;
+  }
+
+  if (mode === "signed") {
+    const expectedRuntimeVersionUrl =
+      `https://raw.githubusercontent.com/microsoft/aibast-agents-library/`
+      + `${releaseCommit}/rapp_brainstem/VERSION`;
+    requirement(
+      "sealed release bootstrap uses canonical immutable authority",
+      bundle.provenance.mode === "release"
+        && bundle.provenance.repositoryUrl
+          === "https://github.com/microsoft/aibast-agents-library.git"
+        && bundle.provenance.commit === releaseCommit
+        && bundle.provenance.sourceRef === releaseTag
+        && rawProvenance?.authority?.requestedMode === "release"
+        && rawProvenance?.authority?.releaseTag === releaseTag
+        && runtimeVersionUrl === expectedRuntimeVersionUrl,
+      `${releaseTag || "missing"}@${releaseCommit || "missing"}`,
+    );
+  }
+
+  const home = path.join(scratchDir, "home");
+  const brainstemHome = path.join(home, ".brainstem");
+  const isolatedSource = path.join(brainstemHome, "src", "rapp_brainstem");
+  requirement(
+    "package bootstrap begins without BRAINSTEM_HOME",
+    !existsSync(brainstemHome),
+    brainstemHome,
+  );
+  if (existsSync(brainstemHome)) return;
+  mkdirSync(home, { recursive: true });
+  const runtime = {
+    home,
+    brainstemHome,
+    betaHome: path.join(brainstemHome, "beta-launcher"),
+    isolatedSource,
+    pythonPath:
+      platform === "windows"
+        ? path.join(brainstemHome, "venv", "Scripts", "python.exe")
+        : path.join(brainstemHome, "venv", "bin", "python"),
+    expectedVersion: readFileSync(
+      path.join(brainstemSource, "VERSION"),
+      "utf8",
+    ).trim(),
+  };
+  evidence.bootstrap = {
+    executed: false,
+    authority_mode:
+      bundle.provenance.mode === "release"
+        ? "canonical-release"
+        : "development",
+    installed_commit: bundle.provenance.commit,
+    release_tag:
+      bundle.provenance.mode === "release" ? releaseTag : null,
+    manifest: rawProvenance,
+  };
 
   const metadataPath = path.join(runtime.betaHome, "ui-driver.json");
   const statusPath = path.join(runtime.betaHome, "package-smoke-status.json");
@@ -1454,7 +1287,7 @@ async function smokeApp({
   const childOutput = collectChildOutput(child);
   let metadata = null;
   try {
-  metadata = await waitForUiDriver(metadataPath, child);
+  metadata = await waitForUiDriver(metadataPath, child, 12 * 60 * 1000);
   requirement(
     "installed app launches from the platform package",
     Boolean(metadata),
@@ -1462,7 +1295,7 @@ async function smokeApp({
   );
 
   const ready = metadata
-    ? await waitForRoutedBrainstem(metadata, child)
+    ? await waitForRoutedBrainstem(metadata, child, 2 * 60 * 1000)
     : null;
   const health = ready?.health;
   const serviceReady = Boolean(
@@ -1495,12 +1328,18 @@ async function smokeApp({
   }
   requirement("routed Brainstem frontend is ready", frontendReady, ready?.routeUrl || "missing");
   requirement("routed Brainstem models endpoint is ready", modelsReady, ready?.routeUrl || "missing");
-  const smokeStatus = await waitForSmokeStatus(statusPath, child);
+  const smokeStatus = await waitForSmokeStatus(
+    statusPath,
+    child,
+    2 * 60 * 1000,
+  );
   const copilotAuthStarted = Boolean(
     ["ready", "signed-out"].includes(smokeStatus?.copilot?.phase) &&
     ["ready", "signed-out"].includes(smokeStatus?.surgeon?.phase) &&
     smokeStatus?.brainstem?.phase === "ready" &&
-    smokeStatus?.url === ready?.routeUrl,
+    smokeStatus?.url === ready?.routeUrl &&
+    smokeStatus?.requestedUserData === env.BRAINSTEM_BETA_USER_DATA_DIR &&
+    smokeStatus?.actualUserData === env.BRAINSTEM_BETA_USER_DATA_DIR,
   );
   requirement(
     "packaged Copilot CLI auth startup completes",
@@ -1508,7 +1347,7 @@ async function smokeApp({
     smokeStatus ? JSON.stringify(smokeStatus) : "status file missing",
   );
 
-  const exit = await waitForChildExit(child, 55000);
+  const exit = await waitForChildExit(child, 30000);
   if (!exit) {
     if (metadata?.pid) {
       try {
@@ -1552,6 +1391,27 @@ async function smokeApp({
     metadataPath,
   );
 
+  const installedCommit = existsSync(path.join(brainstemHome, "src", ".git"))
+    ? command("git", [
+        "-C",
+        path.join(brainstemHome, "src"),
+        "rev-parse",
+        "HEAD",
+      ])
+    : { status: 1, stdout: "", output: "installed source missing" };
+  const exactCommit =
+    installedCommit.status === 0
+    && String(installedCommit.stdout || "").trim()
+      === bundle.provenance.commit;
+  requirement(
+    "packaged bootstrap installed the exact provenance commit",
+    exactCommit,
+    String(installedCommit.stdout || installedCommit.output || "").trim(),
+  );
+  evidence.bootstrap.executed = Boolean(
+    smokeStatus?.provisioned && exactCommit,
+  );
+
   evidence.runtime = {
     service_ready: serviceReady && frontendReady && modelsReady,
     service_stopped: stopped,
@@ -1562,6 +1422,8 @@ async function smokeApp({
     protocol: "RAPP/1",
     copilot_auth_startup: copilotAuthStarted,
     copilot_phase: smokeStatus?.copilot?.phase || null,
+    requested_user_data: smokeStatus?.requestedUserData || null,
+    actual_user_data: smokeStatus?.actualUserData || null,
   };
   } finally {
     if (child.exitCode === null) {
@@ -1716,6 +1578,9 @@ async function gateMac(options, artifactPath, appDir, scratchDir) {
       packagedResources: installed.resources,
       applicationId: options.applicationId,
       platform: "macos",
+      arch: options.arch,
+      mode: options.mode,
+      appDir: installedApp,
       releaseTag: options.releaseTag,
       releaseCommit: options.releaseCommit,
       runtimeVersionUrl: options.runtimeVersionUrl,
@@ -1828,6 +1693,9 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
       packagedResources: installed.resources,
       applicationId: options.applicationId,
       platform: "windows",
+      arch: options.arch,
+      mode: options.mode,
+      appDir: installedAppDir,
       releaseTag: options.releaseTag,
       releaseCommit: options.releaseCommit,
       runtimeVersionUrl: options.runtimeVersionUrl,
@@ -1999,7 +1867,8 @@ function gateReport({
     },
     source: {
       version: packageMetadata.version,
-      application_id: packageMetadata.build.appId,
+      application_id: options.applicationId,
+      product_name: productName,
     },
     runtime_compatibility: {
       operating_system: runtimeMinimum,
@@ -2061,6 +1930,35 @@ export async function runPackageGate(argv = process.argv.slice(2)) {
   const packageLock = JSON.parse(
     readFileSync(path.join(betaDir, "package-lock.json"), "utf8"),
   );
+  let packageIdentity = {};
+  try {
+    packageIdentity = JSON.parse(
+      readFileSync(
+        path.join(
+          betaDir,
+          "build",
+          "generated",
+          "bootstrap",
+          "provenance.json",
+        ),
+        "utf8",
+      ),
+    ).packageIdentity || {};
+  } catch {
+    // A missing generated identity is reported by the packaged bootstrap gate.
+  }
+  productName = String(
+    packageIdentity.productName || packageMetadata.build.productName,
+  ).trim();
+  if (!productName || /[\\/]/.test(productName)) {
+    fail("Packaged product name is missing or unsafe.");
+  }
+  options.applicationId = String(
+    packageIdentity.appId || packageMetadata.build.appId,
+  ).trim();
+  if (!/^[A-Za-z0-9.-]+$/.test(options.applicationId)) {
+    fail("Packaged application ID is missing or unsafe.");
+  }
   const defaults = defaultGatePaths(options, packageMetadata.version);
   const artifactPath = path.resolve(options.artifact || defaults.artifact);
   const appDir = path.resolve(options.appDir || defaults.appDir);
@@ -2072,7 +1970,6 @@ export async function runPackageGate(argv = process.argv.slice(2)) {
   options.brainstemSource = path.resolve(
     options.brainstemSource || path.resolve(betaDir, "..", "rapp_brainstem"),
   );
-  options.applicationId = packageMetadata.build.appId;
   const expectedName = artifactName({
     ...options,
     version: packageMetadata.version,

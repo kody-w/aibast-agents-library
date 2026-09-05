@@ -1,10 +1,18 @@
 {
   "schema": "https://github.com/microsoft/aibast-agents-library/frontier-package-bootstrap-policy/v1",
-  "publication_enabled": false,
+  "publication_enabled": true,
   "canonical_repository": "microsoft/aibast-agents-library",
   "canonical_repository_url": "https://github.com/microsoft/aibast-agents-library.git",
-  "publication_blockers": [
-    "The package bootstrap rollback path is not yet release-certified.",
-    "The package bootstrap install/update lock is not yet release-certified."
-  ]
+  "required_package_gate_contracts": [
+    "missing-runtime first launch executes the verified bundled bootstrap",
+    "atomic staging and rollback preserve the previous ready runtime",
+    "cross-process installation lock serializes concurrent provisioning",
+    "HOME, USERPROFILE, BRAINSTEM_HOME, and Electron userData are isolated",
+    "requested and measured Electron userData paths match",
+    "provisioning logs redact credential canaries",
+    "two concurrent packaged smokes use distinct backends and userData",
+    "backend readiness failure exits nonzero",
+    "sealed release mode uses the unmodified canonical bootstrap at the exact tag and commit"
+  ],
+  "publication_blockers": []
 }

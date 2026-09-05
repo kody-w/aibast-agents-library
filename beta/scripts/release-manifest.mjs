@@ -9,6 +9,9 @@ import {
 } from "./package-contract.mjs";
 
 const betaDir = path.resolve(import.meta.dirname, "..");
+export const RELEASE_MANIFEST_SCHEMA =
+  "rapp-brainstem-frontier-release-manifest/v1";
+export const RELEASE_MANIFEST_FENCE = "rapp-frontier-release-manifest";
 
 function fail(message) {
   throw new Error(message);
@@ -181,11 +184,14 @@ function validateGateReport(
     !/^[0-9a-f]{40}$/i.test(report.bootstrap?.installed_commit || "") ||
     !report.bootstrap?.release_tag ||
     report.bootstrap?.manifest?.mode !== "release" ||
-    report.bootstrap?.manifest?.authority?.repository !==
-      "microsoft/aibast-agents-library" ||
-    report.bootstrap?.manifest?.source_commit !==
+    report.bootstrap?.manifest?.repositoryUrl !==
+      "https://github.com/microsoft/aibast-agents-library.git" ||
+    report.bootstrap?.manifest?.commit !==
       report.bootstrap?.installed_commit ||
-    report.bootstrap?.manifest?.release_tag !==
+    report.bootstrap?.manifest?.sourceRef !==
+      report.bootstrap?.release_tag ||
+    report.bootstrap?.manifest?.authority?.requestedMode !== "release" ||
+    report.bootstrap?.manifest?.authority?.releaseTag !==
       report.bootstrap?.release_tag ||
     report.bootstrap?.manifest?.publication?.ready !== true
   ) {
@@ -319,6 +325,17 @@ export function createReleaseManifest(metadata, checksums, bundles, reports) {
   ) {
     fail("Release manifest has an invalid Artifact Signing endpoint.");
   }
+  const gateRunUrl = new URL(metadata.gateRunUrl);
+  const expectedGatePrefix =
+    `/${metadata.repository.toLowerCase()}/actions/runs/`;
+  if (
+    gateRunUrl.protocol !== "https:" ||
+    gateRunUrl.origin !== normalizedServerUrl ||
+    !gateRunUrl.pathname.toLowerCase().startsWith(expectedGatePrefix) ||
+    !/^[0-9]+$/.test(gateRunUrl.pathname.slice(expectedGatePrefix.length))
+  ) {
+    fail("Release manifest requires this repository's GitHub Actions run URL.");
+  }
 
   const matrix = expectedMatrix(metadata.version);
   for (const entry of matrix) entry.applicationId = metadata.applicationId;
@@ -355,16 +372,16 @@ export function createReleaseManifest(metadata, checksums, bundles, reports) {
   ) {
     fail("Release manifest requires a nonempty Windows SPDX-2.3 SBOM.");
   }
-  const assets = matrix.map((expected) => {
+  const artifacts = matrix.map((expected) => {
     const bundle = bundles[expected.name];
     const report = reports[expected.name];
     if (!bundle) fail(`Missing Sigstore bundle for ${expected.name}.`);
     if (!report) fail(`Missing package-gate report for ${expected.name}.`);
     if (
       report.content.bootstrap?.installed_commit !== metadata.commit ||
-      report.content.bootstrap?.manifest?.source_commit !== metadata.commit ||
+      report.content.bootstrap?.manifest?.commit !== metadata.commit ||
       report.content.bootstrap?.release_tag !== metadata.tag ||
-      report.content.bootstrap?.manifest?.release_tag !== metadata.tag
+      report.content.bootstrap?.manifest?.sourceRef !== metadata.tag
     ) {
       fail(`${expected.name} package bootstrap is not bound to the release commit.`);
     }
@@ -411,18 +428,26 @@ export function createReleaseManifest(metadata, checksums, bundles, reports) {
       expected.name,
     );
     return {
-      name: expected.name,
-      os: expected.os,
-      arch: expected.arch,
+      filename: expected.name,
+      platform: expected.os,
+      architecture: expected.arch,
       size: checksumByName[expected.name].size,
       sha256: checksumByName[expected.name].sha256,
       download_url: downloadUrl,
       signing: {
+        status: "verified",
         provider: report.content.signing.provider,
         identity: signingIdentity,
         verified: true,
       },
-      runtime_compatibility: report.content.runtime_compatibility,
+      runtime: {
+        compatible: true,
+        version: metadata.version,
+        commit: metadata.commit,
+        node: report.content.runtime_compatibility.node_engine,
+        electron: report.content.runtime_compatibility.electron,
+        details: report.content.runtime_compatibility,
+      },
       native_media: report.content.native_media,
       ...(expected.os === "windows"
         ? {
@@ -439,6 +464,9 @@ export function createReleaseManifest(metadata, checksums, bundles, reports) {
         : {}),
       gate: {
         status: "passed",
+        name: `frontier-package-gate-${expected.os}-${expected.arch}`,
+        commit: metadata.commit,
+        run_url: gateRunUrl.href,
         passed: report.content.gate.passed,
         total: report.content.gate.total,
         report: {
@@ -473,13 +501,13 @@ export function createReleaseManifest(metadata, checksums, bundles, reports) {
   );
 
   return {
-    schema:
-      "https://github.com/microsoft/aibast-agents-library/frontier-binary-manifest/v1",
+    schema: RELEASE_MANIFEST_SCHEMA,
     product: "RAPP Brainstem Frontier",
     application_id: metadata.applicationId,
     release: {
       tag: metadata.tag,
       version: metadata.version,
+      commit: metadata.commit,
       url: `${normalizedServerUrl}/${metadata.repository}/releases/tag/${encodeURIComponent(
         metadata.tag,
       )}`,
@@ -542,7 +570,7 @@ export function createReleaseManifest(metadata, checksums, bundles, reports) {
       metadata.repository,
       metadata.commit,
     ),
-    assets,
+    artifacts,
   };
 }
 
@@ -667,6 +695,7 @@ export function writeReleaseManifest(argv = process.argv.slice(2)) {
         sha256: sha256(windowsSbomPath),
         spdx_version: windowsSbomDocument.spdxVersion,
       },
+      gateRunUrl: requiredEnvironment("FRONTIER_GATE_RUN_URL"),
     },
     checksums,
     bundles,

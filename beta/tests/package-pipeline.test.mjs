@@ -4,6 +4,7 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  evaluateWindowsSigningPolicy,
   parsePackagingArguments,
 } from "../scripts/package-platform.mjs";
 import {
@@ -17,7 +18,13 @@ import {
 import {
   createReleaseManifest,
   parseChecksums,
+  RELEASE_MANIFEST_SCHEMA,
 } from "../scripts/release-manifest.mjs";
+import { upsertReleaseManifestFence } from "../scripts/fence-release-manifest.mjs";
+import {
+  parseReleaseManifest,
+  RELEASE_MANIFEST_SCHEMA as DOWNLOAD_CENTER_MANIFEST_SCHEMA,
+} from "../download-center.js";
 import {
   evaluatePolicyReadiness,
   loadNativeMediaPolicy,
@@ -97,6 +104,13 @@ test("current nonfree native media keeps binary publication blocked", () => {
   assert.match(readiness.blockers.join("\n"), /enable-nonfree/);
   assert.match(readiness.blockers.join("\n"), /macos-arm64\/ffmpeg/);
   assert.match(readiness.blockers.join("\n"), /windows-x64\/ffprobe/);
+  const booleanOnlyMutation = structuredClone(policy);
+  booleanOnlyMutation.publication_enabled = true;
+  assert.equal(
+    evaluatePolicyReadiness(booleanOnlyMutation).publication_ready,
+    false,
+    "flipping only the media publication boolean must not bypass provenance",
+  );
   const gateSource = readFileSync(
     path.join(betaDir, "scripts", "package-gate.mjs"),
     "utf8",
@@ -142,6 +156,15 @@ test("package bootstrap release authority is canonical and staging is distinct",
     productName: "RAPP Brainstem Frontier Staging",
   });
   assert.equal(staging.authorityRepository, "example/fork");
+  const policy = JSON.parse(
+    readFileSync(
+      path.join(betaDir, "build", "package-bootstrap-policy.json"),
+      "utf8",
+    ),
+  );
+  assert.equal(policy.publication_enabled, true);
+  assert.deepEqual(policy.publication_blockers, []);
+  assert.ok(policy.required_package_gate_contracts.length >= 9);
 });
 
 test("signed gates fail closed when verification identities are absent", () => {
@@ -267,6 +290,8 @@ test("release manifest requires the complete three-binary matrix", () => {
     windowsFileDigest: "SHA256",
     windowsTimestampDigest: "SHA256",
     windowsTimestampUrl: "http://timestamp.acs.microsoft.com/",
+    gateRunUrl:
+      "https://github.com/owner/repository/actions/runs/123456789",
     windowsSbom: {
       name:
         `RAPP-Brainstem-Frontier-${version}-windows-x64-setup.exe.spdx.json`,
@@ -356,11 +381,17 @@ test("release manifest requires the complete three-binary matrix", () => {
               installed_commit: "a".repeat(40),
               release_tag: metadata.tag,
               manifest: {
+                schema: 1,
+                product: "rapp-brainstem-frontier",
                 mode: "release",
-                source_commit: "a".repeat(40),
-                release_tag: metadata.tag,
+                commit: "a".repeat(40),
+                repositoryUrl:
+                  "https://github.com/microsoft/aibast-agents-library.git",
+                sourceRef: metadata.tag,
                 authority: {
-                  repository: "microsoft/aibast-agents-library",
+                  canonical: true,
+                  requestedMode: "release",
+                  releaseTag: metadata.tag,
                 },
                 publication: {
                   ready: true,
@@ -433,16 +464,21 @@ test("release manifest requires the complete three-binary matrix", () => {
     }),
   );
   const manifest = createReleaseManifest(metadata, checksums, bundles, reports);
-  assert.equal(manifest.assets.length, 3);
+  assert.equal(RELEASE_MANIFEST_SCHEMA, DOWNLOAD_CENTER_MANIFEST_SCHEMA);
+  assert.equal(manifest.schema, DOWNLOAD_CENTER_MANIFEST_SCHEMA);
+  assert.equal(manifest.release.commit, metadata.commit);
+  assert.equal(manifest.artifacts.length, 3);
   assert.equal(manifest.publication_policy.allow_unlisted_binary_assets, false);
   assert.equal(manifest.publication_policy.require_signed_manifest, true);
   assert.equal(manifest.publication_policy.windows_arm64_allowed, false);
-  assert.ok(manifest.assets.every((asset) => asset.gate.status === "passed"));
+  assert.ok(manifest.artifacts.every((asset) => asset.gate.status === "passed"));
+  assert.ok(manifest.artifacts.every((asset) => asset.gate.commit === metadata.commit));
+  assert.ok(manifest.artifacts.every((asset) => asset.gate.run_url === metadata.gateRunUrl));
   assert.ok(
-    manifest.assets.every((asset) => asset.native_media.publication_ready),
+    manifest.artifacts.every((asset) => asset.native_media.publication_ready),
   );
   assert.equal(
-    manifest.assets.find((asset) => asset.os === "windows").sbom.spdx_version,
+    manifest.artifacts.find((asset) => asset.platform === "windows").sbom.spdx_version,
     "SPDX-2.3",
   );
   assert.equal(manifest.signing.windows.profile_type, "PublicTrust");
@@ -451,14 +487,27 @@ test("release manifest requires the complete three-binary matrix", () => {
     "http://timestamp.acs.microsoft.com/",
   );
   assert.ok(
-    manifest.assets.every(
+    manifest.artifacts.every(
       (asset) =>
-        asset.runtime_compatibility.source_checkout_updater_compatible === false,
+        asset.runtime.details.source_checkout_updater_compatible === false,
     ),
   );
-  assert.ok(manifest.assets.every((asset) => asset.download_url.startsWith(
+  assert.ok(manifest.artifacts.every((asset) => asset.download_url.startsWith(
     "https://github.com/owner/repository/releases/download/brainstem-beta-v",
   )));
+  assert.ok(manifest.artifacts.every((asset) => asset.signing.status === "verified"));
+  assert.ok(manifest.artifacts.every((asset) => asset.runtime.compatible === true));
+  const fenced = upsertReleaseManifestFence("Release notes\n", manifest);
+  assert.deepEqual(parseReleaseManifest(fenced), manifest);
+  assert.equal(
+    fenced.match(/^```rapp-frontier-release-manifest$/gm)?.length,
+    1,
+  );
+  assert.equal(
+    upsertReleaseManifestFence(fenced, manifest)
+      .match(/^```rapp-frontier-release-manifest$/gm)?.length,
+    1,
+  );
   assert.equal(manifest.source_fallback.commit, metadata.commit);
   assert.equal(manifest.source_fallback.resolves_latest, false);
   assert.match(manifest.source_fallback.macos_linux.command, new RegExp(metadata.commit));
@@ -488,6 +537,37 @@ test("release manifest requires the complete three-binary matrix", () => {
   assert.throws(
     () => createReleaseManifest(metadata, checksums, bundles, nonfreeReports),
     /not approved for redistribution/,
+  );
+  const mismatchedBootstrapReports = structuredClone(reports);
+  mismatchedBootstrapReports[names[0]].content.bootstrap.manifest.commit =
+    "b".repeat(40);
+  assert.throws(
+    () => createReleaseManifest(
+      metadata,
+      checksums,
+      bundles,
+      mismatchedBootstrapReports,
+    ),
+    /bootstrap is not bound to the release commit/,
+  );
+  assert.throws(
+    () => upsertReleaseManifestFence("", {
+      ...manifest,
+      schema: "mutated-schema",
+    }),
+    /Manifest schema/,
+  );
+  assert.throws(
+    () => createReleaseManifest(
+      {
+        ...metadata,
+        gateRunUrl: "https://github.com/attacker/repository/actions/runs/123",
+      },
+      checksums,
+      bundles,
+      reports,
+    ),
+    /GitHub Actions run URL/,
   );
   assert.throws(
     () =>
@@ -608,13 +688,14 @@ test("packaged builds declare and enforce the binary update channel", () => {
   );
   assert.equal(
     packageMetadata.build.extraResources[0].to,
-    "package-bootstrap",
+    "bootstrap",
   );
   assert.equal(packageMetadata.devDependencies.electron, "43.4.1");
   assert.equal(packageMetadata.devDependencies["electron-builder"], "26.15.7");
   const main = readFileSync(path.join(betaDir, "electron", "main.mjs"), "utf8");
-  assert.match(main, /resolveUpdatePolicy\(\{ isPackaged: app\.isPackaged \}\)/);
-  assert.match(main, /if \(!updatePolicy\.sourceCheckoutAllowed\)/);
+  assert.match(main, /update:\s*app\.isPackaged/);
+  assert.match(main, /packagedUpdateState\(\)/);
+  assert.match(main, /if \(app\.isPackaged\)/);
 });
 
 test("macOS release signing is forced and notarization evidence is inspected", () => {
@@ -681,13 +762,24 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
   assert.equal(packageMetadata.build.nsis.warningsAsErrors, true);
   assert.equal(packageMetadata.build.win.requestedExecutionLevel, "asInvoker");
   assert.equal(policy.publication_enabled, false);
+  assert.equal(policy.backend_approval, "blocked-deprecated-v26");
+  assert.equal(policy.approved_backend_schema, null);
   assert.equal(policy.required_environment, "windows-production");
   assert.equal(policy.required_profile_type, "PublicTrust");
   assert.equal(policy.client_secret_allowed, false);
+  const booleanOnlyMutation = {
+    ...policy,
+    publication_enabled: true,
+  };
+  assert.equal(
+    evaluateWindowsSigningPolicy(booleanOnlyMutation).publicationReady,
+    false,
+    "flipping only the Windows publication boolean must not approve v26",
+  );
   assert.match(packaging, /entry\.endsWith\("\.blockmap"\)/);
   assert.match(packaging, /\^latest/);
   assert.match(packaging, /installers\.length !== 1/);
-  assert.match(main, /app\.setAppUserModelId\(APPLICATION_ID\)/);
+  assert.match(main, /app\.setAppUserModelId\(APP_ID\)/);
   assert.match(standardUserGate, /New-LocalUser/);
   assert.match(standardUserGate, /Add-LocalGroupMember/);
   assert.match(standardUserGate, /Start-Process[\s\S]*-Credential/);
@@ -721,9 +813,9 @@ test("workflow contract pins actions and never creates or moves a release tag", 
   assert.match(workflow, /windows-2025/);
   assert.match(workflow, /binary-manifest\.json/);
   assert.match(workflow, /\.gate\.json/);
-  assert.match(workflow, /require_runtime_service_gate/);
-  assert.match(workflow, /source_fallback/);
-  assert.match(workflow, /windows_arm64_allowed/);
+  assert.match(workflow, /fence-release-manifest\.mjs/);
+  assert.match(workflow, /verify-staged-release\.mjs/);
+  assert.match(workflow, /FRONTIER_GATE_RUN_URL/);
   assert.match(workflow, /test -s "\$asset"/);
   assert.match(workflow, /native-media-gate\.mjs/);
   assert.match(workflow, /windows-signing-policy\.json/);

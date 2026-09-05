@@ -12,7 +12,9 @@ The workflow never creates a release, creates a tag, moves a tag, or replaces
 an existing asset. It also refuses to publish binaries unless a hashed and
 Sigstore-attested binary manifest allowlists each exact filename, OS,
 architecture, SHA-256, platform signing identity, runtime compatibility, and
-passing package-gate report.
+passing package-gate report. The exact same manifest bytes must appear in the
+release body inside the single `rapp-frontier-release-manifest` fence expected
+by the Download Center.
 
 > **Current publication blocker:** `ffmpeg-static` resolves an ARM64 FFmpeg 6.0
 > binary built with `--enable-nonfree`, and FFprobe resolves a different
@@ -22,10 +24,13 @@ passing package-gate report.
 > signing or uploading binaries. This pipeline is not release-ready until a
 > redistributable checksum-pinned native media matrix is approved.
 >
-> `build/package-bootstrap-policy.json` independently blocks publication until
-> the bootstrap rollback and install/update-lock paths are release-certified.
-> `build/windows-signing-policy.json` also blocks the deprecated v26 Azure
-> signing backend.
+> The atomic bootstrap staging, rollback, cross-process lock, log-redaction,
+> and isolated userData contracts now have unit, process, concurrent first-run,
+> and native package-gate coverage. `build/package-bootstrap-policy.json` is
+> enabled and no longer blocks publication. `build/windows-signing-policy.json`
+> still blocks the deprecated electron-builder v26 Azure signing backend. The
+> native-media and Windows-signing policies must remain closed until their
+> recorded blockers are resolved.
 
 ## Supported binary matrix
 
@@ -72,9 +77,11 @@ Pull requests and ordinary manual dispatches build native, clearly named
 
 ## Packaged bootstrap authority and fixture gate
 
-`scripts/prepare-package-bootstrap.mjs` copies the real root Brainstem
-`install.sh` and `install.ps1` into the package together with a hashed authority
-manifest.
+`scripts/prepare-package-bootstrap.mjs` copies the exact committed root
+Brainstem `install.sh` and `install.ps1` into `build/generated/bootstrap`
+together with `provenance.json`. The provenance binds both installer hashes,
+the full source commit, repository URL, source ref, requested packaging mode,
+and package identity. Dirty tracked installer or beta sources fail packaging.
 
 Release mode accepts only:
 
@@ -92,18 +99,24 @@ Fork workflows must set non-production repository variables
 `FRONTIER_STAGING_APP_ID` and `FRONTIER_STAGING_PRODUCT_NAME`. Missing or
 Microsoft production values fail instead of producing a mislabeled package.
 
-The native package gate starts with no `BRAINSTEM_HOME`. It creates a local
-bare Git fixture pinned to one 40-character commit and version tag, verifies
-the bundled bootstrap checksum/authority manifest, executes that bundled
-installer, and requires the resulting source checkout and venv to resolve to
-the fixture commit before launching the packaged app. Preseeding a ready
-Brainstem is not accepted.
+The unsigned macOS verification gate installs the real DMG into an isolated
+Applications directory, starts with no `BRAINSTEM_HOME`, and runs the canonical
+first-run/concurrent smoke suite against a controlled immutable fixture. That
+suite exercises the actual packaged provisioner, atomic stage activation,
+rollback-safe target handling, cross-process lock, credential-canary
+redaction, ready-runtime reuse, two concurrent homes/backends, requested versus
+actual `app.getPath("userData")`, backend-failure exit, physical
+`app.asar.unpacked` Copilot startup, FFmpeg, and FFprobe. No check is optional
+or silently skipped.
 
 That local fixture is development evidence only. A sealed signed artifact gate
 must not reuse it. Release-mode gates instead run the bundled bootstrap against
 the canonical GitHub repository, exact `brainstem-beta-v*` tag, exact
 40-character release commit, and commit-pinned runtime version URL, then verify
-the installed checkout resolves to that same commit.
+the installed checkout resolves to that same commit. The signed artifact is
+not rewritten with the development fixture: its standard-user first launch
+executes the unmodified, hashed bootstrap resource and must reach real
+Brainstem readiness before the package gate can pass.
 
 ## One-time repository configuration
 
@@ -238,8 +251,8 @@ The NSIS contract is exactly one per-user x64 installer named
 - uninstall GUID `48d3a204-a20a-516d-b74f-5ac374e1c8bb`;
 - `asInvoker`, stable shortcuts/uninstall identity, and no app-data deletion;
 - `warningsAsErrors=true`; and
-- `runAfterFinish=false` until runtime bootstrap readiness is independently
-  guaranteed.
+- `runAfterFinish=false`, so installation never races an unobserved first-run
+  bootstrap.
 
 No `.blockmap`, `latest.yml`, or other updater metadata is published. Initial
 SmartScreen warnings may still occur; signing is not documented as a
@@ -270,19 +283,18 @@ be exercised locally:
 
 ```sh
 FRONTIER_SIGNING_MODE=unsigned npm run dist:mac
-BRAINSTEM_PACKAGE_GATE_PYTHON="$HOME/.brainstem/venv/bin/python" \
-  npm run package:gate
+npm run package:gate
 ```
 
 This local artifact is named `*-unsigned.dmg`; never attach it to a release.
 The gate mounts the DMG, copies the app into an isolated Applications
-directory, executes that installed app bundle, and proves the bundled
-bootstrap created the isolated runtime first. The packaged app must then start
-a routed Brainstem whose `/health`, frontend, and `/models` endpoints become
-ready from isolated `HOME`, `USERPROFILE`, and `BRAINSTEM_HOME` paths. It then
-proves the service stops with the app. Windows unsigned verification runs in
-the workflow because NSIS installation, launch, readiness, and uninstall are
-gated on a native Windows runner.
+directory and executes that installed app bundle. The canonical package
+first-run gate rewrites only the unsigned development copy with its immutable
+fixture, restores the original bytes afterward, and runs the 26-check
+missing-runtime, already-ready, concurrent-userData, redaction, Copilot/media,
+readiness, failure, and shutdown contract. Windows unsigned verification runs
+in the workflow because NSIS standard-user installation, real commit-pinned
+bootstrap, launch, readiness, and uninstall require a native Windows runner.
 
 Wait for repository preflight and the unsigned `Frontier Binaries` pull-request
 jobs to pass.
@@ -334,8 +346,9 @@ Running the workflow at the tag is required: it binds the protected environment
 deployment and the provenance `source-ref` to `refs/tags/<tag>` rather than to a
 mutable branch.
 
-At present this command is expected to fail at the native-media policy gate.
-That failure is the publication control, not a release incident.
+At present this command is expected to fail at the native-media and Windows
+signing policy gates. Those failures are publication controls, not release
+incidents.
 
 Release mode fails closed unless all of the following are true:
 
@@ -360,7 +373,12 @@ Release mode fails closed unless all of the following are true:
 - each package-gate JSON report says every check passed and is hashed;
 - the binary manifest contains only the exact three allowed assets and records
   their nonzero byte size, download URL, OS/architecture, SHA-256, verified
-  signing identity, runtime compatibility, and gate-report URL/digest;
+  signing identity, runtime compatibility, exact release commit, and
+  gate-report URL/digest;
+- the manifest uses `rapp-brainstem-frontier-release-manifest/v1`, and the
+  draft release body contains exactly one
+  `rapp-frontier-release-manifest` fence byte-for-byte equivalent to the signed
+  manifest asset;
 - duplicate names, unknown files, uninstallers, missing URLs, zero-size files,
   a mismatched tag, or anything other than a full 40-character source commit
   make manifest generation fail;
@@ -413,20 +431,29 @@ Packaged builds therefore declare
 blocks the source-checkout updater and explains that a packaged update must use
 the binary channel.
 
-The binary channel's authority is
-`RAPP-Brainstem-Frontier-<version>-binary-manifest.json`. GitHub Pages or any
-future in-app binary updater may expose a `.dmg` or `.exe` only when:
+The binary channel's machine-readable authority is the single
+`rapp-frontier-release-manifest` JSON fence in the release body. CI requires it
+to equal the separately attached and Sigstore-attested
+`RAPP-Brainstem-Frontier-<version>-binary-manifest.json` before publication.
+The Download Center may expose a `.dmg` or `.exe` only when:
 
-1. the manifest and its adjacent Sigstore bundle verify;
-2. `SHA256SUMS` verifies the manifest, binary, and package-gate report;
-3. one manifest entry exactly matches the requested filename, OS, and
+1. the manifest schema, release tag, 40-character commit, and version match;
+2. one manifest entry exactly matches the requested filename, OS, and
    architecture;
-4. the binary is nonempty and its size, download URL, and SHA-256 match that
+3. the GitHub release API reports one uploaded, nonempty asset with a safe
+   browser URL and a `sha256:` digest matching that entry;
+4. the binary is nonempty and its size and SHA-256 match that
    entry;
 5. the gate report is nonempty and its URL and SHA-256 match that entry;
 6. the recorded platform signing identity and runtime compatibility match
    policy; and
 7. the gate status is `passed`.
+
+The protected publication workflow additionally verifies `SHA256SUMS`, every
+binary/report/manifest attestation, the exact fenced/body equality, and the
+same Download Center validator immediately before changing the draft to
+published. A future in-app updater must perform equivalent signature and
+attestation verification locally.
 
 There is no in-place `app.asar` mutation or fallback to the source updater.
 Until a manifest-verifying in-app installer exists, packaged users install the

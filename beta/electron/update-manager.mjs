@@ -13,6 +13,8 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/i;
 const UPDATE_REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
+export const PACKAGE_DOWNLOAD_URL =
+  "https://microsoft.github.io/aibast-agents-library/beta/";
 
 export function resolveUpdatePolicy({ isPackaged = false } = {}) {
   if (isPackaged) {
@@ -37,6 +39,20 @@ export function resolveUpdatePolicy({ isPackaged = false } = {}) {
 
 function asErrorMessage(error) {
   return String(error?.message || error);
+}
+
+export function packagedUpdateState() {
+  return {
+    phase: "blocked",
+    message: "Packaged Frontier updates require a new signed app package.",
+    detail: "The source-checkout updater is disabled inside app.asar and will "
+      + "not rewrite this installed application.",
+    guidance: "Download the newer published package from "
+      + `${PACKAGE_DOWNLOAD_URL} `
+      + "Installing it preserves your existing BRAINSTEM_HOME.",
+    action: "download-package",
+    actionLabel: "Download latest signed package",
+  };
 }
 
 export function validateUpdateRef(value) {

@@ -13,6 +13,7 @@ import {
   checkForUpdates,
   githubRawUrl,
   inferManagedBetaHome,
+  packagedUpdateState,
   parseGitHubRepository,
   readUpdateConfiguration,
   resolveManagedInstall,
@@ -33,6 +34,16 @@ test("packaged app.asar builds cannot use the source-checkout updater", () => {
   const source = resolveUpdatePolicy({ isPackaged: false });
   assert.equal(source.channel, "source-checkout");
   assert.equal(source.sourceCheckoutAllowed, true);
+});
+
+test("packaged apps refuse the source-checkout updater explicitly", () => {
+  const state = packagedUpdateState();
+  assert.equal(state.phase, "blocked");
+  assert.match(state.message, /new signed app package/);
+  assert.match(state.detail, /disabled inside app\.asar/);
+  assert.match(state.guidance, /preserves your existing BRAINSTEM_HOME/);
+  assert.equal(state.action, "download-package");
+  assert.equal(state.actionLabel, "Download latest signed package");
 });
 
 test("GitHub repository URLs support HTTPS and SSH remotes", () => {

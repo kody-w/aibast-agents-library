@@ -1,146 +1,252 @@
+#!/usr/bin/env node
+
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
-  copyFileSync,
   mkdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
+import {
+  normalizeGitHubRepositoryUrl,
+  validateBootstrapProvenance,
+} from "../electron/brainstem-provisioner.mjs";
 
-const betaDir = path.resolve(import.meta.dirname, "..");
-const repositoryRoot = path.resolve(betaDir, "..");
-const canonicalRepository = "microsoft/aibast-agents-library";
-const canonicalRepositoryUrl =
+export const CANONICAL_REPOSITORY =
   "https://github.com/microsoft/aibast-agents-library.git";
-const productionApplicationId =
+export const PRODUCTION_APP_ID =
   "com.microsoft.aibast.rapp-brainstem-beta";
-const productionProductName = "RAPP Brainstem Frontier";
+export const PRODUCTION_PRODUCT_NAME =
+  "RAPP Brainstem Frontier";
+export const NSIS_GUID =
+  "48d3a204-a20a-516d-b74f-5ac374e1c8bb";
 
-function fail(message) {
-  throw new Error(message);
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+const betaDir = path.resolve(dirname, "..");
+const repositoryRoot = path.resolve(betaDir, "..");
+const generatedDir = path.join(betaDir, "build", "generated", "bootstrap");
+const commitPattern = /^[0-9a-f]{40}$/;
+const releaseTagPattern = /^brainstem-beta-v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
 }
 
-function sha256(filePath) {
-  return createHash("sha256").update(readFileSync(filePath)).digest("hex");
+function runGit(args) {
+  return execFileSync("git", args, {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }).trim();
 }
 
-function fullCommit() {
+function normalizeSourceRepository(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return normalizeGitHubRepositoryUrl(runGit(["remote", "get-url", "origin"]));
+  if (/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(raw)) {
+    return normalizeGitHubRepositoryUrl(`https://github.com/${raw}.git`);
+  }
+  return normalizeGitHubRepositoryUrl(raw);
+}
+
+function resolveMode(explicitMode) {
+  const requested = String(
+    explicitMode
+      || process.env.FRONTIER_PACKAGE_BOOTSTRAP_MODE
+      || process.env.BRAINSTEM_BETA_PACKAGE_MODE
+      || "development",
+  ).trim().toLowerCase();
+  if (!["development", "staging", "release"].includes(requested)) {
+    throw new Error(
+      "FRONTIER_PACKAGE_BOOTSTRAP_MODE must be development, staging, or release.",
+    );
+  }
+  return requested;
+}
+
+function resolveCommit(explicitCommit) {
   const commit = String(
-    process.env.FRONTIER_PACKAGE_COMMIT ||
-    execFileSync("git", ["rev-parse", "HEAD"], {
-      cwd: repositoryRoot,
-      encoding: "utf8",
-      windowsHide: true,
-    }),
+    explicitCommit
+      || process.env.FRONTIER_PACKAGE_SOURCE_COMMIT
+      || process.env.BRAINSTEM_BETA_PACKAGE_COMMIT
+      || runGit(["rev-parse", "HEAD"]),
+  ).trim().toLowerCase();
+  if (!commitPattern.test(commit)) {
+    throw new Error(
+      "Packaged bootstrap provenance requires a full 40-character commit SHA.",
+    );
+  }
+  const resolved = runGit(["rev-parse", `${commit}^{commit}`]).toLowerCase();
+  if (resolved !== commit) {
+    throw new Error("The requested package commit is not available locally.");
+  }
+  const dirty = runGit([
+    "status",
+    "--porcelain",
+    "--untracked-files=no",
+    "--",
+    "install.sh",
+    "install.ps1",
+    "beta",
+  ]);
+  if (dirty) {
+    throw new Error(
+      "Refusing to package dirty installer or beta sources. Commit the exact "
+      + "runtime and bootstrap bytes before building.",
+    );
+  }
+  return commit;
+}
+
+function resolveIdentity({ mode, repositoryUrl, appId, productName }) {
+  const canonicalSource = repositoryUrl === CANONICAL_REPOSITORY;
+  const requestedAppId = String(
+    appId || process.env.FRONTIER_PACKAGE_APP_ID || "",
   ).trim();
-  if (!/^[0-9a-f]{40}$/i.test(commit)) {
-    fail("Package bootstrap requires a full 40-character source commit.");
-  }
-  return commit.toLowerCase();
-}
+  const requestedProductName = String(
+    productName || process.env.FRONTIER_PACKAGE_PRODUCT_NAME || "",
+  ).trim();
 
-function repositorySlugFromUrl(value) {
-  const match = String(value || "").match(
-    /github\.com[/:]([^/]+)\/([^/]+?)(?:\.git)?$/i,
-  );
-  return match ? `${match[1]}/${match[2]}` : null;
-}
-
-export function resolvePackageAuthority({
-  signingMode,
-  mode = null,
-  sourceRepository = process.env.FRONTIER_PACKAGE_SOURCE_REPOSITORY ||
-    process.env.GITHUB_REPOSITORY ||
-    null,
-  authorityUrl = process.env.FRONTIER_PACKAGE_AUTHORITY_URL ||
-    canonicalRepositoryUrl,
-  applicationId = process.env.FRONTIER_PACKAGE_APP_ID ||
-    productionApplicationId,
-  productName = process.env.FRONTIER_PACKAGE_PRODUCT_NAME ||
-    productionProductName,
-} = {}) {
-  const explicitMode =
-    Boolean(mode) || Boolean(process.env.FRONTIER_PACKAGE_BOOTSTRAP_MODE);
-  mode = mode ||
-    process.env.FRONTIER_PACKAGE_BOOTSTRAP_MODE ||
-    (signingMode === "signed" ? "release" : "development");
-  if (!["release", "staging", "development"].includes(mode)) {
-    fail("FRONTIER_PACKAGE_BOOTSTRAP_MODE must be release, staging, or development.");
-  }
-  const authorityRepository = repositorySlugFromUrl(authorityUrl);
-  if (!authorityRepository) {
-    fail("Package bootstrap authority must be a GitHub repository URL.");
-  }
   if (mode === "release") {
-    if (
-      authorityUrl !== canonicalRepositoryUrl ||
-      authorityRepository !== canonicalRepository ||
-      sourceRepository !== canonicalRepository ||
-      applicationId !== productionApplicationId ||
-      productName !== productionProductName
-    ) {
-      fail("Release package bootstrap authority must be canonical microsoft/aibast-agents-library.");
-    }
-  } else if (
-    authorityRepository !== canonicalRepository ||
-    (sourceRepository && sourceRepository !== canonicalRepository)
-  ) {
-    if (!explicitMode) {
-      fail("Noncanonical package builds require an explicit staging or development mode.");
+    if (!canonicalSource) {
+      throw new Error(
+        `Release package authority must be canonical: ${CANONICAL_REPOSITORY}.`,
+      );
     }
     if (
-      applicationId === productionApplicationId ||
-      productName === productionProductName
+      (requestedAppId && requestedAppId !== PRODUCTION_APP_ID)
+      || (requestedProductName && requestedProductName !== PRODUCTION_PRODUCT_NAME)
     ) {
-      fail("Noncanonical package builds require a distinct application ID and product name.");
+      throw new Error("Release package identity is frozen and cannot be overridden.");
     }
+    return {
+      applicationId: PRODUCTION_APP_ID,
+      productName: PRODUCTION_PRODUCT_NAME,
+    };
   }
+
+  if (!canonicalSource) {
+    if (!requestedAppId || !requestedProductName) {
+      throw new Error(
+        "Noncanonical development/staging packages require an explicit "
+        + "distinct application ID and product name through "
+        + "FRONTIER_PACKAGE_APP_ID and FRONTIER_PACKAGE_PRODUCT_NAME.",
+      );
+    }
+    if (
+      requestedAppId === PRODUCTION_APP_ID
+      || requestedProductName === PRODUCTION_PRODUCT_NAME
+    ) {
+      throw new Error(
+        "Noncanonical packages must use an identity distinct from production.",
+      );
+    }
+    return {
+      applicationId: requestedAppId,
+      productName: requestedProductName,
+    };
+  }
+
   return {
-    mode,
-    sourceRepository,
-    authorityRepository,
-    authorityUrl,
-    applicationId,
-    productName,
+    applicationId: requestedAppId || PRODUCTION_APP_ID,
+    productName: requestedProductName || PRODUCTION_PRODUCT_NAME,
   };
 }
 
-export function preparePackageBootstrap({ signingMode } = {}) {
-  const authority = resolvePackageAuthority({ signingMode });
-  const commit = fullCommit();
-  const releaseTag =
-    authority.mode === "release"
-      ? String(process.env.FRONTIER_PACKAGE_RELEASE_TAG || "").trim()
-      : null;
-  if (
-    authority.mode === "release" &&
-    !/^brainstem-beta-v[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+$/.test(
-      releaseTag,
-    )
-  ) {
-    fail("Release package bootstrap requires FRONTIER_PACKAGE_RELEASE_TAG.");
-  }
-  const outputDir = path.join(betaDir, "release", "package-bootstrap");
-  rmSync(outputDir, { recursive: true, force: true });
-  mkdirSync(outputDir, { recursive: true });
+export function resolvePackageAuthority({
+  mode = "development",
+  sourceRepository,
+  authorityUrl,
+  applicationId,
+  productName,
+} = {}) {
+  const normalizedMode = resolveMode(mode);
+  const repositoryUrl = normalizeSourceRepository(
+    authorityUrl || sourceRepository,
+  );
+  const repository = new URL(repositoryUrl).pathname
+    .replace(/^\/|\/(?:\.git)?$/g, "")
+    .replace(/\.git$/i, "");
+  const identity = resolveIdentity({
+    mode: normalizedMode,
+    repositoryUrl,
+    appId: applicationId,
+    productName,
+  });
+  return {
+    ...identity,
+    authorityRepository: repository,
+    authorityUrl: repositoryUrl,
+    mode: normalizedMode,
+  };
+}
 
-  const files = [
-    ["install.sh", path.join(repositoryRoot, "install.sh")],
-    ["install.ps1", path.join(repositoryRoot, "install.ps1")],
-  ];
-  const manifestFiles = {};
-  for (const [name, source] of files) {
-    const destination = path.join(outputDir, name);
-    copyFileSync(source, destination);
-    manifestFiles[name] = {
-      sha256: sha256(destination),
-      size: readFileSync(destination).length,
-    };
+export function preparePackageBootstrap(options = {}) {
+  const mode = resolveMode(options.mode);
+  const provenanceMode = mode === "release" ? "release" : "development";
+  const commit = resolveCommit(options.commit);
+  const repositoryUrl = normalizeSourceRepository(
+    options.repository || process.env.FRONTIER_PACKAGE_SOURCE_REPOSITORY,
+  );
+  const releaseTag = String(
+    options.releaseTag || process.env.FRONTIER_PACKAGE_RELEASE_TAG || "",
+  ).trim();
+  if (mode === "release" && !releaseTagPattern.test(releaseTag)) {
+    throw new Error(
+      "Release packaging requires FRONTIER_PACKAGE_RELEASE_TAG="
+      + "brainstem-beta-v<semver>.",
+    );
   }
+
+  const identity = resolveIdentity({
+    mode,
+    repositoryUrl,
+    appId: options.appId,
+    productName: options.productName,
+  });
+
+  rmSync(generatedDir, { recursive: true, force: true });
+  mkdirSync(generatedDir, { recursive: true });
+
+  const installers = {};
+  for (const filename of ["install.sh", "install.ps1"]) {
+    const source = execFileSync("git", ["show", `${commit}:${filename}`], {
+      cwd: repositoryRoot,
+      encoding: null,
+      stdio: ["ignore", "pipe", "pipe"],
+      maxBuffer: 8 * 1024 * 1024,
+    });
+    writeFileSync(path.join(generatedDir, filename), source, { mode: 0o755 });
+    installers[filename] = { sha256: sha256(source) };
+  }
+
+  const manifest = {
+    schema: 1,
+    product: provenanceMode === "release"
+      ? "rapp-brainstem-frontier"
+      : "rapp-brainstem-frontier-development",
+    mode: provenanceMode,
+    commit,
+    repositoryUrl,
+    sourceRef: mode === "release"
+      ? releaseTag
+      : String(process.env.BRAINSTEM_BETA_PACKAGE_REF || commit).trim(),
+    installers,
+    authority: {
+      canonical: repositoryUrl === CANONICAL_REPOSITORY,
+      requestedMode: mode,
+      releaseTag: releaseTag || null,
+    },
+    packageIdentity: {
+      appId: identity.applicationId,
+      productName: identity.productName,
+      nsisGuid: NSIS_GUID,
+    },
+  };
 
   const policy = JSON.parse(
     readFileSync(
@@ -148,52 +254,47 @@ export function preparePackageBootstrap({ signingMode } = {}) {
       "utf8",
     ),
   );
-  const manifest = {
-    schema:
-      "https://github.com/microsoft/aibast-agents-library/frontier-package-bootstrap/v1",
-    mode: authority.mode,
-    source_repository: authority.sourceRepository,
-    source_commit: commit,
-    release_tag: releaseTag,
-    authority: {
-      repository: authority.authorityRepository,
-      repository_url: authority.authorityUrl,
-    },
-    package_identity: {
-      application_id: authority.applicationId,
-      product_name: authority.productName,
-    },
-    publication: {
-      ready: policy.publication_enabled === true,
-      blockers: policy.publication_blockers || [],
-      policy_schema: policy.schema,
-    },
-    files: manifestFiles,
+  const policyBlockers = Array.isArray(policy.publication_blockers)
+    ? policy.publication_blockers.map((entry) => String(entry))
+    : [];
+  manifest.publication = {
+    ready: policy.publication_enabled === true && policyBlockers.length === 0,
+    blockers: policyBlockers,
   };
+
+  validateBootstrapProvenance(manifest);
   writeFileSync(
-    path.join(outputDir, "manifest.json"),
+    path.join(generatedDir, "provenance.json"),
     `${JSON.stringify(manifest, null, 2)}\n`,
-    { mode: 0o600 },
+    { mode: 0o644 },
   );
+
   return {
-    ...authority,
-    commit,
-    outputDir,
+    ...identity,
+    bootstrapDirectory: generatedDir,
     manifest,
   };
 }
 
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
-) {
+function main() {
+  const result = preparePackageBootstrap();
+  const written = ["install.sh", "install.ps1", "provenance.json"]
+    .map((filename) => {
+      const body = readFileSync(path.join(generatedDir, filename));
+      return `${filename} (${body.length} bytes)`;
+    })
+    .join(", ");
+  console.log(
+    `Prepared ${result.manifest.mode} bootstrap bundle for `
+    + `${result.manifest.commit}: ${written}`,
+  );
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   try {
-    const signingMode = process.argv[2] || process.env.FRONTIER_SIGNING_MODE;
-    process.stdout.write(
-      `${JSON.stringify(preparePackageBootstrap({ signingMode }), null, 2)}\n`,
-    );
+    main();
   } catch (error) {
-    process.stderr.write(`Package bootstrap preparation failed: ${String(error.stack || error)}\n`);
+    console.error(`Package bootstrap preparation failed: ${error.message}`);
     process.exit(1);
   }
 }

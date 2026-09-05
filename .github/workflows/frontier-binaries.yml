@@ -88,6 +88,9 @@ jobs:
             if ! node -e '
               const policy = require("./beta/build/windows-signing-policy.json");
               if (policy.publication_enabled !== true ||
+                  policy.backend_approval !== "approved" ||
+                  policy.approved_backend_schema !==
+                    policy.current_backend_schema ||
                   policy.client_secret_allowed !== false ||
                   policy.required_environment !== "windows-production" ||
                   policy.required_profile_type !== "PublicTrust") {
@@ -172,10 +175,8 @@ jobs:
         include:
           - arch: x64
             runner: macos-26-intel
-            app_dir: mac
           - arch: arm64
             runner: macos-26
-            app_dir: mac-arm64
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -226,7 +227,6 @@ jobs:
             --arch "${{ matrix.arch }}" \
             --mode unsigned \
             --artifact "$artifact" \
-            --app-dir "release/${{ matrix.app_dir }}/RAPP Brainstem Frontier.app" \
             --scratch-dir "release/package-gate-macos-${{ matrix.arch }}-unsigned" \
             --brainstem-python "${{ steps.runtime.outputs.python }}" \
             --brainstem-source "$GITHUB_WORKSPACE/rapp_brainstem" \
@@ -718,6 +718,7 @@ jobs:
           FRONTIER_RELEASE_TAG: ${{ needs.context.outputs.tag }}
           FRONTIER_RELEASE_VERSION: ${{ needs.context.outputs.version }}
           FRONTIER_RELEASE_COMMIT: ${{ needs.context.outputs.commit }}
+          FRONTIER_GATE_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           MACOS_SIGNING_IDENTITY: ${{ vars.MACOS_SIGNING_IDENTITY }}
           APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
         run: |
@@ -757,6 +758,30 @@ jobs:
             "RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json" \
             "RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json.sigstore.json" \
             > SHA256SUMS
+
+      - name: Bind signed manifest into draft release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.context.outputs.release_id }}
+          MANIFEST: ${{ steps.manifest.outputs.path }}
+        run: |
+          set -euo pipefail
+          gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+            "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+            --jq '.body // ""' > "$RUNNER_TEMP/frontier-release-body.md"
+          node beta/scripts/fence-release-manifest.mjs \
+            --body "$RUNNER_TEMP/frontier-release-body.md" \
+            --manifest "$MANIFEST" \
+            --output "$RUNNER_TEMP/frontier-release-body-with-manifest.md"
+          gh api --method PATCH \
+            -H "X-GitHub-Api-Version: 2026-03-10" \
+            "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+            -F body=@"$RUNNER_TEMP/frontier-release-body-with-manifest.md" \
+            > "$RUNNER_TEMP/frontier-release-updated.json"
+          test "$(
+            jq -r '.body' "$RUNNER_TEMP/frontier-release-updated.json" \
+              | grep -c '^```rapp-frontier-release-manifest$'
+          )" = 1
 
       - name: Attach only to the existing draft release
         env:
@@ -866,162 +891,16 @@ jobs:
             --source-digest "$COMMIT" \
             --source-ref "refs/tags/$TAG" \
             --deny-self-hosted-runners
-          node - "$manifest" "$TAG" "$VERSION" "$COMMIT" <<'NODE'
-          const crypto = require("node:crypto");
-          const fs = require("node:fs");
-          const [manifestPath, tag, version, commit] = process.argv.slice(2);
-          const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-          const digest = (file) => crypto.createHash("sha256")
-            .update(fs.readFileSync(file)).digest("hex");
-          const releaseBase =
-            `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}` +
-            `/releases/download/${encodeURIComponent(tag)}/`;
-          if (manifest.schema !==
-              "https://github.com/microsoft/aibast-agents-library/frontier-binary-manifest/v1") {
-            throw new Error("unsupported binary manifest schema");
-          }
-          if (manifest.release?.tag !== tag ||
-              manifest.release?.version !== version ||
-              manifest.application_id !==
-                "com.microsoft.aibast.rapp-brainstem-beta" ||
-              manifest.toolchain?.electron !== "43.4.1" ||
-              manifest.toolchain?.electron_builder !== "26.15.7" ||
-              manifest.release?.url !==
-                `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}` +
-                `/releases/tag/${encodeURIComponent(tag)}` ||
-              manifest.source?.repository !== process.env.GITHUB_REPOSITORY ||
-              manifest.source?.ref !== `refs/tags/${tag}` ||
-              manifest.source?.commit !== commit ||
-              !/^[0-9a-f]{40}$/i.test(manifest.source.commit)) {
-            throw new Error("binary manifest release identity mismatch");
-          }
-          if (manifest.signing?.windows?.profile_type !== "PublicTrust" ||
-              manifest.signing?.windows?.file_digest !== "SHA256" ||
-              manifest.signing?.windows?.timestamp_digest !== "SHA256" ||
-              manifest.signing?.windows?.timestamp !==
-                "http://timestamp.acs.microsoft.com/" ||
-              !/Microsoft/i.test(manifest.signing?.windows?.identity || "") ||
-              !manifest.signing?.windows?.backend_schema) {
-            throw new Error("Windows signing manifest mismatch");
-          }
-          if (manifest.publication_policy?.allow_unlisted_binary_assets !== false ||
-              manifest.publication_policy?.require_signed_manifest !== true ||
-              manifest.publication_policy?.require_runtime_service_gate !== true ||
-              manifest.publication_policy?.windows_arm64_allowed !== false ||
-              manifest.assets?.length !== 3) {
-            throw new Error("binary manifest publication policy mismatch");
-          }
-          if (manifest.manifest_url !==
-              `${releaseBase}${encodeURIComponent(manifestPath)}` ||
-              manifest.source_fallback?.commit !== commit ||
-              manifest.source_fallback?.resolves_latest !== false ||
-              !manifest.source_fallback?.macos_linux?.installer_url?.includes(
-                `/${commit}/beta/install.sh`) ||
-              !manifest.source_fallback?.windows?.installer_url?.includes(
-                `/${commit}/beta/install.cmd`) ||
-              !manifest.source_fallback?.macos_linux?.command?.includes(commit) ||
-              !manifest.source_fallback?.windows?.command?.includes(commit) ||
-              /latest/i.test(manifest.source_fallback?.macos_linux?.command || "") ||
-              /latest/i.test(manifest.source_fallback?.windows?.command || "")) {
-            throw new Error("binary manifest URL or source fallback mismatch");
-          }
-          const expected = new Map([
-            [`RAPP-Brainstem-Frontier-${version}-macos-arm64.dmg`, ["macos", "arm64"]],
-            [`RAPP-Brainstem-Frontier-${version}-macos-x64.dmg`, ["macos", "x64"]],
-            [`RAPP-Brainstem-Frontier-${version}-windows-x64-setup.exe`, ["windows", "x64"]],
-          ]);
-          for (const asset of manifest.assets) {
-            const platform = expected.get(asset.name);
-            if (!platform) throw new Error(`unlisted asset ${asset.name}`);
-            if (asset.os !== platform[0] || asset.arch !== platform[1]) {
-              throw new Error(`platform mismatch ${asset.name}`);
-            }
-            if (asset.gate?.report?.name !== `${asset.name}.gate.json` ||
-                asset.provenance?.sigstore_bundle !== `${asset.name}.sigstore.json`) {
-              throw new Error(`evidence filename mismatch ${asset.name}`);
-            }
-            const size = fs.statSync(asset.name).size;
-            if (size < 1 || asset.size !== size ||
-                asset.download_url !== `${releaseBase}${encodeURIComponent(asset.name)}` ||
-                asset.gate.report.url !==
-                  `${releaseBase}${encodeURIComponent(asset.gate.report.name)}` ||
-                asset.provenance.url !==
-                  `${releaseBase}${encodeURIComponent(asset.provenance.sigstore_bundle)}`) {
-              throw new Error(`size or URL mismatch ${asset.name}`);
-            }
-            if (asset.os === "windows") {
-              const expectedSbom = `${asset.name}.spdx.json`;
-              if (asset.sbom?.name !== expectedSbom ||
-                  asset.sbom?.spdx_version !== "SPDX-2.3" ||
-                  asset.sbom?.size !== fs.statSync(expectedSbom).size ||
-                  asset.sbom?.sha256 !== digest(expectedSbom) ||
-                  asset.sbom?.url !==
-                    `${releaseBase}${encodeURIComponent(expectedSbom)}`) {
-                throw new Error(`Windows SBOM mismatch ${asset.name}`);
-              }
-              const sbom = JSON.parse(fs.readFileSync(expectedSbom, "utf8"));
-              if (sbom.spdxVersion !== "SPDX-2.3" ||
-                  !Array.isArray(sbom.packages) ||
-                  sbom.packages.length < 1) {
-                throw new Error(`Invalid Windows SPDX document ${asset.name}`);
-              }
-            } else if (asset.sbom) {
-              throw new Error(`Unexpected SBOM on ${asset.name}`);
-            }
-            expected.delete(asset.name);
-            if (digest(asset.name) !== asset.sha256) throw new Error(`asset digest mismatch ${asset.name}`);
-            if (fs.statSync(asset.gate.report.name).size !== asset.gate.report.size ||
-                asset.gate.report.size < 1 ||
-                digest(asset.gate.report.name) !== asset.gate.report.sha256) {
-              throw new Error(`gate report digest mismatch ${asset.name}`);
-            }
-            const report = JSON.parse(fs.readFileSync(asset.gate.report.name, "utf8"));
-            if (asset.gate.status !== "passed" ||
-                asset.signing.verified !== true ||
-                asset.native_media?.publication_ready !== true ||
-                report.gate?.status !== "passed" ||
-                report.runtime?.service_ready !== true ||
-                report.runtime?.isolated_home !== true ||
-                report.runtime?.copilot_auth_startup !== true ||
-                report.bootstrap?.executed !== true ||
-                report.bootstrap?.authority_mode !== "canonical-release" ||
-                report.bootstrap?.installed_commit !== commit ||
-                report.bootstrap?.release_tag !== tag ||
-                report.bootstrap?.manifest?.mode !== "release" ||
-                report.bootstrap?.manifest?.authority?.repository !==
-                  "microsoft/aibast-agents-library" ||
-                report.bootstrap?.manifest?.source_commit !== commit ||
-                report.bootstrap?.manifest?.release_tag !== tag ||
-                report.bootstrap?.manifest?.publication?.ready !== true ||
-                report.signing?.verified !== true ||
-                report.signing?.identity !== asset.signing.identity ||
-                report.source?.application_id !== manifest.application_id ||
-                report.publication?.status !== "ready" ||
-                report.publication?.blockers?.length ||
-                report.native_media?.publication_ready !== true ||
-                report.runtime_compatibility?.source_checkout_updater_compatible !== false) {
-              throw new Error(`unsafe gate report ${asset.name}`);
-            }
-            if (asset.os === "windows" &&
-                report.execution?.windows_standard_user !== true) {
-              throw new Error(`Windows package was not gated as a standard user`);
-            }
-            if (asset.os === "macos" &&
-                (report.notarization?.app?.submission?.status !== "Accepted" ||
-                 report.notarization?.app?.log?.status !== "Accepted" ||
-                 report.notarization?.app?.stapled !== true ||
-                 report.notarization?.app?.target?.code_signature?.ad_hoc !== false ||
-                 !report.notarization?.app?.target?.code_signature?.timestamp ||
-                 report.notarization?.dmg?.submission?.status !== "Accepted" ||
-                 report.notarization?.dmg?.log?.status !== "Accepted" ||
-                 report.notarization?.dmg?.stapled !== true ||
-                 report.notarization?.dmg?.target?.code_signature?.ad_hoc !== false ||
-                 !report.notarization?.dmg?.target?.code_signature?.timestamp)) {
-              throw new Error(`notarization evidence mismatch ${asset.name}`);
-            }
-          }
-          if (expected.size) throw new Error(`missing allowlisted assets: ${[...expected]}`);
-          NODE
+          gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+            "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+            > "$RUNNER_TEMP/frontier-staged-release.json"
+          node "$GITHUB_WORKSPACE/beta/scripts/verify-staged-release.mjs" \
+            --release-json "$RUNNER_TEMP/frontier-staged-release.json" \
+            --artifact-dir "$PWD" \
+            --manifest "$manifest" \
+            --tag "$TAG" \
+            --version "$VERSION" \
+            --commit "$COMMIT"
           test "$(find . -maxdepth 1 -type f | wc -l | tr -d ' ')" = 13
 
       - name: Keep release draft until native redownload verification
@@ -1275,6 +1154,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_ID: ${{ needs.context.outputs.release_id }}
           TAG: ${{ needs.context.outputs.tag }}
+          VERSION: ${{ needs.context.outputs.version }}
           COMMIT: ${{ needs.context.outputs.commit }}
         run: |
           set -euo pipefail
@@ -1283,6 +1163,45 @@ jobs:
               "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
           )"
           test "$(jq -r '.draft' <<<"$before")" = true
+          mkdir publish-verification
+          manifest="RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json"
+          gh release download "$TAG" \
+            --dir publish-verification \
+            --pattern "$manifest" \
+            --pattern "$manifest.sigstore.json"
+          gh attestation verify "publish-verification/$manifest" \
+            --bundle "publish-verification/$manifest.sigstore.json" \
+            --repo "$GITHUB_REPOSITORY" \
+            --source-digest "$COMMIT" \
+            --source-ref "refs/tags/$TAG" \
+            --deny-self-hosted-runners
+          printf '%s' "$before" > "$RUNNER_TEMP/frontier-prepublish-release.json"
+          node --input-type=module - \
+            "$RUNNER_TEMP/frontier-prepublish-release.json" \
+            "publish-verification/$manifest" \
+            "$TAG" "$VERSION" "$COMMIT" <<'NODE'
+          import assert from "node:assert/strict";
+          import { readFileSync } from "node:fs";
+          import {
+            analyzePackagedDownloads,
+            parseReleaseManifest,
+          } from "./beta/download-center.js";
+          const [releasePath, manifestPath, tag, version, commit] =
+            process.argv.slice(2);
+          const release = JSON.parse(readFileSync(releasePath, "utf8"));
+          const signedManifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+          assert.equal(release.tag_name, tag);
+          assert.equal(release.draft, true);
+          const bodyManifest = parseReleaseManifest(release.body);
+          assert.deepEqual(bodyManifest, signedManifest);
+          const analysis = analyzePackagedDownloads(release, {
+            repository: process.env.GITHUB_REPOSITORY,
+            commit,
+            version,
+            manifest: bodyManifest,
+          });
+          assert.equal(analysis.downloads.length, 3);
+          NODE
           gh release edit "$TAG" --draft=false --prerelease --latest=false
           after=
           for _ in {1..10}; do

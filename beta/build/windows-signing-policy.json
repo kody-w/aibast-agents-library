@@ -2,6 +2,8 @@
   "schema": "https://github.com/microsoft/aibast-agents-library/frontier-windows-signing-policy/v1",
   "publication_enabled": false,
   "current_backend_schema": "electron-builder-26.15.7/WindowsAzureSigningConfiguration-v26",
+  "backend_approval": "blocked-deprecated-v26",
+  "approved_backend_schema": null,
   "publication_blocker": "electron-builder v26 azureSignOptions is deprecated. Windows publication remains blocked until a surgically tested Artifact Signing backend migration is reviewed.",
   "required_environment": "windows-production",
   "required_profile_type": "PublicTrust",

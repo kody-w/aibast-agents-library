@@ -184,6 +184,33 @@ function windowsSigningConfiguration(mode, applicationId) {
   };
 }
 
+export function evaluateWindowsSigningPolicy(policy) {
+  const blockers = [];
+  if (policy?.publication_enabled !== true) {
+    blockers.push(policy?.publication_blocker || "publication is disabled");
+  }
+  if (
+    policy?.backend_approval !== "approved"
+    || !policy?.approved_backend_schema
+    || policy.approved_backend_schema !== policy.current_backend_schema
+  ) {
+    blockers.push(
+      `signing backend ${policy?.current_backend_schema || "unknown"} is not approved`,
+    );
+  }
+  if (
+    policy?.client_secret_allowed !== false
+    || policy?.required_environment !== "windows-production"
+    || policy?.required_profile_type !== "PublicTrust"
+  ) {
+    blockers.push("OIDC/Public Trust production policy is incomplete");
+  }
+  return {
+    publicationReady: blockers.length === 0,
+    blockers,
+  };
+}
+
 export async function packagePlatform(argv = process.argv.slice(2)) {
   const { platform, arch } = parsePackagingArguments(argv);
   const mode = signingMode();
@@ -210,15 +237,10 @@ export async function packagePlatform(argv = process.argv.slice(2)) {
           "utf8",
         ),
       );
-      if (
-        windowsSigningPolicy.publication_enabled !== true ||
-        windowsSigningPolicy.client_secret_allowed !== false ||
-        windowsSigningPolicy.required_environment !== "windows-production" ||
-        windowsSigningPolicy.required_profile_type !== "PublicTrust"
-      ) {
+      const readiness = evaluateWindowsSigningPolicy(windowsSigningPolicy);
+      if (!readiness.publicationReady) {
         fail(
-          `Signed Windows packaging is blocked: ` +
-          `${windowsSigningPolicy.publication_blocker || "policy not approved"}`,
+          `Signed Windows packaging is blocked: ${readiness.blockers.join(" | ")}`,
         );
       }
     }

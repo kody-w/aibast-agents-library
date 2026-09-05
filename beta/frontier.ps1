@@ -9,6 +9,18 @@ if ($repo -notmatch "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$") {
     throw "Invalid RAPP_FRONTIER_REPO: $repo"
 }
 
+$isWindowsArm64 = (
+    $env:PROCESSOR_ARCHITECTURE -eq "ARM64" -or
+    $env:PROCESSOR_ARCHITEW6432 -eq "ARM64"
+)
+if ($isWindowsArm64 -and $env:RAPP_FRONTIER_RESOLVE_ONLY -ne "1") {
+    throw (
+        "Windows ARM64 is not a native RAPP Brainstem Frontier target. " +
+        "The source bootstrap will not mix ARM64 Node with x64-only Electron " +
+        "or media binaries. Use an x64 Windows 11 device or x64 virtual machine."
+    )
+}
+
 $api = "https://api.github.com/repos/$repo"
 $headers = @{ Accept = "application/vnd.github+json" }
 $releases = Invoke-RestMethod -Headers $headers -Uri "$api/releases?per_page=30"

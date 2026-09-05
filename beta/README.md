@@ -151,26 +151,42 @@ The dedicated Download Center-style GitHub Pages installer is published at
 `/beta/`. It provides platform bootstrap downloads, copyable install commands,
 release metadata, requirements, and installation guidance. The page resolves
 the latest `brainstem-beta-v*` release from the fork serving it, so staging and
-production remain separate. Immutable Frontier releases include native Intel
-and Apple-silicon DMGs plus a Windows x64 NSIS installer; the page lists those
-`.dmg` and `.exe` assets automatically ahead of the source bootstrap only from
-a release whose signed, hashed binary manifest allowlists the exact asset and
-its package gate passed.
+production remain separate. Public repository overrides are rejected outside
+localhost. Source commands are enabled only after the selected tag resolves to
+a validated 40-character commit, and both the installer URL and
+`BRAINSTEM_BETA_COMMIT` stay pinned to that displayed commit.
+
+Immutable Frontier releases may include native Intel and Apple-silicon DMGs
+plus one Windows x64 NSIS installer. The page exposes a `.dmg` or `.exe` only
+when the release notes contain exactly one fenced
+`rapp-frontier-release-manifest` using
+`rapp-brainstem-frontier-release-manifest/v1`. That manifest must bind the
+exact asset name, OS/architecture, positive size, GitHub SHA-256 digest,
+verified signing identity, compatible runtime, release tag and commit, and
+successful package-gate run. Missing, duplicated, deceptive, uninstaller, or
+mismatched entries fail closed to the commit-pinned source bootstrap.
 
 Binary publication is currently blocked: the resolved ARM64 FFmpeg binary was
 built with `--enable-nonfree`, and the FFprobe version is not normalized with
 FFmpeg. Until a redistributable checksum-pinned native media matrix is approved,
 the source bootstrap remains the available install path. Publication is also
-blocked until the packaged bootstrap rollback/lock work and the Windows signing
-backend migration are release-certified.
+blocked by the Windows signing policy until the deprecated electron-builder
+v26 Azure signing backend is migrated and production Artifact Signing values
+are approved. The packaged bootstrap rollback, cross-process lock, atomic
+staging, log redaction, and isolated first-run contracts are implemented and
+release-gated; they are no longer publication blockers.
 
-### Windows 11
+### Windows 11 x64
 
 Run this in PowerShell:
 
 ```powershell
 irm https://microsoft.github.io/aibast-agents-library/beta/frontier.ps1 | iex
 ```
+
+Windows ARM64 is intentionally not advertised. Every native dependency,
+including FFmpeg and FFprobe, must pass a native ARM64 package gate before that
+policy can change.
 
 ### macOS or Linux
 

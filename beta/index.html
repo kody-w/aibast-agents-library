@@ -16,6 +16,7 @@
     content="Download the source-only RAPP Brainstem Frontier desktop preview for Windows, macOS, or Linux."
   >
   <title>Download RAPP Brainstem Frontier | AIBAST Download Center</title>
+  <link rel="icon" href="build/icon.svg" type="image/svg+xml">
   <style>
     :root {
       color-scheme: light;
@@ -23,8 +24,8 @@
       --cp-bg-elevated: #fcfbf8;
       --cp-surface: #ffffff;
       --cp-surface-soft: #f5f5f5;
-      --cp-border: #dedede;
-      --cp-border-strong: #919191;
+      --cp-border: #858585;
+      --cp-border-strong: #686868;
       --cp-text: #242424;
       --cp-text-muted: #5c5c5c;
       --cp-text-soft: #6f6f6f;
@@ -35,7 +36,7 @@
       --cp-success: #16a34a;
       --cp-danger: #dc2626;
       --cp-warning: #f59e0b;
-      --cp-link: #0078d4;
+      --cp-link: #005ea8;
       --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
       --cp-overlay: rgba(255, 255, 255, 0.8);
       --cp-panel: rgba(255, 255, 255, 0.86);
@@ -49,11 +50,11 @@
       --cp-bg-elevated: #343231;
       --cp-surface: #292929;
       --cp-surface-soft: #2e2e2e;
-      --cp-border: #474747;
-      --cp-border-strong: #5f5f5f;
+      --cp-border: #858585;
+      --cp-border-strong: #9d9d9d;
       --cp-text: #dedede;
-      --cp-text-muted: #919191;
-      --cp-text-soft: #b0b0b0;
+      --cp-text-muted: #b8b8b8;
+      --cp-text-soft: #c2c2c2;
       --cp-accent: #fd8ea1;
       --cp-accent-hover: #fb7b91;
       --cp-accent-soft: rgba(253, 142, 161, 0.14);
@@ -61,7 +62,7 @@
       --cp-success: #4ade80;
       --cp-danger: #f87171;
       --cp-warning: #fbbf24;
-      --cp-link: #4da6ff;
+      --cp-link: #75baff;
       --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
       --cp-overlay: rgba(41, 41, 41, 0.88);
       --cp-panel: rgba(41, 41, 41, 0.72);
@@ -84,7 +85,8 @@
       margin: 0;
       background: var(--cp-bg);
       color: var(--cp-text);
-      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
       line-height: 1.5;
     }
 
@@ -93,6 +95,7 @@
     a {
       font: inherit;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     button,
@@ -105,8 +108,12 @@
     }
 
     :focus-visible {
-      outline: 3px solid var(--cp-highlight);
+      outline: 3px solid var(--cp-link);
       outline-offset: 3px;
+    }
+
+    main:focus {
+      outline: none;
     }
 
     [hidden] {
@@ -155,6 +162,16 @@
       text-decoration: none;
     }
 
+    .brand,
+    .context-label,
+    .header-nav a,
+    .resource-links a,
+    .footer-links a {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+    }
+
     .brand {
       gap: 10px;
       font-size: 18px;
@@ -187,6 +204,7 @@
     }
 
     .header-nav a {
+      display: inline-flex;
       color: var(--cp-text);
       text-decoration: none;
     }
@@ -197,7 +215,7 @@
 
     .hero-shell {
       border-bottom: 1px solid var(--cp-border);
-      background: var(--cp-surface-soft);
+      background: linear-gradient(135deg, var(--cp-surface-soft), var(--cp-bg-elevated));
     }
 
     .breadcrumb {
@@ -206,12 +224,15 @@
       gap: 8px;
       align-items: center;
       padding-top: 22px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 14px;
     }
 
     .breadcrumb a {
-      color: var(--cp-text-muted);
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      color: var(--cp-text-soft);
       text-decoration: none;
     }
 
@@ -236,8 +257,8 @@
       padding: 6px 10px;
       border: 1px solid var(--cp-border);
       border-radius: 999px;
-      background: var(--cp-surface);
-      color: var(--cp-text-muted);
+      background: var(--cp-panel-strong);
+      color: var(--cp-text-soft);
       font-size: 13px;
       font-weight: 700;
     }
@@ -275,7 +296,7 @@
     .hero-description {
       max-width: 820px;
       margin-bottom: 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: clamp(18px, 2vw, 22px);
       line-height: 1.55;
     }
@@ -289,7 +310,7 @@
       padding: 28px;
       border: 1px solid var(--cp-border);
       border-radius: 16px;
-      background: var(--cp-surface);
+      background: var(--cp-panel-strong);
       box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
       text-align: center;
     }
@@ -305,7 +326,7 @@
     }
 
     .product-mark span {
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -331,7 +352,7 @@
     .download-copy p {
       max-width: 650px;
       margin-bottom: 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 15px;
     }
 
@@ -344,19 +365,22 @@
 
     .download-controls {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1.15fr) minmax(8.5rem, 0.85fr) auto;
       gap: 12px;
+      min-width: 0;
     }
 
     select {
       min-height: 48px;
+      min-width: 0;
       width: 100%;
       padding: 10px 38px 10px 12px;
       border: 1px solid var(--cp-border-strong);
-      border-radius: 0;
+      border-radius: 0.625rem;
       background: var(--cp-surface);
       color: var(--cp-text);
       cursor: pointer;
+      text-overflow: ellipsis;
     }
 
     .button {
@@ -374,6 +398,11 @@
       font-size: 14px;
       font-weight: 700;
       text-decoration: none;
+      transition:
+        border-color 120ms ease,
+        background-color 120ms ease,
+        color 120ms ease,
+        transform 120ms ease;
     }
 
     .button:hover {
@@ -394,18 +423,53 @@
       color: var(--cp-accent-fg);
     }
 
+    .button:active {
+      transform: translateY(1px);
+    }
+
     .button:disabled {
       border-color: var(--cp-border);
       background: var(--cp-surface-soft);
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       cursor: wait;
+      transform: none;
     }
 
     .platform-help {
       min-height: 21px;
       margin: 8px 0 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
+    }
+
+    .no-js-fallback {
+      grid-column: 1 / -1;
+      padding-top: 28px;
+      border-top: 1px solid var(--cp-border);
+    }
+
+    .no-js-fallback > h2 {
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    .no-js-fallback > p {
+      max-width: 820px;
+      margin-bottom: 0;
+      color: var(--cp-text-soft);
+    }
+
+    .no-js-fallback .install-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .no-js-heading {
+      display: none;
+      padding: 21px 4px;
+      color: var(--cp-text);
+      font-size: 20px;
+      font-weight: 600;
     }
 
     .content {
@@ -422,6 +486,55 @@
       background: var(--cp-surface);
       color: var(--cp-text);
       font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .source-status,
+    .recovery-panel {
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      border: 1px solid var(--cp-border);
+      border-left: 4px solid var(--cp-link);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+    }
+
+    .source-status {
+      color: var(--cp-text-soft);
+    }
+
+    .recovery-panel h2 {
+      margin-bottom: 6px;
+      font-size: 20px;
+    }
+
+    .recovery-panel > p {
+      margin-bottom: 16px;
+      color: var(--cp-text-soft);
+    }
+
+    .recovery-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .recovery-option {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .recovery-option strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .recovery-option .command {
+      margin-bottom: 10px;
     }
 
     .file-details {
@@ -444,7 +557,7 @@
 
     .file-detail dt {
       margin-bottom: 8px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -463,6 +576,25 @@
       font-size: 13px;
     }
 
+    .release-file-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .release-file-entry {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: baseline;
+    }
+
+    .release-file-entry span {
+      color: var(--cp-text-soft);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
     .details-heading {
       display: flex;
       align-items: center;
@@ -477,6 +609,8 @@
     }
 
     .expand-button {
+      min-height: 44px;
+      padding: 8px 4px;
       border: 0;
       background: transparent;
       color: var(--cp-link);
@@ -533,7 +667,7 @@
 
     .accordion-panel {
       padding: 0 4px 32px 46px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 15px;
     }
 
@@ -607,6 +741,7 @@
     }
 
     .install-card {
+      min-width: 0;
       padding: 22px;
       border: 1px solid var(--cp-border);
       border-radius: 16px;
@@ -647,6 +782,8 @@
     }
 
     .command {
+      width: 100%;
+      max-width: 100%;
       min-height: 82px;
       margin: 0 0 14px;
       padding: 14px;
@@ -665,6 +802,12 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      min-width: 0;
+    }
+
+    .button-row > * {
+      min-width: 0;
+      max-width: 100%;
     }
 
     .boundary {
@@ -713,6 +856,7 @@
       background: var(--cp-surface);
       color: var(--cp-text);
       box-shadow: var(--cp-shadow);
+      overscroll-behavior: contain;
     }
 
     dialog::backdrop {
@@ -738,8 +882,8 @@
 
     .dialog-close {
       display: grid;
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       flex: 0 0 auto;
       place-items: center;
       border: 1px solid var(--cp-border);
@@ -752,7 +896,7 @@
 
     .dialog-intro {
       margin-bottom: 22px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
     }
 
     .file-options {
@@ -811,7 +955,7 @@
 
     .file-platform,
     .file-size {
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -837,7 +981,7 @@
 
     .dialog-note {
       margin: 16px 0 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 12px;
     }
 
@@ -852,7 +996,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -863,7 +1007,8 @@
     }
 
     .footer-links a {
-      color: var(--cp-text-muted);
+      display: inline-flex;
+      color: var(--cp-text-soft);
       text-decoration: none;
     }
 
@@ -897,7 +1042,7 @@
 
       .capability-grid,
       .install-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .install-card p {
@@ -917,27 +1062,53 @@
 
       .header-nav {
         width: 100%;
-        gap: 16px;
+        justify-content: space-between;
+        gap: 8px;
         margin-left: 0;
         padding-top: 10px;
         border-top: 1px solid var(--cp-border);
       }
 
       .hero {
-        gap: 30px;
-        padding: 40px 0 44px;
+        gap: 24px;
+        padding: 34px 0 38px;
       }
 
       h1 {
-        font-size: clamp(38px, 13vw, 54px);
+        font-size: clamp(36px, 12vw, 50px);
+      }
+
+      .product-mark {
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .product-mark img {
+        width: 64px;
+        height: 64px;
       }
 
       .download-grid {
         gap: 28px;
+        padding: 32px 0;
       }
 
       .download-controls {
         grid-template-columns: 1fr;
+      }
+
+      .recovery-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .button-row .button {
+        width: 100%;
+        white-space: normal;
       }
 
       .file-details {
@@ -945,7 +1116,24 @@
       }
 
       .accordion-panel {
-        padding-left: 4px;
+        padding: 0 0 28px;
+      }
+
+      .accordion-trigger {
+        min-height: 64px;
+        padding: 17px 0;
+        font-size: 18px;
+      }
+
+      .install-card {
+        padding: 16px;
+      }
+
+      .command {
+        min-height: 0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
 
       .file-option {
@@ -956,6 +1144,29 @@
         grid-column: 2;
       }
 
+      .dialog-shell {
+        padding: 20px;
+      }
+
+      .dialog-header {
+        gap: 16px;
+      }
+
+      .dialog-header h2 {
+        font-size: clamp(24px, 8vw, 28px);
+        line-height: 1.15;
+      }
+
+      .dialog-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .resource-links {
+        display: grid;
+        gap: 0;
+      }
+
       .footer-inner {
         align-items: flex-start;
         flex-direction: column;
@@ -963,7 +1174,42 @@
         padding: 28px 0;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
+      }
+    }
   </style>
+  <noscript>
+    <style>
+      .download-form,
+      .expand-button,
+      .accordion-trigger,
+      .button-row button {
+        display: none !important;
+      }
+
+      .download-grid > noscript {
+        display: contents;
+      }
+
+      .download-copy {
+        grid-column: 1 / -1;
+      }
+
+      .no-js-heading {
+        display: block;
+      }
+    </style>
+  </noscript>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -978,13 +1224,27 @@
       <a class="context-label" href="./">Download Center</a>
       <nav class="header-nav" aria-label="Download Center links">
         <a href="../library.html">Agents Library</a>
-        <a id="source-link" href="#" target="_blank" rel="noreferrer">Source</a>
-        <a id="release-link-top" href="#" target="_blank" rel="noreferrer">Release notes</a>
+        <a
+          id="source-link"
+          href="https://github.com/microsoft/aibast-agents-library/tree/main/beta"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Source
+        </a>
+        <a
+          id="release-link-top"
+          href="https://github.com/microsoft/aibast-agents-library/releases"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Release notes
+        </a>
       </nav>
     </div>
   </header>
 
-  <main id="main-content">
+  <main id="main-content" tabindex="-1">
     <section class="hero-shell">
       <div class="container">
         <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -997,9 +1257,9 @@
 
         <div class="hero">
           <div>
-            <div class="release-chip">
+            <div class="release-chip" role="status" aria-live="polite" aria-atomic="true">
               <span id="status-dot" class="status-dot" aria-hidden="true"></span>
-              <span id="release-status">Resolving Frontier release</span>
+              <span id="release-status">Checking Frontier release</span>
             </div>
             <h1>RAPP Brainstem Frontier</h1>
             <p class="hero-description">
@@ -1012,8 +1272,8 @@
 
           <aside class="product-mark" aria-label="RAPP Brainstem Frontier product mark">
             <img src="build/icon.svg" alt="">
-            <strong>Verified release downloads</strong>
-            <span>Windows 11, macOS, and Linux</span>
+            <strong>Commit-pinned source bootstraps</strong>
+            <span>Windows 11 x64, macOS, and Linux</span>
           </aside>
         </div>
       </div>
@@ -1024,30 +1284,122 @@
         <div class="download-copy">
           <h2 id="download-heading">Download RAPP Brainstem Frontier</h2>
           <p>
-            Choose your operating system. Published application installers appear here
-            automatically, with the verified source bootstrap preserved as a fallback.
+            Choose your operating system and architecture. Only release-manifest
+            allowlisted application installers appear here, with the exact commit-pinned
+            source install preserved as a fallback.
           </p>
         </div>
 
         <form class="download-form" id="download-form">
-          <label for="platform-select">Choose your operating system</label>
+          <label for="platform-select">Choose your operating system and architecture</label>
           <div class="download-controls">
-            <select id="platform-select" name="platform">
-              <option value="windows">Windows 11</option>
+            <select id="platform-select" name="platform" aria-describedby="platform-help">
+              <option value="windows">Windows 11 x64</option>
               <option value="macos">macOS</option>
               <option value="linux">Linux</option>
+            </select>
+            <select
+              id="architecture-select"
+              name="architecture"
+              aria-label="Architecture"
+              aria-describedby="platform-help"
+            >
+              <option value="x64">x64</option>
+              <option value="arm64">ARM64</option>
             </select>
             <button class="button primary" id="download-button" type="submit" disabled>
               Download
             </button>
           </div>
-          <p class="platform-help" id="platform-help">Detecting your platform.</p>
+          <p class="platform-help" id="platform-help" role="status" aria-live="polite">
+            Checking the release and available downloads.
+          </p>
         </form>
+
+        <noscript>
+          <section
+            class="no-js-fallback"
+            id="no-js-download"
+            aria-labelledby="no-js-download-heading"
+          >
+            <h2 id="no-js-download-heading">Download the source bootstrap</h2>
+            <p>
+              JavaScript is unavailable, so packaged-asset selection and live release
+              metadata cannot run. These source bootstraps resolve the latest published
+              Frontier release to an exact commit when you launch them.
+            </p>
+            <div class="install-grid">
+              <article class="install-card">
+                <h3>Windows 11 x64</h3>
+                <p>Download the PowerShell bootstrap, then run it from your Downloads folder.</p>
+                <pre class="command"><code>powershell -ExecutionPolicy Bypass -File ".\RAPP-Brainstem-Frontier-Windows.ps1"</code></pre>
+                <a
+                  class="button primary"
+                  href="frontier.ps1"
+                  download="RAPP-Brainstem-Frontier-Windows.ps1"
+                >
+                  Download Windows bootstrap
+                </a>
+              </article>
+              <article class="install-card">
+                <h3>macOS or Linux</h3>
+                <p>Download the shell bootstrap, then run it from your Downloads folder.</p>
+                <pre class="command"><code>bash "$HOME/Downloads/RAPP-Brainstem-Frontier-macOS-Linux.sh"</code></pre>
+                <a
+                  class="button primary"
+                  href="frontier.sh"
+                  download="RAPP-Brainstem-Frontier-macOS-Linux.sh"
+                >
+                  Download macOS or Linux bootstrap
+                </a>
+              </article>
+            </div>
+          </section>
+        </noscript>
       </div>
     </section>
 
     <div class="container content">
       <div id="load-error" class="notice" role="status" hidden></div>
+      <div id="source-status" class="source-status" role="status" hidden></div>
+      <section
+        id="recovery-panel"
+        class="recovery-panel"
+        aria-labelledby="recovery-heading"
+        hidden
+      >
+        <h2 id="recovery-heading">Install from the source bootstrap</h2>
+        <p id="recovery-message">
+          Live release details are unavailable. These inspectable bootstraps resolve the
+          published Frontier release before installing.
+        </p>
+        <div class="recovery-actions">
+          <div class="recovery-option">
+            <strong>Windows 11 x64</strong>
+            <pre class="command"><code id="recovery-windows-command">powershell -ExecutionPolicy Bypass -File ".\RAPP-Brainstem-Frontier-Windows.ps1"</code></pre>
+            <a
+              class="button primary"
+              id="recovery-windows-link"
+              href="frontier.ps1"
+              download="RAPP-Brainstem-Frontier-Windows.ps1"
+            >
+              Download Windows bootstrap
+            </a>
+          </div>
+          <div class="recovery-option">
+            <strong>macOS or Linux</strong>
+            <pre class="command"><code id="recovery-unix-command">bash "$HOME/Downloads/RAPP-Brainstem-Frontier-macOS-Linux.sh"</code></pre>
+            <a
+              class="button primary"
+              id="recovery-unix-link"
+              href="frontier.sh"
+              download="RAPP-Brainstem-Frontier-macOS-Linux.sh"
+            >
+              Download macOS or Linux bootstrap
+            </a>
+          </div>
+        </div>
+      </section>
 
       <dl class="file-details" aria-label="Release file details">
         <div class="file-detail">
@@ -1060,7 +1412,10 @@
         </div>
         <div class="file-detail">
           <dt>File name</dt>
-          <dd id="release-files"><code>frontier.ps1</code>, <code>frontier.sh</code></dd>
+          <dd id="release-files" class="release-file-list">
+            <span class="release-file-entry"><code>frontier.ps1</code><span>Source</span></span>
+            <span class="release-file-entry"><code>frontier.sh</code><span>Source</span></span>
+          </dd>
         </div>
         <div class="file-detail">
           <dt>Release commit</dt>
@@ -1071,7 +1426,15 @@
       <section aria-labelledby="details-heading">
         <div class="details-heading">
           <h2 id="details-heading">Download details</h2>
-          <button class="expand-button" id="expand-all" type="button">Expand all</button>
+          <button
+            class="expand-button"
+            id="expand-all"
+            type="button"
+            aria-controls="panel-details panel-requirements panel-install panel-additional"
+            aria-expanded="false"
+          >
+            Expand all
+          </button>
         </div>
 
         <div class="accordion" aria-label="Accordion containing details about the download">
@@ -1079,15 +1442,22 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-details"
                 type="button"
                 aria-expanded="true"
                 aria-controls="panel-details"
               >
-                <span class="accordion-icon" aria-hidden="true">-</span>
+                <span class="accordion-icon" aria-hidden="true">−</span>
                 <span>Details</span>
               </button>
+              <span class="no-js-heading">Details</span>
             </h3>
-            <div class="accordion-panel" id="panel-details">
+            <div
+              class="accordion-panel"
+              id="panel-details"
+              role="region"
+              aria-labelledby="trigger-details"
+            >
               <p>
                 RAPP Brainstem Frontier puts the live agent Explorer, the real Brainstem
                 chat, and GitHub Copilot Brain Surgeon in one visible workspace. Describe
@@ -1132,6 +1502,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-requirements"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-requirements"
@@ -1139,11 +1510,17 @@
                 <span class="accordion-icon" aria-hidden="true">+</span>
                 <span>System Requirements</span>
               </button>
+              <span class="no-js-heading">System Requirements</span>
             </h3>
-            <div class="accordion-panel" id="panel-requirements" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-requirements"
+              role="region"
+              aria-labelledby="trigger-requirements"
+            >
               <h4>Supported operating systems</h4>
               <div class="supported-os">
-                <span class="os-pill">Windows 11 x64 or ARM64</span>
+                <span class="os-pill" id="windows-support">Windows 11 x64</span>
                 <span class="os-pill">macOS x64 or ARM64</span>
                 <span class="os-pill">Linux x64 or ARM64</span>
               </div>
@@ -1161,6 +1538,12 @@
                   on the device. Managed-device policy may block source-built previews.
                 </li>
                 <li>
+                  Package manifest and application signature verification are not claimed
+                  for this preview. Windows Defender SmartScreen warnings may still appear
+                  for this unsigned source-built release. The bootstrap does not suppress
+                  or remove those warnings.
+                </li>
+                <li>
                   Synthetic or approved data only. This Frontier build is a rapid proof
                   and teaching environment, not a production deployment.
                 </li>
@@ -1172,6 +1555,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-install"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-install"
@@ -1179,8 +1563,14 @@
                 <span class="accordion-icon" aria-hidden="true">+</span>
                 <span>Install Instructions</span>
               </button>
+              <span class="no-js-heading">Install Instructions</span>
             </h3>
-            <div class="accordion-panel" id="panel-install" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-install"
+              role="region"
+              aria-labelledby="trigger-install"
+            >
               <p>
                 Use the same one-liner to install, update or repair, and launch Frontier.
                 The bootstrap resolves the newest published <code>brainstem-beta-v*</code>
@@ -1191,16 +1581,21 @@
                 <article class="install-card" id="windows-card">
                   <h4>
                     <span class="platform-icon" aria-hidden="true">PS</span>
-                    Windows 11
+                    Windows 11 x64
                   </h4>
                   <p>Open PowerShell, paste the command, and press Enter.</p>
-                  <pre class="command"><code id="windows-command">Preparing installer command...</code></pre>
+                  <pre class="command"><code id="windows-command">powershell -ExecutionPolicy Bypass -File ".\RAPP-Brainstem-Frontier-Windows.ps1"</code></pre>
                   <div class="button-row">
                     <button class="button primary" id="copy-windows" type="button" disabled>
                       Copy command
                     </button>
-                    <a class="button" id="windows-script" href="#" target="_blank" rel="noreferrer">
-                      Inspect bootstrap
+                    <a
+                      class="button"
+                      id="windows-script"
+                      href="frontier.ps1"
+                      download="RAPP-Brainstem-Frontier-Windows.ps1"
+                    >
+                      Download bootstrap
                     </a>
                   </div>
                 </article>
@@ -1211,13 +1606,18 @@
                     macOS or Linux
                   </h4>
                   <p>Open Terminal, paste the command, and press Enter.</p>
-                  <pre class="command"><code id="unix-command">Preparing installer command...</code></pre>
+                  <pre class="command"><code id="unix-command">bash "$HOME/Downloads/RAPP-Brainstem-Frontier-macOS-Linux.sh"</code></pre>
                   <div class="button-row">
                     <button class="button primary" id="copy-unix" type="button" disabled>
                       Copy command
                     </button>
-                    <a class="button" id="unix-script" href="#" target="_blank" rel="noreferrer">
-                      Inspect bootstrap
+                    <a
+                      class="button"
+                      id="unix-script"
+                      href="frontier.sh"
+                      download="RAPP-Brainstem-Frontier-macOS-Linux.sh"
+                    >
+                      Download bootstrap
                     </a>
                   </div>
                 </article>
@@ -1227,7 +1627,7 @@
                 <li>Run the installer command for your operating system.</li>
                 <li>
                   Let the bootstrap install or reuse the shared Brainstem, then assemble
-                  the isolated Frontier launcher from the verified release commit.
+                  the isolated Frontier launcher from the resolved release commit.
                 </li>
                 <li>
                   Launch <strong>RAPP Brainstem Frontier</strong> from Applications,
@@ -1242,6 +1642,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-additional"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-additional"
@@ -1249,14 +1650,21 @@
                 <span class="accordion-icon" aria-hidden="true">+</span>
                 <span>Additional Information</span>
               </button>
+              <span class="no-js-heading">Additional Information</span>
             </h3>
-            <div class="accordion-panel" id="panel-additional" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-additional"
+              role="region"
+              aria-labelledby="trigger-additional"
+            >
               <p>
-                Frontier always publishes small source bootstraps that verify the release
+                Frontier always publishes small source bootstraps that resolve the release
                 tag, pin the exact source commit, and keep the launcher removable from the
                 shared Brainstem runtime. When a release also contains packaged
-                <code>.exe</code> or <code>.dmg</code> installers, this page lists those
-                assets first and retains the source route alongside them.
+                <code>.exe</code> or <code>.dmg</code> installers, this page lists only
+                assets allowlisted by the release manifest and retains the source route
+                alongside them.
               </p>
 
               <div class="boundary">
@@ -1272,9 +1680,28 @@
               </div>
 
               <div class="resource-links">
-                <a href="README.md">Read the Frontier guide</a>
-                <a href="GOLDEN_PATH.md">Read the product golden path</a>
-                <a id="release-link-bottom" href="#" target="_blank" rel="noreferrer">
+                <a
+                  id="frontier-guide-link"
+                  href="https://github.com/microsoft/aibast-agents-library/blob/main/beta/README.md"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Read the Frontier guide
+                </a>
+                <a
+                  id="golden-path-link"
+                  href="https://github.com/microsoft/aibast-agents-library/blob/main/beta/GOLDEN_PATH.md"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Read the product golden path
+                </a>
+                <a
+                  id="release-link-bottom"
+                  href="https://github.com/microsoft/aibast-agents-library/releases"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   View the GitHub release
                 </a>
               </div>
@@ -1285,17 +1712,22 @@
     </div>
   </main>
 
-  <dialog id="download-dialog" aria-labelledby="download-dialog-title">
+  <dialog
+    id="download-dialog"
+    aria-labelledby="download-dialog-title"
+    aria-describedby="download-dialog-description"
+  >
     <form class="dialog-shell" method="dialog">
       <div class="dialog-header">
         <h2 id="download-dialog-title">Choose the download you want</h2>
         <button class="dialog-close" type="submit" value="cancel" aria-label="Close download dialog">
-          x
+          &times;
         </button>
       </div>
-      <p class="dialog-intro">
-        Choose a packaged application installer when one is published, or use the source
-        bootstrap that resolves and pins the same verified Frontier release.
+      <p class="dialog-intro" id="download-dialog-description">
+        Choose a packaged installer only when its release manifest verifies the exact
+        artifact, signing identity, runtime, and gate, or use the source command pinned
+        to the displayed Frontier release commit.
       </p>
 
       <fieldset class="file-options">
@@ -1310,420 +1742,42 @@
 
       <div class="dialog-actions">
         <button class="button" id="copy-selected" type="button">Copy install command</button>
-        <a class="button primary" id="download-selected" href="#" download>
+        <a class="button primary" id="download-selected" hidden>
           Download selected file
         </a>
       </div>
       <p class="dialog-note">
         Review source bootstraps before running them on a managed device.
       </p>
+      <p id="copy-status" class="visually-hidden" role="status" aria-live="polite"></p>
     </form>
   </dialog>
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <span id="resolved-date">Release metadata is loading.</span>
+      <span id="resolved-date">Checking the published Frontier release.</span>
       <div class="footer-links">
         <a href="../">AIBAST Agents Library</a>
-        <a href="../SECURITY.md">Security</a>
-        <a href="../LICENSE">License</a>
+        <a
+          id="security-link"
+          href="https://github.com/microsoft/aibast-agents-library/blob/main/SECURITY.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Security
+        </a>
+        <a
+          id="license-link"
+          href="https://github.com/microsoft/aibast-agents-library/blob/main/LICENSE"
+          target="_blank"
+          rel="noreferrer"
+        >
+          License
+        </a>
       </div>
     </div>
   </footer>
 
-  <script>
-    (() => {
-      const TAG_PREFIX = "brainstem-beta-v";
-      const params = new URLSearchParams(window.location.search);
-      const elements = {
-        error: document.getElementById("load-error"),
-        status: document.getElementById("release-status"),
-        statusDot: document.getElementById("status-dot"),
-        version: document.getElementById("release-version"),
-        date: document.getElementById("release-date"),
-        files: document.getElementById("release-files"),
-        commit: document.getElementById("release-commit"),
-        resolvedDate: document.getElementById("resolved-date"),
-        platformSelect: document.getElementById("platform-select"),
-        platformHelp: document.getElementById("platform-help"),
-        downloadForm: document.getElementById("download-form"),
-        downloadButton: document.getElementById("download-button"),
-        dialog: document.getElementById("download-dialog"),
-        downloadOptionList: document.getElementById("download-option-list"),
-        selectedCommandPanel: document.getElementById("selected-command-panel"),
-        selectedCommand: document.getElementById("selected-command"),
-        copySelected: document.getElementById("copy-selected"),
-        downloadSelected: document.getElementById("download-selected"),
-        unixCommand: document.getElementById("unix-command"),
-        windowsCommand: document.getElementById("windows-command"),
-        copyUnix: document.getElementById("copy-unix"),
-        copyWindows: document.getElementById("copy-windows"),
-        unixScript: document.getElementById("unix-script"),
-        windowsScript: document.getElementById("windows-script"),
-        sourceLink: document.getElementById("source-link"),
-        releaseLinkTop: document.getElementById("release-link-top"),
-        releaseLinkBottom: document.getElementById("release-link-bottom"),
-        expandAll: document.getElementById("expand-all"),
-      };
-
-      let downloadItems = [];
-
-      function validRepo(value) {
-        return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(value || "");
-      }
-
-      function resolveRepository() {
-        const override = params.get("repo");
-        if (validRepo(override)) return override;
-
-        if (window.location.hostname.endsWith(".github.io")) {
-          const owner = window.location.hostname.slice(0, -".github.io".length);
-          const repository = window.location.pathname.split("/").filter(Boolean)[0];
-          const derived = `${owner}/${repository || ""}`;
-          if (validRepo(derived)) return derived;
-        }
-
-        return "microsoft/aibast-agents-library";
-      }
-
-      async function fetchJson(url) {
-        const response = await fetch(url, {
-          headers: { Accept: "application/vnd.github+json" },
-        });
-        if (!response.ok) {
-          throw new Error(`GitHub returned ${response.status} for ${url}`);
-        }
-        return response.json();
-      }
-
-      function bootstrapUrl(filename) {
-        return new URL(filename, window.location.href).href;
-      }
-
-      function unixInstallCommand(repo) {
-        return `curl -fsSL "${bootstrapUrl("frontier.sh")}" | RAPP_FRONTIER_REPO="${repo}" bash`;
-      }
-
-      function windowsInstallCommand(repo) {
-        return `$env:RAPP_FRONTIER_REPO="${repo}";irm "${bootstrapUrl("frontier.ps1")}" | iex`;
-      }
-
-      async function copyText(button, value) {
-        const original = button.textContent;
-        try {
-          await navigator.clipboard.writeText(value);
-        } catch {
-          const textarea = document.createElement("textarea");
-          textarea.value = value;
-          textarea.setAttribute("readonly", "");
-          textarea.style.position = "fixed";
-          textarea.style.opacity = "0";
-          document.body.appendChild(textarea);
-          textarea.select();
-          document.execCommand("copy");
-          textarea.remove();
-        }
-        button.textContent = "Copied";
-        window.setTimeout(() => {
-          button.textContent = original;
-        }, 1600);
-      }
-
-      function setReleaseLinks(url) {
-        for (const link of [elements.releaseLinkTop, elements.releaseLinkBottom]) {
-          link.href = url;
-        }
-      }
-
-      function detectPlatform() {
-        const platform =
-          navigator.userAgentData?.platform || navigator.platform || navigator.userAgent || "";
-        if (/win/i.test(platform)) return "windows";
-        if (/mac/i.test(platform)) return "macos";
-        if (/linux|x11/i.test(platform)) return "linux";
-        return "windows";
-      }
-
-      function formatBytes(value) {
-        if (!Number.isFinite(value) || value < 0) return "Size unavailable";
-        if (value < 1024) return `${value} B`;
-        if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
-        return `${(value / (1024 * 1024)).toFixed(1)} MB`;
-      }
-
-      function assetArchitecture(name) {
-        if (/arm64|aarch64/i.test(name)) return "ARM64";
-        if (/x64|amd64|x86_64/i.test(name)) return "x64";
-        return "supported architecture";
-      }
-
-      function packagedDownloads(release) {
-        return (release.assets || []).flatMap((asset, index) => {
-          const name = String(asset.name || "");
-          const windows = /\.exe$/i.test(name);
-          const macos = /\.dmg$/i.test(name);
-          if (!windows && !macos) return [];
-          const platform = windows ? "windows" : "macos";
-          const platformLabel = windows ? "Windows 11" : "macOS";
-          return [{
-            id: `release-${index}`,
-            platforms: [platform],
-            fileName: name,
-            description: `${platformLabel} ${assetArchitecture(name)} application installer`,
-            size: formatBytes(Number(asset.size)),
-            href: asset.browser_download_url,
-            downloadName: name,
-            command: "",
-            kind: "binary",
-          }];
-        });
-      }
-
-      function setFileNames(names) {
-        const fragment = document.createDocumentFragment();
-        names.forEach((name, index) => {
-          if (index) fragment.append(", ");
-          const code = document.createElement("code");
-          code.textContent = name;
-          fragment.append(code);
-        });
-        elements.files.replaceChildren(fragment);
-      }
-
-      function renderDownloadOptions(platform) {
-        const available = downloadItems.filter((item) => item.platforms.includes(platform));
-        elements.downloadOptionList.replaceChildren();
-
-        available.forEach((item, index) => {
-          const label = document.createElement("label");
-          label.className = "file-option";
-
-          const input = document.createElement("input");
-          input.type = "radio";
-          input.name = "download-file";
-          input.value = item.id;
-          input.checked = index === 0;
-          input.addEventListener("change", updateDialogSelection);
-
-          const description = document.createElement("span");
-          const name = document.createElement("span");
-          name.className = "file-name";
-          name.textContent = item.fileName;
-          const platformLabel = document.createElement("span");
-          platformLabel.className = "file-platform";
-          platformLabel.textContent = item.description;
-          description.append(name, platformLabel);
-
-          const size = document.createElement("span");
-          size.className = "file-size";
-          size.textContent = item.size;
-
-          label.append(input, description, size);
-          elements.downloadOptionList.append(label);
-        });
-
-        updateDialogSelection();
-      }
-
-      function updatePlatformRecommendation() {
-        const selected = elements.platformSelect.value;
-        const packaged = downloadItems.some(
-          (item) => item.kind === "binary" && item.platforms.includes(selected),
-        );
-        const platformNames = {
-          windows: "Windows 11",
-          macos: "macOS",
-          linux: "Linux",
-        };
-        elements.platformHelp.textContent = packaged
-          ? `Packaged installer and source bootstrap available for ${platformNames[selected]}.`
-          : `Verified source bootstrap available for ${platformNames[selected]}.`;
-        document.getElementById("windows-card").classList.toggle("recommended", selected === "windows");
-        document.getElementById("unix-card").classList.toggle("recommended", selected !== "windows");
-      }
-
-      function updateDialogSelection() {
-        const selected = document.querySelector('input[name="download-file"]:checked');
-        if (!selected) return;
-        const file = downloadItems.find((candidate) => candidate.id === selected.value);
-        if (!file) return;
-        const hasCommand = Boolean(file.command);
-        elements.selectedCommandPanel.hidden = !hasCommand;
-        elements.copySelected.hidden = !hasCommand;
-        elements.selectedCommand.textContent = file.command;
-        elements.downloadSelected.href = file.href;
-        elements.downloadSelected.setAttribute("download", file.downloadName);
-        elements.downloadSelected.textContent = file.kind === "binary"
-          ? "Download installer"
-          : "Download bootstrap file";
-      }
-
-      function openDownloadDialog() {
-        renderDownloadOptions(elements.platformSelect.value);
-        if (typeof elements.dialog.showModal === "function") {
-          elements.dialog.showModal();
-        } else {
-          elements.dialog.setAttribute("open", "");
-        }
-      }
-
-      function setupInstallers(repo) {
-        const unixCommand = unixInstallCommand(repo);
-        const windowsCommand = windowsInstallCommand(repo);
-        downloadItems = [
-          {
-            id: "source-windows",
-            platforms: ["windows"],
-            fileName: "frontier.ps1",
-            description: "Windows 11 source bootstrap, x64 or ARM64",
-            size: "1.8 KB",
-            command: windowsCommand,
-            href: bootstrapUrl("frontier.ps1"),
-            downloadName: "RAPP-Brainstem-Frontier-Windows.ps1",
-            kind: "bootstrap",
-          },
-          {
-            id: "source-unix",
-            platforms: ["macos", "linux"],
-            fileName: "frontier.sh",
-            description: "macOS or Linux source bootstrap, x64 or ARM64",
-            size: "1.5 KB",
-            command: unixCommand,
-            href: bootstrapUrl("frontier.sh"),
-            downloadName: "RAPP-Brainstem-Frontier-macOS-Linux.sh",
-            kind: "bootstrap",
-          },
-        ];
-
-        elements.unixCommand.textContent = unixCommand;
-        elements.windowsCommand.textContent = windowsCommand;
-        elements.unixScript.href = downloadItems[1].href;
-        elements.windowsScript.href = downloadItems[0].href;
-        elements.copyUnix.disabled = false;
-        elements.copyWindows.disabled = false;
-        elements.downloadButton.disabled = false;
-
-        elements.copyUnix.addEventListener("click", () => copyText(elements.copyUnix, unixCommand));
-        elements.copyWindows.addEventListener(
-          "click",
-          () => copyText(elements.copyWindows, windowsCommand),
-        );
-        elements.copySelected.addEventListener(
-          "click",
-          () => copyText(elements.copySelected, elements.selectedCommand.textContent),
-        );
-        updatePlatformRecommendation();
-      }
-
-      function setAccordionState(button, open) {
-        const panel = document.getElementById(button.getAttribute("aria-controls"));
-        button.setAttribute("aria-expanded", String(open));
-        button.querySelector(".accordion-icon").textContent = open ? "-" : "+";
-        panel.hidden = !open;
-      }
-
-      function setupAccordions() {
-        const triggers = [...document.querySelectorAll(".accordion-trigger")];
-        for (const trigger of triggers) {
-          trigger.addEventListener("click", () => {
-            setAccordionState(trigger, trigger.getAttribute("aria-expanded") !== "true");
-            const allOpen = triggers.every(
-              (candidate) => candidate.getAttribute("aria-expanded") === "true",
-            );
-            elements.expandAll.textContent = allOpen ? "Collapse all" : "Expand all";
-          });
-        }
-
-        elements.expandAll.addEventListener("click", () => {
-          const shouldOpen = triggers.some(
-            (trigger) => trigger.getAttribute("aria-expanded") !== "true",
-          );
-          for (const trigger of triggers) {
-            setAccordionState(trigger, shouldOpen);
-          }
-          elements.expandAll.textContent = shouldOpen ? "Collapse all" : "Expand all";
-        });
-      }
-
-      async function loadRelease(repo) {
-        const requestedTag = params.get("tag");
-        elements.sourceLink.href = `https://github.com/${repo}/tree/main/beta`;
-
-        const releases = await fetchJson(
-          `https://api.github.com/repos/${repo}/releases?per_page=30`,
-        );
-        const release = releases.find((candidate) => {
-          if (candidate.draft) return false;
-          if (requestedTag) return candidate.tag_name === requestedTag;
-          return candidate.tag_name.startsWith(TAG_PREFIX);
-        });
-        if (!release) {
-          throw new Error(
-            requestedTag
-              ? `Release ${requestedTag} was not found in ${repo}.`
-              : `No published ${TAG_PREFIX} release was found in ${repo}.`,
-          );
-        }
-
-        const commitData = await fetchJson(
-          `https://api.github.com/repos/${repo}/commits/${encodeURIComponent(release.tag_name)}`,
-        );
-        const commit = commitData.sha;
-        const version = release.tag_name.startsWith(TAG_PREFIX)
-          ? release.tag_name.slice(TAG_PREFIX.length)
-          : release.tag_name;
-        const published = new Date(release.published_at);
-        const publishedLabel = new Intl.DateTimeFormat(undefined, {
-          dateStyle: "long",
-        }).format(published);
-        const binaries = packagedDownloads(release);
-        if (binaries.length) {
-          downloadItems = [...binaries, ...downloadItems];
-          setFileNames(binaries.map((item) => item.fileName));
-        }
-
-        elements.sourceLink.href =
-          `https://github.com/${repo}/tree/${encodeURIComponent(release.tag_name)}/beta`;
-        elements.status.textContent = release.prerelease ? "Prerelease ready" : "Release ready";
-        elements.statusDot.className = "status-dot ready";
-        elements.version.textContent = version;
-        elements.date.textContent = publishedLabel;
-        elements.commit.textContent = commit.slice(0, 12);
-        elements.commit.title = commit;
-        elements.resolvedDate.textContent =
-          `Published ${publishedLabel} from ${repo} at ${commit.slice(0, 12)}.`;
-        setReleaseLinks(release.html_url);
-        updatePlatformRecommendation();
-      }
-
-      const repo = resolveRepository();
-      elements.platformSelect.value = detectPlatform();
-      setupInstallers(repo);
-      setupAccordions();
-
-      elements.platformSelect.addEventListener("change", updatePlatformRecommendation);
-      elements.downloadForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        openDownloadDialog();
-      });
-      elements.dialog.addEventListener("click", (event) => {
-        if (event.target === elements.dialog) {
-          elements.dialog.close();
-        }
-      });
-
-      loadRelease(repo).catch((error) => {
-        elements.status.textContent = "Release check unavailable";
-        elements.statusDot.className = "status-dot error";
-        elements.version.textContent = "Unavailable";
-        elements.date.textContent = "Unavailable";
-        elements.commit.textContent = "Unavailable";
-        elements.resolvedDate.textContent = "Release metadata could not be verified.";
-        elements.error.textContent =
-          `${error.message} The bootstrap files remain available, but verify the published release before installing.`;
-        elements.error.hidden = false;
-      });
-    })();
-  </script>
+  <script type="module" src="download-center.js"></script>
 </body>
 </html>
