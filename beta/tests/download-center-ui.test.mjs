@@ -1,0 +1,209 @@
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+
+const betaRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const page = readFileSync(path.join(betaRoot, "index.html"), "utf8");
+const scripts = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
+const style = page.match(/<style>([\s\S]*?)<\/style>/)?.[1] || "";
+
+function removeCssBlock(source, selector) {
+  const start = source.indexOf(selector);
+  if (start === -1) return source;
+  const openingBrace = source.indexOf("{", start);
+  if (openingBrace === -1) return source;
+
+  let depth = 0;
+  for (let index = openingBrace; index < source.length; index += 1) {
+    if (source[index] === "{") depth += 1;
+    if (source[index] === "}") depth -= 1;
+    if (depth === 0) {
+      return `${source.slice(0, start)}${source.slice(index + 1)}`;
+    }
+  }
+  return source;
+}
+
+function validateDownloadCenter(source) {
+  const issues = [];
+  const css = source.match(/<style>([\s\S]*?)<\/style>/)?.[1] || "";
+  const add = (condition, issue) => {
+    if (!condition) issues.push(issue);
+  };
+
+  add(
+    /<main id="main-content" tabindex="-1">/.test(source),
+    "skip link target must be programmatically focusable",
+  );
+  add(
+    /class="release-chip" role="status" aria-live="polite" aria-atomic="true"/.test(source),
+    "release state must be announced",
+  );
+  add(
+    /id="platform-select" name="platform" aria-describedby="platform-help"/.test(source) &&
+      /id="platform-help" role="status" aria-live="polite"/.test(source),
+    "platform guidance must be associated and announced",
+  );
+  add(
+    /id="download-dialog"[\s\S]*?aria-describedby="download-dialog-description"/.test(source) &&
+      /id="download-dialog-description"/.test(source),
+    "dialog must have an accessible description",
+  );
+  add(
+    /id="copy-status" class="visually-hidden" role="status" aria-live="polite"/.test(source),
+    "copy confirmation must use a live status",
+  );
+  add(
+    /id="expand-all"[\s\S]*?aria-controls="panel-details panel-requirements panel-install panel-additional"[\s\S]*?aria-expanded="false"/.test(
+      source,
+    ),
+    "expand-all state must be exposed",
+  );
+
+  for (const name of ["details", "requirements", "install", "additional"]) {
+    add(
+      new RegExp(
+        `id="trigger-${name}"[\\s\\S]*?aria-controls="panel-${name}"[\\s\\S]*?<div[^>]*id="panel-${name}"[^>]*role="region"[^>]*aria-labelledby="trigger-${name}"`,
+      ).test(source),
+      `accordion ${name} must associate its trigger and region`,
+    );
+  }
+
+  for (const key of ["ArrowDown", "ArrowUp", "Home", "End"]) {
+    add(
+      source.includes(`case "${key}":`),
+      `accordion keyboard support must include ${key}`,
+    );
+  }
+  add(
+    /trigger\.addEventListener\("keydown"/.test(source),
+    "accordion triggers must handle roving keyboard focus",
+  );
+  add(
+    /querySelector\('input\[name="download-file"\]:checked'\)[\s\S]*?\.focus\(\)/.test(source),
+    "dialog must focus the selected download option",
+  );
+  add(
+    /elements\.dialog\.addEventListener\("keydown"[\s\S]*?event\.key !== "Tab"[\s\S]*?getClientRects\(\)\.length > 0/.test(
+      source,
+    ),
+    "dialog must keep Tab focus within visible controls",
+  );
+  add(
+    !source.includes("offsetParent"),
+    "visibility checks must not use offsetParent",
+  );
+  add(
+    /elements\.expandAll\.setAttribute\("aria-expanded", String\(allOpen\)\)/.test(source),
+    "expand-all aria state must stay synchronized",
+  );
+
+  add(
+    /\.brand,\s*\.context-label,\s*\.header-nav a,\s*\.resource-links a,\s*\.footer-links a\s*\{[^}]*min-height:\s*44px;/s.test(
+      css,
+    ),
+    "compact navigation targets must be at least 44px tall",
+  );
+  add(
+    /\.dialog-close\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px;/s.test(css),
+    "dialog close target must be 44px square",
+  );
+  add(
+    /\.install-card\s*\{[^}]*min-width:\s*0;/s.test(css) &&
+      /\.command\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*100%;/s.test(css),
+    "command cards must be allowed to shrink",
+  );
+  add(
+    /@media \(max-width: 680px\)[\s\S]*?\.command\s*\{[^}]*white-space:\s*pre-wrap;[^}]*overflow-wrap:\s*anywhere;/s.test(
+      css,
+    ),
+    "mobile commands must wrap without horizontal overflow",
+  );
+  add(
+    /@media \(prefers-reduced-motion: reduce\)/.test(css) &&
+      /scroll-behavior:\s*auto;/.test(css),
+    "reduced-motion users must not receive smooth scrolling",
+  );
+  add(
+    /:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--cp-accent\);/s.test(css),
+    "focus indicator must use the high-contrast accent",
+  );
+
+  let nonTokenCss = removeCssBlock(css, ":root");
+  nonTokenCss = removeCssBlock(nonTokenCss, 'html[data-theme="dark"]');
+  add(
+    !/(?:#[\da-f]{3,8}\b|rgba?\(|hsla?\()/i.test(nonTokenCss),
+    "literal colors must stay inside the --cp-* token blocks",
+  );
+
+  return issues;
+}
+
+test("mandatory Clawpilot theme script and token blocks remain byte-exact", () => {
+  assert.ok(scripts.length >= 2);
+  assert.equal(
+    createHash("sha256").update(scripts[0]).digest("hex"),
+    "2ac85d6a736048e9279c88c6161a28c93927621ff593e437d4fa77f3ad5b3f3f",
+  );
+  const tokenBlocks = [
+    style.match(/    :root \{[\s\S]*?\n    \}/)?.[0],
+    style.match(/    html\[data-theme="dark"\] \{[\s\S]*?\n    \}/)?.[0],
+  ];
+  assert.ok(tokenBlocks.every(Boolean));
+  assert.equal(
+    createHash("sha256").update(tokenBlocks.join("\n")).digest("hex"),
+    "59c8df02359057d54d21d774a1344a09899acfe192f2e7284b1e801365db11ec",
+  );
+});
+
+test("download center encodes the responsive accessibility contract", () => {
+  assert.deepEqual(validateDownloadCenter(page), []);
+});
+
+test("download center UI checks reject representative regressions", () => {
+  const mutations = [
+    {
+      expected: "dialog must have an accessible description",
+      source: page.replace(' aria-describedby="download-dialog-description"', ""),
+    },
+    {
+      expected: "mobile commands must wrap without horizontal overflow",
+      source: page.replace("white-space: pre-wrap;", "white-space: pre;"),
+    },
+    {
+      expected: "accordion keyboard support must include ArrowDown",
+      source: page.replace('case "ArrowDown":', 'case "PageDown":'),
+    },
+    {
+      expected: "dialog must keep Tab focus within visible controls",
+      source: page.replace('event.key !== "Tab"', 'event.key !== "Enter"'),
+    },
+    {
+      expected: "literal colors must stay inside the --cp-* token blocks",
+      source: page.replace("background: var(--cp-bg);", "background: #000;"),
+    },
+    {
+      expected: "accordion details must associate its trigger and region",
+      source: page.replace(
+        '              id="panel-details"\n              role="region"',
+        '              id="panel-details"',
+      ),
+    },
+  ];
+
+  for (const mutation of mutations) {
+    assert.ok(
+      validateDownloadCenter(mutation.source).includes(mutation.expected),
+      `mutation was not detected: ${mutation.expected}`,
+    );
+  }
+});
+
+test("all inline scripts remain valid JavaScript", () => {
+  for (const source of scripts) {
+    assert.doesNotThrow(() => new Function(source));
+  }
+});

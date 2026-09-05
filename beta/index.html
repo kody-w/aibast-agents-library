@@ -16,6 +16,7 @@
     content="Download the source-only RAPP Brainstem Frontier desktop preview for Windows, macOS, or Linux."
   >
   <title>Download RAPP Brainstem Frontier | AIBAST Download Center</title>
+  <link rel="icon" href="build/icon.svg" type="image/svg+xml">
   <style>
     :root {
       color-scheme: light;
@@ -84,7 +85,8 @@
       margin: 0;
       background: var(--cp-bg);
       color: var(--cp-text);
-      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
       line-height: 1.5;
     }
 
@@ -93,6 +95,7 @@
     a {
       font: inherit;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     button,
@@ -105,8 +108,12 @@
     }
 
     :focus-visible {
-      outline: 3px solid var(--cp-highlight);
+      outline: 3px solid var(--cp-accent);
       outline-offset: 3px;
+    }
+
+    main:focus {
+      outline: none;
     }
 
     [hidden] {
@@ -155,6 +162,16 @@
       text-decoration: none;
     }
 
+    .brand,
+    .context-label,
+    .header-nav a,
+    .resource-links a,
+    .footer-links a {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+    }
+
     .brand {
       gap: 10px;
       font-size: 18px;
@@ -187,6 +204,7 @@
     }
 
     .header-nav a {
+      display: inline-flex;
       color: var(--cp-text);
       text-decoration: none;
     }
@@ -197,7 +215,7 @@
 
     .hero-shell {
       border-bottom: 1px solid var(--cp-border);
-      background: var(--cp-surface-soft);
+      background: linear-gradient(135deg, var(--cp-surface-soft), var(--cp-bg-elevated));
     }
 
     .breadcrumb {
@@ -206,12 +224,15 @@
       gap: 8px;
       align-items: center;
       padding-top: 22px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 14px;
     }
 
     .breadcrumb a {
-      color: var(--cp-text-muted);
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      color: var(--cp-text-soft);
       text-decoration: none;
     }
 
@@ -236,8 +257,8 @@
       padding: 6px 10px;
       border: 1px solid var(--cp-border);
       border-radius: 999px;
-      background: var(--cp-surface);
-      color: var(--cp-text-muted);
+      background: var(--cp-panel-strong);
+      color: var(--cp-text-soft);
       font-size: 13px;
       font-weight: 700;
     }
@@ -275,7 +296,7 @@
     .hero-description {
       max-width: 820px;
       margin-bottom: 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: clamp(18px, 2vw, 22px);
       line-height: 1.55;
     }
@@ -289,7 +310,7 @@
       padding: 28px;
       border: 1px solid var(--cp-border);
       border-radius: 16px;
-      background: var(--cp-surface);
+      background: var(--cp-panel-strong);
       box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
       text-align: center;
     }
@@ -305,7 +326,7 @@
     }
 
     .product-mark span {
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -331,7 +352,7 @@
     .download-copy p {
       max-width: 650px;
       margin-bottom: 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 15px;
     }
 
@@ -353,7 +374,7 @@
       width: 100%;
       padding: 10px 38px 10px 12px;
       border: 1px solid var(--cp-border-strong);
-      border-radius: 0;
+      border-radius: 0.625rem;
       background: var(--cp-surface);
       color: var(--cp-text);
       cursor: pointer;
@@ -374,6 +395,11 @@
       font-size: 14px;
       font-weight: 700;
       text-decoration: none;
+      transition:
+        border-color 120ms ease,
+        background-color 120ms ease,
+        color 120ms ease,
+        transform 120ms ease;
     }
 
     .button:hover {
@@ -394,17 +420,22 @@
       color: var(--cp-accent-fg);
     }
 
+    .button:active {
+      transform: translateY(1px);
+    }
+
     .button:disabled {
       border-color: var(--cp-border);
       background: var(--cp-surface-soft);
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       cursor: wait;
+      transform: none;
     }
 
     .platform-help {
       min-height: 21px;
       margin: 8px 0 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -444,7 +475,7 @@
 
     .file-detail dt {
       margin-bottom: 8px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -477,6 +508,8 @@
     }
 
     .expand-button {
+      min-height: 44px;
+      padding: 8px 4px;
       border: 0;
       background: transparent;
       color: var(--cp-link);
@@ -533,7 +566,7 @@
 
     .accordion-panel {
       padding: 0 4px 32px 46px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 15px;
     }
 
@@ -607,6 +640,7 @@
     }
 
     .install-card {
+      min-width: 0;
       padding: 22px;
       border: 1px solid var(--cp-border);
       border-radius: 16px;
@@ -647,6 +681,8 @@
     }
 
     .command {
+      width: 100%;
+      max-width: 100%;
       min-height: 82px;
       margin: 0 0 14px;
       padding: 14px;
@@ -713,6 +749,7 @@
       background: var(--cp-surface);
       color: var(--cp-text);
       box-shadow: var(--cp-shadow);
+      overscroll-behavior: contain;
     }
 
     dialog::backdrop {
@@ -738,8 +775,8 @@
 
     .dialog-close {
       display: grid;
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       flex: 0 0 auto;
       place-items: center;
       border: 1px solid var(--cp-border);
@@ -752,7 +789,7 @@
 
     .dialog-intro {
       margin-bottom: 22px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
     }
 
     .file-options {
@@ -811,7 +848,7 @@
 
     .file-platform,
     .file-size {
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -837,7 +874,7 @@
 
     .dialog-note {
       margin: 16px 0 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 12px;
     }
 
@@ -852,7 +889,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -863,7 +900,8 @@
     }
 
     .footer-links a {
-      color: var(--cp-text-muted);
+      display: inline-flex;
+      color: var(--cp-text-soft);
       text-decoration: none;
     }
 
@@ -897,7 +935,7 @@
 
       .capability-grid,
       .install-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .install-card p {
@@ -917,23 +955,35 @@
 
       .header-nav {
         width: 100%;
-        gap: 16px;
+        justify-content: space-between;
+        gap: 8px;
         margin-left: 0;
         padding-top: 10px;
         border-top: 1px solid var(--cp-border);
       }
 
       .hero {
-        gap: 30px;
-        padding: 40px 0 44px;
+        gap: 24px;
+        padding: 34px 0 38px;
       }
 
       h1 {
-        font-size: clamp(38px, 13vw, 54px);
+        font-size: clamp(36px, 12vw, 50px);
+      }
+
+      .product-mark {
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .product-mark img {
+        width: 64px;
+        height: 64px;
       }
 
       .download-grid {
         gap: 28px;
+        padding: 32px 0;
       }
 
       .download-controls {
@@ -945,7 +995,24 @@
       }
 
       .accordion-panel {
-        padding-left: 4px;
+        padding: 0 0 28px;
+      }
+
+      .accordion-trigger {
+        min-height: 64px;
+        padding: 17px 0;
+        font-size: 18px;
+      }
+
+      .install-card {
+        padding: 16px;
+      }
+
+      .command {
+        min-height: 0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
 
       .file-option {
@@ -956,11 +1023,47 @@
         grid-column: 2;
       }
 
+      .dialog-shell {
+        padding: 20px;
+      }
+
+      .dialog-header {
+        gap: 16px;
+      }
+
+      .dialog-header h2 {
+        font-size: clamp(24px, 8vw, 28px);
+        line-height: 1.15;
+      }
+
+      .dialog-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .resource-links {
+        display: grid;
+        gap: 0;
+      }
+
       .footer-inner {
         align-items: flex-start;
         flex-direction: column;
         justify-content: center;
         padding: 28px 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
       }
     }
   </style>
@@ -984,7 +1087,7 @@
     </div>
   </header>
 
-  <main id="main-content">
+  <main id="main-content" tabindex="-1">
     <section class="hero-shell">
       <div class="container">
         <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -997,7 +1100,7 @@
 
         <div class="hero">
           <div>
-            <div class="release-chip">
+            <div class="release-chip" role="status" aria-live="polite" aria-atomic="true">
               <span id="status-dot" class="status-dot" aria-hidden="true"></span>
               <span id="release-status">Resolving Frontier release</span>
             </div>
@@ -1032,7 +1135,7 @@
         <form class="download-form" id="download-form">
           <label for="platform-select">Choose your operating system</label>
           <div class="download-controls">
-            <select id="platform-select" name="platform">
+            <select id="platform-select" name="platform" aria-describedby="platform-help">
               <option value="windows">Windows 11</option>
               <option value="macos">macOS</option>
               <option value="linux">Linux</option>
@@ -1041,7 +1144,9 @@
               Download
             </button>
           </div>
-          <p class="platform-help" id="platform-help">Detecting your platform.</p>
+          <p class="platform-help" id="platform-help" role="status" aria-live="polite">
+            Detecting your platform.
+          </p>
         </form>
       </div>
     </section>
@@ -1071,7 +1176,15 @@
       <section aria-labelledby="details-heading">
         <div class="details-heading">
           <h2 id="details-heading">Download details</h2>
-          <button class="expand-button" id="expand-all" type="button">Expand all</button>
+          <button
+            class="expand-button"
+            id="expand-all"
+            type="button"
+            aria-controls="panel-details panel-requirements panel-install panel-additional"
+            aria-expanded="false"
+          >
+            Expand all
+          </button>
         </div>
 
         <div class="accordion" aria-label="Accordion containing details about the download">
@@ -1079,15 +1192,21 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-details"
                 type="button"
                 aria-expanded="true"
                 aria-controls="panel-details"
               >
-                <span class="accordion-icon" aria-hidden="true">-</span>
+                <span class="accordion-icon" aria-hidden="true">−</span>
                 <span>Details</span>
               </button>
             </h3>
-            <div class="accordion-panel" id="panel-details">
+            <div
+              class="accordion-panel"
+              id="panel-details"
+              role="region"
+              aria-labelledby="trigger-details"
+            >
               <p>
                 RAPP Brainstem Frontier puts the live agent Explorer, the real Brainstem
                 chat, and GitHub Copilot Brain Surgeon in one visible workspace. Describe
@@ -1132,6 +1251,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-requirements"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-requirements"
@@ -1140,7 +1260,13 @@
                 <span>System Requirements</span>
               </button>
             </h3>
-            <div class="accordion-panel" id="panel-requirements" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-requirements"
+              role="region"
+              aria-labelledby="trigger-requirements"
+              hidden
+            >
               <h4>Supported operating systems</h4>
               <div class="supported-os">
                 <span class="os-pill">Windows 11 x64 or ARM64</span>
@@ -1172,6 +1298,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-install"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-install"
@@ -1180,7 +1307,13 @@
                 <span>Install Instructions</span>
               </button>
             </h3>
-            <div class="accordion-panel" id="panel-install" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-install"
+              role="region"
+              aria-labelledby="trigger-install"
+              hidden
+            >
               <p>
                 Use the same one-liner to install, update or repair, and launch Frontier.
                 The bootstrap resolves the newest published <code>brainstem-beta-v*</code>
@@ -1242,6 +1375,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-additional"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-additional"
@@ -1250,7 +1384,13 @@
                 <span>Additional Information</span>
               </button>
             </h3>
-            <div class="accordion-panel" id="panel-additional" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-additional"
+              role="region"
+              aria-labelledby="trigger-additional"
+              hidden
+            >
               <p>
                 Frontier always publishes small source bootstraps that verify the release
                 tag, pin the exact source commit, and keep the launcher removable from the
@@ -1285,15 +1425,19 @@
     </div>
   </main>
 
-  <dialog id="download-dialog" aria-labelledby="download-dialog-title">
+  <dialog
+    id="download-dialog"
+    aria-labelledby="download-dialog-title"
+    aria-describedby="download-dialog-description"
+  >
     <form class="dialog-shell" method="dialog">
       <div class="dialog-header">
         <h2 id="download-dialog-title">Choose the download you want</h2>
         <button class="dialog-close" type="submit" value="cancel" aria-label="Close download dialog">
-          x
+          &times;
         </button>
       </div>
-      <p class="dialog-intro">
+      <p class="dialog-intro" id="download-dialog-description">
         Choose a packaged application installer when one is published, or use the source
         bootstrap that resolves and pins the same verified Frontier release.
       </p>
@@ -1317,6 +1461,7 @@
       <p class="dialog-note">
         Review source bootstraps before running them on a managed device.
       </p>
+      <p id="copy-status" class="visually-hidden" role="status" aria-live="polite"></p>
     </form>
   </dialog>
 
@@ -1353,6 +1498,7 @@
         selectedCommandPanel: document.getElementById("selected-command-panel"),
         selectedCommand: document.getElementById("selected-command"),
         copySelected: document.getElementById("copy-selected"),
+        copyStatus: document.getElementById("copy-status"),
         downloadSelected: document.getElementById("download-selected"),
         unixCommand: document.getElementById("unix-command"),
         windowsCommand: document.getElementById("windows-command"),
@@ -1367,6 +1513,7 @@
       };
 
       let downloadItems = [];
+      let copyStatusTimer;
 
       function validRepo(value) {
         return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(value || "");
@@ -1409,7 +1556,7 @@
       }
 
       async function copyText(button, value) {
-        const original = button.textContent;
+        const original = button.textContent.trim();
         try {
           await navigator.clipboard.writeText(value);
         } catch {
@@ -1424,8 +1571,11 @@
           textarea.remove();
         }
         button.textContent = "Copied";
-        window.setTimeout(() => {
+        elements.copyStatus.textContent = `${original} copied to the clipboard.`;
+        window.clearTimeout(copyStatusTimer);
+        copyStatusTimer = window.setTimeout(() => {
           button.textContent = original;
+          elements.copyStatus.textContent = "";
         }, 1600);
       }
 
@@ -1560,11 +1710,15 @@
 
       function openDownloadDialog() {
         renderDownloadOptions(elements.platformSelect.value);
+        const selectedOption = elements.downloadOptionList.querySelector(
+          'input[name="download-file"]:checked',
+        );
         if (typeof elements.dialog.showModal === "function") {
           elements.dialog.showModal();
         } else {
           elements.dialog.setAttribute("open", "");
         }
+        selectedOption?.focus();
       }
 
       function setupInstallers(repo) {
@@ -1618,8 +1772,16 @@
       function setAccordionState(button, open) {
         const panel = document.getElementById(button.getAttribute("aria-controls"));
         button.setAttribute("aria-expanded", String(open));
-        button.querySelector(".accordion-icon").textContent = open ? "-" : "+";
+        button.querySelector(".accordion-icon").textContent = open ? "−" : "+";
         panel.hidden = !open;
+      }
+
+      function syncExpandAllState(triggers) {
+        const allOpen = triggers.every(
+          (trigger) => trigger.getAttribute("aria-expanded") === "true",
+        );
+        elements.expandAll.textContent = allOpen ? "Collapse all" : "Expand all";
+        elements.expandAll.setAttribute("aria-expanded", String(allOpen));
       }
 
       function setupAccordions() {
@@ -1627,10 +1789,30 @@
         for (const trigger of triggers) {
           trigger.addEventListener("click", () => {
             setAccordionState(trigger, trigger.getAttribute("aria-expanded") !== "true");
-            const allOpen = triggers.every(
-              (candidate) => candidate.getAttribute("aria-expanded") === "true",
-            );
-            elements.expandAll.textContent = allOpen ? "Collapse all" : "Expand all";
+            syncExpandAllState(triggers);
+          });
+
+          trigger.addEventListener("keydown", (event) => {
+            const currentIndex = triggers.indexOf(trigger);
+            let nextIndex;
+            switch (event.key) {
+              case "ArrowDown":
+                nextIndex = (currentIndex + 1) % triggers.length;
+                break;
+              case "ArrowUp":
+                nextIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+                break;
+              case "Home":
+                nextIndex = 0;
+                break;
+              case "End":
+                nextIndex = triggers.length - 1;
+                break;
+              default:
+                return;
+            }
+            event.preventDefault();
+            triggers[nextIndex].focus();
           });
         }
 
@@ -1641,8 +1823,10 @@
           for (const trigger of triggers) {
             setAccordionState(trigger, shouldOpen);
           }
-          elements.expandAll.textContent = shouldOpen ? "Collapse all" : "Expand all";
+          syncExpandAllState(triggers);
         });
+
+        syncExpandAllState(triggers);
       }
 
       async function loadRelease(repo) {
@@ -1705,6 +1889,28 @@
       elements.downloadForm.addEventListener("submit", (event) => {
         event.preventDefault();
         openDownloadDialog();
+      });
+      elements.dialog.addEventListener("keydown", (event) => {
+        if (event.key !== "Tab") return;
+        const visibleControls = [
+          ...elements.dialog.querySelectorAll(
+            'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        ].filter((control) => control.getClientRects().length > 0);
+        if (!visibleControls.length) return;
+
+        const first = visibleControls[0];
+        const last = visibleControls[visibleControls.length - 1];
+        if (!elements.dialog.contains(document.activeElement)) {
+          event.preventDefault();
+          first.focus();
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       });
       elements.dialog.addEventListener("click", (event) => {
         if (event.target === elements.dialog) {
