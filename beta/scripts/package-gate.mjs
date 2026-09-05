@@ -12,7 +12,7 @@ import {
 } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 
 import { loadBootstrapBundle } from "../electron/brainstem-provisioner.mjs";
 
@@ -92,7 +92,64 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function main() {
+function safeRead(filePath) {
+  try {
+    return { ok: true, value: readFileSync(filePath, "utf8") };
+  } catch (error) {
+    return {
+      ok: false,
+      detail: `${filePath}: ${String(error?.message || error)}`,
+      value: "",
+    };
+  }
+}
+
+function safeRealpath(filePath) {
+  try {
+    return { ok: true, value: realpathSync(filePath) };
+  } catch (error) {
+    return {
+      ok: false,
+      detail: `${filePath}: ${String(error?.message || error)}`,
+      value: null,
+    };
+  }
+}
+
+function runPackaged(executablePath, env, timeoutMs = 30_000) {
+  return new Promise((resolve) => {
+    const child = spawn(executablePath, [], {
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true,
+    });
+    let output = "";
+    let settled = false;
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      resolve(result);
+    };
+    child.stdout.on("data", (chunk) => { output += chunk; });
+    child.stderr.on("data", (chunk) => { output += chunk; });
+    const timeout = setTimeout(() => {
+      child.kill("SIGKILL");
+    }, timeoutMs);
+    child.once("error", (error) => {
+      clearTimeout(timeout);
+      finish({ status: null, output: String(error?.message || error) });
+    });
+    child.once("close", (code, signal) => {
+      clearTimeout(timeout);
+      finish({
+        status: code,
+        output: `${output}${signal ? `\nSignal: ${signal}` : ""}`.trim(),
+      });
+    });
+  });
+}
+
+async function main() {
   requirement("packaged macOS app exists", existsSync(executable), executable);
   const asarPath = path.join(resources, "app.asar");
   requirement("packaged app.asar exists", existsSync(asarPath), asarPath);
@@ -174,6 +231,7 @@ server.listen(Number(process.env.PORT), "127.0.0.1", () => {
     HOME: process.env.HOME,
     USERPROFILE: process.env.USERPROFILE,
     BRAINSTEM_HOME: process.env.BRAINSTEM_HOME,
+    USER_DATA_DIR: process.env.BRAINSTEM_BETA_USER_DATA_DIR,
   }));
 });
 for (const signal of ["SIGINT", "SIGTERM"]) {
@@ -241,18 +299,37 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
           ].includes(key)
         )),
       );
-      const packagedEnv = {
-        ...smokeEnv,
-        HOME: isolatedHome,
-        USERPROFILE: isolatedHome,
-        BRAINSTEM_HOME: brainstemHome,
-        BRAINSTEM_BETA_HEADLESS: "1",
-        BRAINSTEM_BETA_HOME: path.join(brainstemHome, "beta-launcher"),
-        BRAINSTEM_BETA_SMOKE_EXIT_MS: "8000",
-        BRAINSTEM_BETA_SMOKE_REQUIRE_READY: "1",
-        FAKE_NODE_PATH: process.execPath,
-        FAKE_BRAINSTEM_MARKER: serviceMarker,
+      const packagedEnvironment = (
+        home,
+        label,
+        marker,
+        overrides = {},
+      ) => {
+        const target = path.join(home, ".brainstem");
+        return {
+          ...smokeEnv,
+          HOME: home,
+          USERPROFILE: home,
+          BRAINSTEM_HOME: target,
+          BRAINSTEM_BETA_HEADLESS: "1",
+          BRAINSTEM_BETA_HOME: path.join(target, "beta-launcher"),
+          BRAINSTEM_BETA_SMOKE_EXIT_MS: "8000",
+          BRAINSTEM_BETA_SMOKE_REQUIRE_READY: "1",
+          BRAINSTEM_BETA_USER_DATA_DIR: path.join(
+            home,
+            "electron-user-data",
+            label,
+          ),
+          FAKE_NODE_PATH: process.execPath,
+          FAKE_BRAINSTEM_MARKER: marker,
+          ...overrides,
+        };
       };
+      const packagedEnv = packagedEnvironment(
+        isolatedHome,
+        "provision",
+        serviceMarker,
+      );
       const smoke = spawnSync(executable, [], {
         encoding: "utf8",
         env: packagedEnv,
@@ -273,15 +350,26 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
         existsSync(serviceMarker),
         serviceMarker,
       );
-      const serviceEnvironment = existsSync(serviceMarker)
-        ? JSON.parse(readFileSync(serviceMarker, "utf8"))
-        : {};
+      const markerRead = safeRead(serviceMarker);
+      let serviceEnvironment = {};
+      let markerDetail = markerRead.detail || serviceMarker;
+      if (markerRead.ok) {
+        try {
+          serviceEnvironment = JSON.parse(markerRead.value);
+        } catch (error) {
+          markerDetail = `${serviceMarker}: ${String(error?.message || error)}`;
+        }
+      }
       requirement(
         "packaged smoke kept HOME and BRAINSTEM_HOME isolated",
         serviceEnvironment.HOME === isolatedHome
           && serviceEnvironment.USERPROFILE === isolatedHome
-          && serviceEnvironment.BRAINSTEM_HOME === brainstemHome,
-        JSON.stringify(serviceEnvironment),
+          && serviceEnvironment.BRAINSTEM_HOME === brainstemHome
+          && serviceEnvironment.USER_DATA_DIR
+            === packagedEnv.BRAINSTEM_BETA_USER_DATA_DIR,
+        Object.keys(serviceEnvironment).length
+          ? JSON.stringify(serviceEnvironment)
+          : markerDetail,
       );
       requirement(
         "missing-runtime bootstrap atomically activated the shared home",
@@ -291,14 +379,19 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
       );
       const stagedHomes = readdirSync(isolatedHome)
         .filter((name) => name.includes("frontier-stage-"));
+      const targetPath = safeRealpath(brainstemHome);
+      const stagedPaths = stagedHomes.map((name) => (
+        safeRealpath(path.join(isolatedHome, name))
+      ));
       requirement(
         "missing-runtime bootstrap left no abandoned staging home",
-        stagedHomes.length === 1
-          && stagedHomes.every((name) => (
-            realpathSync(path.join(isolatedHome, name))
-            === realpathSync(brainstemHome)
-          )),
-        realpathSync(brainstemHome),
+        targetPath.ok
+          && stagedPaths.length === 1
+          && stagedPaths[0].ok
+          && stagedPaths[0].value === targetPath.value,
+        targetPath.ok
+          ? targetPath.value
+          : targetPath.detail,
       );
       const sanitizedLog = existsSync(provisionLog)
         ? readFileSync(provisionLog, "utf8")
@@ -314,42 +407,101 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
       rmSync(serviceMarker, { force: true });
       const readySmoke = spawnSync(executable, [], {
         encoding: "utf8",
-        env: {
-          ...packagedEnv,
-          BRAINSTEM_BETA_SMOKE_EXIT_MS: "5000",
-        },
+        env: packagedEnvironment(
+          isolatedHome,
+          "ready",
+          serviceMarker,
+          { BRAINSTEM_BETA_SMOKE_EXIT_MS: "5000" },
+        ),
         timeout: 30000,
         windowsHide: true,
       });
       const readyOutput = String(
         readySmoke.stderr || readySmoke.stdout || "",
       ).trim();
+      const readyLog = safeRead(provisionLog);
       requirement(
         "already-ready packaged launch skips provisioning",
         readySmoke.status === 0
-          && readFileSync(provisionLog, "utf8") === firstLog
+          && readyLog.ok
+          && readyLog.value === firstLog
           && !/Error occurred in handler|UnhandledPromiseRejection|TypeError:/.test(
             readyOutput,
           ),
-        readyOutput,
+        readyLog.ok ? readyOutput : readyLog.detail,
       );
-      writeFileSync(
+      const concurrentHomes = [
+        mkdtempSync(path.join(scratchRoot, "concurrent-a-")),
+        mkdtempSync(path.join(scratchRoot, "concurrent-b-")),
+      ];
+      const concurrentMarkers = concurrentHomes.map(
+        (home) => path.join(home, "service-ready"),
+      );
+      const concurrentEnvironments = concurrentHomes.map((home, index) => (
+        packagedEnvironment(
+          home,
+          `concurrent-${index + 1}`,
+          concurrentMarkers[index],
+        )
+      ));
+      const concurrentResults = await Promise.all(
+        concurrentEnvironments.map((environment) => (
+          runPackaged(executable, environment)
+        )),
+      );
+      requirement(
+        "two concurrent packaged smokes both reach their own backend",
+        concurrentResults.every((result) => result.status === 0)
+          && concurrentMarkers.every((marker) => existsSync(marker)),
+        concurrentResults.map((result) => result.output).join("\n---\n"),
+      );
+      for (let index = 0; index < concurrentHomes.length; index += 1) {
+        const evidence = safeRead(concurrentMarkers[index]);
+        let measured = null;
+        try {
+          measured = evidence.ok ? JSON.parse(evidence.value) : null;
+        } catch {}
+        requirement(
+          `concurrent smoke ${index + 1} kept a unique userData identity`,
+          measured?.BRAINSTEM_HOME
+              === concurrentEnvironments[index].BRAINSTEM_HOME
+            && measured?.USER_DATA_DIR
+              === concurrentEnvironments[index].BRAINSTEM_BETA_USER_DATA_DIR,
+          measured ? JSON.stringify(measured) : evidence.detail,
+        );
+      }
+      const failureFixtureReady = existsSync(python);
+      requirement(
+        "backend-failure fixture has an activated Python launcher",
+        failureFixtureReady,
         python,
-        "#!/bin/sh\n"
-        + 'if [ "$1" = "-B" ]; then exit 0; fi\n'
-        + "exit 17\n",
       );
-      chmodSync(python, 0o700);
+      if (failureFixtureReady) {
+        writeFileSync(
+          python,
+          "#!/bin/sh\n"
+          + 'if [ "$1" = "-B" ]; then exit 0; fi\n'
+          + "exit 17\n",
+        );
+        chmodSync(python, 0o700);
+      }
       rmSync(serviceMarker, { force: true });
-      const failingSmoke = spawnSync(executable, [], {
-        encoding: "utf8",
-        env: {
-          ...packagedEnv,
-          BRAINSTEM_BETA_SMOKE_EXIT_MS: "2000",
-        },
-        timeout: 30000,
-        windowsHide: true,
-      });
+      const failingSmoke = failureFixtureReady
+        ? spawnSync(executable, [], {
+            encoding: "utf8",
+            env: packagedEnvironment(
+              isolatedHome,
+              "backend-failure",
+              serviceMarker,
+              { BRAINSTEM_BETA_SMOKE_EXIT_MS: "2000" },
+            ),
+            timeout: 30000,
+            windowsHide: true,
+          })
+        : {
+            status: null,
+            stderr: "Activated Python launcher was unavailable.",
+          };
       requirement(
         "packaged smoke fails closed when its Brainstem service fails",
         failingSmoke.status !== 0,
@@ -364,13 +516,23 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
     }
   }
 
+}
+
+function summarize() {
   const failures = results.filter((result) => !result.pass);
   process.stdout.write(
     `\n${failures.length ? "PACKAGE NOT READY" : "PACKAGE READY"} — ${
       results.length - failures.length
     }/${results.length} pass\n`,
   );
-  process.exit(failures.length ? 1 : 0);
+  process.exitCode = failures.length ? 1 : 0;
 }
 
-main();
+main().then(summarize).catch((error) => {
+  requirement(
+    "package gate completed without an internal crash",
+    false,
+    String(error?.stack || error),
+  );
+  summarize();
+});

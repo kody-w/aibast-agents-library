@@ -1375,6 +1375,12 @@ async function startServices() {
   await Promise.allSettled([brainstemTask, copilotTask, uiDriverTask]);
 }
 
+const userDataOverride = String(
+  process.env.BRAINSTEM_BETA_USER_DATA_DIR || "",
+).trim();
+if (userDataOverride) {
+  app.setPath("userData", path.resolve(userDataOverride));
+}
 const hasLock = app.requestSingleInstanceLock();
 if (!hasLock) {
   app.quit();
