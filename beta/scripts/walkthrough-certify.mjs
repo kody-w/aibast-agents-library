@@ -106,7 +106,7 @@ function main() {
       "package-gate",
       "npm",
       ["run", "package:gate", "--silent"],
-      /PACKAGE READY\s+—\s+(\d+)\/(\d+)\s+pass/,
+      /PACKAGE (?:READY FOR PUBLICATION|VERIFIED, PUBLICATION BLOCKED)\s+—\s+(\d+)\/(\d+)\s+pass/,
     ),
     runValidation(
       runDirectory,

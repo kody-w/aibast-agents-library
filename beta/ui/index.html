@@ -79,7 +79,9 @@
     }
     .card h1 { margin: 0 0 10px; font-size: 24px; }
     .card p { margin: 7px 0; color: #8c959f; line-height: 1.55; }
-    #error { color: #ff7b72; white-space: pre-wrap; }
+    #startup-detail, #error { white-space: pre-wrap; }
+    #startup-detail { font-size: 12px; }
+    #error { color: #ff7b72; }
     #intro {
       position: fixed;
       z-index: 20;
@@ -628,8 +630,9 @@
   <main>
     <div id="splash">
       <div class="card">
-        <h1>Starting your global Brainstem</h1>
-        <p>This launcher uses the same agents, memories, authentication, and port 7071 as the regular installer.</p>
+        <h1 id="startup-title">Preparing your global Brainstem</h1>
+        <p id="startup-status">Checking the shared runtime...</p>
+        <p id="startup-detail">A packaged app provisions a missing runtime from its immutable release commit and never captures your credentials.</p>
         <p id="error"></p>
       </div>
     </div>
@@ -700,7 +703,7 @@
       <div class="surgeon-hint">runs on your GitHub Copilot account · ⌘↵ to send</div>
     </div>
   </aside>
-  <section id="intro" aria-labelledby="intro-title">
+  <section id="intro" class="hidden" aria-labelledby="intro-title">
     <div class="intro-panel">
       <div class="intro-hero">
         <div class="eyebrow">Learn AI · teach AI · keep the skill</div>

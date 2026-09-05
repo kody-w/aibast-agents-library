@@ -5,9 +5,16 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repositoryRoot = path.resolve(root, "..");
 const unix = readFileSync(path.join(root, "install.sh"), "utf8");
 const windows = readFileSync(path.join(root, "install.cmd"), "utf8");
+const rootUnix = readFileSync(path.join(repositoryRoot, "install.sh"), "utf8");
+const rootWindows = readFileSync(
+  path.join(repositoryRoot, "install.ps1"),
+  "utf8",
+);
 const installerPage = readFileSync(path.join(root, "index.html"), "utf8");
+const downloadCenter = readFileSync(path.join(root, "download-center.js"), "utf8");
 const frontierUnix = readFileSync(path.join(root, "frontier.sh"), "utf8");
 const frontierWindows = readFileSync(path.join(root, "frontier.ps1"), "utf8");
 const packageJson = JSON.parse(
@@ -16,6 +23,10 @@ const packageJson = JSON.parse(
 const main = readFileSync(path.join(root, "electron", "main.mjs"), "utf8");
 const brainSurgeon = readFileSync(
   path.join(root, "electron", "brain-surgeon.mjs"),
+  "utf8",
+);
+const copilotRuntime = readFileSync(
+  path.join(root, "electron", "copilot-runtime.mjs"),
   "utf8",
 );
 const routeManager = readFileSync(
@@ -51,6 +62,34 @@ const walkthroughGate = readFileSync(
 );
 const walkthroughCertify = readFileSync(
   path.join(root, "scripts", "walkthrough-certify.mjs"),
+  "utf8",
+);
+const packageGate = readFileSync(
+  path.join(root, "scripts", "package-gate.mjs"),
+  "utf8",
+);
+const packageFirstRunGate = readFileSync(
+  path.join(root, "scripts", "package-first-run-gate.mjs"),
+  "utf8",
+);
+const prepareBootstrap = readFileSync(
+  path.join(root, "scripts", "prepare-package-bootstrap.mjs"),
+  "utf8",
+);
+const provisionerSource = readFileSync(
+  path.join(root, "electron", "brainstem-provisioner.mjs"),
+  "utf8",
+);
+const provisionLock = readFileSync(
+  path.join(root, "electron", "provision-lock.mjs"),
+  "utf8",
+);
+const safeLog = readFileSync(
+  path.join(root, "electron", "safe-log.mjs"),
+  "utf8",
+);
+const userDataPath = readFileSync(
+  path.join(root, "electron", "user-data-path.mjs"),
   "utf8",
 );
 const brainstemUi = readFileSync(
@@ -118,20 +157,295 @@ test("released beta installs can pin the launcher and runtime to one commit", ()
   assert.doesNotMatch(windows, /for \/f "delims=" %%H in \('.*rev-parse HEAD.*\)/);
 });
 
+test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () => {
+  assert.match(packageJson.scripts["prepare:bootstrap"], /prepare-package-bootstrap/);
+  assert.match(packageJson.scripts["dist:mac"], /package-platform/);
+  assert.match(packageGate, /package-first-run-gate\.mjs/);
+  assert.deepEqual(packageJson.build.extraResources[0], {
+    from: "build/generated/bootstrap",
+    to: "bootstrap",
+    filter: ["**/*"],
+  });
+  assert.match(packageJson.scripts.check, /brainstem-provisioner\.mjs/);
+  assert.match(packageJson.scripts.check, /provision-lock\.mjs/);
+  assert.match(packageJson.scripts.check, /safe-log\.mjs/);
+  assert.match(main, /new BrainstemProvisioner/);
+  assert.match(main, /app\.isPackaged/);
+  const services = main.slice(
+    main.indexOf("async function startServices()"),
+    main.indexOf("const hasLock = app.requestSingleInstanceLock()"),
+  );
+  const ensureIndex = services.indexOf("provisioner.ensure()");
+  const managersIndex = services.indexOf("initializeProvisionedManagers()");
+  const startupFingerprintIndex = services.indexOf("betaSourceFingerprint(");
+  const fingerprintIndex = services.indexOf("runtimeDirectoryFingerprint(");
+  assert.ok(ensureIndex >= 0);
+  assert.ok(managersIndex >= 0);
+  assert.ok(startupFingerprintIndex >= 0);
+  assert.ok(fingerprintIndex >= 0);
+  assert.ok(
+    ensureIndex < startupFingerprintIndex
+      && ensureIndex < fingerprintIndex
+      && ensureIndex < managersIndex,
+    "fingerprints must run only after provisioning",
+  );
+  assert.doesNotMatch(
+    main.slice(0, main.indexOf("async function startServices()")),
+    /= (?:betaSourceFingerprint|runtimeDirectoryFingerprint)\(/,
+  );
+  const ready = main.slice(main.indexOf("app.whenReady().then"));
+  const windowIndex = ready.indexOf("mainWindow = createWindow()");
+  const servicesIndex = ready.indexOf("void startServices()");
+  assert.ok(windowIndex >= 0);
+  assert.ok(servicesIndex >= 0);
+  assert.ok(
+    windowIndex < servicesIndex,
+    "the provisioning UI must exist before runtime checks begin",
+  );
+  assert.match(ui, /id="startup-status"/);
+  assert.match(ui, /immutable release commit/);
+  assert.match(ui, /id="intro" class="hidden"/);
+  assert.match(renderer, /state\.brainstem\.detail/);
+  assert.match(renderer, /intro\.classList\.add\("hidden"\)/);
+  assert.match(main, /Evidence certification is disabled for this session/);
+  assert.match(main, /fingerprintWarnings/);
+});
+
+test("packaged Copilot CLI always resolves to an executable outside ASAR", () => {
+  assert.ok(
+    packageJson.build.asarUnpack.includes("node_modules/@github/copilot-*/**"),
+  );
+  assert.match(copilotRuntime, /app\.asar\.unpacked/);
+  assert.match(copilotRuntime, /process\.resourcesPath/);
+  assert.match(copilotRuntime, /RUNNING_FROM_ASAR && !cliPath/);
+  assert.match(packageGate, /Copilot CLI/);
+  assert.match(packageGate, /\["--version"\]/);
+});
+
+test("single-instance lock precedes every stateful runtime constructor", () => {
+  const lock = main.indexOf("const hasLock = app.requestSingleInstanceLock()");
+  assert.ok(lock > 0);
+  const beforeLock = main.slice(0, lock);
+  for (const constructor of [
+    "new BrainstemProvisioner",
+    "new BetaRouteManager",
+    "new CopilotRuntime",
+    "new CopilotStudioAuthManager",
+    "new RappStoreClient",
+    "new TwinManager",
+  ]) {
+    assert.doesNotMatch(beforeLock, new RegExp(constructor));
+    assert.ok(main.indexOf(constructor, lock) > lock);
+  }
+});
+
+test("packaged smoke requires real service readiness in an isolated home", () => {
+  assert.match(main, /BRAINSTEM_BETA_SMOKE_REQUIRE_READY/);
+  assert.match(main, /state\.brainstem\.phase !== "ready"/);
+  assert.match(main, /app\.exit\(requestedExitCode\)/);
+  assert.match(packageFirstRunGate, /!key\.startsWith\("BRAINSTEM_"\)/);
+  assert.match(packageFirstRunGate, /HOME: home/);
+  assert.match(packageFirstRunGate, /USERPROFILE: home/);
+  assert.match(packageFirstRunGate, /BRAINSTEM_HOME: target/);
+  assert.match(packageFirstRunGate, /provisions a missing runtime and reaches readiness/);
+  assert.match(packageFirstRunGate, /missing-runtime bootstrap left no abandoned staging home/);
+  assert.match(packageFirstRunGate, /provisioning log scrubs credential canaries/);
+  assert.match(packageFirstRunGate, /packaged smoke reached a compatible Brainstem service/);
+  assert.match(packageFirstRunGate, /packaged smoke fails closed when its Brainstem service fails/);
+  assert.match(packageFirstRunGate, /BRAINSTEM_BETA_USER_DATA_DIR/);
+  assert.match(packageFirstRunGate, /two concurrent packaged smokes both reach their own backend/);
+  assert.match(packageFirstRunGate, /ACTUAL_USER_DATA_DIR/);
+  assert.match(packageFirstRunGate, /concurrent-shared-home-/);
+  assert.match(packageFirstRunGate, /safeRealpath/);
+  assert.match(packageFirstRunGate, /package gate completed without an internal crash/);
+  assert.match(packageGate, /canonical first-run\/concurrent package gate passes/);
+  assert.match(packageGate, /sealed release bootstrap uses canonical immutable authority/);
+  assert.match(packageGate, /requestedUserData/);
+  assert.match(packageGate, /actualUserData/);
+});
+
+test("bootstrap staging, lock ownership, and log redaction are explicit", () => {
+  assert.match(provisionerSource, /Automatic repair was not attempted/);
+  assert.match(provisionerSource, /agents", "context_memory_agent\.py"/);
+  assert.match(provisionerSource, /agents", "manage_memory_agent\.py"/);
+  assert.match(provisionerSource, /Python 3\.11\+ is required/);
+  assert.match(provisionerSource, /compile\(source/);
+  assert.match(provisionerSource, /frontier-stage-/);
+  assert.match(provisionerSource, /this\.link\([\s\S]*stageHome,[\s\S]*this\.config\.brainstemHome/);
+  assert.match(provisionerSource, /No runtime was activated/);
+  assert.match(provisionLock, /randomBytes\(32\)/);
+  assert.match(provisionLock, /\.stale-\$\{token\}/);
+  assert.match(provisionLock, /before\.owner\.token !== token/);
+  assert.match(safeLog, /github_pat_/);
+  assert.match(safeLog, /\[REDACTED\]/);
+  assert.match(provisionerSource, /detached: this\.platform !== "win32"/);
+  assert.match(provisionerSource, /taskkill\.exe/);
+  assert.match(provisionerSource, /process\.kill\(-pid, signal\)/);
+  assert.match(main, /Shutdown cleanup failed/);
+});
+
+test("release packaging is canonical and fork packaging is explicit development", () => {
+  assert.match(prepareBootstrap, /FRONTIER_PACKAGE_BOOTSTRAP_MODE/);
+  assert.match(prepareBootstrap, /BRAINSTEM_BETA_PACKAGE_MODE/);
+  assert.match(prepareBootstrap, /development", "staging", "release"/);
+  assert.match(prepareBootstrap, /rapp-brainstem-frontier-development/);
+  assert.match(provisionerSource, /release provenance must use/);
+  assert.match(provisionerSource, /microsoft\/aibast-agents-library/);
+});
+
+test("packaged updater refuses the source-checkout path inside app.asar", () => {
+  assert.match(main, /if \(app\.isPackaged\)[\s\S]*packagedUpdateState\(\)/);
+  assert.match(main, /if \(!app\.isPackaged\) loadPendingUpdateResult\(\)/);
+  assert.match(main, /Download Latest Package\.\.\./);
+  assert.match(main, /beta:open-package-download/);
+  assert.match(main, /rapp-beta:download-package/);
+  assert.match(preload, /openPackageDownload/);
+  assert.match(renderer, /rapp-beta:download-package/);
+  assert.match(
+    readFileSync(path.join(root, "electron", "update-manager.mjs"), "utf8"),
+    /source-checkout updater is disabled inside app\.asar/,
+  );
+});
+
+test("Windows package is x64 per-user NSIS and preserves user data", () => {
+  assert.match(packageJson.scripts["dist:win"], /--platform windows --arch x64/);
+  assert.match(packageJson.scripts["dist:win:x64"], /--platform windows --arch x64/);
+  assert.deepEqual(packageJson.build.win.target, [{
+    target: "nsis",
+    arch: ["x64"],
+  }]);
+  assert.match(packageJson.build.win.artifactName, /windows-x64-setup/);
+  assert.equal(packageJson.build.nsis.oneClick, true);
+  assert.equal(packageJson.build.nsis.perMachine, false);
+  assert.equal(packageJson.build.nsis.allowToChangeInstallationDirectory, false);
+  assert.equal(packageJson.build.nsis.allowElevation, false);
+  assert.equal(packageJson.build.nsis.deleteAppDataOnUninstall, false);
+  assert.equal(packageJson.build.nsis.runAfterFinish, false);
+  assert.match(packageGate, /exactly one HKCU entry and no HKLM entry/);
+  assert.match(packageGate, /reinstall preserves one per-user entry/);
+  assert.match(packageGate, /uninstall removes installed executable/);
+  assert.match(packageGate, /uninstall preserves shared Brainstem runtime/);
+  assert.match(packageGate, /uninstall preserves Frontier user data/);
+  assert.match(packageGate, /source-installed command shims remain intact/);
+  assert.match(packageGate, /N-1 Windows installer/);
+});
+
+test("Windows AppUserModelID is set before any window can be created", () => {
+  const lock = main.indexOf("const hasLock = app.requestSingleInstanceLock()");
+  const appId = main.indexOf("app.setAppUserModelId(APP_ID)", lock);
+  const secondInstance = main.indexOf('app.on("second-instance"', lock);
+  const ready = main.indexOf("app.whenReady().then", lock);
+  assert.ok(lock >= 0);
+  assert.ok(appId > lock);
+  assert.ok(appId < secondInstance);
+  assert.ok(appId < ready);
+  assert.match(main, /const APP_ID = "com\.microsoft\.aibast\.rapp-brainstem-beta"/);
+  assert.equal(packageJson.build.appId, "com.microsoft.aibast.rapp-brainstem-beta");
+});
+
+test("packaged userData override isolates the single-instance lock", () => {
+  const override = main.indexOf("BRAINSTEM_BETA_USER_DATA_DIR");
+  const setPath = main.indexOf('app.setPath("userData"', override);
+  const lock = main.indexOf("const hasLock = app.requestSingleInstanceLock()");
+  assert.ok(override >= 0);
+  assert.ok(setPath > override);
+  assert.ok(setPath < lock);
+  assert.match(main, /resolveUserDataDirectory/);
+  assert.match(main, /BRAINSTEM_BETA_ACTUAL_USER_DATA_DIR = app\.getPath\("userData"\)/);
+  assert.match(userDataPath, /isAbsolute\(requested\)/);
+  assert.match(userDataPath, /must not be a filesystem root/);
+});
+
+test("Windows ARM64 source bootstrap fails instead of mixing architectures", () => {
+  for (const bootstrap of [windows, frontierWindows]) {
+    assert.match(bootstrap, /PROCESSOR_ARCHITECTURE/);
+    assert.match(bootstrap, /PROCESSOR_ARCHITEW6432/);
+    assert.match(bootstrap, /Windows ARM64 is not a native/);
+    assert.match(bootstrap, /x64 Windows 11/);
+  }
+  assert.match(windows, /set "NODE_PLATFORM=win-x64"/);
+  assert.doesNotMatch(windows, /NODE_PLATFORM=win-arm64/);
+  assert.match(rootWindows, /winget install --id \$PackageId --scope user/);
+});
+
+test("root installers expose a non-launching commit-pinned runtime mode", () => {
+  assert.match(rootUnix, /BRAINSTEM_HOME="\$\{BRAINSTEM_HOME:-\$HOME\/\.brainstem\}"/);
+  assert.match(rootUnix, /--runtime-only/);
+  assert.match(rootUnix, /fetch --filter=blob:none --depth 1 origin "\$expected"/);
+  assert.match(rootUnix, /Checked out immutable commit/);
+  assert.match(rootWindows, /if \(\$env:BRAINSTEM_HOME\)/);
+  assert.match(rootWindows, /\$VENV_DIR = "\$BRAINSTEM_HOME\\venv"/);
+  assert.match(rootWindows, /--runtime-only/);
+  assert.match(rootWindows, /fetch --filter=blob:none --depth 1 origin \$expected/);
+  assert.match(rootWindows, /Checked out immutable commit/);
+  assert.match(windows, /if not defined BRAINSTEM_HOME/);
+});
+
 test("dedicated beta page resolves fork releases without changing main install", () => {
-  assert.match(installerPage, /brainstem-beta-v/);
-  assert.match(installerPage, /api\.github\.com\/repos/);
+  assert.match(downloadCenter, /brainstem-beta-v/);
+  assert.match(downloadCenter, /api\.github\.com\/repos/);
   assert.match(installerPage, /frontier\.sh/);
   assert.match(installerPage, /frontier\.ps1/);
   assert.match(installerPage, /The production installer is unchanged/);
   assert.match(installerPage, /--cp-bg/);
   assert.match(installerPage, /data-theme/);
   assert.match(installerPage, /white-space: pre;/);
-  assert.match(installerPage, /frontier\.sh/);
-  assert.match(installerPage, /frontier\.ps1/);
-  assert.match(installerPage, /RAPP_FRONTIER_REPO/);
+  assert.match(downloadCenter, /frontier\.sh/);
+  assert.match(downloadCenter, /frontier\.ps1/);
+  assert.match(downloadCenter, /BRAINSTEM_BETA_COMMIT/);
+  assert.match(downloadCenter, /releases\/tags/);
+  assert.match(downloadCenter, /PUBLIC_REPOSITORY_OVERRIDE/);
   assert.match(installerPage, /install, update or repair, and launch/);
   assert.doesNotMatch(installerPage, /\.join\("\\n"\)/);
+});
+
+test("dedicated beta page uses the Download Center details structure", () => {
+  assert.match(installerPage, /AIBAST Download Center/);
+  assert.match(installerPage, /Choose your operating system/);
+  assert.match(installerPage, /id="architecture-select"/);
+  assert.match(installerPage, /Choose the download you want/);
+  assert.match(installerPage, />Details</);
+  assert.match(installerPage, />System Requirements</);
+  assert.match(installerPage, />Install Instructions</);
+  assert.match(installerPage, />Additional Information</);
+  assert.match(installerPage, /id="download-dialog"/);
+  assert.match(installerPage, /aria-controls="panel-details"/);
+  assert.match(installerPage, /aria-controls="panel-requirements"/);
+  assert.match(installerPage, /aria-controls="panel-install"/);
+  assert.match(installerPage, /aria-controls="panel-additional"/);
+  assert.match(installerPage, /id="golden-path-link"/);
+  assert.match(installerPage, /github\.com\/microsoft\/aibast-agents-library\/blob\/main\/beta\/GOLDEN_PATH\.md/);
+  assert.doesNotMatch(installerPage, /href="GOLDEN_PATH\.md"/);
+  assert.match(downloadCenter, /RAPP-Brainstem-Frontier-Windows\.ps1/);
+  assert.match(downloadCenter, /RAPP-Brainstem-Frontier-macOS-Linux\.sh/);
+  assert.match(installerPage, /download-center\.js/);
+  assert.match(downloadCenter, /release\.assets/);
+  assert.match(downloadCenter, /\\\.exe\$/);
+  assert.match(downloadCenter, /\\\.dmg\$/);
+  assert.match(downloadCenter, /browser_download_url/);
+  assert.match(downloadCenter, /rapp-brainstem-frontier-release-manifest\/v1/);
+  assert.match(downloadCenter, /rapp-frontier-release-manifest/);
+  assert.match(downloadCenter, /release\?\.immutable !== true/);
+  assert.match(downloadCenter, /verifyReleaseManifestAsset/);
+  assert.match(downloadCenter, /cryptoImpl\.subtle\.digest/);
+  assert.match(downloadCenter, /fenced release manifest and attached manifest asset differ/);
+  assert.match(downloadCenter, /signing\.status !== "verified"/);
+  assert.match(downloadCenter, /gate\.status !== "passed"/);
+  assert.match(installerPage, /release-manifest\s+allowlisted application installers/);
+  assert.match(installerPage, /Commit-pinned source bootstraps/);
+  assert.match(installerPage, /Windows Defender SmartScreen warnings may still appear/);
+  assert.match(installerPage, /id="no-js-download"/);
+  assert.match(installerPage, /href="frontier\.ps1"/);
+  assert.match(installerPage, /href="frontier\.sh"/);
+  assert.doesNotMatch(installerPage, /href="#"/);
+  assert.doesNotMatch(installerPage, /Windows 11 x64 or ARM64/);
+  for (const id of ["panel-requirements", "panel-install", "panel-additional"]) {
+    const panel = installerPage.match(
+      new RegExp(`<div\\s+class="accordion-panel"\\s+id="${id}"[\\s\\S]*?>`),
+    )?.[0];
+    assert.ok(panel, `${id} opening tag is missing`);
+    assert.doesNotMatch(panel, /\shidden(?:\s|>)/);
+  }
 });
 
 test("stable Frontier bootstraps resolve and run the latest published release", () => {
@@ -149,10 +463,11 @@ test("stable Frontier bootstraps resolve and run the latest published release", 
 
 test("dedicated beta page scripts parse", () => {
   const scripts = [...installerPage.matchAll(/<script>([\s\S]*?)<\/script>/g)];
-  assert.ok(scripts.length >= 2);
+  assert.ok(scripts.length >= 1);
   for (const [, source] of scripts) {
     assert.doesNotThrow(() => new Function(source));
   }
+  assert.match(installerPage, /<script type="module" src="download-center\.js"><\/script>/);
 });
 
 test("beta launcher reuses the global Brainstem without duplicate toolbar IPC", () => {
@@ -190,6 +505,8 @@ test("chat can hot-load an animated driver for the real frontend", () => {
   assert.match(routeManager, /AGENTS_PATH/);
   assert.match(routeManager, /ephemeralAgent/);
   assert.match(routeManager, /globalAgentEntries/);
+  assert.match(routeManager, /expectedAgents: \["ContextMemory", "ManageMemory"\]/);
+  assert.match(routeManager, /rejectQuarantined: true/);
   assert.match(uiDriverServer, /\/v1\/recording-upload/);
   assert.match(uiDriverServer, /createWriteStream/);
   assert.match(driveViaChat, /action: "surgeon_chat"/);
