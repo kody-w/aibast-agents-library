@@ -278,8 +278,8 @@ jobs:
           FRONTIER_SIGNING_MODE: unsigned
           FRONTIER_PACKAGE_BOOTSTRAP_MODE: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && 'staging' || 'development' }}
           FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
-          FRONTIER_PACKAGE_APP_ID: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && vars.FRONTIER_STAGING_APP_ID || '' }}
-          FRONTIER_PACKAGE_PRODUCT_NAME: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && vars.FRONTIER_STAGING_PRODUCT_NAME || '' }}
+          FRONTIER_PACKAGE_APP_ID: ${{ vars.FRONTIER_STAGING_APP_ID || 'io.github.aibast.frontier-staging' }}
+          FRONTIER_PACKAGE_PRODUCT_NAME: ${{ vars.FRONTIER_STAGING_PRODUCT_NAME || 'RAPP Brainstem Frontier Staging' }}
           TMPDIR: ${{ github.workspace }}/beta/release/.ci-tmp
         run: |
           set -euo pipefail
@@ -365,8 +365,8 @@ jobs:
           FRONTIER_SIGNING_MODE: unsigned
           FRONTIER_PACKAGE_BOOTSTRAP_MODE: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && 'staging' || 'development' }}
           FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
-          FRONTIER_PACKAGE_APP_ID: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && vars.FRONTIER_STAGING_APP_ID || '' }}
-          FRONTIER_PACKAGE_PRODUCT_NAME: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && vars.FRONTIER_STAGING_PRODUCT_NAME || '' }}
+          FRONTIER_PACKAGE_APP_ID: ${{ vars.FRONTIER_STAGING_APP_ID || 'io.github.aibast.frontier-staging' }}
+          FRONTIER_PACKAGE_PRODUCT_NAME: ${{ vars.FRONTIER_STAGING_PRODUCT_NAME || 'RAPP Brainstem Frontier Staging' }}
           TEMP: ${{ github.workspace }}\beta\release\.ci-tmp
           TMP: ${{ github.workspace }}\beta\release\.ci-tmp
         run: |

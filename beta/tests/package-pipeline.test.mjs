@@ -187,6 +187,29 @@ test("package bootstrap release authority is canonical and staging is distinct",
       "https://github.com/microsoft/aibast-agents-library.git",
   });
 
+  test("unsigned workflow has deterministic non-production identity defaults", () => {
+    const workflow = readFileSync(
+      path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+      "utf8",
+    );
+    assert.equal(
+      [...workflow.matchAll(
+        /FRONTIER_PACKAGE_APP_ID: \$\{\{ vars\.FRONTIER_STAGING_APP_ID \|\| 'io\.github\.aibast\.frontier-staging' \}\}/g,
+      )].length,
+      2,
+    );
+    assert.equal(
+      [...workflow.matchAll(
+        /FRONTIER_PACKAGE_PRODUCT_NAME: \$\{\{ vars\.FRONTIER_STAGING_PRODUCT_NAME \|\| 'RAPP Brainstem Frontier Staging' \}\}/g,
+      )].length,
+      2,
+    );
+    assert.doesNotMatch(
+      workflow,
+      /FRONTIER_PACKAGE_(?:APP_ID|PRODUCT_NAME):[\s\S]*?\|\| ''/,
+    );
+  });
+
   assert.equal(canonical.applicationId, "com.microsoft.aibast.rapp-brainstem-beta");
   assert.throws(
     () =>
