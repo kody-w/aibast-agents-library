@@ -29,6 +29,7 @@ import {
   allowsUiDriverMediaPermission,
   startUiDriverServer,
 } from "./ui-driver-server.mjs";
+import { resolveUserDataDirectory } from "./user-data-path.mjs";
 import {
   checkForUpdates,
   consumeUpdateResult,
@@ -1375,6 +1376,15 @@ async function startServices() {
   await Promise.allSettled([brainstemTask, copilotTask, uiDriverTask]);
 }
 
+const userDataOverride = resolveUserDataDirectory(
+  process.env.BRAINSTEM_BETA_USER_DATA_DIR,
+);
+if (userDataOverride) {
+  app.setPath("userData", userDataOverride);
+}
+if (process.env.BRAINSTEM_BETA_CAPTURE_USER_DATA_PATH === "1") {
+  process.env.BRAINSTEM_BETA_ACTUAL_USER_DATA_DIR = app.getPath("userData");
+}
 const hasLock = app.requestSingleInstanceLock();
 if (!hasLock) {
   app.quit();

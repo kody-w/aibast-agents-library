@@ -39,6 +39,12 @@ The package gate launches with isolated `HOME`, `USERPROFILE`,
 runtime, substitutes a controlled immutable installer fixture, verifies staged
 activation and sanitized logs, then requires the routed Brainstem worker to
 pass the compatibility/agent-load gate before the smoke process may exit zero.
+Every invocation receives a unique `BRAINSTEM_BETA_USER_DATA_DIR` before
+Electron takes its single-instance lock, and the gate runs two packaged smokes
+concurrently with the same `HOME`/`USERPROFILE`. Each records the actual
+`app.getPath("userData")` observed by its backend, proving neither can steal the
+other's identity or backend. Overrides must be absolute, normalized, non-root
+paths.
 Packaged update UX must continue directing users to a new signed package; the
 source-checkout updater is not a binary updater.
 The gate also executes the Copilot platform binary from

@@ -84,6 +84,10 @@ const safeLog = readFileSync(
   path.join(root, "electron", "safe-log.mjs"),
   "utf8",
 );
+const userDataPath = readFileSync(
+  path.join(root, "electron", "user-data-path.mjs"),
+  "utf8",
+);
 const brainstemUi = readFileSync(
   process.env.BRAINSTEM_BETA_RUNTIME_DIR
     ? path.join(process.env.BRAINSTEM_BETA_RUNTIME_DIR, "index.html")
@@ -235,14 +239,20 @@ test("packaged smoke requires real service readiness in an isolated home", () =>
   assert.match(main, /state\.brainstem\.phase !== "ready"/);
   assert.match(main, /app\.exit\(requestedExitCode\)/);
   assert.match(packageGate, /!key\.startsWith\("BRAINSTEM_"\)/);
-  assert.match(packageGate, /HOME: isolatedHome/);
-  assert.match(packageGate, /USERPROFILE: isolatedHome/);
-  assert.match(packageGate, /BRAINSTEM_HOME: brainstemHome/);
+  assert.match(packageGate, /HOME: home/);
+  assert.match(packageGate, /USERPROFILE: home/);
+  assert.match(packageGate, /BRAINSTEM_HOME: target/);
   assert.match(packageGate, /provisions a missing runtime and reaches readiness/);
   assert.match(packageGate, /missing-runtime bootstrap left no abandoned staging home/);
   assert.match(packageGate, /provisioning log scrubs credential canaries/);
   assert.match(packageGate, /packaged smoke reached a compatible Brainstem service/);
   assert.match(packageGate, /packaged smoke fails closed when its Brainstem service fails/);
+  assert.match(packageGate, /BRAINSTEM_BETA_USER_DATA_DIR/);
+  assert.match(packageGate, /two concurrent packaged smokes both reach their own backend/);
+  assert.match(packageGate, /ACTUAL_USER_DATA_DIR/);
+  assert.match(packageGate, /concurrent-shared-home-/);
+  assert.match(packageGate, /safeRealpath/);
+  assert.match(packageGate, /package gate completed without an internal crash/);
 });
 
 test("bootstrap staging, lock ownership, and log redaction are explicit", () => {
@@ -311,6 +321,19 @@ test("Windows AppUserModelID is set before any window can be created", () => {
   assert.ok(appId < ready);
   assert.match(main, /const APP_ID = "com\.microsoft\.aibast\.rapp-brainstem-beta"/);
   assert.equal(packageJson.build.appId, "com.microsoft.aibast.rapp-brainstem-beta");
+});
+
+test("packaged userData override isolates the single-instance lock", () => {
+  const override = main.indexOf("BRAINSTEM_BETA_USER_DATA_DIR");
+  const setPath = main.indexOf('app.setPath("userData"', override);
+  const lock = main.indexOf("const hasLock = app.requestSingleInstanceLock()");
+  assert.ok(override >= 0);
+  assert.ok(setPath > override);
+  assert.ok(setPath < lock);
+  assert.match(main, /resolveUserDataDirectory/);
+  assert.match(main, /BRAINSTEM_BETA_ACTUAL_USER_DATA_DIR = app\.getPath\("userData"\)/);
+  assert.match(userDataPath, /isAbsolute\(requested\)/);
+  assert.match(userDataPath, /must not be a filesystem root/);
 });
 
 test("Windows ARM64 source bootstrap fails instead of mixing architectures", () => {
