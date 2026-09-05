@@ -151,8 +151,18 @@ The dedicated Download Center-style GitHub Pages installer is published at
 `/beta/`. It provides platform bootstrap downloads, copyable install commands,
 release metadata, requirements, and installation guidance. The page resolves
 the latest `brainstem-beta-v*` release from the fork serving it, so staging and
-production remain separate. If that release includes packaged `.exe` or `.dmg`
-assets, the page lists them automatically ahead of the source bootstrap.
+production remain separate. Immutable Frontier releases include native Intel
+and Apple-silicon DMGs plus a Windows x64 NSIS installer; the page lists those
+`.dmg` and `.exe` assets automatically ahead of the source bootstrap only from
+a release whose signed, hashed binary manifest allowlists the exact asset and
+its package gate passed.
+
+Binary publication is currently blocked: the resolved ARM64 FFmpeg binary was
+built with `--enable-nonfree`, and the FFprobe version is not normalized with
+FFmpeg. Until a redistributable checksum-pinned native media matrix is approved,
+the source bootstrap remains the available install path. Publication is also
+blocked until the packaged bootstrap rollback/lock work and the Windows signing
+backend migration are release-certified.
 
 ### Windows 11
 
@@ -181,16 +191,25 @@ brainstem-frontier
 
 ## Check for updates
 
-Open the three-dot **RAPP Brainstem Frontier** dropdown in the Brainstem toolbar and
-choose **Check for updates**. The native application menu also exposes
-**Check for Updates...**. The launcher compares its installed commit with the
-latest commit on the configured GitHub branch (`main` by default).
+Open the three-dot **RAPP Brainstem Frontier** dropdown in the Brainstem toolbar
+and choose **Check for updates**. The native application menu also exposes
+**Check for Updates...**.
 
-When an update is available, **Update and Restart** runs the existing Frontier
-installer against that exact commit. This refreshes both the desktop launcher
-and the shared Brainstem source, runs the Frontier checks, and reopens the app.
-Tracked local changes in the Frontier checkout block the update instead of being
-discarded.
+For a source-managed installation, the launcher compares its installed commit
+with the configured GitHub branch (`main` by default). **Update and Restart**
+runs the existing Frontier installer against that exact commit. Tracked local
+changes block the update instead of being discarded.
+
+A packaged DMG/NSIS app cannot use that source flow because its code is sealed
+inside `app.asar`. Packaged builds disable the source updater and use the
+separate `binary-release-manifest-v1` channel. Until an in-app binary installer
+verifies that manifest, its Sigstore bundle, SHA-256 values, platform signing
+identity, runtime compatibility, and passing gate report, packaged users
+install the next immutable allowlisted asset from the Download Center. The app
+never rewrites `app.asar` from a source checkout. If the binary is unavailable,
+the Download Center uses the manifest's source-fallback command, which pins
+`BRAINSTEM_BETA_COMMIT` and the installer URL to the same displayed
+40-character release commit instead of resolving “latest” again.
 
 ## Drive Frontier through chat
 
@@ -239,14 +258,21 @@ https://github.com/microsoft/aibast-agents-library.git
 The `BRAINSTEM_BETA_REPO_URL` and `BRAINSTEM_BETA_REF` environment variables
 exist only for fork staging and release-candidate verification.
 
-Release procedure and source-only publication rules are documented in
+The signed binary matrix, package gates, credentials, and immutable release
+procedure are documented in
 [`RELEASING.md`](RELEASING.md).
 
 ## Frontier limitations
 
-- This is an unsigned source-built Frontier preview, not an officially supported Microsoft
-  desktop application. Managed-device controls may block Electron or downloaded
-  source.
+- Frontier is a beta rather than an officially supported Microsoft desktop
+  application. The release workflow can sign, notarize, checksum, and attest
+  DMG/NSIS assets, but it currently refuses publication because the bundled
+  native media redistribution policy does not pass. Source-bootstrap and
+  pull-request verification builds remain explicitly unsigned.
+- Windows ARM64 is not offered until Electron and every bundled native
+  dependency, including `ffmpeg` and `ffprobe`, pass the ARM64 package gate.
+- A valid Windows signature does not promise a SmartScreen-free first
+  download; publisher reputation and managed-device policy can still warn.
 - Initial source installation still needs network access and may open a console
   while dependencies are assembled. Normal chat launch uses the desktop app and
   does not require a terminal.

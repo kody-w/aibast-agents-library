@@ -7,6 +7,7 @@ import test from "node:test";
 import {
   copilotPackageName,
   readGitHubTokenFile,
+  unpackedAsarPath,
   withTimeout,
 } from "../electron/copilot-runtime.mjs";
 
@@ -22,6 +23,17 @@ test("Copilot package selection follows platform and architecture", () => {
   assert.equal(
     copilotPackageName("linux", "x64"),
     "@github/copilot-linux-x64",
+  );
+});
+
+test("packaged Copilot binaries resolve outside app.asar before spawn", () => {
+  assert.equal(
+    unpackedAsarPath("/Applications/Frontier.app/Contents/Resources/app.asar/node_modules/@github/copilot-darwin-arm64/copilot"),
+    "/Applications/Frontier.app/Contents/Resources/app.asar.unpacked/node_modules/@github/copilot-darwin-arm64/copilot",
+  );
+  assert.equal(
+    unpackedAsarPath("C:\\Frontier\\resources\\app.asar\\node_modules\\@github\\copilot-win32-x64\\copilot.exe"),
+    "C:\\Frontier\\resources\\app.asar.unpacked\\node_modules\\@github\\copilot-win32-x64\\copilot.exe",
   );
 });
 

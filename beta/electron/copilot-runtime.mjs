@@ -19,6 +19,13 @@ export function copilotPackageName(
   return `@github/copilot-${os}-${arch}`;
 }
 
+export function unpackedAsarPath(filePath) {
+  return String(filePath || "").replace(
+    /([\\/])app\.asar([\\/])/,
+    (_match, left, right) => `${left}app.asar.unpacked${right}`,
+  );
+}
+
 export function resolveCopilotCliPath(
   platform = process.platform,
   arch = process.arch,
@@ -26,6 +33,8 @@ export function resolveCopilotCliPath(
   const packageName = copilotPackageName(platform, arch);
   try {
     const resolved = require.resolve(packageName);
+    const unpacked = unpackedAsarPath(resolved);
+    if (existsSync(unpacked)) return unpacked;
     if (existsSync(resolved)) return resolved;
   } catch {}
 
@@ -35,6 +44,8 @@ export function resolveCopilotCliPath(
     );
     const binaryName = platform === "win32" ? "copilot.exe" : "copilot";
     const binaryPath = path.join(packageDir, binaryName);
+    const unpacked = unpackedAsarPath(binaryPath);
+    if (existsSync(unpacked)) return unpacked;
     if (existsSync(binaryPath)) return binaryPath;
   } catch {}
 

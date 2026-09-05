@@ -16,11 +16,24 @@ import {
   parseGitHubRepository,
   readUpdateConfiguration,
   resolveManagedInstall,
+  resolveUpdatePolicy,
   validateUpdateRef,
 } from "../electron/update-manager.mjs";
 
 const CURRENT_COMMIT = "1".repeat(40);
 const LATEST_COMMIT = "2".repeat(40);
+
+test("packaged app.asar builds cannot use the source-checkout updater", () => {
+  const packaged = resolveUpdatePolicy({ isPackaged: true });
+  assert.equal(packaged.channel, "binary-release-manifest-v1");
+  assert.equal(packaged.sourceCheckoutAllowed, false);
+  assert.match(packaged.detail, /cannot replace app\.asar/);
+  assert.match(packaged.detail, /SHA-256/);
+
+  const source = resolveUpdatePolicy({ isPackaged: false });
+  assert.equal(source.channel, "source-checkout");
+  assert.equal(source.sourceCheckoutAllowed, true);
+});
 
 test("GitHub repository URLs support HTTPS and SSH remotes", () => {
   assert.deepEqual(

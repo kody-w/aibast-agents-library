@@ -1,5 +1,5 @@
 import path from "node:path";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
@@ -31,6 +31,7 @@ import {
   checkForUpdates,
   consumeUpdateResult,
   prepareUpdate,
+  resolveUpdatePolicy,
 } from "./update-manager.mjs";
 import {
   betaSourceFingerprint,
@@ -46,7 +47,10 @@ const appIconFile = path.join(packageDir, "build", "icon.png");
 const appIcon = existsSync(appIconFile) ? nativeImage.createFromPath(appIconFile) : null;
 const uiFile = path.join(dirname, "..", "ui", "index.html");
 const uiUrl = pathToFileURL(uiFile).href;
+const APPLICATION_ID = "com.microsoft.aibast.rapp-brainstem-beta";
+if (process.platform === "win32") app.setAppUserModelId(APPLICATION_ID);
 const config = resolveBrainstemConfig();
+const updatePolicy = resolveUpdatePolicy({ isPackaged: app.isPackaged });
 const startupFingerprint = betaSourceFingerprint(path.resolve(packageDir, ".."));
 const brainstemRuntimeFingerprint = runtimeDirectoryFingerprint(
   config.brainstemDir,
@@ -89,7 +93,8 @@ const BETA_FRAME_BRIDGE_SOURCE = `(() => {
     ".beta-frame-menu #beta-update-status[data-phase=current],",
     ".beta-frame-menu #beta-update-status[data-phase=success]",
     "{border-color:#238636;color:#3fb950}",
-    ".beta-frame-menu #beta-update-status[data-phase=available]",
+    ".beta-frame-menu #beta-update-status[data-phase=available],",
+    ".beta-frame-menu #beta-update-status[data-phase=binary-channel]",
     "{border-color:#1f6feb;color:#58a6ff}",
     ".beta-frame-menu #beta-update-status[data-phase=blocked],",
     ".beta-frame-menu #beta-update-status[data-phase=error]",
@@ -375,8 +380,10 @@ const state = {
   },
   uiDriver: { phase: "starting", message: "Preparing visible AI controls..." },
   update: {
-    phase: "idle",
-    message: "Check GitHub for the latest RAPP Brainstem Frontier.",
+    phase: updatePolicy.sourceCheckoutAllowed ? "idle" : "binary-channel",
+    message: updatePolicy.message,
+    detail: updatePolicy.detail,
+    channel: updatePolicy.channel,
   },
   url: config.url,
 };
@@ -839,6 +846,15 @@ function setUpdateState(update) {
 
 async function handleCheckForUpdates({ openPanel = false } = {}) {
   if (openPanel) openUpdatePanel();
+  if (!updatePolicy.sourceCheckoutAllowed) {
+    availableUpdate = null;
+    return setUpdateState({
+      phase: "binary-channel",
+      message: updatePolicy.message,
+      detail: updatePolicy.detail,
+      channel: updatePolicy.channel,
+    });
+  }
   if (updateCheckInFlight) return structuredClone(state.update);
   updateCheckInFlight = true;
   if (updateMenuItem) updateMenuItem.enabled = false;
@@ -906,6 +922,15 @@ async function handleCheckForUpdates({ openPanel = false } = {}) {
 }
 
 async function handleInstallUpdate() {
+  if (!updatePolicy.sourceCheckoutAllowed) {
+    availableUpdate = null;
+    return setUpdateState({
+      phase: "blocked",
+      message: "Source updates are disabled for packaged Frontier.",
+      detail: updatePolicy.detail,
+      channel: updatePolicy.channel,
+    });
+  }
   if (!availableUpdate) {
     return setUpdateState({
       phase: "error",
@@ -1006,6 +1031,7 @@ function installApplicationMenu() {
 }
 
 function loadPendingUpdateResult() {
+  if (!updatePolicy.sourceCheckoutAllowed) return;
   let result;
   try {
     result = consumeUpdateResult({ packageDir, env: process.env });
@@ -1251,6 +1277,20 @@ async function startServices() {
   });
 
   await Promise.allSettled([brainstemTask, copilotTask]);
+  const smokeStatusFile = process.env.BRAINSTEM_BETA_SMOKE_STATUS_FILE;
+  if (smokeStatusFile) {
+    mkdirSync(path.dirname(smokeStatusFile), { recursive: true });
+    writeFileSync(
+      smokeStatusFile,
+      `${JSON.stringify({
+        brainstem: state.brainstem,
+        copilot: state.copilot,
+        surgeon: state.surgeon,
+        url: state.url,
+      }, null, 2)}\n`,
+      { mode: 0o600 },
+    );
+  }
 }
 
 const hasLock = app.requestSingleInstanceLock();

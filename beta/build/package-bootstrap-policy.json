@@ -1,0 +1,10 @@
+{
+  "schema": "https://github.com/microsoft/aibast-agents-library/frontier-package-bootstrap-policy/v1",
+  "publication_enabled": false,
+  "canonical_repository": "microsoft/aibast-agents-library",
+  "canonical_repository_url": "https://github.com/microsoft/aibast-agents-library.git",
+  "publication_blockers": [
+    "The package bootstrap rollback path is not yet release-certified.",
+    "The package bootstrap install/update lock is not yet release-certified."
+  ]
+}

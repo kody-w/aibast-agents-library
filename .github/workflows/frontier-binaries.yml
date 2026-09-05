@@ -1,0 +1,1309 @@
+name: Frontier Binaries
+
+on:
+  pull_request:
+    paths:
+      - 'beta/**'
+      - '.github/workflows/frontier-binaries.yml'
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Sign, attach, verify, and publish an existing draft release'
+        required: true
+        default: false
+        type: boolean
+      release_tag:
+        description: 'Existing draft brainstem-beta-v* tag (required only when publishing)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontier-binaries-${{ inputs.publish_release && inputs.release_tag || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  context:
+    name: Validate packaging context
+    runs-on: ubuntu-24.04
+    outputs:
+      commit: ${{ steps.context.outputs.commit }}
+      release_id: ${{ steps.context.outputs.release_id }}
+      release_mode: ${{ steps.context.outputs.release_mode }}
+      tag: ${{ steps.context.outputs.tag }}
+      version: ${{ steps.context.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.release_tag || github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.19.0'
+
+      - name: Validate source and optional draft release
+        id: context
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_RELEASE: ${{ inputs.publish_release || false }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          version="$(node -p 'require("./beta/package.json").version')"
+          test "$version" = "$(tr -d '[:space:]' < beta/VERSION)"
+          test "$version" = "$(node -p 'require("./beta/package-lock.json").version')"
+          test "$version" = "$(node -p 'require("./beta/package-lock.json").packages[""].version')"
+          commit="$(git rev-parse HEAD)"
+          release_mode=false
+          release_id=
+          tag=
+
+          if [ "$PUBLISH_RELEASE" = true ]; then
+            test "$GITHUB_EVENT_NAME" = workflow_dispatch
+            tag="${RELEASE_TAG:?release_tag is required when publish_release is true}"
+            expected_tag="brainstem-beta-v$version"
+            if [ "$tag" != "$expected_tag" ]; then
+              echo "::error::release_tag must be exactly $expected_tag for this source tree"
+              exit 1
+            fi
+            if ! [[ "$tag" =~ ^brainstem-beta-v[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+$ ]]; then
+              echo "::error::release_tag is not a supported Frontier beta tag"
+              exit 1
+            fi
+            test "$GITHUB_REF" = "refs/tags/$tag"
+            if [ "$GITHUB_REPOSITORY" != microsoft/aibast-agents-library ]; then
+              echo "::error::release package authority must be microsoft/aibast-agents-library"
+              exit 1
+            fi
+            release_policy_failed=0
+            if ! node beta/scripts/native-media-gate.mjs \
+              --policy beta/build/native-media-policy.json \
+              --require-publication; then
+              release_policy_failed=1
+            fi
+            if ! node -e '
+              const policy = require("./beta/build/windows-signing-policy.json");
+              if (policy.publication_enabled !== true ||
+                  policy.client_secret_allowed !== false ||
+                  policy.required_environment !== "windows-production" ||
+                  policy.required_profile_type !== "PublicTrust") {
+                console.error(policy.publication_blocker ||
+                  "Windows signing policy is not approved.");
+                process.exit(1);
+              }
+            '; then
+              release_policy_failed=1
+            fi
+            if ! node -e '
+              const policy = require("./beta/build/package-bootstrap-policy.json");
+              if (policy.publication_enabled !== true ||
+                  policy.canonical_repository !==
+                    "microsoft/aibast-agents-library") {
+                console.error((policy.publication_blockers || []).join(" | ") ||
+                  "Package bootstrap policy is not approved.");
+                process.exit(1);
+              }
+            '; then
+              release_policy_failed=1
+            fi
+            test "$release_policy_failed" = 0
+
+            if [ "$(git cat-file -t "refs/tags/$tag")" != tag ]; then
+              echo "::error::Frontier release tags must be annotated tags"
+              exit 1
+            fi
+            tag_commit="$(git rev-parse "$tag^{commit}")"
+            test "$tag_commit" = "$commit"
+            remote_tag_object="$(
+              git ls-remote --exit-code origin "refs/tags/$tag" | awk 'NR == 1 { print $1 }'
+            )"
+            test "$remote_tag_object" = "$(git rev-parse "refs/tags/$tag")"
+
+            releases="$(
+              gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+                "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+                --paginate --slurp |
+                jq -c --arg tag "$tag" '[.[][] | select(.tag_name == $tag)]'
+            )"
+            test "$(jq 'length' <<<"$releases")" = 1
+            release="$(jq -c '.[0]' <<<"$releases")"
+            test "$(jq -r '.draft' <<<"$release")" = true
+            test "$(jq -r '.prerelease' <<<"$release")" = true
+            test "$(jq -r '.immutable // false' <<<"$release")" = false
+            release_id="$(jq -r '.id' <<<"$release")"
+            release_mode=true
+          else
+            if [ -n "${RELEASE_TAG:-}" ]; then
+              echo "::error::release_tag must be empty for unsigned verification"
+              exit 1
+            fi
+          fi
+
+          {
+            echo "commit=$commit"
+            echo "release_id=$release_id"
+            echo "release_mode=$release_mode"
+            echo "tag=$tag"
+            echo "version=$version"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Frontier binary context"
+            echo
+            echo "- mode: $([ "$release_mode" = true ] && echo signed-release || echo unsigned-verification)"
+            echo "- version: \`$version\`"
+            echo "- commit: \`$commit\`"
+            if [ "$release_mode" = true ]; then
+              echo "- existing draft release: \`$tag\` (id \`$release_id\`)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  verify-macos:
+    name: Unsigned macOS ${{ matrix.arch }}
+    needs: context
+    if: needs.context.outputs.release_mode != 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: macos-26-intel
+            app_dir: mac
+          - arch: arm64
+            runner: macos-26
+            app_dir: mac-arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.context.outputs.commit }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: beta/package-lock.json
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Prepare Brainstem runtime for package smoke
+        id: runtime
+        run: |
+          python -m pip install -q --disable-pip-version-check -r rapp_brainstem/requirements.txt
+          echo "python=$(python -c 'import sys; print(sys.executable)')" >> "$GITHUB_OUTPUT"
+
+      - name: Build native unsigned DMG
+        working-directory: beta
+        env:
+          FRONTIER_SIGNING_MODE: unsigned
+          FRONTIER_PACKAGE_BOOTSTRAP_MODE: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && 'staging' || 'development' }}
+          FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          FRONTIER_PACKAGE_APP_ID: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && vars.FRONTIER_STAGING_APP_ID || '' }}
+          FRONTIER_PACKAGE_PRODUCT_NAME: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && vars.FRONTIER_STAGING_PRODUCT_NAME || '' }}
+          TMPDIR: ${{ github.workspace }}/beta/release/.ci-tmp
+        run: |
+          set -euo pipefail
+          mkdir -p "$TMPDIR"
+          npm ci --no-audit --no-fund
+          npm run "dist:mac:${{ matrix.arch }}"
+
+      - name: Gate final unsigned DMG
+        working-directory: beta
+        env:
+          VERSION: ${{ needs.context.outputs.version }}
+        run: |
+          set -euo pipefail
+          artifact="release/RAPP-Brainstem-Frontier-${VERSION}-macos-${{ matrix.arch }}-unsigned.dmg"
+          report="$artifact.gate.json"
+          npm run package:gate -- \
+            --platform macos \
+            --arch "${{ matrix.arch }}" \
+            --mode unsigned \
+            --artifact "$artifact" \
+            --app-dir "release/${{ matrix.app_dir }}/RAPP Brainstem Frontier.app" \
+            --scratch-dir "release/package-gate-macos-${{ matrix.arch }}-unsigned" \
+            --brainstem-python "${{ steps.runtime.outputs.python }}" \
+            --brainstem-source "$GITHUB_WORKSPACE/rapp_brainstem" \
+            --report "$report"
+          cat > release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt <<EOF
+          This is an unsigned CI verification build, not a release asset.
+          Commit: ${{ needs.context.outputs.commit }}
+          Platform: macOS ${{ matrix.arch }}
+          EOF
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: UNSIGNED-frontier-macos-${{ matrix.arch }}-${{ needs.context.outputs.commit }}
+          path: |
+            beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-macos-${{ matrix.arch }}-unsigned.dmg
+            beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-macos-${{ matrix.arch }}-unsigned.dmg.gate.json
+            beta/release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+  verify-windows:
+    name: Unsigned Windows x64
+    needs: context
+    if: needs.context.outputs.release_mode != 'true'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.context.outputs.commit }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: beta/package-lock.json
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Prepare Brainstem runtime for package smoke
+        id: runtime
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -m pip install -q --disable-pip-version-check -r rapp_brainstem/requirements.txt
+          "python=$(python -c 'import sys; print(sys.executable)')" |
+            Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Build native unsigned NSIS installer
+        working-directory: beta
+        shell: pwsh
+        env:
+          FRONTIER_SIGNING_MODE: unsigned
+          FRONTIER_PACKAGE_BOOTSTRAP_MODE: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && 'staging' || 'development' }}
+          FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          FRONTIER_PACKAGE_APP_ID: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && vars.FRONTIER_STAGING_APP_ID || '' }}
+          FRONTIER_PACKAGE_PRODUCT_NAME: ${{ (github.repository != 'microsoft/aibast-agents-library' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)) && vars.FRONTIER_STAGING_PRODUCT_NAME || '' }}
+          TEMP: ${{ github.workspace }}\beta\release\.ci-tmp
+          TMP: ${{ github.workspace }}\beta\release\.ci-tmp
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path $env:TEMP | Out-Null
+          npm ci --no-audit --no-fund
+          npm run dist:win:x64
+
+      - name: Gate final unsigned NSIS installer
+        working-directory: beta
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.context.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $artifact = "$env:GITHUB_WORKSPACE\beta\release\RAPP-Brainstem-Frontier-$env:VERSION-windows-x64-setup-unsigned.exe"
+          $report = "$artifact.gate.json"
+          & "$env:GITHUB_WORKSPACE\beta\scripts\run-windows-package-gate-standard-user.ps1" `
+            -NodePath (Get-Command node).Source `
+            -Workspace $env:GITHUB_WORKSPACE `
+            -Artifact $artifact `
+            -AppDir "$env:GITHUB_WORKSPACE\beta\release\win-unpacked" `
+            -ScratchDir "$env:GITHUB_WORKSPACE\beta\release\package-gate-windows-x64-unsigned" `
+            -PythonPath '${{ steps.runtime.outputs.python }}' `
+            -Mode unsigned `
+            -Report $report
+          @"
+          This is an unsigned CI verification build, not a release asset.
+          Commit: ${{ needs.context.outputs.commit }}
+          Platform: Windows x64
+          "@ | Set-Content -Path release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt -Encoding utf8
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: UNSIGNED-frontier-windows-x64-${{ needs.context.outputs.commit }}
+          path: |
+            beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-windows-x64-setup-unsigned.exe
+            beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-windows-x64-setup-unsigned.exe.gate.json
+            beta/release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+  release-macos:
+    name: Signed macOS ${{ matrix.arch }}
+    needs: context
+    if: needs.context.outputs.release_mode == 'true'
+    environment: frontier-binary-release
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: macos-26-intel
+            app_dir: mac
+          - arch: arm64
+            runner: macos-26
+            app_dir: mac-arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.context.outputs.commit }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: beta/package-lock.json
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Prepare Brainstem runtime for package smoke
+        id: runtime
+        run: |
+          python -m pip install -q --disable-pip-version-check -r rapp_brainstem/requirements.txt
+          echo "python=$(python -c 'import sys; print(sys.executable)')" >> "$GITHUB_OUTPUT"
+
+      - name: Materialize App Store Connect API key
+        working-directory: beta
+        env:
+          APPLE_API_KEY_ID: ${{ vars.APPLE_API_KEY_ID }}
+          APPLE_API_KEY_P8_BASE64: ${{ secrets.APPLE_API_KEY_P8_BASE64 }}
+        run: |
+          set -euo pipefail
+          : "${APPLE_API_KEY_ID:?APPLE_API_KEY_ID is required}"
+          : "${APPLE_API_KEY_P8_BASE64:?APPLE_API_KEY_P8_BASE64 is required}"
+          key_path="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
+          node - "$key_path" <<'NODE'
+          const fs = require("node:fs");
+          const target = process.argv[2];
+          const bytes = Buffer.from(process.env.APPLE_API_KEY_P8_BASE64, "base64");
+          if (!bytes.toString("utf8").includes("PRIVATE KEY")) {
+            throw new Error("APPLE_API_KEY_P8_BASE64 is not an App Store Connect private key.");
+          }
+          fs.writeFileSync(target, bytes, { mode: 0o600 });
+          NODE
+          echo "APPLE_API_KEY=$key_path" >> "$GITHUB_ENV"
+
+      - name: Build, Developer ID sign, and notarize native DMG
+        working-directory: beta
+        env:
+          FRONTIER_SIGNING_MODE: signed
+          FRONTIER_PACKAGE_BOOTSTRAP_MODE: release
+          FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.repository }}
+          FRONTIER_PACKAGE_RELEASE_TAG: ${{ needs.context.outputs.tag }}
+          TMPDIR: ${{ github.workspace }}/beta/release/.ci-tmp
+          CSC_LINK: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_SIGNING_IDENTITY: ${{ vars.MACOS_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          APPLE_API_KEY_ID: ${{ vars.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          : "${CSC_LINK:?MACOS_CERTIFICATE_P12_BASE64 is required}"
+          : "${CSC_KEY_PASSWORD:?MACOS_CERTIFICATE_PASSWORD is required}"
+          : "${MACOS_SIGNING_IDENTITY:?MACOS_SIGNING_IDENTITY is required}"
+          : "${APPLE_TEAM_ID:?APPLE_TEAM_ID is required}"
+          : "${APPLE_API_KEY:?APPLE_API_KEY is required}"
+          : "${APPLE_API_KEY_ID:?APPLE_API_KEY_ID is required}"
+          : "${APPLE_API_ISSUER:?APPLE_API_ISSUER_ID is required}"
+          mkdir -p "$TMPDIR"
+          npm ci --no-audit --no-fund
+          npm run "dist:mac:${{ matrix.arch }}"
+
+      - name: Gate signed and notarized DMG
+        id: package
+        working-directory: beta
+        env:
+          VERSION: ${{ needs.context.outputs.version }}
+          MACOS_SIGNING_IDENTITY: ${{ vars.MACOS_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          artifact="$GITHUB_WORKSPACE/beta/release/RAPP-Brainstem-Frontier-${VERSION}-macos-${{ matrix.arch }}.dmg"
+          report="$artifact.gate.json"
+          npm run package:gate -- \
+            --platform macos \
+            --arch "${{ matrix.arch }}" \
+            --mode signed \
+            --artifact "$artifact" \
+            --app-dir "release/${{ matrix.app_dir }}/RAPP Brainstem Frontier.app" \
+            --scratch-dir "release/package-gate-macos-${{ matrix.arch }}-signed" \
+            --identity "$MACOS_SIGNING_IDENTITY" \
+            --team-id "$APPLE_TEAM_ID" \
+            --brainstem-python "${{ steps.runtime.outputs.python }}" \
+            --brainstem-source "$GITHUB_WORKSPACE/rapp_brainstem" \
+            --release-tag "${{ needs.context.outputs.tag }}" \
+            --release-commit "${{ needs.context.outputs.commit }}" \
+            --runtime-version-url \
+              "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${{ needs.context.outputs.commit }}/rapp_brainstem/VERSION" \
+            --report "$report"
+          {
+            echo "asset=$artifact"
+            echo "report=$report"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Attest macOS release asset
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: ${{ steps.package.outputs.asset }}
+
+      - name: Preserve Sigstore bundle beside asset
+        env:
+          ASSET: ${{ steps.package.outputs.asset }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: cp "$BUNDLE" "$ASSET.sigstore.json"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frontier-signed-macos-${{ matrix.arch }}
+          path: |
+            ${{ steps.package.outputs.asset }}
+            ${{ steps.package.outputs.asset }}.sigstore.json
+            ${{ steps.package.outputs.report }}
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+      - name: Remove notarization key
+        if: always()
+        run: |
+          if [ -n "${APPLE_API_KEY:-}" ]; then
+            rm -f "$APPLE_API_KEY"
+          fi
+
+  release-windows:
+    name: Signed Windows x64
+    needs: context
+    if: needs.context.outputs.release_mode == 'true'
+    environment: windows-production
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.context.outputs.commit }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: beta/package-lock.json
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Prepare Brainstem runtime for package smoke
+        id: runtime
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -m pip install -q --disable-pip-version-check -r rapp_brainstem/requirements.txt
+          "python=$(python -c 'import sys; print(sys.executable)')" |
+            Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      # The OIDC service principal has only Artifact Signing Certificate
+      # Profile Signer at the selected certificate-profile scope.
+      - name: Validate Artifact Signing configuration
+        shell: pwsh
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
+          AZURE_ARTIFACT_SIGNING_ENDPOINT: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
+          AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME }}
+          AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME }}
+          AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($name in @(
+            'AZURE_CLIENT_ID',
+            'AZURE_TENANT_ID',
+            'AZURE_SUBSCRIPTION_ID',
+            'WINDOWS_SIGNING_SUBJECT',
+            'AZURE_ARTIFACT_SIGNING_ENDPOINT',
+            'AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME',
+            'AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME',
+            'AZURE_ARTIFACT_SIGNING_PROFILE_TYPE'
+          )) {
+            if (-not [Environment]::GetEnvironmentVariable($name)) {
+              throw "$name is required"
+            }
+          }
+          if ($env:AZURE_ARTIFACT_SIGNING_PROFILE_TYPE -ne 'PublicTrust') {
+            throw 'AZURE_ARTIFACT_SIGNING_PROFILE_TYPE must be PublicTrust'
+          }
+
+      - name: Azure login with workload identity
+        uses: azure/login@7ddb5af1ef8758cf1353cf3b42f940aee27ba21c # v3.0.2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and Artifact Sign native NSIS installer
+        working-directory: beta
+        shell: pwsh
+        env:
+          FRONTIER_SIGNING_MODE: signed
+          FRONTIER_PACKAGE_BOOTSTRAP_MODE: release
+          FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.repository }}
+          FRONTIER_PACKAGE_RELEASE_TAG: ${{ needs.context.outputs.tag }}
+          TEMP: ${{ github.workspace }}\beta\release\.ci-tmp
+          TMP: ${{ github.workspace }}\beta\release\.ci-tmp
+          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
+          AZURE_ARTIFACT_SIGNING_ENDPOINT: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
+          AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME }}
+          AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME }}
+          AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path $env:TEMP | Out-Null
+          npm ci --no-audit --no-fund
+          npm run dist:win:x64
+
+      - name: Gate signed NSIS package and installed payload
+        id: package
+        working-directory: beta
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.context.outputs.version }}
+          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
+          AZURE_ARTIFACT_SIGNING_ENDPOINT: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
+          AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME }}
+          AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME }}
+          AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $artifact = "$env:GITHUB_WORKSPACE\beta\release\RAPP-Brainstem-Frontier-$env:VERSION-windows-x64-setup.exe"
+          $report = "$artifact.gate.json"
+          $runtimeVersionUrl = "https://raw.githubusercontent.com/$env:GITHUB_REPOSITORY/${{ needs.context.outputs.commit }}/rapp_brainstem/VERSION"
+          & "$env:GITHUB_WORKSPACE\beta\scripts\run-windows-package-gate-standard-user.ps1" `
+            -NodePath (Get-Command node).Source `
+            -Workspace $env:GITHUB_WORKSPACE `
+            -Artifact $artifact `
+            -AppDir "$env:GITHUB_WORKSPACE\beta\release\win-unpacked" `
+            -ScratchDir "$env:GITHUB_WORKSPACE\beta\release\package-gate-windows-x64-signed" `
+            -PythonPath '${{ steps.runtime.outputs.python }}' `
+            -Mode signed `
+            -ExpectedPublisher $env:WINDOWS_SIGNING_SUBJECT `
+            -ReleaseTag '${{ needs.context.outputs.tag }}' `
+            -ReleaseCommit '${{ needs.context.outputs.commit }}' `
+            -RuntimeVersionUrl $runtimeVersionUrl `
+            -Report $report
+          @(
+            "asset=$artifact",
+            "report=$report"
+          ) | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Attest Windows release asset
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: ${{ steps.package.outputs.asset }}
+
+      - name: Generate Windows SPDX SBOM
+        id: sbom
+        working-directory: beta
+        shell: pwsh
+        env:
+          ASSET: ${{ steps.package.outputs.asset }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $sbom = "$env:ASSET.spdx.json"
+          npm sbom --sbom-format=spdx |
+            Set-Content -LiteralPath $sbom -Encoding utf8
+          if ($LASTEXITCODE -ne 0) { throw "npm sbom failed with exit $LASTEXITCODE" }
+          $document = Get-Content -LiteralPath $sbom -Raw | ConvertFrom-Json
+          if ($document.spdxVersion -ne 'SPDX-2.3' -or
+              $document.name -notlike '@aibast/rapp-brainstem-frontier@*' -or
+              $document.packages.Count -lt 1) {
+            throw 'Generated SPDX SBOM is invalid'
+          }
+          "path=$sbom" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Preserve Sigstore bundle beside asset
+        shell: pwsh
+        env:
+          ASSET: ${{ steps.package.outputs.asset }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: Copy-Item -LiteralPath $env:BUNDLE -Destination "${env:ASSET}.sigstore.json"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frontier-signed-windows-x64
+          path: |
+            ${{ steps.package.outputs.asset }}
+            ${{ steps.package.outputs.asset }}.sigstore.json
+            ${{ steps.package.outputs.report }}
+            ${{ steps.sbom.outputs.path }}
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+      - name: Clear Azure CLI session
+        if: always()
+        shell: pwsh
+        run: |
+          az logout 2>$null
+          exit 0
+
+  stage-release:
+    name: Stage and verify draft release assets
+    needs: [context, release-macos, release-windows]
+    if: needs.context.outputs.release_mode == 'true'
+    environment: frontier-binary-release
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.context.outputs.commit }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.19.0'
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: frontier-signed-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Require complete binary, gate, and provenance matrix
+        env:
+          VERSION: ${{ needs.context.outputs.version }}
+        run: |
+          set -euo pipefail
+          cd release-assets
+          expected=(
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg"
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg"
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe"
+          )
+          for asset in "${expected[@]}"; do
+            test -s "$asset"
+            test -s "$asset.sigstore.json"
+            test -s "$asset.gate.json"
+          done
+          test -s \
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe.spdx.json"
+          test "$(find . -maxdepth 1 -type f \( -name '*.dmg' -o -name '*.exe' \) | wc -l | tr -d ' ')" = 3
+          test "$(find . -maxdepth 1 -type f | wc -l | tr -d ' ')" = 10
+          sha256sum "${expected[@]}" > "$RUNNER_TEMP/FRONTIER_BINARY_SHA256SUMS"
+
+      - name: Write binary allowlist manifest
+        id: manifest
+        env:
+          FRONTIER_RELEASE_TAG: ${{ needs.context.outputs.tag }}
+          FRONTIER_RELEASE_VERSION: ${{ needs.context.outputs.version }}
+          FRONTIER_RELEASE_COMMIT: ${{ needs.context.outputs.commit }}
+          MACOS_SIGNING_IDENTITY: ${{ vars.MACOS_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+        run: |
+          manifest="$GITHUB_WORKSPACE/release-assets/RAPP-Brainstem-Frontier-${FRONTIER_RELEASE_VERSION}-binary-manifest.json"
+          node beta/scripts/release-manifest.mjs \
+            --artifact-dir release-assets \
+            --checksums "$RUNNER_TEMP/FRONTIER_BINARY_SHA256SUMS" \
+            --output "$manifest"
+          echo "path=$manifest" >> "$GITHUB_OUTPUT"
+
+      - name: Attest binary allowlist manifest
+        id: manifest-attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: ${{ steps.manifest.outputs.path }}
+
+      - name: Preserve manifest signature and hash release evidence
+        env:
+          MANIFEST: ${{ steps.manifest.outputs.path }}
+          BUNDLE: ${{ steps.manifest-attest.outputs.bundle-path }}
+          VERSION: ${{ needs.context.outputs.version }}
+        run: |
+          set -euo pipefail
+          cp "$BUNDLE" "$MANIFEST.sigstore.json"
+          cd release-assets
+          sha256sum \
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg" \
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg.gate.json" \
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg.sigstore.json" \
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg" \
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg.gate.json" \
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg.sigstore.json" \
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe" \
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe.gate.json" \
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe.sigstore.json" \
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe.spdx.json" \
+            "RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json" \
+            "RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json.sigstore.json" \
+            > SHA256SUMS
+
+      - name: Attach only to the existing draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.context.outputs.release_id }}
+          TAG: ${{ needs.context.outputs.tag }}
+          VERSION: ${{ needs.context.outputs.version }}
+          COMMIT: ${{ needs.context.outputs.commit }}
+        run: |
+          set -euo pipefail
+          release="$(
+            gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+          )"
+          test "$(jq -r '.tag_name' <<<"$release")" = "$TAG"
+          test "$(jq -r '.draft' <<<"$release")" = true
+          test "$(jq -r '.prerelease' <<<"$release")" = true
+          test "$(jq -r '.immutable // false' <<<"$release")" = false
+          test "$(git rev-parse "$TAG^{commit}")" = "$COMMIT"
+
+          mapfile -t existing_names < <(
+            jq -r '.assets[].name' <<<"$release"
+          )
+          allowed_names=(
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg"
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg.gate.json"
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg.sigstore.json"
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg"
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg.gate.json"
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg.sigstore.json"
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe"
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe.gate.json"
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe.sigstore.json"
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe.spdx.json"
+            "RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json"
+            "RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json.sigstore.json"
+            "SHA256SUMS"
+          )
+          for existing in "${existing_names[@]}"; do
+            if ! printf '%s\n' "${allowed_names[@]}" | grep -Fxq "$existing"; then
+              echo "::error::unexpected pre-existing draft asset: $existing"
+              exit 1
+            fi
+          done
+          is_existing() {
+            local wanted="$1"
+            printf '%s\n' "${existing_names[@]}" | grep -Fxq "$wanted"
+          }
+
+          mkdir -p existing-release-assets
+          for file in release-assets/*; do
+            test -s "$file"
+            name="$(basename "$file")"
+            if is_existing "$name"; then
+              if [[ "$name" = *.sigstore.json ]]; then
+                echo "Preserving already-attached immutable provenance bundle: $name"
+                continue
+              fi
+              gh release download "$TAG" --pattern "$name" --dir existing-release-assets
+              if ! cmp -s "$file" "existing-release-assets/$name"; then
+                echo "::error::$name already exists with different bytes; refusing to replace it"
+                exit 1
+              fi
+              echo "Already attached with identical bytes: $name"
+              continue
+            fi
+            gh release upload "$TAG" "$file"
+          done
+
+      - name: Verify draft assets, checksums, and attestations
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.context.outputs.tag }}
+          VERSION: ${{ needs.context.outputs.version }}
+          COMMIT: ${{ needs.context.outputs.commit }}
+        run: |
+          set -euo pipefail
+          mkdir -p published-assets
+          gh release download "$TAG" \
+            --dir published-assets \
+            --pattern "RAPP-Brainstem-Frontier-${VERSION}-*" \
+            --pattern SHA256SUMS
+          cd published-assets
+          expected=(
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg"
+            "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg"
+            "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe"
+          )
+          manifest="RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json"
+          sha256sum -c SHA256SUMS
+          for asset in "${expected[@]}"; do
+            test -s "$asset"
+            test -s "$asset.gate.json"
+            test -s "$asset.sigstore.json"
+            gh attestation verify "$asset" \
+              --bundle "$asset.sigstore.json" \
+              --repo "$GITHUB_REPOSITORY" \
+              --source-digest "$COMMIT" \
+              --source-ref "refs/tags/$TAG" \
+              --deny-self-hosted-runners
+          done
+          test -s "$manifest"
+          test -s "$manifest.sigstore.json"
+          gh attestation verify "$manifest" \
+            --bundle "$manifest.sigstore.json" \
+            --repo "$GITHUB_REPOSITORY" \
+            --source-digest "$COMMIT" \
+            --source-ref "refs/tags/$TAG" \
+            --deny-self-hosted-runners
+          node - "$manifest" "$TAG" "$VERSION" "$COMMIT" <<'NODE'
+          const crypto = require("node:crypto");
+          const fs = require("node:fs");
+          const [manifestPath, tag, version, commit] = process.argv.slice(2);
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+          const digest = (file) => crypto.createHash("sha256")
+            .update(fs.readFileSync(file)).digest("hex");
+          const releaseBase =
+            `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}` +
+            `/releases/download/${encodeURIComponent(tag)}/`;
+          if (manifest.schema !==
+              "https://github.com/microsoft/aibast-agents-library/frontier-binary-manifest/v1") {
+            throw new Error("unsupported binary manifest schema");
+          }
+          if (manifest.release?.tag !== tag ||
+              manifest.release?.version !== version ||
+              manifest.application_id !==
+                "com.microsoft.aibast.rapp-brainstem-beta" ||
+              manifest.toolchain?.electron !== "43.4.1" ||
+              manifest.toolchain?.electron_builder !== "26.15.7" ||
+              manifest.release?.url !==
+                `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}` +
+                `/releases/tag/${encodeURIComponent(tag)}` ||
+              manifest.source?.repository !== process.env.GITHUB_REPOSITORY ||
+              manifest.source?.ref !== `refs/tags/${tag}` ||
+              manifest.source?.commit !== commit ||
+              !/^[0-9a-f]{40}$/i.test(manifest.source.commit)) {
+            throw new Error("binary manifest release identity mismatch");
+          }
+          if (manifest.signing?.windows?.profile_type !== "PublicTrust" ||
+              manifest.signing?.windows?.file_digest !== "SHA256" ||
+              manifest.signing?.windows?.timestamp_digest !== "SHA256" ||
+              manifest.signing?.windows?.timestamp !==
+                "http://timestamp.acs.microsoft.com/" ||
+              !/Microsoft/i.test(manifest.signing?.windows?.identity || "") ||
+              !manifest.signing?.windows?.backend_schema) {
+            throw new Error("Windows signing manifest mismatch");
+          }
+          if (manifest.publication_policy?.allow_unlisted_binary_assets !== false ||
+              manifest.publication_policy?.require_signed_manifest !== true ||
+              manifest.publication_policy?.require_runtime_service_gate !== true ||
+              manifest.publication_policy?.windows_arm64_allowed !== false ||
+              manifest.assets?.length !== 3) {
+            throw new Error("binary manifest publication policy mismatch");
+          }
+          if (manifest.manifest_url !==
+              `${releaseBase}${encodeURIComponent(manifestPath)}` ||
+              manifest.source_fallback?.commit !== commit ||
+              manifest.source_fallback?.resolves_latest !== false ||
+              !manifest.source_fallback?.macos_linux?.installer_url?.includes(
+                `/${commit}/beta/install.sh`) ||
+              !manifest.source_fallback?.windows?.installer_url?.includes(
+                `/${commit}/beta/install.cmd`) ||
+              !manifest.source_fallback?.macos_linux?.command?.includes(commit) ||
+              !manifest.source_fallback?.windows?.command?.includes(commit) ||
+              /latest/i.test(manifest.source_fallback?.macos_linux?.command || "") ||
+              /latest/i.test(manifest.source_fallback?.windows?.command || "")) {
+            throw new Error("binary manifest URL or source fallback mismatch");
+          }
+          const expected = new Map([
+            [`RAPP-Brainstem-Frontier-${version}-macos-arm64.dmg`, ["macos", "arm64"]],
+            [`RAPP-Brainstem-Frontier-${version}-macos-x64.dmg`, ["macos", "x64"]],
+            [`RAPP-Brainstem-Frontier-${version}-windows-x64-setup.exe`, ["windows", "x64"]],
+          ]);
+          for (const asset of manifest.assets) {
+            const platform = expected.get(asset.name);
+            if (!platform) throw new Error(`unlisted asset ${asset.name}`);
+            if (asset.os !== platform[0] || asset.arch !== platform[1]) {
+              throw new Error(`platform mismatch ${asset.name}`);
+            }
+            if (asset.gate?.report?.name !== `${asset.name}.gate.json` ||
+                asset.provenance?.sigstore_bundle !== `${asset.name}.sigstore.json`) {
+              throw new Error(`evidence filename mismatch ${asset.name}`);
+            }
+            const size = fs.statSync(asset.name).size;
+            if (size < 1 || asset.size !== size ||
+                asset.download_url !== `${releaseBase}${encodeURIComponent(asset.name)}` ||
+                asset.gate.report.url !==
+                  `${releaseBase}${encodeURIComponent(asset.gate.report.name)}` ||
+                asset.provenance.url !==
+                  `${releaseBase}${encodeURIComponent(asset.provenance.sigstore_bundle)}`) {
+              throw new Error(`size or URL mismatch ${asset.name}`);
+            }
+            if (asset.os === "windows") {
+              const expectedSbom = `${asset.name}.spdx.json`;
+              if (asset.sbom?.name !== expectedSbom ||
+                  asset.sbom?.spdx_version !== "SPDX-2.3" ||
+                  asset.sbom?.size !== fs.statSync(expectedSbom).size ||
+                  asset.sbom?.sha256 !== digest(expectedSbom) ||
+                  asset.sbom?.url !==
+                    `${releaseBase}${encodeURIComponent(expectedSbom)}`) {
+                throw new Error(`Windows SBOM mismatch ${asset.name}`);
+              }
+              const sbom = JSON.parse(fs.readFileSync(expectedSbom, "utf8"));
+              if (sbom.spdxVersion !== "SPDX-2.3" ||
+                  !Array.isArray(sbom.packages) ||
+                  sbom.packages.length < 1) {
+                throw new Error(`Invalid Windows SPDX document ${asset.name}`);
+              }
+            } else if (asset.sbom) {
+              throw new Error(`Unexpected SBOM on ${asset.name}`);
+            }
+            expected.delete(asset.name);
+            if (digest(asset.name) !== asset.sha256) throw new Error(`asset digest mismatch ${asset.name}`);
+            if (fs.statSync(asset.gate.report.name).size !== asset.gate.report.size ||
+                asset.gate.report.size < 1 ||
+                digest(asset.gate.report.name) !== asset.gate.report.sha256) {
+              throw new Error(`gate report digest mismatch ${asset.name}`);
+            }
+            const report = JSON.parse(fs.readFileSync(asset.gate.report.name, "utf8"));
+            if (asset.gate.status !== "passed" ||
+                asset.signing.verified !== true ||
+                asset.native_media?.publication_ready !== true ||
+                report.gate?.status !== "passed" ||
+                report.runtime?.service_ready !== true ||
+                report.runtime?.isolated_home !== true ||
+                report.runtime?.copilot_auth_startup !== true ||
+                report.bootstrap?.executed !== true ||
+                report.bootstrap?.authority_mode !== "canonical-release" ||
+                report.bootstrap?.installed_commit !== commit ||
+                report.bootstrap?.release_tag !== tag ||
+                report.bootstrap?.manifest?.mode !== "release" ||
+                report.bootstrap?.manifest?.authority?.repository !==
+                  "microsoft/aibast-agents-library" ||
+                report.bootstrap?.manifest?.source_commit !== commit ||
+                report.bootstrap?.manifest?.release_tag !== tag ||
+                report.bootstrap?.manifest?.publication?.ready !== true ||
+                report.signing?.verified !== true ||
+                report.signing?.identity !== asset.signing.identity ||
+                report.source?.application_id !== manifest.application_id ||
+                report.publication?.status !== "ready" ||
+                report.publication?.blockers?.length ||
+                report.native_media?.publication_ready !== true ||
+                report.runtime_compatibility?.source_checkout_updater_compatible !== false) {
+              throw new Error(`unsafe gate report ${asset.name}`);
+            }
+            if (asset.os === "windows" &&
+                report.execution?.windows_standard_user !== true) {
+              throw new Error(`Windows package was not gated as a standard user`);
+            }
+            if (asset.os === "macos" &&
+                (report.notarization?.app?.submission?.status !== "Accepted" ||
+                 report.notarization?.app?.log?.status !== "Accepted" ||
+                 report.notarization?.app?.stapled !== true ||
+                 report.notarization?.app?.target?.code_signature?.ad_hoc !== false ||
+                 !report.notarization?.app?.target?.code_signature?.timestamp ||
+                 report.notarization?.dmg?.submission?.status !== "Accepted" ||
+                 report.notarization?.dmg?.log?.status !== "Accepted" ||
+                 report.notarization?.dmg?.stapled !== true ||
+                 report.notarization?.dmg?.target?.code_signature?.ad_hoc !== false ||
+                 !report.notarization?.dmg?.target?.code_signature?.timestamp)) {
+              throw new Error(`notarization evidence mismatch ${asset.name}`);
+            }
+          }
+          if (expected.size) throw new Error(`missing allowlisted assets: ${[...expected]}`);
+          NODE
+          test "$(find . -maxdepth 1 -type f | wc -l | tr -d ' ')" = 13
+
+      - name: Keep release draft until native redownload verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.context.outputs.release_id }}
+          TAG: ${{ needs.context.outputs.tag }}
+        run: |
+          set -euo pipefail
+          release="$(
+            gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+          )"
+          test "$(jq -r '.draft' <<<"$release")" = true
+          test "$(jq -r '.tag_name' <<<"$release")" = "$TAG"
+
+  redownload-macos:
+    name: Redownload and verify macOS ${{ matrix.arch }}
+    needs: [context, stage-release]
+    if: needs.context.outputs.release_mode == 'true'
+    environment: frontier-binary-release
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: macos-26-intel
+            machine: x86_64
+          - arch: arm64
+            runner: macos-26
+            machine: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Download staged draft assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.context.outputs.tag }}
+        run: |
+          mkdir redownload
+          gh release download "$TAG" \
+            --dir redownload \
+            --pattern 'RAPP-Brainstem-Frontier-*' \
+            --pattern SHA256SUMS
+
+      - name: Reverify downloaded DMG, app, media, and notarization
+        env:
+          VERSION: ${{ needs.context.outputs.version }}
+          MACOS_SIGNING_IDENTITY: ${{ vars.MACOS_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          ARCH: ${{ matrix.arch }}
+          EXPECTED_MACHINE: ${{ matrix.machine }}
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = "$EXPECTED_MACHINE"
+          cd redownload
+          test "$(find . -maxdepth 1 -type f | wc -l | tr -d ' ')" = 13
+          shasum -a 256 -c SHA256SUMS
+          dmg="RAPP-Brainstem-Frontier-${VERSION}-macos-${ARCH}.dmg"
+          test -s "$dmg"
+          hdiutil verify "$dmg"
+          codesign --verify --deep --strict --verbose=4 "$dmg"
+          dmg_signature="$(codesign -d --verbose=4 "$dmg" 2>&1)"
+          grep -F "Authority=$MACOS_SIGNING_IDENTITY" <<<"$dmg_signature"
+          grep -q '^Timestamp=' <<<"$dmg_signature"
+          if grep -q 'Signature=adhoc' <<<"$dmg_signature"; then
+            echo "DMG is ad-hoc signed" >&2
+            exit 1
+          fi
+          xcrun stapler validate -v "$dmg"
+          spctl --assess --type open --context context:primary-signature \
+            --verbose=4 "$dmg"
+
+          mount_point="$RUNNER_TEMP/frontier-redownload-${ARCH}"
+          rm -rf "$mount_point"
+          mkdir -p "$mount_point"
+          cleanup() {
+            hdiutil detach "$mount_point" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          hdiutil attach "$dmg" -nobrowse -readonly -mountpoint "$mount_point"
+          app="$mount_point/RAPP Brainstem Frontier.app"
+          test -d "$app"
+          codesign --verify --deep --strict --verbose=4 "$app"
+          app_signature="$(codesign -d --verbose=4 "$app" 2>&1)"
+          grep -F "Authority=$MACOS_SIGNING_IDENTITY" <<<"$app_signature"
+          grep -F "TeamIdentifier=$APPLE_TEAM_ID" <<<"$app_signature"
+          grep -q '^Timestamp=' <<<"$app_signature"
+          if grep -q 'Signature=adhoc' <<<"$app_signature"; then
+            echo "App is ad-hoc signed" >&2
+            exit 1
+          fi
+          xcrun stapler validate -v "$app"
+          spctl --assess --type execute --verbose=4 "$app"
+
+          mach_count=0
+          while IFS= read -r -d '' candidate; do
+            description="$(file -b "$candidate")"
+            case "$description" in
+              *Mach-O*)
+                mach_count=$((mach_count + 1))
+                if [ "$ARCH" = arm64 ]; then
+                  grep -q arm64 <<<"$description"
+                  if grep -q x86_64 <<<"$description"; then exit 1; fi
+                else
+                  grep -q x86_64 <<<"$description"
+                  if grep -q arm64 <<<"$description"; then exit 1; fi
+                fi
+                ;;
+            esac
+          done < <(find "$app" -type f -print0)
+          test "$mach_count" -ge 3
+
+          ffmpeg="$(find "$app/Contents/Resources/app.asar.unpacked" -type f -name ffmpeg -print -quit)"
+          ffprobe="$(find "$app/Contents/Resources/app.asar.unpacked" -type f -name ffprobe -print -quit)"
+          copilot="$app/Contents/Resources/app.asar.unpacked/node_modules/@github/copilot-darwin-${ARCH}/copilot"
+          test -x "$ffmpeg"
+          test -x "$ffprobe"
+          test -x "$copilot"
+          ffmpeg_version="$("$ffmpeg" -version 2>&1)"
+          ffprobe_version="$("$ffprobe" -version 2>&1)"
+          if grep -q -- '--enable-nonfree' <<<"$ffmpeg_version"; then
+            echo "Downloaded FFmpeg is nonfree and cannot be published" >&2
+            exit 1
+          fi
+          test "$(awk 'NR == 1 { gsub(/^n/, "", $3); print $3 }' <<<"$ffmpeg_version")" = \
+            "$(awk 'NR == 1 { gsub(/^n/, "", $3); print $3 }' <<<"$ffprobe_version")"
+          "$copilot" --version
+
+          jq -e \
+            --arg identity "$MACOS_SIGNING_IDENTITY" \
+            '.gate.status == "passed"
+             and .publication.status == "ready"
+             and .signing.identity == $identity
+             and .runtime.copilot_auth_startup == true
+             and .notarization.app.submission.status == "Accepted"
+             and .notarization.app.log.status == "Accepted"
+             and .notarization.dmg.submission.status == "Accepted"
+             and .notarization.dmg.log.status == "Accepted"' \
+            "$dmg.gate.json" >/dev/null
+          hdiutil detach "$mount_point"
+          trap - EXIT
+
+  redownload-windows:
+    name: Redownload and verify Windows x64
+    needs: [context, stage-release]
+    if: needs.context.outputs.release_mode == 'true'
+    environment: windows-production
+    permissions:
+      contents: read
+    runs-on: windows-2025
+    steps:
+      - name: Download staged draft assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.context.outputs.tag }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path redownload | Out-Null
+          gh release download $env:TAG `
+            --dir redownload `
+            --pattern 'RAPP-Brainstem-Frontier-*' `
+            --pattern SHA256SUMS
+
+      - name: Reverify downloaded Authenticode and allowlist evidence
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.context.outputs.version }}
+          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-Location redownload
+          $files = Get-ChildItem -File
+          if ($files.Count -ne 13) { throw "Expected 13 release assets, found $($files.Count)" }
+          foreach ($line in Get-Content SHA256SUMS) {
+            if ($line -notmatch '^([0-9a-f]{64}) [ *](.+)$') {
+              throw "Malformed SHA256SUMS line: $line"
+            }
+            $expected = $Matches[1]
+            $name = $Matches[2]
+            $item = Get-Item -LiteralPath $name
+            if ($item.Length -lt 1) { throw "$name is empty" }
+            $actual = (Get-FileHash -LiteralPath $name -Algorithm SHA256).Hash
+            if ($actual -ne $expected) { throw "$name SHA-256 mismatch" }
+          }
+
+          $installer = "RAPP-Brainstem-Frontier-$env:VERSION-windows-x64-setup.exe"
+          $signtool = (Get-Command signtool.exe -ErrorAction SilentlyContinue).Source
+          if (-not $signtool) {
+            $kits = Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10\bin'
+            $signtool = Get-ChildItem -LiteralPath $kits -Filter signtool.exe -Recurse |
+              Where-Object FullName -Match '\\x64\\signtool\.exe$' |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1 -ExpandProperty FullName
+          }
+          if (-not $signtool) { throw 'signtool.exe is missing' }
+          & $signtool verify /pa /all /v /tw $installer
+          if ($LASTEXITCODE -in 1, 2) {
+            throw "signtool verification failed with exit $LASTEXITCODE"
+          }
+          if ($LASTEXITCODE -ne 0) {
+            throw "signtool verification failed with unexpected exit $LASTEXITCODE"
+          }
+          $signature = Get-AuthenticodeSignature -LiteralPath $installer
+          if ($signature.Status -ne 'Valid') { throw "Installer signature is $($signature.Status)" }
+          if ($signature.SignerCertificate.Subject -ne $env:WINDOWS_SIGNING_SUBJECT) {
+            throw "Installer publisher mismatch"
+          }
+          if (-not $signature.TimeStamperCertificate) { throw 'Installer timestamp is missing' }
+
+          $sbomPath = "$installer.spdx.json"
+          $sbom = Get-Content -LiteralPath $sbomPath -Raw | ConvertFrom-Json
+          if ($sbom.spdxVersion -ne 'SPDX-2.3' -or
+              $sbom.name -notlike '@aibast/rapp-brainstem-frontier@*' -or
+              $sbom.packages.Count -lt 1) {
+            throw 'Downloaded Windows SPDX SBOM is invalid'
+          }
+
+          $report = Get-Content "$installer.gate.json" -Raw | ConvertFrom-Json
+          if ($report.gate.status -ne 'passed' -or
+              $report.publication.status -ne 'ready' -or
+              -not $report.runtime.copilot_auth_startup -or
+              -not $report.execution.windows_standard_user -or
+              -not $report.native_media.publication_ready -or
+              $report.signing.identity -ne $env:WINDOWS_SIGNING_SUBJECT) {
+            throw 'Downloaded Windows gate report is not release-ready'
+          }
+
+  publish:
+    name: Publish immutable release after redownload verification
+    needs:
+      - context
+      - stage-release
+      - redownload-macos
+      - redownload-windows
+    if: needs.context.outputs.release_mode == 'true'
+    environment: frontier-binary-release
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.context.outputs.commit }}
+
+      - name: Publish and assert GitHub immutability
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.context.outputs.release_id }}
+          TAG: ${{ needs.context.outputs.tag }}
+          COMMIT: ${{ needs.context.outputs.commit }}
+        run: |
+          set -euo pipefail
+          before="$(
+            gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+          )"
+          test "$(jq -r '.draft' <<<"$before")" = true
+          gh release edit "$TAG" --draft=false --prerelease --latest=false
+          after=
+          for _ in {1..10}; do
+            after="$(
+              gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+                "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+            )"
+            if [ "$(jq -r '.immutable // false' <<<"$after")" = true ]; then
+              break
+            fi
+            sleep 3
+          done
+          test "$(jq -r '.draft' <<<"$after")" = false
+          if [ "$(jq -r '.immutable // false' <<<"$after")" != true ]; then
+            gh release edit "$TAG" --draft=true || true
+            echo "::error::GitHub release immutability is not enabled; release returned to draft"
+            exit 1
+          fi
+          test "$(jq -r '.tag_name' <<<"$after")" = "$TAG"
+          remote_commit="$(
+            git ls-remote --exit-code origin "refs/tags/$TAG^{}" | awk 'NR == 1 { print $1 }'
+          )"
+          test "$remote_commit" = "$COMMIT"
+          echo "Published immutable $TAG at $COMMIT after native redownload verification."

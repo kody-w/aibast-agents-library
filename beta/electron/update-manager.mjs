@@ -14,6 +14,27 @@ const execFileAsync = promisify(execFile);
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/i;
 const UPDATE_REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
 
+export function resolveUpdatePolicy({ isPackaged = false } = {}) {
+  if (isPackaged) {
+    return {
+      channel: "binary-release-manifest-v1",
+      sourceCheckoutAllowed: false,
+      message: "Packaged Frontier updates use immutable signed binary releases.",
+      detail:
+        "The source-checkout updater cannot replace app.asar. Install only an "
+        + "OS/architecture asset allowlisted by the release binary manifest "
+        + "after its SHA-256, platform signature, provenance, runtime "
+        + "compatibility, and package-gate result verify.",
+    };
+  }
+  return {
+    channel: "source-checkout",
+    sourceCheckoutAllowed: true,
+    message: "Check GitHub for the latest RAPP Brainstem Frontier source.",
+    detail: null,
+  };
+}
+
 function asErrorMessage(error) {
   return String(error?.message || error);
 }
