@@ -126,6 +126,34 @@ test("clean runtime inspection reports provisioning is needed", async () => {
   assert.equal(pythonCalls, 0);
 });
 
+test("an installed but incompatible runtime requires provisioning", async () => {
+  let pythonCalls = 0;
+  const result = await inspectBrainstemRuntime(config("/isolated/brainstem"), {
+    fileExists: () => true,
+    readText: () => "0.6.15\n",
+    runPython: async () => {
+      pythonCalls += 1;
+    },
+  });
+  assert.equal(result.ready, false);
+  assert.match(result.issues.join("\n"), /compatible minimum 0\.6\.16/);
+  assert.equal(pythonCalls, 0);
+});
+
+test("runtime dependency probe receives the isolated BRAINSTEM_HOME", async () => {
+  let probedHome;
+  const brainstemHome = "/isolated/brainstem";
+  const result = await inspectBrainstemRuntime(config(brainstemHome), {
+    fileExists: () => true,
+    readText: () => "0.6.16\n",
+    runPython: async (_python, receivedHome) => {
+      probedHome = receivedHome;
+    },
+  });
+  assert.equal(result.ready, true);
+  assert.equal(probedHome, brainstemHome);
+});
+
 test("packaged provisioning runs the pinned runtime-only installer then verifies", async () => {
   const root = scratch("success");
   const brainstemHome = path.join(root, "brainstem");
@@ -138,6 +166,10 @@ test("packaged provisioning runs the pinned runtime-only installer then verifies
     config: config(brainstemHome),
     isPackaged: true,
     bootstrapDirectory: bundleDirectory,
+    env: {
+      HOME: "/developer-home",
+      USERPROFILE: String.raw`C:\Users\developer`,
+    },
     inspectRuntime: async () => {
       inspections += 1;
       return inspections >= 3
@@ -162,6 +194,8 @@ test("packaged provisioning runs the pinned runtime-only installer then verifies
     COMMIT,
   ]);
   assert.equal(invocation.env.BRAINSTEM_HOME, brainstemHome);
+  assert.equal(invocation.env.HOME, "/developer-home");
+  assert.notEqual(invocation.env.HOME, invocation.env.BRAINSTEM_HOME);
   assert.equal(
     invocation.env.BRAINSTEM_REPO_URL,
     "https://github.com/microsoft/aibast-agents-library.git",
@@ -301,7 +335,11 @@ test("Windows invocation also pins the same immutable commit", () => {
   const invocation = buildInstallerInvocation({
     bundle,
     config: config(String.raw`C:\isolated\.brainstem`),
-    env: { PATH: "fixture" },
+    env: {
+      HOME: "/developer-home",
+      PATH: "fixture",
+      USERPROFILE: String.raw`C:\Users\developer`,
+    },
     platform: "win32",
   });
   assert.equal(invocation.command, "powershell.exe");
@@ -312,6 +350,11 @@ test("Windows invocation also pins the same immutable commit", () => {
     COMMIT,
   ]);
   assert.equal(invocation.env.BRAINSTEM_HOME, String.raw`C:\isolated\.brainstem`);
+  assert.equal(invocation.env.USERPROFILE, String.raw`C:\Users\developer`);
+  assert.notEqual(
+    invocation.env.USERPROFILE,
+    invocation.env.BRAINSTEM_HOME,
+  );
 });
 
 test("commit provenance gate kills a permissive-regex mutant", async () => {
@@ -335,8 +378,16 @@ test("commit provenance gate kills a permissive-regex mutant", async () => {
     "const COMMIT_PATTERN = /^.+$/;",
   );
   assert.notEqual(mutant, original, "mutation target must exist exactly");
-  const mutantPath = path.join(scratch("mutant"), "brainstem-provisioner.mjs");
+  const mutantDirectory = scratch("mutant");
+  const mutantPath = path.join(mutantDirectory, "brainstem-provisioner.mjs");
   writeFileSync(mutantPath, mutant);
+  writeFileSync(
+    path.join(mutantDirectory, "brainstem-process.mjs"),
+    readFileSync(
+      path.join(betaDir, "electron", "brainstem-process.mjs"),
+      "utf8",
+    ),
+  );
   const mutatedModule = await import(
     `${pathToFileURL(mutantPath).href}?mutation=${Date.now()}`
   );

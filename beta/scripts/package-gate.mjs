@@ -3,6 +3,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readFileSync,
   readdirSync,
   rmSync,
   statSync,
@@ -85,6 +86,10 @@ function executableCheck(label, filePath) {
   }
 }
 
+function shellQuote(value) {
+  return `'${String(value).replaceAll("'", "'\\''")}'`;
+}
+
 function main() {
   requirement("packaged macOS app exists", existsSync(executable), executable);
   const asarPath = path.join(resources, "app.asar");
@@ -127,24 +132,78 @@ function main() {
     const brainstemHome = path.join(isolatedHome, ".brainstem");
     const runtime = path.join(brainstemHome, "src", "rapp_brainstem");
     const python = path.join(brainstemHome, "venv", "bin", "python");
+    const fakeServer = path.join(runtime, "package-gate-server.mjs");
+    const serviceMarker = path.join(isolatedHome, "service-ready");
     try {
       mkdirSync(path.join(runtime, "agents"), { recursive: true });
       mkdirSync(path.dirname(python), { recursive: true });
       writeFileSync(path.join(runtime, "brainstem.py"), "\n");
       writeFileSync(path.join(runtime, "requirements.txt"), "\n");
-      writeFileSync(path.join(runtime, "VERSION"), "package-gate\n");
-      writeFileSync(python, "#!/bin/sh\nexit 0\n");
+      writeFileSync(path.join(runtime, "VERSION"), "0.6.16\n");
+      writeFileSync(
+        fakeServer,
+        `import { writeFileSync } from "node:fs";
+import http from "node:http";
+const health = ${JSON.stringify({
+          status: "unauthenticated",
+          version: "0.6.16",
+          soul: path.join(runtime, "soul.md"),
+          agents: ["ContextMemory", "ManageMemory"],
+          quarantined: [],
+        })};
+const server = http.createServer((request, response) => {
+  if (request.url !== "/health") {
+    response.writeHead(404).end();
+    return;
+  }
+  response.writeHead(200, { "Content-Type": "application/json" });
+  response.end(JSON.stringify(health));
+});
+server.listen(Number(process.env.PORT), "127.0.0.1", () => {
+  writeFileSync(process.env.FAKE_BRAINSTEM_MARKER, JSON.stringify({
+    HOME: process.env.HOME,
+    USERPROFILE: process.env.USERPROFILE,
+    BRAINSTEM_HOME: process.env.BRAINSTEM_HOME,
+  }));
+});
+for (const signal of ["SIGINT", "SIGTERM"]) {
+  process.on(signal, () => server.close(() => process.exit(0)));
+}
+`,
+      );
+      writeFileSync(path.join(runtime, "soul.md"), "package gate\n");
+      writeFileSync(
+        python,
+        "#!/bin/sh\n"
+        + 'if [ "$1" = "-B" ]; then exit 0; fi\n'
+        + `exec ${shellQuote(process.execPath)} ${shellQuote(fakeServer)}\n`,
+      );
       chmodSync(python, 0o700);
+      const smokeEnv = Object.fromEntries(
+        Object.entries(process.env).filter(([key]) => (
+          !key.startsWith("BRAINSTEM_")
+          && ![
+            "COPILOT_TOKEN",
+            "GH_TOKEN",
+            "GITHUB_TOKEN",
+            "PORT",
+          ].includes(key)
+        )),
+      );
+      const packagedEnv = {
+        ...smokeEnv,
+        HOME: isolatedHome,
+        USERPROFILE: isolatedHome,
+        BRAINSTEM_HOME: brainstemHome,
+        BRAINSTEM_BETA_HEADLESS: "1",
+        BRAINSTEM_BETA_HOME: path.join(brainstemHome, "beta-launcher"),
+        BRAINSTEM_BETA_SMOKE_EXIT_MS: "5000",
+        BRAINSTEM_BETA_SMOKE_REQUIRE_READY: "1",
+        FAKE_BRAINSTEM_MARKER: serviceMarker,
+      };
       const smoke = spawnSync(executable, [], {
         encoding: "utf8",
-        env: {
-          ...process.env,
-          HOME: isolatedHome,
-          BRAINSTEM_HOME: brainstemHome,
-          BRAINSTEM_BETA_HEADLESS: "1",
-          BRAINSTEM_BETA_HOME: path.join(brainstemHome, "beta-launcher"),
-          BRAINSTEM_BETA_SMOKE_EXIT_MS: "3000",
-        },
+        env: packagedEnv,
         timeout: 30000,
         windowsHide: true,
       });
@@ -152,6 +211,43 @@ function main() {
         "packaged app passes isolated headless smoke",
         smoke.status === 0,
         String(smoke.stderr || smoke.stdout || "").trim(),
+      );
+      requirement(
+        "packaged smoke reached a compatible Brainstem service",
+        existsSync(serviceMarker),
+        serviceMarker,
+      );
+      const serviceEnvironment = existsSync(serviceMarker)
+        ? JSON.parse(readFileSync(serviceMarker, "utf8"))
+        : {};
+      requirement(
+        "packaged smoke kept HOME and BRAINSTEM_HOME isolated",
+        serviceEnvironment.HOME === isolatedHome
+          && serviceEnvironment.USERPROFILE === isolatedHome
+          && serviceEnvironment.BRAINSTEM_HOME === brainstemHome,
+        JSON.stringify(serviceEnvironment),
+      );
+      writeFileSync(
+        python,
+        "#!/bin/sh\n"
+        + 'if [ "$1" = "-B" ]; then exit 0; fi\n'
+        + "exit 17\n",
+      );
+      chmodSync(python, 0o700);
+      rmSync(serviceMarker, { force: true });
+      const failingSmoke = spawnSync(executable, [], {
+        encoding: "utf8",
+        env: {
+          ...packagedEnv,
+          BRAINSTEM_BETA_SMOKE_EXIT_MS: "2000",
+        },
+        timeout: 30000,
+        windowsHide: true,
+      });
+      requirement(
+        "packaged smoke fails closed when its Brainstem service fails",
+        failingSmoke.status !== 0,
+        String(failingSmoke.stderr || failingSmoke.stdout || "").trim(),
       );
       requirement(
         "already-ready packaged smoke skipped provisioning",

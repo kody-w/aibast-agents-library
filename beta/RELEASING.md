@@ -33,6 +33,12 @@ you intentionally prepare a macOS preview artifact, run `npm run dist:mac` and
 review it separately. Do not attach a locally assembled application to the
 source-only GitHub Release.
 
+The package gate launches with isolated `HOME`, `USERPROFILE`,
+`BRAINSTEM_HOME`, and Frontier state directories. It requires the routed
+Brainstem worker to pass the compatibility/agent-load gate before the smoke
+process may exit zero. Packaged update UX must continue directing users to a
+new signed package; the source-checkout updater is not a binary updater.
+
 ## 2. Create the immutable tag
 
 Use a component-qualified tag because this repository ships more than one

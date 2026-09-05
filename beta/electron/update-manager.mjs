@@ -18,6 +18,18 @@ function asErrorMessage(error) {
   return String(error?.message || error);
 }
 
+export function packagedUpdateState() {
+  return {
+    phase: "blocked",
+    message: "Packaged Frontier updates require a new signed app package.",
+    detail: "The source-checkout updater is disabled inside app.asar and will "
+      + "not rewrite this installed application.",
+    guidance: "Download the newer published package from "
+      + "https://microsoft.github.io/aibast-agents-library/beta/. "
+      + "Installing it preserves your existing BRAINSTEM_HOME.",
+  };
+}
+
 export function validateUpdateRef(value) {
   const ref = String(value || "").trim();
   const invalid = !UPDATE_REF_PATTERN.test(ref)

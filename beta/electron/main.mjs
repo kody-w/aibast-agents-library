@@ -31,6 +31,7 @@ import {
 import {
   checkForUpdates,
   consumeUpdateResult,
+  packagedUpdateState,
   prepareUpdate,
 } from "./update-manager.mjs";
 import {
@@ -343,17 +344,19 @@ const BETA_FRAME_BRIDGE_SOURCE = `(() => {
   }, true);
   return true;
 })()`;
-const copilot = new CopilotRuntime({
-  tokenFile: path.join(config.brainstemDir, ".copilot_token"),
-  workingDirectory: config.brainstemDir,
-});
-const copilotStudioAuth = new CopilotStudioAuthManager();
 const betaHome = process.env.BRAINSTEM_BETA_HOME
   || path.join(config.brainstemHome, "beta-launcher");
 
 let mainWindow = null;
+let copilot = null;
+let copilotStudioAuth = null;
+let provisioner = null;
+let routeManager = null;
+let rappStore = null;
+let twinManager = null;
 let shutdownStarted = false;
 let shutdownComplete = false;
+let requestedExitCode = 0;
 let updateCheckInFlight = false;
 let updateMenuItem = null;
 let availableUpdate = null;
@@ -373,39 +376,14 @@ const state = {
     message: "Waiting for Brainstem setup...",
   },
   uiDriver: { phase: "waiting", message: "Waiting for Brainstem setup..." },
-  update: {
-    phase: "idle",
-    message: "Check GitHub for the latest RAPP Brainstem Frontier.",
-  },
+  update: app.isPackaged
+    ? packagedUpdateState()
+    : {
+        phase: "idle",
+        message: "Check GitHub for the latest RAPP Brainstem Frontier.",
+      },
   url: config.url,
 };
-const provisioner = new BrainstemProvisioner({
-  config,
-  isPackaged: app.isPackaged,
-  resourcesPath: process.resourcesPath,
-  packageDir,
-  env: process.env,
-  onState: (next) => {
-    state.brainstem = next;
-    emitState();
-  },
-});
-const routeManager = new BetaRouteManager({
-  betaHome,
-  brainstemConfig: config,
-  onActivate: async (route) => {
-    state.url = route.url;
-    state.brainstem = {
-      phase: "ready",
-      message: `Routed Brainstem v${route.health.version}`,
-      callerRappid: route.callerRappid,
-      memoryGuid: route.memoryGuid,
-      stackRappid: route.stackRappid,
-      compositionHash: route.transientCompositionHash || route.compositionHash,
-    };
-    emitState();
-  },
-});
 
 function emitState() {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -422,22 +400,6 @@ function emitSurgeonEvent(event) {
 // RAPPlication twins — specialized rapplications hatched from the RAPP Store as
 // concurrent long-lived workers on their own loopback ports, beside the
 // Brainstem chats in the herd. Kernel unchanged; driven only over /chat.
-const rappStore = new RappStoreClient();
-const twinManager = new TwinManager({
-  brainstemConfig: config,
-  betaHome,
-  routeManager,
-  storeClient: rappStore,
-  // The Brainstem that plans a two-brain loop is whichever one is live now
-  // (config URL, or a routed Brainstem once a route activates).
-  brainstemUrl: () => state.url,
-  onEvent: (event) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send("beta:twin-event", structuredClone(event));
-    }
-    if (event.type === "twin-needs-auth") notifyTwinNeedsAuth(event);
-  },
-});
 
 // Twins pause at the one user-owned auth step (e.g. PAC device login). If the
 // user is multitasking off the window they must still know a twin needs them —
@@ -849,6 +811,10 @@ function setUpdateState(update) {
 
 async function handleCheckForUpdates({ openPanel = false } = {}) {
   if (openPanel) openUpdatePanel();
+  if (app.isPackaged) {
+    availableUpdate = null;
+    return setUpdateState(packagedUpdateState());
+  }
   if (updateCheckInFlight) return structuredClone(state.update);
   updateCheckInFlight = true;
   if (updateMenuItem) updateMenuItem.enabled = false;
@@ -916,6 +882,10 @@ async function handleCheckForUpdates({ openPanel = false } = {}) {
 }
 
 async function handleInstallUpdate() {
+  if (app.isPackaged) {
+    availableUpdate = null;
+    return setUpdateState(packagedUpdateState());
+  }
   if (!availableUpdate) {
     return setUpdateState({
       phase: "error",
@@ -1346,6 +1316,63 @@ const hasLock = app.requestSingleInstanceLock();
 if (!hasLock) {
   app.quit();
 } else {
+  const initializeStatefulRuntime = () => {
+    copilot = new CopilotRuntime({
+      tokenFile: path.join(config.brainstemDir, ".copilot_token"),
+      workingDirectory: config.brainstemDir,
+    });
+    copilotStudioAuth = new CopilotStudioAuthManager();
+    provisioner = new BrainstemProvisioner({
+      config,
+      isPackaged: app.isPackaged,
+      resourcesPath: process.resourcesPath,
+      packageDir,
+      env: process.env,
+      onState: (next) => {
+        state.brainstem = next;
+        emitState();
+      },
+    });
+    routeManager = new BetaRouteManager({
+      betaHome,
+      brainstemConfig: config,
+      onActivate: async (route) => {
+        state.url = route.url;
+        state.brainstem = {
+          phase: "ready",
+          message: `Routed Brainstem v${route.health.version}`,
+          callerRappid: route.callerRappid,
+          memoryGuid: route.memoryGuid,
+          stackRappid: route.stackRappid,
+          compositionHash: route.transientCompositionHash
+            || route.compositionHash,
+          loadedAgents: [...route.health.agents],
+          loadErrors: [...route.health.quarantined],
+        };
+        emitState();
+      },
+    });
+    rappStore = new RappStoreClient();
+    twinManager = new TwinManager({
+      brainstemConfig: config,
+      betaHome,
+      routeManager,
+      storeClient: rappStore,
+      // The Brainstem that plans a two-brain loop is whichever one is live now
+      // (config URL, or a routed Brainstem once a route activates).
+      brainstemUrl: () => state.url,
+      onEvent: (event) => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send(
+            "beta:twin-event",
+            structuredClone(event),
+          );
+        }
+        if (event.type === "twin-needs-auth") notifyTwinNeedsAuth(event);
+      },
+    });
+  };
+
   app.on("second-instance", () => {
     if (!mainWindow || mainWindow.isDestroyed()) mainWindow = createWindow();
     if (mainWindow.isMinimized()) mainWindow.restore();
@@ -1363,15 +1390,41 @@ if (!hasLock) {
     });
     registerIpc();
     installApplicationMenu();
-    loadPendingUpdateResult();
+    if (!app.isPackaged) loadPendingUpdateResult();
     mainWindow = createWindow();
-    void startServices();
+    let initialized = true;
+    try {
+      initializeStatefulRuntime();
+    } catch (error) {
+      initialized = false;
+      state.brainstem = {
+        phase: "error",
+        message: "Frontier could not initialize its local runtime managers.",
+        detail: `${String(error.message || error)} Nothing was launched. `
+          + "Close other Frontier processes, check BRAINSTEM_HOME permissions, "
+          + "then reopen the app.",
+      };
+      emitState();
+    }
+    if (initialized) void startServices();
     const smokeExitMs = Number.parseInt(
       process.env.BRAINSTEM_BETA_SMOKE_EXIT_MS || "0",
       10,
     );
     if (Number.isInteger(smokeExitMs) && smokeExitMs > 0) {
-      setTimeout(() => app.quit(), smokeExitMs);
+      setTimeout(() => {
+        if (
+          process.env.BRAINSTEM_BETA_SMOKE_REQUIRE_READY === "1"
+          && state.brainstem.phase !== "ready"
+        ) {
+          requestedExitCode = 1;
+          console.error(
+            "Packaged smoke failed: Brainstem did not reach ready state. "
+            + `${state.brainstem.phase}: ${state.brainstem.message || "unknown"}`,
+          );
+        }
+        app.quit();
+      }, smokeExitMs);
     }
   });
 
@@ -1389,16 +1442,18 @@ if (!hasLock) {
     event.preventDefault();
     if (shutdownStarted) return;
     shutdownStarted = true;
-    Promise.allSettled([
+    const shutdownTasks = [
       ...Array.from(brainSurgeons.values(), (surgeon) => surgeon.stop()),
-      twinManager.stopAll(),
-      copilot.stop(),
-      routeManager.stop(),
-      provisioner.stop(),
+      twinManager ? twinManager.stopAll() : null,
+      copilot?.stop(),
+      routeManager?.stop(),
+      provisioner?.stop(),
       uiDriver?.stop(),
-    ]).finally(() => {
+    ].filter(Boolean);
+    Promise.allSettled(shutdownTasks).finally(() => {
       shutdownComplete = true;
-      app.quit();
+      if (requestedExitCode) app.exit(requestedExitCode);
+      else app.quit();
     });
   });
 }

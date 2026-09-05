@@ -14,6 +14,11 @@ import {
 import path from "node:path";
 import { promisify } from "node:util";
 
+import {
+  MINIMUM_BRAINSTEM_VERSION,
+  versionAtLeast,
+} from "./brainstem-process.mjs";
+
 const execFileAsync = promisify(execFile);
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/i;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/i;
@@ -173,7 +178,7 @@ export function loadBootstrapBundle({
   };
 }
 
-async function probePython(python) {
+async function probePython(python, brainstemHome) {
   await execFileAsync(
     python,
     [
@@ -185,6 +190,7 @@ async function probePython(python) {
       encoding: "utf8",
       env: {
         ...process.env,
+        BRAINSTEM_HOME: brainstemHome,
         PYTHONDONTWRITEBYTECODE: "1",
         PYTHONUTF8: "1",
       },
@@ -199,21 +205,39 @@ export async function inspectBrainstemRuntime(
   config,
   {
     fileExists = existsSync,
+    minimumVersion = MINIMUM_BRAINSTEM_VERSION,
+    readText = (filePath) => readFileSync(filePath, "utf8"),
     runPython = probePython,
   } = {},
 ) {
+  const versionPath = path.join(config.brainstemDir, "VERSION");
   const required = [
     ["Brainstem server", path.join(config.brainstemDir, "brainstem.py")],
     ["Brainstem requirements", path.join(config.brainstemDir, "requirements.txt")],
-    ["Brainstem version", path.join(config.brainstemDir, "VERSION")],
+    ["Brainstem version", versionPath],
     ["Brainstem Python environment", config.python],
   ];
   const issues = required
     .filter(([, filePath]) => !fileExists(filePath))
     .map(([label, filePath]) => `${label} is missing at ${filePath}.`);
+  if (fileExists(versionPath)) {
+    try {
+      const version = readText(versionPath).trim();
+      if (!versionAtLeast(version, minimumVersion)) {
+        issues.push(
+          `Brainstem version ${version || "missing"} is older than the `
+          + `compatible minimum ${minimumVersion}.`,
+        );
+      }
+    } catch (error) {
+      issues.push(
+        `Brainstem version could not be read at ${versionPath}: ${message(error)}.`,
+      );
+    }
+  }
   if (issues.length === 0) {
     try {
-      await runPython(config.python);
+      await runPython(config.python, config.brainstemHome);
     } catch {
       issues.push(
         `Brainstem Python dependencies are not usable from ${config.python}.`,

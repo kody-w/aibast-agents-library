@@ -198,6 +198,12 @@ Failures remain visible and name the installer log plus the next action.
 Frontier never asks the installer to authenticate, and it does not copy tokens
 or credentials into package metadata or logs.
 
+Compatibility is also fail-closed: Frontier requires Brainstem 0.6.16 or newer,
+a present soul, loaded-agent evidence, the routed `ContextMemory` and
+`ManageMemory` agents, and an empty quarantine/load-error list before it shows
+chat as ready. `BRAINSTEM_HOME` remains authoritative even when it differs from
+`HOME` or `USERPROFILE`.
+
 ## Check for updates
 
 Open the three-dot **RAPP Brainstem Frontier** dropdown in the Brainstem toolbar and
@@ -210,6 +216,11 @@ installer against that exact commit. This refreshes both the desktop launcher
 and the shared Brainstem source, runs the Frontier checks, and reopens the app.
 Tracked local changes in the Frontier checkout block the update instead of being
 discarded.
+
+That updater applies only to source-managed Frontier checkouts. A packaged app
+does not try to rewrite `app.asar`; its update panel fails closed with a link to
+download and install a newer signed package. Replacing the app preserves the
+existing `BRAINSTEM_HOME`.
 
 ## Drive Frontier through chat
 

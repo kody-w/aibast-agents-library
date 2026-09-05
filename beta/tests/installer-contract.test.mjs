@@ -59,6 +59,10 @@ const walkthroughCertify = readFileSync(
   path.join(root, "scripts", "walkthrough-certify.mjs"),
   "utf8",
 );
+const packageGate = readFileSync(
+  path.join(root, "scripts", "package-gate.mjs"),
+  "utf8",
+);
 const brainstemUi = readFileSync(
   process.env.BRAINSTEM_BETA_RUNTIME_DIR
     ? path.join(process.env.BRAINSTEM_BETA_RUNTIME_DIR, "index.html")
@@ -135,12 +139,70 @@ test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () =
   assert.match(packageJson.scripts.check, /brainstem-provisioner\.mjs/);
   assert.match(main, /new BrainstemProvisioner/);
   assert.match(main, /app\.isPackaged/);
-  assert.match(main, /runtimeDirectoryFingerprint[\s\S]*provisioner\.ensure/);
+  const services = main.slice(
+    main.indexOf("async function startServices()"),
+    main.indexOf("const hasLock = app.requestSingleInstanceLock()"),
+  );
+  const ensureIndex = services.indexOf("provisioner.ensure()");
+  const fingerprintIndex = services.indexOf("runtimeDirectoryFingerprint(");
+  assert.ok(ensureIndex >= 0);
+  assert.ok(fingerprintIndex >= 0);
+  assert.ok(
+    ensureIndex < fingerprintIndex,
+    "runtime fingerprint must run only after provisioning",
+  );
+  const ready = main.slice(main.indexOf("app.whenReady().then"));
+  const windowIndex = ready.indexOf("mainWindow = createWindow()");
+  const servicesIndex = ready.indexOf("void startServices()");
+  assert.ok(windowIndex >= 0);
+  assert.ok(servicesIndex >= 0);
+  assert.ok(
+    windowIndex < servicesIndex,
+    "the provisioning UI must exist before runtime checks begin",
+  );
   assert.match(ui, /id="startup-status"/);
   assert.match(ui, /immutable release commit/);
   assert.match(ui, /id="intro" class="hidden"/);
   assert.match(renderer, /state\.brainstem\.detail/);
   assert.match(renderer, /intro\.classList\.add\("hidden"\)/);
+});
+
+test("single-instance lock precedes every stateful runtime constructor", () => {
+  const lock = main.indexOf("const hasLock = app.requestSingleInstanceLock()");
+  assert.ok(lock > 0);
+  const beforeLock = main.slice(0, lock);
+  for (const constructor of [
+    "new BrainstemProvisioner",
+    "new BetaRouteManager",
+    "new CopilotRuntime",
+    "new CopilotStudioAuthManager",
+    "new RappStoreClient",
+    "new TwinManager",
+  ]) {
+    assert.doesNotMatch(beforeLock, new RegExp(constructor));
+    assert.ok(main.indexOf(constructor, lock) > lock);
+  }
+});
+
+test("packaged smoke requires real service readiness in an isolated home", () => {
+  assert.match(main, /BRAINSTEM_BETA_SMOKE_REQUIRE_READY/);
+  assert.match(main, /state\.brainstem\.phase !== "ready"/);
+  assert.match(main, /app\.exit\(requestedExitCode\)/);
+  assert.match(packageGate, /!key\.startsWith\("BRAINSTEM_"\)/);
+  assert.match(packageGate, /HOME: isolatedHome/);
+  assert.match(packageGate, /USERPROFILE: isolatedHome/);
+  assert.match(packageGate, /BRAINSTEM_HOME: brainstemHome/);
+  assert.match(packageGate, /packaged smoke reached a compatible Brainstem service/);
+  assert.match(packageGate, /packaged smoke fails closed when its Brainstem service fails/);
+});
+
+test("packaged updater refuses the source-checkout path inside app.asar", () => {
+  assert.match(main, /if \(app\.isPackaged\)[\s\S]*packagedUpdateState\(\)/);
+  assert.match(main, /if \(!app\.isPackaged\) loadPendingUpdateResult\(\)/);
+  assert.match(
+    readFileSync(path.join(root, "electron", "update-manager.mjs"), "utf8"),
+    /source-checkout updater is disabled inside app\.asar/,
+  );
 });
 
 test("root installers expose a non-launching commit-pinned runtime mode", () => {
@@ -249,6 +311,8 @@ test("chat can hot-load an animated driver for the real frontend", () => {
   assert.match(routeManager, /AGENTS_PATH/);
   assert.match(routeManager, /ephemeralAgent/);
   assert.match(routeManager, /globalAgentEntries/);
+  assert.match(routeManager, /expectedAgents: \["ContextMemory", "ManageMemory"\]/);
+  assert.match(routeManager, /rejectQuarantined: true/);
   assert.match(uiDriverServer, /\/v1\/recording-upload/);
   assert.match(uiDriverServer, /createWriteStream/);
   assert.match(driveViaChat, /action: "surgeon_chat"/);

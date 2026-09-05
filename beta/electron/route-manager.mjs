@@ -823,6 +823,11 @@ export class BetaRouteManager {
         AGENTS_PATH: materialized.agentDirectory,
         BRAINSTEM_BETA_ROUTED_WORKER: "1",
       },
+      healthRequirements: {
+        expectedAgents: ["ContextMemory", "ManageMemory"],
+        minimumAgentCount: 2,
+        rejectQuarantined: true,
+      },
     };
     const process = new BrainstemProcess(config);
     const result = await process.start();
