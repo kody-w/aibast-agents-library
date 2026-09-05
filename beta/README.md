@@ -183,8 +183,9 @@ release-gated; they are no longer publication blockers.
 
 The requested Electron 43.6.0/electron-builder 26.16.0 update is also held by a
 fail-closed toolchain policy: the configured npm feed does not yet expose
-Electron 43.6.0, and electron-builder 26.16.0 is not a published npm version or
-upstream tag. The repository retains the last reproducibly locked patches
+Electron 43.6.0. The upstream `electron-builder@26.16.0` release and tag exist,
+but neither the configured nor public npm registry provides an installable
+26.16.0 package. The repository retains the last reproducibly locked patches
 rather than inventing dependency artifacts.
 
 Future binary publication additionally requires the repository immutable

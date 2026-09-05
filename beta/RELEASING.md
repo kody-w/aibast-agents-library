@@ -31,11 +31,12 @@ by the Download Center.
 > still blocks the deprecated electron-builder v26 Azure signing backend. The
 > requested Electron 43.6.0 / electron-builder 26.16.0 toolchain cannot yet be
 > locked reproducibly: the configured npm feed exposes Electron only through
-> 43.4.1, and electron-builder 26.16.0 has neither a published npm version nor
-> an upstream Git tag. `build/toolchain-policy.json` therefore fails release
-> mode instead of fabricating dependencies. The toolchain, native-media, and
-> Windows-signing policies must remain closed until their recorded blockers are
-> resolved.
+> 43.4.1. The upstream `electron-builder@26.16.0` release and tag exist, but no
+> installable 26.16.0 package is available from the configured or public npm
+> registry, so a reproducible lock and `npm ci` cannot be produced.
+> `build/toolchain-policy.json` therefore fails release mode instead of
+> fabricating dependencies. The toolchain, native-media, and Windows-signing
+> policies must remain closed until their recorded blockers are resolved.
 
 ## Supported binary matrix
 
@@ -139,8 +140,9 @@ Brainstem readiness before the package gate can pass.
 
 The release workflow requires an existing draft prerelease. Immediately before
 publication it calls the repository immutable-releases settings endpoint and
-refuses to publish unless the setting is enabled. After publishing it verifies
-that the release API reports `"immutable": true`. An unexpected mismatch is an
+requires valid JSON for which `jq -e '.enabled == true'` succeeds; HTTP success
+alone is not sufficient. After publishing it verifies that the release API
+reports `"immutable": true`. An unexpected mismatch is an
 explicit failure. While the release remains mutable, the workflow retries a
 rollback by the validated release ID and re-reads until `draft:true`; inability
 to verify that rollback is a loud immutable-release incident. Draft-first

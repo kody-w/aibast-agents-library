@@ -44,6 +44,9 @@ import {
 } from "../scripts/toolchain-policy.mjs";
 import { verifyReleaseSnapshot } from "../scripts/release-race-guard.mjs";
 import {
+  assertImmutableReleasesEnabled,
+} from "../scripts/immutable-release-policy.mjs";
+import {
   selectPreviousWindowsBinary,
 } from "../scripts/windows-upgrade-policy.mjs";
 import {
@@ -209,6 +212,10 @@ test("unavailable requested toolchain versions block publication honestly", () =
     electronBuilder: "26.15.7",
     macosMinimum: "12.0",
   });
+  const blockers = policy.publication_blockers.join("\n");
+  assert.match(blockers, /electron-builder@26\.16\.0 release and tag exist/);
+  assert.match(blockers, /configured or public npm registry/);
+  assert.doesNotMatch(blockers, /no .*upstream .*tag/i);
   assert.equal(
     evaluateToolchainPolicy(policy, installed).publicationReady,
     false,
@@ -1194,6 +1201,12 @@ test("publication revalidates the full set and immutable setting at the last gat
   const immutableSetting = publish.indexOf(
     'repos/$GITHUB_REPOSITORY/immutable-releases',
   );
+  const immutableJson = publish.indexOf(
+    "jq -e '.enabled == true'",
+  );
+  const immutablePolicy = publish.indexOf(
+    "immutable-release-policy.mjs",
+  );
   const prepublishSnapshot = publish.indexOf(
     'verify_release_snapshot "immediately before publication"',
   );
@@ -1211,7 +1224,9 @@ test("publication revalidates the full set and immutable setting at the last gat
       && checksums < attestations
       && attestations < staged
       && staged < immutableSetting
-      && immutableSetting < prepublishSnapshot
+      && immutableSetting < immutableJson
+      && immutableJson < immutablePolicy
+      && immutablePolicy < prepublishSnapshot
       && prepublishSnapshot < publishRelease
       && publishRelease < postpublishSnapshot,
   );
@@ -1223,6 +1238,22 @@ test("publication revalidates the full set and immutable setting at the last gat
   assert.match(publish, /IMMUTABLE RELEASE INCIDENT/);
   assert.match(publish, /for attempt in \{1\.\.5\}/);
   assert.match(publish, /-F draft=true/);
+});
+
+test("immutable release settings require enabled true at runtime", () => {
+  assert.equal(assertImmutableReleasesEnabled({ enabled: true }), true);
+  for (const settings of [
+    { enabled: false },
+    {},
+    null,
+    [],
+    { enabled: "true" },
+  ]) {
+    assert.throws(
+      () => assertImmutableReleasesEnabled(settings),
+      /enabled=true/,
+    );
+  }
 });
 
 test("annotated tag object, peeled commit, and release ID are race-bound", () => {

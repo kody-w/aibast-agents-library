@@ -1734,12 +1734,20 @@ jobs:
             --tag "$TAG" \
             --version "$VERSION" \
             --commit "$COMMIT"
-          if ! gh api --silent \
+          immutable_settings="$RUNNER_TEMP/frontier-immutable-release-settings.json"
+          if ! gh api \
             -H "X-GitHub-Api-Version: 2026-03-10" \
-            "repos/$GITHUB_REPOSITORY/immutable-releases"; then
+            "repos/$GITHUB_REPOSITORY/immutable-releases" \
+            >"$immutable_settings"; then
             echo "::error title=Publication blocked::Repository immutable releases are not enabled or could not be verified. The draft remains unpublished."
             exit 1
           fi
+          if ! jq -e '.enabled == true' "$immutable_settings" >/dev/null; then
+            echo "::error title=Publication blocked::Repository immutable release settings returned enabled=false or invalid JSON. The draft remains unpublished."
+            exit 1
+          fi
+          node beta/scripts/immutable-release-policy.mjs \
+            --input "$immutable_settings"
           prepublish="$(
             gh api -H "X-GitHub-Api-Version: 2026-03-10" \
               "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
