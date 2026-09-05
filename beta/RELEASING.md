@@ -479,7 +479,19 @@ drift is a sticky integrity incident, not a retryable transport failure; a
 later canonical immutable response cannot erase it. SIGINT/SIGTERM starts a
 bounded ID-based recovery before the process exits, and a
 `failure() || cancelled()` workflow step re-runs recovery from the durable
-transition state if the Node process could not finish.
+transition state if the Node process could not finish. Recovery merges the
+complete durable latch state rather than replacing it with interruption
+metadata. After a publication request begins, one draft read is never terminal:
+the request is awaited where possible, then an ID-bound rollback must be issued
+and two bounded reads must prove stable draft state unless the release is
+already immutable.
+
+Transition state uses a unique same-directory temporary file, complete write,
+`fsync`, close, and atomic rename. A write or rename failure leaves the previous
+valid marker untouched, latches persistence failure in memory, and forces
+rollback. A draft recovered after integrity or persistence failure is reported
+as `INTEGRITY_ROLLED_BACK` or `PERSISTENCE_ROLLED_BACK`, never as ordinary
+success.
 
 The release includes:
 

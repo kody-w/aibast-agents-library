@@ -62,6 +62,9 @@ import {
   verifyWindowsSigningInput,
 } from "../scripts/windows-signing-input.mjs";
 import {
+  createAtomicStateWriter,
+  mergeDurableState,
+  recoverFromDurableState,
   recoverInterruptedRelease,
   recoveryRequiredFromState,
   ReleaseTransitionError,
@@ -1845,6 +1848,222 @@ test("signal recovery retries until release ID is proven draft or immutable", as
   assert.match(publish, /if: \$\{\{ failure\(\) \|\| cancelled\(\) \}\}/);
   assert.match(publish, /Recover interrupted mutable release transition/);
   assert.match(publish, /--recover-only/);
+  const stateMachineSource = readFileSync(
+    path.join(
+      betaDir,
+      "scripts",
+      "publish-release-state-machine.mjs",
+    ),
+    "utf8",
+  );
+  assert.ok(
+    [...stateMachineSource.matchAll(/process\.once\(signal/g)].length >= 2,
+    "publish and recovery-only modes need independent signal controllers",
+  );
+  assert.match(stateMachineSource, /recovery-only-interrupted/);
+});
+
+test("durable integrity latch survives interruption and recovery", async () => {
+  const durable = {
+    phase: "interrupted-recovery-started",
+    transitionAttempted: true,
+    observedMutable: true,
+    integrityViolation: true,
+    integrityDetail: "asset digest drift",
+    persistenceFailure: false,
+    history: [{ phase: "poll-1-integrity-violation", detail: "drift" }],
+  };
+  const merged = mergeDurableState(durable, {
+    phase: "recovery-only-interrupted",
+    signal: "SIGTERM",
+    history: [{ phase: "recovery-only-interrupted", detail: "SIGTERM" }],
+  });
+  assert.equal(merged.integrityViolation, true);
+  assert.equal(merged.integrityDetail, "asset digest drift");
+  assert.equal(merged.history.length, 2);
+
+  await assert.rejects(
+    () => recoverFromDurableState(durable, {
+      getRelease: async () => ({ id: 1, draft: false, immutable: true }),
+      rollbackRelease: async () => {
+        throw new Error("immutable release cannot roll back");
+      },
+      verifySnapshot: async () => true,
+      maxAttempts: 1,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "INCIDENT");
+      assert.equal(error.state.integrityViolation, true);
+      return true;
+    },
+  );
+
+  let drift = true;
+  let current = { id: 1, draft: false, immutable: false };
+  await assert.rejects(
+    () => recoverFromDurableState({
+      phase: "interrupted",
+      transitionAttempted: true,
+      integrityViolation: false,
+      history: [],
+    }, {
+      getRelease: async () => ({ ...current, drift }),
+      rollbackRelease: async () => {
+        drift = false;
+        current = { id: 1, draft: true, immutable: false };
+        return { ...current };
+      },
+      verifySnapshot: async (release) => {
+        if (release.drift) throw new Error("body fingerprint drift");
+        return true;
+      },
+      maxAttempts: 1,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "INTEGRITY_ROLLED_BACK");
+      assert.equal(error.state.integrityViolation, true);
+      return true;
+    },
+  );
+});
+
+test("in-flight publication draft observation always runs verified rollback", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const mutable = { id: 1, draft: false, immutable: false };
+  let readCount = 0;
+  let rollbackCalls = 0;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => {
+        readCount += 1;
+        if (readCount <= 4) return { ...draft };
+        if (readCount === 5) return { ...mutable };
+        return { ...draft };
+      },
+      publishRelease: async () => {
+        throw new Error("request response lost while server still processes");
+      },
+      rollbackRelease: async () => {
+        rollbackCalls += 1;
+        return { ...draft };
+      },
+      verifySnapshot: async () => true,
+      maxPolls: 1,
+      maxRollbackAttempts: 3,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "ROLLED_BACK");
+      assert.ok(rollbackCalls >= 2);
+      return true;
+    },
+  );
+});
+
+test("atomic state persistence retains the previous marker on write failures", () => {
+  const previous = '{"phase":"publishing"}\n';
+  const temporaryPaths = [];
+  const successfulWriter = createAtomicStateWriter("state.json", {
+    openSync: (filePath) => {
+      temporaryPaths.push(filePath);
+      return temporaryPaths.length;
+    },
+    writeFileSync() {},
+    fsyncSync() {},
+    closeSync() {},
+    renameSync() {},
+    rmSync() {},
+  });
+  assert.equal(successfulWriter({ phase: "one" }).ok, true);
+  assert.equal(successfulWriter({ phase: "two" }).ok, true);
+  assert.equal(new Set(temporaryPaths).size, 2);
+  assert.ok(temporaryPaths.every((entry) => entry.endsWith(".state.tmp")));
+
+  for (const failurePoint of ["open-disk-full", "write", "rename"]) {
+    let marker = previous;
+    let temporary = "";
+    let fsyncCalls = 0;
+    let closeCalls = 0;
+    const writer = createAtomicStateWriter("state.json", {
+      openSync: () => {
+        if (failurePoint === "open-disk-full") {
+          throw Object.assign(new Error("disk full"), { code: "ENOSPC" });
+        }
+        return 7;
+      },
+      writeFileSync: (_descriptor, value) => {
+        if (failurePoint === "write") {
+          throw Object.assign(new Error("write failed"), { code: "EIO" });
+        }
+        temporary = value;
+      },
+      fsyncSync: () => { fsyncCalls += 1; },
+      closeSync: () => { closeCalls += 1; },
+      renameSync: () => {
+        if (failurePoint === "rename") throw new Error("rename failed");
+        marker = temporary;
+      },
+      rmSync: () => { temporary = ""; },
+    });
+    const result = writer({ phase: "publish-response" });
+    assert.equal(result.ok, false);
+    assert.equal(marker, previous);
+    if (failurePoint !== "open-disk-full") assert.ok(closeCalls >= 1);
+    if (failurePoint === "rename") assert.equal(fsyncCalls, 1);
+    assert.equal(
+      writer({ phase: "later" }).ok,
+      false,
+      "writer must freeze after failure instead of replacing the valid marker",
+    );
+  }
+});
+
+test("post-publication persistence failure recovers from in-memory state", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const mutable = { id: 1, draft: false, immutable: false };
+  let current = { ...draft };
+  let rollbackCalls = 0;
+  let persistenceFailed = false;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => ({ ...current }),
+      publishRelease: async () => {
+        current = { ...mutable };
+        return { ...current };
+      },
+      rollbackRelease: async () => {
+        rollbackCalls += 1;
+        current = { ...draft };
+        return { ...current };
+      },
+      verifySnapshot: async () => true,
+      onState: (state) => {
+        if (state.phase === "publish-response" || persistenceFailed) {
+          persistenceFailed = true;
+          return {
+            ok: false,
+            error: Object.assign(new Error("disk full"), { code: "ENOSPC" }),
+          };
+        }
+        return { ok: true };
+      },
+      maxPolls: 1,
+      maxRollbackAttempts: 1,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "PERSISTENCE_ROLLED_BACK");
+      assert.equal(error.state.persistenceFailure, true);
+      assert.ok(rollbackCalls >= 1);
+      return true;
+    },
+  );
 });
 
 test("second Windows binary release requires immutable N-1 evidence", () => {
