@@ -21,6 +21,7 @@ keep working unmodified.
 """
 from __future__ import annotations
 
+import functools
 import json
 import os
 import subprocess
@@ -30,6 +31,7 @@ import uuid
 from pathlib import Path
 
 import requests
+from dotenv import load_dotenv
 
 try:
     from textual.app import App, ComposeResult
@@ -43,9 +45,23 @@ except ImportError as exc:  # pragma: no cover - import guard for callers
     )
 
 HOST = "127.0.0.1"
-PORT = int(os.environ.get("PORT", "7071"))
-BASE_URL = f"http://{HOST}:{PORT}"
 HEALTH_TIMEOUT_S = 60
+
+
+def _resolve_port() -> int:
+    """Mirror brainstem.py's own PORT resolution exactly (same .env, same
+    fallback-on-invalid-value behavior) so the TUI always polls the port the
+    server it just spawned will actually bind — never a stale hardcoded 7071
+    when `.env` sets a custom PORT."""
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+    try:
+        return int((os.getenv("PORT") or "7071").strip())
+    except ValueError:
+        return 7071
+
+
+PORT = _resolve_port()
+BASE_URL = f"http://{HOST}:{PORT}"
 
 
 def _wait_for_health(base_url: str, timeout_s: int = HEALTH_TIMEOUT_S) -> bool:
@@ -139,7 +155,9 @@ class BrainstemTUI(App):
         self._busy = True
         log = self.query_one("#chat-log", RichLog)
         log.write(f"[bold cyan]You:[/bold cyan] {text}")
-        self.run_worker(self._send(text), exclusive=False, thread=True)
+        self.run_worker(
+            functools.partial(self._send, text), exclusive=False, thread=True
+        )
 
     def _send(self, text: str) -> None:
         log = self.query_one("#chat-log", RichLog)
@@ -218,10 +236,22 @@ def main() -> int:
         return 1
 
     app = BrainstemTUI(server_process=server_process)
-    app.run()
-
-    if server_process is not None and server_process.poll() is None:
-        server_process.terminate()
+    try:
+        app.run()
+    except Exception as exc:  # noqa: BLE001 - any TUI crash must still fall back cleanly
+        print(f"[brainstem-tui] Terminal UI crashed: {exc}")
+        return 1
+    finally:
+        # Guaranteed cleanup regardless of how app.run() exits (clean quit,
+        # exception, or a terminal that reports a tty but can't actually
+        # render) — a crashed TUI must never leave an orphaned server holding
+        # the port.
+        if server_process is not None and server_process.poll() is None:
+            try:
+                server_process.terminate()
+                server_process.wait(timeout=5)
+            except Exception:
+                pass
     return 0
 
 

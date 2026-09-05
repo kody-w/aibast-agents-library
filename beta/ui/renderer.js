@@ -112,7 +112,16 @@ function setSurgeonOpen(open) {
   surgeon.classList.toggle("open", open);
   document.body.classList.toggle("surgeon-open", open);
   localStorage.setItem(surgeonOpenKey, open ? "open" : "closed");
-  if (open) setTimeout(() => surgeonInput.focus(), 300);
+  // When the herd (multi-pane) view is active, the single Surgeon panel sits
+  // behind it — focusing its textarea would silently steal keystrokes from
+  // a visible herd tile. Focus the herd's own active composer instead.
+  if (open && surgeonHerd) {
+    setTimeout(() => {
+      surgeonGridEl?.querySelector(".herd-tile .hcomp textarea, .herd-tile .twin-comp textarea")?.focus();
+    }, 300);
+  } else if (open) {
+    setTimeout(() => surgeonInput.focus(), 300);
+  }
 }
 
 function shortIdentifier(value, length = 24) {
@@ -1294,7 +1303,20 @@ setSurgeonOpen(localStorage.getItem(surgeonOpenKey) !== "closed");
 setExplorerOpen(localStorage.getItem(explorerOpenKey) === "open");
 // Herd view defaults to OPEN (herdr-style always-on multi-pane supervision);
 // a user who explicitly closes it (exitSurgeonHerd) stays closed on relaunch.
-if (localStorage.getItem(surgeonHerdOpenKey) !== "closed") enterSurgeonHerd();
+// Herd view defaults to OPEN (herdr-style always-on multi-pane supervision)
+// for new installs and any user who hasn't said otherwise. Two prior-consent
+// signals are respected so this migration can't surprise an existing user:
+//   - an explicit prior herd close (this exact key) always wins, and
+//   - a user who had already closed the single Copilot panel signaled "I
+//     don't want a Copilot surface taking up screen space" — don't reopen a
+//     bigger version of that same surface on their behalf.
+{
+  const herdPref = localStorage.getItem(surgeonHerdOpenKey);
+  const hadPriorSurgeonClosed = localStorage.getItem(surgeonOpenKey) === "closed";
+  if (herdPref === "open" || (herdPref === null && !hadPriorSurgeonClosed)) {
+    enterSurgeonHerd();
+  }
+}
 setInterval(() => void refreshAgentExplorer(), 2000);
 window.brainstemBeta.onSurgeonEvent(handleSurgeonEvent);
 window.brainstemBeta.onTwinEvent(handleTwinEvent);

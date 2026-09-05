@@ -1047,19 +1047,62 @@ with open(sys.argv[2], 'w') as f: json.dump(out, f)
     # headless, containers) but the terminal is real and interactive, offer a
     # clickable/scrollable chat UI instead of a raw log dump. This is strictly
     # additive — any terminal that can't satisfy every check below (old
-    # machines, dumb terminals, piped/non-interactive sessions, or a failed
-    # `textual` install) falls straight through to the unchanged raw-shell
-    # path, which remains the permanent backward-compatible fallback.
-    if [[ "$gui_available" != true ]] && [ -t 0 ] && [ -t 1 ] && [[ "${TERM:-dumb}" != "dumb" ]]; then
-        if "$venv_python" -c "import textual" >/dev/null 2>&1 \
-            || "$VENV_DIR/bin/pip" install --quiet textual >/dev/null 2>&1; then
-            if "$venv_python" -c "import textual" >/dev/null 2>&1; then
-                echo -e "  ${CYAN}No GUI browser detected — launching the mouse-first terminal UI...${NC}"
-                export BRAINSTEM_VENV_PYTHON="$venv_python"
-                exec "$venv_python" tui.py
+    # machines, dumb terminals, CI, a pinned source tree without tui.py, a
+    # partial/failed `textual` install, or an abnormal TUI exit) falls straight
+    # through to the unchanged raw-shell path below, which remains the
+    # permanent backward-compatible fallback and is NEVER `exec`'d away until
+    # the TUI has already exited cleanly.
+    #
+    # Use the same "usable controlling terminal" test as the raw-shell fallback
+    # below (not a bare `[ -t 0 ]`) so `curl | bash` sessions — where stdin is
+    # necessarily a pipe — still qualify when a real terminal is attached via
+    # /dev/tty (the exact case the raw fallback already handles at line ~1075).
+    local has_usable_tty=false
+    if [ -t 0 ] && [ -t 1 ]; then
+        has_usable_tty=true
+    elif [ -t 1 ] && ( : </dev/tty ) 2>/dev/null; then
+        has_usable_tty=true
+    fi
+
+    if [[ "$gui_available" != true ]] && [[ "$has_usable_tty" == true ]] \
+        && [[ "${TERM:-dumb}" != "dumb" ]] \
+        && [ -f "$BRAINSTEM_HOME/src/rapp_brainstem/tui.py" ]; then
+        local tui_ready=false
+        if "$venv_python" -c "import textual" >/dev/null 2>&1; then
+            tui_ready=true
+        else
+            # Bounded, best-effort install — an offline/captive-network machine
+            # must not hang here; a 30s timeout falls through to the raw path.
+            if command -v timeout >/dev/null 2>&1; then
+                timeout 30 "$VENV_DIR/bin/pip" install --quiet textual >/dev/null 2>&1
+            else
+                "$VENV_DIR/bin/pip" install --quiet textual >/dev/null 2>&1
             fi
+            "$venv_python" -c "import textual" >/dev/null 2>&1 && tui_ready=true
         fi
-        echo -e "  ${YELLOW}⚠${NC} Mouse terminal UI unavailable — falling back to plain output"
+
+        if [[ "$tui_ready" == true ]]; then
+            echo -e "  ${CYAN}No GUI browser detected — launching the mouse-first terminal UI...${NC}"
+            export BRAINSTEM_VENV_PYTHON="$venv_python"
+            local tui_status=0
+            if [ -t 0 ]; then
+                "$venv_python" tui.py || tui_status=$?
+            else
+                "$venv_python" tui.py </dev/tty || tui_status=$?
+            fi
+            # Exit code 0 means the user quit the TUI on purpose — that's a
+            # complete, successful launch; don't fall through to a second
+            # server. Anything else (crash, failed import at runtime, a
+            # terminal that reports a tty but can't actually render) falls
+            # through to the unchanged raw-shell path below, which is exactly
+            # the point of a fail-open compatibility fallback.
+            if [ "$tui_status" -eq 0 ]; then
+                return 0
+            fi
+            echo -e "  ${YELLOW}⚠${NC} Mouse terminal UI exited unexpectedly (status $tui_status) — falling back to plain output"
+        else
+            echo -e "  ${YELLOW}⚠${NC} Mouse terminal UI unavailable — falling back to plain output"
+        fi
     fi
 
     # Use exec to replace shell — but only if stdin is a terminal.
