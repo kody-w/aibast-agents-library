@@ -240,7 +240,7 @@ check_for_upgrade() {
 
     # Fetch remote version
     local remote_version
-    remote_version=$(curl -fsSL "$REMOTE_VERSION_URL" 2>/dev/null | tr -d '[:space:]') || true
+    remote_version=$(curl -fsSL --retry 3 --connect-timeout 10 --max-time 20 "$REMOTE_VERSION_URL" 2>/dev/null | tr -d '[:space:]') || true
 
     if [[ -z "$remote_version" ]]; then
         echo -e "  ${YELLOW}⚠${NC} Could not check remote version — upgrading anyway"
@@ -445,7 +445,7 @@ install_brainstem() {
             # Strip leading 'v' for comparison (v0.6.0 → 0.6.0)
             TARGET_VER="${PIN_VERSION#v}"
         else
-            TARGET_VER=$(curl -sf "$REMOTE_VERSION_URL" 2>/dev/null || echo "0.0.0")
+            TARGET_VER=$(curl -sf --retry 3 --connect-timeout 10 --max-time 20 "$REMOTE_VERSION_URL" 2>/dev/null || echo "0.0.0")
         fi
 
         echo "  Local:  v${LOCAL_VER}"
@@ -1010,25 +1010,56 @@ with open(sys.argv[2], 'w') as f: json.dump(out, f)
         fi
     fi
 
-    # Open the browser once the server actually answers (#14) — a fixed delay
-    # races cold startups (token exchange, dep installs) and lands the user on
-    # a dead-port error page. Poll /health, then open; after 60s open anyway so
-    # the user still gets the tab (with the URL bar filled in) on a slow start.
-    (
-        for _ in $(seq 1 60); do
-            if curl -sf -o /dev/null --max-time 1 "http://localhost:7071/health" 2>/dev/null; then
-                break
-            fi
-            sleep 1
-        done
-        open "http://localhost:7071" 2>/dev/null || xdg-open "http://localhost:7071" 2>/dev/null || true
-    ) &
+    # Detect whether a GUI browser can plausibly be opened. macOS always has
+    # `open`; Linux/BSD need both a display server and `xdg-open`. SSH sessions,
+    # headless boxes, and containers land here as false.
+    local gui_available=false
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        command -v open >/dev/null 2>&1 && gui_available=true
+    elif [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+        command -v xdg-open >/dev/null 2>&1 && gui_available=true
+    fi
+
+    if [[ "$gui_available" == true ]]; then
+        # Open the browser once the server actually answers (#14) — a fixed delay
+        # races cold startups (token exchange, dep installs) and lands the user on
+        # a dead-port error page. Poll /health, then open; after 60s open anyway so
+        # the user still gets the tab (with the URL bar filled in) on a slow start.
+        (
+            for _ in $(seq 1 60); do
+                if curl -sf -o /dev/null --max-time 1 "http://localhost:7071/health" 2>/dev/null; then
+                    break
+                fi
+                sleep 1
+            done
+            open "http://localhost:7071" 2>/dev/null || xdg-open "http://localhost:7071" 2>/dev/null || true
+        ) &
+    fi
 
     # Final dep safety net — if somehow we got here without deps, fix it
     if ! "$venv_python" -c "import flask, flask_cors, requests, dotenv" 2>/dev/null; then
         echo -e "  ${YELLOW}⚠${NC} Fixing missing dependencies..."
         "$VENV_DIR/bin/pip" install -r "$BRAINSTEM_HOME/src/rapp_brainstem/requirements.txt" --quiet 2>/dev/null || \
             "$VENV_DIR/bin/pip" install -r "$BRAINSTEM_HOME/src/rapp_brainstem/requirements.txt"
+    fi
+
+    # Mouse-first terminal fallback: when no GUI browser is available (SSH,
+    # headless, containers) but the terminal is real and interactive, offer a
+    # clickable/scrollable chat UI instead of a raw log dump. This is strictly
+    # additive — any terminal that can't satisfy every check below (old
+    # machines, dumb terminals, piped/non-interactive sessions, or a failed
+    # `textual` install) falls straight through to the unchanged raw-shell
+    # path, which remains the permanent backward-compatible fallback.
+    if [[ "$gui_available" != true ]] && [ -t 0 ] && [ -t 1 ] && [[ "${TERM:-dumb}" != "dumb" ]]; then
+        if "$venv_python" -c "import textual" >/dev/null 2>&1 \
+            || "$VENV_DIR/bin/pip" install --quiet textual >/dev/null 2>&1; then
+            if "$venv_python" -c "import textual" >/dev/null 2>&1; then
+                echo -e "  ${CYAN}No GUI browser detected — launching the mouse-first terminal UI...${NC}"
+                export BRAINSTEM_VENV_PYTHON="$venv_python"
+                exec "$venv_python" tui.py
+            fi
+        fi
+        echo -e "  ${YELLOW}⚠${NC} Mouse terminal UI unavailable — falling back to plain output"
     fi
 
     # Use exec to replace shell — but only if stdin is a terminal.
