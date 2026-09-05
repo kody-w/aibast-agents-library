@@ -1,0 +1,1089 @@
+export const TAG_PREFIX = "brainstem-beta-v";
+export const DEFAULT_REPOSITORY = "microsoft/aibast-agents-library";
+
+const PLATFORM_LABELS = Object.freeze({
+  windows: "Windows 11",
+  macos: "macOS",
+  linux: "Linux",
+});
+
+const ARCHITECTURE_LABELS = Object.freeze({
+  x64: "x64",
+  arm64: "ARM64",
+  universal: "universal",
+  unknown: "architecture not specified",
+});
+
+const PLATFORM_ORDER = Object.freeze({
+  windows: 0,
+  macos: 1,
+  linux: 2,
+});
+
+const ARCHITECTURE_ORDER = Object.freeze({
+  universal: 0,
+  x64: 1,
+  arm64: 2,
+  unknown: 3,
+});
+
+const FILE_NAME_COLLATOR = new Intl.Collator("en", {
+  numeric: true,
+  sensitivity: "base",
+});
+
+export class DownloadCenterError extends Error {
+  constructor(message, {
+    code = "DOWNLOAD_CENTER_ERROR",
+    status = null,
+    retryAt = null,
+    cause,
+  } = {}) {
+    super(message, cause === undefined ? undefined : { cause });
+    this.name = "DownloadCenterError";
+    this.code = code;
+    this.status = status;
+    this.retryAt = retryAt;
+  }
+}
+
+export function validRepository(value) {
+  return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(value || "");
+}
+
+function normalizeRequestedTag(value) {
+  if (value === null || value === undefined) return null;
+  const tag = String(value).trim();
+  if (!tag) return null;
+  if (tag.length > 200 || /[\u0000-\u001f\u007f]/.test(tag)) {
+    throw new DownloadCenterError("The requested release tag is invalid.", {
+      code: "INVALID_RELEASE_TAG",
+    });
+  }
+  return tag;
+}
+
+export function resolveDownloadContext(locationLike = {}) {
+  const params = new URLSearchParams(String(locationLike.search || ""));
+  const override = params.get("repo");
+  let repository = validRepository(override) ? override : null;
+
+  const hostname = String(locationLike.hostname || "").toLowerCase();
+  if (!repository && hostname.endsWith(".github.io")) {
+    const owner = hostname.slice(0, -".github.io".length);
+    const project = String(locationLike.pathname || "")
+      .split("/")
+      .filter(Boolean)[0];
+    const derived = `${owner}/${project || ""}`;
+    if (validRepository(derived)) repository = derived;
+  }
+
+  return {
+    repository: repository || DEFAULT_REPOSITORY,
+    requestedTag: normalizeRequestedTag(params.get("tag")),
+  };
+}
+
+function readHeader(headers, name) {
+  try {
+    return headers && typeof headers.get === "function" ? headers.get(name) : null;
+  } catch {
+    return null;
+  }
+}
+
+function parseRateLimitReset(headers) {
+  const raw = readHeader(headers, "x-ratelimit-reset");
+  if (raw === null || raw === "") return null;
+  const seconds = Number(raw);
+  if (!Number.isFinite(seconds) || seconds <= 0) return null;
+  const retryAt = new Date(seconds * 1000);
+  return Number.isFinite(retryAt.getTime()) ? retryAt : null;
+}
+
+export async function fetchGitHubJson(url, {
+  fetchImpl = globalThis.fetch,
+  operation = "checking releases",
+} = {}) {
+  if (typeof fetchImpl !== "function") {
+    throw new DownloadCenterError("GitHub release discovery is unavailable in this browser.", {
+      code: "FETCH_UNAVAILABLE",
+    });
+  }
+
+  let response;
+  try {
+    response = await fetchImpl(url, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+  } catch (cause) {
+    throw new DownloadCenterError(
+      `Could not reach the GitHub API while ${operation}.`,
+      { code: "GITHUB_NETWORK_ERROR", cause },
+    );
+  }
+
+  const status = Number(response?.status);
+  if (
+    !response
+    || typeof response.ok !== "boolean"
+    || !Number.isInteger(status)
+    || status < 100
+    || status > 599
+  ) {
+    throw new DownloadCenterError(
+      `GitHub returned an invalid response while ${operation}.`,
+      { code: "INVALID_GITHUB_RESPONSE" },
+    );
+  }
+
+  if (!response.ok) {
+    const remaining = readHeader(response.headers, "x-ratelimit-remaining");
+    const rateLimited = status === 429 || (status === 403 && remaining === "0");
+    const retryAt = rateLimited ? parseRateLimitReset(response.headers) : null;
+    const retryMessage = retryAt ? ` Try again after ${retryAt.toISOString()}.` : "";
+    const message = rateLimited
+      ? `GitHub API rate limit reached (HTTP ${status}) while ${operation}.${retryMessage}`
+      : `GitHub API request failed (HTTP ${status}) while ${operation}.`;
+    throw new DownloadCenterError(message, {
+      code: rateLimited ? "GITHUB_RATE_LIMIT" : "GITHUB_HTTP_ERROR",
+      status,
+      retryAt,
+    });
+  }
+
+  try {
+    return await response.json();
+  } catch (cause) {
+    throw new DownloadCenterError(
+      `GitHub returned invalid JSON while ${operation}.`,
+      { code: "INVALID_GITHUB_JSON", status, cause },
+    );
+  }
+}
+
+function releaseTimestamp(release) {
+  const timestamp = Date.parse(String(release?.published_at || ""));
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function compareReleases(left, right) {
+  const leftTimestamp = releaseTimestamp(left);
+  const rightTimestamp = releaseTimestamp(right);
+  if (leftTimestamp !== rightTimestamp) {
+    if (leftTimestamp === null) return 1;
+    if (rightTimestamp === null) return -1;
+    return rightTimestamp - leftTimestamp;
+  }
+
+  const leftId = Number(left?.id);
+  const rightId = Number(right?.id);
+  if (Number.isSafeInteger(leftId) && Number.isSafeInteger(rightId) && leftId !== rightId) {
+    return rightId - leftId;
+  }
+
+  return FILE_NAME_COLLATOR.compare(
+    String(right?.tag_name || ""),
+    String(left?.tag_name || ""),
+  );
+}
+
+export function selectRelease(releases, {
+  requestedTag = null,
+  tagPrefix = TAG_PREFIX,
+} = {}) {
+  if (!Array.isArray(releases)) {
+    throw new DownloadCenterError("GitHub release metadata was not an array.", {
+      code: "INVALID_RELEASE_LIST",
+    });
+  }
+
+  const exactTag = normalizeRequestedTag(requestedTag);
+  return releases
+    .filter((candidate) => {
+      if (!candidate || typeof candidate !== "object" || candidate.draft === true) {
+        return false;
+      }
+      const tag = candidate.tag_name;
+      if (typeof tag !== "string" || !tag) return false;
+      return exactTag ? tag === exactTag : tag.startsWith(tagPrefix);
+    })
+    .sort(compareReleases)[0] || null;
+}
+
+function tokenPattern(token) {
+  return new RegExp(`(?:^|[^a-z0-9])(?:${token})(?=$|[^a-z0-9])`, "i");
+}
+
+const UNIVERSAL_ASSET_PATTERN = tokenPattern("universal(?:2)?");
+const ARM64_ASSET_PATTERN = tokenPattern("arm64|aarch64|armv8(?:\\.\\d+)?");
+const X64_ASSET_PATTERN = tokenPattern("x64|amd64|x86[_-]64");
+const X86_ASSET_PATTERN = tokenPattern("ia32|x86|win32");
+
+export function assetArchitecture(name) {
+  const value = String(name || "");
+  if (UNIVERSAL_ASSET_PATTERN.test(value)) return "universal";
+
+  const arm64 = ARM64_ASSET_PATTERN.test(value);
+  const x64 = X64_ASSET_PATTERN.test(value);
+  if (arm64 && x64) return "unknown";
+  if (arm64) return "arm64";
+  if (x64) return "x64";
+  if (X86_ASSET_PATTERN.test(value)) return "x86";
+  return "unknown";
+}
+
+function normalizeArchitecture(architecture, bitness = "") {
+  const value = String(architecture || "").toLowerCase();
+  const bits = String(bitness || "");
+  if (/arm64|aarch64|armv8/.test(value)) return "arm64";
+  if (value === "arm" && bits === "64") return "arm64";
+  if (/x64|amd64|x86_64|x86-64/.test(value)) return "x64";
+  if ((value === "x86" || value === "ia32") && bits === "64") return "x64";
+  return null;
+}
+
+export async function detectArchitecture(navigatorLike = {}) {
+  const userAgentData = navigatorLike?.userAgentData;
+  let entropy = null;
+  if (userAgentData && typeof userAgentData.getHighEntropyValues === "function") {
+    try {
+      entropy = await userAgentData.getHighEntropyValues(["architecture", "bitness"]);
+    } catch {
+      entropy = null;
+    }
+  }
+
+  const detected = normalizeArchitecture(
+    entropy?.architecture || userAgentData?.architecture,
+    entropy?.bitness || userAgentData?.bitness,
+  );
+  if (detected) return detected;
+
+  const userAgent = `${navigatorLike?.platform || ""} ${navigatorLike?.userAgent || ""}`;
+  if (/arm64|aarch64|armv8/i.test(userAgent)) return "arm64";
+  if (/win64|x86[_-]64|amd64|\bx64\b/i.test(userAgent)) return "x64";
+  return null;
+}
+
+export function detectPlatform(navigatorLike = {}) {
+  const platform =
+    navigatorLike?.userAgentData?.platform
+    || navigatorLike?.platform
+    || navigatorLike?.userAgent
+    || "";
+  if (/win/i.test(platform)) return "windows";
+  if (/mac/i.test(platform)) return "macos";
+  if (/linux|x11/i.test(platform)) return "linux";
+  return "windows";
+}
+
+export function formatBytes(value) {
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    throw new DownloadCenterError("Asset size must be a positive integer.", {
+      code: "INVALID_ASSET_SIZE",
+    });
+  }
+  if (value < 1024) return `${value} B`;
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function platformForAssetName(name) {
+  if (/\.exe$/i.test(name)) return "windows";
+  if (/\.dmg$/i.test(name)) return "macos";
+  return null;
+}
+
+export function safeReleaseAssetUrl(value, repository) {
+  if (!validRepository(repository)) return null;
+  try {
+    const url = new URL(String(value || ""));
+    const expectedPath = `/${repository}/releases/download/`.toLowerCase();
+    if (
+      url.protocol !== "https:"
+      || url.username
+      || url.password
+      || url.hostname.toLowerCase() !== "github.com"
+      || !url.pathname.toLowerCase().startsWith(expectedPath)
+    ) {
+      return null;
+    }
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function comparePackagedDownloads(left, right) {
+  const platformOrder =
+    (PLATFORM_ORDER[left.platform] ?? 99) - (PLATFORM_ORDER[right.platform] ?? 99);
+  if (platformOrder) return platformOrder;
+
+  const architectureOrder =
+    (ARCHITECTURE_ORDER[left.architecture] ?? 99)
+    - (ARCHITECTURE_ORDER[right.architecture] ?? 99);
+  if (architectureOrder) return architectureOrder;
+
+  const nameOrder = FILE_NAME_COLLATOR.compare(left.fileName, right.fileName);
+  if (nameOrder) return nameOrder;
+  return left.href.localeCompare(right.href);
+}
+
+function binaryDescription(platform, architecture) {
+  const platformLabel = PLATFORM_LABELS[platform];
+  if (architecture === "unknown") {
+    return `${platformLabel} application installer (architecture not specified)`;
+  }
+  return `${platformLabel} ${ARCHITECTURE_LABELS[architecture]} application installer`;
+}
+
+export function analyzePackagedDownloads(release, { repository } = {}) {
+  if (!validRepository(repository)) {
+    throw new DownloadCenterError("A valid repository is required to verify release assets.", {
+      code: "INVALID_REPOSITORY",
+    });
+  }
+  if (!release || typeof release !== "object" || !Array.isArray(release.assets)) {
+    throw new DownloadCenterError("GitHub release asset metadata was not an array.", {
+      code: "INVALID_RELEASE_ASSETS",
+    });
+  }
+
+  const candidates = [];
+  const rejected = [];
+
+  for (const asset of release.assets) {
+    const rawName = typeof asset?.name === "string" ? asset.name.trim() : "";
+    const platform = platformForAssetName(rawName);
+    if (!platform) continue;
+
+    const reject = (reason) => {
+      rejected.push({ fileName: rawName || "(unnamed asset)", reason });
+    };
+
+    if (
+      !rawName
+      || rawName.length > 255
+      || /[\\/\u0000-\u001f\u007f]/.test(rawName)
+    ) {
+      reject("invalid file name");
+      continue;
+    }
+
+    if (asset.state !== undefined && asset.state !== "uploaded") {
+      reject("asset is not uploaded");
+      continue;
+    }
+
+    let size;
+    try {
+      size = formatBytes(asset.size);
+    } catch {
+      reject("missing or invalid size");
+      continue;
+    }
+
+    const href = safeReleaseAssetUrl(asset.browser_download_url, repository);
+    if (!href) {
+      reject("unsafe or invalid download URL");
+      continue;
+    }
+
+    const architecture = assetArchitecture(rawName);
+    if (architecture === "x86") {
+      reject("32-bit x86 packages are unsupported");
+      continue;
+    }
+
+    candidates.push({
+      platform,
+      architecture,
+      fileName: rawName,
+      description: binaryDescription(platform, architecture),
+      size,
+      sizeBytes: asset.size,
+      href,
+      downloadName: rawName,
+      command: "",
+      kind: "binary",
+    });
+  }
+
+  candidates.sort(comparePackagedDownloads);
+  const seenNames = new Set();
+  const downloads = [];
+  for (const candidate of candidates) {
+    const key = `${candidate.platform}:${candidate.fileName.toLowerCase()}`;
+    if (seenNames.has(key)) {
+      rejected.push({ fileName: candidate.fileName, reason: "duplicate asset name" });
+      continue;
+    }
+    seenNames.add(key);
+    downloads.push({
+      ...candidate,
+      id: `release-${candidate.platform}-${candidate.architecture}-${downloads.length + 1}`,
+      platforms: [candidate.platform],
+    });
+  }
+
+  return { downloads, rejected };
+}
+
+function releaseWebUrl(repository, tag) {
+  return `https://github.com/${repository}/releases/tag/${encodeURIComponent(tag)}`;
+}
+
+function sourceTreeUrl(repository, ref = "main") {
+  return `https://github.com/${repository}/tree/${encodeURIComponent(ref)}/beta`;
+}
+
+function releaseListUrl(repository) {
+  return `https://github.com/${repository}/releases`;
+}
+
+function normalizeReleaseMetadata(release, { repository, requestedTag }) {
+  const tag = typeof release?.tag_name === "string" ? release.tag_name : "";
+  if (!tag || (requestedTag && tag !== requestedTag)) {
+    throw new DownloadCenterError("GitHub returned invalid release tag metadata.", {
+      code: "INVALID_RELEASE_METADATA",
+    });
+  }
+
+  const publishedTimestamp = releaseTimestamp(release);
+  if (publishedTimestamp === null) {
+    throw new DownloadCenterError(`Release ${tag} does not have a valid published date.`, {
+      code: "INVALID_RELEASE_DATE",
+    });
+  }
+
+  const { downloads, rejected } = analyzePackagedDownloads(release, { repository });
+  return {
+    tag,
+    version: tag.startsWith(TAG_PREFIX) ? tag.slice(TAG_PREFIX.length) : tag,
+    prerelease: release.prerelease === true,
+    publishedAt: new Date(publishedTimestamp),
+    releaseUrl: releaseWebUrl(repository, tag),
+    sourceUrl: sourceTreeUrl(repository, tag),
+    packagedDownloads: downloads,
+    rejectedAssets: rejected,
+  };
+}
+
+function normalizeCommit(commitData) {
+  const commit = typeof commitData?.sha === "string"
+    ? commitData.sha.toLowerCase()
+    : "";
+  if (!/^[0-9a-f]{40}$/.test(commit)) {
+    throw new DownloadCenterError(
+      "The Frontier release did not resolve to a full commit SHA.",
+      { code: "INVALID_RELEASE_COMMIT" },
+    );
+  }
+  return commit;
+}
+
+export async function discoverRelease({
+  repository,
+  requestedTag = null,
+  fetchImpl = globalThis.fetch,
+} = {}) {
+  if (!validRepository(repository)) {
+    throw new DownloadCenterError("The release repository is invalid.", {
+      code: "INVALID_REPOSITORY",
+    });
+  }
+
+  const releases = await fetchGitHubJson(
+    `https://api.github.com/repos/${repository}/releases?per_page=30`,
+    { fetchImpl, operation: `checking releases for ${repository}` },
+  );
+  const release = selectRelease(releases, { requestedTag });
+  if (!release) {
+    throw new DownloadCenterError(
+      requestedTag
+        ? `Release ${requestedTag} was not found in ${repository}.`
+        : `No published ${TAG_PREFIX} release was found in ${repository}.`,
+      { code: "RELEASE_NOT_FOUND" },
+    );
+  }
+
+  const metadata = normalizeReleaseMetadata(release, { repository, requestedTag });
+  const commitData = await fetchGitHubJson(
+    `https://api.github.com/repos/${repository}/commits/${encodeURIComponent(metadata.tag)}`,
+    { fetchImpl, operation: `resolving ${metadata.tag} to a commit` },
+  );
+
+  return {
+    ...metadata,
+    repository,
+    commit: normalizeCommit(commitData),
+  };
+}
+
+function bootstrapUrl(fileName, baseUrl) {
+  try {
+    return new URL(fileName, baseUrl).href;
+  } catch (cause) {
+    throw new DownloadCenterError("The bootstrap download URL is invalid.", {
+      code: "INVALID_BOOTSTRAP_URL",
+      cause,
+    });
+  }
+}
+
+export function buildBootstrapDownloads({ repository, baseUrl } = {}) {
+  if (!validRepository(repository)) {
+    throw new DownloadCenterError("The bootstrap repository is invalid.", {
+      code: "INVALID_REPOSITORY",
+    });
+  }
+
+  const windowsHref = bootstrapUrl("frontier.ps1", baseUrl);
+  const unixHref = bootstrapUrl("frontier.sh", baseUrl);
+  return [
+    {
+      id: "source-windows",
+      platforms: ["windows"],
+      platform: "windows",
+      architecture: "source",
+      fileName: "frontier.ps1",
+      description: "Windows 11 source bootstrap",
+      size: "Source",
+      command: `$env:RAPP_FRONTIER_REPO="${repository}";irm "${windowsHref}" | iex`,
+      href: windowsHref,
+      downloadName: "RAPP-Brainstem-Frontier-Windows.ps1",
+      kind: "bootstrap",
+    },
+    {
+      id: "source-unix",
+      platforms: ["macos", "linux"],
+      platform: "unix",
+      architecture: "source",
+      fileName: "frontier.sh",
+      description: "macOS or Linux source bootstrap",
+      size: "Source",
+      command: `curl -fsSL "${unixHref}" | RAPP_FRONTIER_REPO="${repository}" bash`,
+      href: unixHref,
+      downloadName: "RAPP-Brainstem-Frontier-macOS-Linux.sh",
+      kind: "bootstrap",
+    },
+  ];
+}
+
+function downloadCompatibilityRank(item, preferredArchitecture) {
+  if (item.kind !== "binary") return item.kind === "bootstrap" ? 2 : 4;
+  if (!preferredArchitecture) return 0;
+  if (item.architecture === preferredArchitecture) return 0;
+  if (item.architecture === "universal" || item.architecture === "unknown") return 1;
+  return 3;
+}
+
+export function orderDownloadsForPlatform(items, platform, preferredArchitecture = null) {
+  if (!Array.isArray(items)) {
+    throw new DownloadCenterError("The download catalog was not an array.", {
+      code: "INVALID_DOWNLOAD_CATALOG",
+    });
+  }
+  if (!Object.hasOwn(PLATFORM_LABELS, platform)) {
+    throw new DownloadCenterError(`Unsupported download platform: ${platform}`, {
+      code: "INVALID_PLATFORM",
+    });
+  }
+
+  const preferred = preferredArchitecture === "x64" || preferredArchitecture === "arm64"
+    ? preferredArchitecture
+    : null;
+  return items
+    .filter((item) => Array.isArray(item?.platforms) && item.platforms.includes(platform))
+    .sort((left, right) => {
+      const compatibility =
+        downloadCompatibilityRank(left, preferred)
+        - downloadCompatibilityRank(right, preferred);
+      if (compatibility) return compatibility;
+
+      if (left.kind === "binary" && right.kind === "binary") {
+        const architecture =
+          (ARCHITECTURE_ORDER[left.architecture] ?? 99)
+          - (ARCHITECTURE_ORDER[right.architecture] ?? 99);
+        if (architecture) return architecture;
+      }
+
+      const name = FILE_NAME_COLLATOR.compare(
+        String(left.fileName || ""),
+        String(right.fileName || ""),
+      );
+      if (name) return name;
+      return String(left.id || "").localeCompare(String(right.id || ""));
+    });
+}
+
+function architectureSummary(downloads) {
+  const architectures = [];
+  for (const architecture of ["universal", "x64", "arm64", "unknown"]) {
+    if (downloads.some((item) => item.architecture === architecture)) {
+      architectures.push(ARCHITECTURE_LABELS[architecture]);
+    }
+  }
+  return architectures.join(", ");
+}
+
+export function platformRecommendation(items, platform, preferredArchitecture = null) {
+  const binaries = orderDownloadsForPlatform(items, platform, null)
+    .filter((item) => item.kind === "binary");
+  const platformLabel = PLATFORM_LABELS[platform];
+  if (!binaries.length) {
+    return `Verified source bootstrap available for ${platformLabel}.`;
+  }
+
+  const preferred = preferredArchitecture === "x64" || preferredArchitecture === "arm64"
+    ? preferredArchitecture
+    : null;
+  const compatible = preferred
+    ? binaries.filter(
+      (item) => item.architecture === preferred
+        || item.architecture === "universal"
+        || item.architecture === "unknown",
+    )
+    : binaries;
+
+  if (preferred && !compatible.length) {
+    return `No ${ARCHITECTURE_LABELS[preferred]} packaged installer is published for `
+      + `${platformLabel}. The verified source bootstrap is recommended; other architecture `
+      + "installers remain available.";
+  }
+
+  return `Packaged installer${binaries.length === 1 ? "" : "s"} `
+    + `(${architectureSummary(binaries)}) and source bootstrap available for ${platformLabel}.`;
+}
+
+export function windowsSupportLabel(items) {
+  const windowsBinaries = Array.isArray(items)
+    ? items.filter(
+      (item) => item?.kind === "binary" && item?.platforms?.includes("windows"),
+    )
+    : [];
+  if (!windowsBinaries.length) return "Windows 11 source bootstrap";
+
+  const x64 = windowsBinaries.some((item) => item.architecture === "x64");
+  const arm64 = windowsBinaries.some((item) => item.architecture === "arm64");
+  if (x64 && arm64) return "Windows 11 x64 or ARM64";
+  if (arm64) return "Windows 11 ARM64";
+  if (x64) return "Windows 11 x64";
+  if (windowsBinaries.some((item) => item.architecture === "universal")) {
+    return "Windows 11 universal package";
+  }
+  return "Windows 11 packaged installer (architecture unspecified)";
+}
+
+export function claimDownloadCenterInitialization(rootElement) {
+  if (!rootElement || !rootElement.dataset) {
+    throw new DownloadCenterError("The download page root element is unavailable.", {
+      code: "INVALID_DOCUMENT",
+    });
+  }
+  if (rootElement.dataset.downloadCenterInitialized === "true") return false;
+  rootElement.dataset.downloadCenterInitialized = "true";
+  return true;
+}
+
+function requireElement(documentObject, id) {
+  const element = documentObject.getElementById(id);
+  if (!element) {
+    throw new DownloadCenterError(`The download page is missing #${id}.`, {
+      code: "MISSING_PAGE_ELEMENT",
+    });
+  }
+  return element;
+}
+
+function collectElements(documentObject) {
+  return {
+    error: requireElement(documentObject, "load-error"),
+    status: requireElement(documentObject, "release-status"),
+    statusDot: requireElement(documentObject, "status-dot"),
+    version: requireElement(documentObject, "release-version"),
+    date: requireElement(documentObject, "release-date"),
+    files: requireElement(documentObject, "release-files"),
+    commit: requireElement(documentObject, "release-commit"),
+    resolvedDate: requireElement(documentObject, "resolved-date"),
+    platformSelect: requireElement(documentObject, "platform-select"),
+    platformHelp: requireElement(documentObject, "platform-help"),
+    downloadForm: requireElement(documentObject, "download-form"),
+    downloadButton: requireElement(documentObject, "download-button"),
+    dialog: requireElement(documentObject, "download-dialog"),
+    downloadOptionList: requireElement(documentObject, "download-option-list"),
+    selectedCommandPanel: requireElement(documentObject, "selected-command-panel"),
+    selectedCommand: requireElement(documentObject, "selected-command"),
+    copySelected: requireElement(documentObject, "copy-selected"),
+    downloadSelected: requireElement(documentObject, "download-selected"),
+    unixCommand: requireElement(documentObject, "unix-command"),
+    windowsCommand: requireElement(documentObject, "windows-command"),
+    copyUnix: requireElement(documentObject, "copy-unix"),
+    copyWindows: requireElement(documentObject, "copy-windows"),
+    unixScript: requireElement(documentObject, "unix-script"),
+    windowsScript: requireElement(documentObject, "windows-script"),
+    sourceLink: requireElement(documentObject, "source-link"),
+    releaseLinkTop: requireElement(documentObject, "release-link-top"),
+    releaseLinkBottom: requireElement(documentObject, "release-link-bottom"),
+    expandAll: requireElement(documentObject, "expand-all"),
+    windowsCard: requireElement(documentObject, "windows-card"),
+    unixCard: requireElement(documentObject, "unix-card"),
+    windowsSupport: requireElement(documentObject, "windows-support"),
+  };
+}
+
+async function copyText({ documentObject, navigatorObject, windowObject }, button, value) {
+  const original = button.textContent;
+  try {
+    if (!navigatorObject?.clipboard?.writeText) throw new Error("Clipboard API unavailable");
+    await navigatorObject.clipboard.writeText(value);
+  } catch {
+    const textarea = documentObject.createElement("textarea");
+    textarea.value = value;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    documentObject.body.appendChild(textarea);
+    textarea.select();
+    const copied = documentObject.execCommand("copy");
+    textarea.remove();
+    if (!copied) throw new DownloadCenterError("The install command could not be copied.");
+  }
+  button.textContent = "Copied";
+  windowObject.setTimeout(() => {
+    button.textContent = original;
+  }, 1600);
+}
+
+function setReleaseLinks(elements, url) {
+  for (const link of [elements.releaseLinkTop, elements.releaseLinkBottom]) {
+    link.href = url;
+  }
+}
+
+function setFileNames(documentObject, elements, names) {
+  const fragment = documentObject.createDocumentFragment();
+  names.forEach((name, index) => {
+    if (index) fragment.append(", ");
+    const code = documentObject.createElement("code");
+    code.textContent = name;
+    fragment.append(code);
+  });
+  elements.files.replaceChildren(fragment);
+}
+
+function setAccordionState(documentObject, button, open) {
+  const panel = requireElement(documentObject, button.getAttribute("aria-controls"));
+  button.setAttribute("aria-expanded", String(open));
+  const icon = button.querySelector(".accordion-icon");
+  if (!icon) {
+    throw new DownloadCenterError("An accordion icon is missing.", {
+      code: "MISSING_PAGE_ELEMENT",
+    });
+  }
+  icon.textContent = open ? "-" : "+";
+  panel.hidden = !open;
+}
+
+function setupAccordions(documentObject, elements) {
+  const triggers = [...documentObject.querySelectorAll(".accordion-trigger")];
+  if (!triggers.length) {
+    throw new DownloadCenterError("The download page has no accordion controls.", {
+      code: "MISSING_PAGE_ELEMENT",
+    });
+  }
+
+  for (const trigger of triggers) {
+    trigger.addEventListener("click", () => {
+      setAccordionState(
+        documentObject,
+        trigger,
+        trigger.getAttribute("aria-expanded") !== "true",
+      );
+      const allOpen = triggers.every(
+        (candidate) => candidate.getAttribute("aria-expanded") === "true",
+      );
+      elements.expandAll.textContent = allOpen ? "Collapse all" : "Expand all";
+    });
+  }
+
+  elements.expandAll.addEventListener("click", () => {
+    const shouldOpen = triggers.some(
+      (trigger) => trigger.getAttribute("aria-expanded") !== "true",
+    );
+    for (const trigger of triggers) {
+      setAccordionState(documentObject, trigger, shouldOpen);
+    }
+    elements.expandAll.textContent = shouldOpen ? "Collapse all" : "Expand all";
+  });
+}
+
+function updateDialogSelection(documentObject, elements, state) {
+  const selected = elements.downloadOptionList.querySelector(
+    'input[name="download-file"]:checked',
+  );
+  if (!selected) {
+    elements.selectedCommandPanel.hidden = true;
+    elements.copySelected.hidden = true;
+    elements.downloadSelected.removeAttribute("href");
+    return;
+  }
+
+  const file = state.downloadItems.find((candidate) => candidate.id === selected.value);
+  if (!file) {
+    throw new DownloadCenterError("The selected download is no longer available.", {
+      code: "INVALID_DOWNLOAD_SELECTION",
+    });
+  }
+
+  const hasCommand = Boolean(file.command);
+  elements.selectedCommandPanel.hidden = !hasCommand;
+  elements.copySelected.hidden = !hasCommand;
+  elements.selectedCommand.textContent = file.command;
+  elements.downloadSelected.href = file.href;
+  elements.downloadSelected.setAttribute("download", file.downloadName);
+  elements.downloadSelected.textContent = file.kind === "binary"
+    ? "Download installer"
+    : "Download bootstrap file";
+}
+
+function renderDownloadOptions(documentObject, elements, state) {
+  const available = orderDownloadsForPlatform(
+    state.downloadItems,
+    elements.platformSelect.value,
+    state.preferredArchitecture,
+  );
+  elements.downloadOptionList.replaceChildren();
+
+  available.forEach((item, index) => {
+    const label = documentObject.createElement("label");
+    label.className = "file-option";
+
+    const input = documentObject.createElement("input");
+    input.type = "radio";
+    input.name = "download-file";
+    input.value = item.id;
+    input.checked = index === 0;
+    input.addEventListener(
+      "change",
+      () => updateDialogSelection(documentObject, elements, state),
+    );
+
+    const description = documentObject.createElement("span");
+    const name = documentObject.createElement("span");
+    name.className = "file-name";
+    name.textContent = item.fileName;
+    const platformLabel = documentObject.createElement("span");
+    platformLabel.className = "file-platform";
+    platformLabel.textContent = item.description;
+    description.append(name, platformLabel);
+
+    const size = documentObject.createElement("span");
+    size.className = "file-size";
+    size.textContent = item.size;
+
+    label.append(input, description, size);
+    elements.downloadOptionList.append(label);
+  });
+
+  updateDialogSelection(documentObject, elements, state);
+}
+
+function updatePlatformRecommendation(elements, state) {
+  const selected = elements.platformSelect.value;
+  elements.platformHelp.textContent = platformRecommendation(
+    state.downloadItems,
+    selected,
+    state.preferredArchitecture,
+  );
+  elements.windowsSupport.textContent = windowsSupportLabel(state.downloadItems);
+  elements.windowsCard.classList.toggle("recommended", selected === "windows");
+  elements.unixCard.classList.toggle("recommended", selected !== "windows");
+}
+
+function openDownloadDialog(documentObject, elements, state) {
+  renderDownloadOptions(documentObject, elements, state);
+  if (typeof elements.dialog.showModal === "function") {
+    if (!elements.dialog.open) elements.dialog.showModal();
+  } else {
+    elements.dialog.setAttribute("open", "");
+  }
+}
+
+function refreshOpenDownloadDialog(documentObject, elements, state) {
+  if (elements.dialog.open || elements.dialog.hasAttribute("open")) {
+    renderDownloadOptions(documentObject, elements, state);
+  }
+}
+
+function setupDownloadControls({
+  documentObject,
+  navigatorObject,
+  windowObject,
+  elements,
+  state,
+}) {
+  const windowsSource = state.downloadItems.find((item) => item.id === "source-windows");
+  const unixSource = state.downloadItems.find((item) => item.id === "source-unix");
+  if (!windowsSource || !unixSource) {
+    throw new DownloadCenterError("The source bootstrap fallback is incomplete.", {
+      code: "MISSING_BOOTSTRAP",
+    });
+  }
+
+  elements.windowsCommand.textContent = windowsSource.command;
+  elements.unixCommand.textContent = unixSource.command;
+  elements.windowsScript.href = windowsSource.href;
+  elements.unixScript.href = unixSource.href;
+  elements.copyWindows.disabled = false;
+  elements.copyUnix.disabled = false;
+  elements.downloadButton.disabled = false;
+
+  const copyContext = { documentObject, navigatorObject, windowObject };
+  elements.copyWindows.addEventListener(
+    "click",
+    () => copyText(copyContext, elements.copyWindows, windowsSource.command),
+  );
+  elements.copyUnix.addEventListener(
+    "click",
+    () => copyText(copyContext, elements.copyUnix, unixSource.command),
+  );
+  elements.copySelected.addEventListener(
+    "click",
+    () => copyText(copyContext, elements.copySelected, elements.selectedCommand.textContent),
+  );
+  elements.platformSelect.addEventListener(
+    "change",
+    () => updatePlatformRecommendation(elements, state),
+  );
+  elements.downloadForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    openDownloadDialog(documentObject, elements, state);
+  });
+  elements.dialog.addEventListener("click", (event) => {
+    if (event.target !== elements.dialog) return;
+    if (typeof elements.dialog.close === "function") {
+      elements.dialog.close();
+    } else {
+      elements.dialog.removeAttribute("open");
+    }
+  });
+}
+
+export function presentReleaseFailure(elements, error) {
+  const message = error instanceof Error ? error.message : "Unknown release discovery error.";
+  elements.status.textContent = "Release check unavailable";
+  elements.statusDot.className = "status-dot error";
+  elements.version.textContent = "Unavailable";
+  elements.date.textContent = "Unavailable";
+  elements.commit.textContent = "Unavailable";
+  elements.resolvedDate.textContent = "Release metadata could not be verified.";
+  elements.error.textContent =
+    `${message} The inspectable source bootstraps remain available, but verify the `
+    + "published release before installing.";
+  elements.error.hidden = false;
+}
+
+function formatPublishedDate(date, locale) {
+  if (!(date instanceof Date) || !Number.isFinite(date.getTime())) {
+    throw new DownloadCenterError("The release date could not be measured.", {
+      code: "INVALID_RELEASE_DATE",
+    });
+  }
+  return new Intl.DateTimeFormat(locale || undefined, { dateStyle: "long" }).format(date);
+}
+
+export async function initializeDownloadCenter({
+  windowObject = globalThis.window,
+  documentObject = globalThis.document,
+  fetchImpl,
+} = {}) {
+  if (!documentObject || !claimDownloadCenterInitialization(documentObject.documentElement)) {
+    return { initialized: false };
+  }
+
+  const elements = collectElements(documentObject);
+  const { repository, requestedTag } = resolveDownloadContext(windowObject.location);
+  const sourceDownloads = buildBootstrapDownloads({
+    repository,
+    baseUrl: windowObject.location.href,
+  });
+  const state = {
+    downloadItems: sourceDownloads,
+    preferredArchitecture: null,
+  };
+
+  elements.sourceLink.href = sourceTreeUrl(repository);
+  setReleaseLinks(elements, releaseListUrl(repository));
+  setFileNames(
+    documentObject,
+    elements,
+    sourceDownloads.map((item) => item.fileName),
+  );
+  elements.platformSelect.value = detectPlatform(windowObject.navigator);
+  setupDownloadControls({
+    documentObject,
+    navigatorObject: windowObject.navigator,
+    windowObject,
+    elements,
+    state,
+  });
+  setupAccordions(documentObject, elements);
+  updatePlatformRecommendation(elements, state);
+
+  state.preferredArchitecture = await detectArchitecture(windowObject.navigator);
+  updatePlatformRecommendation(elements, state);
+  refreshOpenDownloadDialog(documentObject, elements, state);
+
+  try {
+    const release = await discoverRelease({
+      repository,
+      requestedTag,
+      fetchImpl: fetchImpl || windowObject.fetch?.bind(windowObject),
+    });
+    state.downloadItems = [...release.packagedDownloads, ...sourceDownloads];
+    const publishedLabel = formatPublishedDate(
+      release.publishedAt,
+      windowObject.navigator?.language,
+    );
+
+    elements.sourceLink.href = release.sourceUrl;
+    elements.status.textContent = release.prerelease ? "Prerelease ready" : "Release ready";
+    elements.statusDot.className = "status-dot ready";
+    elements.version.textContent = release.version;
+    elements.date.textContent = publishedLabel;
+    elements.commit.textContent = release.commit.slice(0, 12);
+    elements.commit.title = release.commit;
+    elements.resolvedDate.textContent =
+      `Published ${publishedLabel} from ${repository} at ${release.commit.slice(0, 12)}.`;
+    setReleaseLinks(elements, release.releaseUrl);
+    setFileNames(
+      documentObject,
+      elements,
+      state.downloadItems.map((item) => item.fileName),
+    );
+    updatePlatformRecommendation(elements, state);
+    refreshOpenDownloadDialog(documentObject, elements, state);
+    return { initialized: true, release, downloadItems: state.downloadItems };
+  } catch (error) {
+    presentReleaseFailure(elements, error);
+    return { initialized: true, error, downloadItems: state.downloadItems };
+  }
+}
+
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+  void initializeDownloadCenter().catch((error) => {
+    const errorElement = document.getElementById("load-error");
+    if (errorElement) {
+      errorElement.textContent =
+        `${error instanceof Error ? error.message : "The download page could not start."} `
+        + "Use the inspectable source bootstrap links below.";
+      errorElement.hidden = false;
+    }
+    const status = document.getElementById("release-status");
+    const statusDot = document.getElementById("status-dot");
+    if (status) status.textContent = "Download page unavailable";
+    if (statusDot) statusDot.className = "status-dot error";
+  });
+}
