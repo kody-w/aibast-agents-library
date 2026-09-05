@@ -7,6 +7,10 @@ import {
   artifactName,
   publisherMatchesApplicationId,
 } from "./package-contract.mjs";
+import {
+  loadWindowsSigningPolicy,
+  validateWindowsSigningEvidence,
+} from "./windows-signing-policy.mjs";
 
 const betaDir = path.resolve(import.meta.dirname, "..");
 export const RELEASE_MANIFEST_SCHEMA =
@@ -179,6 +183,27 @@ function validateGateReport(
     fail(`${expected.name} was not installed and run as a standard Windows user.`);
   }
   if (
+    expected.os === "windows"
+    && (
+      report.execution?.windows_lifecycle?.passed !== true
+      || report.execution.windows_lifecycle.per_user_registry_only !== true
+      || report.execution.windows_lifecycle.machine_registry_entries !== 0
+      || report.execution.windows_lifecycle.reinstall_single_entry !== true
+      || report.execution.windows_lifecycle.installed_files_removed !== true
+      || report.execution.windows_lifecycle.registry_and_shortcuts_removed
+        !== true
+      || report.execution.windows_lifecycle.shared_brainstem_preserved !== true
+      || report.execution.windows_lifecycle.user_data_preserved !== true
+      || report.execution.windows_lifecycle.source_migration_safe !== true
+      || report.execution?.windows_upgrade?.passed !== true
+      || !["first-binary-release", "n-minus-one-to-n"].includes(
+        report.execution.windows_upgrade.mode,
+      )
+    )
+  ) {
+    fail(`${expected.name} did not pass Windows install lifecycle and upgrade gates.`);
+  }
+  if (
     report.bootstrap?.executed !== true ||
     report.bootstrap?.authority_mode !== "canonical-release" ||
     !/^[0-9a-f]{40}$/i.test(report.bootstrap?.installed_commit || "") ||
@@ -322,6 +347,20 @@ export function createReleaseManifest(metadata, checksums, bundles, reports) {
   if (!metadata.macosIdentity.includes(`(${metadata.appleTeamId})`)) {
     fail("Release manifest Apple identity and team do not match.");
   }
+  if (!metadata.windowsPolicy || !metadata.windowsExpected) {
+    fail("Release manifest requires independent Windows signing policy.");
+  }
+  validateWindowsSigningEvidence({
+    backend_schema: metadata.windowsSigningBackendSchema,
+    endpoint: metadata.azureEndpoint,
+    account: metadata.azureAccount,
+    certificate_profile: metadata.azureProfile,
+    identity: metadata.windowsSubject,
+    profile_type: metadata.windowsProfileType,
+    file_digest: metadata.windowsFileDigest,
+    timestamp_digest: metadata.windowsTimestampDigest,
+    timestamp_url: metadata.windowsTimestampUrl,
+  }, metadata.windowsPolicy, metadata.windowsExpected);
   const azureEndpoint = new URL(metadata.azureEndpoint);
   if (
     azureEndpoint.protocol !== "https:" ||
@@ -401,17 +440,10 @@ export function createReleaseManifest(metadata, checksums, bundles, reports) {
         : metadata.windowsSubject;
     if (
       expected.os === "windows" &&
-      (
-        report.content.signing?.backend_schema !==
-          metadata.windowsSigningBackendSchema ||
-        report.content.signing?.endpoint !== metadata.azureEndpoint ||
-        report.content.signing?.account !== metadata.azureAccount ||
-        report.content.signing?.certificate_profile !== metadata.azureProfile ||
-        report.content.signing?.profile_type !== metadata.windowsProfileType ||
-        report.content.signing?.file_digest !== metadata.windowsFileDigest ||
-        report.content.signing?.timestamp_digest !==
-          metadata.windowsTimestampDigest ||
-        report.content.signing?.timestamp_url !== metadata.windowsTimestampUrl
+      !validateWindowsSigningEvidence(
+        report.content.signing,
+        metadata.windowsPolicy,
+        metadata.windowsExpected,
       )
     ) {
       fail(`${expected.name} Windows signing configuration is not approved.`);
@@ -648,7 +680,16 @@ export function writeReleaseManifest(argv = process.argv.slice(2)) {
     (report) => report.content.artifact?.os === "windows",
   );
   if (!windowsReport) fail("Windows package-gate report is missing.");
-  const windowsSigning = windowsReport.content.signing;
+  const windowsPolicy = loadWindowsSigningPolicy();
+  const windowsExpected = {
+    endpoint: requiredEnvironment("AZURE_ARTIFACT_SIGNING_ENDPOINT"),
+    account: requiredEnvironment("AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME"),
+    certificateProfile: requiredEnvironment(
+      "AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME",
+    ),
+    publisherSubject: requiredEnvironment("WINDOWS_SIGNING_SUBJECT"),
+    profileType: requiredEnvironment("AZURE_ARTIFACT_SIGNING_PROFILE_TYPE"),
+  };
   const windowsSbomName =
     `RAPP-Brainstem-Frontier-${requiredEnvironment(
       "FRONTIER_RELEASE_VERSION",
@@ -684,15 +725,17 @@ export function writeReleaseManifest(argv = process.argv.slice(2)) {
         packageLock.packages["node_modules/electron-builder"].version,
       macosIdentity: requiredEnvironment("MACOS_SIGNING_IDENTITY"),
       appleTeamId: requiredEnvironment("APPLE_TEAM_ID"),
-      azureEndpoint: windowsSigning.endpoint,
-      azureAccount: windowsSigning.account,
-      azureProfile: windowsSigning.certificate_profile,
-      windowsSubject: windowsSigning.identity,
-      windowsSigningBackendSchema: windowsSigning.backend_schema,
-      windowsProfileType: windowsSigning.profile_type,
-      windowsFileDigest: windowsSigning.file_digest,
-      windowsTimestampDigest: windowsSigning.timestamp_digest,
-      windowsTimestampUrl: windowsSigning.timestamp_url,
+      azureEndpoint: windowsExpected.endpoint,
+      azureAccount: windowsExpected.account,
+      azureProfile: windowsExpected.certificateProfile,
+      windowsSubject: windowsExpected.publisherSubject,
+      windowsSigningBackendSchema: windowsPolicy.current_backend_schema,
+      windowsProfileType: windowsExpected.profileType,
+      windowsFileDigest: "SHA256",
+      windowsTimestampDigest: "SHA256",
+      windowsTimestampUrl: "http://timestamp.acs.microsoft.com/",
+      windowsPolicy,
+      windowsExpected,
       windowsSbom: {
         name: windowsSbomName,
         size: windowsSbomSize,

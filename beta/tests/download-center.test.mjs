@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
@@ -33,6 +34,7 @@ import {
   selectRelease,
   setFunctionalLink,
   showDownloadDialog,
+  verifyReleaseManifestAsset,
   windowsSupportLabel,
 } from "../download-center.js";
 
@@ -66,6 +68,7 @@ function release(overrides = {}) {
     tag_name: tag,
     draft: false,
     prerelease: true,
+    immutable: true,
     published_at: "2026-09-04T20:00:00Z",
     assets: [],
     body: "",
@@ -141,6 +144,27 @@ function manifestBody(manifest) {
     JSON.stringify(manifest),
     "\`\`\`",
   ].join("\n");
+}
+
+function manifestAsset(manifest) {
+  const contents = `${JSON.stringify(manifest)}\n`;
+  const name =
+    `RAPP-Brainstem-Frontier-${manifest.release.version}-binary-manifest.json`;
+  return asset(name, {
+    size: Buffer.byteLength(contents),
+    digest:
+      `sha256:${createHash("sha256").update(contents).digest("hex")}`,
+    url:
+      `https://github.com/${repository}/releases/download/`
+      + `${manifest.release.tag}/${name}`,
+  });
+}
+
+function manifestResponse(manifest) {
+  return new Response(`${JSON.stringify(manifest)}\n`, {
+    status: 200,
+    headers: { "content-type": "application/json" },
+  });
 }
 
 function analyze(releaseAssets, manifest = manifestFor(releaseAssets)) {
@@ -334,14 +358,16 @@ test("release discovery executes the real API selection and commit validation", 
     id: 10,
     tag_name: olderTag,
     published_at: "2026-08-01T00:00:00Z",
-    assets: [olderAsset],
+    assets: [olderAsset, manifestAsset(olderManifest)],
     body: manifestBody(olderManifest),
   });
   const fetchImpl = async (url, options) => {
     calls.push({ url, options });
-    return calls.length === 1
-      ? jsonResponse(selectedRelease)
-      : jsonResponse({ sha: commit.toUpperCase() });
+    if (calls.length === 1) return jsonResponse(selectedRelease);
+    if (url.includes("-binary-manifest.json")) {
+      return manifestResponse(olderManifest);
+    }
+    return jsonResponse({ sha: commit.toUpperCase() });
   };
 
   const result = await discoverRelease({
@@ -366,6 +392,10 @@ test("release discovery executes the real API selection and commit validation", 
   assert.equal(
     calls[1].url,
     `https://api.github.com/repos/${repository}/commits/${olderTag}`,
+  );
+  assert.equal(
+    calls[2].url,
+    manifestAsset(olderManifest).browser_download_url,
   );
   assert.equal(calls[0].options.headers.Accept, "application/vnd.github+json");
 });
@@ -398,9 +428,10 @@ test("default discovery requests 100 releases and orders by published_at", async
 
 test("resolved fork packages and pinned identity reach the DOM transaction", async () => {
   const releaseAsset = asset("Frontier-win-x64.exe");
+  const manifest = manifestFor([releaseAsset]);
   const selectedRelease = release({
-    assets: [releaseAsset],
-    body: manifestBody(manifestFor([releaseAsset])),
+    assets: [releaseAsset, manifestAsset(manifest)],
+    body: manifestBody(manifest),
   });
   const context = resolveDownloadContext({
     search: `?tag=${tag}`,
@@ -410,9 +441,13 @@ test("resolved fork packages and pinned identity reach the DOM transaction", asy
   const resolved = await discoverRelease({
     repository: context.repository,
     requestedTag: context.requestedTag,
-    fetchImpl: async (url) => url.includes("/releases/tags/")
-      ? jsonResponse(selectedRelease)
-      : jsonResponse({ sha: commit.toUpperCase() }),
+    fetchImpl: async (url) => {
+      if (url.includes("/releases/tags/")) return jsonResponse(selectedRelease);
+      if (url.includes("-binary-manifest.json")) {
+        return manifestResponse(manifest);
+      }
+      return jsonResponse({ sha: commit.toUpperCase() });
+    },
   });
   const transaction = buildReleaseTransaction({
     context,
@@ -693,6 +728,88 @@ test("missing or invalid provenance falls back visibly to source bootstraps", as
     ),
     (error) => error.code === "INVALID_RELEASE_MANIFEST",
   );
+});
+
+test("binary trust requires immutable release and byte-identical manifest asset", async () => {
+  const binary = asset("Frontier-win-x64.exe");
+  const manifest = manifestFor([binary]);
+  const attachedManifest = manifestAsset(manifest);
+  const candidate = release({
+    assets: [binary, attachedManifest],
+    body: manifestBody(manifest),
+  });
+
+  assert.deepEqual(
+    await verifyReleaseManifestAsset(candidate, {
+      repository,
+      version: "1.2.3",
+      fetchImpl: async () => manifestResponse(manifest),
+    }),
+    manifest,
+  );
+  assert.throws(
+    () => analyzePackagedDownloads(
+      { ...candidate, immutable: false },
+      { repository, commit, version: "1.2.3", manifest },
+    ),
+    /immutable GitHub release/,
+  );
+  await assert.rejects(
+    () => verifyReleaseManifestAsset(
+      { ...candidate, immutable: false },
+      {
+        repository,
+        version: "1.2.3",
+        fetchImpl: async () => manifestResponse(manifest),
+      },
+    ),
+    /immutable GitHub release/,
+  );
+  await assert.rejects(
+    () => verifyReleaseManifestAsset(candidate, {
+      repository,
+      version: "1.2.3",
+      fetchImpl: async () => new Response(
+        `${JSON.stringify(manifest, null, 2)}\n`,
+        { status: 200 },
+      ),
+    }),
+    /fenced release manifest and attached manifest asset differ/,
+  );
+  await assert.rejects(
+    () => verifyReleaseManifestAsset({
+      ...candidate,
+      assets: [
+        binary,
+        { ...attachedManifest, digest: `sha256:${"0".repeat(64)}` },
+      ],
+    }, {
+      repository,
+      version: "1.2.3",
+      fetchImpl: async () => manifestResponse(manifest),
+    }),
+    /does not match its GitHub SHA-256 digest/,
+  );
+});
+
+test("mutable packaged releases fall back to source-only discovery", async () => {
+  const binary = asset("Frontier-win-x64.exe");
+  const manifest = manifestFor([binary]);
+  const candidate = release({
+    immutable: false,
+    assets: [binary, manifestAsset(manifest)],
+    body: manifestBody(manifest),
+  });
+  const result = await discoverRelease({
+    repository,
+    fetchImpl: async (url) => url.includes("/releases?")
+      ? jsonResponse([candidate])
+      : jsonResponse({ sha: commit }),
+  });
+  assert.equal(result.packagedDownloads.length, 0);
+  assert.equal(result.binaryAvailability.available, false);
+  assert.equal(result.binaryAvailability.code, "INVALID_RELEASE_MANIFEST");
+  assert.match(result.binaryAvailability.detail, /immutable GitHub release/);
 });
 
 test("architecture-aware ordering recommends a compatible package before source fallback", () => {

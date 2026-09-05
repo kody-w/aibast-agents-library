@@ -32,7 +32,13 @@ jobs:
       commit: ${{ steps.context.outputs.commit }}
       release_id: ${{ steps.context.outputs.release_id }}
       release_mode: ${{ steps.context.outputs.release_mode }}
+      first_binary_release: ${{ steps.context.outputs.first_binary_release }}
+      previous_windows_asset_digest: ${{ steps.context.outputs.previous_windows_asset_digest }}
+      previous_windows_asset_id: ${{ steps.context.outputs.previous_windows_asset_id }}
+      previous_windows_asset_name: ${{ steps.context.outputs.previous_windows_asset_name }}
+      previous_windows_release_tag: ${{ steps.context.outputs.previous_windows_release_tag }}
       tag: ${{ steps.context.outputs.tag }}
+      tag_object: ${{ steps.context.outputs.tag_object }}
       version: ${{ steps.context.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -61,6 +67,12 @@ jobs:
           release_mode=false
           release_id=
           tag=
+          tag_object=
+          first_binary_release=false
+          previous_windows_asset_digest=
+          previous_windows_asset_id=
+          previous_windows_asset_name=
+          previous_windows_release_tag=
 
           if [ "$PUBLISH_RELEASE" = true ]; then
             test "$GITHUB_EVENT_NAME" = workflow_dispatch
@@ -125,23 +137,66 @@ jobs:
             fi
             tag_commit="$(git rev-parse "$tag^{commit}")"
             test "$tag_commit" = "$commit"
+            tag_object="$(git rev-parse "refs/tags/$tag")"
             remote_tag_object="$(
               git ls-remote --exit-code origin "refs/tags/$tag" | awk 'NR == 1 { print $1 }'
             )"
-            test "$remote_tag_object" = "$(git rev-parse "refs/tags/$tag")"
+            remote_tag_commit="$(
+              git ls-remote --exit-code origin "refs/tags/$tag^{}" |
+                awk 'NR == 1 { print $1 }'
+            )"
+            test "$remote_tag_object" = "$tag_object"
+            test "$remote_tag_commit" = "$commit"
 
-            releases="$(
+            all_releases="$(
               gh api -H "X-GitHub-Api-Version: 2026-03-10" \
                 "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
                 --paginate --slurp |
-                jq -c --arg tag "$tag" '[.[][] | select(.tag_name == $tag)]'
+                jq -c '[.[][]]'
             )"
+            releases="$(jq -c --arg tag "$tag" \
+              '[.[] | select(.tag_name == $tag)]' <<<"$all_releases")"
             test "$(jq 'length' <<<"$releases")" = 1
             release="$(jq -c '.[0]' <<<"$releases")"
             test "$(jq -r '.draft' <<<"$release")" = true
             test "$(jq -r '.prerelease' <<<"$release")" = true
             test "$(jq -r '.immutable // false' <<<"$release")" = false
             release_id="$(jq -r '.id' <<<"$release")"
+            node beta/scripts/release-race-guard.mjs \
+              --expected-tag "$tag" \
+              --expected-tag-object "$tag_object" \
+              --expected-commit "$commit" \
+              --expected-release-id "$release_id" \
+              --actual-tag "$(jq -r '.tag_name' <<<"$release")" \
+              --actual-tag-object "$remote_tag_object" \
+              --actual-commit "$remote_tag_commit" \
+              --actual-release-id "$(jq -r '.id' <<<"$release")"
+            printf '%s\n' "$all_releases" \
+              > "$RUNNER_TEMP/frontier-release-inventory.json"
+            node beta/scripts/windows-upgrade-policy.mjs \
+              --releases "$RUNNER_TEMP/frontier-release-inventory.json" \
+              --current-tag "$tag" \
+              --output "$RUNNER_TEMP/frontier-windows-upgrade.json"
+            first_binary_release="$(
+              jq -r '.firstBinaryRelease' \
+                "$RUNNER_TEMP/frontier-windows-upgrade.json"
+            )"
+            previous_windows_asset_digest="$(
+              jq -r '.previousAssetDigest // ""' \
+                "$RUNNER_TEMP/frontier-windows-upgrade.json"
+            )"
+            previous_windows_asset_id="$(
+              jq -r '.previousAssetId // ""' \
+                "$RUNNER_TEMP/frontier-windows-upgrade.json"
+            )"
+            previous_windows_asset_name="$(
+              jq -r '.previousAssetName // ""' \
+                "$RUNNER_TEMP/frontier-windows-upgrade.json"
+            )"
+            previous_windows_release_tag="$(
+              jq -r '.previousReleaseTag // ""' \
+                "$RUNNER_TEMP/frontier-windows-upgrade.json"
+            )"
             release_mode=true
           else
             if [ -n "${RELEASE_TAG:-}" ]; then
@@ -152,9 +207,15 @@ jobs:
 
           {
             echo "commit=$commit"
+            echo "first_binary_release=$first_binary_release"
+            echo "previous_windows_asset_digest=$previous_windows_asset_digest"
+            echo "previous_windows_asset_id=$previous_windows_asset_id"
+            echo "previous_windows_asset_name=$previous_windows_asset_name"
+            echo "previous_windows_release_tag=$previous_windows_release_tag"
             echo "release_id=$release_id"
             echo "release_mode=$release_mode"
             echo "tag=$tag"
+            echo "tag_object=$tag_object"
             echo "version=$version"
           } >> "$GITHUB_OUTPUT"
 
@@ -166,6 +227,7 @@ jobs:
             echo "- commit: \`$commit\`"
             if [ "$release_mode" = true ]; then
               echo "- existing draft release: \`$tag\` (id \`$release_id\`)"
+              echo "- Windows upgrade baseline: \`$([ "$first_binary_release" = true ] && echo first-binary-release || echo "$previous_windows_release_tag")\`"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -658,6 +720,45 @@ jobs:
             throw 'Tracked working tree is not clean before Azure login'
           }
 
+      - name: Download immutable N-1 Windows installer
+        id: previous
+        if: needs.context.outputs.first_binary_release != 'true'
+        working-directory: beta
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_ASSET_ID: ${{ needs.context.outputs.previous_windows_asset_id }}
+          PREVIOUS_ASSET_NAME: ${{ needs.context.outputs.previous_windows_asset_name }}
+          PREVIOUS_ASSET_DIGEST: ${{ needs.context.outputs.previous_windows_asset_digest }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:PREVIOUS_ASSET_ID -notmatch '^[1-9][0-9]*$') {
+            throw 'Previous Windows asset ID is invalid'
+          }
+          if ($env:PREVIOUS_ASSET_NAME -notmatch '^RAPP-Brainstem-Frontier-.+-windows-x64-setup\.exe$') {
+            throw 'Previous Windows asset name is invalid'
+          }
+          if ($env:PREVIOUS_ASSET_DIGEST -notmatch '^sha256:[0-9a-f]{64}$') {
+            throw 'Previous Windows asset digest is invalid'
+          }
+          $previousDirectory = Join-Path $PWD 'release\previous'
+          New-Item -ItemType Directory -Force -Path $previousDirectory | Out-Null
+          $target = Join-Path $previousDirectory 'n-minus-one-windows-x64-setup.exe'
+          curl.exe --fail --location --silent --show-error `
+            -H "Authorization: Bearer $env:GH_TOKEN" `
+            -H 'Accept: application/octet-stream' `
+            -H 'X-GitHub-Api-Version: 2026-03-10' `
+            "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/assets/$env:PREVIOUS_ASSET_ID" `
+            --output $target
+          if ($LASTEXITCODE -ne 0) {
+            throw "Previous installer download failed with exit $LASTEXITCODE"
+          }
+          $actual = (Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ("sha256:$actual" -ne $env:PREVIOUS_ASSET_DIGEST) {
+            throw 'Previous Windows installer digest mismatch'
+          }
+          "path=$target" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
       # The OIDC service principal has only Artifact Signing Certificate
       # Profile Signer at the selected certificate-profile scope.
       - name: Validate Artifact Signing configuration
@@ -745,19 +846,28 @@ jobs:
           $artifact = "$env:GITHUB_WORKSPACE\beta\release\RAPP-Brainstem-Frontier-$env:VERSION-windows-x64-setup.exe"
           $report = "$artifact.gate.json"
           $runtimeVersionUrl = "https://raw.githubusercontent.com/$env:GITHUB_REPOSITORY/${{ needs.context.outputs.commit }}/rapp_brainstem/VERSION"
-          & "$env:GITHUB_WORKSPACE\beta\scripts\run-windows-package-gate-standard-user.ps1" `
-            -NodePath (Get-Command node).Source `
-            -Workspace $env:GITHUB_WORKSPACE `
-            -Artifact $artifact `
-            -AppDir "$env:GITHUB_WORKSPACE\beta\release\win-unpacked" `
-            -ScratchDir "$env:GITHUB_WORKSPACE\beta\release\package-gate-windows-x64-signed" `
-            -PythonPath '${{ steps.runtime.outputs.python }}' `
-            -Mode signed `
-            -ExpectedPublisher $env:WINDOWS_SIGNING_SUBJECT `
-            -ReleaseTag '${{ needs.context.outputs.tag }}' `
-            -ReleaseCommit '${{ needs.context.outputs.commit }}' `
-            -RuntimeVersionUrl $runtimeVersionUrl `
-            -Report $report
+          $gateParameters = @{
+            NodePath = (Get-Command node).Source
+            Workspace = $env:GITHUB_WORKSPACE
+            Artifact = $artifact
+            AppDir = "$env:GITHUB_WORKSPACE\beta\release\win-unpacked"
+            ScratchDir = "$env:GITHUB_WORKSPACE\beta\release\package-gate-windows-x64-signed"
+            PythonPath = '${{ steps.runtime.outputs.python }}'
+            Mode = 'signed'
+            ExpectedPublisher = $env:WINDOWS_SIGNING_SUBJECT
+            ReleaseTag = '${{ needs.context.outputs.tag }}'
+            ReleaseCommit = '${{ needs.context.outputs.commit }}'
+            RuntimeVersionUrl = $runtimeVersionUrl
+            Report = $report
+          }
+          if ('${{ needs.context.outputs.first_binary_release }}' -eq 'true') {
+            $gateParameters.FirstBinaryRelease = $true
+          } else {
+            $gateParameters.PreviousInstaller = '${{ steps.previous.outputs.path }}'
+            $gateParameters.PreviousReleaseTag =
+              '${{ needs.context.outputs.previous_windows_release_tag }}'
+          }
+          & "$env:GITHUB_WORKSPACE\beta\scripts\run-windows-package-gate-standard-user.ps1" @gateParameters
           @(
             "asset=$artifact",
             "report=$report"
@@ -866,6 +976,11 @@ jobs:
           FRONTIER_GATE_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           MACOS_SIGNING_IDENTITY: ${{ vars.MACOS_SIGNING_IDENTITY }}
           APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
+          AZURE_ARTIFACT_SIGNING_ENDPOINT: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
+          AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME }}
+          AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME }}
+          AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
         run: |
           manifest="$GITHUB_WORKSPACE/release-assets/RAPP-Brainstem-Frontier-${FRONTIER_RELEASE_VERSION}-binary-manifest.json"
           node beta/scripts/release-manifest.mjs \
@@ -999,9 +1114,15 @@ jobs:
       - name: Verify draft assets, checksums, and attestations
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.context.outputs.release_id }}
           TAG: ${{ needs.context.outputs.tag }}
           VERSION: ${{ needs.context.outputs.version }}
           COMMIT: ${{ needs.context.outputs.commit }}
+          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
+          AZURE_ARTIFACT_SIGNING_ENDPOINT: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
+          AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME }}
+          AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME }}
+          AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
         run: |
           set -euo pipefail
           mkdir -p published-assets
@@ -1037,7 +1158,7 @@ jobs:
             --source-ref "refs/tags/$TAG" \
             --deny-self-hosted-runners
           gh api -H "X-GitHub-Api-Version: 2026-03-10" \
-            "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+            "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
             > "$RUNNER_TEMP/frontier-staged-release.json"
           node "$GITHUB_WORKSPACE/beta/scripts/verify-staged-release.mjs" \
             --release-json "$RUNNER_TEMP/frontier-staged-release.json" \
@@ -1273,6 +1394,20 @@ jobs:
               $report.publication.status -ne 'ready' -or
               -not $report.runtime.copilot_auth_startup -or
               -not $report.execution.windows_standard_user -or
+              -not $report.execution.windows_lifecycle.passed -or
+              -not $report.execution.windows_lifecycle.per_user_registry_only -or
+              $report.execution.windows_lifecycle.machine_registry_entries -ne 0 -or
+              -not $report.execution.windows_lifecycle.reinstall_single_entry -or
+              -not $report.execution.windows_lifecycle.installed_files_removed -or
+              -not $report.execution.windows_lifecycle.registry_and_shortcuts_removed -or
+              -not $report.execution.windows_lifecycle.shared_brainstem_preserved -or
+              -not $report.execution.windows_lifecycle.user_data_preserved -or
+              -not $report.execution.windows_lifecycle.source_migration_safe -or
+              -not $report.execution.windows_upgrade.passed -or
+              $report.execution.windows_upgrade.mode -notin @(
+                'first-binary-release',
+                'n-minus-one-to-n'
+              ) -or
               -not $report.native_media.publication_ready -or
               $report.signing.identity -ne $env:WINDOWS_SIGNING_SUBJECT) {
             throw 'Downloaded Windows gate report is not release-ready'
@@ -1464,10 +1599,100 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_ID: ${{ needs.context.outputs.release_id }}
           TAG: ${{ needs.context.outputs.tag }}
+          TAG_OBJECT: ${{ needs.context.outputs.tag_object }}
           VERSION: ${{ needs.context.outputs.version }}
           COMMIT: ${{ needs.context.outputs.commit }}
+          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
+          AZURE_ARTIFACT_SIGNING_ENDPOINT: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
+          AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME }}
+          AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME }}
+          AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
         run: |
           set -euo pipefail
+          verify_release_snapshot() {
+            local phase="$1"
+            local release_json="$2"
+            local actual_tag_object actual_commit
+            if ! actual_tag_object="$(
+              git ls-remote --exit-code origin "refs/tags/$TAG" |
+                awk 'NR == 1 { print $1 }'
+            )"; then
+              return 1
+            fi
+            if ! actual_commit="$(
+              git ls-remote --exit-code origin "refs/tags/$TAG^{}" |
+                awk 'NR == 1 { print $1 }'
+            )"; then
+              return 1
+            fi
+            node beta/scripts/release-race-guard.mjs \
+              --expected-tag "$TAG" \
+              --expected-tag-object "$TAG_OBJECT" \
+              --expected-commit "$COMMIT" \
+              --expected-release-id "$RELEASE_ID" \
+              --actual-tag "$(jq -r '.tag_name' <<<"$release_json")" \
+              --actual-tag-object "$actual_tag_object" \
+              --actual-commit "$actual_commit" \
+              --actual-release-id "$(jq -r '.id' <<<"$release_json")" ||
+              return 1
+            echo "Release snapshot verified $phase."
+          }
+          rollback_mutable_release() {
+            local reason="$1"
+            local current rollback rollback_complete
+            if ! current="$(
+              gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+                "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+            )"; then
+              echo "::error title=IMMUTABLE RELEASE INCIDENT::$reason; the published release state could not be read before rollback."
+              exit 1
+            fi
+            if [ "$(jq -r '.draft' <<<"$current")" = true ]; then
+              echo "::error title=Publication failed::$reason; release $RELEASE_ID is already verified as draft."
+              exit 1
+            fi
+            if [ "$(jq -r '.immutable // false' <<<"$current")" = true ]; then
+              echo "::error title=IMMUTABLE RELEASE INCIDENT::$reason; release $RELEASE_ID is already immutable and cannot be rolled back."
+              exit 1
+            fi
+
+            rollback_complete=false
+            for attempt in {1..5}; do
+              echo "::warning::Published release remained mutable; rollback attempt $attempt by release ID."
+              if gh api --method PATCH \
+                -H "X-GitHub-Api-Version: 2026-03-10" \
+                "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+                -F draft=true \
+                >"$RUNNER_TEMP/frontier-rollback-response.json"; then
+                if rollback="$(
+                  gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+                    "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+                )"; then
+                  if [ "$(jq -r '.draft' <<<"$rollback")" = true ]; then
+                    rollback_complete=true
+                    break
+                  fi
+                else
+                  echo "::warning::Rollback verification read $attempt failed."
+                fi
+              else
+                echo "::warning::Rollback API request $attempt failed."
+              fi
+              sleep 3
+            done
+            if [ "$rollback_complete" != true ]; then
+              echo "::error title=IMMUTABLE RELEASE INCIDENT::$reason; release $RELEASE_ID is published and mutable, and five verified rollback attempts failed. Freeze the repository and investigate immediately."
+              jq '{id, tag_name, draft, immutable, html_url}' <<<"$current" >&2
+              exit 1
+            fi
+            if ! verify_release_snapshot "after verified rollback" "$rollback"; then
+              echo "::error title=IMMUTABLE RELEASE INCIDENT::Rollback reached draft state, but the tag/release identity changed."
+              exit 1
+            fi
+            echo "::error title=Publication rolled back::$reason Release $RELEASE_ID was verified back in draft state."
+            exit 1
+          }
+
           mkdir publish-verification
           manifest="RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json"
           gh release download "$TAG" \
@@ -1515,7 +1740,26 @@ jobs:
             echo "::error title=Publication blocked::Repository immutable releases are not enabled or could not be verified. The draft remains unpublished."
             exit 1
           fi
-          gh release edit "$TAG" --draft=false --prerelease --latest=false
+          prepublish="$(
+            gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+          )"
+          test "$(jq -r '.draft' <<<"$prepublish")" = true
+          verify_release_snapshot "immediately before publication" "$prepublish"
+          published="$(
+            gh api --method PATCH \
+              -H "X-GitHub-Api-Version: 2026-03-10" \
+              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+              -F draft=false \
+              -F prerelease=true \
+              -f make_latest=false
+          )"
+          if [ "$(jq -r '.draft' <<<"$published")" != false ]; then
+            rollback_mutable_release "GitHub did not confirm the release transition."
+          fi
+          if ! verify_release_snapshot "immediately after publication" "$published"; then
+            rollback_mutable_release "The tag object, peeled commit, or release ID changed during publication."
+          fi
           after=
           for _ in {1..10}; do
             after="$(
@@ -1527,15 +1771,17 @@ jobs:
             fi
             sleep 3
           done
-          test "$(jq -r '.draft' <<<"$after")" = false
           if [ "$(jq -r '.immutable // false' <<<"$after")" != true ]; then
-            echo "::error title=Immutable release incident::The release was published after the repository setting verified, but the release API did not report immutable=true. Do not alter assets or the tag; investigate immediately."
-            jq '{id, tag_name, draft, immutable, html_url}' <<<"$after" >&2
+            rollback_mutable_release "Release $RELEASE_ID did not become immutable after publication."
+          fi
+          final_release="$(
+            gh api -H "X-GitHub-Api-Version: 2026-03-10" \
+              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+          )"
+          test "$(jq -r '.draft' <<<"$final_release")" = false
+          test "$(jq -r '.immutable' <<<"$final_release")" = true
+          if ! verify_release_snapshot "after immutable publication" "$final_release"; then
+            echo "::error title=IMMUTABLE RELEASE INCIDENT::The immutable release no longer matches the initially validated tag object, peeled commit, or release ID."
             exit 1
           fi
-          test "$(jq -r '.tag_name' <<<"$after")" = "$TAG"
-          remote_commit="$(
-            git ls-remote --exit-code origin "refs/tags/$TAG^{}" | awk 'NR == 1 { print $1 }'
-          )"
-          test "$remote_commit" = "$COMMIT"
           echo "Published immutable $TAG at $COMMIT after native redownload verification."

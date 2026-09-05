@@ -9,5 +9,6 @@
   "required_profile_type": "PublicTrust",
   "required_role": "Artifact Signing Certificate Profile Signer",
   "required_role_scope": "certificate-profile",
+  "expected_values_source": "frontier-binary-release protected environment",
   "client_secret_allowed": false
 }

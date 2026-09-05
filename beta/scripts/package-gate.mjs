@@ -37,6 +37,8 @@ const evidence = {
   notarization: null,
   runtime: null,
   standardUser: null,
+  windowsLifecycle: null,
+  windowsUpgrade: null,
 };
 
 function fail(message) {
@@ -105,6 +107,9 @@ export function parseGateArguments(argv, host = {
     "release-commit",
     "runtime-version-url",
     "require-standard-user",
+    "previous-installer",
+    "previous-release-tag",
+    "first-binary-release",
   ]);
   for (const name of Object.keys(values)) {
     if (!supported.has(name)) fail(`Unsupported argument: --${name}.`);
@@ -165,6 +170,30 @@ export function parseGateArguments(argv, host = {
   ) {
     fail("Signed Windows package gates require --require-standard-user true.");
   }
+  if (
+    values["first-binary-release"]
+    && !["true", "false"].includes(values["first-binary-release"])
+  ) {
+    fail("--first-binary-release must be true or false.");
+  }
+  const firstBinaryRelease = values["first-binary-release"] === "true";
+  const previousInstaller = values["previous-installer"];
+  if (
+    mode === "signed"
+    && platform === "windows"
+    && Boolean(previousInstaller) === firstBinaryRelease
+  ) {
+    fail(
+      "Signed Windows gates require exactly one of --previous-installer "
+      + "or --first-binary-release true.",
+    );
+  }
+  if (
+    previousInstaller
+    && !/^brainstem-beta-v/.test(values["previous-release-tag"] || "")
+  ) {
+    fail("--previous-installer requires --previous-release-tag.");
+  }
 
   return {
     platform,
@@ -183,6 +212,9 @@ export function parseGateArguments(argv, host = {
     releaseCommit: values["release-commit"],
     runtimeVersionUrl: values["runtime-version-url"],
     requireStandardUser: values["require-standard-user"] === "true",
+    previousInstaller,
+    previousReleaseTag: values["previous-release-tag"],
+    firstBinaryRelease,
   };
 }
 
@@ -776,6 +808,158 @@ function verifyUnsignedMacApp(appPath, label) {
 
 function powershellLiteral(value) {
   return `'${String(value).replace(/'/g, "''")}'`;
+}
+
+function powershellJson(script) {
+  const result = command("powershell.exe", [
+    "-NoLogo",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    script,
+  ]);
+  if (result.status !== 0) {
+    return { error: result.output, value: null };
+  }
+  try {
+    return {
+      error: null,
+      value: JSON.parse(String(result.stdout || "").trim()),
+    };
+  } catch (error) {
+    return { error: String(error.message || error), value: null };
+  }
+}
+
+function windowsLifecycleState() {
+  const product = powershellLiteral(productName);
+  const script = [
+    "$ErrorActionPreference = 'Stop'",
+    `$product = ${product}`,
+    "function Entries([string]$root) {",
+    "  if (-not (Test-Path -LiteralPath $root)) { return @() }",
+    "  return @(Get-ChildItem -LiteralPath $root -ErrorAction SilentlyContinue |",
+    "    ForEach-Object { Get-ItemProperty -LiteralPath $_.PSPath } |",
+    "    Where-Object { $_.DisplayName -eq $product } |",
+    "    ForEach-Object { [pscustomobject]@{",
+    "      Key = $_.PSChildName",
+    "      DisplayName = [string]$_.DisplayName",
+    "      InstallLocation = [string]$_.InstallLocation",
+    "      UninstallString = [string]$_.UninstallString",
+    "    } })",
+    "}",
+    "$userEntries = @(Entries 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall')",
+    "$machineEntries = @(",
+    "  Entries 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall'",
+    "  Entries 'HKLM:\\Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall'",
+    ")",
+    "$desktop = [Environment]::GetFolderPath('Desktop')",
+    "$programs = [Environment]::GetFolderPath('Programs')",
+    "$links = @(",
+    "  Get-ChildItem -LiteralPath $desktop -Filter \"$product.lnk\" -File -ErrorAction SilentlyContinue",
+    "  Get-ChildItem -LiteralPath $programs -Filter \"$product.lnk\" -File -Recurse -ErrorAction SilentlyContinue",
+    ")",
+    "$shell = New-Object -ComObject WScript.Shell",
+    "$shortcuts = @($links | ForEach-Object {",
+    "  $shortcut = $shell.CreateShortcut($_.FullName)",
+    "  [pscustomobject]@{",
+    "    Path = $_.FullName",
+    "    TargetPath = [string]$shortcut.TargetPath",
+    "    Arguments = [string]$shortcut.Arguments",
+    "  }",
+    "})",
+    "[pscustomobject]@{",
+    "  UserEntries = $userEntries",
+    "  MachineEntries = $machineEntries",
+    "  Shortcuts = $shortcuts",
+    "} | ConvertTo-Json -Depth 6 -Compress",
+  ].join("\n");
+  const result = powershellJson(script);
+  if (result.value) {
+    for (const name of ["UserEntries", "MachineEntries", "Shortcuts"]) {
+      const value = result.value[name];
+      result.value[name] = value == null
+        ? []
+        : Array.isArray(value)
+          ? value
+          : [value];
+    }
+  }
+  return result;
+}
+
+function prepareSourceInstallMigrationFixture() {
+  const userProfile = String(process.env.USERPROFILE || "").trim();
+  const localAppData = String(process.env.LOCALAPPDATA || "").trim();
+  if (!userProfile || !localAppData) {
+    return {
+      error: "USERPROFILE or LOCALAPPDATA is missing.",
+      sentinel: null,
+      shims: [],
+    };
+  }
+  const sentinel = `SOURCE_FRONTIER_${process.pid}_${Date.now()}`;
+  const shims = [
+    path.join(userProfile, ".local", "bin", "brainstem-frontier.cmd"),
+    path.join(
+      localAppData,
+      "Microsoft",
+      "WindowsApps",
+      "brainstem-frontier.cmd",
+    ),
+  ];
+  for (const shim of shims) {
+    mkdirSync(path.dirname(shim), { recursive: true });
+    writeFileSync(shim, `@echo off\r\necho ${sentinel}\r\n`, "utf8");
+  }
+  const shortcutScript = [
+    "$ErrorActionPreference = 'Stop'",
+    `$sentinel = ${powershellLiteral(sentinel)}`,
+    "$shell = New-Object -ComObject WScript.Shell",
+    "$paths = @(",
+    "  (Join-Path ([Environment]::GetFolderPath('Desktop')) 'RAPP Brainstem Frontier.lnk'),",
+    "  (Join-Path ([Environment]::GetFolderPath('Programs')) 'RAPP Brainstem Frontier.lnk')",
+    ")",
+    "foreach ($shortcutPath in $paths) {",
+    "  $shortcut = $shell.CreateShortcut($shortcutPath)",
+    "  $shortcut.TargetPath = $env:ComSpec",
+    "  $shortcut.Arguments = \"/d /c echo $sentinel\"",
+    "  $shortcut.Description = 'Source-installed Frontier migration fixture'",
+    "  $shortcut.Save()",
+    "}",
+  ].join("\n");
+  const shortcutResult = command("powershell.exe", [
+    "-NoLogo",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    shortcutScript,
+  ]);
+  return {
+    error: shortcutResult.status === 0 ? null : shortcutResult.output,
+    sentinel,
+    shims,
+  };
+}
+
+function shimsContainSentinel(fixture) {
+  return fixture.shims.every(
+    (shim) => existsSync(shim) && readFileSync(shim, "utf8").includes(
+      fixture.sentinel,
+    ),
+  );
+}
+
+function shortcutTargetsInstalledExecutable(state, installedExecutable) {
+  const expected = path.resolve(installedExecutable).toLowerCase();
+  return (
+    Array.isArray(state?.Shortcuts)
+    && state.Shortcuts.length === 2
+    && state.Shortcuts.every(
+      (shortcut) =>
+        path.resolve(shortcut.TargetPath || "").toLowerCase() === expected,
+    )
+  );
 }
 
 function windowsSignatureRecords(root) {
@@ -1422,6 +1606,7 @@ async function smokeApp({
     service_ready: serviceReady && frontendReady && modelsReady,
     service_stopped: stopped,
     isolated_home: true,
+    brainstem_home: brainstemHome,
     health: health || null,
     route_url: ready?.routeUrl || null,
     python: "3.11",
@@ -1660,20 +1845,117 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
     verifyUnsignedWindowsFile(staging.executable, "staging Windows app");
   }
 
+  const sourceFixture = prepareSourceInstallMigrationFixture();
+  requirement(
+    "source-installed shortcut and shim migration fixture is ready",
+    !sourceFixture.error && shimsContainSentinel(sourceFixture),
+    sourceFixture.error || sourceFixture.shims.join(", "),
+  );
+
   const installDir = path.join(scratchDir, "installed");
   mkdirSync(installDir, { recursive: true });
+  if (options.mode === "signed" && options.previousInstaller) {
+    const previousInstaller = path.resolve(options.previousInstaller);
+    requirement(
+      "N-1 Windows installer exists",
+      existsSync(previousInstaller),
+      previousInstaller,
+    );
+    if (existsSync(previousInstaller)) {
+      verifySignedWindowsFile(
+        previousInstaller,
+        "N-1 NSIS installer",
+        options.expectedPublisher,
+      );
+      const previousInstall = command(
+        previousInstaller,
+        ["/S", `/D=${installDir}`],
+        { timeout: 120000 },
+      );
+      const previousState = windowsLifecycleState();
+      requirement(
+        "N-1 installer establishes one per-user entry and no machine entry",
+        previousInstall.status === 0
+          && !previousState.error
+          && previousState.value?.UserEntries?.length === 1
+          && previousState.value?.MachineEntries?.length === 0,
+        previousState.error || previousInstall.output,
+      );
+      evidence.windowsUpgrade = {
+        passed:
+          previousInstall.status === 0
+          && !previousState.error
+          && previousState.value?.UserEntries?.length === 1
+          && previousState.value?.MachineEntries?.length === 0,
+        mode: "n-minus-one-to-n",
+        previous_release_tag: options.previousReleaseTag,
+        previous_installer_sha256: sha256(previousInstaller),
+      };
+    }
+  } else if (options.mode === "signed") {
+    requirement(
+      "first binary release is explicitly recorded when no N-1 exists",
+      options.firstBinaryRelease === true,
+      String(options.firstBinaryRelease),
+    );
+    evidence.windowsUpgrade = {
+      passed: options.firstBinaryRelease === true,
+      mode: "first-binary-release",
+      previous_release_tag: null,
+      previous_installer_sha256: null,
+    };
+  } else {
+    evidence.windowsUpgrade = {
+      passed: true,
+      mode: "unsigned-verification",
+      previous_release_tag: null,
+      previous_installer_sha256: null,
+    };
+  }
+
   const install = command(artifactPath, ["/S", `/D=${installDir}`], {
     timeout: 120000,
   });
   requirement("NSIS installer completes silently", install.status === 0, install.output);
+
+  const installedExecutable = findNamed(installDir, `${productName}.exe`);
+  const installedAppDir = installedExecutable ? path.dirname(installedExecutable) : installDir;
+  const installedState = windowsLifecycleState();
+  const perUserInstalled = Boolean(
+    !installedState.error
+      && installedState.value?.UserEntries?.length === 1
+      && installedState.value?.MachineEntries?.length === 0,
+  );
+  requirement(
+    "NSIS install creates exactly one HKCU entry and no HKLM entry",
+    perUserInstalled,
+    installedState.error || JSON.stringify(installedState.value),
+  );
+  requirement(
+    "native shortcuts replace source shortcuts with the installed executable",
+    Boolean(
+      installedExecutable
+      && shortcutTargetsInstalledExecutable(
+        installedState.value,
+        installedExecutable,
+      ),
+    ),
+    JSON.stringify(installedState.value?.Shortcuts || []),
+  );
+  requirement(
+    "source-installed command shims remain intact during native migration",
+    shimsContainSentinel(sourceFixture),
+    sourceFixture.shims.join(", "),
+  );
   evidence.installation = {
     method: "nsis-silent-install",
     source: artifactPath,
     installed_path: installDir,
+    user_registry_entries: installedState.value?.UserEntries?.length ?? null,
+    machine_registry_entries:
+      installedState.value?.MachineEntries?.length ?? null,
+    shortcuts: installedState.value?.Shortcuts || [],
   };
-
-  const installedExecutable = findNamed(installDir, `${productName}.exe`);
-  const installedAppDir = installedExecutable ? path.dirname(installedExecutable) : installDir;
   const installed = inspectPackagedApp(
     installedAppDir,
     "installed Windows app",
@@ -1712,6 +1994,38 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
     requirement("final installed app exits cleanly", false, "missing executable");
   }
 
+  const reinstall = command(artifactPath, ["/S", `/D=${installDir}`], {
+    timeout: 120000,
+  });
+  const reinstalledState = windowsLifecycleState();
+  const singleReinstallEntry = Boolean(
+    reinstall.status === 0
+      && !reinstalledState.error
+      && reinstalledState.value?.UserEntries?.length === 1
+      && reinstalledState.value?.MachineEntries?.length === 0
+      && installedExecutable
+      && shortcutTargetsInstalledExecutable(
+        reinstalledState.value,
+        installedExecutable,
+      ),
+  );
+  requirement(
+    "reinstall preserves one per-user entry and one native shortcut set",
+    singleReinstallEntry,
+    reinstalledState.error || reinstall.output,
+  );
+
+  const brainstemSentinel = evidence.runtime?.brainstem_home
+    ? path.join(evidence.runtime.brainstem_home, "package-gate-preserve.txt")
+    : null;
+  const userDataSentinel = evidence.runtime?.actual_user_data
+    ? path.join(evidence.runtime.actual_user_data, "package-gate-preserve.txt")
+    : null;
+  for (const sentinel of [brainstemSentinel, userDataSentinel].filter(Boolean)) {
+    mkdirSync(path.dirname(sentinel), { recursive: true });
+    writeFileSync(sentinel, "preserve\n", "utf8");
+  }
+
   const uninstaller = collectFiles(
     installDir,
     (filePath) =>
@@ -1732,6 +2046,76 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
   } else {
     requirement("NSIS uninstaller completes silently", false, "missing");
   }
+  await delay(1000);
+  const uninstalledState = windowsLifecycleState();
+  const installedFilesRemoved =
+    !existsSync(path.join(installedAppDir, `${productName}.exe`))
+    && !existsSync(path.join(installedAppDir, "resources"))
+    && !collectFiles(
+      installDir,
+      (filePath) => path.extname(filePath).toLowerCase() === ".exe",
+    ).length;
+  requirement(
+    "uninstall removes installed executable, resources, and uninstaller",
+    installedFilesRemoved,
+    installDir,
+  );
+  const registryAndShortcutsRemoved = Boolean(
+    !uninstalledState.error
+      && uninstalledState.value?.UserEntries?.length === 0
+      && uninstalledState.value?.MachineEntries?.length === 0
+      && uninstalledState.value?.Shortcuts?.length === 0,
+  );
+  requirement(
+    "uninstall removes per-user registry entry and native shortcuts",
+    registryAndShortcutsRemoved,
+    uninstalledState.error || JSON.stringify(uninstalledState.value),
+  );
+  const sharedBrainstemPreserved = Boolean(
+    brainstemSentinel && existsSync(brainstemSentinel),
+  );
+  const userDataPreserved = Boolean(
+    userDataSentinel && existsSync(userDataSentinel),
+  );
+  requirement(
+    "uninstall preserves shared Brainstem runtime",
+    sharedBrainstemPreserved,
+    brainstemSentinel || "missing runtime path",
+  );
+  requirement(
+    "uninstall preserves Frontier user data",
+    userDataPreserved,
+    userDataSentinel || "missing userData path",
+  );
+  const sourceMigrationSafe = Boolean(
+    shimsContainSentinel(sourceFixture)
+      && uninstalledState.value?.Shortcuts?.length === 0,
+  );
+  requirement(
+    "uninstall leaves source command shims usable without stale shortcuts",
+    sourceMigrationSafe,
+    sourceFixture.shims.join(", "),
+  );
+  evidence.windowsLifecycle = {
+    passed:
+      perUserInstalled
+      && singleReinstallEntry
+      && installedFilesRemoved
+      && registryAndShortcutsRemoved
+      && sharedBrainstemPreserved
+      && userDataPreserved
+      && sourceMigrationSafe,
+    per_user_registry_only: perUserInstalled,
+    machine_registry_entries:
+      installedState.value?.MachineEntries?.length ?? null,
+    reinstall_single_entry: singleReinstallEntry,
+    installed_files_removed: installedFilesRemoved,
+    registry_and_shortcuts_removed: registryAndShortcutsRemoved,
+    shared_brainstem_preserved: sharedBrainstemPreserved,
+    user_data_preserved: userDataPreserved,
+    source_migration_safe: sourceMigrationSafe,
+  };
+  for (const shim of sourceFixture.shims) rmSync(shim, { force: true });
 }
 
 export function defaultGatePaths(options, version) {
@@ -1900,6 +2284,10 @@ function gateReport({
     execution: {
       windows_standard_user:
         options.platform === "windows" ? evidence.standardUser : null,
+      windows_lifecycle:
+        options.platform === "windows" ? evidence.windowsLifecycle : null,
+      windows_upgrade:
+        options.platform === "windows" ? evidence.windowsUpgrade : null,
     },
     gate: {
       status: failures.length ? "failed" : "passed",
@@ -1929,6 +2317,8 @@ export async function runPackageGate(argv = process.argv.slice(2)) {
   evidence.notarization = null;
   evidence.runtime = null;
   evidence.standardUser = null;
+  evidence.windowsLifecycle = null;
+  evidence.windowsUpgrade = null;
   const options = parseGateArguments(argv);
   const packageMetadata = JSON.parse(
     readFileSync(path.join(betaDir, "package.json"), "utf8"),

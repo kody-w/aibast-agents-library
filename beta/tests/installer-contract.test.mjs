@@ -315,11 +315,19 @@ test("Windows package is x64 per-user NSIS and preserves user data", () => {
     arch: ["x64"],
   }]);
   assert.match(packageJson.build.win.artifactName, /windows-x64-setup/);
-  assert.equal(packageJson.build.nsis.oneClick, false);
+  assert.equal(packageJson.build.nsis.oneClick, true);
   assert.equal(packageJson.build.nsis.perMachine, false);
+  assert.equal(packageJson.build.nsis.allowToChangeInstallationDirectory, false);
   assert.equal(packageJson.build.nsis.allowElevation, false);
   assert.equal(packageJson.build.nsis.deleteAppDataOnUninstall, false);
   assert.equal(packageJson.build.nsis.runAfterFinish, false);
+  assert.match(packageGate, /exactly one HKCU entry and no HKLM entry/);
+  assert.match(packageGate, /reinstall preserves one per-user entry/);
+  assert.match(packageGate, /uninstall removes installed executable/);
+  assert.match(packageGate, /uninstall preserves shared Brainstem runtime/);
+  assert.match(packageGate, /uninstall preserves Frontier user data/);
+  assert.match(packageGate, /source-installed command shims remain intact/);
+  assert.match(packageGate, /N-1 Windows installer/);
 });
 
 test("Windows AppUserModelID is set before any window can be created", () => {
@@ -417,6 +425,10 @@ test("dedicated beta page uses the Download Center details structure", () => {
   assert.match(downloadCenter, /browser_download_url/);
   assert.match(downloadCenter, /rapp-brainstem-frontier-release-manifest\/v1/);
   assert.match(downloadCenter, /rapp-frontier-release-manifest/);
+  assert.match(downloadCenter, /release\?\.immutable !== true/);
+  assert.match(downloadCenter, /verifyReleaseManifestAsset/);
+  assert.match(downloadCenter, /cryptoImpl\.subtle\.digest/);
+  assert.match(downloadCenter, /fenced release manifest and attached manifest asset differ/);
   assert.match(downloadCenter, /signing\.status !== "verified"/);
   assert.match(downloadCenter, /gate\.status !== "passed"/);
   assert.match(installerPage, /release-manifest\s+allowlisted application installers/);

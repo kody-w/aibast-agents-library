@@ -19,6 +19,12 @@ import {
   installedToolchain,
   loadToolchainPolicy,
 } from "./toolchain-policy.mjs";
+import {
+  evaluateWindowsSigningPolicy,
+  loadWindowsSigningPolicy,
+} from "./windows-signing-policy.mjs";
+
+export { evaluateWindowsSigningPolicy } from "./windows-signing-policy.mjs";
 
 
 const betaDir = path.resolve(import.meta.dirname, "..");
@@ -197,33 +203,6 @@ function windowsSigningConfiguration(mode, applicationId) {
   };
 }
 
-export function evaluateWindowsSigningPolicy(policy) {
-  const blockers = [];
-  if (policy?.publication_enabled !== true) {
-    blockers.push(policy?.publication_blocker || "publication is disabled");
-  }
-  if (
-    policy?.backend_approval !== "approved"
-    || !policy?.approved_backend_schema
-    || policy.approved_backend_schema !== policy.current_backend_schema
-  ) {
-    blockers.push(
-      `signing backend ${policy?.current_backend_schema || "unknown"} is not approved`,
-    );
-  }
-  if (
-    policy?.client_secret_allowed !== false
-    || policy?.required_environment !== "windows-production"
-    || policy?.required_profile_type !== "PublicTrust"
-  ) {
-    blockers.push("OIDC/Public Trust production policy is incomplete");
-  }
-  return {
-    publicationReady: blockers.length === 0,
-    blockers,
-  };
-}
-
 export function createBuilderConfiguration({
   platform,
   mode,
@@ -301,12 +280,7 @@ export async function packagePlatform(argv = process.argv.slice(2)) {
       );
     }
     if (platform === "windows") {
-      const windowsSigningPolicy = JSON.parse(
-        readFileSync(
-          path.join(betaDir, "build", "windows-signing-policy.json"),
-          "utf8",
-        ),
-      );
+      const windowsSigningPolicy = loadWindowsSigningPolicy();
       const readiness = evaluateWindowsSigningPolicy(windowsSigningPolicy);
       if (!readiness.publicationReady) {
         fail(

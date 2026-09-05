@@ -10,7 +10,10 @@ param(
     [string]$ExpectedPublisher = "",
     [string]$ReleaseTag = "",
     [string]$ReleaseCommit = "",
-    [string]$RuntimeVersionUrl = ""
+    [string]$RuntimeVersionUrl = "",
+    [string]$PreviousInstaller = "",
+    [string]$PreviousReleaseTag = "",
+    [switch]$FirstBinaryRelease
 )
 
 $ErrorActionPreference = "Stop"
@@ -61,6 +64,15 @@ try {
     }
     if ($RuntimeVersionUrl) {
         $arguments += @("--runtime-version-url", $RuntimeVersionUrl)
+    }
+    if ($PreviousInstaller) {
+        $arguments += @(
+            "--previous-installer", $PreviousInstaller,
+            "--previous-release-tag", $PreviousReleaseTag
+        )
+    }
+    if ($FirstBinaryRelease) {
+        $arguments += @("--first-binary-release", "true")
     }
 
     @{

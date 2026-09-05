@@ -406,7 +406,7 @@ function manifestError(message, code = "INVALID_RELEASE_MANIFEST") {
   return new DownloadCenterError(message, { code });
 }
 
-export function parseReleaseManifest(body) {
+export function parseReleaseManifestBlock(body) {
   if (typeof body !== "string" || !body.trim()) {
     throw manifestError(
       "This release does not publish the required binary provenance manifest.",
@@ -429,8 +429,12 @@ export function parseReleaseManifest(body) {
     throw manifestError("The release contains multiple binary provenance manifests.");
   }
 
-  const source = blocks[0][1].trim();
-  if (!source || new TextEncoder().encode(source).byteLength > MAX_RELEASE_MANIFEST_BYTES) {
+  const source = blocks[0][1];
+  if (
+    source !== source.trim()
+    || !source
+    || new TextEncoder().encode(source).byteLength > MAX_RELEASE_MANIFEST_BYTES
+  ) {
     throw manifestError("The binary provenance manifest is empty or too large.");
   }
 
@@ -443,7 +447,123 @@ export function parseReleaseManifest(body) {
   if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
     throw manifestError("The binary provenance manifest must be a JSON object.");
   }
-  return manifest;
+  return { manifest, source };
+}
+
+export function parseReleaseManifest(body) {
+  return parseReleaseManifestBlock(body).manifest;
+}
+
+function manifestAssetName(version) {
+  return `RAPP-Brainstem-Frontier-${version}-binary-manifest.json`;
+}
+
+async function sha256Hex(bytes, cryptoImpl = globalThis.crypto) {
+  if (!cryptoImpl?.subtle || typeof cryptoImpl.subtle.digest !== "function") {
+    throw manifestError("This browser cannot verify the release manifest digest.");
+  }
+  let digest;
+  try {
+    digest = await cryptoImpl.subtle.digest("SHA-256", bytes);
+  } catch (cause) {
+    throw new DownloadCenterError(
+      "The release manifest digest could not be verified.",
+      { code: "INVALID_RELEASE_MANIFEST", cause },
+    );
+  }
+  return [...new Uint8Array(digest)]
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+export async function verifyReleaseManifestAsset(release, {
+  repository,
+  version,
+  fetchImpl = globalThis.fetch,
+  cryptoImpl = globalThis.crypto,
+} = {}) {
+  const block = parseReleaseManifestBlock(release?.body);
+  if (release?.immutable !== true) {
+    throw manifestError(
+      "Packaged installers require an immutable GitHub release.",
+    );
+  }
+  const expectedName = manifestAssetName(version);
+  const matches = release.assets.filter((entry) => entry?.name === expectedName);
+  if (matches.length !== 1) {
+    throw manifestError(
+      `Release manifest asset ${expectedName} must exist exactly once.`,
+    );
+  }
+  const asset = matches[0];
+  if (
+    asset.state !== "uploaded"
+    || !Number.isSafeInteger(asset.size)
+    || asset.size <= 0
+    || !/^sha256:[0-9a-f]{64}$/i.test(asset.digest || "")
+  ) {
+    throw manifestError("Release manifest asset metadata is incomplete.");
+  }
+  const href = safeReleaseAssetUrl(
+    asset.browser_download_url,
+    repository,
+    release.tag_name,
+    expectedName,
+  );
+  if (!href || typeof fetchImpl !== "function") {
+    throw manifestError("Release manifest asset URL cannot be verified.");
+  }
+
+  let response;
+  try {
+    response = await fetchImpl(href, {
+      headers: { Accept: "application/json" },
+    });
+  } catch (cause) {
+    throw new DownloadCenterError(
+      "The allowlisted release manifest asset could not be downloaded.",
+      { code: "INVALID_RELEASE_MANIFEST", cause },
+    );
+  }
+  const status = Number(response?.status);
+  if (
+    !response
+    || response.ok !== true
+    || !Number.isInteger(status)
+    || typeof response.arrayBuffer !== "function"
+  ) {
+    throw manifestError(
+      `Release manifest asset download failed (HTTP ${
+        Number.isInteger(status) ? status : "unknown"
+      }).`,
+    );
+  }
+  let bytes;
+  try {
+    bytes = new Uint8Array(await response.arrayBuffer());
+  } catch (cause) {
+    throw new DownloadCenterError(
+      "The allowlisted release manifest asset could not be read.",
+      { code: "INVALID_RELEASE_MANIFEST", cause },
+    );
+  }
+  const expectedBytes = new TextEncoder().encode(`${block.source}\n`);
+  if (
+    bytes.byteLength !== asset.size
+    || bytes.byteLength !== expectedBytes.byteLength
+    || bytes.some((value, index) => value !== expectedBytes[index])
+  ) {
+    throw manifestError(
+      "The fenced release manifest and attached manifest asset differ.",
+    );
+  }
+  const digest = await sha256Hex(bytes, cryptoImpl);
+  if (`sha256:${digest}` !== String(asset.digest).toLowerCase()) {
+    throw manifestError(
+      "The attached release manifest does not match its GitHub SHA-256 digest.",
+    );
+  }
+  return block.manifest;
 }
 
 function manifestText(value, label, maximum = 500) {
@@ -538,6 +658,11 @@ export function analyzePackagedDownloads(
     throw new DownloadCenterError("GitHub release asset metadata was not an array.", {
       code: "INVALID_RELEASE_ASSETS",
     });
+  }
+  if (release.immutable !== true) {
+    throw manifestError(
+      "Packaged installers require an immutable GitHub release.",
+    );
   }
   if (!/^[0-9a-f]{40}$/.test(commit || "") || typeof version !== "string" || !version) {
     throw manifestError("Verified release identity is required before evaluating binaries.");
@@ -858,7 +983,11 @@ export async function discoverRelease({
   let rejectedAssets = [];
   let binaryAvailability;
   try {
-    const manifest = parseReleaseManifest(release.body);
+    const manifest = await verifyReleaseManifestAsset(release, {
+      repository,
+      version: metadata.version,
+      fetchImpl,
+    });
     const analysis = analyzePackagedDownloads(release, {
       repository,
       commit,

@@ -6,9 +6,14 @@ import { pathToFileURL } from "node:url";
 
 import {
   analyzePackagedDownloads,
-  parseReleaseManifest,
+  parseReleaseManifestBlock,
   RELEASE_MANIFEST_SCHEMA,
+  safeReleaseAssetUrl,
 } from "../download-center.js";
+import {
+  loadWindowsSigningPolicy,
+  validateWindowsSigningEvidence,
+} from "./windows-signing-policy.mjs";
 
 function fail(message) {
   throw new Error(message);
@@ -52,6 +57,8 @@ export function verifyStagedRelease({
   commit,
   repository,
   serverUrl,
+  windowsPolicy,
+  windowsExpected,
 }) {
   if (manifest.schema !== RELEASE_MANIFEST_SCHEMA) {
     fail(`Unsupported release manifest schema: ${manifest.schema}`);
@@ -70,13 +77,40 @@ export function verifyStagedRelease({
     fail("Staged release identity does not match the exact tag and commit.");
   }
 
-  const bodyManifest = parseReleaseManifest(release.body);
+  const bodyBlock = parseReleaseManifestBlock(release.body);
+  const bodyManifest = bodyBlock.manifest;
   assert.deepEqual(
     bodyManifest,
     manifest,
     "release body manifest differs from the signed manifest asset",
   );
-  const pageAnalysis = analyzePackagedDownloads(release, {
+  const manifestName =
+    `RAPP-Brainstem-Frontier-${version}-binary-manifest.json`;
+  const manifestPath = path.join(artifactDir, manifestName);
+  const manifestBytes = readFileSync(manifestPath);
+  const manifestAssets = release.assets.filter(
+    (asset) => asset?.name === manifestName,
+  );
+  if (
+    manifestAssets.length !== 1
+    || manifestAssets[0].state !== "uploaded"
+    || manifestAssets[0].size !== manifestBytes.length
+    || String(manifestAssets[0].digest || "").toLowerCase()
+      !== `sha256:${sha256(manifestPath)}`
+    || !safeReleaseAssetUrl(
+      manifestAssets[0].browser_download_url,
+      repository,
+      tag,
+      manifestName,
+    )
+    || manifestBytes.toString("utf8") !== `${bodyBlock.source}\n`
+  ) {
+    fail("Signed manifest asset metadata, digest, URL, or body bytes differ.");
+  }
+  const pageAnalysis = analyzePackagedDownloads({
+    ...release,
+    immutable: true,
+  }, {
     repository,
     commit,
     version,
@@ -108,11 +142,20 @@ export function verifyStagedRelease({
   ) {
     fail("Windows signing manifest does not match production policy.");
   }
+  validateWindowsSigningEvidence({
+    backend_schema: manifest.signing.windows.backend_schema,
+    endpoint: manifest.signing.windows.endpoint,
+    account: manifest.signing.windows.account,
+    certificate_profile: manifest.signing.windows.certificate_profile,
+    identity: manifest.signing.windows.identity,
+    profile_type: manifest.signing.windows.profile_type,
+    file_digest: manifest.signing.windows.file_digest,
+    timestamp_digest: manifest.signing.windows.timestamp_digest,
+    timestamp_url: manifest.signing.windows.timestamp,
+  }, windowsPolicy, windowsExpected);
 
   const releaseBase =
     `${serverUrl}/${repository}/releases/download/${encodeURIComponent(tag)}/`;
-  const manifestName =
-    `RAPP-Brainstem-Frontier-${version}-binary-manifest.json`;
   if (
     manifest.manifest_url
       !== `${releaseBase}${encodeURIComponent(manifestName)}`
@@ -214,6 +257,34 @@ export function verifyStagedRelease({
       fail("Windows package was not gated as a standard user.");
     }
     if (
+      artifact.platform === "windows"
+      && (
+        report.execution?.windows_lifecycle?.passed !== true
+        || report.execution.windows_lifecycle.per_user_registry_only !== true
+        || report.execution.windows_lifecycle.machine_registry_entries !== 0
+        || report.execution.windows_lifecycle.reinstall_single_entry !== true
+        || report.execution.windows_lifecycle.installed_files_removed !== true
+        || report.execution.windows_lifecycle.registry_and_shortcuts_removed
+          !== true
+        || report.execution.windows_lifecycle.shared_brainstem_preserved !== true
+        || report.execution.windows_lifecycle.user_data_preserved !== true
+        || report.execution.windows_lifecycle.source_migration_safe !== true
+        || report.execution?.windows_upgrade?.passed !== true
+        || !["first-binary-release", "n-minus-one-to-n"].includes(
+          report.execution.windows_upgrade.mode,
+        )
+      )
+    ) {
+      fail("Windows package lifecycle or N-1 upgrade evidence is incomplete.");
+    }
+    if (artifact.platform === "windows") {
+      validateWindowsSigningEvidence(
+        report.signing,
+        windowsPolicy,
+        windowsExpected,
+      );
+    }
+    if (
       artifact.platform === "macos"
       && (
         report.notarization?.app?.submission?.status !== "Accepted"
@@ -261,6 +332,15 @@ export function verifyStagedRelease({
 export function verifyStagedReleaseFiles(argv = process.argv.slice(2)) {
   const args = parseArguments(argv);
   const manifestPath = path.resolve(args.manifest);
+  const windowsPolicy = loadWindowsSigningPolicy();
+  const windowsExpected = {
+    endpoint: process.env.AZURE_ARTIFACT_SIGNING_ENDPOINT,
+    account: process.env.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME,
+    certificateProfile:
+      process.env.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME,
+    publisherSubject: process.env.WINDOWS_SIGNING_SUBJECT,
+    profileType: process.env.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE,
+  };
   return verifyStagedRelease({
     release: JSON.parse(readFileSync(path.resolve(args["release-json"]), "utf8")),
     manifest: JSON.parse(readFileSync(manifestPath, "utf8")),
@@ -271,6 +351,8 @@ export function verifyStagedReleaseFiles(argv = process.argv.slice(2)) {
     commit: args.commit,
     repository: process.env.GITHUB_REPOSITORY,
     serverUrl: process.env.GITHUB_SERVER_URL,
+    windowsPolicy,
+    windowsExpected,
   });
 }
 

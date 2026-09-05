@@ -141,9 +141,11 @@ The release workflow requires an existing draft prerelease. Immediately before
 publication it calls the repository immutable-releases settings endpoint and
 refuses to publish unless the setting is enabled. After publishing it verifies
 that the release API reports `"immutable": true`. An unexpected mismatch is an
-explicit release incident; the workflow does not pretend a best-effort return
-to draft can undo publication. Draft-first publication follows GitHub's
-guidance: create the draft, attach and verify every asset, then publish.
+explicit failure. While the release remains mutable, the workflow retries a
+rollback by the validated release ID and re-reads until `draft:true`; inability
+to verify that rollback is a loud immutable-release incident. Draft-first
+publication follows GitHub's guidance: create the draft, attach and verify
+every asset, then publish.
 
 ### Apple secrets
 
@@ -236,6 +238,22 @@ These production values are intentionally absent from the repository. Do not
 invent placeholder account, profile, endpoint, tenant, subscription, client,
 or publisher values.
 
+Mirror these five non-secret expected values into the protected
+`frontier-binary-release` environment:
+
+- `AZURE_ARTIFACT_SIGNING_ENDPOINT`
+- `AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME`
+- `AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME`
+- `AZURE_ARTIFACT_SIGNING_PROFILE_TYPE`
+- `WINDOWS_SIGNING_SUBJECT`
+
+Manifest generation, staged verification, and final prepublication
+verification load `build/windows-signing-policy.json` and these protected
+values independently. They reject a gate report unless its backend equals both
+`current_backend_schema` and `approved_backend_schema` and every signing value
+matches the protected expectation. The currently blocked v26 backend is never
+treated as an approved test fixture.
+
 There is no Azure client secret, certificate blob, or long-lived cloud
 credential. `azure/login` exchanges GitHub's job-scoped OIDC token for a
 short-lived Azure token only after `npm ci`, checks, tests, native-media
@@ -268,7 +286,8 @@ The NSIS contract is exactly one per-user x64 installer named
 
 - application ID and AUMID `com.microsoft.aibast.rapp-brainstem-beta`;
 - uninstall GUID `48d3a204-a20a-516d-b74f-5ac374e1c8bb`;
-- `asInvoker`, stable shortcuts/uninstall identity, and no app-data deletion;
+- `oneClick=true`, `perMachine=false`, `asInvoker`, no install-mode chooser,
+  stable shortcuts/uninstall identity, and no app-data deletion;
 - `warningsAsErrors=true`; and
 - `runAfterFinish=false`, so installation never races an unobserved first-run
   bootstrap.
@@ -283,6 +302,18 @@ unsigned verification and future signed release gates create a temporary local
 non-administrator account and run the installed NSIS application, bundled
 bootstrap, Copilot startup, FFmpeg, FFprobe, and Brainstem readiness checks
 under that standard-user token. An elevated-only pass is rejected.
+
+The Windows package gate also proves the complete install lifecycle. It
+requires exactly one HKCU uninstall entry and zero HKLM entries, validates both
+native shortcuts, preserves source-installed command shims during migration,
+reinstalls without duplicate entries, and then verifies uninstall removes the
+application files, uninstaller, registry entry, and shortcuts while preserving
+the shared Brainstem and Electron user data. Before every release, GitHub
+release inventory determines whether this is the first binary release. Once an
+immutable prior Windows binary exists, its asset ID and GitHub SHA-256 are
+captured before signing, downloaded by ID, signature-verified, installed, and
+upgraded in place to N. A second binary release cannot pass without this
+N-1-to-N evidence.
 
 ## Prepare a release commit
 
@@ -372,7 +403,11 @@ incidents.
 Release mode fails closed unless all of the following are true:
 
 - the source version exactly matches the requested tag;
-- the remote tag is annotated and resolves to the checked-out commit;
+- the initial remote annotated tag-object SHA and its peeled commit are
+  recorded; both are re-fetched immediately before and after publication and
+  must remain byte-for-byte identical;
+- publication patches the exact validated GitHub release ID, never an
+  ambiguous tag lookup;
 - the repository immutable-release setting verifies before publication and the
   final release reports GitHub immutability afterward;
 - exactly one matching draft prerelease already exists;
@@ -463,17 +498,21 @@ to equal the separately attached and Sigstore-attested
 `RAPP-Brainstem-Frontier-<version>-binary-manifest.json` before publication.
 The Download Center may expose a `.dmg` or `.exe` only when:
 
-1. the manifest schema, release tag, 40-character commit, and version match;
-2. one manifest entry exactly matches the requested filename, OS, and
+1. GitHub reports the release itself as immutable;
+2. the deterministic manifest asset is uploaded and nonempty, its bytes equal
+   the fenced body JSON plus the canonical final newline, and its GitHub
+   SHA-256 digest verifies;
+3. the manifest schema, release tag, 40-character commit, and version match;
+4. one manifest entry exactly matches the requested filename, OS, and
    architecture;
-3. the GitHub release API reports one uploaded, nonempty asset with a safe
+5. the GitHub release API reports one uploaded, nonempty asset with a safe
    browser URL and a `sha256:` digest matching that entry;
-4. the binary is nonempty and its size and SHA-256 match that
+6. the binary is nonempty and its size and SHA-256 match that
    entry;
-5. the gate report is nonempty and its URL and SHA-256 match that entry;
-6. the recorded platform signing identity and runtime compatibility match
+7. the gate report is nonempty and its URL and SHA-256 match that entry;
+8. the recorded platform signing identity and runtime compatibility match
    policy; and
-7. the gate status is `passed`.
+9. the gate status is `passed`.
 
 The protected publication workflow additionally verifies `SHA256SUMS`, every
 binary/report/manifest attestation, the exact fenced/body equality, and the

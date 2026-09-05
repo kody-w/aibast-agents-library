@@ -158,13 +158,16 @@ a validated 40-character commit, and both the installer URL and
 
 Immutable Frontier releases may include native Intel and Apple-silicon DMGs
 plus one Windows x64 NSIS installer. The page exposes a `.dmg` or `.exe` only
-when the release notes contain exactly one fenced
+when GitHub reports `immutable: true`, the release notes contain exactly one fenced
 `rapp-frontier-release-manifest` using
 `rapp-brainstem-frontier-release-manifest/v1`. That manifest must bind the
 exact asset name, OS/architecture, positive size, GitHub SHA-256 digest,
 verified signing identity, compatible runtime, release tag and commit, and
-successful package-gate run. Missing, duplicated, deceptive, uninstaller, or
-mismatched entries fail closed to the commit-pinned source bootstrap.
+successful package-gate run. The page separately downloads the deterministic
+manifest asset, verifies its GitHub digest and size, and requires its bytes to
+equal the fenced body JSON. Missing, mutable, duplicated, deceptive,
+uninstaller, or mismatched entries fail closed to the commit-pinned source
+bootstrap.
 
 Binary publication is currently blocked: the resolved ARM64 FFmpeg binary was
 built with `--enable-nonfree`, and the FFprobe version is not normalized with

@@ -42,6 +42,14 @@ import {
   installedToolchain,
   loadToolchainPolicy,
 } from "../scripts/toolchain-policy.mjs";
+import { verifyReleaseSnapshot } from "../scripts/release-race-guard.mjs";
+import {
+  selectPreviousWindowsBinary,
+} from "../scripts/windows-upgrade-policy.mjs";
+import {
+  loadWindowsSigningPolicy,
+  validateWindowsSigningEvidence,
+} from "../scripts/windows-signing-policy.mjs";
 
 
 const betaDir = path.resolve(import.meta.dirname, "..");
@@ -332,14 +340,31 @@ test("release manifest requires the complete three-binary matrix", () => {
     azureAccount: "frontier",
     azureProfile: "public-trust",
     windowsSubject: "CN=Microsoft Corporation",
-    windowsSigningBackendSchema:
-      "electron-builder-26.15.7/WindowsAzureSigningConfiguration-v26",
+    windowsSigningBackendSchema: "test-approved-artifact-signing/v1",
     windowsProfileType: "PublicTrust",
     windowsFileDigest: "SHA256",
     windowsTimestampDigest: "SHA256",
     windowsTimestampUrl: "http://timestamp.acs.microsoft.com/",
     gateRunUrl:
       "https://github.com/owner/repository/actions/runs/123456789",
+    windowsPolicy: {
+      schema:
+        "https://github.com/microsoft/aibast-agents-library/frontier-windows-signing-policy/v1",
+      publication_enabled: true,
+      current_backend_schema: "test-approved-artifact-signing/v1",
+      backend_approval: "approved",
+      approved_backend_schema: "test-approved-artifact-signing/v1",
+      required_environment: "windows-production",
+      required_profile_type: "PublicTrust",
+      client_secret_allowed: false,
+    },
+    windowsExpected: {
+      endpoint: "https://eus.codesigning.azure.net",
+      account: "frontier",
+      certificateProfile: "public-trust",
+      publisherSubject: "CN=Microsoft Corporation",
+      profileType: "PublicTrust",
+    },
     windowsSbom: {
       name:
         `RAPP-Brainstem-Frontier-${version}-windows-x64-setup.exe.spdx.json`,
@@ -449,6 +474,27 @@ test("release manifest requires the complete three-binary matrix", () => {
             },
             execution: {
               windows_standard_user: windows ? true : null,
+              windows_lifecycle: windows
+                ? {
+                    passed: true,
+                    per_user_registry_only: true,
+                    machine_registry_entries: 0,
+                    reinstall_single_entry: true,
+                    installed_files_removed: true,
+                    registry_and_shortcuts_removed: true,
+                    shared_brainstem_preserved: true,
+                    user_data_preserved: true,
+                    source_migration_safe: true,
+                  }
+                : null,
+              windows_upgrade: windows
+                ? {
+                    passed: true,
+                    mode: "first-binary-release",
+                    previous_release_tag: null,
+                    previous_installer_sha256: null,
+                  }
+                : null,
             },
             publication: {
               status: "ready",
@@ -612,6 +658,30 @@ test("release manifest requires the complete three-binary matrix", () => {
     ),
     /notarization evidence/,
   );
+  const machineInstallReports = structuredClone(reports);
+  machineInstallReports[names[2]].content.execution.windows_lifecycle
+    .machine_registry_entries = 1;
+  assert.throws(
+    () => createReleaseManifest(
+      metadata,
+      checksums,
+      bundles,
+      machineInstallReports,
+    ),
+    /lifecycle and upgrade gates/,
+  );
+  const missingUpgradeReports = structuredClone(reports);
+  missingUpgradeReports[names[2]].content.execution.windows_upgrade.passed =
+    false;
+  assert.throws(
+    () => createReleaseManifest(
+      metadata,
+      checksums,
+      bundles,
+      missingUpgradeReports,
+    ),
+    /lifecycle and upgrade gates/,
+  );
   const unsignedDmgReports = structuredClone(reports);
   unsignedDmgReports[names[0]].content.notarization.dmg.target
     .code_signature.ad_hoc = true;
@@ -642,6 +712,38 @@ test("release manifest requires the complete three-binary matrix", () => {
       reports,
     ),
     /GitHub Actions run URL/,
+  );
+  const blockedWindowsPolicy = JSON.parse(
+    readFileSync(
+      path.join(betaDir, "build", "windows-signing-policy.json"),
+      "utf8",
+    ),
+  );
+  assert.throws(
+    () => createReleaseManifest(
+      {
+        ...metadata,
+        windowsPolicy: blockedWindowsPolicy,
+        windowsSigningBackendSchema:
+          blockedWindowsPolicy.current_backend_schema,
+      },
+      checksums,
+      bundles,
+      reports,
+    ),
+    /Windows signing policy is blocked/,
+  );
+  const mismatchedSigningReports = structuredClone(reports);
+  mismatchedSigningReports[names[2]].content.signing.endpoint =
+    "https://other.codesigning.azure.net";
+  assert.throws(
+    () => createReleaseManifest(
+      metadata,
+      checksums,
+      bundles,
+      mismatchedSigningReports,
+    ),
+    /independently protected policy/,
   );
   assert.throws(
     () =>
@@ -884,12 +986,7 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
   const packageMetadata = JSON.parse(
     readFileSync(path.join(betaDir, "package.json"), "utf8"),
   );
-  const policy = JSON.parse(
-    readFileSync(
-      path.join(betaDir, "build", "windows-signing-policy.json"),
-      "utf8",
-    ),
-  );
+  const policy = loadWindowsSigningPolicy();
   const packaging = readFileSync(
     path.join(betaDir, "scripts", "package-platform.mjs"),
     "utf8",
@@ -911,7 +1008,12 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
     packageMetadata.build.nsis.guid,
     "48d3a204-a20a-516d-b74f-5ac374e1c8bb",
   );
+  assert.equal(packageMetadata.build.nsis.oneClick, true);
   assert.equal(packageMetadata.build.nsis.perMachine, false);
+  assert.equal(
+    packageMetadata.build.nsis.allowToChangeInstallationDirectory,
+    false,
+  );
   assert.equal(packageMetadata.build.nsis.runAfterFinish, false);
   assert.equal(packageMetadata.build.nsis.deleteAppDataOnUninstall, false);
   assert.equal(packageMetadata.build.nsis.warningsAsErrors, true);
@@ -931,6 +1033,18 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
     false,
     "flipping only the Windows publication boolean must not approve v26",
   );
+  assert.throws(
+    () => validateWindowsSigningEvidence({
+      backend_schema: policy.current_backend_schema,
+    }, policy, {
+      endpoint: "https://eus.codesigning.azure.net",
+      account: "frontier",
+      certificateProfile: "public-trust",
+      publisherSubject: "CN=Microsoft Corporation",
+      profileType: "PublicTrust",
+    }),
+    /policy is blocked/,
+  );
   assert.match(packaging, /entry\.endsWith\("\.blockmap"\)/);
   assert.match(packaging, /\^latest/);
   assert.match(packaging, /installers\.length !== 1/);
@@ -939,6 +1053,29 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
   assert.match(standardUserGate, /Add-LocalGroupMember/);
   assert.match(standardUserGate, /Start-Process[\s\S]*-Credential/);
   assert.match(standardUserGate, /Remove-LocalUser/);
+  const stagedVerifier = readFileSync(
+    path.join(betaDir, "scripts", "verify-staged-release.mjs"),
+    "utf8",
+  );
+  assert.match(stagedVerifier, /loadWindowsSigningPolicy/);
+  assert.match(stagedVerifier, /validateWindowsSigningEvidence/);
+  const workflow = readFileSync(
+    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+    "utf8",
+  );
+  const stage = workflowJob(workflow, "stage-release");
+  for (const name of [
+    "WINDOWS_SIGNING_SUBJECT",
+    "AZURE_ARTIFACT_SIGNING_ENDPOINT",
+    "AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME",
+    "AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME",
+    "AZURE_ARTIFACT_SIGNING_PROFILE_TYPE",
+  ]) {
+    assert.ok(
+      stage.includes(`${name}: $` + `{{ vars.${name} }}`),
+      `${name} must come from the protected staging environment`,
+    );
+  }
 });
 
 test("workflow contract pins actions and never creates or moves a release tag", () => {
@@ -1057,8 +1194,15 @@ test("publication revalidates the full set and immutable setting at the last gat
   const immutableSetting = publish.indexOf(
     'repos/$GITHUB_REPOSITORY/immutable-releases',
   );
+  const prepublishSnapshot = publish.indexOf(
+    'verify_release_snapshot "immediately before publication"',
+  );
   const publishRelease = publish.indexOf(
-    'gh release edit "$TAG" --draft=false',
+    '"repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \\\n'
+      + "              -F draft=false",
+  );
+  const postpublishSnapshot = publish.indexOf(
+    'verify_release_snapshot "immediately after publication"',
   );
   assert.ok(
     0 <= download
@@ -1067,13 +1211,135 @@ test("publication revalidates the full set and immutable setting at the last gat
       && checksums < attestations
       && attestations < staged
       && staged < immutableSetting
-      && immutableSetting < publishRelease,
+      && immutableSetting < prepublishSnapshot
+      && prepublishSnapshot < publishRelease
+      && publishRelease < postpublishSnapshot,
   );
   assert.match(publish, /RAPP-Brainstem-Frontier-\$\{VERSION\}-macos-arm64\.dmg/);
   assert.match(publish, /RAPP-Brainstem-Frontier-\$\{VERSION\}-macos-x64\.dmg/);
   assert.match(publish, /RAPP-Brainstem-Frontier-\$\{VERSION\}-windows-x64-setup\.exe/);
   assert.doesNotMatch(publish, /--draft=true/);
-  assert.match(publish, /Immutable release incident/);
+  assert.doesNotMatch(publish, /gh release edit/);
+  assert.match(publish, /IMMUTABLE RELEASE INCIDENT/);
+  assert.match(publish, /for attempt in \{1\.\.5\}/);
+  assert.match(publish, /-F draft=true/);
+});
+
+test("annotated tag object, peeled commit, and release ID are race-bound", () => {
+  const snapshot = {
+    tag: "brainstem-beta-v1.2.3",
+    tagObject: "a".repeat(40),
+    commit: "b".repeat(40),
+    releaseId: "12345",
+  };
+  assert.deepEqual(verifyReleaseSnapshot(snapshot, snapshot), snapshot);
+  for (const [field, value] of [
+    ["tag", "brainstem-beta-v1.2.4"],
+    ["tagObject", "c".repeat(40)],
+    ["commit", "d".repeat(40)],
+    ["releaseId", "54321"],
+  ]) {
+    assert.throws(
+      () => verifyReleaseSnapshot(snapshot, {
+        ...snapshot,
+        [field]: value,
+      }),
+      new RegExp(`${field} changed`),
+    );
+  }
+
+  const workflow = readFileSync(
+    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+    "utf8",
+  );
+  const context = workflowJob(workflow, "context");
+  assert.match(context, /tag_object:/);
+  assert.match(context, /refs\/tags\/\$tag\^\{\}/);
+  assert.match(context, /release-race-guard\.mjs/);
+  const publish = workflowJob(workflow, "publish");
+  assert.match(publish, /TAG_OBJECT: \$\{\{ needs\.context\.outputs\.tag_object \}\}/);
+  assert.ok(
+    [...publish.matchAll(/release-race-guard\.mjs/g)].length >= 1,
+    "publish must re-run the release race guard",
+  );
+  assert.match(
+    publish,
+    /repos\/\$GITHUB_REPOSITORY\/releases\/\$RELEASE_ID/,
+  );
+});
+
+test("second Windows binary release requires immutable N-1 evidence", () => {
+  const currentTag = "brainstem-beta-v2.0.0-beta.2";
+  assert.deepEqual(selectPreviousWindowsBinary([], currentTag), {
+    firstBinaryRelease: true,
+    previousReleaseTag: null,
+    previousAssetId: null,
+    previousAssetName: null,
+    previousAssetDigest: null,
+  });
+  const previous = {
+    id: 10,
+    tag_name: "brainstem-beta-v2.0.0-beta.1",
+    draft: false,
+    immutable: true,
+    published_at: "2026-09-01T00:00:00Z",
+    assets: [{
+      id: 99,
+      name:
+        "RAPP-Brainstem-Frontier-2.0.0-beta.1-windows-x64-setup.exe",
+      digest: `sha256:${"a".repeat(64)}`,
+      state: "uploaded",
+      size: 1234,
+    }],
+  };
+  assert.deepEqual(selectPreviousWindowsBinary([previous], currentTag), {
+    firstBinaryRelease: false,
+    previousReleaseTag: previous.tag_name,
+    previousAssetId: "99",
+    previousAssetName: previous.assets[0].name,
+    previousAssetDigest: previous.assets[0].digest,
+  });
+  assert.throws(
+    () => selectPreviousWindowsBinary(
+      [{ ...previous, immutable: false }],
+      currentTag,
+    ),
+    /not immutable/,
+  );
+  assert.throws(
+    () => selectPreviousWindowsBinary([{
+      ...previous,
+      assets: [...previous.assets, { ...previous.assets[0], id: 100 }],
+    }], currentTag),
+    /exactly one/,
+  );
+  assert.throws(
+    () => parseGateArguments([
+      "--platform", "windows",
+      "--arch", "x64",
+      "--mode", "signed",
+      "--expected-publisher", "CN=Microsoft Corporation",
+      "--release-tag", currentTag,
+      "--release-commit", "b".repeat(40),
+      "--runtime-version-url",
+      `https://raw.githubusercontent.com/test/repo/${"b".repeat(40)}/VERSION`,
+      "--require-standard-user", "true",
+    ], { platform: "win32", arch: "x64" }),
+    /exactly one of --previous-installer/,
+  );
+  const workflow = readFileSync(
+    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+    "utf8",
+  );
+  const context = workflowJob(workflow, "context");
+  assert.match(context, /windows-upgrade-policy\.mjs/);
+  assert.match(context, /previous_windows_asset_id/);
+  assert.match(context, /first_binary_release/);
+  const windows = workflowJob(workflow, "release-windows");
+  assert.match(windows, /releases\/assets\/\$env:PREVIOUS_ASSET_ID/);
+  assert.match(windows, /PREVIOUS_ASSET_DIGEST/);
+  assert.match(windows, /PreviousInstaller/);
+  assert.match(windows, /FirstBinaryRelease/);
 });
 
 test("protected clean-Mac gate exercises quarantine and LaunchServices", () => {
