@@ -147,9 +147,12 @@ you're watching*, so it is always clear an AI, not a hand, is at the controls.
 
 ## Install
 
-The dedicated GitHub Pages installer is published at `/beta/`. It resolves the
-latest `brainstem-beta-v*` release from the fork serving the page, so staging
-and production remain separate.
+The dedicated Download Center-style GitHub Pages installer is published at
+`/beta/`. It provides platform bootstrap downloads, copyable install commands,
+release metadata, requirements, and installation guidance. The page resolves
+the latest `brainstem-beta-v*` release from the fork serving it, so staging and
+production remain separate. If that release includes packaged `.exe` or `.dmg`
+assets, the page lists them automatically ahead of the source bootstrap.
 
 ### Windows 11
 
