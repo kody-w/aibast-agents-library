@@ -16,14 +16,41 @@ prerelease version, then run:
 npm ci --no-audit --no-fund
 npm run check
 npm test
+npm run prepare:bootstrap
 ```
 
 Wait for the repository preflight workflow on the release commit to pass.
+
+`prepare:bootstrap` must run from a clean tracked checkout. It writes a
+generated package resource that binds `install.sh`, `install.ps1`, the GitHub
+repository, and the full checkout commit. `npm run dist:mac` runs this step
+automatically. Release mode accepts only the canonical Microsoft repository.
+For explicit fork-only development artifacts, set
+`BRAINSTEM_BETA_PACKAGE_MODE=development`; those artifacts receive a distinct
+development provenance identity and are not release candidates.
 
 Binary packaging is optional and is not required for a source-only release. If
 you intentionally prepare a macOS preview artifact, run `npm run dist:mac` and
 review it separately. Do not attach a locally assembled application to the
 source-only GitHub Release.
+
+The package gate launches with isolated `HOME`, `USERPROFILE`,
+`BRAINSTEM_HOME`, and Frontier state directories. It starts with no target
+runtime, substitutes a controlled immutable installer fixture, verifies staged
+activation and sanitized logs, then requires the routed Brainstem worker to
+pass the compatibility/agent-load gate before the smoke process may exit zero.
+Packaged update UX must continue directing users to a new signed package; the
+source-checkout updater is not a binary updater.
+The gate also executes the Copilot platform binary from
+`app.asar.unpacked`; a logical ASAR path is not acceptable evidence.
+
+Windows publication is x64 NSIS only. The installer must remain per-user,
+non-elevating, launch after install, and preserve both Electron profile data and
+the external shared `BRAINSTEM_HOME` during uninstall. Windows CI must exercise
+a clean standard-user first launch and wait for the compatible Brainstem
+readiness gate before signing or publishing. ARM64 source bootstrap is expected
+to fail with the explicit x64 guidance until one complete architecture stack is
+supported.
 
 ## 2. Create the immutable tag
 

@@ -6,8 +6,8 @@ umask 077
 # Usage: curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash
 # Pin a version: curl ... install.sh | bash -s -- --version v0.6.0
 
-BRAINSTEM_HOME="$HOME/.brainstem"
-BRAINSTEM_BIN="$HOME/.local/bin"
+BRAINSTEM_HOME="${BRAINSTEM_HOME:-$HOME/.brainstem}"
+BRAINSTEM_BIN="${BRAINSTEM_BIN:-$HOME/.local/bin}"
 VENV_DIR="$BRAINSTEM_HOME/venv"
 SOURCE_OVERRIDE_REQUESTED=false
 if [[ -n "${BRAINSTEM_REPO_URL:-}" || -n "${BRAINSTEM_REPO_REF:-}" || -n "${BRAINSTEM_VERSION_URL:-}" ]]; then
@@ -18,6 +18,7 @@ REPO_REF="${BRAINSTEM_REPO_REF:-main}"
 REMOTE_VERSION_URL="${BRAINSTEM_VERSION_URL:-https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/VERSION}"
 PIN_VERSION=""
 NO_LAUNCH=false
+RUNTIME_ONLY=false
 
 # Colors
 RED='\033[0;31m'
@@ -85,6 +86,40 @@ brainstem_source_ready() {
         && [ -f "$repo_dir/rapp_brainstem/VERSION" ]
 }
 
+is_commit_pin() {
+    [[ "$PIN_VERSION" =~ ^[0-9a-fA-F]{40}$ ]]
+}
+
+checkout_pinned_source() {
+    local repo_dir="$1"
+    if is_commit_pin; then
+        local expected actual
+        expected=$(printf '%s' "$PIN_VERSION" | tr 'A-F' 'a-f')
+        git -C "$repo_dir" fetch --filter=blob:none --depth 1 origin "$expected" \
+            >/dev/null 2>&1 || return 1
+        git -C "$repo_dir" reset --hard --quiet FETCH_HEAD 2>/dev/null || return 1
+        actual=$(git -C "$repo_dir" rev-parse HEAD 2>/dev/null | tr 'A-F' 'a-f') \
+            || return 1
+        [ "$actual" = "$expected" ] || return 1
+        PIN_VERSION="$expected"
+        echo -e "  ${GREEN}✓${NC} Checked out immutable commit ${expected}"
+        return 0
+    fi
+
+    git -C "$repo_dir" fetch --filter=blob:none --tags --quiet origin \
+        >/dev/null 2>&1 || return 1
+    local tag_ref=""
+    for cand in "$PIN_VERSION" "v${PIN_VERSION#v}" "brainstem-${PIN_VERSION#v}" "brainstem-v${PIN_VERSION#v}"; do
+        if git -C "$repo_dir" rev-parse "$cand" >/dev/null 2>&1; then
+            tag_ref="$cand"
+            break
+        fi
+    done
+    [ -n "$tag_ref" ] || return 1
+    git -C "$repo_dir" checkout --quiet "$tag_ref" 2>/dev/null || return 1
+    echo -e "  ${GREEN}✓${NC} Checked out ${tag_ref}"
+}
+
 repair_brainstem_source() {
     local repo_dir="$1"
     local repair_dir="${repo_dir}-repair-$$"
@@ -102,18 +137,10 @@ repair_brainstem_source() {
     fi
 
     if [ -n "$PIN_VERSION" ]; then
-        (
-            cd "$repair_dir"
-            git fetch --filter=blob:none --tags --quiet origin
-            local tag_ref=""
-            for cand in "$PIN_VERSION" "v${PIN_VERSION#v}" "brainstem-${PIN_VERSION#v}" "brainstem-v${PIN_VERSION#v}"; do
-                if git rev-parse "$cand" >/dev/null 2>&1; then tag_ref="$cand"; break; fi
-            done
-            [ -n "$tag_ref" ] && git checkout --quiet "$tag_ref"
-        ) || {
+        if ! checkout_pinned_source "$repair_dir"; then
             rm -rf "$repair_dir" 2>/dev/null || true
             return 1
-        }
+        fi
     fi
 
     if ! brainstem_source_ready "$repair_dir"; then
@@ -329,6 +356,12 @@ check_prereqs() {
         echo -e "  ${GREEN}✓${NC} Git $(echo "$git_version" | cut -d' ' -f3) installed"
     fi
 
+    # Packaged Frontier uses Brainstem's in-app device flow and needs only the
+    # runtime. Do not add unrelated user-level tooling during first-run setup.
+    if [[ "$RUNTIME_ONLY" == true ]]; then
+        return 0
+    fi
+
     # GitHub CLI (required for Copilot token auth)
     if command -v gh &> /dev/null; then
         echo -e "  ${GREEN}✓${NC} GitHub CLI $(gh --version | head -1 | awk '{print $3}')"
@@ -482,21 +515,13 @@ install_brainstem() {
             cd "$BRAINSTEM_HOME/src"
             git remote set-url origin "$REPO_URL" 2>/dev/null || true
             git stash --quiet 2>/dev/null || true
-            git fetch --filter=blob:none origin --tags --quiet 2>/dev/null || true
             local update_succeeded=true
             if [ -n "$PIN_VERSION" ]; then
-                # Resolve the pin against every tag form we ship: the documented
-                # v0.6.0 UX, a bare 0.6.0, and the actual release tag brainstem-v0.6.0.
-                TAG_REF=""
-                for cand in "$PIN_VERSION" "v${PIN_VERSION#v}" "brainstem-${PIN_VERSION#v}" "brainstem-v${PIN_VERSION#v}"; do
-                    if git rev-parse "$cand" >/dev/null 2>&1; then TAG_REF="$cand"; break; fi
-                done
-                if [ -n "$TAG_REF" ]; then
-                    git checkout "$TAG_REF" --quiet 2>/dev/null
-                    echo -e "  ${GREEN}✓${NC} Checked out ${TAG_REF}"
-                else
+                if ! checkout_pinned_source "$BRAINSTEM_HOME/src"; then
                     echo -e "  ${RED}✗${NC} Version ${PIN_VERSION} not found. Available versions:"
-                    git tag -l 'brainstem-v*' 'v*' | sort -V | sed 's/^/    /'
+                    if ! is_commit_pin; then
+                        git tag -l 'brainstem-v*' 'v*' | sort -V | sed 's/^/    /'
+                    fi
                     exit 1
                 fi
             else
@@ -610,19 +635,13 @@ install_brainstem() {
             echo "    Your existing files were left untouched."
             exit 1
         fi
-        # If pinning, checkout the specific tag after clone (accepts every tag form).
+        # If pinning, resolve either an immutable commit or a release tag.
         if [ -n "$PIN_VERSION" ]; then
-            git -C "$SOURCE_STAGE" fetch --filter=blob:none origin --tags --quiet 2>/dev/null || true
-            TAG_REF=""
-            for cand in "$PIN_VERSION" "v${PIN_VERSION#v}" "brainstem-${PIN_VERSION#v}" "brainstem-v${PIN_VERSION#v}"; do
-                if git -C "$SOURCE_STAGE" rev-parse "$cand" >/dev/null 2>&1; then TAG_REF="$cand"; break; fi
-            done
-            if [ -n "$TAG_REF" ]; then
-                git -C "$SOURCE_STAGE" checkout "$TAG_REF" --quiet 2>/dev/null
-                echo -e "  ${GREEN}✓${NC} Checked out ${TAG_REF}"
-            else
+            if ! checkout_pinned_source "$SOURCE_STAGE"; then
                 echo -e "  ${RED}✗${NC} Version ${PIN_VERSION} not found. Available versions:"
-                git -C "$SOURCE_STAGE" tag -l 'brainstem-v*' 'v*' | sort -V | sed 's/^/    /'
+                if ! is_commit_pin; then
+                    git -C "$SOURCE_STAGE" tag -l 'brainstem-v*' 'v*' | sort -V | sed 's/^/    /'
+                fi
                 rm -rf "$SOURCE_STAGE" "$FRESH_BACKUP" 2>/dev/null || true
                 echo "    Your existing files were left untouched."
                 exit 1
@@ -761,40 +780,48 @@ install_cli() {
     echo "Installing CLI..."
     mkdir -p "$BRAINSTEM_BIN"
 
-    cat > "$BRAINSTEM_BIN/brainstem" << 'WRAPPER'
+    local installed_home_q
+    printf -v installed_home_q '%q' "$BRAINSTEM_HOME"
+    cat > "$BRAINSTEM_BIN/brainstem" << WRAPPER
 #!/bin/bash
-BRAINSTEM_HOME="$HOME/.brainstem"
-VENV_PYTHON="$BRAINSTEM_HOME/venv/bin/python"
-cd "$BRAINSTEM_HOME/src/rapp_brainstem"
+if [ -z "\${BRAINSTEM_HOME+x}" ]; then
+    BRAINSTEM_HOME=$installed_home_q
+fi
+export BRAINSTEM_HOME
+VENV_PYTHON="\$BRAINSTEM_HOME/venv/bin/python"
+cd "\$BRAINSTEM_HOME/src/rapp_brainstem"
 
 # Use venv Python; fall back to creating venv if missing
-if [ ! -x "$VENV_PYTHON" ]; then
+if [ ! -x "\$VENV_PYTHON" ]; then
     echo "  Setting up environment..."
-    PYTHON_CMD=$(command -v python3.11 || command -v python3.12 || command -v python3.13 || command -v python3)
-    "$PYTHON_CMD" -m venv "$BRAINSTEM_HOME/venv" 2>/dev/null
-    "$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || \
-        "$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt
-    VENV_PYTHON="$BRAINSTEM_HOME/venv/bin/python"
+    PYTHON_CMD=\$(command -v python3.11 || command -v python3.12 || command -v python3.13 || command -v python3)
+    "\$PYTHON_CMD" -m venv "\$BRAINSTEM_HOME/venv" 2>/dev/null
+    "\$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || \
+        "\$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt
+    VENV_PYTHON="\$BRAINSTEM_HOME/venv/bin/python"
 fi
 
 # Verify deps on every launch (fast no-op if already installed)
-if ! "$VENV_PYTHON" -c "import flask, flask_cors, requests, dotenv" 2>/dev/null; then
-    "$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || true
+if ! "\$VENV_PYTHON" -c "import flask, flask_cors, requests, dotenv" 2>/dev/null; then
+    "\$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || true
 fi
 
-exec "$VENV_PYTHON" brainstem.py "$@"
+exec "\$VENV_PYTHON" brainstem.py "\$@"
 WRAPPER
 
     chmod +x "$BRAINSTEM_BIN/brainstem"
 
+    local installed_bin_q
+    printf -v installed_bin_q '%q' "$BRAINSTEM_BIN"
     add_to_path() {
         local file="$1"
         # Create shell config if it doesn't exist (common on fresh macOS)
         touch "$file"
-        if ! grep -q '\.local/bin' "$file" 2>/dev/null; then
+        local path_line="export PATH=${installed_bin_q}:\$PATH"
+        if ! grep -Fq "$path_line" "$file" 2>/dev/null; then
             echo '' >> "$file"
             echo '# RAPP Brainstem' >> "$file"
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$file"
+            echo "$path_line" >> "$file"
         fi
     }
     add_to_path "$HOME/.bashrc"
@@ -1060,6 +1087,11 @@ main() {
                 NO_LAUNCH=true
                 shift
                 ;;
+            --runtime-only)
+                RUNTIME_ONLY=true
+                NO_LAUNCH=true
+                shift
+                ;;
             *)
                 shift
                 ;;
@@ -1083,7 +1115,9 @@ main() {
                 check_prereqs
                 setup_venv
                 ensure_deps
-                install_cli
+                if [[ "$RUNTIME_ONLY" != true ]]; then
+                    install_cli
+                fi
                 create_env
                 if [[ "$NO_LAUNCH" == true ]]; then
                     echo -e "  ${GREEN}✓${NC} Brainstem runtime is ready (launch skipped)"
@@ -1102,7 +1136,9 @@ main() {
     install_brainstem
     setup_venv
     setup_deps
-    install_cli
+    if [[ "$RUNTIME_ONLY" != true ]]; then
+        install_cli
+    fi
     create_env
 
     # Make sure brainstem and gh are on PATH for this session

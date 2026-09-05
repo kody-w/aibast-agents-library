@@ -13,6 +13,7 @@ import {
   checkForUpdates,
   githubRawUrl,
   inferManagedBetaHome,
+  packagedUpdateState,
   parseGitHubRepository,
   readUpdateConfiguration,
   resolveManagedInstall,
@@ -21,6 +22,16 @@ import {
 
 const CURRENT_COMMIT = "1".repeat(40);
 const LATEST_COMMIT = "2".repeat(40);
+
+test("packaged apps refuse the source-checkout updater explicitly", () => {
+  const state = packagedUpdateState();
+  assert.equal(state.phase, "blocked");
+  assert.match(state.message, /new signed app package/);
+  assert.match(state.detail, /disabled inside app\.asar/);
+  assert.match(state.guidance, /preserves your existing BRAINSTEM_HOME/);
+  assert.equal(state.action, "download-package");
+  assert.equal(state.actionLabel, "Download latest signed package");
+});
 
 test("GitHub repository URLs support HTTPS and SSH remotes", () => {
   assert.deepEqual(

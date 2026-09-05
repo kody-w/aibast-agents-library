@@ -169,6 +169,15 @@ Run this in PowerShell:
 irm https://microsoft.github.io/aibast-agents-library/beta/frontier.ps1 | iex
 ```
 
+Published Windows binaries are x64, per-user NSIS installers. They launch
+Frontier without elevation; first launch provisions the shared Brainstem under
+the user's `BRAINSTEM_HOME`, then waits for compatible backend and agent-load
+evidence before showing chat as ready.
+
+Windows ARM64 is not claimed as a native target. The source bootstrap fails
+with guidance rather than mixing ARM64 Node with x64-only Electron or media
+binaries. Use an x64 Windows 11 device or x64 virtual machine for this preview.
+
 ### macOS or Linux
 
 ```bash
@@ -186,6 +195,45 @@ Launchpad, the Linux app menu, the Windows Desktop/Start Menu, or run:
 brainstem-frontier
 ```
 
+### Packaged app first run
+
+A published `.dmg` or `.exe` no longer assumes `~/.brainstem` already exists.
+The package carries the root Brainstem installers plus a manifest that binds
+their SHA-256 hashes, repository, and runtime source to the package's full
+40-character release commit. On launch, Frontier:
+
+1. verifies the existing `BRAINSTEM_HOME` source, Python environment, and
+   required imports without changing a ready installation;
+2. automatically provisions only when the entire target `BRAINSTEM_HOME` is
+   absent; an old, partial, dirty, or incompatible home fails closed with manual
+   repair guidance and is never reset;
+3. runs the existing root installer in `--runtime-only --no-launch` mode against
+   the package's immutable commit inside a unique versioned sibling stage;
+4. verifies the staged source, fresh venv, Python 3.11+, required memory-agent
+   files, soul, dependencies, and `brainstem.py` syntax;
+5. atomically creates a no-replace directory link from the still-absent target
+   to that verified stage (a Windows junction on Windows), then requires
+   compatible `/health` evidence before starting the rest of Frontier.
+
+Failures remove the stage, preserve the prior target, remain visible, and name
+the sanitized installer log plus the next action. Frontier never asks the
+installer to authenticate. Launcher and worker log boundaries redact known
+token, secret, authorization-header, credential-URL, quoted-assignment, and
+nested JSON fields; route response/agent-log previews use the same sanitizer.
+Raw child output is not claimed safe or written directly.
+
+Compatibility is also fail-closed: Frontier requires Brainstem 0.6.16 or newer,
+a present soul, loaded-agent evidence, the routed `ContextMemory` and
+`ManageMemory` agents, and an empty quarantine/load-error list before it shows
+chat as ready. `BRAINSTEM_HOME` remains authoritative even when it differs from
+`HOME` or `USERPROFILE`.
+
+The packaged GitHub Copilot platform executable is resolved from
+`app.asar.unpacked` (never the logical `app.asar` path passed to `spawn`).
+Source and Brainstem fingerprints are computed only after the window exists and
+runtime provisioning succeeds, so a missing clean-machine runtime cannot crash
+during module evaluation.
+
 ## Check for updates
 
 Open the three-dot **RAPP Brainstem Frontier** dropdown in the Brainstem toolbar and
@@ -198,6 +246,11 @@ installer against that exact commit. This refreshes both the desktop launcher
 and the shared Brainstem source, runs the Frontier checks, and reopens the app.
 Tracked local changes in the Frontier checkout block the update instead of being
 discarded.
+
+That updater applies only to source-managed Frontier checkouts. A packaged app
+does not try to rewrite `app.asar`; its update panel fails closed with a link to
+download and install a newer signed package. Replacing the app preserves the
+existing `BRAINSTEM_HOME`.
 
 ## Drive Frontier through chat
 
@@ -243,6 +296,15 @@ Both installers default to:
 https://github.com/microsoft/aibast-agents-library.git
 ```
 
+Binary packaging runs `npm run prepare:bootstrap` before electron-builder. The
+preparation step refuses dirty tracked source, records the exact checkout HEAD,
+and copies the matching root installers into the packaged resources. Release
+mode is the default and requires
+`https://github.com/microsoft/aibast-agents-library.git`. A fork build must set
+`BRAINSTEM_BETA_PACKAGE_MODE=development` and carries the distinct
+`rapp-brainstem-frontier-development` provenance identity. Runtime environment
+variables cannot replace packaged provenance.
+
 The `BRAINSTEM_BETA_REPO_URL` and `BRAINSTEM_BETA_REF` environment variables
 exist only for fork staging and release-candidate verification.
 
@@ -263,6 +325,11 @@ Release procedure and source-only publication rules are documented in
 ## Uninstall the launcher
 
 Removing Frontier does not remove the shared Brainstem or user data.
+
+The Windows NSIS uninstaller is per-user and intentionally leaves Electron
+profile data and `%USERPROFILE%\.brainstem` intact. Remove those separately
+only when you explicitly want to delete agents, memories, recordings, and
+authentication state.
 
 ```bash
 rm -rf ~/.brainstem/beta-launcher

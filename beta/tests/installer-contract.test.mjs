@@ -5,8 +5,14 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repositoryRoot = path.resolve(root, "..");
 const unix = readFileSync(path.join(root, "install.sh"), "utf8");
 const windows = readFileSync(path.join(root, "install.cmd"), "utf8");
+const rootUnix = readFileSync(path.join(repositoryRoot, "install.sh"), "utf8");
+const rootWindows = readFileSync(
+  path.join(repositoryRoot, "install.ps1"),
+  "utf8",
+);
 const installerPage = readFileSync(path.join(root, "index.html"), "utf8");
 const downloadCenter = readFileSync(path.join(root, "download-center.js"), "utf8");
 const frontierUnix = readFileSync(path.join(root, "frontier.sh"), "utf8");
@@ -17,6 +23,10 @@ const packageJson = JSON.parse(
 const main = readFileSync(path.join(root, "electron", "main.mjs"), "utf8");
 const brainSurgeon = readFileSync(
   path.join(root, "electron", "brain-surgeon.mjs"),
+  "utf8",
+);
+const copilotRuntime = readFileSync(
+  path.join(root, "electron", "copilot-runtime.mjs"),
   "utf8",
 );
 const routeManager = readFileSync(
@@ -52,6 +62,26 @@ const walkthroughGate = readFileSync(
 );
 const walkthroughCertify = readFileSync(
   path.join(root, "scripts", "walkthrough-certify.mjs"),
+  "utf8",
+);
+const packageGate = readFileSync(
+  path.join(root, "scripts", "package-gate.mjs"),
+  "utf8",
+);
+const prepareBootstrap = readFileSync(
+  path.join(root, "scripts", "prepare-package-bootstrap.mjs"),
+  "utf8",
+);
+const provisionerSource = readFileSync(
+  path.join(root, "electron", "brainstem-provisioner.mjs"),
+  "utf8",
+);
+const provisionLock = readFileSync(
+  path.join(root, "electron", "provision-lock.mjs"),
+  "utf8",
+);
+const safeLog = readFileSync(
+  path.join(root, "electron", "safe-log.mjs"),
   "utf8",
 );
 const brainstemUi = readFileSync(
@@ -117,6 +147,195 @@ test("released beta installs can pin the launcher and runtime to one commit", ()
   // breaks every pinned-commit install on Windows; the block must use !...!.
   assert.doesNotMatch(windows, /rev-parse HEAD > "%ACTUAL_COMMIT_FILE%"/);
   assert.doesNotMatch(windows, /for \/f "delims=" %%H in \('.*rev-parse HEAD.*\)/);
+});
+
+test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () => {
+  assert.match(packageJson.scripts["prepare:bootstrap"], /prepare-package-bootstrap/);
+  assert.match(packageJson.scripts["dist:mac"], /prepare:bootstrap/);
+  assert.deepEqual(packageJson.build.extraResources[0], {
+    from: "build/generated/bootstrap",
+    to: "bootstrap",
+    filter: ["**/*"],
+  });
+  assert.match(packageJson.scripts.check, /brainstem-provisioner\.mjs/);
+  assert.match(packageJson.scripts.check, /provision-lock\.mjs/);
+  assert.match(packageJson.scripts.check, /safe-log\.mjs/);
+  assert.match(main, /new BrainstemProvisioner/);
+  assert.match(main, /app\.isPackaged/);
+  const services = main.slice(
+    main.indexOf("async function startServices()"),
+    main.indexOf("const hasLock = app.requestSingleInstanceLock()"),
+  );
+  const ensureIndex = services.indexOf("provisioner.ensure()");
+  const managersIndex = services.indexOf("initializeProvisionedManagers()");
+  const startupFingerprintIndex = services.indexOf("betaSourceFingerprint(");
+  const fingerprintIndex = services.indexOf("runtimeDirectoryFingerprint(");
+  assert.ok(ensureIndex >= 0);
+  assert.ok(managersIndex >= 0);
+  assert.ok(startupFingerprintIndex >= 0);
+  assert.ok(fingerprintIndex >= 0);
+  assert.ok(
+    ensureIndex < startupFingerprintIndex
+      && ensureIndex < fingerprintIndex
+      && ensureIndex < managersIndex,
+    "fingerprints must run only after provisioning",
+  );
+  assert.doesNotMatch(
+    main.slice(0, main.indexOf("async function startServices()")),
+    /= (?:betaSourceFingerprint|runtimeDirectoryFingerprint)\(/,
+  );
+  const ready = main.slice(main.indexOf("app.whenReady().then"));
+  const windowIndex = ready.indexOf("mainWindow = createWindow()");
+  const servicesIndex = ready.indexOf("void startServices()");
+  assert.ok(windowIndex >= 0);
+  assert.ok(servicesIndex >= 0);
+  assert.ok(
+    windowIndex < servicesIndex,
+    "the provisioning UI must exist before runtime checks begin",
+  );
+  assert.match(ui, /id="startup-status"/);
+  assert.match(ui, /immutable release commit/);
+  assert.match(ui, /id="intro" class="hidden"/);
+  assert.match(renderer, /state\.brainstem\.detail/);
+  assert.match(renderer, /intro\.classList\.add\("hidden"\)/);
+  assert.match(main, /Evidence certification is disabled for this session/);
+  assert.match(main, /fingerprintWarnings/);
+});
+
+test("packaged Copilot CLI always resolves to an executable outside ASAR", () => {
+  assert.ok(
+    packageJson.build.asarUnpack.includes("node_modules/@github/copilot-*/**"),
+  );
+  assert.match(copilotRuntime, /app\.asar\.unpacked/);
+  assert.match(copilotRuntime, /process\.resourcesPath/);
+  assert.match(copilotRuntime, /RUNNING_FROM_ASAR && !cliPath/);
+  assert.match(packageGate, /"Copilot CLI"/);
+  assert.match(packageGate, /\["--version"\]/);
+});
+
+test("single-instance lock precedes every stateful runtime constructor", () => {
+  const lock = main.indexOf("const hasLock = app.requestSingleInstanceLock()");
+  assert.ok(lock > 0);
+  const beforeLock = main.slice(0, lock);
+  for (const constructor of [
+    "new BrainstemProvisioner",
+    "new BetaRouteManager",
+    "new CopilotRuntime",
+    "new CopilotStudioAuthManager",
+    "new RappStoreClient",
+    "new TwinManager",
+  ]) {
+    assert.doesNotMatch(beforeLock, new RegExp(constructor));
+    assert.ok(main.indexOf(constructor, lock) > lock);
+  }
+});
+
+test("packaged smoke requires real service readiness in an isolated home", () => {
+  assert.match(main, /BRAINSTEM_BETA_SMOKE_REQUIRE_READY/);
+  assert.match(main, /state\.brainstem\.phase !== "ready"/);
+  assert.match(main, /app\.exit\(requestedExitCode\)/);
+  assert.match(packageGate, /!key\.startsWith\("BRAINSTEM_"\)/);
+  assert.match(packageGate, /HOME: isolatedHome/);
+  assert.match(packageGate, /USERPROFILE: isolatedHome/);
+  assert.match(packageGate, /BRAINSTEM_HOME: brainstemHome/);
+  assert.match(packageGate, /provisions a missing runtime and reaches readiness/);
+  assert.match(packageGate, /missing-runtime bootstrap left no abandoned staging home/);
+  assert.match(packageGate, /provisioning log scrubs credential canaries/);
+  assert.match(packageGate, /packaged smoke reached a compatible Brainstem service/);
+  assert.match(packageGate, /packaged smoke fails closed when its Brainstem service fails/);
+});
+
+test("bootstrap staging, lock ownership, and log redaction are explicit", () => {
+  assert.match(provisionerSource, /Automatic repair was not attempted/);
+  assert.match(provisionerSource, /agents", "context_memory_agent\.py"/);
+  assert.match(provisionerSource, /agents", "manage_memory_agent\.py"/);
+  assert.match(provisionerSource, /Python 3\.11\+ is required/);
+  assert.match(provisionerSource, /compile\(source/);
+  assert.match(provisionerSource, /frontier-stage-/);
+  assert.match(provisionerSource, /this\.link\([\s\S]*stageHome,[\s\S]*this\.config\.brainstemHome/);
+  assert.match(provisionerSource, /No runtime was activated/);
+  assert.match(provisionLock, /randomBytes\(32\)/);
+  assert.match(provisionLock, /\.stale-\$\{token\}/);
+  assert.match(provisionLock, /before\.owner\.token !== token/);
+  assert.match(safeLog, /github_pat_/);
+  assert.match(safeLog, /\[REDACTED\]/);
+  assert.match(provisionerSource, /detached: this\.platform !== "win32"/);
+  assert.match(provisionerSource, /taskkill\.exe/);
+  assert.match(provisionerSource, /process\.kill\(-pid, signal\)/);
+  assert.match(main, /Shutdown cleanup failed/);
+});
+
+test("release packaging is canonical and fork packaging is explicit development", () => {
+  assert.match(prepareBootstrap, /BRAINSTEM_BETA_PACKAGE_MODE \|\| "release"/);
+  assert.match(prepareBootstrap, /rapp-brainstem-frontier-development/);
+  assert.match(provisionerSource, /release provenance must use/);
+  assert.match(provisionerSource, /microsoft\/aibast-agents-library/);
+});
+
+test("packaged updater refuses the source-checkout path inside app.asar", () => {
+  assert.match(main, /if \(app\.isPackaged\)[\s\S]*packagedUpdateState\(\)/);
+  assert.match(main, /if \(!app\.isPackaged\) loadPendingUpdateResult\(\)/);
+  assert.match(main, /Download Latest Package\.\.\./);
+  assert.match(main, /beta:open-package-download/);
+  assert.match(main, /rapp-beta:download-package/);
+  assert.match(preload, /openPackageDownload/);
+  assert.match(renderer, /rapp-beta:download-package/);
+  assert.match(
+    readFileSync(path.join(root, "electron", "update-manager.mjs"), "utf8"),
+    /source-checkout updater is disabled inside app\.asar/,
+  );
+});
+
+test("Windows package is x64 per-user NSIS and preserves user data", () => {
+  assert.match(packageJson.scripts["dist:win"], /--win nsis --x64/);
+  assert.deepEqual(packageJson.build.win.target, [{
+    target: "nsis",
+    arch: ["x64"],
+  }]);
+  assert.match(packageJson.build.win.artifactName, /windows-x64-setup/);
+  assert.equal(packageJson.build.nsis.oneClick, false);
+  assert.equal(packageJson.build.nsis.perMachine, false);
+  assert.equal(packageJson.build.nsis.allowElevation, false);
+  assert.equal(packageJson.build.nsis.deleteAppDataOnUninstall, false);
+  assert.equal(packageJson.build.nsis.runAfterFinish, true);
+});
+
+test("Windows AppUserModelID is set before any window can be created", () => {
+  const lock = main.indexOf("const hasLock = app.requestSingleInstanceLock()");
+  const appId = main.indexOf("app.setAppUserModelId(APP_ID)", lock);
+  const secondInstance = main.indexOf('app.on("second-instance"', lock);
+  const ready = main.indexOf("app.whenReady().then", lock);
+  assert.ok(lock >= 0);
+  assert.ok(appId > lock);
+  assert.ok(appId < secondInstance);
+  assert.ok(appId < ready);
+  assert.match(main, /const APP_ID = "com\.microsoft\.aibast\.rapp-brainstem-beta"/);
+  assert.equal(packageJson.build.appId, "com.microsoft.aibast.rapp-brainstem-beta");
+});
+
+test("Windows ARM64 source bootstrap fails instead of mixing architectures", () => {
+  for (const bootstrap of [windows, frontierWindows]) {
+    assert.match(bootstrap, /PROCESSOR_ARCHITECTURE/);
+    assert.match(bootstrap, /PROCESSOR_ARCHITEW6432/);
+    assert.match(bootstrap, /Windows ARM64 is not a native/);
+    assert.match(bootstrap, /x64 Windows 11/);
+  }
+  assert.match(windows, /set "NODE_PLATFORM=win-x64"/);
+  assert.doesNotMatch(windows, /NODE_PLATFORM=win-arm64/);
+  assert.match(rootWindows, /winget install --id \$PackageId --scope user/);
+});
+
+test("root installers expose a non-launching commit-pinned runtime mode", () => {
+  assert.match(rootUnix, /BRAINSTEM_HOME="\$\{BRAINSTEM_HOME:-\$HOME\/\.brainstem\}"/);
+  assert.match(rootUnix, /--runtime-only/);
+  assert.match(rootUnix, /fetch --filter=blob:none --depth 1 origin "\$expected"/);
+  assert.match(rootUnix, /Checked out immutable commit/);
+  assert.match(rootWindows, /if \(\$env:BRAINSTEM_HOME\)/);
+  assert.match(rootWindows, /\$VENV_DIR = "\$BRAINSTEM_HOME\\venv"/);
+  assert.match(rootWindows, /--runtime-only/);
+  assert.match(rootWindows, /fetch --filter=blob:none --depth 1 origin \$expected/);
+  assert.match(rootWindows, /Checked out immutable commit/);
+  assert.match(windows, /if not defined BRAINSTEM_HOME/);
 });
 
 test("dedicated beta page resolves fork releases without changing main install", () => {
@@ -239,6 +458,8 @@ test("chat can hot-load an animated driver for the real frontend", () => {
   assert.match(routeManager, /AGENTS_PATH/);
   assert.match(routeManager, /ephemeralAgent/);
   assert.match(routeManager, /globalAgentEntries/);
+  assert.match(routeManager, /expectedAgents: \["ContextMemory", "ManageMemory"\]/);
+  assert.match(routeManager, /rejectQuarantined: true/);
   assert.match(uiDriverServer, /\/v1\/recording-upload/);
   assert.match(uiDriverServer, /createWriteStream/);
   assert.match(driveViaChat, /action: "surgeon_chat"/);

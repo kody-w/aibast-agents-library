@@ -13,5 +13,7 @@ __pycache__/
 .DS_Store
 node_modules/
 beta/release/
+beta/build/generated/
+beta/.test-tmp/
 browser-audit/mutation-runs/
 work/
