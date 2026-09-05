@@ -144,6 +144,26 @@ present and are never copied into chat, source, logs, or checkpoints.
 The deployment engine remains the existing agent.py pipeline. The Frontier pill is
 only the visible conversational entry point and safety/control loop around it.
 
+### Native Copilot Studio conversion charter
+
+Microsoft's Copilot Studio plugin owns native authoring. RAPP supplies the
+source behavior contract, preserves source files, and checks the mapping and
+functional parity; it does not build a second compiler or hosted runtime.
+
+The target executes directly inside Copilot Studio using native skills
+(including supporting Python files where supported), tools, and agent flows.
+Power Automate and Dataverse may implement workflows and scoped durable state.
+Business connectors call the original business service, not a RAPP bridge.
+Azure Functions, externally hosted RAPP/Python, localhost bridges, and new MCP
+servers are not conversion fallbacks. This constraint is specific to native
+Copilot Studio conversion, not the repository's other deployment tracks.
+
+Every selected capability must preserve inputs, outputs, errors, side effects,
+and state semantics. A prompt is not executable code, RAG is not mutable
+memory, and a package is not evidence of runtime parity. An unmappable
+behavior remains an explicit blocker; only the real Draft parity gate can
+justify completion.
+
 Generic conversion is proven against the Frontier-owned industry matrix at
 `resources/copilot-studio/industry-agent-matrix.json`. The matrix covers
 read-only network tools, deterministic content, workflow orchestration,

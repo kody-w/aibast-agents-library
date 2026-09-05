@@ -1,0 +1,12 @@
+{
+  "name": "rapp-studio",
+  "version": "0.1.0",
+  "description": "RAPP behavior mapping and parity around Microsoft's Copilot Studio authoring plugin. Native Studio execution, not an external RAPP bridge.",
+  "author": {
+    "name": "AIBAST"
+  },
+  "repository": "https://github.com/kody-w/rapp-copilot-studio-plugin",
+  "license": "MIT",
+  "commands": "./commands",
+  "skills": "./skills"
+}

@@ -49,7 +49,7 @@ except ModuleNotFoundError:
 __manifest__ = {
     "schema": "rapp-agent/1.0",
     "name": "@kody-w/copilot_studio_parity_deploy",
-    "version": "1.0.14",
+    "version": "1.0.15",
     "display_name": "Copilot Studio Parity Deploy",
     "description": (
         "Compiles caller-selected local RAPP agents into a provisioned, "
@@ -1328,17 +1328,23 @@ def _derived_constraints(contracts: list[dict]) -> list[str]:
         "The selected agent.py observable behavior is the canonical contract. "
         "Copilot Studio must be black-box indistinguishable from Brainstem for "
         "the same inputs, outputs, errors, side effects, and context behavior.",
-        "Always recreate the RAPP capability itself. Platform-native features may "
-        "augment it, but must never replace a non-identical implementation; the "
-        "custom path must still work when optional platform features are disabled.",
-        "Translate behavior semantically; never claim the Python runtime itself was deployed.",
+        "Microsoft's Copilot Studio plugin owns native artifact authoring. RAPP "
+        "supplies the source behavior contract and checks the resulting mapping "
+        "and parity; do not build a parallel compiler or runtime.",
+        "Implement the capability directly inside Copilot Studio using native "
+        "skills (including supporting Python files), tools, and agent flows. "
+        "Do not provision Azure Functions, external RAPP/Python runtimes, a "
+        "localhost bridge, or a new MCP server as a conversion fallback.",
+        "Preserve observable behavior, not the Brainstem runtime. Native "
+        "packaging alone does not prove execution or functional parity.",
         "Do not fabricate a successful external lookup or state change when no executable "
         "Copilot Studio capability backs it.",
         "Preserve each selected agent's input schema, validation bounds, return/error "
         "semantics, and safety rules from the source file.",
-        "A missing in-sandbox capability is not a terminal gap. Provision durable "
-        "state, a connector, MCP server, workflow, or another supported external "
-        "runtime; then re-author, push, and preview until the parity case passes.",
+        "Resolve gaps with native Dataverse state, connectors to the original "
+        "business services, or agent flows/Power Automate. If a behavior cannot "
+        "be mapped natively, report that exact blocker and do not finalize or "
+        "silently replace execution with a prompt or knowledge file.",
         "PAC 2.10.x does not serialize every UI-bound tool. Push authored YAML "
         "before binding UI-only infrastructure tools, and never push again after "
         "those bindings unless the pipeline will deterministically rebind them.",
@@ -1361,16 +1367,16 @@ def _derived_constraints(contracts: list[dict]) -> list[str]:
                 )
                 + ". Implement it with a real supported executable capability; "
                 "do not substitute model knowledge or static sample data. If "
-                "in-sandbox networking is restricted, provision a custom connector, "
-                "MCP server, or workflow and retry."
+                "in-sandbox networking is restricted, author a native connector "
+                "or agent flow to the original business API, not a RAPP bridge."
             )
         if analysis["persistence_signals"]:
             constraints.append(
                 f"{tool_name}: the source contains persistence signals "
                 f"{', '.join(analysis['persistence_signals'])}. Preserve durable "
-                "cross-conversation state with a custom supported cloud store that "
-                "matches the source record/scope semantics. Built-in platform memory "
-                "may also be enabled, but it does not replace this custom parity path."
+                "cross-conversation state with native Dataverse tools/flows that "
+                "match the source record/scope semantics. Conversation history, "
+                "RAG, and skill scratch files are not durable mutable memory."
             )
         if contract["has_system_context"]:
             constraints.append(
@@ -1405,10 +1411,10 @@ def _infrastructure_requests(contracts: list[dict]) -> list[dict]:
                 },
                 "provisioner_order": [
                     "custom_connector",
-                    "mcp_server",
                     "agent_workflow",
                 ],
-                "terminal_on_missing": False,
+                "execution_boundary": "copilot-studio-native",
+                "terminal_on_missing": True,
             })
         if analysis["persistence_signals"]:
             requests.append({
@@ -1424,11 +1430,11 @@ def _infrastructure_requests(contracts: list[dict]) -> list[dict]:
                 },
                 "provisioner_order": [
                     "dataverse_table_or_annotations",
-                    "custom_connector",
-                    "mcp_server",
+                    "agent_workflow",
                 ],
-                "platform_features": "optional-augmentation-only",
-                "terminal_on_missing": False,
+                "platform_features": "semantic-parity-required",
+                "execution_boundary": "copilot-studio-native",
+                "terminal_on_missing": True,
             })
     return requests
 
@@ -1472,6 +1478,8 @@ def _build_manifest(
         "capability_constraints": _derived_constraints(contracts),
         "infrastructure_requests": _infrastructure_requests(contracts),
         "deployment_policy": {
+            "execution_boundary": "copilot-studio-native",
+            "external_compute_allowed": False,
             "authoring_plugin": "mcs-assistant@copilot-studio-plugin",
             "authoring_plugin_revision": PLUGIN_REVISION,
             "authoring_mode": "cli-copilot",
@@ -1479,8 +1487,8 @@ def _build_manifest(
             "publish": False,
             "source_files_must_remain_unchanged": True,
             "parity_target": "black-box-1-to-1-with-agent.py",
-            "platform_features": "optional-augmentation-only",
-            "gap_policy": "provision-infrastructure-and-retry",
+            "platform_features": "semantic-parity-required",
+            "gap_policy": "native-repair-or-block",
             "verification_loop": [
                 "author",
                 "push-draft",
@@ -1824,7 +1832,7 @@ publish. The Python behavior is the semantic authority only.
 
 Read every source snapshot above. The Python files describe the behavior, but
 the target must be a modern Copilot Studio CLI/agentic-loop project. Implement
-the closest honest cloud-native equivalent in the target project. The final
+the behavior directly inside Copilot Studio, not behind an external runtime. The final
 artifact is the YAML and supporting files written under the initialized target;
 do not stop at a design or JSON proposal, do not modify `.mcs`, and do not
 modify the source agents.
@@ -1852,15 +1860,18 @@ They are mandatory parity work, not optional recommendations:
    the selected source agents. The number and kind of components must be based
    on the files, not on a fixed bundle.
 4. When static analysis reports live I/O, persistence, always-on context, or
-   side effects, implement the closest supported executable/cloud-native
+   side effects, implement a supported native executable
    equivalent and preserve the source's validation and error semantics.
 5. If a required integration cannot be fully bound from the available project
    assets, do not stop at a documented gap. Emit the concrete infrastructure
-   requirement, provision a Dataverse state layer, connector, MCP server,
-   workflow, or equivalent supported runtime, then re-author and retest.
-6. Platform-native capabilities are optional augmentations only. Even when a
-   matching platform feature is enabled, preserve a custom implementation that
-   reproduces the selected agent.py when that feature is disabled.
+   requirement and author native Dataverse tools, business-service connectors,
+   or agent flows, then re-author and retest. Never escape to Azure Functions,
+   an external RAPP/Python runtime, localhost, or a new MCP server. An unmappable
+   behavior blocks completion.
+6. Use InlineAgentSkill supporting Python files for compatible deterministic
+   code. Preserve input/output, error, state, and side-effect semantics. This
+   agentic loop does not support classic topics, Power Fx, or global/topic
+   variables. Do not mistake knowledge retrieval for execution or memory.
 7. Every authored `.mcs.yml` component filename except `settings.mcs.yml` must
    begin with `{manifest['publisher_prefix']}_` and stay within 100 characters.
 8. You have file read/write tools only. Do not require shell access. For every

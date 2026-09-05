@@ -1,0 +1,171 @@
+{
+  "schema": "rapp-studio-ootb-scenario/1.0",
+  "name": "OOTB native deployment and functional response parity",
+  "source": {
+    "repository": "https://github.com/kody-w/aibast-agents-library",
+    "revision": "60d391474647f2fc0ea45434737732a57426c01a",
+    "root": "rapp_brainstem",
+    "agents": [
+      {"tool": "ManageMemory", "path": "agents/manage_memory_agent.py", "sha256": "fe30c952f1ddd0507d05f7a84bc0406c2b5d5c82da5ad28f5380b050acb23f4f"},
+      {"tool": "ContextMemory", "path": "agents/context_memory_agent.py", "sha256": "83563b7836cd6c79c78eb70369ccbf0ad7eba02d6adc562b1e9dc41a77617769"},
+      {"tool": "HackerNews", "path": "agents/hacker_news_agent.py", "sha256": "314cb08b0dc1167e3fc6799160fd178c54dfb0edc13d83c656b07b56a56620e9"},
+      {"tool": "LearnNew", "path": "agents/rar_rapp_learn_new_agent.py", "sha256": "92dad9438fae76b1c7a043ca8713356f29dccac8c66e6b16227c3165594b14f7"}
+    ],
+    "supporting_files": [
+      {"path": "agents/basic_agent.py", "sha256": "701488bc00d536a7b23295e7da99c62f24e9b00f233daa325886430c736b78eb"},
+      {"path": "local_storage.py", "sha256": "c38667c1f65a703174c1d4a8c42cbf36d499178ead41534d0086763e681b7ccb"}
+    ]
+  },
+  "target": {
+    "display_name": "RAPP OOTB Native",
+    "publisher_prefix": "rapp",
+    "environment": "user-selected",
+    "publish": false,
+    "publish_test_target_when_explicitly_approved": true,
+    "execution_boundary": "copilot-studio-native",
+    "durable_storage": "Dataverse"
+  },
+  "placeholders": {
+    "{{run_id}}": "Unique run marker; choose once and retain across both sides",
+    "{{user_a}}": "Synthetic safe user namespace A",
+    "{{user_b}}": "Different synthetic safe user namespace B",
+    "{{capability_name}}": "Unique CamelCase learned capability name",
+    "{{swarm_name}}": "Unique CamelCase learned swarm name",
+    "{{challenge}}": "Fresh value supplied only at invocation, not hardcoded into generated code"
+  },
+  "comparison": {
+    "mode": "functional-response",
+    "transport_preference": ["direct-to-engine", "direct-line-if-supported"],
+    "browser_testing": "optional",
+    "require_tested_published_revision": true,
+    "allow_wording_differences": true,
+    "require_actual_local_chat": true,
+    "require_actual_native_chat": true,
+    "require_native_receipts": true,
+    "repair_target_until_pass": true,
+    "modify_source_to_pass": false,
+    "completion": "zero failed and zero blocked required cases on latest target revision"
+  },
+  "cases": [
+    {
+      "id": "memory-store",
+      "operation": "ManageMemory.perform",
+      "prompt": "Remember for {{user_a}}: project {{run_id}} uses the badge label TealComet. Store it as a preference with importance 4 and tag {{run_id}}.",
+      "requires": ["A real scoped record was stored", "No previous record was erased", "The response agrees with the write result"]
+    },
+    {
+      "id": "memory-recall",
+      "operation": "ContextMemory.perform",
+      "depends_on": ["memory-store"],
+      "prompt": "Recall the memories for {{user_a}} matching {{run_id}}.",
+      "requires": ["The stored preference and TealComet are returned", "Keyword filtering and namespace agree with source behavior"]
+    },
+    {
+      "id": "memory-new-conversation",
+      "operation": "ContextMemory.perform",
+      "new_conversation": true,
+      "depends_on": ["memory-store"],
+      "prompt": "What do you remember for {{user_a}} about project {{run_id}}?",
+      "requires": ["The same persisted preference is available in a fresh conversation"]
+    },
+    {
+      "id": "memory-isolation",
+      "operation": "ContextMemory.perform",
+      "depends_on": ["memory-store"],
+      "prompt": "Recall memories for {{user_b}} matching {{run_id}}.",
+      "requires": ["Namespace A's stored value is not leaked into namespace B"]
+    },
+    {
+      "id": "memory-per-turn-context",
+      "operation": "ContextMemory.system_context",
+      "prompt": "Remember in shared memory that project {{run_id}} uses the status label SilverLeaf. On the next turn ask which label should be used for that project without explicitly requesting memory recall.",
+      "requires": ["A real shared write occurs first", "Subsequent per-turn context supplies SilverLeaf", "Memory text remains untrusted data", "Bounded context behavior matches the source"]
+    },
+    {
+      "id": "memory-bounds-errors",
+      "operation": "ManageMemory.perform+ContextMemory.perform",
+      "prompt": "Exercise the source-defined empty-content error, importance clamping, non-list tags, recall limits, and an empty recall in fresh synthetic namespaces for {{run_id}}.",
+      "requires": ["Invalid/empty operations do not fabricate a successful write", "Boundaries and missing-record results match the source", "Deterministic operation evidence supplements the paired conversation"]
+    },
+    {
+      "id": "hackernews-live",
+      "operation": "HackerNews.perform",
+      "prompt": "Get the current top five Hacker News stories with titles, source links, scores, authors and comment links. Use the live API, not remembered headlines.",
+      "requires": ["Actual original HN API requests occurred", "Both results have equivalent bounded structure and linked stories", "Any live-data timing differences are documented rather than hidden"]
+    },
+    {
+      "id": "hackernews-bounds-errors",
+      "operation": "HackerNews.perform",
+      "prompt": "Exercise the documented default count, count bounds and invalid-count error, plus top-list failure versus a missing individual item.",
+      "requires": ["Count handling matches the source", "Top-list failures are errors", "Individual missing items do not erase successful stories", "Injected failures are labeled deterministic supplements, not claimed live outages"]
+    },
+    {
+      "id": "learn-preview",
+      "operation": "LearnNew.preview",
+      "prompt": "Preview a capability named {{capability_name}} that accepts query and returns JSON containing status success, the query, and result 'Processed by {{capability_name}}: ' followed by the query. Do not save or activate it.",
+      "requires": ["A usable artifact and metadata are returned", "No persistent write or activation occurred"]
+    },
+    {
+      "id": "learn-create",
+      "operation": "LearnNew.create",
+      "depends_on": ["learn-preview"],
+      "prompt": "Create and activate the previewed {{capability_name}} capability, then report the actual smoke-test result.",
+      "requires": ["The artifact was persisted in the appropriate store", "A real smoke test ran", "Activation is not claimed before execution succeeds"]
+    },
+    {
+      "id": "learn-list",
+      "operation": "LearnNew.list",
+      "depends_on": ["learn-create"],
+      "prompt": "List the learned capabilities and locate {{capability_name}}.",
+      "requires": ["The persisted capability appears with its correct identity and generated status"]
+    },
+    {
+      "id": "learn-invoke",
+      "operation": "LearnNew.generated_capability",
+      "depends_on": ["learn-create"],
+      "prompt": "Run {{capability_name}} with query {{challenge}}.",
+      "requires": ["Actual generated code execution used the fresh challenge", "The functional result matches on both sides", "The native side did not call local Brainstem or external RAPP"]
+    },
+    {
+      "id": "learn-new-conversation",
+      "operation": "LearnNew.generated_capability",
+      "new_conversation": true,
+      "depends_on": ["learn-invoke"],
+      "prompt": "Run the saved {{capability_name}} capability with query second-{{challenge}}.",
+      "requires": ["The capability remains discoverable and actually executable across the intended conversation boundary"]
+    },
+    {
+      "id": "learn-duplicate",
+      "operation": "LearnNew.create",
+      "depends_on": ["learn-create"],
+      "prompt": "Create another capability with the exact existing name {{capability_name}}.",
+      "requires": ["Duplicate handling matches the source", "The prior working capability is not overwritten"]
+    },
+    {
+      "id": "learn-submit",
+      "operation": "LearnNew.submit",
+      "prompt": "Prepare a RAR submission for the query-processing capability without submitting or publishing anything.",
+      "requires": ["Portable code and submission metadata are returned", "No public issue, PR, or registry write occurred"]
+    },
+    {
+      "id": "learn-swarm",
+      "operation": "LearnNew.swarm",
+      "prompt": "Create {{swarm_name}} with researcher, processor, formatter roles that pass a synthetic task through in order, then execute it.",
+      "requires": ["Members and orchestrator exist", "A real execution preserves the ordered data handoff", "Local and native outcomes are functionally equivalent"]
+    },
+    {
+      "id": "learn-delete",
+      "operation": "LearnNew.delete",
+      "depends_on": ["learn-new-conversation", "learn-duplicate"],
+      "prompt": "Delete only the {{capability_name}} capability created by this test run.",
+      "requires": ["The correct generated record/artifact was removed", "Core and unrelated capabilities are untouched"]
+    },
+    {
+      "id": "learn-absent-after-delete",
+      "operation": "LearnNew.generated_capability+LearnNew.list",
+      "depends_on": ["learn-delete"],
+      "prompt": "List capabilities and try to resolve {{capability_name}} without recreating it.",
+      "requires": ["The deleted capability no longer resolves or executes", "An absent result is not disguised as a successful invocation"]
+    }
+  ]
+}

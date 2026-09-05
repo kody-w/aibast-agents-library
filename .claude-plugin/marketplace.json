@@ -1,0 +1,17 @@
+{
+  "name": "aibast-rapp",
+  "owner": {
+    "name": "AIBAST"
+  },
+  "metadata": {
+    "description": "RAPP workflows for native Microsoft downstream platforms."
+  },
+  "plugins": [
+    {
+      "name": "rapp-studio",
+      "description": "Map any selected RAPP agent group through Microsoft's Copilot Studio plugin, with native execution and behavioral parity gates.",
+      "version": "0.1.0",
+      "source": "./plugins/rapp-studio"
+    }
+  ]
+}

@@ -13,7 +13,7 @@ const factoryResourceUrl = new URL(
 
 test("bundled parity deploy agent builds an explicit frozen agents package", async () => {
   const source = await readFile(resourceUrl, "utf8");
-  assert.match(source, /"version": "1\.0\.14"/);
+  assert.match(source, /"version": "1\.0\.15"/);
   assert.match(source, /BETA_DRAFT_ONLY = True/);
   assert.match(source, /self\.name = "CopilotStudioDeployBeta"/);
   assert.match(source, /relative\.parts\[0\] == "runtime"/);
@@ -32,11 +32,23 @@ test("bundled parity deploy agent builds an explicit frozen agents package", asy
 
 test("bundled beta Factory cannot be shadowed by generic deployment tools", async () => {
   const source = await readFile(factoryResourceUrl, "utf8");
-  assert.match(source, /"version": "1\.0\.4"/);
+  assert.match(source, /"version": "1\.0\.5"/);
   assert.match(source, /BETA_DRAFT_ONLY = True/);
   assert.match(source, /self\.name = "RappCopilotStudioFactoryBeta"/);
   assert.ok(
     source.indexOf('"rar_kody_w_copilot_studio_parity_deploy_agent"')
       < source.indexOf('"copilot_studio_deploy_agent"'),
   );
+});
+
+test("native Studio conversion uses the plugin with no external runtime fallback", async () => {
+  const source = await readFile(resourceUrl, "utf8");
+  const factory = await readFile(factoryResourceUrl, "utf8");
+  assert.match(source, /"architect": "mcs-assistant:copilot-studio-architect"/);
+  assert.match(source, /"execution_boundary": "copilot-studio-native"/);
+  assert.match(source, /"external_compute_allowed": False/);
+  assert.match(source, /"gap_policy": "native-repair-or-block"/);
+  assert.match(source, /Use InlineAgentSkill supporting Python files/);
+  assert.doesNotMatch(source, /"mcp_server"/);
+  assert.match(factory, /otherwise report an explicit blocker, not a simulated result/);
 });

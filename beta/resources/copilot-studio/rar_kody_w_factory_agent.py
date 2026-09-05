@@ -21,7 +21,7 @@ except ModuleNotFoundError:
 __manifest__ = {
     "schema": "rapp-agent/1.0",
     "name": "@kody-w/factory",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "display_name": "RAPP to Copilot Studio Factory",
     "description": (
         "Turns any caller-selected group of local RAPP agent.py files into one "
@@ -341,9 +341,11 @@ class RappCopilotStudioFactoryAgent(BasicAgent):
             f"Read the complete architect brief at {brief_path}. Extend the "
             f"existing initialized project at {project} in place. Preserve "
             "identity and every existing selected capability. Add only the "
-            "new caller-selected source contracts. Missing runtime capabilities "
-            "must become explicit provisionable infrastructure requirements, "
-            "not terminal gaps or model-knowledge substitutes. Do not run PAC, "
+            "new caller-selected source contracts. Author the mapping natively "
+            "inside Copilot Studio. No Azure Functions, external RAPP/Python "
+            "runtime, localhost bridge, or new MCP server. Resolve gaps with "
+            "native skills, business-service tools, Dataverse, or agent flows; "
+            "otherwise report an explicit blocker, not a simulated result. Do not run PAC, "
             "push, or publish."
         )
         architect_output = module._invoke_plugin_agent(
