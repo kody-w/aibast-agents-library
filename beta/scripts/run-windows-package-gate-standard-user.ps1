@@ -82,6 +82,7 @@ try {
         ResultPath = $resultPath
         LogPath = $logPath
         Path = $env:PATH
+        ProfileRoot = (Join-Path $env:SystemDrive "Users\$userName")
         SigningEnvironment = @{
             WINDOWS_SIGNING_SUBJECT = $env:WINDOWS_SIGNING_SUBJECT
             AZURE_ARTIFACT_SIGNING_ENDPOINT = $env:AZURE_ARTIFACT_SIGNING_ENDPOINT
@@ -95,6 +96,26 @@ try {
 $ErrorActionPreference = "Stop"
 $config = Get-Content -LiteralPath $args[0] -Raw | ConvertFrom-Json
 $env:PATH = $config.Path
+$profileRoot = [string]$config.ProfileRoot
+$localAppData = Join-Path $profileRoot "AppData\Local"
+$roamingAppData = Join-Path $profileRoot "AppData\Roaming"
+$tempPath = Join-Path $localAppData "Temp"
+$env:USERPROFILE = $profileRoot
+$env:HOME = $profileRoot
+$env:HOMEDRIVE = [IO.Path]::GetPathRoot($profileRoot).TrimEnd("\")
+$env:HOMEPATH = $profileRoot.Substring($env:HOMEDRIVE.Length)
+$env:LOCALAPPDATA = $localAppData
+$env:APPDATA = $roamingAppData
+$env:TEMP = $tempPath
+$env:TMP = $tempPath
+$env:PSModulePath = @(
+    (Join-Path $PSHOME "Modules"),
+    (Join-Path $env:ProgramFiles "PowerShell\Modules"),
+    (Join-Path $env:ProgramFiles "WindowsPowerShell\Modules"),
+    (Join-Path $env:SystemRoot "system32\WindowsPowerShell\v1.0\Modules")
+) -join [IO.Path]::PathSeparator
+New-Item -ItemType Directory -Force -Path $localAppData, $roamingAppData, $tempPath |
+    Out-Null
 foreach ($property in $config.SigningEnvironment.psobject.Properties) {
     if ($property.Value) {
         [Environment]::SetEnvironmentVariable(

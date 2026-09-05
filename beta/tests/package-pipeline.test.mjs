@@ -25,6 +25,8 @@ import {
 } from "../scripts/package-contract.mjs";
 import {
   binaryArchitectures,
+  hasEmbeddedPeSignature,
+  normalizeAsarEntry,
   parseGateArguments,
 } from "../scripts/package-gate.mjs";
 import {
@@ -136,11 +138,14 @@ function mach64(cpuType) {
 }
 
 function pe64(machine) {
-  const buffer = Buffer.alloc(256);
+  const buffer = Buffer.alloc(512);
   buffer.write("MZ", 0, "ascii");
   buffer.writeUInt32LE(128, 0x3c);
   buffer.write("PE\0\0", 128, "ascii");
   buffer.writeUInt16LE(machine, 132);
+  buffer.writeUInt16LE(240, 148);
+  buffer.writeUInt16LE(0x20b, 152);
+  buffer.writeUInt32LE(16, 260);
   return buffer;
 }
 
@@ -149,6 +154,7 @@ test("binary architecture parser identifies native Mach-O and PE files", () => {
   assert.deepEqual(binaryArchitectures(mach64(0x01000007)), ["x64"]);
   assert.deepEqual(binaryArchitectures(pe64(0x8664)), ["x64"]);
   assert.deepEqual(binaryArchitectures(pe64(0xaa64)), ["arm64"]);
+  assert.deepEqual(binaryArchitectures(pe64(0x014c)), ["ia32"]);
   const universal = Buffer.alloc(48);
   universal.writeUInt32BE(0xcafebabe, 0);
   universal.writeUInt32BE(2, 4);
@@ -156,6 +162,33 @@ test("binary architecture parser identifies native Mach-O and PE files", () => {
   universal.writeUInt32BE(0x0100000c, 28);
   assert.deepEqual(binaryArchitectures(universal), ["arm64", "x64"]);
   assert.deepEqual(binaryArchitectures(Buffer.from("not a binary")), []);
+});
+
+test("Windows package inspection normalizes ASAR paths and reads PE signatures", () => {
+  assert.equal(
+    normalizeAsarEntry(String.raw`\electron\main.mjs`, "windows"),
+    "electron/main.mjs",
+  );
+  assert.equal(normalizeAsarEntry("/ui/index.html", "macos"), "ui/index.html");
+  assert.equal(
+    normalizeAsarEntry(String.raw`/electron\main.mjs`, "macos"),
+    String.raw`electron\main.mjs`,
+  );
+
+  const unsigned = pe64(0x8664);
+  assert.equal(hasEmbeddedPeSignature(unsigned), false);
+  const signed = Buffer.from(unsigned);
+  const certificateDirectory = 152 + 112 + (4 * 8);
+  signed.writeUInt32LE(384, certificateDirectory);
+  signed.writeUInt32LE(64, certificateDirectory + 4);
+  assert.equal(hasEmbeddedPeSignature(signed), true);
+  const malformed = Buffer.from(unsigned);
+  malformed.writeUInt32LE(64, certificateDirectory + 4);
+  assert.equal(hasEmbeddedPeSignature(malformed), true);
+  assert.throws(
+    () => hasEmbeddedPeSignature(Buffer.from("not a PE file")),
+    /valid PE executable/,
+  );
 });
 
 test("packaging refuses Windows ARM64 and cross-architecture hosts", () => {
@@ -1166,6 +1199,14 @@ test("Windows NSIS identity and production signing policy are frozen", async () 
   assert.match(standardUserGate, /New-LocalUser/);
   assert.match(standardUserGate, /Add-LocalGroupMember/);
   assert.match(standardUserGate, /Start-Process[\s\S]*-Credential/);
+  assert.match(standardUserGate, /\$env:USERPROFILE = \$profileRoot/);
+  assert.match(standardUserGate, /\$env:LOCALAPPDATA = \$localAppData/);
+  assert.match(standardUserGate, /\$env:PSModulePath = @\(/);
+  assert.match(standardUserGate, /Join-Path \$PSHOME "Modules"/);
+  assert.doesNotMatch(
+    standardUserGate,
+    /Join-Path \$profileRoot "Documents\\(?:PowerShell|WindowsPowerShell)\\Modules"/,
+  );
   assert.match(standardUserGate, /Remove-LocalUser/);
   assert.match(isolatedSigner, /prepackaged: prepackagedApp/);
   assert.match(isolatedSigner, /npmRebuild: false/);

@@ -290,6 +290,55 @@ export function binaryArchitectures(buffer) {
   return [...new Set(architectures)].sort();
 }
 
+export function normalizeAsarEntry(entry, platform = process.platform) {
+  const normalized = String(entry).replace(/^[/\\]/, "");
+  return ["win32", "win", "windows"].includes(platform)
+    ? normalized.replaceAll("\\", "/")
+    : normalized;
+}
+
+export function hasEmbeddedPeSignature(buffer) {
+  if (buffer.length < 0x40 || buffer[0] !== 0x4d || buffer[1] !== 0x5a) {
+    fail("File is not a valid PE executable.");
+  }
+  const peOffset = buffer.readUInt32LE(0x3c);
+  const optionalHeader = peOffset + 24;
+  const optionalHeaderSize = peOffset + 22 <= buffer.length
+    ? buffer.readUInt16LE(peOffset + 20)
+    : 0;
+  if (
+    optionalHeader + 2 > buffer.length ||
+    buffer.toString("ascii", peOffset, peOffset + 4) !== "PE\0\0"
+  ) {
+    fail("File is not a valid PE executable.");
+  }
+  const magic = buffer.readUInt16LE(optionalHeader);
+  const dataDirectory = magic === 0x10b
+    ? optionalHeader + 96
+    : magic === 0x20b
+      ? optionalHeader + 112
+      : -1;
+  const directoryCountOffset = magic === 0x10b
+    ? optionalHeader + 92
+    : magic === 0x20b
+      ? optionalHeader + 108
+      : -1;
+  const certificateDirectory = dataDirectory + (4 * 8);
+  if (
+    dataDirectory < 0 ||
+    directoryCountOffset + 4 > buffer.length ||
+    buffer.readUInt32LE(directoryCountOffset) < 5 ||
+    certificateDirectory + 8 > optionalHeader + optionalHeaderSize ||
+    certificateDirectory + 8 > buffer.length
+  ) {
+    fail("PE optional header is missing its certificate directory.");
+  }
+  return (
+    buffer.readUInt32LE(certificateDirectory) !== 0 ||
+    buffer.readUInt32LE(certificateDirectory + 4) !== 0
+  );
+}
+
 function architectureCheck(label, filePath, expectedArchitecture) {
   if (!filePath || !existsSync(filePath)) {
     requirement(`${label} has ${expectedArchitecture} architecture`, false, filePath || "missing");
@@ -393,7 +442,9 @@ function inspectPackagedApp(appPath, label, platform, arch, checkFreshness = fal
   if (existsSync(asarPath)) {
     let entries = [];
     try {
-      entries = listPackage(asarPath).map((entry) => entry.replace(/^[/\\]/, ""));
+      entries = listPackage(asarPath).map((entry) =>
+        normalizeAsarEntry(entry, platform),
+      );
       requirement(`${label} app.asar is readable`, entries.length > 0, `${entries.length} entries`);
     } catch (error) {
       requirement(`${label} app.asar is readable`, false, String(error.message || error));
@@ -516,6 +567,7 @@ function inspectPackagedApp(appPath, label, platform, arch, checkFreshness = fal
   }
 
   if (platform === "windows") {
+    const elevateHelper = path.resolve(resources, "elevate.exe").toLowerCase();
     const pePayload = collectFiles(appPath, (filePath) => {
       const extension = path.extname(filePath).toLowerCase();
       return [".exe", ".dll", ".node"].includes(extension) &&
@@ -523,10 +575,14 @@ function inspectPackagedApp(appPath, label, platform, arch, checkFreshness = fal
     });
     const badPayload = pePayload.filter((filePath) => {
       const architectures = binaryArchitectures(readHeader(filePath));
+      if (path.resolve(filePath).toLowerCase() === elevateHelper) {
+        return architectures.length !== 1 ||
+          !["ia32", arch].includes(architectures[0]);
+      }
       return architectures.length !== 1 || architectures[0] !== arch;
     });
     requirement(
-      `${label} Windows PE payload is entirely ${arch}`,
+      `${label} Windows PE payload matches ${arch} or the approved elevate helper`,
       pePayload.length >= 3 && badPayload.length === 0,
       badPayload.length
         ? badPayload.join(", ")
@@ -1129,12 +1185,15 @@ function verifySignedWindowsFile(filePath, label, expectedPublisher) {
 }
 
 function verifyUnsignedWindowsFile(filePath, label) {
-  const signature = windowsFileSignature(filePath);
-  requirement(
-    `${label} is unsigned`,
-    !signature.error && signature.Status === "NotSigned",
-    signature.error || `${signature.Status}; signer=${signature.SignerSubject || "none"}`,
-  );
+  try {
+    requirement(
+      `${label} is unsigned`,
+      !hasEmbeddedPeSignature(readHeader(filePath)),
+      "embedded Authenticode certificate table present",
+    );
+  } catch (error) {
+    requirement(`${label} is unsigned`, false, String(error.message || error));
+  }
 }
 
 function verifyNativeMediaPublication(options, packagedApp) {
@@ -1814,13 +1873,7 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
     updaterMetadata.length === 0,
     updaterMetadata.join(", "),
   );
-  const staging = inspectPackagedApp(
-    appDir,
-    "staging Windows app",
-    "windows",
-    options.arch,
-    true,
-  );
+  const stagingExecutable = appLayout(appDir, "windows").executable;
   if (options.mode === "signed") {
     requirement(
       "Windows signing configuration uses Azure Public Trust",
@@ -1842,8 +1895,15 @@ async function gateWindows(options, artifactPath, appDir, scratchDir) {
     verifySignedWindowsTree(appDir, "staging Windows app", options.expectedPublisher);
   } else {
     verifyUnsignedWindowsFile(artifactPath, "NSIS installer");
-    verifyUnsignedWindowsFile(staging.executable, "staging Windows app");
+    verifyUnsignedWindowsFile(stagingExecutable, "staging Windows app");
   }
+  const staging = inspectPackagedApp(
+    appDir,
+    "staging Windows app",
+    "windows",
+    options.arch,
+    true,
+  );
 
   const sourceFixture = prepareSourceInstallMigrationFixture();
   requirement(
