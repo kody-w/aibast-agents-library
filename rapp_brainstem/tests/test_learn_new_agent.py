@@ -11,7 +11,7 @@ def test_learn_new_is_the_single_generation_tool():
     agents_dir = Path(__file__).resolve().parents[1] / "agents"
     assert not (agents_dir / "prompt_generator_agent.py").exists()
     assert __manifest__["name"] == "@rapp/learn_new"
-    assert __manifest__["version"] == "2.1.1"
+    assert __manifest__["version"] == "2.1.2"
     assert "search-fallback" in __manifest__["tags"]
 
 
@@ -94,6 +94,25 @@ def test_generated_nested_indentation_is_preserved(monkeypatch):
     assert "            return" in body
 
 
+def test_indented_unfenced_generation_preserves_first_line(monkeypatch):
+    agent = LearnNewAgent()
+    completed = subprocess.CompletedProcess(
+        args=[], returncode=0,
+        stdout=(
+            "        value = query.strip()\n"
+            "        if not value:\n"
+            '            return json.dumps({"status": "error"})\n'
+            '        return json.dumps({"status": "success", "result": value})\n'
+        ),
+        stderr="",
+    )
+    monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: completed)
+    body = agent._generate_perform_body("process a query")
+    compile("def perform(query):\n" + body, "indented.py", "exec")
+    assert body.splitlines()[0] == "        value = query.strip()"
+    assert body.splitlines()[1] == "        if not value:"
+
+
 def test_failed_smoke_test_does_not_report_success(tmp_path, monkeypatch):
     agent = LearnNewAgent()
     agent.agents_dir = tmp_path
@@ -158,6 +177,7 @@ def test_fallback_swarm_runs_task_and_selected_subagent(tmp_path, monkeypatch):
             agents_in_swarm="alpha,beta",
         ))
         assert created["status"] == "success"
+        assert created["hot_loaded"] is True
         module = importlib.import_module("agents.task_parity_agent")
         swarm = module.TaskParityAgent()
         result = json.loads(swarm.perform(task="fresh task"))
@@ -174,3 +194,24 @@ def test_fallback_swarm_runs_task_and_selected_subagent(tmp_path, monkeypatch):
     finally:
         for name in modules:
             sys.modules.pop(name, None)
+
+
+def test_swarm_does_not_claim_success_when_smoke_tests_fail(tmp_path, monkeypatch):
+    agent = LearnNewAgent()
+    agent.agents_dir = tmp_path
+    monkeypatch.setattr(
+        agent, "_generate_perform_body",
+        lambda description: '        return json.dumps({"status": "success"})',
+    )
+    monkeypatch.setattr(
+        agent, "_hot_load_agent",
+        lambda *args: {"success": False, "error": "synthetic smoke failure"},
+    )
+    result = json.loads(agent.perform(
+        action="swarm", name="BrokenSwarm",
+        description="Process a synthetic task", agents_in_swarm="alpha",
+    ))
+    assert result["status"] == "error"
+    assert result["hot_loaded"] is False
+    assert len(result["smoke_tests"]) == 2
+    assert "smoke tests failed" in result["message"]

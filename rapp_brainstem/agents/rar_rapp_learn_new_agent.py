@@ -37,7 +37,7 @@ except ImportError:
 __manifest__ = {
     "schema": "rapp-agent/1.0",
     "name": "@rapp/learn_new",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "display_name": "LearnNew",
     "description": "Creates, smoke-tests, saves, and hot-loads agents or swarms from natural-language descriptions and unmet library searches, with a VS Code repair handoff.",
     "author": "RAPP",
@@ -596,12 +596,21 @@ if __name__ == "__main__":
                 "single shareable singleton file."
             )
 
+            smoke_tests = {}
             for f in generated_files:
                 if not f.get("is_orchestrator"):
                     fpath = self.agents_dir / f["filename"]
-                    self._hot_load_agent(fpath, f["class"])
+                    smoke_tests[f["filename"]] = self._hot_load_agent(fpath, f["class"])
             orch_path = self.agents_dir / orch_filename
-            self._hot_load_agent(orch_path, orch_class)
+            smoke_tests[orch_filename] = self._hot_load_agent(orch_path, orch_class)
+            result["smoke_tests"] = smoke_tests
+            result["hot_loaded"] = all(test.get("success") for test in smoke_tests.values())
+            if not result["hot_loaded"]:
+                result["status"] = "error"
+                result["message"] = (
+                    f"Created {swarm_name} files, but one or more smoke tests failed. "
+                    "Inspect smoke_tests and repair the generated files before invoking the swarm."
+                )
         else:
             result["orchestrator_code"] = orch_code
 
@@ -802,7 +811,7 @@ if __name__ == "__main__":
             )
 
             if result.returncode == 0 and result.stdout.strip():
-                body = result.stdout.strip()
+                body = result.stdout
                 if '```python' in body:
                     body = body.split('```python')[1].split('```')[0]
                 elif '```' in body:
