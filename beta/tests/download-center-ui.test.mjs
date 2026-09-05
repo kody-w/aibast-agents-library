@@ -57,6 +57,23 @@ function validateDownloadCenter(source) {
     "copy confirmation must use a live status",
   );
   add(
+    source.includes('id="golden-path-link"') &&
+      source.includes(
+        'href="https://github.com/microsoft/aibast-agents-library/blob/main/beta/GOLDEN_PATH.md"',
+      ) &&
+      !source.includes('href="GOLDEN_PATH.md"') &&
+      source.includes(
+        'goldenPathLink: document.getElementById("golden-path-link")',
+      ) &&
+      /elements\.goldenPathLink\.href =\s*`https:\/\/github\.com\/\$\{repo\}\/blob\/main\/beta\/GOLDEN_PATH\.md`/.test(
+        source,
+      ) &&
+      /elements\.goldenPathLink\.href =\s*`https:\/\/github\.com\/\$\{repo\}\/blob\/\$\{encodeURIComponent\(release\.tag_name\)\}\/beta\/GOLDEN_PATH\.md`/.test(
+        source,
+      ),
+    "golden path link must remain Pages-safe and release-pinned",
+  );
+  add(
     /id="expand-all"[\s\S]*?aria-controls="panel-details panel-requirements panel-install panel-additional"[\s\S]*?aria-expanded="false"/.test(
       source,
     ),
@@ -180,6 +197,13 @@ test("download center UI checks reject representative regressions", () => {
     {
       expected: "dialog must keep Tab focus within visible controls",
       source: page.replace('event.key !== "Tab"', 'event.key !== "Enter"'),
+    },
+    {
+      expected: "golden path link must remain Pages-safe and release-pinned",
+      source: page.replace(
+        'href="https://github.com/microsoft/aibast-agents-library/blob/main/beta/GOLDEN_PATH.md"',
+        'href="GOLDEN_PATH.md"',
+      ),
     },
     {
       expected: "literal colors must stay inside the --cp-* token blocks",
