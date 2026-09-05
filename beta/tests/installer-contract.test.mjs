@@ -165,7 +165,21 @@ test("dedicated beta page uses the Download Center details structure", () => {
   assert.match(downloadCenter, /rapp-frontier-release-manifest/);
   assert.match(downloadCenter, /signing\.status !== "verified"/);
   assert.match(downloadCenter, /gate\.status !== "passed"/);
-  assert.match(installerPage, /Only provenance-verified application installers/);
+  assert.match(installerPage, /release-manifest\s+allowlisted application installers/);
+  assert.match(installerPage, /Commit-pinned source bootstraps/);
+  assert.match(installerPage, /Windows Defender SmartScreen warnings may still appear/);
+  assert.match(installerPage, /id="no-js-download"/);
+  assert.match(installerPage, /href="frontier\.ps1"/);
+  assert.match(installerPage, /href="frontier\.sh"/);
+  assert.doesNotMatch(installerPage, /href="#"/);
+  assert.doesNotMatch(installerPage, /Windows 11 x64 or ARM64/);
+  for (const id of ["panel-requirements", "panel-install", "panel-additional"]) {
+    const panel = installerPage.match(
+      new RegExp(`<div\\s+class="accordion-panel"\\s+id="${id}"[\\s\\S]*?>`),
+    )?.[0];
+    assert.ok(panel, `${id} opening tag is missing`);
+    assert.doesNotMatch(panel, /\shidden(?:\s|>)/);
+  }
 });
 
 test("stable Frontier bootstraps resolve and run the latest published release", () => {

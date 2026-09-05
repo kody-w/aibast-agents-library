@@ -16,6 +16,7 @@
     content="Download the source-only RAPP Brainstem Frontier desktop preview for Windows, macOS, or Linux."
   >
   <title>Download RAPP Brainstem Frontier | AIBAST Download Center</title>
+  <link rel="icon" href="build/icon.svg" type="image/svg+xml">
   <style>
     :root {
       color-scheme: light;
@@ -23,8 +24,8 @@
       --cp-bg-elevated: #fcfbf8;
       --cp-surface: #ffffff;
       --cp-surface-soft: #f5f5f5;
-      --cp-border: #dedede;
-      --cp-border-strong: #919191;
+      --cp-border: #858585;
+      --cp-border-strong: #686868;
       --cp-text: #242424;
       --cp-text-muted: #5c5c5c;
       --cp-text-soft: #6f6f6f;
@@ -35,7 +36,7 @@
       --cp-success: #16a34a;
       --cp-danger: #dc2626;
       --cp-warning: #f59e0b;
-      --cp-link: #0078d4;
+      --cp-link: #005ea8;
       --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
       --cp-overlay: rgba(255, 255, 255, 0.8);
       --cp-panel: rgba(255, 255, 255, 0.86);
@@ -49,11 +50,11 @@
       --cp-bg-elevated: #343231;
       --cp-surface: #292929;
       --cp-surface-soft: #2e2e2e;
-      --cp-border: #474747;
-      --cp-border-strong: #5f5f5f;
+      --cp-border: #858585;
+      --cp-border-strong: #9d9d9d;
       --cp-text: #dedede;
-      --cp-text-muted: #919191;
-      --cp-text-soft: #b0b0b0;
+      --cp-text-muted: #b8b8b8;
+      --cp-text-soft: #c2c2c2;
       --cp-accent: #fd8ea1;
       --cp-accent-hover: #fb7b91;
       --cp-accent-soft: rgba(253, 142, 161, 0.14);
@@ -61,7 +62,7 @@
       --cp-success: #4ade80;
       --cp-danger: #f87171;
       --cp-warning: #fbbf24;
-      --cp-link: #4da6ff;
+      --cp-link: #75baff;
       --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
       --cp-overlay: rgba(41, 41, 41, 0.88);
       --cp-panel: rgba(41, 41, 41, 0.72);
@@ -84,7 +85,8 @@
       margin: 0;
       background: var(--cp-bg);
       color: var(--cp-text);
-      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
       line-height: 1.5;
     }
 
@@ -93,6 +95,7 @@
     a {
       font: inherit;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     button,
@@ -105,8 +108,12 @@
     }
 
     :focus-visible {
-      outline: 3px solid var(--cp-highlight);
+      outline: 3px solid var(--cp-link);
       outline-offset: 3px;
+    }
+
+    main:focus {
+      outline: none;
     }
 
     [hidden] {
@@ -155,6 +162,16 @@
       text-decoration: none;
     }
 
+    .brand,
+    .context-label,
+    .header-nav a,
+    .resource-links a,
+    .footer-links a {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+    }
+
     .brand {
       gap: 10px;
       font-size: 18px;
@@ -187,6 +204,7 @@
     }
 
     .header-nav a {
+      display: inline-flex;
       color: var(--cp-text);
       text-decoration: none;
     }
@@ -197,7 +215,7 @@
 
     .hero-shell {
       border-bottom: 1px solid var(--cp-border);
-      background: var(--cp-surface-soft);
+      background: linear-gradient(135deg, var(--cp-surface-soft), var(--cp-bg-elevated));
     }
 
     .breadcrumb {
@@ -206,12 +224,15 @@
       gap: 8px;
       align-items: center;
       padding-top: 22px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 14px;
     }
 
     .breadcrumb a {
-      color: var(--cp-text-muted);
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      color: var(--cp-text-soft);
       text-decoration: none;
     }
 
@@ -236,8 +257,8 @@
       padding: 6px 10px;
       border: 1px solid var(--cp-border);
       border-radius: 999px;
-      background: var(--cp-surface);
-      color: var(--cp-text-muted);
+      background: var(--cp-panel-strong);
+      color: var(--cp-text-soft);
       font-size: 13px;
       font-weight: 700;
     }
@@ -275,7 +296,7 @@
     .hero-description {
       max-width: 820px;
       margin-bottom: 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: clamp(18px, 2vw, 22px);
       line-height: 1.55;
     }
@@ -289,7 +310,7 @@
       padding: 28px;
       border: 1px solid var(--cp-border);
       border-radius: 16px;
-      background: var(--cp-surface);
+      background: var(--cp-panel-strong);
       box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
       text-align: center;
     }
@@ -305,7 +326,7 @@
     }
 
     .product-mark span {
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -331,7 +352,7 @@
     .download-copy p {
       max-width: 650px;
       margin-bottom: 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 15px;
     }
 
@@ -353,7 +374,7 @@
       width: 100%;
       padding: 10px 38px 10px 12px;
       border: 1px solid var(--cp-border-strong);
-      border-radius: 0;
+      border-radius: 0.625rem;
       background: var(--cp-surface);
       color: var(--cp-text);
       cursor: pointer;
@@ -374,6 +395,11 @@
       font-size: 14px;
       font-weight: 700;
       text-decoration: none;
+      transition:
+        border-color 120ms ease,
+        background-color 120ms ease,
+        color 120ms ease,
+        transform 120ms ease;
     }
 
     .button:hover {
@@ -394,18 +420,53 @@
       color: var(--cp-accent-fg);
     }
 
+    .button:active {
+      transform: translateY(1px);
+    }
+
     .button:disabled {
       border-color: var(--cp-border);
       background: var(--cp-surface-soft);
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       cursor: wait;
+      transform: none;
     }
 
     .platform-help {
       min-height: 21px;
       margin: 8px 0 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
+    }
+
+    .no-js-fallback {
+      grid-column: 1 / -1;
+      padding-top: 28px;
+      border-top: 1px solid var(--cp-border);
+    }
+
+    .no-js-fallback > h2 {
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    .no-js-fallback > p {
+      max-width: 820px;
+      margin-bottom: 0;
+      color: var(--cp-text-soft);
+    }
+
+    .no-js-fallback .install-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .no-js-heading {
+      display: none;
+      padding: 21px 4px;
+      color: var(--cp-text);
+      font-size: 20px;
+      font-weight: 600;
     }
 
     .content {
@@ -422,6 +483,7 @@
       background: var(--cp-surface);
       color: var(--cp-text);
       font-size: 14px;
+      overflow-wrap: anywhere;
     }
 
     .file-details {
@@ -444,7 +506,7 @@
 
     .file-detail dt {
       margin-bottom: 8px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -477,6 +539,8 @@
     }
 
     .expand-button {
+      min-height: 44px;
+      padding: 8px 4px;
       border: 0;
       background: transparent;
       color: var(--cp-link);
@@ -533,7 +597,7 @@
 
     .accordion-panel {
       padding: 0 4px 32px 46px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 15px;
     }
 
@@ -607,6 +671,7 @@
     }
 
     .install-card {
+      min-width: 0;
       padding: 22px;
       border: 1px solid var(--cp-border);
       border-radius: 16px;
@@ -647,6 +712,8 @@
     }
 
     .command {
+      width: 100%;
+      max-width: 100%;
       min-height: 82px;
       margin: 0 0 14px;
       padding: 14px;
@@ -665,6 +732,12 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      min-width: 0;
+    }
+
+    .button-row > * {
+      min-width: 0;
+      max-width: 100%;
     }
 
     .boundary {
@@ -713,6 +786,7 @@
       background: var(--cp-surface);
       color: var(--cp-text);
       box-shadow: var(--cp-shadow);
+      overscroll-behavior: contain;
     }
 
     dialog::backdrop {
@@ -738,8 +812,8 @@
 
     .dialog-close {
       display: grid;
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       flex: 0 0 auto;
       place-items: center;
       border: 1px solid var(--cp-border);
@@ -752,7 +826,7 @@
 
     .dialog-intro {
       margin-bottom: 22px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
     }
 
     .file-options {
@@ -811,7 +885,7 @@
 
     .file-platform,
     .file-size {
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -837,7 +911,7 @@
 
     .dialog-note {
       margin: 16px 0 0;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 12px;
     }
 
@@ -852,7 +926,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      color: var(--cp-text-muted);
+      color: var(--cp-text-soft);
       font-size: 13px;
     }
 
@@ -863,7 +937,8 @@
     }
 
     .footer-links a {
-      color: var(--cp-text-muted);
+      display: inline-flex;
+      color: var(--cp-text-soft);
       text-decoration: none;
     }
 
@@ -897,7 +972,7 @@
 
       .capability-grid,
       .install-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .install-card p {
@@ -917,27 +992,49 @@
 
       .header-nav {
         width: 100%;
-        gap: 16px;
+        justify-content: space-between;
+        gap: 8px;
         margin-left: 0;
         padding-top: 10px;
         border-top: 1px solid var(--cp-border);
       }
 
       .hero {
-        gap: 30px;
-        padding: 40px 0 44px;
+        gap: 24px;
+        padding: 34px 0 38px;
       }
 
       h1 {
-        font-size: clamp(38px, 13vw, 54px);
+        font-size: clamp(36px, 12vw, 50px);
+      }
+
+      .product-mark {
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .product-mark img {
+        width: 64px;
+        height: 64px;
       }
 
       .download-grid {
         gap: 28px;
+        padding: 32px 0;
       }
 
       .download-controls {
         grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .button-row .button {
+        width: 100%;
+        white-space: normal;
       }
 
       .file-details {
@@ -945,7 +1042,24 @@
       }
 
       .accordion-panel {
-        padding-left: 4px;
+        padding: 0 0 28px;
+      }
+
+      .accordion-trigger {
+        min-height: 64px;
+        padding: 17px 0;
+        font-size: 18px;
+      }
+
+      .install-card {
+        padding: 16px;
+      }
+
+      .command {
+        min-height: 0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
 
       .file-option {
@@ -956,6 +1070,29 @@
         grid-column: 2;
       }
 
+      .dialog-shell {
+        padding: 20px;
+      }
+
+      .dialog-header {
+        gap: 16px;
+      }
+
+      .dialog-header h2 {
+        font-size: clamp(24px, 8vw, 28px);
+        line-height: 1.15;
+      }
+
+      .dialog-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .resource-links {
+        display: grid;
+        gap: 0;
+      }
+
       .footer-inner {
         align-items: flex-start;
         flex-direction: column;
@@ -963,7 +1100,42 @@
         padding: 28px 0;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
+      }
+    }
   </style>
+  <noscript>
+    <style>
+      .download-form,
+      .expand-button,
+      .accordion-trigger,
+      .button-row button {
+        display: none !important;
+      }
+
+      .download-grid > noscript {
+        display: contents;
+      }
+
+      .download-copy {
+        grid-column: 1 / -1;
+      }
+
+      .no-js-heading {
+        display: block;
+      }
+    </style>
+  </noscript>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -998,7 +1170,7 @@
     </div>
   </header>
 
-  <main id="main-content">
+  <main id="main-content" tabindex="-1">
     <section class="hero-shell">
       <div class="container">
         <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -1011,9 +1183,9 @@
 
         <div class="hero">
           <div>
-            <div class="release-chip">
+            <div class="release-chip" role="status" aria-live="polite" aria-atomic="true">
               <span id="status-dot" class="status-dot" aria-hidden="true"></span>
-              <span id="release-status">Resolving Frontier release</span>
+              <span id="release-status">Source downloads ready</span>
             </div>
             <h1>RAPP Brainstem Frontier</h1>
             <p class="hero-description">
@@ -1026,7 +1198,7 @@
 
           <aside class="product-mark" aria-label="RAPP Brainstem Frontier product mark">
             <img src="build/icon.svg" alt="">
-            <strong>Verified release downloads</strong>
+            <strong>Commit-pinned source bootstraps</strong>
             <span>Windows 11 x64, macOS, and Linux</span>
           </aside>
         </div>
@@ -1038,20 +1210,26 @@
         <div class="download-copy">
           <h2 id="download-heading">Download RAPP Brainstem Frontier</h2>
           <p>
-            Choose your operating system. Only provenance-verified application installers
-            appear here, with the inspectable source bootstrap preserved as a fallback.
+            Choose your operating system and architecture. Only release-manifest
+            allowlisted application installers appear here, with the exact commit-pinned
+            source install preserved as a fallback.
           </p>
         </div>
 
         <form class="download-form" id="download-form">
           <label for="platform-select">Choose your operating system and architecture</label>
           <div class="download-controls">
-            <select id="platform-select" name="platform" aria-label="Operating system">
-              <option value="windows">Windows 11</option>
+            <select id="platform-select" name="platform" aria-describedby="platform-help">
+              <option value="windows">Windows 11 x64</option>
               <option value="macos">macOS</option>
               <option value="linux">Linux</option>
             </select>
-            <select id="architecture-select" name="architecture" aria-label="Architecture">
+            <select
+              id="architecture-select"
+              name="architecture"
+              aria-label="Architecture"
+              aria-describedby="platform-help"
+            >
               <option value="x64">x64</option>
               <option value="arm64">ARM64 (macOS or Linux)</option>
             </select>
@@ -1059,30 +1237,65 @@
               Download
             </button>
           </div>
-          <p class="platform-help" id="platform-help">Detecting your platform.</p>
+          <p class="platform-help" id="platform-help" role="status" aria-live="polite">
+            Detecting your platform.
+          </p>
         </form>
+
+        <noscript>
+          <section
+            class="no-js-fallback"
+            id="no-js-download"
+            aria-labelledby="no-js-download-heading"
+          >
+            <h2 id="no-js-download-heading">Download the source bootstrap</h2>
+            <p>
+              JavaScript is unavailable, so packaged-asset selection and live release
+              metadata cannot run. These source bootstraps resolve the latest published
+              Frontier release to an exact commit when you launch them.
+            </p>
+            <div class="install-grid">
+              <article class="install-card">
+                <h3>Windows 11 x64</h3>
+                <p>Download the PowerShell bootstrap, then run it from your Downloads folder.</p>
+                <pre class="command"><code>powershell -ExecutionPolicy Bypass -File ".\RAPP-Brainstem-Frontier-Windows.ps1"</code></pre>
+                <a
+                  class="button primary"
+                  href="frontier.ps1"
+                  download="RAPP-Brainstem-Frontier-Windows.ps1"
+                >
+                  Download Windows bootstrap
+                </a>
+              </article>
+              <article class="install-card">
+                <h3>macOS or Linux</h3>
+                <p>Download the shell bootstrap, then run it from your Downloads folder.</p>
+                <pre class="command"><code>bash "$HOME/Downloads/RAPP-Brainstem-Frontier-macOS-Linux.sh"</code></pre>
+                <a
+                  class="button primary"
+                  href="frontier.sh"
+                  download="RAPP-Brainstem-Frontier-macOS-Linux.sh"
+                >
+                  Download macOS or Linux bootstrap
+                </a>
+              </article>
+            </div>
+          </section>
+        </noscript>
       </div>
     </section>
 
     <div class="container content">
       <div id="load-error" class="notice" role="status" hidden></div>
-      <p id="copy-status" class="visually-hidden" aria-live="polite"></p>
-      <noscript>
-        <div class="notice">
-          JavaScript is required for verified release selection. You can still inspect the
-          <a href="frontier.ps1">Windows x64 source bootstrap</a> or the
-          <a href="frontier.sh">macOS and Linux source bootstrap</a>.
-        </div>
-      </noscript>
 
       <dl class="file-details" aria-label="Release file details">
         <div class="file-detail">
           <dt>Version</dt>
-          <dd id="release-version">Resolving</dd>
+          <dd id="release-version">Latest published beta</dd>
         </div>
         <div class="file-detail">
           <dt>Date published</dt>
-          <dd id="release-date">Resolving</dd>
+          <dd id="release-date">See release notes</dd>
         </div>
         <div class="file-detail">
           <dt>File name</dt>
@@ -1090,14 +1303,22 @@
         </div>
         <div class="file-detail">
           <dt>Release commit</dt>
-          <dd><code id="release-commit">Resolving</code></dd>
+          <dd><code id="release-commit">Resolved by bootstrap</code></dd>
         </div>
       </dl>
 
       <section aria-labelledby="details-heading">
         <div class="details-heading">
           <h2 id="details-heading">Download details</h2>
-          <button class="expand-button" id="expand-all" type="button">Expand all</button>
+          <button
+            class="expand-button"
+            id="expand-all"
+            type="button"
+            aria-controls="panel-details panel-requirements panel-install panel-additional"
+            aria-expanded="false"
+          >
+            Expand all
+          </button>
         </div>
 
         <div class="accordion" aria-label="Accordion containing details about the download">
@@ -1105,15 +1326,22 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-details"
                 type="button"
                 aria-expanded="true"
                 aria-controls="panel-details"
               >
-                <span class="accordion-icon" aria-hidden="true">-</span>
+                <span class="accordion-icon" aria-hidden="true">−</span>
                 <span>Details</span>
               </button>
+              <span class="no-js-heading">Details</span>
             </h3>
-            <div class="accordion-panel" id="panel-details">
+            <div
+              class="accordion-panel"
+              id="panel-details"
+              role="region"
+              aria-labelledby="trigger-details"
+            >
               <p>
                 RAPP Brainstem Frontier puts the live agent Explorer, the real Brainstem
                 chat, and GitHub Copilot Brain Surgeon in one visible workspace. Describe
@@ -1158,6 +1386,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-requirements"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-requirements"
@@ -1165,8 +1394,14 @@
                 <span class="accordion-icon" aria-hidden="true">+</span>
                 <span>System Requirements</span>
               </button>
+              <span class="no-js-heading">System Requirements</span>
             </h3>
-            <div class="accordion-panel" id="panel-requirements" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-requirements"
+              role="region"
+              aria-labelledby="trigger-requirements"
+            >
               <h4>Supported operating systems</h4>
               <div class="supported-os">
                 <span class="os-pill" id="windows-support">Windows 11 x64</span>
@@ -1187,6 +1422,12 @@
                   on the device. Managed-device policy may block source-built previews.
                 </li>
                 <li>
+                  Package manifest and application signature verification are not claimed
+                  for this preview. Windows Defender SmartScreen warnings may still appear
+                  for this unsigned source-built release. The bootstrap does not suppress
+                  or remove those warnings.
+                </li>
+                <li>
                   Synthetic or approved data only. This Frontier build is a rapid proof
                   and teaching environment, not a production deployment.
                 </li>
@@ -1198,6 +1439,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-install"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-install"
@@ -1205,8 +1447,14 @@
                 <span class="accordion-icon" aria-hidden="true">+</span>
                 <span>Install Instructions</span>
               </button>
+              <span class="no-js-heading">Install Instructions</span>
             </h3>
-            <div class="accordion-panel" id="panel-install" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-install"
+              role="region"
+              aria-labelledby="trigger-install"
+            >
               <p>
                 Use the same one-liner to install, update or repair, and launch Frontier.
                 The bootstrap resolves the newest published <code>brainstem-beta-v*</code>
@@ -1220,13 +1468,18 @@
                     Windows 11 x64
                   </h4>
                   <p>Open PowerShell, paste the command, and press Enter.</p>
-                  <pre class="command"><code id="windows-command">Preparing installer command...</code></pre>
+                  <pre class="command"><code id="windows-command">powershell -ExecutionPolicy Bypass -File ".\RAPP-Brainstem-Frontier-Windows.ps1"</code></pre>
                   <div class="button-row">
                     <button class="button primary" id="copy-windows" type="button" disabled>
                       Copy command
                     </button>
-                    <a class="button" id="windows-script" href="frontier.ps1" target="_blank" rel="noreferrer">
-                      Inspect bootstrap
+                    <a
+                      class="button"
+                      id="windows-script"
+                      href="frontier.ps1"
+                      download="RAPP-Brainstem-Frontier-Windows.ps1"
+                    >
+                      Download bootstrap
                     </a>
                   </div>
                 </article>
@@ -1237,13 +1490,18 @@
                     macOS or Linux
                   </h4>
                   <p>Open Terminal, paste the command, and press Enter.</p>
-                  <pre class="command"><code id="unix-command">Preparing installer command...</code></pre>
+                  <pre class="command"><code id="unix-command">bash "$HOME/Downloads/RAPP-Brainstem-Frontier-macOS-Linux.sh"</code></pre>
                   <div class="button-row">
                     <button class="button primary" id="copy-unix" type="button" disabled>
                       Copy command
                     </button>
-                    <a class="button" id="unix-script" href="frontier.sh" target="_blank" rel="noreferrer">
-                      Inspect bootstrap
+                    <a
+                      class="button"
+                      id="unix-script"
+                      href="frontier.sh"
+                      download="RAPP-Brainstem-Frontier-macOS-Linux.sh"
+                    >
+                      Download bootstrap
                     </a>
                   </div>
                 </article>
@@ -1253,7 +1511,7 @@
                 <li>Run the installer command for your operating system.</li>
                 <li>
                   Let the bootstrap install or reuse the shared Brainstem, then assemble
-                  the isolated Frontier launcher from the verified release commit.
+                  the isolated Frontier launcher from the resolved release commit.
                 </li>
                 <li>
                   Launch <strong>RAPP Brainstem Frontier</strong> from Applications,
@@ -1268,6 +1526,7 @@
             <h3>
               <button
                 class="accordion-trigger"
+                id="trigger-additional"
                 type="button"
                 aria-expanded="false"
                 aria-controls="panel-additional"
@@ -1275,15 +1534,20 @@
                 <span class="accordion-icon" aria-hidden="true">+</span>
                 <span>Additional Information</span>
               </button>
+              <span class="no-js-heading">Additional Information</span>
             </h3>
-            <div class="accordion-panel" id="panel-additional" hidden>
+            <div
+              class="accordion-panel"
+              id="panel-additional"
+              role="region"
+              aria-labelledby="trigger-additional"
+            >
               <p>
-                Frontier always publishes small source bootstraps that verify the release
+                Frontier always publishes small source bootstraps that resolve the release
                 tag, pin the exact source commit, and keep the launcher removable from the
                 shared Brainstem runtime. When a release also contains packaged
-                <code>.exe</code> or <code>.dmg</code> installers, this page lists only
-                assets allowlisted by the release provenance manifest, recommends a
-                compatible package first, and retains the source route alongside them.
+                <code>.exe</code> or <code>.dmg</code> installers, this page lists those
+                assets first and retains the source route alongside them.
               </p>
 
               <div class="boundary">
@@ -1324,18 +1588,22 @@
     </div>
   </main>
 
-  <dialog id="download-dialog" aria-labelledby="download-dialog-title">
+  <dialog
+    id="download-dialog"
+    aria-labelledby="download-dialog-title"
+    aria-describedby="download-dialog-description"
+  >
     <form class="dialog-shell" method="dialog">
       <div class="dialog-header">
         <h2 id="download-dialog-title">Choose the download you want</h2>
         <button class="dialog-close" type="submit" value="cancel" aria-label="Close download dialog">
-          x
+          &times;
         </button>
       </div>
-      <p class="dialog-intro">
-        Choose a packaged application installer only when its release manifest verifies
-        the exact artifact, signing identity, runtime, and gate, or use the source bootstrap
-        that resolves and pins the same Frontier release.
+      <p class="dialog-intro" id="download-dialog-description">
+        Choose a packaged installer only when its release manifest verifies the exact
+        artifact, signing identity, runtime, and gate, or use the source command pinned
+        to the displayed Frontier release commit.
       </p>
 
       <fieldset class="file-options">
@@ -1357,12 +1625,13 @@
       <p class="dialog-note">
         Review source bootstraps before running them on a managed device.
       </p>
+      <p id="copy-status" class="visually-hidden" role="status" aria-live="polite"></p>
     </form>
   </dialog>
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <span id="resolved-date">Release metadata is loading.</span>
+      <span id="resolved-date">Source bootstraps resolve the published release to an exact commit.</span>
       <div class="footer-links">
         <a href="../">AIBAST Agents Library</a>
         <a href="../SECURITY.md">Security</a>

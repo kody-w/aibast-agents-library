@@ -10,7 +10,7 @@ const COMMIT_SHA_PATTERN = /^[0-9a-f]{40}$/i;
 const RELEASE_TAG_PATTERN = /^brainstem-beta-v[0-9A-Za-z][0-9A-Za-z._-]*$/;
 
 const PLATFORM_LABELS = Object.freeze({
-  windows: "Windows 11",
+  windows: "Windows 11 x64",
   macos: "macOS",
   linux: "Linux",
 });
@@ -1279,8 +1279,16 @@ function setAccordionState(documentObject, button, open) {
       code: "MISSING_PAGE_ELEMENT",
     });
   }
-  icon.textContent = open ? "-" : "+";
+  icon.textContent = open ? "−" : "+";
   panel.hidden = !open;
+}
+
+function syncExpandAllState(elements, triggers) {
+  const allOpen = triggers.every(
+    (trigger) => trigger.getAttribute("aria-expanded") === "true",
+  );
+  elements.expandAll.textContent = allOpen ? "Collapse all" : "Expand all";
+  elements.expandAll.setAttribute("aria-expanded", String(allOpen));
 }
 
 function setupAccordions(documentObject, elements) {
@@ -1292,16 +1300,41 @@ function setupAccordions(documentObject, elements) {
   }
 
   for (const trigger of triggers) {
+    setAccordionState(
+      documentObject,
+      trigger,
+      trigger.getAttribute("aria-expanded") === "true",
+    );
     trigger.addEventListener("click", () => {
       setAccordionState(
         documentObject,
         trigger,
         trigger.getAttribute("aria-expanded") !== "true",
       );
-      const allOpen = triggers.every(
-        (candidate) => candidate.getAttribute("aria-expanded") === "true",
-      );
-      elements.expandAll.textContent = allOpen ? "Collapse all" : "Expand all";
+      syncExpandAllState(elements, triggers);
+    });
+
+    trigger.addEventListener("keydown", (event) => {
+      const currentIndex = triggers.indexOf(trigger);
+      let nextIndex;
+      switch (event.key) {
+        case "ArrowDown":
+          nextIndex = (currentIndex + 1) % triggers.length;
+          break;
+        case "ArrowUp":
+          nextIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+          break;
+        case "Home":
+          nextIndex = 0;
+          break;
+        case "End":
+          nextIndex = triggers.length - 1;
+          break;
+        default:
+          return;
+      }
+      event.preventDefault();
+      triggers[nextIndex].focus();
     });
   }
 
@@ -1312,8 +1345,9 @@ function setupAccordions(documentObject, elements) {
     for (const trigger of triggers) {
       setAccordionState(documentObject, trigger, shouldOpen);
     }
-    elements.expandAll.textContent = shouldOpen ? "Collapse all" : "Expand all";
+    syncExpandAllState(elements, triggers);
   });
+  syncExpandAllState(elements, triggers);
 }
 
 function updateDialogSelection(documentObject, elements, state) {
@@ -1421,7 +1455,12 @@ export function showDownloadDialog(dialog) {
 
 function openDownloadDialog(documentObject, elements, state) {
   renderDownloadOptions(documentObject, elements, state);
-  return showDownloadDialog(elements.dialog);
+  const selectedOption = elements.downloadOptionList.querySelector(
+    'input[name="download-file"]:checked',
+  );
+  const opened = showDownloadDialog(elements.dialog);
+  selectedOption?.focus();
+  return opened;
 }
 
 export function handleDownloadSubmit(event, {
@@ -1444,6 +1483,21 @@ function sourceDownload(state, id) {
   return state.downloadItems.find((item) => item.id === id);
 }
 
+function applySourceLink(link, source) {
+  setFunctionalLink(link, source.href);
+  if (source.ready) {
+    link.removeAttribute("download");
+    link.setAttribute("target", "_blank");
+    link.setAttribute("rel", "noreferrer");
+    link.textContent = "Inspect pinned installer";
+  } else {
+    link.setAttribute("download", source.downloadName);
+    link.removeAttribute("target");
+    link.removeAttribute("rel");
+    link.textContent = "Download bootstrap";
+  }
+}
+
 function applySourceControls(elements, state) {
   const windowsSource = sourceDownload(state, "source-windows");
   const unixSource = sourceDownload(state, "source-unix");
@@ -1457,8 +1511,8 @@ function applySourceControls(elements, state) {
     windowsSource.command || "Release verification required before this command is enabled.";
   elements.unixCommand.textContent =
     unixSource.command || "Release verification required before this command is enabled.";
-  setFunctionalLink(elements.windowsScript, windowsSource.href);
-  setFunctionalLink(elements.unixScript, unixSource.href);
+  applySourceLink(elements.windowsScript, windowsSource);
+  applySourceLink(elements.unixScript, unixSource);
   elements.copyWindows.disabled = !windowsSource.command;
   elements.copyUnix.disabled = !unixSource.command;
 }
@@ -1511,6 +1565,28 @@ function setupDownloadControls({
       disabled: elements.downloadButton.disabled,
       openDialog: () => openDownloadDialog(documentObject, elements, state),
     });
+  });
+  elements.dialog.addEventListener("keydown", (event) => {
+    if (event.key !== "Tab") return;
+    const visibleControls = [
+      ...elements.dialog.querySelectorAll(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    ].filter((control) => control.getClientRects().length > 0);
+    if (!visibleControls.length) return;
+
+    const first = visibleControls[0];
+    const last = visibleControls[visibleControls.length - 1];
+    if (!elements.dialog.contains(documentObject.activeElement)) {
+      event.preventDefault();
+      first.focus();
+    } else if (event.shiftKey && documentObject.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && documentObject.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   });
   elements.dialog.addEventListener("click", (event) => {
     if (event.target !== elements.dialog) return;
