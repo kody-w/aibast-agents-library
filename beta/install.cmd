@@ -2,7 +2,7 @@
 setlocal EnableExtensions EnableDelayedExpansion
 title RAPP Brainstem Frontier Installer
 
-set "BRAINSTEM_HOME=%USERPROFILE%\.brainstem"
+if not defined BRAINSTEM_HOME set "BRAINSTEM_HOME=%USERPROFILE%\.brainstem"
 set "BETA_HOME=%BRAINSTEM_HOME%\beta-launcher"
 set "BETA_SOURCE=%BETA_HOME%\src"
 set "REPO_URL=https://github.com/microsoft/aibast-agents-library.git"

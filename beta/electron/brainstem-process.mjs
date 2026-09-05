@@ -17,11 +17,15 @@ export function resolveBrainstemConfig({
   home = homedir(),
 } = {}) {
   const paths = platform === "win32" ? path.win32 : path.posix;
-  const brainstemHome = env.BRAINSTEM_HOME || paths.join(home, ".brainstem");
+  const brainstemHome = paths.resolve(
+    env.BRAINSTEM_HOME || paths.join(home, ".brainstem"),
+  );
   const brainstemDir = env.BRAINSTEM_BETA_SOURCE_DIR
-    || paths.join(brainstemHome, "src", "rapp_brainstem");
+    ? paths.resolve(env.BRAINSTEM_BETA_SOURCE_DIR)
+    : paths.join(brainstemHome, "src", "rapp_brainstem");
   const python = env.BRAINSTEM_BETA_PYTHON
-    || (platform === "win32"
+    ? paths.resolve(env.BRAINSTEM_BETA_PYTHON)
+    : (platform === "win32"
       ? paths.join(brainstemHome, "venv", "Scripts", "python.exe")
       : paths.join(brainstemHome, "venv", "bin", "python"));
   const port = Number.parseInt(

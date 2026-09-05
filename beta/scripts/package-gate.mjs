@@ -1,14 +1,17 @@
 import {
+  chmodSync,
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readdirSync,
   rmSync,
   statSync,
+  writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
+import { loadBootstrapBundle } from "../electron/brainstem-provisioner.mjs";
 
 const betaDir = path.resolve(import.meta.dirname, "..");
 const appDir = path.join(
@@ -25,6 +28,7 @@ const executable = path.join(
 );
 const resources = path.join(appDir, "Contents", "Resources");
 const unpackedModules = path.join(resources, "app.asar.unpacked", "node_modules");
+const bootstrapDirectory = path.join(resources, "bootstrap");
 const results = [];
 
 function requirement(name, pass, detail = "") {
@@ -94,16 +98,51 @@ function main() {
   }
   executableCheck("ffmpeg", findNamed(unpackedModules, "ffmpeg"));
   executableCheck("ffprobe", findNamed(unpackedModules, "ffprobe"));
+  for (const platform of ["darwin", "win32"]) {
+    try {
+      const bundle = loadBootstrapBundle({
+        directory: bootstrapDirectory,
+        platform,
+      });
+      requirement(
+        `packaged ${bundle.installerName} matches immutable provenance`,
+        true,
+        bundle.provenance.commit,
+      );
+    } catch (error) {
+      requirement(
+        `packaged ${platform === "win32" ? "install.ps1" : "install.sh"} matches immutable provenance`,
+        false,
+        String(error.message || error),
+      );
+    }
+  }
 
   if (existsSync(executable)) {
-    const isolatedHome = mkdtempSync(path.join(tmpdir(), "rapp-beta-package-gate-"));
+    const scratchRoot = path.join(betaDir, "release", ".package-gate");
+    mkdirSync(scratchRoot, { recursive: true });
+    const isolatedHome = mkdtempSync(
+      path.join(scratchRoot, "rapp-beta-package-gate-"),
+    );
+    const brainstemHome = path.join(isolatedHome, ".brainstem");
+    const runtime = path.join(brainstemHome, "src", "rapp_brainstem");
+    const python = path.join(brainstemHome, "venv", "bin", "python");
     try {
+      mkdirSync(path.join(runtime, "agents"), { recursive: true });
+      mkdirSync(path.dirname(python), { recursive: true });
+      writeFileSync(path.join(runtime, "brainstem.py"), "\n");
+      writeFileSync(path.join(runtime, "requirements.txt"), "\n");
+      writeFileSync(path.join(runtime, "VERSION"), "package-gate\n");
+      writeFileSync(python, "#!/bin/sh\nexit 0\n");
+      chmodSync(python, 0o700);
       const smoke = spawnSync(executable, [], {
         encoding: "utf8",
         env: {
           ...process.env,
+          HOME: isolatedHome,
+          BRAINSTEM_HOME: brainstemHome,
           BRAINSTEM_BETA_HEADLESS: "1",
-          BRAINSTEM_BETA_HOME: isolatedHome,
+          BRAINSTEM_BETA_HOME: path.join(brainstemHome, "beta-launcher"),
           BRAINSTEM_BETA_SMOKE_EXIT_MS: "3000",
         },
         timeout: 30000,
@@ -114,8 +153,16 @@ function main() {
         smoke.status === 0,
         String(smoke.stderr || smoke.stdout || "").trim(),
       );
+      requirement(
+        "already-ready packaged smoke skipped provisioning",
+        !existsSync(
+          path.join(brainstemHome, "logs", "frontier-provision.log"),
+        ),
+        brainstemHome,
+      );
     } finally {
       rmSync(isolatedHome, { recursive: true, force: true });
+      rmSync(scratchRoot, { recursive: true, force: true });
     }
   }
 

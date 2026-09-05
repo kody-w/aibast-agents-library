@@ -179,6 +179,25 @@ Launchpad, the Linux app menu, the Windows Desktop/Start Menu, or run:
 brainstem-frontier
 ```
 
+### Packaged app first run
+
+A published `.dmg` or `.exe` no longer assumes `~/.brainstem` already exists.
+The package carries the root Brainstem installers plus a manifest that binds
+their SHA-256 hashes, repository, and runtime source to the package's full
+40-character release commit. On launch, Frontier:
+
+1. verifies the existing `BRAINSTEM_HOME` source, Python environment, and
+   required imports without changing a ready installation;
+2. shows a blocking provisioning screen when the runtime is missing or broken;
+3. runs the existing root installer in `--runtime-only --no-launch` mode against
+   the package's immutable commit;
+4. verifies the finished runtime before starting any Brainstem, Copilot, or UI
+   driver service.
+
+Failures remain visible and name the installer log plus the next action.
+Frontier never asks the installer to authenticate, and it does not copy tokens
+or credentials into package metadata or logs.
+
 ## Check for updates
 
 Open the three-dot **RAPP Brainstem Frontier** dropdown in the Brainstem toolbar and
@@ -235,6 +254,13 @@ Both installers default to:
 ```text
 https://github.com/microsoft/aibast-agents-library.git
 ```
+
+Binary packaging runs `npm run prepare:bootstrap` before electron-builder. The
+preparation step refuses dirty tracked source, records the exact checkout HEAD,
+and copies the matching root installers into the packaged resources. Set
+`BRAINSTEM_BETA_PACKAGE_REPOSITORY_URL` only when packaging a release from an
+approved fork; runtime environment variables cannot replace packaged
+provenance.
 
 The `BRAINSTEM_BETA_REPO_URL` and `BRAINSTEM_BETA_REF` environment variables
 exist only for fork staging and release-candidate verification.

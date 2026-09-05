@@ -14,8 +14,16 @@ try {
         [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 } catch {}
 
-$BRAINSTEM_HOME = "$env:USERPROFILE\.brainstem"
-$BRAINSTEM_BIN = "$env:USERPROFILE\.local\bin"
+$BRAINSTEM_HOME = if ($env:BRAINSTEM_HOME) {
+    [System.IO.Path]::GetFullPath($env:BRAINSTEM_HOME)
+} else {
+    "$env:USERPROFILE\.brainstem"
+}
+$BRAINSTEM_BIN = if ($env:BRAINSTEM_BIN) {
+    [System.IO.Path]::GetFullPath($env:BRAINSTEM_BIN)
+} else {
+    "$env:USERPROFILE\.local\bin"
+}
 $SOURCE_OVERRIDE_REQUESTED = [bool](
     $env:BRAINSTEM_REPO_URL -or
     $env:BRAINSTEM_REPO_REF -or
@@ -24,8 +32,9 @@ $SOURCE_OVERRIDE_REQUESTED = [bool](
 $REPO_URL = if ($env:BRAINSTEM_REPO_URL) { $env:BRAINSTEM_REPO_URL } else { "https://github.com/microsoft/aibast-agents-library.git" }
 $REPO_REF = if ($env:BRAINSTEM_REPO_REF) { $env:BRAINSTEM_REPO_REF } else { "main" }
 $REMOTE_VERSION_URL = if ($env:BRAINSTEM_VERSION_URL) { $env:BRAINSTEM_VERSION_URL } else { "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/VERSION" }
-$VENV_DIR = "$env:USERPROFILE\.brainstem\venv"
+$VENV_DIR = "$BRAINSTEM_HOME\venv"
 $NO_LAUNCH = $false
+$RUNTIME_ONLY = $false
 
 # Optional version pin: `--version vX.Y.Z` (also accepts a bare 0.6.14 or the release
 # tag form brainstem-v0.6.14). Parsed from the script arguments so a user can pin or
@@ -38,6 +47,9 @@ for ($i = 0; $i -lt $argList.Count; $i++) {
         $PIN_VERSION = [string]$argList[$i + 1]
         $i++
     } elseif ($argList[$i] -eq "--no-launch") {
+        $NO_LAUNCH = $true
+    } elseif ($argList[$i] -eq "--runtime-only") {
+        $RUNTIME_ONLY = $true
         $NO_LAUNCH = $true
     }
 }
@@ -375,6 +387,10 @@ function Check-Prerequisites {
     # Store the working python command for later use
     $script:PythonExe = $pythonCmd
 
+    # Packaged Frontier uses Brainstem's in-app device flow and needs only the
+    # runtime. Do not add unrelated user-level tooling during first-run setup.
+    if ($RUNTIME_ONLY) { return }
+
     # GitHub CLI (optional but recommended)
     try {
         gh --version 2>&1 | Out-Null
@@ -450,6 +466,48 @@ function Resolve-PinnedTag {
     return $null
 }
 
+function Set-PinnedSource {
+    param([string]$RepoPath)
+    if ($PIN_VERSION -match '^[0-9a-fA-F]{40}$') {
+        $expected = $PIN_VERSION.ToLowerInvariant()
+        $prev = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            git -C $RepoPath fetch --filter=blob:none --depth 1 origin $expected 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) { return $false }
+            git -C $RepoPath reset --hard --quiet FETCH_HEAD 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) { return $false }
+            $actual = (git -C $RepoPath rev-parse HEAD 2>$null).Trim().ToLowerInvariant()
+            if ($LASTEXITCODE -ne 0 -or $actual -ne $expected) { return $false }
+            $script:PIN_VERSION = $expected
+            Write-Host "  [OK] Checked out immutable commit $expected" -ForegroundColor Green
+            return $true
+        } finally {
+            $ErrorActionPreference = $prev
+        }
+    }
+
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        git -C $RepoPath fetch --filter=blob:none --tags --quiet origin 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) { return $false }
+        Push-Location $RepoPath
+        try {
+            $tag = Resolve-PinnedTag $PIN_VERSION
+            if (-not $tag) { return $false }
+            git checkout --quiet $tag 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) { return $false }
+            Write-Host "  [OK] Checked out $tag" -ForegroundColor Green
+            return $true
+        } finally {
+            Pop-Location
+        }
+    } finally {
+        $ErrorActionPreference = $prev
+    }
+}
+
 function Enable-BrainstemSparseCheckout {
     param([string]$RepoPath)
     $prev = $ErrorActionPreference
@@ -493,17 +551,7 @@ function Repair-BrainstemSource {
         if (-not (Enable-BrainstemSparseCheckout $repairPath)) { return $false }
 
         if ($PIN_VERSION) {
-            Push-Location $repairPath
-            try {
-                git fetch --filter=blob:none --tags --quiet origin 2>&1 | Out-Null
-                if ($LASTEXITCODE -ne 0) { return $false }
-                $repairTag = Resolve-PinnedTag $PIN_VERSION
-                if (-not $repairTag) { return $false }
-                git checkout --quiet $repairTag 2>&1 | Out-Null
-                if ($LASTEXITCODE -ne 0) { return $false }
-            } finally {
-                Pop-Location
-            }
+            if (-not (Set-PinnedSource $repairPath)) { return $false }
         }
 
         if (-not (Test-BrainstemSourceReady $repairPath)) { return $false }
@@ -596,21 +644,9 @@ function Install-Brainstem {
             $prevEAP = $ErrorActionPreference
             $ErrorActionPreference = 'Continue'
             git remote set-url origin $REPO_URL 2>&1 | Out-Null
-            $TagRef = $null
             if ($PIN_VERSION) {
-                # Pin/RC-test: fetch tags and check out the requested release tag
-                # (accepts v0.6.14 / 0.6.14 / brainstem-v0.6.14 forms like install.sh).
                 git stash 2>&1 | Out-Null
-                git fetch --filter=blob:none --tags --quiet origin 2>&1 | Out-Null
-                $TagRef = Resolve-PinnedTag $PIN_VERSION
-                $pullOk = $false
-                if ($TagRef) {
-                    git checkout --quiet $TagRef 2>&1 | Out-Null
-                    $pullOk = ($LASTEXITCODE -eq 0)
-                } else {
-                    Write-Host "  [X] Version $PIN_VERSION not found. Available versions:" -ForegroundColor Red
-                    git tag -l 'brainstem-v*' 'v*' 2>&1 | Sort-Object | ForEach-Object { Write-Host "    $_" }
-                }
+                $pullOk = Set-PinnedSource "$BRAINSTEM_HOME\src"
             } else {
                 git fetch --filter=blob:none --quiet origin $REPO_REF 2>&1 | Out-Null
                 $pullOk = ($LASTEXITCODE -eq 0)
@@ -621,16 +657,14 @@ function Install-Brainstem {
             }
             $ErrorActionPreference = $prevEAP
             Pop-Location
-            if ($PIN_VERSION -and -not $TagRef) {
+            if ($PIN_VERSION -and -not $pullOk) {
                 throw "pinned version $PIN_VERSION not found"
             }
             if ((-not $pullOk) -and (-not (Test-BrainstemSourceReady "$BRAINSTEM_HOME\src"))) {
                 $pullOk = Repair-BrainstemSource "$BRAINSTEM_HOME\src"
             }
             if ($pullOk) {
-                if ($PIN_VERSION) {
-                    Write-Host "  [OK] Checked out $TagRef" -ForegroundColor Green
-                } else {
+                if (-not $PIN_VERSION) {
                     Write-Host "  [OK] Framework updated" -ForegroundColor Green
                 }
             } else {
@@ -763,27 +797,11 @@ function Install-Brainstem {
         }
 
         if ($PIN_VERSION) {
-            # Pin/RC-test: check out the requested release tag after cloning
-            # (accepts v0.6.14 / 0.6.14 / brainstem-v0.6.14 forms like install.sh).
-            Push-Location $SourceStage
-            $prevEAP = $ErrorActionPreference
-            $ErrorActionPreference = 'Continue'
-            git fetch --filter=blob:none --tags --quiet origin 2>&1 | Out-Null
-            $TagRef = Resolve-PinnedTag $PIN_VERSION
-            if ($TagRef) {
-                git checkout --quiet $TagRef 2>&1 | Out-Null
-            } else {
-                Write-Host "  [X] Version $PIN_VERSION not found. Available versions:" -ForegroundColor Red
-                git tag -l 'brainstem-v*' 'v*' 2>&1 | Sort-Object | ForEach-Object { Write-Host "    $_" }
-            }
-            $ErrorActionPreference = $prevEAP
-            Pop-Location
-            if (-not $TagRef) {
+            if (-not (Set-PinnedSource $SourceStage)) {
                 Remove-Item -Recurse -Force $SourceStage -ErrorAction SilentlyContinue
                 if ($FreshBackup) { Remove-Item -Recurse -Force $FreshBackup -ErrorAction SilentlyContinue }
                 throw "pinned version $PIN_VERSION not found"
             }
-            Write-Host "  [OK] Checked out $TagRef" -ForegroundColor Green
         }
         if (-not (Test-BrainstemSourceReady $SourceStage)) {
             Remove-Item -Recurse -Force $SourceStage -ErrorAction SilentlyContinue
@@ -1211,7 +1229,9 @@ function Main {
             Check-Prerequisites
             Setup-Venv
             Ensure-Dependencies
-            Install-CLI
+            if (-not $RUNTIME_ONLY) {
+                Install-CLI
+            }
             Create-Env
             if ($NO_LAUNCH) {
                 Write-Host "  [OK] Brainstem runtime is ready (launch skipped)" -ForegroundColor Green
@@ -1230,7 +1250,9 @@ function Main {
     # CLI wrappers and .env before dependencies: they are cheap, offline-safe and
     # idempotent. If Setup-Dependencies throws, VERSION already matches remote, so
     # a re-run takes the fast path and would otherwise never come back for them.
-    Install-CLI
+    if (-not $RUNTIME_ONLY) {
+        Install-CLI
+    }
     Create-Env
     Setup-Dependencies
 

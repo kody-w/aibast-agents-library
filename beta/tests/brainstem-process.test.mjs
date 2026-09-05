@@ -53,6 +53,23 @@ test("beta launcher resolves Windows Brainstem paths on every host", () => {
   );
 });
 
+test("beta launcher respects an explicit isolated BRAINSTEM_HOME", () => {
+  const config = resolveBrainstemConfig({
+    env: { BRAINSTEM_HOME: "/workspace/isolated-brainstem" },
+    platform: "linux",
+    home: "/real-home-must-not-be-used",
+  });
+  assert.equal(config.brainstemHome, "/workspace/isolated-brainstem");
+  assert.equal(
+    config.brainstemDir,
+    "/workspace/isolated-brainstem/src/rapp_brainstem",
+  );
+  assert.equal(
+    config.python,
+    "/workspace/isolated-brainstem/venv/bin/python",
+  );
+});
+
 test("beta launcher accepts authenticated and unauthenticated health", () => {
   const base = { version: "0.6.16", agents: [] };
   assert.equal(isBrainstemHealth({ ...base, status: "ok" }), true);

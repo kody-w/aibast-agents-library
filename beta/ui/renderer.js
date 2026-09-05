@@ -1,6 +1,9 @@
 const frame = document.getElementById("brainstem");
 const splash = document.getElementById("splash");
 const error = document.getElementById("error");
+const startupTitle = document.getElementById("startup-title");
+const startupStatus = document.getElementById("startup-status");
+const startupDetail = document.getElementById("startup-detail");
 const intro = document.getElementById("intro");
 const introStorageKey = "rapp-brainstem-beta-intro-v1";
 const surgeon = document.getElementById("surgeon");
@@ -1213,6 +1216,9 @@ function render(state) {
     frame.classList.add("ready");
     splash.classList.add("hidden");
     error.textContent = "";
+    if (localStorage.getItem(introStorageKey) !== "seen") {
+      intro.classList.remove("hidden");
+    }
     syncBetaUpdate(state.update);
     void refreshAgentExplorer();
     return;
@@ -1220,8 +1226,17 @@ function render(state) {
 
   frame.classList.remove("ready");
   splash.classList.remove("hidden");
-  error.textContent = state.brainstem.phase === "error"
-    ? state.brainstem.message
+  intro.classList.add("hidden");
+  const failed = state.brainstem.phase === "error";
+  startupTitle.textContent = failed
+    ? "Brainstem setup needs attention"
+    : state.brainstem.phase === "provisioning"
+      ? "Installing your global Brainstem"
+      : "Preparing your global Brainstem";
+  startupStatus.textContent = state.brainstem.message || "Preparing Brainstem...";
+  startupDetail.textContent = failed ? "" : (state.brainstem.detail || "");
+  error.textContent = failed
+    ? [state.brainstem.message, state.brainstem.detail].filter(Boolean).join("\n\n")
     : "";
 }
 

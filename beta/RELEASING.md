@@ -16,9 +16,17 @@ prerelease version, then run:
 npm ci --no-audit --no-fund
 npm run check
 npm test
+npm run prepare:bootstrap
 ```
 
 Wait for the repository preflight workflow on the release commit to pass.
+
+`prepare:bootstrap` must run from a clean tracked checkout. It writes a
+generated package resource that binds `install.sh`, `install.ps1`, the GitHub
+repository, and the full checkout commit. `npm run dist:mac` runs this step
+automatically. A release pipeline building from an approved fork must set
+`BRAINSTEM_BETA_PACKAGE_REPOSITORY_URL`; it must still build the exact release
+commit.
 
 Binary packaging is optional and is not required for a source-only release. If
 you intentionally prepare a macOS preview artifact, run `npm run dist:mac` and

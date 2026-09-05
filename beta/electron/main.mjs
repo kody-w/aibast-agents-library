@@ -16,6 +16,7 @@ import {
 import {
   resolveBrainstemConfig,
 } from "./brainstem-process.mjs";
+import { BrainstemProvisioner } from "./brainstem-provisioner.mjs";
 import { humanizeAgentName } from "./agent-display.mjs";
 import { BrainSurgeon } from "./brain-surgeon.mjs";
 import { CopilotStudioAuthManager } from "./copilot-studio-auth.mjs";
@@ -48,9 +49,7 @@ const uiFile = path.join(dirname, "..", "ui", "index.html");
 const uiUrl = pathToFileURL(uiFile).href;
 const config = resolveBrainstemConfig();
 const startupFingerprint = betaSourceFingerprint(path.resolve(packageDir, ".."));
-const brainstemRuntimeFingerprint = runtimeDirectoryFingerprint(
-  config.brainstemDir,
-);
+let brainstemRuntimeFingerprint = null;
 const BETA_FRAME_BRIDGE_SOURCE = `(() => {
   if (window.__rappBetaFrameBridge) return true;
   window.__rappBetaFrameBridge = true;
@@ -367,19 +366,30 @@ const brainSurgeons = new Map();
 const MAX_BRAIN_SURGEONS = 12;
 
 const state = {
-  brainstem: { phase: "starting", message: "Starting shared Brainstem..." },
-  copilot: { phase: "starting", message: "Connecting bundled Copilot CLI..." },
+  brainstem: { phase: "checking", message: "Checking shared Brainstem..." },
+  copilot: { phase: "waiting", message: "Waiting for Brainstem setup..." },
   surgeon: {
-    phase: "starting",
-    message: "Preparing GitHub Copilot Agent mode...",
+    phase: "waiting",
+    message: "Waiting for Brainstem setup...",
   },
-  uiDriver: { phase: "starting", message: "Preparing visible AI controls..." },
+  uiDriver: { phase: "waiting", message: "Waiting for Brainstem setup..." },
   update: {
     phase: "idle",
     message: "Check GitHub for the latest RAPP Brainstem Frontier.",
   },
   url: config.url,
 };
+const provisioner = new BrainstemProvisioner({
+  config,
+  isPackaged: app.isPackaged,
+  resourcesPath: process.resourcesPath,
+  packageDir,
+  env: process.env,
+  onState: (next) => {
+    state.brainstem = next;
+    emitState();
+  },
+});
 const routeManager = new BetaRouteManager({
   betaHome,
   brainstemConfig: config,
@@ -1208,6 +1218,57 @@ function registerIpc() {
 }
 
 async function startServices() {
+  let provisioned;
+  try {
+    provisioned = await provisioner.ensure();
+    brainstemRuntimeFingerprint = runtimeDirectoryFingerprint(
+      config.brainstemDir,
+    );
+    state.brainstem = {
+      phase: "starting",
+      message: provisioned.provisioned
+        ? "Brainstem installed. Starting the isolated chat worker..."
+        : "Starting the isolated Brainstem chat worker...",
+      ...(provisioned.logPath
+        ? { detail: `Provisioning log: ${provisioned.logPath}` }
+        : {}),
+    };
+    state.copilot = {
+      phase: "starting",
+      message: "Connecting bundled Copilot CLI...",
+    };
+    state.surgeon = {
+      phase: "starting",
+      message: "Preparing GitHub Copilot Agent mode...",
+    };
+    state.uiDriver = {
+      phase: "starting",
+      message: "Preparing visible AI controls...",
+    };
+    emitState();
+  } catch (error) {
+    const failure = String(error.message || error);
+    state.brainstem = {
+      phase: "error",
+      message: "The shared Brainstem could not be prepared.",
+      detail: failure,
+    };
+    state.copilot = {
+      phase: "blocked",
+      message: "Blocked until Brainstem setup succeeds.",
+    };
+    state.surgeon = {
+      phase: "blocked",
+      message: "Blocked until Brainstem setup succeeds.",
+    };
+    state.uiDriver = {
+      phase: "blocked",
+      message: "Blocked until Brainstem setup succeeds.",
+    };
+    emitState();
+    return;
+  }
+
   const brainstemTask = routeManager.startDefault().then((route) => {
     state.url = route.url;
     emitState();
@@ -1250,7 +1311,35 @@ async function startServices() {
     emitState();
   });
 
-  await Promise.allSettled([brainstemTask, copilotTask]);
+  const uiDriverTask = startUiDriverServer({
+    resolveTwinUrls: (id) => {
+      const twin = twinManager.list().find((candidate) => candidate.id === id);
+      return twin ? [twin.url].filter(Boolean) : [];
+    },
+    window: mainWindow,
+    brainstemHome: config.brainstemHome,
+    loopbackUrl,
+    env: process.env,
+    routeTelemetry: () => routeManager.telemetrySnapshot(),
+    brainstemRuntimeFingerprint,
+    runtimeFingerprint: startupFingerprint,
+  }).then((driver) => {
+    uiDriver = driver;
+    state.uiDriver = {
+      phase: "ready",
+      message: "Chat agents can visibly operate this Brainstem.",
+    };
+    emitState();
+  }).catch((error) => {
+    state.uiDriver = {
+      phase: "error",
+      message: `Visible AI controls unavailable: ${String(error.message || error)}`,
+    };
+    console.error(state.uiDriver.message);
+    emitState();
+  });
+
+  await Promise.allSettled([brainstemTask, copilotTask, uiDriverTask]);
 }
 
 const hasLock = app.requestSingleInstanceLock();
@@ -1276,33 +1365,6 @@ if (!hasLock) {
     installApplicationMenu();
     loadPendingUpdateResult();
     mainWindow = createWindow();
-    startUiDriverServer({
-      resolveTwinUrls: (id) => {
-        const twin = twinManager.list().find((t) => t.id === id);
-        return twin ? [twin.url].filter(Boolean) : [];
-      },
-      window: mainWindow,
-      brainstemHome: config.brainstemHome,
-      loopbackUrl,
-      env: process.env,
-      routeTelemetry: () => routeManager.telemetrySnapshot(),
-      brainstemRuntimeFingerprint,
-      runtimeFingerprint: startupFingerprint,
-    }).then((driver) => {
-      uiDriver = driver;
-      state.uiDriver = {
-        phase: "ready",
-        message: "Chat agents can visibly operate this Brainstem.",
-      };
-      emitState();
-    }).catch((error) => {
-      state.uiDriver = {
-        phase: "error",
-        message: `Visible AI controls unavailable: ${String(error.message || error)}`,
-      };
-      console.error(state.uiDriver.message);
-      emitState();
-    });
     void startServices();
     const smokeExitMs = Number.parseInt(
       process.env.BRAINSTEM_BETA_SMOKE_EXIT_MS || "0",
@@ -1332,6 +1394,7 @@ if (!hasLock) {
       twinManager.stopAll(),
       copilot.stop(),
       routeManager.stop(),
+      provisioner.stop(),
       uiDriver?.stop(),
     ]).finally(() => {
       shutdownComplete = true;

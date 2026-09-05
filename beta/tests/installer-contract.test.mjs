@@ -5,8 +5,14 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repositoryRoot = path.resolve(root, "..");
 const unix = readFileSync(path.join(root, "install.sh"), "utf8");
 const windows = readFileSync(path.join(root, "install.cmd"), "utf8");
+const rootUnix = readFileSync(path.join(repositoryRoot, "install.sh"), "utf8");
+const rootWindows = readFileSync(
+  path.join(repositoryRoot, "install.ps1"),
+  "utf8",
+);
 const installerPage = readFileSync(path.join(root, "index.html"), "utf8");
 const frontierUnix = readFileSync(path.join(root, "frontier.sh"), "utf8");
 const frontierWindows = readFileSync(path.join(root, "frontier.ps1"), "utf8");
@@ -116,6 +122,38 @@ test("released beta installs can pin the launcher and runtime to one commit", ()
   // breaks every pinned-commit install on Windows; the block must use !...!.
   assert.doesNotMatch(windows, /rev-parse HEAD > "%ACTUAL_COMMIT_FILE%"/);
   assert.doesNotMatch(windows, /for \/f "delims=" %%H in \('.*rev-parse HEAD.*\)/);
+});
+
+test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () => {
+  assert.match(packageJson.scripts["prepare:bootstrap"], /prepare-package-bootstrap/);
+  assert.match(packageJson.scripts["dist:mac"], /prepare:bootstrap/);
+  assert.deepEqual(packageJson.build.extraResources[0], {
+    from: "build/generated/bootstrap",
+    to: "bootstrap",
+    filter: ["**/*"],
+  });
+  assert.match(packageJson.scripts.check, /brainstem-provisioner\.mjs/);
+  assert.match(main, /new BrainstemProvisioner/);
+  assert.match(main, /app\.isPackaged/);
+  assert.match(main, /runtimeDirectoryFingerprint[\s\S]*provisioner\.ensure/);
+  assert.match(ui, /id="startup-status"/);
+  assert.match(ui, /immutable release commit/);
+  assert.match(ui, /id="intro" class="hidden"/);
+  assert.match(renderer, /state\.brainstem\.detail/);
+  assert.match(renderer, /intro\.classList\.add\("hidden"\)/);
+});
+
+test("root installers expose a non-launching commit-pinned runtime mode", () => {
+  assert.match(rootUnix, /BRAINSTEM_HOME="\$\{BRAINSTEM_HOME:-\$HOME\/\.brainstem\}"/);
+  assert.match(rootUnix, /--runtime-only/);
+  assert.match(rootUnix, /fetch --filter=blob:none --depth 1 origin "\$expected"/);
+  assert.match(rootUnix, /Checked out immutable commit/);
+  assert.match(rootWindows, /if \(\$env:BRAINSTEM_HOME\)/);
+  assert.match(rootWindows, /\$VENV_DIR = "\$BRAINSTEM_HOME\\venv"/);
+  assert.match(rootWindows, /--runtime-only/);
+  assert.match(rootWindows, /fetch --filter=blob:none --depth 1 origin \$expected/);
+  assert.match(rootWindows, /Checked out immutable commit/);
+  assert.match(windows, /if not defined BRAINSTEM_HOME/);
 });
 
 test("dedicated beta page resolves fork releases without changing main install", () => {
