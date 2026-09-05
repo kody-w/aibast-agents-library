@@ -780,28 +780,33 @@ install_cli() {
     echo "Installing CLI..."
     mkdir -p "$BRAINSTEM_BIN"
 
-    cat > "$BRAINSTEM_BIN/brainstem" << 'WRAPPER'
+    local installed_home_q
+    printf -v installed_home_q '%q' "$BRAINSTEM_HOME"
+    cat > "$BRAINSTEM_BIN/brainstem" << WRAPPER
 #!/bin/bash
-BRAINSTEM_HOME="$HOME/.brainstem"
-VENV_PYTHON="$BRAINSTEM_HOME/venv/bin/python"
-cd "$BRAINSTEM_HOME/src/rapp_brainstem"
+if [ -z "\${BRAINSTEM_HOME+x}" ]; then
+    BRAINSTEM_HOME=$installed_home_q
+fi
+export BRAINSTEM_HOME
+VENV_PYTHON="\$BRAINSTEM_HOME/venv/bin/python"
+cd "\$BRAINSTEM_HOME/src/rapp_brainstem"
 
 # Use venv Python; fall back to creating venv if missing
-if [ ! -x "$VENV_PYTHON" ]; then
+if [ ! -x "\$VENV_PYTHON" ]; then
     echo "  Setting up environment..."
-    PYTHON_CMD=$(command -v python3.11 || command -v python3.12 || command -v python3.13 || command -v python3)
-    "$PYTHON_CMD" -m venv "$BRAINSTEM_HOME/venv" 2>/dev/null
-    "$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || \
-        "$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt
-    VENV_PYTHON="$BRAINSTEM_HOME/venv/bin/python"
+    PYTHON_CMD=\$(command -v python3.11 || command -v python3.12 || command -v python3.13 || command -v python3)
+    "\$PYTHON_CMD" -m venv "\$BRAINSTEM_HOME/venv" 2>/dev/null
+    "\$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || \
+        "\$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt
+    VENV_PYTHON="\$BRAINSTEM_HOME/venv/bin/python"
 fi
 
 # Verify deps on every launch (fast no-op if already installed)
-if ! "$VENV_PYTHON" -c "import flask, flask_cors, requests, dotenv" 2>/dev/null; then
-    "$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || true
+if ! "\$VENV_PYTHON" -c "import flask, flask_cors, requests, dotenv" 2>/dev/null; then
+    "\$BRAINSTEM_HOME/venv/bin/pip" install -r requirements.txt --quiet 2>/dev/null || true
 fi
 
-exec "$VENV_PYTHON" brainstem.py "$@"
+exec "\$VENV_PYTHON" brainstem.py "\$@"
 WRAPPER
 
     chmod +x "$BRAINSTEM_BIN/brainstem"

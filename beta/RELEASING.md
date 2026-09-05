@@ -24,9 +24,10 @@ Wait for the repository preflight workflow on the release commit to pass.
 `prepare:bootstrap` must run from a clean tracked checkout. It writes a
 generated package resource that binds `install.sh`, `install.ps1`, the GitHub
 repository, and the full checkout commit. `npm run dist:mac` runs this step
-automatically. A release pipeline building from an approved fork must set
-`BRAINSTEM_BETA_PACKAGE_REPOSITORY_URL`; it must still build the exact release
-commit.
+automatically. Release mode accepts only the canonical Microsoft repository.
+For explicit fork-only development artifacts, set
+`BRAINSTEM_BETA_PACKAGE_MODE=development`; those artifacts receive a distinct
+development provenance identity and are not release candidates.
 
 Binary packaging is optional and is not required for a source-only release. If
 you intentionally prepare a macOS preview artifact, run `npm run dist:mac` and
@@ -34,10 +35,12 @@ review it separately. Do not attach a locally assembled application to the
 source-only GitHub Release.
 
 The package gate launches with isolated `HOME`, `USERPROFILE`,
-`BRAINSTEM_HOME`, and Frontier state directories. It requires the routed
-Brainstem worker to pass the compatibility/agent-load gate before the smoke
-process may exit zero. Packaged update UX must continue directing users to a
-new signed package; the source-checkout updater is not a binary updater.
+`BRAINSTEM_HOME`, and Frontier state directories. It starts with no target
+runtime, substitutes a controlled immutable installer fixture, verifies staged
+activation and sanitized logs, then requires the routed Brainstem worker to
+pass the compatibility/agent-load gate before the smoke process may exit zero.
+Packaged update UX must continue directing users to a new signed package; the
+source-checkout updater is not a binary updater.
 The gate also executes the Copilot platform binary from
 `app.asar.unpacked`; a logical ASAR path is not acceptable evidence.
 

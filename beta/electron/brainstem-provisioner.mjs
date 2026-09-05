@@ -3,12 +3,12 @@ import { execFile, spawn } from "node:child_process";
 import {
   closeSync,
   existsSync,
+  lstatSync,
   mkdirSync,
   openSync,
   readFileSync,
+  renameSync,
   rmSync,
-  statSync,
-  writeFileSync,
   writeSync,
 } from "node:fs";
 import path from "node:path";
@@ -18,21 +18,49 @@ import {
   MINIMUM_BRAINSTEM_VERSION,
   versionAtLeast,
 } from "./brainstem-process.mjs";
+import {
+  acquireProvisioningLock,
+  provisioningLockPath,
+} from "./provision-lock.mjs";
+import { attachScrubbedLog, scrubSecrets } from "./safe-log.mjs";
 
 const execFileAsync = promisify(execFile);
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/i;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/i;
 const SOURCE_REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
 const PROVENANCE_SCHEMA = 1;
-const PROVISION_LOCK = ".frontier-provision.lock";
+const CANONICAL_REPOSITORY =
+  "https://github.com/microsoft/aibast-agents-library.git";
 const provisionByHome = new Map();
 
+export const PYTHON_READINESS_SCRIPT = [
+  "import pathlib, sys",
+  "required = (3, 11)",
+  "if sys.version_info < required:",
+  "    raise RuntimeError(",
+  "        f'Python 3.11+ is required; found {sys.version_info.major}.{sys.version_info.minor}'",
+  "    )",
+  "source = pathlib.Path(sys.argv[1]).read_text(encoding='utf-8')",
+  "compile(source, sys.argv[1], 'exec')",
+  "import flask, flask_cors, requests, dotenv",
+].join("\n");
+
 function message(error) {
-  return String(error?.message || error);
+  return scrubSecrets(error?.stderr || error?.message || error);
 }
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function pathEntryExists(filePath) {
+  try {
+    lstatSync(filePath);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
 }
 
 function validateSourceRef(value) {
@@ -91,13 +119,26 @@ export function validateBootstrapProvenance(value) {
   if (value.schema !== PROVENANCE_SCHEMA) {
     throw new Error(`bootstrap provenance schema must be ${PROVENANCE_SCHEMA}.`);
   }
-  if (value.product !== "rapp-brainstem-frontier") {
-    throw new Error("bootstrap provenance has the wrong product.");
+  const mode = value.mode;
+  if (!["development", "release"].includes(mode)) {
+    throw new Error("bootstrap provenance mode must be release or development.");
+  }
+  const expectedProduct = mode === "release"
+    ? "rapp-brainstem-frontier"
+    : "rapp-brainstem-frontier-development";
+  if (value.product !== expectedProduct) {
+    throw new Error(`bootstrap provenance product must be ${expectedProduct}.`);
   }
   if (!COMMIT_PATTERN.test(value.commit || "")) {
     throw new Error("bootstrap provenance commit must be a full 40-character SHA.");
   }
   const repositoryUrl = normalizeGitHubRepositoryUrl(value.repositoryUrl);
+  if (mode === "release" && repositoryUrl !== CANONICAL_REPOSITORY) {
+    throw new Error(
+      `release provenance must use ${CANONICAL_REPOSITORY}; `
+      + "use explicit development mode for a fork.",
+    );
+  }
   const sourceRef = validateSourceRef(value.sourceRef || "main");
   const installers = {};
   for (const filename of ["install.sh", "install.ps1"]) {
@@ -115,7 +156,8 @@ export function validateBootstrapProvenance(value) {
   }
   return {
     schema: PROVENANCE_SCHEMA,
-    product: "rapp-brainstem-frontier",
+    product: expectedProduct,
+    mode,
     commit: value.commit.toLowerCase(),
     repositoryUrl,
     sourceRef,
@@ -178,14 +220,10 @@ export function loadBootstrapBundle({
   };
 }
 
-async function probePython(python, brainstemHome) {
+async function probePython(python, brainstemHome, brainstemFile) {
   await execFileAsync(
     python,
-    [
-      "-B",
-      "-c",
-      "import flask, flask_cors, requests, dotenv",
-    ],
+    ["-B", "-c", PYTHON_READINESS_SCRIPT, brainstemFile],
     {
       encoding: "utf8",
       env: {
@@ -210,17 +248,30 @@ export async function inspectBrainstemRuntime(
     runPython = probePython,
   } = {},
 ) {
+  const brainstemFile = path.join(config.brainstemDir, "brainstem.py");
   const versionPath = path.join(config.brainstemDir, "VERSION");
   const required = [
-    ["Brainstem server", path.join(config.brainstemDir, "brainstem.py")],
+    ["Brainstem server", brainstemFile],
     ["Brainstem requirements", path.join(config.brainstemDir, "requirements.txt")],
     ["Brainstem version", versionPath],
+    ["Brainstem soul", path.join(config.brainstemDir, "soul.md")],
+    [
+      "ContextMemory agent",
+      path.join(config.brainstemDir, "agents", "context_memory_agent.py"),
+    ],
+    [
+      "ManageMemory agent",
+      path.join(config.brainstemDir, "agents", "manage_memory_agent.py"),
+    ],
     ["Brainstem Python environment", config.python],
   ];
+  const present = new Map(required.map(([, filePath]) => (
+    [filePath, fileExists(filePath)]
+  )));
   const issues = required
-    .filter(([, filePath]) => !fileExists(filePath))
+    .filter(([, filePath]) => !present.get(filePath))
     .map(([label, filePath]) => `${label} is missing at ${filePath}.`);
-  if (fileExists(versionPath)) {
+  if (present.get(versionPath)) {
     try {
       const version = readText(versionPath).trim();
       if (!versionAtLeast(version, minimumVersion)) {
@@ -237,14 +288,31 @@ export async function inspectBrainstemRuntime(
   }
   if (issues.length === 0) {
     try {
-      await runPython(config.python, config.brainstemHome);
-    } catch {
+      await runPython(config.python, config.brainstemHome, brainstemFile);
+    } catch (error) {
       issues.push(
-        `Brainstem Python dependencies are not usable from ${config.python}.`,
+        `Brainstem Python or source validation failed at ${config.python}: `
+        + `${message(error)}.`,
       );
     }
   }
   return { ready: issues.length === 0, issues };
+}
+
+function platformPaths(platform) {
+  return platform === "win32" ? path.win32 : path.posix;
+}
+
+export function configForBrainstemHome(config, brainstemHome, platform) {
+  const paths = platformPaths(platform);
+  return {
+    ...config,
+    brainstemHome,
+    brainstemDir: paths.join(brainstemHome, "src", "rapp_brainstem"),
+    python: platform === "win32"
+      ? paths.join(brainstemHome, "venv", "Scripts", "python.exe")
+      : paths.join(brainstemHome, "venv", "bin", "python"),
+  };
 }
 
 export function buildInstallerInvocation({
@@ -253,10 +321,13 @@ export function buildInstallerInvocation({
   env = process.env,
   platform = process.platform,
 } = {}) {
+  const paths = platformPaths(platform);
   const provenance = bundle.provenance;
+  const temporaryDirectory = paths.join(config.brainstemHome, "tmp");
   const installerEnv = {
     ...env,
     BRAINSTEM_HOME: config.brainstemHome,
+    BRAINSTEM_BIN: paths.join(config.brainstemHome, "bin"),
     BRAINSTEM_REPO_REF: provenance.sourceRef,
     BRAINSTEM_REPO_URL: provenance.repositoryUrl,
     BRAINSTEM_VERSION_URL: rawGitHubUrl(
@@ -264,6 +335,9 @@ export function buildInstallerInvocation({
       provenance.commit,
       "rapp_brainstem/VERSION",
     ),
+    TMP: temporaryDirectory,
+    TEMP: temporaryDirectory,
+    TMPDIR: temporaryDirectory,
   };
   const installerArgs = [
     "--runtime-only",
@@ -293,29 +367,50 @@ export function buildInstallerInvocation({
   };
 }
 
-function processExists(pid) {
-  if (!Number.isInteger(pid) || pid < 1) return false;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (error) {
-    return error?.code === "EPERM";
-  }
+function siblingArtifact(brainstemHome, suffix) {
+  const resolved = path.resolve(brainstemHome);
+  return path.join(
+    path.dirname(resolved),
+    `${path.basename(resolved)}.${suffix}`,
+  );
 }
 
-function staleLock(lockPath, staleMs) {
-  let age;
+export function provisioningLogPath(brainstemHome) {
+  return siblingArtifact(brainstemHome, "frontier-provision.log");
+}
+
+function stagingHome(brainstemHome, bundle, token) {
+  return siblingArtifact(
+    brainstemHome,
+    `frontier-stage-${bundle.provenance.commit.slice(0, 12)}-${token.slice(0, 16)}`,
+  );
+}
+
+function manualRepairError(config, inspection) {
+  return new Error(
+    `Existing BRAINSTEM_HOME is present but not compatible: ${
+      inspection.issues.join(" ")
+    } Automatic repair was not attempted and no existing files were changed. `
+    + `Back up ${config.brainstemHome}, then run the published source installer `
+    + "manually to repair it, or choose a new empty BRAINSTEM_HOME.",
+  );
+}
+
+async function terminateWindowsTree(pid) {
   try {
-    age = Date.now() - statSync(lockPath).mtimeMs;
-  } catch {
-    return false;
-  }
-  if (age < staleMs) return false;
+    await execFileAsync(
+      "taskkill.exe",
+      ["/pid", String(pid), "/t", "/f"],
+      { windowsHide: true },
+    );
+  } catch {}
+}
+
+function signalUnixTree(pid, signal) {
   try {
-    const owner = JSON.parse(readFileSync(path.join(lockPath, "owner.json"), "utf8"));
-    return !processExists(owner.pid);
-  } catch {
-    return true;
+    process.kill(-pid, signal);
+  } catch (error) {
+    if (error?.code !== "ESRCH") throw error;
   }
 }
 
@@ -332,10 +427,15 @@ export class BrainstemProvisioner {
     loadBundle = loadBootstrapBundle,
     runInstaller = null,
     onState = () => {},
+    acquireLock = acquireProvisioningLock,
     lockTimeoutMs = 10 * 60_000,
-    staleLockMs = 30 * 60_000,
-    pollIntervalMs = 500,
+    invalidOwnerGraceMs = 2_000,
+    pollIntervalMs = 100,
     sleep = wait,
+    pathExists = pathEntryExists,
+    makeDirectory = mkdirSync,
+    move = renameSync,
+    remove = rmSync,
   } = {}) {
     this.config = config;
     this.isPackaged = isPackaged;
@@ -349,11 +449,18 @@ export class BrainstemProvisioner {
     this.loadBundle = loadBundle;
     this.runInstallerOverride = runInstaller;
     this.onState = onState;
+    this.acquireLock = acquireLock;
     this.lockTimeoutMs = lockTimeoutMs;
-    this.staleLockMs = staleLockMs;
+    this.invalidOwnerGraceMs = invalidOwnerGraceMs;
     this.pollIntervalMs = pollIntervalMs;
     this.sleep = sleep;
+    this.pathExists = pathExists;
+    this.makeDirectory = makeDirectory;
+    this.move = move;
+    this.remove = remove;
     this.child = null;
+    this.ensurePromise = null;
+    this.lockLease = null;
     this.stopped = false;
   }
 
@@ -371,8 +478,10 @@ export class BrainstemProvisioner {
     const pending = this.ensureOnce();
     const shared = pending.finally(() => {
       if (provisionByHome.get(key) === shared) provisionByHome.delete(key);
+      if (this.ensurePromise === shared) this.ensurePromise = null;
     });
     provisionByHome.set(key, shared);
+    this.ensurePromise = shared;
     return shared;
   }
 
@@ -396,12 +505,14 @@ export class BrainstemProvisioner {
     if (initial.ready) {
       return { provisioned: false, reused: true };
     }
-
+    if (this.pathExists(this.config.brainstemHome)) {
+      throw manualRepairError(this.config, initial);
+    }
     if (!this.bootstrapDirectory) {
       const installer = path.join(this.packageDir || "beta", "install.sh");
       throw new Error(
-        `The shared Brainstem runtime is not ready: ${initial.issues.join(" ")} `
-        + `Nothing was launched. Run ${installer}, then reopen Frontier.`,
+        `The shared Brainstem runtime is absent. Nothing was launched. Run `
+        + `${installer}, then reopen Frontier.`,
       );
     }
 
@@ -419,27 +530,63 @@ export class BrainstemProvisioner {
       );
     }
 
-    const logPath = path.join(
-      this.config.brainstemHome,
-      "logs",
-      "frontier-provision.log",
-    );
-    const releaseLock = await this.acquireLock(logPath);
+    const logPath = provisioningLogPath(this.config.brainstemHome);
+    const lease = await this.acquireLock({
+      brainstemHome: this.config.brainstemHome,
+      invalidOwnerGraceMs: this.invalidOwnerGraceMs,
+      lockPath: provisioningLockPath(this.config.brainstemHome),
+      onWait: () => {
+        this.onState({
+          phase: "waiting",
+          message: "Another Frontier process is preparing the shared Brainstem...",
+          detail: `Waiting for its provisioning lock. Progress log: ${logPath}`,
+        });
+      },
+      pollIntervalMs: this.pollIntervalMs,
+      sleep: this.sleep,
+      timeoutMs: this.lockTimeoutMs,
+    });
+    this.lockLease = lease;
+    let stageHome = null;
     try {
       const afterLock = await this.inspectRuntime(this.config);
       this.assertRunning();
       if (afterLock.ready) {
         return { provisioned: false, reused: true, waited: true };
       }
+      if (this.pathExists(this.config.brainstemHome)) {
+        throw manualRepairError(this.config, afterLock);
+      }
 
+      stageHome = stagingHome(
+        this.config.brainstemHome,
+        bundle,
+        lease.token,
+      );
+      if (this.pathExists(stageHome)) {
+        throw new Error(
+          `Private Brainstem staging path already exists: ${stageHome}. `
+          + "Nothing was installed; remove that abandoned stage and reopen Frontier.",
+        );
+      }
+      this.makeDirectory(stageHome, { mode: 0o700 });
+      this.makeDirectory(path.join(stageHome, "tmp"), {
+        recursive: true,
+        mode: 0o700,
+      });
+      const stageConfig = configForBrainstemHome(
+        this.config,
+        stageHome,
+        this.platform,
+      );
       this.onState({
         phase: "provisioning",
-        message: "Installing the shared Brainstem runtime...",
-        detail: `This can take several minutes. Progress log: ${logPath}`,
+        message: "Installing a staged shared Brainstem runtime...",
+        detail: `The existing target remains untouched. Sanitized log: ${logPath}`,
       });
       const invocation = buildInstallerInvocation({
         bundle,
-        config: this.config,
+        config: stageConfig,
         env: this.env,
         platform: this.platform,
       });
@@ -447,9 +594,10 @@ export class BrainstemProvisioner {
       const result = this.runInstallerOverride
         ? await this.runInstallerOverride({
             bundle,
-            config: this.config,
+            config: stageConfig,
             invocation,
             logPath,
+            stageHome,
           })
         : await this.runInstaller(invocation, bundle, logPath);
       if (result?.code !== 0) {
@@ -457,24 +605,47 @@ export class BrainstemProvisioner {
           ? `was stopped by ${result.signal}`
           : `exited with code ${result?.code ?? "unknown"}`;
         throw new Error(
-          `Brainstem provisioning failed: ${bundle.installerName} ${ending}. `
-          + `Nothing was launched. Review ${logPath}, fix the prerequisite or `
-          + "network error shown there, then reopen Frontier.",
+          `Brainstem staging failed: ${bundle.installerName} ${ending}. `
+          + `No runtime was activated. Review the sanitized log at ${logPath}, `
+          + "fix the prerequisite or network error, then reopen Frontier.",
         );
       }
 
       this.onState({
         phase: "verifying",
-        message: "Verifying the installed Brainstem runtime...",
-        detail: `Installer log: ${logPath}`,
+        message: "Verifying the staged Brainstem runtime...",
+        detail: `Sanitized installer log: ${logPath}`,
       });
-      const verified = await this.inspectRuntime(this.config);
+      const staged = await this.inspectRuntime(stageConfig);
       this.assertRunning();
-      if (!verified.ready) {
+      if (!staged.ready) {
         throw new Error(
-          "Brainstem provisioning did not produce a usable runtime: "
-          + `${verified.issues.join(" ")} Nothing was launched. Review ${logPath}, `
-          + "then rerun the published Frontier installer or reopen this app.",
+          "Staged Brainstem verification failed: "
+          + `${staged.issues.join(" ")} No runtime was activated. Review the `
+          + `sanitized log at ${logPath}, then reopen Frontier.`,
+        );
+      }
+      if (this.pathExists(this.config.brainstemHome)) {
+        throw new Error(
+          `BRAINSTEM_HOME appeared while staging was in progress: ${
+            this.config.brainstemHome
+          }. The staged runtime was discarded and the existing target was preserved.`,
+        );
+      }
+
+      this.move(stageHome, this.config.brainstemHome);
+      const activatedStage = stageHome;
+      stageHome = null;
+      const activated = await this.inspectRuntime(this.config);
+      this.assertRunning();
+      if (!activated.ready) {
+        const rollback = `${activatedStage}.rollback`;
+        this.move(this.config.brainstemHome, rollback);
+        this.remove(rollback, { recursive: true, force: true });
+        throw new Error(
+          "Activated Brainstem failed its final readiness check and was rolled "
+          + `back to an absent target: ${activated.issues.join(" ")} Reopen `
+          + "Frontier to retry.",
         );
       }
       return {
@@ -484,57 +655,29 @@ export class BrainstemProvisioner {
         reused: false,
       };
     } finally {
-      releaseLock();
-    }
-  }
-
-  async acquireLock(logPath) {
-    mkdirSync(this.config.brainstemHome, { recursive: true, mode: 0o700 });
-    const lockPath = path.join(this.config.brainstemHome, PROVISION_LOCK);
-    const deadline = Date.now() + this.lockTimeoutMs;
-    while (Date.now() < deadline) {
-      this.assertRunning();
-      try {
-        mkdirSync(lockPath, { mode: 0o700 });
-        writeFileSync(
-          path.join(lockPath, "owner.json"),
-          `${JSON.stringify({
-            pid: process.pid,
-            startedAt: new Date().toISOString(),
-          })}\n`,
-          { mode: 0o600 },
-        );
-        return () => rmSync(lockPath, { recursive: true, force: true });
-      } catch (error) {
-        if (error?.code !== "EEXIST") throw error;
-        if (staleLock(lockPath, this.staleLockMs)) {
-          rmSync(lockPath, { recursive: true, force: true });
-          continue;
-        }
-        this.onState({
-          phase: "waiting",
-          message: "Another Frontier process is preparing the shared Brainstem...",
-          detail: `Waiting for its provisioning lock. Progress log: ${logPath}`,
-        });
-        await this.sleep(this.pollIntervalMs);
+      if (stageHome && this.pathExists(stageHome)) {
+        this.remove(stageHome, { recursive: true, force: true });
       }
+      lease.release();
+      if (this.lockLease === lease) this.lockLease = null;
     }
-    throw new Error(
-      "Another Frontier process still holds the Brainstem provisioning lock. "
-      + `Nothing was launched. Close the other Frontier launch, check ${logPath}, `
-      + "then reopen the app.",
-    );
   }
 
   async runInstaller(invocation, bundle, logPath) {
     this.assertRunning();
-    mkdirSync(path.dirname(logPath), { recursive: true, mode: 0o700 });
+    this.makeDirectory(path.dirname(logPath), {
+      recursive: true,
+      mode: 0o700,
+    });
     const logFd = openSync(logPath, "a", 0o600);
     writeSync(
       logFd,
-      `\n[${new Date().toISOString()}] Provisioning Brainstem from `
-      + `${bundle.provenance.commit}\n`,
+      scrubSecrets(
+        `\n[${new Date().toISOString()}] Staging Brainstem from `
+        + `${bundle.provenance.commit}\n`,
+      ),
     );
+    const cleanups = [];
     try {
       return await new Promise((resolve, reject) => {
         let settled = false;
@@ -544,22 +687,28 @@ export class BrainstemProvisioner {
           callback(value);
         };
         this.child = spawn(invocation.command, invocation.args, {
+          detached: this.platform !== "win32",
           env: invocation.env,
           shell: false,
-          stdio: ["ignore", logFd, logFd],
+          stdio: ["ignore", "pipe", "pipe"],
           windowsHide: true,
         });
+        cleanups.push(
+          attachScrubbedLog(this.child.stdout, logFd),
+          attachScrubbedLog(this.child.stderr, logFd),
+        );
         this.child.once("error", (error) => finish(reject, error));
-        this.child.once("exit", (code, signal) => {
+        this.child.once("close", (code, signal) => {
           finish(resolve, { code, signal });
         });
       });
     } catch (error) {
       throw new Error(
         `Could not start ${bundle.installerName}: ${message(error)}. `
-        + `Nothing was launched. Review ${logPath}, then reopen Frontier.`,
+        + `No runtime was activated. Review the sanitized log at ${logPath}.`,
       );
     } finally {
+      for (const cleanup of cleanups) cleanup();
       this.child = null;
       closeSync(logFd);
     }
@@ -568,12 +717,33 @@ export class BrainstemProvisioner {
   async stop() {
     this.stopped = true;
     const child = this.child;
-    if (!child || child.exitCode !== null) return;
-    child.kill("SIGTERM");
+    if (!child?.pid) return;
+    const closed = new Promise((resolve) => child.once("close", resolve));
+    if (this.platform === "win32") {
+      await terminateWindowsTree(child.pid);
+    } else {
+      signalUnixTree(child.pid, "SIGTERM");
+    }
+    let timeout;
     await Promise.race([
-      new Promise((resolve) => child.once("exit", resolve)),
-      this.sleep(5_000),
+      closed,
+      new Promise((resolve) => {
+        timeout = setTimeout(resolve, 5_000);
+      }),
     ]);
-    if (child.exitCode === null) child.kill("SIGKILL");
+    clearTimeout(timeout);
+    if (this.platform !== "win32" && this.child) {
+      signalUnixTree(child.pid, "SIGKILL");
+    }
+    if (this.lockLease && this.ensurePromise) {
+      let releaseTimeout;
+      await Promise.race([
+        this.ensurePromise.catch(() => undefined),
+        new Promise((resolve) => {
+          releaseTimeout = setTimeout(resolve, 5_000);
+        }),
+      ]);
+      clearTimeout(releaseTimeout);
+    }
   }
 }

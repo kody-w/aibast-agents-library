@@ -67,6 +67,22 @@ const packageGate = readFileSync(
   path.join(root, "scripts", "package-gate.mjs"),
   "utf8",
 );
+const prepareBootstrap = readFileSync(
+  path.join(root, "scripts", "prepare-package-bootstrap.mjs"),
+  "utf8",
+);
+const provisionerSource = readFileSync(
+  path.join(root, "electron", "brainstem-provisioner.mjs"),
+  "utf8",
+);
+const provisionLock = readFileSync(
+  path.join(root, "electron", "provision-lock.mjs"),
+  "utf8",
+);
+const safeLog = readFileSync(
+  path.join(root, "electron", "safe-log.mjs"),
+  "utf8",
+);
 const brainstemUi = readFileSync(
   process.env.BRAINSTEM_BETA_RUNTIME_DIR
     ? path.join(process.env.BRAINSTEM_BETA_RUNTIME_DIR, "index.html")
@@ -141,6 +157,8 @@ test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () =
     filter: ["**/*"],
   });
   assert.match(packageJson.scripts.check, /brainstem-provisioner\.mjs/);
+  assert.match(packageJson.scripts.check, /provision-lock\.mjs/);
+  assert.match(packageJson.scripts.check, /safe-log\.mjs/);
   assert.match(main, /new BrainstemProvisioner/);
   assert.match(main, /app\.isPackaged/);
   const services = main.slice(
@@ -148,14 +166,17 @@ test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () =
     main.indexOf("const hasLock = app.requestSingleInstanceLock()"),
   );
   const ensureIndex = services.indexOf("provisioner.ensure()");
+  const managersIndex = services.indexOf("initializeProvisionedManagers()");
   const startupFingerprintIndex = services.indexOf("betaSourceFingerprint(");
   const fingerprintIndex = services.indexOf("runtimeDirectoryFingerprint(");
   assert.ok(ensureIndex >= 0);
+  assert.ok(managersIndex >= 0);
   assert.ok(startupFingerprintIndex >= 0);
   assert.ok(fingerprintIndex >= 0);
   assert.ok(
     ensureIndex < startupFingerprintIndex
-      && ensureIndex < fingerprintIndex,
+      && ensureIndex < fingerprintIndex
+      && ensureIndex < managersIndex,
     "fingerprints must run only after provisioning",
   );
   assert.doesNotMatch(
@@ -176,6 +197,8 @@ test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () =
   assert.match(ui, /id="intro" class="hidden"/);
   assert.match(renderer, /state\.brainstem\.detail/);
   assert.match(renderer, /intro\.classList\.add\("hidden"\)/);
+  assert.match(main, /Evidence certification is disabled for this session/);
+  assert.match(main, /fingerprintWarnings/);
 });
 
 test("packaged Copilot CLI always resolves to an executable outside ASAR", () => {
@@ -214,8 +237,37 @@ test("packaged smoke requires real service readiness in an isolated home", () =>
   assert.match(packageGate, /HOME: isolatedHome/);
   assert.match(packageGate, /USERPROFILE: isolatedHome/);
   assert.match(packageGate, /BRAINSTEM_HOME: brainstemHome/);
+  assert.match(packageGate, /provisions a missing runtime and reaches readiness/);
+  assert.match(packageGate, /missing-runtime bootstrap cleaned every staging home/);
+  assert.match(packageGate, /provisioning log scrubs credential canaries/);
   assert.match(packageGate, /packaged smoke reached a compatible Brainstem service/);
   assert.match(packageGate, /packaged smoke fails closed when its Brainstem service fails/);
+});
+
+test("bootstrap staging, lock ownership, and log redaction are explicit", () => {
+  assert.match(provisionerSource, /Automatic repair was not attempted/);
+  assert.match(provisionerSource, /agents", "context_memory_agent\.py"/);
+  assert.match(provisionerSource, /agents", "manage_memory_agent\.py"/);
+  assert.match(provisionerSource, /Python 3\.11\+ is required/);
+  assert.match(provisionerSource, /compile\(source/);
+  assert.match(provisionerSource, /frontier-stage-/);
+  assert.match(provisionerSource, /this\.move\(stageHome, this\.config\.brainstemHome\)/);
+  assert.match(provisionerSource, /No runtime was activated/);
+  assert.match(provisionLock, /randomBytes\(32\)/);
+  assert.match(provisionLock, /\.stale-\$\{token\}/);
+  assert.match(provisionLock, /before\.owner\.token !== token/);
+  assert.match(safeLog, /github_pat_/);
+  assert.match(safeLog, /\[REDACTED\]/);
+  assert.match(provisionerSource, /detached: this\.platform !== "win32"/);
+  assert.match(provisionerSource, /taskkill\.exe/);
+  assert.match(provisionerSource, /process\.kill\(-pid, signal\)/);
+});
+
+test("release packaging is canonical and fork packaging is explicit development", () => {
+  assert.match(prepareBootstrap, /BRAINSTEM_BETA_PACKAGE_MODE \|\| "release"/);
+  assert.match(prepareBootstrap, /rapp-brainstem-frontier-development/);
+  assert.match(provisionerSource, /release provenance must use/);
+  assert.match(provisionerSource, /microsoft\/aibast-agents-library/);
 });
 
 test("packaged updater refuses the source-checkout path inside app.asar", () => {

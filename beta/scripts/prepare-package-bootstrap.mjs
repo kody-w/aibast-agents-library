@@ -56,6 +56,14 @@ function resolveCommit() {
 
 function main() {
   const commit = resolveCommit();
+  const mode = String(
+    process.env.BRAINSTEM_BETA_PACKAGE_MODE || "release",
+  ).trim().toLowerCase();
+  if (!["development", "release"].includes(mode)) {
+    throw new Error(
+      "BRAINSTEM_BETA_PACKAGE_MODE must be release or development.",
+    );
+  }
   const repositoryUrl = normalizeGitHubRepositoryUrl(
     process.env.BRAINSTEM_BETA_PACKAGE_REPOSITORY_URL
       || git(["remote", "get-url", "origin"]),
@@ -72,7 +80,10 @@ function main() {
   mkdirSync(outputDirectory, { recursive: true, mode: 0o700 });
   const manifest = {
     schema: 1,
-    product: "rapp-brainstem-frontier",
+    product: mode === "release"
+      ? "rapp-brainstem-frontier"
+      : "rapp-brainstem-frontier-development",
+    mode,
     commit,
     repositoryUrl,
     sourceRef,
@@ -90,7 +101,7 @@ function main() {
     { mode: 0o600 },
   );
   process.stdout.write(
-    `Prepared immutable Brainstem bootstrap ${commit} from ${repositoryUrl}\n`,
+    `Prepared ${mode} Brainstem bootstrap ${commit} from ${repositoryUrl}\n`,
   );
 }
 

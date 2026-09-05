@@ -23,6 +23,7 @@ import { CopilotStudioAuthManager } from "./copilot-studio-auth.mjs";
 import { CopilotRuntime } from "./copilot-runtime.mjs";
 import { BetaRouteManager } from "./route-manager.mjs";
 import { RappStoreClient } from "./rapp-store.mjs";
+import { scrubSecrets } from "./safe-log.mjs";
 import { TwinManager } from "./twin-manager.mjs";
 import {
   allowsUiDriverMediaPermission,
@@ -363,6 +364,7 @@ let provisioner = null;
 let routeManager = null;
 let rappStore = null;
 let twinManager = null;
+let initializeProvisionedManagers = null;
 let shutdownStarted = false;
 let shutdownComplete = false;
 let requestedExitCode = 0;
@@ -385,6 +387,10 @@ const state = {
     message: "Waiting for Brainstem setup...",
   },
   uiDriver: { phase: "waiting", message: "Waiting for Brainstem setup..." },
+  evidence: {
+    phase: "pending",
+    message: "Evidence fingerprints will be measured after Brainstem setup.",
+  },
   update: app.isPackaged
     ? packagedUpdateState()
     : {
@@ -887,7 +893,7 @@ async function handleCheckForUpdates({ openPanel = false } = {}) {
     return setUpdateState({
       phase: "error",
       message: "RAPP Brainstem Frontier could not check for updates.",
-      detail: String(error.message || error),
+      detail: scrubSecrets(error.message || error),
     });
   } finally {
     updateCheckInFlight = false;
@@ -925,7 +931,7 @@ async function handleInstallUpdate() {
     return setUpdateState({
       phase: "error",
       message: "RAPP Brainstem Frontier could not start the update.",
-      detail: String(error.message || error),
+      detail: scrubSecrets(error.message || error),
     });
   }
 }
@@ -1012,7 +1018,7 @@ function loadPendingUpdateResult() {
   } catch (error) {
     result = {
       success: false,
-      error: `The update result could not be read: ${String(error.message || error)}`,
+      error: `The update result could not be read: ${scrubSecrets(error.message || error)}`,
     };
   }
   if (!result) return;
@@ -1159,11 +1165,11 @@ function registerIpc() {
   });
   ipcMain.handle("beta:store-list", async (event) => {
     assertTrustedIpc(event);
-    return rappStore.list();
+    return rappStore ? rappStore.list() : [];
   });
   ipcMain.handle("beta:twin-list", async (event) => {
     assertTrustedIpc(event);
-    return twinManager.list();
+    return twinManager ? twinManager.list() : [];
   });
   ipcMain.handle("beta:twin-hatch", async (event, storeId, instruction) => {
     assertTrustedIpc(event);
@@ -1215,10 +1221,37 @@ async function startServices() {
   let provisioned;
   try {
     provisioned = await provisioner.ensure();
-    startupFingerprint = betaSourceFingerprint(path.resolve(packageDir, ".."));
-    brainstemRuntimeFingerprint = runtimeDirectoryFingerprint(
-      config.brainstemDir,
-    );
+    const fingerprintWarnings = [];
+    try {
+      startupFingerprint = betaSourceFingerprint(path.resolve(packageDir, ".."));
+    } catch (error) {
+      fingerprintWarnings.push(
+        `Frontier source fingerprint failed: ${scrubSecrets(error.message || error)}`,
+      );
+    }
+    try {
+      brainstemRuntimeFingerprint = runtimeDirectoryFingerprint(
+        config.brainstemDir,
+      );
+    } catch (error) {
+      fingerprintWarnings.push(
+        `Brainstem fingerprint failed: ${scrubSecrets(error.message || error)}`,
+      );
+    }
+    state.evidence = fingerprintWarnings.length
+      ? {
+          phase: "warning",
+          message: "Evidence certification is disabled for this session.",
+          detail: fingerprintWarnings.join(" "),
+        }
+      : {
+          phase: "ready",
+          message: "Evidence fingerprints are ready.",
+        };
+    if (fingerprintWarnings.length) {
+      console.warn(`${state.evidence.message} ${state.evidence.detail}`);
+    }
+    initializeProvisionedManagers();
     state.brainstem = {
       phase: "starting",
       message: provisioned.provisioned
@@ -1226,7 +1259,9 @@ async function startServices() {
         : "Starting the isolated Brainstem chat worker...",
       ...(provisioned.logPath
         ? { detail: `Provisioning log: ${provisioned.logPath}` }
-        : {}),
+        : state.evidence.phase === "warning"
+          ? { detail: state.evidence.message }
+          : {}),
     };
     state.copilot = {
       phase: "starting",
@@ -1242,7 +1277,7 @@ async function startServices() {
     };
     emitState();
   } catch (error) {
-    const failure = String(error.message || error);
+    const failure = scrubSecrets(error.message || error);
     state.brainstem = {
       phase: "error",
       message: "The shared Brainstem could not be prepared.",
@@ -1268,7 +1303,10 @@ async function startServices() {
     state.url = route.url;
     emitState();
   }).catch((error) => {
-    state.brainstem = { phase: "error", message: String(error.message || error) };
+    state.brainstem = {
+      phase: "error",
+      message: scrubSecrets(error.message || error),
+    };
     emitState();
   });
 
@@ -1297,7 +1335,7 @@ async function startServices() {
   }).catch((error) => {
     state.copilot = {
       phase: "warning",
-      message: `Copilot CLI status unavailable: ${String(error.message || error)}`,
+      message: `Copilot CLI status unavailable: ${scrubSecrets(error.message || error)}`,
     };
     state.surgeon = {
       phase: "error",
@@ -1328,7 +1366,7 @@ async function startServices() {
   }).catch((error) => {
     state.uiDriver = {
       phase: "error",
-      message: `Visible AI controls unavailable: ${String(error.message || error)}`,
+      message: `Visible AI controls unavailable: ${scrubSecrets(error.message || error)}`,
     };
     console.error(state.uiDriver.message);
     emitState();
@@ -1343,7 +1381,7 @@ if (!hasLock) {
 } else {
   app.setAppUserModelId(APP_ID);
 
-  const initializeStatefulRuntime = () => {
+  const initializeBootstrapRuntime = () => {
     copilot = new CopilotRuntime({
       tokenFile: path.join(config.brainstemDir, ".copilot_token"),
       workingDirectory: config.brainstemDir,
@@ -1360,6 +1398,9 @@ if (!hasLock) {
         emitState();
       },
     });
+  };
+  initializeProvisionedManagers = () => {
+    if (routeManager) return;
     routeManager = new BetaRouteManager({
       betaHome,
       brainstemConfig: config,
@@ -1375,6 +1416,7 @@ if (!hasLock) {
             || route.compositionHash,
           loadedAgents: [...route.health.agents],
           loadErrors: [...route.health.quarantined],
+          evidence: structuredClone(state.evidence),
         };
         emitState();
       },
@@ -1421,13 +1463,13 @@ if (!hasLock) {
     mainWindow = createWindow();
     let initialized = true;
     try {
-      initializeStatefulRuntime();
+      initializeBootstrapRuntime();
     } catch (error) {
       initialized = false;
       state.brainstem = {
         phase: "error",
         message: "Frontier could not initialize its local runtime managers.",
-        detail: `${String(error.message || error)} Nothing was launched. `
+        detail: `${scrubSecrets(error.message || error)} Nothing was launched. `
           + "Close other Frontier processes, check BRAINSTEM_HOME permissions, "
           + "then reopen the app.",
       };

@@ -1,5 +1,6 @@
 """Regression tests for destructive and fail-open installer paths."""
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -339,6 +340,54 @@ main --runtime-only
         "deps",
         "env",
     ]
+
+
+def test_generated_unix_launcher_honors_custom_home_and_bin(tmp_path):
+    real_home = tmp_path / "real-home"
+    brainstem_home = tmp_path / "custom-brainstem"
+    brainstem_bin = tmp_path / "custom-bin"
+    runtime = brainstem_home / "src/rapp_brainstem"
+    python = brainstem_home / "venv/bin/python"
+    marker = tmp_path / "launched"
+    runtime.mkdir(parents=True)
+    python.parent.mkdir(parents=True)
+    real_home.mkdir()
+    (runtime / "brainstem.py").write_text("\n", encoding="utf-8")
+    python.write_text(
+        "#!/bin/bash\n"
+        "if [ \"$1\" = \"-c\" ]; then exit 0; fi\n"
+        f"printf '%s\\n' \"$PWD|$BRAINSTEM_HOME|$*\" > {str(marker)!r}\n",
+        encoding="utf-8",
+    )
+    python.chmod(0o700)
+
+    result = run_harness(
+        real_home,
+        f"""
+BRAINSTEM_HOME={str(brainstem_home)!r}
+BRAINSTEM_BIN={str(brainstem_bin)!r}
+VENV_DIR="$BRAINSTEM_HOME/venv"
+install_cli
+""",
+    )
+    assert result.returncode == 0, result.stderr
+    launcher = brainstem_bin / "brainstem"
+    assert launcher.exists()
+
+    environment = os.environ.copy()
+    environment["HOME"] = str(real_home)
+    environment.pop("BRAINSTEM_HOME", None)
+    launched = subprocess.run(
+        [str(launcher), "hello"],
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert launched.returncode == 0, launched.stderr
+    assert marker.read_text(encoding="utf-8").strip() == (
+        f"{runtime}|{brainstem_home}|brainstem.py hello"
+    )
 
 
 def test_brainstem_home_environment_is_respected_at_initialization(tmp_path):

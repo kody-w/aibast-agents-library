@@ -9,6 +9,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -86,8 +87,8 @@ function executableCheck(label, filePath, args = ["-version"]) {
   }
 }
 
-function shellQuote(value) {
-  return `'${String(value).replaceAll("'", "'\\''")}'`;
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 function main() {
@@ -137,22 +138,25 @@ function main() {
     const brainstemHome = path.join(isolatedHome, ".brainstem");
     const runtime = path.join(brainstemHome, "src", "rapp_brainstem");
     const python = path.join(brainstemHome, "venv", "bin", "python");
-    const fakeServer = path.join(runtime, "package-gate-server.mjs");
     const serviceMarker = path.join(isolatedHome, "service-ready");
+    const provisionLog = path.join(
+      isolatedHome,
+      ".brainstem.frontier-provision.log",
+    );
+    const bootstrapFiles = ["install.sh", "install.ps1", "provenance.json"];
+    const originalBootstrap = Object.fromEntries(
+      bootstrapFiles.map((filename) => [
+        filename,
+        readFileSync(path.join(bootstrapDirectory, filename)),
+      ]),
+    );
     try {
-      mkdirSync(path.join(runtime, "agents"), { recursive: true });
-      mkdirSync(path.dirname(python), { recursive: true });
-      writeFileSync(path.join(runtime, "brainstem.py"), "\n");
-      writeFileSync(path.join(runtime, "requirements.txt"), "\n");
-      writeFileSync(path.join(runtime, "VERSION"), "0.6.16\n");
-      writeFileSync(
-        fakeServer,
-        `import { writeFileSync } from "node:fs";
+      const fakeServerSource = `import { writeFileSync } from "node:fs";
 import http from "node:http";
 const health = ${JSON.stringify({
           status: "unauthenticated",
           version: "0.6.16",
-          soul: path.join(runtime, "soul.md"),
+          soul: "fixture-soul.md",
           agents: ["ContextMemory", "ManageMemory"],
           quarantined: [],
         })};
@@ -174,16 +178,57 @@ server.listen(Number(process.env.PORT), "127.0.0.1", () => {
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => server.close(() => process.exit(0)));
 }
-`,
-      );
-      writeFileSync(path.join(runtime, "soul.md"), "package gate\n");
+`;
+      const fixtureInstaller = `#!/bin/bash
+set -eu
+runtime="$BRAINSTEM_HOME/src/rapp_brainstem"
+agents="$runtime/agents"
+python="$BRAINSTEM_HOME/venv/bin/python"
+mkdir -p "$agents" "$(dirname "$python")"
+printf '%s\\n' "print('fixture')" > "$runtime/brainstem.py"
+printf '%s\\n' "flask" > "$runtime/requirements.txt"
+printf '%s\\n' "0.6.16" > "$runtime/VERSION"
+printf '%s\\n' "package gate soul" > "$runtime/soul.md"
+printf '%s\\n' "class ContextMemoryAgent: pass" > "$agents/context_memory_agent.py"
+printf '%s\\n' "class ManageMemoryAgent: pass" > "$agents/manage_memory_agent.py"
+cat > "$runtime/package-gate-server.mjs" <<'SERVER'
+${fakeServerSource}
+SERVER
+cat > "$python" <<'PYTHON'
+#!/bin/sh
+if [ "$1" = "-B" ]; then exit 0; fi
+exec "$FAKE_NODE_PATH" "$BRAINSTEM_HOME/src/rapp_brainstem/package-gate-server.mjs"
+PYTHON
+chmod 700 "$python"
+printf '%s\\n' 'GITHUB_TOKEN=ghp_PackageGateCanary123456' >&2
+printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
+`;
+      const fixturePowerShell = "throw 'macOS package-gate fixture only'\n";
+      const fixtureManifest = {
+        schema: 1,
+        product: "rapp-brainstem-frontier",
+        mode: "release",
+        commit: "f".repeat(40),
+        repositoryUrl:
+          "https://github.com/microsoft/aibast-agents-library.git",
+        sourceRef: "main",
+        installers: {
+          "install.sh": { sha256: sha256(fixtureInstaller) },
+          "install.ps1": { sha256: sha256(fixturePowerShell) },
+        },
+      };
       writeFileSync(
-        python,
-        "#!/bin/sh\n"
-        + 'if [ "$1" = "-B" ]; then exit 0; fi\n'
-        + `exec ${shellQuote(process.execPath)} ${shellQuote(fakeServer)}\n`,
+        path.join(bootstrapDirectory, "install.sh"),
+        fixtureInstaller,
       );
-      chmodSync(python, 0o700);
+      writeFileSync(
+        path.join(bootstrapDirectory, "install.ps1"),
+        fixturePowerShell,
+      );
+      writeFileSync(
+        path.join(bootstrapDirectory, "provenance.json"),
+        `${JSON.stringify(fixtureManifest, null, 2)}\n`,
+      );
       const smokeEnv = Object.fromEntries(
         Object.entries(process.env).filter(([key]) => (
           !key.startsWith("BRAINSTEM_")
@@ -202,8 +247,9 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
         BRAINSTEM_HOME: brainstemHome,
         BRAINSTEM_BETA_HEADLESS: "1",
         BRAINSTEM_BETA_HOME: path.join(brainstemHome, "beta-launcher"),
-        BRAINSTEM_BETA_SMOKE_EXIT_MS: "5000",
+        BRAINSTEM_BETA_SMOKE_EXIT_MS: "8000",
         BRAINSTEM_BETA_SMOKE_REQUIRE_READY: "1",
+        FAKE_NODE_PATH: process.execPath,
         FAKE_BRAINSTEM_MARKER: serviceMarker,
       };
       const smoke = spawnSync(executable, [], {
@@ -212,10 +258,14 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
         timeout: 30000,
         windowsHide: true,
       });
+      const smokeOutput = String(smoke.stderr || smoke.stdout || "").trim();
       requirement(
-        "packaged app passes isolated headless smoke",
-        smoke.status === 0,
-        String(smoke.stderr || smoke.stdout || "").trim(),
+        "packaged app provisions a missing runtime and reaches readiness",
+        smoke.status === 0
+          && !/Error occurred in handler|UnhandledPromiseRejection|TypeError:/.test(
+            smokeOutput,
+          ),
+        smokeOutput,
       );
       requirement(
         "packaged smoke reached a compatible Brainstem service",
@@ -231,6 +281,52 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
           && serviceEnvironment.USERPROFILE === isolatedHome
           && serviceEnvironment.BRAINSTEM_HOME === brainstemHome,
         JSON.stringify(serviceEnvironment),
+      );
+      requirement(
+        "missing-runtime bootstrap atomically activated the shared home",
+        existsSync(path.join(runtime, "brainstem.py"))
+          && existsSync(python),
+        brainstemHome,
+      );
+      requirement(
+        "missing-runtime bootstrap cleaned every staging home",
+        readdirSync(isolatedHome).every(
+          (name) => !name.includes("frontier-stage-"),
+        ),
+        isolatedHome,
+      );
+      const sanitizedLog = existsSync(provisionLog)
+        ? readFileSync(provisionLog, "utf8")
+        : "";
+      requirement(
+        "provisioning log scrubs credential canaries",
+        sanitizedLog.includes("[REDACTED]")
+          && !sanitizedLog.includes("ghp_PackageGateCanary123456")
+          && !sanitizedLog.includes("PackageGatePassword"),
+        provisionLog,
+      );
+      const firstLog = sanitizedLog;
+      rmSync(serviceMarker, { force: true });
+      const readySmoke = spawnSync(executable, [], {
+        encoding: "utf8",
+        env: {
+          ...packagedEnv,
+          BRAINSTEM_BETA_SMOKE_EXIT_MS: "5000",
+        },
+        timeout: 30000,
+        windowsHide: true,
+      });
+      const readyOutput = String(
+        readySmoke.stderr || readySmoke.stdout || "",
+      ).trim();
+      requirement(
+        "already-ready packaged launch skips provisioning",
+        readySmoke.status === 0
+          && readFileSync(provisionLog, "utf8") === firstLog
+          && !/Error occurred in handler|UnhandledPromiseRejection|TypeError:/.test(
+            readyOutput,
+          ),
+        readyOutput,
       );
       writeFileSync(
         python,
@@ -254,14 +350,10 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
         failingSmoke.status !== 0,
         String(failingSmoke.stderr || failingSmoke.stdout || "").trim(),
       );
-      requirement(
-        "already-ready packaged smoke skipped provisioning",
-        !existsSync(
-          path.join(brainstemHome, "logs", "frontier-provision.log"),
-        ),
-        brainstemHome,
-      );
     } finally {
+      for (const [filename, bytes] of Object.entries(originalBootstrap)) {
+        writeFileSync(path.join(bootstrapDirectory, filename), bytes);
+      }
       rmSync(isolatedHome, { recursive: true, force: true });
       rmSync(scratchRoot, { recursive: true, force: true });
     }

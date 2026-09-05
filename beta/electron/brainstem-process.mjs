@@ -8,6 +8,8 @@ import { homedir } from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 
+import { attachScrubbedLog, scrubSecrets } from "./safe-log.mjs";
+
 const DEFAULT_PORT = 7071;
 const START_TIMEOUT_MS = 90_000;
 export const MINIMUM_BRAINSTEM_VERSION = "0.6.16";
@@ -208,6 +210,7 @@ export class BrainstemProcess {
     this.config = config;
     this.child = null;
     this.logFd = null;
+    this.logCleanups = [];
     this.owned = false;
   }
 
@@ -248,8 +251,12 @@ export class BrainstemProcess {
       env: buildBrainstemEnvironment(this.config),
       windowsHide: true,
       shell: false,
-      stdio: ["ignore", this.logFd, this.logFd],
+      stdio: ["ignore", "pipe", "pipe"],
     });
+    this.logCleanups = [
+      attachScrubbedLog(this.child.stdout, this.logFd),
+      attachScrubbedLog(this.child.stderr, this.logFd),
+    ];
     this.owned = true;
 
     let incompatible = null;
@@ -274,7 +281,7 @@ export class BrainstemProcess {
       throw new Error(
         incompatible
           ? `Brainstem started but failed the compatibility gate: ${
-              incompatible.issues.join(" ")
+              scrubSecrets(incompatible.issues.join(" "))
             } Nothing was opened. See ${this.config.logFile}.`
           : `Brainstem did not become healthy${
               exitCode === null ? "" : ` (exit ${exitCode})`
@@ -293,12 +300,13 @@ export class BrainstemProcess {
     if (child && child.exitCode === null) {
       child.kill("SIGTERM");
       await Promise.race([
-        new Promise((resolve) => child.once("exit", resolve)),
+        new Promise((resolve) => child.once("close", resolve)),
         new Promise((resolve) => setTimeout(resolve, 5_000)),
       ]);
       if (child.exitCode === null) child.kill("SIGKILL");
     }
 
+    for (const cleanup of this.logCleanups.splice(0)) cleanup();
     if (this.logFd !== null) {
       closeSync(this.logFd);
       this.logFd = null;
