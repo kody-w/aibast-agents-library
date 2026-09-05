@@ -68,10 +68,10 @@ function newestSourceMtime(directory) {
   return newest;
 }
 
-function executableCheck(label, filePath) {
+function executableCheck(label, filePath, args = ["-version"]) {
   requirement(`${label} exists in app.asar.unpacked`, Boolean(filePath), filePath || "");
   if (!filePath) return;
-  const version = spawnSync(filePath, ["-version"], {
+  const version = spawnSync(filePath, args, {
     encoding: "utf8",
     windowsHide: true,
   });
@@ -103,6 +103,11 @@ function main() {
   }
   executableCheck("ffmpeg", findNamed(unpackedModules, "ffmpeg"));
   executableCheck("ffprobe", findNamed(unpackedModules, "ffprobe"));
+  executableCheck(
+    "Copilot CLI",
+    findNamed(unpackedModules, "copilot"),
+    ["--version"],
+  );
   for (const platform of ["darwin", "win32"]) {
     try {
       const bundle = loadBootstrapBundle({

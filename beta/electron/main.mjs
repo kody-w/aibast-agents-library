@@ -49,7 +49,7 @@ const appIcon = existsSync(appIconFile) ? nativeImage.createFromPath(appIconFile
 const uiFile = path.join(dirname, "..", "ui", "index.html");
 const uiUrl = pathToFileURL(uiFile).href;
 const config = resolveBrainstemConfig();
-const startupFingerprint = betaSourceFingerprint(path.resolve(packageDir, ".."));
+let startupFingerprint = null;
 let brainstemRuntimeFingerprint = null;
 const BETA_FRAME_BRIDGE_SOURCE = `(() => {
   if (window.__rappBetaFrameBridge) return true;
@@ -1191,6 +1191,7 @@ async function startServices() {
   let provisioned;
   try {
     provisioned = await provisioner.ensure();
+    startupFingerprint = betaSourceFingerprint(path.resolve(packageDir, ".."));
     brainstemRuntimeFingerprint = runtimeDirectoryFingerprint(
       config.brainstemDir,
     );

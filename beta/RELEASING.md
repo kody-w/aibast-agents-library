@@ -38,6 +38,8 @@ The package gate launches with isolated `HOME`, `USERPROFILE`,
 Brainstem worker to pass the compatibility/agent-load gate before the smoke
 process may exit zero. Packaged update UX must continue directing users to a
 new signed package; the source-checkout updater is not a binary updater.
+The gate also executes the Copilot platform binary from
+`app.asar.unpacked`; a logical ASAR path is not acceptable evidence.
 
 ## 2. Create the immutable tag
 

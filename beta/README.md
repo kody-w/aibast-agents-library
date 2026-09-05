@@ -204,6 +204,12 @@ a present soul, loaded-agent evidence, the routed `ContextMemory` and
 chat as ready. `BRAINSTEM_HOME` remains authoritative even when it differs from
 `HOME` or `USERPROFILE`.
 
+The packaged GitHub Copilot platform executable is resolved from
+`app.asar.unpacked` (never the logical `app.asar` path passed to `spawn`).
+Source and Brainstem fingerprints are computed only after the window exists and
+runtime provisioning succeeds, so a missing clean-machine runtime cannot crash
+during module evaluation.
+
 ## Check for updates
 
 Open the three-dot **RAPP Brainstem Frontier** dropdown in the Brainstem toolbar and

@@ -24,6 +24,10 @@ const brainSurgeon = readFileSync(
   path.join(root, "electron", "brain-surgeon.mjs"),
   "utf8",
 );
+const copilotRuntime = readFileSync(
+  path.join(root, "electron", "copilot-runtime.mjs"),
+  "utf8",
+);
 const routeManager = readFileSync(
   path.join(root, "electron", "route-manager.mjs"),
   "utf8",
@@ -144,12 +148,19 @@ test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () =
     main.indexOf("const hasLock = app.requestSingleInstanceLock()"),
   );
   const ensureIndex = services.indexOf("provisioner.ensure()");
+  const startupFingerprintIndex = services.indexOf("betaSourceFingerprint(");
   const fingerprintIndex = services.indexOf("runtimeDirectoryFingerprint(");
   assert.ok(ensureIndex >= 0);
+  assert.ok(startupFingerprintIndex >= 0);
   assert.ok(fingerprintIndex >= 0);
   assert.ok(
-    ensureIndex < fingerprintIndex,
-    "runtime fingerprint must run only after provisioning",
+    ensureIndex < startupFingerprintIndex
+      && ensureIndex < fingerprintIndex,
+    "fingerprints must run only after provisioning",
+  );
+  assert.doesNotMatch(
+    main.slice(0, main.indexOf("async function startServices()")),
+    /= (?:betaSourceFingerprint|runtimeDirectoryFingerprint)\(/,
   );
   const ready = main.slice(main.indexOf("app.whenReady().then"));
   const windowIndex = ready.indexOf("mainWindow = createWindow()");
@@ -165,6 +176,17 @@ test("packaged Frontier carries a fail-closed immutable runtime bootstrap", () =
   assert.match(ui, /id="intro" class="hidden"/);
   assert.match(renderer, /state\.brainstem\.detail/);
   assert.match(renderer, /intro\.classList\.add\("hidden"\)/);
+});
+
+test("packaged Copilot CLI always resolves to an executable outside ASAR", () => {
+  assert.ok(
+    packageJson.build.asarUnpack.includes("node_modules/@github/copilot-*/**"),
+  );
+  assert.match(copilotRuntime, /app\.asar\.unpacked/);
+  assert.match(copilotRuntime, /process\.resourcesPath/);
+  assert.match(copilotRuntime, /RUNNING_FROM_ASAR && !cliPath/);
+  assert.match(packageGate, /"Copilot CLI"/);
+  assert.match(packageGate, /\["--version"\]/);
 });
 
 test("single-instance lock precedes every stateful runtime constructor", () => {
