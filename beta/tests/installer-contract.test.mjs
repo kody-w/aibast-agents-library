@@ -83,6 +83,10 @@ const safeLog = readFileSync(
   path.join(root, "electron", "safe-log.mjs"),
   "utf8",
 );
+const userDataPath = readFileSync(
+  path.join(root, "electron", "user-data-path.mjs"),
+  "utf8",
+);
 const brainstemUi = readFileSync(
   process.env.BRAINSTEM_BETA_RUNTIME_DIR
     ? path.join(process.env.BRAINSTEM_BETA_RUNTIME_DIR, "index.html")
@@ -244,6 +248,8 @@ test("packaged smoke requires real service readiness in an isolated home", () =>
   assert.match(packageGate, /packaged smoke fails closed when its Brainstem service fails/);
   assert.match(packageGate, /BRAINSTEM_BETA_USER_DATA_DIR/);
   assert.match(packageGate, /two concurrent packaged smokes both reach their own backend/);
+  assert.match(packageGate, /ACTUAL_USER_DATA_DIR/);
+  assert.match(packageGate, /concurrent-shared-home-/);
   assert.match(packageGate, /safeRealpath/);
   assert.match(packageGate, /package gate completed without an internal crash/);
 });
@@ -323,7 +329,10 @@ test("packaged userData override isolates the single-instance lock", () => {
   assert.ok(override >= 0);
   assert.ok(setPath > override);
   assert.ok(setPath < lock);
-  assert.match(main, /path\.resolve\(userDataOverride\)/);
+  assert.match(main, /resolveUserDataDirectory/);
+  assert.match(main, /BRAINSTEM_BETA_ACTUAL_USER_DATA_DIR = app\.getPath\("userData"\)/);
+  assert.match(userDataPath, /isAbsolute\(requested\)/);
+  assert.match(userDataPath, /must not be a filesystem root/);
 });
 
 test("Windows ARM64 source bootstrap fails instead of mixing architectures", () => {

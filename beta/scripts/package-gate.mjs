@@ -231,7 +231,8 @@ server.listen(Number(process.env.PORT), "127.0.0.1", () => {
     HOME: process.env.HOME,
     USERPROFILE: process.env.USERPROFILE,
     BRAINSTEM_HOME: process.env.BRAINSTEM_HOME,
-    USER_DATA_DIR: process.env.BRAINSTEM_BETA_USER_DATA_DIR,
+    REQUESTED_USER_DATA_DIR: process.env.BRAINSTEM_BETA_USER_DATA_DIR,
+    ACTUAL_USER_DATA_DIR: process.env.BRAINSTEM_BETA_ACTUAL_USER_DATA_DIR,
   }));
 });
 for (const signal of ["SIGINT", "SIGTERM"]) {
@@ -315,6 +316,7 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
           BRAINSTEM_BETA_HOME: path.join(target, "beta-launcher"),
           BRAINSTEM_BETA_SMOKE_EXIT_MS: "8000",
           BRAINSTEM_BETA_SMOKE_REQUIRE_READY: "1",
+          BRAINSTEM_BETA_CAPTURE_USER_DATA_PATH: "1",
           BRAINSTEM_BETA_USER_DATA_DIR: path.join(
             home,
             "electron-user-data",
@@ -365,7 +367,9 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
         serviceEnvironment.HOME === isolatedHome
           && serviceEnvironment.USERPROFILE === isolatedHome
           && serviceEnvironment.BRAINSTEM_HOME === brainstemHome
-          && serviceEnvironment.USER_DATA_DIR
+          && serviceEnvironment.REQUESTED_USER_DATA_DIR
+            === packagedEnv.BRAINSTEM_BETA_USER_DATA_DIR
+          && serviceEnvironment.ACTUAL_USER_DATA_DIR
             === packagedEnv.BRAINSTEM_BETA_USER_DATA_DIR,
         Object.keys(serviceEnvironment).length
           ? JSON.stringify(serviceEnvironment)
@@ -430,18 +434,28 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
           ),
         readyLog.ok ? readyOutput : readyLog.detail,
       );
-      const concurrentHomes = [
-        mkdtempSync(path.join(scratchRoot, "concurrent-a-")),
-        mkdtempSync(path.join(scratchRoot, "concurrent-b-")),
-      ];
-      const concurrentMarkers = concurrentHomes.map(
-        (home) => path.join(home, "service-ready"),
+      const concurrentHome = mkdtempSync(
+        path.join(scratchRoot, "concurrent-shared-home-"),
       );
-      const concurrentEnvironments = concurrentHomes.map((home, index) => (
+      const concurrentTargets = [
+        path.join(concurrentHome, "brainstem-a"),
+        path.join(concurrentHome, "brainstem-b"),
+      ];
+      const concurrentMarkers = concurrentTargets.map(
+        (_target, index) => path.join(
+          concurrentHome,
+          `service-ready-${index + 1}`,
+        ),
+      );
+      const concurrentEnvironments = concurrentTargets.map((target, index) => (
         packagedEnvironment(
-          home,
+          concurrentHome,
           `concurrent-${index + 1}`,
           concurrentMarkers[index],
+          {
+            BRAINSTEM_HOME: target,
+            BRAINSTEM_BETA_HOME: path.join(target, "beta-launcher"),
+          },
         )
       ));
       const concurrentResults = await Promise.all(
@@ -455,7 +469,7 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
           && concurrentMarkers.every((marker) => existsSync(marker)),
         concurrentResults.map((result) => result.output).join("\n---\n"),
       );
-      for (let index = 0; index < concurrentHomes.length; index += 1) {
+      for (let index = 0; index < concurrentTargets.length; index += 1) {
         const evidence = safeRead(concurrentMarkers[index]);
         let measured = null;
         try {
@@ -463,9 +477,12 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
         } catch {}
         requirement(
           `concurrent smoke ${index + 1} kept a unique userData identity`,
-          measured?.BRAINSTEM_HOME
-              === concurrentEnvironments[index].BRAINSTEM_HOME
-            && measured?.USER_DATA_DIR
+          measured?.HOME === concurrentHome
+            && measured?.USERPROFILE === concurrentHome
+            && measured?.BRAINSTEM_HOME === concurrentTargets[index]
+            && measured?.REQUESTED_USER_DATA_DIR
+              === concurrentEnvironments[index].BRAINSTEM_BETA_USER_DATA_DIR
+            && measured?.ACTUAL_USER_DATA_DIR
               === concurrentEnvironments[index].BRAINSTEM_BETA_USER_DATA_DIR,
           measured ? JSON.stringify(measured) : evidence.detail,
         );
