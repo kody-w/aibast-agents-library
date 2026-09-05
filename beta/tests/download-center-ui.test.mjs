@@ -6,7 +6,10 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const betaRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const page = readFileSync(path.join(betaRoot, "index.html"), "utf8");
+const page = readFileSync(path.join(betaRoot, "index.html"), "utf8").replace(
+  /\r\n/g,
+  "\n",
+);
 const scripts = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
 const style = page.match(/<style>([\s\S]*?)<\/style>/)?.[1] || "";
 const unsupportedWindowsArchitecture = `ARM${64}`;
