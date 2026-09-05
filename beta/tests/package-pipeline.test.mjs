@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import {
+  existsSync,
   mkdirSync,
   readFileSync,
   rmSync,
@@ -86,6 +88,35 @@ import {
 
 const betaDir = path.resolve(import.meta.dirname, "..");
 const repositoryDir = path.resolve(betaDir, "..");
+const workflowPath = path.join(
+  repositoryDir,
+  ".github",
+  "workflows",
+  "frontier-binaries.yml",
+);
+let workflowContract;
+
+function loadWorkflowContract() {
+  if (workflowContract !== undefined) {
+    return workflowContract;
+  }
+  if (existsSync(workflowPath)) {
+    workflowContract = readFileSync(workflowPath, "utf8");
+    return workflowContract;
+  }
+  const sparsePaths = execFileSync(
+    "git",
+    ["-C", repositoryDir, "sparse-checkout", "list"],
+    { encoding: "utf8" },
+  ).split(/\r?\n/).filter(Boolean).sort();
+  assert.deepEqual(
+    sparsePaths,
+    ["beta", "tools/rapp1"],
+    "the workflow contract may be absent only from the intentional beta runtime sparse checkout",
+  );
+  workflowContract = null;
+  return workflowContract;
+}
 
 function workflowJob(workflow, name) {
   const marker = `\n  ${name}:\n`;
@@ -188,25 +219,27 @@ test("package bootstrap release authority is canonical and staging is distinct",
   });
 
   test("unsigned workflow has deterministic non-production identity defaults", () => {
-    const workflow = readFileSync(
-      path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-      "utf8",
+    const workflow = loadWorkflowContract();
+    if (workflow === null) {
+      return;
+    }
+    const mac = workflowJob(workflow, "verify-macos");
+    assert.match(
+      mac,
+      /export FRONTIER_PACKAGE_APP_ID="\$\{FRONTIER_PACKAGE_APP_ID:-io\.github\.aibast\.frontier-staging\}"/,
     );
-    assert.equal(
-      [...workflow.matchAll(
-        /FRONTIER_PACKAGE_APP_ID: \$\{\{ vars\.FRONTIER_STAGING_APP_ID \|\| 'io\.github\.aibast\.frontier-staging' \}\}/g,
-      )].length,
-      2,
+    assert.match(
+      mac,
+      /export FRONTIER_PACKAGE_PRODUCT_NAME="\$\{FRONTIER_PACKAGE_PRODUCT_NAME:-RAPP Brainstem Frontier Staging\}"/,
     );
-    assert.equal(
-      [...workflow.matchAll(
-        /FRONTIER_PACKAGE_PRODUCT_NAME: \$\{\{ vars\.FRONTIER_STAGING_PRODUCT_NAME \|\| 'RAPP Brainstem Frontier Staging' \}\}/g,
-      )].length,
-      2,
+    const windows = workflowJob(workflow, "verify-windows");
+    assert.match(
+      windows,
+      /IsNullOrWhiteSpace\(\$env:FRONTIER_PACKAGE_APP_ID\)[\s\S]*io\.github\.aibast\.frontier-staging/,
     );
-    assert.doesNotMatch(
-      workflow,
-      /FRONTIER_PACKAGE_(?:APP_ID|PRODUCT_NAME):[\s\S]*?\|\| ''/,
+    assert.match(
+      windows,
+      /IsNullOrWhiteSpace\(\$env:FRONTIER_PACKAGE_PRODUCT_NAME\)[\s\S]*RAPP Brainstem Frontier Staging/,
     );
   });
 
@@ -1029,10 +1062,10 @@ test("blocked native media permits report-only unsigned uploads", () => {
       /reports only/,
     );
   }
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   for (const jobName of ["verify-macos", "verify-windows"]) {
     const job = workflowJob(workflow, jobName);
     const upload = job.slice(job.indexOf("uses: actions/upload-artifact@"));
@@ -1169,10 +1202,10 @@ test("Windows NSIS identity and production signing policy are frozen", async () 
   );
   assert.match(stagedVerifier, /loadWindowsSigningPolicy/);
   assert.match(stagedVerifier, /validateWindowsSigningEvidence/);
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   const stage = workflowJob(workflow, "stage-release");
   for (const name of [
     "WINDOWS_SIGNING_SUBJECT",
@@ -1189,10 +1222,10 @@ test("Windows NSIS identity and production signing policy are frozen", async () 
 });
 
 test("workflow contract pins actions and never creates or moves a release tag", () => {
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   const actions = [
     ...workflow.matchAll(/^\s*-\s+uses:\s*([^#\n]+)(?:#.*)?$/gm),
   ];
@@ -1233,10 +1266,10 @@ test("workflow contract pins actions and never creates or moves a release tag", 
 });
 
 test("signing credentials are exposed only after dependency and media gates", () => {
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   const mac = workflowJob(workflow, "release-macos");
   const macInstall = mac.indexOf("npm ci --no-audit --no-fund");
   const macTests = mac.indexOf("npm test");
@@ -1371,10 +1404,10 @@ test("Windows signing input hash manifest detects any post-validation mutation",
 });
 
 test("publication revalidates the full set and immutable setting at the last gate", () => {
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   const publish = workflowJob(workflow, "publish");
   const download = publish.indexOf("--dir publish-verification");
   const count = publish.indexOf("= 13");
@@ -1533,10 +1566,10 @@ test("annotated tag object, peeled commit, and release ID are race-bound", () =>
     );
   }
 
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   const context = workflowJob(workflow, "context");
   assert.match(context, /tag_object:/);
   assert.match(context, /--fingerprint-file/);
@@ -2201,10 +2234,10 @@ test("signal reconciliation waits for the interrupted operation", async () => {
     false,
     "concurrent state merging must never bless a manual-only marker",
   );
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   const publish = workflowJob(workflow, "publish");
   assert.match(publish, /Reconcile interrupted release publication/);
   assert.match(publish, /failure\(\) \|\| cancelled\(\)/);
@@ -3132,10 +3165,10 @@ test("second Windows binary release requires immutable N-1 evidence", () => {
     ], { platform: "win32", arch: "x64" }),
     /exactly one of --previous-installer/,
   );
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   const context = workflowJob(workflow, "context");
   assert.match(context, /windows-upgrade-policy\.mjs/);
   assert.match(context, /previous_windows_asset_id/);
@@ -3148,10 +3181,10 @@ test("second Windows binary release requires immutable N-1 evidence", () => {
 });
 
 test("protected clean-Mac gate exercises quarantine and LaunchServices", () => {
-  const workflow = readFileSync(
-    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
-    "utf8",
-  );
+  const workflow = loadWorkflowContract();
+  if (workflow === null) {
+    return;
+  }
   const quarantine = workflowJob(workflow, "quarantine-macos");
   assert.match(quarantine, /environment: frontier-clean-mac-acceptance/);
   assert.match(quarantine, /runs-on: macos-26/);
