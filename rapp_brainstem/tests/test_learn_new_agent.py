@@ -1,5 +1,7 @@
 import json
+import importlib
 import subprocess
+import sys
 from pathlib import Path
 
 from agents.rar_rapp_learn_new_agent import LearnNewAgent, __manifest__
@@ -9,7 +11,7 @@ def test_learn_new_is_the_single_generation_tool():
     agents_dir = Path(__file__).resolve().parents[1] / "agents"
     assert not (agents_dir / "prompt_generator_agent.py").exists()
     assert __manifest__["name"] == "@rapp/learn_new"
-    assert __manifest__["version"] == "2.1.0"
+    assert __manifest__["version"] == "2.1.1"
     assert "search-fallback" in __manifest__["tags"]
 
 
@@ -111,3 +113,64 @@ def test_failed_smoke_test_does_not_report_success(tmp_path, monkeypatch):
     assert result["hot_loaded"] is False
     assert "smoke test failed" in result["message"].lower()
     assert "repair_prompt" in result
+
+
+def test_generation_uses_supported_copilot_prompt_option(monkeypatch):
+    agent = LearnNewAgent()
+    calls = []
+
+    def run(command, **kwargs):
+        calls.append(command)
+        return subprocess.CompletedProcess(
+            command, 0,
+            stdout="Example" if "CamelCase" in command[2] else 'return json.dumps({"status": "success"})',
+            stderr="",
+        )
+
+    monkeypatch.setattr(subprocess, "run", run)
+    assert agent._generate_name("Handle a synthetic task") == "Example"
+    agent._generate_perform_body("Handle a synthetic task")
+    assert len(calls) == 2
+    assert all(command[:2] == ["copilot", "-p"] for command in calls)
+
+
+def test_fallback_swarm_runs_task_and_selected_subagent(tmp_path, monkeypatch):
+    import agents
+
+    agent = LearnNewAgent()
+    agent.agents_dir = tmp_path
+    monkeypatch.setattr(agents, "__path__", [str(tmp_path), *agents.__path__])
+    monkeypatch.setattr(
+        subprocess, "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args=[], returncode=1, stdout="", stderr="generation unavailable",
+        ),
+    )
+    modules = [
+        "agents.task_parity_alpha_agent",
+        "agents.task_parity_beta_agent",
+        "agents.task_parity_agent",
+    ]
+    try:
+        created = json.loads(agent.perform(
+            action="swarm", name="TaskParity",
+            description="Process a synthetic task",
+            agents_in_swarm="alpha,beta",
+        ))
+        assert created["status"] == "success"
+        module = importlib.import_module("agents.task_parity_agent")
+        swarm = module.TaskParityAgent()
+        result = json.loads(swarm.perform(task="fresh task"))
+        assert result["status"] == "ok"
+        assert result["pipeline_steps"] == 2
+        assert list(result["results"]) == ["alpha", "beta"]
+        for output in result["results"].values():
+            parsed = json.loads(output)
+            assert parsed["status"] == "success"
+            assert parsed["query"] == "fresh task"
+        selected = json.loads(swarm.perform(task="selected task", sub_agent="alpha"))
+        assert selected["status"] == "success"
+        assert selected["query"] == "selected task"
+    finally:
+        for name in modules:
+            sys.modules.pop(name, None)

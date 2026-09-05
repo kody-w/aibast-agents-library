@@ -37,7 +37,7 @@ except ImportError:
 __manifest__ = {
     "schema": "rapp-agent/1.0",
     "name": "@rapp/learn_new",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "display_name": "LearnNew",
     "description": "Creates, smoke-tests, saves, and hot-loads agents or swarms from natural-language descriptions and unmet library searches, with a VS Code repair handoff.",
     "author": "RAPP",
@@ -165,6 +165,7 @@ class {class_name}(BasicAgent):
 
     def perform(self, **kwargs):
         task = kwargs.get('task', '')
+        query = kwargs.get('query', task)
 
 {perform_body}
 
@@ -254,7 +255,7 @@ class {class_name}(BasicAgent):
                 available = {agent_names_json}
                 return json.dumps({{"status": "error",
                     "message": f"Unknown sub-agent '{{sub_agent}}'. Available: {{available}}"}})
-            return agent.perform(task=task, **kwargs)
+            return agent.perform(**dict(kwargs, task=task))
 
         results = {{}}
         pipeline = {pipeline_json}
@@ -645,7 +646,7 @@ if __name__ == "__main__":
     def _generate_name(self, description):
         try:
             result = subprocess.run(
-                ['copilot', '--message',
+                ['copilot', '-p',
                  f'Generate a short 1-2 word CamelCase name for an agent that: '
                  f'{description[:200]}. Reply with ONLY the name, nothing else.'],
                 capture_output=True, text=True, timeout=10
@@ -796,7 +797,7 @@ if __name__ == "__main__":
             )
 
             result = subprocess.run(
-                ['copilot', '--message', prompt],
+                ['copilot', '-p', prompt],
                 capture_output=True, text=True, timeout=30
             )
 
