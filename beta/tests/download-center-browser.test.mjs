@@ -304,6 +304,8 @@ test("Download Center works without JavaScript and stays narrow under stress", {
               '.accordion-trigger[aria-expanded="true"]',
             ).length,
             noJsFallbackPresent: Boolean(document.querySelector("#no-js-download")),
+            releaseClaim: document.querySelector(".product-mark strong").textContent.trim(),
+            requirements: document.querySelector("#panel-requirements").innerText,
           };
         })()`,
       );
@@ -311,6 +313,13 @@ test("Download Center works without JavaScript and stays narrow under stress", {
       assert.equal(enhanced.overflow, 0);
       assert.equal(enhanced.expanded, 4);
       assert.equal(enhanced.noJsFallbackPresent, false);
+      assert.equal(enhanced.releaseClaim, "Commit-pinned source bootstraps");
+      assert.match(
+        enhanced.requirements,
+        /Package manifest and application signature verification are not claimed/,
+      );
+      assert.match(enhanced.requirements, /SmartScreen warnings may still appear/);
+      assert.match(enhanced.requirements, /does not suppress or remove those warnings/);
     }
 
     await browser.cdp.send(

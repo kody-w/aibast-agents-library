@@ -162,6 +162,17 @@ test("dedicated beta page uses the Download Center details structure", () => {
     installerPage,
     new RegExp(`Windows 11[^"<\\n]*${unsupportedWindowsArchitecture}`, "i"),
   );
+  assert.match(installerPage, /Commit-pinned source bootstraps/);
+  assert.match(
+    installerPage,
+    /Package manifest and application signature verification are not claimed\s+for this preview\./,
+  );
+  assert.match(installerPage, /Windows Defender SmartScreen warnings may still appear/);
+  assert.match(installerPage, /The bootstrap does not suppress\s+or remove those warnings\./);
+  assert.doesNotMatch(
+    installerPage,
+    /Verified release downloads|verified source bootstrap|same verified Frontier release|verified release commit/i,
+  );
   assert.match(installerPage, /<noscript>[\s\S]*id="no-js-download"/);
   assert.match(installerPage, /href="frontier\.ps1"/);
   assert.match(installerPage, /href="frontier\.sh"/);

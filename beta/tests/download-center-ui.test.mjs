@@ -183,6 +183,18 @@ function validateDownloadCenter(source) {
     "Windows support copy must remain x64-only",
   );
   add(
+    source.includes("<strong>Commit-pinned source bootstraps</strong>") &&
+      /Package manifest and application signature verification are not claimed\s+for this preview\./.test(
+        source,
+      ) &&
+      source.includes("Windows Defender SmartScreen warnings may still appear") &&
+      /The bootstrap does not suppress\s+or remove those warnings\./.test(source) &&
+      !/Verified release downloads|verified source bootstrap|same verified Frontier release|verified release commit/i.test(
+        source,
+      ),
+    "release wording must not overclaim verification or suppress Windows warnings",
+  );
+  add(
     /id="expand-all"[\s\S]*?aria-controls="panel-details panel-requirements panel-install panel-additional"[\s\S]*?aria-expanded="false"/.test(
       source,
     ),
@@ -323,6 +335,20 @@ test("download center UI checks reject representative regressions", () => {
       source: page.replace(
         'description: "Windows 11 x64 source bootstrap"',
         `description: "Windows 11 ${unsupportedWindowsArchitecture} source bootstrap"`,
+      ),
+    },
+    {
+      expected: "release wording must not overclaim verification or suppress Windows warnings",
+      source: page.replace(
+        "<strong>Commit-pinned source bootstraps</strong>",
+        "<strong>Verified release downloads</strong>",
+      ),
+    },
+    {
+      expected: "release wording must not overclaim verification or suppress Windows warnings",
+      source: page.replace(
+        "Windows Defender SmartScreen warnings may still appear",
+        "Windows setup is warning-free",
       ),
     },
     {

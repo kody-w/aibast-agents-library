@@ -1198,7 +1198,7 @@
 
           <aside class="product-mark" aria-label="RAPP Brainstem Frontier product mark">
             <img src="build/icon.svg" alt="">
-            <strong>Verified release downloads</strong>
+            <strong>Commit-pinned source bootstraps</strong>
             <span>Windows 11 x64, macOS, and Linux</span>
           </aside>
         </div>
@@ -1211,7 +1211,7 @@
           <h2 id="download-heading">Download RAPP Brainstem Frontier</h2>
           <p>
             Choose your operating system. Published application installers appear here
-            automatically, with the verified source bootstrap preserved as a fallback.
+            automatically, with the commit-pinned source bootstrap preserved as a fallback.
           </p>
         </div>
 
@@ -1241,8 +1241,8 @@
             <h2 id="no-js-download-heading">Download the source bootstrap</h2>
             <p>
               JavaScript is unavailable, so packaged-asset selection and live release
-              metadata cannot run. These source bootstraps resolve and verify the latest
-              published Frontier release when you launch them.
+              metadata cannot run. These source bootstraps resolve the latest published
+              Frontier release to an exact commit when you launch them.
             </p>
             <div class="install-grid">
               <article class="install-card">
@@ -1293,7 +1293,7 @@
         </div>
         <div class="file-detail">
           <dt>Release commit</dt>
-          <dd><code id="release-commit">Verified by bootstrap</code></dd>
+          <dd><code id="release-commit">Resolved by bootstrap</code></dd>
         </div>
       </dl>
 
@@ -1412,6 +1412,12 @@
                   on the device. Managed-device policy may block source-built previews.
                 </li>
                 <li>
+                  Package manifest and application signature verification are not claimed
+                  for this preview. Windows Defender SmartScreen warnings may still appear
+                  for this unsigned source-built release. The bootstrap does not suppress
+                  or remove those warnings.
+                </li>
+                <li>
                   Synthetic or approved data only. This Frontier build is a rapid proof
                   and teaching environment, not a production deployment.
                 </li>
@@ -1495,7 +1501,7 @@
                 <li>Run the installer command for your operating system.</li>
                 <li>
                   Let the bootstrap install or reuse the shared Brainstem, then assemble
-                  the isolated Frontier launcher from the verified release commit.
+                  the isolated Frontier launcher from the resolved release commit.
                 </li>
                 <li>
                   Launch <strong>RAPP Brainstem Frontier</strong> from Applications,
@@ -1527,7 +1533,7 @@
               aria-labelledby="trigger-additional"
             >
               <p>
-                Frontier always publishes small source bootstraps that verify the release
+                Frontier always publishes small source bootstraps that resolve the release
                 tag, pin the exact source commit, and keep the launcher removable from the
                 shared Brainstem runtime. When a release also contains packaged
                 <code>.exe</code> or <code>.dmg</code> installers, this page lists those
@@ -1586,7 +1592,7 @@
       </div>
       <p class="dialog-intro" id="download-dialog-description">
         Choose a packaged application installer when one is published, or use the source
-        bootstrap that resolves and pins the same verified Frontier release.
+        bootstrap that resolves and pins the same Frontier release commit.
       </p>
 
       <fieldset class="file-options">
@@ -1619,7 +1625,7 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <span id="resolved-date">Source bootstraps verify the published release before installing.</span>
+      <span id="resolved-date">Source bootstraps resolve the published release to an exact commit.</span>
       <div class="footer-links">
         <a href="../">AIBAST Agents Library</a>
         <a href="../SECURITY.md">Security</a>
@@ -1840,7 +1846,7 @@
         };
         elements.platformHelp.textContent = packaged
           ? `Packaged installer and source bootstrap available for ${platformNames[selected]}.`
-          : `Verified source bootstrap available for ${platformNames[selected]}.`;
+          : `Commit-pinned source bootstrap available for ${platformNames[selected]}.`;
         document.getElementById("windows-card").classList.toggle("recommended", selected === "windows");
         document.getElementById("unix-card").classList.toggle("recommended", selected !== "windows");
       }
@@ -2085,7 +2091,7 @@
         elements.commit.textContent = "Unavailable";
         elements.resolvedDate.textContent = "Release metadata could not be verified.";
         elements.error.textContent =
-          `${error.message} The bootstrap files remain available, but verify the published release before installing.`;
+          `${error.message} The bootstrap files remain available, but review the published release and source before installing.`;
         elements.error.hidden = false;
       });
     })();
