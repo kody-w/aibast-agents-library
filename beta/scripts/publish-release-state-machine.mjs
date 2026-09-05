@@ -151,8 +151,77 @@ function wait(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+export async function withOperationTimeout(
+  promise,
+  timeoutMs,
+  label = "operation",
+) {
+  let timer;
+  try {
+    return await Promise.race([
+      Promise.resolve(promise),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`${label} timed out after ${timeoutMs}ms.`));
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+function boundedTimeout(deadline, operationTimeoutMs) {
+  const remaining = deadline - Date.now();
+  if (remaining <= 0) throw new Error("Overall release recovery deadline expired.");
+  return Math.max(1, Math.min(operationTimeoutMs, remaining));
+}
+
+function normalizePublishHandle(handle) {
+  if (
+    !handle
+    || typeof handle !== "object"
+    || !Object.hasOwn(handle, "response")
+  ) {
+    throw new Error("startPublishRelease must return a publish operation handle.");
+  }
+  const response = Promise.resolve(handle.response);
+  return {
+    response,
+    settled: handle.settled
+      ? Promise.resolve(handle.settled)
+      : response.then(() => undefined, () => undefined),
+    cancel: typeof handle.cancel === "function"
+      ? handle.cancel
+      : async () => {},
+  };
+}
+
+export async function quiescePublishOperation(
+  handle,
+  timeoutMs,
+) {
+  const operation = normalizePublishHandle(handle);
+  const deadline = Date.now() + timeoutMs;
+  try {
+    await withOperationTimeout(
+      operation.cancel(),
+      boundedTimeout(deadline, timeoutMs),
+      "publish operation cancellation",
+    );
+  } catch {
+    // Settlement, not cancellation acknowledgement, is authoritative.
+  }
+  await withOperationTimeout(
+    operation.settled,
+    boundedTimeout(deadline, timeoutMs),
+    "publish operation settlement",
+  );
+}
+
 export async function runReleaseTransition({
   getRelease,
+  startPublishRelease,
   publishRelease,
   rollbackRelease,
   verifySnapshot,
@@ -162,6 +231,10 @@ export async function runReleaseTransition({
   sleep = wait,
   onState = () => {},
   initialState = null,
+  operationTimeoutMs = 15000,
+  recoveryDeadlineMs = 60000,
+  publishSettlementTimeoutMs = 15000,
+  onPublishHandle = () => {},
 }) {
   const state = mergeDurableState({
     phase: "ready",
@@ -171,6 +244,8 @@ export async function runReleaseTransition({
     integrityDetail: null,
     persistenceFailure: false,
     persistenceDetail: null,
+    publishSettlementUnproven: false,
+    publishSettled: false,
     history: [],
   }, initialState);
   const record = createStateRecorder(state, onState);
@@ -183,8 +258,13 @@ export async function runReleaseTransition({
     release,
     phase,
     allowPersistenceFailure = false,
+    timeoutMs = operationTimeoutMs,
   ) => {
-    const proof = await verifySnapshot(release);
+    const proof = await withOperationTimeout(
+      verifySnapshot(release),
+      timeoutMs,
+      "release snapshot verification",
+    );
     if (proof !== true) {
       throw new Error("Release snapshot verifier did not return an explicit true proof.");
     }
@@ -202,10 +282,18 @@ export async function runReleaseTransition({
     }
     return release;
   };
-  const read = async (phase, allowPersistenceFailure = false) => {
+  const read = async (
+    phase,
+    allowPersistenceFailure = false,
+    timeoutMs = operationTimeoutMs,
+  ) => {
     let release;
     try {
-      release = await getRelease();
+      release = await withOperationTimeout(
+        getRelease(),
+        timeoutMs,
+        "GitHub release GET",
+      );
     } catch (error) {
       if (
         !record(`${phase}-transport-failed`, String(error.message || error))
@@ -216,7 +304,12 @@ export async function runReleaseTransition({
       return null;
     }
     try {
-      return await inspect(release, phase, allowPersistenceFailure);
+      return await inspect(
+        release,
+        phase,
+        allowPersistenceFailure,
+        timeoutMs,
+      );
     } catch (error) {
       if (!(error instanceof StatePersistenceError)) {
         latchIntegrity(phase, error);
@@ -234,28 +327,57 @@ export async function runReleaseTransition({
         state,
       );
     }
-    record(phase, "release is immutable");
+    if (!record(phase, "release is immutable")) {
+      throw new ReleaseTransitionError(
+        "Immutable release was observed but terminal state could not persist.",
+        "PERSISTENCE_INCIDENT",
+        state,
+      );
+    }
     return { release, state };
   };
-  const draftFailure = () => new ReleaseTransitionError(
-    state.integrityViolation
-      ? "Integrity violation was latched and release rollback was verified."
-      : state.persistenceFailure
-        ? "State persistence failed and release rollback was verified."
-      : "Release rollback was verified in draft state.",
-    state.integrityViolation
-      ? "INTEGRITY_ROLLED_BACK"
-      : state.persistenceFailure
-        ? "PERSISTENCE_ROLLED_BACK"
-        : "ROLLED_BACK",
-    state,
-  );
+  const draftFailure = () => {
+    const terminalPersisted = record(
+      "rollback-verified-draft",
+      "release is stably draft after ID-bound rollback",
+    );
+    return new ReleaseTransitionError(
+      state.integrityViolation
+        ? "Integrity violation was latched and release rollback was verified."
+        : state.persistenceFailure || !terminalPersisted
+          ? "State persistence failed and release rollback was verified."
+          : "Release rollback was verified in draft state.",
+      state.integrityViolation
+        ? "INTEGRITY_ROLLED_BACK"
+        : state.persistenceFailure || !terminalPersisted
+          ? "PERSISTENCE_ROLLED_BACK"
+          : "ROLLED_BACK",
+      state,
+    );
+  };
   const recover = async (reason) => {
+    const recoveryDeadline = Date.now() + recoveryDeadlineMs;
+    const recoveryOperationTimeout = () => {
+      try {
+        return boundedTimeout(recoveryDeadline, operationTimeoutMs);
+      } catch (error) {
+        record("recovery-deadline-expired", String(error.message || error));
+        throw new ReleaseTransitionError(
+          "Overall release recovery deadline expired.",
+          "INCIDENT",
+          state,
+        );
+      }
+    };
     record("rollback-required", reason);
     for (let attempt = 1; attempt <= maxRollbackAttempts; attempt += 1) {
       let before = null;
       try {
-        before = await read(`rollback-${attempt}-initial-read`, true);
+        before = await read(
+          `rollback-${attempt}-initial-read`,
+          true,
+          recoveryOperationTimeout(),
+        );
       } catch {
         // Integrity is sticky; continue directly to the ID-bound rollback.
       }
@@ -264,13 +386,18 @@ export async function runReleaseTransition({
       }
 
       try {
-        const response = await rollbackRelease();
+        const response = await withOperationTimeout(
+          rollbackRelease(),
+          recoveryOperationTimeout(),
+          "GitHub rollback PATCH",
+        );
         if (response) {
           try {
             const inspected = await inspect(
               response,
               `rollback-${attempt}-response`,
               true,
+              recoveryOperationTimeout(),
             );
             if (inspected.immutable === true) {
               return completed(inspected, "immutable-during-recovery");
@@ -289,7 +416,11 @@ export async function runReleaseTransition({
 
       let after = null;
       try {
-        after = await read(`rollback-${attempt}-verification`, true);
+        after = await read(
+          `rollback-${attempt}-verification`,
+          true,
+          recoveryOperationTimeout(),
+        );
       } catch {
         // Integrity remains latched and cannot be cleared by a later response.
       }
@@ -297,12 +428,17 @@ export async function runReleaseTransition({
         return completed(after, "immutable-during-recovery");
       }
       if (after?.draft === true) {
-        await sleep(pollDelayMs);
+        await withOperationTimeout(
+          sleep(pollDelayMs),
+          recoveryOperationTimeout(),
+          "draft confirmation delay",
+        );
         let confirmed = null;
         try {
           confirmed = await read(
             `rollback-${attempt}-draft-confirmation`,
             true,
+            recoveryOperationTimeout(),
           );
         } catch {
           // Continue recovery; one draft observation is never terminal.
@@ -312,7 +448,13 @@ export async function runReleaseTransition({
         }
         if (confirmed?.draft === true) throw draftFailure();
       }
-      if (attempt < maxRollbackAttempts) await sleep(pollDelayMs);
+      if (attempt < maxRollbackAttempts) {
+        await withOperationTimeout(
+          sleep(pollDelayMs),
+          recoveryOperationTimeout(),
+          "rollback retry delay",
+        );
+      }
     }
     record("incident-unproven-state");
     throw new ReleaseTransitionError(
@@ -360,22 +502,81 @@ export async function runReleaseTransition({
       state,
     );
   }
-  let publishResponse = null;
+  let publishHandle;
   try {
-    publishResponse = await publishRelease();
+    const starter = startPublishRelease || (() => {
+      const response = Promise.resolve().then(() => publishRelease());
+      return {
+        response,
+        settled: response.then(() => undefined, () => undefined),
+        cancel: async () => {},
+      };
+    });
+    publishHandle = normalizePublishHandle(starter());
+    onPublishHandle(publishHandle);
   } catch (error) {
+    state.publishSettlementUnproven = true;
+    record("publish-start-failed", String(error.message || error));
+    throw new ReleaseTransitionError(
+      "Publication operation handle could not be established.",
+      "INCIDENT",
+      state,
+    );
+  }
+  let publishResponse = null;
+  let publishResponseError = null;
+  try {
+    publishResponse = await withOperationTimeout(
+      publishHandle.response,
+      operationTimeoutMs,
+      "GitHub publication PATCH response",
+    );
+  } catch (error) {
+    publishResponseError = error;
     record("publish-transport-failed", String(error.message || error));
+  }
+  try {
+    if (publishResponseError) {
+      await quiescePublishOperation(
+        publishHandle,
+        publishSettlementTimeoutMs,
+      );
+    } else {
+      await withOperationTimeout(
+        publishHandle.settled,
+        publishSettlementTimeoutMs,
+        "publish operation settlement",
+      );
+    }
+    state.publishSettled = true;
+    if (!record("publish-operation-settled")) {
+      return recover("Publish settled, but settlement state could not persist.");
+    }
+  } catch (error) {
+    state.publishSettlementUnproven = true;
+    record("publish-settlement-unproven", String(error.message || error));
+    throw new ReleaseTransitionError(
+      "Publish operation settlement could not be proven before rollback.",
+      "INCIDENT",
+      state,
+    );
   }
   if (publishResponse) {
     try {
       const inspected = await inspect(publishResponse, "publish-response");
       if (inspected.immutable === true) return completed(inspected, "immutable");
     } catch (error) {
+      if (error instanceof ReleaseTransitionError) throw error;
       if (error instanceof StatePersistenceError) {
         return recover("State persistence failed after publication response.");
       }
       latchIntegrity("publish-response", error);
       return recover("Integrity violation in publication response.");
+    }
+    if (publishResponse.draft === true) {
+      return recover(
+        "Publication response remained draft after transition began.",
+      );
     }
   }
 
@@ -408,6 +609,9 @@ export async function recoverInterruptedRelease({
   sleep = wait,
   onState = () => {},
   initialState = null,
+  operationTimeoutMs = 15000,
+  overallDeadlineMs = 60000,
+  deferredQuiescenceMs = 15000,
 }) {
   const state = mergeDurableState({
     phase: "recovery-started",
@@ -417,12 +621,47 @@ export async function recoverInterruptedRelease({
     integrityDetail: null,
     persistenceFailure: false,
     persistenceDetail: null,
+    publishSettlementUnproven: false,
+    publishSettled: false,
     history: [],
   }, initialState);
   state.transitionAttempted = true;
   const record = createStateRecorder(state, onState);
+  const deadline = Date.now() + overallDeadlineMs;
+  const operationTimeout = () => {
+    try {
+      return boundedTimeout(deadline, operationTimeoutMs);
+    } catch (error) {
+      record("recovery-overall-deadline-expired", String(error.message || error));
+      throw new ReleaseTransitionError(
+        "Overall interrupted-release recovery deadline expired.",
+        "INCIDENT",
+        state,
+      );
+    }
+  };
+  const waitWithinDeadline = async (promise, label) => {
+    try {
+      return await withOperationTimeout(
+        promise,
+        operationTimeout(),
+        label,
+      );
+    } catch (error) {
+      record("recovery-overall-deadline-expired", String(error.message || error));
+      throw new ReleaseTransitionError(
+        "Overall interrupted-release recovery deadline expired.",
+        "INCIDENT",
+        state,
+      );
+    }
+  };
   const inspect = async (release, phase) => {
-    const proof = await verifySnapshot(release);
+    const proof = await withOperationTimeout(
+      verifySnapshot(release),
+      operationTimeout(),
+      "recovery snapshot verification",
+    );
     if (proof !== true) {
       throw new Error("Release snapshot verifier did not return an explicit true proof.");
     }
@@ -435,7 +674,11 @@ export async function recoverInterruptedRelease({
   const observe = async (phase) => {
     let release;
     try {
-      release = await getRelease();
+      release = await withOperationTimeout(
+        getRelease(),
+        operationTimeout(),
+        "recovery GitHub release GET",
+      );
     } catch (error) {
       record(`${phase}-transport-failed`, String(error.message || error));
       return null;
@@ -459,10 +702,17 @@ export async function recoverInterruptedRelease({
         state,
       );
     }
-    record("recovery-verified-immutable");
+    if (!record("recovery-verified-immutable")) {
+      throw new ReleaseTransitionError(
+        "Immutable recovery was observed but terminal state could not persist.",
+        "PERSISTENCE_INCIDENT",
+        state,
+      );
+    }
     return { status: "immutable", release, state };
   };
   const draftResult = (release) => {
+    const terminalPersisted = record("recovery-verified-draft");
     if (state.integrityViolation) {
       throw new ReleaseTransitionError(
         "Integrity violation was latched and recovery verified draft state.",
@@ -477,11 +727,29 @@ export async function recoverInterruptedRelease({
         state,
       );
     }
-    record("recovery-verified-draft");
+    if (!terminalPersisted) {
+      throw new ReleaseTransitionError(
+        "Draft recovery was verified but terminal state could not persist.",
+        "PERSISTENCE_ROLLED_BACK",
+        state,
+      );
+    }
     return { status: "draft", release, state };
   };
 
   record("recovery-started");
+  if (state.publishSettlementUnproven) {
+    await waitWithinDeadline(
+      sleep(deferredQuiescenceMs),
+      "deferred publish quiescence window",
+    );
+    state.publishSettlementUnproven = false;
+    state.publishSettled = true;
+    record(
+      "deferred-publish-quiescence-window-complete",
+      `${deferredQuiescenceMs}ms`,
+    );
+  }
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const before = await observe(`recovery-${attempt}-initial-read`);
     if (before?.immutable === true && before.draft === false) {
@@ -489,7 +757,11 @@ export async function recoverInterruptedRelease({
     }
 
     try {
-      const response = await rollbackRelease();
+      const response = await withOperationTimeout(
+        rollbackRelease(),
+        operationTimeout(),
+        "recovery GitHub rollback PATCH",
+      );
       if (response) {
         const inspected = await inspect(
           response,
@@ -519,14 +791,22 @@ export async function recoverInterruptedRelease({
       return immutableResult(first);
     }
     if (first?.draft === true) {
-      await sleep(pollDelayMs);
+      await waitWithinDeadline(
+        sleep(pollDelayMs),
+        "recovery draft confirmation delay",
+      );
       const second = await observe(`recovery-${attempt}-verification-2`);
       if (second?.immutable === true && second.draft === false) {
         return immutableResult(second);
       }
       if (second?.draft === true) return draftResult(second);
     }
-    if (attempt < maxAttempts) await sleep(pollDelayMs);
+    if (attempt < maxAttempts) {
+      await waitWithinDeadline(
+        sleep(pollDelayMs),
+        "recovery retry delay",
+      );
+    }
   }
   record("recovery-incident-unproven-state");
   throw new ReleaseTransitionError(
@@ -581,15 +861,71 @@ async function ghJson(repository, releaseId, method = "GET", fields = []) {
   const { stdout } = await execFileAsync("gh", args, {
     encoding: "utf8",
     maxBuffer: 20 * 1024 * 1024,
+    timeout: 15000,
+    killSignal: "SIGTERM",
   });
   return JSON.parse(stdout);
+}
+
+function startGhJsonOperation(
+  repository,
+  releaseId,
+  method,
+  fields,
+) {
+  const args = [
+    "api",
+    "--method",
+    method,
+    "-H",
+    "X-GitHub-Api-Version: 2026-03-10",
+    `repos/${repository}/releases/${releaseId}`,
+    ...fields,
+  ];
+  let child;
+  let settle;
+  const settled = new Promise((resolve) => {
+    settle = resolve;
+  });
+  const response = new Promise((resolve, reject) => {
+    child = execFile("gh", args, {
+      encoding: "utf8",
+      maxBuffer: 20 * 1024 * 1024,
+      timeout: 15000,
+      killSignal: "SIGTERM",
+    }, (error, stdout) => {
+      settle();
+      if (error) {
+        reject(error);
+        return;
+      }
+      try {
+        resolve(JSON.parse(stdout));
+      } catch (parseError) {
+        reject(parseError);
+      }
+    });
+  });
+  return {
+    response,
+    settled,
+    cancel: async () => {
+      if (child && child.exitCode === null && child.signalCode === null) {
+        child.kill("SIGTERM");
+      }
+    },
+  };
 }
 
 async function remoteRef(repository, ref) {
   const { stdout } = await execFileAsync(
     "git",
     ["ls-remote", "--exit-code", "origin", ref],
-    { encoding: "utf8" },
+    {
+      encoding: "utf8",
+      timeout: 15000,
+      killSignal: "SIGTERM",
+    },
   );
   const sha = stdout.trim().split(/\s+/)[0];
   if (!/^[0-9a-f]{40}$/i.test(sha || "")) {
@@ -648,10 +984,12 @@ export async function publishReleaseWithStateMachine(argv = process.argv.slice(2
     ["-F", "draft=true"],
   );
   let signalRecoveryStarted = false;
+  let activePublishHandle = null;
   for (const signal of ["SIGINT", "SIGTERM"]) {
     process.once(signal, async () => {
       if (signalRecoveryStarted) return;
       signalRecoveryStarted = true;
+      const signalDeadline = Date.now() + 60000;
       const interruptedState = mergeDurableState(latestState, {
         phase: "interrupted-recovery-started",
         signal,
@@ -666,6 +1004,38 @@ export async function publishReleaseWithStateMachine(argv = process.argv.slice(2
         process.exit(130);
         return;
       }
+      if (activePublishHandle) {
+        try {
+          await quiescePublishOperation(
+            activePublishHandle,
+            Math.max(1, Math.min(10000, signalDeadline - Date.now())),
+          );
+          const settledState = mergeDurableState(interruptedState, {
+            phase: "interrupted-publish-operation-settled",
+            publishSettled: true,
+            publishSettlementUnproven: false,
+            history: [{
+              phase: "interrupted-publish-operation-settled",
+              detail: signal,
+            }],
+          });
+          latestState = settledState;
+          onState(settledState);
+        } catch (error) {
+          const unprovenState = mergeDurableState(interruptedState, {
+            phase: "interrupted-publish-settlement-unproven",
+            publishSettlementUnproven: true,
+            history: [{
+              phase: "interrupted-publish-settlement-unproven",
+              detail: String(error.message || error),
+            }],
+          });
+          latestState = unprovenState;
+          onState(unprovenState);
+          process.exit(130);
+          return;
+        }
+      }
       try {
         const recovery = await recoverInterruptedRelease({
           getRelease,
@@ -674,7 +1044,8 @@ export async function publishReleaseWithStateMachine(argv = process.argv.slice(2
           maxAttempts: 2,
           pollDelayMs: 1000,
           onState,
-          initialState: interruptedState,
+          initialState: latestState,
+          overallDeadlineMs: Math.max(1, signalDeadline - Date.now()),
         });
         writeFileSync(
           output,
@@ -697,7 +1068,7 @@ export async function publishReleaseWithStateMachine(argv = process.argv.slice(2
   try {
     const result = await runReleaseTransition({
       getRelease,
-      publishRelease: () => ghJson(
+      startPublishRelease: () => startGhJsonOperation(
         args.repository,
         args["release-id"],
         "PATCH",
@@ -706,6 +1077,9 @@ export async function publishReleaseWithStateMachine(argv = process.argv.slice(2
       rollbackRelease,
       verifySnapshot,
       onState,
+      onPublishHandle: (handle) => {
+        activePublishHandle = handle;
+      },
     });
     writeFileSync(output, `${JSON.stringify(result.release, null, 2)}\n`, "utf8");
     return result;
@@ -761,6 +1135,7 @@ export async function recoverReleaseFromStateFile(argv = process.argv.slice(2)) 
     process.once(signal, async () => {
       if (signalRecoveryStarted) return;
       signalRecoveryStarted = true;
+      const signalDeadline = Date.now() + 60000;
       const interruptedState = mergeDurableState(latestState, {
         phase: "recovery-only-interrupted",
         signal,
@@ -779,6 +1154,7 @@ export async function recoverReleaseFromStateFile(argv = process.argv.slice(2)) 
           pollDelayMs: 1000,
           onState,
           initialState: interruptedState,
+          overallDeadlineMs: Math.max(1, signalDeadline - Date.now()),
         });
       } catch (error) {
         onState(error.state || mergeDurableState(interruptedState, {

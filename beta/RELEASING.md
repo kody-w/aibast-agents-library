@@ -482,16 +482,23 @@ bounded ID-based recovery before the process exits, and a
 transition state if the Node process could not finish. Recovery merges the
 complete durable latch state rather than replacing it with interruption
 metadata. After a publication request begins, one draft read is never terminal:
-the request is awaited where possible, then an ID-bound rollback must be issued
-and two bounded reads must prove stable draft state unless the release is
-already immutable.
+the cancellable request handle is aborted when necessary and its separate
+settlement promise must quiesce under a deadline before rollback. If settlement
+cannot be proven, the durable marker remains an incident and the
+`failure() || cancelled()` recovery step retries later. Once quiesced, an
+ID-bound rollback must be issued and two bounded reads must prove stable draft
+state unless the release is already immutable. A publish response that still
+says `draft:true` enters this recovery immediately.
 
 Transition state uses a unique same-directory temporary file, complete write,
 `fsync`, close, and atomic rename. A write or rename failure leaves the previous
 valid marker untouched, latches persistence failure in memory, and forces
 rollback. A draft recovered after integrity or persistence failure is reported
 as `INTEGRITY_ROLLED_BACK` or `PERSISTENCE_ROLLED_BACK`, never as ordinary
-success.
+success. Terminal immutable/draft records must themselves persist successfully;
+otherwise no terminal success is returned. GitHub GET/PATCH, `git ls-remote`,
+snapshot verification, signal recovery, and recovery-only mode all have
+per-operation and overall deadlines.
 
 The release includes:
 

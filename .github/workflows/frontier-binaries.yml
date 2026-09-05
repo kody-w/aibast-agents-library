@@ -1787,6 +1787,7 @@ jobs:
           ref: ${{ needs.context.outputs.commit }}
 
       - name: Publish and assert GitHub immutability
+        timeout-minutes: 5
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_ID: ${{ needs.context.outputs.release_id }}
@@ -1894,6 +1895,7 @@ jobs:
 
       - name: Recover interrupted mutable release transition
         if: ${{ failure() || cancelled() }}
+        timeout-minutes: 2
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_ID: ${{ needs.context.outputs.release_id }}
