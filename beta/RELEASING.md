@@ -29,8 +29,13 @@ by the Download Center.
 > and native package-gate coverage. `build/package-bootstrap-policy.json` is
 > enabled and no longer blocks publication. `build/windows-signing-policy.json`
 > still blocks the deprecated electron-builder v26 Azure signing backend. The
-> native-media and Windows-signing policies must remain closed until their
-> recorded blockers are resolved.
+> requested Electron 43.6.0 / electron-builder 26.16.0 toolchain cannot yet be
+> locked reproducibly: the configured npm feed exposes Electron only through
+> 43.4.1, and electron-builder 26.16.0 has neither a published npm version nor
+> an upstream Git tag. `build/toolchain-policy.json` therefore fails release
+> mode instead of fabricating dependencies. The toolchain, native-media, and
+> Windows-signing policies must remain closed until their recorded blockers are
+> resolved.
 
 ## Supported binary matrix
 
@@ -70,10 +75,12 @@ media binaries, review the license obligations, update
 `THIRD-PARTY-NOTICES.md`, and add all target checksums and provenance in one
 reviewed change.
 
-Pull requests and ordinary manual dispatches build native, clearly named
-`*-unsigned.dmg` and `*-unsigned.exe` Actions artifacts. They are retained for
-14 days, include `UNSIGNED-NOT-FOR-DISTRIBUTION.txt` plus a machine-readable
-`*.gate.json`, and are never uploaded to a GitHub Release.
+Pull requests and ordinary manual dispatches still build and fully gate native
+unsigned packages, but while this policy is blocked the packages are deleted
+before artifact upload. Actions retains only `*.gate.json`, `*.gate.log`, and
+`UNSIGNED-NOT-FOR-DISTRIBUTION.txt`. The upload gate rejects a `.dmg` or `.exe`
+mutation, preventing the current `--enable-nonfree` FFmpeg bytes from being
+distributed even as an unsigned CI artifact.
 
 ## Packaged bootstrap authority and fixture gate
 
@@ -125,15 +132,18 @@ Brainstem readiness before the package gate can pass.
 1. Enable **immutable releases** in repository settings.
 2. Create a GitHub environment named `frontier-binary-release`.
 3. Create a separate GitHub environment named `windows-production`.
-4. Restrict both environments to tags matching `brainstem-beta-v*`.
-5. Add required reviewers and prevent self-review where repository policy
+4. Create `frontier-clean-mac-acceptance` with required reviewers.
+5. Restrict all three environments to tags matching `brainstem-beta-v*`.
+6. Add required reviewers and prevent self-review where repository policy
    permits it.
 
-The release workflow requires an existing draft prerelease. After publishing,
-it verifies that the release API reports `"immutable": true`; if not, it
-immediately attempts to return the release to draft and fails. Draft-first
-publication follows GitHub's immutable-release guidance: create draft, attach
-every asset, then publish.
+The release workflow requires an existing draft prerelease. Immediately before
+publication it calls the repository immutable-releases settings endpoint and
+refuses to publish unless the setting is enabled. After publishing it verifies
+that the release API reports `"immutable": true`. An unexpected mismatch is an
+explicit release incident; the workflow does not pretend a best-effort return
+to draft can undo publication. Draft-first publication follows GitHub's
+guidance: create the draft, attach and verify every asset, then publish.
 
 ### Apple secrets
 
@@ -155,9 +165,13 @@ Store these as environment variables:
 | `APPLE_API_ISSUER_ID` | App Store Connect Team API Key issuer UUID |
 
 The App Store Connect Team API key needs **App Manager** access, as required by
-`@electron/notarize`. Do not use an Apple ID password. The workflow materializes
-the `.p8` only on the macOS runner and electron-builder creates an ephemeral
-keychain for the PKCS#12.
+`@electron/notarize`. Do not use an Apple ID password. Each signed job completes
+`npm ci`, syntax checks, the full tests, actual native-media hashing, the media
+policy gate, and a clean tracked-tree check before any Apple secret is exposed.
+Only then does it decode the `.p8` and PKCS#12, import the certificate into an
+isolated keychain, and narrowly run package/sign/notarize. The key, PKCS#12, and
+keychain are deleted immediately afterward, before package verification or
+attestation.
 
 The release configuration deliberately grants only:
 
@@ -169,10 +183,11 @@ It does not grant `allow-unsigned-executable-memory` or
 `disable-library-validation`. Electron 43 does not need the former, and this
 application does not load unsigned third-party libraries into its process.
 
-The package is pinned to the latest tested Electron 43 patch and current
-electron-builder 26 patch. Do not jump to Electron 44 or raise the macOS
-minimum to 13 as part of release plumbing; that requires its own compatibility
-change and evidence.
+The package remains pinned to the last reproducibly available Electron 43 and
+electron-builder 26 patches while `build/toolchain-policy.json` blocks release
+for the requested unavailable versions. Do not jump to Electron 44 or raise
+the explicit macOS minimum above 12.0 as part of release plumbing; that
+requires its own compatibility change and evidence.
 
 ### Azure Artifact Signing with OIDC
 
@@ -223,12 +238,16 @@ or publisher values.
 
 There is no Azure client secret, certificate blob, or long-lived cloud
 credential. `azure/login` exchanges GitHub's job-scoped OIDC token for a
-short-lived Azure token. electron-builder then uses Azure CLI authentication
+short-lived Azure token only after `npm ci`, checks, tests, native-media
+hash/policy validation, and the clean-tree assertion pass. electron-builder
+then uses Azure CLI authentication
 to sign every generated `.exe`, `.dll`, and native `.node` file, including
 unpacked `ffmpeg`, `ffprobe`, and the NSIS uninstaller. The workflow uses
 electron-builder's Azure backend instead of post-signing only the final
 installer so executable payloads and the generated uninstaller are signed
-before NSIS embeds them.
+before NSIS embeds them. It logs out and clears the Azure CLI account
+immediately after signing, before the standard-user package gate, SBOM, or
+attestation steps.
 
 The locked builder currently exposes Azure signing through the deprecated
 electron-builder v26 `WindowsAzureSigningConfiguration` / `azureSignOptions`
@@ -354,15 +373,15 @@ Release mode fails closed unless all of the following are true:
 
 - the source version exactly matches the requested tag;
 - the remote tag is annotated and resolves to the checked-out commit;
-- the final published release reports GitHub immutability (otherwise the
-  workflow attempts to return it to draft and fails);
+- the repository immutable-release setting verifies before publication and the
+  final release reports GitHub immutability afterward;
 - exactly one matching draft prerelease already exists;
 - both native macOS builds use the configured Developer ID identity;
 - `forceCodeSigning` is true, the bundle ID is compatible with the publisher,
   and no signed item is ad-hoc;
 - the app and DMG have secure timestamps, return notarization status
-  `Accepted`, have their notary logs inspected, are stapled, and pass
-  `codesign`, `spctl`, and `hdiutil` verification;
+  `Accepted`, have issue-free notary logs (warnings and unknown severities also
+  fail), are stapled, and pass `codesign`, `spctl`, and `hdiutil` verification;
 - the Windows payload, installer, and installed uninstaller have valid,
   timestamped signatures from `WINDOWS_SIGNING_SUBJECT`;
 - packaged app contents, architecture, `ffmpeg`, `ffprobe`, actual DMG/NSIS
@@ -393,8 +412,15 @@ uploads missing draft assets without `--clobber`; a same-name asset with
 different bytes aborts. Native macOS ARM64/x64 jobs then redownload the DMGs and
 rerun `hdiutil`, code-signing, timestamp, notarization, Gatekeeper, media, and
 architecture checks. A Windows job redownloads and revalidates SHA-256 and
-Authenticode. Only after those read-only jobs pass does the final job publish
-the existing draft and assert the GitHub API reports `"immutable": true`.
+Authenticode. A separately protected clean `macos-26` job applies a
+browser-equivalent quarantine ticket to the downloaded ARM64 DMG, copies the
+app to `/Applications`, and launches it through LaunchServices `open -W -n`;
+its machine-readable evidence must show real first-run provisioning and
+readiness. Immediately before publication, the final job redownloads the full
+13-file set again, verifies `SHA256SUMS`, all four attestations, every report,
+and the Download Center manifest contract. It then verifies the repository
+immutability setting, publishes the existing draft, and asserts the release
+reports `"immutable": true`.
 
 The release includes:
 

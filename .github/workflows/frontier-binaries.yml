@@ -80,6 +80,10 @@ jobs:
               exit 1
             fi
             release_policy_failed=0
+            if ! node beta/scripts/toolchain-policy.mjs \
+              --require-publication; then
+              release_policy_failed=1
+            fi
             if ! node beta/scripts/native-media-gate.mjs \
               --policy beta/build/native-media-policy.json \
               --require-publication; then
@@ -222,6 +226,7 @@ jobs:
           set -euo pipefail
           artifact="release/RAPP-Brainstem-Frontier-${VERSION}-macos-${{ matrix.arch }}-unsigned.dmg"
           report="$artifact.gate.json"
+          log="$artifact.gate.log"
           npm run package:gate -- \
             --platform macos \
             --arch "${{ matrix.arch }}" \
@@ -230,19 +235,26 @@ jobs:
             --scratch-dir "release/package-gate-macos-${{ matrix.arch }}-unsigned" \
             --brainstem-python "${{ steps.runtime.outputs.python }}" \
             --brainstem-source "$GITHUB_WORKSPACE/rapp_brainstem" \
-            --report "$report"
+            --report "$report" 2>&1 | tee "$log"
           cat > release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt <<EOF
-          This is an unsigned CI verification build, not a release asset.
+          This is report-only unsigned CI evidence, not a distributable package.
           Commit: ${{ needs.context.outputs.commit }}
           Platform: macOS ${{ matrix.arch }}
           EOF
+          node scripts/unsigned-upload-gate.mjs \
+            --path "$report" \
+            --path "$log" \
+            --path release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt
+          rm -f "$artifact" "$artifact.blockmap"
+          rm -rf "release/${{ matrix.arch == 'arm64' && 'mac-arm64' || 'mac' }}"
+          test ! -e "$artifact"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: UNSIGNED-frontier-macos-${{ matrix.arch }}-${{ needs.context.outputs.commit }}
+          name: UNSIGNED-REPORTS-frontier-macos-${{ matrix.arch }}-${{ needs.context.outputs.commit }}
           path: |
-            beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-macos-${{ matrix.arch }}-unsigned.dmg
             beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-macos-${{ matrix.arch }}-unsigned.dmg.gate.json
+            beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-macos-${{ matrix.arch }}-unsigned.dmg.gate.log
             beta/release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt
           if-no-files-found: error
           retention-days: 14
@@ -303,27 +315,43 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $artifact = "$env:GITHUB_WORKSPACE\beta\release\RAPP-Brainstem-Frontier-$env:VERSION-windows-x64-setup-unsigned.exe"
           $report = "$artifact.gate.json"
-          & "$env:GITHUB_WORKSPACE\beta\scripts\run-windows-package-gate-standard-user.ps1" `
-            -NodePath (Get-Command node).Source `
-            -Workspace $env:GITHUB_WORKSPACE `
-            -Artifact $artifact `
-            -AppDir "$env:GITHUB_WORKSPACE\beta\release\win-unpacked" `
-            -ScratchDir "$env:GITHUB_WORKSPACE\beta\release\package-gate-windows-x64-unsigned" `
-            -PythonPath '${{ steps.runtime.outputs.python }}' `
-            -Mode unsigned `
-            -Report $report
+          $log = "$artifact.gate.log"
+          Start-Transcript -Path $log -Force
+          try {
+            & "$env:GITHUB_WORKSPACE\beta\scripts\run-windows-package-gate-standard-user.ps1" `
+              -NodePath (Get-Command node).Source `
+              -Workspace $env:GITHUB_WORKSPACE `
+              -Artifact $artifact `
+              -AppDir "$env:GITHUB_WORKSPACE\beta\release\win-unpacked" `
+              -ScratchDir "$env:GITHUB_WORKSPACE\beta\release\package-gate-windows-x64-unsigned" `
+              -PythonPath '${{ steps.runtime.outputs.python }}' `
+              -Mode unsigned `
+              -Report $report
+          } finally {
+            Stop-Transcript
+          }
           @"
-          This is an unsigned CI verification build, not a release asset.
+          This is report-only unsigned CI evidence, not a distributable package.
           Commit: ${{ needs.context.outputs.commit }}
           Platform: Windows x64
           "@ | Set-Content -Path release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt -Encoding utf8
+          node scripts/unsigned-upload-gate.mjs `
+            --path $report `
+            --path $log `
+            --path release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt
+          Remove-Item -LiteralPath $artifact -Force
+          Remove-Item -LiteralPath "$artifact.blockmap" -Force -ErrorAction SilentlyContinue
+          Remove-Item -LiteralPath release/win-unpacked -Recurse -Force
+          if (Test-Path -LiteralPath $artifact) {
+            throw 'Unsigned NSIS installer still exists before report upload'
+          }
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: UNSIGNED-frontier-windows-x64-${{ needs.context.outputs.commit }}
+          name: UNSIGNED-REPORTS-frontier-windows-x64-${{ needs.context.outputs.commit }}
           path: |
-            beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-windows-x64-setup-unsigned.exe
             beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-windows-x64-setup-unsigned.exe.gate.json
+            beta/release/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-windows-x64-setup-unsigned.exe.gate.log
             beta/release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt
           if-no-files-found: error
           retention-days: 14
@@ -371,26 +399,85 @@ jobs:
           python -m pip install -q --disable-pip-version-check -r rapp_brainstem/requirements.txt
           echo "python=$(python -c 'import sys; print(sys.executable)')" >> "$GITHUB_OUTPUT"
 
-      - name: Materialize App Store Connect API key
+      - name: Install, test, hash native media, and assert a clean tree
         working-directory: beta
         env:
-          APPLE_API_KEY_ID: ${{ vars.APPLE_API_KEY_ID }}
-          APPLE_API_KEY_P8_BASE64: ${{ secrets.APPLE_API_KEY_P8_BASE64 }}
+          TMPDIR: ${{ github.workspace }}/beta/release/.ci-tmp
         run: |
           set -euo pipefail
+          mkdir -p "$TMPDIR"
+          npm ci --no-audit --no-fund
+          npm run check
+          npm test
+          node scripts/native-media-preflight.mjs \
+            --platform macos \
+            --arch "${{ matrix.arch }}" \
+            --output "release/native-media-preflight-macos-${{ matrix.arch }}.json"
+          git diff --exit-code
+          git diff --cached --exit-code
+          test -z "$(git status --porcelain --untracked-files=no)"
+
+      - name: Materialize isolated Apple signing authority
+        working-directory: beta
+        env:
+          MACOS_CERTIFICATE_P12_BASE64: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          APPLE_API_KEY_P8_BASE64: ${{ secrets.APPLE_API_KEY_P8_BASE64 }}
+          MACOS_SIGNING_IDENTITY: ${{ vars.MACOS_SIGNING_IDENTITY }}
+          APPLE_API_KEY_ID: ${{ vars.APPLE_API_KEY_ID }}
+        run: |
+          set -euo pipefail
+          : "${MACOS_CERTIFICATE_P12_BASE64:?MACOS_CERTIFICATE_P12_BASE64 is required}"
+          : "${MACOS_CERTIFICATE_PASSWORD:?MACOS_CERTIFICATE_PASSWORD is required}"
+          : "${MACOS_SIGNING_IDENTITY:?MACOS_SIGNING_IDENTITY is required}"
           : "${APPLE_API_KEY_ID:?APPLE_API_KEY_ID is required}"
           : "${APPLE_API_KEY_P8_BASE64:?APPLE_API_KEY_P8_BASE64 is required}"
-          key_path="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
-          node - "$key_path" <<'NODE'
+          p12_path="$RUNNER_TEMP/frontier-signing-${{ matrix.arch }}.p12"
+          key_path="$RUNNER_TEMP/frontier-notarization-${{ matrix.arch }}.p8"
+          keychain="$RUNNER_TEMP/frontier-signing-${{ matrix.arch }}.keychain-db"
+          keychain_password="$(openssl rand -hex 32)"
+          echo "::add-mask::$keychain_password"
+          node - "$p12_path" "$key_path" <<'NODE'
           const fs = require("node:fs");
-          const target = process.argv[2];
-          const bytes = Buffer.from(process.env.APPLE_API_KEY_P8_BASE64, "base64");
-          if (!bytes.toString("utf8").includes("PRIVATE KEY")) {
+          const [p12Path, keyPath] = process.argv.slice(2);
+          const p12 = Buffer.from(
+            process.env.MACOS_CERTIFICATE_P12_BASE64,
+            "base64",
+          );
+          const apiKey = Buffer.from(
+            process.env.APPLE_API_KEY_P8_BASE64,
+            "base64",
+          );
+          if (p12.length < 128) {
+            throw new Error("MACOS_CERTIFICATE_P12_BASE64 is empty or invalid.");
+          }
+          if (!apiKey.toString("utf8").includes("PRIVATE KEY")) {
             throw new Error("APPLE_API_KEY_P8_BASE64 is not an App Store Connect private key.");
           }
-          fs.writeFileSync(target, bytes, { mode: 0o600 });
+          fs.writeFileSync(p12Path, p12, { mode: 0o600 });
+          fs.writeFileSync(keyPath, apiKey, { mode: 0o600 });
           NODE
-          echo "APPLE_API_KEY=$key_path" >> "$GITHUB_ENV"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$p12_path" \
+            -k "$keychain" \
+            -P "$MACOS_CERTIFICATE_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/security
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "$keychain_password" \
+            "$keychain"
+          security find-identity -v -p codesigning "$keychain" |
+            grep -F "$MACOS_SIGNING_IDENTITY"
+          {
+            echo "APPLE_API_KEY=$key_path"
+            echo "CSC_KEYCHAIN=$keychain"
+            echo "FRONTIER_SIGNING_P12=$p12_path"
+            echo "FRONTIER_SIGNING_KEYCHAIN=$keychain"
+          } >> "$GITHUB_ENV"
 
       - name: Build, Developer ID sign, and notarize native DMG
         working-directory: beta
@@ -400,24 +487,52 @@ jobs:
           FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.repository }}
           FRONTIER_PACKAGE_RELEASE_TAG: ${{ needs.context.outputs.tag }}
           TMPDIR: ${{ github.workspace }}/beta/release/.ci-tmp
-          CSC_LINK: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
-          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
           MACOS_SIGNING_IDENTITY: ${{ vars.MACOS_SIGNING_IDENTITY }}
           APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
           APPLE_API_KEY_ID: ${{ vars.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER_ID }}
         run: |
           set -euo pipefail
-          : "${CSC_LINK:?MACOS_CERTIFICATE_P12_BASE64 is required}"
-          : "${CSC_KEY_PASSWORD:?MACOS_CERTIFICATE_PASSWORD is required}"
+          test -z "${CSC_LINK:-}"
+          test -z "${CSC_KEY_PASSWORD:-}"
+          : "${CSC_KEYCHAIN:?CSC_KEYCHAIN is required}"
           : "${MACOS_SIGNING_IDENTITY:?MACOS_SIGNING_IDENTITY is required}"
           : "${APPLE_TEAM_ID:?APPLE_TEAM_ID is required}"
           : "${APPLE_API_KEY:?APPLE_API_KEY is required}"
           : "${APPLE_API_KEY_ID:?APPLE_API_KEY_ID is required}"
           : "${APPLE_API_ISSUER:?APPLE_API_ISSUER_ID is required}"
-          mkdir -p "$TMPDIR"
-          npm ci --no-audit --no-fund
           npm run "dist:mac:${{ matrix.arch }}"
+
+      - name: Remove Apple signing authority immediately
+        if: always()
+        run: |
+          set -uo pipefail
+          cleanup_failed=0
+          keychain="$RUNNER_TEMP/frontier-signing-${{ matrix.arch }}.keychain-db"
+          p12_path="$RUNNER_TEMP/frontier-signing-${{ matrix.arch }}.p12"
+          key_path="$RUNNER_TEMP/frontier-notarization-${{ matrix.arch }}.p8"
+          if [ -e "$keychain" ]; then
+            security delete-keychain "$keychain" ||
+              cleanup_failed=1
+          fi
+          rm -f "$p12_path" "$key_path" ||
+            cleanup_failed=1
+          if [ -e "$keychain" ]; then
+            cleanup_failed=1
+          fi
+          if [ -e "$p12_path" ]; then
+            cleanup_failed=1
+          fi
+          if [ -e "$key_path" ]; then
+            cleanup_failed=1
+          fi
+          {
+            echo "APPLE_API_KEY="
+            echo "CSC_KEYCHAIN="
+            echo "FRONTIER_SIGNING_P12="
+            echo "FRONTIER_SIGNING_KEYCHAIN="
+          } >> "$GITHUB_ENV"
+          test "$cleanup_failed" = 0
 
       - name: Gate signed and notarized DMG
         id: package
@@ -474,13 +589,6 @@ jobs:
           retention-days: 7
           compression-level: 0
 
-      - name: Remove notarization key
-        if: always()
-        run: |
-          if [ -n "${APPLE_API_KEY:-}" ]; then
-            rm -f "$APPLE_API_KEY"
-          fi
-
   release-windows:
     name: Signed Windows x64
     needs: context
@@ -515,6 +623,40 @@ jobs:
           python -m pip install -q --disable-pip-version-check -r rapp_brainstem/requirements.txt
           "python=$(python -c 'import sys; print(sys.executable)')" |
             Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Install, test, hash native media, and assert a clean tree
+        working-directory: beta
+        shell: pwsh
+        env:
+          TEMP: ${{ github.workspace }}\beta\release\.ci-tmp
+          TMP: ${{ github.workspace }}\beta\release\.ci-tmp
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path $env:TEMP | Out-Null
+          npm ci --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { throw "npm ci failed with exit $LASTEXITCODE" }
+          npm run check
+          if ($LASTEXITCODE -ne 0) { throw "npm run check failed with exit $LASTEXITCODE" }
+          npm test
+          if ($LASTEXITCODE -ne 0) { throw "npm test failed with exit $LASTEXITCODE" }
+          node scripts/native-media-preflight.mjs `
+            --platform windows `
+            --arch x64 `
+            --output release/native-media-preflight-windows-x64.json
+          if ($LASTEXITCODE -ne 0) {
+            throw "native media preflight failed with exit $LASTEXITCODE"
+          }
+          git diff --quiet
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Tracked files changed during pre-signing validation'
+          }
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            throw 'The index changed during pre-signing validation'
+          }
+          if (git status --porcelain --untracked-files=no) {
+            throw 'Tracked working tree is not clean before Azure login'
+          }
 
       # The OIDC service principal has only Artifact Signing Certificate
       # Profile Signer at the selected certificate-profile scope.
@@ -573,9 +715,19 @@ jobs:
           AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
         run: |
           $ErrorActionPreference = 'Stop'
-          New-Item -ItemType Directory -Force -Path $env:TEMP | Out-Null
-          npm ci --no-audit --no-fund
           npm run dist:win:x64
+
+      - name: Clear Azure CLI session immediately after signing
+        if: always()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          az logout 2>$null
+          az account clear 2>$null
+          $account = az account show 2>$null
+          if ($LASTEXITCODE -eq 0 -or $account) {
+            throw 'Azure CLI signing session remained active after cleanup'
+          }
 
       - name: Gate signed NSIS package and installed payload
         id: package
@@ -655,13 +807,6 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
-
-      - name: Clear Azure CLI session
-        if: always()
-        shell: pwsh
-        run: |
-          az logout 2>$null
-          exit 0
 
   stage-release:
     name: Stage and verify draft release assets
@@ -1039,8 +1184,10 @@ jobs:
              and .runtime.copilot_auth_startup == true
              and .notarization.app.submission.status == "Accepted"
              and .notarization.app.log.status == "Accepted"
+             and .notarization.app.log.issues == []
              and .notarization.dmg.submission.status == "Accepted"
-             and .notarization.dmg.log.status == "Accepted"' \
+             and .notarization.dmg.log.status == "Accepted"
+             and .notarization.dmg.log.issues == []' \
             "$dmg.gate.json" >/dev/null
           hdiutil detach "$mount_point"
           trap - EXIT
@@ -1131,6 +1278,167 @@ jobs:
             throw 'Downloaded Windows gate report is not release-ready'
           }
 
+  quarantine-macos:
+    name: Protected clean-Mac quarantine acceptance
+    needs: [context, stage-release]
+    if: needs.context.outputs.release_mode == 'true'
+    environment: frontier-clean-mac-acceptance
+    permissions:
+      contents: read
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.context.outputs.commit }}
+
+      - name: Download, quarantine, copy to Applications, and launch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.context.outputs.tag }}
+          VERSION: ${{ needs.context.outputs.version }}
+          COMMIT: ${{ needs.context.outputs.commit }}
+        run: |
+          set -euo pipefail
+          download_dir="$RUNNER_TEMP/frontier-quarantine-download"
+          evidence_dir="$GITHUB_WORKSPACE/quarantine-acceptance"
+          acceptance_home="$RUNNER_TEMP/frontier-clean-user"
+          brainstem_home="$acceptance_home/.brainstem"
+          user_data="$acceptance_home/Library/Application Support/RAPP Brainstem Frontier"
+          status_file="$acceptance_home/frontier-smoke-status.json"
+          installed_app="/Applications/RAPP Brainstem Frontier.app"
+          dmg_name="RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg"
+          dmg="$download_dir/$dmg_name"
+          mount_point="$RUNNER_TEMP/frontier-quarantine-volume"
+          mkdir -p "$download_dir" "$evidence_dir" "$acceptance_home" "$mount_point"
+          test ! -e "$brainstem_home"
+          sudo rm -rf "$installed_app"
+
+          mounted=0
+          cleanup() {
+            for name in \
+              HOME USERPROFILE BRAINSTEM_HOME BRAINSTEM_BETA_HOME \
+              BRAINSTEM_BETA_USER_DATA_DIR BRAINSTEM_BETA_SMOKE_STATUS_FILE \
+              BRAINSTEM_BETA_SMOKE_EXIT_MS BRAINSTEM_BETA_SMOKE_EXIT_ON_READY \
+              BRAINSTEM_BETA_SMOKE_REQUIRE_READY BRAINSTEM_BETA_HEADLESS \
+              BRAINSTEM_BETA_CAPTURE_USER_DATA_PATH; do
+              launchctl unsetenv "$name" >/dev/null 2>&1 || true
+            done
+            if [ "$mounted" = 1 ]; then
+              hdiutil detach "$mount_point" >/dev/null 2>&1 || true
+            fi
+            sudo rm -rf "$installed_app"
+            rm -rf "$acceptance_home"
+          }
+          trap cleanup EXIT
+
+          gh release download "$TAG" \
+            --dir "$download_dir" \
+            --pattern "$dmg_name" \
+            --pattern "$dmg_name.gate.json" \
+            --pattern SHA256SUMS
+          expected_sha="$(
+            awk -v name="$dmg_name" '$2 == name { print $1 }' \
+              "$download_dir/SHA256SUMS"
+          )"
+          test "$expected_sha" = "$(shasum -a 256 "$dmg" | awk '{print $1}')"
+          ticket="0083;$(printf '%x' "$(date +%s)");GitHubActions;${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          xattr -w com.apple.quarantine "$ticket" "$dmg"
+          test "$(xattr -p com.apple.quarantine "$dmg")" = "$ticket"
+          hdiutil verify "$dmg"
+          codesign --verify --deep --strict --verbose=4 "$dmg"
+          xcrun stapler validate -v "$dmg"
+          spctl --assess --type open --context context:primary-signature \
+            --verbose=4 "$dmg"
+          hdiutil attach "$dmg" -nobrowse -readonly -mountpoint "$mount_point"
+          mounted=1
+          source_app="$mount_point/RAPP Brainstem Frontier.app"
+          test -d "$source_app"
+          sudo ditto "$source_app" "$installed_app"
+          sudo xattr -w com.apple.quarantine "$ticket" "$installed_app"
+          installed_ticket="$(xattr -p com.apple.quarantine "$installed_app")"
+          test "$installed_ticket" = "$ticket"
+          codesign --verify --deep --strict --verbose=4 "$installed_app"
+          xcrun stapler validate -v "$installed_app"
+          gatekeeper_output="$(
+            spctl --assess --type execute --verbose=4 "$installed_app" 2>&1
+          )"
+
+          launchctl setenv HOME "$acceptance_home"
+          launchctl setenv USERPROFILE "$acceptance_home"
+          launchctl setenv BRAINSTEM_HOME "$brainstem_home"
+          launchctl setenv BRAINSTEM_BETA_HOME "$brainstem_home/beta-launcher"
+          launchctl setenv BRAINSTEM_BETA_USER_DATA_DIR "$user_data"
+          launchctl setenv BRAINSTEM_BETA_SMOKE_STATUS_FILE "$status_file"
+          launchctl setenv BRAINSTEM_BETA_SMOKE_EXIT_MS 840000
+          launchctl setenv BRAINSTEM_BETA_SMOKE_EXIT_ON_READY 1
+          launchctl setenv BRAINSTEM_BETA_SMOKE_REQUIRE_READY 1
+          launchctl setenv BRAINSTEM_BETA_HEADLESS 1
+          launchctl setenv BRAINSTEM_BETA_CAPTURE_USER_DATA_PATH 1
+
+          open -W -n "$installed_app" \
+            >"$evidence_dir/launchservices.log" 2>&1
+          test -s "$status_file"
+          jq -e \
+            --arg user_data "$user_data" \
+            '.brainstem.phase == "ready"
+             and (.copilot.phase == "ready" or .copilot.phase == "signed-out")
+             and .provisioned == true
+             and .requestedUserData == $user_data
+             and .actualUserData == $user_data' \
+            "$status_file" >/dev/null
+          test "$(git -C "$brainstem_home/src" rev-parse HEAD)" = "$COMMIT"
+          jq -e \
+            '.gate.status == "passed"
+             and .publication.status == "ready"
+             and .notarization.app.log.issues == []
+             and .notarization.dmg.log.issues == []' \
+            "$download_dir/$dmg_name.gate.json" >/dev/null
+
+          export ACCEPTANCE_DMG="$dmg_name"
+          export ACCEPTANCE_SHA="$expected_sha"
+          export ACCEPTANCE_TICKET="$ticket"
+          export ACCEPTANCE_APP="$installed_app"
+          export ACCEPTANCE_STATUS="$status_file"
+          export ACCEPTANCE_GATEKEEPER="$gatekeeper_output"
+          node - "$evidence_dir/quarantine-acceptance.json" <<'NODE'
+          const fs = require("node:fs");
+          const output = process.argv[2];
+          fs.writeFileSync(output, `${JSON.stringify({
+            schema: "rapp-brainstem-frontier-quarantine-acceptance/v1",
+            release: {
+              tag: process.env.TAG,
+              commit: process.env.COMMIT,
+              version: process.env.VERSION,
+            },
+            download: {
+              filename: process.env.ACCEPTANCE_DMG,
+              sha256: process.env.ACCEPTANCE_SHA,
+              quarantine: process.env.ACCEPTANCE_TICKET,
+            },
+            installation: {
+              method: "quarantined-dmg-copy-to-applications",
+              path: process.env.ACCEPTANCE_APP,
+            },
+            launch: {
+              method: "LaunchServices open -W -n",
+              gatekeeper: process.env.ACCEPTANCE_GATEKEEPER,
+              status: JSON.parse(
+                fs.readFileSync(process.env.ACCEPTANCE_STATUS, "utf8"),
+              ),
+            },
+            run_url:
+              `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
+              + `/actions/runs/${process.env.GITHUB_RUN_ID}`,
+          }, null, 2)}\n`, { mode: 0o600 });
+          NODE
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frontier-clean-mac-quarantine-acceptance
+          path: quarantine-acceptance/
+          if-no-files-found: error
+          retention-days: 30
+
   publish:
     name: Publish immutable release after redownload verification
     needs:
@@ -1138,10 +1446,12 @@ jobs:
       - stage-release
       - redownload-macos
       - redownload-windows
+      - quarantine-macos
     if: needs.context.outputs.release_mode == 'true'
     environment: frontier-binary-release
     permissions:
       contents: write
+      attestations: read
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -1158,50 +1468,53 @@ jobs:
           COMMIT: ${{ needs.context.outputs.commit }}
         run: |
           set -euo pipefail
+          mkdir publish-verification
+          manifest="RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json"
+          gh release download "$TAG" \
+            --dir publish-verification \
+            --pattern "RAPP-Brainstem-Frontier-${VERSION}-*" \
+            --pattern SHA256SUMS
+          (
+            cd publish-verification
+            test "$(find . -maxdepth 1 -type f | wc -l | tr -d ' ')" = 13
+            sha256sum -c SHA256SUMS
+            for asset in \
+              "RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg" \
+              "RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg" \
+              "RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe"; do
+              gh attestation verify "$asset" \
+                --bundle "$asset.sigstore.json" \
+                --repo "$GITHUB_REPOSITORY" \
+                --source-digest "$COMMIT" \
+                --source-ref "refs/tags/$TAG" \
+                --deny-self-hosted-runners
+            done
+            gh attestation verify "$manifest" \
+              --bundle "$manifest.sigstore.json" \
+              --repo "$GITHUB_REPOSITORY" \
+              --source-digest "$COMMIT" \
+              --source-ref "refs/tags/$TAG" \
+              --deny-self-hosted-runners
+          )
           before="$(
             gh api -H "X-GitHub-Api-Version: 2026-03-10" \
               "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
           )"
           test "$(jq -r '.draft' <<<"$before")" = true
-          mkdir publish-verification
-          manifest="RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json"
-          gh release download "$TAG" \
-            --dir publish-verification \
-            --pattern "$manifest" \
-            --pattern "$manifest.sigstore.json"
-          gh attestation verify "publish-verification/$manifest" \
-            --bundle "publish-verification/$manifest.sigstore.json" \
-            --repo "$GITHUB_REPOSITORY" \
-            --source-digest "$COMMIT" \
-            --source-ref "refs/tags/$TAG" \
-            --deny-self-hosted-runners
           printf '%s' "$before" > "$RUNNER_TEMP/frontier-prepublish-release.json"
-          node --input-type=module - \
-            "$RUNNER_TEMP/frontier-prepublish-release.json" \
-            "publish-verification/$manifest" \
-            "$TAG" "$VERSION" "$COMMIT" <<'NODE'
-          import assert from "node:assert/strict";
-          import { readFileSync } from "node:fs";
-          import {
-            analyzePackagedDownloads,
-            parseReleaseManifest,
-          } from "./beta/download-center.js";
-          const [releasePath, manifestPath, tag, version, commit] =
-            process.argv.slice(2);
-          const release = JSON.parse(readFileSync(releasePath, "utf8"));
-          const signedManifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-          assert.equal(release.tag_name, tag);
-          assert.equal(release.draft, true);
-          const bodyManifest = parseReleaseManifest(release.body);
-          assert.deepEqual(bodyManifest, signedManifest);
-          const analysis = analyzePackagedDownloads(release, {
-            repository: process.env.GITHUB_REPOSITORY,
-            commit,
-            version,
-            manifest: bodyManifest,
-          });
-          assert.equal(analysis.downloads.length, 3);
-          NODE
+          node beta/scripts/verify-staged-release.mjs \
+            --release-json "$RUNNER_TEMP/frontier-prepublish-release.json" \
+            --artifact-dir publish-verification \
+            --manifest "publish-verification/$manifest" \
+            --tag "$TAG" \
+            --version "$VERSION" \
+            --commit "$COMMIT"
+          if ! gh api --silent \
+            -H "X-GitHub-Api-Version: 2026-03-10" \
+            "repos/$GITHUB_REPOSITORY/immutable-releases"; then
+            echo "::error title=Publication blocked::Repository immutable releases are not enabled or could not be verified. The draft remains unpublished."
+            exit 1
+          fi
           gh release edit "$TAG" --draft=false --prerelease --latest=false
           after=
           for _ in {1..10}; do
@@ -1216,8 +1529,8 @@ jobs:
           done
           test "$(jq -r '.draft' <<<"$after")" = false
           if [ "$(jq -r '.immutable // false' <<<"$after")" != true ]; then
-            gh release edit "$TAG" --draft=true || true
-            echo "::error::GitHub release immutability is not enabled; release returned to draft"
+            echo "::error title=Immutable release incident::The release was published after the repository setting verified, but the release API did not report immutable=true. Do not alter assets or the tag; investigate immediately."
+            jq '{id, tag_name, draft, immutable, html_url}' <<<"$after" >&2
             exit 1
           fi
           test "$(jq -r '.tag_name' <<<"$after")" = "$TAG"

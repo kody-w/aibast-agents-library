@@ -4,9 +4,11 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  createBuilderConfiguration,
   evaluateWindowsSigningPolicy,
   parsePackagingArguments,
 } from "../scripts/package-platform.mjs";
+import { validateNotarizationLog } from "../scripts/notarize-target.mjs";
 import {
   artifactName,
   publisherMatchesApplicationId,
@@ -32,10 +34,28 @@ import {
 import {
   resolvePackageAuthority,
 } from "../scripts/prepare-package-bootstrap.mjs";
+import {
+  assertUnsignedUploadPolicy,
+} from "../scripts/unsigned-upload-gate.mjs";
+import {
+  evaluateToolchainPolicy,
+  installedToolchain,
+  loadToolchainPolicy,
+} from "../scripts/toolchain-policy.mjs";
 
 
 const betaDir = path.resolve(import.meta.dirname, "..");
 const repositoryDir = path.resolve(betaDir, "..");
+
+function workflowJob(workflow, name) {
+  const marker = `\n  ${name}:\n`;
+  const start = workflow.indexOf(marker);
+  assert.ok(start >= 0, `workflow job ${name} is missing`);
+  const bodyStart = start + marker.length;
+  const remainder = workflow.slice(bodyStart);
+  const next = remainder.search(/\n  [a-z0-9-]+:\n/);
+  return next < 0 ? remainder : remainder.slice(0, next);
+}
 
 function mach64(cpuType) {
   const buffer = Buffer.alloc(32);
@@ -126,6 +146,7 @@ test("package bootstrap release authority is canonical and staging is distinct",
     authorityUrl:
       "https://github.com/microsoft/aibast-agents-library.git",
   });
+
   assert.equal(canonical.applicationId, "com.microsoft.aibast.rapp-brainstem-beta");
   assert.throws(
     () =>
@@ -165,6 +186,33 @@ test("package bootstrap release authority is canonical and staging is distinct",
   assert.equal(policy.publication_enabled, true);
   assert.deepEqual(policy.publication_blockers, []);
   assert.ok(policy.required_package_gate_contracts.length >= 9);
+});
+
+test("unavailable requested toolchain versions block publication honestly", () => {
+  const policy = loadToolchainPolicy();
+  const installed = installedToolchain();
+  assert.deepEqual(policy.required, {
+    electron: "43.6.0",
+    electron_builder: "26.16.0",
+    macos_minimum: "12.0",
+  });
+  assert.deepEqual(installed, {
+    electron: "43.4.1",
+    electronBuilder: "26.15.7",
+    macosMinimum: "12.0",
+  });
+  assert.equal(
+    evaluateToolchainPolicy(policy, installed).publicationReady,
+    false,
+  );
+  assert.equal(
+    evaluateToolchainPolicy(
+      { ...policy, publication_enabled: true },
+      installed,
+    ).publicationReady,
+    false,
+    "flipping only the toolchain policy cannot fabricate unavailable versions",
+  );
 });
 
 test("signed gates fail closed when verification identities are absent", () => {
@@ -430,7 +478,7 @@ test("release manifest requires the complete three-binary matrix", () => {
               : {
                   app: {
                     submission: { status: "Accepted" },
-                    log: { status: "Accepted" },
+                    log: { status: "Accepted", issues: [] },
                     stapled: true,
                     target: {
                       code_signature: {
@@ -442,7 +490,7 @@ test("release manifest requires the complete three-binary matrix", () => {
                   },
                   dmg: {
                     submission: { status: "Accepted" },
-                    log: { status: "Accepted" },
+                    log: { status: "Accepted", issues: [] },
                     stapled: true,
                     target: {
                       code_signature: {
@@ -549,6 +597,32 @@ test("release manifest requires the complete three-binary matrix", () => {
       mismatchedBootstrapReports,
     ),
     /bootstrap is not bound to the release commit/,
+  );
+  const warningReports = structuredClone(reports);
+  warningReports[names[0]].content.notarization.dmg.log.issues = [{
+    severity: "warning",
+    message: "unknown warning",
+  }];
+  assert.throws(
+    () => createReleaseManifest(
+      metadata,
+      checksums,
+      bundles,
+      warningReports,
+    ),
+    /notarization evidence/,
+  );
+  const unsignedDmgReports = structuredClone(reports);
+  unsignedDmgReports[names[0]].content.notarization.dmg.target
+    .code_signature.ad_hoc = true;
+  assert.throws(
+    () => createReleaseManifest(
+      metadata,
+      checksums,
+      bundles,
+      unsignedDmgReports,
+    ),
+    /notarization evidence/,
   );
   assert.throws(
     () => upsertReleaseManifestFence("", {
@@ -692,6 +766,7 @@ test("packaged builds declare and enforce the binary update channel", () => {
   );
   assert.equal(packageMetadata.devDependencies.electron, "43.4.1");
   assert.equal(packageMetadata.devDependencies["electron-builder"], "26.15.7");
+  assert.equal(packageMetadata.build.mac.minimumSystemVersion, "12.0");
   const main = readFileSync(path.join(betaDir, "electron", "main.mjs"), "utf8");
   assert.match(main, /update:\s*app\.isPackaged/);
   assert.match(main, /packagedUpdateState\(\)/);
@@ -699,10 +774,6 @@ test("packaged builds declare and enforce the binary update channel", () => {
 });
 
 test("macOS release signing is forced and notarization evidence is inspected", () => {
-  const packaging = readFileSync(
-    path.join(betaDir, "scripts", "package-platform.mjs"),
-    "utf8",
-  );
   const notarization = readFileSync(
     path.join(betaDir, "scripts", "notarize-target.mjs"),
     "utf8",
@@ -711,10 +782,36 @@ test("macOS release signing is forced and notarization evidence is inspected", (
     path.join(betaDir, "build", "entitlements.mac.plist"),
     "utf8",
   );
-  assert.match(packaging, /forceCodeSigning:\s*mode === "signed"/);
-  assert.match(packaging, /afterSign:/);
-  assert.match(packaging, /notarizeTarget\(outputPath/);
-  assert.match(notarization, /submissionResult\.status !== "Accepted"/);
+  const bootstrap = {
+    applicationId: "com.microsoft.aibast.rapp-brainstem-beta",
+    productName: "RAPP Brainstem Frontier",
+  };
+  const packageMetadata = {
+    build: { appId: bootstrap.applicationId },
+  };
+  const signed = createBuilderConfiguration({
+    platform: "macos",
+    mode: "signed",
+    bootstrap,
+    packageMetadata,
+    macSigning: {
+      identity: "Developer ID Application: Microsoft Corporation (TEAM123456)",
+      notarize: false,
+    },
+  });
+  const unsigned = createBuilderConfiguration({
+    platform: "macos",
+    mode: "unsigned",
+    bootstrap,
+    packageMetadata,
+    macSigning: { identity: null, notarize: false },
+  });
+  assert.equal(signed.forceCodeSigning, true);
+  assert.equal(signed.dmg.sign, true);
+  assert.match(signed.afterSign, /notarize-target\.mjs$/);
+  assert.equal(unsigned.forceCodeSigning, false);
+  assert.equal(unsigned.dmg.sign, false);
+  assert.equal(unsigned.afterSign, undefined);
   assert.match(notarization, /notarytool",\s*"log"/);
   assert.match(notarization, /stapler",\s*"staple"/);
   assert.match(notarization, /Signature=adhoc/);
@@ -723,6 +820,64 @@ test("macOS release signing is forced and notarization evidence is inspected", (
     entitlements,
     /allow-unsigned-executable-memory|disable-library-validation/,
   );
+  const digest = "a".repeat(64);
+  assert.deepEqual(
+    validateNotarizationLog({
+      status: "Accepted",
+      sha256: digest,
+      issues: [],
+    }, digest),
+    { issues: [] },
+  );
+  for (const severity of ["warning", "info", "unknown"]) {
+    assert.throws(
+      () => validateNotarizationLog({
+        status: "Accepted",
+        sha256: digest,
+        issues: [{ severity, message: "review required" }],
+      }, digest),
+      /issue-free/,
+    );
+  }
+});
+
+test("blocked native media permits report-only unsigned uploads", () => {
+  const evidence = [
+    "release/app.dmg.gate.json",
+    "release/app.dmg.gate.log",
+    "release/UNSIGNED-NOT-FOR-DISTRIBUTION.txt",
+  ];
+  assert.equal(
+    assertUnsignedUploadPolicy({
+      publicationReady: false,
+      paths: evidence,
+      requireFiles: false,
+    }),
+    true,
+  );
+  for (const artifact of ["release/app.dmg", "release/setup.exe"]) {
+    assert.throws(
+      () => assertUnsignedUploadPolicy({
+        publicationReady: false,
+        paths: [...evidence, artifact],
+        requireFiles: false,
+      }),
+      /reports only/,
+    );
+  }
+  const workflow = readFileSync(
+    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+    "utf8",
+  );
+  for (const jobName of ["verify-macos", "verify-windows"]) {
+    const job = workflowJob(workflow, jobName);
+    const upload = job.slice(job.indexOf("uses: actions/upload-artifact@"));
+    assert.match(job, /unsigned-upload-gate\.mjs/);
+    assert.match(upload, /UNSIGNED-REPORTS-/);
+    assert.doesNotMatch(upload, /^\s+beta\/release\/.*-unsigned\.(?:dmg|exe)$/m);
+    assert.match(upload, /\.gate\.json/);
+    assert.match(upload, /\.gate\.log/);
+  }
 });
 
 test("Windows NSIS identity and production signing policy are frozen", () => {
@@ -806,7 +961,7 @@ test("workflow contract pins actions and never creates or moves a release tag", 
   assert.doesNotMatch(workflow, /^\s+push:/m);
   assert.match(workflow, /publish_release:[\s\S]*default:\s+false/);
   assert.match(workflow, /\.immutable \/\/ false/);
-  assert.match(workflow, /--draft=true/);
+  assert.doesNotMatch(workflow, /--draft=true/);
   assert.match(workflow, /Artifact Signing Certificate[\s\S]*Profile Signer/);
   assert.match(workflow, /macos-26-intel/);
   assert.match(workflow, /macos-26/);
@@ -828,4 +983,112 @@ test("workflow contract pins actions and never creates or moves a release tag", 
   assert.doesNotMatch(workflow, /AZURE_CLIENT_SECRET/);
   assert.doesNotMatch(workflow, /runner:\s*windows[^\n]*arm/i);
   assert.doesNotMatch(workflow, /RAPP-[^\n]*windows-arm64/i);
+});
+
+test("signing credentials are exposed only after dependency and media gates", () => {
+  const workflow = readFileSync(
+    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+    "utf8",
+  );
+  const mac = workflowJob(workflow, "release-macos");
+  const macInstall = mac.indexOf("npm ci --no-audit --no-fund");
+  const macTests = mac.indexOf("npm test");
+  const macMedia = mac.indexOf("native-media-preflight.mjs");
+  const macClean = mac.indexOf("git diff --exit-code");
+  const macAuthority = mac.indexOf("Materialize isolated Apple signing authority");
+  const macBuild = mac.indexOf("Build, Developer ID sign, and notarize native DMG");
+  const macCleanup = mac.indexOf("Remove Apple signing authority immediately");
+  const macGate = mac.indexOf("Gate signed and notarized DMG");
+  assert.ok(
+    0 <= macInstall
+      && macInstall < macTests
+      && macTests < macMedia
+      && macMedia < macClean
+      && macClean < macAuthority
+      && macAuthority < macBuild
+      && macBuild < macCleanup
+      && macCleanup < macGate,
+  );
+  assert.doesNotMatch(
+    mac.slice(0, macAuthority),
+    /MACOS_CERTIFICATE_P12_BASE64|APPLE_API_KEY_P8_BASE64|CSC_LINK|CSC_KEYCHAIN/,
+  );
+  assert.equal(mac.lastIndexOf("npm ci --no-audit --no-fund"), macInstall);
+  assert.match(mac, /test -z "\$\{CSC_LINK:-\}"/);
+  assert.match(mac, /security delete-keychain/);
+
+  const windows = workflowJob(workflow, "release-windows");
+  const winInstall = windows.indexOf("npm ci --no-audit --no-fund");
+  const winTests = windows.indexOf("npm test");
+  const winMedia = windows.indexOf("native-media-preflight.mjs");
+  const winClean = windows.indexOf("git diff --quiet");
+  const azureLogin = windows.indexOf("azure/login@");
+  const winBuild = windows.indexOf("Build and Artifact Sign native NSIS installer");
+  const azureCleanup = windows.indexOf(
+    "Clear Azure CLI session immediately after signing",
+  );
+  const winGate = windows.indexOf("Gate signed NSIS package");
+  assert.ok(
+    0 <= winInstall
+      && winInstall < winTests
+      && winTests < winMedia
+      && winMedia < winClean
+      && winClean < azureLogin
+      && azureLogin < winBuild
+      && winBuild < azureCleanup
+      && azureCleanup < winGate,
+  );
+  assert.equal(windows.lastIndexOf("npm ci --no-audit --no-fund"), winInstall);
+  assert.doesNotMatch(windows.slice(0, azureLogin), /AZURE_CLIENT_SECRET/);
+  assert.match(windows, /az account clear/);
+});
+
+test("publication revalidates the full set and immutable setting at the last gate", () => {
+  const workflow = readFileSync(
+    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+    "utf8",
+  );
+  const publish = workflowJob(workflow, "publish");
+  const download = publish.indexOf("--dir publish-verification");
+  const count = publish.indexOf("= 13");
+  const checksums = publish.indexOf("sha256sum -c SHA256SUMS");
+  const attestations = publish.indexOf("gh attestation verify");
+  const staged = publish.indexOf("verify-staged-release.mjs");
+  const immutableSetting = publish.indexOf(
+    'repos/$GITHUB_REPOSITORY/immutable-releases',
+  );
+  const publishRelease = publish.indexOf(
+    'gh release edit "$TAG" --draft=false',
+  );
+  assert.ok(
+    0 <= download
+      && download < count
+      && count < checksums
+      && checksums < attestations
+      && attestations < staged
+      && staged < immutableSetting
+      && immutableSetting < publishRelease,
+  );
+  assert.match(publish, /RAPP-Brainstem-Frontier-\$\{VERSION\}-macos-arm64\.dmg/);
+  assert.match(publish, /RAPP-Brainstem-Frontier-\$\{VERSION\}-macos-x64\.dmg/);
+  assert.match(publish, /RAPP-Brainstem-Frontier-\$\{VERSION\}-windows-x64-setup\.exe/);
+  assert.doesNotMatch(publish, /--draft=true/);
+  assert.match(publish, /Immutable release incident/);
+});
+
+test("protected clean-Mac gate exercises quarantine and LaunchServices", () => {
+  const workflow = readFileSync(
+    path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
+    "utf8",
+  );
+  const quarantine = workflowJob(workflow, "quarantine-macos");
+  assert.match(quarantine, /environment: frontier-clean-mac-acceptance/);
+  assert.match(quarantine, /runs-on: macos-26/);
+  assert.match(quarantine, /com\.apple\.quarantine/);
+  assert.match(quarantine, /\/Applications\/RAPP Brainstem Frontier\.app/);
+  assert.match(quarantine, /sudo ditto/);
+  assert.match(quarantine, /open -W -n/);
+  assert.match(quarantine, /quarantine-acceptance\.json/);
+  const publish = workflowJob(workflow, "publish");
+  assert.match(publish, /- quarantine-macos/);
 });

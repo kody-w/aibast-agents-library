@@ -80,6 +80,27 @@ function bundleIdentifier(appPath) {
   ]).stdout.trim();
 }
 
+export function validateNotarizationLog(notarizationLog, submittedSha256) {
+  const issues = notarizationLog?.issues == null
+    ? []
+    : notarizationLog.issues;
+  if (!Array.isArray(issues)) {
+    fail("Apple notarization log issues must be an array or null.");
+  }
+  if (
+    notarizationLog?.status !== "Accepted"
+    || String(notarizationLog?.sha256 || "").toLowerCase()
+      !== submittedSha256.toLowerCase()
+    || issues.length !== 0
+  ) {
+    fail(
+      "Apple notarization log is not Accepted and issue-free: "
+      + JSON.stringify(notarizationLog),
+    );
+  }
+  return { issues };
+}
+
 export async function notarizeTarget(targetPath, evidencePath) {
   if (process.platform !== "darwin") {
     fail("Apple notarization must run on macOS.");
@@ -144,16 +165,10 @@ export async function notarizeTarget(targetPath, evidencePath) {
     ...authorizationArguments(),
   ]);
   const notarizationLog = JSON.parse(readFileSync(logPath, "utf8"));
-  const blockingIssues = (notarizationLog.issues || []).filter(
-    (issue) => String(issue.severity || "").toLowerCase() === "error",
+  const { issues } = validateNotarizationLog(
+    notarizationLog,
+    submittedSha256,
   );
-  if (
-    notarizationLog.status !== "Accepted" ||
-    notarizationLog.sha256?.toLowerCase() !== submittedSha256 ||
-    blockingIssues.length
-  ) {
-    fail(`Apple notarization log is not clean: ${JSON.stringify(notarizationLog)}`);
-  }
 
   run("xcrun", ["stapler", "staple", "-v", resolvedTarget]);
   run("xcrun", ["stapler", "validate", "-v", resolvedTarget]);
@@ -182,7 +197,7 @@ export async function notarizeTarget(targetPath, evidencePath) {
       name: path.basename(logPath),
       sha256: sha256(logPath),
       status: notarizationLog.status,
-      issues: notarizationLog.issues || [],
+      issues,
     },
     stapled: true,
   };

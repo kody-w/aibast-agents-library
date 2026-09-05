@@ -14,6 +14,11 @@ import {
 } from "./native-media-gate.mjs";
 import { notarizeTarget } from "./notarize-target.mjs";
 import { preparePackageBootstrap } from "./prepare-package-bootstrap.mjs";
+import {
+  evaluateToolchainPolicy,
+  installedToolchain,
+  loadToolchainPolicy,
+} from "./toolchain-policy.mjs";
 
 
 const betaDir = path.resolve(import.meta.dirname, "..");
@@ -105,13 +110,21 @@ function macSigningConfiguration(mode, applicationId) {
 
   const identity = requiredEnvironment("MACOS_SIGNING_IDENTITY");
   const teamId = requiredEnvironment("APPLE_TEAM_ID");
-  requiredEnvironment("CSC_LINK");
-  requiredEnvironment("CSC_KEY_PASSWORD");
+  const keychain = requiredEnvironment("CSC_KEYCHAIN");
   const appleApiKey = requiredEnvironment("APPLE_API_KEY");
   const appleApiKeyId = requiredEnvironment("APPLE_API_KEY_ID");
   const appleApiIssuer = requiredEnvironment("APPLE_API_ISSUER");
   if (!existsSync(appleApiKey)) {
     fail(`APPLE_API_KEY does not exist: ${appleApiKey}`);
+  }
+  if (!existsSync(keychain)) {
+    fail(`CSC_KEYCHAIN does not exist: ${keychain}`);
+  }
+  if (process.env.CSC_LINK || process.env.CSC_KEY_PASSWORD) {
+    fail(
+      "CSC_LINK and CSC_KEY_PASSWORD must be removed after certificate import "
+      + "and before packaging.",
+    );
   }
   if (!identity.startsWith("Developer ID Application:")) {
     fail("MACOS_SIGNING_IDENTITY must be a Developer ID Application identity.");
@@ -211,12 +224,69 @@ export function evaluateWindowsSigningPolicy(policy) {
   };
 }
 
+export function createBuilderConfiguration({
+  platform,
+  mode,
+  bootstrap,
+  packageMetadata,
+  macSigning,
+  windowsSigning,
+}) {
+  const outputPattern = builderArtifactPattern({ platform, mode });
+  if (platform === "macos") {
+    return {
+      appId: bootstrap.applicationId,
+      productName: bootstrap.productName,
+      forceCodeSigning: mode === "signed",
+      ...(mode === "signed"
+        ? {
+            afterSign: path.join(
+              betaDir,
+              "scripts",
+              "notarize-target.mjs",
+            ),
+          }
+        : {}),
+      mac: {
+        ...(macSigning
+          ?? macSigningConfiguration(mode, bootstrap.applicationId)),
+        artifactName: outputPattern,
+      },
+      dmg: {
+        artifactName: outputPattern,
+        sign: mode === "signed",
+      },
+    };
+  }
+  return {
+    appId: bootstrap.applicationId,
+    productName: bootstrap.productName,
+    forceCodeSigning: mode === "signed",
+    win: {
+      ...(windowsSigning
+        ?? windowsSigningConfiguration(mode, bootstrap.applicationId)),
+      signExts: [".exe", ".dll", ".node"],
+      artifactName: outputPattern,
+    },
+  };
+}
+
 export async function packagePlatform(argv = process.argv.slice(2)) {
   const { platform, arch } = parsePackagingArguments(argv);
   const mode = signingMode();
   assertNativeHost(platform, arch);
   const bootstrap = preparePackageBootstrap({ signingMode: mode });
   if (mode === "signed") {
+    const toolchain = evaluateToolchainPolicy(
+      loadToolchainPolicy(),
+      installedToolchain(),
+    );
+    if (!toolchain.publicationReady) {
+      fail(
+        `Signed binary packaging is blocked by toolchain policy: `
+        + toolchain.blockers.join(" | "),
+      );
+    }
     if (bootstrap.manifest.publication.ready !== true) {
       fail(
         `Signed binary packaging is blocked by package bootstrap policy: ` +
@@ -262,40 +332,12 @@ export async function packagePlatform(argv = process.argv.slice(2)) {
     process.env.FRONTIER_NOTARIZATION_APP_EVIDENCE =
       appNotarizationEvidence;
   }
-  const outputPattern = builderArtifactPattern({ platform, mode });
-  const config =
-    platform === "macos"
-      ? {
-          appId: bootstrap.applicationId,
-          productName: bootstrap.productName,
-          forceCodeSigning: mode === "signed",
-          ...(mode === "signed"
-            ? {
-                afterSign: path.join(
-                  betaDir,
-                  "scripts",
-                  "notarize-target.mjs",
-                ),
-              }
-            : {}),
-          mac: {
-            ...macSigningConfiguration(mode, packageMetadata.build.appId),
-            artifactName: outputPattern,
-          },
-          dmg: {
-            artifactName: outputPattern,
-          },
-        }
-      : {
-          appId: bootstrap.applicationId,
-          productName: bootstrap.productName,
-          forceCodeSigning: mode === "signed",
-          win: {
-            ...windowsSigningConfiguration(mode, packageMetadata.build.appId),
-            signExts: [".exe", ".dll", ".node"],
-            artifactName: outputPattern,
-          },
-        };
+  const config = createBuilderConfiguration({
+    platform,
+    mode,
+    bootstrap,
+    packageMetadata,
+  });
   rmSync(outputPath, { force: true });
   rmSync(appOutputDirectory(platform, arch), { recursive: true, force: true });
   for (const evidencePath of [

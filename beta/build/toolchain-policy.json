@@ -1,0 +1,13 @@
+{
+  "schema": "https://github.com/microsoft/aibast-agents-library/frontier-toolchain-policy/v1",
+  "publication_enabled": false,
+  "required": {
+    "electron": "43.6.0",
+    "electron_builder": "26.16.0",
+    "macos_minimum": "12.0"
+  },
+  "publication_blockers": [
+    "electron 43.6.0 is not available from the configured npm package feed, so no reproducible package lock or npm ci validation can be produced.",
+    "electron-builder 26.16.0 has no published npm version or upstream Git tag; fabricating that version is prohibited."
+  ]
+}

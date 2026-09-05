@@ -169,12 +169,25 @@ mismatched entries fail closed to the commit-pinned source bootstrap.
 Binary publication is currently blocked: the resolved ARM64 FFmpeg binary was
 built with `--enable-nonfree`, and the FFprobe version is not normalized with
 FFmpeg. Until a redistributable checksum-pinned native media matrix is approved,
-the source bootstrap remains the available install path. Publication is also
+the source bootstrap remains the available install path. Unsigned CI packages
+are fully gated and then deleted; Actions uploads only gate JSON/log evidence,
+never the blocked DMG or EXE bytes. Publication is also
 blocked by the Windows signing policy until the deprecated electron-builder
 v26 Azure signing backend is migrated and production Artifact Signing values
 are approved. The packaged bootstrap rollback, cross-process lock, atomic
 staging, log redaction, and isolated first-run contracts are implemented and
 release-gated; they are no longer publication blockers.
+
+The requested Electron 43.6.0/electron-builder 26.16.0 update is also held by a
+fail-closed toolchain policy: the configured npm feed does not yet expose
+Electron 43.6.0, and electron-builder 26.16.0 is not a published npm version or
+upstream tag. The repository retains the last reproducibly locked patches
+rather than inventing dependency artifacts.
+
+Future binary publication additionally requires the repository immutable
+release setting and a protected clean-Mac acceptance run that applies
+quarantine, copies the app to `/Applications`, and launches it through
+LaunchServices.
 
 ### Windows 11 x64
 

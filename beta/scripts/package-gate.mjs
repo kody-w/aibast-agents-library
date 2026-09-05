@@ -692,9 +692,14 @@ function readNotarizationEvidence(evidencePath, expectedType) {
       rawLog = null;
     }
   }
-  const blockingIssues = (value.log?.issues || []).filter(
-    (issue) => String(issue.severity || "").toLowerCase() === "error",
-  );
+  const evidenceIssues = Array.isArray(value.log?.issues)
+    ? value.log.issues
+    : null;
+  const rawIssues = Array.isArray(rawLog?.issues)
+    ? rawLog.issues
+    : rawLog?.issues == null
+      ? []
+      : null;
   requirement(
     `${expectedType} notarization result is Accepted`,
     value.submission?.status === "Accepted" &&
@@ -711,9 +716,10 @@ function readNotarizationEvidence(evidencePath, expectedType) {
       value.log?.sha256 === logDigest &&
       rawLog?.status === "Accepted" &&
       rawLog?.sha256?.toLowerCase() === value.target?.submitted_sha256 &&
-      blockingIssues.length === 0,
+      evidenceIssues?.length === 0 &&
+      rawIssues?.length === 0,
     logExists
-      ? `${value.log?.name}; errors=${blockingIssues.length}`
+      ? `${value.log?.name}; issues=${evidenceIssues?.length ?? "invalid"}`
       : "missing log",
   );
   requirement(

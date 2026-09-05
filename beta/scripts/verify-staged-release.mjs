@@ -218,11 +218,15 @@ export function verifyStagedRelease({
       && (
         report.notarization?.app?.submission?.status !== "Accepted"
         || report.notarization?.app?.log?.status !== "Accepted"
+        || !Array.isArray(report.notarization?.app?.log?.issues)
+        || report.notarization.app.log.issues.length !== 0
         || report.notarization?.app?.stapled !== true
         || report.notarization?.app?.target?.code_signature?.ad_hoc !== false
         || !report.notarization?.app?.target?.code_signature?.timestamp
         || report.notarization?.dmg?.submission?.status !== "Accepted"
         || report.notarization?.dmg?.log?.status !== "Accepted"
+        || !Array.isArray(report.notarization?.dmg?.log?.issues)
+        || report.notarization.dmg.log.issues.length !== 0
         || report.notarization?.dmg?.stapled !== true
         || report.notarization?.dmg?.target?.code_signature?.ad_hoc !== false
         || !report.notarization?.dmg?.target?.code_signature?.timestamp
