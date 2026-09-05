@@ -229,10 +229,14 @@ def main() -> int:
     if not _wait_for_health(BASE_URL):
         print("[brainstem-tui] Server did not become healthy in time; "
               "falling back to raw log output.")
-        if server_process is not None:
-            if server_process.poll() is None:
-                server_process.wait()
-            return server_process.returncode or 1
+        if server_process is not None and server_process.poll() is None:
+            # The server may genuinely still be alive but stuck — don't block
+            # main() (and therefore install.sh's launch) forever waiting on it.
+            try:
+                server_process.terminate()
+                server_process.wait(timeout=5)
+            except Exception:
+                pass
         return 1
 
     app = BrainstemTUI(server_process=server_process)
@@ -243,16 +247,23 @@ def main() -> int:
         return 1
     finally:
         # Guaranteed cleanup regardless of how app.run() exits (clean quit,
-        # exception, or a terminal that reports a tty but can't actually
-        # render) — a crashed TUI must never leave an orphaned server holding
-        # the port.
+        # an exception here, or a crash inside a Textual worker/handler that
+        # app.run() swallows internally — see the return_code check below) —
+        # a crashed TUI must never leave an orphaned server holding the port.
         if server_process is not None and server_process.poll() is None:
             try:
                 server_process.terminate()
                 server_process.wait(timeout=5)
             except Exception:
                 pass
-    return 0
+
+    # Textual catches exceptions raised inside event handlers and thread
+    # workers internally (App._handle_exception) and lets app.run() return
+    # normally with app.return_code set, rather than re-raising — so a crash
+    # inside _send() (a thread worker, the core chat path) would otherwise
+    # look identical to a clean quit here. Propagate the real code so
+    # install.sh's fallback gate can tell them apart.
+    return app.return_code or 0
 
 
 if __name__ == "__main__":

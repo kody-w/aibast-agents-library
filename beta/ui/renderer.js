@@ -113,14 +113,19 @@ function setSurgeonOpen(open) {
   document.body.classList.toggle("surgeon-open", open);
   localStorage.setItem(surgeonOpenKey, open ? "open" : "closed");
   // When the herd (multi-pane) view is active, the single Surgeon panel sits
-  // behind it — focusing its textarea would silently steal keystrokes from
-  // a visible herd tile. Focus the herd's own active composer instead.
-  if (open && surgeonHerd) {
+  // behind it — focusing its textarea would silently steal keystrokes from a
+  // visible herd tile. Re-check surgeonHerd INSIDE the callback (not at call
+  // time): on the default page-load path this runs before enterSurgeonHerd()
+  // flips that flag, so checking it eagerly here would always pick the
+  // stale, now-hidden target for the exact scenario this exists to fix.
+  if (open) {
     setTimeout(() => {
-      surgeonGridEl?.querySelector(".herd-tile .hcomp textarea, .herd-tile .twin-comp textarea")?.focus();
+      if (surgeonHerd) {
+        surgeonGridEl?.querySelector(".herd-tile .hcomp textarea, .herd-tile .twin-comp textarea")?.focus();
+      } else {
+        surgeonInput.focus();
+      }
     }, 300);
-  } else if (open) {
-    setTimeout(() => surgeonInput.focus(), 300);
   }
 }
 
