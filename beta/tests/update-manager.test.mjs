@@ -29,6 +29,8 @@ test("packaged apps refuse the source-checkout updater explicitly", () => {
   assert.match(state.message, /new signed app package/);
   assert.match(state.detail, /disabled inside app\.asar/);
   assert.match(state.guidance, /preserves your existing BRAINSTEM_HOME/);
+  assert.equal(state.action, "download-package");
+  assert.equal(state.actionLabel, "Download latest signed package");
 });
 
 test("GitHub repository URLs support HTTPS and SSH remotes", () => {

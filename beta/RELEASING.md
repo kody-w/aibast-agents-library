@@ -41,6 +41,14 @@ new signed package; the source-checkout updater is not a binary updater.
 The gate also executes the Copilot platform binary from
 `app.asar.unpacked`; a logical ASAR path is not acceptable evidence.
 
+Windows publication is x64 NSIS only. The installer must remain per-user,
+non-elevating, launch after install, and preserve both Electron profile data and
+the external shared `BRAINSTEM_HOME` during uninstall. Windows CI must exercise
+a clean standard-user first launch and wait for the compatible Brainstem
+readiness gate before signing or publishing. ARM64 source bootstrap is expected
+to fail with the explicit x64 guidance until one complete architecture stack is
+supported.
+
 ## 2. Create the immutable tag
 
 Use a component-qualified tag because this repository ships more than one

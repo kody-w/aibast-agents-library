@@ -31,6 +31,7 @@ import {
 import {
   checkForUpdates,
   consumeUpdateResult,
+  PACKAGE_DOWNLOAD_URL,
   packagedUpdateState,
   prepareUpdate,
 } from "./update-manager.mjs";
@@ -41,6 +42,7 @@ import {
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const packageDir = path.resolve(dirname, "..");
+const APP_ID = "com.microsoft.aibast.rapp-brainstem-beta";
 // The blue-brain app icon (build/icon.png), used for the window, the dock, and
 // the taskbar so the running app never shows the default Electron icon. Packaged
 // builds pick up build/icon.icns / .ico / icons/ via package.json.
@@ -170,9 +172,10 @@ const BETA_FRAME_BRIDGE_SOURCE = `(() => {
     const checkButton = document.getElementById("beta-check-updates");
     if (checkButton) {
       checkButton.disabled = busy;
+      checkButton.dataset.updateAction = update.action || "check";
       checkButton.textContent = phase === "checking"
         ? "Checking GitHub..."
-        : "Check for updates";
+        : (update.actionLabel || "Check for updates");
     }
     const installButton = document.getElementById("beta-install-update");
     if (installButton) {
@@ -251,6 +254,12 @@ const BETA_FRAME_BRIDGE_SOURCE = `(() => {
       });
       checkButton?.addEventListener("click", (event) => {
         event.stopPropagation();
+        if (checkButton.dataset.updateAction === "download-package") {
+          window.parent.postMessage({
+            type: "rapp-beta:download-package",
+          }, "*");
+          return;
+        }
         renderBetaUpdate({
           phase: "checking",
           message: "Checking GitHub for updates...",
@@ -803,6 +812,11 @@ function openUpdatePanel() {
   }
 }
 
+async function openPackageDownload() {
+  await shell.openExternal(PACKAGE_DOWNLOAD_URL);
+  return { opened: PACKAGE_DOWNLOAD_URL };
+}
+
 function setUpdateState(update) {
   state.update = update;
   emitState();
@@ -917,12 +931,18 @@ async function handleInstallUpdate() {
 }
 
 function installApplicationMenu() {
-  const checkForUpdatesItem = {
-    id: "check-for-updates",
-    label: "Check for Updates...",
-    accelerator: "CmdOrCtrl+Shift+U",
-    click: () => void handleCheckForUpdates({ openPanel: true }),
-  };
+  const updateItem = app.isPackaged
+    ? {
+        id: "download-package",
+        label: "Download Latest Package...",
+        click: () => void openPackageDownload(),
+      }
+    : {
+        id: "check-for-updates",
+        label: "Check for Updates...",
+        accelerator: "CmdOrCtrl+Shift+U",
+        click: () => void handleCheckForUpdates({ openPanel: true }),
+      };
   const editMenu = {
     label: "Edit",
     submenu: [
@@ -956,7 +976,7 @@ function installApplicationMenu() {
           submenu: [
             { role: "about" },
             { type: "separator" },
-            checkForUpdatesItem,
+            updateItem,
             { type: "separator" },
             { role: "services" },
             { type: "separator" },
@@ -976,7 +996,7 @@ function installApplicationMenu() {
         editMenu,
         viewMenu,
         { role: "windowMenu" },
-        { label: "Help", submenu: [checkForUpdatesItem] },
+        { label: "Help", submenu: [updateItem] },
       ];
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
@@ -1113,6 +1133,10 @@ function registerIpc() {
       return handleInstallUpdate();
     },
   );
+  ipcMain.handle("beta:open-package-download", async (event) => {
+    assertTrustedIpc(event);
+    return openPackageDownload();
+  });
   ipcMain.handle("beta:surgeon-send", async (event, sessionId, prompt) => {
     assertTrustedIpc(event);
     return ensureBrainSurgeon(sessionId).send(prompt);
@@ -1317,6 +1341,8 @@ const hasLock = app.requestSingleInstanceLock();
 if (!hasLock) {
   app.quit();
 } else {
+  app.setAppUserModelId(APP_ID);
+
   const initializeStatefulRuntime = () => {
     copilot = new CopilotRuntime({
       tokenFile: path.join(config.brainstemDir, ".copilot_token"),

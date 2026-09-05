@@ -357,6 +357,48 @@ test("Windows invocation also pins the same immutable commit", () => {
   );
 });
 
+test("Windows packaged first launch provisions then verifies as the user", async () => {
+  const root = scratch("windows-first-launch");
+  const brainstemHome = path.join(root, "user-brainstem");
+  const bundleDirectory = path.join(root, "bootstrap");
+  writeBundle(bundleDirectory);
+  let inspections = 0;
+  let invocation;
+  const phases = [];
+  const provisioner = new BrainstemProvisioner({
+    config: config(brainstemHome),
+    isPackaged: true,
+    bootstrapDirectory: bundleDirectory,
+    env: {
+      USERPROFILE: String.raw`C:\Users\standard`,
+      PATH: String.raw`C:\Windows\System32`,
+    },
+    platform: "win32",
+    inspectRuntime: async () => {
+      inspections += 1;
+      return inspections >= 3
+        ? { ready: true, issues: [] }
+        : { ready: false, issues: ["runtime missing"] };
+    },
+    runInstaller: async (request) => {
+      invocation = request.invocation;
+      return { code: 0, signal: null };
+    },
+    onState: (state) => phases.push(state.phase),
+  });
+
+  const result = await provisioner.ensure();
+  assert.equal(result.provisioned, true);
+  assert.equal(inspections, 3);
+  assert.equal(invocation.command, "powershell.exe");
+  assert.ok(invocation.args.includes("-NonInteractive"));
+  assert.ok(invocation.args.includes("--runtime-only"));
+  assert.ok(invocation.args.includes("--no-launch"));
+  assert.equal(invocation.env.BRAINSTEM_HOME, brainstemHome);
+  assert.equal(invocation.env.USERPROFILE, String.raw`C:\Users\standard`);
+  assert.deepEqual(phases, ["checking", "provisioning", "verifying"]);
+});
+
 test("commit provenance gate kills a permissive-regex mutant", async () => {
   const invalid = provenance("moving-main").manifest;
   const gate = (validate) => {

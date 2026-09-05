@@ -25,6 +25,7 @@
     "test": "node --test",
     "prepare:bootstrap": "node scripts/prepare-package-bootstrap.mjs",
     "dist:mac": "npm run prepare:bootstrap && electron-builder --mac dmg zip --arm64 --publish never",
+    "dist:win": "npm run prepare:bootstrap && electron-builder --win nsis --x64 --publish never",
     "package:gate": "node scripts/package-gate.mjs"
   },
   "dependencies": {
@@ -107,7 +108,26 @@
       "artifactName": "${productName}-${version}-mac-${arch}.${ext}"
     },
     "win": {
-      "icon": "build/icon.ico"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-${version}-windows-x64-setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true
     },
     "linux": {
       "icon": "build/icons"

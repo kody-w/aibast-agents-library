@@ -221,10 +221,54 @@ test("packaged smoke requires real service readiness in an isolated home", () =>
 test("packaged updater refuses the source-checkout path inside app.asar", () => {
   assert.match(main, /if \(app\.isPackaged\)[\s\S]*packagedUpdateState\(\)/);
   assert.match(main, /if \(!app\.isPackaged\) loadPendingUpdateResult\(\)/);
+  assert.match(main, /Download Latest Package\.\.\./);
+  assert.match(main, /beta:open-package-download/);
+  assert.match(main, /rapp-beta:download-package/);
+  assert.match(preload, /openPackageDownload/);
+  assert.match(renderer, /rapp-beta:download-package/);
   assert.match(
     readFileSync(path.join(root, "electron", "update-manager.mjs"), "utf8"),
     /source-checkout updater is disabled inside app\.asar/,
   );
+});
+
+test("Windows package is x64 per-user NSIS and preserves user data", () => {
+  assert.match(packageJson.scripts["dist:win"], /--win nsis --x64/);
+  assert.deepEqual(packageJson.build.win.target, [{
+    target: "nsis",
+    arch: ["x64"],
+  }]);
+  assert.match(packageJson.build.win.artifactName, /windows-x64-setup/);
+  assert.equal(packageJson.build.nsis.oneClick, false);
+  assert.equal(packageJson.build.nsis.perMachine, false);
+  assert.equal(packageJson.build.nsis.allowElevation, false);
+  assert.equal(packageJson.build.nsis.deleteAppDataOnUninstall, false);
+  assert.equal(packageJson.build.nsis.runAfterFinish, true);
+});
+
+test("Windows AppUserModelID is set before any window can be created", () => {
+  const lock = main.indexOf("const hasLock = app.requestSingleInstanceLock()");
+  const appId = main.indexOf("app.setAppUserModelId(APP_ID)", lock);
+  const secondInstance = main.indexOf('app.on("second-instance"', lock);
+  const ready = main.indexOf("app.whenReady().then", lock);
+  assert.ok(lock >= 0);
+  assert.ok(appId > lock);
+  assert.ok(appId < secondInstance);
+  assert.ok(appId < ready);
+  assert.match(main, /const APP_ID = "com\.microsoft\.aibast\.rapp-brainstem-beta"/);
+  assert.equal(packageJson.build.appId, "com.microsoft.aibast.rapp-brainstem-beta");
+});
+
+test("Windows ARM64 source bootstrap fails instead of mixing architectures", () => {
+  for (const bootstrap of [windows, frontierWindows]) {
+    assert.match(bootstrap, /PROCESSOR_ARCHITECTURE/);
+    assert.match(bootstrap, /PROCESSOR_ARCHITEW6432/);
+    assert.match(bootstrap, /Windows ARM64 is not a native/);
+    assert.match(bootstrap, /x64 Windows 11/);
+  }
+  assert.match(windows, /set "NODE_PLATFORM=win-x64"/);
+  assert.doesNotMatch(windows, /NODE_PLATFORM=win-arm64/);
+  assert.match(rootWindows, /winget install --id \$PackageId --scope user/);
 });
 
 test("root installers expose a non-launching commit-pinned runtime mode", () => {

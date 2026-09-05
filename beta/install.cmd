@@ -30,6 +30,17 @@ echo RAPP Brainstem Frontier Launcher
 echo Skill Recorder-style desktop launch over the shared global Brainstem
 echo.
 
+set "WINDOWS_ARM64=0"
+if /i "%PROCESSOR_ARCHITECTURE%"=="ARM64" set "WINDOWS_ARM64=1"
+if /i "%PROCESSOR_ARCHITEW6432%"=="ARM64" set "WINDOWS_ARM64=1"
+if "%WINDOWS_ARM64%"=="1" (
+  echo [X] Windows ARM64 is not a native Frontier target.
+  echo     The source bootstrap will not mix ARM64 Node with x64-only Electron
+  echo     or media binaries. Use an x64 Windows 11 device or x64 virtual
+  echo     machine, then run the installer again.
+  exit /b 1
+)
+
 if defined REPO_COMMIT (
   powershell.exe -NoProfile -Command "if ($env:BRAINSTEM_BETA_COMMIT -notmatch '^[0-9a-fA-F]{40}$') { exit 1 }"
   if errorlevel 1 (
@@ -143,7 +154,6 @@ if exist "%BETA_SOURCE%\solutions" (
 echo [OK] Beta checkout excludes the solution library.
 
 set "NODE_PLATFORM=win-x64"
-if /i "%PROCESSOR_ARCHITECTURE%"=="ARM64" set "NODE_PLATFORM=win-arm64"
 set "NODE_ARCHIVE=node-v%NODE_VERSION%-%NODE_PLATFORM%.zip"
 set "NODE_DIR=%BETA_HOME%\node-v%NODE_VERSION%-%NODE_PLATFORM%"
 set "CACHE=%BETA_HOME%\cache"

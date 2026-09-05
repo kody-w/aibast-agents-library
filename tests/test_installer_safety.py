@@ -422,6 +422,7 @@ def test_windows_repair_and_port_paths_match_safety_contract():
     assert '$VENV_DIR = "$BRAINSTEM_HOME\\venv"' in text
     assert "--runtime-only" in text
     assert "Checked out immutable commit" in text
+    assert "winget install --id $PackageId --scope user" in text
 
 
 def test_documented_installer_mirrors_are_byte_identical():

@@ -61,6 +61,10 @@ window.addEventListener("message", async (event) => {
     await window.brainstemBeta.installUpdate();
     return;
   }
+  if (type === "rapp-beta:download-package") {
+    await window.brainstemBeta.openPackageDownload();
+    return;
+  }
   if (type === "rapp-beta:toggle-explorer") {
     setExplorerOpen(!explorer.classList.contains("open"));
     return;

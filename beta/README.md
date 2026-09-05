@@ -154,13 +154,22 @@ the latest `brainstem-beta-v*` release from the fork serving it, so staging and
 production remain separate. If that release includes packaged `.exe` or `.dmg`
 assets, the page lists them automatically ahead of the source bootstrap.
 
-### Windows 11
+### Windows 11 x64
 
 Run this in PowerShell:
 
 ```powershell
 irm https://microsoft.github.io/aibast-agents-library/beta/frontier.ps1 | iex
 ```
+
+Published Windows binaries are x64, per-user NSIS installers. They launch
+Frontier without elevation; first launch provisions the shared Brainstem under
+the user's `BRAINSTEM_HOME`, then waits for compatible backend and agent-load
+evidence before showing chat as ready.
+
+Windows ARM64 is not claimed as a native target. The source bootstrap fails
+with guidance rather than mixing ARM64 Node with x64-only Electron or media
+binaries. Use an x64 Windows 11 device or x64 virtual machine for this preview.
 
 ### macOS or Linux
 
@@ -299,6 +308,11 @@ Release procedure and source-only publication rules are documented in
 ## Uninstall the launcher
 
 Removing Frontier does not remove the shared Brainstem or user data.
+
+The Windows NSIS uninstaller is per-user and intentionally leaves Electron
+profile data and `%USERPROFILE%\.brainstem` intact. Remove those separately
+only when you explicitly want to delete agents, memories, recordings, and
+authentication state.
 
 ```bash
 rm -rf ~/.brainstem/beta-launcher
