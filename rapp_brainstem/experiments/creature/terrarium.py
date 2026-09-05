@@ -263,7 +263,7 @@ def apply_auth_reference(environment, reference, independent=False):
     environment["GITHUB_TOKEN"] = token
 
 
-def wait_for_brainstem(port, process, timeout=100):
+def wait_for_brainstem(port, process, expected_soul, timeout=100):
     deadline = time.monotonic() + timeout
     last_error = "not listening yet"
     while time.monotonic() < deadline:
@@ -273,8 +273,12 @@ def wait_for_brainstem(port, process, timeout=100):
             status, raw = local_request(port, "/health", timeout=3)
             health = json.loads(raw)
             if status == 200 and health.get("status") in {"ok", "unauthenticated"}:
+                if health.get("soul") != str(expected_soul):
+                    raise TerrariumError("Another Brainstem answered on the selected port; no creature action was sent.")
                 return health
             last_error = f"HTTP {status}: {health.get('status', 'invalid health')}"
+        except TerrariumError:
+            raise
         except (OSError, ValueError) as exc:
             last_error = str(exc)
         time.sleep(0.4)
@@ -315,7 +319,7 @@ def serve(root, config, independent_auth=False):
         with (logs / "brainstem.log").open("ab") as log:
             os.chmod(log.name, 0o600)
             process = subprocess.Popen([str(python), str(kernel)], cwd=runtime, env=environment, stdout=log, stderr=subprocess.STDOUT)
-            health = wait_for_brainstem(config["brainstem_port"], process)
+            health = wait_for_brainstem(config["brainstem_port"], process, root / "creature-soul.md")
             print(f"RAPP Brainstem terrarium: http://127.0.0.1:{config['ui_port']}", flush=True)
             print(f"Brainstem: http://127.0.0.1:{config['brainstem_port']} ({health['status']})", flush=True)
             print(f"Agent files: {root / 'agents'}", flush=True)

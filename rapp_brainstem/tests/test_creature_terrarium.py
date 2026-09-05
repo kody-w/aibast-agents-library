@@ -316,3 +316,17 @@ def test_refresh_control_recovers_after_action_finishes():
         "state.busy = false; renderReadState(); assert.equal(elements.refresh.disabled, false);"
     )
     subprocess.run([node, "-e", program], check=True, capture_output=True, text=True)
+
+
+def test_startup_refuses_a_different_brainstem_on_a_racing_port(monkeypatch, tmp_path):
+    process = type("Process", (), {"poll": lambda self: None})()
+    monkeypatch.setattr(view, "local_request", lambda *args, **kwargs: (
+        200, b'{"status":"ok","soul":"/another/brainstem/soul.md"}'
+    ))
+    with pytest.raises(view.TerrariumError, match="Another Brainstem"):
+        view.wait_for_brainstem(7081, process, tmp_path / "creature-soul.md")
+    expected = tmp_path / "creature-soul.md"
+    monkeypatch.setattr(view, "local_request", lambda *args, **kwargs: (
+        200, json.dumps({"status": "unauthenticated", "soul": str(expected)}).encode()
+    ))
+    assert view.wait_for_brainstem(7081, process, expected)["status"] == "unauthenticated"
