@@ -162,6 +162,37 @@ test("dedicated beta page uses the Download Center details structure", () => {
     installerPage,
     new RegExp(`Windows 11[^"<\\n]*${unsupportedWindowsArchitecture}`, "i"),
   );
+  assert.match(installerPage, /<noscript>[\s\S]*id="no-js-download"/);
+  assert.match(installerPage, /href="frontier\.ps1"/);
+  assert.match(installerPage, /href="frontier\.sh"/);
+  assert.match(
+    installerPage,
+    /id="source-link"\s+href="https:\/\/github\.com\/microsoft\/aibast-agents-library\/tree\/main\/beta"/,
+  );
+  assert.match(
+    installerPage,
+    /id="release-link-top"\s+href="https:\/\/github\.com\/microsoft\/aibast-agents-library\/releases"/,
+  );
+  for (const id of [
+    "source-link",
+    "release-link-top",
+    "release-link-bottom",
+    "windows-script",
+    "unix-script",
+  ]) {
+    const openingTag = installerPage.match(
+      new RegExp(`<a(?=[^>]*id="${id}")[^>]*>`),
+    )?.[0];
+    assert.ok(openingTag, `${id} opening tag is missing`);
+    assert.doesNotMatch(openingTag, /href="#"/);
+  }
+  for (const id of ["panel-requirements", "panel-install", "panel-additional"]) {
+    const openingTag = installerPage.match(
+      new RegExp(`<div\\s+class="accordion-panel"\\s+id="${id}"[\\s\\S]*?>`),
+    )?.[0];
+    assert.ok(openingTag, `${id} opening tag is missing`);
+    assert.doesNotMatch(openingTag, /\shidden(?:\s|>)/);
+  }
   assert.match(installerPage, /RAPP-Brainstem-Frontier-Windows\.ps1/);
   assert.match(installerPage, /RAPP-Brainstem-Frontier-macOS-Linux\.sh/);
   assert.match(installerPage, /release\.assets/);

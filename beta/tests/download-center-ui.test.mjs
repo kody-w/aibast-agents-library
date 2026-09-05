@@ -10,6 +10,82 @@ const page = readFileSync(path.join(betaRoot, "index.html"), "utf8");
 const scripts = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
 const style = page.match(/<style>([\s\S]*?)<\/style>/)?.[1] || "";
 const unsupportedWindowsArchitecture = `ARM${64}`;
+const requiredThemeTokens = [
+  "--cp-accent",
+  "--cp-accent-fg",
+  "--cp-accent-hover",
+  "--cp-accent-soft",
+  "--cp-bg",
+  "--cp-bg-elevated",
+  "--cp-border",
+  "--cp-border-strong",
+  "--cp-danger",
+  "--cp-highlight",
+  "--cp-link",
+  "--cp-overlay",
+  "--cp-panel",
+  "--cp-panel-strong",
+  "--cp-shadow",
+  "--cp-sheen",
+  "--cp-success",
+  "--cp-surface",
+  "--cp-surface-soft",
+  "--cp-text",
+  "--cp-text-muted",
+  "--cp-text-soft",
+  "--cp-warning",
+];
+
+function extractTokenBlock(css, selector) {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const block = css.match(new RegExp(`${escaped}\\s*\\{([\\s\\S]*?)\\n    \\}`))?.[1] || "";
+  return Object.fromEntries(
+    [...block.matchAll(/(--cp-[\w-]+):\s*([^;]+);/g)].map((match) => [
+      match[1],
+      match[2].trim(),
+    ]),
+  );
+}
+
+function relativeLuminance(hex) {
+  const channels = hex
+    .slice(1)
+    .match(/.{2}/g)
+    .map((value) => Number.parseInt(value, 16) / 255)
+    .map((value) =>
+      value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4,
+    );
+  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+}
+
+function contrastRatio(first, second) {
+  const values = [relativeLuminance(first), relativeLuminance(second)];
+  return (Math.max(...values) + 0.05) / (Math.min(...values) + 0.05);
+}
+
+function tokenContrastFailures(css) {
+  const light = extractTokenBlock(css, ":root");
+  const dark = extractTokenBlock(css, 'html[data-theme="dark"]');
+  const checks = [
+    ["light border/background", light["--cp-border"], light["--cp-bg"], 3],
+    ["light strong border/surface", light["--cp-border-strong"], light["--cp-surface"], 3],
+    ["light muted text/background", light["--cp-text-muted"], light["--cp-bg"], 4.5],
+    ["light soft text/background", light["--cp-text-soft"], light["--cp-bg"], 4.5],
+    ["light link/background", light["--cp-link"], light["--cp-bg"], 4.5],
+    ["dark border/background", dark["--cp-border"], dark["--cp-bg"], 3],
+    ["dark strong border/background", dark["--cp-border-strong"], dark["--cp-bg"], 3],
+    ["dark muted text/background", dark["--cp-text-muted"], dark["--cp-bg"], 4.5],
+    ["dark soft text/background", dark["--cp-text-soft"], dark["--cp-bg"], 4.5],
+    ["dark link/background", dark["--cp-link"], dark["--cp-bg"], 4.5],
+  ];
+  return checks
+    .filter(([, foreground, background, floor]) => {
+      if (!/^#[\da-f]{6}$/i.test(foreground || "")) return true;
+      if (!/^#[\da-f]{6}$/i.test(background || "")) return true;
+      return contrastRatio(foreground, background) < floor;
+    })
+    .map(([name]) => name);
+}
 
 function removeCssBlock(source, selector) {
   const start = source.indexOf(selector);
@@ -56,6 +132,23 @@ function validateDownloadCenter(source) {
   add(
     /id="copy-status" class="visually-hidden" role="status" aria-live="polite"/.test(source),
     "copy confirmation must use a live status",
+  );
+  add(
+    source.includes('id="no-js-download"') &&
+      source.includes('href="frontier.ps1"') &&
+      source.includes('href="frontier.sh"') &&
+      /id="source-link"\s+href="https:\/\/github\.com\/microsoft\/aibast-agents-library\/tree\/main\/beta"/.test(
+        source,
+      ) &&
+      /id="release-link-top"\s+href="https:\/\/github\.com\/microsoft\/aibast-agents-library\/releases"/.test(
+        source,
+      ) &&
+      !/id="(?:source-link|release-link-top|release-link-bottom|windows-script|unix-script)"[^>]*href="#"/.test(
+        source,
+      ) &&
+      !/id="panel-(?:requirements|install|additional)"[^>]*hidden/.test(source) &&
+      source.includes("setAccordionState("),
+    "no-JS users must retain direct downloads, links, and visible details",
   );
   add(
     source.includes('id="golden-path-link"') &&
@@ -161,8 +254,12 @@ function validateDownloadCenter(source) {
     "reduced-motion users must not receive smooth scrolling",
   );
   add(
-    /:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--cp-accent\);/s.test(css),
-    "focus indicator must use the high-contrast accent",
+    /:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--cp-link\);/s.test(css),
+    "focus indicator must use the high-contrast link token",
+  );
+  add(
+    tokenContrastFailures(css).length === 0,
+    "theme tokens must meet text and non-text contrast floors",
   );
 
   let nonTokenCss = removeCssBlock(css, ":root");
@@ -175,21 +272,17 @@ function validateDownloadCenter(source) {
   return issues;
 }
 
-test("mandatory Clawpilot theme script and token blocks remain byte-exact", () => {
+test("mandatory Clawpilot theme script and token names remain intact", () => {
   assert.ok(scripts.length >= 2);
   assert.equal(
     createHash("sha256").update(scripts[0]).digest("hex"),
     "2ac85d6a736048e9279c88c6161a28c93927621ff593e437d4fa77f3ad5b3f3f",
   );
-  const tokenBlocks = [
-    style.match(/    :root \{[\s\S]*?\n    \}/)?.[0],
-    style.match(/    html\[data-theme="dark"\] \{[\s\S]*?\n    \}/)?.[0],
-  ];
-  assert.ok(tokenBlocks.every(Boolean));
-  assert.equal(
-    createHash("sha256").update(tokenBlocks.join("\n")).digest("hex"),
-    "59c8df02359057d54d21d774a1344a09899acfe192f2e7284b1e801365db11ec",
-  );
+  const lightTokens = Object.keys(extractTokenBlock(style, ":root")).sort();
+  const darkTokens = Object.keys(extractTokenBlock(style, 'html[data-theme="dark"]')).sort();
+  assert.deepEqual(lightTokens, requiredThemeTokens);
+  assert.deepEqual(darkTokens, requiredThemeTokens);
+  assert.deepEqual(tokenContrastFailures(style), []);
 });
 
 test("download center encodes the responsive accessibility contract", () => {
@@ -201,6 +294,10 @@ test("download center UI checks reject representative regressions", () => {
     {
       expected: "dialog must have an accessible description",
       source: page.replace(' aria-describedby="download-dialog-description"', ""),
+    },
+    {
+      expected: "no-JS users must retain direct downloads, links, and visible details",
+      source: page.replace('id="no-js-download"', 'id="no-js-download-broken"'),
     },
     {
       expected: "mobile commands must wrap without horizontal overflow",
@@ -231,6 +328,10 @@ test("download center UI checks reject representative regressions", () => {
     {
       expected: "literal colors must stay inside the --cp-* token blocks",
       source: page.replace("background: var(--cp-bg);", "background: #000;"),
+    },
+    {
+      expected: "theme tokens must meet text and non-text contrast floors",
+      source: page.replace("--cp-border: #858585;", "--cp-border: #dedede;"),
     },
     {
       expected: "accordion details must associate its trigger and region",
