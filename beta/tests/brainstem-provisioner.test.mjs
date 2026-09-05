@@ -235,7 +235,10 @@ test("runtime dependency probe receives the isolated BRAINSTEM_HOME", async () =
   });
   assert.equal(result.ready, true);
   assert.equal(probedHome, brainstemHome);
-  assert.equal(probedSource, "/isolated/brainstem/src/rapp_brainstem/brainstem.py");
+  assert.equal(
+    probedSource,
+    path.join(brainstemHome, "src", "rapp_brainstem", "brainstem.py"),
+  );
   assert.match(PYTHON_READINESS_SCRIPT, /sys\.version_info < required/);
   assert.match(PYTHON_READINESS_SCRIPT, /compile\(source/);
 });
@@ -366,7 +369,10 @@ test("packaged provisioning runs the pinned runtime-only installer then verifies
   const result = await provisioner.ensure();
   assert.equal(result.provisioned, true);
   assert.equal(result.commit, COMMIT);
-  assert.equal(invocation.command, "/bin/bash");
+  assert.equal(
+    invocation.command,
+    process.platform === "win32" ? "powershell.exe" : "/bin/bash",
+  );
   assert.deepEqual(invocation.args.slice(-4), [
     "--runtime-only",
     "--no-launch",
@@ -642,7 +648,12 @@ test("installer logs scrub credential canaries", async () => {
   const provisioner = new BrainstemProvisioner({
     config: config(path.join(root, "brainstem")),
   });
-  const result = await provisioner.runInstaller({
+  const canaryOutput = [
+    "GITHUB_TOKEN=ghp_CanarySecret123456",
+    "Authorization: bearerCanary123456",
+    "https://alice:supersecret@example.test/path",
+  ].join("\n");
+  const unixInvocation = {
     command: "/bin/bash",
     args: [
       "-c",
@@ -651,7 +662,15 @@ test("installer logs scrub credential canaries", async () => {
         + "'https://alice:supersecret@example.test/path'",
     ],
     env: process.env,
-  }, bundle, logPath);
+  };
+  const invocation = process.platform === "win32"
+    ? {
+        command: process.execPath,
+        args: ["-e", `process.stderr.write(${JSON.stringify(canaryOutput)})`],
+        env: process.env,
+      }
+    : unixInvocation;
+  const result = await provisioner.runInstaller(invocation, bundle, logPath);
   assert.equal(result.code, 0);
   const log = readFileSync(logPath, "utf8");
   for (const secret of [

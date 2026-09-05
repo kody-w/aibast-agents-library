@@ -90,7 +90,7 @@ test("JSON redaction gate kills a sensitive-key mutation", async () => {
   gate(scrubSecrets);
 
   const sourcePath = path.join(betaDir, "electron", "safe-log.mjs");
-  const original = readFileSync(sourcePath, "utf8");
+  const original = readFileSync(sourcePath, "utf8").replace(/\r\n/g, "\n");
   const target = `function sensitiveKey(key) {
   return SENSITIVE_KEYS.has(
     String(key || "").toLowerCase().replace(/[^a-z0-9]/g, ""),
