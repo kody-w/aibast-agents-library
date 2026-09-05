@@ -10,6 +10,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  realpathSync,
   readdirSync,
   readFileSync,
   rmSync,
@@ -25,6 +26,7 @@ import {
   inspectBrainstemRuntime,
   loadBootstrapBundle,
   PYTHON_READINESS_SCRIPT,
+  terminateWindowsProcessTree,
   validateBootstrapProvenance,
 } from "../electron/brainstem-provisioner.mjs";
 import { provisioningLockPath } from "../electron/provision-lock.mjs";
@@ -382,7 +384,8 @@ test("packaged provisioning runs the pinned runtime-only installer then verifies
   assert.match(invocation.env.BRAINSTEM_VERSION_URL, new RegExp(COMMIT));
   assert.equal(inspections, 4);
   assert.equal(existsSync(brainstemHome), true);
-  assert.equal(existsSync(stageHome), false);
+  assert.equal(existsSync(stageHome), true);
+  assert.equal(realpathSync(brainstemHome), realpathSync(stageHome));
   assert.deepEqual(
     states.map((state) => state.phase),
     ["checking", "provisioning", "verifying"],
@@ -486,6 +489,41 @@ test("a target created during staging is preserved and never overwritten", async
   assert.equal(
     readFileSync(path.join(brainstemHome, "manual-owner"), "utf8"),
     "preserve me",
+  );
+  assert.equal(existsSync(stageHome), false);
+});
+
+test("atomic activation never replaces a target created after the final check", async () => {
+  const root = scratch("activation-no-replace");
+  const brainstemHome = path.join(root, "brainstem");
+  const bundleDirectory = path.join(root, "bootstrap");
+  writeBundle(bundleDirectory);
+  let stageHome;
+  const provisioner = new BrainstemProvisioner({
+    config: config(brainstemHome),
+    isPackaged: true,
+    bootstrapDirectory: bundleDirectory,
+    inspectRuntime: async (runtimeConfig) => ({
+      ready: runtimeConfig.brainstemHome !== brainstemHome,
+      issues: runtimeConfig.brainstemHome === brainstemHome ? ["absent"] : [],
+    }),
+    runInstaller: async (request) => {
+      stageHome = request.stageHome;
+      return { code: 0, signal: null };
+    },
+    beforeActivate: async () => {
+      mkdirSync(brainstemHome);
+      writeFileSync(path.join(brainstemHome, "race-winner"), "preserve");
+    },
+  });
+
+  await assert.rejects(
+    provisioner.ensure(),
+    /appeared immediately before activation[\s\S]*existing target was preserved/,
+  );
+  assert.equal(
+    readFileSync(path.join(brainstemHome, "race-winner"), "utf8"),
+    "preserve",
   );
   assert.equal(existsSync(stageHome), false);
 });
@@ -637,6 +675,7 @@ test("cancellation terminates the installer process group and grandchild", {
   const marker = path.join(root, "grandchild.pid");
   const provisioner = new BrainstemProvisioner({
     config: config(path.join(root, "brainstem")),
+    terminationGraceMs: 50,
   });
   const running = provisioner.runInstaller({
     command: process.execPath,
@@ -657,6 +696,34 @@ test("cancellation terminates the installer process group and grandchild", {
   await provisioner.stop();
   await running;
   assert.equal(await waitFor(() => !processExists(grandchildPid)), true);
+});
+
+test("Windows taskkill failure is surfaced after direct-child fallback", async () => {
+  const direct = [];
+  await assert.rejects(
+    terminateWindowsProcessTree(4242, {
+      runTaskkill: async () => {
+        throw new Error("access denied");
+      },
+      killDirect: (pid) => direct.push(pid),
+    }),
+    /taskkill could not terminate installer PID 4242[\s\S]*fallback was attempted/,
+  );
+  assert.deepEqual(direct, [4242]);
+});
+
+test("Windows taskkill success does not use direct-child fallback", async () => {
+  let directCalls = 0;
+  await terminateWindowsProcessTree(4343, {
+    runTaskkill: async (command, args) => {
+      assert.equal(command, "taskkill.exe");
+      assert.deepEqual(args, ["/pid", "4343", "/t", "/f"]);
+    },
+    killDirect: () => {
+      directCalls += 1;
+    },
+  });
+  assert.equal(directCalls, 0);
 });
 
 test("Windows invocation also pins the same immutable commit", () => {
@@ -735,6 +802,7 @@ test("Windows packaged first launch provisions then verifies as the user", async
   assert.notEqual(stageHome, brainstemHome);
   assert.equal(invocation.env.USERPROFILE, String.raw`C:\Users\standard`);
   assert.equal(existsSync(brainstemHome), true);
+  assert.equal(realpathSync(brainstemHome), realpathSync(stageHome));
   assert.deepEqual(phases, ["checking", "provisioning", "verifying"]);
 });
 

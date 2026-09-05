@@ -345,7 +345,7 @@ main --runtime-only
 def test_generated_unix_launcher_honors_custom_home_and_bin(tmp_path):
     real_home = tmp_path / "real-home"
     brainstem_home = tmp_path / "custom-brainstem"
-    brainstem_bin = tmp_path / "custom-bin"
+    brainstem_bin = tmp_path / "custom bin"
     runtime = brainstem_home / "src/rapp_brainstem"
     python = brainstem_home / "venv/bin/python"
     marker = tmp_path / "launched"
@@ -388,6 +388,24 @@ install_cli
     assert marker.read_text(encoding="utf-8").strip() == (
         f"{runtime}|{brainstem_home}|brainstem.py hello"
     )
+    resolved = subprocess.run(
+        [
+            "bash",
+            "-c",
+            'source "$1"; command -v brainstem',
+            "profile-check",
+            str(real_home / ".bashrc"),
+        ],
+        env={
+            **environment,
+            "PATH": "/usr/bin:/bin",
+        },
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert resolved.returncode == 0, resolved.stderr
+    assert resolved.stdout.strip() == str(launcher)
 
 
 def test_brainstem_home_environment_is_respected_at_initialization(tmp_path):

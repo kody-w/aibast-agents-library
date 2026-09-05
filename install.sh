@@ -811,14 +811,17 @@ WRAPPER
 
     chmod +x "$BRAINSTEM_BIN/brainstem"
 
+    local installed_bin_q
+    printf -v installed_bin_q '%q' "$BRAINSTEM_BIN"
     add_to_path() {
         local file="$1"
         # Create shell config if it doesn't exist (common on fresh macOS)
         touch "$file"
-        if ! grep -q '\.local/bin' "$file" 2>/dev/null; then
+        local path_line="export PATH=${installed_bin_q}:\$PATH"
+        if ! grep -Fq "$path_line" "$file" 2>/dev/null; then
             echo '' >> "$file"
             echo '# RAPP Brainstem' >> "$file"
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$file"
+            echo "$path_line" >> "$file"
         fi
     }
     add_to_path "$HOME/.bashrc"

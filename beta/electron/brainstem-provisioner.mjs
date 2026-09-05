@@ -7,8 +7,9 @@ import {
   mkdirSync,
   openSync,
   readFileSync,
-  renameSync,
   rmSync,
+  symlinkSync,
+  unlinkSync,
   writeSync,
 } from "node:fs";
 import path from "node:path";
@@ -396,14 +397,32 @@ function manualRepairError(config, inspection) {
   );
 }
 
-async function terminateWindowsTree(pid) {
+export async function terminateWindowsProcessTree(
+  pid,
+  {
+    killDirect = (processId) => process.kill(processId, "SIGTERM"),
+    runTaskkill = execFileAsync,
+  } = {},
+) {
   try {
-    await execFileAsync(
+    await runTaskkill(
       "taskkill.exe",
       ["/pid", String(pid), "/t", "/f"],
       { windowsHide: true },
     );
-  } catch {}
+    return;
+  } catch (error) {
+    let fallback = "Direct-child fallback was attempted.";
+    try {
+      killDirect(pid);
+    } catch (fallbackError) {
+      fallback = `Direct-child fallback also failed: ${message(fallbackError)}.`;
+    }
+    throw new Error(
+      `Windows taskkill could not terminate installer PID ${pid}: `
+      + `${message(error)} ${fallback}`,
+    );
+  }
 }
 
 function signalUnixTree(pid, signal) {
@@ -411,6 +430,15 @@ function signalUnixTree(pid, signal) {
     process.kill(-pid, signal);
   } catch (error) {
     if (error?.code !== "ESRCH") throw error;
+  }
+}
+
+function unixProcessGroupExists(pid) {
+  try {
+    process.kill(-pid, 0);
+    return true;
+  } catch (error) {
+    return error?.code === "EPERM";
   }
 }
 
@@ -434,8 +462,11 @@ export class BrainstemProvisioner {
     sleep = wait,
     pathExists = pathEntryExists,
     makeDirectory = mkdirSync,
-    move = renameSync,
+    link = symlinkSync,
     remove = rmSync,
+    unlink = unlinkSync,
+    beforeActivate = async () => {},
+    terminationGraceMs = 500,
   } = {}) {
     this.config = config;
     this.isPackaged = isPackaged;
@@ -456,9 +487,14 @@ export class BrainstemProvisioner {
     this.sleep = sleep;
     this.pathExists = pathExists;
     this.makeDirectory = makeDirectory;
-    this.move = move;
+    this.link = link;
     this.remove = remove;
+    this.unlink = unlink;
+    this.beforeActivate = beforeActivate;
+    this.terminationGraceMs = terminationGraceMs;
     this.child = null;
+    this.processGroupId = null;
+    this.installerPid = null;
     this.ensurePromise = null;
     this.lockLease = null;
     this.stopped = false;
@@ -633,15 +669,33 @@ export class BrainstemProvisioner {
         );
       }
 
-      this.move(stageHome, this.config.brainstemHome);
       const activatedStage = stageHome;
-      stageHome = null;
+      await this.beforeActivate({
+        stageHome,
+        targetHome: this.config.brainstemHome,
+      });
+      try {
+        this.link(
+          stageHome,
+          this.config.brainstemHome,
+          this.platform === "win32" ? "junction" : "dir",
+        );
+        stageHome = null;
+      } catch (error) {
+        if (error?.code === "EEXIST") {
+          throw new Error(
+            `BRAINSTEM_HOME appeared immediately before activation: ${
+              this.config.brainstemHome
+            }. The staged runtime was discarded and the existing target was preserved.`,
+          );
+        }
+        throw error;
+      }
       const activated = await this.inspectRuntime(this.config);
       this.assertRunning();
       if (!activated.ready) {
-        const rollback = `${activatedStage}.rollback`;
-        this.move(this.config.brainstemHome, rollback);
-        this.remove(rollback, { recursive: true, force: true });
+        this.unlink(this.config.brainstemHome);
+        this.remove(activatedStage, { recursive: true, force: true });
         throw new Error(
           "Activated Brainstem failed its final readiness check and was rolled "
           + `back to an absent target: ${activated.issues.join(" ")} Reopen `
@@ -660,6 +714,7 @@ export class BrainstemProvisioner {
       }
       lease.release();
       if (this.lockLease === lease) this.lockLease = null;
+      this.installerPid = null;
     }
   }
 
@@ -693,6 +748,10 @@ export class BrainstemProvisioner {
           stdio: ["ignore", "pipe", "pipe"],
           windowsHide: true,
         });
+        this.installerPid = this.child.pid;
+        this.processGroupId = this.platform === "win32"
+          ? null
+          : this.child.pid;
         cleanups.push(
           attachScrubbedLog(this.child.stdout, logFd),
           attachScrubbedLog(this.child.stderr, logFd),
@@ -710,6 +769,12 @@ export class BrainstemProvisioner {
     } finally {
       for (const cleanup of cleanups) cleanup();
       this.child = null;
+      if (
+        this.processGroupId
+        && !unixProcessGroupExists(this.processGroupId)
+      ) {
+        this.processGroupId = null;
+      }
       closeSync(logFd);
     }
   }
@@ -717,23 +782,24 @@ export class BrainstemProvisioner {
   async stop() {
     this.stopped = true;
     const child = this.child;
-    if (!child?.pid) return;
-    const closed = new Promise((resolve) => child.once("close", resolve));
+    const processGroupId = this.processGroupId;
+    const installerPid = this.installerPid || child?.pid;
+    let terminationError = null;
     if (this.platform === "win32") {
-      await terminateWindowsTree(child.pid);
-    } else {
-      signalUnixTree(child.pid, "SIGTERM");
-    }
-    let timeout;
-    await Promise.race([
-      closed,
-      new Promise((resolve) => {
-        timeout = setTimeout(resolve, 5_000);
-      }),
-    ]);
-    clearTimeout(timeout);
-    if (this.platform !== "win32" && this.child) {
-      signalUnixTree(child.pid, "SIGKILL");
+      if (installerPid) {
+        try {
+          await terminateWindowsProcessTree(installerPid);
+        } catch (error) {
+          terminationError = error;
+        }
+      }
+    } else if (processGroupId) {
+      signalUnixTree(processGroupId, "SIGTERM");
+      await this.sleep(this.terminationGraceMs);
+      if (unixProcessGroupExists(processGroupId)) {
+        signalUnixTree(processGroupId, "SIGKILL");
+      }
+      this.processGroupId = null;
     }
     if (this.lockLease && this.ensurePromise) {
       let releaseTimeout;
@@ -745,5 +811,6 @@ export class BrainstemProvisioner {
       ]);
       clearTimeout(releaseTimeout);
     }
+    if (terminationError) throw terminationError;
   }
 }

@@ -330,6 +330,56 @@ test("persistent route callback telemetry binds request ID and proof response", 
   }
 });
 
+test("route telemetry redacts nested JSON response and agent-log previews", async () => {
+  const { root, manager } = fixture();
+  try {
+    const descriptor = manager.compositionDescriptor();
+    const materialized = manager.materializeComposition(descriptor);
+    const route = {
+      url: "http://127.0.0.1:7000",
+      compositionHash: descriptor.compositionHash,
+      stackRappid: descriptor.stack.rappid,
+    };
+    manager.activeRoute = route;
+    manager.workers.set(descriptor.compositionHash, {
+      activeRequests: 0,
+      agentDirectory: materialized.agentDirectory,
+      compositionDirectory: materialized.compositionDirectory,
+      process: { stop: async () => {} },
+      route,
+    });
+    const canaries = {
+      api: "apiKeyTelemetryCanary",
+      client: "clientSecretTelemetryCanary",
+      github: "ghp_TelemetryGithubCanary123",
+      password: "passwordTelemetryCanary",
+      refresh: "refreshTelemetryCanary",
+    };
+    await manager.withRoute({}, async () => ({
+      agentLogs: `CLIENT_SECRET="${canaries.client}"\n`
+        + `{"password": "${canaries.password}", "items": `
+        + `[{"refresh_token": "${canaries.refresh}"}]}`,
+      requestId: 8,
+      response: `{"api_key": "${canaries.api}", "nested": `
+        + `{"github_token": "${canaries.github}"}}`,
+    }));
+    manager.recordTelemetry("direct-secret-shape", {
+      args: {
+        password: canaries.password,
+        nested: [{ client_secret: canaries.client }],
+      },
+    });
+
+    const serialized = JSON.stringify(manager.telemetrySnapshot());
+    for (const canary of Object.values(canaries)) {
+      assert.doesNotMatch(serialized, new RegExp(canary));
+    }
+    assert.match(serialized, /\[REDACTED\]/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("active-agent deletion persists for stack and global sources", async () => {
   const { root, manager } = fixture();
   try {

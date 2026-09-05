@@ -204,15 +204,16 @@ their SHA-256 hashes, repository, and runtime source to the package's full
    the package's immutable commit inside a unique versioned sibling stage;
 4. verifies the staged source, fresh venv, Python 3.11+, required memory-agent
    files, soul, dependencies, and `brainstem.py` syntax;
-5. atomically renames that verified stage into place only if the final target is
-   still absent, then requires compatible `/health` evidence before starting the
-   rest of Frontier.
+5. atomically creates a no-replace directory link from the still-absent target
+   to that verified stage (a Windows junction on Windows), then requires
+   compatible `/health` evidence before starting the rest of Frontier.
 
 Failures remove the stage, preserve the prior target, remain visible, and name
 the sanitized installer log plus the next action. Frontier never asks the
 installer to authenticate. Launcher and worker log boundaries redact known
-token, secret, authorization-header, and credential-URL patterns; raw child
-output is not claimed safe or written directly.
+token, secret, authorization-header, credential-URL, quoted-assignment, and
+nested JSON fields; route response/agent-log previews use the same sanitizer.
+Raw child output is not claimed safe or written directly.
 
 Compatibility is also fail-closed: Frontier requires Brainstem 0.6.16 or newer,
 a present soul, loaded-agent evidence, the routed `ContextMemory` and

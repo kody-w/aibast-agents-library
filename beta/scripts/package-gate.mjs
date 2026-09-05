@@ -4,6 +4,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   readdirSync,
   rmSync,
   statSync,
@@ -288,12 +289,16 @@ printf '%s\\n' 'https://fixture:PackageGatePassword@example.test/path' >&2
           && existsSync(python),
         brainstemHome,
       );
+      const stagedHomes = readdirSync(isolatedHome)
+        .filter((name) => name.includes("frontier-stage-"));
       requirement(
-        "missing-runtime bootstrap cleaned every staging home",
-        readdirSync(isolatedHome).every(
-          (name) => !name.includes("frontier-stage-"),
-        ),
-        isolatedHome,
+        "missing-runtime bootstrap left no abandoned staging home",
+        stagedHomes.length === 1
+          && stagedHomes.every((name) => (
+            realpathSync(path.join(isolatedHome, name))
+            === realpathSync(brainstemHome)
+          )),
+        realpathSync(brainstemHome),
       );
       const sanitizedLog = existsSync(provisionLog)
         ? readFileSync(provisionLog, "utf8")

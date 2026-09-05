@@ -238,7 +238,7 @@ test("packaged smoke requires real service readiness in an isolated home", () =>
   assert.match(packageGate, /USERPROFILE: isolatedHome/);
   assert.match(packageGate, /BRAINSTEM_HOME: brainstemHome/);
   assert.match(packageGate, /provisions a missing runtime and reaches readiness/);
-  assert.match(packageGate, /missing-runtime bootstrap cleaned every staging home/);
+  assert.match(packageGate, /missing-runtime bootstrap left no abandoned staging home/);
   assert.match(packageGate, /provisioning log scrubs credential canaries/);
   assert.match(packageGate, /packaged smoke reached a compatible Brainstem service/);
   assert.match(packageGate, /packaged smoke fails closed when its Brainstem service fails/);
@@ -251,7 +251,7 @@ test("bootstrap staging, lock ownership, and log redaction are explicit", () => 
   assert.match(provisionerSource, /Python 3\.11\+ is required/);
   assert.match(provisionerSource, /compile\(source/);
   assert.match(provisionerSource, /frontier-stage-/);
-  assert.match(provisionerSource, /this\.move\(stageHome, this\.config\.brainstemHome\)/);
+  assert.match(provisionerSource, /this\.link\([\s\S]*stageHome,[\s\S]*this\.config\.brainstemHome/);
   assert.match(provisionerSource, /No runtime was activated/);
   assert.match(provisionLock, /randomBytes\(32\)/);
   assert.match(provisionLock, /\.stale-\$\{token\}/);
@@ -261,6 +261,7 @@ test("bootstrap staging, lock ownership, and log redaction are explicit", () => 
   assert.match(provisionerSource, /detached: this\.platform !== "win32"/);
   assert.match(provisionerSource, /taskkill\.exe/);
   assert.match(provisionerSource, /process\.kill\(-pid, signal\)/);
+  assert.match(main, /Shutdown cleanup failed/);
 });
 
 test("release packaging is canonical and fork packaging is explicit development", () => {

@@ -1519,10 +1519,20 @@ if (!hasLock) {
       provisioner?.stop(),
       uiDriver?.stop(),
     ].filter(Boolean);
-    Promise.allSettled(shutdownTasks).finally(() => {
-      shutdownComplete = true;
-      if (requestedExitCode) app.exit(requestedExitCode);
-      else app.quit();
-    });
+    Promise.allSettled(shutdownTasks)
+      .then((results) => {
+        for (const result of results) {
+          if (result.status === "rejected") {
+            console.error(
+              `Shutdown cleanup failed: ${scrubSecrets(result.reason)}`,
+            );
+          }
+        }
+      })
+      .finally(() => {
+        shutdownComplete = true;
+        if (requestedExitCode) app.exit(requestedExitCode);
+        else app.quit();
+      });
   });
 }

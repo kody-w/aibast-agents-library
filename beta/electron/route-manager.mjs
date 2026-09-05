@@ -21,6 +21,10 @@ import {
   mintRappid,
   packEgg,
 } from "./rapp-protocol.mjs";
+import {
+  sanitizeTelemetryValue,
+  scrubSecrets,
+} from "./safe-log.mjs";
 
 
 const ROUTING_SCHEMA = "rapp-beta-routing/1";
@@ -213,7 +217,7 @@ export class BetaRouteManager {
       sequence: ++this.telemetrySequence,
       timestamp: new Date().toISOString(),
       type,
-      ...details,
+      ...sanitizeTelemetryValue(details),
     };
     this.telemetry.push(event);
     if (this.telemetry.length > 500) this.telemetry.shift();
@@ -1124,18 +1128,22 @@ export class BetaRouteManager {
         });
         const result = await callback(route);
         this.recordTelemetry("route-callback-end", {
-          agent_logs_preview: String(result?.agentLogs || "").slice(0, 2000),
+          agent_logs_preview: scrubSecrets(
+            String(result?.agentLogs || ""),
+          ).slice(0, 2000),
           composition_fingerprint: this.compositionFingerprint(worker),
           composition_hash: descriptor.compositionHash,
           request_id: result?.requestId || null,
-          response_preview: String(result?.response || "").slice(0, 1000),
+          response_preview: scrubSecrets(
+            String(result?.response || ""),
+          ).slice(0, 1000),
           url: route.url,
         });
         return result;
       } catch (error) {
         this.recordTelemetry("route-callback-error", {
           composition_hash: descriptor.compositionHash,
-          error: String(error?.message || error),
+          error: scrubSecrets(error?.message || error),
           url: route.url,
         });
         throw error;
