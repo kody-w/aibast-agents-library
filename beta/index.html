@@ -344,7 +344,7 @@
 
     .download-controls {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
       gap: 12px;
     }
 
@@ -1013,7 +1013,7 @@
           <aside class="product-mark" aria-label="RAPP Brainstem Frontier product mark">
             <img src="build/icon.svg" alt="">
             <strong>Verified release downloads</strong>
-            <span>Windows 11, macOS, and Linux</span>
+            <span>Windows 11 x64, macOS, and Linux</span>
           </aside>
         </div>
       </div>
@@ -1030,12 +1030,16 @@
         </div>
 
         <form class="download-form" id="download-form">
-          <label for="platform-select">Choose your operating system</label>
+          <label for="platform-select">Choose your operating system and architecture</label>
           <div class="download-controls">
-            <select id="platform-select" name="platform">
+            <select id="platform-select" name="platform" aria-label="Operating system">
               <option value="windows">Windows 11</option>
               <option value="macos">macOS</option>
               <option value="linux">Linux</option>
+            </select>
+            <select id="architecture-select" name="architecture" aria-label="Architecture">
+              <option value="x64">x64</option>
+              <option value="arm64">ARM64 (macOS or Linux)</option>
             </select>
             <button class="button primary" id="download-button" type="submit" disabled>
               Download
@@ -1143,7 +1147,7 @@
             <div class="accordion-panel" id="panel-requirements" hidden>
               <h4>Supported operating systems</h4>
               <div class="supported-os">
-                <span class="os-pill" id="windows-support">Windows 11 source bootstrap</span>
+                <span class="os-pill" id="windows-support">Windows 11 x64</span>
                 <span class="os-pill">macOS x64 or ARM64</span>
                 <span class="os-pill">Linux x64 or ARM64</span>
               </div>
@@ -1191,7 +1195,7 @@
                 <article class="install-card" id="windows-card">
                   <h4>
                     <span class="platform-icon" aria-hidden="true">PS</span>
-                    Windows 11
+                    Windows 11 x64
                   </h4>
                   <p>Open PowerShell, paste the command, and press Enter.</p>
                   <pre class="command"><code id="windows-command">Preparing installer command...</code></pre>

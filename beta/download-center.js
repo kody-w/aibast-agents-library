@@ -6,6 +6,8 @@ export const RELEASE_MANIFEST_FENCE = "rapp-frontier-release-manifest";
 
 const MAX_RELEASE_MANIFEST_BYTES = 128 * 1024;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
+const COMMIT_SHA_PATTERN = /^[0-9a-f]{40}$/i;
+const RELEASE_TAG_PATTERN = /^brainstem-beta-v[0-9A-Za-z][0-9A-Za-z._-]*$/;
 
 const PLATFORM_LABELS = Object.freeze({
   windows: "Windows 11",
@@ -54,39 +56,88 @@ export class DownloadCenterError extends Error {
 }
 
 export function validRepository(value) {
-  return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(value || "");
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(value || "")) return false;
+  return String(value).split("/").every((part) => part !== "." && part !== "..");
 }
 
 function normalizeRequestedTag(value) {
   if (value === null || value === undefined) return null;
   const tag = String(value).trim();
   if (!tag) return null;
-  if (tag.length > 200 || /[\u0000-\u001f\u007f]/.test(tag)) {
-    throw new DownloadCenterError("The requested release tag is invalid.", {
-      code: "INVALID_RELEASE_TAG",
-    });
+  if (!RELEASE_TAG_PATTERN.test(tag)) {
+    throw new DownloadCenterError(
+      `The requested tag must match ${TAG_PREFIX}<version>.`,
+      {
+        code: "INVALID_RELEASE_TAG",
+      },
+    );
   }
   return tag;
 }
 
+function isLoopbackHostname(hostname) {
+  return ["localhost", "127.0.0.1", "::1", "[::1]"].includes(hostname);
+}
+
 export function resolveDownloadContext(locationLike = {}) {
   const params = new URLSearchParams(String(locationLike.search || ""));
+  const hasOverride = params.has("repo");
   const override = params.get("repo");
-  let repository = validRepository(override) ? override : null;
-
   const hostname = String(locationLike.hostname || "").toLowerCase();
-  if (!repository && hostname.endsWith(".github.io")) {
-    const owner = hostname.slice(0, -".github.io".length);
-    const project = String(locationLike.pathname || "")
-      .split("/")
-      .filter(Boolean)[0];
-    const derived = `${owner}/${project || ""}`;
-    if (validRepository(derived)) repository = derived;
+  const requestedTag = normalizeRequestedTag(params.get("tag"));
+
+  if (isLoopbackHostname(hostname)) {
+    if (hasOverride && !validRepository(override)) {
+      throw new DownloadCenterError("The localhost repository override is invalid.", {
+        code: "INVALID_REPOSITORY",
+      });
+    }
+    const untrustedOverride = hasOverride && override !== DEFAULT_REPOSITORY;
+    return {
+      repository: hasOverride ? override : DEFAULT_REPOSITORY,
+      requestedTag,
+      trusted: !untrustedOverride,
+      authority: untrustedOverride ? "localhost-override" : "canonical-default",
+      warning: untrustedOverride
+        ? `LOCAL TEST ONLY — UNTRUSTED REPOSITORY ${override}. `
+          + "Do not redistribute commands or downloads from this page."
+        : "",
+    };
   }
 
+  if (hasOverride) {
+    throw new DownloadCenterError(
+      "Public repository overrides are disabled. Use the repository that owns this Pages deployment.",
+      { code: "PUBLIC_REPOSITORY_OVERRIDE" },
+    );
+  }
+  if (!hostname.endsWith(".github.io")) {
+    throw new DownloadCenterError(
+      "This download page cannot determine a trusted repository from this deployment origin.",
+      { code: "AMBIGUOUS_DEPLOYMENT_ORIGIN" },
+    );
+  }
+
+  const owner = hostname.slice(0, -".github.io".length);
+  const pathSegments = String(locationLike.pathname || "").split("/").filter(Boolean);
+  if (pathSegments.length < 2 || pathSegments[1] !== "beta") {
+    throw new DownloadCenterError(
+      "This Pages path does not unambiguously identify a beta repository deployment.",
+      { code: "AMBIGUOUS_DEPLOYMENT_PATH" },
+    );
+  }
+  const repository = `${owner}/${pathSegments[0]}`;
+  if (!validRepository(repository)) {
+    throw new DownloadCenterError("The Pages deployment repository is invalid.", {
+      code: "INVALID_REPOSITORY",
+    });
+  }
   return {
-    repository: repository || DEFAULT_REPOSITORY,
-    requestedTag: normalizeRequestedTag(params.get("tag")),
+    repository,
+    requestedTag,
+    trusted: true,
+    authority: "github-pages-origin",
+    warning: "",
   };
 }
 
@@ -414,6 +465,7 @@ function packageFileName(value) {
     /[ .]$/.test(stem)
     || /\.(?:exe|dmg)(?:$|[ ._()+-])/i.test(stem)
     || /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(stem)
+    || /(?:^|[ ._()+-])(?:uninstall(?:er)?[0-9]*|unins[0-9]*|remove)(?=$|[ ._()+-])/i.test(stem)
   ) {
     throw manifestError(`Manifest filename ${fileName} uses a deceptive extension.`);
   }
@@ -502,6 +554,7 @@ export function analyzePackagedDownloads(
   const candidates = [];
   const allowlistedNames = new Set();
   const allowlistedKeys = new Set();
+  const allowlistedTuples = new Set();
   for (const entry of manifest.artifacts) {
     if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
       throw manifestError("Every manifest artifact must be an object.");
@@ -530,10 +583,15 @@ export function analyzePackagedDownloads(
     const architecture = entry.architecture;
     if (
       !["x64", "arm64", "universal"].includes(architecture)
-      || (platform === "windows" && architecture === "universal")
+      || (platform === "windows" && architecture !== "x64")
     ) {
       throw manifestError(`Manifest architecture is invalid for ${fileName}.`);
     }
+    const tuple = `${platform}:${architecture}`;
+    if (allowlistedTuples.has(tuple)) {
+      throw manifestError(`Manifest platform/architecture tuple ${tuple} is duplicated.`);
+    }
+    allowlistedTuples.add(tuple);
     const nameArchitecture = assetArchitecture(fileName);
     if (
       nameArchitecture === "ambiguous"
@@ -721,16 +779,14 @@ function normalizeReleaseMetadata(release, { repository, requestedTag }) {
 }
 
 function normalizeCommit(commitData) {
-  const commit = typeof commitData?.sha === "string"
-    ? commitData.sha.toLowerCase()
-    : "";
-  if (!/^[0-9a-f]{40}$/.test(commit)) {
+  const rawCommit = typeof commitData?.sha === "string" ? commitData.sha.trim() : "";
+  if (!COMMIT_SHA_PATTERN.test(rawCommit)) {
     throw new DownloadCenterError(
       "The Frontier release did not resolve to a full commit SHA.",
       { code: "INVALID_RELEASE_COMMIT" },
     );
   }
-  return commit;
+  return rawCommit.toLowerCase();
 }
 
 export async function discoverRelease({
@@ -744,16 +800,33 @@ export async function discoverRelease({
     });
   }
 
-  const releases = await fetchGitHubJson(
-    `https://api.github.com/repos/${repository}/releases?per_page=30`,
-    { fetchImpl, operation: `checking releases for ${repository}` },
-  );
-  const release = selectRelease(releases, { requestedTag });
+  let release;
+  if (requestedTag) {
+    release = await fetchGitHubJson(
+      `https://api.github.com/repos/${repository}/releases/tags/${encodeURIComponent(requestedTag)}`,
+      { fetchImpl, operation: `checking ${requestedTag} in ${repository}` },
+    );
+    if (
+      !release
+      || typeof release !== "object"
+      || release.draft === true
+      || release.tag_name !== requestedTag
+    ) {
+      throw new DownloadCenterError(
+        `Release ${requestedTag} was not found in ${repository}.`,
+        { code: "RELEASE_NOT_FOUND" },
+      );
+    }
+  } else {
+    const releases = await fetchGitHubJson(
+      `https://api.github.com/repos/${repository}/releases?per_page=100`,
+      { fetchImpl, operation: `checking releases for ${repository}` },
+    );
+    release = selectRelease(releases);
+  }
   if (!release) {
     throw new DownloadCenterError(
-      requestedTag
-        ? `Release ${requestedTag} was not found in ${repository}.`
-        : `No published ${TAG_PREFIX} release was found in ${repository}.`,
+      `No published ${TAG_PREFIX} release was found in ${repository}.`,
       { code: "RELEASE_NOT_FOUND" },
     );
   }
@@ -819,54 +892,127 @@ function bootstrapUrl(fileName, baseUrl) {
   }
 }
 
-export function buildBootstrapDownloads({ repository, baseUrl } = {}) {
+function rawRepositoryUrl(repository, commit, filePath) {
+  return `https://raw.githubusercontent.com/${repository}/${commit}/${filePath}`;
+}
+
+function repositoryFileUrl(repository, ref, filePath) {
+  return `https://github.com/${repository}/blob/${encodeURIComponent(ref)}/${filePath}`;
+}
+
+export function buildBootstrapDownloads({
+  repository,
+  baseUrl,
+  tag = null,
+  commit = null,
+} = {}) {
   if (!validRepository(repository)) {
     throw new DownloadCenterError("The bootstrap repository is invalid.", {
       code: "INVALID_REPOSITORY",
     });
   }
 
-  const windowsHref = bootstrapUrl("frontier.ps1", baseUrl);
-  const unixHref = bootstrapUrl("frontier.sh", baseUrl);
+  const pinned = tag !== null || commit !== null;
+  if (
+    pinned
+    && (!RELEASE_TAG_PATTERN.test(tag || "") || !COMMIT_SHA_PATTERN.test(commit || ""))
+  ) {
+    throw new DownloadCenterError(
+      "A valid Frontier tag and full commit are required for pinned source commands.",
+      { code: "INVALID_RELEASE_IDENTITY" },
+    );
+  }
+
+  const normalizedCommit = pinned ? commit.toLowerCase() : null;
+  const repositoryUrl = `https://github.com/${repository}.git`;
+  const runtimeVersionUrl = pinned
+    ? rawRepositoryUrl(repository, normalizedCommit, "rapp_brainstem/VERSION")
+    : "";
+  const windowsInstallerUrl = pinned
+    ? rawRepositoryUrl(repository, normalizedCommit, "beta/install.cmd")
+    : "";
+  const unixInstallerUrl = pinned
+    ? rawRepositoryUrl(repository, normalizedCommit, "beta/install.sh")
+    : "";
+  const brainstemBootstrapUrl = pinned
+    ? rawRepositoryUrl(repository, normalizedCommit, "install.ps1")
+    : "";
+  const windowsHref = pinned
+    ? repositoryFileUrl(repository, normalizedCommit, "beta/install.cmd")
+    : bootstrapUrl("frontier.ps1", baseUrl);
+  const unixHref = pinned
+    ? repositoryFileUrl(repository, normalizedCommit, "beta/install.sh")
+    : bootstrapUrl("frontier.sh", baseUrl);
+  const windowsCommand = pinned
+    ? [
+      `$env:BRAINSTEM_BETA_REPO_URL="${repositoryUrl}"`,
+      `$env:BRAINSTEM_BETA_RELEASE_TAG="${tag}"`,
+      `$env:BRAINSTEM_BETA_RUNTIME_VERSION_URL="${runtimeVersionUrl}"`,
+      `$env:BRAINSTEM_BETA_COMMIT="${normalizedCommit}"`,
+      `$env:BRAINSTEM_BETA_BOOTSTRAP_URL="${brainstemBootstrapUrl}"`,
+      `$installer=Join-Path $env:TEMP "rapp-frontier-${normalizedCommit}.cmd"`,
+      `try { Invoke-WebRequest "${windowsInstallerUrl}" -OutFile $installer `
+        + "-UseBasicParsing; & $installer; if ($LASTEXITCODE -ne 0) "
+        + "{ throw \"Frontier installer failed with exit code $LASTEXITCODE.\" } } "
+        + "finally { Remove-Item $installer -Force -ErrorAction SilentlyContinue }",
+    ].join(";")
+    : "";
+  const unixCommand = pinned
+    ? `curl -fsSL "${unixInstallerUrl}" | `
+      + `BRAINSTEM_BETA_REPO_URL="${repositoryUrl}" `
+      + `BRAINSTEM_BETA_RELEASE_TAG="${tag}" `
+      + `BRAINSTEM_BETA_RUNTIME_VERSION_URL="${runtimeVersionUrl}" `
+      + `BRAINSTEM_BETA_COMMIT="${normalizedCommit}" bash`
+    : "";
+
   return [
     {
       id: "source-windows",
       platforms: ["windows"],
       platform: "windows",
       architecture: "source",
-      fileName: "frontier.ps1",
-      description: "Windows 11 source bootstrap",
-      size: "Source",
-      command: `$env:RAPP_FRONTIER_REPO="${repository}";irm "${windowsHref}" | iex`,
+      architectures: ["x64"],
+      fileName: pinned ? "install.cmd" : "frontier.ps1",
+      description: pinned
+        ? "Windows 11 x64 exact-commit source install"
+        : "Inspect the Windows 11 x64 source bootstrap",
+      size: pinned ? "Pinned source" : "Source",
+      command: windowsCommand,
       href: windowsHref,
       downloadName: "RAPP-Brainstem-Frontier-Windows.ps1",
       kind: "bootstrap",
+      ready: pinned,
+      downloadable: false,
     },
     {
       id: "source-unix",
       platforms: ["macos", "linux"],
       platform: "unix",
       architecture: "source",
-      fileName: "frontier.sh",
-      description: "macOS or Linux source bootstrap",
-      size: "Source",
-      command: `curl -fsSL "${unixHref}" | RAPP_FRONTIER_REPO="${repository}" bash`,
+      architectures: ["x64", "arm64"],
+      fileName: pinned ? "install.sh" : "frontier.sh",
+      description: pinned
+        ? "macOS or Linux exact-commit source install"
+        : "Inspect the macOS or Linux source bootstrap",
+      size: pinned ? "Pinned source" : "Source",
+      command: unixCommand,
       href: unixHref,
       downloadName: "RAPP-Brainstem-Frontier-macOS-Linux.sh",
       kind: "bootstrap",
+      ready: pinned,
+      downloadable: false,
     },
   ];
 }
 
-function downloadCompatibilityRank(item, preferredArchitecture) {
-  if (item.kind !== "binary") return item.kind === "bootstrap" ? 2 : 4;
-  if (!preferredArchitecture) return 0;
-  if (item.architecture === preferredArchitecture) return 0;
-  if (item.architecture === "universal" || item.architecture === "unknown") return 1;
-  return 3;
+function itemSupportsArchitecture(item, architecture) {
+  if (item.kind === "binary") {
+    return item.architecture === architecture || item.architecture === "universal";
+  }
+  return Array.isArray(item.architectures) && item.architectures.includes(architecture);
 }
 
-export function orderDownloadsForPlatform(items, platform, preferredArchitecture = null) {
+export function orderDownloadsForPlatform(items, platform, architecture) {
   if (!Array.isArray(items)) {
     throw new DownloadCenterError("The download catalog was not an array.", {
       code: "INVALID_DOWNLOAD_CATALOG",
@@ -877,23 +1023,32 @@ export function orderDownloadsForPlatform(items, platform, preferredArchitecture
       code: "INVALID_PLATFORM",
     });
   }
+  if (!["x64", "arm64"].includes(architecture)) {
+    throw new DownloadCenterError("Choose an explicit x64 or ARM64 architecture.", {
+      code: "INVALID_ARCHITECTURE",
+    });
+  }
 
-  const preferred = preferredArchitecture === "x64" || preferredArchitecture === "arm64"
-    ? preferredArchitecture
-    : null;
   return items
-    .filter((item) => Array.isArray(item?.platforms) && item.platforms.includes(platform))
+    .filter(
+      (item) => Array.isArray(item?.platforms)
+        && item.platforms.includes(platform)
+        && itemSupportsArchitecture(item, architecture),
+    )
     .sort((left, right) => {
-      const compatibility =
-        downloadCompatibilityRank(left, preferred)
-        - downloadCompatibilityRank(right, preferred);
-      if (compatibility) return compatibility;
+      const kindOrder =
+        (left.kind === "binary" ? 0 : 1) - (right.kind === "binary" ? 0 : 1);
+      if (kindOrder) return kindOrder;
 
       if (left.kind === "binary" && right.kind === "binary") {
-        const architecture =
+        const compatibilityOrder =
+          (left.architecture === architecture ? 0 : 1)
+          - (right.architecture === architecture ? 0 : 1);
+        if (compatibilityOrder) return compatibilityOrder;
+        const architectureOrder =
           (ARCHITECTURE_ORDER[left.architecture] ?? 99)
           - (ARCHITECTURE_ORDER[right.architecture] ?? 99);
-        if (architecture) return architecture;
+        if (architectureOrder) return architectureOrder;
       }
 
       const name = FILE_NAME_COLLATOR.compare(
@@ -915,33 +1070,30 @@ function architectureSummary(downloads) {
   return architectures.join(", ");
 }
 
-export function platformRecommendation(items, platform, preferredArchitecture = null) {
-  const binaries = orderDownloadsForPlatform(items, platform, null)
-    .filter((item) => item.kind === "binary");
+export function platformRecommendation(items, platform, architecture) {
   const platformLabel = PLATFORM_LABELS[platform];
-  if (!binaries.length) {
-    return `Verified source bootstrap available for ${platformLabel}.`;
+  if (platform === "windows" && architecture === "arm64") {
+    return "Windows ARM64 is not supported until its native dependencies pass the package gate.";
   }
 
-  const preferred = preferredArchitecture === "x64" || preferredArchitecture === "arm64"
-    ? preferredArchitecture
-    : null;
-  const compatible = preferred
-    ? binaries.filter(
-      (item) => item.architecture === preferred
-        || item.architecture === "universal"
-        || item.architecture === "unknown",
-    )
-    : binaries;
-
-  if (preferred && !compatible.length) {
-    return `No ${ARCHITECTURE_LABELS[preferred]} packaged installer is published for `
-      + `${platformLabel}. The verified source bootstrap is recommended; other architecture `
-      + "installers remain available.";
+  const available = orderDownloadsForPlatform(items, platform, architecture);
+  const binaries = available.filter((item) => item.kind === "binary");
+  const sourceAvailable = available.some(
+    (item) => item.kind === "bootstrap" && item.ready === true,
+  );
+  if (!binaries.length && !sourceAvailable) {
+    return `No validated ${ARCHITECTURE_LABELS[architecture]} download is available for `
+      + `${platformLabel}.`;
+  }
+  if (!binaries.length) {
+    return `Exact-commit source install available for ${platformLabel} `
+      + `${ARCHITECTURE_LABELS[architecture]}.`;
   }
 
   return `Packaged installer${binaries.length === 1 ? "" : "s"} `
-    + `(${architectureSummary(binaries)}) and source bootstrap available for ${platformLabel}.`;
+    + `(${architectureSummary(binaries)})`
+    + `${sourceAvailable ? " and exact-commit source install" : ""} available for `
+    + `${platformLabel}.`;
 }
 
 export function windowsSupportLabel(items) {
@@ -950,17 +1102,9 @@ export function windowsSupportLabel(items) {
       (item) => item?.kind === "binary" && item?.platforms?.includes("windows"),
     )
     : [];
-  if (!windowsBinaries.length) return "Windows 11 source bootstrap";
-
-  const x64 = windowsBinaries.some((item) => item.architecture === "x64");
-  const arm64 = windowsBinaries.some((item) => item.architecture === "arm64");
-  if (x64 && arm64) return "Windows 11 x64 or ARM64";
-  if (arm64) return "Windows 11 ARM64";
-  if (x64) return "Windows 11 x64";
-  if (windowsBinaries.some((item) => item.architecture === "universal")) {
-    return "Windows 11 universal package";
-  }
-  return "Windows 11 packaged installer (architecture unspecified)";
+  return windowsBinaries.some((item) => item.architecture === "x64")
+    ? "Windows 11 x64"
+    : "Windows 11 x64 source install";
 }
 
 export function claimDownloadCenterInitialization(rootElement) {
@@ -995,6 +1139,7 @@ function collectElements(documentObject) {
     commit: requireElement(documentObject, "release-commit"),
     resolvedDate: requireElement(documentObject, "resolved-date"),
     platformSelect: requireElement(documentObject, "platform-select"),
+    architectureSelect: requireElement(documentObject, "architecture-select"),
     platformHelp: requireElement(documentObject, "platform-help"),
     downloadForm: requireElement(documentObject, "download-form"),
     downloadButton: requireElement(documentObject, "download-button"),
@@ -1114,7 +1259,9 @@ function updateDialogSelection(documentObject, elements, state) {
   if (!selected) {
     elements.selectedCommandPanel.hidden = true;
     elements.copySelected.hidden = true;
+    elements.downloadSelected.hidden = true;
     elements.downloadSelected.removeAttribute("href");
+    elements.downloadSelected.removeAttribute("download");
     return;
   }
 
@@ -1129,18 +1276,23 @@ function updateDialogSelection(documentObject, elements, state) {
   elements.selectedCommandPanel.hidden = !hasCommand;
   elements.copySelected.hidden = !hasCommand;
   elements.selectedCommand.textContent = file.command;
-  elements.downloadSelected.href = file.href;
-  elements.downloadSelected.setAttribute("download", file.downloadName);
-  elements.downloadSelected.textContent = file.kind === "binary"
-    ? "Download installer"
-    : "Download bootstrap file";
+  const downloadable = file.kind === "binary" && file.downloadable !== false;
+  elements.downloadSelected.hidden = !downloadable;
+  if (downloadable) {
+    elements.downloadSelected.href = file.href;
+    elements.downloadSelected.setAttribute("download", file.downloadName);
+    elements.downloadSelected.textContent = "Download installer";
+  } else {
+    elements.downloadSelected.removeAttribute("href");
+    elements.downloadSelected.removeAttribute("download");
+  }
 }
 
 function renderDownloadOptions(documentObject, elements, state) {
   const available = orderDownloadsForPlatform(
     state.downloadItems,
     elements.platformSelect.value,
-    state.preferredArchitecture,
+    elements.architectureSelect.value,
   );
   elements.downloadOptionList.replaceChildren();
 
@@ -1179,15 +1331,18 @@ function renderDownloadOptions(documentObject, elements, state) {
 }
 
 function updatePlatformRecommendation(elements, state) {
-  const selected = elements.platformSelect.value;
+  const platform = elements.platformSelect.value;
+  const architecture = elements.architectureSelect.value;
   elements.platformHelp.textContent = platformRecommendation(
     state.downloadItems,
-    selected,
-    state.preferredArchitecture,
+    platform,
+    architecture,
   );
   elements.windowsSupport.textContent = windowsSupportLabel(state.downloadItems);
-  elements.windowsCard.classList.toggle("recommended", selected === "windows");
-  elements.unixCard.classList.toggle("recommended", selected !== "windows");
+  elements.windowsCard.classList.toggle("recommended", platform === "windows");
+  elements.unixCard.classList.toggle("recommended", platform !== "windows");
+  elements.downloadButton.disabled = !state.releaseReady
+    || orderDownloadsForPlatform(state.downloadItems, platform, architecture).length === 0;
 }
 
 function openDownloadDialog(documentObject, elements, state) {
@@ -1205,6 +1360,29 @@ function refreshOpenDownloadDialog(documentObject, elements, state) {
   }
 }
 
+function sourceDownload(state, id) {
+  return state.downloadItems.find((item) => item.id === id);
+}
+
+function applySourceControls(elements, state) {
+  const windowsSource = sourceDownload(state, "source-windows");
+  const unixSource = sourceDownload(state, "source-unix");
+  if (!windowsSource || !unixSource) {
+    throw new DownloadCenterError("The source bootstrap fallback is incomplete.", {
+      code: "MISSING_BOOTSTRAP",
+    });
+  }
+
+  elements.windowsCommand.textContent =
+    windowsSource.command || "Release verification required before this command is enabled.";
+  elements.unixCommand.textContent =
+    unixSource.command || "Release verification required before this command is enabled.";
+  elements.windowsScript.href = windowsSource.href;
+  elements.unixScript.href = unixSource.href;
+  elements.copyWindows.disabled = !windowsSource.command;
+  elements.copyUnix.disabled = !unixSource.command;
+}
+
 function setupDownloadControls({
   documentObject,
   navigatorObject,
@@ -1212,41 +1390,38 @@ function setupDownloadControls({
   elements,
   state,
 }) {
-  const windowsSource = state.downloadItems.find((item) => item.id === "source-windows");
-  const unixSource = state.downloadItems.find((item) => item.id === "source-unix");
-  if (!windowsSource || !unixSource) {
-    throw new DownloadCenterError("The source bootstrap fallback is incomplete.", {
-      code: "MISSING_BOOTSTRAP",
-    });
-  }
-
-  elements.windowsCommand.textContent = windowsSource.command;
-  elements.unixCommand.textContent = unixSource.command;
-  elements.windowsScript.href = windowsSource.href;
-  elements.unixScript.href = unixSource.href;
-  elements.copyWindows.disabled = false;
-  elements.copyUnix.disabled = false;
-  elements.downloadButton.disabled = false;
+  applySourceControls(elements, state);
 
   const copyContext = { documentObject, navigatorObject, windowObject };
   elements.copyWindows.addEventListener(
     "click",
-    () => copyText(copyContext, elements.copyWindows, windowsSource.command),
+    () => copyText(
+      copyContext,
+      elements.copyWindows,
+      sourceDownload(state, "source-windows")?.command || "",
+    ),
   );
   elements.copyUnix.addEventListener(
     "click",
-    () => copyText(copyContext, elements.copyUnix, unixSource.command),
+    () => copyText(
+      copyContext,
+      elements.copyUnix,
+      sourceDownload(state, "source-unix")?.command || "",
+    ),
   );
   elements.copySelected.addEventListener(
     "click",
     () => copyText(copyContext, elements.copySelected, elements.selectedCommand.textContent),
   );
-  elements.platformSelect.addEventListener(
-    "change",
-    () => updatePlatformRecommendation(elements, state),
-  );
+  const updateSelection = () => {
+    updatePlatformRecommendation(elements, state);
+    refreshOpenDownloadDialog(documentObject, elements, state);
+  };
+  elements.platformSelect.addEventListener("change", updateSelection);
+  elements.architectureSelect.addEventListener("change", updateSelection);
   elements.downloadForm.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (elements.downloadButton.disabled) return;
     openDownloadDialog(documentObject, elements, state);
   });
   elements.dialog.addEventListener("click", (event) => {
@@ -1259,7 +1434,13 @@ function setupDownloadControls({
   });
 }
 
-export function presentReleaseFailure(elements, error) {
+function setSafetyNotice(elements, messages) {
+  const notice = messages.filter(Boolean).join(" ");
+  elements.error.textContent = notice;
+  elements.error.hidden = !notice;
+}
+
+export function presentReleaseFailure(elements, error, authorityWarning = "") {
   const message = error instanceof Error ? error.message : "Unknown release discovery error.";
   elements.status.textContent = "Release check unavailable";
   elements.statusDot.className = "status-dot error";
@@ -1267,18 +1448,19 @@ export function presentReleaseFailure(elements, error) {
   elements.date.textContent = "Unavailable";
   elements.commit.textContent = "Unavailable";
   elements.resolvedDate.textContent = "Release metadata could not be verified.";
-  elements.error.textContent =
+  setSafetyNotice(elements, [
+    authorityWarning,
     `${message} The inspectable source bootstraps remain available, but verify the `
-    + "published release before installing.";
-  elements.error.hidden = false;
+      + "published release before installing.",
+  ]);
 }
 
 export function presentBinaryUnavailable(elements, availability) {
   const reason = availability?.message || "Release provenance could not be verified.";
-  elements.error.textContent =
+  setSafetyNotice(elements, [
     `Packaged installers are unavailable: ${reason} `
-    + "The inspectable source bootstraps remain available.";
-  elements.error.hidden = false;
+      + "The exact-commit source install remains available.",
+  ]);
 }
 
 function formatPublishedDate(date, locale) {
@@ -1288,6 +1470,115 @@ function formatPublishedDate(date, locale) {
     });
   }
   return new Intl.DateTimeFormat(locale || undefined, { dateStyle: "long" }).format(date);
+}
+
+export function buildReleaseTransaction({ context, release, locale } = {}) {
+  if (
+    !context
+    || !validRepository(context.repository)
+    || release?.repository !== context.repository
+    || !RELEASE_TAG_PATTERN.test(release?.tag || "")
+    || !COMMIT_SHA_PATTERN.test(release?.commit || "")
+    || !Array.isArray(release?.packagedDownloads)
+    || !release?.binaryAvailability
+  ) {
+    throw new DownloadCenterError("The resolved release transaction is invalid.", {
+      code: "INVALID_RELEASE_TRANSACTION",
+    });
+  }
+
+  const pinnedSourceDownloads = buildBootstrapDownloads({
+    repository: context.repository,
+    tag: release.tag,
+    commit: release.commit,
+  });
+  return {
+    context,
+    release,
+    publishedLabel: formatPublishedDate(release.publishedAt, locale),
+    downloadItems: [...release.packagedDownloads, ...pinnedSourceDownloads],
+  };
+}
+
+export function applyReleaseSummary(elements, transaction) {
+  const { context, release, publishedLabel } = transaction;
+  elements.sourceLink.href = release.sourceUrl;
+  elements.goldenPathLink.href = release.goldenPathUrl;
+  setReleaseLinks(elements, release.releaseUrl);
+  elements.version.textContent = release.version;
+  elements.date.textContent = publishedLabel;
+  elements.commit.textContent = release.commit.slice(0, 12);
+  elements.commit.title = release.commit;
+  elements.resolvedDate.textContent =
+    `Published ${publishedLabel} from ${context.repository} at ${release.commit.slice(0, 12)}.`;
+
+  const notices = [];
+  if (context.warning) notices.push(context.warning);
+  if (!release.binaryAvailability.available) {
+    notices.push(
+      `Packaged installers are unavailable: ${release.binaryAvailability.message} `
+      + "The exact-commit source install remains available.",
+    );
+  }
+  setSafetyNotice(elements, notices);
+
+  if (!context.trusted) {
+    elements.status.textContent = "LOCAL TEST · UNTRUSTED REPOSITORY";
+    elements.statusDot.className = "status-dot error";
+  } else {
+    elements.status.textContent = release.binaryAvailability.available
+      ? (release.prerelease ? "Prerelease ready" : "Release ready")
+      : (release.prerelease ? "Source prerelease ready" : "Source release ready");
+    elements.statusDot.className = "status-dot ready";
+  }
+}
+
+function applyReleaseTransaction({
+  documentObject,
+  elements,
+  state,
+  context,
+  release,
+  locale,
+}) {
+  const transaction = buildReleaseTransaction({ context, release, locale });
+  const nextState = {
+    downloadItems: transaction.downloadItems,
+    releaseReady: true,
+  };
+  applyReleaseSummary(elements, transaction);
+  setFileNames(
+    documentObject,
+    elements,
+    transaction.downloadItems.map((item) => item.fileName),
+  );
+  applySourceControls(elements, nextState);
+  updatePlatformRecommendation(elements, nextState);
+  refreshOpenDownloadDialog(documentObject, elements, nextState);
+  state.downloadItems = nextState.downloadItems;
+  state.releaseReady = nextState.releaseReady;
+  return transaction;
+}
+
+function resetReleaseTransaction({
+  documentObject,
+  elements,
+  state,
+  inspectionDownloads,
+  context,
+  error,
+}) {
+  state.downloadItems = inspectionDownloads;
+  state.releaseReady = false;
+  setFileNames(
+    documentObject,
+    elements,
+    inspectionDownloads.map((item) => item.fileName),
+  );
+  applySourceControls(elements, state);
+  updatePlatformRecommendation(elements, state);
+  refreshOpenDownloadDialog(documentObject, elements, state);
+  presentReleaseFailure(elements, error, context.warning);
 }
 
 export async function initializeDownloadCenter({
@@ -1300,25 +1591,27 @@ export async function initializeDownloadCenter({
   }
 
   const elements = collectElements(documentObject);
-  const { repository, requestedTag } = resolveDownloadContext(windowObject.location);
-  const sourceDownloads = buildBootstrapDownloads({
-    repository,
+  const context = resolveDownloadContext(windowObject.location);
+  const inspectionDownloads = buildBootstrapDownloads({
+    repository: context.repository,
     baseUrl: windowObject.location.href,
   });
   const state = {
-    downloadItems: sourceDownloads,
-    preferredArchitecture: null,
+    downloadItems: inspectionDownloads,
+    releaseReady: false,
   };
 
-  elements.sourceLink.href = sourceTreeUrl(repository);
-  elements.goldenPathLink.href = goldenPathUrl(repository);
-  setReleaseLinks(elements, releaseListUrl(repository));
+  elements.sourceLink.href = sourceTreeUrl(context.repository);
+  elements.goldenPathLink.href = goldenPathUrl(context.repository);
+  setReleaseLinks(elements, releaseListUrl(context.repository));
   setFileNames(
     documentObject,
     elements,
-    sourceDownloads.map((item) => item.fileName),
+    inspectionDownloads.map((item) => item.fileName),
   );
   elements.platformSelect.value = detectPlatform(windowObject.navigator);
+  elements.architectureSelect.value =
+    await detectArchitecture(windowObject.navigator) || "x64";
   setupDownloadControls({
     documentObject,
     navigatorObject: windowObject.navigator,
@@ -1328,53 +1621,36 @@ export async function initializeDownloadCenter({
   });
   setupAccordions(documentObject, elements);
   updatePlatformRecommendation(elements, state);
-
-  state.preferredArchitecture = await detectArchitecture(windowObject.navigator);
-  updatePlatformRecommendation(elements, state);
-  refreshOpenDownloadDialog(documentObject, elements, state);
+  if (context.warning) {
+    elements.status.textContent = "LOCAL TEST · UNTRUSTED REPOSITORY";
+    elements.statusDot.className = "status-dot error";
+    setSafetyNotice(elements, [context.warning]);
+  }
 
   try {
     const release = await discoverRelease({
-      repository,
-      requestedTag,
+      repository: context.repository,
+      requestedTag: context.requestedTag,
       fetchImpl: fetchImpl || windowObject.fetch?.bind(windowObject),
     });
-    state.downloadItems = [...release.packagedDownloads, ...sourceDownloads];
-    const publishedLabel = formatPublishedDate(
-      release.publishedAt,
-      windowObject.navigator?.language,
-    );
-
-    elements.sourceLink.href = release.sourceUrl;
-    elements.goldenPathLink.href = release.goldenPathUrl;
-    if (release.binaryAvailability.available) {
-      elements.status.textContent = release.prerelease ? "Prerelease ready" : "Release ready";
-      elements.error.textContent = "";
-      elements.error.hidden = true;
-    } else {
-      elements.status.textContent = release.prerelease
-        ? "Source prerelease ready"
-        : "Source release ready";
-      presentBinaryUnavailable(elements, release.binaryAvailability);
-    }
-    elements.statusDot.className = "status-dot ready";
-    elements.version.textContent = release.version;
-    elements.date.textContent = publishedLabel;
-    elements.commit.textContent = release.commit.slice(0, 12);
-    elements.commit.title = release.commit;
-    elements.resolvedDate.textContent =
-      `Published ${publishedLabel} from ${repository} at ${release.commit.slice(0, 12)}.`;
-    setReleaseLinks(elements, release.releaseUrl);
-    setFileNames(
+    applyReleaseTransaction({
       documentObject,
       elements,
-      state.downloadItems.map((item) => item.fileName),
-    );
-    updatePlatformRecommendation(elements, state);
-    refreshOpenDownloadDialog(documentObject, elements, state);
+      state,
+      context,
+      release,
+      locale: windowObject.navigator?.language,
+    });
     return { initialized: true, release, downloadItems: state.downloadItems };
   } catch (error) {
-    presentReleaseFailure(elements, error);
+    resetReleaseTransaction({
+      documentObject,
+      elements,
+      state,
+      inspectionDownloads,
+      context,
+      error,
+    });
     return { initialized: true, error, downloadItems: state.downloadItems };
   }
 }

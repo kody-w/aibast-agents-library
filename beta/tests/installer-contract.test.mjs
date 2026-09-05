@@ -130,7 +130,9 @@ test("dedicated beta page resolves fork releases without changing main install",
   assert.match(installerPage, /white-space: pre;/);
   assert.match(downloadCenter, /frontier\.sh/);
   assert.match(downloadCenter, /frontier\.ps1/);
-  assert.match(downloadCenter, /RAPP_FRONTIER_REPO/);
+  assert.match(downloadCenter, /BRAINSTEM_BETA_COMMIT/);
+  assert.match(downloadCenter, /releases\/tags/);
+  assert.match(downloadCenter, /PUBLIC_REPOSITORY_OVERRIDE/);
   assert.match(installerPage, /install, update or repair, and launch/);
   assert.doesNotMatch(installerPage, /\.join\("\\n"\)/);
 });
@@ -138,6 +140,7 @@ test("dedicated beta page resolves fork releases without changing main install",
 test("dedicated beta page uses the Download Center details structure", () => {
   assert.match(installerPage, /AIBAST Download Center/);
   assert.match(installerPage, /Choose your operating system/);
+  assert.match(installerPage, /id="architecture-select"/);
   assert.match(installerPage, /Choose the download you want/);
   assert.match(installerPage, />Details</);
   assert.match(installerPage, />System Requirements</);

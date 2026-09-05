@@ -9,7 +9,9 @@ import {
   RELEASE_MANIFEST_FENCE,
   RELEASE_MANIFEST_SCHEMA,
   analyzePackagedDownloads,
+  applyReleaseSummary,
   buildBootstrapDownloads,
+  buildReleaseTransaction,
   claimDownloadCenterInitialization,
   detectArchitecture,
   discoverRelease,
@@ -151,35 +153,78 @@ function jsonResponse(value, { status = 200, headers = {} } = {}) {
   return new Response(JSON.stringify(value), { status, headers });
 }
 
-test("repository and optional tag resolution stay fork-aware", () => {
+test("public repository authority is origin-bound and localhost overrides are untrusted", () => {
   assert.deepEqual(
     resolveDownloadContext({
-      search: "?repo=contoso/frontier-fork&tag=brainstem-beta-v9.1.0",
-      hostname: "microsoft.github.io",
-      pathname: "/aibast-agents-library/beta/",
+      search: "?tag=brainstem-beta-v9.1.0",
+      hostname: "contoso.github.io",
+      pathname: "/frontier-fork/beta/",
     }),
     {
       repository: "contoso/frontier-fork",
       requestedTag: "brainstem-beta-v9.1.0",
+      trusted: true,
+      authority: "github-pages-origin",
+      warning: "",
     },
   );
 
   assert.deepEqual(
     resolveDownloadContext({
-      search: "",
-      hostname: "contoso.github.io",
-      pathname: "/frontier-fork/beta/",
+      search: "?repo=contoso/frontier-fork",
+      hostname: "localhost",
+      pathname: "/beta/",
     }),
-    { repository: "contoso/frontier-fork", requestedTag: null },
+    {
+      repository: "contoso/frontier-fork",
+      requestedTag: null,
+      trusted: false,
+      authority: "localhost-override",
+      warning:
+        "LOCAL TEST ONLY — UNTRUSTED REPOSITORY contoso/frontier-fork. "
+        + "Do not redistribute commands or downloads from this page.",
+    },
   );
 
-  assert.deepEqual(
-    resolveDownloadContext({
-      search: "?repo=not/a/repository",
+  assert.throws(
+    () => resolveDownloadContext({
+      search: "?repo=attacker/payload",
+      hostname: "microsoft.github.io",
+      pathname: "/aibast-agents-library/beta/",
+    }),
+    (error) => error.code === "PUBLIC_REPOSITORY_OVERRIDE",
+  );
+  assert.throws(
+    () => resolveDownloadContext({
+      search: "",
+      hostname: "downloads.example.com",
+      pathname: "/beta/",
+    }),
+    (error) => error.code === "AMBIGUOUS_DEPLOYMENT_ORIGIN",
+  );
+  assert.throws(
+    () => resolveDownloadContext({
+      search: "",
+      hostname: "contoso.github.io",
+      pathname: "/beta/",
+    }),
+    (error) => error.code === "AMBIGUOUS_DEPLOYMENT_PATH",
+  );
+  assert.throws(
+    () => resolveDownloadContext({
+      search: "?tag=v9.1.0",
       hostname: "contoso.github.io",
       pathname: "/frontier-fork/beta/",
     }),
-    { repository: "contoso/frontier-fork", requestedTag: null },
+    (error) => error.code === "INVALID_RELEASE_TAG",
+  );
+  assert.throws(
+    () => resolveDownloadContext({
+      search: "?repo=../payload",
+      hostname: "localhost",
+      pathname: "/beta/",
+    }),
+    (error) => error.code === "INVALID_REPOSITORY",
   );
 });
 
@@ -231,20 +276,17 @@ test("release discovery executes the real API selection and commit validation", 
     ],
   });
   const calls = [];
-  const releases = [
-    release({ tag_name: tag, published_at: "2026-09-04T20:00:00Z" }),
-    release({
-      id: 10,
-      tag_name: olderTag,
-      published_at: "2026-08-01T00:00:00Z",
-      assets: [olderAsset],
-      body: manifestBody(olderManifest),
-    }),
-  ];
+  const selectedRelease = release({
+    id: 10,
+    tag_name: olderTag,
+    published_at: "2026-08-01T00:00:00Z",
+    assets: [olderAsset],
+    body: manifestBody(olderManifest),
+  });
   const fetchImpl = async (url, options) => {
     calls.push({ url, options });
     return calls.length === 1
-      ? jsonResponse(releases)
+      ? jsonResponse(selectedRelease)
       : jsonResponse({ sha: commit.toUpperCase() });
   };
 
@@ -265,7 +307,7 @@ test("release discovery executes the real API selection and commit validation", 
   );
   assert.equal(
     calls[0].url,
-    `https://api.github.com/repos/${repository}/releases?per_page=30`,
+    `https://api.github.com/repos/${repository}/releases/tags/${olderTag}`,
   );
   assert.equal(
     calls[1].url,
@@ -274,10 +316,117 @@ test("release discovery executes the real API selection and commit validation", 
   assert.equal(calls[0].options.headers.Accept, "application/vnd.github+json");
 });
 
+test("default discovery requests 100 releases and orders by published_at", async () => {
+  const releases = Array.from({ length: 40 }, (_, index) => release({
+    id: index + 1,
+    tag_name: `brainstem-beta-v1.0.${index}`,
+    published_at: new Date(Date.UTC(2026, 0, index + 1)).toISOString(),
+  })).reverse();
+  const expected = releases.at(-1);
+  expected.published_at = "2027-01-01T00:00:00Z";
+  const calls = [];
+  const result = await discoverRelease({
+    repository,
+    fetchImpl: async (url) => {
+      calls.push(url);
+      return url.includes("/releases?")
+        ? jsonResponse(releases)
+        : jsonResponse({ sha: commit });
+    },
+  });
+
+  assert.equal(result.tag, expected.tag_name);
+  assert.equal(
+    calls[0],
+    `https://api.github.com/repos/${repository}/releases?per_page=100`,
+  );
+});
+
+test("resolved fork packages and pinned identity reach the DOM transaction", async () => {
+  const releaseAsset = asset("Frontier-win-x64.exe");
+  const selectedRelease = release({
+    assets: [releaseAsset],
+    body: manifestBody(manifestFor([releaseAsset])),
+  });
+  const context = resolveDownloadContext({
+    search: `?tag=${tag}`,
+    hostname: "octo.github.io",
+    pathname: "/frontier/beta/",
+  });
+  const resolved = await discoverRelease({
+    repository: context.repository,
+    requestedTag: context.requestedTag,
+    fetchImpl: async (url) => url.includes("/releases/tags/")
+      ? jsonResponse(selectedRelease)
+      : jsonResponse({ sha: commit.toUpperCase() }),
+  });
+  const transaction = buildReleaseTransaction({
+    context,
+    release: resolved,
+    locale: "en-US",
+  });
+
+  assert.equal(transaction.downloadItems[0].fileName, releaseAsset.name);
+  const windowsSource = transaction.downloadItems.find(
+    (item) => item.id === "source-windows",
+  );
+  assert.match(windowsSource.command, new RegExp(commit));
+  assert.match(windowsSource.command, new RegExp(tag));
+  assert.match(windowsSource.command, new RegExp(repository));
+
+  const elements = Object.fromEntries(
+    [
+      "sourceLink",
+      "goldenPathLink",
+      "releaseLinkTop",
+      "releaseLinkBottom",
+      "version",
+      "date",
+      "commit",
+      "resolvedDate",
+      "status",
+      "statusDot",
+      "error",
+    ].map((name) => [name, {
+      textContent: "",
+      href: "",
+      title: "",
+      className: "",
+      hidden: true,
+    }]),
+  );
+  applyReleaseSummary(elements, transaction);
+  assert.equal(elements.commit.textContent, commit.slice(0, 12));
+  assert.match(elements.resolvedDate.textContent, new RegExp(repository));
+  assert.equal(elements.status.textContent, "Prerelease ready");
+  assert.equal(elements.error.hidden, true);
+
+  const localContext = resolveDownloadContext({
+    search: `?repo=${repository}&tag=${tag}`,
+    hostname: "localhost",
+    pathname: "/beta/",
+  });
+  applyReleaseSummary(
+    elements,
+    buildReleaseTransaction({ context: localContext, release: resolved, locale: "en-US" }),
+  );
+  assert.equal(elements.status.textContent, "LOCAL TEST · UNTRUSTED REPOSITORY");
+  assert.equal(elements.statusDot.className, "status-dot error");
+  assert.match(elements.error.textContent, /LOCAL TEST ONLY — UNTRUSTED REPOSITORY/);
+
+  assert.throws(
+    () => buildReleaseTransaction({
+      context,
+      release: { ...resolved, commit: "not-a-commit" },
+      locale: "en-US",
+    }),
+    (error) => error.code === "INVALID_RELEASE_TRANSACTION",
+  );
+});
+
 test("only manifest-allowlisted packaged assets are promoted deterministically", () => {
   const validAssets = [
     asset("Frontier-2.0.0-mac-arm64.dmg"),
-    asset("Frontier-2.0.0-win-arm64.exe"),
     asset("Frontier-2.0.0-win-x64.exe"),
     asset("Frontier-2.0.0-mac-x64.dmg"),
   ];
@@ -301,7 +450,6 @@ test("only manifest-allowlisted packaged assets are promoted deterministically",
 
   const expectedNames = [
     "Frontier-2.0.0-win-x64.exe",
-    "Frontier-2.0.0-win-arm64.exe",
     "Frontier-2.0.0-mac-x64.dmg",
     "Frontier-2.0.0-mac-arm64.dmg",
   ];
@@ -327,6 +475,8 @@ test("hostile package names cannot enter the manifest allowlist", async (t) => {
     "Frontier-mac-arm64.dmg.exe",
     "Frontier-win-x64\u202Ecod.exe",
     "CON.exe",
+    "Frontier-uninstaller-x64.exe",
+    "Frontier-unins000-x64.exe",
   ]) {
     await t.test(fileName, () => {
       const releaseAsset = asset(fileName);
@@ -399,6 +549,15 @@ test("every provenance binding fails closed on manifest mismatch", async (t) => 
       );
     });
   }
+
+  const duplicateTupleAssets = [
+    asset("Frontier-win-x64.exe"),
+    asset("Frontier-portable-win-x64.exe"),
+  ];
+  assert.throws(
+    () => analyze(duplicateTupleAssets),
+    /platform\/architecture tuple windows:x64 is duplicated/,
+  );
 });
 
 test("missing or invalid provenance falls back visibly to source bootstraps", async () => {
@@ -441,7 +600,7 @@ test("missing or invalid provenance falls back visibly to source bootstraps", as
     presentBinaryUnavailable(elements, result.binaryAvailability);
     assert.equal(elements.error.hidden, false);
     assert.match(elements.error.textContent, /Packaged installers are unavailable/);
-    assert.match(elements.error.textContent, /source bootstraps remain available/);
+    assert.match(elements.error.textContent, /exact-commit source install remains available/);
   }
 
   assert.throws(
@@ -454,66 +613,65 @@ test("missing or invalid provenance falls back visibly to source bootstraps", as
 
 test("architecture-aware ordering recommends a compatible package before source fallback", () => {
   const packagedAssets = [
-    asset("Frontier-win-arm64.exe"),
     asset("Frontier-win-x64.exe"),
+    asset("Frontier-mac-x64.dmg"),
     asset("Frontier-mac-arm64.dmg"),
+    asset("Frontier-mac-universal.dmg"),
   ];
   const { downloads } = analyze(packagedAssets);
   const catalog = [
     ...downloads,
     ...buildBootstrapDownloads({
       repository,
-      baseUrl: "https://contoso.github.io/frontier/beta/",
+      tag,
+      commit,
     }),
   ];
 
   assert.deepEqual(
     orderDownloadsForPlatform(catalog, "windows", "arm64").map((item) => item.fileName),
-    ["Frontier-win-arm64.exe", "frontier.ps1", "Frontier-win-x64.exe"],
+    [],
   );
   assert.deepEqual(
     orderDownloadsForPlatform(catalog, "windows", "x64").map((item) => item.fileName),
-    ["Frontier-win-x64.exe", "frontier.ps1", "Frontier-win-arm64.exe"],
-  );
-  assert.deepEqual(
-    orderDownloadsForPlatform(catalog, "windows").map((item) => item.fileName),
-    ["Frontier-win-x64.exe", "Frontier-win-arm64.exe", "frontier.ps1"],
+    ["Frontier-win-x64.exe", "install.cmd"],
   );
   assert.deepEqual(
     orderDownloadsForPlatform(catalog, "linux", "arm64").map((item) => item.fileName),
-    ["frontier.sh"],
+    ["install.sh"],
   );
-
-  const unspecifiedAsset = asset("Frontier-Setup.exe");
-  const unspecified = analyze(
-    [unspecifiedAsset],
-    manifestFor([unspecifiedAsset], {
-      artifacts: [manifestEntry(unspecifiedAsset, { architecture: "arm64" })],
-    }),
-  ).downloads;
   assert.deepEqual(
-    orderDownloadsForPlatform(
-      [...unspecified, ...catalog.filter((item) => item.kind === "bootstrap")],
-      "windows",
-      "arm64",
-    ).map((item) => item.fileName),
-    ["Frontier-Setup.exe", "frontier.ps1"],
+    orderDownloadsForPlatform(catalog, "macos", "arm64").map((item) => item.fileName),
+    ["Frontier-mac-arm64.dmg", "Frontier-mac-universal.dmg", "install.sh"],
+  );
+  assert.deepEqual(
+    orderDownloadsForPlatform(catalog, "macos", "x64").map((item) => item.fileName),
+    ["Frontier-mac-x64.dmg", "Frontier-mac-universal.dmg", "install.sh"],
+  );
+  assert.throws(
+    () => orderDownloadsForPlatform(catalog, "windows"),
+    (error) => error.code === "INVALID_ARCHITECTURE",
   );
 });
 
-test("Windows ARM64 is only advertised when an ARM64 package exists", () => {
+test("Windows ARM64 packages and claims remain disabled", () => {
   const x64Asset = asset("Frontier-win-x64.exe");
   const arm64Asset = asset("Frontier-win-arm64.exe");
   const x64Only = analyze([x64Asset]).downloads;
-  const withArm64 = analyze([x64Asset, arm64Asset]).downloads;
 
   assert.equal(windowsSupportLabel(x64Only), "Windows 11 x64");
   assert.doesNotMatch(windowsSupportLabel(x64Only), /ARM64/);
-  assert.equal(windowsSupportLabel(withArm64), "Windows 11 x64 or ARM64");
+  assert.throws(
+    () => analyze([arm64Asset]),
+    /architecture is invalid/,
+  );
   assert.match(
     platformRecommendation(x64Only, "windows", "arm64"),
-    /No ARM64 packaged installer is published/,
+    /Windows ARM64 is not supported/,
   );
+  const pageSource = readFileSync(path.join(betaRoot, "index.html"), "utf8");
+  assert.doesNotMatch(pageSource, /Windows 11 x64 or ARM64/);
+  assert.match(pageSource, /ARM64 \(macOS or Linux\)/);
 });
 
 test("missing and invalid size measurements fail instead of being skipped", () => {
@@ -600,7 +758,28 @@ test("release failures are visible while source fallback remains inspectable", (
       "https://contoso.github.io/frontier/beta/frontier.sh",
     ],
   );
-  assert.ok(fallback.every((item) => item.command.includes(`RAPP_FRONTIER_REPO="${repository}"`)));
+  assert.ok(fallback.every((item) => item.command === "" && item.ready === false));
+
+  const pinned = buildBootstrapDownloads({ repository, tag, commit });
+  assert.ok(pinned.every((item) => item.command.includes(commit)));
+  assert.ok(pinned.every((item) => item.command.includes(tag)));
+  assert.ok(pinned.every((item) => item.command.includes(`https://github.com/${repository}.git`)));
+  assert.ok(pinned.every((item) => item.command.includes("BRAINSTEM_BETA_RELEASE_TAG")));
+  assert.ok(pinned.every((item) => item.command.includes("BRAINSTEM_BETA_COMMIT")));
+  assert.ok(pinned.every((item) => !/RAPP_FRONTIER_REPO/.test(item.command)));
+  assert.ok(pinned.every((item) => !/beta\/frontier\.(?:ps1|sh)/.test(item.command)));
+  assert.ok(pinned.every((item) => item.href.includes(`/blob/${commit}/beta/install.`)));
+  assert.match(pinned[0].command, /BRAINSTEM_BETA_BOOTSTRAP_URL/);
+  assert.ok(
+    pinned[0].command.includes(
+      `https://raw.githubusercontent.com/${repository}/${commit}/beta/install.cmd`,
+    ),
+  );
+  assert.ok(
+    pinned[1].command.includes(
+      `https://raw.githubusercontent.com/${repository}/${commit}/beta/install.sh`,
+    ),
+  );
 });
 
 test("duplicate initialization exits before listener registration", async () => {

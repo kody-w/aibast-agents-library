@@ -151,14 +151,17 @@ The dedicated Download Center-style GitHub Pages installer is published at
 `/beta/`. It provides platform bootstrap downloads, copyable install commands,
 release metadata, requirements, and installation guidance. The page resolves
 the latest `brainstem-beta-v*` release from the fork serving it, so staging and
-production remain separate. If that release includes packaged `.exe` or `.dmg`
-assets, the page exposes them only when one fenced
+production remain separate. Public query-string repository overrides are
+rejected; localhost overrides are marked untrusted. Source commands are enabled
+only after the displayed tag resolves to a validated full commit and pin both
+values into the installer environment. If that release includes packaged
+`.exe` or `.dmg` assets, the page exposes them only when one fenced
 `rapp-frontier-release-manifest` object binds the exact filename, platform,
 architecture, GitHub SHA-256 digest, verified signing identity, compatible
 runtime, and successful package gate. Missing or mismatched provenance fails
 closed to the source bootstrap.
 
-### Windows 11
+### Windows 11 x64
 
 Run this in PowerShell:
 
