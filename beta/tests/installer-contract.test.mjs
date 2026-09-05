@@ -148,6 +148,9 @@ test("dedicated beta page uses the Download Center details structure", () => {
   assert.match(installerPage, /aria-controls="panel-requirements"/);
   assert.match(installerPage, /aria-controls="panel-install"/);
   assert.match(installerPage, /aria-controls="panel-additional"/);
+  assert.match(installerPage, /id="golden-path-link"/);
+  assert.match(installerPage, /github\.com\/microsoft\/aibast-agents-library\/blob\/main\/beta\/GOLDEN_PATH\.md/);
+  assert.doesNotMatch(installerPage, /href="GOLDEN_PATH\.md"/);
   assert.match(downloadCenter, /RAPP-Brainstem-Frontier-Windows\.ps1/);
   assert.match(downloadCenter, /RAPP-Brainstem-Frontier-macOS-Linux\.sh/);
   assert.match(installerPage, /download-center\.js/);

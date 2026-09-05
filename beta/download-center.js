@@ -438,6 +438,15 @@ function sourceTreeUrl(repository, ref = "main") {
   return `https://github.com/${repository}/tree/${encodeURIComponent(ref)}/beta`;
 }
 
+export function goldenPathUrl(repository, ref = "main") {
+  if (!validRepository(repository)) {
+    throw new DownloadCenterError("The golden path repository is invalid.", {
+      code: "INVALID_REPOSITORY",
+    });
+  }
+  return `https://github.com/${repository}/blob/${encodeURIComponent(ref)}/beta/GOLDEN_PATH.md`;
+}
+
 function releaseListUrl(repository) {
   return `https://github.com/${repository}/releases`;
 }
@@ -465,6 +474,7 @@ function normalizeReleaseMetadata(release, { repository, requestedTag }) {
     publishedAt: new Date(publishedTimestamp),
     releaseUrl: releaseWebUrl(repository, tag),
     sourceUrl: sourceTreeUrl(repository, tag),
+    goldenPathUrl: goldenPathUrl(repository, tag),
     packagedDownloads: downloads,
     rejectedAssets: rejected,
   };
@@ -724,6 +734,7 @@ function collectElements(documentObject) {
     unixScript: requireElement(documentObject, "unix-script"),
     windowsScript: requireElement(documentObject, "windows-script"),
     sourceLink: requireElement(documentObject, "source-link"),
+    goldenPathLink: requireElement(documentObject, "golden-path-link"),
     releaseLinkTop: requireElement(documentObject, "release-link-top"),
     releaseLinkBottom: requireElement(documentObject, "release-link-bottom"),
     expandAll: requireElement(documentObject, "expand-all"),
@@ -1015,6 +1026,7 @@ export async function initializeDownloadCenter({
   };
 
   elements.sourceLink.href = sourceTreeUrl(repository);
+  elements.goldenPathLink.href = goldenPathUrl(repository);
   setReleaseLinks(elements, releaseListUrl(repository));
   setFileNames(
     documentObject,
@@ -1049,6 +1061,7 @@ export async function initializeDownloadCenter({
     );
 
     elements.sourceLink.href = release.sourceUrl;
+    elements.goldenPathLink.href = release.goldenPathUrl;
     elements.status.textContent = release.prerelease ? "Prerelease ready" : "Release ready";
     elements.statusDot.className = "status-dot ready";
     elements.version.textContent = release.version;

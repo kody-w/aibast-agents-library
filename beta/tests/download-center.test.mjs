@@ -13,6 +13,7 @@ import {
   discoverRelease,
   fetchGitHubJson,
   formatBytes,
+  goldenPathUrl,
   initializeDownloadCenter,
   orderDownloadsForPlatform,
   platformRecommendation,
@@ -155,6 +156,10 @@ test("release discovery executes the real API selection and commit validation", 
   assert.equal(result.version, "1.0.0");
   assert.equal(result.commit, commit);
   assert.equal(result.packagedDownloads.length, 1);
+  assert.equal(
+    result.goldenPathUrl,
+    `https://github.com/${repository}/blob/${olderTag}/beta/GOLDEN_PATH.md`,
+  );
   assert.equal(
     calls[0].url,
     `https://api.github.com/repos/${repository}/releases?per_page=30`,
@@ -404,6 +409,12 @@ test("download URLs and DOM wiring reject executable injection surfaces", () => 
   const pageSource = readFileSync(path.join(betaRoot, "index.html"), "utf8");
   assert.doesNotMatch(moduleSource, /\binnerHTML\b|insertAdjacentHTML|document\.write/);
   assert.match(pageSource, /<script type="module" src="download-center\.js"><\/script>/);
+  assert.doesNotMatch(pageSource, /href="GOLDEN_PATH\.md"/);
+  assert.match(pageSource, /id="golden-path-link"/);
+  assert.equal(
+    goldenPathUrl("contoso/frontier", "brainstem-beta-v2.0.0"),
+    "https://github.com/contoso/frontier/blob/brainstem-beta-v2.0.0/beta/GOLDEN_PATH.md",
+  );
   assert.equal(
     [...pageSource.matchAll(/src="download-center\.js"/g)].length,
     1,
