@@ -1,0 +1,4570 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brainstem Terrarium</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--cp-bg);
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      color: inherit;
+      font: inherit;
+    }
+
+    button,
+    a,
+    input,
+    select,
+    summary {
+      outline-color: var(--cp-accent);
+      outline-offset: 3px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled,
+    input:disabled,
+    select:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+    }
+
+    a {
+      color: var(--cp-link);
+    }
+
+    code,
+    pre {
+      font-family: Consolas, "Courier New", Courier, monospace;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 8px;
+      left: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--cp-accent);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-accent);
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .app-shell {
+      width: min(1600px, 100%);
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 20px 0 18px;
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid var(--cp-accent);
+      border-radius: 16px;
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .eyebrow {
+      margin: 0 0 2px;
+      color: var(--cp-accent);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 3px;
+      font-size: clamp(1.35rem, 2vw, 1.8rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+    }
+
+    h2 {
+      margin-bottom: 4px;
+      font-size: 1.03rem;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .subtitle,
+    .muted {
+      color: var(--cp-text-muted);
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 0.88rem;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .button,
+    .button-secondary,
+    .button-quiet,
+    .button-danger {
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .button {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+    }
+
+    .button:hover:not(:disabled) {
+      border-color: var(--cp-accent-hover);
+      background: var(--cp-accent-hover);
+    }
+
+    .button-secondary:hover:not(:disabled),
+    .button-quiet:hover:not(:disabled) {
+      border-color: var(--cp-border-strong);
+      background: var(--cp-surface-soft);
+    }
+
+    .button-quiet {
+      border-color: var(--cp-border);
+      background: var(--cp-bg-elevated);
+      font-weight: 600;
+    }
+
+    .button-danger {
+      border-color: var(--cp-danger);
+      background: var(--cp-surface);
+      color: var(--cp-danger);
+    }
+
+    .button-danger:hover:not(:disabled) {
+      background: var(--cp-surface-soft);
+    }
+
+    .compact-button {
+      min-height: 32px;
+      padding: 5px 9px;
+      font-size: 0.82rem;
+    }
+
+    .status-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 14px;
+      padding: 12px 0;
+      color: var(--cp-text-muted);
+      font-size: 0.82rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 9px;
+      border: 1px solid var(--cp-border);
+      border-radius: 999px;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--cp-text-muted);
+    }
+
+    .status-pill[data-status="ok"] .status-dot,
+    .badge[data-status="active"] {
+      border-color: var(--cp-success);
+      color: var(--cp-success);
+    }
+
+    .status-pill[data-status="ok"] .status-dot {
+      background: var(--cp-success);
+    }
+
+    .status-pill[data-status="unauthenticated"] .status-dot,
+    .badge[data-status="unhatched"] {
+      border-color: var(--cp-warning);
+      color: var(--cp-warning);
+    }
+
+    .status-pill[data-status="unauthenticated"] .status-dot {
+      background: var(--cp-warning);
+    }
+
+    .status-pill[data-status="unavailable"] .status-dot,
+    .badge[data-status="unavailable"] {
+      border-color: var(--cp-danger);
+      color: var(--cp-danger);
+    }
+
+    .status-pill[data-status="unavailable"] .status-dot {
+      background: var(--cp-danger);
+    }
+
+    .badge[data-status="dormant"] {
+      border-color: var(--cp-border-strong);
+      color: var(--cp-text-muted);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .main-column {
+      display: grid;
+      min-width: 0;
+      gap: 16px;
+    }
+
+    .panel {
+      min-width: 0;
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      background: var(--cp-surface);
+      box-shadow: 0 0 0 1px var(--cp-sheen), 0 1px 2px var(--cp-border);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    .panel-header p {
+      margin: 0;
+      font-size: 0.83rem;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .issues {
+      margin-bottom: 16px;
+      border-color: var(--cp-warning);
+    }
+
+    .issues .panel-body {
+      padding: 12px 16px;
+    }
+
+    .issues-title {
+      margin-bottom: 4px;
+      color: var(--cp-warning);
+      font-size: 0.88rem;
+    }
+
+    .issues ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--cp-text);
+      font-size: 0.83rem;
+    }
+
+    .read-error {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--cp-danger);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-danger);
+      font-size: 0.86rem;
+    }
+
+    .habitat {
+      overflow: hidden;
+    }
+
+    .habitat-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .habitat-glyph {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+      color: var(--cp-success);
+      font-weight: 800;
+    }
+
+    .race-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--cp-border);
+      background: var(--cp-bg-elevated);
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+    }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--cp-text-muted);
+      font-size: 0.69rem;
+      font-weight: 750;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      display: block;
+      overflow: hidden;
+      font-size: 1.04rem;
+      font-weight: 760;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .metric-note {
+      display: block;
+      margin-top: 2px;
+      color: var(--cp-text-muted);
+      font-size: 0.7rem;
+    }
+
+    .habitat-empty,
+    .empty-state {
+      display: grid;
+      min-height: 270px;
+      place-items: center;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .empty-state {
+      min-height: 180px;
+    }
+
+    .empty-state-inner {
+      max-width: 520px;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .empty-state p {
+      margin: 0;
+      color: var(--cp-text-muted);
+      font-size: 0.86rem;
+    }
+
+    .replay-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+    }
+
+    .field label,
+    .field-label {
+      color: var(--cp-text-muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    select,
+    textarea {
+      width: 100%;
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--cp-accent);
+    }
+
+    input[type="checkbox"] {
+      accent-color: var(--cp-accent);
+    }
+
+    .replay-toolbar .field {
+      min-width: min(260px, 100%);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      color: var(--cp-text-muted);
+      font-size: 0.74rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border: 2px solid var(--cp-border-strong);
+      border-radius: 999px;
+      background: var(--cp-surface);
+    }
+
+    .legend-dot.agent {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent);
+    }
+
+    .legend-dot.food {
+      border-color: var(--cp-success);
+      background: var(--cp-success);
+    }
+
+    .legend-dot.hazard {
+      border-color: var(--cp-danger);
+      background: var(--cp-danger);
+    }
+
+    .boards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--cp-bg-elevated);
+    }
+
+    .board-card {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      background: var(--cp-surface);
+    }
+
+    .board-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    .board-header h3 {
+      margin: 0;
+    }
+
+    .board-id {
+      display: block;
+      margin-top: 2px;
+      color: var(--cp-text-muted);
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.7rem;
+    }
+
+    .board-frame-meta {
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+      text-align: right;
+    }
+
+    .board-canvas-wrap {
+      min-height: 300px;
+      padding: 12px;
+      background: var(--cp-bg-elevated);
+    }
+
+    .board-canvas {
+      display: block;
+      width: 100%;
+      height: 300px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+    }
+
+    .board-event {
+      min-height: 44px;
+      margin: 0;
+      padding: 10px 14px;
+      border-top: 1px solid var(--cp-border);
+      color: var(--cp-text-muted);
+      font-size: 0.76rem;
+    }
+
+    .replay-controls {
+      display: grid;
+      grid-template-columns: auto minmax(160px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 18px 18px;
+      border-top: 1px solid var(--cp-border);
+    }
+
+    .transport {
+      display: flex;
+      gap: 6px;
+    }
+
+    .scrubber-wrap {
+      display: grid;
+      gap: 4px;
+    }
+
+    .scrubber-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+    }
+
+    .replay-note {
+      margin: 0;
+      padding: 0 18px 16px;
+      color: var(--cp-text-muted);
+      font-size: 0.74rem;
+    }
+
+    .roster-panel .panel-body {
+      padding: 14px;
+    }
+
+    .roster-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .count-chip,
+    .badge,
+    .capability-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border: 1px solid var(--cp-border);
+      border-radius: 999px;
+      background: var(--cp-surface);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .creature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .creature-card {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 10px;
+      width: 100%;
+      min-height: 88px;
+      padding: 12px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      text-align: left;
+    }
+
+    .creature-card:hover {
+      border-color: var(--cp-border-strong);
+      background: var(--cp-bg-elevated);
+    }
+
+    .creature-card[aria-pressed="true"] {
+      border-color: var(--cp-accent);
+      box-shadow: 0 0 0 2px var(--cp-accent-soft);
+    }
+
+    .creature-mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid var(--cp-accent);
+      border-radius: 16px;
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .creature-card[data-status="dormant"] .creature-mark {
+      border-color: var(--cp-border-strong);
+      background: var(--cp-surface-soft);
+      color: var(--cp-text-muted);
+    }
+
+    .creature-card[data-status="unavailable"] .creature-mark {
+      border-color: var(--cp-danger);
+      color: var(--cp-danger);
+    }
+
+    .creature-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .creature-name {
+      overflow: hidden;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .creature-meta,
+    .creature-problem {
+      display: block;
+      margin-top: 4px;
+      overflow: hidden;
+      color: var(--cp-text-muted);
+      font-size: 0.73rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .creature-problem {
+      color: var(--cp-danger);
+    }
+
+    .roster-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px 16px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--cp-border);
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+    }
+
+    .path-text {
+      max-width: 100%;
+      overflow: hidden;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .inspector {
+      position: sticky;
+      top: 12px;
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+    }
+
+    .inspector .panel-header {
+      position: sticky;
+      z-index: 4;
+      top: 0;
+      background: var(--cp-panel-strong);
+    }
+
+    .inspector-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .inspector-id {
+      margin: 3px 0 0;
+      color: var(--cp-text-muted);
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.74rem;
+    }
+
+    .action-stack {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 14px;
+      border-bottom: 1px solid var(--cp-border);
+      background: var(--cp-bg-elevated);
+    }
+
+    .action-stack .button,
+    .action-stack .button-secondary,
+    .action-stack .button-quiet,
+    .action-stack .button-danger {
+      display: inline-grid;
+      width: 100%;
+      place-items: center;
+      text-align: center;
+    }
+
+    .action-hint {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    .tabs[data-count="4"] {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .tab {
+      min-height: 42px;
+      padding: 8px;
+      border: 0;
+      border-right: 1px solid var(--cp-border);
+      border-radius: 0;
+      background: var(--cp-surface);
+      color: var(--cp-text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .tab:last-child {
+      border-right: 0;
+    }
+
+    .tab[aria-selected="true"] {
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+      box-shadow: inset 0 -2px var(--cp-accent);
+    }
+
+    .tab-panel {
+      padding: 16px;
+    }
+
+    .section-block + .section-block {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--cp-border);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .section-heading h3 {
+      margin: 0;
+    }
+
+    .section-kicker {
+      color: var(--cp-text-muted);
+      font-size: 0.7rem;
+    }
+
+    .capability-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .definition-grid {
+      display: grid;
+      grid-template-columns: minmax(100px, 0.45fr) minmax(0, 1fr);
+      gap: 8px 12px;
+      margin: 0;
+      font-size: 0.79rem;
+    }
+
+    .definition-grid dt {
+      color: var(--cp-text-muted);
+    }
+
+    .definition-grid dd {
+      min-width: 0;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .mono {
+      font-family: Consolas, "Courier New", Courier, monospace;
+    }
+
+    .program,
+    .diff,
+    .log-output,
+    .command-box {
+      max-height: 260px;
+      overflow: auto;
+      padding: 12px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+      color: var(--cp-text);
+      font-size: 0.74rem;
+      line-height: 1.55;
+    }
+
+    .program {
+      border-left-color: var(--cp-accent);
+    }
+
+    .diff {
+      min-height: 70px;
+    }
+
+    .lineage-selector {
+      display: flex;
+      gap: 6px;
+      padding-bottom: 4px;
+      overflow-x: auto;
+    }
+
+    .generation-button {
+      flex: 0 0 auto;
+      min-height: 32px;
+      padding: 5px 9px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .generation-button[aria-pressed="true"] {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+    }
+
+    .generation-button[data-accepted="false"] {
+      border-style: dashed;
+    }
+
+    .generation-meta {
+      margin-top: 10px;
+    }
+
+    .chart-wrap {
+      overflow: hidden;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .training-chart {
+      display: block;
+      width: 100%;
+      min-height: 170px;
+    }
+
+    .chart-caption {
+      margin: 0;
+      padding: 8px 10px;
+      border-top: 1px solid var(--cp-border);
+      color: var(--cp-text-muted);
+      font-size: 0.7rem;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metrics-grid .metric {
+      padding: 9px 10px;
+    }
+
+    .evidence-note {
+      margin: 8px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+    }
+
+    .contestant-table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+    }
+
+    th,
+    td {
+      padding: 7px 6px;
+      border-bottom: 1px solid var(--cp-border);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--cp-text-muted);
+      font-weight: 700;
+    }
+
+    .structured {
+      display: grid;
+      gap: 8px;
+      font-size: 0.76rem;
+    }
+
+    .structured-row {
+      display: grid;
+      grid-template-columns: minmax(90px, 0.4fr) minmax(0, 1fr);
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    .structured-key {
+      color: var(--cp-text-muted);
+      overflow-wrap: anywhere;
+    }
+
+    .structured-value {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .nested {
+      padding-left: 10px;
+      border-left: 2px solid var(--cp-border);
+    }
+
+    .vm-banner {
+      padding: 10px 12px;
+      border: 1px solid var(--cp-accent);
+      border-radius: 0.625rem;
+      background: var(--cp-accent-soft);
+      color: var(--cp-text);
+      font-size: 0.76rem;
+    }
+
+    .vm-banner strong {
+      color: var(--cp-accent);
+    }
+
+    .record-stack,
+    .invention-tree,
+    .invention-tree ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .invention-tree ul {
+      margin-top: 10px;
+      padding-left: 18px;
+      border-left: 2px solid var(--cp-border);
+    }
+
+    .record-card {
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .record-card[data-decision="accepted"] {
+      border-left-color: var(--cp-success);
+    }
+
+    .record-card[data-decision="not-accepted"] {
+      border-left-color: var(--cp-warning);
+    }
+
+    .record-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .record-title {
+      min-width: 0;
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: 0.8rem;
+      font-weight: 750;
+    }
+
+    .record-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .decision-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 2px 7px;
+      border: 1px solid var(--cp-border);
+      border-radius: 999px;
+      background: var(--cp-surface);
+      color: var(--cp-text-muted);
+      font-size: 0.68rem;
+      font-weight: 750;
+    }
+
+    .decision-chip[data-decision="accepted"] {
+      border-color: var(--cp-success);
+      color: var(--cp-success);
+    }
+
+    .decision-chip[data-decision="not-accepted"] {
+      border-color: var(--cp-warning);
+      color: var(--cp-warning);
+    }
+
+    .source-block {
+      max-height: 220px;
+      margin-top: 8px;
+      overflow: auto;
+      padding: 10px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 0.7rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .source-label {
+      display: block;
+      margin-top: 8px;
+      color: var(--cp-text-muted);
+      font-size: 0.68rem;
+      font-weight: 750;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .comparison-card {
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .comparison-card h4 {
+      margin: 0 0 8px;
+      font-size: 0.78rem;
+    }
+
+    .dependency-reference {
+      padding: 8px 10px;
+      border: 1px dashed var(--cp-border-strong);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+    }
+
+    .resume-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .operation-console {
+      margin-top: 16px;
+    }
+
+    .operation-console[data-tone="error"] {
+      border-color: var(--cp-danger);
+    }
+
+    .operation-console[data-tone="working"] {
+      border-color: var(--cp-accent);
+    }
+
+    .operation-status {
+      margin: 0;
+      color: var(--cp-text-muted);
+      font-size: 0.83rem;
+    }
+
+    .operation-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .operation-grid h3 {
+      margin-bottom: 6px;
+      font-size: 0.78rem;
+    }
+
+    .log-output {
+      min-height: 80px;
+      max-height: 300px;
+    }
+
+    .details-summary {
+      cursor: pointer;
+      color: var(--cp-text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .tool-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .footer-note {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+      margin-top: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+      color: var(--cp-text-muted);
+      font-size: 0.75rem;
+    }
+
+    .footer-note p {
+      margin: 0;
+      min-width: 0;
+    }
+
+    dialog {
+      width: min(560px, calc(100% - 28px));
+      max-height: calc(100vh - 28px);
+      padding: 0;
+      overflow: auto;
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      box-shadow: var(--cp-shadow);
+    }
+
+    dialog::backdrop {
+      background: var(--cp-overlay);
+    }
+
+    .dialog-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px;
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    .dialog-header p {
+      margin: 3px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.8rem;
+    }
+
+    .dialog-body {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--cp-border);
+      background: var(--cp-bg-elevated);
+    }
+
+    .capability-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 7px;
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      font-size: 0.8rem;
+    }
+
+    .checkbox-row input {
+      margin-top: 3px;
+    }
+
+    .form-error {
+      margin: 0;
+      color: var(--cp-danger);
+      font-size: 0.78rem;
+    }
+
+    .busy-line {
+      color: var(--cp-accent);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1050px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .inspector {
+        position: static;
+        max-height: none;
+      }
+
+      .inspector .panel-header {
+        position: static;
+      }
+
+      .inspector .tab-panel {
+        max-height: min(70vh, 680px);
+        overflow: auto;
+      }
+    }
+
+    @media (max-width: 740px) {
+      .app-shell {
+        padding: 12px;
+      }
+
+      .topbar {
+        display: grid;
+        padding-top: 14px;
+      }
+
+      .top-actions {
+        justify-content: flex-start;
+      }
+
+      .boards,
+      .operation-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .race-summary {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .replay-controls {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .transport {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .board-canvas-wrap {
+        min-height: 260px;
+      }
+
+      .board-canvas {
+        height: 260px;
+      }
+
+      .footer-note {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .panel-header {
+        padding: 14px;
+      }
+
+      .panel-body,
+      .tab-panel {
+        padding: 14px;
+      }
+
+      .creature-list {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .action-stack,
+      .capability-options,
+      .metrics-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .tabs,
+      .tabs[data-count="4"] {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .tab {
+        border-right: 0;
+        border-bottom: 1px solid var(--cp-border);
+      }
+
+      .tab:last-child {
+        border-bottom: 0;
+      }
+
+      .definition-grid,
+      .structured-row,
+      .comparison-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 3px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to terrarium</a>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">RB</div>
+        <div>
+          <p class="eyebrow">RAPP Brainstem experience</p>
+          <h1>Creature Terrarium</h1>
+          <p class="subtitle">One local Brainstem, visible as file-backed agents and recorded grid evidence.</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="open-introduce" class="button" type="button" aria-haspopup="dialog">Introduce creature</button>
+        <button id="refresh-terrarium" class="button-secondary" type="button" aria-label="Refresh terrarium inventory and snapshots">Refresh</button>
+        <a id="brainstem-link" class="button-quiet" href="/brainstem">Open Brainstem</a>
+      </div>
+    </header>
+
+    <div class="status-strip" aria-label="Brainstem connection status">
+      <span id="brainstem-status" class="status-pill" data-status="unavailable">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="brainstem-status-text">Connecting</span>
+      </span>
+      <span>Version <strong id="brainstem-version">—</strong></span>
+      <span>Model <strong id="brainstem-model">—</strong></span>
+      <span><strong id="loaded-tool-count">0</strong> loaded tools</span>
+      <span id="last-refresh">Not read yet</span>
+      <details id="loaded-tools-details">
+        <summary class="details-summary">Loaded tool names</summary>
+        <div id="loaded-tools" class="tool-list" aria-label="Loaded Brainstem tools"></div>
+      </details>
+    </div>
+
+    <div id="read-error" class="read-error" role="alert" hidden></div>
+    <section id="issues-panel" class="panel issues" aria-labelledby="issues-title" hidden>
+      <div class="panel-body">
+        <h2 id="issues-title" class="issues-title">Terrarium reported issues</h2>
+        <ul id="issues-list"></ul>
+      </div>
+    </section>
+
+    <main id="main-content">
+      <div class="workspace">
+        <div class="main-column">
+          <section class="panel habitat" aria-labelledby="habitat-title">
+            <div class="panel-header">
+              <div class="habitat-heading">
+                <div class="habitat-glyph" aria-hidden="true">╬</div>
+                <div>
+                  <h2 id="habitat-title">Recorded habitat</h2>
+                  <p class="muted">Held-out founder and descendant traces share one unfamiliar seed.</p>
+                </div>
+              </div>
+              <div class="legend" aria-label="Habitat legend">
+                <span class="legend-item"><span class="legend-dot agent" aria-hidden="true"></span>Agent</span>
+                <span class="legend-item"><span class="legend-dot food" aria-hidden="true"></span>Food</span>
+                <span class="legend-item"><span class="legend-dot hazard" aria-hidden="true"></span>Hazard</span>
+              </div>
+            </div>
+
+            <div id="race-summary" class="race-summary" hidden>
+              <div class="metric">
+                <span class="metric-label">Held-out ancestor</span>
+                <span id="race-ancestor-score" class="metric-value">—</span>
+                <span id="race-ancestor-detail" class="metric-note">No metrics</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Held-out descendant</span>
+                <span id="race-descendant-score" class="metric-value">—</span>
+                <span id="race-descendant-detail" class="metric-note">No metrics</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Reported improvement</span>
+                <span id="race-improvement" class="metric-value">—</span>
+                <span id="race-trials" class="metric-note">No race recorded</span>
+              </div>
+            </div>
+
+            <div id="habitat-empty" class="habitat-empty">
+              <div class="empty-state-inner">
+                <strong id="habitat-empty-title">Reading the local terrarium…</strong>
+                <p id="habitat-empty-copy">No movement is shown until a stored race trace is available.</p>
+              </div>
+            </div>
+
+            <div id="replay-content" hidden>
+              <div class="replay-toolbar">
+                <div class="field">
+                  <label for="course-select">Recorded held-out course</label>
+                  <select id="course-select" aria-label="Choose a held-out race seed"></select>
+                </div>
+                <div>
+                  <div class="legend">
+                    <span id="course-dimensions">Grid —</span>
+                    <span id="course-recordings">— traces</span>
+                  </div>
+                  <p id="course-warning" class="evidence-note" hidden></p>
+                </div>
+              </div>
+
+              <div class="boards">
+                <article class="board-card" aria-labelledby="ancestor-board-title">
+                  <div class="board-header">
+                    <div>
+                      <h3 id="ancestor-board-title">Founder</h3>
+                      <span id="ancestor-board-id" class="board-id">No trace</span>
+                    </div>
+                    <div id="ancestor-frame-meta" class="board-frame-meta">—</div>
+                  </div>
+                  <div class="board-canvas-wrap">
+                    <canvas id="ancestor-canvas" class="board-canvas" role="img" aria-label="No founder trace is selected">
+                      This replay board requires canvas support.
+                    </canvas>
+                  </div>
+                  <p id="ancestor-event" class="board-event">No stored frame.</p>
+                </article>
+
+                <article class="board-card" aria-labelledby="descendant-board-title">
+                  <div class="board-header">
+                    <div>
+                      <h3 id="descendant-board-title">Descendant</h3>
+                      <span id="descendant-board-id" class="board-id">No trace</span>
+                    </div>
+                    <div id="descendant-frame-meta" class="board-frame-meta">—</div>
+                  </div>
+                  <div class="board-canvas-wrap">
+                    <canvas id="descendant-canvas" class="board-canvas" role="img" aria-label="No descendant trace is selected">
+                      This replay board requires canvas support.
+                    </canvas>
+                  </div>
+                  <p id="descendant-event" class="board-event">No stored frame.</p>
+                </article>
+              </div>
+
+              <div class="replay-controls" aria-label="Recorded replay controls">
+                <div class="transport">
+                  <button id="replay-step-back" class="button-quiet compact-button" type="button" aria-label="Previous stored replay frame">Back</button>
+                  <button id="replay-toggle" class="button compact-button" type="button" aria-label="Play recorded race replay">Play</button>
+                  <button id="replay-step-forward" class="button-quiet compact-button" type="button" aria-label="Next stored replay frame">Next</button>
+                </div>
+                <div class="scrubber-wrap">
+                  <input id="replay-scrubber" type="range" min="0" max="0" value="0" aria-label="Stored replay frame">
+                  <div class="scrubber-labels">
+                    <span id="replay-position">Frame 0 of 0</span>
+                    <span id="replay-step-value">Recorded step —</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="replay-speed">Replay speed</label>
+                  <select id="replay-speed">
+                    <option value="0.5">0.5×</option>
+                    <option value="1" selected>1×</option>
+                    <option value="2">2×</option>
+                    <option value="4">4×</option>
+                  </select>
+                </div>
+              </div>
+              <p id="replay-note" class="replay-note">Playback advances only through stored trace frames and stops at the final frame.</p>
+            </div>
+          </section>
+
+          <section class="panel roster-panel" aria-labelledby="roster-title">
+            <div class="panel-header">
+              <div>
+                <h2 id="roster-title">File-backed creatures</h2>
+                <p class="muted">Adding or archiving a trusted agent file changes this inventory on the next read.</p>
+              </div>
+              <div id="roster-summary" class="roster-summary" aria-label="Creature status counts"></div>
+            </div>
+            <div class="panel-body">
+              <div id="roster-empty" class="empty-state">
+                <div class="empty-state-inner">
+                  <strong>No creature records loaded</strong>
+                  <p>Use Introduce creature when the caretaker tool is available. Introduction creates a trusted standalone agent but does not hatch it.</p>
+                </div>
+              </div>
+              <div id="creature-list" class="creature-list" aria-label="Terrarium creatures" hidden></div>
+              <div class="roster-footer">
+                <span id="creature-limit">Capacity —</span>
+                <span id="agents-path" class="path-text" title="">Agents path not reported</span>
+                <span id="dormant-path" class="path-text" title="">Dormant path not reported</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside id="inspector" class="panel inspector" aria-labelledby="inspector-title">
+          <div id="inspector-empty" class="empty-state">
+            <div class="empty-state-inner">
+              <strong>Select a creature</strong>
+              <p>Capabilities, executable genome changes, memory, and measured evidence appear here only when reported by its snapshot.</p>
+            </div>
+          </div>
+
+          <div id="inspector-content" hidden>
+            <div class="panel-header">
+              <div>
+                <div class="inspector-title-row">
+                  <h2 id="inspector-title">Creature</h2>
+                  <span id="inspector-status" class="badge" data-status="unavailable">Unavailable</span>
+                </div>
+                <p id="inspector-id" class="inspector-id">—</p>
+              </div>
+              <span id="inspector-generation" class="count-chip">No state</span>
+            </div>
+
+            <div id="creature-problem" class="read-error" role="alert" hidden></div>
+
+            <div class="action-stack" aria-label="Creature actions">
+              <button id="check-creature-status" class="button-quiet" type="button">Read tool status</button>
+              <button id="hatch-creature" class="button" type="button">Hatch with seed 41</button>
+              <button id="run-twelve" class="button" type="button">Run 12 generations</button>
+              <button id="run-race" class="button-secondary" type="button">Race 12 trials</button>
+              <button id="sleep-wake" class="button-secondary" type="button">Move to dormancy</button>
+              <button id="export-egg-action" class="button-secondary" type="button">Export egg</button>
+              <a id="export-agent" class="button-quiet" href="#" download>Download agent</a>
+              <a id="download-egg" class="button-quiet" href="#" download hidden>Download egg JSON</a>
+              <p id="action-hint" class="action-hint">Actions require the exact loaded tool name from the latest inventory read.</p>
+            </div>
+
+            <div id="inspector-tabs" class="tabs" role="tablist" aria-label="Creature inspector sections" data-count="3">
+              <button id="tab-profile" class="tab" type="button" role="tab" aria-selected="true" aria-controls="panel-profile" tabindex="0" data-tab="profile">Identity</button>
+              <button id="tab-genome" class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-genome" tabindex="-1" data-tab="genome">Genome changes</button>
+              <button id="tab-vm" class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-vm" tabindex="-1" data-tab="vm" hidden>VM &amp; tools</button>
+              <button id="tab-evidence" class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-evidence" tabindex="-1" data-tab="evidence">Evidence &amp; memory</button>
+            </div>
+
+            <section id="panel-profile" class="tab-panel" role="tabpanel" aria-labelledby="tab-profile">
+              <div class="section-block">
+                <div class="section-heading">
+                  <h3>Declared capabilities</h3>
+                  <span class="section-kicker">From inventory</span>
+                </div>
+                <div id="capability-list" class="capability-list"></div>
+              </div>
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <h3>Identity &amp; state</h3>
+                  <span class="section-kicker">Backend authoritative</span>
+                </div>
+                <dl id="identity-grid" class="definition-grid"></dl>
+              </div>
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <h3>Fresh-process resume</h3>
+                  <span class="section-kicker">Display only</span>
+                </div>
+                <pre id="resume-command" class="command-box">No resume command reported.</pre>
+                <div class="inline-actions" style="margin-top: 8px;">
+                  <button id="copy-resume-command" class="button-quiet compact-button" type="button">Copy command</button>
+                </div>
+              </div>
+            </section>
+
+            <section id="panel-genome" class="tab-panel" role="tabpanel" aria-labelledby="tab-genome" hidden>
+              <div id="genome-empty" class="empty-state">
+                <div class="empty-state-inner">
+                  <strong>No executable genome state</strong>
+                  <p>Hatch this trusted agent or resume a compatible egg before inspecting a program or lineage.</p>
+                </div>
+              </div>
+              <div id="genome-content" hidden>
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h3>Current bounded LisPy program</h3>
+                    <span id="current-genome-sha" class="section-kicker mono">—</span>
+                  </div>
+                  <pre id="current-program" class="program"></pre>
+                </div>
+
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h3>Generation record</h3>
+                    <span class="section-kicker">Select an exact generation</span>
+                  </div>
+                  <div id="lineage-selector" class="lineage-selector" aria-label="Recorded lineage generations"></div>
+                  <dl id="generation-meta" class="definition-grid generation-meta"></dl>
+                </div>
+
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h3>Exact accepted source diff</h3>
+                    <span class="section-kicker">Unified diff from snapshot</span>
+                  </div>
+                  <pre id="generation-diff" class="diff"></pre>
+                </div>
+              </div>
+            </section>
+
+            <section id="panel-vm" class="tab-panel" role="tabpanel" aria-labelledby="tab-vm" hidden>
+              <div id="vm-provenance-section" class="section-block" hidden>
+                <div class="section-heading">
+                  <h3 id="vm-section-title">LisPy · safe core operation meter</h3>
+                  <span class="section-kicker">Recorded snapshot</span>
+                </div>
+                <div id="vm-summary" class="metrics-grid"></div>
+                <div id="vm-details" class="structured" style="margin-top: 10px;"></div>
+                <div class="inline-actions" style="margin-top: 10px;">
+                  <a id="vm-source-link" class="button-quiet compact-button" href="#" target="_blank" rel="noreferrer" hidden>Open VM provenance</a>
+                </div>
+                <p class="evidence-note">This is the installed VM's safe-core profile, not a copied evaluator. Provenance, commit, deterministic in-process limits, cost model, and actual counters are displayed from the snapshot. These limits are not a hard adversarial OS sandbox.</p>
+              </div>
+
+              <div id="vm-tools-section" class="section-block" hidden>
+                <div class="section-heading">
+                  <h3>Inherited reusable tools</h3>
+                  <span class="section-kicker">Actual genome records</span>
+                </div>
+                <div id="vm-tools-list" class="record-stack"></div>
+              </div>
+
+              <div id="vm-inventions-section" class="section-block" hidden>
+                <div class="section-heading">
+                  <h3>Invention dependency tree</h3>
+                  <span id="vm-invention-summary" class="section-kicker"></span>
+                </div>
+                <ul id="invention-tree" class="invention-tree" aria-label="Recorded invention dependency tree"></ul>
+              </div>
+
+              <div id="vm-failures-section" class="section-block" hidden>
+                <div class="section-heading">
+                  <h3>Failed or not accepted attempts</h3>
+                  <span class="section-kicker">Recorded outcomes only</span>
+                </div>
+                <div id="failed-inventions" class="record-stack"></div>
+              </div>
+
+              <div id="vm-comparison-section" class="section-block" hidden>
+                <div class="section-heading">
+                  <h3>Primitive-only vs tool-enabled</h3>
+                  <span class="section-kicker">Compute comparison</span>
+                </div>
+                <div id="comparison-banner" class="vm-banner"></div>
+                <div class="comparison-grid">
+                  <article id="primitive-comparison" class="comparison-card" hidden>
+                    <h4>Primitive-only</h4>
+                    <div id="primitive-comparison-data" class="structured"></div>
+                  </article>
+                  <article id="tool-comparison" class="comparison-card" hidden>
+                    <h4>Tool-enabled</h4>
+                    <div id="tool-comparison-data" class="structured"></div>
+                  </article>
+                </div>
+                <div id="comparison-details" class="structured" style="margin-top: 10px;"></div>
+                <p class="evidence-note">The UI does not infer equal compute, improvement, or a winner. It shows the recorded budget, usage, seeds, and results so primitive-only and tool-enabled runs can be checked directly.</p>
+              </div>
+            </section>
+
+            <section id="panel-evidence" class="tab-panel" role="tabpanel" aria-labelledby="tab-evidence" hidden>
+              <div id="evidence-empty" class="empty-state">
+                <div class="empty-state-inner">
+                  <strong>No measured state</strong>
+                  <p>Training and held-out evidence are not estimated before a snapshot exists.</p>
+                </div>
+              </div>
+              <div id="evidence-content" hidden>
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h3>Training selection record</h3>
+                    <span class="section-kicker">Not held-out evidence</span>
+                  </div>
+                  <div id="training-metrics" class="metrics-grid"></div>
+                  <div class="chart-wrap" style="margin-top: 10px;">
+                    <svg id="training-chart" class="training-chart" viewBox="0 0 560 180" role="img" aria-labelledby="training-chart-title training-chart-desc">
+                      <title id="training-chart-title">Recorded training score by generation</title>
+                      <desc id="training-chart-desc">No lineage training scores are currently recorded.</desc>
+                    </svg>
+                    <p class="chart-caption">Recorded training score only. Accepted and unchanged generations are labeled in the lineage selector.</p>
+                  </div>
+                </div>
+
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h3>Held-out ancestor race</h3>
+                    <span id="race-seed-set" class="section-kicker">No race</span>
+                  </div>
+                  <div id="heldout-metrics" class="metrics-grid"></div>
+                  <p id="heldout-note" class="evidence-note">Race to record an unfamiliar course.</p>
+                  <div id="contestants-wrap" class="contestant-table-wrap" hidden>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Generation</th>
+                          <th>Genome</th>
+                          <th>Score</th>
+                          <th>Food</th>
+                          <th>Steps</th>
+                          <th>Energy</th>
+                        </tr>
+                      </thead>
+                      <tbody id="contestants-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h3>Structured memory</h3>
+                    <span class="section-kicker">Snapshot values</span>
+                  </div>
+                  <div id="memory-view" class="structured"></div>
+                </div>
+
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h3>Egg portability</h3>
+                    <span id="egg-status" class="section-kicker">Not exported</span>
+                  </div>
+                  <dl id="egg-meta" class="definition-grid"></dl>
+                  <p class="evidence-note">Download the exported egg, then use the fresh-process resume command on the Identity tab. The installer stages the complete history locally and sends only its content identifier through Brainstem chat. Existing creatures are never overwritten.</p>
+                </div>
+              </div>
+            </section>
+          </div>
+        </aside>
+      </div>
+
+      <section id="operation-console" class="panel operation-console" aria-labelledby="operation-title" data-tone="idle">
+        <div class="panel-header">
+          <div>
+            <h2 id="operation-title">Action evidence</h2>
+            <p id="operation-status" class="operation-status" role="status" aria-live="polite">No mutation or lifecycle action has been requested from this page.</p>
+          </div>
+          <span id="operation-session" class="count-chip">No chat session</span>
+        </div>
+        <div class="panel-body operation-grid">
+          <div>
+            <h3>Brainstem response</h3>
+            <pre id="operation-response" class="log-output">Explicit actions send one English tool request through POST /chat. HTTP completion is never presented as proof that the tool succeeded.</pre>
+          </div>
+          <div>
+            <h3>Authoritative agent log</h3>
+            <pre id="operation-logs" class="log-output">No agent log returned yet.</pre>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer-note">
+        <p><strong>Ground truth:</strong> This seeded grid-foraging simulation runs genome S-expressions through the installed LisPy safe-core profile reported by the snapshot. It makes no consciousness or sentience claim. Playback uses only recorded frames; there are no decorative liveness pulses, invented scores, or continuous background actions.</p>
+        <p><strong>Trust boundary:</strong> The bounded genome grammar exposes no host capabilities. Its deterministic in-process operation limits are not a hard adversarial OS sandbox, so install only trusted creature <code>_agent.py</code> files because agent Python remains executable code.</p>
+      </footer>
+    </main>
+  </div>
+
+  <dialog id="introduce-dialog" aria-labelledby="introduce-title">
+    <form id="introduce-form">
+      <div class="dialog-header">
+        <div>
+          <h2 id="introduce-title">Introduce a trusted creature</h2>
+          <p>The caretaker copies one standalone agent template. Hatching is a separate explicit action after inventory refresh.</p>
+        </div>
+        <button id="close-introduce" class="button-quiet compact-button" type="button" aria-label="Close introduce creature dialog">Close</button>
+      </div>
+      <div class="dialog-body">
+        <div class="field">
+          <label for="introduce-name">Creature name</label>
+          <input id="introduce-name" name="name" type="text" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9 _.\-]{0,63}" autocomplete="off" required>
+        </div>
+        <div class="field">
+          <label for="introduce-id">File-safe creature ID</label>
+          <input id="introduce-id" name="id" type="text" maxlength="32" pattern="[a-z][a-z0-9\-]{0,31}" autocomplete="off" required>
+        </div>
+        <fieldset style="margin: 0; padding: 0; border: 0;">
+          <legend class="field-label" style="margin-bottom: 5px;">Capabilities from the caretaker inventory</legend>
+          <div id="capability-options" class="capability-options"></div>
+        </fieldset>
+        <p id="introduce-error" class="form-error" role="alert" hidden></p>
+      </div>
+      <div class="dialog-footer">
+        <button id="cancel-introduce" class="button-secondary" type="button">Cancel</button>
+        <button id="submit-introduce" class="button" type="submit">Create agent file</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const byId = (id) => document.getElementById(id);
+      const svgNamespace = "http://www.w3.org/2000/svg";
+      const pollIntervalMs = 4000;
+      const validToolName = /^[A-Za-z0-9_.-]+$/;
+
+      const elements = {
+        readError: byId("read-error"),
+        issuesPanel: byId("issues-panel"),
+        issuesList: byId("issues-list"),
+        statusPill: byId("brainstem-status"),
+        statusText: byId("brainstem-status-text"),
+        version: byId("brainstem-version"),
+        model: byId("brainstem-model"),
+        loadedToolCount: byId("loaded-tool-count"),
+        loadedTools: byId("loaded-tools"),
+        lastRefresh: byId("last-refresh"),
+        refresh: byId("refresh-terrarium"),
+        openIntroduce: byId("open-introduce"),
+        introduceDialog: byId("introduce-dialog"),
+        introduceForm: byId("introduce-form"),
+        introduceName: byId("introduce-name"),
+        introduceId: byId("introduce-id"),
+        introduceError: byId("introduce-error"),
+        capabilityOptions: byId("capability-options"),
+        submitIntroduce: byId("submit-introduce"),
+        rosterSummary: byId("roster-summary"),
+        rosterEmpty: byId("roster-empty"),
+        creatureList: byId("creature-list"),
+        creatureLimit: byId("creature-limit"),
+        agentsPath: byId("agents-path"),
+        dormantPath: byId("dormant-path"),
+        inspectorEmpty: byId("inspector-empty"),
+        inspectorContent: byId("inspector-content"),
+        inspectorTitle: byId("inspector-title"),
+        inspectorStatus: byId("inspector-status"),
+        inspectorId: byId("inspector-id"),
+        inspectorGeneration: byId("inspector-generation"),
+        creatureProblem: byId("creature-problem"),
+        inspectorTabs: byId("inspector-tabs"),
+        vmTab: byId("tab-vm"),
+        checkStatus: byId("check-creature-status"),
+        hatch: byId("hatch-creature"),
+        evolve: byId("run-twelve"),
+        race: byId("run-race"),
+        sleepWake: byId("sleep-wake"),
+        exportEggAction: byId("export-egg-action"),
+        exportAgent: byId("export-agent"),
+        downloadEgg: byId("download-egg"),
+        actionHint: byId("action-hint"),
+        capabilityList: byId("capability-list"),
+        identityGrid: byId("identity-grid"),
+        resumeCommand: byId("resume-command"),
+        copyResumeCommand: byId("copy-resume-command"),
+        genomeEmpty: byId("genome-empty"),
+        genomeContent: byId("genome-content"),
+        currentGenomeSha: byId("current-genome-sha"),
+        currentProgram: byId("current-program"),
+        lineageSelector: byId("lineage-selector"),
+        generationMeta: byId("generation-meta"),
+        generationDiff: byId("generation-diff"),
+        vmProvenanceSection: byId("vm-provenance-section"),
+        vmSectionTitle: byId("vm-section-title"),
+        vmSummary: byId("vm-summary"),
+        vmDetails: byId("vm-details"),
+        vmSourceLink: byId("vm-source-link"),
+        vmToolsSection: byId("vm-tools-section"),
+        vmToolsList: byId("vm-tools-list"),
+        vmInventionsSection: byId("vm-inventions-section"),
+        vmInventionSummary: byId("vm-invention-summary"),
+        inventionTree: byId("invention-tree"),
+        vmFailuresSection: byId("vm-failures-section"),
+        failedInventions: byId("failed-inventions"),
+        vmComparisonSection: byId("vm-comparison-section"),
+        comparisonBanner: byId("comparison-banner"),
+        primitiveComparison: byId("primitive-comparison"),
+        primitiveComparisonData: byId("primitive-comparison-data"),
+        toolComparison: byId("tool-comparison"),
+        toolComparisonData: byId("tool-comparison-data"),
+        comparisonDetails: byId("comparison-details"),
+        evidenceEmpty: byId("evidence-empty"),
+        evidenceContent: byId("evidence-content"),
+        trainingMetrics: byId("training-metrics"),
+        trainingChart: byId("training-chart"),
+        trainingChartDesc: byId("training-chart-desc"),
+        raceSeedSet: byId("race-seed-set"),
+        heldoutMetrics: byId("heldout-metrics"),
+        heldoutNote: byId("heldout-note"),
+        contestantsWrap: byId("contestants-wrap"),
+        contestantsBody: byId("contestants-body"),
+        memoryView: byId("memory-view"),
+        eggStatus: byId("egg-status"),
+        eggMeta: byId("egg-meta"),
+        raceSummary: byId("race-summary"),
+        raceAncestorScore: byId("race-ancestor-score"),
+        raceAncestorDetail: byId("race-ancestor-detail"),
+        raceDescendantScore: byId("race-descendant-score"),
+        raceDescendantDetail: byId("race-descendant-detail"),
+        raceImprovement: byId("race-improvement"),
+        raceTrials: byId("race-trials"),
+        habitatEmpty: byId("habitat-empty"),
+        habitatEmptyTitle: byId("habitat-empty-title"),
+        habitatEmptyCopy: byId("habitat-empty-copy"),
+        replayContent: byId("replay-content"),
+        courseSelect: byId("course-select"),
+        courseDimensions: byId("course-dimensions"),
+        courseRecordings: byId("course-recordings"),
+        courseWarning: byId("course-warning"),
+        ancestorCanvas: byId("ancestor-canvas"),
+        descendantCanvas: byId("descendant-canvas"),
+        ancestorBoardTitle: byId("ancestor-board-title"),
+        descendantBoardTitle: byId("descendant-board-title"),
+        ancestorBoardId: byId("ancestor-board-id"),
+        descendantBoardId: byId("descendant-board-id"),
+        ancestorFrameMeta: byId("ancestor-frame-meta"),
+        descendantFrameMeta: byId("descendant-frame-meta"),
+        ancestorEvent: byId("ancestor-event"),
+        descendantEvent: byId("descendant-event"),
+        replayBack: byId("replay-step-back"),
+        replayToggle: byId("replay-toggle"),
+        replayForward: byId("replay-step-forward"),
+        replayScrubber: byId("replay-scrubber"),
+        replayPosition: byId("replay-position"),
+        replayStepValue: byId("replay-step-value"),
+        replaySpeed: byId("replay-speed"),
+        replayNote: byId("replay-note"),
+        operationConsole: byId("operation-console"),
+        operationTitle: byId("operation-title"),
+        operationStatus: byId("operation-status"),
+        operationSession: byId("operation-session"),
+        operationResponse: byId("operation-response"),
+        operationLogs: byId("operation-logs")
+      };
+
+      const state = {
+        data: null,
+        selectedId: new URLSearchParams(window.location.search).get("creature"),
+        selectedTab: "profile",
+        selectedGeneration: null,
+        selectedSeedKey: null,
+        replayIndex: 0,
+        replaySpeed: 1,
+        replayTimer: null,
+        replayKey: null,
+        busy: false,
+        firstRead: true,
+        lastReadAt: null,
+        readSequence: 0,
+        pendingSelection: null,
+        introduceIdTouched: false,
+        capabilitySignature: "",
+        staleError: null
+      };
+
+      function isObject(value) {
+        return value !== null && typeof value === "object" && !Array.isArray(value);
+      }
+
+      function arrayValue(value) {
+        return Array.isArray(value) ? value : [];
+      }
+
+      function stringValue(value, fallback = "—") {
+        return typeof value === "string" && value.length ? value : fallback;
+      }
+
+      function finiteNumber(value) {
+        return typeof value === "number" && Number.isFinite(value);
+      }
+
+      function formatNumber(value) {
+        if (!finiteNumber(value)) {
+          return "Not recorded";
+        }
+        return new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }).format(value);
+      }
+
+      function formatSignedNumber(value) {
+        if (!finiteNumber(value)) {
+          return "Not recorded";
+        }
+        const formatted = formatNumber(Math.abs(value));
+        if (value > 0) {
+          return `+${formatted}`;
+        }
+        if (value < 0) {
+          return `−${formatted}`;
+        }
+        return formatted;
+      }
+
+      function shortSha(value) {
+        return typeof value === "string" && value.length ? value.slice(0, 12) : "not recorded";
+      }
+
+      function createElement(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) {
+          node.className = className;
+        }
+        if (text !== undefined) {
+          node.textContent = String(text);
+        }
+        return node;
+      }
+
+      function clearElement(node) {
+        node.replaceChildren();
+      }
+
+      function setHidden(node, hidden) {
+        node.hidden = Boolean(hidden);
+      }
+
+      function normalizedCreatures() {
+        const rawCreatures = arrayValue(state.data && state.data.creatures);
+        return rawCreatures.map((raw, index) => {
+          if (!isObject(raw)) {
+            return {
+              id: `__malformed_${index}`,
+              name: `Malformed creature record ${index + 1}`,
+              status: "unavailable",
+              capabilities: [],
+              snapshot: null,
+              problem: "This inventory entry was not an object.",
+              _malformed: true
+            };
+          }
+          const hasId = typeof raw.id === "string" && raw.id.trim().length > 0;
+          return {
+            ...raw,
+            id: hasId ? raw.id : `__malformed_${index}`,
+            name: stringValue(raw.name, hasId ? raw.id : `Malformed creature record ${index + 1}`),
+            capabilities: arrayValue(raw.capabilities).filter((item) => typeof item === "string"),
+            status: stringValue(raw.status, "unavailable"),
+            problem: typeof raw.problem === "string" ? raw.problem : null,
+            _malformed: !hasId
+          };
+        });
+      }
+
+      function selectedCreature() {
+        return normalizedCreatures().find((creature) => creature.id === state.selectedId) || null;
+      }
+
+      function validSnapshot(creature) {
+        if (!creature || !isObject(creature.snapshot)) {
+          return null;
+        }
+        if (creature.snapshot.schema !== "rapp-creature/snapshot/1") {
+          return null;
+        }
+        return creature.snapshot;
+      }
+
+      function brainstem() {
+        return isObject(state.data && state.data.brainstem) ? state.data.brainstem : {};
+      }
+
+      function loadedTools() {
+        return arrayValue(brainstem().agents).filter((name) => typeof name === "string");
+      }
+
+      function brainstemReady() {
+        return brainstem().status === "ok";
+      }
+
+      function caretakerReady() {
+        return brainstemReady() && loadedTools().includes("CreatureTwin");
+      }
+
+      function creatureToolReady(creature) {
+        return Boolean(
+          creature &&
+          !creature._malformed &&
+          brainstemReady() &&
+          typeof creature.agent_name === "string" &&
+          validToolName.test(creature.agent_name) &&
+          loadedTools().includes(creature.agent_name)
+        );
+      }
+
+      function snapshotExists(snapshot) {
+        return Boolean(snapshot && snapshot.exists === true);
+      }
+
+      function displayStatus(status) {
+        if (status === "active") {
+          return "Active";
+        }
+        if (status === "dormant") {
+          return "Dormant";
+        }
+        if (status === "unhatched") {
+          return "Unhatched";
+        }
+        if (status === "unavailable") {
+          return "Unavailable";
+        }
+        return `Unknown: ${stringValue(status, "not reported")}`;
+      }
+
+      function clientIssues() {
+        const issues = [];
+        const rawCreatures = state.data && state.data.creatures;
+        if (state.data && !Array.isArray(rawCreatures)) {
+          issues.push("The terrarium response did not provide a creatures array.");
+        }
+        normalizedCreatures().forEach((creature) => {
+          if (creature._malformed) {
+            issues.push(`${creature.name}: ${creature.problem || "The inventory record is malformed."}`);
+          }
+          if (isObject(creature.snapshot) && creature.snapshot.schema !== "rapp-creature/snapshot/1") {
+            issues.push(`${creature.name}: the snapshot schema is not recognized.`);
+          }
+        });
+        if (state.data && !Array.isArray(state.data.capability_options)) {
+          issues.push("The caretaker did not report a capability_options array.");
+        }
+        return issues;
+      }
+
+      function ensureSelection() {
+        const creatures = normalizedCreatures();
+        if (state.pendingSelection) {
+          const pending = creatures.find((creature) => creature.id === state.pendingSelection);
+          if (pending) {
+            state.selectedId = pending.id;
+          }
+          state.pendingSelection = null;
+        }
+        if (!creatures.some((creature) => creature.id === state.selectedId)) {
+          state.selectedId = creatures.length ? creatures[0].id : null;
+          state.selectedGeneration = null;
+          state.selectedSeedKey = null;
+          state.replayIndex = 0;
+          stopReplay();
+        }
+        const creature = selectedCreature();
+        if (!creature || creature.status !== "active") {
+          stopReplay();
+        }
+      }
+
+      async function fetchTerrarium(options = {}) {
+        const sequence = ++state.readSequence;
+        const silent = options.silent === true;
+        if (!silent) {
+          elements.refresh.disabled = true;
+          elements.refresh.textContent = "Reading…";
+        }
+        try {
+          const response = await fetch("/api/terrarium", {
+            method: "GET",
+            headers: { Accept: "application/json" },
+            cache: "no-store"
+          });
+          const responseText = await response.text();
+          let payload = null;
+          try {
+            payload = responseText ? JSON.parse(responseText) : null;
+          } catch (error) {
+            throw new Error(`Terrarium returned non-JSON data (${response.status}).`);
+          }
+          if (!response.ok) {
+            const message = isObject(payload) && typeof payload.error === "string"
+              ? payload.error
+              : `Terrarium read failed with HTTP ${response.status}.`;
+            throw new Error(message);
+          }
+          if (!isObject(payload) || payload.status !== "ok") {
+            throw new Error("Terrarium response did not report status 'ok'.");
+          }
+          if (sequence !== state.readSequence) {
+            return;
+          }
+          state.data = payload;
+          state.lastReadAt = new Date();
+          state.staleError = null;
+          state.firstRead = false;
+          ensureSelection();
+          renderAll();
+        } catch (error) {
+          if (sequence !== state.readSequence) {
+            return;
+          }
+          state.staleError = error instanceof Error ? error.message : String(error);
+          state.firstRead = false;
+          renderAll();
+        } finally {
+          if (!silent) {
+            elements.refresh.disabled = state.busy;
+            elements.refresh.textContent = "Refresh";
+          }
+        }
+      }
+
+      function renderAll() {
+        renderReadState();
+        renderHeader();
+        renderIssues();
+        renderCapabilityOptions();
+        renderRoster();
+        renderInspector();
+        renderHabitat();
+      }
+
+      function renderReadState() {
+        elements.refresh.disabled = state.busy;
+        if (state.staleError) {
+          elements.readError.textContent = state.data
+            ? `Refresh failed: ${state.staleError} Showing the last successfully read snapshot.`
+            : `Terrarium unavailable: ${state.staleError}`;
+          setHidden(elements.readError, false);
+        } else {
+          elements.readError.textContent = "";
+          setHidden(elements.readError, true);
+        }
+      }
+
+      function renderHeader() {
+        const health = brainstem();
+        const status = stringValue(health.status, "unavailable");
+        elements.statusPill.dataset.status = status;
+        elements.statusText.textContent = status === "ok"
+          ? "Brainstem ready"
+          : status === "unauthenticated"
+            ? "Authentication required"
+            : "Brainstem unavailable";
+        elements.version.textContent = stringValue(health.version);
+        elements.model.textContent = stringValue(health.model);
+        const tools = loadedTools();
+        elements.loadedToolCount.textContent = String(tools.length);
+        clearElement(elements.loadedTools);
+        if (tools.length) {
+          tools.forEach((tool) => {
+            elements.loadedTools.append(createElement("span", "capability-chip mono", tool));
+          });
+        } else {
+          elements.loadedTools.append(createElement("span", "muted", "No loaded tool names reported."));
+        }
+        elements.lastRefresh.textContent = state.lastReadAt
+          ? `Last read ${state.lastReadAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
+          : state.firstRead
+            ? "Reading now"
+            : "No successful read";
+      }
+
+      function renderIssues() {
+        const serverIssues = arrayValue(state.data && state.data.issues)
+          .filter((issue) => typeof issue === "string");
+        const issues = [...serverIssues, ...clientIssues()];
+        clearElement(elements.issuesList);
+        issues.forEach((issue) => {
+          elements.issuesList.append(createElement("li", "", issue));
+        });
+        setHidden(elements.issuesPanel, issues.length === 0);
+      }
+
+      function renderCapabilityOptions() {
+        const options = arrayValue(state.data && state.data.capability_options)
+          .filter((option) => typeof option === "string");
+        const signature = JSON.stringify(options);
+        if (signature === state.capabilitySignature) {
+          return;
+        }
+        const checked = new Set(
+          Array.from(elements.capabilityOptions.querySelectorAll("input:checked"))
+            .map((input) => input.value)
+        );
+        clearElement(elements.capabilityOptions);
+        options.forEach((option, index) => {
+          const label = createElement("label", "checkbox-row");
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.name = "capability";
+          input.value = option;
+          input.id = `capability-option-${index}`;
+          input.checked = checked.has(option);
+          const text = createElement("span", "", option);
+          label.append(input, text);
+          elements.capabilityOptions.append(label);
+        });
+        if (!options.length) {
+          elements.capabilityOptions.append(createElement("p", "muted", "No capability options were reported."));
+        }
+        state.capabilitySignature = signature;
+      }
+
+      function countByStatus(creatures, status) {
+        return creatures.filter((creature) => creature.status === status).length;
+      }
+
+      function createCountChip(label, count) {
+        return createElement("span", "count-chip", `${label} ${count}`);
+      }
+
+      function initials(name) {
+        const parts = String(name).trim().split(/\s+/).filter(Boolean);
+        const value = parts.slice(0, 2).map((part) => part[0]).join("");
+        return value.toUpperCase() || "—";
+      }
+
+      function renderRoster() {
+        const creatures = normalizedCreatures();
+        clearElement(elements.rosterSummary);
+        elements.rosterSummary.append(
+          createCountChip("Active", countByStatus(creatures, "active")),
+          createCountChip("Dormant", countByStatus(creatures, "dormant")),
+          createCountChip("Unhatched", countByStatus(creatures, "unhatched")),
+          createCountChip("Unavailable", countByStatus(creatures, "unavailable"))
+        );
+
+        clearElement(elements.creatureList);
+        creatures.forEach((creature) => {
+          const snapshot = validSnapshot(creature);
+          const button = createElement("button", "creature-card");
+          button.type = "button";
+          button.dataset.status = creature.status;
+          button.setAttribute("aria-pressed", String(creature.id === state.selectedId));
+          button.setAttribute(
+            "aria-label",
+            `${creature.name}, ${displayStatus(creature.status)}, ${
+              snapshotExists(snapshot) && finiteNumber(snapshot.generation)
+                ? `generation ${snapshot.generation}`
+                : "no recorded generation"
+            }`
+          );
+          button.addEventListener("click", () => selectCreature(creature.id));
+
+          const mark = createElement("span", "creature-mark", initials(creature.name));
+          mark.setAttribute("aria-hidden", "true");
+          const body = createElement("span");
+          const nameRow = createElement("span", "creature-name-row");
+          nameRow.append(
+            createElement("span", "creature-name", creature.name),
+            createElement("span", "badge", displayStatus(creature.status))
+          );
+          nameRow.lastElementChild.dataset.status = creature.status;
+          const meta = snapshotExists(snapshot)
+            ? `Generation ${finiteNumber(snapshot.generation) ? snapshot.generation : "not recorded"} · ${shortSha(snapshot.genome_sha256)}`
+            : "No executable state recorded";
+          body.append(nameRow, createElement("span", "creature-meta", meta));
+          if (creature.problem) {
+            body.append(createElement("span", "creature-problem", creature.problem));
+          }
+          button.append(mark, body);
+          elements.creatureList.append(button);
+        });
+
+        setHidden(elements.rosterEmpty, creatures.length > 0);
+        setHidden(elements.creatureList, creatures.length === 0);
+
+        const maxCreatures = state.data && isObject(state.data.limits) && finiteNumber(state.data.limits.max_creatures)
+          ? state.data.limits.max_creatures
+          : null;
+        elements.creatureLimit.textContent = maxCreatures === null
+          ? `Creatures ${creatures.length} · capacity not reported`
+          : `Creatures ${creatures.length} of ${maxCreatures}`;
+        const agentsPath = stringValue(state.data && state.data.agents_path, "Agents path not reported");
+        const dormantPath = stringValue(state.data && state.data.dormant_path, "Dormant path not reported");
+        elements.agentsPath.textContent = `Active: ${agentsPath}`;
+        elements.agentsPath.title = agentsPath;
+        elements.dormantPath.textContent = `Dormant: ${dormantPath}`;
+        elements.dormantPath.title = dormantPath;
+
+        const atCapacity = maxCreatures !== null && creatures.length >= maxCreatures;
+        elements.openIntroduce.disabled = state.busy || !caretakerReady() || atCapacity;
+        if (atCapacity) {
+          elements.openIntroduce.title = "The reported creature capacity has been reached.";
+        } else if (!caretakerReady()) {
+          elements.openIntroduce.title = "CreatureTwin is not loaded in the latest Brainstem inventory.";
+        } else {
+          elements.openIntroduce.removeAttribute("title");
+        }
+      }
+
+      function selectCreature(id) {
+        if (id === state.selectedId) {
+          return;
+        }
+        state.selectedId = id;
+        state.selectedGeneration = null;
+        state.selectedSeedKey = null;
+        state.replayIndex = 0;
+        state.replayKey = null;
+        stopReplay();
+        renderRoster();
+        renderInspector();
+        renderHabitat();
+      }
+
+      function setDefinitionRows(container, rows) {
+        clearElement(container);
+        rows.forEach(([label, value, className]) => {
+          const term = createElement("dt", "", label);
+          const detail = createElement("dd", className || "", value);
+          container.append(term, detail);
+        });
+      }
+
+      function compactObject(value) {
+        if (!isObject(value) || Object.keys(value).length === 0) {
+          return "Not recorded";
+        }
+        return Object.entries(value).map(([key, item]) => {
+          const rendered = isObject(item) || Array.isArray(item)
+            ? JSON.stringify(item)
+            : String(item);
+          return `${key}=${rendered}`;
+        }).join(" · ");
+      }
+
+      function renderInspector() {
+        const creature = selectedCreature();
+        setHidden(elements.inspectorEmpty, Boolean(creature));
+        setHidden(elements.inspectorContent, !creature);
+        if (!creature) {
+          return;
+        }
+
+        const snapshot = validSnapshot(creature);
+        const exists = snapshotExists(snapshot);
+        elements.inspectorTitle.textContent = creature.name;
+        elements.inspectorStatus.textContent = displayStatus(creature.status);
+        elements.inspectorStatus.dataset.status = creature.status;
+        elements.inspectorId.textContent = creature.id;
+        elements.inspectorGeneration.textContent = exists && finiteNumber(snapshot.generation)
+          ? `Generation ${snapshot.generation}`
+          : "No state";
+        if (creature.problem) {
+          elements.creatureProblem.textContent = creature.problem;
+          setHidden(elements.creatureProblem, false);
+        } else if (isObject(creature.snapshot) && !snapshot) {
+          elements.creatureProblem.textContent = "This creature returned an unrecognized snapshot schema.";
+          setHidden(elements.creatureProblem, false);
+        } else {
+          elements.creatureProblem.textContent = "";
+          setHidden(elements.creatureProblem, true);
+        }
+
+        renderCreatureActions(creature, snapshot);
+        renderProfile(creature, snapshot);
+        renderGenome(snapshot);
+        renderVmInspector(snapshot);
+        renderEvidence(creature, snapshot);
+        activateTab(state.selectedTab, false);
+      }
+
+      function renderCreatureActions(creature, snapshot) {
+        const exists = snapshotExists(snapshot);
+        const ready = creatureToolReady(creature);
+        const active = creature.status === "active";
+        const unhatched = creature.status === "unhatched";
+        const dormant = creature.status === "dormant";
+        const caretaker = caretakerReady();
+        const generationReady = exists && finiteNumber(snapshot.generation);
+
+        setHidden(elements.checkStatus, dormant || creature.status === "unavailable");
+        elements.checkStatus.disabled = state.busy || !ready;
+
+        setHidden(elements.hatch, !(active || unhatched) || exists);
+        elements.hatch.disabled = state.busy || !ready;
+
+        setHidden(elements.evolve, !exists);
+        elements.evolve.disabled = state.busy || !ready || !active || !generationReady;
+
+        setHidden(elements.race, !exists);
+        elements.race.disabled = state.busy || !ready || !active;
+
+        setHidden(elements.sleepWake, !(active || unhatched || dormant));
+        elements.sleepWake.textContent = dormant ? "Wake agent file" : "Move to dormancy";
+        elements.sleepWake.className = dormant ? "button-secondary" : "button-danger";
+        elements.sleepWake.disabled = state.busy || !caretaker || creature._malformed;
+
+        setHidden(elements.exportEggAction, !exists);
+        elements.exportEggAction.disabled = state.busy || !ready || !active;
+
+        const canDownloadSource = !creature._malformed && (active || unhatched || dormant);
+        if (canDownloadSource) {
+          elements.exportAgent.href = `/api/source/${encodeURIComponent(creature.id)}`;
+          elements.exportAgent.removeAttribute("aria-disabled");
+          elements.exportAgent.removeAttribute("tabindex");
+        } else {
+          elements.exportAgent.removeAttribute("href");
+          elements.exportAgent.setAttribute("aria-disabled", "true");
+          elements.exportAgent.setAttribute("tabindex", "-1");
+        }
+
+        const egg = exists && isObject(snapshot.egg) ? snapshot.egg : null;
+        const eggAvailable = Boolean(egg && egg.available === true);
+        setHidden(elements.downloadEgg, !eggAvailable);
+        if (eggAvailable) {
+          elements.downloadEgg.href = `/api/egg/${encodeURIComponent(creature.id)}`;
+        } else {
+          elements.downloadEgg.removeAttribute("href");
+        }
+
+        if (!brainstemReady()) {
+          elements.actionHint.textContent = "Actions are disabled because Brainstem is not ready. Read-only inventory remains visible.";
+        } else if ((active || unhatched) && !ready) {
+          elements.actionHint.textContent = "The exact creature tool from this inventory is not loaded. Refresh after its health state changes; no tool name will be guessed.";
+        } else if ((active || unhatched || dormant) && !caretaker && (dormant || !exists)) {
+          elements.actionHint.textContent = "CreatureTwin is not loaded, so lifecycle actions are unavailable.";
+        } else if (dormant) {
+          elements.actionHint.textContent = "Dormant files retain history. Automatic replay is paused; wake through CreatureTwin before invoking the creature tool.";
+        } else if (!generationReady && exists) {
+          elements.actionHint.textContent = "Evolution is disabled because the snapshot did not report a numeric current generation for expected_generation.";
+        } else {
+          elements.actionHint.textContent = "Each button sends one explicit POST /chat request naming the exact loaded tool and arguments.";
+        }
+      }
+
+      function renderProfile(creature, snapshot) {
+        clearElement(elements.capabilityList);
+        if (creature.capabilities.length) {
+          creature.capabilities.forEach((capability) => {
+            elements.capabilityList.append(createElement("span", "capability-chip", capability));
+          });
+        } else {
+          elements.capabilityList.append(createElement("span", "muted", "No capabilities reported."));
+        }
+
+        const exists = snapshotExists(snapshot);
+        setDefinitionRows(elements.identityGrid, [
+          ["Creature ID", creature.id, "mono"],
+          ["Agent tool", stringValue(creature.agent_name, "Not loaded"), "mono"],
+          ["Agent file", stringValue(creature.filename, "Not reported"), "mono"],
+          ["Status", displayStatus(creature.status)],
+          ["Seed", exists ? formatNumber(snapshot.seed) : "No state"],
+          ["Energy", exists ? formatNumber(snapshot.energy) : "No state"],
+          ["Generation", exists ? formatNumber(snapshot.generation) : "No state"],
+          ["Genome SHA-256", exists ? stringValue(snapshot.genome_sha256, "Not recorded") : "No state", "mono"],
+          ["Interpreter limits", snapshot ? compactObject(snapshot.limits) : "Not recorded", "mono"],
+          ["Resumed from", exists && isObject(snapshot.resumed_from)
+            ? `${shortSha(snapshot.resumed_from.sha256)} · generation ${formatNumber(snapshot.resumed_from.generation)}`
+            : "Not reported"]
+        ]);
+
+        const command = stringValue(state.data && state.data.resume_command, "No resume command reported.");
+        elements.resumeCommand.textContent = command;
+        elements.copyResumeCommand.disabled = command === "No resume command reported.";
+      }
+
+      function lineageEntries(snapshot) {
+        return arrayValue(snapshot && snapshot.lineage).filter((entry) => isObject(entry));
+      }
+
+      function renderGenome(snapshot) {
+        const exists = snapshotExists(snapshot);
+        setHidden(elements.genomeEmpty, exists);
+        setHidden(elements.genomeContent, !exists);
+        if (!exists) {
+          return;
+        }
+
+        elements.currentGenomeSha.textContent = shortSha(snapshot.genome_sha256);
+        elements.currentProgram.textContent = stringValue(snapshot.program, "Program not recorded.");
+
+        const lineage = lineageEntries(snapshot);
+        if (
+          state.selectedGeneration === null ||
+          !lineage.some((entry) => entry.generation === state.selectedGeneration)
+        ) {
+          const current = lineage.find((entry) => entry.generation === snapshot.generation);
+          const fallback = current || lineage[lineage.length - 1] || null;
+          state.selectedGeneration = fallback ? fallback.generation : null;
+        }
+
+        clearElement(elements.lineageSelector);
+        if (!lineage.length) {
+          elements.lineageSelector.append(createElement("span", "muted", "No lineage entries recorded."));
+          setDefinitionRows(elements.generationMeta, []);
+          elements.generationDiff.textContent = "No accepted mutation";
+          return;
+        }
+
+        lineage.forEach((entry) => {
+          const label = finiteNumber(entry.generation) ? `Gen ${entry.generation}` : "Gen ?";
+          const button = createElement("button", "generation-button", label);
+          button.type = "button";
+          button.dataset.accepted = String(entry.accepted === true);
+          button.setAttribute("aria-pressed", String(entry.generation === state.selectedGeneration));
+          button.setAttribute(
+            "aria-label",
+            `${label}, ${entry.accepted === true ? "accepted mutation" : "no accepted mutation"}`
+          );
+          button.addEventListener("click", () => {
+            state.selectedGeneration = entry.generation;
+            renderGenome(snapshot);
+          });
+          elements.lineageSelector.append(button);
+        });
+
+        const selected = lineage.find((entry) => entry.generation === state.selectedGeneration) || lineage[lineage.length - 1];
+        setDefinitionRows(elements.generationMeta, [
+          ["Generation", formatNumber(selected.generation)],
+          ["Accepted", selected.accepted === true ? "Yes" : "No accepted mutation"],
+          ["Genome", stringValue(selected.genome_sha256, "Not recorded"), "mono"],
+          ["Parent", selected.parent_sha256 === null
+            ? "Founder"
+            : stringValue(selected.parent_sha256, "Not recorded"), "mono"],
+          ["Mutations tested", formatNumber(selected.mutations_tested)],
+          ["Training score", isObject(selected.training)
+            ? formatNumber(selected.training.score)
+            : "Not recorded"]
+        ]);
+
+        if (selected.accepted !== true) {
+          elements.generationDiff.textContent = "No accepted mutation";
+        } else if (typeof selected.diff === "string" && selected.diff.length) {
+          elements.generationDiff.textContent = selected.diff;
+        } else {
+          elements.generationDiff.textContent = "Accepted mutation recorded, but no unified diff was included in this snapshot.";
+        }
+      }
+
+      function hasRecordedValue(value) {
+        if (value === null || value === undefined) {
+          return false;
+        }
+        if (typeof value === "string") {
+          return value.length > 0;
+        }
+        if (Array.isArray(value)) {
+          return value.length > 0;
+        }
+        if (isObject(value)) {
+          return Object.keys(value).length > 0;
+        }
+        return true;
+      }
+
+      function formatRecordedValue(value) {
+        if (finiteNumber(value)) {
+          return formatNumber(value);
+        }
+        if (typeof value === "boolean") {
+          return value ? "true" : "false";
+        }
+        if (typeof value === "string") {
+          return value;
+        }
+        if (value === null) {
+          return "null";
+        }
+        if (isObject(value) || Array.isArray(value)) {
+          return JSON.stringify(value);
+        }
+        return String(value);
+      }
+
+      function objectWithout(value, omittedKeys) {
+        if (!isObject(value)) {
+          return {};
+        }
+        const omitted = new Set(omittedKeys);
+        return Object.fromEntries(
+          Object.entries(value).filter(([key]) => !omitted.has(key))
+        );
+      }
+
+      function renderFlexibleData(container, value) {
+        clearElement(container);
+        if (isObject(value)) {
+          appendStructuredObject(container, value, 0);
+          return;
+        }
+        if (Array.isArray(value)) {
+          const indexed = {};
+          value.forEach((item, index) => {
+            indexed[`[${index}]`] = item;
+          });
+          appendStructuredObject(container, indexed, 0);
+          return;
+        }
+        if (hasRecordedValue(value)) {
+          container.append(createElement("div", "structured-value", formatRecordedValue(value)));
+        }
+      }
+
+      function renderVmInspector(snapshot) {
+        const vmValue = snapshot && snapshot.vm;
+        const toolsValue = snapshot && snapshot.tools;
+        const inventionsValue = snapshot && snapshot.inventions;
+        const comparisonValue = snapshot && snapshot.comparison;
+        const hasVm = hasRecordedValue(vmValue);
+        const hasTools = hasRecordedValue(toolsValue);
+        const hasInventions = hasRecordedValue(inventionsValue);
+        const hasComparison = hasRecordedValue(comparisonValue);
+        const hasAnyVmData = hasVm || hasTools || hasInventions || hasComparison;
+
+        elements.vmTab.hidden = !hasAnyVmData;
+        elements.inspectorTabs.dataset.count = hasAnyVmData ? "4" : "3";
+        setHidden(elements.vmProvenanceSection, !hasVm);
+        setHidden(elements.vmToolsSection, !hasTools);
+        setHidden(elements.vmInventionsSection, !hasInventions);
+        setHidden(elements.vmComparisonSection, !hasComparison);
+
+        if (!hasAnyVmData) {
+          setHidden(elements.vmFailuresSection, true);
+          elements.vmSectionTitle.textContent = "LisPy · safe core operation meter";
+          setHidden(elements.vmSourceLink, true);
+          elements.vmSourceLink.removeAttribute("href");
+          clearElement(elements.vmSummary);
+          clearElement(elements.vmDetails);
+          clearElement(elements.vmToolsList);
+          clearElement(elements.inventionTree);
+          clearElement(elements.failedInventions);
+          clearElement(elements.comparisonDetails);
+          if (state.selectedTab === "vm") {
+            state.selectedTab = "profile";
+          }
+          return;
+        }
+
+        if (hasVm) {
+          renderVmRecord(vmValue);
+        } else {
+          elements.vmSectionTitle.textContent = "LisPy · safe core operation meter";
+          setHidden(elements.vmSourceLink, true);
+          elements.vmSourceLink.removeAttribute("href");
+        }
+        if (hasTools) {
+          renderToolRecords(toolsValue);
+        }
+        if (hasInventions) {
+          renderInventionRecords(inventionsValue);
+        } else {
+          setHidden(elements.vmFailuresSection, true);
+          clearElement(elements.inventionTree);
+          clearElement(elements.failedInventions);
+        }
+        if (hasComparison) {
+          renderComputeComparison(comparisonValue);
+        }
+      }
+
+      function safeExternalUrl(value) {
+        if (typeof value !== "string" || value.length === 0) {
+          return null;
+        }
+        try {
+          const url = new URL(value, window.location.href);
+          return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function renderVmRecord(vmValue) {
+        clearElement(elements.vmSummary);
+        const recordedName = isObject(vmValue) && typeof vmValue.name === "string"
+          ? vmValue.name.trim()
+          : typeof vmValue === "string"
+            ? vmValue.trim()
+            : "";
+        const safeCoreName = recordedName
+          ? /safe[\s-]*core/i.test(recordedName)
+            ? recordedName
+            : `${recordedName} · safe core`
+          : "LisPy · safe core";
+        elements.vmSectionTitle.textContent = `${safeCoreName} operation meter`;
+
+        if (isObject(vmValue)) {
+          if (hasRecordedValue(vmValue.name)) {
+            elements.vmSummary.append(metricNode("VM", formatRecordedValue(vmValue.name)));
+          }
+          if (hasRecordedValue(vmValue.operation_limit)) {
+            elements.vmSummary.append(metricNode("Operation limit", formatRecordedValue(vmValue.operation_limit)));
+          }
+          if (hasRecordedValue(vmValue.source_commit)) {
+            elements.vmSummary.append(metricNode("Source commit", shortSha(String(vmValue.source_commit))));
+          }
+          if (hasRecordedValue(vmValue.cost_model)) {
+            const costLabel = isObject(vmValue.cost_model) || Array.isArray(vmValue.cost_model)
+              ? "Structured model"
+              : formatRecordedValue(vmValue.cost_model);
+            elements.vmSummary.append(metricNode("Cost model", costLabel, "Exact fields below"));
+          }
+          const usageCounters = hasRecordedValue(vmValue.usage_counters)
+            ? vmValue.usage_counters
+            : hasRecordedValue(vmValue.counters)
+              ? vmValue.counters
+              : vmValue.usage;
+          if (hasRecordedValue(usageCounters)) {
+            const usageLabel = isObject(usageCounters)
+              ? `${Object.keys(usageCounters).length} counters`
+              : formatRecordedValue(usageCounters);
+            elements.vmSummary.append(metricNode("Actual usage", usageLabel, "Exact counters below"));
+          }
+          for (const [label, key] of [
+            ["Operations used", "operations_used"],
+            ["Operation count", "operation_count"],
+            ["Compute used", "compute_used"]
+          ]) {
+            if (hasRecordedValue(vmValue[key]) && !isObject(vmValue[key]) && !Array.isArray(vmValue[key])) {
+              elements.vmSummary.append(metricNode(label, formatRecordedValue(vmValue[key])));
+              break;
+            }
+          }
+        }
+        renderFlexibleData(elements.vmDetails, vmValue);
+
+        const sourceUrl = isObject(vmValue) ? safeExternalUrl(vmValue.source_url) : null;
+        if (sourceUrl) {
+          elements.vmSourceLink.href = sourceUrl;
+          elements.vmSourceLink.textContent = `Open ${safeCoreName} provenance`;
+          elements.vmSourceLink.setAttribute("aria-label", `Open VM source provenance at ${sourceUrl}`);
+          setHidden(elements.vmSourceLink, false);
+        } else {
+          elements.vmSourceLink.textContent = "Open VM provenance";
+          elements.vmSourceLink.removeAttribute("href");
+          elements.vmSourceLink.removeAttribute("aria-label");
+          setHidden(elements.vmSourceLink, true);
+        }
+      }
+
+      function appendPlainTextRecord(container, label, value) {
+        if (typeof value !== "string" || value.length === 0) {
+          return;
+        }
+        container.append(
+          createElement("span", "source-label", label),
+          createElement("pre", "source-block", value)
+        );
+      }
+
+      function toolDisplayName(tool, index) {
+        if (isObject(tool)) {
+          for (const key of ["name", "id", "tool_name", "symbol"]) {
+            if (hasRecordedValue(tool[key])) {
+              return formatRecordedValue(tool[key]);
+            }
+          }
+        }
+        return `Recorded tool ${index + 1}`;
+      }
+
+      function renderToolRecords(toolsValue) {
+        clearElement(elements.vmToolsList);
+        const tools = Array.isArray(toolsValue) ? toolsValue : [toolsValue];
+        tools.forEach((tool, index) => {
+          const card = createElement("article", "record-card");
+          const header = createElement("div", "record-card-header");
+          header.append(createElement("h4", "record-title", toolDisplayName(tool, index)));
+          card.append(header);
+
+          if (typeof tool === "string") {
+            appendPlainTextRecord(card, "Recorded tool", tool);
+          } else if (isObject(tool)) {
+            const meta = createElement("div", "record-meta");
+            if (hasRecordedValue(tool.generation)) {
+              meta.append(createElement("span", "count-chip", `Generation ${formatRecordedValue(tool.generation)}`));
+            }
+            if (hasRecordedValue(tool.operation_cost)) {
+              meta.append(createElement("span", "count-chip", `Cost ${formatRecordedValue(tool.operation_cost)}`));
+            }
+            if (hasRecordedValue(tool.inherited_from)) {
+              meta.append(createElement("span", "count-chip", `Inherited ${formatRecordedValue(tool.inherited_from)}`));
+            }
+            if (meta.childElementCount) {
+              card.append(meta);
+            }
+
+            appendPlainTextRecord(card, "Tool source", tool.source);
+            appendPlainTextRecord(card, "Tool diff", tool.diff);
+            const remaining = objectWithout(tool, [
+              "name",
+              "id",
+              "tool_name",
+              "symbol",
+              "generation",
+              "operation_cost",
+              "inherited_from",
+              "source",
+              "diff"
+            ]);
+            if (Object.keys(remaining).length) {
+              const details = createElement("div", "structured");
+              appendStructuredObject(details, remaining, 0);
+              card.append(details);
+            }
+          } else {
+            card.append(createElement("div", "structured-value", formatRecordedValue(tool)));
+          }
+          elements.vmToolsList.append(card);
+        });
+      }
+
+      function dependencyIds(value) {
+        if (Array.isArray(value)) {
+          return value.flatMap((item) => dependencyIds(item));
+        }
+        if (typeof value === "string" || finiteNumber(value)) {
+          return [String(value)];
+        }
+        if (isObject(value)) {
+          if (hasRecordedValue(value.id)) {
+            return [String(value.id)];
+          }
+          if (hasRecordedValue(value.name)) {
+            return [String(value.name)];
+          }
+        }
+        return [];
+      }
+
+      function explicitInventionDecision(record) {
+        if (!isObject(record)) {
+          return "unreported";
+        }
+        if (record.accepted === true) {
+          return "accepted";
+        }
+        if (record.accepted === false) {
+          return "not-accepted";
+        }
+        const status = typeof record.status === "string"
+          ? record.status.toLowerCase()
+          : typeof record.outcome === "string"
+            ? record.outcome.toLowerCase()
+            : "";
+        if (["accepted", "success", "succeeded"].includes(status)) {
+          return "accepted";
+        }
+        if (["failed", "rejected", "not-accepted", "not_accepted"].includes(status)) {
+          return "not-accepted";
+        }
+        return "unreported";
+      }
+
+      function inventionEntries(inventionsValue) {
+        const inventions = Array.isArray(inventionsValue) ? inventionsValue : [inventionsValue];
+        return inventions.map((record, index) => {
+          const actualId = isObject(record) && hasRecordedValue(record.id)
+            ? String(record.id)
+            : null;
+          return {
+            record,
+            index,
+            internalId: actualId || `__record_${index}`,
+            actualId,
+            displayId: actualId || `Recorded attempt ${index + 1}`,
+            dependencies: isObject(record) ? dependencyIds(record.depends_on) : [],
+            decision: explicitInventionDecision(record)
+          };
+        });
+      }
+
+      function renderInventionRecords(inventionsValue) {
+        const entries = inventionEntries(inventionsValue);
+        const acceptedCount = entries.filter((entry) => entry.decision === "accepted").length;
+        const failed = entries.filter((entry) => entry.decision === "not-accepted");
+        const unreportedCount = entries.length - acceptedCount - failed.length;
+        const summaryParts = [`${entries.length} recorded`, `${acceptedCount} accepted`, `${failed.length} not accepted`];
+        if (unreportedCount) {
+          summaryParts.push(`${unreportedCount} without a recorded decision`);
+        }
+        elements.vmInventionSummary.textContent = summaryParts.join(" · ");
+
+        clearElement(elements.inventionTree);
+        const byActualId = new Map(
+          entries.filter((entry) => entry.actualId).map((entry) => [entry.actualId, entry])
+        );
+        const children = new Map();
+        entries.forEach((entry) => {
+          entry.dependencies.forEach((dependency) => {
+            if (!byActualId.has(dependency)) {
+              return;
+            }
+            if (!children.has(dependency)) {
+              children.set(dependency, []);
+            }
+            children.get(dependency).push(entry);
+          });
+        });
+        let roots = entries.filter((entry) => {
+          return !entry.dependencies.some((dependency) => byActualId.has(dependency));
+        });
+        if (!roots.length) {
+          roots = entries;
+        }
+        const rendered = new Set();
+        roots.forEach((entry) => {
+          elements.inventionTree.append(renderInventionBranch(entry, children, rendered, new Set()));
+        });
+        entries.filter((entry) => !rendered.has(entry.internalId)).forEach((entry) => {
+          elements.inventionTree.append(renderInventionBranch(entry, children, rendered, new Set()));
+        });
+
+        setHidden(elements.vmFailuresSection, failed.length === 0);
+        clearElement(elements.failedInventions);
+        failed.forEach((entry) => {
+          elements.failedInventions.append(renderInventionCard(entry, true));
+        });
+      }
+
+      function renderInventionBranch(entry, children, rendered, path) {
+        const item = document.createElement("li");
+        if (path.has(entry.internalId)) {
+          item.append(createElement("div", "dependency-reference", `Dependency cycle references ${entry.displayId}.`));
+          return item;
+        }
+        if (rendered.has(entry.internalId)) {
+          item.append(createElement("div", "dependency-reference", `Also depends on recorded invention ${entry.displayId}.`));
+          return item;
+        }
+        rendered.add(entry.internalId);
+        item.append(renderInventionCard(entry, false));
+
+        const nextPath = new Set(path);
+        nextPath.add(entry.internalId);
+        const childEntries = children.get(entry.actualId) || [];
+        if (childEntries.length) {
+          const branch = document.createElement("ul");
+          childEntries.forEach((child) => {
+            branch.append(renderInventionBranch(child, children, rendered, nextPath));
+          });
+          item.append(branch);
+        }
+        return item;
+      }
+
+      function renderInventionCard(entry, compact) {
+        const record = entry.record;
+        const card = createElement("article", "record-card");
+        card.dataset.decision = entry.decision;
+        const header = createElement("div", "record-card-header");
+        header.append(createElement("h4", "record-title mono", entry.displayId));
+        const decisionLabel = entry.decision === "accepted"
+          ? "Accepted"
+          : entry.decision === "not-accepted"
+            ? "Not accepted"
+            : "Decision not reported";
+        const decision = createElement("span", "decision-chip", decisionLabel);
+        decision.dataset.decision = entry.decision;
+        header.append(decision);
+        card.append(header);
+
+        if (!isObject(record)) {
+          appendPlainTextRecord(card, "Recorded attempt", formatRecordedValue(record));
+          return card;
+        }
+
+        const meta = createElement("div", "record-meta");
+        if (hasRecordedValue(record.generation)) {
+          meta.append(createElement("span", "count-chip", `Generation ${formatRecordedValue(record.generation)}`));
+        }
+        if (hasRecordedValue(record.operation_cost)) {
+          meta.append(createElement("span", "count-chip", `Operation cost ${formatRecordedValue(record.operation_cost)}`));
+        }
+        entry.dependencies.forEach((dependency) => {
+          meta.append(createElement("span", "count-chip mono", `Depends on ${dependency}`));
+        });
+        if (meta.childElementCount) {
+          card.append(meta);
+        }
+        if (hasRecordedValue(record.reason)) {
+          card.append(createElement("p", "evidence-note", `Reason: ${formatRecordedValue(record.reason)}`));
+        }
+        appendPlainTextRecord(card, "Invention source", record.source);
+        appendPlainTextRecord(card, "Invention diff", record.diff);
+
+        const remaining = objectWithout(record, [
+          "id",
+          "generation",
+          "operation_cost",
+          "depends_on",
+          "accepted",
+          "status",
+          "outcome",
+          "reason",
+          "source",
+          "diff"
+        ]);
+        if (!compact && Object.keys(remaining).length) {
+          const details = createElement("div", "structured");
+          appendStructuredObject(details, remaining, 0);
+          card.append(details);
+        }
+        return card;
+      }
+
+      function renderComputeComparison(comparisonValue) {
+        const comparison = isObject(comparisonValue) ? comparisonValue : {};
+        clearElement(elements.comparisonBanner);
+        const bannerLead = createElement("strong");
+        let bannerCopy;
+        if (comparison.equal_compute === true) {
+          bannerLead.textContent = "Snapshot marks equal compute. ";
+          bannerCopy = "Primitive-only and tool-enabled records are presented without an inferred winner.";
+        } else if (comparison.equal_compute === false) {
+          bannerLead.textContent = "Snapshot does not mark equal compute. ";
+          bannerCopy = "Do not treat the two result records as a controlled comparison.";
+        } else if (hasRecordedValue(comparison.compute_budget)) {
+          bannerLead.textContent = `Recorded compute budget: ${formatRecordedValue(comparison.compute_budget)}. `;
+          bannerCopy = "Budget equality and outcome still must be established by the recorded fields.";
+        } else {
+          bannerLead.textContent = "Compute equality is not explicitly recorded. ";
+          bannerCopy = "The UI does not assume matched budgets or invention benefit.";
+        }
+        elements.comparisonBanner.append(bannerLead, document.createTextNode(bannerCopy));
+
+        const primitive = comparison.primitive_only;
+        const toolEnabled = comparison.tool_enabled;
+        const hasPrimitive = hasRecordedValue(primitive);
+        const hasToolEnabled = hasRecordedValue(toolEnabled);
+        setHidden(elements.primitiveComparison, !hasPrimitive);
+        setHidden(elements.toolComparison, !hasToolEnabled);
+        if (hasPrimitive) {
+          renderFlexibleData(elements.primitiveComparisonData, primitive);
+        } else {
+          clearElement(elements.primitiveComparisonData);
+        }
+        if (hasToolEnabled) {
+          renderFlexibleData(elements.toolComparisonData, toolEnabled);
+        } else {
+          clearElement(elements.toolComparisonData);
+        }
+
+        const remaining = isObject(comparisonValue)
+          ? objectWithout(comparisonValue, ["primitive_only", "tool_enabled"])
+          : comparisonValue;
+        renderFlexibleData(elements.comparisonDetails, remaining);
+        setHidden(elements.comparisonDetails, !hasRecordedValue(remaining));
+      }
+
+      function metricNode(label, value, note) {
+        const node = createElement("div", "metric");
+        node.append(
+          createElement("span", "metric-label", label),
+          createElement("span", "metric-value", value)
+        );
+        if (note) {
+          node.append(createElement("span", "metric-note", note));
+        }
+        return node;
+      }
+
+      function renderMetricSet(container, metrics) {
+        clearElement(container);
+        if (!isObject(metrics)) {
+          container.append(createElement("p", "muted", "No metrics recorded."));
+          return;
+        }
+        container.append(
+          metricNode("Score", formatNumber(metrics.score)),
+          metricNode("Food", formatNumber(metrics.food)),
+          metricNode("Steps", formatNumber(metrics.steps)),
+          metricNode("Energy", formatNumber(metrics.energy))
+        );
+      }
+
+      function renderEvidence(creature, snapshot) {
+        const hasSnapshot = Boolean(snapshot);
+        setHidden(elements.evidenceEmpty, hasSnapshot);
+        setHidden(elements.evidenceContent, !hasSnapshot);
+        if (!hasSnapshot) {
+          return;
+        }
+
+        renderMetricSet(elements.trainingMetrics, snapshot.training);
+        renderTrainingChart(lineageEntries(snapshot));
+
+        const race = isObject(snapshot.race) ? snapshot.race : null;
+        if (race) {
+          elements.raceSeedSet.textContent = `Seed set ${stringValue(race.seed_set, "not recorded")}`;
+          clearElement(elements.heldoutMetrics);
+          elements.heldoutMetrics.append(
+            metricNode("Ancestor score", isObject(race.ancestor) ? formatNumber(race.ancestor.score) : "Not recorded"),
+            metricNode("Descendant score", isObject(race.descendant) ? formatNumber(race.descendant.score) : "Not recorded"),
+            metricNode("Improvement", formatSignedNumber(race.improvement)),
+            metricNode("Trials", formatNumber(race.trials))
+          );
+          elements.heldoutNote.textContent = "Held-out metrics are reported by the recorded ancestor race and are distinct from training selection.";
+          renderContestants(race.contestants);
+        } else {
+          elements.raceSeedSet.textContent = "No race";
+          clearElement(elements.heldoutMetrics);
+          elements.heldoutMetrics.append(createElement("p", "muted", "No held-out metrics recorded."));
+          elements.heldoutNote.textContent = "Race to record an unfamiliar course.";
+          setHidden(elements.contestantsWrap, true);
+          clearElement(elements.contestantsBody);
+        }
+
+        renderStructuredMemory(snapshot.memory);
+        renderEgg(creature, snapshot);
+      }
+
+      function createSvgElement(tag, attributes = {}, text) {
+        const node = document.createElementNS(svgNamespace, tag);
+        Object.entries(attributes).forEach(([name, value]) => {
+          node.setAttribute(name, String(value));
+        });
+        if (text !== undefined) {
+          node.textContent = String(text);
+        }
+        return node;
+      }
+
+      function renderTrainingChart(lineage) {
+        const title = byId("training-chart-title");
+        const description = elements.trainingChartDesc;
+        elements.trainingChart.replaceChildren(title, description);
+        const points = lineage
+          .filter((entry) => isObject(entry.training) && finiteNumber(entry.training.score) && finiteNumber(entry.generation))
+          .map((entry) => ({
+            generation: entry.generation,
+            score: entry.training.score,
+            accepted: entry.accepted === true
+          }));
+
+        if (!points.length) {
+          description.textContent = "No lineage training scores are currently recorded.";
+          const emptyText = createSvgElement("text", {
+            x: 280,
+            y: 94,
+            "text-anchor": "middle",
+            fill: "var(--cp-text-muted)",
+            "font-size": 14,
+            "font-family": "\"Segoe UI\", Aptos, Calibri, sans-serif"
+          }, "No recorded lineage training scores");
+          elements.trainingChart.append(emptyText);
+          return;
+        }
+
+        const chart = { left: 52, right: 536, top: 20, bottom: 146 };
+        const scores = points.map((point) => point.score);
+        const generations = points.map((point) => point.generation);
+        const recordedMinScore = Math.min(...scores);
+        const recordedMaxScore = Math.max(...scores);
+        let minScore = recordedMinScore;
+        let maxScore = recordedMaxScore;
+        let minGeneration = Math.min(...generations);
+        let maxGeneration = Math.max(...generations);
+        if (minScore === maxScore) {
+          minScore -= 1;
+          maxScore += 1;
+        }
+        if (minGeneration === maxGeneration) {
+          minGeneration -= 1;
+          maxGeneration += 1;
+        }
+
+        const xFor = (generation) => chart.left + ((generation - minGeneration) / (maxGeneration - minGeneration)) * (chart.right - chart.left);
+        const yFor = (score) => chart.bottom - ((score - minScore) / (maxScore - minScore)) * (chart.bottom - chart.top);
+
+        [chart.top, (chart.top + chart.bottom) / 2, chart.bottom].forEach((y) => {
+          elements.trainingChart.append(createSvgElement("line", {
+            x1: chart.left,
+            y1: y,
+            x2: chart.right,
+            y2: y,
+            stroke: "var(--cp-border)",
+            "stroke-width": 1
+          }));
+        });
+
+        const pathPoints = points.map((point) => `${xFor(point.generation)},${yFor(point.score)}`).join(" ");
+        elements.trainingChart.append(createSvgElement("polyline", {
+          points: pathPoints,
+          fill: "none",
+          stroke: "var(--cp-accent)",
+          "stroke-width": 3,
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        }));
+
+        points.forEach((point) => {
+          const circle = createSvgElement("circle", {
+            cx: xFor(point.generation),
+            cy: yFor(point.score),
+            r: point.accepted ? 5 : 4,
+            fill: point.accepted ? "var(--cp-accent)" : "var(--cp-surface)",
+            stroke: point.accepted ? "var(--cp-accent)" : "var(--cp-border-strong)",
+            "stroke-width": 2
+          });
+          circle.append(createSvgElement(
+            "title",
+            {},
+            `Generation ${point.generation}: training score ${formatNumber(point.score)}; ${point.accepted ? "accepted" : "no accepted mutation"}`
+          ));
+          elements.trainingChart.append(circle);
+        });
+
+        const labelStyle = {
+          fill: "var(--cp-text-muted)",
+          "font-size": 11,
+          "font-family": "\"Segoe UI\", Aptos, Calibri, sans-serif"
+        };
+        elements.trainingChart.append(
+          createSvgElement("text", { x: 10, y: chart.top + 4, ...labelStyle }, formatNumber(recordedMaxScore)),
+          createSvgElement("text", { x: 10, y: chart.bottom + 4, ...labelStyle }, formatNumber(recordedMinScore)),
+          createSvgElement("text", { x: chart.left, y: 169, ...labelStyle }, `Gen ${Math.min(...generations)}`),
+          createSvgElement("text", {
+            x: chart.right,
+            y: 169,
+            "text-anchor": "end",
+            ...labelStyle
+          }, `Gen ${Math.max(...generations)}`)
+        );
+        description.textContent = `${points.length} recorded training scores from generation ${Math.min(...generations)} through ${Math.max(...generations)}.`;
+      }
+
+      function renderContestants(contestantsValue) {
+        const contestants = arrayValue(contestantsValue).filter((contestant) => isObject(contestant));
+        clearElement(elements.contestantsBody);
+        contestants.forEach((contestant) => {
+          const row = document.createElement("tr");
+          const metrics = isObject(contestant.metrics) ? contestant.metrics : {};
+          [
+            formatNumber(contestant.generation),
+            shortSha(contestant.genome_sha256),
+            formatNumber(metrics.score),
+            formatNumber(metrics.food),
+            formatNumber(metrics.steps),
+            formatNumber(metrics.energy)
+          ].forEach((value, index) => {
+            const cell = createElement("td", index === 1 ? "mono" : "", value);
+            row.append(cell);
+          });
+          elements.contestantsBody.append(row);
+        });
+        setHidden(elements.contestantsWrap, contestants.length === 0);
+      }
+
+      function renderStructuredMemory(memory) {
+        clearElement(elements.memoryView);
+        if (!isObject(memory) || Object.keys(memory).length === 0) {
+          elements.memoryView.append(createElement("p", "muted", "No structured memory values recorded."));
+          return;
+        }
+        appendStructuredObject(elements.memoryView, memory, 0);
+      }
+
+      function appendStructuredObject(container, value, depth) {
+        if (depth > 5) {
+          container.append(createElement("span", "structured-value", "Nested value omitted beyond depth 5."));
+          return;
+        }
+        Object.entries(value).forEach(([key, item]) => {
+          const row = createElement("div", "structured-row");
+          row.append(createElement("div", "structured-key", key));
+          const detail = createElement("div", "structured-value");
+          if (isObject(item)) {
+            detail.classList.add("nested");
+            appendStructuredObject(detail, item, depth + 1);
+          } else if (Array.isArray(item)) {
+            if (!item.length) {
+              detail.textContent = "[]";
+            } else if (item.every((entry) => !isObject(entry) && !Array.isArray(entry))) {
+              detail.textContent = item.map((entry) => String(entry)).join(", ");
+            } else {
+              item.forEach((entry, index) => {
+                const nested = createElement("div", "nested");
+                nested.append(createElement("div", "structured-key", `[${index}]`));
+                if (isObject(entry)) {
+                  appendStructuredObject(nested, entry, depth + 1);
+                } else {
+                  nested.append(createElement("div", "structured-value", JSON.stringify(entry)));
+                }
+                detail.append(nested);
+              });
+            }
+          } else if (item === null) {
+            detail.textContent = "null";
+          } else {
+            detail.textContent = String(item);
+          }
+          row.append(detail);
+          container.append(row);
+        });
+      }
+
+      function renderEgg(creature, snapshot) {
+        const egg = isObject(snapshot.egg) ? snapshot.egg : null;
+        const available = Boolean(egg && egg.available === true);
+        elements.eggStatus.textContent = available ? "Exported" : "Not exported";
+        setDefinitionRows(elements.eggMeta, available
+          ? [
+              ["File", stringValue(egg.file, "egg.json"), "mono"],
+              ["SHA-256", stringValue(egg.sha256, "Not recorded"), "mono"],
+              ["Generation", formatNumber(egg.generation)]
+            ]
+          : [["Export", "No exported egg is reported by this snapshot."]]
+        );
+
+      }
+
+      function activateTab(tabName, focus) {
+        const validTabs = ["profile", "genome", "vm", "evidence"];
+        const requested = validTabs.includes(tabName) ? tabName : "profile";
+        const selected = requested === "vm" && elements.vmTab.hidden ? "profile" : requested;
+        state.selectedTab = selected;
+        document.querySelectorAll("[role='tab'][data-tab]").forEach((tab) => {
+          const active = tab.dataset.tab === selected;
+          tab.setAttribute("aria-selected", String(active));
+          tab.tabIndex = active ? 0 : -1;
+          if (active && focus) {
+            tab.focus();
+          }
+        });
+        validTabs.forEach((name) => {
+          setHidden(byId(`panel-${name}`), name !== selected);
+        });
+      }
+
+      function raceReplayGroups(race) {
+        const groups = new Map();
+        arrayValue(race && race.replays)
+          .filter((replay) => isObject(replay))
+          .forEach((replay, index) => {
+            const key = `${typeof replay.seed}:${String(replay.seed)}`;
+            if (!groups.has(key)) {
+              groups.set(key, { key, seed: replay.seed, replays: [] });
+            }
+            groups.get(key).replays.push({ ...replay, _index: index });
+          });
+        groups.forEach((group) => {
+          group.replays.sort((left, right) => {
+            const leftGeneration = finiteNumber(left.generation) ? left.generation : Number.POSITIVE_INFINITY;
+            const rightGeneration = finiteNumber(right.generation) ? right.generation : Number.POSITIVE_INFINITY;
+            return leftGeneration - rightGeneration;
+          });
+        });
+        return Array.from(groups.values());
+      }
+
+      function currentReplayGroup() {
+        const creature = selectedCreature();
+        const snapshot = validSnapshot(creature);
+        const race = snapshot && isObject(snapshot.race) ? snapshot.race : null;
+        const groups = raceReplayGroups(race);
+        if (!groups.length) {
+          return null;
+        }
+        let group = groups.find((candidate) => candidate.key === state.selectedSeedKey);
+        if (!group) {
+          group = groups[0];
+          state.selectedSeedKey = group.key;
+        }
+        return group;
+      }
+
+      function replayPair(group) {
+        if (!group || !group.replays.length) {
+          return { ancestor: null, descendant: null };
+        }
+        if (group.replays.length === 1) {
+          return { ancestor: group.replays[0], descendant: null };
+        }
+        return {
+          ancestor: group.replays[0],
+          descendant: group.replays[group.replays.length - 1]
+        };
+      }
+
+      function replaySignature(creature, snapshot, group) {
+        if (!creature || !snapshot || !group) {
+          return null;
+        }
+        const traceSignature = group.replays.map((replay) => {
+          const trace = arrayValue(replay.trace);
+          const final = trace[trace.length - 1];
+          return [
+            replay.generation,
+            replayGenomeSha(replay),
+            trace.length,
+            isObject(final) ? final.step : ""
+          ].join(":");
+        }).join("|");
+        return `${creature.id}|${snapshot.genome_sha256}|${group.key}|${traceSignature}`;
+      }
+
+      function replayGenomeSha(replay) {
+        if (replay && typeof replay.genome_sha256 === "string" && replay.genome_sha256.length) {
+          return replay.genome_sha256;
+        }
+        const creature = selectedCreature();
+        const snapshot = validSnapshot(creature);
+        const race = snapshot && isObject(snapshot.race) ? snapshot.race : null;
+        const contestant = arrayValue(race && race.contestants).find((entry) => {
+          return isObject(entry) && entry.generation === (replay && replay.generation);
+        });
+        return contestant && typeof contestant.genome_sha256 === "string"
+          ? contestant.genome_sha256
+          : "";
+      }
+
+      function renderHabitat() {
+        const creature = selectedCreature();
+        const snapshot = validSnapshot(creature);
+        const race = snapshot && isObject(snapshot.race) ? snapshot.race : null;
+
+        renderRaceSummary(race);
+
+        if (!creature) {
+          showHabitatEmpty("Select a creature", "A stored held-out race is required before any path appears.");
+          return;
+        }
+        if (!snapshotExists(snapshot)) {
+          showHabitatEmpty("No executable state", "Hatch or resume this creature before training and racing it.");
+          return;
+        }
+        if (!race) {
+          showHabitatEmpty("Race to record a course", "No held-out race or replay trace is stored for this creature. Nothing is animated or estimated.");
+          return;
+        }
+        const groups = raceReplayGroups(race);
+        if (!groups.length) {
+          showHabitatEmpty("Race metrics exist, but no replay trace was recorded", "The metric evidence remains visible in the inspector. No habitat path can be reconstructed.");
+          return;
+        }
+
+        setHidden(elements.habitatEmpty, true);
+        setHidden(elements.replayContent, false);
+        renderCourseOptions(groups);
+        const group = currentReplayGroup();
+        const pair = replayPair(group);
+        const signature = replaySignature(creature, snapshot, group);
+        if (signature !== state.replayKey) {
+          state.replayKey = signature;
+          state.replayIndex = 0;
+          stopReplay();
+        }
+        const maxIndex = Math.max(
+          arrayValue(pair.ancestor && pair.ancestor.trace).length,
+          arrayValue(pair.descendant && pair.descendant.trace).length
+        ) - 1;
+        state.replayIndex = Math.max(0, Math.min(state.replayIndex, Math.max(0, maxIndex)));
+        renderReplayControls(creature, pair, maxIndex);
+        renderReplayBoards(pair);
+      }
+
+      function renderRaceSummary(race) {
+        setHidden(elements.raceSummary, !race);
+        if (!race) {
+          return;
+        }
+        const ancestor = isObject(race.ancestor) ? race.ancestor : {};
+        const descendant = isObject(race.descendant) ? race.descendant : {};
+        elements.raceAncestorScore.textContent = formatNumber(ancestor.score);
+        elements.raceAncestorDetail.textContent = `Food ${formatNumber(ancestor.food)} · energy ${formatNumber(ancestor.energy)}`;
+        elements.raceDescendantScore.textContent = formatNumber(descendant.score);
+        elements.raceDescendantDetail.textContent = `Food ${formatNumber(descendant.food)} · energy ${formatNumber(descendant.energy)}`;
+        elements.raceImprovement.textContent = formatSignedNumber(race.improvement);
+        elements.raceTrials.textContent = `${formatNumber(race.trials)} held-out trials · ${stringValue(race.seed_set, "seed set not recorded")}`;
+      }
+
+      function showHabitatEmpty(title, copy) {
+        stopReplay();
+        setHidden(elements.habitatEmpty, false);
+        setHidden(elements.replayContent, true);
+        elements.habitatEmptyTitle.textContent = title;
+        elements.habitatEmptyCopy.textContent = copy;
+      }
+
+      function renderCourseOptions(groups) {
+        const existingSignature = Array.from(elements.courseSelect.options)
+          .map((option) => option.value)
+          .join("|");
+        const nextSignature = groups.map((group) => group.key).join("|");
+        if (existingSignature !== nextSignature) {
+          clearElement(elements.courseSelect);
+          groups.forEach((group) => {
+            const option = document.createElement("option");
+            option.value = group.key;
+            option.textContent = `Seed ${String(group.seed)} · ${group.replays.length} recorded trace${group.replays.length === 1 ? "" : "s"}`;
+            elements.courseSelect.append(option);
+          });
+        }
+        if (!groups.some((group) => group.key === state.selectedSeedKey)) {
+          state.selectedSeedKey = groups[0].key;
+        }
+        elements.courseSelect.value = state.selectedSeedKey;
+      }
+
+      function dimensionsAgree(pair) {
+        const values = [pair.ancestor, pair.descendant].filter(Boolean);
+        if (!values.length) {
+          return null;
+        }
+        const width = values[0].width;
+        const height = values[0].height;
+        const allAgree = values.every((replay) => replay.width === width && replay.height === height);
+        return { width, height, allAgree };
+      }
+
+      function renderReplayControls(creature, pair, maxIndex) {
+        const group = currentReplayGroup();
+        const dimensions = dimensionsAgree(pair);
+        elements.courseDimensions.textContent = dimensions
+          ? `Grid ${formatNumber(dimensions.width)} × ${formatNumber(dimensions.height)}`
+          : "Grid dimensions not recorded";
+        elements.courseRecordings.textContent = `${group ? group.replays.length : 0} stored trace${group && group.replays.length === 1 ? "" : "s"}`;
+        const paired = Boolean(pair.ancestor && pair.descendant);
+        elements.courseWarning.textContent = paired
+          ? dimensions && !dimensions.allAgree
+            ? "The two stored traces report different grid dimensions; each board uses its own recorded dimensions."
+            : ""
+          : "Only one trace was recorded for this seed, so a same-seed founder/descendant comparison is incomplete.";
+        setHidden(elements.courseWarning, paired && (!dimensions || dimensions.allAgree));
+
+        const hasFrames = maxIndex >= 0;
+        const canAutoPlay = hasFrames && creature.status === "active";
+        elements.replayScrubber.max = String(Math.max(0, maxIndex));
+        elements.replayScrubber.value = String(state.replayIndex);
+        elements.replayScrubber.disabled = !hasFrames;
+        elements.replayBack.disabled = !hasFrames || state.replayIndex <= 0;
+        elements.replayForward.disabled = !hasFrames || state.replayIndex >= maxIndex;
+        elements.replayToggle.disabled = !canAutoPlay;
+        elements.replayToggle.textContent = state.replayTimer ? "Pause" : "Play";
+        elements.replayToggle.setAttribute(
+          "aria-label",
+          state.replayTimer ? "Pause recorded race replay" : "Play recorded race replay"
+        );
+        elements.replayPosition.textContent = hasFrames
+          ? `Frame ${state.replayIndex + 1} of ${maxIndex + 1}`
+          : "No stored frames";
+        elements.replayScrubber.setAttribute(
+          "aria-valuetext",
+          hasFrames ? `Stored frame ${state.replayIndex + 1} of ${maxIndex + 1}` : "No stored frames"
+        );
+        const currentSteps = [pair.ancestor, pair.descendant]
+          .map((replay) => frameForReplay(replay, state.replayIndex))
+          .filter(Boolean)
+          .map((frame) => frame.step)
+          .filter((step) => step !== undefined);
+        elements.replayStepValue.textContent = currentSteps.length
+          ? `Recorded step ${currentSteps.map((step) => String(step)).join(" / ")}`
+          : "Recorded step —";
+        elements.replayNote.textContent = creature.status === "dormant"
+          ? "Dormant creature: automatic playback is disabled. The scrubber may inspect stored evidence without running the agent."
+          : "Playback advances only through stored trace frames and stops at the final frame.";
+      }
+
+      function frameForReplay(replay, index) {
+        const trace = arrayValue(replay && replay.trace).filter((frame) => isObject(frame));
+        if (!trace.length) {
+          return null;
+        }
+        return trace[Math.min(index, trace.length - 1)];
+      }
+
+      function renderReplayBoards(pair) {
+        renderReplayBoard({
+          replay: pair.ancestor,
+          canvas: elements.ancestorCanvas,
+          title: elements.ancestorBoardTitle,
+          id: elements.ancestorBoardId,
+          meta: elements.ancestorFrameMeta,
+          event: elements.ancestorEvent,
+          fallbackTitle: "Founder"
+        });
+        renderReplayBoard({
+          replay: pair.descendant,
+          canvas: elements.descendantCanvas,
+          title: elements.descendantBoardTitle,
+          id: elements.descendantBoardId,
+          meta: elements.descendantFrameMeta,
+          event: elements.descendantEvent,
+          fallbackTitle: "Descendant"
+        });
+      }
+
+      function renderReplayBoard(config) {
+        const replay = config.replay;
+        if (!replay) {
+          config.title.textContent = config.fallbackTitle;
+          config.id.textContent = "No matched trace";
+          config.meta.textContent = "—";
+          config.event.textContent = "No stored frame for this side of the comparison.";
+          drawReplayCanvas(config.canvas, null, 0);
+          return;
+        }
+        const trace = arrayValue(replay.trace).filter((frame) => isObject(frame));
+        const localIndex = trace.length ? Math.min(state.replayIndex, trace.length - 1) : 0;
+        const frame = trace[localIndex] || null;
+        const ended = trace.length > 0 && state.replayIndex >= trace.length - 1;
+        config.title.textContent = finiteNumber(replay.generation)
+          ? `Generation ${replay.generation}`
+          : config.fallbackTitle;
+        config.id.textContent = `${shortSha(replayGenomeSha(replay))} · seed ${String(replay.seed)}`;
+        config.meta.textContent = frame
+          ? `Energy ${formatNumber(frame.energy)} · food ${formatNumber(frame.collected)}${ended && state.replayIndex > localIndex ? " · trace ended" : ""}`
+          : "No stored frames";
+        const eventParts = [];
+        if (frame && frame.step !== undefined) {
+          eventParts.push(`Step ${String(frame.step)}`);
+        }
+        if (frame && frame.action !== undefined) {
+          eventParts.push(`action ${String(frame.action)}`);
+        }
+        if (frame && frame.event !== undefined) {
+          eventParts.push(`event ${String(frame.event)}`);
+        }
+        if (ended && typeof replay.termination === "string") {
+          const endings = {
+            all_food: "All food collected",
+            energy_depleted: "Energy depleted",
+            step_limit: "Movement limit",
+            fuel_exhausted: "VM fuel limit"
+          };
+          eventParts.push(endings[replay.termination] || replay.termination);
+          if (finiteNumber(replay.operations) && finiteNumber(replay.operation_limit)) {
+            eventParts.push(`episode VM steps ${formatNumber(replay.operations)} / ${formatNumber(replay.operation_limit)}`);
+          }
+        }
+        config.event.textContent = eventParts.length ? eventParts.join(" · ") : "No event or action label recorded for this frame.";
+        drawReplayCanvas(config.canvas, replay, localIndex);
+      }
+
+      function cssColor(variable) {
+        return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+      }
+
+      function drawReplayCanvas(canvas, replay, index) {
+        const rectangle = canvas.getBoundingClientRect();
+        const cssWidth = Math.max(280, Math.round(rectangle.width || 320));
+        const cssHeight = Math.max(240, Math.round(rectangle.height || 300));
+        const density = Math.max(1, window.devicePixelRatio || 1);
+        canvas.width = Math.round(cssWidth * density);
+        canvas.height = Math.round(cssHeight * density);
+        const context = canvas.getContext("2d");
+        if (!context) {
+          return;
+        }
+        context.setTransform(density, 0, 0, density, 0, 0);
+        context.clearRect(0, 0, cssWidth, cssHeight);
+        context.fillStyle = cssColor("--cp-surface");
+        context.fillRect(0, 0, cssWidth, cssHeight);
+
+        if (!replay) {
+          canvas.setAttribute("aria-label", "No stored replay trace for this comparison board.");
+          drawCanvasMessage(context, cssWidth, cssHeight, "No matched trace");
+          return;
+        }
+
+        const gridWidth = finiteNumber(replay.width) ? Math.floor(replay.width) : 0;
+        const gridHeight = finiteNumber(replay.height) ? Math.floor(replay.height) : 0;
+        const trace = arrayValue(replay.trace).filter((frame) => isObject(frame));
+        const frame = trace[index] || null;
+        if (gridWidth <= 0 || gridHeight <= 0 || !frame) {
+          canvas.setAttribute("aria-label", "Stored replay is missing valid grid dimensions or trace frames.");
+          drawCanvasMessage(context, cssWidth, cssHeight, "Incomplete trace");
+          return;
+        }
+
+        const padding = 18;
+        const cellSize = Math.min(
+          (cssWidth - padding * 2) / gridWidth,
+          (cssHeight - padding * 2) / gridHeight
+        );
+        const boardWidth = cellSize * gridWidth;
+        const boardHeight = cellSize * gridHeight;
+        const originX = (cssWidth - boardWidth) / 2;
+        const originY = (cssHeight - boardHeight) / 2;
+
+        context.fillStyle = cssColor("--cp-bg-elevated");
+        context.fillRect(originX, originY, boardWidth, boardHeight);
+        context.strokeStyle = cssColor("--cp-border");
+        context.lineWidth = 1;
+        for (let x = 0; x <= gridWidth; x += 1) {
+          const drawX = originX + x * cellSize;
+          context.beginPath();
+          context.moveTo(drawX, originY);
+          context.lineTo(drawX, originY + boardHeight);
+          context.stroke();
+        }
+        for (let y = 0; y <= gridHeight; y += 1) {
+          const drawY = originY + y * cellSize;
+          context.beginPath();
+          context.moveTo(originX, drawY);
+          context.lineTo(originX + boardWidth, drawY);
+          context.stroke();
+        }
+
+        const consumed = consumedFoodPositions(trace, index);
+        arrayValue(replay.food).forEach((position) => {
+          if (!validPosition(position) || consumed.has(`${position[0]},${position[1]}`)) {
+            return;
+          }
+          drawFood(context, originX, originY, cellSize, position[0], position[1]);
+        });
+        arrayValue(replay.hazards).forEach((position) => {
+          if (!validPosition(position)) {
+            return;
+          }
+          drawHazard(context, originX, originY, cellSize, position[0], position[1]);
+        });
+        if (finiteNumber(frame.x) && finiteNumber(frame.y)) {
+          drawAgent(
+            context,
+            originX,
+            originY,
+            cellSize,
+            frame.x,
+            frame.y,
+            replayGenomeSha(replay)
+          );
+        }
+
+        canvas.setAttribute(
+          "aria-label",
+          `Recorded generation ${String(replay.generation)}, seed ${String(replay.seed)}, frame ${index + 1} of ${trace.length}, position ${String(frame.x)}, ${String(frame.y)}, energy ${formatNumber(frame.energy)}, collected ${formatNumber(frame.collected)}.`
+        );
+      }
+
+      function drawCanvasMessage(context, width, height, message) {
+        context.fillStyle = cssColor("--cp-text-muted");
+        context.font = "600 14px \"Segoe UI\", Aptos, Calibri, sans-serif";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(message, width / 2, height / 2);
+      }
+
+      function validPosition(position) {
+        return Array.isArray(position) && finiteNumber(position[0]) && finiteNumber(position[1]);
+      }
+
+      function consumedFoodPositions(trace, index) {
+        const consumed = new Set();
+        const end = Math.min(index, trace.length - 1);
+        for (let frameIndex = 1; frameIndex <= end; frameIndex += 1) {
+          const previous = trace[frameIndex - 1];
+          const current = trace[frameIndex];
+          if (
+            finiteNumber(previous.collected) &&
+            finiteNumber(current.collected) &&
+            current.collected > previous.collected &&
+            finiteNumber(current.x) &&
+            finiteNumber(current.y)
+          ) {
+            consumed.add(`${current.x},${current.y}`);
+          }
+        }
+        return consumed;
+      }
+
+      function cellCenter(originX, originY, cellSize, x, y) {
+        return {
+          x: originX + (x + 0.5) * cellSize,
+          y: originY + (y + 0.5) * cellSize
+        };
+      }
+
+      function drawFood(context, originX, originY, cellSize, x, y) {
+        const center = cellCenter(originX, originY, cellSize, x, y);
+        const radius = Math.max(2.5, cellSize * 0.12);
+        context.strokeStyle = cssColor("--cp-success");
+        context.fillStyle = cssColor("--cp-success");
+        context.lineWidth = Math.max(1.5, cellSize * 0.06);
+        context.beginPath();
+        context.moveTo(center.x, center.y + radius * 1.7);
+        context.lineTo(center.x, center.y - radius * 1.3);
+        context.stroke();
+        context.beginPath();
+        context.arc(center.x - radius * 0.75, center.y - radius * 0.55, radius, 0, Math.PI * 2);
+        context.arc(center.x + radius * 0.75, center.y - radius * 0.95, radius, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      function drawHazard(context, originX, originY, cellSize, x, y) {
+        const center = cellCenter(originX, originY, cellSize, x, y);
+        const radius = Math.max(4, cellSize * 0.24);
+        context.fillStyle = cssColor("--cp-danger");
+        context.beginPath();
+        context.moveTo(center.x, center.y - radius);
+        context.lineTo(center.x + radius, center.y + radius);
+        context.lineTo(center.x - radius, center.y + radius);
+        context.closePath();
+        context.fill();
+        context.strokeStyle = cssColor("--cp-surface");
+        context.lineWidth = Math.max(1, cellSize * 0.045);
+        context.beginPath();
+        context.moveTo(center.x, center.y - radius * 0.42);
+        context.lineTo(center.x, center.y + radius * 0.28);
+        context.stroke();
+      }
+
+      function hashBits(value) {
+        let hash = 0;
+        for (let index = 0; index < value.length; index += 1) {
+          hash = ((hash << 5) - hash + value.charCodeAt(index)) | 0;
+        }
+        return Math.abs(hash);
+      }
+
+      function drawAgent(context, originX, originY, cellSize, x, y, sha) {
+        const center = cellCenter(originX, originY, cellSize, x, y);
+        const radius = Math.max(5, cellSize * 0.27);
+        const bits = hashBits(sha);
+        context.strokeStyle = cssColor("--cp-text");
+        context.lineWidth = Math.max(1.2, cellSize * 0.045);
+        const limbs = 3 + (bits % 3);
+        for (let index = 0; index < limbs; index += 1) {
+          const angle = ((Math.PI * 2) / limbs) * index + ((bits % 17) / 17);
+          context.beginPath();
+          context.moveTo(
+            center.x + Math.cos(angle) * radius * 0.6,
+            center.y + Math.sin(angle) * radius * 0.6
+          );
+          context.lineTo(
+            center.x + Math.cos(angle) * radius * 1.25,
+            center.y + Math.sin(angle) * radius * 1.25
+          );
+          context.stroke();
+        }
+        context.fillStyle = cssColor("--cp-accent");
+        context.beginPath();
+        context.arc(center.x, center.y, radius, 0, Math.PI * 2);
+        context.fill();
+        context.strokeStyle = cssColor("--cp-surface");
+        context.lineWidth = Math.max(1.5, cellSize * 0.06);
+        context.beginPath();
+        context.arc(center.x, center.y, radius * 0.42, 0, Math.PI * 2);
+        context.stroke();
+      }
+
+      function replayMaxIndex() {
+        const pair = replayPair(currentReplayGroup());
+        return Math.max(
+          arrayValue(pair.ancestor && pair.ancestor.trace).length,
+          arrayValue(pair.descendant && pair.descendant.trace).length
+        ) - 1;
+      }
+
+      function startReplay() {
+        const creature = selectedCreature();
+        const maxIndex = replayMaxIndex();
+        if (!creature || creature.status !== "active" || maxIndex < 0) {
+          return;
+        }
+        if (state.replayIndex >= maxIndex) {
+          state.replayIndex = 0;
+        }
+        stopReplay();
+        state.replayTimer = window.setInterval(() => {
+          const currentCreature = selectedCreature();
+          const currentMax = replayMaxIndex();
+          if (!currentCreature || currentCreature.status !== "active" || state.replayIndex >= currentMax) {
+            stopReplay();
+            renderHabitat();
+            return;
+          }
+          state.replayIndex += 1;
+          renderHabitat();
+          if (state.replayIndex >= currentMax) {
+            stopReplay();
+            renderHabitat();
+          }
+        }, Math.round(650 / state.replaySpeed));
+        renderHabitat();
+      }
+
+      function stopReplay() {
+        if (state.replayTimer !== null) {
+          window.clearInterval(state.replayTimer);
+          state.replayTimer = null;
+        }
+      }
+
+      function makeToolRequest(toolName, argumentsObject) {
+        if (!validToolName.test(toolName)) {
+          throw new Error("The latest inventory did not provide a safe exact tool name.");
+        }
+        return [
+          `Invoke exactly one tool named "${toolName}".`,
+          `Use exactly these JSON arguments: ${JSON.stringify(argumentsObject)}.`,
+          "Do not invoke any other tool.",
+          "Do not infer or claim success beyond the returned tool result.",
+          "Return the exact tool result, including any error."
+        ].join(" ");
+      }
+
+      function prettyValue(value, fallback) {
+        if (value === undefined) {
+          return fallback;
+        }
+        if (typeof value === "string") {
+          return value;
+        }
+        try {
+          return JSON.stringify(value, null, 2);
+        } catch (error) {
+          return String(value);
+        }
+      }
+
+      async function runChatAction({ title, toolName, argumentsObject, pendingSelection }) {
+        if (state.busy) {
+          return;
+        }
+        let userInput;
+        try {
+          userInput = makeToolRequest(toolName, argumentsObject);
+        } catch (error) {
+          showLocalActionError(title, error instanceof Error ? error.message : String(error));
+          return;
+        }
+
+        state.busy = true;
+        if (pendingSelection) {
+          state.pendingSelection = pendingSelection;
+        }
+        elements.operationConsole.dataset.tone = "working";
+        elements.operationTitle.textContent = title;
+        elements.operationStatus.textContent = `Sending one explicit request to ${toolName}…`;
+        elements.operationResponse.textContent = userInput;
+        elements.operationLogs.textContent = "Waiting for Brainstem agent logs.";
+        elements.operationSession.textContent = "Request in progress";
+        elements.operationConsole.setAttribute("aria-busy", "true");
+        renderAll();
+
+        try {
+          const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ user_input: userInput })
+          });
+          const responseText = await response.text();
+          let payload = null;
+          let parsedJson = false;
+          try {
+            payload = responseText ? JSON.parse(responseText) : null;
+            parsedJson = true;
+          } catch (error) {
+            payload = { response: responseText };
+          }
+
+          if (!response.ok) {
+            const errorMessage = isObject(payload) && typeof payload.error === "string"
+              ? payload.error
+              : `POST /chat failed with HTTP ${response.status}.`;
+            elements.operationConsole.dataset.tone = "error";
+            elements.operationStatus.textContent = `Response failed: ${errorMessage} The tool may already have changed state. The inventory is being refreshed; do not repeat evolution without inspecting its generation.`;
+            elements.operationResponse.textContent = prettyValue(
+              isObject(payload) ? payload.response || payload.error : payload,
+              "No response body returned."
+            );
+            elements.operationLogs.textContent = prettyValue(
+              isObject(payload) ? payload.agent_logs : undefined,
+              "No agent log returned with this error."
+            );
+            elements.operationSession.textContent = isObject(payload) && typeof payload.session_id === "string"
+              ? `Session ${payload.session_id}`
+              : "No chat session";
+          } else if (!parsedJson || !isObject(payload)) {
+            elements.operationConsole.dataset.tone = "error";
+            elements.operationStatus.textContent = "POST /chat returned an unexpected non-JSON response or response shape.";
+            elements.operationResponse.textContent = prettyValue(payload, "No response body returned.");
+            elements.operationLogs.textContent = "No structured agent log returned.";
+            elements.operationSession.textContent = "No chat session";
+          } else {
+            elements.operationConsole.dataset.tone = "idle";
+            elements.operationStatus.textContent = "Response received. Inspect the authoritative tool log below; HTTP completion is not treated as action success.";
+            elements.operationResponse.textContent = prettyValue(payload.response, "No response text returned.");
+            elements.operationLogs.textContent = prettyValue(payload.agent_logs, "No agent log returned.");
+            elements.operationSession.textContent = typeof payload.session_id === "string"
+              ? `Session ${payload.session_id}`
+              : "No chat session";
+          }
+        } catch (error) {
+          elements.operationConsole.dataset.tone = "error";
+          elements.operationStatus.textContent = `Action request could not reach Brainstem: ${error instanceof Error ? error.message : String(error)}`;
+          elements.operationResponse.textContent = "No action result was received.";
+          elements.operationLogs.textContent = "No agent log was received.";
+          elements.operationSession.textContent = "No chat session";
+        } finally {
+          await fetchTerrarium({ silent: true });
+          state.busy = false;
+          elements.operationConsole.removeAttribute("aria-busy");
+          renderAll();
+        }
+      }
+
+      function showLocalActionError(title, message) {
+        elements.operationConsole.dataset.tone = "error";
+        elements.operationTitle.textContent = title;
+        elements.operationStatus.textContent = message;
+        elements.operationResponse.textContent = "No POST /chat request was sent.";
+        elements.operationLogs.textContent = "No agent log exists for a request that was not sent.";
+        elements.operationSession.textContent = "No chat session";
+      }
+
+      function selectedForAction() {
+        const creature = selectedCreature();
+        if (!creature) {
+          showLocalActionError("Creature action", "Select a creature first.");
+          return null;
+        }
+        return creature;
+      }
+
+      function runCreatureAction(title, action, extraArguments = {}) {
+        const creature = selectedForAction();
+        if (!creature) {
+          return;
+        }
+        if (!creatureToolReady(creature)) {
+          showLocalActionError(title, "The exact creature tool is not loaded in the latest inventory. No tool name was guessed.");
+          return;
+        }
+        runChatAction({
+          title,
+          toolName: creature.agent_name,
+          argumentsObject: { action, ...extraArguments }
+        });
+      }
+
+      function slugify(value) {
+        return value
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9-]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .replace(/^[^a-z]+/, "")
+          .slice(0, 32);
+      }
+
+      elements.refresh.addEventListener("click", () => fetchTerrarium());
+
+      elements.openIntroduce.addEventListener("click", () => {
+        elements.introduceError.textContent = "";
+        setHidden(elements.introduceError, true);
+        state.introduceIdTouched = false;
+        elements.introduceForm.reset();
+        elements.introduceDialog.showModal();
+        elements.introduceName.focus();
+      });
+
+      [byId("close-introduce"), byId("cancel-introduce")].forEach((button) => {
+        button.addEventListener("click", () => elements.introduceDialog.close());
+      });
+
+      elements.introduceName.addEventListener("input", () => {
+        if (!state.introduceIdTouched) {
+          elements.introduceId.value = slugify(elements.introduceName.value);
+        }
+      });
+
+      elements.introduceId.addEventListener("input", () => {
+        state.introduceIdTouched = true;
+      });
+
+      elements.introduceForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = elements.introduceName.value.trim();
+        const id = elements.introduceId.value.trim();
+        const capabilities = Array.from(
+          elements.capabilityOptions.querySelectorAll("input[name='capability']:checked")
+        ).map((input) => input.value);
+        if (!caretakerReady()) {
+          elements.introduceError.textContent = "CreatureTwin is not loaded in the latest inventory.";
+          setHidden(elements.introduceError, false);
+          return;
+        }
+        if (!name || !id || !elements.introduceForm.checkValidity()) {
+          elements.introduceError.textContent = "Enter a name and a valid lowercase file-safe ID.";
+          setHidden(elements.introduceError, false);
+          elements.introduceForm.reportValidity();
+          return;
+        }
+        if (!capabilities.length) {
+          elements.introduceError.textContent = "Select at least one reported capability.";
+          setHidden(elements.introduceError, false);
+          return;
+        }
+        elements.introduceDialog.close();
+        runChatAction({
+          title: `Introduce ${name}`,
+          toolName: "CreatureTwin",
+          argumentsObject: {
+            action: "introduce",
+            id,
+            name,
+            capabilities
+          },
+          pendingSelection: id
+        });
+      });
+
+      document.querySelectorAll("[role='tab'][data-tab]").forEach((tab) => {
+        tab.addEventListener("click", () => activateTab(tab.dataset.tab, false));
+        tab.addEventListener("keydown", (event) => {
+          const tabs = Array.from(document.querySelectorAll("[role='tab'][data-tab]"))
+            .filter((candidate) => !candidate.hidden);
+          const currentIndex = tabs.indexOf(tab);
+          let nextIndex = null;
+          if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+            nextIndex = (currentIndex + 1) % tabs.length;
+          } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+            nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+          } else if (event.key === "Home") {
+            nextIndex = 0;
+          } else if (event.key === "End") {
+            nextIndex = tabs.length - 1;
+          }
+          if (nextIndex !== null) {
+            event.preventDefault();
+            activateTab(tabs[nextIndex].dataset.tab, true);
+          }
+        });
+      });
+
+      elements.checkStatus.addEventListener("click", () => {
+        const creature = selectedForAction();
+        if (creature) {
+          runCreatureAction(`Read ${creature.name} tool status`, "status");
+        }
+      });
+
+      elements.hatch.addEventListener("click", () => {
+        const creature = selectedForAction();
+        if (creature) {
+          runCreatureAction(`Hatch ${creature.name}`, "hatch", {
+            name: creature.name,
+            seed: 41
+          });
+        }
+      });
+
+      elements.evolve.addEventListener("click", () => {
+        const creature = selectedForAction();
+        const snapshot = validSnapshot(creature);
+        if (!creature || !snapshot || !finiteNumber(snapshot.generation)) {
+          showLocalActionError("Run 12 generations", "The current numeric generation is required for expected_generation.");
+          return;
+        }
+        runCreatureAction(`Run 12 generations for ${creature.name}`, "evolve", {
+          generations: 12,
+          expected_generation: snapshot.generation
+        });
+      });
+
+      elements.race.addEventListener("click", () => {
+        const creature = selectedForAction();
+        if (creature) {
+          runCreatureAction(`Race ${creature.name} on held-out seeds`, "race", { trials: 12 });
+        }
+      });
+
+      elements.sleepWake.addEventListener("click", () => {
+        const creature = selectedForAction();
+        if (!creature) {
+          return;
+        }
+        if (!caretakerReady()) {
+          showLocalActionError("Creature lifecycle", "CreatureTwin is not loaded in the latest inventory.");
+          return;
+        }
+        const wake = creature.status === "dormant";
+        runChatAction({
+          title: wake ? `Wake ${creature.name}` : `Move ${creature.name} to dormancy`,
+          toolName: "CreatureTwin",
+          argumentsObject: {
+            action: wake ? "wake" : "sleep",
+            id: creature.id
+          },
+          pendingSelection: creature.id
+        });
+      });
+
+      elements.exportEggAction.addEventListener("click", () => {
+        const creature = selectedForAction();
+        if (creature) {
+          runCreatureAction(`Export ${creature.name} egg`, "export_egg");
+        }
+      });
+
+      elements.copyResumeCommand.addEventListener("click", async () => {
+        const command = elements.resumeCommand.textContent;
+        if (!command || command === "No resume command reported.") {
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(command);
+          elements.copyResumeCommand.textContent = "Copied";
+          window.setTimeout(() => {
+            elements.copyResumeCommand.textContent = "Copy command";
+          }, 1500);
+        } catch (error) {
+          showLocalActionError("Copy resume command", "Clipboard access was unavailable. Select and copy the display-only command manually.");
+        }
+      });
+
+      elements.courseSelect.addEventListener("change", () => {
+        state.selectedSeedKey = elements.courseSelect.value;
+        state.replayIndex = 0;
+        state.replayKey = null;
+        stopReplay();
+        renderHabitat();
+      });
+
+      elements.replayToggle.addEventListener("click", () => {
+        if (state.replayTimer) {
+          stopReplay();
+          renderHabitat();
+        } else {
+          startReplay();
+        }
+      });
+
+      elements.replayBack.addEventListener("click", () => {
+        stopReplay();
+        state.replayIndex = Math.max(0, state.replayIndex - 1);
+        renderHabitat();
+      });
+
+      elements.replayForward.addEventListener("click", () => {
+        stopReplay();
+        state.replayIndex = Math.min(Math.max(0, replayMaxIndex()), state.replayIndex + 1);
+        renderHabitat();
+      });
+
+      elements.replayScrubber.addEventListener("input", () => {
+        stopReplay();
+        state.replayIndex = Number(elements.replayScrubber.value);
+        renderHabitat();
+      });
+
+      elements.replaySpeed.addEventListener("change", () => {
+        state.replaySpeed = Number(elements.replaySpeed.value) || 1;
+        if (state.replayTimer) {
+          startReplay();
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        if (!elements.replayContent.hidden) {
+          renderReplayBoards(replayPair(currentReplayGroup()));
+        }
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          stopReplay();
+          if (state.data) {
+            renderHabitat();
+          }
+        }
+      });
+
+      fetchTerrarium();
+      window.setInterval(() => fetchTerrarium({ silent: true }), pollIntervalMs);
+    })();
+  </script>
+</body>
+</html>
