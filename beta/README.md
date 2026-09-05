@@ -174,10 +174,10 @@ built with `--enable-nonfree`, and the FFprobe version is not normalized with
 FFmpeg. Until a redistributable checksum-pinned native media matrix is approved,
 the source bootstrap remains the available install path. Unsigned CI packages
 are fully gated and then deleted; Actions uploads only gate JSON/log evidence,
-never the blocked DMG or EXE bytes. Publication is also
-blocked by the Windows signing policy until the deprecated electron-builder
-v26 Azure signing backend is migrated and production Artifact Signing values
-are approved. The packaged bootstrap rollback, cross-process lock, atomic
+never the blocked DMG or EXE bytes. Publication is also blocked by the Windows
+signing policy until the new hash-sealed, no-install protected Artifact Signing
+job receives native x64 evidence with approved production values. The packaged
+bootstrap rollback, cross-process lock, atomic
 staging, log redaction, and isolated first-run contracts are implemented and
 release-gated; they are no longer publication blockers.
 

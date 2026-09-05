@@ -19,13 +19,12 @@ export function loadWindowsSigningPolicy(filePath = defaultPolicyPath) {
       "https://github.com/microsoft/aibast-agents-library/frontier-windows-signing-policy/v1"
     || typeof policy.publication_enabled !== "boolean"
     || typeof policy.current_backend_schema !== "string"
-    || !["approved", "blocked-deprecated-v26"].includes(
-      policy.backend_approval,
-    )
+    || policy.backend_approval !== "approved"
     || (
       policy.approved_backend_schema !== null
       && typeof policy.approved_backend_schema !== "string"
     )
+    || typeof policy.protected_signer_validation !== "string"
     || policy.required_environment !== "windows-production"
     || policy.required_profile_type !== "PublicTrust"
     || policy.client_secret_allowed !== false
@@ -48,6 +47,9 @@ export function evaluateWindowsSigningPolicy(policy) {
     blockers.push(
       `signing backend ${policy?.current_backend_schema || "unknown"} is not approved`,
     );
+  }
+  if (policy?.protected_signer_validation !== "approved") {
+    blockers.push("isolated protected signer lacks approved native Windows evidence");
   }
   if (
     policy?.client_secret_allowed !== false

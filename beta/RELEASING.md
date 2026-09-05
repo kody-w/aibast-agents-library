@@ -28,7 +28,8 @@ by the Download Center.
 > and isolated userData contracts now have unit, process, concurrent first-run,
 > and native package-gate coverage. `build/package-bootstrap-policy.json` is
 > enabled and no longer blocks publication. `build/windows-signing-policy.json`
-> still blocks the deprecated electron-builder v26 Azure signing backend. The
+> still blocks publication until the isolated Artifact Signing job split has
+> native Windows evidence with the real production account and profile. The
 > requested Electron 43.6.0 / electron-builder 26.16.0 toolchain cannot yet be
 > locked reproducibly: the configured npm feed exposes Electron only through
 > 43.4.1. The upstream `electron-builder@26.16.0` release and tag exist, but no
@@ -257,25 +258,30 @@ matches the protected expectation. The currently blocked v26 backend is never
 treated as an approved test fixture.
 
 There is no Azure client secret, certificate blob, or long-lived cloud
-credential. `azure/login` exchanges GitHub's job-scoped OIDC token for a
-short-lived Azure token only after `npm ci`, checks, tests, native-media
-hash/policy validation, and the clean-tree assertion pass. electron-builder
-then uses Azure CLI authentication
-to sign every generated `.exe`, `.dll`, and native `.node` file, including
-unpacked `ffmpeg`, `ffprobe`, and the NSIS uninstaller. The workflow uses
-electron-builder's Azure backend instead of post-signing only the final
-installer so executable payloads and the generated uninstaller are signed
-before NSIS embeds them. It logs out and clears the Azure CLI account
-immediately after signing, before the standard-user package gate, SBOM, or
-attestation steps.
+credential. Windows work is divided across three jobs:
 
-The locked builder currently exposes Azure signing through the deprecated
-electron-builder v26 `WindowsAzureSigningConfiguration` / `azureSignOptions`
-schema. `build/windows-signing-policy.json` therefore keeps Windows
-publication disabled. Migrating to a supported backend requires a separate
-surgical dependency/configuration change, full native Windows tests, and an
-updated recorded backend schema; do not flip the policy around the deprecated
-path.
+1. An unprotected job with no `id-token` permission checks out the exact
+   commit, runs `npm ci`, checks, tests, native-media validation, the unsigned
+   package gate, and build preparation. It downloads the ArtifactSigning
+   PowerShell module without any Azure authority, creates a file-by-file hash
+   manifest, and seals the validated workspace in a SHA-256-bound archive.
+2. A fresh `windows-production` job has `id-token: write` but performs no
+   checkout, package-manager lifecycle, dependency installation, or general
+   tests. It verifies the immutable archive before executing any bundled code,
+   exchanges OIDC with `azure/login`, and runs only the narrow custom
+   ArtifactSigning hook needed to sign the app payload, generated uninstaller,
+   and final NSIS package. It logs out immediately and seals the signed
+   workspace with a new hash manifest.
+3. A no-OIDC verification job revalidates the signed workspace, performs the
+   standard-user lifecycle and N-1 gate, and produces the SBOM/package report.
+   The separate staging job creates GitHub attestations only after those gates
+   pass.
+
+The recorded backend is
+`electron-builder-26.15.7/custom-ArtifactSigning-0.1.8/v1`; the older
+`azureSignOptions` path is not used for protected signing. Publication remains
+disabled until this exact split receives native Windows x64 evidence with the
+real protected production values.
 
 The configured application ID is
 `com.microsoft.aibast.rapp-brainstem-beta`. Both packaging and manifest gates
@@ -408,6 +414,10 @@ Release mode fails closed unless all of the following are true:
 - the initial remote annotated tag-object SHA and its peeled commit are
   recorded; both are re-fetched immediately before and after publication and
   must remain byte-for-byte identical;
+- after staging, a canonical SHA-256 fingerprint binds the exact release body
+  bytes plus sorted asset `{id,name,state,size,digest}` metadata; every
+  prepublish, post-PATCH, mutable polling, rollback, and final immutable read
+  must match it;
 - publication patches the exact validated GitHub release ID, never an
   ambiguous tag lookup;
 - the repository immutable-release setting verifies before publication and the
@@ -458,6 +468,13 @@ readiness. Immediately before publication, the final job redownloads the full
 and the Download Center manifest contract. It then verifies the repository
 immutability setting, publishes the existing draft, and asserts the release
 reports `"immutable": true`.
+
+The publication transition runs under an ERR/EXIT-trapped state machine.
+Ambiguous PATCH responses and failed polling reads do not imply success or
+failure: the workflow retries ID-bound reads until the release is proven
+immutable or, while still mutable, retries an ID-bound rollback until
+`draft:true` is re-read. If neither state can be proven, the job emits a loud
+release incident and exits nonzero.
 
 The release includes:
 

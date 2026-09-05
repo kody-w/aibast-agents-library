@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import {
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
@@ -42,10 +47,21 @@ import {
   installedToolchain,
   loadToolchainPolicy,
 } from "../scripts/toolchain-policy.mjs";
-import { verifyReleaseSnapshot } from "../scripts/release-race-guard.mjs";
+import {
+  releaseContentFingerprint,
+  verifyReleaseSnapshot,
+} from "../scripts/release-race-guard.mjs";
 import {
   assertImmutableReleasesEnabled,
 } from "../scripts/immutable-release-policy.mjs";
+import {
+  createWindowsSigningInput,
+  verifyWindowsSigningInput,
+} from "../scripts/windows-signing-input.mjs";
+import {
+  ReleaseTransitionError,
+  runReleaseTransition,
+} from "../scripts/publish-release-state-machine.mjs";
 import {
   selectPreviousWindowsBinary,
 } from "../scripts/windows-upgrade-policy.mjs";
@@ -361,6 +377,7 @@ test("release manifest requires the complete three-binary matrix", () => {
       current_backend_schema: "test-approved-artifact-signing/v1",
       backend_approval: "approved",
       approved_backend_schema: "test-approved-artifact-signing/v1",
+      protected_signer_validation: "approved",
       required_environment: "windows-production",
       required_profile_type: "PublicTrust",
       client_secret_allowed: false,
@@ -948,6 +965,8 @@ test("macOS release signing is forced and notarization evidence is inspected", (
       /issue-free/,
     );
   }
+
+
 });
 
 test("blocked native media permits report-only unsigned uploads", () => {
@@ -1007,6 +1026,18 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
     ),
     "utf8",
   );
+  const isolatedSigner = readFileSync(
+    path.join(
+      betaDir,
+      "scripts",
+      "sign-validated-windows-input.mjs",
+    ),
+    "utf8",
+  );
+  const signingHook = readFileSync(
+    path.join(betaDir, "scripts", "artifact-signing-hook.cjs"),
+    "utf8",
+  );
   assert.equal(
     packageMetadata.build.appId,
     "com.microsoft.aibast.rapp-brainstem-beta",
@@ -1026,8 +1057,15 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
   assert.equal(packageMetadata.build.nsis.warningsAsErrors, true);
   assert.equal(packageMetadata.build.win.requestedExecutionLevel, "asInvoker");
   assert.equal(policy.publication_enabled, false);
-  assert.equal(policy.backend_approval, "blocked-deprecated-v26");
-  assert.equal(policy.approved_backend_schema, null);
+  assert.equal(policy.backend_approval, "approved");
+  assert.equal(
+    policy.approved_backend_schema,
+    "electron-builder-26.15.7/custom-ArtifactSigning-0.1.8/v1",
+  );
+  assert.equal(
+    policy.protected_signer_validation,
+    "pending-native-windows-evidence",
+  );
   assert.equal(policy.required_environment, "windows-production");
   assert.equal(policy.required_profile_type, "PublicTrust");
   assert.equal(policy.client_secret_allowed, false);
@@ -1038,7 +1076,7 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
   assert.equal(
     evaluateWindowsSigningPolicy(booleanOnlyMutation).publicationReady,
     false,
-    "flipping only the Windows publication boolean must not approve v26",
+    "flipping only the Windows publication boolean must not approve an unvalidated signer",
   );
   assert.throws(
     () => validateWindowsSigningEvidence({
@@ -1060,6 +1098,12 @@ test("Windows NSIS identity and production signing policy are frozen", () => {
   assert.match(standardUserGate, /Add-LocalGroupMember/);
   assert.match(standardUserGate, /Start-Process[\s\S]*-Credential/);
   assert.match(standardUserGate, /Remove-LocalUser/);
+  assert.match(isolatedSigner, /prepackaged: prepackagedApp/);
+  assert.match(isolatedSigner, /npmRebuild: false/);
+  assert.match(isolatedSigner, /collectSignableFiles/);
+  assert.match(signingHook, /Invoke-ArtifactSigning/);
+  assert.match(signingHook, /Import-Module ArtifactSigning/);
+  assert.doesNotMatch(signingHook, /Install-Module|Save-Module/);
   const stagedVerifier = readFileSync(
     path.join(betaDir, "scripts", "verify-staged-release.mjs"),
     "utf8",
@@ -1101,7 +1145,7 @@ test("workflow contract pins actions and never creates or moves a release tag", 
   assert.doesNotMatch(workflow, /\bgit (?:tag|push)\b/);
   assert.doesNotMatch(workflow, /--clobber/);
   assert.equal(workflow.match(/contents:\s+write/g)?.length, 2);
-  assert.equal(workflow.match(/id-token:\s+write/g)?.length, 3);
+  assert.equal(workflow.match(/id-token:\s+write/g)?.length, 2);
   assert.doesNotMatch(workflow, /^\s+push:/m);
   assert.match(workflow, /publish_release:[\s\S]*default:\s+false/);
   assert.match(workflow, /\.immutable \/\/ false/);
@@ -1161,30 +1205,110 @@ test("signing credentials are exposed only after dependency and media gates", ()
   assert.match(mac, /test -z "\$\{CSC_LINK:-\}"/);
   assert.match(mac, /security delete-keychain/);
 
-  const windows = workflowJob(workflow, "release-windows");
-  const winInstall = windows.indexOf("npm ci --no-audit --no-fund");
-  const winTests = windows.indexOf("npm test");
-  const winMedia = windows.indexOf("native-media-preflight.mjs");
-  const winClean = windows.indexOf("git diff --quiet");
-  const azureLogin = windows.indexOf("azure/login@");
-  const winBuild = windows.indexOf("Build and Artifact Sign native NSIS installer");
-  const azureCleanup = windows.indexOf(
+  const preparation = workflowJob(workflow, "prepare-windows-release");
+  assert.match(preparation, /actions\/checkout@/);
+  assert.match(preparation, /npm ci --no-audit --no-fund/);
+  assert.match(preparation, /npm test/);
+  assert.match(preparation, /native-media-preflight\.mjs/);
+  assert.match(preparation, /windows-signing-input\.mjs/);
+  assert.match(preparation, /Save-Module -Name ArtifactSigning/);
+  assert.doesNotMatch(preparation, /id-token:\s+write/);
+  assert.doesNotMatch(preparation, /environment:\s+windows-production/);
+
+  const signer = workflowJob(workflow, "release-windows");
+  const inputVerify = signer.indexOf(
+    "Verify immutable signing input before OIDC use",
+  );
+  const outerDigest = signer.indexOf("Get-FileHash");
+  const innerManifest = signer.indexOf("--mode verify");
+  const azureLogin = signer.indexOf("azure/login@");
+  const winBuild = signer.indexOf(
+    "Sign validated app, uninstaller, and NSIS package",
+  );
+  const azureCleanup = signer.indexOf(
     "Clear Azure CLI session immediately after signing",
   );
-  const winGate = windows.indexOf("Gate signed NSIS package");
+  const seal = signer.indexOf("Seal signed workspace after OIDC cleanup");
   assert.ok(
-    0 <= winInstall
-      && winInstall < winTests
-      && winTests < winMedia
-      && winMedia < winClean
-      && winClean < azureLogin
+    0 <= inputVerify
+      && inputVerify < outerDigest
+      && outerDigest < innerManifest
+      && innerManifest < azureLogin
       && azureLogin < winBuild
       && winBuild < azureCleanup
-      && azureCleanup < winGate,
+      && azureCleanup < seal,
   );
-  assert.equal(windows.lastIndexOf("npm ci --no-audit --no-fund"), winInstall);
-  assert.doesNotMatch(windows.slice(0, azureLogin), /AZURE_CLIENT_SECRET/);
-  assert.match(windows, /az account clear/);
+  assert.match(signer, /environment: windows-production/);
+  assert.match(signer, /id-token:\s+write/);
+  assert.doesNotMatch(signer, /actions\/checkout@|actions\/setup-node@/);
+  assert.doesNotMatch(
+    signer,
+    /\bnpm(?:\.cmd)?\s+(?:ci|install|test)|\bpip\s+install|Install-Module|Install-PackageProvider|Save-Module/,
+  );
+  assert.match(signer, /windows-signing-input\.mjs[\s\S]*--mode verify/);
+  assert.match(signer, /az account clear/);
+
+  const verification = workflowJob(workflow, "verify-windows-release");
+  assert.doesNotMatch(verification, /id-token:\s+write/);
+  assert.match(verification, /run-windows-package-gate-standard-user\.ps1/);
+  assert.match(verification, /frontier-verified-windows-x64/);
+
+  const jobNames = [
+    ...workflow.matchAll(/^\s{2}([a-z0-9-]+):\s*$/gm),
+  ].map((match) => match[1]);
+  const idTokenJobs = jobNames.filter((name) =>
+    /id-token:\s+write/.test(workflowJob(workflow, name)),
+  );
+  assert.ok(idTokenJobs.length >= 2);
+  for (const name of idTokenJobs) {
+    assert.doesNotMatch(
+      workflowJob(workflow, name),
+      /\bnpm(?:\.cmd)?\s+(?:ci|install|test)|\bpip\s+install|Install-Module|Install-PackageProvider|Save-Module/,
+      `${name} must not run dependency-install or general-test lifecycles`,
+    );
+  }
+});
+
+test("Windows signing input hash manifest detects any post-validation mutation", () => {
+  const root = path.join(
+    betaDir,
+    "release",
+    `signing-input-test-${process.pid}-${Date.now()}`,
+  );
+  const commit = "a".repeat(40);
+  try {
+    mkdirSync(path.join(root, "beta"), { recursive: true });
+    writeFileSync(
+      path.join(root, "beta", "package.json"),
+      JSON.stringify({
+        version: "1.2.3-beta.4",
+        engines: { node: ">=24.19.0 <26" },
+        build: {
+          appId: "com.microsoft.aibast.rapp-brainstem-beta",
+          productName: "RAPP Brainstem Frontier",
+        },
+      }),
+    );
+    writeFileSync(
+      path.join(root, "beta", "package-lock.json"),
+      JSON.stringify({
+        packages: {
+          "node_modules/electron": { version: "43.4.1" },
+          "node_modules/electron-builder": { version: "26.15.7" },
+        },
+      }),
+    );
+    writeFileSync(path.join(root, "payload.exe"), "validated bytes");
+    createWindowsSigningInput(root, commit);
+    assert.equal(verifyWindowsSigningInput(root, commit).commit, commit);
+    writeFileSync(path.join(root, "payload.exe"), "mutated bytes");
+    assert.throws(
+      () => verifyWindowsSigningInput(root, commit),
+      /do not match the validated manifest/,
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test("publication revalidates the full set and immutable setting at the last gate", () => {
@@ -1207,16 +1331,8 @@ test("publication revalidates the full set and immutable setting at the last gat
   const immutablePolicy = publish.indexOf(
     "immutable-release-policy.mjs",
   );
-  const prepublishSnapshot = publish.indexOf(
-    'verify_release_snapshot "immediately before publication"',
-  );
-  const publishRelease = publish.indexOf(
-    '"repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \\\n'
-      + "              -F draft=false",
-  );
-  const postpublishSnapshot = publish.indexOf(
-    'verify_release_snapshot "immediately after publication"',
-  );
+  const traps = publish.indexOf("trap report_transition_error ERR");
+  const stateMachine = publish.indexOf("publish-release-state-machine.mjs");
   assert.ok(
     0 <= download
       && download < count
@@ -1226,9 +1342,8 @@ test("publication revalidates the full set and immutable setting at the last gat
       && staged < immutableSetting
       && immutableSetting < immutableJson
       && immutableJson < immutablePolicy
-      && immutablePolicy < prepublishSnapshot
-      && prepublishSnapshot < publishRelease
-      && publishRelease < postpublishSnapshot,
+      && immutablePolicy < traps
+      && traps < stateMachine,
   );
   assert.match(publish, /RAPP-Brainstem-Frontier-\$\{VERSION\}-macos-arm64\.dmg/);
   assert.match(publish, /RAPP-Brainstem-Frontier-\$\{VERSION\}-macos-x64\.dmg/);
@@ -1236,8 +1351,19 @@ test("publication revalidates the full set and immutable setting at the last gat
   assert.doesNotMatch(publish, /--draft=true/);
   assert.doesNotMatch(publish, /gh release edit/);
   assert.match(publish, /IMMUTABLE RELEASE INCIDENT/);
-  assert.match(publish, /for attempt in \{1\.\.5\}/);
-  assert.match(publish, /-F draft=true/);
+  assert.match(publish, /trap report_transition_exit EXIT/);
+  const transitionSource = readFileSync(
+    path.join(
+      betaDir,
+      "scripts",
+      "publish-release-state-machine.mjs",
+    ),
+    "utf8",
+  );
+  assert.match(transitionSource, /maxRollbackAttempts = 5/);
+  assert.match(transitionSource, /\["-F", "draft=true"\]/);
+  assert.match(transitionSource, /immediately-before-publication/);
+  assert.match(transitionSource, /publish-response/);
 });
 
 test("immutable release settings require enabled true at runtime", () => {
@@ -1257,11 +1383,31 @@ test("immutable release settings require enabled true at runtime", () => {
 });
 
 test("annotated tag object, peeled commit, and release ID are race-bound", () => {
+  const release = {
+    id: 12345,
+    tag_name: "brainstem-beta-v1.2.3",
+    body: "exact release body\n",
+    assets: [{
+      id: 2,
+      name: "b.exe",
+      state: "uploaded",
+      size: 20,
+      digest: `sha256:${"b".repeat(64)}`,
+    }, {
+      id: 1,
+      name: "a.dmg",
+      state: "uploaded",
+      size: 10,
+      digest: `sha256:${"a".repeat(64)}`,
+    }],
+  };
+  const releaseFingerprint = releaseContentFingerprint(release);
   const snapshot = {
-    tag: "brainstem-beta-v1.2.3",
+    tag: release.tag_name,
     tagObject: "a".repeat(40),
     commit: "b".repeat(40),
-    releaseId: "12345",
+    releaseId: String(release.id),
+    releaseFingerprint,
   };
   assert.deepEqual(verifyReleaseSnapshot(snapshot, snapshot), snapshot);
   for (const [field, value] of [
@@ -1269,6 +1415,7 @@ test("annotated tag object, peeled commit, and release ID are race-bound", () =>
     ["tagObject", "c".repeat(40)],
     ["commit", "d".repeat(40)],
     ["releaseId", "54321"],
+    ["releaseFingerprint", "e".repeat(64)],
   ]) {
     assert.throws(
       () => verifyReleaseSnapshot(snapshot, {
@@ -1278,6 +1425,51 @@ test("annotated tag object, peeled commit, and release ID are race-bound", () =>
       new RegExp(`${field} changed`),
     );
   }
+  assert.equal(
+    releaseContentFingerprint({
+      ...release,
+      assets: [...release.assets].reverse(),
+    }),
+    releaseFingerprint,
+    "release asset ordering must not change the canonical fingerprint",
+  );
+  const contentMutations = [
+    { ...release, body: `${release.body}changed` },
+    {
+      ...release,
+      assets: release.assets.map((asset, index) =>
+        index ? asset : { ...asset, id: 99 }),
+    },
+    {
+      ...release,
+      assets: release.assets.map((asset, index) =>
+        index ? asset : { ...asset, name: "changed.exe" }),
+    },
+    {
+      ...release,
+      assets: release.assets.map((asset, index) =>
+        index ? asset : { ...asset, state: "new" }),
+    },
+    {
+      ...release,
+      assets: release.assets.map((asset, index) =>
+        index ? asset : { ...asset, size: asset.size + 1 }),
+    },
+    {
+      ...release,
+      assets: release.assets.map((asset, index) =>
+        index ? asset : { ...asset, digest: `sha256:${"f".repeat(64)}` }),
+    },
+  ];
+  for (const mutatedRelease of contentMutations) {
+    assert.throws(
+      () => verifyReleaseSnapshot(snapshot, {
+        ...snapshot,
+        releaseFingerprint: releaseContentFingerprint(mutatedRelease),
+      }),
+      /releaseFingerprint changed/,
+    );
+  }
 
   const workflow = readFileSync(
     path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
@@ -1285,17 +1477,213 @@ test("annotated tag object, peeled commit, and release ID are race-bound", () =>
   );
   const context = workflowJob(workflow, "context");
   assert.match(context, /tag_object:/);
+  assert.match(context, /--fingerprint-file/);
   assert.match(context, /refs\/tags\/\$tag\^\{\}/);
   assert.match(context, /release-race-guard\.mjs/);
   const publish = workflowJob(workflow, "publish");
   assert.match(publish, /TAG_OBJECT: \$\{\{ needs\.context\.outputs\.tag_object \}\}/);
-  assert.ok(
-    [...publish.matchAll(/release-race-guard\.mjs/g)].length >= 1,
-    "publish must re-run the release race guard",
+  assert.match(
+    publish,
+    /RELEASE_FINGERPRINT: \$\{\{ needs\.stage-release\.outputs\.release_fingerprint \}\}/,
   );
+  const stateMachineSource = readFileSync(
+    path.join(betaDir, "scripts", "publish-release-state-machine.mjs"),
+    "utf8",
+  );
+  assert.match(stateMachineSource, /verifyReleaseSnapshot/);
+  assert.match(stateMachineSource, /releaseContentFingerprint/);
   assert.match(
     publish,
     /repos\/\$GITHUB_REPOSITORY\/releases\/\$RELEASE_ID/,
+  );
+});
+
+test("publication state machine recovers from ambiguous API outcomes", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const mutable = { id: 1, draft: false, immutable: false };
+  const immutable = { id: 1, draft: false, immutable: true };
+  const verifySnapshot = async (release) => {
+    assert.equal(release.id, 1);
+  };
+
+  {
+    let current = { ...draft };
+    let reads = 0;
+    const result = await runReleaseTransition({
+      getRelease: async () => {
+        reads += 1;
+        if (reads >= 3) current = { ...immutable };
+        return { ...current };
+      },
+      publishRelease: async () => {
+        current = { ...mutable };
+        throw new Error("response lost after server-side success");
+      },
+      rollbackRelease: async () => {
+        throw new Error("rollback must not run");
+      },
+      verifySnapshot,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    });
+
+    assert.equal(result.release.immutable, true);
+    assert.match(
+      JSON.stringify(result.state.history),
+      /publish-response-lost-or-failed/,
+    );
+  }
+
+  {
+    let current = { ...draft };
+    let pollReads = 0;
+    const result = await runReleaseTransition({
+      getRelease: async () => {
+        if (current.draft) return { ...current };
+        pollReads += 1;
+        if (pollReads <= 2) throw new Error("temporary polling failure");
+        return { ...immutable };
+      },
+      publishRelease: async () => {
+        current = { ...mutable };
+        return { ...current };
+      },
+      rollbackRelease: async () => {
+        throw new Error("rollback must not run");
+      },
+      verifySnapshot,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    });
+    assert.equal(result.release.immutable, true);
+    assert.match(JSON.stringify(result.state.history), /poll-1-failed/);
+  }
+
+  {
+    let current = { ...draft };
+    let afterPublishReads = 0;
+    await assert.rejects(
+      () => runReleaseTransition({
+        getRelease: async () => {
+          if (current.draft) return { ...current };
+          afterPublishReads += 1;
+          if (afterPublishReads === 2) {
+            throw new Error("initial rollback state read failed");
+          }
+          return { ...current };
+        },
+        publishRelease: async () => {
+          current = { ...mutable };
+          return { ...current };
+        },
+        rollbackRelease: async () => {
+          current = { ...draft };
+          throw new Error("rollback response lost");
+        },
+        verifySnapshot,
+        maxPolls: 1,
+        maxRollbackAttempts: 2,
+        pollDelayMs: 0,
+        sleep: async () => {},
+      }),
+      (error) => {
+        assert.ok(error instanceof ReleaseTransitionError);
+        assert.equal(error.code, "ROLLED_BACK");
+        assert.match(JSON.stringify(error.state.history), /initial-read-failed/);
+        return true;
+      },
+    );
+  }
+  {
+    let firstRead = true;
+    await assert.rejects(
+      () => runReleaseTransition({
+        getRelease: async () => {
+          if (firstRead) {
+            firstRead = false;
+            return { ...draft };
+          }
+          throw new Error("release state unavailable");
+        },
+        publishRelease: async () => {
+          throw new Error("ambiguous publish response");
+        },
+        rollbackRelease: async () => {
+          throw new Error("ambiguous rollback response");
+        },
+        verifySnapshot,
+        maxPolls: 1,
+        maxRollbackAttempts: 2,
+        pollDelayMs: 0,
+        sleep: async () => {},
+      }),
+      (error) => {
+        assert.equal(error.code, "INCIDENT");
+        assert.match(error.message, /could not be proven/);
+        return true;
+      },
+    );
+  }
+});
+
+test("publication state machine rolls back mutable content drift", async () => {
+  const baseRelease = {
+    id: 77,
+    tag_name: "brainstem-beta-v1.2.3",
+    draft: true,
+    immutable: false,
+    body: "bound body",
+    assets: [{
+      id: 1,
+      name: "asset.exe",
+      state: "uploaded",
+      size: 10,
+      digest: `sha256:${"a".repeat(64)}`,
+    }],
+  };
+  const expected = {
+    tag: baseRelease.tag_name,
+    tagObject: "b".repeat(40),
+    commit: "c".repeat(40),
+    releaseId: String(baseRelease.id),
+    releaseFingerprint: releaseContentFingerprint(baseRelease),
+  };
+  let current = structuredClone(baseRelease);
+  let published = false;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => {
+        if (published && current.draft === false) {
+          return { ...current, body: "mutated after staging" };
+        }
+        return structuredClone(current);
+      },
+      publishRelease: async () => {
+        published = true;
+        current.draft = false;
+        return structuredClone(current);
+      },
+      rollbackRelease: async () => {
+        current = structuredClone(baseRelease);
+        return structuredClone(current);
+      },
+      verifySnapshot: async (release) => verifyReleaseSnapshot(expected, {
+        tag: release.tag_name,
+        tagObject: expected.tagObject,
+        commit: expected.commit,
+        releaseId: String(release.id),
+        releaseFingerprint: releaseContentFingerprint(release),
+      }),
+      maxPolls: 1,
+      maxRollbackAttempts: 1,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "ROLLED_BACK");
+      assert.equal(current.draft, true);
+      return true;
+    },
   );
 });
 
@@ -1366,7 +1754,7 @@ test("second Windows binary release requires immutable N-1 evidence", () => {
   assert.match(context, /windows-upgrade-policy\.mjs/);
   assert.match(context, /previous_windows_asset_id/);
   assert.match(context, /first_binary_release/);
-  const windows = workflowJob(workflow, "release-windows");
+  const windows = workflowJob(workflow, "verify-windows-release");
   assert.match(windows, /releases\/assets\/\$env:PREVIOUS_ASSET_ID/);
   assert.match(windows, /PREVIOUS_ASSET_DIGEST/);
   assert.match(windows, /PreviousInstaller/);

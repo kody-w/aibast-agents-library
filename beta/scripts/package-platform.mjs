@@ -157,49 +157,15 @@ function macSigningConfiguration(mode, applicationId) {
 }
 
 function windowsSigningConfiguration(mode, applicationId) {
-  if (mode === "unsigned") {
-    process.env.CSC_IDENTITY_AUTO_DISCOVERY = "false";
-    return {
-      signExecutable: false,
-    };
+  if (mode !== "unsigned") {
+    fail(
+      "Signed Windows configuration is available only through the isolated "
+      + "validated-input signer.",
+    );
   }
-  const endpoint = requiredEnvironment("AZURE_ARTIFACT_SIGNING_ENDPOINT");
-  let endpointUrl;
-  try {
-    endpointUrl = new URL(endpoint);
-  } catch {
-    fail("AZURE_ARTIFACT_SIGNING_ENDPOINT must be a valid URL.");
-  }
-  if (
-    endpointUrl.protocol !== "https:" ||
-    !endpointUrl.hostname.endsWith(".codesigning.azure.net")
-  ) {
-    fail("AZURE_ARTIFACT_SIGNING_ENDPOINT must be an HTTPS codesigning.azure.net endpoint.");
-  }
-  const publisherName = requiredEnvironment("WINDOWS_SIGNING_SUBJECT");
-  if (!publisherMatchesApplicationId(applicationId, publisherName)) {
-    fail(`${publisherName} cannot publish application ID ${applicationId}.`);
-  }
-  const profileType = requiredEnvironment(
-    "AZURE_ARTIFACT_SIGNING_PROFILE_TYPE",
-  );
-  if (profileType !== "PublicTrust") {
-    fail("AZURE_ARTIFACT_SIGNING_PROFILE_TYPE must be PublicTrust.");
-  }
+  process.env.CSC_IDENTITY_AUTO_DISCOVERY = "false";
   return {
-    azureSignOptions: {
-      publisherName,
-      endpoint,
-      certificateProfileName: requiredEnvironment(
-        "AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME",
-      ),
-      codeSigningAccountName: requiredEnvironment(
-        "AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME",
-      ),
-      fileDigest: "SHA256",
-      timestampRfc3161: "http://timestamp.acs.microsoft.com/",
-      timestampDigest: "SHA256",
-    },
+    signExecutable: false,
   };
 }
 
@@ -254,6 +220,12 @@ export async function packagePlatform(argv = process.argv.slice(2)) {
   const { platform, arch } = parsePackagingArguments(argv);
   const mode = signingMode();
   assertNativeHost(platform, arch);
+  if (platform === "windows" && mode === "signed") {
+    fail(
+      "Signed Windows packages must use sign-validated-windows-input.mjs "
+      + "inside the isolated windows-production signing job.",
+    );
+  }
   const bootstrap = preparePackageBootstrap({ signingMode: mode });
   if (mode === "signed") {
     const toolchain = evaluateToolchainPolicy(

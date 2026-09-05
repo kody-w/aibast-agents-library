@@ -107,6 +107,7 @@ jobs:
                   policy.backend_approval !== "approved" ||
                   policy.approved_backend_schema !==
                     policy.current_backend_schema ||
+                  policy.protected_signer_validation !== "approved" ||
                   policy.client_secret_allowed !== false ||
                   policy.required_environment !== "windows-production" ||
                   policy.required_profile_type !== "PublicTrust") {
@@ -162,15 +163,21 @@ jobs:
             test "$(jq -r '.prerelease' <<<"$release")" = true
             test "$(jq -r '.immutable // false' <<<"$release")" = false
             release_id="$(jq -r '.id' <<<"$release")"
+            printf '%s' "$release" \
+              > "$RUNNER_TEMP/frontier-initial-release.json"
+            initial_release_fingerprint="$(
+              node beta/scripts/release-race-guard.mjs \
+                --fingerprint-file "$RUNNER_TEMP/frontier-initial-release.json"
+            )"
             node beta/scripts/release-race-guard.mjs \
               --expected-tag "$tag" \
               --expected-tag-object "$tag_object" \
               --expected-commit "$commit" \
               --expected-release-id "$release_id" \
-              --actual-tag "$(jq -r '.tag_name' <<<"$release")" \
+              --expected-release-fingerprint "$initial_release_fingerprint" \
               --actual-tag-object "$remote_tag_object" \
               --actual-commit "$remote_tag_commit" \
-              --actual-release-id "$(jq -r '.id' <<<"$release")"
+              --actual-release-file "$RUNNER_TEMP/frontier-initial-release.json"
             printf '%s\n' "$all_releases" \
               > "$RUNNER_TEMP/frontier-release-inventory.json"
             node beta/scripts/windows-upgrade-policy.mjs \
@@ -426,9 +433,6 @@ jobs:
     environment: frontier-binary-release
     permissions:
       contents: read
-      id-token: write
-      attestations: write
-      artifact-metadata: write
     strategy:
       fail-fast: false
       matrix:
@@ -628,40 +632,25 @@ jobs:
             echo "report=$report"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Attest macOS release asset
-        id: attest
-        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
-        with:
-          subject-path: ${{ steps.package.outputs.asset }}
-
-      - name: Preserve Sigstore bundle beside asset
-        env:
-          ASSET: ${{ steps.package.outputs.asset }}
-          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
-        run: cp "$BUNDLE" "$ASSET.sigstore.json"
-
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: frontier-signed-macos-${{ matrix.arch }}
           path: |
             ${{ steps.package.outputs.asset }}
-            ${{ steps.package.outputs.asset }}.sigstore.json
             ${{ steps.package.outputs.report }}
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
 
-  release-windows:
-    name: Signed Windows x64
+  prepare-windows-release:
+    name: Prepare validated Windows signing input
     needs: context
     if: needs.context.outputs.release_mode == 'true'
-    environment: windows-production
     permissions:
       contents: read
-      id-token: write
-      attestations: write
-      artifact-metadata: write
     runs-on: windows-2025
+    outputs:
+      bundle_sha256: ${{ steps.bundle.outputs.sha256 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -676,15 +665,6 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
-
-      - name: Prepare Brainstem runtime for package smoke
-        id: runtime
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          python -m pip install -q --disable-pip-version-check -r rapp_brainstem/requirements.txt
-          "python=$(python -c 'import sys; print(sys.executable)')" |
-            Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Install, test, hash native media, and assert a clean tree
         working-directory: beta
@@ -710,63 +690,152 @@ jobs:
           }
           git diff --quiet
           if ($LASTEXITCODE -ne 0) {
-            throw 'Tracked files changed during pre-signing validation'
+            throw 'Tracked files changed during Windows input validation'
           }
           git diff --cached --quiet
           if ($LASTEXITCODE -ne 0) {
-            throw 'The index changed during pre-signing validation'
+            throw 'The index changed during Windows input validation'
           }
           if (git status --porcelain --untracked-files=no) {
-            throw 'Tracked working tree is not clean before Azure login'
+            throw 'Tracked working tree is not clean before Windows build preparation'
           }
 
-      - name: Download immutable N-1 Windows installer
-        id: previous
-        if: needs.context.outputs.first_binary_release != 'true'
+      - name: Build and gate unsigned pre-signing package
         working-directory: beta
         shell: pwsh
         env:
-          GH_TOKEN: ${{ github.token }}
-          PREVIOUS_ASSET_ID: ${{ needs.context.outputs.previous_windows_asset_id }}
-          PREVIOUS_ASSET_NAME: ${{ needs.context.outputs.previous_windows_asset_name }}
-          PREVIOUS_ASSET_DIGEST: ${{ needs.context.outputs.previous_windows_asset_digest }}
+          FRONTIER_SIGNING_MODE: unsigned
+          FRONTIER_PACKAGE_BOOTSTRAP_MODE: release
+          FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.repository }}
+          FRONTIER_PACKAGE_RELEASE_TAG: ${{ needs.context.outputs.tag }}
+          TEMP: ${{ github.workspace }}\beta\release\.ci-tmp
+          TMP: ${{ github.workspace }}\beta\release\.ci-tmp
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}\beta\release\electron-builder-cache
+          VERSION: ${{ needs.context.outputs.version }}
         run: |
           $ErrorActionPreference = 'Stop'
-          if ($env:PREVIOUS_ASSET_ID -notmatch '^[1-9][0-9]*$') {
-            throw 'Previous Windows asset ID is invalid'
+          npm run dist:win:x64
+          if ($LASTEXITCODE -ne 0) { throw "unsigned package build failed with exit $LASTEXITCODE" }
+          $artifact = "$env:GITHUB_WORKSPACE\beta\release\RAPP-Brainstem-Frontier-$env:VERSION-windows-x64-setup-unsigned.exe"
+          $report = "$artifact.gate.json"
+          & "$env:GITHUB_WORKSPACE\beta\scripts\run-windows-package-gate-standard-user.ps1" `
+            -NodePath (Get-Command node).Source `
+            -Workspace $env:GITHUB_WORKSPACE `
+            -Artifact $artifact `
+            -AppDir "$env:GITHUB_WORKSPACE\beta\release\win-unpacked" `
+            -ScratchDir "$env:GITHUB_WORKSPACE\beta\release\package-gate-windows-x64-presigning" `
+            -PythonPath (Get-Command python).Source `
+            -Mode unsigned `
+            -Report $report
+          Remove-Item -LiteralPath $artifact -Force
+          Remove-Item -LiteralPath "$artifact.blockmap" -Force -ErrorAction SilentlyContinue
+          Remove-Item -LiteralPath $report -Force
+          if (-not (Test-Path -LiteralPath release/win-unpacked)) {
+            throw 'Validated win-unpacked signing input is missing'
           }
-          if ($env:PREVIOUS_ASSET_NAME -notmatch '^RAPP-Brainstem-Frontier-.+-windows-x64-setup\.exe$') {
-            throw 'Previous Windows asset name is invalid'
-          }
-          if ($env:PREVIOUS_ASSET_DIGEST -notmatch '^sha256:[0-9a-f]{64}$') {
-            throw 'Previous Windows asset digest is invalid'
-          }
-          $previousDirectory = Join-Path $PWD 'release\previous'
-          New-Item -ItemType Directory -Force -Path $previousDirectory | Out-Null
-          $target = Join-Path $previousDirectory 'n-minus-one-windows-x64-setup.exe'
-          curl.exe --fail --location --silent --show-error `
-            -H "Authorization: Bearer $env:GH_TOKEN" `
-            -H 'Accept: application/octet-stream' `
-            -H 'X-GitHub-Api-Version: 2026-03-10' `
-            "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/assets/$env:PREVIOUS_ASSET_ID" `
-            --output $target
-          if ($LASTEXITCODE -ne 0) {
-            throw "Previous installer download failed with exit $LASTEXITCODE"
-          }
-          $actual = (Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ("sha256:$actual" -ne $env:PREVIOUS_ASSET_DIGEST) {
-            throw 'Previous Windows installer digest mismatch'
-          }
-          "path=$target" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-      # The OIDC service principal has only Artifact Signing Certificate
-      # Profile Signer at the selected certificate-profile scope.
-      - name: Validate Artifact Signing configuration
+      - name: Assemble immutable Windows signing input
+        id: bundle
         shell: pwsh
         env:
-          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          COMMIT: ${{ needs.context.outputs.commit }}
+          VERSION: ${{ needs.context.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-Location "$env:GITHUB_WORKSPACE\beta"
+          npm sbom --sbom-format=spdx |
+            Set-Content -LiteralPath release/windows-dependencies.spdx.json -Encoding utf8
+          if ($LASTEXITCODE -ne 0) { throw "npm sbom failed with exit $LASTEXITCODE" }
+
+          $inputRoot = "$env:GITHUB_WORKSPACE\windows-signing-input"
+          Remove-Item -LiteralPath $inputRoot -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path "$inputRoot\beta" | Out-Null
+          robocopy.exe "$env:GITHUB_WORKSPACE\beta" "$inputRoot\beta" /E /R:2 /W:1 /NFL /NDL /NJH /NJS /NP
+          if ($LASTEXITCODE -gt 7) { throw "robocopy failed with exit $LASTEXITCODE" }
+          New-Item -ItemType Directory -Force -Path "$inputRoot\rapp_brainstem" | Out-Null
+          Copy-Item -LiteralPath "$env:GITHUB_WORKSPACE\rapp_brainstem\VERSION" `
+            -Destination "$inputRoot\rapp_brainstem\VERSION"
+          New-Item -ItemType Directory -Force -Path "$inputRoot\tools" | Out-Null
+          Copy-Item -LiteralPath (Get-Command node).Source `
+            -Destination "$inputRoot\tools\node.exe"
+          New-Item -ItemType Directory -Force -Path "$inputRoot\modules" | Out-Null
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 `
+            -Force -Scope CurrentUser | Out-Null
+          Save-Module -Name ArtifactSigning -RequiredVersion 0.1.8 `
+            -Repository PSGallery -Path "$inputRoot\modules"
+          & "$inputRoot\tools\node.exe" `
+            "$inputRoot\beta\scripts\windows-signing-input.mjs" `
+            --mode create `
+            --root $inputRoot `
+            --commit $env:COMMIT
+          if ($LASTEXITCODE -ne 0) { throw 'signing input manifest creation failed' }
+
+          $bundle = "$env:GITHUB_WORKSPACE\windows-signing-input.zip"
+          Remove-Item -LiteralPath $bundle -Force -ErrorAction SilentlyContinue
+          tar.exe -a -c -f $bundle -C $env:GITHUB_WORKSPACE windows-signing-input
+          if ($LASTEXITCODE -ne 0) { throw "signing input archive failed with exit $LASTEXITCODE" }
+          $sha = (Get-FileHash -LiteralPath $bundle -Algorithm SHA256).Hash.ToLowerInvariant()
+          "sha256=$sha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frontier-windows-signing-input
+          path: windows-signing-input.zip
+          if-no-files-found: error
+          retention-days: 3
+          compression-level: 0
+
+  release-windows:
+    name: Sign validated Windows input with isolated OIDC
+    needs: [context, prepare-windows-release]
+    if: needs.context.outputs.release_mode == 'true'
+    environment: windows-production
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: windows-2025
+    outputs:
+      signed_bundle_sha256: ${{ steps.seal.outputs.sha256 }}
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: frontier-windows-signing-input
+          path: signing-download
+
+      - name: Verify immutable signing input before OIDC use
+        id: input
+        shell: pwsh
+        env:
+          EXPECTED_SHA256: ${{ needs.prepare-windows-release.outputs.bundle_sha256 }}
+          COMMIT: ${{ needs.context.outputs.commit }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $bundle = "$env:GITHUB_WORKSPACE\signing-download\windows-signing-input.zip"
+          if ($env:EXPECTED_SHA256 -notmatch '^[0-9a-f]{64}$') {
+            throw 'Expected Windows signing input digest is invalid'
+          }
+          $actual = (Get-FileHash -LiteralPath $bundle -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $env:EXPECTED_SHA256) {
+            throw 'Windows signing input archive digest mismatch'
+          }
+          $extractRoot = "$env:GITHUB_WORKSPACE\signer"
+          New-Item -ItemType Directory -Force -Path $extractRoot | Out-Null
+          tar.exe -xf $bundle -C $extractRoot
+          if ($LASTEXITCODE -ne 0) { throw "signing input extraction failed with exit $LASTEXITCODE" }
+          $inputRoot = "$extractRoot\windows-signing-input"
+          & "$inputRoot\tools\node.exe" `
+            "$inputRoot\beta\scripts\windows-signing-input.mjs" `
+            --mode verify `
+            --root $inputRoot `
+            --commit $env:COMMIT
+          if ($LASTEXITCODE -ne 0) { throw 'Windows signing input verification failed' }
+          "root=$inputRoot" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      # The workload identity has only Artifact Signing Certificate Profile Signer
+      # at the selected certificate-profile scope.
+      - name: Validate protected Artifact Signing configuration
+        shell: pwsh
+        env:
           WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
           AZURE_ARTIFACT_SIGNING_ENDPOINT: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
           AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME }}
@@ -775,9 +844,6 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           foreach ($name in @(
-            'AZURE_CLIENT_ID',
-            'AZURE_TENANT_ID',
-            'AZURE_SUBSCRIPTION_ID',
             'WINDOWS_SIGNING_SUBJECT',
             'AZURE_ARTIFACT_SIGNING_ENDPOINT',
             'AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME',
@@ -799,24 +865,21 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build and Artifact Sign native NSIS installer
-        working-directory: beta
+      - name: Sign validated app, uninstaller, and NSIS package
         shell: pwsh
         env:
-          FRONTIER_SIGNING_MODE: signed
-          FRONTIER_PACKAGE_BOOTSTRAP_MODE: release
-          FRONTIER_PACKAGE_SOURCE_REPOSITORY: ${{ github.repository }}
-          FRONTIER_PACKAGE_RELEASE_TAG: ${{ needs.context.outputs.tag }}
-          TEMP: ${{ github.workspace }}\beta\release\.ci-tmp
-          TMP: ${{ github.workspace }}\beta\release\.ci-tmp
-          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
+          FRONTIER_ARTIFACT_SIGNING_MODULE_ROOT: ${{ steps.input.outputs.root }}\modules
+          ELECTRON_BUILDER_CACHE: ${{ steps.input.outputs.root }}\beta\release\electron-builder-cache
           AZURE_ARTIFACT_SIGNING_ENDPOINT: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
           AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT_NAME }}
           AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ vars.AZURE_ARTIFACT_SIGNING_CERTIFICATE_PROFILE_NAME }}
-          AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
+          WINDOWS_SIGNING_SUBJECT: ${{ vars.WINDOWS_SIGNING_SUBJECT }}
         run: |
           $ErrorActionPreference = 'Stop'
-          npm run dist:win:x64
+          $root = '${{ steps.input.outputs.root }}'
+          & "$root\tools\node.exe" `
+            "$root\beta\scripts\sign-validated-windows-input.mjs"
+          if ($LASTEXITCODE -ne 0) { throw "isolated signing failed with exit $LASTEXITCODE" }
 
       - name: Clear Azure CLI session immediately after signing
         if: always()
@@ -830,9 +893,122 @@ jobs:
             throw 'Azure CLI signing session remained active after cleanup'
           }
 
-      - name: Gate signed NSIS package and installed payload
+      - name: Seal signed workspace after OIDC cleanup
+        id: seal
+        shell: pwsh
+        env:
+          COMMIT: ${{ needs.context.outputs.commit }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = '${{ steps.input.outputs.root }}'
+          & "$root\tools\node.exe" `
+            "$root\beta\scripts\windows-signing-input.mjs" `
+            --mode create `
+            --root $root `
+            --commit $env:COMMIT
+          if ($LASTEXITCODE -ne 0) { throw 'signed workspace manifest creation failed' }
+          $bundle = "$env:GITHUB_WORKSPACE\windows-signed-workspace.zip"
+          tar.exe -a -c -f $bundle -C (Split-Path $root -Parent) (Split-Path $root -Leaf)
+          if ($LASTEXITCODE -ne 0) { throw "signed workspace archive failed with exit $LASTEXITCODE" }
+          $sha = (Get-FileHash -LiteralPath $bundle -Algorithm SHA256).Hash.ToLowerInvariant()
+          "sha256=$sha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frontier-signed-windows-workspace
+          path: windows-signed-workspace.zip
+          if-no-files-found: error
+          retention-days: 3
+          compression-level: 0
+
+  verify-windows-release:
+    name: Verify signed Windows package without OIDC
+    needs: [context, prepare-windows-release, release-windows]
+    if: needs.context.outputs.release_mode == 'true'
+    environment: frontier-binary-release
+    permissions:
+      contents: read
+    runs-on: windows-2025
+    steps:
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: frontier-signed-windows-workspace
+          path: signed-download
+
+      - name: Verify signed workspace input
+        id: workspace
+        shell: pwsh
+        env:
+          EXPECTED_SHA256: ${{ needs.release-windows.outputs.signed_bundle_sha256 }}
+          COMMIT: ${{ needs.context.outputs.commit }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $bundle = "$env:GITHUB_WORKSPACE\signed-download\windows-signed-workspace.zip"
+          if ($env:EXPECTED_SHA256 -notmatch '^[0-9a-f]{64}$') {
+            throw 'Expected signed Windows workspace digest is invalid'
+          }
+          $actual = (Get-FileHash -LiteralPath $bundle -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $env:EXPECTED_SHA256) {
+            throw 'Signed Windows workspace digest mismatch'
+          }
+          $extractRoot = "$env:GITHUB_WORKSPACE\verified"
+          New-Item -ItemType Directory -Force -Path $extractRoot | Out-Null
+          tar.exe -xf $bundle -C $extractRoot
+          if ($LASTEXITCODE -ne 0) { throw "signed workspace extraction failed with exit $LASTEXITCODE" }
+          $root = "$extractRoot\windows-signing-input"
+          & "$root\tools\node.exe" `
+            "$root\beta\scripts\windows-signing-input.mjs" `
+            --mode verify `
+            --root $root `
+            --commit $env:COMMIT
+          if ($LASTEXITCODE -ne 0) { throw 'Signed Windows workspace verification failed' }
+          "root=$root" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Download immutable N-1 Windows installer
+        id: previous
+        if: needs.context.outputs.first_binary_release != 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_ASSET_ID: ${{ needs.context.outputs.previous_windows_asset_id }}
+          PREVIOUS_ASSET_NAME: ${{ needs.context.outputs.previous_windows_asset_name }}
+          PREVIOUS_ASSET_DIGEST: ${{ needs.context.outputs.previous_windows_asset_digest }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = '${{ steps.workspace.outputs.root }}'
+          if ($env:PREVIOUS_ASSET_ID -notmatch '^[1-9][0-9]*$') {
+            throw 'Previous Windows asset ID is invalid'
+          }
+          if ($env:PREVIOUS_ASSET_NAME -notmatch '^RAPP-Brainstem-Frontier-.+-windows-x64-setup\.exe$') {
+            throw 'Previous Windows asset name is invalid'
+          }
+          if ($env:PREVIOUS_ASSET_DIGEST -notmatch '^sha256:[0-9a-f]{64}$') {
+            throw 'Previous Windows asset digest is invalid'
+          }
+          $previousDirectory = "$root\beta\release\previous"
+          New-Item -ItemType Directory -Force -Path $previousDirectory | Out-Null
+          $target = Join-Path $previousDirectory 'n-minus-one-windows-x64-setup.exe'
+          curl.exe --fail --location --silent --show-error `
+            -H "Authorization: Bearer $env:GH_TOKEN" `
+            -H 'Accept: application/octet-stream' `
+            -H 'X-GitHub-Api-Version: 2026-03-10' `
+            "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/assets/$env:PREVIOUS_ASSET_ID" `
+            --output $target
+          if ($LASTEXITCODE -ne 0) {
+            throw "Previous installer download failed with exit $LASTEXITCODE"
+          }
+          $actual = (Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ("sha256:$actual" -ne $env:PREVIOUS_ASSET_DIGEST) {
+            throw 'Previous Windows installer digest mismatch'
+          }
+          "path=$target" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Gate signed NSIS package and complete lifecycle
         id: package
-        working-directory: beta
         shell: pwsh
         env:
           VERSION: ${{ needs.context.outputs.version }}
@@ -843,16 +1019,17 @@ jobs:
           AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $artifact = "$env:GITHUB_WORKSPACE\beta\release\RAPP-Brainstem-Frontier-$env:VERSION-windows-x64-setup.exe"
+          $root = '${{ steps.workspace.outputs.root }}'
+          $artifact = "$root\beta\release\signed\RAPP-Brainstem-Frontier-$env:VERSION-windows-x64-setup.exe"
           $report = "$artifact.gate.json"
           $runtimeVersionUrl = "https://raw.githubusercontent.com/$env:GITHUB_REPOSITORY/${{ needs.context.outputs.commit }}/rapp_brainstem/VERSION"
-          $gateParameters = @{
-            NodePath = (Get-Command node).Source
-            Workspace = $env:GITHUB_WORKSPACE
+          $parameters = @{
+            NodePath = "$root\tools\node.exe"
+            Workspace = $root
             Artifact = $artifact
-            AppDir = "$env:GITHUB_WORKSPACE\beta\release\win-unpacked"
-            ScratchDir = "$env:GITHUB_WORKSPACE\beta\release\package-gate-windows-x64-signed"
-            PythonPath = '${{ steps.runtime.outputs.python }}'
+            AppDir = "$root\beta\release\win-unpacked"
+            ScratchDir = "$root\beta\release\package-gate-windows-x64-signed"
+            PythonPath = (Get-Command python).Source
             Mode = 'signed'
             ExpectedPublisher = $env:WINDOWS_SIGNING_SUBJECT
             ReleaseTag = '${{ needs.context.outputs.tag }}'
@@ -861,66 +1038,34 @@ jobs:
             Report = $report
           }
           if ('${{ needs.context.outputs.first_binary_release }}' -eq 'true') {
-            $gateParameters.FirstBinaryRelease = $true
+            $parameters.FirstBinaryRelease = $true
           } else {
-            $gateParameters.PreviousInstaller = '${{ steps.previous.outputs.path }}'
-            $gateParameters.PreviousReleaseTag =
-              '${{ needs.context.outputs.previous_windows_release_tag }}'
+            $parameters.PreviousInstaller = '${{ steps.previous.outputs.path }}'
+            $parameters.PreviousReleaseTag = '${{ needs.context.outputs.previous_windows_release_tag }}'
           }
-          & "$env:GITHUB_WORKSPACE\beta\scripts\run-windows-package-gate-standard-user.ps1" @gateParameters
+          & "$root\beta\scripts\run-windows-package-gate-standard-user.ps1" @parameters
+          Copy-Item -LiteralPath "$root\beta\release\windows-dependencies.spdx.json" `
+            -Destination "$artifact.spdx.json"
           @(
             "asset=$artifact",
-            "report=$report"
+            "report=$report",
+            "sbom=$artifact.spdx.json"
           ) | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-
-      - name: Attest Windows release asset
-        id: attest
-        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
-        with:
-          subject-path: ${{ steps.package.outputs.asset }}
-
-      - name: Generate Windows SPDX SBOM
-        id: sbom
-        working-directory: beta
-        shell: pwsh
-        env:
-          ASSET: ${{ steps.package.outputs.asset }}
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $sbom = "$env:ASSET.spdx.json"
-          npm sbom --sbom-format=spdx |
-            Set-Content -LiteralPath $sbom -Encoding utf8
-          if ($LASTEXITCODE -ne 0) { throw "npm sbom failed with exit $LASTEXITCODE" }
-          $document = Get-Content -LiteralPath $sbom -Raw | ConvertFrom-Json
-          if ($document.spdxVersion -ne 'SPDX-2.3' -or
-              $document.name -notlike '@aibast/rapp-brainstem-frontier@*' -or
-              $document.packages.Count -lt 1) {
-            throw 'Generated SPDX SBOM is invalid'
-          }
-          "path=$sbom" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-
-      - name: Preserve Sigstore bundle beside asset
-        shell: pwsh
-        env:
-          ASSET: ${{ steps.package.outputs.asset }}
-          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
-        run: Copy-Item -LiteralPath $env:BUNDLE -Destination "${env:ASSET}.sigstore.json"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: frontier-signed-windows-x64
+          name: frontier-verified-windows-x64
           path: |
             ${{ steps.package.outputs.asset }}
-            ${{ steps.package.outputs.asset }}.sigstore.json
             ${{ steps.package.outputs.report }}
-            ${{ steps.sbom.outputs.path }}
+            ${{ steps.package.outputs.sbom }}
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
 
   stage-release:
     name: Stage and verify draft release assets
-    needs: [context, release-macos, release-windows]
+    needs: [context, release-macos, verify-windows-release]
     if: needs.context.outputs.release_mode == 'true'
     environment: frontier-binary-release
     permissions:
@@ -928,6 +1073,8 @@ jobs:
       id-token: write
       attestations: write
       artifact-metadata: write
+    outputs:
+      release_fingerprint: ${{ steps.final-draft.outputs.release_fingerprint }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -941,9 +1088,46 @@ jobs:
 
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          pattern: frontier-signed-*
+          pattern: frontier-signed-macos-*
           path: release-assets
           merge-multiple: true
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: frontier-verified-windows-x64
+          path: release-assets
+
+      - name: Attest macOS ARM64 release asset
+        id: attest-macos-arm64
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: release-assets/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-macos-arm64.dmg
+
+      - name: Attest macOS x64 release asset
+        id: attest-macos-x64
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: release-assets/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-macos-x64.dmg
+
+      - name: Attest Windows x64 release asset
+        id: attest-windows-x64
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: release-assets/RAPP-Brainstem-Frontier-${{ needs.context.outputs.version }}-windows-x64-setup.exe
+
+      - name: Preserve binary provenance bundles
+        env:
+          VERSION: ${{ needs.context.outputs.version }}
+          MACOS_ARM64_BUNDLE: ${{ steps.attest-macos-arm64.outputs.bundle-path }}
+          MACOS_X64_BUNDLE: ${{ steps.attest-macos-x64.outputs.bundle-path }}
+          WINDOWS_X64_BUNDLE: ${{ steps.attest-windows-x64.outputs.bundle-path }}
+        run: |
+          cp "$MACOS_ARM64_BUNDLE" \
+            "release-assets/RAPP-Brainstem-Frontier-${VERSION}-macos-arm64.dmg.sigstore.json"
+          cp "$MACOS_X64_BUNDLE" \
+            "release-assets/RAPP-Brainstem-Frontier-${VERSION}-macos-x64.dmg.sigstore.json"
+          cp "$WINDOWS_X64_BUNDLE" \
+            "release-assets/RAPP-Brainstem-Frontier-${VERSION}-windows-x64-setup.exe.sigstore.json"
 
       - name: Require complete binary, gate, and provenance matrix
         env:
@@ -1170,6 +1354,7 @@ jobs:
           test "$(find . -maxdepth 1 -type f | wc -l | tr -d ' ')" = 13
 
       - name: Keep release draft until native redownload verification
+        id: final-draft
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_ID: ${{ needs.context.outputs.release_id }}
@@ -1182,6 +1367,13 @@ jobs:
           )"
           test "$(jq -r '.draft' <<<"$release")" = true
           test "$(jq -r '.tag_name' <<<"$release")" = "$TAG"
+          printf '%s' "$release" \
+            > "$RUNNER_TEMP/frontier-final-draft-release.json"
+          release_fingerprint="$(
+            node beta/scripts/release-race-guard.mjs \
+              --fingerprint-file "$RUNNER_TEMP/frontier-final-draft-release.json"
+          )"
+          echo "release_fingerprint=$release_fingerprint" >> "$GITHUB_OUTPUT"
 
   redownload-macos:
     name: Redownload and verify macOS ${{ matrix.arch }}
@@ -1598,6 +1790,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_ID: ${{ needs.context.outputs.release_id }}
+          RELEASE_FINGERPRINT: ${{ needs.stage-release.outputs.release_fingerprint }}
           TAG: ${{ needs.context.outputs.tag }}
           TAG_OBJECT: ${{ needs.context.outputs.tag_object }}
           VERSION: ${{ needs.context.outputs.version }}
@@ -1609,90 +1802,6 @@ jobs:
           AZURE_ARTIFACT_SIGNING_PROFILE_TYPE: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE_TYPE }}
         run: |
           set -euo pipefail
-          verify_release_snapshot() {
-            local phase="$1"
-            local release_json="$2"
-            local actual_tag_object actual_commit
-            if ! actual_tag_object="$(
-              git ls-remote --exit-code origin "refs/tags/$TAG" |
-                awk 'NR == 1 { print $1 }'
-            )"; then
-              return 1
-            fi
-            if ! actual_commit="$(
-              git ls-remote --exit-code origin "refs/tags/$TAG^{}" |
-                awk 'NR == 1 { print $1 }'
-            )"; then
-              return 1
-            fi
-            node beta/scripts/release-race-guard.mjs \
-              --expected-tag "$TAG" \
-              --expected-tag-object "$TAG_OBJECT" \
-              --expected-commit "$COMMIT" \
-              --expected-release-id "$RELEASE_ID" \
-              --actual-tag "$(jq -r '.tag_name' <<<"$release_json")" \
-              --actual-tag-object "$actual_tag_object" \
-              --actual-commit "$actual_commit" \
-              --actual-release-id "$(jq -r '.id' <<<"$release_json")" ||
-              return 1
-            echo "Release snapshot verified $phase."
-          }
-          rollback_mutable_release() {
-            local reason="$1"
-            local current rollback rollback_complete
-            if ! current="$(
-              gh api -H "X-GitHub-Api-Version: 2026-03-10" \
-                "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
-            )"; then
-              echo "::error title=IMMUTABLE RELEASE INCIDENT::$reason; the published release state could not be read before rollback."
-              exit 1
-            fi
-            if [ "$(jq -r '.draft' <<<"$current")" = true ]; then
-              echo "::error title=Publication failed::$reason; release $RELEASE_ID is already verified as draft."
-              exit 1
-            fi
-            if [ "$(jq -r '.immutable // false' <<<"$current")" = true ]; then
-              echo "::error title=IMMUTABLE RELEASE INCIDENT::$reason; release $RELEASE_ID is already immutable and cannot be rolled back."
-              exit 1
-            fi
-
-            rollback_complete=false
-            for attempt in {1..5}; do
-              echo "::warning::Published release remained mutable; rollback attempt $attempt by release ID."
-              if gh api --method PATCH \
-                -H "X-GitHub-Api-Version: 2026-03-10" \
-                "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
-                -F draft=true \
-                >"$RUNNER_TEMP/frontier-rollback-response.json"; then
-                if rollback="$(
-                  gh api -H "X-GitHub-Api-Version: 2026-03-10" \
-                    "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
-                )"; then
-                  if [ "$(jq -r '.draft' <<<"$rollback")" = true ]; then
-                    rollback_complete=true
-                    break
-                  fi
-                else
-                  echo "::warning::Rollback verification read $attempt failed."
-                fi
-              else
-                echo "::warning::Rollback API request $attempt failed."
-              fi
-              sleep 3
-            done
-            if [ "$rollback_complete" != true ]; then
-              echo "::error title=IMMUTABLE RELEASE INCIDENT::$reason; release $RELEASE_ID is published and mutable, and five verified rollback attempts failed. Freeze the repository and investigate immediately."
-              jq '{id, tag_name, draft, immutable, html_url}' <<<"$current" >&2
-              exit 1
-            fi
-            if ! verify_release_snapshot "after verified rollback" "$rollback"; then
-              echo "::error title=IMMUTABLE RELEASE INCIDENT::Rollback reached draft state, but the tag/release identity changed."
-              exit 1
-            fi
-            echo "::error title=Publication rolled back::$reason Release $RELEASE_ID was verified back in draft state."
-            exit 1
-          }
-
           mkdir publish-verification
           manifest="RAPP-Brainstem-Frontier-${VERSION}-binary-manifest.json"
           gh release download "$TAG" \
@@ -1748,48 +1857,37 @@ jobs:
           fi
           node beta/scripts/immutable-release-policy.mjs \
             --input "$immutable_settings"
-          prepublish="$(
-            gh api -H "X-GitHub-Api-Version: 2026-03-10" \
-              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
-          )"
-          test "$(jq -r '.draft' <<<"$prepublish")" = true
-          verify_release_snapshot "immediately before publication" "$prepublish"
-          published="$(
-            gh api --method PATCH \
-              -H "X-GitHub-Api-Version: 2026-03-10" \
-              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
-              -F draft=false \
-              -F prerelease=true \
-              -f make_latest=false
-          )"
-          if [ "$(jq -r '.draft' <<<"$published")" != false ]; then
-            rollback_mutable_release "GitHub did not confirm the release transition."
-          fi
-          if ! verify_release_snapshot "immediately after publication" "$published"; then
-            rollback_mutable_release "The tag object, peeled commit, or release ID changed during publication."
-          fi
-          after=
-          for _ in {1..10}; do
-            after="$(
-              gh api -H "X-GitHub-Api-Version: 2026-03-10" \
-                "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
-            )"
-            if [ "$(jq -r '.immutable // false' <<<"$after")" = true ]; then
-              break
+          transition_state="$RUNNER_TEMP/frontier-release-transition-state.json"
+          final_release="$RUNNER_TEMP/frontier-final-immutable-release.json"
+          report_transition_error() {
+            echo "::error title=Release transition failed::The ID-bound publication state machine returned nonzero."
+          }
+          report_transition_exit() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              if [ -s "$transition_state" ]; then
+                cat "$transition_state" >&2
+              else
+                echo "::error title=IMMUTABLE RELEASE INCIDENT::No transition state was recorded; release state is unproven."
+              fi
             fi
-            sleep 3
-          done
-          if [ "$(jq -r '.immutable // false' <<<"$after")" != true ]; then
-            rollback_mutable_release "Release $RELEASE_ID did not become immutable after publication."
-          fi
-          final_release="$(
-            gh api -H "X-GitHub-Api-Version: 2026-03-10" \
-              "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
-          )"
-          test "$(jq -r '.draft' <<<"$final_release")" = false
-          test "$(jq -r '.immutable' <<<"$final_release")" = true
-          if ! verify_release_snapshot "after immutable publication" "$final_release"; then
-            echo "::error title=IMMUTABLE RELEASE INCIDENT::The immutable release no longer matches the initially validated tag object, peeled commit, or release ID."
-            exit 1
-          fi
+          }
+          trap report_transition_error ERR
+          trap report_transition_exit EXIT
+          node beta/scripts/publish-release-state-machine.mjs \
+            --repository "$GITHUB_REPOSITORY" \
+            --release-id "$RELEASE_ID" \
+            --tag "$TAG" \
+            --tag-object "$TAG_OBJECT" \
+            --commit "$COMMIT" \
+            --release-fingerprint "$RELEASE_FINGERPRINT" \
+            --state-file "$transition_state" \
+            --output "$final_release"
+          jq -e \
+            --arg id "$RELEASE_ID" \
+            --arg tag "$TAG" \
+            '.immutable == true and .draft == false
+             and (.id | tostring) == $id and .tag_name == $tag' \
+            "$final_release" >/dev/null
+          trap - ERR EXIT
           echo "Published immutable $TAG at $COMMIT after native redownload verification."

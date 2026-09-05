@@ -2181,7 +2181,7 @@ function signingEvidence(options, failures) {
   };
   if (options.platform === "windows" && options.mode === "signed") {
     value.backend_schema =
-      "electron-builder-26.15.7/WindowsAzureSigningConfiguration-v26";
+      "electron-builder-26.15.7/custom-ArtifactSigning-0.1.8/v1";
     value.endpoint =
       process.env.AZURE_ARTIFACT_SIGNING_ENDPOINT || null;
     value.account =
