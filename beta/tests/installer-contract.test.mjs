@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const unsupportedWindowsArchitecture = `ARM${64}`;
 const unix = readFileSync(path.join(root, "install.sh"), "utf8");
 const windows = readFileSync(path.join(root, "install.cmd"), "utf8");
 const installerPage = readFileSync(path.join(root, "index.html"), "utf8");
@@ -147,6 +148,62 @@ test("dedicated beta page uses the Download Center details structure", () => {
   assert.match(installerPage, /aria-controls="panel-requirements"/);
   assert.match(installerPage, /aria-controls="panel-install"/);
   assert.match(installerPage, /aria-controls="panel-additional"/);
+  assert.match(installerPage, /id="golden-path-link"/);
+  assert.match(
+    installerPage,
+    /github\.com\/microsoft\/aibast-agents-library\/blob\/main\/beta\/GOLDEN_PATH\.md/,
+  );
+  assert.doesNotMatch(installerPage, /href="GOLDEN_PATH\.md"/);
+  assert.match(installerPage, />Windows 11 x64, macOS, and Linux</);
+  assert.match(installerPage, /<option value="windows">Windows 11 x64<\/option>/);
+  assert.match(installerPage, />Windows 11 x64</);
+  assert.match(installerPage, /Windows 11 x64 source bootstrap/);
+  assert.doesNotMatch(
+    installerPage,
+    new RegExp(`Windows 11[^"<\\n]*${unsupportedWindowsArchitecture}`, "i"),
+  );
+  assert.match(installerPage, /Commit-pinned source bootstraps/);
+  assert.match(
+    installerPage,
+    /Package manifest and application signature verification are not claimed\s+for this preview\./,
+  );
+  assert.match(installerPage, /Windows Defender SmartScreen warnings may still appear/);
+  assert.match(installerPage, /The bootstrap does not suppress\s+or remove those warnings\./);
+  assert.doesNotMatch(
+    installerPage,
+    /Verified release downloads|verified source bootstrap|same verified Frontier release|verified release commit/i,
+  );
+  assert.match(installerPage, /<noscript>[\s\S]*id="no-js-download"/);
+  assert.match(installerPage, /href="frontier\.ps1"/);
+  assert.match(installerPage, /href="frontier\.sh"/);
+  assert.match(
+    installerPage,
+    /id="source-link"\s+href="https:\/\/github\.com\/microsoft\/aibast-agents-library\/tree\/main\/beta"/,
+  );
+  assert.match(
+    installerPage,
+    /id="release-link-top"\s+href="https:\/\/github\.com\/microsoft\/aibast-agents-library\/releases"/,
+  );
+  for (const id of [
+    "source-link",
+    "release-link-top",
+    "release-link-bottom",
+    "windows-script",
+    "unix-script",
+  ]) {
+    const openingTag = installerPage.match(
+      new RegExp(`<a(?=[^>]*id="${id}")[^>]*>`),
+    )?.[0];
+    assert.ok(openingTag, `${id} opening tag is missing`);
+    assert.doesNotMatch(openingTag, /href="#"/);
+  }
+  for (const id of ["panel-requirements", "panel-install", "panel-additional"]) {
+    const openingTag = installerPage.match(
+      new RegExp(`<div\\s+class="accordion-panel"\\s+id="${id}"[\\s\\S]*?>`),
+    )?.[0];
+    assert.ok(openingTag, `${id} opening tag is missing`);
+    assert.doesNotMatch(openingTag, /\shidden(?:\s|>)/);
+  }
   assert.match(installerPage, /RAPP-Brainstem-Frontier-Windows\.ps1/);
   assert.match(installerPage, /RAPP-Brainstem-Frontier-macOS-Linux\.sh/);
   assert.match(installerPage, /release\.assets/);
