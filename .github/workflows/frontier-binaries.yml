@@ -1893,7 +1893,7 @@ jobs:
           trap - ERR EXIT
           echo "Published immutable $TAG at $COMMIT after native redownload verification."
 
-      - name: Recover interrupted mutable release transition
+      - name: Reconcile interrupted release publication
         if: ${{ failure() || cancelled() }}
         timeout-minutes: 2
         env:
@@ -1908,13 +1908,23 @@ jobs:
           transition_state="$RUNNER_TEMP/frontier-release-transition-state.json"
           recovery_output="$RUNNER_TEMP/frontier-recovered-release.json"
           if [ ! -s "$transition_state" ]; then
-            echo "No publication transition state exists; no recovery PATCH is required."
+            echo "No durable publication intent exists; no reconciliation is required."
             exit 0
           fi
-          if ! jq -e '.transitionAttempted == true' "$transition_state" >/dev/null; then
-            echo "Publication transition was not attempted; no recovery PATCH is required."
+          if ! jq -e \
+            '.transitionAttempted == true and .publishIntent == true' \
+            "$transition_state" >/dev/null; then
+            echo "Publication intent was not durably recorded; no reconciliation is required."
             exit 0
           fi
+          immutable_settings="$RUNNER_TEMP/frontier-recovery-immutable-release-settings.json"
+          gh api \
+            -H "X-GitHub-Api-Version: 2026-03-10" \
+            "repos/$GITHUB_REPOSITORY/immutable-releases" \
+            >"$immutable_settings"
+          jq -e '.enabled == true' "$immutable_settings" >/dev/null
+          node beta/scripts/immutable-release-policy.mjs \
+            --input "$immutable_settings"
           node beta/scripts/publish-release-state-machine.mjs \
             --recover-only \
             --repository "$GITHUB_REPOSITORY" \
@@ -1926,5 +1936,5 @@ jobs:
             --state-file "$transition_state" \
             --output "$recovery_output"
           jq -e \
-            '.immutable == true or .draft == true' \
+            '.immutable == true and .draft == false' \
             "$recovery_output" >/dev/null

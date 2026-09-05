@@ -144,11 +144,10 @@ publication it calls the repository immutable-releases settings endpoint and
 requires valid JSON for which `jq -e '.enabled == true'` succeeds; HTTP success
 alone is not sufficient. After publishing it verifies that the release API
 reports `"immutable": true`. An unexpected mismatch is an
-explicit failure. While the release remains mutable, the workflow retries a
-rollback by the validated release ID and re-reads until `draft:true`; inability
-to verify that rollback is a loud immutable-release incident. Draft-first
-publication follows GitHub's guidance: create the draft, attach and verify
-every asset, then publish.
+explicit failure. Once durable publish intent is recorded, normal execution,
+signals, and recovery-only runs reconcile only toward the same exact immutable
+release. Draft-first publication follows GitHub's guidance: create the draft,
+attach and verify every asset, then publish.
 
 ### Apple secrets
 
@@ -416,7 +415,7 @@ Release mode fails closed unless all of the following are true:
   must remain byte-for-byte identical;
 - after staging, a canonical SHA-256 fingerprint binds the exact release body
   bytes plus sorted asset `{id,name,state,size,digest}` metadata; every
-  prepublish, post-PATCH, mutable polling, rollback, and final immutable read
+  prepublish, post-PATCH, mutable polling, recovery, and final immutable read
   must match it;
 - publication patches the exact validated GitHub release ID, never an
   ambiguous tag lookup;
@@ -470,32 +469,30 @@ immutability setting, publishes the existing draft, and asserts the release
 reports `"immutable": true`.
 
 The publication transition runs under an ERR/EXIT-trapped state machine.
-Ambiguous PATCH responses and failed polling reads do not imply success or
-failure: the workflow retries ID-bound reads until the release is proven
-immutable or, while still mutable, retries an ID-bound rollback until
-`draft:true` is re-read. If neither state can be proven, the job emits a loud
-release incident and exits nonzero. Tag, release-ID, body, or asset fingerprint
-drift is a sticky integrity incident, not a retryable transport failure; a
-later canonical immutable response cannot erase it. SIGINT/SIGTERM starts a
-bounded ID-based recovery before the process exits, and a
-`failure() || cancelled()` workflow step re-runs recovery from the durable
-transition state if the Node process could not finish. Recovery merges the
-complete durable latch state rather than replacing it with interruption
-metadata. After a publication request begins, one draft read is never terminal:
-the cancellable request handle is aborted when necessary and its separate
-settlement promise must quiesce under a deadline before rollback. If settlement
-cannot be proven, the durable marker remains an incident and the
-`failure() || cancelled()` recovery step retries later. Once quiesced, an
-ID-bound rollback must be issued and two bounded reads must prove stable draft
-state unless the release is already immutable. A publish response that still
-says `draft:true` enters this recovery immediately.
+Before dispatch, it atomically records monotonic publish intent for the exact
+release ID, tag object, peeled commit, body, and asset fingerprint. Every
+subsequent run follows the same reconcile rule: exact immutable is terminal;
+exact draft causes another idempotent publish request; exact public-mutable is
+polled and may be republished; anything else is a durable incident. Draft and
+`NOT_PUBLISHED` are never terminal after intent because delayed server-side
+settlement cannot be disproven. A PATCH response is evidence only: terminal
+success always requires a subsequent exact release-ID GET reporting immutable.
+
+The cancellable publication process and its separate settlement promise are
+retained. Ambiguous responses or SIGINT/SIGTERM cancel the local operation and
+await bounded settlement. Signal handling prevents the interrupted main path
+from dispatching another PATCH, waits for that path to finish, and then uses
+the same monotonic reconciler. If settlement, GitHub state, Git refs, or
+snapshot verification cannot be proven before the deadline, the durable marker
+records `SETTLEMENT_UNPROVEN` and exits nonzero. The
+`failure() || cancelled()` workflow step resumes the same intent later; it
+first re-verifies that repository immutable releases remain enabled and never
+issues a rollback.
 
 Transition state uses a unique same-directory temporary file, complete write,
 `fsync`, close, and atomic rename. A write or rename failure leaves the previous
 valid marker untouched, latches persistence failure in memory, and forces
-rollback. A draft recovered after integrity or persistence failure is reported
-as `INTEGRITY_ROLLED_BACK` or `PERSISTENCE_ROLLED_BACK`, never as ordinary
-success. Terminal immutable/draft records must themselves persist successfully;
+an incident. Terminal immutable records must themselves persist successfully;
 otherwise no terminal success is returned. GitHub GET/PATCH, `git ls-remote`,
 snapshot verification, signal recovery, and recovery-only mode all have
 per-operation and overall deadlines.

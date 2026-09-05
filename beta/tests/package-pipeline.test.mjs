@@ -64,10 +64,10 @@ import {
 import {
   createAtomicStateWriter,
   mergeDurableState,
+  quiescePublishOperation,
+  reconcileInterruptedSignal,
   recoverFromDurableState,
-  recoverInterruptedRelease,
   recoveryRequiredFromState,
-  ReleaseTransitionError,
   runReleaseTransition,
 } from "../scripts/publish-release-state-machine.mjs";
 import {
@@ -1394,10 +1394,10 @@ test("publication revalidates the full set and immutable setting at the last gat
     ),
     "utf8",
   );
-  assert.match(transitionSource, /maxRollbackAttempts = 5/);
-  assert.match(transitionSource, /\["-F", "draft=true"\]/);
-  assert.match(transitionSource, /immediately-before-publication/);
-  assert.match(transitionSource, /publish-response/);
+  assert.doesNotMatch(transitionSource, /draft=true|rollbackRelease|ROLLED_BACK/);
+  assert.match(transitionSource, /publish-intent-recorded/);
+  assert.match(transitionSource, /terminal-immutable/);
+  assert.match(transitionSource, /startGhPublishOperation/);
 });
 
 test("immutable release settings require enabled true at runtime", () => {
@@ -1532,238 +1532,296 @@ test("annotated tag object, peeled commit, and release ID are race-bound", () =>
   );
 });
 
-test("publication state machine recovers from ambiguous API outcomes", async () => {
+test("monotonic publication reconciles only to exact immutable success", async () => {
   const draft = { id: 1, draft: true, immutable: false };
   const mutable = { id: 1, draft: false, immutable: false };
   const immutable = { id: 1, draft: false, immutable: true };
-  const verifySnapshot = async (release) => {
-    assert.equal(release.id, 1);
-    return true;
+  const intentIdentity = {
+    repository: "microsoft/aibast-agents-library",
+    releaseId: "1",
+    tag: "brainstem-beta-v1.2.3",
+    tagObject: "a".repeat(40),
+    commit: "b".repeat(40),
+    releaseFingerprint: "c".repeat(64),
   };
-
-  {
-    let current = { ...draft };
-    let reads = 0;
-    const result = await runReleaseTransition({
-      getRelease: async () => {
-        reads += 1;
-        if (reads >= 3) current = { ...immutable };
-        return { ...current };
-      },
-      publishRelease: async () => {
-        current = { ...mutable };
-        throw new Error("response lost after server-side success");
-      },
-      rollbackRelease: async () => {
-        throw new Error("rollback must not run");
-      },
-      verifySnapshot,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    });
-
-    assert.equal(result.release.immutable, true);
-    assert.match(
-      JSON.stringify(result.state.history),
-      /publish-transport-failed/,
-    );
-  }
-
-  {
-    let current = { ...draft };
-    let pollReads = 0;
-    const result = await runReleaseTransition({
-      getRelease: async () => {
-        if (current.draft) return { ...current };
-        pollReads += 1;
-        if (pollReads <= 2) throw new Error("temporary polling failure");
-        return { ...immutable };
-      },
-      publishRelease: async () => {
-        current = { ...mutable };
-        return { ...current };
-      },
-      rollbackRelease: async () => {
-        throw new Error("rollback must not run");
-      },
-      verifySnapshot,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    });
-    assert.equal(result.release.immutable, true);
-    assert.match(
-      JSON.stringify(result.state.history),
-      /poll-1-transport-failed/,
-    );
-  }
-
-  {
-    let current = { ...draft };
-    let afterPublishReads = 0;
-    await assert.rejects(
-      () => runReleaseTransition({
-        getRelease: async () => {
-          if (current.draft) return { ...current };
-          afterPublishReads += 1;
-          if (afterPublishReads === 2) {
-            throw new Error("initial rollback state read failed");
-          }
-          return { ...current };
-        },
-        publishRelease: async () => {
-          current = { ...mutable };
-          return { ...current };
-        },
-        rollbackRelease: async () => {
-          current = { ...draft };
-          throw new Error("rollback response lost");
-        },
-        verifySnapshot,
-        maxPolls: 1,
-        maxRollbackAttempts: 2,
-        pollDelayMs: 0,
-        sleep: async () => {},
-      }),
-      (error) => {
-        assert.ok(error instanceof ReleaseTransitionError);
-        assert.equal(error.code, "ROLLED_BACK");
-        assert.match(
-          JSON.stringify(error.state.history),
-          /initial-read-transport-failed/,
-        );
-        return true;
-      },
-    );
-  }
-  {
-    let firstRead = true;
-    await assert.rejects(
-      () => runReleaseTransition({
-        getRelease: async () => {
-          if (firstRead) {
-            firstRead = false;
-            return { ...draft };
-          }
-          throw new Error("release state unavailable");
-        },
-        publishRelease: async () => {
-          throw new Error("ambiguous publish response");
-        },
-        rollbackRelease: async () => {
-          throw new Error("ambiguous rollback response");
-        },
-        verifySnapshot,
-        maxPolls: 1,
-        maxRollbackAttempts: 2,
-        pollDelayMs: 0,
-        sleep: async () => {},
-      }),
-      (error) => {
-        assert.equal(error.code, "INCIDENT");
-        assert.match(error.message, /could not be proven/);
-        return true;
-      },
-    );
-  }
-});
-
-test("publication state machine rolls back mutable content drift", async () => {
-  const baseRelease = {
-    id: 77,
-    tag_name: "brainstem-beta-v1.2.3",
-    draft: true,
-    immutable: false,
-    body: "bound body",
-    assets: [{
-      id: 1,
-      name: "asset.exe",
-      state: "uploaded",
-      size: 10,
-      digest: `sha256:${"a".repeat(64)}`,
-    }],
-  };
-  const expected = {
-    tag: baseRelease.tag_name,
-    tagObject: "b".repeat(40),
-    commit: "c".repeat(40),
-    releaseId: String(baseRelease.id),
-    releaseFingerprint: releaseContentFingerprint(baseRelease),
-  };
-  let current = structuredClone(baseRelease);
-  let published = false;
-  await assert.rejects(
-    () => runReleaseTransition({
-      getRelease: async () => {
-        if (published && current.draft === false) {
-          return { ...current, body: "mutated after staging" };
-        }
-        return structuredClone(current);
-      },
-      publishRelease: async () => {
-        published = true;
-        current.draft = false;
-        return structuredClone(current);
-      },
-      rollbackRelease: async () => {
-        current = structuredClone(baseRelease);
-        return structuredClone(current);
-      },
-      verifySnapshot: async (release) => {
-        verifyReleaseSnapshot(expected, {
-          tag: release.tag_name,
-          tagObject: expected.tagObject,
-          commit: expected.commit,
-          releaseId: String(release.id),
-          releaseFingerprint: releaseContentFingerprint(release),
-        });
-        return true;
-      },
-      maxPolls: 1,
-      maxRollbackAttempts: 1,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    }),
-    (error) => {
-      assert.equal(error.code, "INTEGRITY_ROLLED_BACK");
-      assert.equal(current.draft, true);
-      return true;
+  let current = { ...draft };
+  let publishCalls = 0;
+  const result = await runReleaseTransition({
+    getRelease: async () => ({ ...current }),
+    startPublishRelease: () => {
+      publishCalls += 1;
+      current = { ...mutable };
+      return {
+        response: Promise.resolve({ ...current }),
+        settled: Promise.resolve(),
+        cancel: async () => {},
+      };
     },
+    verifySnapshot: async () => true,
+    pollDelayMs: 0,
+    sleep: async () => { current = { ...immutable }; },
+    intentIdentity,
+  });
+  assert.equal(result.status, "immutable");
+  assert.equal(result.release.immutable, true);
+  assert.equal(result.state.publishIntent, true);
+  assert.deepEqual(result.state.intentIdentity, intentIdentity);
+  assert.equal(publishCalls, 1);
+  assert.doesNotMatch(
+    JSON.stringify(result.state.history),
+    /rollback|terminal-draft|NOT_PUBLISHED|ROLLED_BACK/,
   );
 });
 
-test("integrity drift stays latched even if a later response is canonical immutable", async () => {
+test("a public-mutable release cannot be adopted before durable intent", async () => {
+  let publishCalled = false;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => ({
+        id: 1,
+        draft: false,
+        immutable: false,
+      }),
+      startPublishRelease: () => {
+        publishCalled = true;
+        throw new Error("pre-existing transition must not be adopted");
+      },
+      verifySnapshot: async () => true,
+    }),
+    (error) => {
+      assert.equal(error.code, "INTEGRITY_INCIDENT");
+      assert.equal(error.state.publishIntent, false);
+      return true;
+    },
+  );
+  assert.equal(publishCalled, false);
+});
+
+test("delayed server publication resumes monotonically from durable intent", async () => {
   const draft = { id: 1, draft: true, immutable: false };
   const mutable = { id: 1, draft: false, immutable: false };
   const immutable = { id: 1, draft: false, immutable: true };
-  let phase = "draft";
+  let durableState;
+  let cancelCalled = false;
   await assert.rejects(
     () => runReleaseTransition({
-      getRelease: async () => {
-        if (phase === "draft") return { ...draft };
-        if (phase === "drift") {
-          phase = "immutable";
-          return { ...mutable, drifted: true };
-        }
-        return { ...immutable };
+      getRelease: async () => ({ ...draft }),
+      startPublishRelease: () => ({
+        response: Promise.reject(new Error("client exited before response")),
+        settled: new Promise(() => {}),
+        cancel: async () => { cancelCalled = true; },
+      }),
+      verifySnapshot: async () => true,
+      onState: (state) => {
+        durableState = structuredClone(state);
+        return { ok: true };
       },
-      publishRelease: async () => {
-        phase = "drift";
-        return { ...mutable };
-      },
-      rollbackRelease: async () => ({ ...immutable }),
-      verifySnapshot: async (release) => {
-        if (release.drifted) throw new Error("fingerprint mismatch");
-        return true;
-      },
-      maxPolls: 1,
-      maxRollbackAttempts: 1,
+      settlementTimeoutMs: 5,
+      operationTimeoutMs: 10,
       pollDelayMs: 0,
       sleep: async () => {},
     }),
     (error) => {
-      assert.equal(error.code, "INCIDENT");
+      assert.equal(error.code, "SETTLEMENT_UNPROVEN");
+      assert.equal(error.state.publishIntent, true);
+      assert.equal(error.state.publishSettlementUnproven, true);
+      return true;
+    },
+  );
+  assert.equal(cancelCalled, true);
+  assert.equal(durableState.publishIntent, true);
+
+  let current = { ...draft };
+  let sleeps = 0;
+  let recoveryPublishCalls = 0;
+  const recovered = await recoverFromDurableState(durableState, {
+    getRelease: async () => ({ ...current }),
+    startPublishRelease: () => {
+      recoveryPublishCalls += 1;
+      return {
+        response: Promise.resolve({ ...current }),
+        settled: Promise.resolve(),
+        cancel: async () => {},
+      };
+    },
+    verifySnapshot: async () => true,
+    deferredQuiescenceMs: 0,
+    pollDelayMs: 0,
+    sleep: async () => {
+      sleeps += 1;
+      current = sleeps === 1 ? { ...mutable } : { ...immutable };
+    },
+  });
+  assert.equal(recovered.status, "immutable");
+  assert.equal(recovered.release.immutable, true);
+  assert.ok(recoveryPublishCalls >= 1);
+});
+
+test("draft publish responses are reconciled by idempotent publish retries", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const immutable = { id: 1, draft: false, immutable: true };
+  let publishCalls = 0;
+  let current = { ...draft };
+  const result = await runReleaseTransition({
+    getRelease: async () => ({ ...current }),
+    startPublishRelease: () => {
+      publishCalls += 1;
+      if (publishCalls === 2) current = { ...immutable };
+      return {
+        response: Promise.resolve({ ...current }),
+        settled: Promise.resolve(),
+        cancel: async () => {},
+      };
+    },
+    verifySnapshot: async () => true,
+    pollDelayMs: 0,
+    sleep: async () => {},
+  });
+  assert.equal(result.release.immutable, true);
+  assert.equal(publishCalls, 2);
+});
+
+test("an immutable PATCH response is never terminal without a confirming GET", async () => {
+  let reads = 0;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => {
+        reads += 1;
+        return { id: 1, draft: true, immutable: false };
+      },
+      startPublishRelease: () => ({
+        response: Promise.resolve({
+          id: 1,
+          draft: false,
+          immutable: true,
+        }),
+        settled: Promise.resolve(),
+        cancel: async () => {},
+      }),
+      verifySnapshot: async () => true,
+      maxCycles: 1,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "SETTLEMENT_UNPROVEN");
+      return true;
+    },
+  );
+  assert.equal(reads, 3);
+});
+
+test("recover-only reconciles exact mutable release to immutable", async () => {
+  const mutable = { id: 1, draft: false, immutable: false };
+  const immutable = { id: 1, draft: false, immutable: true };
+  let current = { ...mutable };
+  const result = await recoverFromDurableState({
+    transitionAttempted: true,
+    publishIntent: true,
+    history: [],
+  }, {
+    getRelease: async () => ({ ...current }),
+    startPublishRelease: () => ({
+      response: Promise.resolve({ ...current }),
+      settled: Promise.resolve(),
+      cancel: async () => {},
+    }),
+    verifySnapshot: async () => true,
+    pollDelayMs: 0,
+    sleep: async () => { current = { ...immutable }; },
+  });
+  assert.equal(result.status, "immutable");
+});
+
+test("recovery rejects a different durable publication identity", async () => {
+  const intentIdentity = {
+    repository: "microsoft/aibast-agents-library",
+    releaseId: "1",
+    tag: "brainstem-beta-v1.2.3",
+    tagObject: "a".repeat(40),
+    commit: "b".repeat(40),
+    releaseFingerprint: "c".repeat(64),
+  };
+  let reads = 0;
+  await assert.rejects(
+    () => recoverFromDurableState({
+      transitionAttempted: true,
+      publishIntent: true,
+      intentIdentity,
+      history: [],
+    }, {
+      getRelease: async () => {
+        reads += 1;
+        return { id: 1, draft: false, immutable: true };
+      },
+      startPublishRelease: () => {
+        throw new Error("publish must not run");
+      },
+      verifySnapshot: async () => true,
+      intentIdentity: {
+        ...intentIdentity,
+        releaseFingerprint: "d".repeat(64),
+      },
+    }),
+    (error) => {
+      assert.equal(error.code, "INTEGRITY_INCIDENT");
+      return true;
+    },
+  );
+  assert.equal(reads, 0);
+});
+
+test("integrity drift is a sticky terminal incident", async () => {
+  let reads = 0;
+  const durable = {
+    transitionAttempted: true,
+    publishIntent: true,
+    integrityViolation: true,
+    integrityDetail: "asset drift",
+    history: [],
+  };
+  await assert.rejects(
+    () => recoverFromDurableState(durable, {
+      getRelease: async () => {
+        reads += 1;
+        return { id: 1, draft: false, immutable: true };
+      },
+      startPublishRelease: () => {
+        throw new Error("publish must not run");
+      },
+      verifySnapshot: async () => true,
+    }),
+    (error) => {
+      assert.equal(error.code, "INTEGRITY_INCIDENT");
       assert.equal(error.state.integrityViolation, true);
-      assert.match(error.state.integrityDetail, /fingerprint mismatch/);
+      return true;
+    },
+  );
+  assert.equal(reads, 0);
+
+  let current = { id: 1, draft: false, immutable: false, drift: true };
+  await assert.rejects(
+    () => recoverFromDurableState({
+      transitionAttempted: true,
+      publishIntent: true,
+      history: [],
+    }, {
+      getRelease: async () => ({ ...current }),
+      startPublishRelease: () => ({
+        response: Promise.resolve({ ...current }),
+        settled: Promise.resolve(),
+        cancel: async () => {},
+      }),
+      verifySnapshot: async (release) => {
+        if (release.drift) throw new Error("body fingerprint drift");
+        return true;
+      },
+      maxCycles: 1,
+      pollDelayMs: 0,
+      sleep: async () => { current = { id: 1, draft: false, immutable: true }; },
+    }),
+    (error) => {
+      assert.equal(error.code, "INTEGRITY_INCIDENT");
       return true;
     },
   );
@@ -1774,312 +1832,158 @@ test("snapshot verification cannot be mutated into a no-op", async () => {
   await assert.rejects(
     () => runReleaseTransition({
       getRelease: async () => ({ id: 1, draft: true, immutable: false }),
-      publishRelease: async () => {
+      startPublishRelease: () => {
         publishCalled = true;
-        return { id: 1, draft: false, immutable: false };
+        return {
+          response: Promise.resolve({ id: 1, draft: false, immutable: false }),
+          settled: Promise.resolve(),
+          cancel: async () => {},
+        };
       },
-      rollbackRelease: async () => ({ id: 1, draft: true, immutable: false }),
       verifySnapshot: async () => undefined,
-      pollDelayMs: 0,
-      sleep: async () => {},
     }),
     (error) => {
-      assert.equal(error.code, "INTEGRITY");
-      assert.match(error.message, /verifier did not return an explicit true proof/);
+      assert.equal(error.code, "INTEGRITY_INCIDENT");
       return true;
     },
   );
   assert.equal(publishCalled, false);
 });
 
-test("signal recovery retries until release ID is proven draft or immutable", async () => {
-  assert.equal(
-    recoveryRequiredFromState({
-      phase: "interrupted-recovery-started",
-      transitionAttempted: true,
+test("cancellable publish handle settles before reconciliation continues", async () => {
+  let cancelCalled = false;
+  let settle;
+  const settled = new Promise((resolve) => { settle = resolve; });
+  const handle = {
+    response: Promise.reject(new Error("response lost")),
+    settled,
+    cancel: async () => {
+      cancelCalled = true;
+      setTimeout(settle, 10);
+    },
+  };
+  const started = Date.now();
+  await quiescePublishOperation(handle, 100);
+  assert.equal(cancelCalled, true);
+  assert.ok(Date.now() - started >= 8);
+});
+
+test("local interruption stops dispatch after durable publish intent", async () => {
+  let abortChecks = 0;
+  let publishCalled = false;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => ({ id: 1, draft: true, immutable: false }),
+      startPublishRelease: () => {
+        publishCalled = true;
+        throw new Error("interrupted main operation must not publish");
+      },
+      verifySnapshot: async () => true,
+      shouldAbort: () => {
+        abortChecks += 1;
+        return abortChecks >= 2;
+      },
     }),
-    true,
+    (error) => {
+      assert.equal(error.code, "LOCAL_OPERATION_INTERRUPTED");
+      assert.equal(error.state.publishIntent, true);
+      return true;
+    },
   );
+  assert.equal(publishCalled, false);
+});
+
+test("signal reconciliation waits for the interrupted operation", async () => {
+  const merged = mergeDurableState({
+    transitionAttempted: true,
+    publishIntent: true,
+    integrityViolation: true,
+    integrityDetail: "digest drift",
+    history: [{ phase: "integrity", detail: "drift" }],
+  }, {
+    phase: "signal-reconciliation-started",
+    signal: "SIGTERM",
+    history: [{ phase: "signal-reconciliation-started", detail: "SIGTERM" }],
+  });
+  assert.equal(recoveryRequiredFromState(merged), true);
+  assert.equal(merged.integrityViolation, true);
+  assert.equal(merged.integrityDetail, "digest drift");
+  assert.equal(merged.history.length, 2);
   assert.equal(
-    recoveryRequiredFromState({
-      phase: "prepublication-failure",
-      transitionAttempted: false,
-    }),
-    false,
+    mergeDurableState(merged, merged).history.length,
+    2,
+    "concurrent signal/main snapshots must not duplicate durable history",
   );
-
-  let release = { id: 1, draft: false, immutable: false };
-  let reads = 0;
-  const draftRecovery = await recoverInterruptedRelease({
-    getRelease: async () => {
-      reads += 1;
-      if (reads === 1) throw new Error("initial recovery GET unavailable");
-      return { ...release };
-    },
-    rollbackRelease: async () => {
-      release = { id: 1, draft: true, immutable: false };
-      throw new Error("rollback response lost");
-    },
-    verifySnapshot: async () => true,
-    maxAttempts: 2,
-    pollDelayMs: 0,
-    sleep: async () => {},
-  });
-  assert.equal(draftRecovery.status, "draft");
-  assert.equal(draftRecovery.release.draft, true);
-
-  const immutableRecovery = await recoverInterruptedRelease({
-    getRelease: async () => ({ id: 1, draft: false, immutable: true }),
-    rollbackRelease: async () => {
-      throw new Error("rollback must not run for immutable release");
-    },
-    verifySnapshot: async () => true,
-    maxAttempts: 1,
-    pollDelayMs: 0,
-    sleep: async () => {},
-  });
-  assert.equal(immutableRecovery.status, "immutable");
-
   const workflow = readFileSync(
     path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
     "utf8",
   );
   const publish = workflowJob(workflow, "publish");
-  assert.match(publish, /if: \$\{\{ failure\(\) \|\| cancelled\(\) \}\}/);
-  assert.match(publish, /Recover interrupted mutable release transition/);
+  assert.match(publish, /Reconcile interrupted release publication/);
+  assert.match(publish, /failure\(\) \|\| cancelled\(\)/);
   assert.match(publish, /--recover-only/);
-  const stateMachineSource = readFileSync(
-    path.join(
-      betaDir,
-      "scripts",
-      "publish-release-state-machine.mjs",
-    ),
+  const recoveryStep = publish.slice(
+    publish.indexOf("Reconcile interrupted release publication"),
+  );
+  const recoveryImmutable = recoveryStep.indexOf("immutable-releases");
+  const recoverOnly = recoveryStep.indexOf("--recover-only");
+  assert.ok(
+    recoveryImmutable >= 0
+      && recoverOnly >= 0
+      && recoveryImmutable < recoverOnly,
+    "recovery must recheck immutable-release policy before another PATCH",
+  );
+  assert.match(recoveryStep, /jq -e '\.enabled == true'/);
+  const transitionSource = readFileSync(
+    path.join(betaDir, "scripts", "publish-release-state-machine.mjs"),
     "utf8",
   );
-  assert.ok(
-    [...stateMachineSource.matchAll(/process\.once\(signal/g)].length >= 2,
-    "publish and recovery-only modes need independent signal controllers",
-  );
-  assert.match(stateMachineSource, /recovery-only-interrupted/);
-});
+  assert.match(transitionSource, /waitForMain/);
+  assert.match(transitionSource, /process\.exitCode = 130/);
+  assert.doesNotMatch(transitionSource, /process\.exit\(130\)/);
 
-test("durable integrity latch survives interruption and recovery", async () => {
-  const durable = {
-    phase: "interrupted-recovery-started",
+  let latest = {
     transitionAttempted: true,
-    observedMutable: true,
-    integrityViolation: true,
-    integrityDetail: "asset digest drift",
-    persistenceFailure: false,
-    history: [{ phase: "poll-1-integrity-violation", detail: "drift" }],
+    publishIntent: true,
+    history: [],
   };
-  const merged = mergeDurableState(durable, {
-    phase: "recovery-only-interrupted",
+  const cliState = {
+    get latest() {
+      return latest;
+    },
+    merge(patch) {
+      latest = mergeDurableState(latest, patch);
+      return { ok: true };
+    },
+    persist(state) {
+      latest = structuredClone(state);
+      return { ok: true };
+    },
+  };
+  let mainFinished = false;
+  const result = await reconcileInterruptedSignal({
     signal: "SIGTERM",
-    history: [{ phase: "recovery-only-interrupted", detail: "SIGTERM" }],
+    cliState,
+    getRelease: async () => {
+      assert.equal(mainFinished, true);
+      return { id: 1, draft: false, immutable: true };
+    },
+    startPublishRelease: () => {
+      throw new Error("an immutable release must not be republished");
+    },
+    verifySnapshot: async () => true,
+    waitForMain: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      mainFinished = true;
+    },
+    overallDeadlineMs: 100,
   });
-  assert.equal(merged.integrityViolation, true);
-  assert.equal(merged.integrityDetail, "asset digest drift");
-  assert.equal(merged.history.length, 2);
-
-  await assert.rejects(
-    () => recoverFromDurableState(durable, {
-      getRelease: async () => ({ id: 1, draft: false, immutable: true }),
-      rollbackRelease: async () => {
-        throw new Error("immutable release cannot roll back");
-      },
-      verifySnapshot: async () => true,
-      maxAttempts: 1,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    }),
-    (error) => {
-      assert.equal(error.code, "INCIDENT");
-      assert.equal(error.state.integrityViolation, true);
-      return true;
-    },
-  );
-
-  let drift = true;
-  let current = { id: 1, draft: false, immutable: false };
-  await assert.rejects(
-    () => recoverFromDurableState({
-      phase: "interrupted",
-      transitionAttempted: true,
-      integrityViolation: false,
-      history: [],
-    }, {
-      getRelease: async () => ({ ...current, drift }),
-      rollbackRelease: async () => {
-        drift = false;
-        current = { id: 1, draft: true, immutable: false };
-        return { ...current };
-      },
-      verifySnapshot: async (release) => {
-        if (release.drift) throw new Error("body fingerprint drift");
-        return true;
-      },
-      maxAttempts: 1,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    }),
-    (error) => {
-      assert.equal(error.code, "INTEGRITY_ROLLED_BACK");
-      assert.equal(error.state.integrityViolation, true);
-      return true;
-    },
-  );
+  assert.equal(result.status, "immutable");
+  assert.equal(latest.phase, "terminal-immutable");
 });
 
-test("in-flight publication draft observation always runs verified rollback", async () => {
-  const draft = { id: 1, draft: true, immutable: false };
-  const mutable = { id: 1, draft: false, immutable: false };
-  let readCount = 0;
-  let rollbackCalls = 0;
-  await assert.rejects(
-    () => runReleaseTransition({
-      getRelease: async () => {
-        readCount += 1;
-        if (readCount <= 4) return { ...draft };
-        if (readCount === 5) return { ...mutable };
-        return { ...draft };
-      },
-      publishRelease: async () => {
-        throw new Error("request response lost while server still processes");
-      },
-      rollbackRelease: async () => {
-        rollbackCalls += 1;
-        return { ...draft };
-      },
-      verifySnapshot: async () => true,
-      maxPolls: 1,
-      maxRollbackAttempts: 3,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    }),
-    (error) => {
-      assert.equal(error.code, "ROLLED_BACK");
-      assert.ok(rollbackCalls >= 2);
-      return true;
-    },
-  );
-});
-
-test("publish operation settles before rollback can confirm draft", async () => {
-  const draft = { id: 1, draft: true, immutable: false };
-  const mutable = { id: 1, draft: false, immutable: false };
-  let current = { ...draft };
-  let getCalls = 0;
-  let cancelCalled = false;
-  let serverApplied = false;
-  let rollbackCalls = 0;
-  let settle;
-  const settled = new Promise((resolve) => { settle = resolve; });
-  const started = Date.now();
-
-  await assert.rejects(
-    () => runReleaseTransition({
-      getRelease: async () => {
-        getCalls += 1;
-        return { ...current };
-      },
-      startPublishRelease: () => ({
-        response: Promise.reject(new Error("publication response lost")),
-        settled,
-        cancel: async () => {
-          cancelCalled = true;
-          setTimeout(() => {
-            current = { ...mutable };
-            serverApplied = true;
-            settle();
-          }, 10);
-        },
-      }),
-      rollbackRelease: async () => {
-        assert.equal(serverApplied, true);
-        rollbackCalls += 1;
-        current = { ...draft };
-        return { ...current };
-      },
-      verifySnapshot: async () => true,
-      maxPolls: 1,
-      maxRollbackAttempts: 1,
-      pollDelayMs: 0,
-      publishSettlementTimeoutMs: 100,
-      sleep: async () => {},
-    }),
-    (error) => {
-      assert.equal(error.code, "ROLLED_BACK");
-      assert.equal(cancelCalled, true);
-      assert.ok(Date.now() - started >= 8);
-      assert.ok(getCalls >= 4);
-      assert.equal(rollbackCalls, 1);
-      return true;
-    },
-  );
-});
-
-test("unproven publish settlement forbids rollback and terminal success", async () => {
-  let rollbackCalls = 0;
-  await assert.rejects(
-    () => runReleaseTransition({
-      getRelease: async () => ({ id: 1, draft: true, immutable: false }),
-      startPublishRelease: () => ({
-        response: Promise.reject(new Error("ambiguous publication error")),
-        settled: new Promise(() => {}),
-        cancel: async () => {},
-      }),
-      rollbackRelease: async () => {
-        rollbackCalls += 1;
-        return { id: 1, draft: true, immutable: false };
-      },
-      verifySnapshot: async () => true,
-      publishSettlementTimeoutMs: 5,
-      operationTimeoutMs: 10,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    }),
-    (error) => {
-      assert.equal(error.code, "INCIDENT");
-      assert.equal(error.state.publishSettlementUnproven, true);
-      assert.equal(rollbackCalls, 0);
-      return true;
-    },
-  );
-});
-
-test("draft publication response enters rollback immediately", async () => {
-  const draft = { id: 1, draft: true, immutable: false };
-  let rollbackCalls = 0;
-  await assert.rejects(
-    () => runReleaseTransition({
-      getRelease: async () => ({ ...draft }),
-      startPublishRelease: () => ({
-        response: Promise.resolve({ ...draft }),
-        settled: Promise.resolve(),
-        cancel: async () => {},
-      }),
-      rollbackRelease: async () => {
-        rollbackCalls += 1;
-        return { ...draft };
-      },
-      verifySnapshot: async () => true,
-      maxPolls: 10,
-      maxRollbackAttempts: 1,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    }),
-    (error) => {
-      assert.equal(error.code, "ROLLED_BACK");
-      assert.equal(rollbackCalls, 1);
-      assert.doesNotMatch(JSON.stringify(error.state.history), /poll-1/);
-      return true;
-    },
-  );
-});
-
-test("atomic state persistence retains the previous marker on write failures", () => {
-  const previous = '{"phase":"publishing"}\n';
+test("atomic state persistence retains previous valid marker", () => {
+  const previous = '{"phase":"publish-intent-recorded"}\n';
   const temporaryPaths = [];
   const successfulWriter = createAtomicStateWriter("state.json", {
     openSync: (filePath) => {
@@ -2110,9 +2014,7 @@ test("atomic state persistence retains the previous marker on write failures", (
         return 7;
       },
       writeFileSync: (_descriptor, value) => {
-        if (failurePoint === "write") {
-          throw Object.assign(new Error("write failed"), { code: "EIO" });
-        }
+        if (failurePoint === "write") throw new Error("write failed");
         temporary = value;
       },
       fsyncSync: () => { fsyncCalls += 1; },
@@ -2123,77 +2025,32 @@ test("atomic state persistence retains the previous marker on write failures", (
       },
       rmSync: () => { temporary = ""; },
     });
-    const result = writer({ phase: "publish-response" });
-    assert.equal(result.ok, false);
+    assert.equal(writer({ phase: "new" }).ok, false);
     assert.equal(marker, previous);
     if (failurePoint !== "open-disk-full") assert.ok(closeCalls >= 1);
     if (failurePoint === "rename") assert.equal(fsyncCalls, 1);
-    assert.equal(
-      writer({ phase: "later" }).ok,
-      false,
-      "writer must freeze after failure instead of replacing the valid marker",
-    );
+    assert.equal(writer({ phase: "later" }).ok, false);
   }
 });
 
-test("post-publication persistence failure recovers from in-memory state", async () => {
+test("persistence failures and terminal write failures forbid success", async () => {
   const draft = { id: 1, draft: true, immutable: false };
-  const mutable = { id: 1, draft: false, immutable: false };
+  const immutable = { id: 1, draft: false, immutable: true };
   let current = { ...draft };
-  let rollbackCalls = 0;
-  let persistenceFailed = false;
   await assert.rejects(
     () => runReleaseTransition({
       getRelease: async () => ({ ...current }),
-      publishRelease: async () => {
-        current = { ...mutable };
-        return { ...current };
-      },
-      rollbackRelease: async () => {
-        rollbackCalls += 1;
-        current = { ...draft };
-        return { ...current };
+      startPublishRelease: () => {
+        current = { ...immutable };
+        return {
+          response: Promise.resolve({ ...immutable }),
+          settled: Promise.resolve(),
+          cancel: async () => {},
+        };
       },
       verifySnapshot: async () => true,
-      onState: (state) => {
-        if (state.phase === "publish-response" || persistenceFailed) {
-          persistenceFailed = true;
-          return {
-            ok: false,
-            error: Object.assign(new Error("disk full"), { code: "ENOSPC" }),
-          };
-        }
-        return { ok: true };
-      },
-      maxPolls: 1,
-      maxRollbackAttempts: 1,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    }),
-    (error) => {
-      assert.equal(error.code, "PERSISTENCE_ROLLED_BACK");
-      assert.equal(error.state.persistenceFailure, true);
-      assert.ok(rollbackCalls >= 1);
-      return true;
-    },
-  );
-});
-
-test("terminal state persistence failure prevents immutable or draft success", async () => {
-  const draft = { id: 1, draft: true, immutable: false };
-  const immutable = { id: 1, draft: false, immutable: true };
-  await assert.rejects(
-    () => runReleaseTransition({
-      getRelease: async () => ({ ...draft }),
-      startPublishRelease: () => ({
-        response: Promise.resolve({ ...immutable }),
-        settled: Promise.resolve(),
-        cancel: async () => {},
-      }),
-      rollbackRelease: async () => ({ ...draft }),
-      verifySnapshot: async () => true,
-      onState: (state) => state.phase === "immutable"
-        ? { ok: false, error: new Error("terminal immutable write failed") }
+      onState: (state) => state.phase === "terminal-immutable"
+        ? { ok: false, error: new Error("terminal write failed") }
         : { ok: true },
       pollDelayMs: 0,
       sleep: async () => {},
@@ -2204,63 +2061,178 @@ test("terminal state persistence failure prevents immutable or draft success", a
     },
   );
 
+  let intentRecorded = false;
   await assert.rejects(
-    () => recoverInterruptedRelease({
-      initialState: {
-        transitionAttempted: true,
-        history: [],
-      },
+    () => runReleaseTransition({
       getRelease: async () => ({ ...draft }),
-      rollbackRelease: async () => ({ ...draft }),
+      startPublishRelease: () => {
+        throw new Error("must not dispatch without durable intent");
+      },
       verifySnapshot: async () => true,
-      onState: (state) => state.phase === "recovery-verified-draft"
-        ? { ok: false, error: new Error("terminal draft write failed") }
-        : { ok: true },
-      maxAttempts: 1,
-      pollDelayMs: 0,
-      sleep: async () => {},
+      onState: (state) => {
+        if (state.phase === "publish-intent-recorded") {
+          intentRecorded = true;
+          return { ok: false, error: new Error("disk full") };
+        }
+        return { ok: true };
+      },
     }),
     (error) => {
-      assert.equal(error.code, "PERSISTENCE_ROLLED_BACK");
+      assert.equal(error.code, "PERSISTENCE_INCIDENT");
       return true;
     },
   );
+  assert.equal(intentRecorded, true);
 });
 
-test("recovery APIs and snapshot verification are bounded by deadlines", async () => {
+test("post-publication write failures retain recoverable durable intent", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const immutable = { id: 1, draft: false, immutable: true };
+  for (const failurePoint of ["open-disk-full", "write", "rename"]) {
+    let current = { ...draft };
+    let marker = null;
+    let temporary = "";
+    let failNow = false;
+    const writer = createAtomicStateWriter("state.json", {
+      openSync: () => {
+        if (failNow && failurePoint === "open-disk-full") {
+          throw Object.assign(new Error("disk full"), { code: "ENOSPC" });
+        }
+        return 7;
+      },
+      writeFileSync: (_descriptor, value) => {
+        if (failNow && failurePoint === "write") {
+          throw Object.assign(new Error("write failed"), { code: "EIO" });
+        }
+        temporary = value;
+      },
+      fsyncSync() {},
+      closeSync() {},
+      renameSync: () => {
+        if (failNow && failurePoint === "rename") {
+          throw new Error("rename failed");
+        }
+        marker = temporary;
+        temporary = "";
+      },
+      rmSync: () => { temporary = ""; },
+    });
+    await assert.rejects(
+      () => runReleaseTransition({
+        getRelease: async () => ({ ...current }),
+        startPublishRelease: () => {
+          current = { ...immutable };
+          return {
+            response: Promise.resolve({ ...immutable }),
+            settled: Promise.resolve(),
+            cancel: async () => {},
+          };
+        },
+        verifySnapshot: async () => true,
+        onState: (state) => {
+          failNow = state.phase.endsWith("-publish-operation-settled");
+          return writer(state);
+        },
+        pollDelayMs: 0,
+        sleep: async () => {},
+      }),
+      (error) => {
+        assert.equal(error.code, "PERSISTENCE_INCIDENT");
+        assert.equal(error.state.publishIntent, true);
+        assert.equal(error.state.persistenceFailure, true);
+        return true;
+      },
+    );
+    const durable = JSON.parse(marker);
+    assert.equal(durable.publishIntent, true);
+    assert.notEqual(durable.phase, "terminal-immutable");
+    const recovered = await recoverFromDurableState(durable, {
+      getRelease: async () => ({ ...immutable }),
+      startPublishRelease: () => {
+        throw new Error("immutable recovery must not publish");
+      },
+      verifySnapshot: async () => true,
+      onState: () => ({ ok: true }),
+      deferredQuiescenceMs: 0,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    });
+    assert.equal(recovered.status, "immutable");
+  }
+});
+
+test("reconciliation operations and polling sleeps are deadline bounded", async () => {
+  const durable = {
+    transitionAttempted: true,
+    publishIntent: true,
+    history: [],
+  };
   const started = Date.now();
   await assert.rejects(
-    () => recoverInterruptedRelease({
-      initialState: {
-        transitionAttempted: true,
-        history: [],
-      },
+    () => recoverFromDurableState(durable, {
       getRelease: async () => new Promise(() => {}),
-      rollbackRelease: async () => new Promise(() => {}),
-      verifySnapshot: async () => new Promise(() => {}),
-      maxAttempts: 1,
+      startPublishRelease: () => {
+        throw new Error("publish should not be reached");
+      },
+      verifySnapshot: async () => true,
       operationTimeoutMs: 5,
       overallDeadlineMs: 25,
       pollDelayMs: 0,
       sleep: async () => {},
     }),
     (error) => {
-      assert.equal(error.code, "INCIDENT");
-      assert.match(JSON.stringify(error.state.history), /timed out|deadline/i);
+      assert.equal(error.code, "SETTLEMENT_UNPROVEN");
+      assert.equal(error.state.publishSettlementUnproven, true);
       return true;
     },
   );
   assert.ok(Date.now() - started < 500);
-  const stateMachineSource = readFileSync(
-    path.join(
-      betaDir,
-      "scripts",
-      "publish-release-state-machine.mjs",
-    ),
-    "utf8",
+
+  await assert.rejects(
+    () => recoverFromDurableState(durable, {
+      getRelease: async () => ({
+        id: 1,
+        draft: false,
+        immutable: false,
+      }),
+      startPublishRelease: () => {
+        throw new Error("publish should not be reached");
+      },
+      verifySnapshot: async () => new Promise(() => {}),
+      operationTimeoutMs: 5,
+      overallDeadlineMs: 25,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    (error) => {
+      assert.equal(error.code, "SETTLEMENT_UNPROVEN");
+      assert.equal(error.state.integrityViolation, false);
+      return true;
+    },
   );
-  assert.match(stateMachineSource, /timeout: 15000/);
-  assert.match(stateMachineSource, /recovery-only-interrupted/);
+
+  let sleepStarted = false;
+  await assert.rejects(
+    () => recoverFromDurableState(durable, {
+      getRelease: async () => ({ id: 1, draft: false, immutable: false }),
+      startPublishRelease: () => ({
+        response: Promise.resolve({ id: 1, draft: false, immutable: false }),
+        settled: Promise.resolve(),
+        cancel: async () => {},
+      }),
+      verifySnapshot: async () => true,
+      maxCycles: 2,
+      operationTimeoutMs: 5,
+      overallDeadlineMs: 20,
+      pollDelayMs: 1,
+      sleep: async () => {
+        sleepStarted = true;
+        return new Promise(() => {});
+      },
+    }),
+    /settlement is unproven|deadline/i,
+  );
+  assert.equal(sleepStarted, true);
 });
 
 test("second Windows binary release requires immutable N-1 evidence", () => {
