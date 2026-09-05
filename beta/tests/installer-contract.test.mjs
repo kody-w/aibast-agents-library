@@ -153,6 +153,8 @@ test("dedicated beta page uses the Download Center details structure", () => {
   assert.match(installerPage, /\\\.exe\$/);
   assert.match(installerPage, /\\\.dmg\$/);
   assert.match(installerPage, /browser_download_url/);
+  assert.match(installerPage, /id="golden-path-link"/);
+  assert.doesNotMatch(installerPage, /href="GOLDEN_PATH\.md"/);
 });
 
 test("stable Frontier bootstraps resolve and run the latest published release", () => {

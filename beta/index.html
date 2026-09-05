@@ -1273,7 +1273,14 @@
 
               <div class="resource-links">
                 <a href="README.md">Read the Frontier guide</a>
-                <a href="GOLDEN_PATH.md">Read the product golden path</a>
+                <a
+                  id="golden-path-link"
+                  href="https://github.com/microsoft/aibast-agents-library/blob/main/beta/GOLDEN_PATH.md"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Read the product golden path
+                </a>
                 <a id="release-link-bottom" href="#" target="_blank" rel="noreferrer">
                   View the GitHub release
                 </a>
@@ -1361,6 +1368,7 @@
         unixScript: document.getElementById("unix-script"),
         windowsScript: document.getElementById("windows-script"),
         sourceLink: document.getElementById("source-link"),
+        goldenPathLink: document.getElementById("golden-path-link"),
         releaseLinkTop: document.getElementById("release-link-top"),
         releaseLinkBottom: document.getElementById("release-link-bottom"),
         expandAll: document.getElementById("expand-all"),
@@ -1684,6 +1692,8 @@
 
         elements.sourceLink.href =
           `https://github.com/${repo}/tree/${encodeURIComponent(release.tag_name)}/beta`;
+        elements.goldenPathLink.href =
+          `https://github.com/${repo}/blob/${encodeURIComponent(release.tag_name)}/beta/GOLDEN_PATH.md`;
         elements.status.textContent = release.prerelease ? "Prerelease ready" : "Release ready";
         elements.statusDot.className = "status-dot ready";
         elements.version.textContent = version;
