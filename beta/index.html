@@ -978,8 +978,22 @@
       <a class="context-label" href="./">Download Center</a>
       <nav class="header-nav" aria-label="Download Center links">
         <a href="../library.html">Agents Library</a>
-        <a id="source-link" href="#" target="_blank" rel="noreferrer">Source</a>
-        <a id="release-link-top" href="#" target="_blank" rel="noreferrer">Release notes</a>
+        <a
+          id="source-link"
+          href="https://github.com/microsoft/aibast-agents-library/tree/main/beta"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Source
+        </a>
+        <a
+          id="release-link-top"
+          href="https://github.com/microsoft/aibast-agents-library/releases"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Release notes
+        </a>
       </nav>
     </div>
   </header>
@@ -1052,6 +1066,14 @@
 
     <div class="container content">
       <div id="load-error" class="notice" role="status" hidden></div>
+      <p id="copy-status" class="visually-hidden" aria-live="polite"></p>
+      <noscript>
+        <div class="notice">
+          JavaScript is required for verified release selection. You can still inspect the
+          <a href="frontier.ps1">Windows x64 source bootstrap</a> or the
+          <a href="frontier.sh">macOS and Linux source bootstrap</a>.
+        </div>
+      </noscript>
 
       <dl class="file-details" aria-label="Release file details">
         <div class="file-detail">
@@ -1203,7 +1225,7 @@
                     <button class="button primary" id="copy-windows" type="button" disabled>
                       Copy command
                     </button>
-                    <a class="button" id="windows-script" href="#" target="_blank" rel="noreferrer">
+                    <a class="button" id="windows-script" href="frontier.ps1" target="_blank" rel="noreferrer">
                       Inspect bootstrap
                     </a>
                   </div>
@@ -1220,7 +1242,7 @@
                     <button class="button primary" id="copy-unix" type="button" disabled>
                       Copy command
                     </button>
-                    <a class="button" id="unix-script" href="#" target="_blank" rel="noreferrer">
+                    <a class="button" id="unix-script" href="frontier.sh" target="_blank" rel="noreferrer">
                       Inspect bootstrap
                     </a>
                   </div>
@@ -1286,7 +1308,12 @@
                 >
                   Read the product golden path
                 </a>
-                <a id="release-link-bottom" href="#" target="_blank" rel="noreferrer">
+                <a
+                  id="release-link-bottom"
+                  href="https://github.com/microsoft/aibast-agents-library/releases"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   View the GitHub release
                 </a>
               </div>
@@ -1323,7 +1350,7 @@
 
       <div class="dialog-actions">
         <button class="button" id="copy-selected" type="button">Copy install command</button>
-        <a class="button primary" id="download-selected" href="#" download>
+        <a class="button primary" id="download-selected" hidden>
           Download selected file
         </a>
       </div>

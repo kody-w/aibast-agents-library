@@ -13,11 +13,13 @@ import {
   buildBootstrapDownloads,
   buildReleaseTransaction,
   claimDownloadCenterInitialization,
+  copyText,
   detectArchitecture,
   discoverRelease,
   fetchGitHubJson,
   formatBytes,
   goldenPathUrl,
+  handleDownloadSubmit,
   initializeDownloadCenter,
   orderDownloadsForPlatform,
   parseReleaseManifest,
@@ -27,6 +29,8 @@ import {
   resolveDownloadContext,
   safeReleaseAssetUrl,
   selectRelease,
+  setFunctionalLink,
+  showDownloadDialog,
   windowsSupportLabel,
 } from "../download-center.js";
 
@@ -151,6 +155,54 @@ function analyze(releaseAssets, manifest = manifestFor(releaseAssets)) {
 
 function jsonResponse(value, { status = 200, headers = {} } = {}) {
   return new Response(JSON.stringify(value), { status, headers });
+}
+
+function copyFixture({ writeText, execCommand = () => false } = {}) {
+  const timers = [];
+  const textarea = {
+    style: {},
+    removed: false,
+    selected: false,
+    setAttribute() {},
+    select() {
+      this.selected = true;
+    },
+    remove() {
+      this.removed = true;
+    },
+  };
+  const attributes = new Map();
+  return {
+    context: {
+      documentObject: {
+        createElement: () => textarea,
+        body: { appendChild() {} },
+        execCommand,
+      },
+      navigatorObject: {
+        clipboard: writeText ? { writeText } : undefined,
+      },
+      windowObject: {
+        setTimeout(callback) {
+          timers.push(callback);
+        },
+      },
+    },
+    button: {
+      textContent: "Copy command",
+      dataset: {},
+      setAttribute(name, value) {
+        attributes.set(name, value);
+      },
+      removeAttribute(name) {
+        attributes.delete(name);
+      },
+    },
+    status: { textContent: "" },
+    textarea,
+    timers,
+    attributes,
+  };
 }
 
 test("public repository authority is origin-bound and localhost overrides are untrusted", () => {
@@ -393,6 +445,8 @@ test("resolved fork packages and pinned identity reach the DOM transaction", asy
       title: "",
       className: "",
       hidden: true,
+      setAttribute() {},
+      removeAttribute() {},
     }]),
   );
   applyReleaseSummary(elements, transaction);
@@ -780,6 +834,131 @@ test("release failures are visible while source fallback remains inspectable", (
       `https://raw.githubusercontent.com/${repository}/${commit}/beta/install.sh`,
     ),
   );
+});
+
+test("copy feedback reports Clipboard API, fallback, and total failure truthfully", async () => {
+  const clipboard = copyFixture({ writeText: async () => {} });
+  const clipboardResult = await copyText(
+    clipboard.context,
+    clipboard.button,
+    "exact command",
+    clipboard.status,
+  );
+  assert.deepEqual(clipboardResult, { ok: true, method: "clipboard" });
+  assert.equal(clipboard.button.textContent, "Copied");
+  assert.match(clipboard.status.textContent, /Clipboard API/);
+  assert.equal(clipboard.textarea.selected, false);
+  clipboard.timers[0]();
+  assert.equal(clipboard.button.textContent, "Copy command");
+
+  const fallback = copyFixture({
+    writeText: async () => {
+      throw new Error("permission denied");
+    },
+    execCommand: () => true,
+  });
+  const fallbackResult = await copyText(
+    fallback.context,
+    fallback.button,
+    "exact command",
+    fallback.status,
+  );
+  assert.deepEqual(fallbackResult, { ok: true, method: "fallback" });
+  assert.equal(fallback.textarea.selected, true);
+  assert.equal(fallback.textarea.removed, true);
+  assert.match(fallback.status.textContent, /browser fallback/);
+
+  const failed = copyFixture({
+    writeText: async () => {
+      throw new Error("permission denied");
+    },
+    execCommand: () => false,
+  });
+  const failedResult = await copyText(
+    failed.context,
+    failed.button,
+    "exact command",
+    failed.status,
+  );
+  assert.equal(failedResult.ok, false);
+  assert.match(failedResult.clipboardError.message, /permission denied/);
+  assert.match(failedResult.fallbackError.message, /fallback failed/);
+  assert.equal(failed.button.textContent, "Copy failed");
+  assert.equal(failed.attributes.get("aria-invalid"), "true");
+  assert.equal(failed.button.dataset.copyState, "failed");
+  assert.match(failed.status.textContent, /Clipboard API and browser fallback could not copy/);
+  assert.equal(failed.textarea.removed, true);
+});
+
+test("submit and dialog behavior stays disabled until a validated release is ready", () => {
+  let prevented = 0;
+  let opened = 0;
+  const event = { preventDefault: () => { prevented += 1; } };
+
+  assert.equal(
+    handleDownloadSubmit(event, { disabled: true, openDialog: () => { opened += 1; } }),
+    false,
+  );
+  assert.equal(prevented, 1);
+  assert.equal(opened, 0);
+  assert.equal(
+    handleDownloadSubmit(event, { disabled: false, openDialog: () => { opened += 1; } }),
+    true,
+  );
+  assert.equal(prevented, 2);
+  assert.equal(opened, 1);
+
+  const nativeDialog = {
+    open: false,
+    calls: 0,
+    hasAttribute: () => false,
+    showModal() {
+      this.calls += 1;
+      this.open = true;
+    },
+  };
+  assert.equal(showDownloadDialog(nativeDialog), true);
+  assert.equal(showDownloadDialog(nativeDialog), false);
+  assert.equal(nativeDialog.calls, 1);
+
+  const attributes = new Set();
+  const fallbackDialog = {
+    open: false,
+    hasAttribute: (name) => attributes.has(name),
+    setAttribute: (name) => attributes.add(name),
+  };
+  assert.equal(showDownloadDialog(fallbackDialog), true);
+  assert.equal(attributes.has("open"), true);
+  assert.equal(showDownloadDialog(fallbackDialog), false);
+});
+
+test("nonfunctional links are disabled and no-JS source fallbacks stay usable", () => {
+  const attributes = new Map([["href", "#"]]);
+  const link = {
+    href: "#",
+    setAttribute(name, value) {
+      attributes.set(name, value);
+    },
+    removeAttribute(name) {
+      attributes.delete(name);
+      if (name === "href") this.href = "";
+    },
+  };
+  assert.equal(setFunctionalLink(link, "#"), false);
+  assert.equal(link.href, "");
+  assert.equal(attributes.get("aria-disabled"), "true");
+  assert.equal(attributes.get("tabindex"), "-1");
+  assert.equal(
+    setFunctionalLink(link, "https://github.com/octo/frontier/releases"),
+    true,
+  );
+  assert.equal(attributes.has("aria-disabled"), false);
+
+  const pageSource = readFileSync(path.join(betaRoot, "index.html"), "utf8");
+  assert.doesNotMatch(pageSource, /href="#"/);
+  assert.match(pageSource, /id="copy-status"[^>]*aria-live="polite"/);
+  assert.match(pageSource, /<noscript>[\s\S]*href="frontier\.ps1"/);
+  assert.match(pageSource, /<noscript>[\s\S]*href="frontier\.sh"/);
 });
 
 test("duplicate initialization exits before listener registration", async () => {

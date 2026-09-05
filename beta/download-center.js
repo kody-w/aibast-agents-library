@@ -1131,6 +1131,7 @@ function requireElement(documentObject, id) {
 function collectElements(documentObject) {
   return {
     error: requireElement(documentObject, "load-error"),
+    copyStatus: requireElement(documentObject, "copy-status"),
     status: requireElement(documentObject, "release-status"),
     statusDot: requireElement(documentObject, "status-dot"),
     version: requireElement(documentObject, "release-version"),
@@ -1166,32 +1167,95 @@ function collectElements(documentObject) {
   };
 }
 
-async function copyText({ documentObject, navigatorObject, windowObject }, button, value) {
-  const original = button.textContent;
-  try {
-    if (!navigatorObject?.clipboard?.writeText) throw new Error("Clipboard API unavailable");
-    await navigatorObject.clipboard.writeText(value);
-  } catch {
-    const textarea = documentObject.createElement("textarea");
-    textarea.value = value;
-    textarea.setAttribute("readonly", "");
-    textarea.style.position = "fixed";
-    textarea.style.opacity = "0";
-    documentObject.body.appendChild(textarea);
-    textarea.select();
-    const copied = documentObject.execCommand("copy");
-    textarea.remove();
-    if (!copied) throw new DownloadCenterError("The install command could not be copied.");
+export async function copyText(
+  { documentObject, navigatorObject, windowObject },
+  button,
+  value,
+  statusElement,
+) {
+  const original = button.dataset?.copyOriginalLabel || button.textContent;
+  if (button.dataset && !button.dataset.copyOriginalLabel) {
+    button.dataset.copyOriginalLabel = original;
   }
+
+  let clipboardFailure = null;
+  let method = "clipboard";
+  try {
+    if (!value) throw new Error("No command is available to copy.");
+    if (typeof navigatorObject?.clipboard?.writeText !== "function") {
+      throw new Error("Clipboard API unavailable.");
+    }
+    await navigatorObject.clipboard.writeText(value);
+  } catch (error) {
+    clipboardFailure = error;
+    method = "fallback";
+  }
+
+  if (clipboardFailure) {
+    let textarea = null;
+    try {
+      if (!value) throw clipboardFailure;
+      textarea = documentObject.createElement("textarea");
+      textarea.value = value;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      documentObject.body.appendChild(textarea);
+      textarea.select();
+      if (
+        typeof documentObject.execCommand !== "function"
+        || documentObject.execCommand("copy") !== true
+      ) {
+        throw new Error("Browser copy fallback failed.");
+      }
+    } catch (fallbackFailure) {
+      button.textContent = "Copy failed";
+      button.setAttribute("aria-invalid", "true");
+      if (button.dataset) button.dataset.copyState = "failed";
+      statusElement.textContent =
+        "Copy failed. The Clipboard API and browser fallback could not copy the command. "
+        + "Select the command text and copy it manually.";
+      return {
+        ok: false,
+        clipboardError: clipboardFailure,
+        fallbackError: fallbackFailure,
+      };
+    } finally {
+      textarea?.remove();
+    }
+  }
+
   button.textContent = "Copied";
+  button.removeAttribute("aria-invalid");
+  if (button.dataset) button.dataset.copyState = "copied";
+  statusElement.textContent =
+    `Install command copied using the ${method === "clipboard" ? "Clipboard API" : "browser fallback"}.`;
   windowObject.setTimeout(() => {
     button.textContent = original;
+    if (button.dataset) button.dataset.copyState = "idle";
   }, 1600);
+  return { ok: true, method };
+}
+
+export function setFunctionalLink(link, url) {
+  try {
+    const parsed = new URL(String(url || ""));
+    if (!["https:", "http:"].includes(parsed.protocol)) throw new Error("Invalid protocol");
+    link.href = parsed.href;
+    link.removeAttribute("aria-disabled");
+    link.removeAttribute("tabindex");
+    return true;
+  } catch {
+    link.removeAttribute("href");
+    link.setAttribute("aria-disabled", "true");
+    link.setAttribute("tabindex", "-1");
+    return false;
+  }
 }
 
 function setReleaseLinks(elements, url) {
   for (const link of [elements.releaseLinkTop, elements.releaseLinkBottom]) {
-    link.href = url;
+    setFunctionalLink(link, url);
   }
 }
 
@@ -1279,7 +1343,7 @@ function updateDialogSelection(documentObject, elements, state) {
   const downloadable = file.kind === "binary" && file.downloadable !== false;
   elements.downloadSelected.hidden = !downloadable;
   if (downloadable) {
-    elements.downloadSelected.href = file.href;
+    setFunctionalLink(elements.downloadSelected, file.href);
     elements.downloadSelected.setAttribute("download", file.downloadName);
     elements.downloadSelected.textContent = "Download installer";
   } else {
@@ -1345,13 +1409,29 @@ function updatePlatformRecommendation(elements, state) {
     || orderDownloadsForPlatform(state.downloadItems, platform, architecture).length === 0;
 }
 
+export function showDownloadDialog(dialog) {
+  if (dialog.open || dialog.hasAttribute("open")) return false;
+  if (typeof dialog.showModal === "function") {
+    dialog.showModal();
+  } else {
+    dialog.setAttribute("open", "");
+  }
+  return true;
+}
+
 function openDownloadDialog(documentObject, elements, state) {
   renderDownloadOptions(documentObject, elements, state);
-  if (typeof elements.dialog.showModal === "function") {
-    if (!elements.dialog.open) elements.dialog.showModal();
-  } else {
-    elements.dialog.setAttribute("open", "");
-  }
+  return showDownloadDialog(elements.dialog);
+}
+
+export function handleDownloadSubmit(event, {
+  disabled,
+  openDialog,
+} = {}) {
+  event.preventDefault();
+  if (disabled || typeof openDialog !== "function") return false;
+  openDialog();
+  return true;
 }
 
 function refreshOpenDownloadDialog(documentObject, elements, state) {
@@ -1377,8 +1457,8 @@ function applySourceControls(elements, state) {
     windowsSource.command || "Release verification required before this command is enabled.";
   elements.unixCommand.textContent =
     unixSource.command || "Release verification required before this command is enabled.";
-  elements.windowsScript.href = windowsSource.href;
-  elements.unixScript.href = unixSource.href;
+  setFunctionalLink(elements.windowsScript, windowsSource.href);
+  setFunctionalLink(elements.unixScript, unixSource.href);
   elements.copyWindows.disabled = !windowsSource.command;
   elements.copyUnix.disabled = !unixSource.command;
 }
@@ -1399,6 +1479,7 @@ function setupDownloadControls({
       copyContext,
       elements.copyWindows,
       sourceDownload(state, "source-windows")?.command || "",
+      elements.copyStatus,
     ),
   );
   elements.copyUnix.addEventListener(
@@ -1407,11 +1488,17 @@ function setupDownloadControls({
       copyContext,
       elements.copyUnix,
       sourceDownload(state, "source-unix")?.command || "",
+      elements.copyStatus,
     ),
   );
   elements.copySelected.addEventListener(
     "click",
-    () => copyText(copyContext, elements.copySelected, elements.selectedCommand.textContent),
+    () => copyText(
+      copyContext,
+      elements.copySelected,
+      elements.selectedCommand.textContent,
+      elements.copyStatus,
+    ),
   );
   const updateSelection = () => {
     updatePlatformRecommendation(elements, state);
@@ -1420,9 +1507,10 @@ function setupDownloadControls({
   elements.platformSelect.addEventListener("change", updateSelection);
   elements.architectureSelect.addEventListener("change", updateSelection);
   elements.downloadForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (elements.downloadButton.disabled) return;
-    openDownloadDialog(documentObject, elements, state);
+    handleDownloadSubmit(event, {
+      disabled: elements.downloadButton.disabled,
+      openDialog: () => openDownloadDialog(documentObject, elements, state),
+    });
   });
   elements.dialog.addEventListener("click", (event) => {
     if (event.target !== elements.dialog) return;
@@ -1502,8 +1590,8 @@ export function buildReleaseTransaction({ context, release, locale } = {}) {
 
 export function applyReleaseSummary(elements, transaction) {
   const { context, release, publishedLabel } = transaction;
-  elements.sourceLink.href = release.sourceUrl;
-  elements.goldenPathLink.href = release.goldenPathUrl;
+  setFunctionalLink(elements.sourceLink, release.sourceUrl);
+  setFunctionalLink(elements.goldenPathLink, release.goldenPathUrl);
   setReleaseLinks(elements, release.releaseUrl);
   elements.version.textContent = release.version;
   elements.date.textContent = publishedLabel;
@@ -1570,6 +1658,9 @@ function resetReleaseTransaction({
 }) {
   state.downloadItems = inspectionDownloads;
   state.releaseReady = false;
+  setFunctionalLink(elements.sourceLink, sourceTreeUrl(context.repository));
+  setFunctionalLink(elements.goldenPathLink, goldenPathUrl(context.repository));
+  setReleaseLinks(elements, releaseListUrl(context.repository));
   setFileNames(
     documentObject,
     elements,
@@ -1601,8 +1692,8 @@ export async function initializeDownloadCenter({
     releaseReady: false,
   };
 
-  elements.sourceLink.href = sourceTreeUrl(context.repository);
-  elements.goldenPathLink.href = goldenPathUrl(context.repository);
+  setFunctionalLink(elements.sourceLink, sourceTreeUrl(context.repository));
+  setFunctionalLink(elements.goldenPathLink, goldenPathUrl(context.repository));
   setReleaseLinks(elements, releaseListUrl(context.repository));
   setFileNames(
     documentObject,
