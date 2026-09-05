@@ -63,6 +63,7 @@ import {
 } from "../scripts/windows-signing-input.mjs";
 import {
   createAtomicStateWriter,
+  createSnapshotVerifier,
   mergeDurableState,
   quiescePublishOperation,
   reconcileInterruptedSignal,
@@ -1569,12 +1570,44 @@ test("monotonic publication reconciles only to exact immutable success", async (
   assert.equal(result.status, "immutable");
   assert.equal(result.release.immutable, true);
   assert.equal(result.state.publishIntent, true);
+  assert.equal(result.state.automaticRecoveryAllowed, true);
   assert.deepEqual(result.state.intentIdentity, intentIdentity);
   assert.equal(publishCalls, 1);
   assert.doesNotMatch(
     JSON.stringify(result.state.history),
     /rollback|terminal-draft|NOT_PUBLISHED|ROLLED_BACK/,
   );
+});
+
+test("exact public snapshot durably authorizes monotonic reconciliation", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const mutable = { id: 1, draft: false, immutable: false };
+  const immutable = { id: 1, draft: false, immutable: true };
+  let reads = 0;
+  let current = { ...draft };
+  const persisted = [];
+  const result = await runReleaseTransition({
+    getRelease: async () => {
+      reads += 1;
+      if (reads === 2) current = { ...mutable };
+      return { ...current };
+    },
+    startPublishRelease: () => {
+      throw new Error("verified public snapshot should be polled, not republished");
+    },
+    verifySnapshot: async () => true,
+    onState: (state) => {
+      persisted.push(structuredClone(state));
+      return { ok: true };
+    },
+    pollDelayMs: 0,
+    sleep: async () => { current = { ...immutable }; },
+  });
+  assert.equal(result.status, "immutable");
+  assert.equal(result.state.automaticRecoveryAllowed, true);
+  assert.ok(persisted.some((state) =>
+    state.phase.endsWith("-automatic-recovery-authorized")
+    && state.automaticRecoveryAllowed === true));
 });
 
 test("a public-mutable release cannot be adopted before durable intent", async () => {
@@ -1601,10 +1634,8 @@ test("a public-mutable release cannot be adopted before durable intent", async (
   assert.equal(publishCalled, false);
 });
 
-test("delayed server publication resumes monotonically from durable intent", async () => {
+test("ambiguous publication before a safe marker requires manual recovery", async () => {
   const draft = { id: 1, draft: true, immutable: false };
-  const mutable = { id: 1, draft: false, immutable: false };
-  const immutable = { id: 1, draft: false, immutable: true };
   let durableState;
   let cancelCalled = false;
   await assert.rejects(
@@ -1633,31 +1664,83 @@ test("delayed server publication resumes monotonically from durable intent", asy
   );
   assert.equal(cancelCalled, true);
   assert.equal(durableState.publishIntent, true);
+  assert.equal(durableState.automaticRecoveryAllowed, false);
 
-  let current = { ...draft };
-  let sleeps = 0;
+  let recoveryReads = 0;
   let recoveryPublishCalls = 0;
-  const recovered = await recoverFromDurableState(durableState, {
-    getRelease: async () => ({ ...current }),
-    startPublishRelease: () => {
-      recoveryPublishCalls += 1;
-      return {
-        response: Promise.resolve({ ...current }),
-        settled: Promise.resolve(),
-        cancel: async () => {},
-      };
+  await assert.rejects(
+    () => recoverFromDurableState(durableState, {
+      getRelease: async () => {
+        recoveryReads += 1;
+        return { id: 1, draft: false, immutable: true };
+      },
+      startPublishRelease: () => {
+        recoveryPublishCalls += 1;
+        throw new Error("manual recovery must not PATCH");
+      },
+      verifySnapshot: async () => true,
+    }),
+    (error) => {
+      assert.equal(error.code, "MANUAL_RECOVERY_REQUIRED");
+      assert.match(error.message, /inspect the exact release/i);
+      return true;
     },
-    verifySnapshot: async () => true,
-    deferredQuiescenceMs: 0,
-    pollDelayMs: 0,
-    sleep: async () => {
-      sleeps += 1;
-      current = sleeps === 1 ? { ...mutable } : { ...immutable };
+  );
+  assert.equal(recoveryReads, 0);
+  assert.equal(recoveryPublishCalls, 0);
+});
+
+test("crash immediately after dispatch leaves a manual-only marker", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  let dispatched = false;
+  let lastPersistedBytes = null;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => ({ ...draft }),
+      startPublishRelease: () => {
+        dispatched = true;
+        throw new Error("simulated process crash after dispatch");
+      },
+      verifySnapshot: async () => true,
+      onState: (state) => {
+        if (dispatched) {
+          return { ok: false, error: new Error("process no longer persists") };
+        }
+        lastPersistedBytes = `${JSON.stringify(state)}\n`;
+        return { ok: true };
+      },
+    }),
+    (error) => {
+      assert.equal(error.code, "PERSISTENCE_INCIDENT");
+      return true;
     },
-  });
-  assert.equal(recovered.status, "immutable");
-  assert.equal(recovered.release.immutable, true);
-  assert.ok(recoveryPublishCalls >= 1);
+  );
+  const lastPersisted = JSON.parse(lastPersistedBytes);
+  assert.equal(dispatched, true);
+  assert.match(lastPersisted.phase, /-publish-dispatch-armed$/);
+  assert.equal(lastPersisted.automaticRecoveryAllowed, false);
+
+  let reads = 0;
+  let patches = 0;
+  await assert.rejects(
+    () => recoverFromDurableState(lastPersisted, {
+      getRelease: async () => {
+        reads += 1;
+        return { id: 1, draft: false, immutable: true };
+      },
+      startPublishRelease: () => {
+        patches += 1;
+        throw new Error("manual-only marker must not PATCH");
+      },
+      verifySnapshot: async () => true,
+    }),
+    (error) => {
+      assert.equal(error.code, "MANUAL_RECOVERY_REQUIRED");
+      return true;
+    },
+  );
+  assert.equal(reads, 0);
+  assert.equal(patches, 0);
 });
 
 test("draft publish responses are reconciled by idempotent publish retries", async () => {
@@ -1721,6 +1804,7 @@ test("recover-only reconciles exact mutable release to immutable", async () => {
   const result = await recoverFromDurableState({
     transitionAttempted: true,
     publishIntent: true,
+    automaticRecoveryAllowed: true,
     history: [],
   }, {
     getRelease: async () => ({ ...current }),
@@ -1807,6 +1891,7 @@ test("integrity drift is a sticky terminal incident", async () => {
     () => recoverFromDurableState({
       transitionAttempted: true,
       publishIntent: true,
+      automaticRecoveryAllowed: true,
       history: [],
     }, {
       getRelease: async () => ({ ...current }),
@@ -1859,6 +1944,7 @@ test("response drift survives settlement-state persistence failure", async () =>
       failedState = structuredClone(error.state);
       assert.equal(error.code, "PERSISTENCE_INCIDENT");
       assert.equal(error.state.integrityViolation, true);
+      assert.equal(error.state.automaticRecoveryAllowed, false);
       assert.match(error.state.integrityDetail, /asset digest drift/);
       return true;
     },
@@ -1881,6 +1967,119 @@ test("response drift survives settlement-state persistence failure", async () =>
     },
   );
   assert.equal(recoveryReads, 0);
+});
+
+test("last persisted bytes forbid recovery after integrity directory-sync failure", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const drifted = {
+    id: 1,
+    draft: false,
+    immutable: false,
+    drift: true,
+  };
+  let marker = null;
+  let temporary = "";
+  let failCombinedDirectorySync = false;
+  let directoryFailureTriggered = false;
+  let nextDescriptor = 0;
+  const descriptorKinds = new Map();
+  const writer = createAtomicStateWriter("state.json", {
+    readFileSync: () => {
+      if (marker === null) {
+        throw Object.assign(new Error("missing"), { code: "ENOENT" });
+      }
+      return Buffer.from(marker);
+    },
+    openSync: (filePath) => {
+      nextDescriptor += 1;
+      descriptorKinds.set(
+        nextDescriptor,
+        filePath === "." ? "directory" : "file",
+      );
+      return nextDescriptor;
+    },
+    writeFileSync: (_descriptor, value) => { temporary = value; },
+    fsyncSync: (descriptor) => {
+      if (
+        descriptorKinds.get(descriptor) === "directory"
+        && failCombinedDirectorySync
+        && !directoryFailureTriggered
+      ) {
+        directoryFailureTriggered = true;
+        throw new Error("combined-state directory fsync failed");
+      }
+    },
+    closeSync() {},
+    renameSync: () => {
+      marker = Buffer.isBuffer(temporary)
+        ? temporary.toString("utf8")
+        : temporary;
+      temporary = "";
+    },
+    rmSync: (filePath) => {
+      if (filePath === "state.json") marker = null;
+      else temporary = "";
+    },
+  });
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => ({ ...draft }),
+      startPublishRelease: () => ({
+        response: Promise.resolve({ ...drifted }),
+        settled: Promise.resolve(),
+        cancel: async () => {},
+      }),
+      verifySnapshot: async (release) => {
+        if (release.drift) throw new Error("response fingerprint drift");
+        return true;
+      },
+      onState: (state) => {
+        failCombinedDirectorySync =
+          state.phase.endsWith("-publish-operation-settled");
+        return writer(state);
+      },
+    }),
+    (error) => {
+      assert.equal(error.code, "PERSISTENCE_INCIDENT");
+      assert.equal(error.state.integrityViolation, true);
+      assert.equal(error.state.automaticRecoveryAllowed, false);
+      return true;
+    },
+  );
+  assert.equal(directoryFailureTriggered, true);
+  const lastPersisted = JSON.parse(marker);
+  assert.match(lastPersisted.phase, /-publish-dispatch-armed$/);
+  assert.equal(lastPersisted.publishIntent, true);
+  assert.equal(lastPersisted.automaticRecoveryAllowed, false);
+  assert.equal(lastPersisted.integrityViolation, false);
+
+  let recoveryReads = 0;
+  let recoveryPatches = 0;
+  let immutableSuccess = false;
+  await assert.rejects(
+    async () => {
+      const result = await recoverFromDurableState(lastPersisted, {
+        getRelease: async () => {
+          recoveryReads += 1;
+          return { id: 1, draft: false, immutable: true };
+        },
+        startPublishRelease: () => {
+          recoveryPatches += 1;
+          throw new Error("fresh recovery must not PATCH");
+        },
+        verifySnapshot: async () => true,
+      });
+      immutableSuccess = result.status === "immutable";
+      return result;
+    },
+    (error) => {
+      assert.equal(error.code, "MANUAL_RECOVERY_REQUIRED");
+      return true;
+    },
+  );
+  assert.equal(recoveryReads, 0);
+  assert.equal(recoveryPatches, 0);
+  assert.equal(immutableSuccess, false);
 });
 
 test("snapshot verification cannot be mutated into a no-op", async () => {
@@ -1943,6 +2142,7 @@ test("local interruption stops dispatch after durable publish intent", async () 
     (error) => {
       assert.equal(error.code, "LOCAL_OPERATION_INTERRUPTED");
       assert.equal(error.state.publishIntent, true);
+      assert.equal(error.state.automaticRecoveryAllowed, false);
       return true;
     },
   );
@@ -1970,6 +2170,14 @@ test("signal reconciliation waits for the interrupted operation", async () => {
     2,
     "concurrent signal/main snapshots must not duplicate durable history",
   );
+  assert.equal(
+    mergeDurableState(
+      { automaticRecoveryAllowed: false },
+      { automaticRecoveryAllowed: true },
+    ).automaticRecoveryAllowed,
+    false,
+    "concurrent state merging must never bless a manual-only marker",
+  );
   const workflow = readFileSync(
     path.join(repositoryDir, ".github", "workflows", "frontier-binaries.yml"),
     "utf8",
@@ -1981,13 +2189,18 @@ test("signal reconciliation waits for the interrupted operation", async () => {
   const recoveryStep = publish.slice(
     publish.indexOf("Reconcile interrupted release publication"),
   );
+  const recoveryAuthorization = recoveryStep.indexOf(
+    "automaticRecoveryAllowed == true",
+  );
   const recoveryImmutable = recoveryStep.indexOf("immutable-releases");
   const recoverOnly = recoveryStep.indexOf("--recover-only");
   assert.ok(
-    recoveryImmutable >= 0
+    recoveryAuthorization >= 0
+      && recoveryImmutable >= 0
       && recoverOnly >= 0
+      && recoveryAuthorization < recoveryImmutable
       && recoveryImmutable < recoverOnly,
-    "recovery must recheck immutable-release policy before another PATCH",
+    "recovery must require durable authorization and immutable-release policy",
   );
   assert.match(recoveryStep, /jq -e '\.enabled == true'/);
   const transitionSource = readFileSync(
@@ -2001,6 +2214,7 @@ test("signal reconciliation waits for the interrupted operation", async () => {
   let latest = {
     transitionAttempted: true,
     publishIntent: true,
+    automaticRecoveryAllowed: true,
     history: [],
   };
   const cliState = {
@@ -2036,6 +2250,48 @@ test("signal reconciliation waits for the interrupted operation", async () => {
   });
   assert.equal(result.status, "immutable");
   assert.equal(latest.phase, "terminal-immutable");
+
+  let manualLatest = {
+    transitionAttempted: true,
+    publishIntent: true,
+    automaticRecoveryAllowed: false,
+    history: [],
+  };
+  const manualCliState = {
+    get latest() {
+      return manualLatest;
+    },
+    merge(patch) {
+      manualLatest = mergeDurableState(manualLatest, patch);
+      return { ok: true };
+    },
+    persist(state) {
+      manualLatest = structuredClone(state);
+      return { ok: true };
+    },
+  };
+  let manualReads = 0;
+  let manualPatches = 0;
+  const manualResult = await reconcileInterruptedSignal({
+    signal: "SIGINT",
+    cliState: manualCliState,
+    getRelease: async () => {
+      manualReads += 1;
+      return { id: 1, draft: false, immutable: true };
+    },
+    startPublishRelease: () => {
+      manualPatches += 1;
+      throw new Error("unsafe signal recovery must not PATCH");
+    },
+    verifySnapshot: async () => true,
+    waitForMain: async () => {},
+    overallDeadlineMs: 100,
+  });
+  assert.equal(manualResult, null);
+  assert.equal(manualReads, 0);
+  assert.equal(manualPatches, 0);
+  assert.equal(manualLatest.automaticRecoveryAllowed, false);
+  assert.equal(manualLatest.phase, "manual-recovery-required");
 });
 
 test("atomic state persistence retains previous valid marker", () => {
@@ -2324,7 +2580,7 @@ test("persistence failures and terminal write failures forbid success", async ()
   assert.equal(JSON.parse(marker).publishIntent, false);
 });
 
-test("post-publication write failures retain recoverable durable intent", async () => {
+test("post-publication write failures retain manual-only durable intent", async () => {
   const draft = { id: 1, draft: true, immutable: false };
   const immutable = { id: 1, draft: false, immutable: true };
   for (const failurePoint of ["open-disk-full", "write", "rename"]) {
@@ -2384,19 +2640,29 @@ test("post-publication write failures retain recoverable durable intent", async 
     );
     const durable = JSON.parse(marker);
     assert.equal(durable.publishIntent, true);
+    assert.equal(durable.automaticRecoveryAllowed, false);
     assert.notEqual(durable.phase, "terminal-immutable");
-    const recovered = await recoverFromDurableState(durable, {
-      getRelease: async () => ({ ...immutable }),
-      startPublishRelease: () => {
-        throw new Error("immutable recovery must not publish");
+    let reads = 0;
+    let patches = 0;
+    await assert.rejects(
+      () => recoverFromDurableState(durable, {
+        getRelease: async () => {
+          reads += 1;
+          return { ...immutable };
+        },
+        startPublishRelease: () => {
+          patches += 1;
+          throw new Error("manual recovery must not publish");
+        },
+        verifySnapshot: async () => true,
+      }),
+      (error) => {
+        assert.equal(error.code, "MANUAL_RECOVERY_REQUIRED");
+        return true;
       },
-      verifySnapshot: async () => true,
-      onState: () => ({ ok: true }),
-      deferredQuiescenceMs: 0,
-      pollDelayMs: 0,
-      sleep: async () => {},
-    });
-    assert.equal(recovered.status, "immutable");
+    );
+    assert.equal(reads, 0);
+    assert.equal(patches, 0);
   }
 });
 
@@ -2404,6 +2670,7 @@ test("reconciliation operations and polling sleeps are deadline bounded", async 
   const durable = {
     transitionAttempted: true,
     publishIntent: true,
+    automaticRecoveryAllowed: true,
     history: [],
   };
   const hangingOperation = (signal, evidence) => {
@@ -2548,26 +2815,39 @@ test("reconciliation operations and polling sleeps are deadline bounded", async 
   assert.ok(Date.now() - started < 1000);
 });
 
-test("abortable Git subprocess is terminated and settled before return", async () => {
+test("abort callback cannot settle a SIGTERM-resistant Git child", async () => {
   const childSignals = [];
+  const closeHandlers = [];
+  let callbackReported = false;
+  let callbackBeforeClose = false;
+  let childAlive = true;
   let childSettled = false;
   let publishCalled = false;
   const fakeExecFile = (_command, _args, options, callback) => {
     const child = {
       exitCode: null,
       signalCode: null,
+      once(event, handler) {
+        if (event === "close") closeHandlers.push(handler);
+        return child;
+      },
       kill(signal = "SIGTERM") {
         childSignals.push(signal);
-        if (signal !== "SIGKILL" || childSettled) return true;
-        setTimeout(() => {
-          child.signalCode = "SIGKILL";
-          childSettled = true;
+        if (signal === "SIGTERM" && !callbackReported) {
+          callbackReported = true;
+          callbackBeforeClose = childAlive;
           callback(
             Object.assign(new Error("git aborted"), { code: "ABORT_ERR" }),
             "",
             "",
           );
-        }, 2);
+          return true;
+        }
+        if (signal !== "SIGKILL" || !childAlive) return true;
+        child.signalCode = "SIGKILL";
+        childAlive = false;
+        childSettled = true;
+        for (const handler of closeHandlers) handler(null, "SIGKILL");
         return true;
       },
     };
@@ -2583,6 +2863,7 @@ test("abortable Git subprocess is terminated and settled before return", async (
     () => recoverFromDurableState({
       transitionAttempted: true,
       publishIntent: true,
+      automaticRecoveryAllowed: true,
       history: [],
     }, {
       getRelease: (operation) => {
@@ -2601,15 +2882,172 @@ test("abortable Git subprocess is terminated and settled before return", async (
         throw new Error("work after Git abort must not start");
       },
       verifySnapshot: async () => true,
-      overallDeadlineMs: 100,
+      overallDeadlineMs: 1000,
     }),
     /settlement is unproven|deadline/i,
   );
   assert.ok(childSignals.includes("SIGTERM"));
   assert.ok(childSignals.includes("SIGKILL"));
+  assert.equal(callbackReported, true);
+  assert.equal(callbackBeforeClose, true);
+  assert.equal(childAlive, false);
   assert.equal(childSettled, true);
   assert.equal(publishCalled, false);
-  assert.ok(Date.now() - started < 500);
+  assert.ok(Date.now() - started < 2500);
+});
+
+test("production snapshot verifier awaits every Git child close", async () => {
+  const tag = "brainstem-beta-v1.2.3";
+  const tagObject = "a".repeat(40);
+  const commit = "b".repeat(40);
+  const release = {
+    id: 1,
+    tag_name: tag,
+    draft: false,
+    immutable: false,
+    body: "exact release body",
+    assets: [{
+      id: 10,
+      name: "asset.exe",
+      state: "uploaded",
+      size: 123,
+      digest: `sha256:${"c".repeat(64)}`,
+    }],
+  };
+  const verifierArgs = {
+    repository: "microsoft/aibast-agents-library",
+    tag,
+    "tag-object": tagObject,
+    commit,
+    "release-id": "1",
+    "release-fingerprint": releaseContentFingerprint(release),
+  };
+
+  for (const failingChild of [1, 2]) {
+    const caseStarted = Date.now();
+    let spawnedChildren = 0;
+    let closedChildren = 0;
+    let liveChildren = 0;
+    let sigkillCount = 0;
+    let callbackBeforeClose = false;
+    let secondSpawnedAfterFirstClose = null;
+    let publishCalled = false;
+    const createRemoteOperation = (_repository, ref, operation) => {
+      spawnedChildren += 1;
+      const childIndex = spawnedChildren;
+      if (childIndex === 2) {
+        secondSpawnedAfterFirstClose = closedChildren === 1;
+      }
+      const expectedSha = ref.endsWith("^{}") ? commit : tagObject;
+      const subprocess = startAbortableExecFile(
+        "git",
+        ["ls-remote", ref],
+        { encoding: "utf8" },
+        operation,
+        (_command, _args, options, callback) => {
+          const closeHandlers = [];
+          let callbackReported = false;
+          let closed = false;
+          liveChildren += 1;
+          const child = {
+            exitCode: null,
+            signalCode: null,
+            once(event, handler) {
+              if (event === "close") closeHandlers.push(handler);
+              return child;
+            },
+            kill(signal = "SIGTERM") {
+              if (closed) return true;
+              if (signal === "SIGTERM" && childIndex === failingChild) {
+                if (!callbackReported) {
+                  callbackReported = true;
+                  callbackBeforeClose = liveChildren > 0;
+                  callback(
+                    Object.assign(
+                      new Error(`git child ${childIndex} aborted`),
+                      { code: "ABORT_ERR" },
+                    ),
+                    "",
+                    "",
+                  );
+                }
+                return true;
+              }
+              if (signal === "SIGKILL" && childIndex === failingChild) {
+                sigkillCount += 1;
+                if (closed) return true;
+                closed = true;
+                child.signalCode = "SIGKILL";
+                liveChildren -= 1;
+                closedChildren += 1;
+                for (const handler of closeHandlers) {
+                  handler(null, "SIGKILL");
+                }
+              }
+              return true;
+            },
+          };
+          options.signal.addEventListener(
+            "abort",
+            () => child.kill(options.killSignal),
+            { once: true },
+          );
+          if (childIndex < failingChild) {
+            queueMicrotask(() => {
+              callbackReported = true;
+              callback(null, `${expectedSha}\t${ref}\n`, "");
+              queueMicrotask(() => {
+                if (closed) return;
+                closed = true;
+                child.exitCode = 0;
+                liveChildren -= 1;
+                closedChildren += 1;
+                for (const handler of closeHandlers) handler(0, null);
+              });
+            });
+          }
+          return child;
+        },
+      );
+      return {
+        result: subprocess.result.then(({ stdout }) =>
+          stdout.trim().split(/\s+/)[0]),
+        settled: subprocess.settled,
+        cancel: subprocess.cancel,
+      };
+    };
+    const verifySnapshot = createSnapshotVerifier(
+      verifierArgs,
+      createRemoteOperation,
+    );
+    await assert.rejects(
+      () => recoverFromDurableState({
+        transitionAttempted: true,
+        publishIntent: true,
+        automaticRecoveryAllowed: true,
+        history: [],
+      }, {
+        getRelease: async () => structuredClone(release),
+        startPublishRelease: () => {
+          publishCalled = true;
+          throw new Error("snapshot failure must stop later publication work");
+        },
+        verifySnapshot,
+        overallDeadlineMs: 1000,
+      }),
+      /settlement is unproven|deadline/i,
+    );
+    assert.equal(spawnedChildren, failingChild);
+    assert.equal(closedChildren, failingChild);
+    assert.equal(liveChildren, 0);
+    assert.equal(sigkillCount, 1);
+    assert.equal(callbackBeforeClose, true);
+    assert.equal(publishCalled, false);
+    if (failingChild === 2) {
+      assert.equal(secondSpawnedAfterFirstClose, true);
+    }
+    assert.ok(Date.now() - caseStarted < 2500);
+  }
 });
 
 test("second Windows binary release requires immutable N-1 evidence", () => {

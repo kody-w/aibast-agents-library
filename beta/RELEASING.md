@@ -470,13 +470,18 @@ reports `"immutable": true`.
 
 The publication transition runs under an ERR/EXIT-trapped state machine.
 Before dispatch, it atomically records monotonic publish intent for the exact
-release ID, tag object, peeled commit, body, and asset fingerprint. Every
-subsequent run follows the same reconcile rule: exact immutable is terminal;
-exact draft causes another idempotent publish request; exact public-mutable is
-polled and may be republished; anything else is a durable incident. Draft and
-`NOT_PUBLISHED` are never terminal after intent because delayed server-side
-settlement cannot be disproven. A PATCH response is evidence only: terminal
-success always requires a subsequent exact release-ID GET reporting immutable.
+release ID, tag object, peeled commit, body, and asset fingerprint with
+`automaticRecoveryAllowed:false`. Immediately before every PATCH it durably
+re-arms that manual-only interlock. Only an exact verified PATCH response or an
+exact verified current public-mutable snapshot can durably set
+`automaticRecoveryAllowed:true`; an exact immutable snapshot may persist
+terminal success directly. Every authorized subsequent run follows the same
+reconcile rule: exact immutable is terminal; exact draft causes another
+idempotent publish request; exact public-mutable is polled and may be
+republished; anything else is a durable incident. Draft and `NOT_PUBLISHED`
+are never terminal after intent because delayed server-side settlement cannot
+be disproven. A PATCH response is evidence only: terminal success always
+requires a subsequent exact release-ID GET reporting immutable.
 After the PATCH child settles, its response is integrity-verified before the
 combined settled/integrity state is written, so a persistence failure cannot
 erase an already-observed content drift from in-memory recovery.
@@ -489,14 +494,20 @@ the same monotonic reconciler. If settlement, GitHub state, Git refs, or
 snapshot verification cannot be proven before the deadline, the durable marker
 records `SETTLEMENT_UNPROVEN` and exits nonzero. The
 `failure() || cancelled()` workflow step resumes the same intent later; it
-first re-verifies that repository immutable releases remain enabled and never
-issues a rollback.
+first requires the last successfully persisted marker to explicitly contain
+`automaticRecoveryAllowed:true`, then re-verifies that repository immutable
+releases remain enabled. A missing/false authorization is a manual incident:
+fresh recovery and pre-safe-marker signal handling perform no GET/PATCH and
+instruct an operator to inspect the exact release ID, tag, body, and assets.
+Recovery never issues a rollback.
 
 Transition state uses a unique same-directory temporary file, complete write,
 file `fsync`, close, and atomic rename. It then opens, `fsync`s, and closes the
 parent directory before reporting success. Directory-open/sync/close failure
 restores the prior valid marker, latches persistence failure, and prevents
-publication dispatch. Terminal immutable records must themselves persist
+publication dispatch. Thus failure while persisting response integrity leaves
+the prior pre-dispatch marker manual-only, and a fresh process cannot republish
+from lost in-memory evidence. Terminal immutable records must themselves persist
 successfully; otherwise no terminal success is returned.
 
 One shared `AbortController` and remaining overall deadline covers GitHub

@@ -54,6 +54,24 @@ export function mergeDurableState(state, patch) {
     seenHistory.add(key);
     history.push(entry);
   }
+  const stateHasAutomaticRecovery = Object.hasOwn(
+    state || {},
+    "automaticRecoveryAllowed",
+  );
+  const patchHasAutomaticRecovery = Object.hasOwn(
+    patch || {},
+    "automaticRecoveryAllowed",
+  );
+  let automaticRecoveryAllowed = false;
+  if (stateHasAutomaticRecovery && patchHasAutomaticRecovery) {
+    automaticRecoveryAllowed =
+      state.automaticRecoveryAllowed === true
+      && patch.automaticRecoveryAllowed === true;
+  } else if (stateHasAutomaticRecovery) {
+    automaticRecoveryAllowed = state.automaticRecoveryAllowed === true;
+  } else if (patchHasAutomaticRecovery) {
+    automaticRecoveryAllowed = patch.automaticRecoveryAllowed === true;
+  }
   return {
     ...(state && typeof state === "object" ? state : {}),
     ...(patch && typeof patch === "object" ? patch : {}),
@@ -81,6 +99,7 @@ export function mergeDurableState(state, patch) {
     publishSettlementUnproven:
       state?.publishSettlementUnproven === true
       || patch?.publishSettlementUnproven === true,
+    automaticRecoveryAllowed,
     intentIdentity:
       state?.intentIdentity
       || patch?.intentIdentity
@@ -411,9 +430,22 @@ async function awaitAbortableOperation({
     ? Promise.resolve(settled)
     : resultPromise.then(() => undefined, () => undefined);
   try {
-    return await waitForResultOrAbort(resultPromise, scope, label);
+    const value = await waitForResultOrAbort(resultPromise, scope, label);
+    await waitForResultOrAbort(
+      settledPromise,
+      scope,
+      `${label} settlement`,
+    );
+    return value;
   } catch (error) {
-    if (!scope.signal.aborted) throw error;
+    if (!scope.signal.aborted) {
+      await settleBeforeCleanupDeadline(
+        settledPromise,
+        scope,
+        `${label} operation`,
+      );
+      throw error;
+    }
     try {
       await settleBeforeCleanupDeadline(cancel(), scope, `${label} cancellation`);
     } catch {}
@@ -581,6 +613,18 @@ function persistenceIncident(state, message) {
   );
 }
 
+function manualRecoveryIncident(state, record, detail) {
+  state.automaticRecoveryAllowed = false;
+  record("manual-recovery-required", detail);
+  throw new ReleaseTransitionError(
+    "Automatic publication recovery is not authorized by the last durable "
+      + "marker. Inspect the exact release ID, tag, body, and assets manually "
+      + "before any further publication attempt.",
+    "MANUAL_RECOVERY_REQUIRED",
+    state,
+  );
+}
+
 function assertLocalOperationActive(shouldAbort, state, scope = null) {
   if (shouldAbort()) {
     const error = new ReleaseTransitionError(
@@ -698,6 +742,7 @@ async function reconcileReleasePublicationInScope({
   sleep = wait,
   intentIdentity = null,
   shouldAbort = () => false,
+  originatingProcessCanDispatch = false,
 }, scope) {
   const state = initialState(seed);
   const record = createRecorder(state, onState);
@@ -734,6 +779,17 @@ async function reconcileReleasePublicationInScope({
       }
     } catch (error) {
       return settlementIncident(state, record, label, error);
+    }
+  };
+  const authorizeAutomaticRecovery = (phase, detail) => {
+    if (state.automaticRecoveryAllowed === true) return;
+    state.automaticRecoveryAllowed = true;
+    if (!record(`${phase}-automatic-recovery-authorized`, detail)) {
+      return persistenceIncident(
+        state,
+        "Exact release state was verified, but automatic recovery "
+          + "authorization did not persist.",
+      );
     }
   };
   const readRelease = async (phase) => {
@@ -773,6 +829,16 @@ async function reconcileReleasePublicationInScope({
   };
   const requestPublish = async (phase) => {
     let handle;
+    state.automaticRecoveryAllowed = false;
+    if (!record(
+      `${phase}-dispatch-armed`,
+      "automatic recovery disabled until exact response verification",
+    )) {
+      return persistenceIncident(
+        state,
+        "The manual-only pre-dispatch marker did not persist.",
+      );
+    }
     try {
       ensureScopeActive(scope, "GitHub publication PATCH");
       handle = normalizePublishHandle(
@@ -851,6 +917,7 @@ async function reconcileReleasePublicationInScope({
     }
     state.publishSettled = true;
     state.publishSettlementUnproven = false;
+    state.automaticRecoveryAllowed = responseIntegrityError === null;
     if (!record(
       `${phase}-operation-settled`,
       responseIntegrityError
@@ -881,6 +948,17 @@ async function reconcileReleasePublicationInScope({
       "Durable integrity incident forbids publication success.",
       "INTEGRITY_INCIDENT",
       state,
+    );
+  }
+  if (
+    !originatingProcessCanDispatch
+    && state.automaticRecoveryAllowed !== true
+  ) {
+    return manualRecoveryIncident(
+      state,
+      record,
+      "Last persisted publish-intent marker did not explicitly authorize "
+        + "automatic recovery.",
     );
   }
   if (state.persistenceFailure) {
@@ -915,6 +993,15 @@ async function reconcileReleasePublicationInScope({
     assertLocalOperationActive(shouldAbort, state, scope);
     if (release.immutable === true) {
       return persistImmutableTerminal(state, record, release);
+    }
+    if (
+      release.draft === false
+      && state.automaticRecoveryAllowed !== true
+    ) {
+      authorizeAutomaticRecovery(
+        `reconcile-${cycle}-read`,
+        "exact public-mutable release snapshot verified",
+      );
     }
 
     if (release.draft === true || cycle % 3 === 0) {
@@ -1024,9 +1111,11 @@ async function runReleaseTransitionInScope({
 
   state.transitionAttempted = true;
   state.publishIntent = true;
+  state.automaticRecoveryAllowed = false;
   if (!record(
     "publish-intent-recorded",
-    "monotonic exact immutable publication requested",
+    "monotonic publication requested; automatic recovery requires a later "
+      + "exact response or current-release snapshot",
   )) {
     state.transitionAttempted = false;
     state.publishIntent = false;
@@ -1048,6 +1137,7 @@ async function runReleaseTransitionInScope({
     sleep,
     intentIdentity,
     shouldAbort,
+    originatingProcessCanDispatch: true,
     operationScope: scope,
   });
 }
@@ -1140,7 +1230,6 @@ export function startAbortableExecFile(
         signal: operation.signal,
         killSignal: "SIGTERM",
       }, (error, stdout, stderr) => {
-        settle();
         if (error) {
           if (stderr && !error.stderr) error.stderr = stderr;
           reject(error);
@@ -1148,6 +1237,7 @@ export function startAbortableExecFile(
         }
         resolve({ stdout, stderr });
       });
+      child.once("close", settle);
     } catch (error) {
       settle();
       reject(error);
@@ -1272,36 +1362,69 @@ function intentIdentityFromArgs(args) {
   });
 }
 
-function createSnapshotVerifier(args) {
+export function createSnapshotVerifier(
+  args,
+  createRemoteOperation = remoteRefOperation,
+) {
   const expected = expectedSnapshot(args);
   return (release, operation = {}) => {
     let activeSubprocess = null;
+    const spawnedSubprocesses = [];
+    let settleComposite;
+    const settled = new Promise((resolve) => {
+      settleComposite = resolve;
+    });
+    const completeRemoteOperation = async (subprocess) => {
+      let value;
+      let failure = null;
+      try {
+        value = await subprocess.result;
+      } catch (error) {
+        failure = error;
+      }
+      await subprocess.settled;
+      if (failure) throw failure;
+      return value;
+    };
     const result = (async () => {
-      activeSubprocess = remoteRefOperation(
-        args.repository,
-        `refs/tags/${args.tag}`,
-        operation,
-      );
-      const tagObject = await activeSubprocess.result;
-      activeSubprocess = remoteRefOperation(
-        args.repository,
-        `refs/tags/${args.tag}^{}`,
-        operation,
-      );
-      const commit = await activeSubprocess.result;
-      verifyReleaseSnapshot(expected, {
-        tag: release.tag_name,
-        tagObject,
-        commit,
-        releaseId: String(release.id),
-        releaseFingerprint: releaseContentFingerprint(release),
-      });
-      return true;
+      try {
+        activeSubprocess = createRemoteOperation(
+          args.repository,
+          `refs/tags/${args.tag}`,
+          operation,
+        );
+        spawnedSubprocesses.push(activeSubprocess);
+        const tagObject = await completeRemoteOperation(activeSubprocess);
+        activeSubprocess = createRemoteOperation(
+          args.repository,
+          `refs/tags/${args.tag}^{}`,
+          operation,
+        );
+        spawnedSubprocesses.push(activeSubprocess);
+        const commit = await completeRemoteOperation(activeSubprocess);
+        verifyReleaseSnapshot(expected, {
+          tag: release.tag_name,
+          tagObject,
+          commit,
+          releaseId: String(release.id),
+          releaseFingerprint: releaseContentFingerprint(release),
+        });
+        return true;
+      } finally {
+        await Promise.all(
+          spawnedSubprocesses.map((subprocess) => subprocess.settled),
+        );
+        settleComposite();
+      }
     })();
     return {
       result,
-      settled: result.then(() => undefined, () => undefined),
-      cancel: async () => activeSubprocess?.cancel(),
+      settled,
+      cancel: async () => {
+        await Promise.all(
+          spawnedSubprocesses.map((subprocess) => subprocess.cancel()),
+        );
+      },
     };
   };
 }

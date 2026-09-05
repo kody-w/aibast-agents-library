@@ -1917,6 +1917,12 @@ jobs:
             echo "Publication intent was not durably recorded; no reconciliation is required."
             exit 0
           fi
+          if ! jq -e \
+            '.automaticRecoveryAllowed == true' \
+            "$transition_state" >/dev/null; then
+            echo "::error title=Manual release inspection required::The last durable publication marker does not authorize automatic recovery. Inspect the exact release ID, tag, body, and assets before any further PATCH."
+            exit 1
+          fi
           immutable_settings="$RUNNER_TEMP/frontier-recovery-immutable-release-settings.json"
           gh api \
             -H "X-GitHub-Api-Version: 2026-03-10" \
