@@ -59,6 +59,7 @@ BETA_PUBLIC_FILES = frozenset(
         "beta/THIRD-PARTY-NOTICES.md",
         "beta/VERSION",
         "beta/build/icon.svg",
+        "beta/download-center.js",
         "beta/frontier.ps1",
         "beta/frontier.sh",
         "beta/index.html",

@@ -8,6 +8,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const unix = readFileSync(path.join(root, "install.sh"), "utf8");
 const windows = readFileSync(path.join(root, "install.cmd"), "utf8");
 const installerPage = readFileSync(path.join(root, "index.html"), "utf8");
+const downloadCenter = readFileSync(path.join(root, "download-center.js"), "utf8");
+const installerSources = `${installerPage}\n${downloadCenter}`;
 const frontierUnix = readFileSync(path.join(root, "frontier.sh"), "utf8");
 const frontierWindows = readFileSync(path.join(root, "frontier.ps1"), "utf8");
 const packageJson = JSON.parse(
@@ -119,8 +121,8 @@ test("released beta installs can pin the launcher and runtime to one commit", ()
 });
 
 test("dedicated beta page resolves fork releases without changing main install", () => {
-  assert.match(installerPage, /brainstem-beta-v/);
-  assert.match(installerPage, /api\.github\.com\/repos/);
+  assert.match(installerSources, /brainstem-beta-v/);
+  assert.match(installerSources, /api\.github\.com\/repos/);
   assert.match(installerPage, /frontier\.sh/);
   assert.match(installerPage, /frontier\.ps1/);
   assert.match(installerPage, /The production installer is unchanged/);
@@ -129,9 +131,9 @@ test("dedicated beta page resolves fork releases without changing main install",
   assert.match(installerPage, /white-space: pre;/);
   assert.match(installerPage, /frontier\.sh/);
   assert.match(installerPage, /frontier\.ps1/);
-  assert.match(installerPage, /RAPP_FRONTIER_REPO/);
+  assert.match(installerSources, /BRAINSTEM_BETA_COMMIT/);
   assert.match(installerPage, /install, update or repair, and launch/);
-  assert.doesNotMatch(installerPage, /\.join\("\\n"\)/);
+  assert.doesNotMatch(installerSources, /\.join\("\\n"\)/);
 });
 
 test("dedicated beta page uses the Download Center details structure", () => {
@@ -149,10 +151,10 @@ test("dedicated beta page uses the Download Center details structure", () => {
   assert.match(installerPage, /aria-controls="panel-additional"/);
   assert.match(installerPage, /RAPP-Brainstem-Frontier-Windows\.ps1/);
   assert.match(installerPage, /RAPP-Brainstem-Frontier-macOS-Linux\.sh/);
-  assert.match(installerPage, /release\.assets/);
-  assert.match(installerPage, /\\\.exe\$/);
-  assert.match(installerPage, /\\\.dmg\$/);
-  assert.match(installerPage, /browser_download_url/);
+  assert.match(installerSources, /release\.assets/);
+  assert.match(installerSources, /\\\.exe\$/);
+  assert.match(installerSources, /\\\.dmg\$/);
+  assert.match(installerSources, /browser_download_url/);
   assert.match(installerPage, /id="golden-path-link"/);
   assert.doesNotMatch(installerPage, /href="GOLDEN_PATH\.md"/);
 });
@@ -172,10 +174,15 @@ test("stable Frontier bootstraps resolve and run the latest published release", 
 
 test("dedicated beta page scripts parse", () => {
   const scripts = [...installerPage.matchAll(/<script>([\s\S]*?)<\/script>/g)];
-  assert.ok(scripts.length >= 2);
+  assert.ok(scripts.length >= 1);
   for (const [, source] of scripts) {
     assert.doesNotThrow(() => new Function(source));
   }
+  assert.doesNotThrow(() => new Function(
+    downloadCenter
+      .replace(/^export\s+/gm, "")
+      .replace(/^import\s+.*$/gm, ""),
+  ));
 });
 
 test("beta launcher reuses the global Brainstem without duplicate toolbar IPC", () => {
