@@ -13,7 +13,7 @@ const factoryResourceUrl = new URL(
 
 test("bundled parity deploy agent builds an explicit frozen agents package", async () => {
   const source = await readFile(resourceUrl, "utf8");
-  assert.match(source, /"version": "1\.0\.15"/);
+  assert.match(source, /"version": "1\.0\.16"/);
   assert.match(source, /BETA_DRAFT_ONLY = True/);
   assert.match(source, /self\.name = "CopilotStudioDeployBeta"/);
   assert.match(source, /relative\.parts\[0\] == "runtime"/);

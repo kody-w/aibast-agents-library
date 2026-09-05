@@ -49,7 +49,7 @@ except ModuleNotFoundError:
 __manifest__ = {
     "schema": "rapp-agent/1.0",
     "name": "@kody-w/copilot_studio_parity_deploy",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "display_name": "Copilot Studio Parity Deploy",
     "description": (
         "Compiles caller-selected local RAPP agents into a provisioned, "
@@ -211,12 +211,21 @@ def _yaml_dump(value: dict) -> str:
         def increase_indent(self, flow=False, indentless=False):
             return super().increase_indent(flow, False)
 
+    def represent_string(dumper, text):
+        return dumper.represent_scalar(
+            "tag:yaml.org,2002:str", text,
+            style="|" if "\n" in text else None,
+        )
+
+    PacDumper.add_representer(str, represent_string)
+    # PAC 2.10.1 can silently drop wrapped scalars or corrupt quoted continuations.
     return yaml.dump(
         value,
         Dumper=PacDumper,
         sort_keys=False,
         allow_unicode=True,
         default_flow_style=False,
+        width=2**31 - 1,
     )
 
 

@@ -197,6 +197,16 @@ and `pass`/`fail`/`blocked` verdicts. Never derive a pass from canned outputs
 or text similarity alone. Repair failing mappings through the Microsoft
 plugin, then rerun the same cases.
 
+For PAC 2.10.1, keep metadata descriptions on a single physical line (or use
+a literal block) and multiline skill `content` in a literal `|`/`|-` block.
+Its parser can silently drop wrapped plain metadata or corrupt quoted
+backslash continuations even when a standard YAML parser accepts them.
+Inline Python bytes belong inside the component `data` YAML as
+`contentBase64`; do not require separate `.py` members in the solution ZIP.
+Check that expected `botcomponents/.../data` members exist and that decoded
+skill text/resource hashes survived. Let Microsoft's plugin own the encoding
+repair; do not substitute a separate compiler.
+
 ### Mandatory compare / repair / retest loop
 
 Do not stop at a report of functional mismatches. The default conversion and
