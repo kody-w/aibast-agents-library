@@ -133,6 +133,14 @@ function validateDownloadCenter(source, logic = downloadCenter) {
     "platform and architecture guidance must be associated and announced",
   );
   add(
+    source.includes('id="release-status">Checking Frontier release</span>') &&
+      source.includes('id="release-version">Resolving</dd>') &&
+      /id="download-button" type="submit" disabled/.test(source) &&
+      source.includes("Checking the release and available downloads.") &&
+      logic.includes('elements.status.textContent = "Checking Frontier release"'),
+    "initial release state must remain truthfully unresolved",
+  );
+  add(
     /id="download-dialog"[\s\S]*?aria-describedby="download-dialog-description"/.test(source) &&
       /id="download-dialog-description"/.test(source),
     "dialog must have an accessible description",
@@ -157,6 +165,14 @@ function validateDownloadCenter(source, logic = downloadCenter) {
       !/id="panel-(?:requirements|install|additional)"[^>]*hidden/.test(source) &&
       logic.includes("setAccordionState("),
     "no-JS users must retain direct downloads, links, and visible details",
+  );
+  add(
+    source.includes('id="recovery-panel"') &&
+      source.includes('id="recovery-windows-link"') &&
+      source.includes('id="recovery-unix-link"') &&
+      logic.includes("showRecoveryPanel(elements, inspectionDownloads)") &&
+      logic.includes("source recovery options below"),
+    "API failures must expose immediate source recovery",
   );
   add(
     source.includes('id="golden-path-link"') &&
@@ -197,6 +213,27 @@ function validateDownloadCenter(source, logic = downloadCenter) {
       ),
     "release wording must not overclaim verification or suppress Windows warnings",
   );
+  add(
+    source.includes('id="source-status" class="source-status"') &&
+      logic.includes('code: "SOURCE_ONLY_RELEASE"') &&
+      logic.includes("This release is source-only.") &&
+      !logic.includes(
+        'code: "SOURCE_ONLY_RELEASE",\n        message: "This release does not publish the required binary provenance manifest."',
+      ),
+    "expected source-only releases must use calm explanatory status",
+  );
+  add(
+    /id="release-files" class="release-file-list"/.test(source) &&
+      logic.includes("releaseFileSummary(items)") &&
+      logic.includes('entry.className = "release-file-entry"'),
+    "release file summaries must pair filenames with sizes",
+  );
+  for (const id of ["frontier-guide-link", "security-link", "license-link"]) {
+    add(
+      new RegExp(`<a(?=[^>]*id="${id}")(?=[^>]*https://github\\.com/)[^>]*>`).test(source),
+      `${id} must use a rendered GitHub URL`,
+    );
+  }
   add(
     /id="expand-all"[\s\S]*?aria-controls="panel-details panel-requirements panel-install panel-additional"[\s\S]*?aria-expanded="false"/.test(
       source,
@@ -264,6 +301,11 @@ function validateDownloadCenter(source, logic = downloadCenter) {
     "mobile commands must wrap without horizontal overflow",
   );
   add(
+    /\.download-controls\s*\{[^}]*min-width:\s*0;/s.test(css) &&
+      /select\s*\{[^}]*min-width:\s*0;[^}]*text-overflow:\s*ellipsis;/s.test(css),
+    "download selectors must shrink without clipping",
+  );
+  add(
     /@media \(prefers-reduced-motion: reduce\)/.test(css) &&
       /scroll-behavior:\s*auto;/.test(css),
     "reduced-motion users must not receive smooth scrolling",
@@ -308,6 +350,10 @@ test("download center encodes the responsive accessibility contract", () => {
 test("download center UI checks reject representative regressions", () => {
   const mutations = [
     {
+      expected: "initial release state must remain truthfully unresolved",
+      source: page.replace("Checking Frontier release", "Source downloads ready"),
+    },
+    {
       expected: "dialog must have an accessible description",
       source: page.replace(' aria-describedby="download-dialog-description"', ""),
     },
@@ -318,6 +364,13 @@ test("download center UI checks reject representative regressions", () => {
     {
       expected: "mobile commands must wrap without horizontal overflow",
       source: page.replace("white-space: pre-wrap;", "white-space: pre;"),
+    },
+    {
+      expected: "download selectors must shrink without clipping",
+      source: page.replace(
+        "grid-template-columns: minmax(0, 1.15fr) minmax(8.5rem, 0.85fr) auto;",
+        "grid-template-columns: minmax(0, 1fr) auto;",
+      ).replace("      min-width: 0;\n", ""),
     },
     {
       expected: "accordion keyboard support must include ArrowDown",

@@ -343,6 +343,16 @@ test("Download Center works without JavaScript and stays narrow under stress", {
             noJsFallbackPresent: Boolean(document.querySelector("#no-js-download")),
             releaseClaim: document.querySelector(".product-mark strong").textContent.trim(),
             requirements: document.querySelector("#panel-requirements").innerText,
+            recoveryVisible:
+              document.querySelector("#recovery-panel").getClientRects().length > 0,
+            recoveryDownloads: [
+              ...document.querySelectorAll("#recovery-panel a[download]"),
+            ].map((link) => link.getAttribute("href")),
+            recoveryCommands: [
+              document.querySelector("#recovery-windows-command").textContent.trim(),
+              document.querySelector("#recovery-unix-command").textContent.trim(),
+            ],
+            platformHelp: document.querySelector("#platform-help").textContent.trim(),
           };
         })()`,
       );
@@ -351,6 +361,13 @@ test("Download Center works without JavaScript and stays narrow under stress", {
       assert.equal(enhanced.expanded, 4);
       assert.equal(enhanced.noJsFallbackPresent, false);
       assert.equal(enhanced.releaseClaim, "Commit-pinned source bootstraps");
+      assert.equal(enhanced.recoveryVisible, true);
+      assert.equal(enhanced.recoveryDownloads.length, 2);
+      assert.match(enhanced.recoveryDownloads[0], /frontier\.ps1$/);
+      assert.match(enhanced.recoveryDownloads[1], /frontier\.sh$/);
+      assert.match(enhanced.recoveryCommands[0], /powershell/i);
+      assert.match(enhanced.recoveryCommands[1], /^bash /);
+      assert.match(enhanced.platformHelp, /source recovery options below/);
       assert.match(
         enhanced.requirements,
         /Package manifest and application signature verification are not claimed/,
@@ -358,6 +375,104 @@ test("Download Center works without JavaScript and stays narrow under stress", {
       assert.match(enhanced.requirements, /SmartScreen warnings may still appear/);
       assert.match(enhanced.requirements, /does not suppress or remove those warnings/);
     }
+
+    const sourceOnlyRelease = {
+      id: 1,
+      tag_name: "brainstem-beta-v0.1.0-beta.6",
+      draft: false,
+      prerelease: true,
+      published_at: "2026-08-18T23:03:14Z",
+      assets: [],
+      body: "",
+    };
+    const sourceOnlyCommit = "985693ee9399e737e17f75b6c02a227fdb628551";
+    await browser.cdp.send(
+      "Page.addScriptToEvaluateOnNewDocument",
+      {
+        source: `(() => {
+          const originalFetch = window.fetch.bind(window);
+          const release = ${JSON.stringify(sourceOnlyRelease)};
+          window.fetch = async (input, init) => {
+            const url = String(input);
+            if (url.includes("api.github.com") && url.includes("/releases?")) {
+              await new Promise((resolve) => setTimeout(resolve, 250));
+              return new Response(JSON.stringify([release]), {
+                status: 200,
+                headers: { "content-type": "application/json" },
+              });
+            }
+            if (url.includes("api.github.com") && url.includes("/commits/")) {
+              return new Response(JSON.stringify({ sha: "${sourceOnlyCommit}" }), {
+                status: 200,
+                headers: { "content-type": "application/json" },
+              });
+            }
+            return originalFetch(input, init);
+          };
+        })();`,
+      },
+      browser.sessionId,
+    );
+    await navigate(
+      browser.cdp,
+      browser.sessionId,
+      `${site.pageUrl}?source-only=beta.6`,
+      { width: 640, height: 900, scripts: true },
+    );
+    const loading = await evaluate(
+      browser.cdp,
+      browser.sessionId,
+      `({
+        status: document.querySelector("#release-status").textContent.trim(),
+        disabled: document.querySelector("#download-button").disabled,
+        version: document.querySelector("#release-version").textContent.trim(),
+        help: document.querySelector("#platform-help").textContent.trim(),
+      })`,
+    );
+    assert.equal(loading.status, "Checking Frontier release");
+    assert.equal(loading.disabled, true);
+    assert.equal(loading.version, "Resolving");
+    assert.match(loading.help, /Checking the release/);
+
+    const sourceOnly = await evaluate(
+      browser.cdp,
+      browser.sessionId,
+      `(async () => {
+        for (let attempt = 0; attempt < 100; attempt += 1) {
+          if (!document.querySelector("#download-button").disabled) break;
+          await new Promise((resolve) => setTimeout(resolve, 20));
+        }
+        document.querySelector("#download-button").click();
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        const download = document.querySelector("#download-selected");
+        return {
+          status: document.querySelector("#release-status").textContent.trim(),
+          sourceStatus: document.querySelector("#source-status").textContent.trim(),
+          warningHidden: document.querySelector("#load-error").hidden,
+          dialogOpen: document.querySelector("#download-dialog").open,
+          copyVisible: document.querySelector("#copy-selected").getClientRects().length > 0,
+          downloadVisible: download.getClientRects().length > 0,
+          downloadHref: download.getAttribute("href"),
+          downloadName: download.getAttribute("download"),
+          downloadText: download.textContent.trim(),
+          guide: document.querySelector("#frontier-guide-link").href,
+          security: document.querySelector("#security-link").href,
+          license: document.querySelector("#license-link").href,
+        };
+      })()`,
+    );
+    assert.equal(sourceOnly.status, "Source prerelease ready");
+    assert.match(sourceOnly.sourceStatus, /source-only/i);
+    assert.equal(sourceOnly.warningHidden, true);
+    assert.equal(sourceOnly.dialogOpen, true);
+    assert.equal(sourceOnly.copyVisible, true);
+    assert.equal(sourceOnly.downloadVisible, true);
+    assert.match(sourceOnly.downloadHref, /^data:text\/plain;charset=utf-8,/);
+    assert.match(sourceOnly.downloadName, /RAPP-Brainstem-Frontier/);
+    assert.equal(sourceOnly.downloadText, "Download bootstrap");
+    assert.match(sourceOnly.guide, /blob\/brainstem-beta-v0\.1\.0-beta\.6\/beta\/README\.md$/);
+    assert.match(sourceOnly.security, /blob\/brainstem-beta-v0\.1\.0-beta\.6\/SECURITY\.md$/);
+    assert.match(sourceOnly.license, /blob\/brainstem-beta-v0\.1\.0-beta\.6\/LICENSE$/);
 
     await browser.cdp.send(
       "Emulation.setEmulatedMedia",

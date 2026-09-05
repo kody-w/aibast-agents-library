@@ -26,6 +26,8 @@ import {
   platformRecommendation,
   presentBinaryUnavailable,
   presentReleaseFailure,
+  releaseFileSummary,
+  repositoryDocumentUrl,
   resolveDownloadContext,
   safeReleaseAssetUrl,
   selectRelease,
@@ -429,7 +431,10 @@ test("resolved fork packages and pinned identity reach the DOM transaction", asy
   const elements = Object.fromEntries(
     [
       "sourceLink",
+      "guideLink",
       "goldenPathLink",
+      "securityLink",
+      "licenseLink",
       "releaseLinkTop",
       "releaseLinkBottom",
       "version",
@@ -439,6 +444,8 @@ test("resolved fork packages and pinned identity reach the DOM transaction", asy
       "status",
       "statusDot",
       "error",
+      "sourceStatus",
+      "recoveryPanel",
     ].map((name) => [name, {
       textContent: "",
       href: "",
@@ -452,6 +459,9 @@ test("resolved fork packages and pinned identity reach the DOM transaction", asy
   applyReleaseSummary(elements, transaction);
   assert.equal(elements.commit.textContent, commit.slice(0, 12));
   assert.match(elements.resolvedDate.textContent, new RegExp(repository));
+  assert.match(elements.guideLink.href, new RegExp(`/blob/${tag}/beta/README\\.md$`));
+  assert.match(elements.securityLink.href, new RegExp(`/blob/${tag}/SECURITY\\.md$`));
+  assert.match(elements.licenseLink.href, new RegExp(`/blob/${tag}/LICENSE$`));
   assert.equal(elements.status.textContent, "Prerelease ready");
   assert.equal(elements.error.hidden, true);
 
@@ -619,15 +629,15 @@ test("missing or invalid provenance falls back visibly to source bootstraps", as
   const invalidManifest = manifestFor([releaseAsset]);
   invalidManifest.artifacts[0].gate.status = "failed";
   const candidates = [
-    release({ assets: [releaseAsset], body: "" }),
-    release({ assets: [releaseAsset], body: manifestBody(invalidManifest) }),
-    release({
+    [release({ assets: [releaseAsset], body: "" }), "SOURCE_ONLY_RELEASE"],
+    [release({ assets: [releaseAsset], body: manifestBody(invalidManifest) }), "INVALID_RELEASE_MANIFEST"],
+    [release({
       assets: [releaseAsset],
       body: `\`\`\`${RELEASE_MANIFEST_FENCE}\n{not json}\n\`\`\``,
-    }),
+    }), "INVALID_RELEASE_MANIFEST"],
   ];
 
-  for (const candidate of candidates) {
+  for (const [candidate, expectedCode] of candidates) {
     const result = await discoverRelease({
       repository,
       fetchImpl: async (url) => url.includes("/releases?")
@@ -636,25 +646,45 @@ test("missing or invalid provenance falls back visibly to source bootstraps", as
     });
     assert.equal(result.packagedDownloads.length, 0);
     assert.equal(result.binaryAvailability.available, false);
-    assert.match(result.binaryAvailability.message, /manifest|gate/i);
-    const sourceFallback = buildBootstrapDownloads({
-      repository,
-      baseUrl: "https://contoso.github.io/frontier/beta/",
+    assert.equal(result.binaryAvailability.code, expectedCode);
+    const transaction = buildReleaseTransaction({
+      context: {
+        repository,
+        trusted: true,
+        warning: "",
+      },
+      release: result,
+      locale: "en-US",
     });
+    const sourceFallback = transaction.downloadItems;
     assert.deepEqual(
       orderDownloadsForPlatform(
-        [...result.packagedDownloads, ...sourceFallback],
+        sourceFallback,
         "windows",
         "x64",
       ).map((item) => item.fileName),
-      ["frontier.ps1"],
+      ["install.cmd"],
     );
 
-    const elements = { error: { textContent: "", hidden: true } };
+    const windowsSource = sourceFallback.find((item) => item.id === "source-windows");
+    assert.equal(windowsSource.downloadable, true);
+    assert.match(windowsSource.downloadHref, /^data:text\/plain;charset=utf-8,/);
+    assert.match(decodeURIComponent(windowsSource.downloadHref), new RegExp(commit));
+
+    const elements = {
+      error: { textContent: "", hidden: true },
+      sourceStatus: { textContent: "", hidden: true },
+    };
     presentBinaryUnavailable(elements, result.binaryAvailability);
-    assert.equal(elements.error.hidden, false);
-    assert.match(elements.error.textContent, /Packaged installers are unavailable/);
-    assert.match(elements.error.textContent, /exact-commit source install remains available/);
+    if (expectedCode === "SOURCE_ONLY_RELEASE") {
+      assert.equal(elements.error.hidden, true);
+      assert.equal(elements.sourceStatus.hidden, false);
+      assert.match(elements.sourceStatus.textContent, /source-only/i);
+      assert.doesNotMatch(elements.sourceStatus.textContent, /provenance manifest/i);
+    } else {
+      assert.equal(elements.error.hidden, false);
+      assert.match(elements.error.textContent, /Packaged installers are unavailable/);
+    }
   }
 
   assert.throws(
@@ -690,6 +720,14 @@ test("architecture-aware ordering recommends a compatible package before source 
     orderDownloadsForPlatform(catalog, "windows", "x64").map((item) => item.fileName),
     ["Frontier-win-x64.exe", "install.cmd"],
   );
+  assert.doesNotMatch(
+    platformRecommendation(catalog, "windows", "x64"),
+    /Windows 11 x64 x64/,
+  );
+  assert.doesNotMatch(
+    downloads.find((item) => item.platform === "windows").description,
+    /Windows 11 x64 x64/,
+  );
   assert.deepEqual(
     orderDownloadsForPlatform(catalog, "linux", "arm64").map((item) => item.fileName),
     ["install.sh"],
@@ -705,6 +743,25 @@ test("architecture-aware ordering recommends a compatible package before source 
   assert.throws(
     () => orderDownloadsForPlatform(catalog, "windows"),
     (error) => error.code === "INVALID_ARCHITECTURE",
+  );
+});
+
+test("release summaries keep every filename paired with its size", () => {
+  const packagedAssets = [
+    asset("Frontier-win-x64.exe", { size: 5_242_880 }),
+    asset("Frontier-mac-arm64.dmg", { size: 7_340_032 }),
+  ];
+  const manifest = manifestFor(packagedAssets, {
+    artifacts: packagedAssets.map((item) => manifestEntry(item, { size: item.size })),
+  });
+  const downloads = analyze(packagedAssets, manifest).downloads;
+  assert.deepEqual(releaseFileSummary(downloads), [
+    { fileName: "Frontier-win-x64.exe", size: "5.0 MB" },
+    { fileName: "Frontier-mac-arm64.dmg", size: "7.0 MB" },
+  ]);
+  assert.throws(
+    () => releaseFileSummary([{ fileName: "missing-size.exe", size: "" }]),
+    (error) => error.code === "INVALID_RELEASE_FILES",
   );
 });
 
@@ -725,7 +782,9 @@ test("Windows ARM64 packages and claims remain disabled", () => {
   );
   const pageSource = readFileSync(path.join(betaRoot, "index.html"), "utf8");
   assert.doesNotMatch(pageSource, /Windows 11 x64 or ARM64/);
-  assert.match(pageSource, /ARM64 \(macOS or Linux\)/);
+  assert.match(pageSource, /<option value="arm64">ARM64<\/option>/);
+  assert.match(pageSource, /\.download-controls\s*\{[^}]*min-width:\s*0;/s);
+  assert.match(pageSource, /select\s*\{[^}]*min-width:\s*0;/s);
 });
 
 test("missing and invalid size measurements fail instead of being skipped", () => {
@@ -823,6 +882,13 @@ test("release failures are visible while source fallback remains inspectable", (
   assert.ok(pinned.every((item) => !/RAPP_FRONTIER_REPO/.test(item.command)));
   assert.ok(pinned.every((item) => !/beta\/frontier\.(?:ps1|sh)/.test(item.command)));
   assert.ok(pinned.every((item) => item.href.includes(`/blob/${commit}/beta/install.`)));
+  assert.ok(pinned.every((item) => item.downloadable === true));
+  assert.ok(
+    pinned.every((item) => item.downloadHref.startsWith("data:text/plain;charset=utf-8,")),
+  );
+  assert.ok(
+    pinned.every((item) => decodeURIComponent(item.downloadHref).includes(commit)),
+  );
   assert.match(pinned[0].command, /BRAINSTEM_BETA_BOOTSTRAP_URL/);
   assert.ok(
     pinned[0].command.includes(
@@ -956,6 +1022,12 @@ test("nonfunctional links are disabled and no-JS source fallbacks stay usable", 
 
   const pageSource = readFileSync(path.join(betaRoot, "index.html"), "utf8");
   assert.doesNotMatch(pageSource, /href="#"/);
+  assert.match(pageSource, /id="release-status">Checking Frontier release</);
+  assert.match(pageSource, /id="download-button" type="submit" disabled/);
+  assert.match(pageSource, /id="release-version">Resolving</);
+  assert.match(pageSource, /Checking the release and available downloads\./);
+  assert.match(pageSource, /id="recovery-panel"[\s\S]*?id="recovery-windows-link"/);
+  assert.match(pageSource, /id="recovery-panel"[\s\S]*?id="recovery-unix-link"/);
   assert.match(pageSource, /id="copy-status"[^>]*aria-live="polite"/);
   assert.match(pageSource, /<noscript>[\s\S]*href="frontier\.ps1"/);
   assert.match(pageSource, /<noscript>[\s\S]*href="frontier\.sh"/);
@@ -1014,6 +1086,15 @@ test("download URLs and DOM wiring reject executable injection surfaces", () => 
     goldenPathUrl("contoso/frontier", "brainstem-beta-v2.0.0"),
     "https://github.com/contoso/frontier/blob/brainstem-beta-v2.0.0/beta/GOLDEN_PATH.md",
   );
+  assert.equal(
+    repositoryDocumentUrl("contoso/frontier", "brainstem-beta-v2.0.0", "beta/README.md"),
+    "https://github.com/contoso/frontier/blob/brainstem-beta-v2.0.0/beta/README.md",
+  );
+  for (const id of ["frontier-guide-link", "security-link", "license-link"]) {
+    const tag = pageSource.match(new RegExp(`<a(?=[^>]*id="${id}")[^>]*>`))?.[0];
+    assert.ok(tag, `${id} is missing`);
+    assert.match(tag, /https:\/\/github\.com\/microsoft\/aibast-agents-library\/blob\/main\//);
+  }
   assert.equal(
     [...pageSource.matchAll(/src="download-center\.js"/g)].length,
     1,

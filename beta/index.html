@@ -365,12 +365,14 @@
 
     .download-controls {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1.15fr) minmax(8.5rem, 0.85fr) auto;
       gap: 12px;
+      min-width: 0;
     }
 
     select {
       min-height: 48px;
+      min-width: 0;
       width: 100%;
       padding: 10px 38px 10px 12px;
       border: 1px solid var(--cp-border-strong);
@@ -378,6 +380,7 @@
       background: var(--cp-surface);
       color: var(--cp-text);
       cursor: pointer;
+      text-overflow: ellipsis;
     }
 
     .button {
@@ -486,6 +489,54 @@
       overflow-wrap: anywhere;
     }
 
+    .source-status,
+    .recovery-panel {
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      border: 1px solid var(--cp-border);
+      border-left: 4px solid var(--cp-link);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+    }
+
+    .source-status {
+      color: var(--cp-text-soft);
+    }
+
+    .recovery-panel h2 {
+      margin-bottom: 6px;
+      font-size: 20px;
+    }
+
+    .recovery-panel > p {
+      margin-bottom: 16px;
+      color: var(--cp-text-soft);
+    }
+
+    .recovery-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .recovery-option {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .recovery-option strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .recovery-option .command {
+      margin-bottom: 10px;
+    }
+
     .file-details {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -523,6 +574,25 @@
     .file-detail code {
       font-family: Consolas, "Courier New", Courier, monospace;
       font-size: 13px;
+    }
+
+    .release-file-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .release-file-entry {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: baseline;
+    }
+
+    .release-file-entry span {
+      color: var(--cp-text-soft);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
     }
 
     .details-heading {
@@ -1027,6 +1097,10 @@
         grid-template-columns: 1fr;
       }
 
+      .recovery-actions {
+        grid-template-columns: 1fr;
+      }
+
       .button-row {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
@@ -1185,7 +1259,7 @@
           <div>
             <div class="release-chip" role="status" aria-live="polite" aria-atomic="true">
               <span id="status-dot" class="status-dot" aria-hidden="true"></span>
-              <span id="release-status">Source downloads ready</span>
+              <span id="release-status">Checking Frontier release</span>
             </div>
             <h1>RAPP Brainstem Frontier</h1>
             <p class="hero-description">
@@ -1231,14 +1305,14 @@
               aria-describedby="platform-help"
             >
               <option value="x64">x64</option>
-              <option value="arm64">ARM64 (macOS or Linux)</option>
+              <option value="arm64">ARM64</option>
             </select>
             <button class="button primary" id="download-button" type="submit" disabled>
               Download
             </button>
           </div>
           <p class="platform-help" id="platform-help" role="status" aria-live="polite">
-            Detecting your platform.
+            Checking the release and available downloads.
           </p>
         </form>
 
@@ -1287,23 +1361,65 @@
 
     <div class="container content">
       <div id="load-error" class="notice" role="status" hidden></div>
+      <div id="source-status" class="source-status" role="status" hidden></div>
+      <section
+        id="recovery-panel"
+        class="recovery-panel"
+        aria-labelledby="recovery-heading"
+        hidden
+      >
+        <h2 id="recovery-heading">Install from the source bootstrap</h2>
+        <p id="recovery-message">
+          Live release details are unavailable. These inspectable bootstraps resolve the
+          published Frontier release before installing.
+        </p>
+        <div class="recovery-actions">
+          <div class="recovery-option">
+            <strong>Windows 11 x64</strong>
+            <pre class="command"><code id="recovery-windows-command">powershell -ExecutionPolicy Bypass -File ".\RAPP-Brainstem-Frontier-Windows.ps1"</code></pre>
+            <a
+              class="button primary"
+              id="recovery-windows-link"
+              href="frontier.ps1"
+              download="RAPP-Brainstem-Frontier-Windows.ps1"
+            >
+              Download Windows bootstrap
+            </a>
+          </div>
+          <div class="recovery-option">
+            <strong>macOS or Linux</strong>
+            <pre class="command"><code id="recovery-unix-command">bash "$HOME/Downloads/RAPP-Brainstem-Frontier-macOS-Linux.sh"</code></pre>
+            <a
+              class="button primary"
+              id="recovery-unix-link"
+              href="frontier.sh"
+              download="RAPP-Brainstem-Frontier-macOS-Linux.sh"
+            >
+              Download macOS or Linux bootstrap
+            </a>
+          </div>
+        </div>
+      </section>
 
       <dl class="file-details" aria-label="Release file details">
         <div class="file-detail">
           <dt>Version</dt>
-          <dd id="release-version">Latest published beta</dd>
+          <dd id="release-version">Resolving</dd>
         </div>
         <div class="file-detail">
           <dt>Date published</dt>
-          <dd id="release-date">See release notes</dd>
+          <dd id="release-date">Resolving</dd>
         </div>
         <div class="file-detail">
           <dt>File name</dt>
-          <dd id="release-files"><code>frontier.ps1</code>, <code>frontier.sh</code></dd>
+          <dd id="release-files" class="release-file-list">
+            <span class="release-file-entry"><code>frontier.ps1</code><span>Source</span></span>
+            <span class="release-file-entry"><code>frontier.sh</code><span>Source</span></span>
+          </dd>
         </div>
         <div class="file-detail">
           <dt>Release commit</dt>
-          <dd><code id="release-commit">Resolved by bootstrap</code></dd>
+          <dd><code id="release-commit">Resolving</code></dd>
         </div>
       </dl>
 
@@ -1546,8 +1662,9 @@
                 Frontier always publishes small source bootstraps that resolve the release
                 tag, pin the exact source commit, and keep the launcher removable from the
                 shared Brainstem runtime. When a release also contains packaged
-                <code>.exe</code> or <code>.dmg</code> installers, this page lists those
-                assets first and retains the source route alongside them.
+                <code>.exe</code> or <code>.dmg</code> installers, this page lists only
+                assets allowlisted by the release manifest and retains the source route
+                alongside them.
               </p>
 
               <div class="boundary">
@@ -1563,7 +1680,14 @@
               </div>
 
               <div class="resource-links">
-                <a href="README.md">Read the Frontier guide</a>
+                <a
+                  id="frontier-guide-link"
+                  href="https://github.com/microsoft/aibast-agents-library/blob/main/beta/README.md"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Read the Frontier guide
+                </a>
                 <a
                   id="golden-path-link"
                   href="https://github.com/microsoft/aibast-agents-library/blob/main/beta/GOLDEN_PATH.md"
@@ -1631,11 +1755,25 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <span id="resolved-date">Source bootstraps resolve the published release to an exact commit.</span>
+      <span id="resolved-date">Checking the published Frontier release.</span>
       <div class="footer-links">
         <a href="../">AIBAST Agents Library</a>
-        <a href="../SECURITY.md">Security</a>
-        <a href="../LICENSE">License</a>
+        <a
+          id="security-link"
+          href="https://github.com/microsoft/aibast-agents-library/blob/main/SECURITY.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Security
+        </a>
+        <a
+          id="license-link"
+          href="https://github.com/microsoft/aibast-agents-library/blob/main/LICENSE"
+          target="_blank"
+          rel="noreferrer"
+        >
+          License
+        </a>
       </div>
     </div>
   </footer>

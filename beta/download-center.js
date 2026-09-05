@@ -393,9 +393,13 @@ function comparePackagedDownloads(left, right) {
   return left.href.localeCompare(right.href);
 }
 
+function platformArchitectureLabel(platform, architecture) {
+  if (platform === "windows") return "Windows 11 x64";
+  return `${PLATFORM_LABELS[platform]} ${ARCHITECTURE_LABELS[architecture]}`;
+}
+
 function binaryDescription(platform, architecture) {
-  const platformLabel = PLATFORM_LABELS[platform];
-  return `${platformLabel} ${ARCHITECTURE_LABELS[architecture]} provenance-verified installer`;
+  return `${platformArchitectureLabel(platform, architecture)} provenance-verified installer`;
 }
 
 function manifestError(message, code = "INVALID_RELEASE_MANIFEST") {
@@ -734,13 +738,23 @@ function sourceTreeUrl(repository, ref = "main") {
   return `https://github.com/${repository}/tree/${encodeURIComponent(ref)}/beta`;
 }
 
-export function goldenPathUrl(repository, ref = "main") {
-  if (!validRepository(repository)) {
-    throw new DownloadCenterError("The golden path repository is invalid.", {
-      code: "INVALID_REPOSITORY",
+export function repositoryDocumentUrl(repository, ref, filePath) {
+  if (
+    !validRepository(repository)
+    || typeof ref !== "string"
+    || !ref
+    || !/^[A-Za-z0-9_./-]+$/.test(filePath || "")
+    || String(filePath).includes("..")
+  ) {
+    throw new DownloadCenterError("The repository document URL is invalid.", {
+      code: "INVALID_REPOSITORY_DOCUMENT",
     });
   }
-  return `https://github.com/${repository}/blob/${encodeURIComponent(ref)}/beta/GOLDEN_PATH.md`;
+  return `https://github.com/${repository}/blob/${encodeURIComponent(ref)}/${filePath}`;
+}
+
+export function goldenPathUrl(repository, ref = "main") {
+  return repositoryDocumentUrl(repository, ref, "beta/GOLDEN_PATH.md");
 }
 
 function releaseListUrl(repository) {
@@ -775,6 +789,9 @@ function normalizeReleaseMetadata(release, { repository, requestedTag }) {
     releaseUrl: releaseWebUrl(repository, tag),
     sourceUrl: sourceTreeUrl(repository, tag),
     goldenPathUrl: goldenPathUrl(repository, tag),
+    guideUrl: repositoryDocumentUrl(repository, tag, "beta/README.md"),
+    securityUrl: repositoryDocumentUrl(repository, tag, "SECURITY.md"),
+    licenseUrl: repositoryDocumentUrl(repository, tag, "LICENSE"),
   };
 }
 
@@ -864,11 +881,18 @@ export async function discoverRelease({
     ) {
       throw error;
     }
-    binaryAvailability = {
-      available: false,
-      code: error.code,
-      message: error.message,
-    };
+    binaryAvailability = error.code === "MISSING_RELEASE_MANIFEST"
+      ? {
+        available: false,
+        code: "SOURCE_ONLY_RELEASE",
+        message: "This release publishes source bootstraps only.",
+      }
+      : {
+        available: false,
+        code: error.code,
+        message: "Packaged installers were withheld because release validation failed.",
+        detail: error.message,
+      };
   }
 
   return {
@@ -964,6 +988,16 @@ export function buildBootstrapDownloads({
       + `BRAINSTEM_BETA_RUNTIME_VERSION_URL="${runtimeVersionUrl}" `
       + `BRAINSTEM_BETA_COMMIT="${normalizedCommit}" bash`
     : "";
+  const windowsDownloadHref = pinned
+    ? `data:text/plain;charset=utf-8,${encodeURIComponent(
+      `$ErrorActionPreference = "Stop"\r\n${windowsCommand}\r\n`,
+    )}`
+    : "";
+  const unixDownloadHref = pinned
+    ? `data:text/plain;charset=utf-8,${encodeURIComponent(
+      `#!/usr/bin/env bash\nset -euo pipefail\n${unixCommand}\n`,
+    )}`
+    : "";
 
   return [
     {
@@ -979,10 +1013,11 @@ export function buildBootstrapDownloads({
       size: pinned ? "Pinned source" : "Source",
       command: windowsCommand,
       href: windowsHref,
+      downloadHref: windowsDownloadHref,
       downloadName: "RAPP-Brainstem-Frontier-Windows.ps1",
       kind: "bootstrap",
       ready: pinned,
-      downloadable: false,
+      downloadable: pinned,
     },
     {
       id: "source-unix",
@@ -997,10 +1032,11 @@ export function buildBootstrapDownloads({
       size: pinned ? "Pinned source" : "Source",
       command: unixCommand,
       href: unixHref,
+      downloadHref: unixDownloadHref,
       downloadName: "RAPP-Brainstem-Frontier-macOS-Linux.sh",
       kind: "bootstrap",
       ready: pinned,
-      downloadable: false,
+      downloadable: pinned,
     },
   ];
 }
@@ -1071,29 +1107,28 @@ function architectureSummary(downloads) {
 }
 
 export function platformRecommendation(items, platform, architecture) {
-  const platformLabel = PLATFORM_LABELS[platform];
   if (platform === "windows" && architecture === "arm64") {
     return "Windows ARM64 is not supported until its native dependencies pass the package gate.";
   }
 
+  const selectionLabel = platformArchitectureLabel(platform, architecture);
   const available = orderDownloadsForPlatform(items, platform, architecture);
   const binaries = available.filter((item) => item.kind === "binary");
   const sourceAvailable = available.some(
     (item) => item.kind === "bootstrap" && item.ready === true,
   );
   if (!binaries.length && !sourceAvailable) {
-    return `No validated ${ARCHITECTURE_LABELS[architecture]} download is available for `
-      + `${platformLabel}.`;
+    return `No validated download is available for ${selectionLabel}.`;
   }
   if (!binaries.length) {
-    return `Exact-commit source install available for ${platformLabel} `
-      + `${ARCHITECTURE_LABELS[architecture]}.`;
+    return `Download the bootstrap or copy the exact-commit command for ${selectionLabel}.`;
   }
 
-  return `Packaged installer${binaries.length === 1 ? "" : "s"} `
-    + `(${architectureSummary(binaries)})`
+  const packagedLabel = `Packaged installer${binaries.length === 1 ? "" : "s"}`
+    + `${binaries.length > 1 ? ` (${architectureSummary(binaries)})` : ""}`;
+  return packagedLabel
     + `${sourceAvailable ? " and exact-commit source install" : ""} available for `
-    + `${platformLabel}.`;
+    + `${selectionLabel}.`;
 }
 
 export function windowsSupportLabel(items) {
@@ -1131,6 +1166,11 @@ function requireElement(documentObject, id) {
 function collectElements(documentObject) {
   return {
     error: requireElement(documentObject, "load-error"),
+    sourceStatus: requireElement(documentObject, "source-status"),
+    recoveryPanel: requireElement(documentObject, "recovery-panel"),
+    recoveryMessage: requireElement(documentObject, "recovery-message"),
+    recoveryWindowsLink: requireElement(documentObject, "recovery-windows-link"),
+    recoveryUnixLink: requireElement(documentObject, "recovery-unix-link"),
     copyStatus: requireElement(documentObject, "copy-status"),
     status: requireElement(documentObject, "release-status"),
     statusDot: requireElement(documentObject, "status-dot"),
@@ -1157,7 +1197,10 @@ function collectElements(documentObject) {
     unixScript: requireElement(documentObject, "unix-script"),
     windowsScript: requireElement(documentObject, "windows-script"),
     sourceLink: requireElement(documentObject, "source-link"),
+    guideLink: requireElement(documentObject, "frontier-guide-link"),
     goldenPathLink: requireElement(documentObject, "golden-path-link"),
+    securityLink: requireElement(documentObject, "security-link"),
+    licenseLink: requireElement(documentObject, "license-link"),
     releaseLinkTop: requireElement(documentObject, "release-link-top"),
     releaseLinkBottom: requireElement(documentObject, "release-link-bottom"),
     expandAll: requireElement(documentObject, "expand-all"),
@@ -1259,14 +1302,39 @@ function setReleaseLinks(elements, url) {
   }
 }
 
-function setFileNames(documentObject, elements, names) {
-  const fragment = documentObject.createDocumentFragment();
-  names.forEach((name, index) => {
-    if (index) fragment.append(", ");
-    const code = documentObject.createElement("code");
-    code.textContent = name;
-    fragment.append(code);
+export function releaseFileSummary(items) {
+  if (!Array.isArray(items) || !items.length) {
+    throw new DownloadCenterError("Release files are unavailable.", {
+      code: "INVALID_RELEASE_FILES",
+    });
+  }
+  return items.map((item) => {
+    if (
+      typeof item?.fileName !== "string"
+      || !item.fileName
+      || typeof item?.size !== "string"
+      || !item.size
+    ) {
+      throw new DownloadCenterError("Release file metadata is incomplete.", {
+        code: "INVALID_RELEASE_FILES",
+      });
+    }
+    return { fileName: item.fileName, size: item.size };
   });
+}
+
+function setFileNames(documentObject, elements, items) {
+  const fragment = documentObject.createDocumentFragment();
+  for (const item of releaseFileSummary(items)) {
+    const entry = documentObject.createElement("span");
+    entry.className = "release-file-entry";
+    const code = documentObject.createElement("code");
+    code.textContent = item.fileName;
+    const size = documentObject.createElement("span");
+    size.textContent = item.size;
+    entry.append(code, size);
+    fragment.append(entry);
+  }
   elements.files.replaceChildren(fragment);
 }
 
@@ -1374,12 +1442,28 @@ function updateDialogSelection(documentObject, elements, state) {
   elements.selectedCommandPanel.hidden = !hasCommand;
   elements.copySelected.hidden = !hasCommand;
   elements.selectedCommand.textContent = file.command;
-  const downloadable = file.kind === "binary" && file.downloadable !== false;
+  const downloadable = file.downloadable !== false
+    && (file.kind === "binary" || Boolean(file.downloadHref));
   elements.downloadSelected.hidden = !downloadable;
   if (downloadable) {
-    setFunctionalLink(elements.downloadSelected, file.href);
+    if (file.kind === "binary") {
+      setFunctionalLink(elements.downloadSelected, file.href);
+    } else if (
+      typeof file.downloadHref === "string"
+      && file.downloadHref.startsWith("data:text/plain;charset=utf-8,")
+    ) {
+      elements.downloadSelected.href = file.downloadHref;
+      elements.downloadSelected.removeAttribute("aria-disabled");
+      elements.downloadSelected.removeAttribute("tabindex");
+    } else {
+      throw new DownloadCenterError("The generated bootstrap download is invalid.", {
+        code: "INVALID_BOOTSTRAP_DOWNLOAD",
+      });
+    }
     elements.downloadSelected.setAttribute("download", file.downloadName);
-    elements.downloadSelected.textContent = "Download installer";
+    elements.downloadSelected.textContent = file.kind === "binary"
+      ? "Download installer"
+      : "Download bootstrap";
   } else {
     elements.downloadSelected.removeAttribute("href");
     elements.downloadSelected.removeAttribute("download");
@@ -1431,6 +1515,13 @@ function renderDownloadOptions(documentObject, elements, state) {
 function updatePlatformRecommendation(elements, state) {
   const platform = elements.platformSelect.value;
   const architecture = elements.architectureSelect.value;
+  if (!state.releaseReady) {
+    elements.platformHelp.textContent = "Checking the release and available downloads.";
+    elements.downloadButton.disabled = true;
+    elements.windowsCard.classList.toggle("recommended", platform === "windows");
+    elements.unixCard.classList.toggle("recommended", platform !== "windows");
+    return;
+  }
   elements.platformHelp.textContent = platformRecommendation(
     state.downloadItems,
     platform,
@@ -1604,6 +1695,34 @@ function setSafetyNotice(elements, messages) {
   elements.error.hidden = !notice;
 }
 
+function setSourceStatus(elements, message = "") {
+  if (!elements.sourceStatus) return;
+  elements.sourceStatus.textContent = message;
+  elements.sourceStatus.hidden = !message;
+}
+
+function hideRecoveryPanel(elements) {
+  if (elements.recoveryPanel) elements.recoveryPanel.hidden = true;
+}
+
+function showRecoveryPanel(elements, inspectionDownloads) {
+  const windowsSource = inspectionDownloads.find((item) => item.id === "source-windows");
+  const unixSource = inspectionDownloads.find((item) => item.id === "source-unix");
+  if (!windowsSource || !unixSource) {
+    throw new DownloadCenterError("Source recovery downloads are unavailable.", {
+      code: "MISSING_BOOTSTRAP",
+    });
+  }
+  setFunctionalLink(elements.recoveryWindowsLink, windowsSource.href);
+  setFunctionalLink(elements.recoveryUnixLink, unixSource.href);
+  elements.recoveryWindowsLink.setAttribute("download", windowsSource.downloadName);
+  elements.recoveryUnixLink.setAttribute("download", unixSource.downloadName);
+  elements.recoveryMessage.textContent =
+    "Live release details could not be refreshed. Download an inspectable source bootstrap "
+    + "now; it resolves the published Frontier release before installing.";
+  elements.recoveryPanel.hidden = false;
+}
+
 export function presentReleaseFailure(elements, error, authorityWarning = "") {
   const message = error instanceof Error ? error.message : "Unknown release discovery error.";
   elements.status.textContent = "Release check unavailable";
@@ -1612,6 +1731,7 @@ export function presentReleaseFailure(elements, error, authorityWarning = "") {
   elements.date.textContent = "Unavailable";
   elements.commit.textContent = "Unavailable";
   elements.resolvedDate.textContent = "Release metadata could not be verified.";
+  setSourceStatus(elements);
   setSafetyNotice(elements, [
     authorityWarning,
     `${message} The inspectable source bootstraps remain available, but verify the `
@@ -1621,6 +1741,14 @@ export function presentReleaseFailure(elements, error, authorityWarning = "") {
 
 export function presentBinaryUnavailable(elements, availability) {
   const reason = availability?.message || "Release provenance could not be verified.";
+  if (availability?.code === "SOURCE_ONLY_RELEASE" && elements.sourceStatus) {
+    setSourceStatus(
+      elements,
+      "This release is source-only. Download the bootstrap or copy the exact-commit command.",
+    );
+    setSafetyNotice(elements, []);
+    return;
+  }
   setSafetyNotice(elements, [
     `Packaged installers are unavailable: ${reason} `
       + "The exact-commit source install remains available.",
@@ -1667,7 +1795,10 @@ export function buildReleaseTransaction({ context, release, locale } = {}) {
 export function applyReleaseSummary(elements, transaction) {
   const { context, release, publishedLabel } = transaction;
   setFunctionalLink(elements.sourceLink, release.sourceUrl);
+  setFunctionalLink(elements.guideLink, release.guideUrl);
   setFunctionalLink(elements.goldenPathLink, release.goldenPathUrl);
+  setFunctionalLink(elements.securityLink, release.securityUrl);
+  setFunctionalLink(elements.licenseLink, release.licenseUrl);
   setReleaseLinks(elements, release.releaseUrl);
   elements.version.textContent = release.version;
   elements.date.textContent = publishedLabel;
@@ -1678,13 +1809,25 @@ export function applyReleaseSummary(elements, transaction) {
 
   const notices = [];
   if (context.warning) notices.push(context.warning);
-  if (!release.binaryAvailability.available) {
+  const sourceOnly = release.binaryAvailability.code === "SOURCE_ONLY_RELEASE";
+  if (sourceOnly) {
+    setSourceStatus(
+      elements,
+      "This release is source-only. Download the bootstrap or copy the exact commit-pinned "
+      + "command for your platform.",
+    );
+  } else {
+    setSourceStatus(elements);
+  }
+  if (!release.binaryAvailability.available && !sourceOnly) {
     notices.push(
       `Packaged installers are unavailable: ${release.binaryAvailability.message} `
+      + `${release.binaryAvailability.detail || ""} `
       + "The exact-commit source install remains available.",
     );
   }
   setSafetyNotice(elements, notices);
+  hideRecoveryPanel(elements);
 
   if (!context.trusted) {
     elements.status.textContent = "LOCAL TEST · UNTRUSTED REPOSITORY";
@@ -1714,7 +1857,7 @@ function applyReleaseTransaction({
   setFileNames(
     documentObject,
     elements,
-    transaction.downloadItems.map((item) => item.fileName),
+    transaction.downloadItems,
   );
   applySourceControls(elements, nextState);
   updatePlatformRecommendation(elements, nextState);
@@ -1735,17 +1878,32 @@ function resetReleaseTransaction({
   state.downloadItems = inspectionDownloads;
   state.releaseReady = false;
   setFunctionalLink(elements.sourceLink, sourceTreeUrl(context.repository));
+  setFunctionalLink(
+    elements.guideLink,
+    repositoryDocumentUrl(context.repository, "main", "beta/README.md"),
+  );
   setFunctionalLink(elements.goldenPathLink, goldenPathUrl(context.repository));
+  setFunctionalLink(
+    elements.securityLink,
+    repositoryDocumentUrl(context.repository, "main", "SECURITY.md"),
+  );
+  setFunctionalLink(
+    elements.licenseLink,
+    repositoryDocumentUrl(context.repository, "main", "LICENSE"),
+  );
   setReleaseLinks(elements, releaseListUrl(context.repository));
   setFileNames(
     documentObject,
     elements,
-    inspectionDownloads.map((item) => item.fileName),
+    inspectionDownloads,
   );
   applySourceControls(elements, state);
   updatePlatformRecommendation(elements, state);
   refreshOpenDownloadDialog(documentObject, elements, state);
   presentReleaseFailure(elements, error, context.warning);
+  showRecoveryPanel(elements, inspectionDownloads);
+  elements.platformHelp.textContent =
+    "Live release details are unavailable. Use the source recovery options below.";
 }
 
 export async function initializeDownloadCenter({
@@ -1769,12 +1927,24 @@ export async function initializeDownloadCenter({
   };
 
   setFunctionalLink(elements.sourceLink, sourceTreeUrl(context.repository));
+  setFunctionalLink(
+    elements.guideLink,
+    repositoryDocumentUrl(context.repository, "main", "beta/README.md"),
+  );
   setFunctionalLink(elements.goldenPathLink, goldenPathUrl(context.repository));
+  setFunctionalLink(
+    elements.securityLink,
+    repositoryDocumentUrl(context.repository, "main", "SECURITY.md"),
+  );
+  setFunctionalLink(
+    elements.licenseLink,
+    repositoryDocumentUrl(context.repository, "main", "LICENSE"),
+  );
   setReleaseLinks(elements, releaseListUrl(context.repository));
   setFileNames(
     documentObject,
     elements,
-    inspectionDownloads.map((item) => item.fileName),
+    inspectionDownloads,
   );
   elements.platformSelect.value = detectPlatform(windowObject.navigator);
   elements.architectureSelect.value =
@@ -1787,6 +1957,15 @@ export async function initializeDownloadCenter({
     state,
   });
   setupAccordions(documentObject, elements);
+  elements.status.textContent = "Checking Frontier release";
+  elements.statusDot.className = "status-dot";
+  elements.version.textContent = "Resolving";
+  elements.date.textContent = "Resolving";
+  elements.commit.textContent = "Resolving";
+  elements.resolvedDate.textContent = "Checking the published Frontier release.";
+  elements.platformHelp.textContent = "Checking the release and available downloads.";
+  setSourceStatus(elements);
+  hideRecoveryPanel(elements);
   updatePlatformRecommendation(elements, state);
   if (context.warning) {
     elements.status.textContent = "LOCAL TEST · UNTRUSTED REPOSITORY";
