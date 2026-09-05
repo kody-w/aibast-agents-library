@@ -477,6 +477,9 @@ polled and may be republished; anything else is a durable incident. Draft and
 `NOT_PUBLISHED` are never terminal after intent because delayed server-side
 settlement cannot be disproven. A PATCH response is evidence only: terminal
 success always requires a subsequent exact release-ID GET reporting immutable.
+After the PATCH child settles, its response is integrity-verified before the
+combined settled/integrity state is written, so a persistence failure cannot
+erase an already-observed content drift from in-memory recovery.
 
 The cancellable publication process and its separate settlement promise are
 retained. Ambiguous responses or SIGINT/SIGTERM cancel the local operation and
@@ -490,12 +493,17 @@ first re-verifies that repository immutable releases remain enabled and never
 issues a rollback.
 
 Transition state uses a unique same-directory temporary file, complete write,
-`fsync`, close, and atomic rename. A write or rename failure leaves the previous
-valid marker untouched, latches persistence failure in memory, and forces
-an incident. Terminal immutable records must themselves persist successfully;
-otherwise no terminal success is returned. GitHub GET/PATCH, `git ls-remote`,
-snapshot verification, signal recovery, and recovery-only mode all have
-per-operation and overall deadlines.
+file `fsync`, close, and atomic rename. It then opens, `fsync`s, and closes the
+parent directory before reporting success. Directory-open/sync/close failure
+restores the prior valid marker, latches persistence failure, and prevents
+publication dispatch. Terminal immutable records must themselves persist
+successfully; otherwise no terminal success is returned.
+
+One shared `AbortController` and remaining overall deadline covers GitHub
+GET/PATCH, `git ls-remote`, snapshot verification, sleeps, normal publication,
+signals, and recovery-only mode. Deadline or signal cancellation terminates
+the active subprocess and waits for its exit before the state machine returns;
+no fixed independent operation timeout can outlive the shared deadline.
 
 The release includes:
 

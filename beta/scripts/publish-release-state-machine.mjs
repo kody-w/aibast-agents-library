@@ -1,5 +1,4 @@
 import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import {
   closeSync,
   fsyncSync,
@@ -17,10 +16,8 @@ import {
   verifyReleaseSnapshot,
 } from "./release-race-guard.mjs";
 
-const execFileAsync = promisify(execFile);
-const DEFAULT_OPERATION_TIMEOUT_MS = 15000;
 const DEFAULT_RECONCILE_DEADLINE_MS = 60000;
-const DEFAULT_SETTLEMENT_TIMEOUT_MS = 15000;
+const MAX_ABORT_SETTLEMENT_RESERVE_MS = 2000;
 
 export class ReleaseTransitionError extends Error {
   constructor(message, code, state) {
@@ -122,18 +119,44 @@ export function createAtomicStateWriter(filePath, operations = {}) {
     writeFileSync,
     fsyncSync,
     closeSync,
+    readFileSync,
     renameSync,
     rmSync,
     ...operations,
   };
+  const parentDirectory = path.dirname(filePath);
   let sequence = 0;
   let failure = null;
+  const syncParentDirectory = () => {
+    const descriptor = fs.openSync(parentDirectory, "r");
+    let syncError = null;
+    try {
+      fs.fsyncSync(descriptor);
+    } catch (error) {
+      syncError = error;
+    }
+    try {
+      fs.closeSync(descriptor);
+    } catch (error) {
+      syncError ||= error;
+    }
+    if (syncError) throw syncError;
+  };
   return (state) => {
     if (failure) return { ok: false, error: failure };
     const temporaryPath =
       `${filePath}.${process.pid}.${sequence += 1}.state.tmp`;
     let descriptor = null;
+    let renamed = false;
+    let previousMarker = null;
+    let previousMarkerExists = false;
     try {
+      try {
+        previousMarker = fs.readFileSync(filePath);
+        previousMarkerExists = true;
+      } catch (error) {
+        if (error?.code !== "ENOENT") throw error;
+      }
       descriptor = fs.openSync(temporaryPath, "wx", 0o600);
       fs.writeFileSync(
         descriptor,
@@ -144,6 +167,8 @@ export function createAtomicStateWriter(filePath, operations = {}) {
       fs.closeSync(descriptor);
       descriptor = null;
       fs.renameSync(temporaryPath, filePath);
+      renamed = true;
+      syncParentDirectory();
       return { ok: true };
     } catch (error) {
       failure = error;
@@ -155,6 +180,38 @@ export function createAtomicStateWriter(filePath, operations = {}) {
       try {
         fs.rmSync(temporaryPath, { force: true });
       } catch {}
+      if (renamed) {
+        if (!previousMarkerExists) {
+          try {
+            fs.rmSync(filePath, { force: true });
+          } catch {}
+        } else {
+          const restorePath =
+            `${filePath}.${process.pid}.${sequence}.restore.tmp`;
+          let restoreDescriptor = null;
+          try {
+            restoreDescriptor = fs.openSync(restorePath, "wx", 0o600);
+            fs.writeFileSync(restoreDescriptor, previousMarker);
+            fs.fsyncSync(restoreDescriptor);
+            fs.closeSync(restoreDescriptor);
+            restoreDescriptor = null;
+            fs.renameSync(restorePath, filePath);
+            try {
+              syncParentDirectory();
+            } catch {}
+          } catch {
+            if (restoreDescriptor !== null) {
+              try {
+                fs.closeSync(restoreDescriptor);
+              } catch {}
+            }
+          } finally {
+            try {
+              fs.rmSync(restorePath, { force: true });
+            } catch {}
+          }
+        }
+      }
       return { ok: false, error };
     }
   };
@@ -183,42 +240,198 @@ function createRecorder(state, onState) {
   };
 }
 
-function wait(milliseconds) {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+function abortReason(signal, label) {
+  if (signal.reason instanceof Error) return signal.reason;
+  return new OperationTimeoutError(`${label} was aborted.`);
 }
 
-export async function withOperationTimeout(
-  promise,
-  timeoutMs,
-  label = "operation",
-) {
-  let timer;
-  try {
-    return await Promise.race([
-      Promise.resolve(promise),
-      new Promise((_, reject) => {
-        timer = setTimeout(() => {
-          reject(
-            new OperationTimeoutError(
-              `${label} timed out after ${timeoutMs}ms.`,
-            ),
-          );
-        }, timeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timer) clearTimeout(timer);
+function wait(milliseconds, { signal } = {}) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(abortReason(signal, "publication delay"));
+      return;
+    }
+    let timer;
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(abortReason(signal, "publication delay"));
+    };
+    timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, milliseconds);
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+export function createDeadlineScope({
+  overallDeadlineMs = DEFAULT_RECONCILE_DEADLINE_MS,
+  signal: parentSignal = null,
+} = {}) {
+  if (!Number.isFinite(overallDeadlineMs) || overallDeadlineMs <= 0) {
+    throw new Error("overallDeadlineMs must be a positive number.");
   }
-}
-
-function remainingTimeout(deadline, operationTimeoutMs) {
-  const remaining = deadline - Date.now();
-  if (remaining <= 0) {
-    throw new OperationTimeoutError(
-      "Overall publication reconciliation deadline expired.",
+  const startedAt = Date.now();
+  const hardDeadline = startedAt + overallDeadlineMs;
+  const cleanupReserveMs = Math.min(
+    MAX_ABORT_SETTLEMENT_RESERVE_MS,
+    Math.max(1, Math.floor(overallDeadlineMs / 10)),
+  );
+  const operationDeadline = hardDeadline - cleanupReserveMs;
+  const controller = new AbortController();
+  const abortForDeadline = () => {
+    controller.abort(
+      new OperationTimeoutError(
+        "Overall publication reconciliation deadline expired.",
+      ),
     );
+  };
+  const abortForParent = () => {
+    controller.abort(
+      parentSignal.reason instanceof Error
+        ? parentSignal.reason
+        : new OperationTimeoutError("Publication operation was cancelled."),
+    );
+  };
+  if (parentSignal?.aborted) abortForParent();
+  else {
+    parentSignal?.addEventListener("abort", abortForParent, { once: true });
   }
-  return Math.max(1, Math.min(operationTimeoutMs, remaining));
+  const deadlineTimer = setTimeout(
+    abortForDeadline,
+    Math.max(0, operationDeadline - Date.now()),
+  );
+  return {
+    signal: controller.signal,
+    deadline: operationDeadline,
+    hardDeadline,
+    cleanupReserveMs,
+    abort(reason) {
+      controller.abort(
+        reason instanceof Error
+          ? reason
+          : new OperationTimeoutError(String(reason || "Operation aborted.")),
+      );
+    },
+    dispose() {
+      clearTimeout(deadlineTimer);
+      parentSignal?.removeEventListener("abort", abortForParent);
+    },
+  };
+}
+
+function operationContext(scope) {
+  return {
+    signal: scope.signal,
+    deadline: scope.deadline,
+    hardDeadline: scope.hardDeadline,
+  };
+}
+
+function ensureScopeActive(scope, label) {
+  if (scope.signal.aborted) throw abortReason(scope.signal, label);
+  if (Date.now() >= scope.deadline) {
+    scope.abort(
+      new OperationTimeoutError(
+        "Overall publication reconciliation deadline expired.",
+      ),
+    );
+    throw abortReason(scope.signal, label);
+  }
+}
+
+function waitForResultOrAbort(promise, scope, label) {
+  return new Promise((resolve, reject) => {
+    if (scope.signal.aborted) {
+      reject(abortReason(scope.signal, label));
+      return;
+    }
+    let completed = false;
+    const onAbort = () => {
+      if (completed) return;
+      completed = true;
+      reject(abortReason(scope.signal, label));
+    };
+    scope.signal.addEventListener("abort", onAbort, { once: true });
+    Promise.resolve(promise).then(
+      (value) => {
+        if (completed) return;
+        completed = true;
+        scope.signal.removeEventListener("abort", onAbort);
+        resolve(value);
+      },
+      (error) => {
+        if (completed) return;
+        completed = true;
+        scope.signal.removeEventListener("abort", onAbort);
+        reject(error);
+      },
+    );
+  });
+}
+
+function settleBeforeCleanupDeadline(promise, scope, label) {
+  const cleanupDeadline = scope.hardDeadline;
+  return new Promise((resolve, reject) => {
+    let completed = false;
+    const timer = setTimeout(() => {
+      if (completed) return;
+      completed = true;
+      reject(
+        new OperationTimeoutError(
+          `${label} did not settle before the overall deadline.`,
+        ),
+      );
+    }, Math.max(1, cleanupDeadline - Date.now()));
+    Promise.resolve(promise).then(
+      (value) => {
+        if (completed) return;
+        completed = true;
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        if (completed) return;
+        completed = true;
+        clearTimeout(timer);
+        reject(error);
+      },
+    );
+  });
+}
+
+async function awaitAbortableOperation({
+  result,
+  settled = null,
+  cancel = async () => {},
+}, scope, label) {
+  ensureScopeActive(scope, label);
+  const resultPromise = Promise.resolve(result);
+  const settledPromise = settled
+    ? Promise.resolve(settled)
+    : resultPromise.then(() => undefined, () => undefined);
+  try {
+    return await waitForResultOrAbort(resultPromise, scope, label);
+  } catch (error) {
+    if (!scope.signal.aborted) throw error;
+    try {
+      await settleBeforeCleanupDeadline(cancel(), scope, `${label} cancellation`);
+    } catch {}
+    await settleBeforeCleanupDeadline(
+      settledPromise,
+      scope,
+      `${label} operation`,
+    );
+    throw abortReason(scope.signal, label);
+  }
+}
+
+function normalizeAbortableResult(value) {
+  return value
+    && typeof value === "object"
+    && Object.hasOwn(value, "result")
+    ? value
+    : { result: value };
 }
 
 function isTransportInability(error) {
@@ -227,6 +440,8 @@ function isTransportInability(error) {
     error?.stderr,
   ].filter(Boolean).join(" ").toLowerCase();
   return error instanceof OperationTimeoutError
+    || error?.code === "ABORT_ERR"
+    || error?.code === "LOCAL_OPERATION_INTERRUPTED"
     || error?.killed === true
     || typeof error?.signal === "string"
     || [
@@ -294,30 +509,50 @@ function normalizePublishHandle(handle) {
   };
 }
 
-export async function quiescePublishOperation(handle, timeoutMs) {
+export async function quiescePublishOperation(handle, scopeOrTimeoutMs) {
   const operation = normalizePublishHandle(handle);
   operation.response.catch(() => {});
-  const deadline = Date.now() + timeoutMs;
-  try {
-    await withOperationTimeout(
-      operation.cancel(),
-      remainingTimeout(deadline, timeoutMs),
-      "publication cancellation",
-    );
-  } catch {
-    // The separate settlement promise remains authoritative.
+  const ownsScope = typeof scopeOrTimeoutMs === "number";
+  const scope = ownsScope
+    ? createDeadlineScope({ overallDeadlineMs: scopeOrTimeoutMs })
+    : scopeOrTimeoutMs;
+  if (!scope?.signal || !Number.isFinite(scope.hardDeadline)) {
+    throw new Error("Publication quiescence requires a deadline scope.");
   }
-  await withOperationTimeout(
-    operation.settled,
-    remainingTimeout(deadline, timeoutMs),
-    "publication operation settlement",
-  );
+  try {
+    try {
+      await settleBeforeCleanupDeadline(
+        operation.cancel(),
+        scope,
+        "publication cancellation",
+      );
+    } catch {
+      // The separate settlement promise remains authoritative.
+    }
+    await settleBeforeCleanupDeadline(
+      operation.settled,
+      scope,
+      "publication operation",
+    );
+  } finally {
+    if (ownsScope) scope.dispose();
+  }
 }
 
 function integrityIncident(state, record, phase, error) {
   state.integrityViolation = true;
   state.integrityDetail ||= String(error.message || error);
   record(`${phase}-integrity-incident`, String(error.message || error));
+  throw new ReleaseTransitionError(
+    `Release integrity failed during ${phase}.`,
+    "INTEGRITY_INCIDENT",
+    state,
+  );
+}
+
+function deferredIntegrityIncident(state, phase, error) {
+  state.integrityViolation = true;
+  state.integrityDetail ||= String(error.message || error);
   throw new ReleaseTransitionError(
     `Release integrity failed during ${phase}.`,
     "INTEGRITY_INCIDENT",
@@ -346,13 +581,15 @@ function persistenceIncident(state, message) {
   );
 }
 
-function assertLocalOperationActive(shouldAbort, state) {
+function assertLocalOperationActive(shouldAbort, state, scope = null) {
   if (shouldAbort()) {
-    throw new ReleaseTransitionError(
+    const error = new ReleaseTransitionError(
       "Local publication operation was interrupted for signal reconciliation.",
       "LOCAL_OPERATION_INTERRUPTED",
       state,
     );
+    scope?.abort(error);
+    throw error;
   }
 }
 
@@ -362,20 +599,34 @@ async function verifyExactRelease({
   state,
   record,
   verifySnapshot,
-  timeoutMs,
+  scope,
+  recordResult = true,
+  deferIntegrityRecord = false,
 }) {
   let proof;
   try {
-    proof = await withOperationTimeout(
-      verifySnapshot(release),
-      timeoutMs,
+    proof = await awaitAbortableOperation(
+      normalizeAbortableResult(
+        verifySnapshot(release, operationContext(scope)),
+      ),
+      scope,
       "release snapshot verification",
     );
   } catch (error) {
     if (isTransportInability(error)) throw error;
+    if (deferIntegrityRecord) {
+      return deferredIntegrityIncident(state, phase, error);
+    }
     return integrityIncident(state, record, phase, error);
   }
   if (proof !== true) {
+    if (deferIntegrityRecord) {
+      return deferredIntegrityIncident(
+        state,
+        phase,
+        new Error("Release snapshot verifier did not return explicit true proof."),
+      );
+    }
     return integrityIncident(
       state,
       record,
@@ -389,6 +640,13 @@ async function verifyExactRelease({
     || (release.immutable !== true && release.draft === false)
   );
   if (!validState) {
+    if (deferIntegrityRecord) {
+      return deferredIntegrityIncident(
+        state,
+        phase,
+        new Error("Release draft/immutable state is internally inconsistent."),
+      );
+    }
     return integrityIncident(
       state,
       record,
@@ -399,6 +657,7 @@ async function verifyExactRelease({
   if (release.draft === false && release.immutable !== true) {
     state.observedMutable = true;
   }
+  if (!recordResult) return release;
   if (!record(
     phase,
     `draft=${release.draft}; immutable=${release.immutable}`,
@@ -426,7 +685,7 @@ async function persistImmutableTerminal(state, record, release) {
   return { release, state, status: "immutable" };
 }
 
-export async function reconcileReleasePublication({
+async function reconcileReleasePublicationInScope({
   getRelease,
   startPublishRelease,
   verifySnapshot,
@@ -434,15 +693,12 @@ export async function reconcileReleasePublication({
   onState = () => {},
   onPublishHandle = () => {},
   maxCycles = 20,
-  operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS,
-  overallDeadlineMs = DEFAULT_RECONCILE_DEADLINE_MS,
-  settlementTimeoutMs = DEFAULT_SETTLEMENT_TIMEOUT_MS,
   pollDelayMs = 3000,
   deferredQuiescenceMs = 15000,
   sleep = wait,
   intentIdentity = null,
   shouldAbort = () => false,
-}) {
+}, scope) {
   const state = initialState(seed);
   const record = createRecorder(state, onState);
   const expectedIntentIdentity = normalizedIntentIdentity(intentIdentity);
@@ -459,26 +715,16 @@ export async function reconcileReleasePublication({
       new Error("Durable publication intent identity does not match recovery."),
     );
   }
-  const deadline = Date.now() + overallDeadlineMs;
-  const timeout = () => {
-    try {
-      return remainingTimeout(deadline, operationTimeoutMs);
-    } catch (error) {
-      return settlementIncident(
-        state,
-        record,
-        "overall-deadline",
-        error,
-      );
-    }
-  };
   const boundedSleep = async (milliseconds, label) => {
     try {
-      const available = timeout();
+      ensureScopeActive(scope, label);
+      const available = Math.max(0, scope.deadline - Date.now());
       const duration = Math.max(0, Math.min(milliseconds, available));
-      await withOperationTimeout(
-        sleep(duration),
-        available,
+      await awaitAbortableOperation(
+        normalizeAbortableResult(
+          sleep(duration, operationContext(scope)),
+        ),
+        scope,
         label,
       );
       if (duration < milliseconds) {
@@ -493,9 +739,11 @@ export async function reconcileReleasePublication({
   const readRelease = async (phase) => {
     let release;
     try {
-      release = await withOperationTimeout(
-        getRelease(),
-        timeout(),
+      release = await awaitAbortableOperation(
+        normalizeAbortableResult(
+          getRelease(operationContext(scope)),
+        ),
+        scope,
         "GitHub release GET",
       );
     } catch (error) {
@@ -508,7 +756,7 @@ export async function reconcileReleasePublication({
         state,
         record,
         verifySnapshot,
-        timeoutMs: timeout(),
+        scope,
       });
     } catch (error) {
       if (error instanceof StatePersistenceError) {
@@ -526,7 +774,10 @@ export async function reconcileReleasePublication({
   const requestPublish = async (phase) => {
     let handle;
     try {
-      handle = normalizePublishHandle(startPublishRelease());
+      ensureScopeActive(scope, "GitHub publication PATCH");
+      handle = normalizePublishHandle(
+        startPublishRelease(operationContext(scope)),
+      );
       onPublishHandle(handle);
     } catch (error) {
       return settlementIncident(state, record, phase, error);
@@ -534,17 +785,18 @@ export async function reconcileReleasePublication({
 
     let response;
     try {
-      response = await withOperationTimeout(
-        handle.response,
-        timeout(),
+      response = await awaitAbortableOperation(
+        {
+          result: handle.response,
+          settled: handle.settled,
+          cancel: handle.cancel,
+        },
+        scope,
         "GitHub publication PATCH",
       );
     } catch (error) {
       try {
-        await quiescePublishOperation(
-          handle,
-          Math.min(settlementTimeoutMs, timeout()),
-        );
+        await quiescePublishOperation(handle, scope);
       } catch (settlementError) {
         return settlementIncident(
           state,
@@ -556,9 +808,13 @@ export async function reconcileReleasePublication({
       return settlementIncident(state, record, phase, error);
     }
     try {
-      await withOperationTimeout(
-        handle.settled,
-        Math.min(settlementTimeoutMs, timeout()),
+      await awaitAbortableOperation(
+        {
+          result: handle.settled,
+          settled: handle.settled,
+          cancel: handle.cancel,
+        },
+        scope,
         "publication operation settlement",
       );
     } catch (error) {
@@ -569,30 +825,19 @@ export async function reconcileReleasePublication({
         error,
       );
     }
-    state.publishSettled = true;
-    state.publishSettlementUnproven = false;
-    if (!record(`${phase}-operation-settled`)) {
-      return persistenceIncident(
-        state,
-        "Publication settled but settlement state did not persist.",
-      );
-    }
+    let responseIntegrityError = null;
     try {
-      return await verifyExactRelease({
+      response = await verifyExactRelease({
         release: response,
         phase: `${phase}-response`,
         state,
         record,
         verifySnapshot,
-        timeoutMs: timeout(),
+        scope,
+        recordResult: false,
+        deferIntegrityRecord: true,
       });
     } catch (error) {
-      if (error instanceof StatePersistenceError) {
-        return persistenceIncident(
-          state,
-          "Publication response was exact, but state persistence failed.",
-        );
-      }
       if (isTransportInability(error)) {
         return settlementIncident(
           state,
@@ -601,8 +846,27 @@ export async function reconcileReleasePublication({
           error,
         );
       }
-      throw error;
+      if (error?.code !== "INTEGRITY_INCIDENT") throw error;
+      responseIntegrityError = error;
     }
+    state.publishSettled = true;
+    state.publishSettlementUnproven = false;
+    if (!record(
+      `${phase}-operation-settled`,
+      responseIntegrityError
+        ? `response-integrity=${state.integrityDetail}`
+        : "response-integrity=verified",
+    )) {
+      return persistenceIncident(
+        state,
+        responseIntegrityError
+          ? "Publication response integrity failed and the combined "
+            + "settlement/integrity state did not persist."
+          : "Publication settled but settlement state did not persist.",
+      );
+    }
+    if (responseIntegrityError) throw responseIntegrityError;
+    return response;
   };
 
   if (!recoveryRequiredFromState(state)) {
@@ -646,26 +910,26 @@ export async function reconcileReleasePublication({
   }
 
   for (let cycle = 1; cycle <= maxCycles; cycle += 1) {
-    assertLocalOperationActive(shouldAbort, state);
+    assertLocalOperationActive(shouldAbort, state, scope);
     let release = await readRelease(`reconcile-${cycle}-read`);
-    assertLocalOperationActive(shouldAbort, state);
+    assertLocalOperationActive(shouldAbort, state, scope);
     if (release.immutable === true) {
       return persistImmutableTerminal(state, record, release);
     }
 
     if (release.draft === true || cycle % 3 === 0) {
-      assertLocalOperationActive(shouldAbort, state);
+      assertLocalOperationActive(shouldAbort, state, scope);
       await requestPublish(`reconcile-${cycle}-publish`);
-      assertLocalOperationActive(shouldAbort, state);
+      assertLocalOperationActive(shouldAbort, state, scope);
       release = await readRelease(`reconcile-${cycle}-postpublish-read`);
-      assertLocalOperationActive(shouldAbort, state);
+      assertLocalOperationActive(shouldAbort, state, scope);
       if (release.immutable === true) {
         return persistImmutableTerminal(state, record, release);
       }
     }
 
     if (cycle < maxCycles) {
-      assertLocalOperationActive(shouldAbort, state);
+      assertLocalOperationActive(shouldAbort, state, scope);
       await boundedSleep(pollDelayMs, `reconcile-${cycle}-poll-delay`);
     }
   }
@@ -677,30 +941,44 @@ export async function reconcileReleasePublication({
   );
 }
 
-export async function runReleaseTransition({
+export async function reconcileReleasePublication(options) {
+  const ownsScope = !options.operationScope;
+  const scope = options.operationScope || createDeadlineScope({
+    overallDeadlineMs:
+      options.overallDeadlineMs ?? DEFAULT_RECONCILE_DEADLINE_MS,
+    signal: options.signal,
+  });
+  try {
+    return await reconcileReleasePublicationInScope(options, scope);
+  } finally {
+    if (ownsScope) scope.dispose();
+  }
+}
+
+async function runReleaseTransitionInScope({
   getRelease,
   startPublishRelease,
   verifySnapshot,
   onState = () => {},
   onPublishHandle = () => {},
-  operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS,
   overallDeadlineMs = DEFAULT_RECONCILE_DEADLINE_MS,
-  settlementTimeoutMs = DEFAULT_SETTLEMENT_TIMEOUT_MS,
   pollDelayMs = 3000,
   maxCycles = 20,
   sleep = wait,
   intentIdentity = null,
   shouldAbort = () => false,
-}) {
+}, scope) {
   const state = initialState({
     intentIdentity: normalizedIntentIdentity(intentIdentity),
   });
   const record = createRecorder(state, onState);
   let release;
   try {
-    release = await withOperationTimeout(
-      getRelease(),
-      operationTimeoutMs,
+    release = await awaitAbortableOperation(
+      normalizeAbortableResult(
+        getRelease(operationContext(scope)),
+      ),
+      scope,
       "prepublication GitHub release GET",
     );
   } catch (error) {
@@ -718,7 +996,7 @@ export async function runReleaseTransition({
       state,
       record,
       verifySnapshot,
-      timeoutMs: operationTimeoutMs,
+      scope,
     });
   } catch (error) {
     if (error instanceof StatePersistenceError) {
@@ -729,7 +1007,7 @@ export async function runReleaseTransition({
     }
     throw error;
   }
-  assertLocalOperationActive(shouldAbort, state);
+  assertLocalOperationActive(shouldAbort, state, scope);
   if (release.immutable === true) {
     return persistImmutableTerminal(state, record, release);
   }
@@ -764,15 +1042,28 @@ export async function runReleaseTransition({
     initialState: state,
     onState,
     onPublishHandle,
-    operationTimeoutMs,
     overallDeadlineMs,
-    settlementTimeoutMs,
     pollDelayMs,
     maxCycles,
     sleep,
     intentIdentity,
     shouldAbort,
+    operationScope: scope,
   });
+}
+
+export async function runReleaseTransition(options) {
+  const ownsScope = !options.operationScope;
+  const scope = options.operationScope || createDeadlineScope({
+    overallDeadlineMs:
+      options.overallDeadlineMs ?? DEFAULT_RECONCILE_DEADLINE_MS,
+    signal: options.signal,
+  });
+  try {
+    return await runReleaseTransitionInScope(options, scope);
+  } finally {
+    if (ownsScope) scope.dispose();
+  }
 }
 
 export async function recoverFromDurableState(durableState, options) {
@@ -821,8 +1112,72 @@ function parseArguments(argv) {
   return values;
 }
 
-async function ghJson(repository, releaseId) {
-  const { stdout } = await execFileAsync("gh", [
+export function startAbortableExecFile(
+  command,
+  args,
+  options = {},
+  operation = {},
+  execFileImpl = execFile,
+) {
+  let child = null;
+  let forceKillTimer = null;
+  let settle;
+  const settled = new Promise((resolve) => {
+    settle = () => {
+      if (forceKillTimer) clearTimeout(forceKillTimer);
+      resolve();
+    };
+  });
+  const result = new Promise((resolve, reject) => {
+    if (operation.signal?.aborted) {
+      settle();
+      reject(abortReason(operation.signal, `${command} subprocess`));
+      return;
+    }
+    try {
+      child = execFileImpl(command, args, {
+        ...options,
+        signal: operation.signal,
+        killSignal: "SIGTERM",
+      }, (error, stdout, stderr) => {
+        settle();
+        if (error) {
+          if (stderr && !error.stderr) error.stderr = stderr;
+          reject(error);
+          return;
+        }
+        resolve({ stdout, stderr });
+      });
+    } catch (error) {
+      settle();
+      reject(error);
+    }
+  });
+  return {
+    result,
+    settled,
+    cancel: async () => {
+      if (child && child.exitCode === null && child.signalCode === null) {
+        child.kill("SIGTERM");
+        if (!forceKillTimer && Number.isFinite(operation.hardDeadline)) {
+          const remaining = Math.max(1, operation.hardDeadline - Date.now());
+          forceKillTimer = setTimeout(() => {
+            if (
+              child
+              && child.exitCode === null
+              && child.signalCode === null
+            ) {
+              child.kill("SIGKILL");
+            }
+          }, Math.max(1, Math.min(500, Math.floor(remaining / 2))));
+        }
+      }
+    },
+  };
+}
+
+function ghJson(repository, releaseId, operation = {}) {
+  const subprocess = startAbortableExecFile("gh", [
     "api",
     "--method",
     "GET",
@@ -832,13 +1187,15 @@ async function ghJson(repository, releaseId) {
   ], {
     encoding: "utf8",
     maxBuffer: 20 * 1024 * 1024,
-    timeout: DEFAULT_OPERATION_TIMEOUT_MS,
-    killSignal: "SIGTERM",
-  });
-  return JSON.parse(stdout);
+  }, operation);
+  return {
+    result: subprocess.result.then(({ stdout }) => JSON.parse(stdout)),
+    settled: subprocess.settled,
+    cancel: subprocess.cancel,
+  };
 }
 
-function startGhPublishOperation(repository, releaseId) {
+function startGhPublishOperation(repository, releaseId, operation = {}) {
   const args = [
     "api",
     "--method",
@@ -853,44 +1210,22 @@ function startGhPublishOperation(repository, releaseId) {
     "-f",
     "make_latest=false",
   ];
-  let child;
-  let settle;
-  const settled = new Promise((resolve) => { settle = resolve; });
-  const response = new Promise((resolve, reject) => {
-    child = execFile("gh", args, {
-      encoding: "utf8",
-      maxBuffer: 20 * 1024 * 1024,
-      timeout: DEFAULT_OPERATION_TIMEOUT_MS,
-      killSignal: "SIGTERM",
-    }, (error, stdout) => {
-      settle();
-      if (error) {
-        reject(error);
-        return;
-      }
-      try {
-        resolve(JSON.parse(stdout));
-      } catch (parseError) {
-        reject(parseError);
-      }
-    });
-  });
+  const subprocess = startAbortableExecFile("gh", args, {
+    encoding: "utf8",
+    maxBuffer: 20 * 1024 * 1024,
+  }, operation);
   return {
-    response,
-    settled,
-    cancel: async () => {
-      if (child && child.exitCode === null && child.signalCode === null) {
-        child.kill("SIGTERM");
-      }
-    },
+    response: subprocess.result.then(({ stdout }) => JSON.parse(stdout)),
+    settled: subprocess.settled,
+    cancel: subprocess.cancel,
   };
 }
 
-async function remoteRef(repository, ref) {
+function remoteRefOperation(repository, ref, operation = {}) {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository)) {
     throw new Error("GitHub repository identity is invalid.");
   }
-  const { stdout } = await execFileAsync(
+  const subprocess = startAbortableExecFile(
     "git",
     [
       "ls-remote",
@@ -900,15 +1235,20 @@ async function remoteRef(repository, ref) {
     ],
     {
       encoding: "utf8",
-      timeout: DEFAULT_OPERATION_TIMEOUT_MS,
-      killSignal: "SIGTERM",
     },
+    operation,
   );
-  const sha = stdout.trim().split(/\s+/)[0];
-  if (!/^[0-9a-f]{40}$/i.test(sha || "")) {
-    throw new Error(`Remote ref ${ref} did not resolve in ${repository}.`);
-  }
-  return sha.toLowerCase();
+  return {
+    result: subprocess.result.then(({ stdout }) => {
+      const sha = stdout.trim().split(/\s+/)[0];
+      if (!/^[0-9a-f]{40}$/i.test(sha || "")) {
+        throw new Error(`Remote ref ${ref} did not resolve in ${repository}.`);
+      }
+      return sha.toLowerCase();
+    }),
+    settled: subprocess.settled,
+    cancel: subprocess.cancel,
+  };
 }
 
 function expectedSnapshot(args) {
@@ -934,21 +1274,35 @@ function intentIdentityFromArgs(args) {
 
 function createSnapshotVerifier(args) {
   const expected = expectedSnapshot(args);
-  return async (release) => {
-    verifyReleaseSnapshot(expected, {
-      tag: release.tag_name,
-      tagObject: await remoteRef(
+  return (release, operation = {}) => {
+    let activeSubprocess = null;
+    const result = (async () => {
+      activeSubprocess = remoteRefOperation(
         args.repository,
         `refs/tags/${args.tag}`,
-      ),
-      commit: await remoteRef(
+        operation,
+      );
+      const tagObject = await activeSubprocess.result;
+      activeSubprocess = remoteRefOperation(
         args.repository,
         `refs/tags/${args.tag}^{}`,
-      ),
-      releaseId: String(release.id),
-      releaseFingerprint: releaseContentFingerprint(release),
-    });
-    return true;
+        operation,
+      );
+      const commit = await activeSubprocess.result;
+      verifyReleaseSnapshot(expected, {
+        tag: release.tag_name,
+        tagObject,
+        commit,
+        releaseId: String(release.id),
+        releaseFingerprint: releaseContentFingerprint(release),
+      });
+      return true;
+    })();
+    return {
+      result,
+      settled: result.then(() => undefined, () => undefined),
+      cancel: async () => activeSubprocess?.cancel(),
+    };
   };
 }
 
@@ -985,84 +1339,84 @@ export async function reconcileInterruptedSignal({
   waitForMain = async () => {},
   overallDeadlineMs = DEFAULT_RECONCILE_DEADLINE_MS,
 }) {
-  const deadline = Date.now() + overallDeadlineMs;
-  cliState.merge({
-    phase: "signal-reconciliation-started",
-    signal,
-    history: [{
+  const scope = createDeadlineScope({ overallDeadlineMs });
+  try {
+    cliState.merge({
       phase: "signal-reconciliation-started",
-      detail: signal,
-    }],
-  });
-  const handle = getActiveHandle();
-  if (handle) {
-    try {
-      await quiescePublishOperation(
-        handle,
-        Math.max(1, Math.min(
-          DEFAULT_SETTLEMENT_TIMEOUT_MS,
-          deadline - Date.now(),
-        )),
-      );
-      cliState.merge({
-        phase: "signal-local-operation-settled",
-        publishSettled: true,
-        publishSettlementUnproven: false,
-        history: [{
+      signal,
+      history: [{
+        phase: "signal-reconciliation-started",
+        detail: signal,
+      }],
+    });
+    const handle = getActiveHandle();
+    if (handle) {
+      try {
+        await quiescePublishOperation(handle, scope);
+        cliState.merge({
           phase: "signal-local-operation-settled",
-          detail: signal,
-        }],
-      });
+          publishSettled: true,
+          publishSettlementUnproven: false,
+          history: [{
+            phase: "signal-local-operation-settled",
+            detail: signal,
+          }],
+        });
+      } catch (error) {
+        cliState.merge({
+          phase: "signal-settlement-unproven",
+          publishSettlementUnproven: true,
+          history: [{
+            phase: "signal-settlement-unproven",
+            detail: String(error.message || error),
+          }],
+        });
+        return null;
+      }
+    }
+    try {
+      await awaitAbortableOperation(
+        normalizeAbortableResult(
+          waitForMain(operationContext(scope)),
+        ),
+        scope,
+        "interrupted publication operation",
+      );
     } catch (error) {
       cliState.merge({
-        phase: "signal-settlement-unproven",
+        phase: "signal-main-operation-unproven",
         publishSettlementUnproven: true,
         history: [{
-          phase: "signal-settlement-unproven",
+          phase: "signal-main-operation-unproven",
           detail: String(error.message || error),
         }],
       });
       return null;
     }
-  }
-  try {
-    await withOperationTimeout(
-      waitForMain(),
-      Math.max(1, deadline - Date.now()),
-      "interrupted publication operation",
-    );
-  } catch (error) {
-    cliState.merge({
-      phase: "signal-main-operation-unproven",
-      publishSettlementUnproven: true,
-      history: [{
-        phase: "signal-main-operation-unproven",
-        detail: String(error.message || error),
-      }],
-    });
-    return null;
-  }
-  if (!recoveryRequiredFromState(cliState.latest)) return null;
-  try {
-    return await reconcileReleasePublication({
-      getRelease,
-      startPublishRelease,
-      verifySnapshot,
-      initialState: cliState.latest,
-      onState: (state) => cliState.persist(state),
-      overallDeadlineMs: Math.max(1, deadline - Date.now()),
-      onPublishHandle: () => {},
-      intentIdentity,
-    });
-  } catch (error) {
-    cliState.persist(error.state || mergeDurableState(cliState.latest, {
-      phase: "signal-reconciliation-incident",
-      history: [{
+    if (!recoveryRequiredFromState(cliState.latest)) return null;
+    try {
+      return await reconcileReleasePublication({
+        getRelease,
+        startPublishRelease,
+        verifySnapshot,
+        initialState: cliState.latest,
+        onState: (state) => cliState.persist(state),
+        onPublishHandle: () => {},
+        intentIdentity,
+        operationScope: scope,
+      });
+    } catch (error) {
+      cliState.persist(error.state || mergeDurableState(cliState.latest, {
         phase: "signal-reconciliation-incident",
-        detail: String(error.message || error),
-      }],
-    }));
-    return null;
+        history: [{
+          phase: "signal-reconciliation-incident",
+          detail: String(error.message || error),
+        }],
+      }));
+      return null;
+    }
+  } finally {
+    scope.dispose();
   }
 }
 
@@ -1074,6 +1428,7 @@ function installSignalReconciler({
   intentIdentity,
   getActiveHandle,
   waitForMain,
+  abortMain,
 }) {
   let handling = false;
   let signalPromise = null;
@@ -1082,6 +1437,13 @@ function installSignalReconciler({
       if (handling) return;
       handling = true;
       process.exitCode = 130;
+      abortMain(
+        new ReleaseTransitionError(
+          `${signal} interrupted the local publication operation.`,
+          "LOCAL_OPERATION_INTERRUPTED",
+          cliState.latest,
+        ),
+      );
       signalPromise = reconcileInterruptedSignal({
         signal,
         cliState,
@@ -1111,10 +1473,15 @@ export async function publishReleaseWithStateMachine(
   const stateFile = path.resolve(args["state-file"]);
   const output = path.resolve(args.output);
   const cliState = createCliState(stateFile);
-  const getRelease = () => ghJson(args.repository, args["release-id"]);
-  const startPublishRelease = () => startGhPublishOperation(
+  const getRelease = (operation) => ghJson(
     args.repository,
     args["release-id"],
+    operation,
+  );
+  const startPublishRelease = (operation) => startGhPublishOperation(
+    args.repository,
+    args["release-id"],
+    operation,
   );
   const verifySnapshot = createSnapshotVerifier(args);
   const intentIdentity = intentIdentityFromArgs(args);
@@ -1123,6 +1490,7 @@ export async function publishReleaseWithStateMachine(
   const mainFinished = new Promise((resolve) => {
     finishMain = resolve;
   });
+  const mainAbortController = new AbortController();
   const signalController = installSignalReconciler({
     cliState,
     getRelease,
@@ -1131,6 +1499,7 @@ export async function publishReleaseWithStateMachine(
     intentIdentity,
     getActiveHandle: () => activeHandle,
     waitForMain: () => mainFinished,
+    abortMain: (reason) => mainAbortController.abort(reason),
   });
   let result = null;
   let operationError = null;
@@ -1147,6 +1516,7 @@ export async function publishReleaseWithStateMachine(
       },
       intentIdentity,
       shouldAbort: () => signalController.handling,
+      signal: mainAbortController.signal,
     });
   } catch (error) {
     operationError = error;
@@ -1191,10 +1561,15 @@ export async function recoverReleaseFromStateFile(
   }
   const cliState = createCliState(stateFile);
   cliState.persist(durableState);
-  const getRelease = () => ghJson(args.repository, args["release-id"]);
-  const startPublishRelease = () => startGhPublishOperation(
+  const getRelease = (operation) => ghJson(
     args.repository,
     args["release-id"],
+    operation,
+  );
+  const startPublishRelease = (operation) => startGhPublishOperation(
+    args.repository,
+    args["release-id"],
+    operation,
   );
   const verifySnapshot = createSnapshotVerifier(args);
   const intentIdentity = intentIdentityFromArgs(args);
@@ -1203,6 +1578,7 @@ export async function recoverReleaseFromStateFile(
   const mainFinished = new Promise((resolve) => {
     finishMain = resolve;
   });
+  const mainAbortController = new AbortController();
   const signalController = installSignalReconciler({
     cliState,
     getRelease,
@@ -1211,6 +1587,7 @@ export async function recoverReleaseFromStateFile(
     intentIdentity,
     getActiveHandle: () => activeHandle,
     waitForMain: () => mainFinished,
+    abortMain: (reason) => mainAbortController.abort(reason),
   });
   let result = null;
   let operationError = null;
@@ -1227,6 +1604,7 @@ export async function recoverReleaseFromStateFile(
       },
       intentIdentity,
       shouldAbort: () => signalController.handling,
+      signal: mainAbortController.signal,
     });
   } catch (error) {
     operationError = error;

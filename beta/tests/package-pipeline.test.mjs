@@ -69,6 +69,7 @@ import {
   recoverFromDurableState,
   recoveryRequiredFromState,
   runReleaseTransition,
+  startAbortableExecFile,
 } from "../scripts/publish-release-state-machine.mjs";
 import {
   createValidatedWindowsBuilderConfiguration,
@@ -1398,6 +1399,9 @@ test("publication revalidates the full set and immutable setting at the last gat
   assert.match(transitionSource, /publish-intent-recorded/);
   assert.match(transitionSource, /terminal-immutable/);
   assert.match(transitionSource, /startGhPublishOperation/);
+  assert.match(transitionSource, /new AbortController\(\)/);
+  assert.match(transitionSource, /startAbortableExecFile/);
+  assert.doesNotMatch(transitionSource, /Promise\.race|DEFAULT_OPERATION_TIMEOUT/);
 });
 
 test("immutable release settings require enabled true at runtime", () => {
@@ -1616,8 +1620,7 @@ test("delayed server publication resumes monotonically from durable intent", asy
         durableState = structuredClone(state);
         return { ok: true };
       },
-      settlementTimeoutMs: 5,
-      operationTimeoutMs: 10,
+      overallDeadlineMs: 50,
       pollDelayMs: 0,
       sleep: async () => {},
     }),
@@ -1827,6 +1830,59 @@ test("integrity drift is a sticky terminal incident", async () => {
   );
 });
 
+test("response drift survives settlement-state persistence failure", async () => {
+  const draft = { id: 1, draft: true, immutable: false };
+  const drifted = {
+    id: 1,
+    draft: false,
+    immutable: false,
+    drift: true,
+  };
+  let failedState;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => ({ ...draft }),
+      startPublishRelease: () => ({
+        response: Promise.resolve({ ...drifted }),
+        settled: Promise.resolve(),
+        cancel: async () => {},
+      }),
+      verifySnapshot: async (release) => {
+        if (release.drift) throw new Error("response asset digest drift");
+        return true;
+      },
+      onState: (state) => state.phase.endsWith("-publish-operation-settled")
+        ? { ok: false, error: new Error("settlement state write failed") }
+        : { ok: true },
+    }),
+    (error) => {
+      failedState = structuredClone(error.state);
+      assert.equal(error.code, "PERSISTENCE_INCIDENT");
+      assert.equal(error.state.integrityViolation, true);
+      assert.match(error.state.integrityDetail, /asset digest drift/);
+      return true;
+    },
+  );
+  let recoveryReads = 0;
+  await assert.rejects(
+    () => recoverFromDurableState(failedState, {
+      getRelease: async () => {
+        recoveryReads += 1;
+        return { id: 1, draft: false, immutable: true };
+      },
+      startPublishRelease: () => {
+        throw new Error("latched integrity incident must not publish");
+      },
+      verifySnapshot: async () => true,
+    }),
+    (error) => {
+      assert.equal(error.code, "INTEGRITY_INCIDENT");
+      return true;
+    },
+  );
+  assert.equal(recoveryReads, 0);
+});
+
 test("snapshot verification cannot be mutated into a no-op", async () => {
   let publishCalled = false;
   await assert.rejects(
@@ -1985,50 +2041,166 @@ test("signal reconciliation waits for the interrupted operation", async () => {
 test("atomic state persistence retains previous valid marker", () => {
   const previous = '{"phase":"publish-intent-recorded"}\n';
   const temporaryPaths = [];
+  let directoryOpens = 0;
+  let directoryFsyncs = 0;
+  let directoryCloses = 0;
+  const operationOrder = [];
   const successfulWriter = createAtomicStateWriter("state.json", {
+    readFileSync: () => {
+      throw Object.assign(new Error("missing"), { code: "ENOENT" });
+    },
     openSync: (filePath) => {
+      if (filePath === ".") {
+        operationOrder.push("open-directory");
+        directoryOpens += 1;
+        return 100 + directoryOpens;
+      }
+      operationOrder.push("open-file");
       temporaryPaths.push(filePath);
       return temporaryPaths.length;
     },
-    writeFileSync() {},
-    fsyncSync() {},
-    closeSync() {},
-    renameSync() {},
+    writeFileSync() { operationOrder.push("write-file"); },
+    fsyncSync: (descriptor) => {
+      if (descriptor >= 100) {
+        operationOrder.push("fsync-directory");
+        directoryFsyncs += 1;
+      } else {
+        operationOrder.push("fsync-file");
+      }
+    },
+    closeSync: (descriptor) => {
+      if (descriptor >= 100) {
+        operationOrder.push("close-directory");
+        directoryCloses += 1;
+      } else {
+        operationOrder.push("close-file");
+      }
+    },
+    renameSync() { operationOrder.push("rename"); },
     rmSync() {},
   });
   assert.equal(successfulWriter({ phase: "one" }).ok, true);
   assert.equal(successfulWriter({ phase: "two" }).ok, true);
   assert.equal(new Set(temporaryPaths).size, 2);
   assert.ok(temporaryPaths.every((entry) => entry.endsWith(".state.tmp")));
+  assert.equal(directoryOpens, 2);
+  assert.equal(directoryFsyncs, 2);
+  assert.equal(directoryCloses, 2);
+  assert.deepEqual(operationOrder.slice(0, 8), [
+    "open-file",
+    "write-file",
+    "fsync-file",
+    "close-file",
+    "rename",
+    "open-directory",
+    "fsync-directory",
+    "close-directory",
+  ]);
 
-  for (const failurePoint of ["open-disk-full", "write", "rename"]) {
+  for (const failurePoint of [
+    "open-disk-full",
+    "write",
+    "rename",
+    "directory-open",
+    "directory-fsync",
+    "directory-close",
+  ]) {
     let marker = previous;
     let temporary = "";
-    let fsyncCalls = 0;
-    let closeCalls = 0;
+    let directoryFailureTriggered = false;
+    let directoryOpenCalls = 0;
+    let directoryFsyncCalls = 0;
+    let directoryCloseCalls = 0;
+    const descriptorKinds = new Map();
+    let nextDescriptor = 1;
     const writer = createAtomicStateWriter("state.json", {
-      openSync: () => {
-        if (failurePoint === "open-disk-full") {
+      readFileSync: () => Buffer.from(marker),
+      openSync: (filePath) => {
+        const isDirectory = filePath === ".";
+        if (
+          isDirectory
+          && failurePoint === "directory-open"
+          && !directoryFailureTriggered
+        ) {
+          directoryFailureTriggered = true;
+          throw new Error("directory open failed");
+        }
+        if (
+          !isDirectory
+          && !filePath.endsWith(".restore.tmp")
+          && failurePoint === "open-disk-full"
+        ) {
           throw Object.assign(new Error("disk full"), { code: "ENOSPC" });
         }
-        return 7;
+        const descriptor = nextDescriptor;
+        nextDescriptor += 1;
+        descriptorKinds.set(descriptor, isDirectory ? "directory" : "file");
+        if (isDirectory) directoryOpenCalls += 1;
+        return descriptor;
       },
       writeFileSync: (_descriptor, value) => {
-        if (failurePoint === "write") throw new Error("write failed");
+        if (
+          failurePoint === "write"
+          && !String(value).includes("publish-intent-recorded")
+        ) {
+          throw new Error("write failed");
+        }
         temporary = value;
       },
-      fsyncSync: () => { fsyncCalls += 1; },
-      closeSync: () => { closeCalls += 1; },
-      renameSync: () => {
-        if (failurePoint === "rename") throw new Error("rename failed");
-        marker = temporary;
+      fsyncSync: (descriptor) => {
+        if (descriptorKinds.get(descriptor) !== "directory") return;
+        directoryFsyncCalls += 1;
+        if (
+          failurePoint === "directory-fsync"
+          && !directoryFailureTriggered
+        ) {
+          directoryFailureTriggered = true;
+          throw new Error("directory fsync failed");
+        }
       },
-      rmSync: () => { temporary = ""; },
+      closeSync: (descriptor) => {
+        if (descriptorKinds.get(descriptor) !== "directory") return;
+        directoryCloseCalls += 1;
+        if (
+          failurePoint === "directory-close"
+          && !directoryFailureTriggered
+        ) {
+          directoryFailureTriggered = true;
+          throw new Error("directory close failed");
+        }
+      },
+      renameSync: (source) => {
+        if (
+          failurePoint === "rename"
+          && !source.endsWith(".restore.tmp")
+        ) {
+          throw new Error("rename failed");
+        }
+        marker = Buffer.isBuffer(temporary)
+          ? temporary.toString("utf8")
+          : temporary;
+        temporary = "";
+      },
+      rmSync: (filePath) => {
+        if (filePath === "state.json") marker = null;
+        else temporary = "";
+      },
     });
     assert.equal(writer({ phase: "new" }).ok, false);
     assert.equal(marker, previous);
-    if (failurePoint !== "open-disk-full") assert.ok(closeCalls >= 1);
-    if (failurePoint === "rename") assert.equal(fsyncCalls, 1);
+    if (failurePoint.startsWith("directory-")) {
+      assert.equal(directoryFailureTriggered, true);
+    }
+    if (failurePoint === "directory-fsync") {
+      assert.ok(directoryOpenCalls >= 2);
+      assert.ok(directoryFsyncCalls >= 2);
+      assert.ok(directoryCloseCalls >= 2);
+    }
+    if (failurePoint === "directory-close") {
+      assert.ok(directoryOpenCalls >= 2);
+      assert.ok(directoryFsyncCalls >= 2);
+      assert.ok(directoryCloseCalls >= 2);
+    }
     assert.equal(writer({ phase: "later" }).ok, false);
   }
 });
@@ -2083,6 +2255,73 @@ test("persistence failures and terminal write failures forbid success", async ()
     },
   );
   assert.equal(intentRecorded, true);
+
+  let marker = null;
+  let temporary = "";
+  let failDirectorySync = false;
+  let directoryFailureTriggered = false;
+  let descriptor = 0;
+  const descriptorKinds = new Map();
+  const directoryFailingWriter = createAtomicStateWriter("state.json", {
+    readFileSync: () => {
+      if (marker === null) {
+        throw Object.assign(new Error("missing"), { code: "ENOENT" });
+      }
+      return Buffer.from(marker);
+    },
+    openSync: (filePath) => {
+      descriptor += 1;
+      descriptorKinds.set(
+        descriptor,
+        filePath === "." ? "directory" : "file",
+      );
+      return descriptor;
+    },
+    writeFileSync: (_descriptor, value) => { temporary = value; },
+    fsyncSync: (currentDescriptor) => {
+      if (
+        descriptorKinds.get(currentDescriptor) === "directory"
+        && failDirectorySync
+        && !directoryFailureTriggered
+      ) {
+        directoryFailureTriggered = true;
+        throw new Error("directory fsync failed");
+      }
+    },
+    closeSync() {},
+    renameSync: () => {
+      marker = Buffer.isBuffer(temporary)
+        ? temporary.toString("utf8")
+        : temporary;
+      temporary = "";
+    },
+    rmSync: (filePath) => {
+      if (filePath === "state.json") marker = null;
+      else temporary = "";
+    },
+  });
+  let directoryFailurePublishCalled = false;
+  await assert.rejects(
+    () => runReleaseTransition({
+      getRelease: async () => ({ ...draft }),
+      startPublishRelease: () => {
+        directoryFailurePublishCalled = true;
+        throw new Error("directory durability failure must block dispatch");
+      },
+      verifySnapshot: async () => true,
+      onState: (state) => {
+        failDirectorySync = state.phase === "publish-intent-recorded";
+        return directoryFailingWriter(state);
+      },
+    }),
+    (error) => {
+      assert.equal(error.code, "PERSISTENCE_INCIDENT");
+      return true;
+    },
+  );
+  assert.equal(directoryFailureTriggered, true);
+  assert.equal(directoryFailurePublishCalled, false);
+  assert.equal(JSON.parse(marker).publishIntent, false);
 });
 
 test("post-publication write failures retain recoverable durable intent", async () => {
@@ -2167,16 +2406,43 @@ test("reconciliation operations and polling sleeps are deadline bounded", async 
     publishIntent: true,
     history: [],
   };
+  const hangingOperation = (signal, evidence) => {
+    let settle;
+    let rejectResult;
+    const settled = new Promise((resolve) => { settle = resolve; });
+    const result = new Promise((_, reject) => { rejectResult = reject; });
+    signal.addEventListener("abort", () => {
+      evidence.abortObserved = true;
+      evidence.settled = true;
+      settle();
+      rejectResult(signal.reason);
+    }, { once: true });
+    return {
+      result,
+      settled,
+      cancel: async () => { evidence.cancelCalled = true; },
+    };
+  };
+  const checkedSignal = ({ signal, deadline, hardDeadline }) => {
+    assert.ok(signal instanceof AbortSignal);
+    assert.ok(Number.isFinite(deadline));
+    assert.ok(hardDeadline > deadline);
+    return signal;
+  };
+
+  const getEvidence = {};
+  let getLaterWork = false;
   const started = Date.now();
   await assert.rejects(
     () => recoverFromDurableState(durable, {
-      getRelease: async () => new Promise(() => {}),
+      getRelease: (operation) =>
+        hangingOperation(checkedSignal(operation), getEvidence),
       startPublishRelease: () => {
-        throw new Error("publish should not be reached");
+        getLaterWork = true;
+        throw new Error("publish must not start after aborted GET");
       },
       verifySnapshot: async () => true,
-      operationTimeoutMs: 5,
-      overallDeadlineMs: 25,
+      overallDeadlineMs: 100,
       pollDelayMs: 0,
       sleep: async () => {},
     }),
@@ -2186,8 +2452,14 @@ test("reconciliation operations and polling sleeps are deadline bounded", async 
       return true;
     },
   );
+  assert.equal(getEvidence.abortObserved, true);
+  assert.equal(getEvidence.cancelCalled, true);
+  assert.equal(getEvidence.settled, true);
+  assert.equal(getLaterWork, false);
   assert.ok(Date.now() - started < 500);
 
+  const snapshotEvidence = {};
+  let snapshotLaterWork = false;
   await assert.rejects(
     () => recoverFromDurableState(durable, {
       getRelease: async () => ({
@@ -2196,11 +2468,12 @@ test("reconciliation operations and polling sleeps are deadline bounded", async 
         immutable: false,
       }),
       startPublishRelease: () => {
-        throw new Error("publish should not be reached");
+        snapshotLaterWork = true;
+        throw new Error("publish must not start after aborted snapshot");
       },
-      verifySnapshot: async () => new Promise(() => {}),
-      operationTimeoutMs: 5,
-      overallDeadlineMs: 25,
+      verifySnapshot: (_release, operation) =>
+        hangingOperation(checkedSignal(operation), snapshotEvidence),
+      overallDeadlineMs: 100,
       pollDelayMs: 0,
       sleep: async () => {},
     }),
@@ -2210,29 +2483,133 @@ test("reconciliation operations and polling sleeps are deadline bounded", async 
       return true;
     },
   );
+  assert.equal(snapshotEvidence.abortObserved, true);
+  assert.equal(snapshotEvidence.cancelCalled, true);
+  assert.equal(snapshotEvidence.settled, true);
+  assert.equal(snapshotLaterWork, false);
 
-  let sleepStarted = false;
+  const publishEvidence = {};
+  let publishGetCalls = 0;
   await assert.rejects(
     () => recoverFromDurableState(durable, {
-      getRelease: async () => ({ id: 1, draft: false, immutable: false }),
-      startPublishRelease: () => ({
-        response: Promise.resolve({ id: 1, draft: false, immutable: false }),
-        settled: Promise.resolve(),
-        cancel: async () => {},
+      getRelease: async () => {
+        publishGetCalls += 1;
+        return { id: 1, draft: true, immutable: false };
+      },
+      startPublishRelease: (context) => {
+        const operation = hangingOperation(
+          checkedSignal(context),
+          publishEvidence,
+        );
+        return {
+          response: operation.result,
+          settled: operation.settled,
+          cancel: operation.cancel,
+        };
+      },
+      verifySnapshot: async () => true,
+      overallDeadlineMs: 100,
+      pollDelayMs: 0,
+      sleep: async () => {},
+    }),
+    /settlement is unproven|persistence failed|deadline/i,
+  );
+  assert.equal(publishEvidence.abortObserved, true);
+  assert.equal(publishEvidence.cancelCalled, true);
+  assert.equal(publishEvidence.settled, true);
+  assert.equal(publishGetCalls, 1);
+
+  const sleepEvidence = {};
+  let sleepLaterWork = false;
+  await assert.rejects(
+    () => recoverFromDurableState(durable, {
+      getRelease: async () => ({
+        id: 1,
+        draft: false,
+        immutable: false,
       }),
+      startPublishRelease: () => {
+        sleepLaterWork = true;
+        throw new Error("publish must not start after aborted sleep");
+      },
       verifySnapshot: async () => true,
       maxCycles: 2,
-      operationTimeoutMs: 5,
-      overallDeadlineMs: 20,
-      pollDelayMs: 1,
-      sleep: async () => {
-        sleepStarted = true;
-        return new Promise(() => {});
-      },
+      overallDeadlineMs: 100,
+      pollDelayMs: 200,
+      sleep: (_milliseconds, operation) =>
+        hangingOperation(checkedSignal(operation), sleepEvidence),
     }),
     /settlement is unproven|deadline/i,
   );
-  assert.equal(sleepStarted, true);
+  assert.equal(sleepEvidence.abortObserved, true);
+  assert.equal(sleepEvidence.cancelCalled, true);
+  assert.equal(sleepEvidence.settled, true);
+  assert.equal(sleepLaterWork, false);
+  assert.ok(Date.now() - started < 1000);
+});
+
+test("abortable Git subprocess is terminated and settled before return", async () => {
+  const childSignals = [];
+  let childSettled = false;
+  let publishCalled = false;
+  const fakeExecFile = (_command, _args, options, callback) => {
+    const child = {
+      exitCode: null,
+      signalCode: null,
+      kill(signal = "SIGTERM") {
+        childSignals.push(signal);
+        if (signal !== "SIGKILL" || childSettled) return true;
+        setTimeout(() => {
+          child.signalCode = "SIGKILL";
+          childSettled = true;
+          callback(
+            Object.assign(new Error("git aborted"), { code: "ABORT_ERR" }),
+            "",
+            "",
+          );
+        }, 2);
+        return true;
+      },
+    };
+    options.signal.addEventListener(
+      "abort",
+      () => child.kill(options.killSignal),
+      { once: true },
+    );
+    return child;
+  };
+  const started = Date.now();
+  await assert.rejects(
+    () => recoverFromDurableState({
+      transitionAttempted: true,
+      publishIntent: true,
+      history: [],
+    }, {
+      getRelease: (operation) => {
+        assert.ok(Number.isFinite(operation.deadline));
+        assert.ok(operation.hardDeadline > operation.deadline);
+        return startAbortableExecFile(
+          "git",
+          ["ls-remote", "https://github.com/example/example.git"],
+          { encoding: "utf8" },
+          operation,
+          fakeExecFile,
+        );
+      },
+      startPublishRelease: () => {
+        publishCalled = true;
+        throw new Error("work after Git abort must not start");
+      },
+      verifySnapshot: async () => true,
+      overallDeadlineMs: 100,
+    }),
+    /settlement is unproven|deadline/i,
+  );
+  assert.ok(childSignals.includes("SIGTERM"));
+  assert.ok(childSignals.includes("SIGKILL"));
+  assert.equal(childSettled, true);
+  assert.equal(publishCalled, false);
+  assert.ok(Date.now() - started < 500);
 });
 
 test("second Windows binary release requires immutable N-1 evidence", () => {
