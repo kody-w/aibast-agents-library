@@ -134,6 +134,27 @@ test("dedicated beta page resolves fork releases without changing main install",
   assert.doesNotMatch(installerPage, /\.join\("\\n"\)/);
 });
 
+test("dedicated beta page uses the Download Center details structure", () => {
+  assert.match(installerPage, /AIBAST Download Center/);
+  assert.match(installerPage, /Choose your operating system/);
+  assert.match(installerPage, /Choose the download you want/);
+  assert.match(installerPage, />Details</);
+  assert.match(installerPage, />System Requirements</);
+  assert.match(installerPage, />Install Instructions</);
+  assert.match(installerPage, />Additional Information</);
+  assert.match(installerPage, /id="download-dialog"/);
+  assert.match(installerPage, /aria-controls="panel-details"/);
+  assert.match(installerPage, /aria-controls="panel-requirements"/);
+  assert.match(installerPage, /aria-controls="panel-install"/);
+  assert.match(installerPage, /aria-controls="panel-additional"/);
+  assert.match(installerPage, /RAPP-Brainstem-Frontier-Windows\.ps1/);
+  assert.match(installerPage, /RAPP-Brainstem-Frontier-macOS-Linux\.sh/);
+  assert.match(installerPage, /release\.assets/);
+  assert.match(installerPage, /\\\.exe\$/);
+  assert.match(installerPage, /\\\.dmg\$/);
+  assert.match(installerPage, /browser_download_url/);
+});
+
 test("stable Frontier bootstraps resolve and run the latest published release", () => {
   for (const bootstrap of [frontierUnix, frontierWindows]) {
     assert.match(bootstrap, /brainstem-beta-v/);
