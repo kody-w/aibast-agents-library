@@ -101,10 +101,12 @@ def valid_pages() -> dict[str, str]:
  aria-controls="mode-panel-hard" aria-selected="false" tabindex="-1">Manual</button>
 </div></header>
 <main id="main-content" tabindex="-1"><section class="learn-step" id="workshop-step-1">
-<h3>Install RAPP Brainstem Frontier</h3>
-<a href="../../beta/">Open Frontier installer</a>
-<a href="../../beta/install.cmd" download>Download Windows install.cmd</a>
-<a href="../../beta/README.md" download>Download installation guide</a>
+<h3>Install RAPP Brainstem</h3>
+<p>Install with GitHub Copilot in VS Code or any coding AI.</p>
+<pre data-copy-target="brainstem-ai-install-prompt">Read skill.md and install RAPP Brainstem for me.</pre>
+<a href="../../install.cmd" download>Download Windows install.cmd</a>
+<a href="../../install.command" download>Download macOS installer</a>
+<a href="https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skill.md" download="SKILL.md">Download onboarding skill</a>
 {report_button("beta-install")}
 <label><input type="checkbox" data-checkpoint="install"
  data-achievements-group="onboarding" data-achievements-path="shared">Installed</label>

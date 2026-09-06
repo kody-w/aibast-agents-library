@@ -555,7 +555,12 @@ def test_repository_passes_microsoft_ai_academy_gate():
 def test_academy_route_numbers_override_generic_span_layout():
     page = (ROOT / "academy.html").read_text(encoding="utf-8")
     marker_rule = page.split(".hero-route .route-number {", 1)[1].split("}", 1)[0]
+    build_marker_rule = page.split(
+        ".build-path .build-path-index {", 1
+    )[1].split("}", 1)[0]
 
     assert "display: grid;" in marker_rule
     assert "place-items: center;" in marker_rule
     assert "line-height: 1;" in marker_rule
+    assert "display: grid;" in build_marker_rule
+    assert "place-items: center;" in build_marker_rule

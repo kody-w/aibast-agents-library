@@ -497,27 +497,29 @@
 
 
     <section class="learn-step" id="workshop-step-1">
-      <header class="learn-step-header"><span>1</span><div><p>Workshop setup</p><h3>Install RAPP Brainstem Frontier</h3></div><button class="button report-button" type="button" data-report-location="Workshop setup — step 1: install RAPP Brainstem Frontier" data-report-expected="RAPP Brainstem Frontier opens with the Brainstem connected and GitHub Copilot Brain Surgeon visible." data-report-evidence="">Report an issue</button></header>
+      <header class="learn-step-header"><span>1</span><div><p>Workshop setup</p><h3>Install RAPP Brainstem</h3></div><button class="button report-button" type="button" data-report-location="Workshop setup — step 1: install RAPP Brainstem" data-report-expected="RAPP Brainstem is running locally, its health endpoint responds, and the chat UI opens." data-report-evidence="">Report an issue</button></header>
       <div class="learn-step-body">
-        <p>Start every workshop in RAPP Brainstem Frontier. It provides the visible Brainstem, GitHub Copilot Brain Surgeon, live agent Explorer, recordings, and the one-click Copilot Studio path used by the guided exercises.</p>
+        <p>Start every workshop in the stable RAPP Brainstem. The easiest path is to let GitHub Copilot in VS Code follow the canonical onboarding skill and do the local setup for you. The same prompt works in any coding AI that can read a URL and use your terminal.</p>
         <div class="action-panel">
-          <strong>Install and launch</strong>
+          <strong>Install with GitHub Copilot in VS Code</strong>
           <ol>
-            <li>Open the dedicated Frontier installer and choose your operating system.</li>
-            <li>On macOS or Linux, copy and run the command below. On Windows 11, download <code>install.cmd</code> and double-click it.</li>
-            <li>Launch <strong>RAPP Brainstem Frontier</strong> from Applications, Launchpad, the app menu, or the Windows Desktop/Start Menu shortcut.</li>
-            <li>Wait for <strong>connected</strong>, then complete GitHub device login if the app asks.</li>
+            <li>Open GitHub Copilot Chat in VS Code and select <strong>Agent mode</strong>.</li>
+            <li>Paste the prompt below and let Copilot inspect your operating system, install RAPP Brainstem, and launch it.</li>
+            <li>Approve commands when asked and complete GitHub device login if authentication is required.</li>
           </ol>
-          <div class="prompt-heading"><strong>macOS or Linux</strong><button class="button primary" type="button" data-copy-target="beta-install-command">Copy install command</button></div>
-          <pre class="prompt-block" id="beta-install-command">curl -fsSL https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/beta/install.sh | bash</pre>
+          <div class="prompt-heading"><strong>AI install prompt</strong><button class="button primary" type="button" data-copy-target="brainstem-ai-install-prompt">Copy AI prompt</button></div>
+          <pre class="prompt-block" id="brainstem-ai-install-prompt">Read https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skill.md and install and launch RAPP Brainstem for me. Follow the canonical onboarding steps autonomously, run the correct stable installer for my operating system, pause only when GitHub authentication or another approval is required, then verify http://localhost:7071/health and open the chat UI.</pre>
+          <p><small>Also works in GitHub Copilot CLI, ChatGPT desktop, Claude Code, or another coding assistant with local terminal access.</small></p>
+          <div class="prompt-heading"><strong>Manual fallback — macOS or Linux</strong><button class="button" type="button" data-copy-target="brainstem-install-command">Copy one-liner</button></div>
+          <pre class="prompt-block" id="brainstem-install-command">curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</pre>
           <div class="detail-actions">
-            <a class="button primary" href="../../beta/">Open Frontier installer</a>
-            <a class="button" href="../../beta/install.cmd" download>Download Windows install.cmd</a>
-            <a class="button" href="../../beta/README.md" download>Download installation guide</a>
+            <a class="button" href="../../install.cmd" download>Download Windows install.cmd</a>
+            <a class="button" href="../../install.command" download>Download macOS installer</a>
+            <a class="button" href="https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skill.md" download="SKILL.md">Download onboarding skill</a>
           </div>
         </div>
-        <div class="expected-panel"><strong>Expected result</strong><p>The RAPP Brainstem Frontier window is open, the center Brainstem shows <strong>connected</strong>, the blue Brainstem icon opens the live agents Explorer, and the GitHub Copilot Brain Surgeon panel can be opened.</p></div>
-        <label class="step-complete"><input type="checkbox" data-checkpoint="beta-installed" data-achievements-group="onboarding" data-achievements-path="shared"><span>I installed and opened RAPP Brainstem Frontier.</span></label>
+        <div class="expected-panel"><strong>Expected result</strong><p>RAPP Brainstem is running at <code>http://localhost:7071</code>, the <code>/health</code> endpoint responds, and the chat UI is open. Your AI confirms the installation path and authentication state.</p></div>
+        <label class="step-complete"><input type="checkbox" data-checkpoint="brainstem-installed" data-achievements-group="onboarding" data-achievements-path="shared"><span>I installed and opened RAPP Brainstem.</span></label>
       </div>
     </section>
 
