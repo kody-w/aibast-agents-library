@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Microsoft AI Academy — AIBAST Agents Library</title>
+  <title>AIBAST Academy — AIBAST Agents Library</title>
   <meta name="description" content="Learn reusable AIBAST skills through real workshops, prove local milestones, and carry working agent capabilities into the Microsoft ecosystem.">
   <link rel="canonical" href="https://microsoft.github.io/aibast-agents-library/academy.html">
-  <meta property="og:title" content="Microsoft AI Academy — AIBAST Agents Library">
+  <meta property="og:title" content="AIBAST Academy — AIBAST Agents Library">
   <meta property="og:description" content="Learn the skill, build the agent, prove it locally, and carry the capability into the Microsoft ecosystem.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://microsoft.github.io/aibast-agents-library/academy.html">
@@ -196,12 +196,12 @@
       height: 40px;
       place-items: center;
       border-radius: 12px 4px 12px 4px;
-      background: linear-gradient(135deg, var(--accent), var(--blue));
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
       color: #ffffff;
       font-size: 0.7rem;
       font-weight: 900;
       letter-spacing: 0.04em;
-      box-shadow: 0 6px 14px rgba(91, 45, 163, 0.24);
+      box-shadow: 0 6px 14px var(--accent-soft);
     }
     .brand-copy span,
     .brand-copy small { display: block; }
@@ -261,10 +261,7 @@
       overflow: hidden;
       border: 1px solid var(--hero-border);
       border-radius: 28px;
-      background:
-        radial-gradient(circle at 88% 12%, rgba(85, 186, 255, 0.25), transparent 28%),
-        radial-gradient(circle at 62% 105%, rgba(192, 125, 255, 0.22), transparent 33%),
-        linear-gradient(130deg, var(--hero), var(--hero-soft));
+      background: linear-gradient(130deg, var(--hero), var(--hero-soft));
       color: var(--hero-text);
       box-shadow: var(--shadow);
     }
@@ -404,21 +401,24 @@
       bottom: 0;
       left: 16px;
       width: 2px;
-      background: linear-gradient(#79c9ff, rgba(195, 161, 255, 0.4));
+      background: linear-gradient(var(--accent), transparent);
       content: "";
     }
     .route-number {
       position: relative;
       z-index: 1;
       display: grid;
+      flex-shrink: 0;
       width: 34px;
       height: 34px;
       place-items: center;
-      border: 1px solid var(--hero-border);
+      border: none;
       border-radius: 50%;
       background: var(--accent);
-      color: var(--accent-ink);
-      font-size: 0.75rem;
+      color: var(--accent-ink) !important;
+      font-size: 0.85rem;
+      line-height: 1;
+      text-align: center;
       font-weight: 850;
     }
     .hero-route strong,
@@ -1649,7 +1649,7 @@
       <a class="brand" href="index.html" aria-label="AIBAST Agents Library home">
         <span class="brand-mark" aria-hidden="true">AIB</span>
         <span class="brand-copy">
-          <span>Microsoft AI Academy</span>
+          <span>AIBAST Academy</span>
           <small>by AIBAST Agents Library</small>
         </span>
       </a>
@@ -1668,7 +1668,7 @@
     <section class="hero" aria-labelledby="academy-title">
       <div class="hero-main">
         <div>
-          <p class="eyebrow">AIBAST · Microsoft AI Academy · Experimental</p>
+          <p class="eyebrow">AIBAST Academy · Experimental</p>
           <h1 id="academy-title">Learn the skill. Build the agent. Prove it. Carry it into Microsoft.</h1>
           <p class="lede"><strong>AIBAST hosts reusable skills.</strong> The Academy teaches them through real, self-paced workshops. You build a working agent, record private milestones as proof, then take that capability into the Microsoft ecosystem.</p>
           <div class="hero-actions">
