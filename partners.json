@@ -1,6 +1,6 @@
 {
   "schema": "aibast-partners/1.0",
-  "note": "Curated, non-exhaustive highlights from Microsoft partner AI agent libraries. Descriptions are paraphrased in our own words for what the partner publicly states the agent does; they are not endorsements, resale offers, or verified benchmarks. See each agent's source_url for the partner's own listing.",
+  "note": "Curated, non-exhaustive highlights from Microsoft partner AI agent libraries. Descriptions are paraphrased in our own words for what the partner publicly states the agent does; they are not endorsements, resale offers, or verified benchmarks. Each entry links to a comparable AIBAST agent (aibast_equivalent) so a visitor can compare the partner's build against ours. Where the partner's own page states a quantified result (partner_reported_outcome), it is quoted verbatim and is explicitly partner-reported, not independently verified by AIBAST. See each agent's source_url for the partner's own listing.",
   "guidance": "Use this catalog to see the variety of Copilot/Dynamics 365 agent patterns partners are shipping in the field, alongside AIBAST's own first-party and demo-proven agents.",
   "snapshot_date": "2026-09-06",
   "partners": [
@@ -20,7 +20,8 @@
       "category": "b2b_sales",
       "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
       "description": "Gives on-site field sales reps a location-aware mobile Copilot chat that surfaces store-level KPIs, deliveries, and account context without switching apps.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/next-best-action"
     },
     {
       "id": "congruentx-deal-health",
@@ -29,7 +30,8 @@
       "category": "b2b_sales",
       "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
       "description": "Blends SPICED coverage, engagement velocity, and stakeholder multi-threading into a single explainable deal-health score so reps can focus on at-risk opportunities.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/deal-health-score"
     },
     {
       "id": "congruentx-sunday-stress-buster",
@@ -38,7 +40,8 @@
       "category": "b2b_sales",
       "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
       "description": "A mobile weekly-planning Copilot that answers natural-language questions about pipeline, quota, and tasks so reps can plan the week without opening a dashboard.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/pipeline-velocity"
     },
     {
       "id": "congruentx-generate-pov-agent",
@@ -47,7 +50,8 @@
       "category": "b2b_sales",
       "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
       "description": "Turns CRM opportunity data into a one-click, on-brand point-of-view document sellers can attach, email, or reuse in a competitive response.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/proposal-generation"
     },
     {
       "id": "congruentx-meeting-prep",
@@ -56,7 +60,8 @@
       "category": "b2b_sales",
       "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
       "description": "Builds a two-minute pre-meeting brief from CRM, email, and news context, including likely objections and suggested talking points.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/meeting-prep"
     },
     {
       "id": "congruentx-sales-process-optimization",
@@ -65,7 +70,8 @@
       "category": "b2b_sales",
       "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
       "description": "Analyzes pipeline data to flag qualification gaps and stalled deals, then recommends coaching actions to keep reps on a proven sales process.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/stalled-deal-detection"
     },
     {
       "id": "congruentx-policy-issuance-checklist",
@@ -74,7 +80,8 @@
       "category": "financial_services",
       "product": "Copilot Studio \u00b7 Dynamics 365 Customer Service",
       "description": "Coordinates policy-issuance handoffs and milestone tracking across underwriting, operations, and service teams to speed time-to-first-value.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/fs-customer-onboarding"
     },
     {
       "id": "congruentx-rfp-submission-quote-copilot",
@@ -83,7 +90,9 @@
       "category": "financial_services",
       "product": "Copilot Studio \u00b7 Dynamics 365 Customer Service",
       "description": "Triages inbound RFPs and submissions, then guides configuration, pricing, and discount guardrails to speed underwriting quote turnaround.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/underwriting-support",
+      "partner_reported_outcome": "~50\u201365% faster submission handling"
     },
     {
       "id": "congruentx-territory-route-visit-copilot",
@@ -92,7 +101,9 @@
       "category": "retail_cpg",
       "product": "Copilot Studio \u00b7 Dynamics 365 Field Service",
       "description": "Plans field-rep routes and visit priorities from account health, order, and service signals to raise visit frequency where it matters most.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/store-associate-copilot",
+      "partner_reported_outcome": "10\u201320% more visits per rep per week"
     },
     {
       "id": "congruentx-churn-risk-signals",
@@ -101,7 +112,8 @@
       "category": "retail_cpg",
       "product": "Copilot Studio \u00b7 Dynamics 365 Field Service",
       "description": "Flags churn risk from price, stock, and service-level deltas so distribution teams can trigger a save play before an account lapses.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/client-health-score"
     },
     {
       "id": "congruentx-account-research-copilot",
@@ -110,7 +122,9 @@
       "category": "professional_services",
       "product": "Copilot Studio \u00b7 Dynamics 365 Project Operations",
       "description": "Automates pre-engagement account and buying-committee research for professional-services teams preparing a proposal or SOW.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/account-intelligence",
+      "partner_reported_outcome": "20\u201340% research/admin time reduction"
     },
     {
       "id": "congruentx-stakeholder-success-plan",
@@ -119,7 +133,9 @@
       "category": "professional_services",
       "product": "Copilot Studio \u00b7 Dynamics 365 Project Operations",
       "description": "Maps client-org stakeholders and builds a shared success plan with milestones to speed onboarding and reduce churn.",
-      "source_url": "https://congruentx.com/ai-agents-library/"
+      "source_url": "https://congruentx.com/ai-agents-library/",
+      "aibast_equivalent": "@aibast-agents-library/deal-stakeholder-engagement",
+      "partner_reported_outcome": "Higher NRR; better multi-threading (10\u201320% more expansion)"
     }
   ]
 }

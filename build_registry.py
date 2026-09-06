@@ -646,6 +646,15 @@ def build_registry():
             readiness.append("Production pattern")
         agent["_readiness"] = readiness
 
+    agent_names = {agent["name"] for agent in agents}
+    for row in partner_agents:
+        equivalent = row.get("aibast_equivalent")
+        if equivalent and equivalent not in agent_names:
+            errors.append(
+                f"{PARTNERS_FILE}:{row['id']}: aibast_equivalent "
+                f"'{equivalent}' does not match any agent in the registry"
+            )
+
     registry = {
         "schema": "rapp-registry/1.0",
         "version": "1.0.0",

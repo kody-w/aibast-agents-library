@@ -2063,10 +2063,19 @@ function filteredPartnerAgents() {
     .sort((a, b) => b.score - a.score || a.agent.name.localeCompare(b.agent.name));
 }
 
+function aibastEquivalentOf(agent) {
+  if (!agent.aibast_equivalent) return null;
+  return state.agents.find(item => item.name === agent.aibast_equivalent) || null;
+}
+
 function partnerAgentCard(agent) {
   const badges = [
     `<span class="badge stage-badge">Partner: ${esc(partnerName(agent.partner_id))}</span>`
   ];
+  if (agent.partner_reported_outcome) {
+    badges.push(`<span class="badge demo" title="As stated by the partner; not independently verified by AIBAST">Partner-reported: ${esc(agent.partner_reported_outcome)}</span>`);
+  }
+  const equivalent = aibastEquivalentOf(agent);
   return `
     <article class="agent-card" tabindex="0" data-action="open-partner-agent" data-id="${enc(agent.id)}">
       <div class="card-head">
@@ -2077,10 +2086,15 @@ function partnerAgentCard(agent) {
         <div class="category">${esc(agent.product)}</div>
         <h2>${esc(agent.name)}</h2>
         <p class="what">${esc(agent.description)}</p>
+        ${equivalent ? `
+        <p class="what" style="color:var(--cp-text-muted); font-size:0.85em;">
+          Compare: AIBAST's <strong>${esc(shown(equivalent))}</strong> solves a similar problem — a portable, ownable agent.py you can run yourself instead of buying it.
+        </p>` : ""}
         <div class="card-foot">
           <span class="persona">${esc(CATEGORY_NAMES[agent.category] || pretty(agent.category))}</span>
           <div class="card-actions">
             <a class="button small" href="${esc(agent.source_url)}" target="_blank" rel="noopener" data-action="stop">Partner listing ↗</a>
+            ${equivalent ? `<button class="button small" type="button" data-action="open-agent" data-name="${enc(equivalent.name)}">See AIBAST's agent</button>` : ""}
             <button class="button primary small" type="button" data-action="open-partner-agent" data-id="${enc(agent.id)}">View agent</button>
           </div>
         </div>
@@ -2829,6 +2843,7 @@ function openPartnerAgent(id) {
   const agent = state.partnerAgents.find(item => item.id === id);
   if (!agent) return;
   const partner = state.partners.find(item => item.id === agent.partner_id);
+  const equivalent = aibastEquivalentOf(agent);
   openModal(`
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="partner-agent-title">
       <button class="icon-button modal-close" type="button" data-action="close-modal" aria-label="Close">×</button>
@@ -2846,6 +2861,18 @@ function openPartnerAgent(id) {
             <h3>About this listing</h3>
             <p>This is a curated, paraphrased summary of a capability publicly listed by ${esc(partnerName(agent.partner_id))}. It is not an AIBAST-built or AIBAST-verified agent.</p>
           </section>
+          ${agent.partner_reported_outcome ? `
+          <section class="detail-section">
+            <h3>Partner-reported outcome</h3>
+            <p>${esc(agent.partner_reported_outcome)}</p>
+            <p style="color:var(--cp-text-muted); font-size:0.85em;">As stated on the partner's own site. AIBAST has not independently verified this figure.</p>
+          </section>` : ""}
+          ${equivalent ? `
+          <section class="detail-section">
+            <h3>Build it yourself with AIBAST</h3>
+            <p><strong>${esc(shown(equivalent))}</strong> — ${esc(summary(equivalent))}</p>
+            <button class="button primary" type="button" data-action="open-agent" data-name="${enc(equivalent.name)}">View AIBAST agent</button>
+          </section>` : ""}
         </div>
         <aside class="detail-aside">
           <section class="aside-block microsoft-panel">
@@ -2856,6 +2883,11 @@ function openPartnerAgent(id) {
             <h3>Source</h3>
             <a class="button full" href="${esc(agent.source_url)}" target="_blank" rel="noopener">Partner listing ↗</a>
           </section>
+          ${equivalent ? `
+          <section class="aside-block">
+            <h3>Buy vs. build</h3>
+            <p>Same problem, two paths: buy ${esc(partnerName(agent.partner_id))}'s packaged agent, or run AIBAST's portable, ownable <code>agent.py</code> yourself.</p>
+          </section>` : ""}
         </aside>
       </div>
     </div>

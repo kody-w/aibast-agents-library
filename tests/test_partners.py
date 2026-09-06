@@ -83,6 +83,44 @@ def test_descriptions_are_not_copied_marketing_headlines(entries):
             assert phrase not in blob, f"{entry['id']}: verbatim partner headline reused"
 
 
+# Exact wording confirmed from https://congruentx.com/ai-agents-library/ at
+# fetch time. Any drift here should be re-verified against the source before
+# being changed, since these are quoted as the partner's own stated numbers.
+KNOWN_PARTNER_OUTCOMES = {
+    "congruentx-rfp-submission-quote-copilot": "~50\u201365% faster submission handling",
+    "congruentx-territory-route-visit-copilot": "10\u201320% more visits per rep per week",
+    "congruentx-account-research-copilot": "20\u201340% research/admin time reduction",
+    "congruentx-stakeholder-success-plan": "Higher NRR; better multi-threading (10\u201320% more expansion)",
+}
+
+
+def test_partner_reported_outcomes_match_verified_source_text(entries):
+    by_id = {entry["id"]: entry for entry in entries}
+    for agent_id, expected in KNOWN_PARTNER_OUTCOMES.items():
+        assert by_id[agent_id]["partner_reported_outcome"] == expected
+    # Every other entry must not have an outcome invented for it.
+    for entry in entries:
+        if entry["id"] not in KNOWN_PARTNER_OUTCOMES:
+            assert "partner_reported_outcome" not in entry
+
+
+def test_aibast_equivalent_agents_exist_and_are_distinct(entries, registry):
+    agent_names = {a["name"] for a in registry["agents"]}
+    equivalents = []
+    for entry in entries:
+        equivalent = entry.get("aibast_equivalent")
+        assert equivalent, f"{entry['id']}: missing aibast_equivalent comparison"
+        assert equivalent in agent_names, (
+            f"{entry['id']}: aibast_equivalent '{equivalent}' is not a real "
+            "registry agent"
+        )
+        equivalents.append(equivalent)
+    assert len(equivalents) == len(set(equivalents)), (
+        "each partner agent should map to a distinct AIBAST agent for a "
+        "meaningful comparison"
+    )
+
+
 def test_registry_carries_partner_agents_separately(registry, entries, partners):
     assert len(registry["partner_agents"]) == len(entries)
     assert registry["partners"] == partners
@@ -109,7 +147,11 @@ def test_library_exposes_the_partners_tab_and_contract():
         "function filteredPartnerAgents",
         "function partnerAgentCard",
         "function openPartnerAgent",
+        "function aibastEquivalentOf",
         "Partner listing",
+        "Partner-reported",
+        "Build it yourself with AIBAST",
+        "not independently verified by AIBAST",
     ):
         assert token in page
 
