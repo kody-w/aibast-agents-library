@@ -241,6 +241,23 @@ def load_partners(errors: list) -> tuple:
         if not entry["source_url"].startswith("http"):
             errors.append(f"{PARTNERS_FILE}:{label}: source_url must be an http(s) URL")
             continue
+        list_fields_ok = True
+        for field in ("what_it_does", "problem_it_solves", "who_it_helps"):
+            value = entry.get(field)
+            if value is None:
+                continue
+            if (
+                not isinstance(value, list)
+                or not value
+                or any(not isinstance(v, str) or not v.strip() for v in value)
+            ):
+                errors.append(
+                    f"{PARTNERS_FILE}:{label}: {field} must be a non-empty "
+                    "list of non-empty strings"
+                )
+                list_fields_ok = False
+        if not list_fields_ok:
+            continue
 
         row = dict(entry)
         row["_catalog_kind"] = "partner"
@@ -645,15 +662,6 @@ def build_registry():
         if agent.get("_demo", {}).get("case_count") and agent.get("quality_tier") == "verified":
             readiness.append("Production pattern")
         agent["_readiness"] = readiness
-
-    agent_names = {agent["name"] for agent in agents}
-    for row in partner_agents:
-        equivalent = row.get("aibast_equivalent")
-        if equivalent and equivalent not in agent_names:
-            errors.append(
-                f"{PARTNERS_FILE}:{row['id']}: aibast_equivalent "
-                f"'{equivalent}' does not match any agent in the registry"
-            )
 
     registry = {
         "schema": "rapp-registry/1.0",

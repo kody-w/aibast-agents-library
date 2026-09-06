@@ -87,10 +87,16 @@ def test_descriptions_are_not_copied_marketing_headlines(entries):
 # fetch time. Any drift here should be re-verified against the source before
 # being changed, since these are quoted as the partner's own stated numbers.
 KNOWN_PARTNER_OUTCOMES = {
-    "congruentx-rfp-submission-quote-copilot": "~50\u201365% faster submission handling",
-    "congruentx-territory-route-visit-copilot": "10\u201320% more visits per rep per week",
-    "congruentx-account-research-copilot": "20\u201340% research/admin time reduction",
-    "congruentx-stakeholder-success-plan": "Higher NRR; better multi-threading (10\u201320% more expansion)",
+    "congruentx-buyer-intent-enrichment": "20\u201350% higher campaign ROI vs broad programs",
+    "congruentx-hyper-targeted-market-segmentation": "+5\u201315% marketing ROI, reduced spend on low-impact segments",
+    "congruentx-dynamic-journey-orchestration": "10\u201315% lift in journey revenue",
+    "congruentx-event-webinar-persona-journeys": "+10\u201320% higher MQL\u2192SQL conversion on event leads",
+    "congruentx-first-impact-claims-portal": "+5\u201310 NPS points post-claim, better retention",
+    "congruentx-icp-targeting-by-line": "10\u201315% higher win rate",
+    "congruentx-dormant-account-reactivation": "10\u201320% of dormant accounts reactivated",
+    "congruentx-service-contracts-attach-rate": "10\u201330% higher attach rate",
+    "congruentx-target-accounts-buying-committee": "Higher win rate, larger average deal size (5\u201315%)",
+    "congruentx-thought-leadership-orchestration": "Strong influence on pipeline; higher engagement, 5\u201310% more opps sourced",
 }
 
 
@@ -104,21 +110,22 @@ def test_partner_reported_outcomes_match_verified_source_text(entries):
             assert "partner_reported_outcome" not in entry
 
 
-def test_aibast_equivalent_agents_exist_and_are_distinct(entries, registry):
-    agent_names = {a["name"] for a in registry["agents"]}
-    equivalents = []
+def test_no_partner_agent_duplicates_an_existing_aibast_agent(entries):
+    # This catalog exists to show breadth beyond AIBAST's own lineup, not a
+    # relabeled copy of it, so no entry should carry a mapping/comparison
+    # back to an AIBAST agent.
     for entry in entries:
-        equivalent = entry.get("aibast_equivalent")
-        assert equivalent, f"{entry['id']}: missing aibast_equivalent comparison"
-        assert equivalent in agent_names, (
-            f"{entry['id']}: aibast_equivalent '{equivalent}' is not a real "
-            "registry agent"
-        )
-        equivalents.append(equivalent)
-    assert len(equivalents) == len(set(equivalents)), (
-        "each partner agent should map to a distinct AIBAST agent for a "
-        "meaningful comparison"
-    )
+        assert "aibast_equivalent" not in entry
+
+
+def test_partner_agents_have_rich_detail(entries):
+    for entry in entries:
+        assert entry.get("what_it_does"), f"{entry['id']}: missing what_it_does"
+        assert entry.get("problem_it_solves"), f"{entry['id']}: missing problem_it_solves"
+        assert entry.get("who_it_helps"), f"{entry['id']}: missing who_it_helps"
+        for field in ("what_it_does", "problem_it_solves", "who_it_helps"):
+            assert isinstance(entry[field], list) and entry[field]
+            assert all(isinstance(v, str) and v.strip() for v in entry[field])
 
 
 def test_registry_carries_partner_agents_separately(registry, entries, partners):
@@ -147,13 +154,23 @@ def test_library_exposes_the_partners_tab_and_contract():
         "function filteredPartnerAgents",
         "function partnerAgentCard",
         "function openPartnerAgent",
-        "function aibastEquivalentOf",
         "Partner listing",
         "Partner-reported",
-        "Build it yourself with AIBAST",
+        "What it does",
+        "Problem it solves",
+        "Who it helps",
         "not independently verified by AIBAST",
     ):
         assert token in page
+    for forbidden in (
+        "function aibastEquivalentOf",
+        "aibast_equivalent",
+        "compare approaches",
+        "Build it yourself with AIBAST",
+        "Buy vs. build",
+        "See AIBAST's agent",
+    ):
+        assert forbidden not in page
 
 
 def test_partner_agents_link_back_to_source(entries):
