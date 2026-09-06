@@ -1,7 +1,7 @@
 {
   "schema": "aibast-partners/1.0",
   "note": "Curated, non-exhaustive highlights from Microsoft partner AI agent libraries, selected to show real breadth from each partner's catalog rather than a redundant copy of AIBAST's own lineup. Descriptions, what_it_does, problem_it_solves, and who_it_helps are paraphrased in our own words for what the partner publicly states the agent does; they are not endorsements, resale offers, or verified benchmarks. Where the partner's own page states a quantified result (partner_reported_outcome), it is quoted verbatim and is explicitly partner-reported, not independently verified by AIBAST. See each agent's source_url for the partner's own listing.",
-  "guidance": "Use this catalog to learn what other Microsoft ecosystem partners are building with Copilot Studio and Dynamics 365 — patterns and use cases you can borrow ideas from, independent of AIBAST's own catalog.",
+  "guidance": "Use this catalog to learn what other Microsoft ecosystem partners are building with Copilot Studio and Dynamics 365 — patterns and use cases you can borrow ideas from, independent of AIBAST's own catalog. Every entry here follows the same research and verification standard documented at partner-standards.html.",
   "snapshot_date": "2026-09-06",
   "partners": [
     {

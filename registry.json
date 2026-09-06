@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-09-06T19:27:23.275648+00:00",
+  "generated_at": "2026-09-06T20:13:14.233691+00:00",
   "stats": {
     "total_agents": 72,
     "publishers": 1,
@@ -18,15 +18,19 @@
     "solution_demo_videos": 47,
     "total_lines": 30699,
     "total_kb": 1503.5,
-    "total_first_party": 14,
-    "first_party_available": 12,
-    "first_party_preview": 2,
-    "first_party_documented": 14,
+    "total_first_party": 22,
+    "first_party_available": 13,
+    "first_party_preview": 9,
+    "first_party_documented": 22,
     "first_party_products": [
+      "Dynamics 365 Business Central",
       "Dynamics 365 Contact Center",
       "Dynamics 365 Contact Center / Customer Service",
       "Dynamics 365 Customer Service",
+      "Dynamics 365 Finance",
+      "Dynamics 365 Project Operations",
       "Dynamics 365 Sales",
+      "Dynamics 365 Supply Chain Management",
       "Microsoft 365 Copilot",
       "Microsoft Agent 365"
     ],
@@ -14160,6 +14164,224 @@
       "_catalog_kind": "first_party",
       "_documented": true,
       "_availability_label": "Available"
+    },
+    {
+      "id": "account-reconciliation-agent",
+      "name": "Account Reconciliation Agent",
+      "product": "Dynamics 365 Finance",
+      "vertical": "general",
+      "deck_status": "Preview",
+      "description": "Continuously compares general ledger transactions against subsidiary ledgers, flags discrepancies, and recommends corrective actions to keep the books reconciled between close periods.",
+      "use_cases": [
+        "Continuously compare general ledger and subsidiary ledger transactions across the accounting period",
+        "Flag discrepancies such as unmatched entries or amount mismatches as soon as they occur",
+        "Review AI-suggested corrective actions before applying them to a reconciliation exception",
+        "See a dashboard of open and closed reconciliation exceptions instead of waiting for period-end"
+      ],
+      "personas": [
+        "Accountant",
+        "Controller",
+        "Finance Manager"
+      ],
+      "overview_url": "https://learn.microsoft.com/en-us/dynamics365/finance/general-ledger/acct-rec-agent",
+      "doc_status": "dedicated",
+      "source_slide": 3,
+      "lifecycle": "Preview",
+      "lifecycle_source_url": "https://learn.microsoft.com/en-us/dynamics365/finance/general-ledger/acct-rec-agent",
+      "_catalog_kind": "first_party",
+      "_documented": true,
+      "_availability_label": "Preview"
+    },
+    {
+      "id": "approvals-agent",
+      "name": "Approvals Agent",
+      "product": "Dynamics 365 Project Operations",
+      "vertical": "general",
+      "deck_status": "Preview",
+      "description": "Reviews submitted time, expense, and material entries against uploaded policy documents and classifies each as ready for approval or needing review.",
+      "use_cases": [
+        "Upload policy documents at the organization or project level for the agent to check entries against",
+        "Automatically classify incoming time, expense, and material entries as ready for approval or needing review",
+        "Optionally let the agent auto-approve entries that clearly match policy",
+        "Reduce the manual review load on project managers approving routine entries"
+      ],
+      "personas": [
+        "Project Manager",
+        "Approver",
+        "Project Operations Administrator"
+      ],
+      "overview_url": "https://learn.microsoft.com/en-us/dynamics365/project-operations/approvals/approvals-agent-intro",
+      "configure_url": "https://learn.microsoft.com/en-us/dynamics365/project-operations/approvals/approvals-agent-policy",
+      "doc_status": "dedicated",
+      "source_slide": 3,
+      "lifecycle": "Preview",
+      "lifecycle_source_url": "https://learn.microsoft.com/en-us/dynamics365/project-operations/approvals/approvals-agent-intro",
+      "_catalog_kind": "first_party",
+      "_documented": true,
+      "_availability_label": "Preview"
+    },
+    {
+      "id": "expense-agent-project-operations",
+      "name": "Expense Agent",
+      "product": "Dynamics 365 Project Operations",
+      "vertical": "general",
+      "deck_status": "Preview",
+      "description": "Extracts data from submitted receipts and assembles expense lines and reports for approval, reducing manual expense entry for project teams.",
+      "use_cases": [
+        "Submit a receipt by uploading it in the app or forwarding it to a monitored mailbox",
+        "Let the agent extract merchant, amount, currency, and date from the receipt automatically",
+        "Group extracted expenses into a report by project or trip for review",
+        "Apply configured policy rules before an expense report reaches an approver"
+      ],
+      "personas": [
+        "Project Team Member",
+        "Project Manager",
+        "Finance Approver"
+      ],
+      "overview_url": "https://learn.microsoft.com/en-us/dynamics365/project-operations/expense/expense-agent-overview",
+      "configure_url": "https://learn.microsoft.com/en-us/dynamics365/project-operations/expense/expense-agent-configuration",
+      "doc_status": "dedicated",
+      "source_slide": 3,
+      "lifecycle": "Preview",
+      "lifecycle_source_url": "https://learn.microsoft.com/en-us/dynamics365/project-operations/expense/expense-agent-overview",
+      "_catalog_kind": "first_party",
+      "_documented": true,
+      "_availability_label": "Preview"
+    },
+    {
+      "id": "expense-agent-business-central",
+      "name": "Expense Agent",
+      "product": "Dynamics 365 Business Central",
+      "vertical": "general",
+      "deck_status": "Preview",
+      "description": "Lets any employee submit a receipt by web app or email, then extracts, categorizes, and assembles the data into an expense report inside Business Central.",
+      "use_cases": [
+        "Submit a receipt through the dedicated expense web app or by forwarding it to a shared mailbox, with no Business Central license required",
+        "Let the agent extract and categorize receipt data automatically",
+        "Review and submit the resulting expense report for approval",
+        "Keep all financial data, audit trails, and posting logic inside Business Central's existing rules"
+      ],
+      "personas": [
+        "Employee",
+        "Expense Approver",
+        "Finance Team"
+      ],
+      "overview_url": "https://learn.microsoft.com/en-us/dynamics365/business-central/expense-management/expense-agent",
+      "doc_status": "dedicated",
+      "source_slide": 3,
+      "lifecycle": "Preview",
+      "lifecycle_source_url": "https://learn.microsoft.com/en-us/dynamics365/business-central/expense-management/expense-agent",
+      "_catalog_kind": "first_party",
+      "_documented": true,
+      "_availability_label": "Preview"
+    },
+    {
+      "id": "payables-agent",
+      "name": "Payables Agent",
+      "product": "Dynamics 365 Business Central",
+      "vertical": "general",
+      "deck_status": "Preview",
+      "description": "Monitors a mailbox for vendor invoices, extracts the data with AI, and prepares a draft purchase invoice for a supervisor to review before posting.",
+      "use_cases": [
+        "Monitor a designated mailbox for incoming vendor invoice emails with PDF attachments",
+        "Extract invoice details automatically using AI-based document analysis",
+        "Match the invoice to an existing vendor or flag it for supervisor input",
+        "Review the draft purchase invoice before it is finalized and posted"
+      ],
+      "personas": [
+        "Accounts Payable Clerk",
+        "Agent Supervisor",
+        "Finance Approver"
+      ],
+      "overview_url": "https://learn.microsoft.com/en-us/dynamics365/business-central/payables-agent",
+      "configure_url": "https://learn.microsoft.com/en-us/dynamics365/business-central/payables-agent-setup",
+      "doc_status": "dedicated",
+      "source_slide": 3,
+      "lifecycle": "Preview",
+      "lifecycle_source_url": "https://learn.microsoft.com/en-us/dynamics365/business-central/payables-agent",
+      "_catalog_kind": "first_party",
+      "_documented": true,
+      "_availability_label": "Preview"
+    },
+    {
+      "id": "procurement-agent",
+      "name": "Procurement Agent",
+      "product": "Dynamics 365 Supply Chain Management",
+      "vertical": "general",
+      "deck_status": "Preview",
+      "description": "Automates supplier email communications and evaluates the downstream impact of supplier-driven changes to purchase orders and supply commitments.",
+      "use_cases": [
+        "Classify and analyze inbound supplier emails about purchase order confirmations and change requests",
+        "Draft or send outbound reminder and follow-up emails to suppliers on the purchaser's behalf",
+        "Evaluate how a supplier's requested change would affect inventory, production, and customer commitments",
+        "Let purchasers quickly confirm and apply supplier-driven changes instead of re-entering them manually"
+      ],
+      "personas": [
+        "Purchasing Agent",
+        "Procurement Manager",
+        "Supply Chain Planner"
+      ],
+      "overview_url": "https://learn.microsoft.com/en-us/dynamics365/supply-chain/procurement/procurement-agent-overview",
+      "doc_status": "dedicated",
+      "source_slide": 3,
+      "lifecycle": "Preview",
+      "lifecycle_source_url": "https://learn.microsoft.com/en-us/dynamics365/supply-chain/procurement/procurement-agent-overview",
+      "_catalog_kind": "first_party",
+      "_documented": true,
+      "_availability_label": "Preview"
+    },
+    {
+      "id": "sales-order-agent",
+      "name": "Sales Order Agent",
+      "product": "Dynamics 365 Business Central",
+      "vertical": "general",
+      "deck_status": "GA",
+      "description": "Reads customer sales requests from a monitored mailbox, checks inventory, and prepares a sales quote or order for review before it's sent.",
+      "use_cases": [
+        "Monitor a designated mailbox for incoming customer sales requests",
+        "Clarify missing order details with the customer through a multi-turn email conversation",
+        "Check inventory availability and prepare a sales quote or order as a PDF",
+        "Let an authorized user review and approve the draft before it is converted to an order"
+      ],
+      "personas": [
+        "Sales Order Processor",
+        "Customer Service Representative",
+        "Sales Administrator"
+      ],
+      "overview_url": "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-order-agent",
+      "configure_url": "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-order-agent-setup",
+      "doc_status": "dedicated",
+      "source_slide": 3,
+      "_catalog_kind": "first_party",
+      "_documented": true,
+      "_availability_label": "Available"
+    },
+    {
+      "id": "time-entry-agent",
+      "name": "Time Entry Agent",
+      "product": "Dynamics 365 Project Operations",
+      "vertical": "general",
+      "deck_status": "Preview",
+      "description": "Drafts weekly time entries for project team members from assignments, booked capacity, or prior entries, then reminds them to review and submit.",
+      "use_cases": [
+        "Generate draft time entries at the start of each week from project assignments or booked capacity",
+        "Notify team members in Microsoft Teams about their draft entries",
+        "Review, modify, and submit draft entries from Teams or the Project Operations web app",
+        "Receive a reminder near week's end if any time entries are still missing"
+      ],
+      "personas": [
+        "Project Team Member",
+        "Resource Manager",
+        "Project Operations Administrator"
+      ],
+      "overview_url": "https://learn.microsoft.com/en-us/dynamics365/project-operations/time/enable-time-entry-agent",
+      "doc_status": "dedicated",
+      "source_slide": 3,
+      "lifecycle": "Preview",
+      "lifecycle_source_url": "https://learn.microsoft.com/en-us/dynamics365/project-operations/time/enable-time-entry-agent",
+      "_catalog_kind": "first_party",
+      "_documented": true,
+      "_availability_label": "Preview"
     }
   ],
   "partners": [
