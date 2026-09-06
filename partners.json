@@ -1,0 +1,125 @@
+{
+  "schema": "aibast-partners/1.0",
+  "note": "Curated, non-exhaustive highlights from Microsoft partner AI agent libraries. Descriptions are paraphrased in our own words for what the partner publicly states the agent does; they are not endorsements, resale offers, or verified benchmarks. See each agent's source_url for the partner's own listing.",
+  "guidance": "Use this catalog to see the variety of Copilot/Dynamics 365 agent patterns partners are shipping in the field, alongside AIBAST's own first-party and demo-proven agents.",
+  "snapshot_date": "2026-09-06",
+  "partners": [
+    {
+      "id": "congruentx",
+      "name": "CongruentX",
+      "url": "https://congruentx.com/ai-agents-library/",
+      "description": "Microsoft Dynamics 365 and Power Platform partner publishing a public library of 40+ Copilot-based sales, insurance, distribution, and professional-services agents."
+    }
+  ],
+  "count": 12,
+  "agents": [
+    {
+      "id": "congruentx-field-seller-ai-copilot",
+      "partner_id": "congruentx",
+      "name": "Field Seller AI Agent Copilot",
+      "category": "b2b_sales",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
+      "description": "Gives on-site field sales reps a location-aware mobile Copilot chat that surfaces store-level KPIs, deliveries, and account context without switching apps.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-deal-health",
+      "partner_id": "congruentx",
+      "name": "Deal Health",
+      "category": "b2b_sales",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
+      "description": "Blends SPICED coverage, engagement velocity, and stakeholder multi-threading into a single explainable deal-health score so reps can focus on at-risk opportunities.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-sunday-stress-buster",
+      "partner_id": "congruentx",
+      "name": "Sunday Stress Buster",
+      "category": "b2b_sales",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
+      "description": "A mobile weekly-planning Copilot that answers natural-language questions about pipeline, quota, and tasks so reps can plan the week without opening a dashboard.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-generate-pov-agent",
+      "partner_id": "congruentx",
+      "name": "Generate POV Agent",
+      "category": "b2b_sales",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
+      "description": "Turns CRM opportunity data into a one-click, on-brand point-of-view document sellers can attach, email, or reuse in a competitive response.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-meeting-prep",
+      "partner_id": "congruentx",
+      "name": "Meeting Prep",
+      "category": "b2b_sales",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
+      "description": "Builds a two-minute pre-meeting brief from CRM, email, and news context, including likely objections and suggested talking points.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-sales-process-optimization",
+      "partner_id": "congruentx",
+      "name": "Sales Process Optimization Agent",
+      "category": "b2b_sales",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Sales",
+      "description": "Analyzes pipeline data to flag qualification gaps and stalled deals, then recommends coaching actions to keep reps on a proven sales process.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-policy-issuance-checklist",
+      "partner_id": "congruentx",
+      "name": "Policy Issuance Checklist Agent",
+      "category": "financial_services",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Customer Service",
+      "description": "Coordinates policy-issuance handoffs and milestone tracking across underwriting, operations, and service teams to speed time-to-first-value.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-rfp-submission-quote-copilot",
+      "partner_id": "congruentx",
+      "name": "RFP/Submission Triage & Quote Copilot",
+      "category": "financial_services",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Customer Service",
+      "description": "Triages inbound RFPs and submissions, then guides configuration, pricing, and discount guardrails to speed underwriting quote turnaround.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-territory-route-visit-copilot",
+      "partner_id": "congruentx",
+      "name": "Territory Route & Visit Copilot",
+      "category": "retail_cpg",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Field Service",
+      "description": "Plans field-rep routes and visit priorities from account health, order, and service signals to raise visit frequency where it matters most.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-churn-risk-signals",
+      "partner_id": "congruentx",
+      "name": "Churn Risk: Price/Stock/Service Deltas",
+      "category": "retail_cpg",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Field Service",
+      "description": "Flags churn risk from price, stock, and service-level deltas so distribution teams can trigger a save play before an account lapses.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-account-research-copilot",
+      "partner_id": "congruentx",
+      "name": "Account Research Copilot",
+      "category": "professional_services",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Project Operations",
+      "description": "Automates pre-engagement account and buying-committee research for professional-services teams preparing a proposal or SOW.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    },
+    {
+      "id": "congruentx-stakeholder-success-plan",
+      "partner_id": "congruentx",
+      "name": "Stakeholder Map + Success Plan",
+      "category": "professional_services",
+      "product": "Copilot Studio \u00b7 Dynamics 365 Project Operations",
+      "description": "Maps client-org stakeholders and builds a shared success plan with milestones to speed onboarding and reduce churn.",
+      "source_url": "https://congruentx.com/ai-agents-library/"
+    }
+  ]
+}
