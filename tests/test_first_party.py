@@ -244,6 +244,8 @@ def test_library_exposes_only_the_first_party_catalog_contract():
         "function openFirstParty",
         "Current use cases",
         "Microsoft Learn",
+        "Estimate cost",
+        "https://microsoft.github.io/copilot-studio-estimator/",
     ):
         assert token in page
     for forbidden in (

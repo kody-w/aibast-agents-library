@@ -1449,6 +1449,20 @@ const CATEGORY_ICONS = {
   professional_services: "§", retail_cpg: "▦", slg_government: "⌂",
   software_digital_products: "⌘", customer_service: "☎"
 };
+const PARTNER_AGENT_ICONS = {
+  "congruentx-buyer-intent-enrichment": "◎",
+  "congruentx-hyper-targeted-market-segmentation": "⊞",
+  "congruentx-dynamic-journey-orchestration": "⇄",
+  "congruentx-event-webinar-persona-journeys": "⚑",
+  "congruentx-first-impact-claims-portal": "◑",
+  "congruentx-icp-targeting-by-line": "◈",
+  "congruentx-risk-loss-ratio-storytelling": "▲",
+  "congruentx-loyalty-tier-triggers": "★",
+  "congruentx-dormant-account-reactivation": "↻",
+  "congruentx-service-contracts-attach-rate": "⬡",
+  "congruentx-target-accounts-buying-committee": "⬢",
+  "congruentx-thought-leadership-orchestration": "☆"
+};
 
 const FIRST_PARTY_VERTICALS = {
   customer_service: "Customer Service & Contact Center"
@@ -2064,29 +2078,39 @@ function filteredPartnerAgents() {
 }
 
 function partnerAgentCard(agent) {
+  const icon = PARTNER_AGENT_ICONS[agent.id] || CATEGORY_ICONS[agent.category] || "▣";
+  const persona = first(agent.who_it_helps, "Business user");
+  const productChips = agent.product.split("\u00b7").map(part => part.trim()).filter(Boolean);
   const badges = [
     `<span class="badge stage-badge">Partner: ${esc(partnerName(agent.partner_id))}</span>`
   ];
-  if (agent.partner_reported_outcome) {
-    badges.push(`<span class="badge demo" title="As stated by the partner; not independently verified by AIBAST">Partner-reported: ${esc(agent.partner_reported_outcome)}</span>`);
-  }
-  const highlight = (agent.what_it_does || [])[0];
+  const whyLabel = agent.partner_reported_outcome ? "Partner-reported outcome" : "Why it's worth knowing";
+  const whyText = agent.partner_reported_outcome
+    || first(agent.problem_it_solves, "")
+    || first(agent.what_it_does, "");
   return `
     <article class="agent-card" tabindex="0" data-action="open-partner-agent" data-id="${enc(agent.id)}">
       <div class="card-head">
-        <span class="agent-icon">${esc(CATEGORY_ICONS[agent.category] || "▣")}</span>
+        <span class="agent-icon">${esc(icon)}</span>
         <div class="badges">${badges.join("")}</div>
       </div>
       <div class="card-body">
-        <div class="category">${esc(agent.product)}</div>
+        <div class="category">${esc(CATEGORY_NAMES[agent.category] || pretty(agent.category))}</div>
         <h2>${esc(agent.name)}</h2>
         <p class="what">${esc(agent.description)}</p>
-        ${highlight ? `
-        <p class="what" style="color:var(--cp-text-muted); font-size:0.85em;">
-          ${esc(highlight)}
-        </p>` : ""}
+        ${whyText ? `
+        <div class="why" title="${agent.partner_reported_outcome ? "As stated by the partner; not independently verified by AIBAST" : ""}">
+          <strong>${esc(whyLabel)}</strong>
+          <span>${esc(whyText)}</span>
+        </div>` : ""}
+        <div class="microsoft-story">
+          <strong>Partner</strong>
+          <div class="tool-chips">
+            ${[partnerName(agent.partner_id), ...productChips].map(chip => `<span class="tool-chip">${esc(chip)}</span>`).join("")}
+          </div>
+        </div>
         <div class="card-foot">
-          <span class="persona">${esc(CATEGORY_NAMES[agent.category] || pretty(agent.category))}</span>
+          <span class="persona">For ${esc(persona)}</span>
           <div class="card-actions">
             <a class="button small" href="${esc(agent.source_url)}" target="_blank" rel="noopener" data-action="stop">Partner listing ↗</a>
             <button class="button primary small" type="button" data-action="open-partner-agent" data-id="${enc(agent.id)}">View agent</button>
@@ -2821,6 +2845,11 @@ function openFirstParty(id) {
             <a class="button full" href="${esc(agent.overview_url)}" target="_blank" rel="noopener">Overview ↗</a>
             ${agent.configure_url ? `<a class="button full" href="${esc(agent.configure_url)}" target="_blank" rel="noopener">Configure ↗</a>` : ""}
           </section>
+          <section class="aside-block">
+            <h3>Estimate cost</h3>
+            <p>Model expected Copilot Studio consumption before you configure this agent.</p>
+            <a class="button full" href="https://microsoft.github.io/copilot-studio-estimator/" target="_blank" rel="noopener">Copilot Studio Estimator ↗</a>
+          </section>
           ${(agent.personas || []).length ? `
           <section class="aside-block">
             <h3>Personas</h3>
@@ -2841,7 +2870,7 @@ function openPartnerAgent(id) {
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="partner-agent-title">
       <button class="icon-button modal-close" type="button" data-action="close-modal" aria-label="Close">×</button>
       <header class="detail-head">
-        <span class="detail-icon">${esc(CATEGORY_ICONS[agent.category] || "▣")}</span>
+        <span class="detail-icon">${esc(PARTNER_AGENT_ICONS[agent.id] || CATEGORY_ICONS[agent.category] || "▣")}</span>
         <div>
           <div class="category">${esc(agent.product)} · ${esc(CATEGORY_NAMES[agent.category] || pretty(agent.category))}</div>
           <h2 id="partner-agent-title">${esc(agent.name)}</h2>
