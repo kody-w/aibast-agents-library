@@ -50,14 +50,31 @@ contacts Clarity.
 
 ## Privacy posture
 
-The stamped loader is the standard Clarity snippet with two guards:
+The stamped block is a consent-gated Clarity loader:
 
+- **Consent first.** A small bar at the bottom of the page explains that the
+  site uses Microsoft Clarity, links the Microsoft Privacy Statement, and
+  offers Accept / Decline. Clarity is not loaded, and sets no cookie, until the
+  visitor accepts. The choice is stored per browser under
+  `localStorage["aibast-clarity-consent"]` ("granted" or "denied") and the bar
+  never returns once answered. Accepting also sends Clarity's `consent` signal,
+  so the project's **Cookie consent: Required** setting can stay on.
 - It only loads on `*.github.io` hosts. Local previews, `file://` opens, and
   forks served elsewhere never report sessions.
-- It stays silent when the browser sends Global Privacy Control or Do Not
-  Track.
+- It stays silent, with no bar, when the browser sends Global Privacy Control
+  or Do Not Track.
+- The bar is drawn with CSS system colours (Canvas, CanvasText, AccentColor),
+  so it follows the visitor's light or dark scheme on every page without
+  touching any page's theme tokens.
 
-Clarity masks text input by default. Keep **Masking: Strict** in the project
-settings so recordings never capture typed content, and enable the Clarity
-**Cookie consent** setting if the site is ever served under a domain that
-requires consent before analytics cookies.
+Clarity masks text input by default. Keep **Masking: Strict** and **Cookie
+consent: Required** in the project settings.
+
+## Bundles and gates
+
+The block is a hosting artifact, not solution content. Downloadable solution
+bundles (`tools/build_solution_export.py`) ship pages without it, and the
+workshop rollout audit compares bundle and page bytes with the block removed on
+both sides, so changing the tag never rebuilds a bundle. The Academy security
+gate likewise scans `academy.html` with the block removed; every other
+analytics or tracking pattern remains forbidden there.

@@ -7,14 +7,20 @@ root. ``render_tag`` turns it into the block every published page carries;
 pages and ``tools/scaffold_solution_journey.py`` emits it in fresh workshop
 pages, so both paths produce byte-identical heads.
 
-The rendered tag is the standard Clarity loader with two guards added:
+The rendered block is a consent-gated Clarity loader:
 
-* it only loads on ``*.github.io`` hosts, so local previews and file:// opens
+* it only runs on ``*.github.io`` hosts, so local previews and file:// opens
   never report sessions;
-* it stays silent when the browser sends Global Privacy Control or Do Not Track.
+* it stays silent when the browser sends Global Privacy Control or Do Not Track;
+* it shows a small cookie-consent bar and loads Clarity only after the visitor
+  accepts; the choice is remembered per browser under
+  ``localStorage["aibast-clarity-consent"]`` ("granted" or "denied").
 
-While ``project_id`` is empty the tag is still stamped (so every page carries
-the same block) but the loader returns before contacting Clarity.
+The block is a hosting artifact, not solution content: ``strip_tag`` removes it
+so downloadable solution bundles and their audit compare pages without it.
+
+While ``project_id`` is empty the block is still stamped (so every page carries
+the same bytes) but the loader returns before doing anything.
 """
 
 from __future__ import annotations
@@ -31,8 +37,11 @@ END_MARK = "<!-- clarity:end -->"
 BLOCK_RE = re.compile(
     re.escape(START_MARK) + r".*?" + re.escape(END_MARK) + r"\n?", re.DOTALL
 )
+BLOCK_BYTES_RE = re.compile(BLOCK_RE.pattern.encode("ascii"), re.DOTALL)
 HEAD_CLOSE_RE = re.compile(r"</head>", re.IGNORECASE)
 PROJECT_ID_RE = re.compile(r"^[a-z0-9]{6,20}$")
+CONSENT_STORAGE_KEY = "aibast-clarity-consent"
+PRIVACY_STATEMENT_URL = "https://go.microsoft.com/fwlink/?LinkId=521839"
 
 # Published site pages: root HTML plus these directories (see
 # scripts/build_pages_site.py for what GitHub Pages actually serves).
@@ -42,18 +51,46 @@ PUBLIC_DIRECTORIES = ("docs", "reports", "solutions")
 # beta Electron renderer.
 EXCLUDED_PREFIXES = ("rapp_brainstem/", "rapp_ai/", "tools/", "beta/", "node_modules/")
 
-TAG_TEMPLATE = """{start}
-<script data-clarity-project="{project_id}">
-(function (c, l, a, r, i, t, y) {{
-  if (!i || !/\\.github\\.io$/i.test(l.location.hostname)) return;
-  var n = c.navigator || {{}};
-  if (n.globalPrivacyControl || n.doNotTrack === "1" || c.doNotTrack === "1") return;
-  c[a] = c[a] || function () {{ (c[a].q = c[a].q || []).push(arguments); }};
-  t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-  y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-}})(window, document, "clarity", "script", "{project_id}");
+TAG_TEMPLATE = """<!-- clarity:start -->
+<script data-clarity-project="__PROJECT_ID__">
+(function (w, d, id) {
+  if (!id || !/\\.github\\.io$/i.test(d.location.hostname)) return;
+  var n = w.navigator || {};
+  if (n.globalPrivacyControl || n.doNotTrack === "1" || w.doNotTrack === "1") return;
+  var KEY = "__CONSENT_KEY__";
+  function read() { try { return w.localStorage.getItem(KEY); } catch (e) { return null; } }
+  function write(v) { try { w.localStorage.setItem(KEY, v); } catch (e) {} }
+  function load() {
+    w.clarity = w.clarity || function () { (w.clarity.q = w.clarity.q || []).push(arguments); };
+    var t = d.createElement("script"); t.async = 1; t.src = "https://www.clarity.ms/tag/" + id;
+    var y = d.getElementsByTagName("script")[0]; y.parentNode.insertBefore(t, y);
+    w.clarity("consent");
+  }
+  function el(tag, css, text) { var e = d.createElement(tag); e.style.cssText = css; if (text) e.textContent = text; return e; }
+  function banner() {
+    if (d.getElementById(KEY)) return;
+    var bar = el("div", "position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;padding:12px 16px;background:Canvas;color:CanvasText;border-top:1px solid GrayText;font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif");
+    bar.id = KEY; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Cookie consent");
+    var text = el("span", "max-width:62ch", "This site uses Microsoft Clarity to understand how visitors use it. Typed text is masked. ");
+    var link = el("a", "color:LinkText;text-decoration:underline", "Microsoft Privacy Statement");
+    link.href = "__PRIVACY_URL__"; link.target = "_blank"; link.rel = "noopener";
+    text.appendChild(link);
+    var btn = "cursor:pointer;border-radius:6px;padding:7px 14px;font:inherit;font-weight:600;";
+    var accept = el("button", btn + "border:1px solid AccentColor;background:AccentColor;color:AccentColorText", "Accept");
+    var decline = el("button", btn + "border:1px solid GrayText;background:ButtonFace;color:ButtonText", "Decline");
+    accept.type = "button"; decline.type = "button";
+    accept.onclick = function () { write("granted"); bar.remove(); load(); };
+    decline.onclick = function () { write("denied"); bar.remove(); };
+    bar.appendChild(text); bar.appendChild(accept); bar.appendChild(decline);
+    d.body.appendChild(bar);
+  }
+  var choice = read();
+  if (choice === "granted") { load(); return; }
+  if (choice === "denied") return;
+  if (d.body) banner(); else d.addEventListener("DOMContentLoaded", banner);
+})(window, document, "__PROJECT_ID__");
 </script>
-{end}
+<!-- clarity:end -->
 """
 
 
@@ -70,7 +107,26 @@ def load_config(path: Path = CONFIG_PATH) -> dict:
 
 
 def render_tag(project_id: str) -> str:
-    return TAG_TEMPLATE.format(start=START_MARK, end=END_MARK, project_id=project_id)
+    return (
+        TAG_TEMPLATE.replace("__PROJECT_ID__", project_id)
+        .replace("__CONSENT_KEY__", CONSENT_STORAGE_KEY)
+        .replace("__PRIVACY_URL__", PRIVACY_STATEMENT_URL)
+    )
+
+
+def current_tag(root: Path = ROOT) -> str:
+    """The tag every published page must carry right now (from clarity.json)."""
+    return render_tag(load_config(root / "clarity.json")["project_id"])
+
+
+def strip_tag(text: str) -> str:
+    """Return ``text`` without any Clarity block."""
+    return BLOCK_RE.sub("", text)
+
+
+def strip_tag_bytes(data: bytes) -> bytes:
+    """Byte-level ``strip_tag`` for bundle and audit comparisons."""
+    return BLOCK_BYTES_RE.sub(b"", data)
 
 
 def is_public_page(relative: str) -> bool:
@@ -96,16 +152,10 @@ def public_pages(root: Path = ROOT) -> list[Path]:
 
 def stamp(html: str, tag: str) -> str:
     """Return ``html`` carrying exactly one copy of ``tag`` before ``</head>``."""
-    stripped = BLOCK_RE.sub("", html)
+    stripped = strip_tag(html)
     match = HEAD_CLOSE_RE.search(stripped)
     if match is None:
         raise ValueError("page has no </head>")
-    before = stripped[: match.start()]
-    if before and not before.endswith("\n"):
-        before += "\n"
-    return before + tag + stripped[match.start() :]
-
-
-def current_tag(root: Path = ROOT) -> str:
-    """The tag every published page must carry right now (from clarity.json)."""
-    return render_tag(load_config(root / "clarity.json")["project_id"])
+    # Nothing is added outside the block, so strip_tag(stamp(x)) == x exactly;
+    # bundles and the rollout audit rely on that.
+    return stripped[: match.start()] + tag + stripped[match.start() :]
