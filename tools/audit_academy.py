@@ -116,6 +116,11 @@ FRONT_MATTER_KEY_RE = re.compile(
 MUTATING_METHOD_RE = re.compile(
     r"\bmethod\s*:\s*['\"](?:POST|PUT|PATCH|DELETE)['\"]", re.I
 )
+try:
+    from tools.clarity_tag import strip_tag as strip_clarity_tag
+except ModuleNotFoundError:
+    from clarity_tag import strip_tag as strip_clarity_tag
+
 ANALYTICS_RE = re.compile(
     r"google-analytics|googletagmanager|analytics\.js|gtag\s*\(|"
     r"\bfbq\s*\(|mixpanel|hotjar|segment\.com|plausible(?:\.io)?|"
@@ -1621,7 +1626,10 @@ def audit_academy_html(
         result.fail("accessibility", "user-scalable=no is forbidden")
     if "offsetparent" in lower_script:
         result.fail("accessibility", "offsetParent visibility logic is forbidden")
-    if ANALYTICS_RE.search(source):
+    # The site-wide Microsoft Clarity block (tools/clarity_tag.py) is the one
+    # sanctioned analytics surface: consent-gated, github.io-only, GPC/DNT-aware.
+    # Everything else that looks like tracking stays forbidden.
+    if ANALYTICS_RE.search(strip_clarity_tag(source)):
         result.fail("security", "analytics or tracking code is forbidden")
     if AUTO_SUBMISSION_RE.search(script) or MUTATING_METHOD_RE.search(script):
         result.fail("security", "automatic public submission primitives are forbidden")
