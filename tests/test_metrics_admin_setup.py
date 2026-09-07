@@ -107,7 +107,7 @@ def test_page_is_self_contained_and_inline_scripts_parse_with_node():
     assert not re.search(r"<link\b[^>]*rel=[\"']stylesheet", HTML, re.IGNORECASE)
 
     scripts = inline_scripts()
-    assert len(scripts) == 2
+    assert len(scripts) == 3
     for script in scripts:
         result = subprocess.run(
             ["node", "--check"],
