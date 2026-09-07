@@ -64,26 +64,39 @@ def test_landing_page_installer_uses_current_pages_host():
     )
 
 
-def test_staging_install_commands_pin_the_staging_repository_and_ref():
+def test_hero_matches_production_shape():
+    soup = BeautifulSoup(
+        (ROOT / "index.html").read_text(encoding="utf-8"),
+        "html.parser",
+    )
+    hero = soup.select_one(".hero")
+    assert hero.select(".academy-action") == []
+    assert hero.select(".academy-copy") == []
+    assert [p.get_text(" ", strip=True) for p in hero.select("p")] == [
+        "Industry agent templates, production patterns, and a local-first RAPP "
+        "Brainstem powered by GitHub Copilot."
+    ]
+
+
+def test_staging_ring_uses_the_same_short_one_liner_as_production():
     staging = install_commands(
         "kody-w.github.io",
         "https://kody-w.github.io/aibast-agents-library/",
     )
-    for command in (
-        staging["bash"],
-        staging["windows"],
-        staging["macManual"],
-        staging["windowsManual"],
-    ):
-        assert "kody-w/aibast-agents-library" in command
-        assert "easy-mode-copilot-chat-pilot" in command
-    assert "BRAINSTEM_REPO_URL" in staging["bash"]
-    assert "BRAINSTEM_REPO_REF" in staging["bash"]
-    assert "BRAINSTEM_VERSION_URL" in staging["bash"]
-    assert "$env:BRAINSTEM_REPO_URL" in staging["windows"]
+    assert staging["bash"] == (
+        "curl -fsSL https://kody-w.github.io/aibast-agents-library/install.sh | bash"
+    )
+    assert staging["windows"] == (
+        "irm https://kody-w.github.io/aibast-agents-library/install.ps1 | iex"
+    )
+    for command in (staging["macManual"], staging["windowsManual"]):
+        assert "--branch staging https://github.com/kody-w/aibast-agents-library.git" in command
+    for command in staging.values():
+        assert "BRAINSTEM_" not in str(command)
+        assert "easy-mode-copilot-chat-pilot" not in str(command)
 
 
-def test_staging_download_wrappers_embed_the_same_pinned_commands():
+def test_staging_download_wrappers_embed_the_short_ring_commands():
     text = (ROOT / "index.html").read_text(encoding="utf-8")
     commands_start = text.index("function buildInstallCommands")
     commands_end = text.index("const installCommands")
@@ -113,7 +126,7 @@ console.log(JSON.stringify(buildInstallerDownloads(commands)));
     )
     assert result.returncode == 0, result.stderr
     downloads = json.loads(result.stdout)
+    assert "https://kody-w.github.io/aibast-agents-library/install.sh | bash" in downloads["macOS/Linux"]["href"]
+    assert "irm https://kody-w.github.io/aibast-agents-library/install.ps1 | iex" in downloads["Windows"]["href"]
     for platform in ("macOS/Linux", "Windows"):
-        payload = downloads[platform]["href"]
-        assert "kody-w/aibast-agents-library" in payload
-        assert "easy-mode-copilot-chat-pilot" in payload
+        assert "BRAINSTEM_" not in downloads[platform]["href"]
