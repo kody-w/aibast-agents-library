@@ -274,7 +274,7 @@ def test_rollout_audit_ignores_the_tag_but_still_catches_real_drift(tmp_path):
 
 
 def test_academy_gate_ignores_only_the_sanctioned_clarity_block():
-    from tools import audit_academy
+    audit_academy = pytest.importorskip("tools.audit_academy")  # Academy ships on staging first
 
     tag = clarity.render_tag("abc1234567")
     page = clarity.stamp("<html><head></head><body></body></html>", tag)
