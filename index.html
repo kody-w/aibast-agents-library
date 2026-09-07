@@ -24,8 +24,6 @@
   .hero h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
   .hero p { color: #8b949e; font-size: 16px; line-height: 1.6; }
   .hero .tagline { color: #58a6ff; font-weight: 600; font-size: 14px; margin-top: 12px; }
-  .hero .academy-copy { margin-top: 12px; }
-  .hero > .academy-action { margin-top: 20px; }
   .hero-actions {
     display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
     margin-top: 10px;
@@ -242,8 +240,6 @@
   <h1>AIBAST Agents Library</h1>
   <p>Industry agent templates, production patterns, and a local-first RAPP Brainstem powered by GitHub Copilot.</p>
   <div class="tagline">Build locally. Validate with the production guide. Scale through the Microsoft AI stack.</div>
-  <p class="academy-copy">The Library hosts reusable skills; Microsoft AI Academy teaches them through real workshops and Microsoft ecosystem deployment.</p>
-  <a class="hero-action primary academy-action" href="academy.html">Open Microsoft AI Academy</a>
   <div class="hero-actions">
     <a class="hero-action primary" href="docs/rapp-guide.html">Open Production Guide</a>
     <a class="hero-action" href="library.html">Browse Agent Library</a>
@@ -446,23 +442,19 @@
       : 'https://microsoft.github.io/aibast-agents-library/'
   );
   function buildInstallCommands(hostname, base) {
+    // The published install.sh / install.ps1 already carry the repository and
+    // ref for the host that serves them (the staging ring renders its own
+    // copies), so the one-liner is identical on every host.
     const staging = hostname === 'kody-w.github.io';
     const owner = staging ? 'kody-w' : 'microsoft';
-    const ref = staging ? 'easy-mode-copilot-chat-pilot' : 'main';
+    const ref = staging ? 'staging' : 'main';
     const repoUrl = `https://github.com/${owner}/aibast-agents-library.git`;
-    const versionUrl = `https://raw.githubusercontent.com/${owner}/aibast-agents-library/${ref}/rapp_brainstem/VERSION`;
-    const bashOverrides = staging
-      ? `BRAINSTEM_REPO_URL=${repoUrl} BRAINSTEM_REPO_REF=${ref} BRAINSTEM_VERSION_URL=${versionUrl} `
-      : '';
-    const powershellOverrides = staging
-      ? `$env:BRAINSTEM_REPO_URL='${repoUrl}'; $env:BRAINSTEM_REPO_REF='${ref}'; $env:BRAINSTEM_VERSION_URL='${versionUrl}'; `
-      : '';
     return {
       staging,
       owner,
       ref,
-      bash: `curl -fsSL ${base}install.sh | ${bashOverrides}bash`,
-      windows: `${powershellOverrides}irm ${base}install.ps1 | iex`,
+      bash: `curl -fsSL ${base}install.sh | bash`,
+      windows: `irm ${base}install.ps1 | iex`,
       macManual: `git clone --branch ${ref} ${repoUrl} ~/.brainstem/src && cd ~/.brainstem/src/rapp_brainstem && pip3 install -r requirements.txt && ./start.sh`,
       windowsManual: `git clone --branch ${ref} ${repoUrl} %USERPROFILE%\\.brainstem\\src && cd %USERPROFILE%\\.brainstem\\src\\rapp_brainstem && pip install -r requirements.txt && python brainstem.py`
     };
