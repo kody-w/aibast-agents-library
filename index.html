@@ -498,8 +498,8 @@
     return {
       skill,
       comment: '# No Brainstem. Paste into GitHub Copilot, Claude Code / Cowork, or Microsoft Scout. 🤖',
-      cmd: `Read ${skill} and give me Ask HR using Easy Mode and test it for me.`,
-      hint: 'Works in any AI that can read a URL and use your terminal: GitHub Copilot (VS Code Agent mode or Copilot CLI), Claude Code / Cowork, Microsoft Scout. Swap Ask HR for any workshop in the <a href="library.html">library</a>. <a href="skills/aibast-easy-mode-copilot/SKILL.md" download="SKILL.md">Download the Copilot-only SKILL.md</a> to attach it directly.'
+      cmd: `Read ${skill} and show me the AIBAST library, then give me the workshop I pick using Easy Mode and test it for me.`,
+      hint: 'Works in any AI that can read a URL and use your terminal: GitHub Copilot (VS Code Agent mode or Copilot CLI), Claude Code / Cowork, Microsoft Scout. The AI lists every workshop and asks which one you want; browse the <a href="library.html">library</a> first if you already know. <a href="skills/aibast-easy-mode-copilot/SKILL.md" download="SKILL.md">Download the Copilot-only SKILL.md</a> to attach it directly.'
     };
   }
   const installCommands = buildInstallCommands(location.hostname, publishedBase);

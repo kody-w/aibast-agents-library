@@ -176,9 +176,11 @@ def test_copilot_only_lane_points_at_the_served_lane_skill():
         lane = copilot_lane(base)
         assert lane["skill"] == base + "skills/aibast-easy-mode-copilot/SKILL.md"
         assert lane["cmd"] == (
-            f"Read {base}skills/aibast-easy-mode-copilot/SKILL.md and give me Ask HR "
-            "using Easy Mode and test it for me."
+            f"Read {base}skills/aibast-easy-mode-copilot/SKILL.md and show me the AIBAST "
+            "library, then give me the workshop I pick using Easy Mode and test it for me."
         )
+        assert "Ask HR" not in lane["cmd"] and "Ask HR" not in lane["hint"]
+        assert "lists every workshop and asks which one you want" in lane["hint"]
         assert "No Brainstem" in lane["comment"]
         for host in ("GitHub Copilot", "Copilot CLI", "Claude Code / Cowork", "Microsoft Scout"):
             assert host in lane["hint"]
