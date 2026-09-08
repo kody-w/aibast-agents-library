@@ -4,7 +4,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 STANDARDS_PAGE = REPO_ROOT / "partner-standards.html"
-LIBRARY_PAGE = REPO_ROOT / "library.html"
+LIBRARY_PAGE = REPO_ROOT / "index.html"
 
 
 def test_standards_page_exists_and_documents_the_standard():

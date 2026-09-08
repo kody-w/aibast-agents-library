@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why the RAPP Brainstem — AIBAST Agents Library</title>
+<meta name="description" content="Why the AIBAST Agents Library ships a local frontier learning and rapid prototyping tool, what it is not, and how what you build in it graduates into GitHub Copilot, Copilot Studio, and Microsoft 365 Copilot.">
+<link href="data:," rel="icon">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 48px 20px 80px;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  .eyebrow { color: #58a6ff; font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+  h1 { color: #e6edf3; font-size: 40px; font-weight: 700; letter-spacing: -0.5px; margin: 8px 0 12px; line-height: 1.15; }
+  .lede { color: #8b949e; font-size: 18px; margin-bottom: 36px; }
+  h2 { color: #e6edf3; font-size: 22px; font-weight: 600; margin: 40px 0 12px; }
+  p { margin-bottom: 14px; }
+  ul { margin: 0 0 14px 22px; }
+  li { margin-bottom: 8px; }
+  strong { color: #e6edf3; }
+  a { color: #58a6ff; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px 22px; margin: 18px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #30363d; vertical-align: top; }
+  th { color: #8b949e; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
+  td:first-child { color: #e6edf3; font-weight: 600; white-space: nowrap; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+  .button {
+    display: inline-block; padding: 10px 18px; border-radius: 8px; font-weight: 600; text-decoration: none;
+    border: 1px solid #30363d; color: #e6edf3; background: #161b22;
+  }
+  .button.primary { background: #238636; border-color: #238636; color: #fff; }
+  .footer { max-width: 760px; margin: 48px auto 0; color: #6e7681; font-size: 13px; }
+  .footer a { color: #8b949e; }
+  @media (max-width: 600px) { h1 { font-size: 30px; } body { padding-top: 28px; } }
+</style>
+<!-- clarity:start -->
+<script data-clarity-project="yeqkj55zbc">
+(function (w, d, id) {
+  if (!id || !/\.github\.io$/i.test(d.location.hostname)) return;
+  var n = w.navigator || {};
+  if (n.globalPrivacyControl || n.doNotTrack === "1" || w.doNotTrack === "1") return;
+  var KEY = "aibast-clarity-consent";
+  function read() { try { return w.localStorage.getItem(KEY); } catch (e) { return null; } }
+  function write(v) { try { w.localStorage.setItem(KEY, v); } catch (e) {} }
+  function load() {
+    w.clarity = w.clarity || function () { (w.clarity.q = w.clarity.q || []).push(arguments); };
+    var t = d.createElement("script"); t.async = 1; t.src = "https://www.clarity.ms/tag/" + id;
+    var y = d.getElementsByTagName("script")[0]; y.parentNode.insertBefore(t, y);
+    w.clarity("consentv2", { ad_Storage: "denied", analytics_Storage: "granted" });
+  }
+  function el(tag, css, text) { var e = d.createElement(tag); e.style.cssText = css; if (text) e.textContent = text; return e; }
+  function banner() {
+    if (d.getElementById(KEY)) return;
+    var bar = el("div", "position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;padding:12px 16px;background:Canvas;color:CanvasText;border-top:1px solid GrayText;font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif");
+    bar.id = KEY; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Cookie consent");
+    var text = el("span", "max-width:62ch", "This site uses Microsoft Clarity to understand how visitors use it. Typed text is masked. ");
+    var link = el("a", "color:LinkText;text-decoration:underline", "Microsoft Privacy Statement");
+    link.href = "https://go.microsoft.com/fwlink/?LinkId=521839"; link.target = "_blank"; link.rel = "noopener";
+    text.appendChild(link);
+    var btn = "cursor:pointer;border-radius:6px;padding:7px 14px;font:inherit;font-weight:600;";
+    var accept = el("button", btn + "border:1px solid AccentColor;background:AccentColor;color:AccentColorText", "Accept");
+    var decline = el("button", btn + "border:1px solid GrayText;background:ButtonFace;color:ButtonText", "Decline");
+    accept.type = "button"; decline.type = "button";
+    accept.onclick = function () { write("granted"); bar.remove(); load(); };
+    decline.onclick = function () { write("denied"); bar.remove(); };
+    bar.appendChild(text); bar.appendChild(accept); bar.appendChild(decline);
+    d.body.appendChild(bar);
+  }
+  var choice = read();
+  if (choice === "granted") { load(); return; }
+  if (choice === "denied") return;
+  if (d.body) banner(); else d.addEventListener("DOMContentLoaded", banner);
+})(window, document, "yeqkj55zbc");
+</script>
+<!-- clarity:end -->
+</head>
+<body>
+<main>
+  <div class="eyebrow">AIBAST Agents Library</div>
+  <h1>Why the RAPP Brainstem?</h1>
+  <p class="lede">It is a <strong>local frontier learning and rapid prototyping tool</strong>. It is where you learn the agent pattern and prove a prototype on your own machine, before the result graduates into the Microsoft tools that carry it to real users.</p>
+
+  <h2>What it is</h2>
+  <p>A small local server, powered by GitHub Copilot, that runs the RAPP agent loop: read a soul file, discover agents, call the model with tools, execute the tool an agent exposes, and answer. Every agent is one Python file. Agents reload from disk on every request, so the loop from idea to working prototype is measured in minutes, with synthetic data and no cloud to provision.</p>
+  <p>The library's industry solutions, the production guide, and the Academy workshops all assume this loop exists on the learner's machine. That is the whole job of the Brainstem: make the pattern learnable by running it.</p>
+
+  <h2>What it is not</h2>
+  <div class="card">
+    <ul>
+      <li><strong>Not a replacement for GitHub Copilot.</strong> Copilot is the work surface and the model. The Brainstem borrows Copilot's access so there are no keys to manage, and it hands the work back to Copilot the moment you are done learning.</li>
+      <li><strong>Not a competitor to Copilot Studio or Microsoft 365 Copilot.</strong> Those are where a finished agent lives. The Brainstem is where the agent is first understood, and the library ships the Copilot Studio solution for every workshop precisely so the prototype can leave.</li>
+      <li><strong>Not a production runtime.</strong> Nothing here is built to serve users. It is built to teach one person at a time, quickly.</li>
+      <li><strong>Not a second platform to standardise on.</strong> The RAPP/1 wire is one endpoint, <code>POST /chat</code>, and a skill or agent written for it promotes into first-party tooling without a rewrite.</li>
+    </ul>
+  </div>
+
+  <h2>Why local, and why "frontier"</h2>
+  <p>The fastest way to learn an agent pattern is to change one file and see the behaviour change. Doing that against a cloud tenant means provisioning, permissions, publish cycles, and someone else's data. Doing it locally means the loop is yours, the data is synthetic, and nothing you try can reach a customer.</p>
+  <p><strong>Frontier</strong> is the honest word for what happens there: new model behaviour, new tool shapes, and new industry patterns get tried in the Brainstem first. The ones that hold up are written into the production guide and shipped as first-party solutions. The ones that do not are deleted, cheaply.</p>
+
+  <h2>The graduation path</h2>
+  <table>
+    <thead><tr><th>Stage</th><th>Where</th><th>What you have at the end</th></tr></thead>
+    <tbody>
+      <tr><td>Learn</td><td>The Brainstem on your machine</td><td>A working single-file agent you understand line by line</td></tr>
+      <tr><td>Prove</td><td>Academy workshops and the production guide</td><td>Locked test cases passing, evidence captured, a reviewed draft</td></tr>
+      <tr><td>Ship</td><td>GitHub Copilot, Copilot Studio, Microsoft 365 Copilot</td><td>The same skill, running where your users already are</td></tr>
+    </tbody>
+  </table>
+  <p>The library calls these the Brainstem, the Hippocampus, and the Nervous System. The names are a mnemonic for the same idea: start with the survival loop, add memory and a cloud body when you need them, then connect to the enterprise nervous system. You advance when you choose to.</p>
+
+  <h2>How it stays out of the way</h2>
+  <ul>
+    <li><strong>No keys.</strong> GitHub Copilot's token exchange is the only credential, and it is yours.</li>
+    <li><strong>One file per agent.</strong> Portable, reviewable, diffable. The Copilot Studio export for a workshop is generated from the same source.</li>
+    <li><strong>One wire.</strong> <code>POST /chat</code> in, a response out. Any host that can read a URL and use a terminal can drive it, including GitHub Copilot in VS Code or the Copilot CLI, Claude Code, and Microsoft Scout.</li>
+    <li><strong>Leaves cleanly.</strong> Uninstall is deleting one folder. What you learned is in the skill file, not in the server.</li>
+  </ul>
+
+  <h2>Who it is for</h2>
+  <p>Sellers, architects, and partners who need to understand an agent pattern well enough to explain it and adapt it, and workshop learners who want to build one before they publish one. If you already know what you want to ship, go straight to the <a href="index.html">library</a> and take the Copilot Studio solution. If you want to understand it first, install the Brainstem.</p>
+
+  <div class="actions">
+    <a class="button primary" href="docs/installer.html">Install the Brainstem</a>
+    <a class="button" href="index.html">Browse the Agent Library</a>
+    <a class="button" href="academy.html">Open the Academy</a>
+    <a class="button" href="docs/rapp-guide.html">Read the Production Guide</a>
+  </div>
+</main>
+<div class="footer">
+  <a href="index.html">Agent Library</a> · <a href="docs/installer.html">Installer</a> · <a href="metrics.html">Library Metrics</a> · <a href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
+</div>
+</body>
+</html>

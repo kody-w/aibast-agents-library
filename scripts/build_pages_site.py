@@ -854,11 +854,11 @@ def rewrite_html(
         return ATTRIBUTE_RE.sub(replace_attribute, tag_match.group(0))
 
     rewritten = TAG_RE.sub(replace_tag, text)
-    if page == PurePosixPath("library.html") and LIBRARY_DYNAMIC_ZIP_HREF in text:
+    if page == PurePosixPath("index.html") and LIBRARY_DYNAMIC_ZIP_HREF in text:
         occurrences = rewritten.count(LIBRARY_DYNAMIC_ZIP_SOURCE)
         if occurrences != 1:
             broken.append(
-                "library.html: dynamic Copilot Studio ZIP link has no "
+                "index.html: dynamic Copilot Studio ZIP link has no "
                 "classifiable source expression"
             )
         else:
@@ -1166,12 +1166,12 @@ def validate_html_links(output: Path) -> list[str]:
             broken.append(f"{relative}: could not read HTML: {exc}")
             continue
         if (
-            relative == PurePosixPath("library.html")
+            relative == PurePosixPath("index.html")
             and LIBRARY_DYNAMIC_ZIP_HREF in text
             and LIBRARY_DYNAMIC_ZIP_SOURCE in text
         ):
             broken.append(
-                "library.html: dynamic Copilot Studio ZIP link remains relative"
+                "index.html: dynamic Copilot Studio ZIP link remains relative"
             )
         newlines = [index for index, character in enumerate(text) if character == "\n"]
         for tag_match in TAG_RE.finditer(text):

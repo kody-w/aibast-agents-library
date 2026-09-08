@@ -652,7 +652,7 @@ class FullRepositoryArtifactTests(unittest.TestCase):
             self.assertIn("install.sh", ring["rendered_installers"])
 
     def test_library_dynamic_solution_download_uses_immutable_raw_url(self):
-        library = (self.site / "library.html").read_text(encoding="utf-8")
+        library = (self.site / "index.html").read_text(encoding="utf-8")
         source = self.manifest["source"]
         raw = (
             "https://raw.githubusercontent.com/"

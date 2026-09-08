@@ -147,7 +147,7 @@ footer { margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--border
 <header>
   <div class="logo"><div class="logo-mark">AIB</div> Industry Solution</div>
   <div class="header-right">
-    <a class="nav-link" href="library.html">All solutions</a>
+    <a class="nav-link" href="index.html">All solutions</a>
     <a class="nav-link" href="index.html">Home</a>
     <a class="nav-link primary" id="src-link" href="https://github.com/microsoft/aibast-agents-library" target="_blank" rel="noopener">Source</a>
   </div>
@@ -233,7 +233,7 @@ function render(sol, agent, sols) {
     ? `<span class="chip k">${label}</span>` + arr.map(x => `<span class="chip">${esc(x)}</span>`).join('') : '';
 
   document.getElementById('root').innerHTML = `
-  <div class="crumb"><a href="library.html">Agent Library</a> › ${esc(sol.industries?.[0] || 'Solution')}</div>
+  <div class="crumb"><a href="index.html">Agent Library</a> › ${esc(sol.industries?.[0] || 'Solution')}</div>
 
   <div class="hero">
     <div class="slot">AIBAST Agents Library · advertised solution #${esc(sol.slot)}</div>
@@ -306,7 +306,7 @@ function render(sol, agent, sols) {
 
   <footer>
     Advertised catalog in <a href="solutions.json">solutions.json</a> ·
-    <a href="library.html">all ${sols.length} solutions</a> ·
+    <a href="index.html">all ${sols.length} solutions</a> ·
     <a href="https://github.com/${OWNER}/${REPO}" target="_blank" rel="noopener">${OWNER}/${REPO}</a>
   </footer>`;
 
