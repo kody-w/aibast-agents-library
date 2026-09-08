@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AIBAST Agents Library</title>
-<meta name="description" content="AIBAST Agents Library — industry agent templates, the RAPP production guide, and a local-first AI agent server powered by GitHub Copilot.">
+<meta name="description" content="AIBAST Agents Library — industry agent templates, the RAPP production guide, and the RAPP Brainstem: a local frontier learning platform, powered by GitHub Copilot, for skills that graduate into Copilot Studio and Microsoft 365 Copilot.">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -170,6 +170,9 @@
     color: #e6edf3; display: flex; align-items: center; gap: 8px;
   }
   .install-body .prompt .dollar { color: #8b949e; user-select: none; }
+  .install-body.prompt-mode .prompt .dollar { display: none; }
+  .install-body.prompt-mode .prompt { font-family: inherit; font-size: 15px; line-height: 1.5; }
+  .install-hint a { color: #58a6ff; }
   .install-body .copy-icon {
     margin-left: auto; font-size: 16px; opacity: 0.3;
     transition: opacity 0.15s; cursor: pointer; flex-shrink: 0;
@@ -266,7 +269,7 @@
 <div class="hero">
   <div class="logo">🧠</div>
   <h1>AIBAST Agents Library</h1>
-  <p>Industry agent templates, production patterns, and a local-first RAPP Brainstem powered by GitHub Copilot.</p>
+  <p>Industry agent templates, production patterns, and the RAPP Brainstem: a local frontier learning platform, powered by GitHub Copilot, where you learn the pattern before it graduates into Copilot Studio and Microsoft 365 Copilot.</p>
   <div class="tagline">Build locally. Validate with the production guide. Scale through the Microsoft AI stack.</div>
   <div class="hero-actions">
     <a class="hero-action primary" href="docs/rapp-guide.html">Open Production Guide</a>
@@ -280,6 +283,7 @@
       <div class="dots"><span></span><span></span><span></span></div>
       <button class="install-tab active" data-tab="one-liner" onclick="switchTab(this)">One-liner</button>
       <button class="install-tab" data-tab="manual" onclick="switchTab(this)">Manual</button>
+      <button class="install-tab" data-tab="copilot" onclick="switchTab(this)">Copilot-only</button>
     </div>
     <div class="install-tabs-right">
       <div class="os-toggle">
@@ -288,8 +292,8 @@
       </div>
     </div>
   </div>
-  <div class="install-body" onclick="copyInstall(this)">
-    <div class="comment" id="install-comment"># Works everywhere. Installs everything. 🧠</div>
+  <div class="install-body" id="install-body" onclick="copyInstall(this)">
+    <div class="comment" id="install-comment"># Your local learning platform. Installs everything. 🧠</div>
     <div class="prompt">
       <span class="dollar">$</span>
       <span id="install-cmd">curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</span>
@@ -307,13 +311,13 @@
       <div class="tier-icon">🧠</div>
       <div class="tier-title">
         <h2>The Brainstem</h2>
-        <div class="subtitle">Local agent server — the survival basics</div>
+        <div class="subtitle">Frontier learning platform — learn the pattern locally, then graduate it</div>
       </div>
       <span class="tier-badge start">Start here</span>
       <span class="tier-arrow">▶</span>
     </div>
     <div class="tier-body">
-      <p class="metaphor">The biological brainstem keeps you alive — breathing, heartbeat, reflexes. Your AI brainstem does the same: it runs the core agent loop, calls tools, and responds. Everything else builds on top of this.</p>
+      <p class="metaphor">The biological brainstem keeps you alive — breathing, heartbeat, reflexes. Your AI brainstem does the same: it runs the core agent loop, calls tools, and responds. It is a learning platform, not a product you ship: every skill you build here is meant to graduate into GitHub Copilot, Copilot Studio, and Microsoft 365 Copilot, the first-party tools that carry it to your users.</p>
       <div class="one-liner" style="margin-top:16px">
         <div class="step">
           <h3>Run the one-liner</h3>
@@ -487,11 +491,23 @@
       windowsManual: `git clone --branch ${ref} ${repoUrl} %USERPROFILE%\\.brainstem\\src && cd %USERPROFILE%\\.brainstem\\src\\rapp_brainstem && pip install -r requirements.txt && python brainstem.py`
     };
   }
+  function buildCopilotLane(base) {
+    // The workshops' second lane, extended to the front door: no Brainstem,
+    // the AI runs the workshop harness in its own session from one SKILL.md.
+    const skill = `${base}skills/aibast-easy-mode-copilot/SKILL.md`;
+    return {
+      skill,
+      comment: '# No Brainstem. Paste into GitHub Copilot, Claude Code / Cowork, or Microsoft Scout. 🤖',
+      cmd: `Read ${skill} and give me Ask HR using Easy Mode and test it for me.`,
+      hint: 'Works in any AI that can read a URL and use your terminal: GitHub Copilot (VS Code Agent mode or Copilot CLI), Claude Code / Cowork, Microsoft Scout. Swap Ask HR for any workshop in the <a href="library.html">library</a>. <a href="skills/aibast-easy-mode-copilot/SKILL.md" download="SKILL.md">Download the Copilot-only SKILL.md</a> to attach it directly.'
+    };
+  }
   const installCommands = buildInstallCommands(location.hostname, publishedBase);
+  const copilotLane = buildCopilotLane(publishedBase);
   const installs = {
     'macOS/Linux': {
       'one-liner': {
-        comment: '# Works everywhere. Installs everything. 🧠',
+        comment: '# Your local learning platform. Installs everything. 🧠',
         cmd: installCommands.bash,
         hint: 'Works on macOS & Linux. Auto-installs Python 3.11 if missing.'
       },
@@ -499,11 +515,12 @@
         comment: '# Clone, install deps, done.',
         cmd: installCommands.macManual,
         hint: 'Requires Python 3.11+ and Git already installed.'
-      }
+      },
+      'copilot': copilotLane
     },
     'Windows': {
       'one-liner': {
-        comment: '# Factory Windows 11 ready. Installs everything via winget. 🧠',
+        comment: '# Your local learning platform. Factory Windows 11 ready, installs via winget. 🧠',
         cmd: installCommands.windows,
         hint: 'Run in PowerShell. Auto-installs Python, Git & GitHub CLI via winget.'
       },
@@ -511,7 +528,8 @@
         comment: '# Clone, install deps, done.',
         cmd: installCommands.windowsManual,
         hint: 'Requires Python 3.11+ and Git already installed.'
-      }
+      },
+      'copilot': copilotLane
     }
   };
 
@@ -566,6 +584,7 @@
     document.getElementById('install-cmd').textContent = data.cmd;
     document.getElementById('install-hint').innerHTML = data.hint;
     document.getElementById('copy-icon').textContent = '📋';
+    document.getElementById('install-body').classList.toggle('prompt-mode', currentTab === 'copilot');
     const dlDiv = document.getElementById('install-download');
     if (currentTab === 'one-liner') {
       const dl = downloads[currentOS];

@@ -4,7 +4,7 @@
 
 > **👉 [Get Started at microsoft.github.io/aibast-agents-library](https://microsoft.github.io/aibast-agents-library/)**
 
-Industry agent templates, the RAPP production methodology, and a local-first AI agent server powered by GitHub Copilot. No provider API key or cloud setup is required for core chat beyond a GitHub account with Copilot access.
+Industry agent templates, the RAPP production methodology, and the RAPP Brainstem: a local frontier learning platform powered by GitHub Copilot. The Brainstem is where you learn the agent pattern, not a product you ship; every skill built here is meant to graduate into GitHub Copilot, Copilot Studio, and Microsoft 365 Copilot. No provider API key or cloud setup is required for core chat beyond a GitHub account with Copilot access.
 
 [Production Guide](https://microsoft.github.io/aibast-agents-library/docs/rapp-guide.html) | [Microsoft AI Academy](academy.html) | [Agent Library](https://microsoft.github.io/aibast-agents-library/library.html) | [Library Metrics](https://microsoft.github.io/aibast-agents-library/metrics.html) | [Brainstem API and configuration](rapp_brainstem/README.md)
 
@@ -24,6 +24,12 @@ brainstem       # start the server → localhost:7071
 ```
 
 The browser walks through GitHub device-code sign-in when no compatible credential is already available.
+
+**Or, without installing anything (Copilot-only lane):** paste this into GitHub Copilot (VS Code Agent mode or Copilot CLI), Claude Code / Cowork, or Microsoft Scout. The AI runs the workshop harness in its own session from one skill file; swap Ask HR for any workshop in the library.
+
+```
+Read https://microsoft.github.io/aibast-agents-library/skills/aibast-easy-mode-copilot/SKILL.md and give me Ask HR using Easy Mode and test it for me.
+```
 
 ---
 

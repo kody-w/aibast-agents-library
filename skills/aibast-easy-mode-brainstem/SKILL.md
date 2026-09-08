@@ -15,8 +15,8 @@ specialized instructors, and returns the final evidence verdict.
 
 ## Public source
 
-- Repository: `kody-w/aibast-agents-library`
-- Workshop branch: `easy-mode-copilot-chat-pilot`
+- Repository: `microsoft/aibast-agents-library`
+- Workshop branch: `main`
 - Registry path: `registry.json`
 
 Resolve the branch through the GitHub API and pin one immutable commit SHA
