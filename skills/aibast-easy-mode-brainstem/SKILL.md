@@ -22,6 +22,24 @@ specialized instructors, and returns the final evidence verdict.
 Resolve the branch through the GitHub API and pin one immutable commit SHA
 before downloading anything.
 
+## Choose from the library
+
+When the user asks what is available, or asks for a workshop without naming
+one (for example `Show me the AIBAST library, then give me the workshop I pick
+using Easy Mode and test it for me`):
+
+1. Fetch `registry.json` from the pinned commit.
+2. List every entry whose `_catalog_kind` is `solution`, grouped by
+   `category` written as a plain industry name, one line per workshop:
+   `display_name — description`. Do not paste JSON or file paths.
+3. Ask one question: which workshop they want. Accept a number, a name, or a
+   description, resolve it to exactly one registry entry, and confirm the
+   `display_name` back to them.
+4. Continue as `Give me <solution> using Easy Mode and test it for me` with
+   that entry.
+
+Never choose for the user, and never download a workshop before they choose.
+
 ## Build and test
 
 When the user says `Give me <solution> using Easy Mode and test it for me`:
