@@ -155,7 +155,7 @@ def synthetic_academy_html():
 <body>
   <a class="skip-link" href="#academy-main">Skip to course catalog</a>
   <nav aria-label="Primary">
-    <a href="library.html">Library</a>
+    <a href="index.html">Library</a>
     <a href="achievements.html">Achievements</a>
     <a href="metrics.html">Metrics</a>
     <a href="docs/rapp-guide.html">Production guide</a>

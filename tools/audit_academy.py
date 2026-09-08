@@ -37,7 +37,7 @@ REQUIRED_INTEGRATION_PAGES = (
     "README.md",
 )
 REQUIRED_ACADEMY_LINKS = {
-    "library.html",
+    "index.html",
     "achievements.html",
     "metrics.html",
     "docs/rapp-guide.html",

@@ -41,8 +41,8 @@ or add beta routing fields/endpoints to `brainstem.py`.
 - `rapp_ai/` — AIBAST-owned Azure Functions implementation and documentation
 - `azuredeploy.json`, `deploy.sh`, `deploy.ps1` — Azure ARM deployment (Tier 2 cloud)
 - `MSFTAIBASMultiAgentCopilot_*.zip` — Power Platform solution for Copilot Studio (Tier 3)
-- `index.html` — AIBAST Agents Library landing page served at microsoft.github.io/aibast-agents-library
-- `library.html` — browsable agent catalog (search, vertical filter, per-agent and per-stack install commands); reads `registry.json`
+- `index.html` — the landing page is the browsable agent catalog (search, vertical filter, per-agent and per-stack install commands); reads `registry.json`. `library.html` is a redirect that preserves deep links
+- `docs/installer.html` — the Brainstem installer page (one-liner, manual steps, the three tiers); `why.html` explains the positioning
 - `metrics.html`, `scripts/build_metrics.py`, `state/metrics*.json` — public metrics dashboard and its daily snapshot
 - `docs/rapp-guide.html` — Restored 14-step RAPP production methodology
 - `docs/` — Quick start, tutorial, production guide, and installer mirrors
@@ -125,7 +125,7 @@ Each tier is self-contained. Users advance when they choose to.
 Shared Brainstem releases flow from `kody-w/rapp-installer`, but this repository is not a mirror. Preserve these AIBAST-owned surfaces during every sync:
 
 - `agents/@aibast-agents-library/`, `registry.json`, and `build_registry.py`
-- `library.html`, `metrics.html`, `scripts/build_metrics.py`, and `state/` (the catalog browse page, the metrics dashboard, and its snapshots)
+- `index.html`, `library.html`, `docs/installer.html`, `why.html`, `metrics.html`, `scripts/build_metrics.py`, and `state/` (the catalog browse page, the metrics dashboard, and its snapshots)
 - `rapp_ai/`
 - `README.md`, `index.html`, `CLAUDE.md`, `docs/index.html`, `docs/tutorial.html`, and `docs/rapp-guide.html`
 - `.github/`, `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`, `.vscode/`, and `tools/`

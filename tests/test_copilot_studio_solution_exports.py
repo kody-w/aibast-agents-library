@@ -118,7 +118,7 @@ def test_all_advertised_solution_exports_are_importable_and_bound():
 
 
 def test_library_builds_direct_solution_downloads():
-    library = (ROOT / "library.html").read_text(encoding="utf-8")
+    library = (ROOT / "index.html").read_text(encoding="utf-8")
     assert "function copilotSolutionDownloads(agent)" in library
     assert 'zip: `${base}-copilot-studio-solution.zip`' in library
     assert 'settings: `${base}-deployment-settings.json`' in library
