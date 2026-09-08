@@ -104,3 +104,12 @@ def test_neither_skill_can_publish_or_delegate_setup_to_the_user():
         assert "published: false" in text
         assert "Never ask the user" in text
         assert "Never publish" in text
+
+
+def test_lane_skills_pull_workshops_from_the_canonical_source():
+    """Pages renders these two lines to the serving ring (scripts/build_pages_site.py)."""
+    for path in (BRAINSTEM_SKILL, COPILOT_SKILL):
+        text = path.read_text(encoding="utf-8")
+        assert "- Repository: `microsoft/aibast-agents-library`\n- Workshop branch: `main`\n" in text
+        assert "easy-mode-copilot-chat-pilot" not in text
+        assert "kody-w" not in text

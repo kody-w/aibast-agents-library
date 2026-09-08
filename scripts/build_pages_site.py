@@ -88,6 +88,15 @@ INSTALLER_PATHS = frozenset(
     }
 )
 
+# The workshop lane skills name the repository and branch they pull workshops
+# from. Like the installers, they are rendered to the ring that serves them.
+RING_SKILL_PATHS = frozenset(
+    {
+        "skills/aibast-easy-mode-brainstem/SKILL.md",
+        "skills/aibast-easy-mode-copilot/SKILL.md",
+    }
+)
+
 RAPP_BRAINSTEM_PUBLIC_FILES = frozenset(
     {"rapp_brainstem/README.md", "rapp_brainstem/VERSION"}
 )
@@ -936,13 +945,33 @@ def _installer_substitutions(
     return subs
 
 
+def _skill_substitutions(
+    owner: str, repo: str, branch: str
+) -> list[tuple[str, str, bool]]:
+    """(canonical text, ring text, required) for a workshop lane skill."""
+    return [
+        (
+            f"- Repository: `{CANONICAL_OWNER}/{CANONICAL_REPO}`",
+            f"- Repository: `{owner}/{repo}`",
+            True,
+        ),
+        (
+            f"- Workshop branch: `{CANONICAL_BRANCH}`",
+            f"- Workshop branch: `{branch}`",
+            True,
+        ),
+    ]
+
+
 def render_installer(
     path: PurePosixPath, text: str, owner: str, repo: str, branch: str
 ) -> str:
-    """Point an installer's defaults at the ring being published."""
-    for canonical, ring, required in _installer_substitutions(
-        path.suffix.lower(), owner, repo, branch
-    ):
+    """Point an installer's (or lane skill's) defaults at the ring being published."""
+    if path.as_posix() in RING_SKILL_PATHS:
+        substitutions = _skill_substitutions(owner, repo, branch)
+    else:
+        substitutions = _installer_substitutions(path.suffix.lower(), owner, repo, branch)
+    for canonical, ring, required in substitutions:
         if canonical not in text:
             if required:
                 raise BuildError(
@@ -966,7 +995,7 @@ def prepare_installers(
         return {}
     prepared: dict[PurePosixPath, bytes] = {}
     for path in sorted(included, key=lambda item: item.as_posix()):
-        if path.as_posix() not in INSTALLER_PATHS:
+        if path.as_posix() not in INSTALLER_PATHS and path.as_posix() not in RING_SKILL_PATHS:
             continue
         source = _assert_regular_source(root, entries[path])
         try:

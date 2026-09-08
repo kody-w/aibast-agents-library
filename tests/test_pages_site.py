@@ -430,6 +430,61 @@ def write_installers(root: Path) -> None:
         write_bytes(root, f"{prefix}install.cmd", INSTALLER_CMD.encode("utf-8"))
 
 
+LANE_SKILL = (
+    "---\nname: lane\n---\n\n## Public source\n\n"
+    "- Repository: `microsoft/aibast-agents-library`\n"
+    "- Workshop branch: `main`\n- Registry path: `registry.json`\n"
+)
+
+
+def write_lane_skills(root: Path) -> None:
+    for name in ("aibast-easy-mode-brainstem", "aibast-easy-mode-copilot"):
+        write_text(root, f"skills/{name}/SKILL.md", LANE_SKILL)
+
+
+class RingLaneSkillRenderTests(unittest.TestCase):
+    """The served lane skills must pull workshops from the ring that serves them."""
+
+    def test_production_identity_leaves_lane_skills_byte_identical(self):
+        with fixture_root() as root:
+            write_installers(root)
+            write_lane_skills(root)
+            output = root / "_site"
+            manifest = pages.build_site(
+                root, output, pages.CANONICAL_OWNER, pages.CANONICAL_REPO, REF,
+                ring_branch=pages.CANONICAL_BRANCH,
+            )
+            self.assertEqual(manifest["ring"]["rendered_installers"], [])
+            for name in sorted(pages.RING_SKILL_PATHS):
+                self.assertEqual((output / name).read_bytes(), (root / name).read_bytes())
+
+    def test_staging_ring_renders_lane_skills_to_the_fork(self):
+        with fixture_root() as root:
+            write_installers(root)
+            write_lane_skills(root)
+            output = root / "_site"
+            manifest = pages.build_site(
+                root, output, "staging-owner", "staging-repo", REF, ring_branch="staging"
+            )
+            for name in pages.RING_SKILL_PATHS:
+                self.assertIn(name, manifest["ring"]["rendered_installers"])
+                rendered = (output / name).read_text(encoding="utf-8")
+                self.assertIn("- Repository: `staging-owner/staging-repo`", rendered)
+                self.assertIn("- Workshop branch: `staging`", rendered)
+                self.assertNotIn("microsoft/aibast-agents-library", rendered)
+                self.assertIn("- Registry path: `registry.json`", rendered)
+
+    def test_lane_skill_that_drops_its_source_lines_fails_the_ring_build(self):
+        with fixture_root() as root:
+            write_installers(root)
+            write_lane_skills(root)
+            write_text(root, "skills/aibast-easy-mode-copilot/SKILL.md", "---\nname: lane\n---\n")
+            with self.assertRaises(pages.BuildError):
+                pages.build_site(
+                    root, root / "_site", "staging-owner", "staging-repo", REF, ring_branch="staging"
+                )
+
+
 class RingInstallerRenderTests(unittest.TestCase):
     """The published one-liner must install the ring that serves it."""
 

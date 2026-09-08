@@ -72,10 +72,22 @@ def test_hero_matches_production_shape():
     hero = soup.select_one(".hero")
     assert hero.select(".academy-action") == []
     assert hero.select(".academy-copy") == []
-    assert [p.get_text(" ", strip=True) for p in hero.select("p")] == [
-        "Industry agent templates, production patterns, and a local-first RAPP "
-        "Brainstem powered by GitHub Copilot."
-    ]
+    paragraphs = [p.get_text(" ", strip=True) for p in hero.select("p")]
+    assert len(paragraphs) == 1
+    assert paragraphs[0].startswith("Industry agent templates, production patterns, and the RAPP Brainstem")
+
+
+def test_brainstem_is_positioned_as_a_learning_platform_not_a_first_party_competitor():
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    compact = " ".join(text.split())
+    assert "local frontier learning platform" in compact
+    assert "graduate into Copilot Studio and Microsoft 365 Copilot" in compact
+    assert "Frontier learning platform — learn the pattern locally, then graduate it" in compact
+    assert "It is a learning platform, not a product you ship" in compact
+    assert "Your local learning platform. Installs everything." in compact
+    readme = " ".join((ROOT / "README.md").read_text(encoding="utf-8").split())
+    assert "local frontier learning platform" in readme
+    assert "not a product you ship" in readme
 
 
 def test_staging_ring_uses_the_same_short_one_liner_as_production():
@@ -130,3 +142,45 @@ console.log(JSON.stringify(buildInstallerDownloads(commands)));
     assert "irm https://kody-w.github.io/aibast-agents-library/install.ps1 | iex" in downloads["Windows"]["href"]
     for platform in ("macOS/Linux", "Windows"):
         assert "BRAINSTEM_" not in downloads[platform]["href"]
+
+
+def copilot_lane(base):
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    start = text.index("function buildCopilotLane")
+    end = text.index("const installCommands = buildInstallCommands")
+    result = subprocess.run(
+        ["node"],
+        input=text[start:end] + "\nconsole.log(JSON.stringify(buildCopilotLane(" + json.dumps(base) + ")));\n",
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    return json.loads(result.stdout)
+
+
+def test_install_widget_offers_the_copilot_only_lane_next_to_the_brainstem_one_liner():
+    soup = BeautifulSoup((ROOT / "index.html").read_text(encoding="utf-8"), "html.parser")
+    tabs = [(b.get("data-tab"), b.get_text(strip=True)) for b in soup.select(".install-tab")]
+    assert tabs == [("one-liner", "One-liner"), ("manual", "Manual"), ("copilot", "Copilot-only")]
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert text.count("'copilot': copilotLane") == 2  # both OS entries share the lane
+    assert "classList.toggle('prompt-mode', currentTab === 'copilot')" in text
+
+
+def test_copilot_only_lane_points_at_the_served_lane_skill():
+    for base in (
+        "https://microsoft.github.io/aibast-agents-library/",
+        "https://kody-w.github.io/aibast-agents-library/",
+    ):
+        lane = copilot_lane(base)
+        assert lane["skill"] == base + "skills/aibast-easy-mode-copilot/SKILL.md"
+        assert lane["cmd"] == (
+            f"Read {base}skills/aibast-easy-mode-copilot/SKILL.md and give me Ask HR "
+            "using Easy Mode and test it for me."
+        )
+        assert "No Brainstem" in lane["comment"]
+        for host in ("GitHub Copilot", "Copilot CLI", "Claude Code / Cowork", "Microsoft Scout"):
+            assert host in lane["hint"]
+        assert 'href="skills/aibast-easy-mode-copilot/SKILL.md" download="SKILL.md"' in lane["hint"]
+        assert "curl" not in lane["cmd"] and "install" not in lane["cmd"]
