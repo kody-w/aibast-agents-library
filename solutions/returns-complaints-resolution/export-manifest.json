@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-complaint-classification",
-      "label": "Manual skill: complaint classification",
+      "label": "Capability card: complaint classification",
       "path": "solutions/returns-complaints-resolution/manual/skills/complaint-classification/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/returns-complaints-resolution/manual/skills/complaint-classification/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-resolution-recommendation",
-      "label": "Manual skill: resolution recommendation",
+      "label": "Capability card: resolution recommendation",
       "path": "solutions/returns-complaints-resolution/manual/skills/resolution-recommendation/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/returns-complaints-resolution/manual/skills/resolution-recommendation/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-return-processing",
-      "label": "Manual skill: return processing",
+      "label": "Capability card: return processing",
       "path": "solutions/returns-complaints-resolution/manual/skills/return-processing/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/returns-complaints-resolution/manual/skills/return-processing/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-trend-analysis",
-      "label": "Manual skill: trend analysis",
+      "label": "Capability card: trend analysis",
       "path": "solutions/returns-complaints-resolution/manual/skills/trend-analysis/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/returns-complaints-resolution/manual/skills/trend-analysis/SKILL.md",
       "use": "Manual skill upload",

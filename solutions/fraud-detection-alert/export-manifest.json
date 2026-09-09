@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-aibast-alert-triage-01",
-      "label": "Manual skill: aibast alert triage 01",
+      "label": "Capability card: aibast alert triage 01",
       "path": "solutions/fraud-detection-alert/manual/skills/aibast_alert-triage_01/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fraud-detection-alert/manual/skills/aibast_alert-triage_01/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-aibast-investigation-summary-04",
-      "label": "Manual skill: aibast investigation summary 04",
+      "label": "Capability card: aibast investigation summary 04",
       "path": "solutions/fraud-detection-alert/manual/skills/aibast_investigation-summary_04/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fraud-detection-alert/manual/skills/aibast_investigation-summary_04/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-aibast-pattern-detection-03",
-      "label": "Manual skill: aibast pattern detection 03",
+      "label": "Capability card: aibast pattern detection 03",
       "path": "solutions/fraud-detection-alert/manual/skills/aibast_pattern-detection_03/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fraud-detection-alert/manual/skills/aibast_pattern-detection_03/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-aibast-transaction-analysis-02",
-      "label": "Manual skill: aibast transaction analysis 02",
+      "label": "Capability card: aibast transaction analysis 02",
       "path": "solutions/fraud-detection-alert/manual/skills/aibast_transaction-analysis_02/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fraud-detection-alert/manual/skills/aibast_transaction-analysis_02/SKILL.md",
       "use": "Manual skill upload",

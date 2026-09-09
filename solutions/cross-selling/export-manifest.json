@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-opportunity-scan",
-      "label": "Manual skill: opportunity scan",
+      "label": "Capability card: opportunity scan",
       "path": "solutions/cross-selling/manual/skills/opportunity-scan/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/cross-selling/manual/skills/opportunity-scan/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-product-affinity",
-      "label": "Manual skill: product affinity",
+      "label": "Capability card: product affinity",
       "path": "solutions/cross-selling/manual/skills/product-affinity/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/cross-selling/manual/skills/product-affinity/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-recommendation-engine",
-      "label": "Manual skill: recommendation engine",
+      "label": "Capability card: recommendation engine",
       "path": "solutions/cross-selling/manual/skills/recommendation-engine/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/cross-selling/manual/skills/recommendation-engine/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-revenue-impact",
-      "label": "Manual skill: revenue impact",
+      "label": "Capability card: revenue impact",
       "path": "solutions/cross-selling/manual/skills/revenue-impact/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/cross-selling/manual/skills/revenue-impact/SKILL.md",
       "use": "Manual skill upload",

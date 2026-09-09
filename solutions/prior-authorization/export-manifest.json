@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-appeal-evidence-packet",
-      "label": "Manual skill: appeal evidence packet",
+      "label": "Capability card: appeal evidence packet",
       "path": "solutions/prior-authorization/manual/skills/appeal-evidence-packet/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/prior-authorization/manual/skills/appeal-evidence-packet/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-criteria-evidence",
-      "label": "Manual skill: criteria evidence",
+      "label": "Capability card: criteria evidence",
       "path": "solutions/prior-authorization/manual/skills/criteria-evidence/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/prior-authorization/manual/skills/criteria-evidence/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-request-evidence",
-      "label": "Manual skill: request evidence",
+      "label": "Capability card: request evidence",
       "path": "solutions/prior-authorization/manual/skills/request-evidence/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/prior-authorization/manual/skills/request-evidence/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-status-summary",
-      "label": "Manual skill: status summary",
+      "label": "Capability card: status summary",
       "path": "solutions/prior-authorization/manual/skills/status-summary/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/prior-authorization/manual/skills/status-summary/SKILL.md",
       "use": "Manual skill upload",

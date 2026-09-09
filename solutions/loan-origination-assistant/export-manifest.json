@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-aibast-application-review-01",
-      "label": "Manual skill: aibast application review 01",
+      "label": "Capability card: aibast application review 01",
       "path": "solutions/loan-origination-assistant/manual/skills/aibast_application-review_01/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/loan-origination-assistant/manual/skills/aibast_application-review_01/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-aibast-condition-tracking-05",
-      "label": "Manual skill: aibast condition tracking 05",
+      "label": "Capability card: aibast condition tracking 05",
       "path": "solutions/loan-origination-assistant/manual/skills/aibast_condition-tracking_05/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/loan-origination-assistant/manual/skills/aibast_condition-tracking_05/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-aibast-credit-analysis-02",
-      "label": "Manual skill: aibast credit analysis 02",
+      "label": "Capability card: aibast credit analysis 02",
       "path": "solutions/loan-origination-assistant/manual/skills/aibast_credit-analysis_02/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/loan-origination-assistant/manual/skills/aibast_credit-analysis_02/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-aibast-decision-recommendation-04",
-      "label": "Manual skill: aibast decision recommendation 04",
+      "label": "Capability card: aibast decision recommendation 04",
       "path": "solutions/loan-origination-assistant/manual/skills/aibast_decision-recommendation_04/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/loan-origination-assistant/manual/skills/aibast_decision-recommendation_04/SKILL.md",
       "use": "Manual skill upload",
@@ -196,7 +196,7 @@
     },
     {
       "id": "skill-aibast-document-verification-03",
-      "label": "Manual skill: aibast document verification 03",
+      "label": "Capability card: aibast document verification 03",
       "path": "solutions/loan-origination-assistant/manual/skills/aibast_document-verification_03/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/loan-origination-assistant/manual/skills/aibast_document-verification_03/SKILL.md",
       "use": "Manual skill upload",

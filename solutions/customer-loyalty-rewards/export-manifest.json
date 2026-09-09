@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-loyalty-dashboard",
-      "label": "Manual skill: loyalty dashboard",
+      "label": "Capability card: loyalty dashboard",
       "path": "solutions/customer-loyalty-rewards/manual/skills/loyalty-dashboard/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/customer-loyalty-rewards/manual/skills/loyalty-dashboard/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-points-summary",
-      "label": "Manual skill: points summary",
+      "label": "Capability card: points summary",
       "path": "solutions/customer-loyalty-rewards/manual/skills/points-summary/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/customer-loyalty-rewards/manual/skills/points-summary/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-reward-recommendations",
-      "label": "Manual skill: reward recommendations",
+      "label": "Capability card: reward recommendations",
       "path": "solutions/customer-loyalty-rewards/manual/skills/reward-recommendations/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/customer-loyalty-rewards/manual/skills/reward-recommendations/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-tier-analysis",
-      "label": "Manual skill: tier analysis",
+      "label": "Capability card: tier analysis",
       "path": "solutions/customer-loyalty-rewards/manual/skills/tier-analysis/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/customer-loyalty-rewards/manual/skills/tier-analysis/SKILL.md",
       "use": "Manual skill upload",

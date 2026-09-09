@@ -366,7 +366,8 @@ def test_scaffolds_complete_evidence_grounded_journey(tmp_path):
     assert 'role="tabpanel" aria-labelledby="mode-tab-hard"' in quest
     assert 'button.setAttribute("aria-selected", String(selected));' in quest
     assert quest.count('<article class="step"') == len(frames)
-    assert "manually on this page." in quest
+    assert "is built, one capability at a time." in quest
+    assert "Easy mode already did all of this for you" in quest
     assert "manual-progress" in quest
     assert "Draft · published false" in quest
     assert "manual-tutorial.html" in quest

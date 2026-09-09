@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-encounter-summary",
-      "label": "Manual skill: encounter summary",
+      "label": "Capability card: encounter summary",
       "path": "solutions/clinical-notes-summarizer/manual/skills/encounter-summary/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/clinical-notes-summarizer/manual/skills/encounter-summary/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-medication-inventory",
-      "label": "Manual skill: medication inventory",
+      "label": "Capability card: medication inventory",
       "path": "solutions/clinical-notes-summarizer/manual/skills/medication-inventory/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/clinical-notes-summarizer/manual/skills/medication-inventory/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-problem-list-extract",
-      "label": "Manual skill: problem list extract",
+      "label": "Capability card: problem list extract",
       "path": "solutions/clinical-notes-summarizer/manual/skills/problem-list-extract/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/clinical-notes-summarizer/manual/skills/problem-list-extract/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-referral-context",
-      "label": "Manual skill: referral context",
+      "label": "Capability card: referral context",
       "path": "solutions/clinical-notes-summarizer/manual/skills/referral-context/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/clinical-notes-summarizer/manual/skills/referral-context/SKILL.md",
       "use": "Manual skill upload",
