@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-aibast-dispatch-dashboard",
-      "label": "Manual skill: aibast dispatch dashboard",
+      "label": "Capability card: aibast dispatch dashboard",
       "path": "solutions/field-service-dispatch/manual/skills/aibast_dispatch-dashboard/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-service-dispatch/manual/skills/aibast_dispatch-dashboard/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-aibast-emergency-response",
-      "label": "Manual skill: aibast emergency response",
+      "label": "Capability card: aibast emergency response",
       "path": "solutions/field-service-dispatch/manual/skills/aibast_emergency-response/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-service-dispatch/manual/skills/aibast_emergency-response/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-aibast-route-optimization",
-      "label": "Manual skill: aibast route optimization",
+      "label": "Capability card: aibast route optimization",
       "path": "solutions/field-service-dispatch/manual/skills/aibast_route-optimization/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-service-dispatch/manual/skills/aibast_route-optimization/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-aibast-technician-assignment",
-      "label": "Manual skill: aibast technician assignment",
+      "label": "Capability card: aibast technician assignment",
       "path": "solutions/field-service-dispatch/manual/skills/aibast_technician-assignment/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-service-dispatch/manual/skills/aibast_technician-assignment/SKILL.md",
       "use": "Manual skill upload",

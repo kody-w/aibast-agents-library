@@ -1223,7 +1223,7 @@ def choose_frame_resources(ctx: JourneyContext) -> list[Path]:
 
 def generic_label(path: Path) -> str:
     if path.name == "SKILL.md":
-        return f"Manual skill: {path.parent.name.replace('_', ' ').replace('-', ' ')}"
+        return f"Capability card: {path.parent.name.replace('_', ' ').replace('-', ' ')}"
     return path.stem.replace("_", " ").replace("-", " ").title()
 
 
@@ -3839,9 +3839,9 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
 
     <section class="path" data-path="hard" id="mode-panel-hard" role="tabpanel" aria-labelledby="mode-tab-hard" hidden>
       <section class="card hard-overview">
-        <p class="eyebrow">Manual mode · literal browser construction</p>
-        <h2>Build {html.escape(ctx.title)} manually on this page.</h2>
-        <p class="lede">No PAC CLI, YAML import, plugin architect, or nested tutorial frame. Perform one action per real browserfilm frame, compare the screenshot, and stop at Draft.</p>
+        <p class="eyebrow">Manual mode · see how it was built</p>
+        <h2>See how {html.escape(ctx.title)} is built, one capability at a time.</h2>
+        <p class="lede">Optional. Easy mode already did all of this for you from one skill file. This lane replays every action the AI took, one real browser frame per step, so you can understand the agent before you adapt it. No PAC CLI, YAML import, or plugin architect; stop at Draft.</p>
         <div class="notice"><strong>Synthetic disclosure:</strong> this is qualitative workflow evidence using packaged synthetic inputs. It is not a customer KPI or a live-system result.</div>
         <div class="feedback-notice"><strong>Found something inaccurate?</strong> Use <em>Report an issue</em> on that step. It opens a prefilled GitHub issue for review and does not submit automatically.</div>
         {manual_content.pending_notice}

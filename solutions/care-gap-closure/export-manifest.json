@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-cohort-review",
-      "label": "Manual skill: cohort review",
+      "label": "Capability card: cohort review",
       "path": "solutions/care-gap-closure/manual/skills/cohort-review/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/care-gap-closure/manual/skills/cohort-review/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-gap-analysis",
-      "label": "Manual skill: gap analysis",
+      "label": "Capability card: gap analysis",
       "path": "solutions/care-gap-closure/manual/skills/gap-analysis/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/care-gap-closure/manual/skills/gap-analysis/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-outreach-draft",
-      "label": "Manual skill: outreach draft",
+      "label": "Capability card: outreach draft",
       "path": "solutions/care-gap-closure/manual/skills/outreach-draft/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/care-gap-closure/manual/skills/outreach-draft/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-quality-dashboard",
-      "label": "Manual skill: quality dashboard",
+      "label": "Capability card: quality dashboard",
       "path": "solutions/care-gap-closure/manual/skills/quality-dashboard/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/care-gap-closure/manual/skills/quality-dashboard/SKILL.md",
       "use": "Manual skill upload",

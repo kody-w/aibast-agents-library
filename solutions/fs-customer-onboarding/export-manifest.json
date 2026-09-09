@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-aibast-account-setup-02",
-      "label": "Manual skill: aibast account setup 02",
+      "label": "Capability card: aibast account setup 02",
       "path": "solutions/fs-customer-onboarding/manual/skills/aibast_account-setup_02/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-customer-onboarding/manual/skills/aibast_account-setup_02/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-aibast-document-checklist-03",
-      "label": "Manual skill: aibast document checklist 03",
+      "label": "Capability card: aibast document checklist 03",
       "path": "solutions/fs-customer-onboarding/manual/skills/aibast_document-checklist_03/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-customer-onboarding/manual/skills/aibast_document-checklist_03/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-aibast-kyc-verification-01",
-      "label": "Manual skill: aibast kyc verification 01",
+      "label": "Capability card: aibast kyc verification 01",
       "path": "solutions/fs-customer-onboarding/manual/skills/aibast_kyc-verification_01/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-customer-onboarding/manual/skills/aibast_kyc-verification_01/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-aibast-onboarding-status-04",
-      "label": "Manual skill: aibast onboarding status 04",
+      "label": "Capability card: aibast onboarding status 04",
       "path": "solutions/fs-customer-onboarding/manual/skills/aibast_onboarding-status_04/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-customer-onboarding/manual/skills/aibast_onboarding-status_04/SKILL.md",
       "use": "Manual skill upload",

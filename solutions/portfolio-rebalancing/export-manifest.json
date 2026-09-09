@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-aibast-execution-plan-06",
-      "label": "Manual skill: aibast execution plan 06",
+      "label": "Capability card: aibast execution plan 06",
       "path": "solutions/portfolio-rebalancing/manual/skills/aibast_execution-plan_06/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/portfolio-rebalancing/manual/skills/aibast_execution-plan_06/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-aibast-portfolio-analysis-01",
-      "label": "Manual skill: aibast portfolio analysis 01",
+      "label": "Capability card: aibast portfolio analysis 01",
       "path": "solutions/portfolio-rebalancing/manual/skills/aibast_portfolio-analysis_01/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/portfolio-rebalancing/manual/skills/aibast_portfolio-analysis_01/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-aibast-rebalance-recommendation-02",
-      "label": "Manual skill: aibast rebalance recommendation 02",
+      "label": "Capability card: aibast rebalance recommendation 02",
       "path": "solutions/portfolio-rebalancing/manual/skills/aibast_rebalance-recommendation_02/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/portfolio-rebalancing/manual/skills/aibast_rebalance-recommendation_02/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-aibast-retirement-scenario-05",
-      "label": "Manual skill: aibast retirement scenario 05",
+      "label": "Capability card: aibast retirement scenario 05",
       "path": "solutions/portfolio-rebalancing/manual/skills/aibast_retirement-scenario_05/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/portfolio-rebalancing/manual/skills/aibast_retirement-scenario_05/SKILL.md",
       "use": "Manual skill upload",
@@ -196,7 +196,7 @@
     },
     {
       "id": "skill-aibast-tax-impact-03",
-      "label": "Manual skill: aibast tax impact 03",
+      "label": "Capability card: aibast tax impact 03",
       "path": "solutions/portfolio-rebalancing/manual/skills/aibast_tax-impact_03/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/portfolio-rebalancing/manual/skills/aibast_tax-impact_03/SKILL.md",
       "use": "Manual skill upload",
@@ -204,7 +204,7 @@
     },
     {
       "id": "skill-aibast-tax-loss-harvest-04",
-      "label": "Manual skill: aibast tax loss harvest 04",
+      "label": "Capability card: aibast tax loss harvest 04",
       "path": "solutions/portfolio-rebalancing/manual/skills/aibast_tax-loss-harvest_04/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/portfolio-rebalancing/manual/skills/aibast_tax-loss-harvest_04/SKILL.md",
       "use": "Manual skill upload",

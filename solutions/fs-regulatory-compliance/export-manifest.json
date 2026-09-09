@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-aibast-certification-tracker-rc05",
-      "label": "Manual skill: aibast certification tracker rc05",
+      "label": "Capability card: aibast certification tracker rc05",
       "path": "solutions/fs-regulatory-compliance/manual/skills/aibast_certification-tracker_rc05/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-regulatory-compliance/manual/skills/aibast_certification-tracker_rc05/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-aibast-compliance-dashboard-rc01",
-      "label": "Manual skill: aibast compliance dashboard rc01",
+      "label": "Capability card: aibast compliance dashboard rc01",
       "path": "solutions/fs-regulatory-compliance/manual/skills/aibast_compliance-dashboard_rc01/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-regulatory-compliance/manual/skills/aibast_compliance-dashboard_rc01/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-aibast-documentation-review-rc03",
-      "label": "Manual skill: aibast documentation review rc03",
+      "label": "Capability card: aibast documentation review rc03",
       "path": "solutions/fs-regulatory-compliance/manual/skills/aibast_documentation-review_rc03/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-regulatory-compliance/manual/skills/aibast_documentation-review_rc03/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-aibast-remediation-submission-rc04",
-      "label": "Manual skill: aibast remediation submission rc04",
+      "label": "Capability card: aibast remediation submission rc04",
       "path": "solutions/fs-regulatory-compliance/manual/skills/aibast_remediation-submission_rc04/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-regulatory-compliance/manual/skills/aibast_remediation-submission_rc04/SKILL.md",
       "use": "Manual skill upload",
@@ -196,7 +196,7 @@
     },
     {
       "id": "skill-aibast-trade-surveillance-rc02",
-      "label": "Manual skill: aibast trade surveillance rc02",
+      "label": "Capability card: aibast trade surveillance rc02",
       "path": "solutions/fs-regulatory-compliance/manual/skills/aibast_trade-surveillance_rc02/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/fs-regulatory-compliance/manual/skills/aibast_trade-surveillance_rc02/SKILL.md",
       "use": "Manual skill upload",

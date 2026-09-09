@@ -164,7 +164,7 @@
     },
     {
       "id": "skill-aibast-adjudication-review-02",
-      "label": "Manual skill: aibast adjudication review 02",
+      "label": "Capability card: aibast adjudication review 02",
       "path": "solutions/claims-processing/manual/skills/aibast_adjudication-review_02/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/claims-processing/manual/skills/aibast_adjudication-review_02/SKILL.md",
       "use": "Manual skill upload",
@@ -172,7 +172,7 @@
     },
     {
       "id": "skill-aibast-claim-intake-01",
-      "label": "Manual skill: aibast claim intake 01",
+      "label": "Capability card: aibast claim intake 01",
       "path": "solutions/claims-processing/manual/skills/aibast_claim-intake_01/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/claims-processing/manual/skills/aibast_claim-intake_01/SKILL.md",
       "use": "Manual skill upload",
@@ -180,7 +180,7 @@
     },
     {
       "id": "skill-aibast-fraud-flag-03",
-      "label": "Manual skill: aibast fraud flag 03",
+      "label": "Capability card: aibast fraud flag 03",
       "path": "solutions/claims-processing/manual/skills/aibast_fraud-flag_03/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/claims-processing/manual/skills/aibast_fraud-flag_03/SKILL.md",
       "use": "Manual skill upload",
@@ -188,7 +188,7 @@
     },
     {
       "id": "skill-aibast-settlement-recommendation-04",
-      "label": "Manual skill: aibast settlement recommendation 04",
+      "label": "Capability card: aibast settlement recommendation 04",
       "path": "solutions/claims-processing/manual/skills/aibast_settlement-recommendation_04/SKILL.md",
       "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/claims-processing/manual/skills/aibast_settlement-recommendation_04/SKILL.md",
       "use": "Manual skill upload",

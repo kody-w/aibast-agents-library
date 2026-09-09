@@ -1746,7 +1746,7 @@
         </div>
         <div class="summary-item">
           <span class="summary-value" id="summarySkills">—</span>
-          <span class="summary-label">reusable skills taught</span>
+          <span class="summary-label">agent capabilities taught</span>
         </div>
         <div class="summary-item">
           <span class="summary-value" id="summaryPaths">—</span>
@@ -1897,7 +1897,7 @@
                 <option value="recommended">Recommended</option>
                 <option value="most-practice">Most practice</option>
                 <option value="a-z">A–Z</option>
-                <option value="most-skills">Most skills</option>
+                <option value="most-skills">Most capabilities</option>
               </select>
             </div>
             <button class="button clear-button" id="clearFilters" type="button">Clear</button>
@@ -3043,7 +3043,7 @@
         facts.className = "course-depth";
         appendDepthFact(facts, numberFormat.format(depth.demoCases), "demo cases");
         appendDepthFact(facts, numberFormat.format(depth.manualSteps), "manual steps");
-        appendDepthFact(facts, numberFormat.format(depth.skillCount), "reusable skills");
+        appendDepthFact(facts, numberFormat.format(depth.skillCount), "agent capabilities");
         appendDepthFact(facts, depth.hasVideo ? "Available" : "Not listed", "demo video");
         appendDepthFact(
           facts,
@@ -3297,7 +3297,7 @@
         [
           [numberFormat.format(depth.demoCases), "guided demo cases"],
           [numberFormat.format(depth.manualSteps), "manual build steps"],
-          [numberFormat.format(depth.skillCount), "repository skills"],
+          [numberFormat.format(depth.skillCount), "agent capabilities"],
           [depth.hasVideo ? "Available" : "Not listed", "demo video"],
           [
             text(depth.path?.level, "Level not specified"),
