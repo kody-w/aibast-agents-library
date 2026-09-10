@@ -68,3 +68,18 @@ def test_primary_pages_link_the_library_at_the_root():
         text = (ROOT / relative).read_text(encoding="utf-8")
         assert 'href="library.html"' not in text, relative
         assert 'href="index.html"' in text, relative
+
+
+REQUEST_FORM = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR7RNABRLLw9Eq-9okV_7Z-hUOEY3QjQ3V1RJUk43OEs4WEkzTDZQUVdNMC4u"
+
+
+def test_request_info_page_embeds_the_form_and_is_linked_from_the_library():
+    page = BeautifulSoup((ROOT / "request-info.html").read_text(encoding="utf-8"), "html.parser")
+    iframe = page.find("iframe")
+    assert iframe is not None and iframe.get("src") == REQUEST_FORM + "&embed=true"
+    assert any(a.get("href") == REQUEST_FORM for a in page.select("a")), "a plain link to the form must exist as a fallback"
+    assert 'href="index.html"' in page.decode()
+    # The primary toolbar stays at four links (test_library_agent_upvotes pins it), so the library links the
+    # request page from its footer and every solution page links it next to the one-pager and video badges.
+    for relative in ("index.html", "solution.html"):
+        assert 'href="request-info.html"' in (ROOT / relative).read_text(encoding="utf-8"), relative
