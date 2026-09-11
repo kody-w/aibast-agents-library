@@ -549,7 +549,7 @@ html[data-theme="dark"] {
       <div class="brand"><span class="brand-mark">A</span><span>AIBAST manual workshop</span></div>
       <a class="academy-breadcrumb" href="../../academy.html#course/care-gap-closure">Academy / Care Gap Closure Agent</a>
     </div>
-    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button" href="screenshots/manual/manual-build-walkthrough.gif">Watch the manual film</a> <a class="button" href="quest.html">Back to workshop</a><a class="button primary" href="exports/care-gap-closure-source.zip">Download source bundle</a></div>
+    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button> <a class="button" href="quest.html">Back to workshop</a><a class="button primary" href="exports/care-gap-closure-source.zip">Download source bundle</a></div>
   </header>
   <div class="layout">
     <aside class="sidebar">
@@ -584,7 +584,7 @@ html[data-theme="dark"] {
         <div class="notice"><strong>Synthetic disclosure:</strong> this is qualitative workflow evidence using packaged synthetic inputs. It is not a customer KPI or a live-system result.</div>
         <div class="notice" data-storage-notice role="status" aria-live="polite" aria-atomic="true" hidden>Progress will remain available on this page, but it will not persist after you leave.</div>
         <div class="feedback-notice"><strong>Found something inaccurate?</strong> Use <em>Report an issue</em> on that step. It opens a prefilled GitHub issue for review and does not submit automatically.</div>
-        <!-- No pending evidence. -->
+        <div class="notice"><strong>Pending evidence:</strong> this page was generated with <code>--allow-pending</code>. Missing evidence is labeled and is not proof.</div>
       </section>
       <h2>Build and verify</h2>
       <article class="step" id="step-1">
@@ -618,7 +618,7 @@ html[data-theme="dark"] {
         </div>
       </article>
 <article class="step" id="step-3">
-        <header><span>3</span><div><h3>Enter the reviewed global instructions</h3><p>Step 3 of 18</p></div><button class="button report-button" type="button" data-report-location="Manual mode — step 3: Enter the reviewed global instructions" data-report-expected="The reviewed manual/GLOBAL-INSTRUCTIONS.md policy is visible or saved without unrecorded edits." data-report-evidence="solutions/care-gap-closure/screenshots/manual/03-enter-instructions.jpg">Report an issue</button></header>
+        <header><span>3</span><div><h3>Enter the reviewed global instructions</h3><p>Step 3 of 18</p></div><button class="button report-button" type="button" data-report-location="Manual mode — step 3: Enter the reviewed global instructions" data-report-expected="Enter the current manual/GLOBAL-INSTRUCTIONS.md policy, save it, and verify it persists after reopening. The historical capture does not verify this source revision." data-report-evidence="solutions/care-gap-closure/screenshots/manual/03-enter-instructions.jpg">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><div class="instruction-heading"><strong>Action</strong><button class="button copy-button" type="button" data-copy-target="hard-copy-3">Copy instructions</button><pre class="copy-source" id="hard-copy-3" hidden># Role
@@ -649,6 +649,7 @@ Do not require users to know operation names. Ask one concise clarification only
 2. Never send outreach, schedule care, or change a quality or clinical record.
 3. Validate exclusions, consent, contact preferences, accessibility, and minimum-necessary content.
 4. Quality and clinical reviewers approve downstream action.
+5. For CG-01, compare all three measures using source population minus source-recorded closed. Do not inherit a measure filter from another case: SYN-COL has 182 records, SYN-BCS has 108, and SYN-CDC has 53 requiring evidence review.
 
 # Response style
 
@@ -667,7 +668,7 @@ Route from the user&#x27;s natural-language intent. For the matching operation, 
 
 Do not narrate internal retrieval, tool selection, restrictions, or implementation mechanics. Present only the user-facing result.
 
-- `CG-01` / `gap_analysis`: `SYN-BCS`, `Records requiring evidence review`
+- `CG-01` / `gap_analysis`: `SYN-COL — 182 records`, `Records requiring evidence review`
 - `CG-02` / `cohort_review`: `Multiple Source Gaps`, `operational triage only`
 - `CG-03` / `outreach_draft`: `No message is sent`, `Do not state`
 - `CG-04` / `quality_dashboard`: `SYN-BCS`, `source-recorded closed`
@@ -675,10 +676,10 @@ Do not narrate internal retrieval, tool selection, restrictions, or implementati
 These phrases are acceptance evidence for the fixed synthetic cases. Preserve their wording when that case applies, while keeping the surrounding answer natural and evidence-first.
 &lt;!-- locked-preview-anchors:end --&gt;
 </pre></div><span>Enter the reviewed global instructions</span></div>
-            <div class="instruction expected"><strong>Expected result</strong>The reviewed manual/GLOBAL-INSTRUCTIONS.md policy is visible or saved without unrecorded edits.</div>
+            <div class="instruction expected"><strong>Expected result</strong>Enter the current manual/GLOBAL-INSTRUCTIONS.md policy, save it, and verify it persists after reopening. The historical capture does not verify this source revision.</div>
           </div>
 
-          <a class="shot-link" href="screenshots/manual/annotated/03-enter-instructions.png" download="03-enter-instructions.png"><img class="shot" data-evidence-status="reusable" src="screenshots/manual/annotated/03-enter-instructions.png" alt="Enter the reviewed global instructions annotated evidence" loading="lazy"></a><p class="capture-meta">Positive visual checkpoint: Locked Preview evidence anchors; CG-01 / gap_analysis: SYN-BCS, Records requiring evidence review; CG-02 / cohort_review: Multiple Source Gaps, operational triage only; CG-03 / outreach_draft: No message is sent, Do not state; CG-04 / quality_dashboard: SYN-BCS, source-recorded closed. Source capture: 1424×863 JPEG. The full pass remains the deterministic machine gate. <a href="screenshots/manual/03-enter-instructions.jpg" download="03-enter-instructions.jpg">Download original</a>.</p>
+          <div class="look-for verification-checkpoint"><strong>Live verification checkpoint</strong><p><strong>Expected state:</strong> Enter the current manual/GLOBAL-INSTRUCTIONS.md policy, save it, and verify it persists after reopening. The historical capture does not verify this source revision.</p><p>Use the current product state for this step. Mark it complete only when what you see matches the expected result and the deterministic gate agrees.</p></div>
           <footer>
             <a href="manual/GLOBAL-INSTRUCTIONS.md" download>Download source: Global Instructions</a>
             <label><input class="complete" type="checkbox" data-step="3"> Mark complete</label>
@@ -686,14 +687,14 @@ These phrases are acceptance evidence for the fixed synthetic cases. Preserve th
         </div>
       </article>
 <article class="step" id="step-4">
-        <header><span>4</span><div><h3>Save the instruction policy</h3><p>Step 4 of 18</p></div><button class="button report-button" type="button" data-report-location="Manual mode — step 4: Save the instruction policy" data-report-expected="The reviewed manual/GLOBAL-INSTRUCTIONS.md policy is visible or saved without unrecorded edits." data-report-evidence="solutions/care-gap-closure/screenshots/manual/04-save-instructions.jpg">Report an issue</button></header>
+        <header><span>4</span><div><h3>Save the instruction policy</h3><p>Step 4 of 18</p></div><button class="button report-button" type="button" data-report-location="Manual mode — step 4: Save the instruction policy" data-report-expected="Enter the current manual/GLOBAL-INSTRUCTIONS.md policy, save it, and verify it persists after reopening. The historical capture does not verify this source revision." data-report-evidence="solutions/care-gap-closure/screenshots/manual/04-save-instructions.jpg">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><div class="instruction-heading"><strong>Action</strong></div><span>Save the instruction policy</span></div>
-            <div class="instruction expected"><strong>Expected result</strong>The reviewed manual/GLOBAL-INSTRUCTIONS.md policy is visible or saved without unrecorded edits.</div>
+            <div class="instruction expected"><strong>Expected result</strong>Enter the current manual/GLOBAL-INSTRUCTIONS.md policy, save it, and verify it persists after reopening. The historical capture does not verify this source revision.</div>
           </div>
 
-          <a class="shot-link" href="screenshots/manual/annotated/04-save-instructions.png" download="04-save-instructions.png"><img class="shot" data-evidence-status="reusable" src="screenshots/manual/annotated/04-save-instructions.png" alt="Save the instruction policy annotated evidence" loading="lazy"></a><p class="capture-meta">Positive visual checkpoint: Care Gap Closure Agent; Quality Manager; Care Coordinator; Clinical Operations Lead. Source capture: 1424×863 JPEG. The full pass remains the deterministic machine gate. <a href="screenshots/manual/04-save-instructions.jpg" download="04-save-instructions.jpg">Download original</a>.</p>
+          <div class="look-for verification-checkpoint"><strong>Live verification checkpoint</strong><p><strong>Expected state:</strong> Enter the current manual/GLOBAL-INSTRUCTIONS.md policy, save it, and verify it persists after reopening. The historical capture does not verify this source revision.</p><p>Use the current product state for this step. Mark it complete only when what you see matches the expected result and the deterministic gate agrees.</p></div>
           <footer>
             <a href="manual/GLOBAL-INSTRUCTIONS.md" download>Download source: Global Instructions</a>
             <label><input class="complete" type="checkbox" data-step="4"> Mark complete</label>
@@ -836,14 +837,14 @@ These phrases are acceptance evidence for the fixed synthetic cases. Preserve th
         </div>
       </article>
 <article class="step" id="step-14">
-        <header><span>14</span><div><h3>Pass CG-01: Quality Manager</h3><p>Step 14 of 18</p></div><button class="button report-button" type="button" data-report-location="Manual mode — step 14: Pass CG-01: Quality Manager" data-report-expected="The captured Preview evidence records CG-01 with the recorded identifiers SYN-BCS, Records requiring evidence review; do not infer results beyond it." data-report-evidence="solutions/care-gap-closure/screenshots/manual/14-cg-01.jpg">Report an issue</button></header>
+        <header><span>14</span><div><h3>Pass CG-01: Quality Manager</h3><p>Step 14 of 18</p></div><button class="button report-button" type="button" data-report-location="Manual mode — step 14: Pass CG-01: Quality Manager" data-report-expected="A fresh Preview response must include SYN-COL — 182 records, Records requiring evidence review for CG-01; the historical capture does not validate the repaired source contract." data-report-evidence="solutions/care-gap-closure/screenshots/manual/14-cg-01.jpg">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><div class="instruction-heading"><strong>Action</strong><button class="button copy-button" type="button" data-copy-target="hard-copy-14">Copy Preview prompt</button><pre class="copy-source" id="hard-copy-14" hidden>Which synthetic quality measure has the largest evidence-review queue?</pre></div><span>Pass CG-01: Quality Manager</span></div>
-            <div class="instruction expected"><strong>Expected result</strong>The captured Preview evidence records CG-01 with the recorded identifiers SYN-BCS, Records requiring evidence review; do not infer results beyond it.</div>
+            <div class="instruction expected"><strong>Expected result</strong>A fresh Preview response must include SYN-COL — 182 records, Records requiring evidence review for CG-01; the historical capture does not validate the repaired source contract.</div>
           </div>
           <div class="look-for"><strong>Before this case</strong><p>Open Preview in a fresh conversation before running CG-01. A previous response must not influence the evidence.</p></div>
-          <a class="shot-link" href="screenshots/manual/annotated/14-cg-01.png" download="14-cg-01.png"><img class="shot" data-evidence-status="reusable" src="screenshots/manual/annotated/14-cg-01.png" alt="Pass CG-01: Quality Manager annotated evidence" loading="lazy"></a><p class="capture-meta">Positive visual checkpoint: SYN-BCS; Records requiring evidence review. Source capture: 1424×863 JPEG. The full pass remains the deterministic machine gate. <a href="screenshots/manual/14-cg-01.jpg" download="14-cg-01.jpg">Download original</a>.</p>
+          <div class="look-for verification-checkpoint"><strong>Live verification checkpoint</strong><p><strong>Expected state:</strong> A fresh Preview response must include SYN-COL — 182 records, Records requiring evidence review for CG-01; the historical capture does not validate the repaired source contract.</p><p>Use the current product state for this step. Mark it complete only when what you see matches the expected result and the deterministic gate agrees.</p></div>
           <footer>
             <a href="evals/manual-build-evidence.json" download>Download source: Manual Build Evidence</a>
             <label><input class="complete" type="checkbox" data-step="14"> Mark complete</label>

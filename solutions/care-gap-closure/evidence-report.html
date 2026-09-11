@@ -460,8 +460,8 @@ html[data-theme="dark"] {
     </section>
 
     <div class="summary-grid">
-      <article><strong>22</strong><span>Reusable positive checkpoints</span></article>
-      <article><strong>1</strong><span>Reference-only captures excluded from learner proof</span></article>
+      <article><strong>18</strong><span>Reusable positive checkpoints</span></article>
+      <article><strong>5</strong><span>Reference-only captures excluded from learner proof</span></article>
       <article><strong>0</strong><span>Optional future Learn-step captures</span></article>
     </div>
 
@@ -472,7 +472,7 @@ html[data-theme="dark"] {
           <thead><tr><th>Case</th><th>Must include</th><th>Must not claim</th></tr></thead>
           <tbody><tr>
           <td><code>CG-01</code></td>
-          <td><span class="marker-chip">SYN-BCS</span><span class="marker-chip">Records requiring evidence review</span></td>
+          <td><span class="marker-chip">SYN-COL — 182 records</span><span class="marker-chip">Records requiring evidence review</span></td>
           <td><span class="marker-chip">I don&#x27;t have access</span><span class="marker-chip">live patient record updated</span><span class="marker-chip">appointment booked</span><span class="marker-chip">authorization granted</span></td>
         </tr>
 <tr>
@@ -501,12 +501,6 @@ html[data-theme="dark"] {
         <table>
           <thead><tr><th>Checkpoint</th><th>Mode</th><th>Visible evidence</th><th>Annotated asset</th></tr></thead>
           <tbody><tr>
-          <td><code>easy-cg-01</code></td>
-          <td>easy</td>
-          <td>SYN-BCS; Records requiring evidence review</td>
-          <td>solutions/care-gap-closure/screenshots/assisted/annotated/02-cg-01.png</td>
-        </tr>
-<tr>
           <td><code>easy-cg-02</code></td>
           <td>easy</td>
           <td>Multiple Source Gaps</td>
@@ -535,18 +529,6 @@ html[data-theme="dark"] {
           <td>hard</td>
           <td>Care Gap Closure Manual</td>
           <td>solutions/care-gap-closure/screenshots/manual/annotated/02-name-agent.png</td>
-        </tr>
-<tr>
-          <td><code>hard-step-03</code></td>
-          <td>hard</td>
-          <td>Locked Preview evidence anchors; CG-01 / gap_analysis: SYN-BCS, Records requiring evidence review; CG-02 / cohort_review: Multiple Source Gaps, operational triage only; CG-03 / outreach_draft: No message is sent, Do not state; CG-04 / quality_dashboard: SYN-BCS, source-recorded closed</td>
-          <td>solutions/care-gap-closure/screenshots/manual/annotated/03-enter-instructions.png</td>
-        </tr>
-<tr>
-          <td><code>hard-step-04</code></td>
-          <td>hard</td>
-          <td>Care Gap Closure Agent; Quality Manager; Care Coordinator; Clinical Operations Lead</td>
-          <td>solutions/care-gap-closure/screenshots/manual/annotated/04-save-instructions.png</td>
         </tr>
 <tr>
           <td><code>hard-step-05</code></td>
@@ -603,12 +585,6 @@ html[data-theme="dark"] {
           <td>solutions/care-gap-closure/screenshots/manual/annotated/13-open-preview.png</td>
         </tr>
 <tr>
-          <td><code>hard-cg-01</code></td>
-          <td>hard</td>
-          <td>SYN-BCS; Records requiring evidence review</td>
-          <td>solutions/care-gap-closure/screenshots/manual/annotated/14-cg-01.png</td>
-        </tr>
-<tr>
           <td><code>hard-cg-02</code></td>
           <td>hard</td>
           <td>Multiple Source Gaps</td>
@@ -643,10 +619,34 @@ html[data-theme="dark"] {
         <table>
           <thead><tr><th>Checkpoint</th><th>Mode</th><th>Source asset</th><th>Reason</th></tr></thead>
           <tbody><tr>
+          <td><code>easy-cg-01</code></td>
+          <td>easy</td>
+          <td>solutions/care-gap-closure/screenshots/assisted/02-cg-01.jpg</td>
+          <td>The source frame shows the colorectal queue, but its historical annotation locks SYN-BCS and predates the repaired instructions. Capture a fresh CG-01 Preview proving SYN-COL — 182 records and Records requiring evidence review; preserve the old pixels and labels.</td>
+        </tr>
+<tr>
           <td><code>easy-cg-04</code></td>
           <td>easy</td>
           <td>solutions/care-gap-closure/screenshots/assisted/05-cg-04.jpg</td>
           <td>The visible answer says source-recorded only, while neither locked anchor SYN-BCS nor the exact phrase source-recorded closed appears in the screenshot.</td>
+        </tr>
+<tr>
+          <td><code>hard-step-03</code></td>
+          <td>hard</td>
+          <td>solutions/care-gap-closure/screenshots/manual/03-enter-instructions.jpg</td>
+          <td>The editor visibly anchors CG-01 to SYN-BCS. Capture the repaired global instructions with CG-01 anchored to SYN-COL — 182 records and Records requiring evidence review; do not relabel the historical instructions.</td>
+        </tr>
+<tr>
+          <td><code>hard-step-04</code></td>
+          <td>hard</td>
+          <td>solutions/care-gap-closure/screenshots/manual/04-save-instructions.jpg</td>
+          <td>This frame belongs to the old instruction revision and has no explicit saved-state indicator. Verify the repaired SYN-COL — 182 records instructions persist after saving, then capture the saved state without changing the historical image.</td>
+        </tr>
+<tr>
+          <td><code>hard-cg-01</code></td>
+          <td>hard</td>
+          <td>solutions/care-gap-closure/screenshots/manual/14-cg-01.jpg</td>
+          <td>The source frame shows the colorectal queue, but its historical annotation locks SYN-BCS and predates the repaired instructions. After saving the repaired instructions, capture a fresh CG-01 Preview proving SYN-COL — 182 records and Records requiring evidence review; preserve the old pixels and labels.</td>
         </tr></tbody>
         </table>
       </div>
@@ -658,7 +658,7 @@ html[data-theme="dark"] {
       <a class="button" href="evals/visual-checkpoints.json" download>Download visual checkpoint contract</a>
       <a class="button" href="export-manifest.json" download>Download export manifest</a>
       <a class="button" href="exports/care-gap-closure-source.zip" download>Download portable bundle</a>
-      <a class="button primary" href="exports/care-gap-closure-copilot-studio-solution.zip" download>Download Copilot Studio solution</a><a class="button" href="exports/care-gap-closure-deployment-settings.json" download>Deployment settings</a><a class="button" href="exports/care-gap-closure-solution-export.json" download>Export details</a>
+      <div class="notice"><strong>Historical export — source repair pending.</strong> Historical export predates the SYN-COL — 182 records repair. Do not use it as the repaired source; synchronize the reviewed native files, rerun Preview, and create a fresh unmanaged export before import. <a href="exports/care-gap-closure-solution-export.json" download>Export details</a></div>
 
     </section>
   </main>

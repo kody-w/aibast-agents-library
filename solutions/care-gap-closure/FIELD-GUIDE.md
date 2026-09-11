@@ -263,3 +263,9 @@ an approved production tool returns evidence that it succeeded.
   part of scaffolding.
 - **Customer gate:** replacement connections, governance, telemetry, support,
   and success measures are agreed before production.
+
+## Pending evidence
+
+- solutions/care-gap-closure/evals/manual-build-evidence.json does not record passed manual Preview evidence
+
+Pending items are not proof and must not be described as captured.

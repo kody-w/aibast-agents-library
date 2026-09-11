@@ -725,6 +725,13 @@ def copilot_solution_download_links(ctx: JourneyContext) -> str:
     artifacts = copilot_solution_artifacts(ctx)
     if not artifacts:
         return ""
+    if artifacts.metadata.get("source_contract_status") == "stale_source":
+        return (
+            '<div class="notice"><strong>Historical export — source repair pending.</strong> '
+            f'{html.escape(str(artifacts.metadata["source_contract_note"]))} '
+            f'<a href="exports/{html.escape(artifacts.metadata_path.name)}" '
+            'download>Export details</a></div>'
+        )
     return (
         f'<a class="button primary" href="exports/{html.escape(artifacts.zip_path.name)}" '
         'download>Download Copilot Studio solution</a>'
@@ -833,7 +840,9 @@ def canonical_cases(evidence: dict[str, Any] | None) -> list[dict[str, Any]]:
 def manual_evidence_passed(evidence: dict[str, Any] | None) -> bool:
     if not evidence:
         return False
-    if str(evidence.get("status", "")).lower() in {"failed", "error", "pending"}:
+    if str(evidence.get("status", "")).lower() in {
+        "failed", "error", "pending", "reshoot_required",
+    }:
         return False
     cases = canonical_cases(evidence)
     if not cases or not all(case.get("passed") is True for case in cases):
@@ -1147,6 +1156,11 @@ def expected_result(ctx: JourneyContext, action: str, filename: str) -> str:
     if case:
         case_id = case.get("case_id", "recorded Preview case")
         identifiers = ", ".join(str(value) for value in case.get("must_include", []))
+        if case.get("status") == "reshoot_required":
+            return (
+                f"A fresh Preview response must include {identifiers} for {case_id}; "
+                "the historical capture does not validate the repaired source contract."
+            )
         suffix = f" with the recorded identifiers {identifiers}" if identifiers else ""
         return f"The captured Preview evidence records {case_id}{suffix}; do not infer results beyond it."
     if contains_word(lower, "create") and contains_word(lower, "agent"):
@@ -1154,6 +1168,12 @@ def expected_result(ctx: JourneyContext, action: str, filename: str) -> str:
     if contains_word(lower, "name"):
         return f"The page header shows the recorded manual build name: {manual_display_name(ctx)}."
     if contains_word(lower, "instruction") or contains_word(lower, "instructions"):
+        if (ctx.manual_evidence or {}).get("status") == "reshoot_required":
+            return (
+                "Enter the current manual/GLOBAL-INSTRUCTIONS.md policy, save it, "
+                "and verify it persists after reopening. The historical capture "
+                "does not verify this source revision."
+            )
         return "The reviewed manual/GLOBAL-INSTRUCTIONS.md policy is visible or saved without unrecorded edits."
     if "web search" in lower:
         return "The captured inventory no longer lists the default web-search capability."
@@ -1285,14 +1305,17 @@ def collect_resources(ctx: JourneyContext) -> list[Resource]:
     add_resource(resources, seen, ctx, "deployment-recipe", "Deployment recipe", ctx.package / "deployment.json", "Easy-mode deployment contract")
     solution_artifacts = copilot_solution_artifacts(ctx)
     if solution_artifacts:
+        stale_export = solution_artifacts.metadata.get("source_contract_status") == "stale_source"
         add_resource(
             resources,
             seen,
             ctx,
             "copilot-studio-solution",
-            "Importable Copilot Studio solution",
+            "Historical Copilot Studio solution — source repair pending"
+            if stale_export else "Importable Copilot Studio solution",
             solution_artifacts.zip_path,
-            "Unmanaged solution ZIP for manual import; the agent remains unpublished",
+            str(solution_artifacts.metadata["source_contract_note"])
+            if stale_export else "Unmanaged solution ZIP for manual import; the agent remains unpublished",
         )
         add_resource(
             resources,
@@ -1571,9 +1594,13 @@ def render_manifest(ctx: JourneyContext, resources: list[Resource]) -> str:
     }
     if solution_artifacts:
         metadata = solution_artifacts.metadata
+        stale_export = metadata.get("source_contract_status") == "stale_source"
         manifest["copilot_studio_solution"] = {
-            "label": f"Importable {ctx.title} Copilot Studio solution",
-            "status": metadata["status"],
+            "label": (
+                f"Historical {ctx.title} Copilot Studio solution — source repair pending"
+                if stale_export else f"Importable {ctx.title} Copilot Studio solution"
+            ),
+            "status": "stale_source" if stale_export else metadata["status"],
             "solution_unique_name": metadata.get("solution_unique_name"),
             "zip": {
                 "path": ctx.rel(solution_artifacts.zip_path),
@@ -1593,6 +1620,10 @@ def render_manifest(ctx: JourneyContext, resources: list[Resource]) -> str:
             "published": metadata["published"],
             "import_caveats": metadata.get("import_caveats", []),
         }
+        if stale_export:
+            manifest["copilot_studio_solution"]["source_contract_note"] = (
+                metadata["source_contract_note"]
+            )
     return json.dumps(manifest, indent=2) + "\n"
 
 
@@ -1682,9 +1713,13 @@ def easy_case_records(ctx: JourneyContext) -> list[dict[str, Any]]:
                                     transcript.get("assistant_response") or ""
                                 ),
                                 "passed": (
-                                    case.get("passed") is True
-                                    or transcript.get("passed") is True
+                                    (
+                                        case.get("passed") is True
+                                        or transcript.get("passed") is True
+                                    )
+                                    and case.get("status") != "reshoot_required"
                                 ),
+                                "status": case.get("status"),
                                 "evidence_path": transcript_sources.get(
                                     case_id,
                                     "evals/copilot-studio-preview-evidence.json",
@@ -1756,6 +1791,13 @@ def render_response_evidence(
         if case.get("passed") is True and excerpt
         else "Use the reviewed markers above to evaluate the live response."
     )
+    heading = "Verified response evidence"
+    if case.get("status") == "reshoot_required":
+        heading = "Historical response evidence"
+        status = (
+            "Historical response excerpt only; the repaired source still requires "
+            "a fresh Preview run."
+        )
     excerpt_html = (
         f'<pre class="evidence-transcript">{html.escape(excerpt)}</pre>'
         if excerpt
@@ -1763,7 +1805,7 @@ def render_response_evidence(
     )
     return (
         '<div class="verification-evidence">'
-        "<strong>Verified response evidence</strong>"
+        f"<strong>{heading}</strong>"
         f"<p>{html.escape(status)} Compare your fresh Preview result with "
         "the required and forbidden markers before marking this checkpoint "
         "complete.</p>"
@@ -4369,6 +4411,21 @@ before enabling any integration.
 
 {caveat_lines}
 """
+        if artifacts.metadata.get("source_contract_status") == "stale_source":
+            solution_section = f"""
+
+## Historical export — source repair pending
+
+{artifacts.metadata["source_contract_note"]}
+
+- Historical ZIP (audit only): [`{artifacts.zip_path.name}`]({artifacts.zip_path.name})
+- Historical deployment settings: [`{artifacts.settings_path.name}`]({artifacts.settings_path.name})
+- Export details and source-contract warning: [`{artifacts.metadata_path.name}`]({artifacts.metadata_path.name})
+
+The original ZIP and export timestamp are preserved. The repaired native source
+is in `../copilot-studio/`; the regenerated source bundle includes it and the
+explicit evidence gaps. No new live export or publication is claimed.
+"""
     return f"""# Export bundle
 
 Build `{ctx.slug}-source.zip` from the generated manifest:
@@ -4429,7 +4486,9 @@ def readme_block(ctx: JourneyContext, resources: list[Resource]) -> str:
         rows.extend(
             [
                 (
-                    "Copilot Studio solution ZIP",
+                    "Historical Copilot Studio solution ZIP — source repair pending"
+                    if solution_artifacts.metadata.get("source_contract_status") == "stale_source"
+                    else "Copilot Studio solution ZIP",
                     f"`{ctx.rel(solution_artifacts.zip_path)}`",
                 ),
                 (
@@ -4455,10 +4514,12 @@ def readme_block(ctx: JourneyContext, resources: list[Resource]) -> str:
         f"**Scaffold status:** {ready} resources ready; {pending} pending. "
         + (
             "Pending assets are not evidence and must not be claimed as captured."
-            if pending
+            if pending or ctx.missing_evidence
             else "Manual evidence and referenced screenshots passed scaffold validation."
         )
     )
+    if ctx.missing_evidence:
+        status += " Current manual Preview and saved-instruction verification remain pending."
     return f"""{README_START}
 ## Customer journey package map
 

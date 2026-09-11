@@ -28,12 +28,22 @@ def advertised_slugs():
 
 def test_all_advertised_workshops_match_the_authoritative_scaffold():
     for slug in advertised_slugs():
+        evidence_path = ROOT / "solutions" / slug / "evals/manual-build-evidence.json"
+        documented_reshoot = (
+            json.loads(evidence_path.read_text(encoding="utf-8")).get("status")
+            == "reshoot_required"
+        )
         context = scaffold.load_context(
             ROOT,
             slug,
-            allow_pending=False,
+            allow_pending=documented_reshoot,
             raw_base=scaffold.DEFAULT_RAW_BASE,
         )
+        if documented_reshoot:
+            assert context.missing_evidence == [
+                f"solutions/{slug}/evals/manual-build-evidence.json "
+                "does not record passed manual Preview evidence"
+            ]
         resources, outputs = scaffold.generated_outputs(context)
 
         for path, expected in outputs.items():
