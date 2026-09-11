@@ -50,61 +50,129 @@ STYLE_OPEN_RE = re.compile(r"<style[\s>]", re.IGNORECASE)
 HEAD_CLOSE_RE = re.compile(r"</head>", re.IGNORECASE)
 CLARITY_START_RE = re.compile(r"<!--\s*clarity:start\s*-->", re.IGNORECASE)
 
-# The palette the site already ships. Changing a value here restyles every
-# published page, so tests/test_design_tokens.py pins these against the pages
-# that carried them first.
-LIGHT = {
-    "--cp-bg": "#f7f4ef",
-    "--cp-bg-elevated": "#fcfbf8",
-    "--cp-surface": "#ffffff",
-    "--cp-surface-soft": "#f5f5f5",
-    "--cp-border": "#dedede",
-    "--cp-border-strong": "#919191",
-    "--cp-text": "#242424",
-    "--cp-text-muted": "#5c5c5c",
-    "--cp-text-soft": "#6f6f6f",
-    "--cp-accent": "#b11f4b",
-    "--cp-accent-hover": "#9a1a41",
-    "--cp-accent-soft": "rgba(177, 31, 75, 0.08)",
-    "--cp-accent-fg": "#ffffff",
-    # Contrast-corrected in the 2026-09 design pass; see tests/test_design_tokens.py.
-    "--cp-success": "#15803d",
-    "--cp-danger": "#c81e1e",
-    "--cp-warning": "#f59e0b",
-    "--cp-link": "#0f6cbd",
-    "--cp-shadow": "0 18px 48px rgba(0, 0, 0, 0.12)",
-    "--cp-overlay": "rgba(255, 255, 255, 0.8)",
-    "--cp-panel": "rgba(255, 255, 255, 0.86)",
-    "--cp-panel-strong": "rgba(255, 255, 255, 0.96)",
-    "--cp-sheen": "rgba(255, 255, 255, 0.55)",
-    "--cp-highlight": "rgba(177, 31, 75, 0.12)",
+# The palette.
+#
+# The site shipped a warm cream ground (#f7f4ef) with an oxblood accent (#b11f4b).
+# That combination is the one the anti-slop design skill names as its second most
+# recurring AI tell: "warm beige/cream + brass/clay/oxblood" is what an LLM reaches
+# for by default, and it makes the brand invisible. A Microsoft engineering catalog
+# has no reason to look like warm-craft packaging.
+#
+# So the GROUND changed and the SIGNATURE stayed. "signal" is a cool neutral canvas
+# (zinc, not paper) carrying the one saturated accent the library already owned.
+# "fluent" is the alternative: Microsoft's own neutrals and brand blue, no crimson.
+# Switch the whole site with one edit here plus scripts/apply_design_tokens.py.
+PALETTE = "signal"
+
+PALETTES: dict[str, dict[str, dict[str, str]]] = {
+    "signal": {
+        "light": {
+            "--cp-bg": "#f4f4f5",
+            "--cp-bg-elevated": "#fafafa",
+            "--cp-surface": "#ffffff",
+            "--cp-surface-soft": "#eeeeef",
+            "--cp-border": "#dcdcde",
+            "--cp-border-strong": "#8e8e93",
+            "--cp-text": "#18181b",
+            "--cp-text-muted": "#52525b",
+            "--cp-text-soft": "#6b6b74",
+            "--cp-accent": "#b11f4b",
+            "--cp-accent-hover": "#9a1a41",
+            "--cp-accent-soft": "rgba(177, 31, 75, 0.08)",
+            "--cp-accent-fg": "#ffffff",
+            "--cp-success": "#15803d",
+            "--cp-danger": "#c81e1e",
+            "--cp-warning": "#b45309",
+            "--cp-link": "#0f6cbd",
+            "--cp-shadow": "0 16px 40px rgba(24, 24, 27, 0.10)",
+            "--cp-overlay": "rgba(24, 24, 27, 0.55)",
+            "--cp-panel": "rgba(255, 255, 255, 0.86)",
+            "--cp-panel-strong": "rgba(255, 255, 255, 0.96)",
+            "--cp-sheen": "rgba(24, 24, 27, 0.04)",
+            "--cp-highlight": "rgba(177, 31, 75, 0.12)",
+        },
+        "dark": {
+            "--cp-bg": "#18181b",
+            "--cp-bg-elevated": "#232327",
+            "--cp-surface": "#1f1f23",
+            "--cp-surface-soft": "#27272b",
+            "--cp-border": "#34343a",
+            "--cp-border-strong": "#54545c",
+            "--cp-text": "#f4f4f5",
+            "--cp-text-muted": "#a9a9b2",
+            "--cp-text-soft": "#c4c4cc",
+            "--cp-accent": "#ff7a9c",
+            "--cp-accent-hover": "#ff96b0",
+            "--cp-accent-soft": "rgba(255, 122, 156, 0.14)",
+            "--cp-accent-fg": "#18181b",
+            "--cp-success": "#4ade80",
+            "--cp-danger": "#fb8a8a",
+            "--cp-warning": "#fbbf24",
+            "--cp-link": "#66b3ff",
+            "--cp-shadow": "0 16px 40px rgba(0, 0, 0, 0.45)",
+            "--cp-overlay": "rgba(9, 9, 11, 0.7)",
+            "--cp-panel": "rgba(31, 31, 35, 0.78)",
+            "--cp-panel-strong": "rgba(31, 31, 35, 0.96)",
+            "--cp-sheen": "rgba(255, 255, 255, 0.05)",
+            "--cp-highlight": "rgba(255, 122, 156, 0.12)",
+        },
+    },
+    "fluent": {
+        "light": {
+            "--cp-bg": "#f5f5f5",
+            "--cp-bg-elevated": "#fafafa",
+            "--cp-surface": "#ffffff",
+            "--cp-surface-soft": "#ededed",
+            "--cp-border": "#d1d1d1",
+            "--cp-border-strong": "#8a8886",
+            "--cp-text": "#1b1a19",
+            "--cp-text-muted": "#57534e",
+            "--cp-text-soft": "#6b6b6b",
+            "--cp-accent": "#0f6cbd",
+            "--cp-accent-hover": "#115ea3",
+            "--cp-accent-soft": "rgba(15, 108, 189, 0.08)",
+            "--cp-accent-fg": "#ffffff",
+            "--cp-success": "#15803d",
+            "--cp-danger": "#c81e1e",
+            "--cp-warning": "#b45309",
+            "--cp-link": "#0f6cbd",
+            "--cp-shadow": "0 16px 40px rgba(27, 26, 25, 0.10)",
+            "--cp-overlay": "rgba(27, 26, 25, 0.55)",
+            "--cp-panel": "rgba(255, 255, 255, 0.86)",
+            "--cp-panel-strong": "rgba(255, 255, 255, 0.96)",
+            "--cp-sheen": "rgba(27, 26, 25, 0.04)",
+            "--cp-highlight": "rgba(15, 108, 189, 0.12)",
+        },
+        "dark": {
+            "--cp-bg": "#1b1a19",
+            "--cp-bg-elevated": "#292827",
+            "--cp-surface": "#242322",
+            "--cp-surface-soft": "#2e2d2c",
+            "--cp-border": "#3d3b39",
+            "--cp-border-strong": "#5c5a58",
+            "--cp-text": "#f3f2f1",
+            "--cp-text-muted": "#adaba9",
+            "--cp-text-soft": "#c8c6c4",
+            "--cp-accent": "#62abf5",
+            "--cp-accent-hover": "#83bdf7",
+            "--cp-accent-soft": "rgba(98, 171, 245, 0.14)",
+            "--cp-accent-fg": "#06182e",
+            "--cp-success": "#4ade80",
+            "--cp-danger": "#fb8a8a",
+            "--cp-warning": "#fbbf24",
+            "--cp-link": "#62abf5",
+            "--cp-shadow": "0 16px 40px rgba(0, 0, 0, 0.45)",
+            "--cp-overlay": "rgba(0, 0, 0, 0.7)",
+            "--cp-panel": "rgba(36, 35, 34, 0.78)",
+            "--cp-panel-strong": "rgba(36, 35, 34, 0.96)",
+            "--cp-sheen": "rgba(255, 255, 255, 0.05)",
+            "--cp-highlight": "rgba(98, 171, 245, 0.12)",
+        },
+    },
 }
 
-DARK = {
-    "--cp-bg": "#3d3b3a",
-    "--cp-bg-elevated": "#343231",
-    "--cp-surface": "#292929",
-    "--cp-surface-soft": "#2e2e2e",
-    "--cp-border": "#474747",
-    "--cp-border-strong": "#5f5f5f",
-    "--cp-text": "#dedede",
-    "--cp-text-muted": "#a8a8a8",
-    "--cp-text-soft": "#b0b0b0",
-    "--cp-accent": "#fd8ea1",
-    "--cp-accent-hover": "#fb7b91",
-    "--cp-accent-soft": "rgba(253, 142, 161, 0.14)",
-    "--cp-accent-fg": "#1a1a1a",
-    "--cp-success": "#4ade80",
-    "--cp-danger": "#fb8a8a",
-    "--cp-warning": "#fbbf24",
-    "--cp-link": "#66b3ff",
-    "--cp-shadow": "0 18px 48px rgba(0, 0, 0, 0.32)",
-    "--cp-overlay": "rgba(41, 41, 41, 0.88)",
-    "--cp-panel": "rgba(41, 41, 41, 0.72)",
-    "--cp-panel-strong": "rgba(41, 41, 41, 0.96)",
-    "--cp-sheen": "rgba(255, 255, 255, 0.04)",
-    "--cp-highlight": "rgba(253, 142, 161, 0.12)",
-}
+LIGHT = PALETTES[PALETTE]["light"]
+DARK = PALETTES[PALETTE]["dark"]
 
 # Added by the design pass. These had no single definition anywhere: the audit
 # counted 29 distinct font sizes and 10 corner radii on index.html alone.

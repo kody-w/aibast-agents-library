@@ -26,6 +26,8 @@ from scripts import apply_design_tokens as cli  # noqa: E402
 from tools.clarity_tag import public_pages  # noqa: E402
 from tools.design_tokens import (  # noqa: E402
     DARK,
+    PALETTE,
+    PALETTES,
     END_MARK,
     FOCUS_DARK,
     FOCUS_LIGHT,
@@ -117,17 +119,57 @@ def contrast(foreground: str, background: str) -> float:
     return (high + 0.05) / (low + 0.05)
 
 
-def test_the_palette_is_the_one_the_site_already_shipped():
-    # The neutrals and the brand accent are the values the site grew: index.html,
-    # metrics.html, achievements.html, docs/rapp-guide.html and all 206 generated
-    # solution pages carried byte-identical copies before this module existed.
-    assert LIGHT["--cp-bg"] == "#f7f4ef"
-    assert LIGHT["--cp-text"] == "#242424"
-    assert LIGHT["--cp-accent"] == "#b11f4b"
-    assert DARK["--cp-bg"] == "#3d3b3a"
-    assert DARK["--cp-text"] == "#dedede"
-    assert DARK["--cp-accent"] == "#fd8ea1"
+def _rgb(hex_colour: str) -> tuple[int, int, int]:
+    raw = hex_colour.lstrip("#")
+    return tuple(int(raw[i : i + 2], 16) for i in (0, 2, 4))
+
+
+# The families the anti-slop design skill names as its second most recurring AI
+# tell: "warm beige/cream + brass/clay/oxblood + espresso near-black". The site
+# shipped #f7f4ef on #b11f4b, which is squarely in it.
+BANNED_GROUNDS = {
+    "#f5f1ea", "#f7f5f1", "#fbf8f1", "#efeae0",
+    "#ece6db", "#faf7f1", "#e8dfcb", "#f7f4ef",
+}
+
+
+def test_the_ground_is_not_the_warm_paper_ai_tell():
+    ground = LIGHT["--cp-bg"].lower()
+    assert ground not in BANNED_GROUNDS, (
+        f"{ground} is the warm cream ground the design skill bans as a default. "
+        "Pick a neutral or a committed colour, not paper."
+    )
+    # Neutral means the channels stay close together. A warm ground runs R > G > B
+    # with a wide spread; that spread is the tell, not the lightness.
+    for token in ("--cp-bg", "--cp-surface", "--cp-bg-elevated", "--cp-surface-soft"):
+        r, g, b = _rgb(LIGHT[token])
+        assert max(r, g, b) - min(r, g, b) <= 6, (
+            f"light {token} {LIGHT[token]} is a tinted ground (spread {max(r,g,b)-min(r,g,b)}); "
+            "the neutral scale must stay neutral"
+        )
+        r, g, b = _rgb(DARK[token])
+        assert max(r, g, b) - min(r, g, b) <= 8, (
+            f"dark {token} {DARK[token]} is a tinted ground (spread {max(r,g,b)-min(r,g,b)})"
+        )
+
+
+def test_there_is_exactly_one_accent():
+    # "Max 1 accent colour" is the rule the site broke in four places before this
+    # pass: a crimson, a Microsoft blue, a purple and a set of decorative hues.
+    for theme in (LIGHT, DARK):
+        accent, hover = _rgb(theme["--cp-accent"]), _rgb(theme["--cp-accent-hover"])
+        distance = sum(abs(a - b) for a, b in zip(accent, hover))
+        assert distance <= 120, "accent-hover must be a shade of the accent, not a second colour"
     assert set(LIGHT) == set(DARK), "a theme is missing a token the other defines"
+
+
+def test_the_palette_is_selectable_and_every_option_is_complete():
+    # Switching the whole site is one edit here plus apply_design_tokens.py, which
+    # is the point of stamping a single block into every page.
+    assert PALETTE in PALETTES
+    for name, palette in PALETTES.items():
+        assert set(palette["light"]) == set(palette["dark"]), name
+        assert set(palette["light"]) == set(LIGHT), f"{name} does not define the same tokens"
 
 
 def test_every_text_token_passes_wcag_aa_on_the_surfaces_it_lands_on():
