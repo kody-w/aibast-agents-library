@@ -13,11 +13,21 @@
     "tools": 0
   },
   "canonical_preview": {
+    "case_id": "BPP-01",
     "prompt": "Which permit applications have been sitting too long, and which resident is going to complain first?",
+    "required_skill": "permit-backlog-and-complaint-risk",
     "must_include": [
       "BP-2025-0104",
       "Metro School District",
-      "overdue"
+      "overdue",
+      "Synthetic pilot data as of 2026-08-07; no live municipal system was accessed or changed."
+    ],
+    "must_not_include": [
+      "Issue the",
+      "Communicate",
+      "Send the",
+      "date today",
+      "update was sent"
     ],
     "passed": true
   },
