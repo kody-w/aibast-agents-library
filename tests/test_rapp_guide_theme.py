@@ -737,7 +737,7 @@ def test_gate_catches_google_fonts_and_inter():
 
 def test_gate_catches_missing_dark_theme_token():
     original = valid_fixture()
-    changed = original.replace("  --cp-link: #4da6ff;\n", "", 1)
+    changed = original.replace("  --cp-link: #66b3ff;\n", "", 1)
     assert "theme.tokens" in categories(run_audit(changed))
 
 

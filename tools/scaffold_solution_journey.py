@@ -21,6 +21,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.clarity_tag import current_tag as _clarity_current_tag  # noqa: E402
+from tools.design_tokens import render_tokens as _design_tokens  # noqa: E402
+from tools.design_tokens import stamp as _design_stamp  # noqa: E402
 
 
 def clarity_head_tag() -> str:
@@ -183,7 +185,7 @@ THEME_VARIABLES = """--cp-bg: #f7f4ef;
       --cp-surface: #ffffff;
       --cp-surface-soft: #f5f5f5;
       --cp-border: #dedede;
-      --cp-border-strong: #919191;
+      --cp-border-strong: #a8a8a8;
       --cp-text: #242424;
       --cp-text-muted: #5c5c5c;
       --cp-text-soft: #6f6f6f;
@@ -191,10 +193,10 @@ THEME_VARIABLES = """--cp-bg: #f7f4ef;
       --cp-accent-hover: #9a1a41;
       --cp-accent-soft: rgba(177, 31, 75, 0.08);
       --cp-accent-fg: #ffffff;
-      --cp-success: #16a34a;
-      --cp-danger: #dc2626;
+      --cp-success: #15803d;
+      --cp-danger: #c81e1e;
       --cp-warning: #f59e0b;
-      --cp-link: #0078d4;
+      --cp-link: #0f6cbd;
       --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
       --cp-overlay: rgba(255, 255, 255, 0.8);
       --cp-panel: rgba(255, 255, 255, 0.86);
@@ -209,16 +211,16 @@ DARK_THEME_VARIABLES = """--cp-bg: #3d3b3a;
       --cp-border: #474747;
       --cp-border-strong: #5f5f5f;
       --cp-text: #dedede;
-      --cp-text-muted: #919191;
+      --cp-text-muted: #a8a8a8;
       --cp-text-soft: #b0b0b0;
       --cp-accent: #fd8ea1;
       --cp-accent-hover: #fb7b91;
       --cp-accent-soft: rgba(253, 142, 161, 0.14);
       --cp-accent-fg: #1a1a1a;
       --cp-success: #4ade80;
-      --cp-danger: #f87171;
+      --cp-danger: #fb8a8a;
       --cp-warning: #fbbf24;
-      --cp-link: #4da6ff;
+      --cp-link: #66b3ff;
       --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
       --cp-overlay: rgba(41, 41, 41, 0.88);
       --cp-panel: rgba(41, 41, 41, 0.72);
@@ -4487,7 +4489,13 @@ def update_readme(ctx: JourneyContext, resources: list[Resource]) -> None:
 
 
 def normalize_generated_text(content: str) -> str:
-    return "\n".join(line.rstrip() for line in content.strip().splitlines()) + "\n"
+    text = "\n".join(line.rstrip() for line in content.strip().splitlines()) + "\n"
+    # Generated pages carry the shared design tokens like every other published
+    # page, so scripts/apply_design_tokens.py --check stays green after a
+    # scaffold run and the parity gate compares like with like.
+    if "</head>" in text:
+        text = _design_stamp(text, _design_tokens())
+    return text
 
 
 def generated_outputs(
