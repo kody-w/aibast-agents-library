@@ -23,8 +23,10 @@ except ModuleNotFoundError:
     import scaffold_solution_journey as scaffold
 try:
     from tools.clarity_tag import strip_tag_bytes
+    from tools.design_tokens import strip_block_bytes as strip_design_block_bytes
 except ModuleNotFoundError:
     from clarity_tag import strip_tag_bytes
+    from design_tokens import strip_block_bytes as strip_design_block_bytes
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -1595,9 +1597,13 @@ def check_manifest_and_zip(
                         f"{label}: source ZIP missing ready manifest file {entry}"
                     )
                     continue
-                # The Clarity block is stamped on published pages only (see
-                # tools/clarity_tag.py); bundles and pages are compared without it.
-                if strip_tag_bytes(archive.read(entry_names[entry])) != strip_tag_bytes(
+                # The Clarity block and the shared design tokens are stamped on
+                # published pages only (tools/clarity_tag.py, tools/design_tokens.py);
+                # bundles and pages are compared without either.
+                def _comparable(data: bytes) -> bytes:
+                    return strip_design_block_bytes(strip_tag_bytes(data))
+
+                if _comparable(archive.read(entry_names[entry])) != _comparable(
                     path.read_bytes()
                 ):
                     failures.add(
