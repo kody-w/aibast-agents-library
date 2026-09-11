@@ -19,8 +19,7 @@
     "must_include": [
       "BP-2025-0104",
       "Metro School District",
-      "overdue",
-      "Synthetic pilot data as of 2026-08-07; no live municipal system was accessed or changed."
+      "overdue"
     ],
     "must_not_include": [
       "Issue the",

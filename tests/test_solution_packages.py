@@ -1,4 +1,5 @@
 import html
+import importlib.util
 import json
 import re
 import zipfile
@@ -168,6 +169,39 @@ def test_transcripts_cover_every_locked_case_in_strict_isolation():
             assert item["expected_agent"] == case["expects_agent"]
             for value in case["must_include"]:
                 assert value.lower() in item["agent_logs"].lower()
+
+
+def test_building_permit_backlog_is_recommendation_only_and_has_boundary():
+    path = (
+        ROOT
+        / "agents"
+        / "@aibast-agents-library"
+        / "slg_government_stacks"
+        / "building_permit_processing_stack"
+        / "building_permit_processing_agent.py"
+    )
+    spec = importlib.util.spec_from_file_location("building_permit_agent", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    output = module.BuildingPermitProcessingAgent().perform(
+        operation="permit_backlog"
+    )
+    assert "BP-2025-0104" in output
+    assert "Metro School District" in output
+    assert "18 days overdue" in output
+    assert (
+        "Synthetic pilot data as of 2026-08-07; "
+        "no live municipal system was accessed or changed."
+    ) in output
+    lowered = output.lower()
+    for forbidden in (
+        "send the",
+        "issue the",
+        "communicate",
+        "date today",
+        "update was sent",
+    ):
+        assert forbidden not in lowered
 
 
 def test_catalog_demo_links_point_to_exact_canonical_prompts():
