@@ -16,7 +16,7 @@
   --cp-surface: #ffffff;
   --cp-surface-soft: #f5f5f5;
   --cp-border: #dedede;
-  --cp-border-strong: #a8a8a8;
+  --cp-border-strong: #919191;
   --cp-text: #242424;
   --cp-text-muted: #5c5c5c;
   --cp-text-soft: #6f6f6f;
@@ -161,46 +161,56 @@ html[data-theme="dark"] {
 </style>
 <!-- aibast-design:end -->
 <style>
+/* The page keeps its own variable names; each one is now an alias for the shared
+   AIBAST token, so every existing var(--bg)/var(--text)/... reference follows
+   both themes instead of pinning a dark GitHub palette. */
 :root {
-  --bg: #0d1117; --surface: #161b22; --surface2: #21262d; --border: #30363d;
-  --border-hover: #484f58; --text: #e6edf3; --text-dim: #8b949e; --text-muted: #656d76;
-  --accent: #58a6ff; --purple: #bc8cff; --green: #3fb950; --orange: #d29922; --radius: 10px;
+  --bg: var(--cp-bg); --surface: var(--cp-surface); --surface2: var(--cp-surface-soft); --border: var(--cp-border);
+  --border-hover: var(--cp-border-strong); --text: var(--cp-text); --text-dim: var(--cp-text-muted); --text-muted: var(--cp-text-soft);
+  --accent: var(--cp-accent); --green: var(--cp-success); --radius: var(--cp-radius);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+body { font-family: var(--cp-font);
   background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.55; }
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--cp-link); text-decoration: none; }
 a:hover { text-decoration: underline; }
-code, .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace; }
+code, .mono { font-family: var(--cp-font-mono); }
 
 header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 32px;
   display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; gap: 16px; flex-wrap: wrap; }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 700; }
-.logo-mark { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff;
-  width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 800; }
+.logo-mark { background: var(--accent); color: var(--cp-accent-fg);
+  width: 32px; height: 32px; border-radius: var(--cp-radius-sm); display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 800; }
 .nav-link { background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
-  padding: 6px 14px; border-radius: 6px; font-size: .78rem; font-weight: 600; cursor: pointer; }
+  padding: 6px 14px; border-radius: var(--cp-radius-sm); font-size: .78rem; font-weight: 600; cursor: pointer; }
 .nav-link:hover { border-color: var(--border-hover); color: var(--text); text-decoration: none; }
-.nav-link.primary { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; }
+.nav-link.primary { background: var(--accent); color: var(--cp-accent-fg); border-color: var(--accent); }
+.nav-link.primary:hover { background: var(--cp-accent-hover); border-color: var(--cp-accent-hover); color: var(--cp-accent-fg); }
 .header-right { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .container { max-width: 1060px; margin: 0 auto; padding: 30px 24px 90px; }
 .crumb { font-size: .78rem; color: var(--text-muted); margin-bottom: 14px; }
 
-.hero { border: 1px solid var(--border); border-radius: 14px; padding: 28px 30px;
-  background: linear-gradient(135deg, rgba(88,166,255,.08), rgba(188,140,255,.05)); }
-.slot { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--purple); font-weight: 800; }
+.hero { border: 1px solid var(--border); border-radius: var(--cp-radius-lg); padding: 28px 30px;
+  background: var(--cp-bg-elevated); }
+.slot { font-size: .7rem; text-transform: uppercase; letter-spacing: var(--cp-tracking-label); color: var(--accent); font-weight: 800; }
 .hero h1 { font-size: 2.1rem; font-weight: 850; letter-spacing: -.025em; margin: 6px 0 10px; }
 .hero .summary { font-size: 1.05rem; color: var(--text-dim); max-width: 780px; }
 .hero .alias { font-size: .8rem; color: var(--text-muted); margin-top: 10px; }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 16px; }
 .chip { font-size: .72rem; background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text-dim); border-radius: 20px; padding: 3px 11px; }
+  color: var(--text-dim); border-radius: var(--cp-radius-pill); padding: 3px 11px; }
 .chip.k { color: var(--text-muted); border-color: transparent; background: transparent; padding-left: 0; font-weight: 700;
   text-transform: uppercase; letter-spacing: .07em; font-size: .66rem; }
-.assets { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
-.asset { font-size: .72rem; font-weight: 700; border-radius: 6px; padding: 4px 10px;
-  background: rgba(63,185,80,.10); color: var(--green); border: 1px solid rgba(63,185,80,.3); }
+.assets { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; align-items: center; }
+/* Read-only status badges: outlined and quiet. */
+.asset { font-size: .72rem; font-weight: 700; border-radius: var(--cp-radius-sm); padding: 4px 10px;
+  background: var(--surface); color: var(--green); border: 1px solid var(--border); }
+/* The one call to action on the page is an <a>, so it gets the solid accent
+   treatment and reads as a button rather than as another status badge. */
+a.asset { background: var(--accent); color: var(--cp-accent-fg); border-color: var(--accent); }
+a.asset:hover, a.asset:focus-visible { background: var(--cp-accent-hover); border-color: var(--cp-accent-hover);
+  color: var(--cp-accent-fg); text-decoration: none; }
 
 .section { margin-top: 38px; }
 .section > h2 { font-size: 1.15rem; font-weight: 780; margin-bottom: 4px; }
@@ -209,26 +219,27 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .story { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 @media (max-width: 880px) { .story { grid-template-columns: 1fr; } }
 .story .col { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
-.story h3 { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 800; margin-bottom: 10px; }
-.story .situation h3 { color: var(--orange); }
-.story .opportunity h3 { color: var(--accent); }
-.story .helped h3 { color: var(--green); }
+/* One accent: the three column headings each carried a different decorative hue,
+   which read as competing accents. They are labels, so they take body colour. */
+.story h3 { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 800; margin-bottom: 10px; color: var(--text); }
 .story ul { margin: 0 0 0 17px; padding: 0; }
 .story li { font-size: .85rem; color: var(--text-dim); margin-bottom: 7px; }
 
 table { width: 100%; border-collapse: collapse; font-size: .84rem; }
 th { text-align: left; color: var(--text-muted); font-size: .68rem; text-transform: uppercase;
   letter-spacing: .07em; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--border); }
-td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--surface2); color: var(--text-dim); vertical-align: top; }
+td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--border); color: var(--text-dim); vertical-align: top; }
 td.op { white-space: nowrap; }
 .ok { color: var(--green); font-weight: 700; }
 
 .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .tab { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
-  padding: 6px 13px; border-radius: 20px; font-size: .77rem; font-weight: 650; cursor: pointer; }
+  padding: 6px 13px; border-radius: var(--cp-radius-pill); font-size: .77rem; font-weight: 650; cursor: pointer; }
 .tab:hover { border-color: var(--border-hover); color: var(--text); }
-.tab.active { background: rgba(88,166,255,.14); border-color: var(--accent); color: var(--accent); }
-.output { background: #010409; border: 1px solid var(--border); border-radius: var(--radius);
+/* Selected state: accent tint plus an accent edge, with full-strength label text
+   so the tab clears 4.5:1 on both themes (accent-on-tint does not, in dark). */
+.tab.active { background: var(--cp-accent-soft); border-color: var(--accent); color: var(--text); }
+.output { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 20px 22px; overflow-x: auto; }
 .output .label { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
   color: var(--text-muted); font-weight: 700; margin-bottom: 12px; }
@@ -239,11 +250,11 @@ td.op { white-space: nowrap; }
 .output li { font-size: .82rem; color: var(--text-dim); margin-bottom: 4px; }
 .output table { font-size: .78rem; margin: 6px 0 12px; }
 .output th, .output td { padding: 5px 12px 5px 0; }
-.output code { background: var(--surface2); padding: 1px 5px; border-radius: 4px; font-size: .78rem; }
+.output code { background: var(--surface2); padding: 1px 5px; border-radius: var(--cp-radius-sm); font-size: .78rem; }
 .output strong { color: var(--text); }
 
-.cmd { display: block; background: #010409; border: 1px solid var(--border); border-radius: 8px;
-  padding: 12px 40px 12px 15px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+.cmd { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--cp-radius-sm);
+  padding: 12px 40px 12px 15px; font-family: var(--cp-font-mono);
   font-size: .79rem; color: var(--text); cursor: pointer; position: relative; word-break: break-all; }
 .cmd:hover { border-color: var(--border-hover); }
 .cmd::after { content: "copy"; position: absolute; right: 11px; top: 11px; font-size: .64rem; color: var(--text-muted); }

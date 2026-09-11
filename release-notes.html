@@ -16,7 +16,7 @@
   --cp-surface: #ffffff;
   --cp-surface-soft: #f5f5f5;
   --cp-border: #dedede;
-  --cp-border-strong: #a8a8a8;
+  --cp-border-strong: #919191;
   --cp-text: #242424;
   --cp-text-muted: #5c5c5c;
   --cp-text-soft: #6f6f6f;
@@ -163,16 +163,18 @@ html[data-theme="dark"] {
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #0d1117; color: #e6edf3;
+    font-family: var(--cp-font);
+    background: var(--cp-bg); color: var(--cp-text);
     min-height: 100vh; padding: 48px 24px;
     display: flex; flex-direction: column; align-items: center;
   }
-  a { color: #58a6ff; text-decoration: none; }
+  a { color: var(--cp-link); text-decoration: none; }
   a:hover { text-decoration: underline; }
   code {
-    font-family: "SF Mono", "Fira Code", monospace; font-size: 13px;
-    background: #161b22; padding: 2px 6px; border-radius: 4px;
+    font-family: var(--cp-font-mono); font-size: 13px;
+    background: var(--cp-surface-soft); color: var(--cp-text);
+    border: 1px solid var(--cp-border);
+    padding: 2px 6px; border-radius: var(--cp-radius-sm);
   }
 
   .container { max-width: 720px; width: 100%; }
@@ -181,49 +183,50 @@ html[data-theme="dark"] {
     display: flex; align-items: center; gap: 16px;
     margin-bottom: 48px; font-size: 14px;
   }
-  .nav .back { color: #8b949e; }
-  .nav .sep { color: #30363d; }
+  .nav .back { color: var(--cp-text-muted); }
+  .nav .sep { color: var(--cp-border-strong); }
 
   .page-header { margin-bottom: 48px; }
   .page-header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
-  .page-header p { color: #8b949e; font-size: 16px; }
+  .page-header p { color: var(--cp-text-muted); font-size: 16px; }
 
   .release {
-    background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+    background: var(--cp-surface); border: 1px solid var(--cp-border);
+    border-radius: var(--cp-radius-lg);
     margin-bottom: 32px; overflow: hidden;
   }
   .release-header {
-    padding: 20px 24px; border-bottom: 1px solid #21262d;
+    padding: 20px 24px; border-bottom: 1px solid var(--cp-border);
     display: flex; align-items: baseline; gap: 12px;
   }
   .release-version {
-    font-size: 22px; font-weight: 700;
-    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 22px; font-weight: 700; color: var(--cp-text);
+    font-family: var(--cp-font-mono);
   }
-  .release-date { color: #8b949e; font-size: 13px; }
+  .release-date { color: var(--cp-text-muted); font-size: 13px; }
   .release-tag {
     font-size: 11px; font-weight: 600; padding: 3px 10px;
-    border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;
-    background: #238636; color: #fff;
+    border-radius: var(--cp-radius-pill); text-transform: uppercase; letter-spacing: 0.5px;
+    background: var(--cp-accent); color: var(--cp-accent-fg);
   }
   .release-body { padding: 24px; }
   .release-body h3 {
     font-size: 15px; font-weight: 600; margin-bottom: 12px;
-    color: #58a6ff; display: flex; align-items: center; gap: 8px;
+    color: var(--cp-accent); display: flex; align-items: center; gap: 8px;
   }
   .release-body ul {
-    margin: 0 0 24px 20px; font-size: 14px; line-height: 1.8; color: #c9d1d9;
+    margin: 0 0 24px 20px; font-size: 14px; line-height: 1.8; color: var(--cp-text);
   }
   .release-body ul:last-child { margin-bottom: 0; }
   .release-body li { margin-bottom: 4px; }
   .release-body .highlight {
-    background: #1f6feb1a; border-left: 3px solid #1f6feb;
-    padding: 12px 16px; border-radius: 0 8px 8px 0;
-    margin-bottom: 24px; font-size: 14px; color: #c9d1d9; line-height: 1.6;
+    background: var(--cp-accent-soft); border-left: 3px solid var(--cp-accent);
+    padding: 12px 16px; border-radius: 0 var(--cp-radius-sm) var(--cp-radius-sm) 0;
+    margin-bottom: 24px; font-size: 14px; color: var(--cp-text); line-height: 1.6;
   }
 
   .links {
-    margin-top: 32px; text-align: center; font-size: 13px; color: #484f58;
+    margin-top: 32px; text-align: center; font-size: 13px; color: var(--cp-text-soft);
   }
   .links a { margin: 0 12px; }
 </style>
@@ -288,7 +291,7 @@ html[data-theme="dark"] {
   <!-- ── v0.6.0 ── -->
   <div class="release">
     <div class="release-header">
-      <span class="release-version">v0.6.0</span>
+      <h2 class="release-version">v0.6.0</h2>
       <span class="release-date">April 11, 2026</span>
       <span class="release-tag">Latest</span>
     </div>
@@ -337,7 +340,7 @@ html[data-theme="dark"] {
   <!-- ── v0.1.0 ── -->
   <div class="release">
     <div class="release-header">
-      <span class="release-version">v0.1.0</span>
+      <h2 class="release-version">v0.1.0</h2>
       <span class="release-date">March 5, 2026</span>
     </div>
     <div class="release-body">

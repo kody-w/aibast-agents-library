@@ -12,7 +12,7 @@
     var saved = localStorage.getItem('rapp-pitch-theme');
     var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
     var theme = saved || (prefersLight ? 'light' : 'dark');
-    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.setAttribute('data-theme', theme === 'light' ? 'light' : 'dark');
   } catch(e){}
 })();
 </script>
@@ -27,7 +27,7 @@
   --cp-surface: #ffffff;
   --cp-surface-soft: #f5f5f5;
   --cp-border: #dedede;
-  --cp-border-strong: #a8a8a8;
+  --cp-border-strong: #919191;
   --cp-text: #242424;
   --cp-text-muted: #5c5c5c;
   --cp-text-soft: #6f6f6f;
@@ -173,25 +173,23 @@ html[data-theme="dark"] {
 <!-- aibast-design:end -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+/* The deck's own palette, re-expressed in the shared AIBAST tokens. Every
+   var(--bg) / var(--accent) reference below keeps working, but the values now
+   follow the reader's theme (light, dark, or OS preference) instead of being
+   pinned to one look. One accent only: the former green/purple emphasis hues
+   resolve to the same --cp-accent. */
 :root{
-  --bg:#0d1117;--surface:#161b22;--surface2:#1c2128;--border:#30363d;--border2:#21262d;
-  --text:#e6edf3;--text-dim:#8b949e;--muted:#484f58;
-  --accent:#58a6ff;--green:#3fb950;--green-2:#2ea043;--purple:#a78bfa;--purple-2:#8b5cf6;
-  --orange:#f0883e;--yellow:#e3b341;--red:#f85149;--code-bg:#04060c;
-  --chrome-bg:rgba(22,27,34,.92);
-  --grad-1:#7df0c8;--grad-2:#58a6ff;--grad-3:#a78bfa;
-  --tint-green:rgba(63,185,80,.08);--tint-purple:rgba(139,92,246,.08);
-  --logo-glow:rgba(125,240,200,.3);
-}
-[data-theme="light"]{
-  --bg:#ffffff;--surface:#f6f8fa;--surface2:#eaeef2;--border:#d0d7de;--border2:#afb8c1;
-  --text:#1f2328;--text-dim:#59636e;--muted:#8c959f;
-  --accent:#0969da;--green:#1a7f37;--green-2:#2da44e;--purple:#8250df;--purple-2:#6639ba;
-  --orange:#bc4c00;--yellow:#9a6700;--red:#cf222e;--code-bg:#f6f8fa;
-  --chrome-bg:rgba(255,255,255,.88);
-  --grad-1:#2da44e;--grad-2:#0969da;--grad-3:#8250df;
-  --tint-green:rgba(26,127,55,.08);--tint-purple:rgba(130,80,223,.08);
-  --logo-glow:rgba(9,105,218,.2);
+  --bg:var(--cp-bg);--surface:var(--cp-surface);--surface2:var(--cp-surface-soft);
+  --border:var(--cp-border);--border2:var(--cp-border);
+  --text:var(--cp-text);--text-dim:var(--cp-text-muted);--muted:var(--cp-text-soft);
+  --accent:var(--cp-accent);--accent-hover:var(--cp-accent-hover);
+  --green:var(--cp-accent);--green-2:var(--cp-accent-hover);
+  --purple:var(--cp-accent);--purple-2:var(--cp-accent-hover);
+  --orange:var(--cp-warning);--yellow:var(--cp-warning);--red:var(--cp-danger);
+  --code-bg:var(--cp-surface-soft);
+  --chrome-bg:var(--cp-panel);
+  --tint-green:var(--cp-accent-soft);--tint-purple:var(--cp-accent-soft);
+  --logo-glow:var(--cp-highlight);
 }
 html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;transition:background-color .25s,color .25s}
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
@@ -206,7 +204,7 @@ code{background:var(--surface);padding:2px 6px;border-radius:4px;border:1px soli
 
 /* Typography — sized for screenshare presentation */
 h1{font-size:3.6rem;font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-.3px}
-h1 .grad{background:linear-gradient(135deg,var(--grad-1),var(--grad-2),var(--grad-3));-webkit-background-clip:text;background-clip:text;color:transparent}
+h1 .grad{color:var(--accent)}
 h2{font-size:2.6rem;font-weight:700;margin-bottom:22px;color:var(--text);letter-spacing:-.2px}
 h3.kicker{font-size:.95rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
 h3{font-size:1.3rem;font-weight:600;color:var(--text);margin:18px 0 8px}
@@ -294,13 +292,13 @@ pre.cmd .green{color:var(--green)}
 /* Integrated slide question — the hinge line. Not a callout box, not a presenter cue.
    Reads as the natural second beat of the slide: claim → support → question. */
 .slide-q{display:block;margin:40px auto 0;max-width:880px;font-size:1.85rem;line-height:1.4;color:var(--text);font-weight:600;font-style:italic;position:relative;padding-top:30px;letter-spacing:-.1px}
-.slide-q::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:44px;height:2px;background:linear-gradient(90deg,var(--grad-1),var(--grad-3));border-radius:1px;opacity:.8}
-.slide-q .accent{background:linear-gradient(135deg,var(--grad-1),var(--grad-2),var(--grad-3));-webkit-background-clip:text;background-clip:text;color:transparent;font-style:normal;font-weight:700}
+.slide-q::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:44px;height:2px;background:var(--accent);border-radius:1px;opacity:.8}
+.slide-q .accent{color:var(--accent);font-style:normal;font-weight:700}
 
 /* Toggle demo */
 .toggle-demo{display:flex;align-items:center;gap:12px;margin:8px auto;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;max-width:420px}
 .toggle-switch{width:36px;height:20px;background:var(--green);border-radius:10px;position:relative;flex-shrink:0}
-.toggle-switch::after{content:'';position:absolute;top:3px;left:19px;width:14px;height:14px;border-radius:50%;background:#fff}
+.toggle-switch::after{content:'';position:absolute;top:3px;left:19px;width:14px;height:14px;border-radius:50%;background:var(--cp-accent-fg)}
 .toggle-switch.off{background:var(--border)}
 .toggle-switch.off::after{left:3px;background:var(--muted)}
 .toggle-label{font-size:.95rem;font-family:'SF Mono',monospace}
@@ -323,12 +321,12 @@ pre.cmd .green{color:var(--green)}
 /* Buttons */
 .btn-row{display:flex;gap:14px;margin-top:24px;flex-wrap:wrap;justify-content:center}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:10px;font-size:1.15rem;font-weight:600;text-decoration:none;transition:all .15s;border:none;cursor:pointer}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#79c0ff;transform:translateY(-1px);text-decoration:none}
+.btn-primary{background:var(--accent);color:var(--cp-accent-fg)}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);text-decoration:none}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
 .btn-outline:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
-.btn-green{background:rgba(63,185,80,.12);border:1.5px solid var(--green);color:var(--green)}
-.btn-green:hover{background:rgba(63,185,80,.2);text-decoration:none}
+.btn-green{background:var(--tint-green);border:1.5px solid var(--green);color:var(--green)}
+.btn-green:hover{background:var(--cp-highlight);text-decoration:none}
 
 /* Navigation */
 .nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:100;background:var(--chrome-bg);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:40px;padding:8px 18px}
@@ -695,7 +693,7 @@ pre.cmd .green{color:var(--green)}
 function toggleTheme(){
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
   if (isLight) {
-    document.documentElement.removeAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', 'dark');
     localStorage.setItem('rapp-pitch-theme', 'dark');
   } else {
     document.documentElement.setAttribute('data-theme', 'light');

@@ -16,7 +16,7 @@
   --cp-surface: #ffffff;
   --cp-surface-soft: #f5f5f5;
   --cp-border: #dedede;
-  --cp-border-strong: #a8a8a8;
+  --cp-border-strong: #919191;
   --cp-text: #242424;
   --cp-text-muted: #5c5c5c;
   --cp-text-soft: #6f6f6f;
@@ -163,123 +163,131 @@ html[data-theme="dark"] {
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #0d1117; color: #e6edf3;
+    font-family: var(--cp-font);
+    background: var(--cp-bg); color: var(--cp-text);
     min-height: 100vh; padding: 48px 24px;
     display: flex; flex-direction: column; align-items: center;
   }
-  a { color: #58a6ff; text-decoration: none; }
+  a { color: var(--cp-link); text-decoration: none; }
   a:hover { text-decoration: underline; }
   code {
-    font-family: "SF Mono", "Fira Code", monospace; font-size: 13px;
-    background: #161b22; padding: 2px 6px; border-radius: 4px;
+    font-family: var(--cp-font-mono); font-size: 13px;
+    background: var(--cp-surface-soft); color: var(--cp-text);
+    border: 1px solid var(--cp-border);
+    padding: 2px 6px; border-radius: 4px;
   }
   .hero { text-align: center; max-width: 620px; margin-bottom: 48px; }
   .hero .logo { font-size: 64px; margin-bottom: 16px; }
   .hero h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
-  .hero p { color: #8b949e; font-size: 16px; line-height: 1.6; }
-  .hero .tagline { color: #58a6ff; font-weight: 600; font-size: 14px; margin-top: 12px; }
+  .hero p { color: var(--cp-text-muted); font-size: 16px; line-height: 1.6; }
+  .hero .tagline { color: var(--cp-accent); font-weight: 600; font-size: 14px; margin-top: 12px; }
   .hero .why-link { margin-top: 10px; font-size: 14px; }
-  .hero .why-link a { color: #8b949e; text-decoration: none; }
-  .hero .why-link a:hover { color: #58a6ff; text-decoration: underline; }
+  .hero .why-link a { color: var(--cp-text-muted); text-decoration: none; }
+  .hero .why-link a:hover { color: var(--cp-link); text-decoration: underline; }
   .hero-actions {
     display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
     margin-top: 10px;
   }
   .hero-action {
     display: inline-flex; align-items: center; justify-content: center;
-    min-height: 40px; padding: 9px 16px; border: 1px solid #30363d;
-    border-radius: 6px; color: #c9d1d9; font-size: 13px; font-weight: 600;
+    min-height: 40px; padding: 9px 16px; border: 1px solid var(--cp-border-strong);
+    border-radius: 6px; color: var(--cp-text); font-size: 13px; font-weight: 600;
     transition: border-color 0.15s, background 0.15s, color 0.15s;
   }
   .hero-action:hover {
-    border-color: #58a6ff; background: #1f6feb1a; color: #fff;
+    border-color: var(--cp-accent); background: var(--cp-accent-soft); color: var(--cp-text);
     text-decoration: none;
   }
-  .hero-action.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
-  .hero-action.primary:hover { background: #388bfd; }
+  .hero-action.primary {
+    background: var(--cp-accent); border-color: var(--cp-accent); color: var(--cp-accent-fg);
+  }
+  .hero-action.primary:hover {
+    background: var(--cp-accent-hover); border-color: var(--cp-accent-hover);
+    color: var(--cp-accent-fg);
+  }
 
   .one-liner {
     max-width: 620px; width: 100%;
-    background: #161b22; border: 2px solid #238636; border-radius: 12px;
+    background: var(--cp-surface); border: 2px solid var(--cp-accent); border-radius: 12px;
     padding: 20px 24px; margin-bottom: 48px;
     text-align: center; cursor: pointer;
     transition: border-color 0.15s, transform 0.1s;
   }
-  .one-liner:hover { border-color: #3fb950; transform: translateY(-1px); }
-  .one-liner .label { font-size: 12px; color: #3fb950; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .one-liner:hover { border-color: var(--cp-accent-hover); transform: translateY(-1px); }
+  .one-liner .label { font-size: 12px; color: var(--cp-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
   .one-liner .cmd {
-    font-family: "SF Mono", "Fira Code", monospace; font-size: 15px;
-    color: #e6edf3; word-break: break-all;
+    font-family: var(--cp-font-mono); font-size: 15px;
+    color: var(--cp-text); word-break: break-all;
   }
-  .one-liner .hint { font-size: 11px; color: #484f58; margin-top: 8px; }
-  .one-liner.copied .hint { color: #3fb950; }
+  .one-liner .hint { font-size: 11px; color: var(--cp-text-soft); margin-top: 8px; }
+  .one-liner.copied .hint { color: var(--cp-success); }
 
   .tiers { max-width: 620px; width: 100%; }
 
   .tier {
-    background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+    background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 12px;
     margin-bottom: 24px; overflow: hidden;
     transition: border-color 0.15s;
   }
-  .tier:hover { border-color: #30363d; }
+  .tier:hover { border-color: var(--cp-border-strong); }
   .tier-header {
     padding: 20px 24px; display: flex; align-items: center; gap: 16px;
     cursor: pointer; user-select: none;
   }
   .tier-icon { font-size: 32px; flex-shrink: 0; }
   .tier-title h2 { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
-  .tier-title .subtitle { font-size: 13px; color: #8b949e; }
+  .tier-title .subtitle { font-size: 13px; color: var(--cp-text-muted); }
   .tier-badge {
     margin-left: auto; font-size: 11px; font-weight: 600; padding: 4px 10px;
     border-radius: 12px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.5px;
+    border: 1px solid transparent;
   }
-  .tier-badge.start { background: #238636; color: #fff; }
-  .tier-badge.next { background: #1f6feb33; color: #58a6ff; border: 1px solid #1f6feb; }
-  .tier-badge.advanced { background: #8b5cf633; color: #a78bfa; border: 1px solid #8b5cf6; }
+  .tier-badge.start { background: var(--cp-accent); color: var(--cp-accent-fg); border-color: var(--cp-accent); }
+  .tier-badge.next { background: var(--cp-accent-soft); color: var(--cp-accent); border-color: var(--cp-accent); }
+  .tier-badge.advanced { background: transparent; color: var(--cp-text-soft); border-color: var(--cp-border-strong); }
   .tier-arrow {
-    color: #484f58; font-size: 18px; transition: transform 0.2s; flex-shrink: 0;
+    color: var(--cp-text-soft); font-size: 18px; transition: transform 0.2s; flex-shrink: 0;
   }
   .tier.open .tier-arrow { transform: rotate(90deg); }
   .tier-body {
-    display: none; padding: 0 24px 24px; border-top: 1px solid #21262d;
+    display: none; padding: 0 24px 24px; border-top: 1px solid var(--cp-border);
   }
   .tier.open .tier-body { display: block; }
 
-  .tier-body p { color: #8b949e; font-size: 14px; line-height: 1.6; margin-top: 16px; }
-  .tier-body .metaphor { color: #d2a8ff; font-style: italic; font-size: 13px; margin-top: 12px; }
+  .tier-body p { color: var(--cp-text-muted); font-size: 14px; line-height: 1.6; margin-top: 16px; }
+  .tier-body .metaphor { color: var(--cp-text-muted); font-style: italic; font-size: 13px; margin-top: 12px; }
 
   .steps { margin-top: 16px; }
   .step {
-    background: #0d1117; border: 1px solid #21262d; border-radius: 8px;
+    background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: 8px;
     padding: 14px 16px; margin-top: 10px;
   }
   .step h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-  .step p { color: #8b949e; font-size: 13px; margin: 0; }
+  .step p { color: var(--cp-text-muted); font-size: 13px; margin: 0; }
   .cmd {
-    display: block; background: #0d1117; border: 1px solid #21262d;
+    display: block; background: var(--cp-surface-soft); border: 1px solid var(--cp-border);
     border-radius: 8px; padding: 10px 14px; margin-top: 8px;
-    font-family: "SF Mono", "Fira Code", monospace; font-size: 13px;
-    color: #e6edf3; cursor: pointer; position: relative;
+    font-family: var(--cp-font-mono); font-size: 13px;
+    color: var(--cp-text); cursor: pointer; position: relative;
     transition: border-color 0.15s; white-space: pre-wrap;
   }
-  .cmd:hover { border-color: #30363d; }
+  .cmd:hover { border-color: var(--cp-border-strong); }
   .cmd::after {
     content: "📋"; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-    font-size: 13px; opacity: 0.3; transition: opacity 0.15s;
+    font-size: 13px; opacity: 0.45; transition: opacity 0.15s;
   }
   .cmd:hover::after { opacity: 1; }
-  .cmd.copied::after { content: "✓"; color: #3fb950; opacity: 1; }
+  .cmd.copied::after { content: "✓"; color: var(--cp-success); opacity: 1; }
 
   /* ── Install widget ── */
   .install-widget {
     max-width: 620px; width: 100%; margin-bottom: 48px;
-    background: #161b22; border: 2px solid #238636; border-radius: 12px;
+    background: var(--cp-surface); border: 2px solid var(--cp-accent); border-radius: 12px;
     overflow: hidden; transition: border-color 0.15s;
   }
   .install-tabs {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 16px; border-bottom: 1px solid #21262d; height: 40px;
+    padding: 0 16px; border-bottom: 1px solid var(--cp-border); height: 40px;
   }
   .install-tabs-left {
     display: flex; align-items: center; gap: 2px;
@@ -290,92 +298,93 @@ html[data-theme="dark"] {
   .install-tabs-left .dots span {
     width: 10px; height: 10px; border-radius: 50%;
   }
-  .install-tabs-left .dots span:nth-child(1) { background: #f85149; }
-  .install-tabs-left .dots span:nth-child(2) { background: #d29922; }
-  .install-tabs-left .dots span:nth-child(3) { background: #3fb950; }
+  .install-tabs-left .dots span:nth-child(1) { background: var(--cp-danger); }
+  .install-tabs-left .dots span:nth-child(2) { background: var(--cp-warning); }
+  .install-tabs-left .dots span:nth-child(3) { background: var(--cp-success); }
   .install-tab {
-    background: none; border: none; color: #484f58; font-size: 12px;
-    padding: 8px 14px; cursor: pointer; font-family: "SF Mono", "Fira Code", monospace;
+    background: none; border: none; color: var(--cp-text-soft); font-size: 12px;
+    padding: 8px 14px; cursor: pointer; font-family: var(--cp-font-mono);
     border-bottom: 2px solid transparent; margin-bottom: -1px;
     transition: color 0.15s, border-color 0.15s;
   }
-  .install-tab:hover { color: #8b949e; }
+  .install-tab:hover { color: var(--cp-text-muted); }
   .install-tab.active {
-    color: #e6edf3; border-bottom-color: #238636;
+    color: var(--cp-text); border-bottom-color: var(--cp-accent);
   }
   .install-tabs-right {
     display: flex; align-items: center; gap: 10px;
   }
   .os-toggle {
-    display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8b949e;
+    display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--cp-text-muted);
   }
-  .os-toggle .os-name { font-family: "SF Mono", "Fira Code", monospace; }
+  .os-toggle .os-name { font-family: var(--cp-font-mono); }
   .os-toggle .change-btn {
-    background: none; border: none; color: #58a6ff; font-size: 12px;
+    background: none; border: none; color: var(--cp-link); font-size: 12px;
     cursor: pointer; text-decoration: none;
-    font-family: "SF Mono", "Fira Code", monospace;
+    font-family: var(--cp-font-mono);
   }
   .os-toggle .change-btn:hover { text-decoration: underline; }
   .install-body {
     padding: 20px 24px; cursor: pointer;
+    background: var(--cp-surface-soft);
   }
   .install-body .comment {
-    color: #3fb950; font-family: "SF Mono", "Fira Code", monospace;
+    color: var(--cp-text-muted); font-family: var(--cp-font-mono);
     font-size: 13px; margin-bottom: 8px;
   }
   .install-body .prompt {
-    font-family: "SF Mono", "Fira Code", monospace; font-size: 14px;
-    color: #e6edf3; display: flex; align-items: center; gap: 8px;
+    font-family: var(--cp-font-mono); font-size: 14px;
+    color: var(--cp-text); display: flex; align-items: center; gap: 8px;
   }
-  .install-body .prompt .dollar { color: #8b949e; user-select: none; }
-  .install-hint a { color: #58a6ff; }
+  .install-body .prompt .dollar { color: var(--cp-text-muted); user-select: none; }
+  .install-hint a { color: var(--cp-link); }
   .install-body .copy-icon {
-    margin-left: auto; font-size: 16px; opacity: 0.3;
+    margin-left: auto; font-size: 16px; opacity: 0.45;
     transition: opacity 0.15s; cursor: pointer; flex-shrink: 0;
   }
   .install-body:hover .copy-icon { opacity: 1; }
   .install-body.copied .copy-icon { opacity: 1; }
   .install-hint {
-    padding: 0 24px 14px; font-size: 11px; color: #484f58; text-align: center;
+    padding: 14px 24px; font-size: 11px; color: var(--cp-text-soft); text-align: center;
   }
   .install-download {
     padding: 0 24px 16px; text-align: center;
   }
   .install-download a {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; color: #8b949e; text-decoration: none;
-    padding: 6px 14px; border: 1px solid #30363d; border-radius: 6px;
+    font-size: 12px; color: var(--cp-text-muted); text-decoration: none;
+    padding: 6px 14px; border: 1px solid var(--cp-border-strong); border-radius: 6px;
     transition: all 0.15s;
   }
   .install-download a:hover {
-    color: #e6edf3; border-color: #58a6ff; background: #1f6feb1a;
+    color: var(--cp-accent); border-color: var(--cp-accent); background: var(--cp-accent-soft);
   }
 
   .status-bar {
     max-width: 620px; width: 100%; margin-top: 16px;
-    background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+    background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 12px;
     padding: 16px 24px; text-align: center;
   }
   .dot {
     display: inline-block; width: 10px; height: 10px; border-radius: 50%;
     margin-right: 8px; vertical-align: middle;
   }
-  .dot.online { background: #3fb950; }
-  .dot.offline { background: #f85149; }
-  .dot.checking { background: #d29922; animation: pulse 1s infinite; }
+  .dot.online { background: var(--cp-success); }
+  .dot.offline { background: var(--cp-danger); }
+  .dot.checking { background: var(--cp-warning); animation: pulse 1s infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
   .status-label { font-size: 14px; vertical-align: middle; }
   .open-btn {
     display: inline-block; margin-top: 12px;
-    background: #238636; color: #fff; border: none; border-radius: 8px;
+    background: var(--cp-accent); color: var(--cp-accent-fg); border: none; border-radius: 8px;
     padding: 10px 24px; font-size: 14px; font-weight: 600;
     cursor: pointer; transition: background 0.15s;
   }
-  .open-btn:hover { background: #2ea043; }
+  .open-btn:hover { background: var(--cp-accent-hover); }
   .open-btn:disabled { opacity: 0.4; cursor: default; }
 
   .links {
-    margin-top: 32px; text-align: center; font-size: 13px; color: #484f58;
+    margin-top: 32px; text-align: center; font-size: 13px; color: var(--cp-text-soft);
   }
   .links a { margin: 0 12px; }
 </style>
@@ -479,14 +488,14 @@ html[data-theme="dark"] {
           <h3>Run the one-liner</h3>
           <p>This is the only step. It installs Python, clones the repo, sets up a venv, authenticates, and launches.</p>
           <div class="cmd" id="brainstem-cmd" onclick="copyCmd(event, this)">curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</div>
-          <p style="margin-top:6px;font-size:12px;color:#8b949e;">Windows: <code id="brainstem-win-cmd" style="cursor:pointer" onclick="copyCmd(event, this)">irm https://microsoft.github.io/aibast-agents-library/install.ps1 | iex</code></p>
+          <p style="margin-top:6px;font-size:12px;color:var(--cp-text-muted);">Windows: <code id="brainstem-win-cmd" style="cursor:pointer" onclick="copyCmd(event, this)">irm https://microsoft.github.io/aibast-agents-library/install.ps1 | iex</code></p>
         </div>
       </div>
       <div class="install-download" id="install-download" style="margin-top:12px">
         <a id="download-link" href="../install.command" download>⬇ Download installer</a>
       </div>
       <details style="margin-top:16px">
-        <summary style="color:#8b949e;font-size:13px;cursor:pointer;user-select:none">Advanced — manual steps</summary>
+        <summary style="color:var(--cp-text-muted);font-size:13px;cursor:pointer;user-select:none">Advanced — manual steps</summary>
         <div class="steps">
           <div class="step">
             <h3>1. Authenticate with GitHub</h3>
@@ -530,14 +539,14 @@ html[data-theme="dark"] {
           <h3>Run the one-liner</h3>
           <p>This is the only step. It clones <a href="https://github.com/kody-w/CommunityRAPP">CommunityRAPP</a>, installs everything, and tells you what to do next.</p>
           <div class="cmd" onclick="copyCmd(event, this)">curl -fsSL https://github.com/microsoft/aibast-agents-library/releases/download/installers/community_rapp-install.sh | bash</div>
-          <p style="margin-top:6px;font-size:12px;color:#8b949e;">Windows: <code style="cursor:pointer" onclick="copyCmd(event, this)">irm https://github.com/microsoft/aibast-agents-library/releases/download/installers/community_rapp-install.ps1 | iex</code></p>
+          <p style="margin-top:6px;font-size:12px;color:var(--cp-text-muted);">Windows: <code style="cursor:pointer" onclick="copyCmd(event, this)">irm https://github.com/microsoft/aibast-agents-library/releases/download/installers/community_rapp-install.ps1 | iex</code></p>
         </div>
       </div>
       <p style="margin-top:16px"><a href="https://kody-w.github.io/CommunityRAPP/onboard.html">Full onboarding guide</a></p>
 
       <!-- Advanced: manual steps -->
-      <div style="margin-top:20px;border-top:1px solid #21262d;padding-top:16px;">
-        <div style="cursor:pointer;font-size:13px;color:#484f58;" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'block':'none';this.textContent=b.style.display==='none'?'▶ Advanced: manual steps':'▼ Advanced: manual steps'">▶ Advanced: manual steps</div>
+      <div style="margin-top:20px;border-top:1px solid var(--cp-border);padding-top:16px;">
+        <div style="cursor:pointer;font-size:13px;color:var(--cp-text-muted);" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'block':'none';this.textContent=b.style.display==='none'?'▶ Advanced: manual steps':'▼ Advanced: manual steps'">▶ Advanced: manual steps</div>
         <div style="display:none;">
           <div class="steps">
             <div class="step">
@@ -823,15 +832,15 @@ html[data-theme="dark"] {
 </script>
 
 <div style="max-width:620px;width:100%;margin:40px auto;padding:0 0 60px;">
-  <h2 style="font-size:1.3em;margin-bottom:16px;color:#e6edf3;font-weight:600;">Current Limitations</h2>
-  <div style="background:#1c1f26;border:1px solid #d29922;border-radius:8px;padding:14px 18px;margin-bottom:16px;color:#d29922;font-size:13px;line-height:1.6;">
+  <h2 style="font-size:1.3em;margin-bottom:16px;color:var(--cp-text);font-weight:600;">Current Limitations</h2>
+  <div style="background:var(--cp-bg-elevated);border:1px solid var(--cp-warning);border-radius:8px;padding:14px 18px;margin-bottom:16px;color:var(--cp-text);font-size:13px;line-height:1.6;">
     ⚠️ <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product.
   </div>
-  <p style="color:#8b949e;line-height:1.7;font-size:14px;margin-bottom:12px;">This project is still in beta. Even if we're optimizing it for best-practice adherence, by using it you might sometimes experience unwanted patterns, errors, or simply bad architectures. By filing a <a href="https://github.com/microsoft/aibast-agents-library/issues" style="color:#58a6ff;">GitHub issue</a> you will help us improve these tools.</p>
-  <hr style="margin:30px 0;border:none;border-top:1px solid #21262d;">
-  <p style="color:#484f58;font-size:11px;line-height:1.6;">
-    This project has adopted the <a href="https://opensource.microsoft.com/codeofconduct/" style="color:#58a6ff;">Microsoft Open Source Code of Conduct</a>.
-    This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow <a href="https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general" style="color:#58a6ff;">Microsoft's Trademark &amp; Brand Guidelines</a>.
+  <p style="color:var(--cp-text-muted);line-height:1.7;font-size:14px;margin-bottom:12px;">This project is still in beta. Even if we're optimizing it for best-practice adherence, by using it you might sometimes experience unwanted patterns, errors, or simply bad architectures. By filing a <a href="https://github.com/microsoft/aibast-agents-library/issues" style="color:var(--cp-link);">GitHub issue</a> you will help us improve these tools.</p>
+  <hr style="margin:30px 0;border:none;border-top:1px solid var(--cp-border);">
+  <p style="color:var(--cp-text-muted);font-size:11px;line-height:1.6;">
+    This project has adopted the <a href="https://opensource.microsoft.com/codeofconduct/" style="color:var(--cp-link);">Microsoft Open Source Code of Conduct</a>.
+    This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow <a href="https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general" style="color:var(--cp-link);">Microsoft's Trademark &amp; Brand Guidelines</a>.
     MIT License — Copyright (c) 2026 Microsoft.
   </p>
 </div>

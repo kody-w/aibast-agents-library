@@ -15,7 +15,7 @@
   --cp-surface: #ffffff;
   --cp-surface-soft: #f5f5f5;
   --cp-border: #dedede;
-  --cp-border-strong: #a8a8a8;
+  --cp-border-strong: #919191;
   --cp-text: #242424;
   --cp-text-muted: #5c5c5c;
   --cp-text-soft: #6f6f6f;
@@ -162,39 +162,39 @@ html[data-theme="dark"] {
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { overflow-x: hidden; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; line-height: 1.6; overflow-x: hidden; }
-.header { background: linear-gradient(135deg, #1a1a2e, #0a0a1a); padding: 60px 20px; text-align: center; border-bottom: 1px solid #222; }
+body { font-family: var(--cp-font); background: var(--cp-bg); color: var(--cp-text); min-height: 100vh; line-height: 1.6; overflow-x: hidden; }
+.header { background: var(--cp-bg-elevated); padding: 60px 20px; text-align: center; border-bottom: 1px solid var(--cp-border); }
 .header h1 { font-size: 2.5em; margin-bottom: 8px; }
 .header .emoji { font-size: 3em; margin-bottom: 16px; }
-.header p { color: #888; font-size: 1.1em; max-width: 600px; margin: 0 auto; }
+.header p { color: var(--cp-text-muted); font-size: 1.1em; max-width: 600px; margin: 0 auto; }
 .container { max-width: 700px; margin: 0 auto; padding: 40px 20px; }
-.step { background: #111; border: 1px solid #222; border-radius: 12px; padding: 24px; margin: 24px 0; }
-.step .number { background: #7b68ee; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; }
+.step { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: var(--cp-radius-lg); padding: 24px; margin: 24px 0; }
+.step .number { background: var(--cp-accent); color: var(--cp-accent-fg); width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; }
 .step h2 { display: inline; font-size: 1.3em; vertical-align: middle; }
-.step p { margin-top: 12px; color: #ccc; }
-.step .time { color: #7b68ee; font-size: 0.85em; margin-top: 4px; }
-.code-block { background: #0a0a1a; border: 1px solid #333; border-radius: 8px; padding: 16px; margin: 16px 0; font-family: 'SF Mono', Menlo, monospace; font-size: 0.95em; overflow-x: auto; position: relative; color: #00d4ff; }
-.code-block .copy { position: absolute; top: 8px; right: 8px; background: #333; color: #aaa; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
-.code-block .copy:hover { background: #7b68ee; color: #fff; }
-.note { background: #1a1a2e; border-left: 3px solid #7b68ee; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 0.9em; color: #aaa; }
+.step p { margin-top: 12px; color: var(--cp-text); }
+.step .time { color: var(--cp-text-muted); font-size: 0.85em; margin-top: 4px; }
+.code-block { background: var(--cp-surface-soft); border: 1px solid var(--cp-border); border-radius: var(--cp-radius); padding: 16px; margin: 16px 0; font-family: var(--cp-font-mono); font-size: 0.95em; overflow-x: auto; position: relative; color: var(--cp-text); }
+.code-block .copy { position: absolute; top: 8px; right: 8px; background: var(--cp-border); color: var(--cp-text); border: none; padding: 4px 10px; border-radius: var(--cp-radius-sm); cursor: pointer; font-size: 0.8em; }
+.code-block .copy:hover { background: var(--cp-accent); color: var(--cp-accent-fg); }
+.note { background: var(--cp-accent-soft); border-left: 3px solid var(--cp-accent); padding: 12px 16px; margin: 16px 0; border-radius: 0 var(--cp-radius) var(--cp-radius) 0; font-size: 0.9em; color: var(--cp-text-muted); }
 .platform-tabs { display: flex; gap: 0; margin: 16px 0 0; }
-.platform-tabs button { flex: 1; padding: 10px; border: 1px solid #333; background: #111; color: #888; cursor: pointer; font-size: 0.9em; }
-.platform-tabs button:first-child { border-radius: 8px 0 0 8px; }
-.platform-tabs button:last-child { border-radius: 0 8px 8px 0; }
-.platform-tabs button.active { background: #7b68ee22; color: #7b68ee; border-color: #7b68ee; }
+.platform-tabs button { flex: 1; padding: 10px; border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text-muted); cursor: pointer; font-size: 0.9em; }
+.platform-tabs button:first-child { border-radius: var(--cp-radius) 0 0 var(--cp-radius); }
+.platform-tabs button:last-child { border-radius: 0 var(--cp-radius) var(--cp-radius) 0; }
+.platform-tabs button.active { background: var(--cp-accent-soft); color: var(--cp-accent); border-color: var(--cp-accent); }
 .platform-content { display: none; }
 .platform-content.active { display: block; }
-.success { background: #0a1a0a; border: 1px solid #2a5a2a; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center; }
-.success h2 { color: #4CAF50; margin-bottom: 8px; }
-.next-steps { background: #111; border: 1px solid #222; border-radius: 12px; padding: 24px; margin: 24px 0; }
+.success { background: var(--cp-surface); border: 1px solid var(--cp-success); border-radius: var(--cp-radius-lg); padding: 24px; margin: 24px 0; text-align: center; }
+.success h2 { color: var(--cp-success); margin-bottom: 8px; }
+.next-steps { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: var(--cp-radius-lg); padding: 24px; margin: 24px 0; }
 .next-steps h2 { margin-bottom: 16px; }
 .next-steps ul { list-style: none; padding: 0; }
-.next-steps li { padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
+.next-steps li { padding: 8px 0; border-bottom: 1px solid var(--cp-border); }
 .next-steps li:last-child { border: none; }
-.next-steps li::before { content: "→ "; color: #7b68ee; }
-.footer { text-align: center; padding: 40px 20px; color: #444; font-size: 0.85em; border-top: 1px solid #1a1a1a; margin-top: 40px; }
-.agent-example { background: #0a0a1a; border: 1px solid #333; border-radius: 8px; padding: 16px; margin: 16px 0; }
-.agent-example .filename { color: #ff6b9d; font-family: monospace; font-size: 0.85em; margin-bottom: 8px; }
+.next-steps li::before { content: "→ "; color: var(--cp-accent); }
+.footer { text-align: center; padding: 40px 20px; color: var(--cp-text-soft); font-size: 0.85em; border-top: 1px solid var(--cp-border); margin-top: 40px; }
+.agent-example { background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: var(--cp-radius); padding: 16px; margin: 16px 0; }
+.agent-example .filename { color: var(--cp-text-muted); font-family: var(--cp-font-mono); font-size: 0.85em; margin-bottom: 8px; }
 @media (max-width: 600px) { .header h1 { font-size: 1.8em; } .container { padding: 20px 16px; } }
 </style>
 <!-- clarity:start -->
@@ -252,7 +252,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="step">
         <span class="number">0</span>
         <h2>Get GitHub Copilot Access</h2>
-        <p>Sign in at <a href="https://github.com" style="color:#7b68ee">github.com</a> with an account that can use GitHub Copilot. The Brainstem exchanges that credential for model access, so no separate provider API key is needed for core chat.</p>
+        <p>Sign in at <a href="https://github.com" style="color:var(--cp-link)">github.com</a> with an account that can use GitHub Copilot. The Brainstem exchanges that credential for model access, so no separate provider API key is needed for core chat.</p>
         <div class="time">⏱ 2 minutes</div>
     </div>
 
@@ -269,7 +269,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
 
         <div id="windows" class="platform-content active">
-            <p style="margin-top:12px; color:#888;">Open PowerShell (search "powershell" in Start menu)</p>
+            <p style="margin-top:12px; color:var(--cp-text-muted);">Open PowerShell (search "powershell" in Start menu)</p>
             <div class="code-block">
                 <button class="copy" onclick="copyCode(this)">Copy</button>
                 irm https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/install.ps1 | iex
@@ -278,7 +278,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
 
         <div id="mac" class="platform-content">
-            <p style="margin-top:12px; color:#888;">Open Terminal (Cmd+Space, type "terminal")</p>
+            <p style="margin-top:12px; color:var(--cp-text-muted);">Open Terminal (Cmd+Space, type "terminal")</p>
             <div class="code-block">
                 <button class="copy" onclick="copyCode(this)">Copy</button>
                 curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash
@@ -286,7 +286,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
 
         <div id="linux" class="platform-content">
-            <p style="margin-top:12px; color:#888;">Open your terminal</p>
+            <p style="margin-top:12px; color:var(--cp-text-muted);">Open your terminal</p>
             <div class="code-block">
                 <button class="copy" onclick="copyCode(this)">Copy</button>
                 curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash
@@ -381,8 +381,8 @@ class WeatherAgent(BasicAgent):
         <ul>
             <li><strong>Add more agents</strong> — drop .py files in the agents folder. Each one gives your AI a new skill.</li>
             <li><strong>Pull updates</strong> — run the install command again anytime. It auto-updates to the latest version.</li>
-            <li><strong>Use the production guide</strong> — <a href="rapp-guide.html" style="color:#7b68ee">follow the complete 14-step RAPP methodology</a>.</li>
-            <li><strong>Browse agent templates</strong> — <a href="https://github.com/microsoft/aibast-agents-library/tree/main/agents/%40aibast-agents-library" style="color:#7b68ee">review the AIBAST library</a>.</li>
+            <li><strong>Use the production guide</strong> — <a href="rapp-guide.html" style="color:var(--cp-link)">follow the complete 14-step RAPP methodology</a>.</li>
+            <li><strong>Browse agent templates</strong> — <a href="https://github.com/microsoft/aibast-agents-library/tree/main/agents/%40aibast-agents-library" style="color:var(--cp-link)">review the AIBAST library</a>.</li>
             <li><strong>Share with friends</strong> — just send them the install command. One line. That's the whole pitch.</li>
         </ul>
     </div>
@@ -391,7 +391,7 @@ class WeatherAgent(BasicAgent):
 
 <div class="footer">
     <p>AIBAST Agents Library</p>
-    <p style="margin-top: 4px; color: #666;">Experimental v-team project; not an officially supported Microsoft product.</p>
+    <p style="margin-top: 4px; color: var(--cp-text-muted);">Experimental v-team project; not an officially supported Microsoft product.</p>
 </div>
 
 <script>

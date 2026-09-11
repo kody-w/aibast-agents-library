@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Why the RAPP Brainstem — AIBAST Agents Library</title>
-<meta name="description" content="Why the AIBAST Agents Library ships a local frontier learning and rapid prototyping tool, what it is not, and how what you build in it graduates into GitHub Copilot, Copilot Studio, and Microsoft 365 Copilot.">
+<meta name="description" content="Why the RAPP Brainstem makes frontier AI easy to learn: describe real work, watch Copilot build and test a reusable skill, then carry what works into the Microsoft tools your team already uses.">
 <link href="data:," rel="icon">
 <!-- aibast-design:start -->
 <style>
@@ -17,7 +17,7 @@
   --cp-surface: #ffffff;
   --cp-surface-soft: #f5f5f5;
   --cp-border: #dedede;
-  --cp-border-strong: #a8a8a8;
+  --cp-border-strong: #919191;
   --cp-text: #242424;
   --cp-text-muted: #5c5c5c;
   --cp-text-soft: #6f6f6f;
@@ -162,34 +162,48 @@ html[data-theme="dark"] {
 </style>
 <!-- aibast-design:end -->
 <style>
+  /* This page's roles, expressed once in the shared tokens. Every rule below
+     uses these, so the page follows the light theme, the dark theme and the
+     reader's OS preference without restating a single colour. */
+  :root {
+    --bg: var(--cp-bg);
+    --surface: var(--cp-surface);
+    --border: var(--cp-border);
+    --text: var(--cp-text);
+    --text-muted: var(--cp-text-muted);
+    --text-soft: var(--cp-text-soft);
+    --accent: var(--cp-accent);
+    --accent-fg: var(--cp-accent-fg);
+    --link: var(--cp-link);
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 48px 20px 80px;
+    font-family: var(--cp-font);
+    background: var(--bg); color: var(--text); line-height: var(--cp-leading); padding: 48px 20px 80px;
   }
   main { max-width: 760px; margin: 0 auto; }
-  .eyebrow { color: #58a6ff; font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
-  h1 { color: #e6edf3; font-size: 40px; font-weight: 700; letter-spacing: -0.5px; margin: 8px 0 12px; line-height: 1.15; }
-  .lede { color: #8b949e; font-size: 18px; margin-bottom: 36px; }
-  h2 { color: #e6edf3; font-size: 22px; font-weight: 600; margin: 40px 0 12px; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+  h1 { color: var(--text); font-size: 40px; font-weight: 700; letter-spacing: -0.5px; margin: 8px 0 12px; line-height: 1.15; }
+  .lede { color: var(--text-muted); font-size: 18px; margin-bottom: 36px; }
+  h2 { color: var(--text); font-size: 22px; font-weight: 600; margin: 40px 0 12px; }
   p { margin-bottom: 14px; }
   ul { margin: 0 0 14px 22px; }
   li { margin-bottom: 8px; }
-  strong { color: #e6edf3; }
-  a { color: #58a6ff; }
-  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px 22px; margin: 18px 0; }
+  strong { color: var(--text); }
+  a { color: var(--link); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--cp-radius); padding: 20px 22px; margin: 18px 0; }
   table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; }
-  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #30363d; vertical-align: top; }
-  th { color: #8b949e; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
-  td:first-child { color: #e6edf3; font-weight: 600; white-space: nowrap; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
+  td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
   .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
   .button {
-    display: inline-block; padding: 10px 18px; border-radius: 8px; font-weight: 600; text-decoration: none;
-    border: 1px solid #30363d; color: #e6edf3; background: #161b22;
+    display: inline-block; padding: 10px 18px; border-radius: var(--cp-radius-sm); font-weight: 600; text-decoration: none;
+    border: 1px solid var(--border); color: var(--text); background: var(--surface);
   }
-  .button.primary { background: #238636; border-color: #238636; color: #fff; }
-  .footer { max-width: 760px; margin: 48px auto 0; color: #6e7681; font-size: 13px; }
-  .footer a { color: #8b949e; }
+  .button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .footer { max-width: 760px; margin: 48px auto 0; color: var(--text-soft); font-size: 13px; }
+  .footer a { color: var(--text-muted); }
   @media (max-width: 600px) { h1 { font-size: 30px; } body { padding-top: 28px; } }
 </style>
 <!-- clarity:start -->
@@ -240,8 +254,8 @@ html[data-theme="dark"] {
   <p class="lede">It is a <strong>local frontier learning and rapid prototyping tool</strong>. It is where you learn the agent pattern and prove a prototype on your own machine, before the result graduates into the Microsoft tools that carry it to real users.</p>
 
   <h2>What it is</h2>
-  <p>A small local server, powered by GitHub Copilot, that runs the RAPP agent loop: read a soul file, discover agents, call the model with tools, execute the tool an agent exposes, and answer. Every agent is one Python file. Agents reload from disk on every request, so the loop from idea to working prototype is measured in minutes, with synthetic data and no cloud to provision.</p>
-  <p>The library's industry solutions, the production guide, and the Academy workshops all assume this loop exists on the learner's machine. That is the whole job of the Brainstem: make the pattern learnable by running it.</p>
+  <p>A private practice space where you describe real work in ordinary language and watch GitHub Copilot turn it into a working AI skill. You see the files appear, watch the skill run, review the result, and ask Copilot to improve anything that does not work.</p>
+  <p>There is no cloud environment to prepare before learning begins. The library's industry solutions and Academy workshops give you realistic starting points, synthetic examples, and visible tests so you can learn by doing rather than by sitting through another presentation.</p>
 
   <h2>What it is not</h2>
   <div class="card">
@@ -249,13 +263,47 @@ html[data-theme="dark"] {
       <li><strong>Not a replacement for GitHub Copilot.</strong> Copilot is the work surface and the model. The Brainstem borrows Copilot's access so there are no keys to manage, and it hands the work back to Copilot the moment you are done learning.</li>
       <li><strong>Not a competitor to Copilot Studio or Microsoft 365 Copilot.</strong> Those are where a finished agent lives. The Brainstem is where the agent is first understood, and the library ships the Copilot Studio solution for every workshop precisely so the prototype can leave.</li>
       <li><strong>Not a production runtime.</strong> Nothing here is built to serve users. It is built to teach one person at a time, quickly.</li>
-      <li><strong>Not a second platform to standardise on.</strong> The RAPP/1 wire is one endpoint, <code>POST /chat</code>, and a skill or agent written for it promotes into first-party tooling without a rewrite.</li>
+      <li><strong>Not another platform to learn.</strong> The learner talks to Copilot, watches the work happen, and leaves with a reusable skill. The technical plumbing stays in the background.</li>
     </ul>
   </div>
 
   <h2>Why local, and why "frontier"</h2>
-  <p>The fastest way to learn an agent pattern is to change one file and see the behaviour change. Doing that against a cloud tenant means provisioning, permissions, publish cycles, and someone else's data. Doing it locally means the loop is yours, the data is synthetic, and nothing you try can reach a customer.</p>
-  <p><strong>Frontier</strong> is the honest word for what happens there: new model behaviour, new tool shapes, and new industry patterns get tried in the Brainstem first. The ones that hold up are written into the production guide and shipped as first-party solutions. The ones that do not are deleted, cheaply.</p>
+  <p>The fastest way to learn is to try something, watch it work, change it, and try again. Doing that in a production tenant introduces permissions, publishing, and real-user risk before the learner understands the pattern. Doing it locally keeps the first experiment small, visible, and easy to reset.</p>
+  <p><strong>Frontier</strong> means this is where new AI capabilities are explored first. The supplied workshops use synthetic data and stop before real-world actions. Useful patterns graduate into reviewed solutions. Unhelpful experiments can be discarded without disrupting anyone.</p>
+
+  <h2>Why it works with the tools people already use</h2>
+  <p>Teams already work across SharePoint, Dynamics, Microsoft 365, local files, and conversations. RAPP does not ask everyone to abandon those tools for one new application. It helps turn a useful way of working into a portable skill that can meet people where they already are.</p>
+  <div class="card">
+    <ul>
+      <li><strong>Keep information where it belongs.</strong> Learning a workflow does not require copying every source into a new system.</li>
+      <li><strong>Meet people where they work.</strong> A proven skill can later appear through Copilot Studio, Microsoft 365 Copilot, Teams, or another experience that fits the user.</li>
+      <li><strong>Give each role the right view.</strong> A seller, architect, operator, and leader can use the same underlying capability without needing the same screen or level of detail.</li>
+      <li><strong>Use the AI assistant that fits the moment.</strong> Copilot can build the skill, another supported assistant can help inspect or improve it, and the learner keeps the result.</li>
+    </ul>
+  </div>
+  <p>The screen, model, and destination may change. The useful part—the learned workflow and proof that it works—can stay with the person and the team.</p>
+
+  <h2>Local does not mean isolated</h2>
+  <p>Local-first protects the earliest learning loop: private context stays close to the learner, experiments are inexpensive, and unfinished work is not automatically published. Once something works, the learner can share the skill and its evidence without sharing an entire chat history or private workspace.</p>
+  <ul>
+    <li><strong>Personalize locally.</strong> Adapt a workspace or agent to a role, account, or workflow without forcing everyone into the same interface.</li>
+    <li><strong>Share deliberately.</strong> Share the reviewed skill and safe evidence instead of copying private data or every conversation that produced it.</li>
+    <li><strong>Improve together.</strong> A useful local improvement can strengthen the shared version while each person keeps the version that fits their work.</li>
+  </ul>
+  <p>The useful "hive" is not one giant pool of everyone's raw information. It is a team learning from portable capabilities that people intentionally choose to share.</p>
+
+  <h2>What the learner actually does</h2>
+  <ol style="margin:0 0 14px 22px">
+    <li><strong>Describe the work.</strong> Start with a real outcome in ordinary language.</li>
+    <li><strong>Watch Copilot build it.</strong> The files, tools, and decisions remain visible instead of disappearing behind a demo.</li>
+    <li><strong>Run it immediately.</strong> Use synthetic examples to see what the skill does and where it fails.</li>
+    <li><strong>Improve it through conversation.</strong> Correct the result, rerun the test, and watch the capability get better.</li>
+    <li><strong>Keep the skill.</strong> The useful learning becomes a reusable file, not a good answer trapped in yesterday's chat.</li>
+  </ol>
+
+  <h2>Why the learning sticks</h2>
+  <p>A prompt can produce a helpful answer once. RAPP turns the lesson behind that answer into something the learner can see, run, test, change, and reuse. The learner does not have to trust a slide or a polished demonstration—they watch the real workflow complete.</p>
+  <p>The permanent result is not the conversation. It is the small skill, the decisions that shaped it, and the evidence that it worked. A fresh conversation can pick up that useful context without carrying every stale instruction and detour from the chats that came before.</p>
 
   <h2>The graduation path</h2>
   <table>
@@ -263,17 +311,18 @@ html[data-theme="dark"] {
     <tbody>
       <tr><td>Learn</td><td>The Brainstem on your machine</td><td>A working single-file agent you understand line by line</td></tr>
       <tr><td>Prove</td><td>Academy workshops and the production guide</td><td>Locked test cases passing, evidence captured, a reviewed draft</td></tr>
-      <tr><td>Ship</td><td>GitHub Copilot, Copilot Studio, Microsoft 365 Copilot</td><td>The same skill, running where your users already are</td></tr>
+      <tr><td>Ship</td><td>GitHub Copilot, Copilot Studio, Microsoft 365 Copilot</td><td>The same learned workflow, adapted for the place your users already work</td></tr>
     </tbody>
   </table>
   <p>The library calls these the Brainstem, the Hippocampus, and the Nervous System. The names are a mnemonic for the same idea: start with the survival loop, add memory and a cloud body when you need them, then connect to the enterprise nervous system. You advance when you choose to.</p>
 
   <h2>How it stays out of the way</h2>
   <ul>
-    <li><strong>No keys.</strong> GitHub Copilot's token exchange is the only credential, and it is yours.</li>
-    <li><strong>One file per agent.</strong> Portable, reviewable, diffable. The Copilot Studio export for a workshop is generated from the same source.</li>
-    <li><strong>One wire.</strong> <code>POST /chat</code> in, a response out. Any host that can read a URL and use a terminal can drive it, including GitHub Copilot in VS Code or the Copilot CLI, Claude Code, and Microsoft Scout.</li>
-    <li><strong>Leaves cleanly.</strong> Uninstall is deleting one folder. What you learned is in the skill file, not in the server.</li>
+    <li><strong>No separate model key.</strong> The Brainstem uses your existing GitHub Copilot access instead of asking you to create and manage another model-provider credential.</li>
+    <li><strong>Your work is visible.</strong> The skill and its local memory are files you can inspect, back up, keep, or delete.</li>
+    <li><strong>Skills stay small.</strong> One portable agent file is easier to understand, review, share, and improve.</li>
+    <li><strong>Copilot does the technical work.</strong> The learner can stay in conversation while Copilot handles files, tests, and setup in view.</li>
+    <li><strong>You can leave cleanly.</strong> The useful learning stays in the skill file rather than being trapped inside the Brainstem.</li>
   </ul>
 
   <h2>Who it is for</h2>

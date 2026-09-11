@@ -40,7 +40,7 @@
   --cp-surface: #ffffff;
   --cp-surface-soft: #f5f5f5;
   --cp-border: #dedede;
-  --cp-border-strong: #a8a8a8;
+  --cp-border-strong: #919191;
   --cp-text: #242424;
   --cp-text-muted: #5c5c5c;
   --cp-text-soft: #6f6f6f;
@@ -185,82 +185,40 @@ html[data-theme="dark"] {
 </style>
 <!-- aibast-design:end -->
 <style>
+    /* Every local name below is an alias onto the shared AIBAST design
+       tokens, so this page follows the reader's theme instead of carrying a
+       private palette. Every existing reference below keeps working. */
     :root {
-      color-scheme: light;
-      --bg: #f7f4ef;
-      --bg-grid: rgba(177, 31, 75, 0.05);
-      --surface: #ffffff;
-      --surface-soft: #f5f5f5;
-      --surface-strong: #fcfbf8;
-      --text: #242424;
-      --muted: #5c5c5c;
-      --soft-text: #6f6f6f;
-      --border: #dedede;
-      --border-strong: #919191;
-      --accent: #b11f4b;
-      --accent-hover: #9a1a41;
-      --accent-soft: rgba(177, 31, 75, 0.08);
-      --accent-ink: #ffffff;
-      --blue: #0078d4;
-      --blue-soft: #e1f1ff;
-      --teal: #00786f;
-      --teal-soft: #ddf5f1;
-      --gold: #9c5700;
-      --gold-soft: #fff0d5;
-      --success: #16a34a;
-      --success-soft: #e2f5e9;
-      --danger: #dc2626;
-      --hero: #fcfbf8;
-      --hero-soft: #ffffff;
-      --hero-text: #242424;
-      --hero-muted: #5c5c5c;
+      --bg: var(--cp-bg);
+      --bg-grid: var(--cp-accent-soft);
+      --surface: var(--cp-surface);
+      --surface-soft: var(--cp-surface-soft);
+      --surface-strong: var(--cp-bg-elevated);
+      --text: var(--cp-text);
+      --muted: var(--cp-text-muted);
+      --soft-text: var(--cp-text-soft);
+      --border: var(--cp-border);
+      --border-strong: var(--cp-border-strong);
+      --accent: var(--cp-accent);
+      --accent-hover: var(--cp-accent-hover);
+      --accent-soft: var(--cp-accent-soft);
+      --accent-ink: var(--cp-accent-fg);
+      --success: var(--cp-success);
+      --danger: var(--cp-danger);
+      --focus: var(--cp-focus);
+      --shadow: var(--cp-shadow);
+      --hero: var(--cp-bg-elevated);
+      --hero-soft: var(--cp-surface);
+      --hero-text: var(--cp-text);
+      --hero-muted: var(--cp-text-muted);
+      --hero-border: var(--cp-border);
+      --hero-surface: var(--cp-surface-soft);
+      --hero-surface-hover: var(--cp-accent-soft);
+      --hero-panel: var(--cp-panel);
+      /* No shared token fits these two: a modal scrim has to stay dark over a
+         light page as well as a dark one, and the scale has no soft card lift. */
       --overlay: rgba(36, 36, 36, 0.72);
-      --shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
       --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.08);
-      --focus: #0078d4;
-      --hero-border: rgba(36, 36, 36, 0.12);
-      --hero-surface: rgba(36, 36, 36, 0.05);
-      --hero-surface-hover: rgba(36, 36, 36, 0.09);
-      --hero-panel: rgba(255, 255, 255, 0.7);
-    }
-
-    html[data-theme="dark"] {
-      color-scheme: dark;
-      --bg: #3d3b3a;
-      --bg-grid: rgba(253, 142, 161, 0.045);
-      --surface: #292929;
-      --surface-soft: #2e2e2e;
-      --surface-strong: #343231;
-      --text: #dedede;
-      --muted: #919191;
-      --soft-text: #b0b0b0;
-      --border: #474747;
-      --border-strong: #5f5f5f;
-      --accent: #fd8ea1;
-      --accent-hover: #fb7b91;
-      --accent-soft: rgba(253, 142, 161, 0.14);
-      --accent-ink: #1a1a1a;
-      --blue: #4da6ff;
-      --blue-soft: #17334e;
-      --teal: #5ed8ca;
-      --teal-soft: #163b3a;
-      --gold: #ffc46a;
-      --gold-soft: #46351c;
-      --success: #4ade80;
-      --success-soft: #183b2a;
-      --danger: #f87171;
-      --hero: #343231;
-      --hero-soft: #292929;
-      --hero-text: #dedede;
-      --hero-muted: #919191;
-      --overlay: rgba(41, 41, 41, 0.88);
-      --shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
-      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.22);
-      --focus: #4da6ff;
-      --hero-border: rgba(255, 255, 255, 0.13);
-      --hero-surface: rgba(255, 255, 255, 0.08);
-      --hero-surface-hover: rgba(255, 255, 255, 0.14);
-      --hero-panel: rgba(7, 16, 35, 0.38);
     }
 
     * { box-sizing: border-box; }
@@ -282,7 +240,7 @@ html[data-theme="dark"] {
     [hidden] { display: none !important; }
     button, input, select { font: inherit; }
     button, a { -webkit-tap-highlight-color: transparent; }
-    a { color: var(--blue); }
+    a { color: var(--cp-link); }
     a:hover { color: var(--accent-hover); }
     button:focus-visible,
     a:focus-visible,
@@ -323,7 +281,7 @@ html[data-theme="dark"] {
       z-index: 60;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
-      box-shadow: 0 4px 18px rgba(20, 33, 57, 0.06);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
     }
     .topbar-inner {
       display: flex;
@@ -351,8 +309,8 @@ html[data-theme="dark"] {
       height: 40px;
       place-items: center;
       border-radius: 12px 4px 12px 4px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-      color: #ffffff;
+      background: var(--accent);
+      color: var(--accent-ink);
       font-size: 0.7rem;
       font-weight: 900;
       letter-spacing: 0.04em;
@@ -586,7 +544,7 @@ html[data-theme="dark"] {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       border-top: 1px solid var(--hero-border);
-      background: rgba(4, 11, 25, 0.3);
+      background: var(--cp-sheen);
     }
     .summary-item {
       min-width: 0;
@@ -617,7 +575,7 @@ html[data-theme="dark"] {
       margin: 0;
       padding: 14px clamp(22px, 5vw, 66px);
       border-top: 1px solid var(--hero-border);
-      background: rgba(0, 0, 0, 0.16);
+      background: var(--surface-soft);
       color: var(--hero-muted);
       font-size: 0.75rem;
     }
@@ -693,7 +651,6 @@ html[data-theme="dark"] {
     }
     .learning-stat.accent strong { color: var(--accent); }
     .learning-stat.success strong { color: var(--success); }
-    .learning-stat.blue strong { color: var(--blue); }
     .continue-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -740,11 +697,11 @@ html[data-theme="dark"] {
     }
     progress::-webkit-progress-value {
       border-radius: 999px;
-      background: linear-gradient(90deg, var(--blue), var(--accent));
+      background: var(--accent);
     }
     progress::-moz-progress-bar {
       border-radius: 999px;
-      background: linear-gradient(90deg, var(--blue), var(--accent));
+      background: var(--accent);
     }
     .privacy-note {
       margin: 0;
@@ -856,15 +813,11 @@ html[data-theme="dark"] {
       margin-bottom: 13px;
       place-items: center;
       border-radius: 50%;
-      background: var(--blue-soft);
-      color: var(--blue);
+      background: var(--accent-soft);
+      color: var(--accent);
       font-size: 0.7rem;
       font-weight: 850;
     }
-    .ecosystem-stage:nth-child(2) .stage-index { background: var(--accent-soft); color: var(--accent); }
-    .ecosystem-stage:nth-child(3) .stage-index { background: var(--gold-soft); color: var(--gold); }
-    .ecosystem-stage:nth-child(4) .stage-index { background: var(--teal-soft); color: var(--teal); }
-    .ecosystem-stage:nth-child(5) .stage-index { background: var(--success-soft); color: var(--success); }
     .ecosystem-stage h3 { margin: 0; font-size: 0.96rem; line-height: 1.25; }
     .ecosystem-stage p { margin: 7px 0 0; color: var(--muted); font-size: 0.76rem; }
 
@@ -886,14 +839,9 @@ html[data-theme="dark"] {
       position: absolute;
       inset: 0 auto 0 0;
       width: 5px;
-      background: var(--blue);
+      background: var(--accent);
       content: "";
     }
-    .path-card:nth-child(2)::before,
-    .path-card:nth-child(5)::before { background: var(--accent); }
-    .path-card:nth-child(3)::before { background: var(--gold); }
-    .path-card:nth-child(4)::before { background: var(--teal); }
-    .path-card:nth-child(6)::before { background: var(--success); }
     .path-select {
       width: 100%;
       min-height: 100%;
@@ -967,9 +915,9 @@ html[data-theme="dark"] {
       line-height: 1.2;
     }
     .chip.platform {
-      border-color: transparent;
-      background: var(--blue-soft);
-      color: var(--blue);
+      border-color: var(--border);
+      background: var(--surface-soft);
+      color: var(--muted);
     }
     .chip.stage {
       border-color: transparent;
@@ -1067,7 +1015,7 @@ html[data-theme="dark"] {
       font-weight: 850;
     }
     .path-course-item.completed .path-course-number {
-      background: var(--success-soft);
+      background: var(--cp-accent-soft);
       color: var(--success);
     }
     .path-course-copy {
@@ -1394,7 +1342,7 @@ html[data-theme="dark"] {
       border: 1px solid var(--border);
       border-radius: 22px;
       background: var(--surface);
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
+      box-shadow: var(--shadow);
     }
     .modal-close {
       position: absolute;
@@ -1418,7 +1366,7 @@ html[data-theme="dark"] {
       padding: 34px 76px 28px 34px;
       border-bottom: 1px solid var(--border);
       background:
-        radial-gradient(circle at 90% 10%, var(--blue-soft), transparent 32%),
+        radial-gradient(circle at 90% 10%, var(--accent-soft), transparent 32%),
         var(--surface-soft);
     }
     .modal-overline {
@@ -1540,11 +1488,11 @@ html[data-theme="dark"] {
     }
     .milestone-item.earned {
       border-color: var(--success);
-      background: var(--success-soft);
+      background: var(--cp-accent-soft);
     }
     .milestone-item.earned .milestone-check {
       background: var(--success);
-      color: #ffffff;
+      color: var(--accent-ink);
     }
     .milestone-item strong,
     .milestone-item span { display: block; }
@@ -1552,12 +1500,8 @@ html[data-theme="dark"] {
     .milestone-item span { margin-top: 3px; color: var(--muted); font-size: 0.68rem; }
     .mini-stage-list li {
       padding-left: 13px;
-      border-left: 3px solid var(--blue);
+      border-left: 3px solid var(--accent);
     }
-    .mini-stage-list li:nth-child(2) { border-color: var(--accent); }
-    .mini-stage-list li:nth-child(3) { border-color: var(--gold); }
-    .mini-stage-list li:nth-child(4) { border-color: var(--teal); }
-    .mini-stage-list li:nth-child(5) { border-color: var(--success); }
     .mini-stage-list strong,
     .mini-stage-list span { display: block; }
     .mini-stage-list strong { font-size: 0.76rem; }
@@ -1617,14 +1561,10 @@ html[data-theme="dark"] {
       height: 28px;
       place-items: center;
       border-radius: 50%;
-      background: var(--blue-soft);
-      color: var(--blue);
-      font-size: 0.7rem;
-      font-weight: 850;
-    }
-    .build-path li + li .build-path-index {
       background: var(--accent-soft);
       color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 850;
     }
     .build-path strong,
     .build-path span {
@@ -1942,7 +1882,7 @@ html[data-theme="dark"] {
             <strong id="easyCount">0</strong>
             <span>Easy completions</span>
           </div>
-          <div class="learning-stat blue">
+          <div class="learning-stat">
             <strong id="manualCount">0</strong>
             <span>Manual completions</span>
           </div>
@@ -2107,7 +2047,7 @@ html[data-theme="dark"] {
 
     <footer class="footer">
       <p>AIBAST Agents Library · Learn locally, carry capability forward.</p>
-      <p>No analytics. No progress upload. No external scripts or fonts.</p>
+      <p>No progress upload: your course progress stays in this browser. No web fonts. Microsoft Clarity loads only on the published site, and only after you accept it.</p>
     </footer>
   </main>
 
