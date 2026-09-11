@@ -1762,7 +1762,11 @@ async function init() {
   state.advertisedSolutions = new Set(Object.keys(catalog.solutions || {}));
   state.exportedSolutionSlugs = new Set(
     (exportInventory?.solutions || [])
-      .filter(row => row?.status === "exported" && row?.settings_error == null)
+      .filter(row => (
+        row?.status === "exported"
+        && row?.settings_error == null
+        && row?.source_contract_status !== "stale_source"
+      ))
       .map(row => row.slug)
   );
   state.architectureLevel2 = new Map(
@@ -2895,7 +2899,9 @@ function openAgent(name) {
               ${agentDownloadCount(agent)}
               <a class="button" href="${BLOB}/${encodeURI(agent._file)}" target="_blank" rel="noopener">View source ↗</a>
             </div>
-            <p class="detail-note">Download the portable Python file or import the unmanaged Copilot Studio solution manually. Map the supplied deployment settings before enabling integrations; the imported agent remains unpublished until an administrator explicitly publishes it.</p>
+            <p class="detail-note">${solutionDownloads
+              ? "Download the portable Python file or import the unmanaged Copilot Studio solution manually. Map the supplied deployment settings before enabling integrations; the imported agent remains unpublished until an administrator explicitly publishes it."
+              : "Download the portable Python file and review the source before running it locally. A current native Copilot Studio export is unavailable for this agent."}</p>
           </section>
         </div>
         <aside class="detail-aside">

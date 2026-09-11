@@ -3,6 +3,10 @@ import json
 import zipfile
 from pathlib import Path
 
+import pytest
+
+from tests.test_library_agent_upvotes import run_library_node
+
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = ROOT / "state" / "copilot_studio_solution_exports.json"
@@ -123,3 +127,110 @@ def test_library_builds_direct_solution_downloads():
     assert 'zip: `${base}-copilot-studio-solution.zip`' in library
     assert 'settings: `${base}-deployment-settings.json`' in library
     assert "Download Copilot Studio solution" in library
+
+
+def library_export_consumer(inventory):
+    agents = [
+        agent for agent in read_json(ROOT / "registry.json")["agents"]
+        if agent["name"] in {
+            "@aibast-agents-library/care-gap-closure",
+            "@aibast-agents-library/account-intelligence",
+        }
+    ]
+    fixtures = {
+        "registry.json": {"agents": agents},
+        "solutions/catalog.json": {
+            "solutions": {agent["name"]: {} for agent in agents}
+        },
+        "state/copilot_studio_solution_exports.json": inventory,
+    }
+    return run_library_node(
+        f"const fixtures = {json.dumps(fixtures)};\n"
+        """
+getJSON = async ([path]) => fixtures[path.split("?")[0]] ?? null;
+restoreState = renderStats = buildFilters = renderIndustryMenu = bindInputs = render = () => {};
+(async () => {
+  await init();
+  const downloads = {};
+  const dialogs = {};
+  for (const agent of state.agents) {
+    const slug = agent._solution.package.slug;
+    downloads[slug] = copilotSolutionDownloads(agent);
+    openModal = markup => { dialogs[slug] = markup; };
+    openAgent(agent.name);
+  }
+  console.log(JSON.stringify({
+    selected: [...state.exportedSolutionSlugs],
+    downloads,
+    dialogs
+  }));
+})().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});
+"""
+    )
+
+
+def test_library_consumer_withholds_shipped_stale_export_and_keeps_current_exports():
+    result = library_export_consumer(read_json(STATE_PATH))
+
+    assert "care-gap-closure" not in result["selected"]
+    assert result["downloads"]["care-gap-closure"] is None
+    stale_dialog = result["dialogs"]["care-gap-closure"]
+    assert "Download agent.py" in stale_dialog
+    assert "current native Copilot Studio export is unavailable" in stale_dialog
+    for unsupported in (
+        "Download Copilot Studio solution",
+        "care-gap-closure-copilot-studio-solution.zip",
+        "care-gap-closure-deployment-settings.json",
+        "import the unmanaged Copilot Studio solution manually",
+    ):
+        assert unsupported not in stale_dialog
+
+    assert result["downloads"]["account-intelligence"] == {
+        "zip": (
+            "solutions/account-intelligence/exports/"
+            "account-intelligence-copilot-studio-solution.zip"
+        ),
+        "settings": (
+            "solutions/account-intelligence/exports/"
+            "account-intelligence-deployment-settings.json"
+        ),
+    }
+    current_dialog = result["dialogs"]["account-intelligence"]
+    assert "Download Copilot Studio solution" in current_dialog
+    assert "import the unmanaged Copilot Studio solution manually" in current_dialog
+    assert "current native Copilot Studio export is unavailable" not in current_dialog
+
+
+@pytest.mark.parametrize(
+    ("inventory", "importable"),
+    [
+        (None, False),
+        ({}, False),
+        ({"solutions": [None]}, False),
+        ({"solutions": [{
+            "slug": "care-gap-closure", "status": "exported", "settings_error": None,
+        }]}, True),
+        ({"solutions": [{
+            "slug": "care-gap-closure", "status": "exported", "settings_error": None,
+            "source_contract_status": "stale_source",
+        }]}, False),
+        ({"solutions": [{
+            "slug": "care-gap-closure", "status": "exported", "settings_error": "failed",
+        }]}, False),
+        ({"solutions": [{
+            "slug": "care-gap-closure", "status": "missing", "settings_error": None,
+        }]}, False),
+    ],
+    ids=["missing-inventory", "empty-inventory", "null-row", "current", "stale-source", "settings-error", "not-exported"],
+)
+def test_library_export_selector_and_ui_fail_closed(inventory, importable):
+    result = library_export_consumer(inventory)
+    assert ("care-gap-closure" in result["selected"]) is importable
+    assert (result["downloads"]["care-gap-closure"] is not None) is importable
+    dialog = result["dialogs"]["care-gap-closure"]
+    assert "Download agent.py" in dialog
+    assert ("Download Copilot Studio solution" in dialog) is importable
+    assert ("import the unmanaged Copilot Studio solution manually" in dialog) is importable
