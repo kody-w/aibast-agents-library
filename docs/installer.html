@@ -177,7 +177,13 @@ html[data-theme="dark"] {
     padding: 2px 6px; border-radius: 4px;
   }
   .hero { text-align: center; max-width: 620px; margin-bottom: 48px; }
-  .hero .logo { font-size: 64px; margin-bottom: 16px; }
+  .hero .logo {
+    display: grid; place-items: center;
+    width: 64px; height: 64px; margin: 0 auto 16px;
+    border: 3px solid var(--cp-highlight); border-radius: 999px;
+    background: var(--cp-surface); color: var(--cp-text);
+    font-size: 22px; font-weight: 800; letter-spacing: 0.04em;
+  }
   .hero h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
   .hero p { color: var(--cp-text-muted); font-size: 16px; line-height: 1.6; }
   .hero .tagline { color: var(--cp-accent); font-weight: 600; font-size: 14px; margin-top: 12px; }
@@ -234,7 +240,13 @@ html[data-theme="dark"] {
     padding: 20px 24px; display: flex; align-items: center; gap: 16px;
     cursor: pointer; user-select: none;
   }
-  .tier-icon { font-size: 32px; flex-shrink: 0; }
+  .tier-icon {
+    display: grid; place-items: center;
+    width: 44px; height: 44px; flex-shrink: 0;
+    border: 2px solid var(--cp-border-strong); border-radius: 999px;
+    background: var(--cp-surface-soft); color: var(--cp-text);
+    font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums;
+  }
   .tier-title h2 { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
   .tier-title .subtitle { font-size: 13px; color: var(--cp-text-muted); }
   .tier-badge {
@@ -273,7 +285,7 @@ html[data-theme="dark"] {
   }
   .cmd:hover { border-color: var(--cp-border-strong); }
   .cmd::after {
-    content: "📋"; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    content: ""; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
     font-size: 13px; opacity: 0.45; transition: opacity 0.15s;
   }
   .cmd:hover::after { opacity: 1; }
@@ -432,7 +444,7 @@ html[data-theme="dark"] {
 <body>
 
 <div class="hero">
-  <div class="logo">🧠</div>
+  <div class="logo">AI</div>
   <h1>Install the RAPP Brainstem</h1>
   <p>A local frontier learning and rapid prototyping tool, powered by GitHub Copilot, where you learn the agent pattern and prove a prototype before it graduates into GitHub Copilot, Copilot Studio, and Microsoft 365 Copilot.</p>
   <div class="tagline">Build locally. Validate with the production guide. Scale through the Microsoft AI stack.</div>
@@ -458,11 +470,11 @@ html[data-theme="dark"] {
     </div>
   </div>
   <div class="install-body" id="install-body" onclick="copyInstall(this)">
-    <div class="comment" id="install-comment"># Your local learning platform. Installs everything. 🧠</div>
+    <div class="comment" id="install-comment"># Your local learning platform. Installs everything.</div>
     <div class="prompt">
       <span class="dollar">$</span>
       <span id="install-cmd">curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</span>
-      <span class="copy-icon" id="copy-icon">📋</span>
+      <span class="copy-icon" id="copy-icon">⧉</span>
     </div>
   </div>
   <div class="install-hint" id="install-hint">Works on macOS &amp; Linux. Auto-installs Python 3.11 if missing.</div>
@@ -473,7 +485,7 @@ html[data-theme="dark"] {
   <!-- TIER 1: BRAINSTEM -->
   <div class="tier" id="brainstem" onclick="toggleTier(event, this)">
     <div class="tier-header">
-      <div class="tier-icon">🧠</div>
+      <div class="tier-icon">1</div>
       <div class="tier-title">
         <h2>The Brainstem</h2>
         <div class="subtitle">Local frontier learning and rapid prototyping tool — learn the pattern here, then graduate it</div>
@@ -492,7 +504,7 @@ html[data-theme="dark"] {
         </div>
       </div>
       <div class="install-download" id="install-download" style="margin-top:12px">
-        <a id="download-link" href="../install.command" download>⬇ Download installer</a>
+        <a id="download-link" href="../install.command" download>↓ Download installer</a>
       </div>
       <details style="margin-top:16px">
         <summary style="color:var(--cp-text-muted);font-size:13px;cursor:pointer;user-select:none">Advanced — manual steps</summary>
@@ -524,7 +536,7 @@ html[data-theme="dark"] {
   <!-- TIER 2: HIPPOCAMPUS -->
   <div class="tier" id="hippocampus" onclick="toggleTier(event, this)">
     <div class="tier-header">
-      <div class="tier-icon">☁️</div>
+      <div class="tier-icon">2</div>
       <div class="tier-title">
         <h2>The Hippocampus</h2>
         <div class="subtitle">Persistent memory — runs local, deploys to Azure</div>
@@ -574,7 +586,7 @@ html[data-theme="dark"] {
   <!-- TIER 3: COPILOT STUDIO -->
   <div class="tier" id="nervous-system" onclick="toggleTier(event, this)">
     <div class="tier-header">
-      <div class="tier-icon">🤖</div>
+      <div class="tier-icon">3</div>
       <div class="tier-title">
         <h2>The Nervous System</h2>
         <div class="subtitle">Connect to Copilot Studio — reach into M365</div>
@@ -660,7 +672,7 @@ html[data-theme="dark"] {
   const installs = {
     'macOS/Linux': {
       'one-liner': {
-        comment: '# Your local learning platform. Installs everything. 🧠',
+        comment: '# Your local learning platform. Installs everything.',
         cmd: installCommands.bash,
         hint: 'Works on macOS & Linux. Auto-installs Python 3.11 if missing.'
       },
@@ -672,7 +684,7 @@ html[data-theme="dark"] {
     },
     'Windows': {
       'one-liner': {
-        comment: '# Your local learning platform. Factory Windows 11 ready, installs via winget. 🧠',
+        comment: '# Your local learning platform. Factory Windows 11 ready, installs via winget.',
         cmd: installCommands.windows,
         hint: 'Run in PowerShell. Auto-installs Python, Git & GitHub CLI via winget.'
       },
@@ -693,12 +705,12 @@ html[data-theme="dark"] {
         'macOS/Linux': {
           href: '../install.command',
           filename: 'install.command',
-          label: '⬇ Download installer (.command)'
+          label: '↓ Download installer (.command)'
         },
         'Windows': {
           href: '../install.cmd',
           filename: 'install.cmd',
-          label: '⬇ Download installer (.cmd)'
+          label: '↓ Download installer (.cmd)'
         }
       };
     }
@@ -713,12 +725,12 @@ html[data-theme="dark"] {
       'macOS/Linux': {
         href: URL.createObjectURL(new Blob([macPayload], { type: 'application/x-sh' })),
         filename: 'install-staging.command',
-        label: '⬇ Download staging installer (.command)'
+        label: '↓ Download staging installer (.command)'
       },
       'Windows': {
         href: URL.createObjectURL(new Blob([windowsPayload], { type: 'application/octet-stream' })),
         filename: 'install-staging.cmd',
-        label: '⬇ Download staging installer (.cmd)'
+        label: '↓ Download staging installer (.cmd)'
       }
     };
   }
@@ -734,7 +746,7 @@ html[data-theme="dark"] {
     document.getElementById('install-comment').textContent = data.comment;
     document.getElementById('install-cmd').textContent = data.cmd;
     document.getElementById('install-hint').innerHTML = data.hint;
-    document.getElementById('copy-icon').textContent = '📋';
+    document.getElementById('copy-icon').textContent = '⧉';
     const dlDiv = document.getElementById('install-download');
     if (currentTab === 'one-liner') {
       const dl = downloads[currentOS];
@@ -766,7 +778,7 @@ html[data-theme="dark"] {
     document.getElementById('copy-icon').textContent = '✓';
     el.classList.add('copied');
     setTimeout(() => {
-      document.getElementById('copy-icon').textContent = '📋';
+      document.getElementById('copy-icon').textContent = '⧉';
       el.classList.remove('copied');
     }, 2000);
   }
@@ -834,7 +846,7 @@ html[data-theme="dark"] {
 <div style="max-width:620px;width:100%;margin:40px auto;padding:0 0 60px;">
   <h2 style="font-size:1.3em;margin-bottom:16px;color:var(--cp-text);font-weight:600;">Current Limitations</h2>
   <div style="background:var(--cp-bg-elevated);border:1px solid var(--cp-warning);border-radius:8px;padding:14px 18px;margin-bottom:16px;color:var(--cp-text);font-size:13px;line-height:1.6;">
-    ⚠️ <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product.
+    <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product.
   </div>
   <p style="color:var(--cp-text-muted);line-height:1.7;font-size:14px;margin-bottom:12px;">This project is still in beta. Even if we're optimizing it for best-practice adherence, by using it you might sometimes experience unwanted patterns, errors, or simply bad architectures. By filing a <a href="https://github.com/microsoft/aibast-agents-library/issues" style="color:var(--cp-link);">GitHub issue</a> you will help us improve these tools.</p>
   <hr style="margin:30px 0;border:none;border-top:1px solid var(--cp-border);">

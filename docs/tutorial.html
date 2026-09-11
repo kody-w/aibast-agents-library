@@ -165,7 +165,7 @@ html { overflow-x: hidden; }
 body { font-family: var(--cp-font); background: var(--cp-bg); color: var(--cp-text); min-height: 100vh; line-height: 1.6; overflow-x: hidden; }
 .header { background: var(--cp-bg-elevated); padding: 60px 20px; text-align: center; border-bottom: 1px solid var(--cp-border); }
 .header h1 { font-size: 2.5em; margin-bottom: 8px; }
-.header .emoji { font-size: 3em; margin-bottom: 16px; }
+.header .emoji { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 16px; border: 3px solid var(--cp-highlight); border-radius: 999px; background: var(--cp-surface); color: var(--cp-text); font-size: 22px; font-weight: 800; letter-spacing: 0.04em; }
 .header p { color: var(--cp-text-muted); font-size: 1.1em; max-width: 600px; margin: 0 auto; }
 .container { max-width: 700px; margin: 0 auto; padding: 40px 20px; }
 .step { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: var(--cp-radius-lg); padding: 24px; margin: 24px 0; }
@@ -241,7 +241,7 @@ body { font-family: var(--cp-font); background: var(--cp-bg); color: var(--cp-te
 <body>
 
 <div class="header">
-    <div class="emoji">🧠</div>
+    <div class="emoji">AI</div>
     <h1>RAPP Brainstem</h1>
     <p>Your local AI agent server from the AIBAST Agents Library. Core chat requires a GitHub account with Copilot access.</p>
 </div>
@@ -253,7 +253,7 @@ body { font-family: var(--cp-font); background: var(--cp-bg); color: var(--cp-te
         <span class="number">0</span>
         <h2>Get GitHub Copilot Access</h2>
         <p>Sign in at <a href="https://github.com" style="color:var(--cp-link)">github.com</a> with an account that can use GitHub Copilot. The Brainstem exchanges that credential for model access, so no separate provider API key is needed for core chat.</p>
-        <div class="time">⏱ 2 minutes</div>
+        <div class="time">2 minutes</div>
     </div>
 
     <!-- Step 1: Install -->
@@ -293,7 +293,7 @@ body { font-family: var(--cp-font); background: var(--cp-bg); color: var(--cp-te
             </div>
         </div>
 
-        <div class="time">⏱ 3 minutes (auto-installs dependencies)</div>
+        <div class="time">3 minutes (auto-installs dependencies)</div>
     </div>
 
     <!-- Step 2: Auth -->
@@ -306,7 +306,7 @@ body { font-family: var(--cp-font); background: var(--cp-bg); color: var(--cp-te
             brainstem
         </div>
         <div class="note">Authentication persists locally across restarts. You can also use an existing compatible <code>gh auth</code> session.</div>
-        <div class="time">⏱ 1 minute</div>
+        <div class="time">1 minute</div>
     </div>
 
     <!-- Step 3: Start -->
@@ -318,12 +318,12 @@ body { font-family: var(--cp-font); background: var(--cp-bg); color: var(--cp-te
             brainstem
         </div>
         <p>Your AI agent server is now running at <strong>localhost:7071</strong>. Open a browser and go there to chat.</p>
-        <div class="time">⏱ Instant</div>
+        <div class="time">Instant</div>
     </div>
 
     <!-- Success -->
     <div class="success">
-        <h2>You're Running 🧠</h2>
+        <h2>You're Running</h2>
         <p>Your own AI agent server, running locally with your GitHub Copilot access.</p>
     </div>
 

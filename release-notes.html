@@ -280,11 +280,11 @@ html[data-theme="dark"] {
     <span class="sep">/</span>
     <span>Release Notes</span>
     <span class="sep">/</span>
-    <a href="blog.html">Engineering Blog</a>
+    <a href="blog.html">Frontier Field Notes</a>
   </div>
 
   <div class="page-header">
-    <h1>📋 Release Notes</h1>
+    <h1>Release Notes</h1>
     <p>Changelog for the RAPP Brainstem project.</p>
   </div>
 
@@ -301,13 +301,13 @@ html[data-theme="dark"] {
         Account switching, auth reliability, and diagnostics privacy. You can now switch GitHub accounts without restarting, and the login flow handles wrong-account scenarios gracefully instead of hanging forever.
       </div>
 
-      <h3>🔄 Account Switcher</h3>
+      <h3>Account Switcher</h3>
       <ul>
         <li>New <strong>Switch Account</strong> option in the header — change GitHub accounts without restarting the server.</li>
         <li>Clears all cached tokens (GitHub, Copilot, disk) and starts a fresh device code flow immediately.</li>
       </ul>
 
-      <h3>🔐 Auth Race Condition Fix</h3>
+      <h3>Auth Race Condition Fix</h3>
       <ul>
         <li>Fixed: signing in with a non-Copilot account then switching to the correct account left the UI stuck on "Waiting for authorization..." forever.</li>
         <li>Root cause: background poll thread and client poll raced to call <code>poll_device_code()</code>. Now uses a single-writer pattern — the bg thread is the sole caller, the client reads a shared result.</li>
@@ -316,17 +316,17 @@ html[data-theme="dark"] {
         <li>Stale Copilot session cache is cleared when starting a new login flow.</li>
       </ul>
 
-      <h3>🏷️ Version in Header</h3>
+      <h3>Version in Header</h3>
       <ul>
         <li>The brainstem version now displays in the chat UI header — no more guessing which version you're running.</li>
       </ul>
 
-      <h3>🔒 Diagnostics Privacy</h3>
+      <h3>Diagnostics Privacy</h3>
       <ul>
         <li>The <strong>Get Help</strong> report now scrubs <code>user_code</code>, <code>device_code</code>, and <code>session_id</code> from diagnostics before publishing to GitHub issues.</li>
       </ul>
 
-      <h3>🔧 Other Fixes</h3>
+      <h3>Other Fixes</h3>
       <ul>
         <li>Friendly error message when GitHub API quota is exceeded.</li>
         <li>Installer handles force-push divergence and kills existing server on port 7071 before starting.</li>
@@ -349,22 +349,22 @@ html[data-theme="dark"] {
         First versioned release. Focuses the brainstem on <strong>local-first, stateless agent execution</strong> and adds auto-upgrade support to the one-liner installers.
       </div>
 
-      <h3>🎯 Local-Only Agents</h3>
+      <h3>Local-Only Agents</h3>
       <ul>
         <li>Removed the remote agent system — no more hot-loading agents from GitHub repos at runtime.</li>
         <li>Only <code>*_agent.py</code> files directly in the <code>agents/</code> folder are discovered and loaded.</li>
         <li>Subdirectories like <code>agents/experimental/</code> are intentionally excluded from auto-discovery.</li>
-        <li>Removed the <strong>⚡ Sources</strong> sidebar panel, all <code>/repos/*</code> API endpoints, and associated JS/CSS from the chat UI.</li>
+        <li>Removed the <strong>↯ Sources</strong> sidebar panel, all <code>/repos/*</code> API endpoints, and associated JS/CSS from the chat UI.</li>
       </ul>
 
-      <h3>🔄 Stateless Agent Loading</h3>
+      <h3>Stateless Agent Loading</h3>
       <ul>
         <li>Agents now load fresh on every request — no in-memory cache between calls.</li>
         <li>Removed <code>_agents_cache</code> and <code>reload_agents()</code> — the brainstem is fully stateless per invocation.</li>
         <li>Makes local development and debugging faster: edit an agent file, hit the endpoint, see the change immediately.</li>
       </ul>
 
-      <h3>📦 Version Tracking &amp; Auto-Upgrade</h3>
+      <h3>Version Tracking &amp; Auto-Upgrade</h3>
       <ul>
         <li>Added <code>rapp_brainstem/VERSION</code> file as the single source of truth for the current version.</li>
         <li>New <code>GET /version</code> endpoint returns <code>{"version": "0.1.0"}</code>.</li>
@@ -374,7 +374,7 @@ html[data-theme="dark"] {
         <li>If the remote version is newer, the installer proceeds with a full upgrade (git pull + pip install).</li>
       </ul>
 
-      <h3>🔧 Other Improvements</h3>
+      <h3>Other Improvements</h3>
       <ul>
         <li>Improved <code>/health</code> endpoint: returns <code>200</code> with <code>"status": "unauthenticated"</code> when the Copilot token is missing, instead of a 500 error. The chat UI shows the login overlay instead of failing silently.</li>
         <li>GitHub token refresh and caching improvements (from upstream).</li>
@@ -388,7 +388,7 @@ html[data-theme="dark"] {
 
 <div class="links">
   <a href="index.html">Home</a>
-  <a href="blog.html">Engineering Blog</a>
+  <a href="blog.html">Frontier Field Notes</a>
   <a href="https://github.com/microsoft/aibast-agents-library">GitHub</a>
 </div>
 
