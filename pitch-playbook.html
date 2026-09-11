@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RAPP — Learn AI, Teach AI, Keep the Skill</title>
 <meta name="description" content="Executive pitch for RAPP: a visible teach-by-doing Brainstem that turns learning into portable AI skills and promotes them into Microsoft platforms.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='28'%3E🧠%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%230f6cbd' stroke-width='3'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-family='system-ui,sans-serif' font-size='13' font-weight='700' fill='%230f6cbd'%3EAI%3C/text%3E%3C/svg%3E">
 <script>
 (function(){
   try {
@@ -226,7 +226,7 @@ blockquote p{color:var(--purple);margin:0;font-size:1.25rem;font-style:italic}
 .num-badge{display:inline-block;color:var(--accent);font-size:1rem;font-weight:700;letter-spacing:1px;margin-right:10px}
 
 /* Hero */
-.logo{font-size:72px;filter:drop-shadow(0 0 16px var(--logo-glow));margin-bottom:12px}
+.logo{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 12px;border:3px solid var(--accent);border-radius:999px;background:var(--surface);color:var(--text);font-size:26px;font-weight:800;letter-spacing:.04em;filter:drop-shadow(0 0 16px var(--logo-glow))}
 .tag{display:inline-block;margin-top:14px;color:var(--green);font-weight:600;font-size:.9rem;text-transform:uppercase;letter-spacing:1.5px}
 
 /* Cards */
@@ -249,7 +249,6 @@ blockquote p{color:var(--purple);margin:0;font-size:1.25rem;font-style:italic}
 .pipeline{display:flex;align-items:center;gap:4px;margin:20px 0;flex-wrap:wrap;justify-content:center}
 .pipeline .step{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 22px;text-align:center;min-width:140px}
 .pipeline .step:hover{border-color:var(--green)}
-.pipeline .step .emoji{font-size:28px;margin-bottom:6px}
 .pipeline .step .name{font-size:1.15rem;font-weight:600;color:var(--text)}
 .pipeline .step .role{font-size:.9rem;color:var(--muted);margin-top:3px}
 .pipeline .arrow{color:var(--muted);font-size:22px;margin:0 6px;flex-shrink:0}
@@ -341,7 +340,6 @@ pre.cmd .green{color:var(--green)}
 .corner-controls{position:fixed;top:18px;right:22px;z-index:50;display:flex;align-items:center;gap:8px;padding:4px 4px 4px 32px;margin:-4px -4px -4px -32px}
 .brand-link{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--chrome-bg);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:20px;font-size:.82rem;color:var(--text-dim);text-decoration:none;transition:all .15s}
 .brand-link:hover{color:var(--text);border-color:var(--accent);text-decoration:none}
-.brand-link .brand-logo{font-size:1rem}
 
 /* Gear: hidden until the top-right corner is hovered; sticky when rehearse mode is on */
 .mode-toggle{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;background:var(--chrome-bg);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:50%;color:var(--text-dim);cursor:pointer;font-size:.95rem;line-height:1;opacity:0;pointer-events:none;transform:scale(.9);transition:opacity .25s,transform .25s,color .15s,border-color .15s}
@@ -426,7 +424,7 @@ pre.cmd .green{color:var(--green)}
 <body>
 
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
-  <span class="moon">🌙</span><span class="sun">☀️</span>
+  <span class="moon">☾</span><span class="sun">☀</span>
 </button>
 
 <div class="corner-controls" id="cornerControls">
@@ -434,7 +432,7 @@ pre.cmd .green{color:var(--green)}
     <span class="gear">⚙</span>
   </button>
   <a href="./" class="brand-link">
-    <span class="brand-logo">🧠</span> AIBAST Agents Library
+    AIBAST Agents Library
   </a>
 </div>
 
@@ -454,7 +452,7 @@ pre.cmd .green{color:var(--green)}
 <!-- ── SLIDE 1: The Adoption Gap (pure augmentation framing, no product names) ── -->
 <div class="slide active center">
   <div class="slide-inner">
-    <div class="logo animate">🧠</div>
+    <div class="logo animate">AI</div>
     <h1 class="animate d1">Your people are learning AI. <span class="grad">Does the learning stick?</span></h1>
     <p class="big animate d2" style="margin:18px auto 20px;max-width:800px">
       A breakthrough in one chat usually disappears with the person who found it. RAPP turns that learning into a visible, testable skill the team can keep.
@@ -535,11 +533,11 @@ pre.cmd .green{color:var(--green)}
       Freeze the exact working Brainstem — runtime, agents, stacks, memory, session, and model profile. Launch a child twin in Hippocampus, then carry the proven capability into the Microsoft experience that fits.
     </p>
     <div class="pipeline animate d3" style="margin:0 auto 8px">
-      <div class="step"><div class="emoji">💻</div><div class="name">Beta Brainstem</div><div class="role" style="color:var(--text-dim);font-size:.85rem">Learn + prove</div></div>
+      <div class="step"><div class="name">Beta Brainstem</div><div class="role" style="color:var(--text-dim);font-size:.85rem">Learn + prove</div></div>
       <div class="arrow">→</div>
-      <div class="step"><div class="emoji">☁️</div><div class="name">Hippocampus</div><div class="role" style="color:var(--text-dim);font-size:.85rem">Clone + persist</div></div>
+      <div class="step"><div class="name">Hippocampus</div><div class="role" style="color:var(--text-dim);font-size:.85rem">Clone + persist</div></div>
       <div class="arrow">→</div>
-      <div class="step" style="border-color:var(--green)"><div class="emoji">🏢</div><div class="name">Microsoft stack</div><div class="role" style="color:var(--green);font-size:.85rem">Studio · Foundry · M365</div></div>
+      <div class="step" style="border-color:var(--green)"><div class="name">Microsoft stack</div><div class="role" style="color:var(--green);font-size:.85rem">Studio · Foundry · M365</div></div>
     </div>
     <p class="slide-q animate d4">If your team could prototype in an afternoon and <span class="accent">promote it into production the same week</span> — what would they build first?</p>
   </div>
@@ -589,7 +587,7 @@ pre.cmd .green{color:var(--green)}
 <!-- ── SLIDE 8: The Ask ── -->
 <div class="slide center">
   <div class="slide-inner">
-    <div class="logo animate" style="margin-bottom:20px">🧠</div>
+    <div class="logo animate" style="margin-bottom:20px">AI</div>
     <h3 class="kicker animate">Why AIBAST · The ask</h3>
     <h1 class="animate d1">First meeting to production. <span class="green">One guided path.</span></h1>
     <p class="big animate d2" style="margin:20px auto 22px;max-width:850px">
@@ -658,7 +656,7 @@ pre.cmd .green{color:var(--green)}
       <div style="display:grid;grid-template-columns:92px 1fr;gap:16px;padding:14px 18px;background:var(--surface2);border:1px dashed var(--border);border-radius:10px;align-items:flex-start">
         <div style="color:var(--muted);font-family:ui-monospace,monospace;font-weight:700">end card</div>
         <div>
-          <div style="font-weight:600;color:var(--text);margin-bottom:4px">🧠 · 2-second hold</div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:4px">· 2-second hold</div>
           <p style="color:var(--text-dim);font-size:1rem;margin:0;max-width:none">Logo, your name, calendar link. No QR code, no social, no "learn more." They have the meeting on their calendar already.</p>
         </div>
       </div>
