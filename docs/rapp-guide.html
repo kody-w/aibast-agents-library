@@ -1531,23 +1531,23 @@ body:not(.js-enabled) .quiz-option input {
 </a>
 <a class="nav-item audit" href="#step10">
 <span class="nav-icon">🔍</span>
-<span>Audit: Feedback Processing</span>
+<span>Audit: Final Demo Review</span>
 </a>
 <a class="nav-item" href="#step11">
 <span class="nav-icon">11</span>
-<span>Iteration Loop</span>
+<span>Production Planning</span>
 </a>
-<a class="nav-item" href="#step12">
-<span class="nav-icon">12</span>
-<span>Production Deployment</span>
-</a>
-<a class="nav-item audit" href="#step13">
+<a class="nav-item audit" href="#step12">
 <span class="nav-icon">🔍</span>
-<span>Audit: Post-Deployment</span>
+<span>Audit: Security Sign-off</span>
+</a>
+<a class="nav-item" href="#step13">
+<span class="nav-icon">13</span>
+<span>Production Deployment</span>
 </a>
 <a class="nav-item" href="#step14">
 <span class="nav-icon">14</span>
-<span>Scale &amp; Maintain</span>
+<span>Post-Deployment Review</span>
 </a>
 </div>
 <div class="sidebar-section">
@@ -1562,7 +1562,7 @@ body:not(.js-enabled) .quiz-option input {
 </a>
 <a class="nav-item" href="#roadmap">
 <span class="nav-icon">🗺️</span>
-<span>Roadmap - EOY 2025</span>
+<span>Speed Barriers Broken</span>
 </a>
 </div>
 <div class="sidebar-section">
@@ -1704,34 +1704,34 @@ body:not(.js-enabled) .quiz-option input {
 <td>Delivery Team</td>
 </tr>
 <tr>
-<td><strong>10. Feedback Processing</strong></td>
+<td><strong>10. Audit: Final Demo Review</strong></td>
 <td><span class="badge audit">AUDIT</span></td>
-<td>1-3 days</td>
-<td>Field Team</td>
+<td>30-60 min</td>
+<td>Delivery Lead</td>
 </tr>
 <tr>
-<td><strong>11. Iteration Loop</strong></td>
+<td><strong>11. Production Planning</strong></td>
 <td><span class="badge manual">MANUAL</span></td>
-<td>Variable</td>
-<td>Full Team</td>
+<td>3-7 days</td>
+<td>Technical Team</td>
 </tr>
 <tr>
-<td><strong>12. Production Deployment</strong></td>
+<td><strong>12. Audit: Security &amp; Compliance Sign-off</strong></td>
+<td><span class="badge audit">AUDIT</span></td>
+<td>1-3 weeks</td>
+<td>Customer IT and Security</td>
+</tr>
+<tr>
+<td><strong>13. Production Deployment</strong></td>
 <td><span class="badge manual">MANUAL</span></td>
 <td>1 day</td>
 <td>Technical Team</td>
 </tr>
 <tr>
-<td><strong>13. Post-Deployment Audit</strong></td>
+<td><strong>14. Post-Deployment Review</strong></td>
 <td><span class="badge audit">AUDIT</span></td>
 <td>Ongoing</td>
 <td>Success Team</td>
-</tr>
-<tr>
-<td><strong>14. Scale &amp; Maintain</strong></td>
-<td><span class="badge manual">MANUAL</span></td>
-<td>Ongoing</td>
-<td>Technical Team</td>
 </tr>
 </tbody>
 </table></div>
@@ -1798,7 +1798,7 @@ body:not(.js-enabled) .quiz-option input {
 <tr>
 <td><strong>3. Intelligence Layer</strong></td>
 <td>Agent execution, decision-making, tool calling</td>
-<td>Azure Function App (500 lines of code)</td>
+<td>RAPP Brainstem on your machine (~3,500 lines), or the Azure Function App in the cloud (~1,000 lines)</td>
 </tr>
 <tr>
 <td><strong>4. Storage Layer</strong></td>
@@ -1812,16 +1812,16 @@ body:not(.js-enabled) .quiz-option input {
 <h3>⚡ Why This Architecture Wins</h3>
 <h4>1. Hot-Loading Without Redeployment</h4>
 <p><strong>Problem:</strong> Traditional deployments require downtime, testing pipelines, and approval processes. Making a small agent tweak could take days.</p>
-<p><strong>Solution:</strong> Agents live in Azure File Storage at <code>memory/{user-guid}/agents/</code>. The Intelligence Layer dynamically loads them on each request. Drop in a new Python file, and it's live instantly.</p>
+<p><strong>Solution:</strong> Locally, the Brainstem re-reads the agents folder on every request, so a saved file is live on the very next question. In the cloud, agents live in the Azure File Share's agents/ directory and the Intelligence Layer refreshes them on a five-minute cache. Drop in a new Python file, and it's live instantly.</p>
 <div class="example-box">
 <h4>🎯 Real-World Example: Field Sales Route Optimization</h4>
 <p><strong>Scenario:</strong> Customer requests a change to route optimization logic at 2 PM.</p>
 <p><strong>Traditional Approach:</strong> 3-5 days for code change → testing → approval → deployment.</p>
 <p><strong>This Architecture:</strong></p>
 <ol>
-<li>Update <code>dynamic-route-planning-agent.py</code> locally</li>
-<li>Upload to Azure File Storage <code>/agents/</code> directory</li>
-<li>Next request automatically loads updated agent (instant)</li>
+<li>Update <code>dynamic_route_planning_agent.py</code> locally</li>
+<li>Save it in the Brainstem's agents folder, or upload it to the Azure File Share's agents/ directory</li>
+<li>Locally the next request loads it immediately; in Azure it is live within five minutes</li>
 </ol>
 <p><strong>Result:</strong> Customer sees the change in minutes with zero downtime.</p>
 </div>
@@ -1888,7 +1888,7 @@ body:not(.js-enabled) .quiz-option input {
 <span class="code-language">Python - Simplified Intelligence Layer</span>
 <button aria-label="Copy code to clipboard" class="copy-btn" data-copy-button="" onclick="copyCode(this)" type="button">Copy</button>
 </div>
-<pre># Stateless Azure Function (500 lines total)
+<pre># Stateless Azure Function (~1,000 lines total)
 def handle_request(user_message, user_guid):
     # 1. Load context
     memory = storage.read_file(f"memory/{user_guid}/conversation_history.json")
@@ -2084,14 +2084,14 @@ def handle_request(user_message, user_guid):
 <td>"First impressions matter" - polish messaging and flow before customer sees it</td>
 </tr>
 <tr>
-<td><strong>Gate 5: Feedback Processing</strong></td>
+<td><strong>Gate 5: Final Demo Review</strong></td>
 <td>Is this feedback in scope or scope creep?</td>
 <td>Prevents endless iterations - decide what's in/out of MVP</td>
 </tr>
 <tr>
-<td><strong>Gate 6: Post-Deployment Audit</strong></td>
-<td>Are we delivering the promised value?</td>
-<td>Usage metrics, bug tracking, user satisfaction - ensure ROI</td>
+<td><strong>Gate 6: Security &amp; Compliance Sign-off</strong></td>
+<td>Will IT, Security and Compliance let this go live?</td>
+<td>Blocks a prototype from becoming a production liability. Step 14 then tracks usage, bugs and satisfaction after launch.</td>
 </tr>
 </tbody>
 </table></div>
@@ -2376,7 +2376,6 @@ Return valid JSON with this exact structure (copy this template and fill in the 
     "description": "[One sentence describing the overall AI implementation]",
     "stakeholders": "[Names with titles, comma-separated. Example: John Smith (VP Legal), Jane Doe (IT Director)]",
     "competingSolution": "[What solution are they comparing us to? e.g., Salesforce, ServiceNow, or leave empty if none]",
-    "contractDetails": "[EA details, license counts, budget/ACV, discounts - everything commercial]",
     "agents": ["[AgentName1]", "[AgentName2]", "[etc - PascalCase, no spaces]"],
     "mvpUseCase": "[The single focused first use case name, e.g., 'NDA Automation Bot']",
     "mvpDescription": "[2-3 sentences: What will the MVP specifically do?]",
@@ -2414,9 +2413,8 @@ After you provide the JSON, I will copy it and import it into the Project Tracke
 </div>
 <pre>Analyze this transcript: Met with Acme Insurance today about their legal operations.
 VP Legal and Legal Operations Manager discussed
-replacing their current Salesforce contract system. They have an EA with 150
-Copilot Studio licenses and want to start with NDA automation as the MVP.
-Budget approved at $450K ACV. Main concern is contract routing and approval
+replacing their current contract system. They want to start with NDA automation
+as the MVP. Main concern is contract routing and approval
 workflows. They want a POC in 6 weeks focusing on contract generation,
 analysis, and automated routing.</pre>
 </div>
@@ -2433,7 +2431,6 @@ analysis, and automated routing.</pre>
   "description": "Legal operations AI bot for contract automation",
   "stakeholders": "VP Legal, Legal Operations Manager",
   "competingSolution": "Salesforce",
-  "contractDetails": "EA with 150 Copilot Studio licenses, $450K ACV",
   "agents": ["ContractTemplate", "ContractAnalysis", "ContractRouting"],
   "mvpUseCase": "NDA Automation Bot",
   "mvpDescription": "Automated NDA generation, analysis, and routing with approval workflows",
@@ -2802,13 +2799,14 @@ Tone: Professional but approachable. We're confirming we heard them correctly, n
 <div class="audience-detail notice-warning">
 <h3>💼 Business Summary</h3>
 <p><strong>Current state:</strong> Team manually creates agent code using templates and patterns. <strong>Vision:</strong> AI-assisted generation to accelerate development.</p>
-<p><strong>Goal:</strong> Reduce agent development time from 2-3 weeks per agent to hours with reusable templates and tooling. Build library of patterns for consistency.</p>
+<p><strong>Goal, met:</strong> agent development was 2-3 weeks per agent when this step was written, with hours as the target. It is now minutes, against a library of 72 published patterns. See Speed Barriers Broken for the measurements.</p>
 </div>
 <div class="step-section">
 <h3>🎯 Objective</h3>
-<p>Create 6-10 Python agent files that implement the MVP use case. Each agent is self-documenting, modular, and ready to drop into the Azure Function. (Currently manual development with templates; building toward AI-assisted generation)</p>
+<p>Create the agent the MVP needs. In practice that is one well-scoped single-file agent exposing several deterministic operations, which is the shape 50 of the 52 published solutions use; split into a multi-agent stack only when the use case genuinely spans separate roles. Each agent is self-documenting, modular, and ready to drop into the Azure Function. (Currently manual development with templates; building toward AI-assisted generation)</p>
 <h3>⏱️ Duration</h3>
-<p><strong>Days to weeks (manual)</strong> - Team develops agents using templates and patterns. Goal: Reduce to hours with AI-assisted tooling</p>
+<p><strong>Minutes.</strong> A scaffolded agent is generated, smoke-tested and hot-loaded in about fifteen seconds; a hand-written one is live the moment you save the file. Writing the business logic inside it is still the real work.</p>
+<p><strong>Then:</strong> days to weeks, hand-written, with "reduce to hours" as the goal. That figure is kept in Speed Barriers Broken as the baseline this step was measured against.</p>
 <h3>👥 Owner</h3>
 <p><strong>Technical Team</strong> - Manual development using templates. Vision: AI-assisted generation with human review</p>
 </div>
@@ -2829,7 +2827,7 @@ Tone: Professional but approachable. We're confirming we heard them correctly, n
 4. All perform() methods MUST return strings, never dicts or None
 5. Error handling: Return descriptive error strings, never raise exceptions
 6. Include complete JSON Schema metadata for self-documentation
-7. Keep each agent focused on ONE capability (~100-300 lines)
+7. Keep each agent focused on ONE capability. Published agents run roughly 180-960 lines, median about 400
 8. Follow the exact pattern shown in the framework documentation
 
 **CODE TEMPLATE TO FOLLOW:**
@@ -2893,7 +2891,7 @@ class YourAgentNameAgent(BasicAgent):
 
 **OUTPUT FORMAT:**
 For each agent, provide:
-1. Complete Python file contents (ready to save as [agent-name]-agent.py)
+1. Complete Python file contents (ready to save as [agent_name]_agent.py)
 2. File name suggestion
 3. Brief description of what the agent does
 4. Any dependencies or setup notes
@@ -2908,7 +2906,7 @@ Generate all agents now.</pre>
 <li>Identify required agent capabilities from MVP description</li>
 <li>Use existing agent templates from Customers/ directory as starting point</li>
 <li>Manually code each agent following the BasicAgent pattern</li>
-<li>Save each file as <code>[agent-name]-agent.py</code> in customer directory</li>
+<li>Save each file as <code>[agent_name]_agent.py</code> in customer directory</li>
 <li>Test agents locally before proceeding to Step 6</li>
 </ol>
 <h4>Future Automation Vision:</h4>
@@ -2942,7 +2940,7 @@ Generate all agents now.</pre>
 </div>
 <div class="step-section technical-detail">
 <h3>📁 Generated Agent Structure</h3>
-<p>Each agent follows this standard pattern (the entire framework is ~500 lines of code, agents are ~100-300 lines each):</p>
+<p>Each agent follows this standard pattern (the local server is about 3,500 lines and the Azure Function about 1,000, agents run roughly 180-960 lines, median about 400):</p>
 <div class="code-block">
 <div class="code-header">
 <span class="code-language">Python - Generated Agent Example</span>
@@ -3096,7 +3094,7 @@ class DynamicRoutePlanningAgent(BasicAgent):
 <div class="io-box output">
 <h4>🎯 Deliverable</h4>
 <ul>
-<li><strong>6-10 Python agent files</strong>: One per capability, named [capability]-agent.py</li>
+<li><strong>One agent file per capability</strong>, named [capability]_agent.py. Underscores, always: the loader globs *_agent.py, so a hyphenated filename is silently never discovered.</li>
 <li><strong>Agent manifest JSON</strong>: List of all agents with descriptions</li>
 <li><strong>README</strong>: How to deploy these agents to Azure Function</li>
 </ul>
@@ -3104,12 +3102,12 @@ class DynamicRoutePlanningAgent(BasicAgent):
 </div>
 <p><strong>File structure:</strong></p>
 <pre>agents/
-├── dynamic-route-planning-agent.py
-├── shelf-recognition-agent.py
-├── promotion-suggestions-agent.py
-├── next-best-action-agent.py
-├── dynamics-crud-agent.py (helper for CRM operations)
-└── manage-memory-agent.py (default agent, always included)</pre>
+├── dynamic_route_planning_agent.py
+├── shelf_recognition_agent.py
+├── promotion_suggestions_agent.py
+├── next_best_action_agent.py
+├── dynamics_crud_agent.py (helper for CRM operations)
+└── manage_memory_agent.py (default agent, always included)</pre>
 </div>
 <div class="highlight-box">
 <h4>💡 The 60 Agent Test</h4>
@@ -3147,7 +3145,7 @@ class DynamicRoutePlanningAgent(BasicAgent):
 </div>
 <div class="step-section">
 <h3>🎯 Objective</h3>
-<p>Technical team reviews the 6-10 generated agents to verify they're secure, follow best practices, and will integrate correctly with customer systems.</p>
+<p>Technical team reviews the generated agent or agents to verify they're secure, follow best practices, and will integrate correctly with customer systems.</p>
 <h3>⏱️ Duration</h3>
 <p><strong>30-60 minutes</strong> - Experienced developer can review 6-10 agents in one sitting</p>
 <h3>👥 Owner</h3>
@@ -3222,8 +3220,8 @@ class DynamicRoutePlanningAgent(BasicAgent):
 <div class="stat-label">Pass First Attempt</div>
 </div>
 <div class="stat-card">
-<div class="stat-number">6%</div>
-<div class="stat-label">Need Rework</div>
+<div class="stat-number">231</div>
+<div class="stat-label">Executable Demo Cases</div>
 </div>
 <div class="stat-card">
 <div class="stat-number">30-60min</div>
@@ -3280,8 +3278,8 @@ class DynamicRoutePlanningAgent(BasicAgent):
 <p class="section-subtitle">Get working agents into Azure and M365 Copilot in minutes</p>
 <div class="step-section">
 <h3>🎯 Objective</h3>
-<p>Deploy approved, reviewed agent code to Azure Function App and connect to M365 Copilot Studio channels. This makes the prototype accessible to the customer for real testing.</p>
-<p><strong>Time Investment:</strong> 1-2 hours (manual deployment with scripts)</p>
+<p>Get the agent answering first. On the local tier there is nothing to deploy: install the server with one command, put the reviewed files in its agents folder, and ask. Promote to Azure Functions and Copilot Studio channels when the customer needs to reach it without your laptop.</p>
+<p><strong>Time Investment:</strong> minutes locally; 1-2 hours for the cloud tiers, with scripts.</p>
 <p><strong>Human Role:</strong> Manual Azure resource setup, agent deployment, connectivity verification, testing</p>
 <p><strong>Automation Vision:</strong> ARM templates and deployment scripts to reduce setup time to minutes</p>
 </div>
@@ -3294,7 +3292,7 @@ class DynamicRoutePlanningAgent(BasicAgent):
 <li><strong>Reviewed agent code:</strong> 6-10 Python files approved and ready</li>
 <li><strong>Project JSON:</strong> Customer context, MVP scope, data sources</li>
 <li><strong>Integration notes:</strong> Any customer-specific config (Dynamics on-prem, custom APIs, etc.)</li>
-<li><strong>GitHub repo:</strong> Copilot Agent 365 template forked and ready</li>
+<li><strong>GitHub repo:</strong> microsoft/aibast-agents-library, cloned or forked</li>
 </ul>
 </div>
 </div>
@@ -3306,8 +3304,8 @@ class DynamicRoutePlanningAgent(BasicAgent):
 <div class="example-box">
 <h4>Example: One-Click Azure Deployment</h4>
 <ol>
-<li>Go to GitHub repo: <code>Copilot Agent 365</code> template</li>
-<li>Click "Deploy to Azure" button in README</li>
+<li>Go to the repository: <code>microsoft/aibast-agents-library</code></li>
+<li>Click the Deploy to Azure button in the README, which provisions from azuredeploy.json</li>
 <li>ARM template creates:
                             <ul>
 <li>Azure Function App (stateless intelligence layer)</li>
@@ -3323,9 +3321,9 @@ class DynamicRoutePlanningAgent(BasicAgent):
 <h4>Step 7.2: Run Setup Script</h4>
 <p><strong>Execute the bash/PowerShell script</strong> that configures the environment:</p>
 <pre><code># Option 1: Local setup (for testing)
-git clone [copilot-agent-365-repo]
-cd copilot-agent-365
-./setup.sh  # or setup.ps1 on Windows
+git clone https://github.com/microsoft/aibast-agents-library.git
+cd aibast-agents-library
+./deploy.sh  # or deploy.ps1 on Windows
 
 # Script installs:
 # - Python dependencies
@@ -3359,7 +3357,7 @@ cd copilot-agent-365
 <h4>Step 7.4: Connect to M365 Copilot Studio</h4>
 <p>Make your agents accessible through Teams, Outlook, and web chat:</p>
 <ol>
-<li><strong>Download Copilot Studio solution:</strong> Pre-built YAML file in repo (<code>/solution/copilot-agent-solution.zip</code>)</li>
+<li><strong>Download the Copilot Studio solution</strong> for your solution: <code>solutions/&lt;slug&gt;/exports/&lt;slug&gt;-copilot-studio-solution.zip</code>, with the deployment settings JSON beside it. One ships per published solution.</li>
 <li><strong>Import to Power Platform:</strong>
 <ul>
 <li>Go to <a href="https://copilotstudio.microsoft.com">copilotstudio.microsoft.com</a></li>
@@ -3435,14 +3433,14 @@ cd copilot-agent-365
 <div class="pitfall-box">
 <h4>⚠️ Common Deployment Issues</h4>
 <p><strong>Issue #1: Azure Function App timeout errors</strong></p>
-<p><strong>Cause:</strong> Default timeout is 5 minutes, some agents take longer for first cold start</p>
-<p><strong>Fix:</strong> In Azure Portal → Function App → Configuration → General Settings → "Function timeout" → Set to 10 minutes</p>
+<p><strong>Cause:</strong> Default timeout is 5 minutes, some agents take longer on a cold start</p>
+<p><strong>Fix:</strong> Raise functionTimeout in rapp_ai/host.json and republish. A portal edit is overwritten by the next deployment.</p>
 <p><strong>Issue #2: Copilot Studio can't reach Azure Function</strong></p>
-<p><strong>Cause:</strong> CORS not configured to allow copilotstudio.microsoft.com</p>
-<p><strong>Fix:</strong> Azure Portal → Function App → CORS → Add <code>https://*.copilotstudio.microsoft.com</code></p>
+<p><strong>Cause:</strong> Rarely CORS. The template already deploys allowedOrigins ["*"], so Copilot Studio reaches the Function without further work.</p>
+<p><strong>Fix:</strong> Check the Function is running and the key is right first. Narrow allowedOrigins to your own origins before production.</p>
 <p><strong>Issue #3: Agents not loading (File Storage connection error)</strong></p>
-<p><strong>Cause:</strong> Connection string not configured in Function App environment variables</p>
-<p><strong>Fix:</strong> Configuration → Application Settings → Add <code>AZURE_STORAGE_CONNECTION_STRING</code></p>
+<p><strong>Cause:</strong> The Function App managed identity is missing a storage role assignment. The storage account disallows shared keys, so no connection string can work.</p>
+<p><strong>Fix:</strong> Confirm the storage roles in azuredeploy.json are assigned to the Function App system-assigned identity.</p>
 </div>
 <div class="step-section">
 <h3>🎬 Testing Before Customer Demo</h3>
@@ -3513,7 +3511,7 @@ func start
 <p><strong>ARM template automation:</strong> No manual Azure resource creation - one click provisions everything</p>
 <p><strong>Stateless architecture:</strong> 500 lines of code, minimal dependencies, deploys in seconds</p>
 <p><strong>Hot-loading agents:</strong> Update agents without redeploying the Function App</p>
-<p><strong>Pre-built Copilot solution:</strong> No custom Copilot Studio configuration needed</p>
+<p><strong>Pre-built Copilot solution:</strong> import it, bind the two connection references (Office 365 Outlook and Office 365 Users), and point the flow at your Function endpoint</p>
 <p><strong>Speed example:</strong> "Cape team member had his own business set up by the next day using this. That's how fast you can move with this. That's what rapid means."</p>
 </div>
 <div class="nav-controls">
@@ -3791,7 +3789,7 @@ scope a Phase 2 project with those additional capabilities. Sound good?"</code><
 </tr>
 <tr>
 <td>Customer provided written approval</td>
-<td>Email or Slack message saying "approved"</td>
+<td>Email or chat message saying "approved"</td>
 <td>□ Confirmed</td>
 </tr>
 <tr>
@@ -4624,7 +4622,7 @@ Security additions needed:
 <ul>
 <li><strong>Send welcome email:</strong> Instructions for accessing agent in Teams</li>
 <li><strong>Conduct training session:</strong> 30-minute walkthrough of key scenarios</li>
-<li><strong>Provide support channel:</strong> Slack/Teams channel for questions</li>
+<li><strong>Provide support channel:</strong> a Teams channel for questions</li>
 <li><strong>Set expectations:</strong> This is Phase 1, feedback will shape improvements</li>
 </ul>
 </div>
@@ -4778,7 +4776,7 @@ Security additions needed:
 <li>✅ Production Planning → Deployment (Steps 11-13): 1-3 weeks</li>
 <li>✅ Post-Deployment Review (Step 14): 2-4 weeks after launch</li>
 </ul>
-<p><strong>Total timeline:</strong> Working prototype in 3-5 days, production deployment in 3-5 weeks (mostly waiting for security/compliance approvals)</p>
+<p><strong>Total timeline:</strong> a working prototype in minutes when the library already covers the problem, and in days when it does not. Production deployment is still 3-5 weeks, and still mostly waiting for security and compliance approvals. The 3-5 day prototype figure this guide shipped with is kept in Speed Barriers Broken.</p>
 <p><strong>Compare to traditional development:</strong> 3-6 months for same scope</p>
 <p><strong>Result:</strong> 20x faster, 6 human quality gates preventing scope creep, validated ROI with real user data</p>
 </div>
@@ -4860,12 +4858,12 @@ Security additions needed:
 </tr>
 <tr>
 <td>Load Transcript-to-Project Agent</td>
-<td>Import declarativeAgent_0.json from /Transcript-to-Project Agent (1)/</td>
+<td>Open the Transcript-to-Project Agent from the tenant link in Step 2, or use that step's copy-paste fallback prompt</td>
 <td>□ Complete</td>
 </tr>
 <tr>
 <td>Test project tracker tool</td>
-<td>Open customer-project-tracker.html, add test project</td>
+<td>Open the Local Project Tracker Tool (tools/localfirst_project_tracker_tool.html), add test project</td>
 <td>□ Complete</td>
 </tr>
 <tr>
@@ -4897,7 +4895,7 @@ Security additions needed:
 </tr>
 <tr>
 <td>Load RAPP Agent Generator</td>
-<td>Import declarativeAgent_0.json from /RAPP Agent Generator/</td>
+<td>Open the RAPP Agent Generator from the tenant link in Step 5, or use that step's copy-paste fallback prompt</td>
 <td>□ Complete</td>
 </tr>
 <tr>
@@ -4978,7 +4976,7 @@ Team Member B completes Step 6 → Bot posts:
 Team Member C completes Step 10 → Bot posts:
 "🎉 [Customer Name] demo approved! Production planning starts Monday"</code></pre>
 <h4>Shared Project Tracker:</h4>
-<p><strong>Use the customer-project-tracker.html tool</strong> to visualize pipeline:</p>
+<p><strong>Use the the Local Project Tracker Tool (tools/localfirst_project_tracker_tool.html) tool</strong> to visualize pipeline:</p>
 <ul>
 <li><strong>Column 1:</strong> Discovery (Team Members A/B) - Projects in Steps 1-4</li>
 <li><strong>Column 2:</strong> Development (Team Members B/C) - Projects in Steps 5-6</li>
@@ -5015,7 +5013,7 @@ Team Member C completes Step 10 → Bot posts:
 <div class="stat-card">
 <div class="stat-number">30+</div>
 <div class="stat-label">Total Projects Tracked</div>
-<p>In customer-project-tracker.html</p>
+<p>In the Local Project Tracker Tool (tools/localfirst_project_tracker_tool.html)</p>
 </div>
 <div class="stat-card">
 <div class="stat-number">5-7</div>
@@ -5190,160 +5188,97 @@ az functionapp list --query "[?tags.Stage=='Prototype' &amp;&amp; tags.LastUsed&
 </div>
 <!-- ROADMAP -->
 <div class="content-section" id="roadmap">
-<h1 class="section-title">Roadmap - EOY 2025</h1>
-<p class="section-subtitle">Next release wave priorities and strategic focus areas</p>
+<h1 class="section-title">Speed Barriers Broken</h1>
+<p class="section-subtitle">What each step cost when this guide was written, what it costs now, and what we are going after next</p>
 <div class="highlight-box notice notice-accent">
-<h4>🎯 Strategic Shift: From Prototypes to Production</h4>
-<p>The strategic imperative is to transform conceptual ideas into production-ready solutions that field teams can deploy immediately. The focus is on creating demos that not only impress in presentations but can also be reliably reproduced and reused across multiple customer engagements to accelerate deal closure.</p>
+<h4>📉 Why this section exists</h4>
+<p>Every duration in this guide was measured, and was true when it was written. Most of them are no longer true, because the platform underneath the method changed. Rather than quietly overwrite the old numbers, we keep them here as a log. It is how we remember what a week of work used to buy, and it is the honest way to show a customer what changed.</p>
+<p><strong>The rule for this log:</strong> a row is added when a barrier actually falls, with the evidence that it fell. Nothing goes in as a forecast.</p>
 </div>
 <div class="step-section">
-<h3>🥇 Top 3 Priorities (In Order)</h3>
+<h3>📊 The log</h3>
+<div class="table-wrap"><table class="comparison-table">
+<thead><tr><th>Barrier</th><th>When this guide was written</th><th>Now</th><th>How we know</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>Build one agent</strong></td>
+<td>2-3 weeks per agent, hand-written. Step 5 called it "days to weeks" and set the goal at "hours".</td>
+<td>Minutes. A scaffolded agent is generated, smoke-tested and live in about fifteen seconds; a hand-written one is live the moment the file is saved. The business logic inside it is still yours to write.</td>
+<td>Step 5 of this guide, then. The LearnNew agent shipped in the default agent set, now.</td>
+</tr>
+<tr>
+<td><strong>See a change take effect</strong></td>
+<td>3-5 days: code change, testing, approval, deployment.</td>
+<td>The next question, locally. The local server re-reads its agents folder on every request; the cloud tier refreshes on a five-minute cache.</td>
+<td>Measured on a running install: a file saved at 10:27:45 answered on the very next request, with no restart.</td>
+</tr>
+<tr>
+<td><strong>Set up before you can learn anything</strong></td>
+<td>An Azure subscription, a Function App, a storage account, and a deployment before the first lesson.</td>
+<td>One command. No cloud account, no subscription, and no model key: the server borrows your existing GitHub Copilot access.</td>
+<td>The one-liner installer in this repository, and the auth chain in the local server.</td>
+</tr>
+<tr>
+<td><strong>Start from nothing</strong></td>
+<td>Every engagement began with a blank transcript and an empty folder.</td>
+<td>52 published solutions, each a single-file agent with tested operations, a guided workshop and a Copilot Studio solution beside it.</td>
+<td>The generated catalog in this repository.</td>
+</tr>
+<tr>
+<td><strong>Put a demo in front of the field</strong></td>
+<td>Planned as a shared, non-expiring cloud tenant with live endpoints, so nobody had to deploy per demo.</td>
+<td>No shared tenant at all. The catalog and its workshops are public, and any agent is one command away on a laptop.</td>
+<td>The 2025 plan, below, and the published library.</td>
+</tr>
+<tr>
+<td><strong>Hand a prototype to Copilot Studio</strong></td>
+<td>Built by hand in the portal, per agent.</td>
+<td>A Copilot Studio solution and its deployment settings ship beside every published workshop, 51 of them today.</td>
+<td>The export bundle in each solution folder.</td>
+</tr>
+<tr>
+<td><strong>Described use case to working prototype</strong></td>
+<td>3-5 days.</td>
+<td>Minutes, when the library already covers the problem. Production deployment is still 3-5 weeks, and still mostly waiting for security and compliance.</td>
+<td>Step 14 of this guide, then. Measured on a clean install, now.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="step-section">
+<h3>🗓️ What the 2025 plan said, and what happened</h3>
+<p>The plan this guide shipped with had three priorities and a short list of actions. Most of it landed, one part landed in a different shape than planned, and one part did not land at all. Recorded plainly, because a roadmap is only useful if you go back and mark it.</p>
+<div class="table-wrap"><table class="comparison-table">
+<thead><tr><th>2025 priority</th><th>What happened</th></tr></thead>
+<tbody>
+<tr><td>Deliver the committed customer agents and demo videos</td><td><strong>Shipped.</strong> 52 solutions, 51 published one-pagers, 47 filmed demos.</td></tr>
+<tr><td>Enable team members with a station-based guide and supporting tools</td><td><strong>Shipped.</strong> This guide, plus 51 complete workshops and a 51-course Academy with 229 uploadable skills.</td></tr>
+<tr><td>A shared cloud environment where the field can demo live agents without deploying</td><td><strong>Shipped differently.</strong> A local server plus a public catalog removed the need for a shared tenant, so the endpoint problem stopped existing instead of being solved.</td></tr>
+<tr><td>Simplify the deployment scripts to one click</td><td><strong>Shipped.</strong> An Azure template with a Deploy to Azure button, plus deployment scripts for both platforms.</td></tr>
+<tr><td>A review and tagging process for the agent library</td><td><strong>Shipped, and stricter than planned.</strong> Rather than tagging sensitive content, the Constitution bans customer data from the library outright, and every published agent carries a quality tier and a synthetic-data status.</td></tr>
+<tr><td>Speech-to-text timing so demo videos assemble themselves</td><td><strong>Not shipped.</strong> Recording a demo is still a manual pass.</td></tr>
+</tbody>
+</table></div>
+</div>
+<div class="step-section">
+<h3>🎯 What is next</h3>
+<div class="grid-2">
+<div class="priority-card notice-accent">
+<h4>Keep production boring</h4>
+<p>Every release is watched by the same one-liner a new reader would run, on a schedule, on all three platforms. A failure opens an incident by itself rather than waiting for someone to notice.</p>
+</div>
 <div class="priority-card notice-success">
-<h4>1. SPUR Committed Work - Agents &amp; Videos</h4>
-<p><strong>What:</strong> Deliver committed agents and videos for SPUR engagement</p>
-<p><strong>Impact:</strong> Revenue-generating, already committed to customer</p>
-<p><strong>Status to Track:</strong> Completion of agent builds and video production</p>
+<h4>Promote the Academy</h4>
+<p>The Academy and its workshops soak on the staging ring first and are promoted to production only after they hold. The workshops are the part that turns this guide from reading into doing.</p>
 </div>
 <div class="priority-card notice-warning">
-<h4>2. Enable Team Members - Documentation &amp; Tools</h4>
-<p><strong>What:</strong> Create "station-based" guide enabling team to work independently on 2+ process stations</p>
-<p><strong>Deliverables:</strong></p>
-<ul>
-<li>14-step process guide (the "Bible") with audit trails</li>
-<li>M365 agents for discovery calls and MVP generation</li>
-<li>Clear input/output documentation for each station</li>
-</ul>
-<p><strong>Impact:</strong> Team scalability - enable team members to handle 20+ customer engagements concurrently</p>
-<p><strong>Key Requirement:</strong> "Less code-dependent, more tool-based" - team uses tools, not raw code</p>
-</div>
-<div class="priority-card notice-accent">
-<h4>3. AI Agents Library Infrastructure</h4>
-<p><strong>What:</strong> Azure environment architecture where field can demo live agents</p>
-<p><strong>Deliverables:</strong></p>
-<ul>
-<li>Shared Azure tenant (non-expiring) for all agents</li>
-<li>Live endpoint demos accessible by entire field</li>
-<li>No per-demo deployment needed</li>
-</ul>
-<p><strong>Impact:</strong> Field enablement at scale - eliminate deployment friction for demos</p>
+<h4>Finish the version one items</h4>
+<p>The remaining work to call this generally available is licensing, public discussions, and metrics on the production repository. None of it changes the method in this guide.</p>
 </div>
 </div>
-<div class="step-section">
-<h3>⚡ Specific Action Items</h3>
-<h4>Immediate (Next 1-2 Weeks)</h4>
-<div aria-label="Scrollable guide table" class="table-wrap" role="region" tabindex="0"><table class="comparison-table">
-<thead>
-<tr>
-<th>Action</th>
-<th>Description</th>
-<th>Owner</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Hardware Procurement</strong></td>
-<td>Procure 2TB external drive for video storage (via Juke Room Store or procurement)</td>
-<td>Infrastructure Team</td>
-</tr>
-<tr>
-<td><strong>Video Automation</strong></td>
-<td>Implement speech-to-text solution for audio timing (double API call for duration data)</td>
-<td>Automation Team</td>
-</tr>
-<tr>
-<td><strong>PII Gate</strong></td>
-<td>Create review process and tagging system (PII/PII-removed/Public-ready) for agent library</td>
-<td>Security/Compliance</td>
-</tr>
-</tbody>
-</table></div>
-<h4>Short-term (This Cycle)</h4>
-<div aria-label="Scrollable guide table" class="table-wrap" role="region" tabindex="0"><table class="comparison-table">
-<thead>
-<tr>
-<th>Action</th>
-<th>Description</th>
-<th>Owner</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Documentation</strong></td>
-<td>Complete station-based guide with examples and prompts</td>
-<td>Documentation Team</td>
-</tr>
-<tr>
-<td><strong>Agent Deployment</strong></td>
-<td>Simplify ARM scripts for one-click deployment</td>
-<td>Technical Team</td>
-</tr>
-<tr>
-<td><strong>Library Architecture</strong></td>
-<td>Design structure for field-accessible agent demos with live endpoints</td>
-<td>Architecture Team</td>
-</tr>
-</tbody>
-</table></div>
-</div>
-<div class="step-section">
-<h3>📊 Success Metrics</h3>
-<div class="grid-2">
-<div class="metric-card metric-card-themed">
-<div class="metric-icon metric-icon-themed">👥</div>
-<h4>Team Independence</h4>
-<p><strong>Metric:</strong> Number of stations team members can operate independently</p>
-<p><strong>Target:</strong> 2+ stations by end of cycle</p>
-</div>
-<div class="metric-card metric-card-themed">
-<div class="metric-icon metric-icon-themed">⚡</div>
-<h4>Process Efficiency</h4>
-<p><strong>Metric:</strong> Time reduction from manual process to tool-based process</p>
-<p><strong>Target:</strong> 50% reduction in manual steps</p>
-</div>
-<div class="metric-card metric-card-themed">
-<div class="metric-icon metric-icon-themed">🚀</div>
-<h4>Field Adoption</h4>
-<p><strong>Metric:</strong> Number of demos running from shared Azure environment</p>
-<p><strong>Target:</strong> 10+ field-accessible demos</p>
-</div>
-<div class="metric-card metric-card-themed">
-<div class="metric-icon metric-icon-themed">💰</div>
-<h4>Customer Conversion</h4>
-<p><strong>Metric:</strong> Demos converted to deployed agents</p>
-<p><strong>Target:</strong> 30% conversion rate</p>
+<p><strong>Where status actually lives:</strong> this page is the narrative. Milestone status is tracked as GitHub milestones on the repository, and the release ledger records what shipped and what broke afterwards.</p>
 </div>
 </div>
-</div>
-<div class="step-section">
-<h3>🎯 Connect Format Alignment</h3>
-<h4>Results You Deliver:</h4>
-<ul>
-<li><strong>Business Impact:</strong> Accelerating deals through reproducible AI agent demos</li>
-<li><strong>Team Impact:</strong> Enabling team members to scale from individual work to managing 20+ concurrent engagements</li>
-<li><strong>Customer Impact:</strong> Moving from "amazing demos" to deployed, production-ready solutions</li>
-</ul>
-<h4>How You Deliver:</h4>
-<ul>
-<li><strong>From Research to Production:</strong> Grounding prototypes into field-usable tools</li>
-<li><strong>Incremental Delivery:</strong> "Don't wait for the whole project" - ship station 1 &amp; 2, then expand</li>
-<li><strong>Team Enablement:</strong> Growth mindset - building framework that helps others succeed, not just solo innovation</li>
-</ul>
-</div>
-<div class="step-section">
-<h3>🔒 Security &amp; Governance Goals</h3>
-<ul>
-<li><strong>PII Detection &amp; Tagging:</strong> Implement systematic PII detection and classification for agent library</li>
-<li><strong>Governance Gates:</strong> Establish review gates before public consumption of agents</li>
-<li><strong>Data Handling Best Practices:</strong> Document security protocols in team documentation</li>
-<li><strong>Compliance Alignment:</strong> Ensure all agents meet enterprise security standards before field deployment</li>
-</ul>
-</div>
-<div class="highlight-box notice notice-success">
-<h4>💡 Pro Tip for Connect</h4>
-<p>When writing your Connect, emphasize the shift from "200 amazing prototypes" to "2 production-ready tools the field can use tomorrow." This directly addresses the strategic feedback about moving from ideation to realization.</p>
-</div>
-</div>
-<!-- TOOLS BROWSER SECTION -->
 <div class="content-section" id="tools">
 <h1 class="section-title">Tool Browser</h1>
 <p class="section-subtitle">Interactive tools for project management and agent development</p>
