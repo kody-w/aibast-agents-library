@@ -171,10 +171,10 @@
           "why": "What changed and when, including the installer, which people depend on not moving under them."
         },
         {
-          "label": "Field notes",
+          "label": "Frontier Field Notes",
           "href": "blog.html",
           "kind": "page",
-          "why": "Longer write-ups of things learned building these, worth reading before you repeat them."
+          "why": "Topic-by-topic notes for a general audience, plus the workshop of the month: who it is for, what you build, where it runs and why it exists."
         }
       ]
     },
