@@ -1,5 +1,5 @@
 import path from "node:path";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
@@ -16,20 +16,25 @@ import {
 import {
   resolveBrainstemConfig,
 } from "./brainstem-process.mjs";
+import { BrainstemProvisioner } from "./brainstem-provisioner.mjs";
 import { humanizeAgentName } from "./agent-display.mjs";
 import { BrainSurgeon } from "./brain-surgeon.mjs";
 import { CopilotStudioAuthManager } from "./copilot-studio-auth.mjs";
 import { CopilotRuntime } from "./copilot-runtime.mjs";
 import { BetaRouteManager } from "./route-manager.mjs";
 import { RappStoreClient } from "./rapp-store.mjs";
+import { scrubSecrets } from "./safe-log.mjs";
 import { TwinManager } from "./twin-manager.mjs";
 import {
   allowsUiDriverMediaPermission,
   startUiDriverServer,
 } from "./ui-driver-server.mjs";
+import { resolveUserDataDirectory } from "./user-data-path.mjs";
 import {
   checkForUpdates,
   consumeUpdateResult,
+  PACKAGE_DOWNLOAD_URL,
+  packagedUpdateState,
   prepareUpdate,
 } from "./update-manager.mjs";
 import {
@@ -39,6 +44,7 @@ import {
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const packageDir = path.resolve(dirname, "..");
+const APP_ID = "com.microsoft.aibast.rapp-brainstem-beta";
 // The blue-brain app icon (build/icon.png), used for the window, the dock, and
 // the taskbar so the running app never shows the default Electron icon. Packaged
 // builds pick up build/icon.icns / .ico / icons/ via package.json.
@@ -47,10 +53,8 @@ const appIcon = existsSync(appIconFile) ? nativeImage.createFromPath(appIconFile
 const uiFile = path.join(dirname, "..", "ui", "index.html");
 const uiUrl = pathToFileURL(uiFile).href;
 const config = resolveBrainstemConfig();
-const startupFingerprint = betaSourceFingerprint(path.resolve(packageDir, ".."));
-const brainstemRuntimeFingerprint = runtimeDirectoryFingerprint(
-  config.brainstemDir,
-);
+let startupFingerprint = null;
+let brainstemRuntimeFingerprint = null;
 const BETA_FRAME_BRIDGE_SOURCE = `(() => {
   if (window.__rappBetaFrameBridge) return true;
   window.__rappBetaFrameBridge = true;
@@ -170,9 +174,10 @@ const BETA_FRAME_BRIDGE_SOURCE = `(() => {
     const checkButton = document.getElementById("beta-check-updates");
     if (checkButton) {
       checkButton.disabled = busy;
+      checkButton.dataset.updateAction = update.action || "check";
       checkButton.textContent = phase === "checking"
         ? "Checking GitHub..."
-        : "Check for updates";
+        : (update.actionLabel || "Check for updates");
     }
     const installButton = document.getElementById("beta-install-update");
     if (installButton) {
@@ -251,6 +256,12 @@ const BETA_FRAME_BRIDGE_SOURCE = `(() => {
       });
       checkButton?.addEventListener("click", (event) => {
         event.stopPropagation();
+        if (checkButton.dataset.updateAction === "download-package") {
+          window.parent.postMessage({
+            type: "rapp-beta:download-package",
+          }, "*");
+          return;
+        }
         renderBetaUpdate({
           phase: "checking",
           message: "Checking GitHub for updates...",
@@ -344,17 +355,20 @@ const BETA_FRAME_BRIDGE_SOURCE = `(() => {
   }, true);
   return true;
 })()`;
-const copilot = new CopilotRuntime({
-  tokenFile: path.join(config.brainstemDir, ".copilot_token"),
-  workingDirectory: config.brainstemDir,
-});
-const copilotStudioAuth = new CopilotStudioAuthManager();
 const betaHome = process.env.BRAINSTEM_BETA_HOME
   || path.join(config.brainstemHome, "beta-launcher");
 
 let mainWindow = null;
+let copilot = null;
+let copilotStudioAuth = null;
+let provisioner = null;
+let routeManager = null;
+let rappStore = null;
+let twinManager = null;
+let initializeProvisionedManagers = null;
 let shutdownStarted = false;
 let shutdownComplete = false;
+let requestedExitCode = 0;
 let updateCheckInFlight = false;
 let updateMenuItem = null;
 let availableUpdate = null;
@@ -367,35 +381,25 @@ const brainSurgeons = new Map();
 const MAX_BRAIN_SURGEONS = 12;
 
 const state = {
-  brainstem: { phase: "starting", message: "Starting shared Brainstem..." },
-  copilot: { phase: "starting", message: "Connecting bundled Copilot CLI..." },
+  brainstem: { phase: "checking", message: "Checking shared Brainstem..." },
+  copilot: { phase: "waiting", message: "Waiting for Brainstem setup..." },
   surgeon: {
-    phase: "starting",
-    message: "Preparing GitHub Copilot Agent mode...",
+    phase: "waiting",
+    message: "Waiting for Brainstem setup...",
   },
-  uiDriver: { phase: "starting", message: "Preparing visible AI controls..." },
-  update: {
-    phase: "idle",
-    message: "Check GitHub for the latest RAPP Brainstem Frontier.",
+  uiDriver: { phase: "waiting", message: "Waiting for Brainstem setup..." },
+  evidence: {
+    phase: "pending",
+    message: "Evidence fingerprints will be measured after Brainstem setup.",
   },
+  update: app.isPackaged
+    ? packagedUpdateState()
+    : {
+        phase: "idle",
+        message: "Check GitHub for the latest RAPP Brainstem Frontier.",
+      },
   url: config.url,
 };
-const routeManager = new BetaRouteManager({
-  betaHome,
-  brainstemConfig: config,
-  onActivate: async (route) => {
-    state.url = route.url;
-    state.brainstem = {
-      phase: "ready",
-      message: `Routed Brainstem v${route.health.version}`,
-      callerRappid: route.callerRappid,
-      memoryGuid: route.memoryGuid,
-      stackRappid: route.stackRappid,
-      compositionHash: route.transientCompositionHash || route.compositionHash,
-    };
-    emitState();
-  },
-});
 
 function emitState() {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -412,22 +416,6 @@ function emitSurgeonEvent(event) {
 // RAPPlication twins — specialized rapplications hatched from the RAPP Store as
 // concurrent long-lived workers on their own loopback ports, beside the
 // Brainstem chats in the herd. Kernel unchanged; driven only over /chat.
-const rappStore = new RappStoreClient();
-const twinManager = new TwinManager({
-  brainstemConfig: config,
-  betaHome,
-  routeManager,
-  storeClient: rappStore,
-  // The Brainstem that plans a two-brain loop is whichever one is live now
-  // (config URL, or a routed Brainstem once a route activates).
-  brainstemUrl: () => state.url,
-  onEvent: (event) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send("beta:twin-event", structuredClone(event));
-    }
-    if (event.type === "twin-needs-auth") notifyTwinNeedsAuth(event);
-  },
-});
 
 // Twins pause at the one user-owned auth step (e.g. PAC device login). If the
 // user is multitasking off the window they must still know a twin needs them —
@@ -831,6 +819,11 @@ function openUpdatePanel() {
   }
 }
 
+async function openPackageDownload() {
+  await shell.openExternal(PACKAGE_DOWNLOAD_URL);
+  return { opened: PACKAGE_DOWNLOAD_URL };
+}
+
 function setUpdateState(update) {
   state.update = update;
   emitState();
@@ -839,6 +832,10 @@ function setUpdateState(update) {
 
 async function handleCheckForUpdates({ openPanel = false } = {}) {
   if (openPanel) openUpdatePanel();
+  if (app.isPackaged) {
+    availableUpdate = null;
+    return setUpdateState(packagedUpdateState());
+  }
   if (updateCheckInFlight) return structuredClone(state.update);
   updateCheckInFlight = true;
   if (updateMenuItem) updateMenuItem.enabled = false;
@@ -897,7 +894,7 @@ async function handleCheckForUpdates({ openPanel = false } = {}) {
     return setUpdateState({
       phase: "error",
       message: "RAPP Brainstem Frontier could not check for updates.",
-      detail: String(error.message || error),
+      detail: scrubSecrets(error.message || error),
     });
   } finally {
     updateCheckInFlight = false;
@@ -906,6 +903,10 @@ async function handleCheckForUpdates({ openPanel = false } = {}) {
 }
 
 async function handleInstallUpdate() {
+  if (app.isPackaged) {
+    availableUpdate = null;
+    return setUpdateState(packagedUpdateState());
+  }
   if (!availableUpdate) {
     return setUpdateState({
       phase: "error",
@@ -931,18 +932,24 @@ async function handleInstallUpdate() {
     return setUpdateState({
       phase: "error",
       message: "RAPP Brainstem Frontier could not start the update.",
-      detail: String(error.message || error),
+      detail: scrubSecrets(error.message || error),
     });
   }
 }
 
 function installApplicationMenu() {
-  const checkForUpdatesItem = {
-    id: "check-for-updates",
-    label: "Check for Updates...",
-    accelerator: "CmdOrCtrl+Shift+U",
-    click: () => void handleCheckForUpdates({ openPanel: true }),
-  };
+  const updateItem = app.isPackaged
+    ? {
+        id: "download-package",
+        label: "Download Latest Package...",
+        click: () => void openPackageDownload(),
+      }
+    : {
+        id: "check-for-updates",
+        label: "Check for Updates...",
+        accelerator: "CmdOrCtrl+Shift+U",
+        click: () => void handleCheckForUpdates({ openPanel: true }),
+      };
   const editMenu = {
     label: "Edit",
     submenu: [
@@ -976,7 +983,7 @@ function installApplicationMenu() {
           submenu: [
             { role: "about" },
             { type: "separator" },
-            checkForUpdatesItem,
+            updateItem,
             { type: "separator" },
             { role: "services" },
             { type: "separator" },
@@ -996,7 +1003,7 @@ function installApplicationMenu() {
         editMenu,
         viewMenu,
         { role: "windowMenu" },
-        { label: "Help", submenu: [checkForUpdatesItem] },
+        { label: "Help", submenu: [updateItem] },
       ];
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
@@ -1012,7 +1019,7 @@ function loadPendingUpdateResult() {
   } catch (error) {
     result = {
       success: false,
-      error: `The update result could not be read: ${String(error.message || error)}`,
+      error: `The update result could not be read: ${scrubSecrets(error.message || error)}`,
     };
   }
   if (!result) return;
@@ -1133,6 +1140,10 @@ function registerIpc() {
       return handleInstallUpdate();
     },
   );
+  ipcMain.handle("beta:open-package-download", async (event) => {
+    assertTrustedIpc(event);
+    return openPackageDownload();
+  });
   ipcMain.handle("beta:surgeon-send", async (event, sessionId, prompt) => {
     assertTrustedIpc(event);
     return ensureBrainSurgeon(sessionId).send(prompt);
@@ -1155,11 +1166,11 @@ function registerIpc() {
   });
   ipcMain.handle("beta:store-list", async (event) => {
     assertTrustedIpc(event);
-    return rappStore.list();
+    return rappStore ? rappStore.list() : [];
   });
   ipcMain.handle("beta:twin-list", async (event) => {
     assertTrustedIpc(event);
-    return twinManager.list();
+    return twinManager ? twinManager.list() : [];
   });
   ipcMain.handle("beta:twin-hatch", async (event, storeId, instruction) => {
     assertTrustedIpc(event);
@@ -1208,11 +1219,95 @@ function registerIpc() {
 }
 
 async function startServices() {
+  let provisioned;
+  try {
+    provisioned = await provisioner.ensure();
+    const fingerprintWarnings = [];
+    try {
+      startupFingerprint = betaSourceFingerprint(path.resolve(packageDir, ".."));
+    } catch (error) {
+      fingerprintWarnings.push(
+        `Frontier source fingerprint failed: ${scrubSecrets(error.message || error)}`,
+      );
+    }
+    try {
+      brainstemRuntimeFingerprint = runtimeDirectoryFingerprint(
+        config.brainstemDir,
+      );
+    } catch (error) {
+      fingerprintWarnings.push(
+        `Brainstem fingerprint failed: ${scrubSecrets(error.message || error)}`,
+      );
+    }
+    state.evidence = fingerprintWarnings.length
+      ? {
+          phase: "warning",
+          message: "Evidence certification is disabled for this session.",
+          detail: fingerprintWarnings.join(" "),
+        }
+      : {
+          phase: "ready",
+          message: "Evidence fingerprints are ready.",
+        };
+    if (fingerprintWarnings.length) {
+      console.warn(`${state.evidence.message} ${state.evidence.detail}`);
+    }
+    initializeProvisionedManagers();
+    state.brainstem = {
+      phase: "starting",
+      message: provisioned.provisioned
+        ? "Brainstem installed. Starting the isolated chat worker..."
+        : "Starting the isolated Brainstem chat worker...",
+      ...(provisioned.logPath
+        ? { detail: `Provisioning log: ${provisioned.logPath}` }
+        : state.evidence.phase === "warning"
+          ? { detail: state.evidence.message }
+          : {}),
+    };
+    state.copilot = {
+      phase: "starting",
+      message: "Connecting bundled Copilot CLI...",
+    };
+    state.surgeon = {
+      phase: "starting",
+      message: "Preparing GitHub Copilot Agent mode...",
+    };
+    state.uiDriver = {
+      phase: "starting",
+      message: "Preparing visible AI controls...",
+    };
+    emitState();
+  } catch (error) {
+    const failure = scrubSecrets(error.message || error);
+    state.brainstem = {
+      phase: "error",
+      message: "The shared Brainstem could not be prepared.",
+      detail: failure,
+    };
+    state.copilot = {
+      phase: "blocked",
+      message: "Blocked until Brainstem setup succeeds.",
+    };
+    state.surgeon = {
+      phase: "blocked",
+      message: "Blocked until Brainstem setup succeeds.",
+    };
+    state.uiDriver = {
+      phase: "blocked",
+      message: "Blocked until Brainstem setup succeeds.",
+    };
+    emitState();
+    return;
+  }
+
   const brainstemTask = routeManager.startDefault().then((route) => {
     state.url = route.url;
     emitState();
   }).catch((error) => {
-    state.brainstem = { phase: "error", message: String(error.message || error) };
+    state.brainstem = {
+      phase: "error",
+      message: scrubSecrets(error.message || error),
+    };
     emitState();
   });
 
@@ -1241,7 +1336,7 @@ async function startServices() {
   }).catch((error) => {
     state.copilot = {
       phase: "warning",
-      message: `Copilot CLI status unavailable: ${String(error.message || error)}`,
+      message: `Copilot CLI status unavailable: ${scrubSecrets(error.message || error)}`,
     };
     state.surgeon = {
       phase: "error",
@@ -1250,13 +1345,134 @@ async function startServices() {
     emitState();
   });
 
-  await Promise.allSettled([brainstemTask, copilotTask]);
+  const uiDriverTask = startUiDriverServer({
+    resolveTwinUrls: (id) => {
+      const twin = twinManager.list().find((candidate) => candidate.id === id);
+      return twin ? [twin.url].filter(Boolean) : [];
+    },
+    window: mainWindow,
+    brainstemHome: config.brainstemHome,
+    loopbackUrl,
+    env: process.env,
+    routeTelemetry: () => routeManager.telemetrySnapshot(),
+    brainstemRuntimeFingerprint,
+    runtimeFingerprint: startupFingerprint,
+  }).then((driver) => {
+    uiDriver = driver;
+    state.uiDriver = {
+      phase: "ready",
+      message: "Chat agents can visibly operate this Brainstem.",
+    };
+    emitState();
+  }).catch((error) => {
+    state.uiDriver = {
+      phase: "error",
+      message: `Visible AI controls unavailable: ${scrubSecrets(error.message || error)}`,
+    };
+    console.error(state.uiDriver.message);
+    emitState();
+  });
+
+  await Promise.allSettled([brainstemTask, copilotTask, uiDriverTask]);
+  const smokeStatusFile = process.env.BRAINSTEM_BETA_SMOKE_STATUS_FILE;
+  if (smokeStatusFile) {
+    mkdirSync(path.dirname(smokeStatusFile), { recursive: true });
+    writeFileSync(
+      smokeStatusFile,
+      `${JSON.stringify({
+        brainstem: state.brainstem,
+        copilot: state.copilot,
+        surgeon: state.surgeon,
+        uiDriver: state.uiDriver,
+        url: state.url,
+        requestedUserData: process.env.BRAINSTEM_BETA_USER_DATA_DIR || null,
+        actualUserData: app.getPath("userData"),
+        provisioned: Boolean(provisioned?.provisioned),
+      })}\n`,
+      { mode: 0o600 },
+    );
+  }
+  if (process.env.BRAINSTEM_BETA_SMOKE_EXIT_ON_READY === "1") {
+    setTimeout(() => app.quit(), 250);
+  }
 }
 
+const userDataOverride = resolveUserDataDirectory(
+  process.env.BRAINSTEM_BETA_USER_DATA_DIR,
+);
+if (userDataOverride) {
+  app.setPath("userData", userDataOverride);
+}
+if (process.env.BRAINSTEM_BETA_CAPTURE_USER_DATA_PATH === "1") {
+  process.env.BRAINSTEM_BETA_ACTUAL_USER_DATA_DIR = app.getPath("userData");
+}
 const hasLock = app.requestSingleInstanceLock();
 if (!hasLock) {
   app.quit();
 } else {
+  app.setAppUserModelId(APP_ID);
+
+  const initializeBootstrapRuntime = () => {
+    copilot = new CopilotRuntime({
+      tokenFile: path.join(config.brainstemDir, ".copilot_token"),
+      workingDirectory: config.brainstemDir,
+    });
+    copilotStudioAuth = new CopilotStudioAuthManager();
+    provisioner = new BrainstemProvisioner({
+      config,
+      isPackaged: app.isPackaged,
+      resourcesPath: process.resourcesPath,
+      packageDir,
+      env: process.env,
+      onState: (next) => {
+        state.brainstem = next;
+        emitState();
+      },
+    });
+  };
+  initializeProvisionedManagers = () => {
+    if (routeManager) return;
+    routeManager = new BetaRouteManager({
+      betaHome,
+      brainstemConfig: config,
+      onActivate: async (route) => {
+        state.url = route.url;
+        state.brainstem = {
+          phase: "ready",
+          message: `Routed Brainstem v${route.health.version}`,
+          callerRappid: route.callerRappid,
+          memoryGuid: route.memoryGuid,
+          stackRappid: route.stackRappid,
+          compositionHash: route.transientCompositionHash
+            || route.compositionHash,
+          loadedAgents: [...route.health.agents],
+          loadErrors: [...route.health.quarantined],
+          evidence: structuredClone(state.evidence),
+        };
+        emitState();
+      },
+    });
+    rappStore = new RappStoreClient();
+    twinManager = new TwinManager({
+      brainstemConfig: config,
+      betaHome,
+      routeManager,
+      storeClient: rappStore,
+      // The Brainstem that plans a two-brain loop is whichever one is live now
+      // (config URL, or a routed Brainstem once a route activates).
+      brainstemUrl: () => state.url,
+      onEvent: (event) => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send(
+            "beta:twin-event",
+            structuredClone(event),
+          );
+        }
+        if (event.type === "twin-needs-auth") notifyTwinNeedsAuth(event);
+      },
+    });
+  };
+
   app.on("second-instance", () => {
     if (!mainWindow || mainWindow.isDestroyed()) mainWindow = createWindow();
     if (mainWindow.isMinimized()) mainWindow.restore();
@@ -1274,42 +1490,41 @@ if (!hasLock) {
     });
     registerIpc();
     installApplicationMenu();
-    loadPendingUpdateResult();
+    if (!app.isPackaged) loadPendingUpdateResult();
     mainWindow = createWindow();
-    startUiDriverServer({
-      resolveTwinUrls: (id) => {
-        const twin = twinManager.list().find((t) => t.id === id);
-        return twin ? [twin.url].filter(Boolean) : [];
-      },
-      window: mainWindow,
-      brainstemHome: config.brainstemHome,
-      loopbackUrl,
-      env: process.env,
-      routeTelemetry: () => routeManager.telemetrySnapshot(),
-      brainstemRuntimeFingerprint,
-      runtimeFingerprint: startupFingerprint,
-    }).then((driver) => {
-      uiDriver = driver;
-      state.uiDriver = {
-        phase: "ready",
-        message: "Chat agents can visibly operate this Brainstem.",
-      };
-      emitState();
-    }).catch((error) => {
-      state.uiDriver = {
+    let initialized = true;
+    try {
+      initializeBootstrapRuntime();
+    } catch (error) {
+      initialized = false;
+      state.brainstem = {
         phase: "error",
-        message: `Visible AI controls unavailable: ${String(error.message || error)}`,
+        message: "Frontier could not initialize its local runtime managers.",
+        detail: `${scrubSecrets(error.message || error)} Nothing was launched. `
+          + "Close other Frontier processes, check BRAINSTEM_HOME permissions, "
+          + "then reopen the app.",
       };
-      console.error(state.uiDriver.message);
       emitState();
-    });
-    void startServices();
+    }
+    if (initialized) void startServices();
     const smokeExitMs = Number.parseInt(
       process.env.BRAINSTEM_BETA_SMOKE_EXIT_MS || "0",
       10,
     );
     if (Number.isInteger(smokeExitMs) && smokeExitMs > 0) {
-      setTimeout(() => app.quit(), smokeExitMs);
+      setTimeout(() => {
+        if (
+          process.env.BRAINSTEM_BETA_SMOKE_REQUIRE_READY === "1"
+          && state.brainstem.phase !== "ready"
+        ) {
+          requestedExitCode = 1;
+          console.error(
+            "Packaged smoke failed: Brainstem did not reach ready state. "
+            + `${state.brainstem.phase}: ${state.brainstem.message || "unknown"}`,
+          );
+        }
+        app.quit();
+      }, smokeExitMs);
     }
   });
 
@@ -1327,15 +1542,28 @@ if (!hasLock) {
     event.preventDefault();
     if (shutdownStarted) return;
     shutdownStarted = true;
-    Promise.allSettled([
+    const shutdownTasks = [
       ...Array.from(brainSurgeons.values(), (surgeon) => surgeon.stop()),
-      twinManager.stopAll(),
-      copilot.stop(),
-      routeManager.stop(),
+      twinManager ? twinManager.stopAll() : null,
+      copilot?.stop(),
+      routeManager?.stop(),
+      provisioner?.stop(),
       uiDriver?.stop(),
-    ]).finally(() => {
-      shutdownComplete = true;
-      app.quit();
-    });
+    ].filter(Boolean);
+    Promise.allSettled(shutdownTasks)
+      .then((results) => {
+        for (const result of results) {
+          if (result.status === "rejected") {
+            console.error(
+              `Shutdown cleanup failed: ${scrubSecrets(result.reason)}`,
+            );
+          }
+        }
+      })
+      .finally(() => {
+        shutdownComplete = true;
+        if (requestedExitCode) app.exit(requestedExitCode);
+        else app.quit();
+      });
   });
 }

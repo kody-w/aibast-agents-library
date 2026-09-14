@@ -734,7 +734,7 @@ export class BrainSurgeon {
       },
       {
         name: "check_beta_updates",
-        description: "Open the visible beta dropdown and check the configured GitHub source for updates.",
+        description: "Open the visible beta dropdown and check the allowed source or signed binary release channel.",
         defer: "never",
         skipPermission: true,
         parameters: { type: "object", properties: {} },

@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld("brainstemBeta", {
   checkForUpdates: () => ipcRenderer.invoke("beta:check-for-updates"),
   getState: () => ipcRenderer.invoke("beta:get-state"),
   installUpdate: () => ipcRenderer.invoke("beta:install-update"),
+  openPackageDownload: () => ipcRenderer.invoke("beta:open-package-download"),
   deleteAgent: (filename) => ipcRenderer.invoke("beta:delete-agent", filename),
   exportAgent: (filename) => ipcRenderer.invoke("beta:export-agent", filename),
   installFrameBridge: () => (

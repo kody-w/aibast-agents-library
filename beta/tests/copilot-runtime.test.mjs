@@ -6,7 +6,9 @@ import test from "node:test";
 
 import {
   copilotPackageName,
+  copilotRuntimeInternals,
   readGitHubTokenFile,
+  resolveCopilotCliPath,
   withTimeout,
 } from "../electron/copilot-runtime.mjs";
 
@@ -22,6 +24,53 @@ test("Copilot package selection follows platform and architecture", () => {
   assert.equal(
     copilotPackageName("linux", "x64"),
     "@github/copilot-linux-x64",
+  );
+});
+
+test("packaged Copilot CLI resolves through app.asar.unpacked", () => {
+  const logical = "/Applications/Frontier.app/Contents/Resources/app.asar/"
+    + "node_modules/@github/copilot-darwin-arm64/copilot";
+  const unpacked = "/Applications/Frontier.app/Contents/Resources/"
+    + "app.asar.unpacked/node_modules/@github/copilot-darwin-arm64/copilot";
+  assert.equal(
+    copilotRuntimeInternals.asarUnpackedPath(
+      logical,
+      "/Applications/Frontier.app/Contents/Resources",
+    ),
+    unpacked,
+  );
+  assert.equal(
+    resolveCopilotCliPath("darwin", "arm64", {
+      fileExists: (candidate) => candidate === unpacked,
+      requireResolve: () => logical,
+      resourcesPath: "/Applications/Frontier.app/Contents/Resources",
+    }),
+    unpacked,
+  );
+});
+
+test("Windows packaged Copilot CLI resolves outside app.asar", () => {
+  const logical = String.raw`C:\Frontier\resources\app.asar\node_modules\@github\copilot-win32-x64\copilot.exe`;
+  const unpacked = String.raw`C:\Frontier\resources\app.asar.unpacked\node_modules\@github\copilot-win32-x64\copilot.exe`;
+  assert.equal(
+    resolveCopilotCliPath("win32", "x64", {
+      fileExists: (candidate) => candidate === unpacked,
+      requireResolve: () => logical,
+      resourcesPath: String.raw`C:\Frontier\resources`,
+    }),
+    unpacked,
+  );
+});
+
+test("logical app.asar Copilot paths never fall through to spawn", () => {
+  const logical = "/Frontier/Resources/app.asar/node_modules/copilot";
+  assert.equal(
+    resolveCopilotCliPath("darwin", "arm64", {
+      fileExists: (candidate) => candidate === logical,
+      requireResolve: () => logical,
+      resourcesPath: "/Frontier/Resources",
+    }),
+    undefined,
   );
 });
 

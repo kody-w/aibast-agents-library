@@ -1,5 +1,6 @@
 """Regression tests for destructive and fail-open installer paths."""
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -143,6 +144,55 @@ install_brainstem
     ) == "print('staging health public')\n"
 
 
+def test_full_commit_pin_checks_out_exact_runtime_bytes(tmp_path):
+    remote = tmp_path / "remote"
+    init_source_repo(remote, "main", "print('immutable release')\n")
+    pinned_commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=remote,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    (remote / "rapp_brainstem/brainstem.py").write_text(
+        "print('moving branch')\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "add", "."], cwd=remote, check=True)
+    subprocess.run(
+        ["git", "commit", "-m", "move branch"],
+        cwd=remote,
+        check=True,
+        capture_output=True,
+    )
+    isolated = tmp_path / "custom-runtime"
+
+    result = run_harness(
+        tmp_path,
+        f"""
+BRAINSTEM_HOME={str(isolated)!r}
+VENV_DIR="$BRAINSTEM_HOME/venv"
+REPO_URL={str(remote)!r}
+REPO_REF=main
+PIN_VERSION={pinned_commit!r}
+SOURCE_OVERRIDE_REQUESTED=true
+install_brainstem
+""",
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=isolated / "src",
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip() == pinned_commit
+    assert (isolated / "src/rapp_brainstem/brainstem.py").read_text(
+        encoding="utf-8"
+    ) == "print('immutable release')\n"
+
+
 def test_requested_source_failure_keeps_runtime_and_fails_closed(tmp_path):
     installed = tmp_path / ".brainstem/src"
     init_source_repo(installed, "main", "print('production preserved')\n")
@@ -267,6 +317,120 @@ def test_installer_preserves_sensitive_state_and_permissions_contract():
         assert text.count(state_file) >= 2
 
 
+def test_runtime_only_mode_skips_user_cli_and_launch(tmp_path):
+    trace = tmp_path / "trace"
+    result = run_harness(
+        tmp_path,
+        f"""
+check_prereqs() {{ echo prereqs >> {str(trace)!r}; }}
+install_brainstem() {{ echo source >> {str(trace)!r}; }}
+setup_venv() {{ echo venv >> {str(trace)!r}; }}
+setup_deps() {{ echo deps >> {str(trace)!r}; }}
+install_cli() {{ echo cli >> {str(trace)!r}; }}
+create_env() {{ echo env >> {str(trace)!r}; }}
+launch_brainstem() {{ echo launch >> {str(trace)!r}; }}
+main --runtime-only
+""",
+    )
+    assert result.returncode == 0, result.stderr
+    assert trace.read_text().splitlines() == [
+        "prereqs",
+        "source",
+        "venv",
+        "deps",
+        "env",
+    ]
+
+
+def test_generated_unix_launcher_honors_custom_home_and_bin(tmp_path):
+    real_home = tmp_path / "real-home"
+    brainstem_home = tmp_path / "custom-brainstem"
+    brainstem_bin = tmp_path / "custom bin"
+    runtime = brainstem_home / "src/rapp_brainstem"
+    python = brainstem_home / "venv/bin/python"
+    marker = tmp_path / "launched"
+    runtime.mkdir(parents=True)
+    python.parent.mkdir(parents=True)
+    real_home.mkdir()
+    (runtime / "brainstem.py").write_text("\n", encoding="utf-8")
+    python.write_text(
+        "#!/bin/bash\n"
+        "if [ \"$1\" = \"-c\" ]; then exit 0; fi\n"
+        f"printf '%s\\n' \"$PWD|$BRAINSTEM_HOME|$*\" > {str(marker)!r}\n",
+        encoding="utf-8",
+    )
+    python.chmod(0o700)
+
+    result = run_harness(
+        real_home,
+        f"""
+BRAINSTEM_HOME={str(brainstem_home)!r}
+BRAINSTEM_BIN={str(brainstem_bin)!r}
+VENV_DIR="$BRAINSTEM_HOME/venv"
+install_cli
+""",
+    )
+    assert result.returncode == 0, result.stderr
+    launcher = brainstem_bin / "brainstem"
+    assert launcher.exists()
+
+    environment = os.environ.copy()
+    environment["HOME"] = str(real_home)
+    environment.pop("BRAINSTEM_HOME", None)
+    launched = subprocess.run(
+        [str(launcher), "hello"],
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert launched.returncode == 0, launched.stderr
+    assert marker.read_text(encoding="utf-8").strip() == (
+        f"{runtime}|{brainstem_home}|brainstem.py hello"
+    )
+    resolved = subprocess.run(
+        [
+            "bash",
+            "-c",
+            'source "$1"; command -v brainstem',
+            "profile-check",
+            str(real_home / ".bashrc"),
+        ],
+        env={
+            **environment,
+            "PATH": "/usr/bin:/bin",
+        },
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert resolved.returncode == 0, resolved.stderr
+    assert resolved.stdout.strip() == str(launcher)
+
+
+def test_brainstem_home_environment_is_respected_at_initialization(tmp_path):
+    custom_home = tmp_path / "not-the-default"
+    script = f"""
+set -e
+export HOME={str(tmp_path)!r}
+export BRAINSTEM_HOME={str(custom_home)!r}
+{installer_functions()}
+printf '%s\\n%s\\n' "$BRAINSTEM_HOME" "$VENV_DIR"
+"""
+    result = subprocess.run(
+        ["bash"],
+        input=script,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.splitlines()[-2:] == [
+        str(custom_home),
+        str(custom_home / "venv"),
+    ]
+
+
 def test_agent_name_collisions_are_kept_in_recovery():
     text = INSTALLER.read_text(encoding="utf-8")
     assert "preserve_agent_collision" in text
@@ -321,6 +485,18 @@ def test_windows_repair_and_port_paths_match_safety_contract():
     assert "$SOURCE_OVERRIDE_REQUESTED" in text
     assert "Refreshing the explicitly requested repository/ref" in text
     assert "Could not refresh the requested repository/ref" in text
+    assert "if ($env:BRAINSTEM_HOME)" in text
+    assert '$VENV_DIR = "$BRAINSTEM_HOME\\venv"' in text
+    assert "--runtime-only" in text
+    assert "Checked out immutable commit" in text
+    assert "winget install --id $PackageId --scope user" in text
+
+
+def test_documented_installer_mirrors_are_byte_identical():
+    assert INSTALLER.read_bytes() == (ROOT / "docs/install.sh").read_bytes()
+    assert WINDOWS_INSTALLER.read_bytes() == (
+        ROOT / "docs/install.ps1"
+    ).read_bytes()
 
 
 def test_windows_launch_does_not_repeat_source_update():

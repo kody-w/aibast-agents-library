@@ -6,6 +6,38 @@ import { CopilotClient, RuntimeConnection } from "@github/copilot-sdk";
 
 const require = createRequire(import.meta.url);
 const DEFAULT_START_TIMEOUT_MS = 30_000;
+const RUNNING_FROM_ASAR = /[\\/]app\.asar[\\/]/.test(import.meta.url);
+
+function asarUnpackedPath(filePath, resourcesPath = process.resourcesPath) {
+  const value = String(filePath || "");
+  const match = value.match(
+    /^(.*?)([\\/])app\.asar[\\/](.+)$/,
+  );
+  if (!match) return value;
+  const paths = match[2] === "\\" ? path.win32 : path.posix;
+  if (resourcesPath) {
+    return paths.join(resourcesPath, "app.asar.unpacked", match[3]);
+  }
+  return value.replace(
+    /([\\/])app\.asar([\\/])/,
+    "$1app.asar.unpacked$2",
+  );
+}
+
+function executableCandidate(
+  candidate,
+  {
+    fileExists = existsSync,
+    resourcesPath = process.resourcesPath,
+  } = {},
+) {
+  if (!candidate) return undefined;
+  const unpacked = asarUnpackedPath(candidate, resourcesPath);
+  if (unpacked !== candidate) {
+    return fileExists(unpacked) ? unpacked : undefined;
+  }
+  return fileExists(candidate) ? candidate : undefined;
+}
 
 export function copilotPackageName(
   platform = process.platform,
@@ -22,20 +54,31 @@ export function copilotPackageName(
 export function resolveCopilotCliPath(
   platform = process.platform,
   arch = process.arch,
+  {
+    fileExists = existsSync,
+    requireResolve = require.resolve,
+    resourcesPath = process.resourcesPath,
+  } = {},
 ) {
   const packageName = copilotPackageName(platform, arch);
   try {
-    const resolved = require.resolve(packageName);
-    if (existsSync(resolved)) return resolved;
+    const resolved = executableCandidate(requireResolve(packageName), {
+      fileExists,
+      resourcesPath,
+    });
+    if (resolved) return resolved;
   } catch {}
 
   try {
     const packageDir = path.dirname(
-      require.resolve(`${packageName}/package.json`),
+      requireResolve(`${packageName}/package.json`),
     );
     const binaryName = platform === "win32" ? "copilot.exe" : "copilot";
-    const binaryPath = path.join(packageDir, binaryName);
-    if (existsSync(binaryPath)) return binaryPath;
+    const binaryPath = executableCandidate(
+      path.join(packageDir, binaryName),
+      { fileExists, resourcesPath },
+    );
+    if (binaryPath) return binaryPath;
   } catch {}
 
   return undefined;
@@ -95,14 +138,20 @@ export class CopilotRuntime {
 
     this.startPromise = (async () => {
       const cliPath = resolveCopilotCliPath();
+      if (RUNNING_FROM_ASAR && !cliPath) {
+        throw new Error(
+          "The packaged GitHub Copilot CLI is missing from app.asar.unpacked. "
+          + "Reinstall RAPP Brainstem Frontier from the published package.",
+        );
+      }
       const gitHubToken = readGitHubTokenFile(this.tokenFile);
       const options = cliPath
         ? {
-            connection: RuntimeConnection.forStdio({ path: cliPath }),
-            gitHubToken: gitHubToken || undefined,
-            mode: "copilot-cli",
-            workingDirectory: this.workingDirectory,
-          }
+          connection: RuntimeConnection.forStdio({ path: cliPath }),
+          gitHubToken: gitHubToken || undefined,
+          mode: "copilot-cli",
+          workingDirectory: this.workingDirectory,
+        }
         : {
             gitHubToken: gitHubToken || undefined,
             mode: "copilot-cli",
@@ -170,3 +219,8 @@ export class CopilotRuntime {
     return this.client.createSession(config);
   }
 }
+
+export const copilotRuntimeInternals = {
+  asarUnpackedPath,
+  executableCandidate,
+};
