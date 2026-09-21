@@ -296,16 +296,12 @@ def _open_file(path, flags=os.O_RDONLY, private=True):
         os.close(fd)
 
 
-def _read_json(path, managed_headers=False):
+def _read_json(path):
     with _open_file(path) as fd:
         if os.fstat(fd).st_size > _STATE_BYTES:
             _fail("state_corrupt", "A private JSON record exceeds its size bound.")
         raw = os.read(fd, _STATE_BYTES + 1)
     try:
-        if managed_headers:
-            raw = raw.decode("utf-8-sig")
-            while raw.lstrip().startswith("//"):
-                raw = raw.lstrip().partition("\n")[2]
         value = json.loads(raw)
     except (ValueError, UnicodeError):
         _fail("state_corrupt", "A private JSON record is invalid; it was not overwritten.")
@@ -445,17 +441,13 @@ class PortalTaskStore:
         _check_directories(self.staging)
         binary = _absolute(self.config.get("copilot_path"), "copilot_path").resolve(strict=False)
         self.binary = str(binary)
-        auth = self.config.get("auth", {"mode": "environment"})
-        if not isinstance(auth, dict) or set(auth) - {"mode", "source_config"}:
-            _fail("invalid_config", "auth accepts only mode and an optional OAuth metadata source_config.")
-        self.auth_mode = auth.get("mode")
-        if self.auth_mode not in {"environment", "copilot_oauth"}:
-            _fail("invalid_config", "auth.mode must be environment or copilot_oauth.")
-        self.auth_source = None
-        if self.auth_mode == "copilot_oauth":
-            self.auth_source = _absolute(auth.get("source_config"), "auth.source_config")
-        elif "source_config" in auth:
-            _fail("invalid_config", "source_config is only used by copilot_oauth mode.")
+        auth = self.config.get("auth")
+        if auth is not None and (auth != {"mode": "environment"} or "auth_account" in self.config):
+            _fail("invalid_config", "Use only locally pinned auth_account host/login references. Reading a general Copilot source_config is not supported.")
+        self.auth_account = None
+        if "auth_account" in self.config:
+            self.auth_account = self._validate_auth_account(self.config["auth_account"])
+        self.auth_mode = "copilot_oauth" if self.auth_account is not None else "environment"
         self.authorized = self.config.get("authorized")
         if not isinstance(self.authorized, list):
             _fail("invalid_config", "authorized must explicitly list sender/chat bindings.")
@@ -478,25 +470,20 @@ class PortalTaskStore:
             _fail("forbidden", "This sender and chat are not authorized for portal tasks.")
         return owner
 
-    def _auth_metadata(self):
-        if self.auth_mode != "copilot_oauth":
-            return None
-        source = _read_json(self.auth_source, managed_headers=True)
-        selected = source.get("lastLoggedInUser")
-        known = source.get("loggedInUsers")
-        if not isinstance(selected, dict) or not isinstance(known, list):
-            _fail("auth_selector_missing", "The Copilot metadata source has no selected OAuth account. Sign in with the trusted Copilot CLI; do not supply a classic PAT.")
-        host, login = selected.get("host"), selected.get("login")
+    @staticmethod
+    def _validate_auth_account(value):
+        if not isinstance(value, dict) or set(value) != {"host", "login"}:
+            _fail("auth_selector_invalid", "auth_account must contain only locally pinned host and login strings, never credentials.")
+        host, login = value["host"], value["login"]
         if (not isinstance(host, str)
                 or not re.fullmatch(r"https://(?:github\.com|[A-Za-z0-9-]+\.ghe\.com)", host)
                 or not isinstance(login, str)
                 or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", login)):
             _fail("auth_selector_invalid", "OAuth account metadata must identify a supported HTTPS GitHub host and a bounded login.")
-        if not any(isinstance(item, dict) and item.get("host") == host and item.get("login") == login for item in known):
-            _fail("auth_selector_missing", "The selected Copilot account is not in its known OAuth account list.")
-        # These are the ONLY source fields that can leave this function.
-        # Tokens, permissions, hooks, plugins, URLs and all other settings are ignored.
         return {"host": host, "login": login}
+
+    def _auth_metadata(self):
+        return dict(self.auth_account) if self.auth_account is not None else None
 
     def _prepare_auth(self, directory, meta):
         selected = self._auth_metadata()
@@ -539,9 +526,7 @@ class PortalTaskStore:
             _check_directories(path)
             if not path.is_dir():
                 _fail("invalid_config", "An approved additional directory does not exist.")
-            private_paths = [self.root, self.staging, self.config_path]
-            if self.auth_source is not None:
-                private_paths.append(self.auth_source)
+            private_paths = [self.root, self.staging, self.config_path, Path.home() / ".copilot"]
             for private in private_paths:
                 if private == path or path in private.parents or private in path.parents:
                     _fail("invalid_config", "Additional directories must not expose task state, staging, or configuration.")
@@ -959,7 +944,7 @@ class PortalTaskStore:
             for key in auth_vars:
                 if env.get(key):
                     if env[key].startswith("ghp_"):
-                        _fail("auth_unsupported", "Classic GitHub PATs are not supported by Copilot. Use the auth-only copilot_oauth selector or a supported OAuth credential.")
+                        _fail("auth_unsupported", "Classic GitHub PATs are not supported by Copilot. Use locally pinned auth_account metadata or a supported OAuth credential.")
                     break
         env.update(
             COPILOT_HOME=str(directory / "copilot-state"), COPILOT_ALLOW_ALL="false",

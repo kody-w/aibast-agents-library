@@ -766,28 +766,24 @@ def test_cli_json_protocol_rejects_extra_fields_and_never_accepts_non_json(confi
 
 
 def configure_oauth(config):
-    source = config.parent / "current-copilot.json"
     user = {"host": "https://github.com", "login": "synthetic-account"}
-    data = {
-        "lastLoggedInUser": {**user, "token": "SYNTHETIC_SECRET_DO_NOT_COPY"},
-        "loggedInUsers": [user, {"host": "https://github.com", "login": "other-synthetic-account"}],
-        "authTokens": {"unused": "SYNTHETIC_SECRET_DO_NOT_COPY"},
-        "copilotTokens": {"unused": "SYNTHETIC_SECRET_DO_NOT_COPY"},
-        "allowedTools": ["*"],
-        "allowed_directories": ["/"],
-        "hooks": {"sessionStart": "must not run"},
-        "installedPlugins": ["must not load"],
-        "defaultPermissionMode": "allow-all",
-    }
-    source.write_text("// User settings belong in settings.json.\n// Managed metadata.\n" + json.dumps(data))
-    source.chmod(0o600)
-    update_config(config, auth={"mode": "copilot_oauth", "source_config": str(source)})
-    return source, user
+    update_config(config, auth_account=user)
+    return user
 
 
-def test_oauth_reuses_only_account_selection_metadata_not_secrets_or_permissions(config, monkeypatch):
-    source, user = configure_oauth(config)
+def test_pinned_oauth_never_reads_parent_config_or_inherits_secrets_or_permissions(config, monkeypatch):
+    user = configure_oauth(config)
+    parent_home = config.parent / "unrelated-parent-home"
+    source = parent_home / ".copilot" / "config.json"
+    source.parent.mkdir(parents=True)
+    source.write_text("// BROKEN parent config with SYNTHETIC_SECRET_DO_NOT_COPY and permissive hooks; never read it.")
     original = source.read_bytes()
+    monkeypatch.setenv("HOME", str(parent_home))
+    read_json = tasks._read_json
+    def guarded_read(path):
+        assert Path(path) != source, "must not read the parent Copilot configuration"
+        return read_json(path)
+    monkeypatch.setattr(tasks, "_read_json", guarded_read)
     for key in ("COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"):
         monkeypatch.setenv(key, "ghp_SYNTHETIC_CLASSIC_MUST_NOT_PROPAGATE")
     store = tasks.PortalTaskStore(config)
@@ -814,37 +810,42 @@ def test_oauth_reuses_only_account_selection_metadata_not_secrets_or_permissions
 
 
 def test_oauth_account_switch_invalidates_the_pending_approval(config):
-    source, _ = configure_oauth(config)
+    configure_oauth(config)
     store = tasks.PortalTaskStore(config)
     submission = submit(store)
     changed = {"host": "https://github.com", "login": "new-synthetic-account"}
-    save_json(source, {"lastLoggedInUser": changed, "loggedInUsers": [changed]})
-    assert approve(store, submission)["error"]["code"] == "approval_changed"
+    update_config(config, auth_account=changed)
+    assert approve(tasks.PortalTaskStore(config), submission)["error"]["code"] == "approval_changed"
     directory = store.root / submission["job"]["job_id"]
     assert not (directory / "workspace" / "starts.txt").exists()
     assert not (directory / "copilot-state" / "config.json").exists()
 
 
-@pytest.mark.parametrize("mutation", ["missing", "unknown", "host", "login", "permissions", "symlink"])
-def test_invalid_oauth_metadata_fails_closed_without_starting_cli(config, mutation):
-    source, user = configure_oauth(config)
+@pytest.mark.parametrize("mutation", ["missing", "unknown", "host", "login", "secret", "null"])
+def test_invalid_pinned_oauth_metadata_fails_closed(config, mutation):
+    user = configure_oauth(config)
     if mutation == "missing":
-        save_json(source, {})
+        bad = {"host": user["host"]}
     elif mutation == "unknown":
-        save_json(source, {"lastLoggedInUser": user, "loggedInUsers": []})
+        bad = {**user, "permissions": ["*"]}
     elif mutation in {"host", "login"}:
         bad = {**user, mutation: "https://untrusted.invalid" if mutation == "host" else "not an account\n"}
-        save_json(source, {"lastLoggedInUser": bad, "loggedInUsers": [bad]})
-    elif mutation == "permissions":
-        source.chmod(0o644)
+    elif mutation == "secret":
+        bad = {**user, "token": "SYNTHETIC_SECRET_DO_NOT_COPY"}
     else:
-        original = source.with_name("real-source.json")
-        source.rename(original)
-        source.symlink_to(original)
-    store = tasks.PortalTaskStore(config)
-    result = submit(store)
-    assert not result["ok"]
-    assert request(store, "list")["jobs"] == []
+        bad = None
+    update_config(config, auth_account=bad)
+    with pytest.raises(tasks.PortalError) as caught:
+        tasks.PortalTaskStore(config)
+    assert caught.value.code == "auth_selector_invalid"
+    assert "SYNTHETIC_SECRET" not in str(caught.value)
+
+
+def test_general_copilot_config_source_option_is_rejected_without_reading_it(config):
+    update_config(config, auth={"mode": "copilot_oauth", "source_config": "/must/not/read/config.json"})
+    with pytest.raises(tasks.PortalError) as caught:
+        tasks.PortalTaskStore(config)
+    assert caught.value.code == "invalid_config"
 
 
 def test_classic_pat_in_environment_is_rejected_without_exposing_it(config, monkeypatch):
@@ -864,25 +865,24 @@ def test_classic_pat_in_environment_is_rejected_without_exposing_it(config, monk
             assert marker.encode() not in path.read_bytes()
 
 
-def test_completed_history_remains_available_without_oauth_metadata(config):
-    source, _ = configure_oauth(config)
+def test_completed_history_needs_no_external_oauth_metadata(config):
+    configure_oauth(config)
     store = tasks.PortalTaskStore(config)
     submission = submit(store)
     assert approve(store, submission)["ok"]
     wait_for(store, submission["job"]["job_id"])
-    source.unlink()
     restarted = tasks.PortalTaskStore(config)
     assert request(restarted, "result", job_id=submission["job"]["job_id"])["job"]["status"] == "succeeded"
 
 
-def test_permission_profiles_cannot_expose_the_oauth_metadata_source(config):
-    source, _ = configure_oauth(config)
-    auth_directory = config.parent / "auth-only-source"
-    auth_directory.mkdir(mode=0o700)
-    source = source.rename(auth_directory / "config.json")
+def test_permission_profiles_cannot_expose_parent_copilot_configuration(config, monkeypatch):
+    configure_oauth(config)
+    home = config.parent / "parent-home"
+    auth_directory = home / ".copilot"
+    auth_directory.mkdir(parents=True, mode=0o700)
+    monkeypatch.setenv("HOME", str(home))
     values = json.loads(config.read_text())
-    values["auth"]["source_config"] = str(source)
-    values["profiles"]["oauth-files"] = {"available_tools": ["view"], "add_dirs": [str(source.parent)]}
+    values["profiles"]["oauth-files"] = {"available_tools": ["view"], "add_dirs": [str(auth_directory)]}
     save_json(config, values)
     response = request(tasks.PortalTaskStore(config), "submit", prompt="success",
                        request_id="do-not-expose-auth", profile="oauth-files")

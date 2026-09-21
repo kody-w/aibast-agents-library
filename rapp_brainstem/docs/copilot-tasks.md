@@ -90,23 +90,24 @@ selected authentication modes preserve that isolation:
   may be provisioned by the trusted launch context. Values are never written
   by the adapter or returned in status. A selected classic `ghp_` PAT is rejected
   as `auth_unsupported` before invoking Copilot; classic PATs are not supported.
-* To reuse the operator's **existing Copilot OAuth/keychain account**, add this
-  auth-only selector to the private local configuration:
+* To reuse the operator's **existing Copilot OAuth/keychain account**, locally
+  pin its **nonsecret** account reference in the private portal configuration:
 
   ```json
   {
-    "auth": {
-      "mode": "copilot_oauth",
-      "source_config": "/absolute/private/home/.copilot/config.json"
+    "auth_account": {
+      "host": "https://github.com",
+      "login": "synthetic-account"
     }
   }
   ```
 
-  The source must be a current-user regular mode-0600 file. The adapter reads
-  only the account-selection meaning of `lastLoggedInUser` and `loggedInUsers`;
-  the managed leading `//` header is supported. It projects **only** the
-  selected account's `host` and `login` into a fresh private
-  `copilot-state/config.json`, with exactly these two top-level fields:
+  The operator supplies the already-known host/login locally, never from an
+  incoming message or model. Only these two strings are accepted; extra fields
+  such as tokens or permissions are rejected. No main Copilot configuration,
+  settings, or external account file is read. The worker writes only the pinned
+  reference into a fresh private `copilot-state/config.json`, with exactly
+  these two top-level fields:
 
   ```json
   {
@@ -117,13 +118,16 @@ selected authentication modes preserve that isolation:
 
   Copilot itself resolves the OAuth token from its system credential store
   using host/login. The adapter never invokes a keychain token-export command,
-  reads a keychain token, or copies `authTokens`, `copilotTokens`, permissions,
-  settings, hooks, plugins, or other source fields. In this mode inherited
+  reads a keychain token, or reads/copies the parent configuration, `authTokens`,
+  `copilotTokens`, permissions, settings, hooks, or plugins. In this mode inherited
   GitHub token/host overrides are removed from the worker environment so an
   unrelated classic `gh` PAT cannot take precedence. The chosen account is
-  hash-bound into task approval; changing accounts requires fresh approval.
-  Source configuration is never modified, and history remains readable if
-  source metadata later disappears.
+  hash-bound into task approval; changing the local pin requires a new
+  submission and fresh approval. Parent authentication is never modified.
+
+  The earlier experimental `auth.source_config` option is rejected. Replace
+  that block with `auth_account`; do not configure both. This avoids any general
+  configuration read or copy, even when its account references are nonsecret.
 
 This metadata selection is verified against the installed Copilot CLI 1.0.87
 schema (`UserAuthInfo` keeps the token in the runtime secret store, keyed by
@@ -289,8 +293,8 @@ Useful error codes are:
 * `approval_required`, `approval_expired`, `approval_used`, `approval_changed`:
   missing/wrong token, finite expiry, consumed token, or changed bound inputs.
 * `policy_denied`: an unconfigured permission profile.
-* `auth_selector_missing`, `auth_selector_invalid`, `auth_unsupported`: missing
-  or invalid account-selection metadata, or an unsupported classic PAT.
+* `auth_selector_invalid`, `auth_unsupported`: invalid locally pinned account
+  metadata, or an unsupported classic PAT.
 * `worker_launch_failed`: the supervisor could not be launched (operation error).
 * `worker_unavailable`: the Copilot executable is unavailable (terminal result).
 * `worker_lost`: ownership disappeared; terminal `interrupted`, never replayed.
