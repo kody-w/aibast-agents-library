@@ -84,6 +84,19 @@ custom instructions, shell startup files and automatic updates, and supplies
 explicit `--available-tools`, `--allow-tool`, `--deny-tool`, and path flags.
 It never uses `--allow-all`, `--allow-all-tools`, `--allow-all-paths`,
 `--allow-all-urls`, or `--yolo` through the portal path.
+The trusted task boundary also renders the effective tool grants/denials,
+working directory, added directories, and allowed URLs, derived from those
+same enforced arguments. It excludes account configuration, actor data,
+approval tokens and other job/configuration fields. Keep permission rules and
+URL grants themselves nonsecret. This summary is guidance, not additional
+authority: the CLI remains the enforcement boundary.
+
+For shell tasks the worker is told to use only explicitly named approved
+programs, prefer separate permitted invocations, and avoid unapproved preflight
+or cleanup commands. It should leave intermediate files rather than request
+broader permissions. For example, grants for `say`, `ffmpeg`, and `ffprobe` do
+not grant `test` or `rm`; rejection of an unnecessary compound step must not be
+interpreted as a blanket loss of the approved shell capabilities.
 
 Each job has a fresh `COPILOT_HOME` inside its existing job directory, preventing
 inherited permissive settings, plugins, hooks, and session state. Two explicitly
