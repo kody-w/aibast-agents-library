@@ -30,14 +30,18 @@ prompt = args[args.index("-p") + 1]
 mode = prompt.splitlines()[0]
 with open("starts.txt", "a") as marker:
     marker.write("started\n")
-Path("observed.json").write_text(json.dumps({
+observation = {
     "argv": args, "cwd": os.getcwd(),
     "env": {k: os.environ.get(k) for k in (
         "COPILOT_HOME", "COPILOT_ALLOW_ALL", "COPILOT_AUTO_UPDATE",
         "COPILOT_PROVIDER_BASE_URL", "COPILOT_CUSTOM_INSTRUCTIONS_DIRS", "TMPDIR",
         "BASH_ENV", "RAPP_COPILOT_WORKER_TOKEN"
-    )}
-}))
+    )},
+    "auth_env_present": [key for key in ("COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN") if key in os.environ]
+}
+auth_metadata = Path(os.environ["COPILOT_HOME"]) / "config.json"
+observation["auth_metadata"] = json.loads(auth_metadata.read_text()) if auth_metadata.exists() else None
+Path("observed.json").write_text(json.dumps(observation))
 if mode == "fail":
     print("partial output is not success", flush=True)
     print("synthetic CLI refusal", file=sys.stderr, flush=True)
@@ -83,7 +87,9 @@ def save_json(path, value):
 
 
 @pytest.fixture
-def config(tmp_path):
+def config(tmp_path, monkeypatch):
+    for key in ("COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN", "GH_HOST", "COPILOT_GH_HOST"):
+        monkeypatch.delenv(key, raising=False)
     binary = tmp_path / "fake-copilot"
     binary.write_text(f"#!{sys.executable}\n" + FAKE_CLI, encoding="utf-8")
     binary.chmod(0o700)
@@ -757,3 +763,127 @@ def test_cli_json_protocol_rejects_extra_fields_and_never_accepts_non_json(confi
     assert bad.returncode == 1
     assert json.loads(bad.stdout)["error"]["code"] == "invalid_request"
     assert bad.stderr == ""
+
+
+def configure_oauth(config):
+    source = config.parent / "current-copilot.json"
+    user = {"host": "https://github.com", "login": "synthetic-account"}
+    data = {
+        "lastLoggedInUser": {**user, "token": "SYNTHETIC_SECRET_DO_NOT_COPY"},
+        "loggedInUsers": [user, {"host": "https://github.com", "login": "other-synthetic-account"}],
+        "authTokens": {"unused": "SYNTHETIC_SECRET_DO_NOT_COPY"},
+        "copilotTokens": {"unused": "SYNTHETIC_SECRET_DO_NOT_COPY"},
+        "allowedTools": ["*"],
+        "allowed_directories": ["/"],
+        "hooks": {"sessionStart": "must not run"},
+        "installedPlugins": ["must not load"],
+        "defaultPermissionMode": "allow-all",
+    }
+    source.write_text("// User settings belong in settings.json.\n// Managed metadata.\n" + json.dumps(data))
+    source.chmod(0o600)
+    update_config(config, auth={"mode": "copilot_oauth", "source_config": str(source)})
+    return source, user
+
+
+def test_oauth_reuses_only_account_selection_metadata_not_secrets_or_permissions(config, monkeypatch):
+    source, user = configure_oauth(config)
+    original = source.read_bytes()
+    for key in ("COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"):
+        monkeypatch.setenv(key, "ghp_SYNTHETIC_CLASSIC_MUST_NOT_PROPAGATE")
+    store = tasks.PortalTaskStore(config)
+    submission = submit(store)
+    directory = store.root / submission["job"]["job_id"]
+    assert not (directory / "copilot-state" / "config.json").exists()
+    assert approve(store, submission)["ok"]
+    terminal = wait_for(store, directory.name)
+    assert terminal["job"]["status"] == "succeeded"
+    copied = tasks._read_json(directory / "copilot-state" / "config.json")
+    assert copied == {"lastLoggedInUser": user, "loggedInUsers": [user]}
+    assert source.read_bytes() == original
+    assert stat.S_IMODE((directory / "copilot-state" / "config.json").stat().st_mode) == 0o600
+    observed = json.loads((directory / "workspace" / "observed.json").read_text())
+    assert observed["auth_metadata"] == copied
+    assert observed["auth_env_present"] == []
+    assert observed["env"]["COPILOT_ALLOW_ALL"] == "false"
+    assert "--user" not in observed["argv"]
+    assert "--available-tools=view,glob,rg" in observed["argv"]
+    for path in directory.rglob("*"):
+        if path.is_file():
+            assert b"SYNTHETIC_SECRET_DO_NOT_COPY" not in path.read_bytes()
+            assert b"ghp_SYNTHETIC_CLASSIC_MUST_NOT_PROPAGATE" not in path.read_bytes()
+
+
+def test_oauth_account_switch_invalidates_the_pending_approval(config):
+    source, _ = configure_oauth(config)
+    store = tasks.PortalTaskStore(config)
+    submission = submit(store)
+    changed = {"host": "https://github.com", "login": "new-synthetic-account"}
+    save_json(source, {"lastLoggedInUser": changed, "loggedInUsers": [changed]})
+    assert approve(store, submission)["error"]["code"] == "approval_changed"
+    directory = store.root / submission["job"]["job_id"]
+    assert not (directory / "workspace" / "starts.txt").exists()
+    assert not (directory / "copilot-state" / "config.json").exists()
+
+
+@pytest.mark.parametrize("mutation", ["missing", "unknown", "host", "login", "permissions", "symlink"])
+def test_invalid_oauth_metadata_fails_closed_without_starting_cli(config, mutation):
+    source, user = configure_oauth(config)
+    if mutation == "missing":
+        save_json(source, {})
+    elif mutation == "unknown":
+        save_json(source, {"lastLoggedInUser": user, "loggedInUsers": []})
+    elif mutation in {"host", "login"}:
+        bad = {**user, mutation: "https://untrusted.invalid" if mutation == "host" else "not an account\n"}
+        save_json(source, {"lastLoggedInUser": bad, "loggedInUsers": [bad]})
+    elif mutation == "permissions":
+        source.chmod(0o644)
+    else:
+        original = source.with_name("real-source.json")
+        source.rename(original)
+        source.symlink_to(original)
+    store = tasks.PortalTaskStore(config)
+    result = submit(store)
+    assert not result["ok"]
+    assert request(store, "list")["jobs"] == []
+
+
+def test_classic_pat_in_environment_is_rejected_without_exposing_it(config, monkeypatch):
+    marker = "ghp_SYNTHETIC_CLASSIC_SECRET"
+    monkeypatch.setenv("COPILOT_GITHUB_TOKEN", marker)
+    store = tasks.PortalTaskStore(config)
+    submission = submit(store)
+    assert approve(store, submission)["ok"]
+    directory = store.root / submission["job"]["job_id"]
+    result = wait_for(store, directory.name)
+    assert result["job"]["status"] == "failed"
+    assert result["result"]["error"]["code"] == "auth_unsupported"
+    assert result["result"]["exit_code"] is None
+    assert not (directory / "workspace" / "starts.txt").exists()
+    for path in directory.rglob("*"):
+        if path.is_file():
+            assert marker.encode() not in path.read_bytes()
+
+
+def test_completed_history_remains_available_without_oauth_metadata(config):
+    source, _ = configure_oauth(config)
+    store = tasks.PortalTaskStore(config)
+    submission = submit(store)
+    assert approve(store, submission)["ok"]
+    wait_for(store, submission["job"]["job_id"])
+    source.unlink()
+    restarted = tasks.PortalTaskStore(config)
+    assert request(restarted, "result", job_id=submission["job"]["job_id"])["job"]["status"] == "succeeded"
+
+
+def test_permission_profiles_cannot_expose_the_oauth_metadata_source(config):
+    source, _ = configure_oauth(config)
+    auth_directory = config.parent / "auth-only-source"
+    auth_directory.mkdir(mode=0o700)
+    source = source.rename(auth_directory / "config.json")
+    values = json.loads(config.read_text())
+    values["auth"]["source_config"] = str(source)
+    values["profiles"]["oauth-files"] = {"available_tools": ["view"], "add_dirs": [str(source.parent)]}
+    save_json(config, values)
+    response = request(tasks.PortalTaskStore(config), "submit", prompt="success",
+                       request_id="do-not-expose-auth", profile="oauth-files")
+    assert response["error"]["code"] == "invalid_config"

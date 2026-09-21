@@ -82,15 +82,61 @@ It never uses `--allow-all`, `--allow-all-tools`, `--allow-all-paths`,
 `--allow-all-urls`, or `--yolo` through the portal path.
 
 Each job has a fresh `COPILOT_HOME` inside its existing job directory, preventing
-inherited permissive settings, plugins, hooks, and session state. Supported
-GitHub authentication environment variables (`COPILOT_GITHUB_TOKEN`, `GH_TOKEN`,
-`GITHUB_TOKEN`) may be provisioned by the trusted launch context; values are
-never written by the adapter or returned in status. Do not copy the operator's
-general Copilot configuration to work around authentication. If the CLI cannot
-authenticate or rejects a permission, its nonzero exit is a durable failure,
-not permission to retry with broader access. Authentication/inference must be
-checked separately during authorized integration; fake-worker tests prove
-neither.
+inherited permissive settings, plugins, hooks, and session state. Two explicitly
+selected authentication modes preserve that isolation:
+
+* Default `{"auth":{"mode":"environment"}}`: supported GitHub authentication
+  environment variables (`COPILOT_GITHUB_TOKEN`, `GH_TOKEN`, `GITHUB_TOKEN`)
+  may be provisioned by the trusted launch context. Values are never written
+  by the adapter or returned in status. A selected classic `ghp_` PAT is rejected
+  as `auth_unsupported` before invoking Copilot; classic PATs are not supported.
+* To reuse the operator's **existing Copilot OAuth/keychain account**, add this
+  auth-only selector to the private local configuration:
+
+  ```json
+  {
+    "auth": {
+      "mode": "copilot_oauth",
+      "source_config": "/absolute/private/home/.copilot/config.json"
+    }
+  }
+  ```
+
+  The source must be a current-user regular mode-0600 file. The adapter reads
+  only the account-selection meaning of `lastLoggedInUser` and `loggedInUsers`;
+  the managed leading `//` header is supported. It projects **only** the
+  selected account's `host` and `login` into a fresh private
+  `copilot-state/config.json`, with exactly these two top-level fields:
+
+  ```json
+  {
+    "lastLoggedInUser": {"host":"https://github.com","login":"synthetic-account"},
+    "loggedInUsers": [{"host":"https://github.com","login":"synthetic-account"}]
+  }
+  ```
+
+  Copilot itself resolves the OAuth token from its system credential store
+  using host/login. The adapter never invokes a keychain token-export command,
+  reads a keychain token, or copies `authTokens`, `copilotTokens`, permissions,
+  settings, hooks, plugins, or other source fields. In this mode inherited
+  GitHub token/host overrides are removed from the worker environment so an
+  unrelated classic `gh` PAT cannot take precedence. The chosen account is
+  hash-bound into task approval; changing accounts requires fresh approval.
+  Source configuration is never modified, and history remains readable if
+  source metadata later disappears.
+
+This metadata selection is verified against the installed Copilot CLI 1.0.87
+schema (`UserAuthInfo` keeps the token in the runtime secret store, keyed by
+host/login). That CLI rejects `--user`; this adapter does not invent that flag.
+Unsupported metadata fails closed. Missing/inaccessible keychain credentials
+remain an explicit CLI authentication failure—never a reason to copy secret
+values, perform a new login automatically, or widen permissions. An installation
+using plaintext credential fallback cannot use this metadata-only path.
+
+If the CLI cannot authenticate or rejects a permission, its nonzero exit is a
+durable failure, not permission to retry with broader access. Live
+authentication/inference must be checked separately during authorized
+integration; fake-worker tests prove neither.
 
 ## JSON/CLI contract
 
@@ -243,6 +289,8 @@ Useful error codes are:
 * `approval_required`, `approval_expired`, `approval_used`, `approval_changed`:
   missing/wrong token, finite expiry, consumed token, or changed bound inputs.
 * `policy_denied`: an unconfigured permission profile.
+* `auth_selector_missing`, `auth_selector_invalid`, `auth_unsupported`: missing
+  or invalid account-selection metadata, or an unsupported classic PAT.
 * `worker_launch_failed`: the supervisor could not be launched (operation error).
 * `worker_unavailable`: the Copilot executable is unavailable (terminal result).
 * `worker_lost`: ownership disappeared; terminal `interrupted`, never replayed.

@@ -296,12 +296,16 @@ def _open_file(path, flags=os.O_RDONLY, private=True):
         os.close(fd)
 
 
-def _read_json(path):
+def _read_json(path, managed_headers=False):
     with _open_file(path) as fd:
         if os.fstat(fd).st_size > _STATE_BYTES:
             _fail("state_corrupt", "A private JSON record exceeds its size bound.")
         raw = os.read(fd, _STATE_BYTES + 1)
     try:
+        if managed_headers:
+            raw = raw.decode("utf-8-sig")
+            while raw.lstrip().startswith("//"):
+                raw = raw.lstrip().partition("\n")[2]
         value = json.loads(raw)
     except (ValueError, UnicodeError):
         _fail("state_corrupt", "A private JSON record is invalid; it was not overwritten.")
@@ -441,6 +445,17 @@ class PortalTaskStore:
         _check_directories(self.staging)
         binary = _absolute(self.config.get("copilot_path"), "copilot_path").resolve(strict=False)
         self.binary = str(binary)
+        auth = self.config.get("auth", {"mode": "environment"})
+        if not isinstance(auth, dict) or set(auth) - {"mode", "source_config"}:
+            _fail("invalid_config", "auth accepts only mode and an optional OAuth metadata source_config.")
+        self.auth_mode = auth.get("mode")
+        if self.auth_mode not in {"environment", "copilot_oauth"}:
+            _fail("invalid_config", "auth.mode must be environment or copilot_oauth.")
+        self.auth_source = None
+        if self.auth_mode == "copilot_oauth":
+            self.auth_source = _absolute(auth.get("source_config"), "auth.source_config")
+        elif "source_config" in auth:
+            _fail("invalid_config", "source_config is only used by copilot_oauth mode.")
         self.authorized = self.config.get("authorized")
         if not isinstance(self.authorized, list):
             _fail("invalid_config", "authorized must explicitly list sender/chat bindings.")
@@ -462,6 +477,36 @@ class PortalTaskStore:
         if owner not in self.owners:
             _fail("forbidden", "This sender and chat are not authorized for portal tasks.")
         return owner
+
+    def _auth_metadata(self):
+        if self.auth_mode != "copilot_oauth":
+            return None
+        source = _read_json(self.auth_source, managed_headers=True)
+        selected = source.get("lastLoggedInUser")
+        known = source.get("loggedInUsers")
+        if not isinstance(selected, dict) or not isinstance(known, list):
+            _fail("auth_selector_missing", "The Copilot metadata source has no selected OAuth account. Sign in with the trusted Copilot CLI; do not supply a classic PAT.")
+        host, login = selected.get("host"), selected.get("login")
+        if (not isinstance(host, str)
+                or not re.fullmatch(r"https://(?:github\.com|[A-Za-z0-9-]+\.ghe\.com)", host)
+                or not isinstance(login, str)
+                or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", login)):
+            _fail("auth_selector_invalid", "OAuth account metadata must identify a supported HTTPS GitHub host and a bounded login.")
+        if not any(isinstance(item, dict) and item.get("host") == host and item.get("login") == login for item in known):
+            _fail("auth_selector_missing", "The selected Copilot account is not in its known OAuth account list.")
+        # These are the ONLY source fields that can leave this function.
+        # Tokens, permissions, hooks, plugins, URLs and all other settings are ignored.
+        return {"host": host, "login": login}
+
+    def _prepare_auth(self, directory, meta):
+        selected = self._auth_metadata()
+        if (None if selected is None else _digest(selected)) != meta["spec"].get("auth_selector_hash"):
+            _fail("approval_changed", "The selected Copilot OAuth account changed. Submit a new task for approval.")
+        if selected is not None:
+            _atomic_json(directory / "copilot-state" / "config.json", {
+                "lastLoggedInUser": selected,
+                "loggedInUsers": [selected],
+            })
 
     def _profile(self, name):
         name = _bounded_string(name, "profile", 64)
@@ -494,7 +539,10 @@ class PortalTaskStore:
             _check_directories(path)
             if not path.is_dir():
                 _fail("invalid_config", "An approved additional directory does not exist.")
-            for private in (self.root, self.staging, self.config_path):
+            private_paths = [self.root, self.staging, self.config_path]
+            if self.auth_source is not None:
+                private_paths.append(self.auth_source)
+            for private in private_paths:
                 if private == path or path in private.parents or private in path.parents:
                     _fail("invalid_config", "Additional directories must not expose task state, staging, or configuration.")
         return {"name": name, **result}
@@ -555,6 +603,7 @@ class PortalTaskStore:
         prompt = prompt.strip()
         request_id = _bounded_string(request.get("request_id"), "request_id", 128)
         profile = self._profile(request.get("profile"))
+        selected_auth = self._auth_metadata()
         attachments = request.get("attachments", [])
         outputs = request.get("artifact_paths", [])
         if not isinstance(attachments, list) or len(attachments) > 16:
@@ -624,6 +673,7 @@ class PortalTaskStore:
                     "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
                     "attachments": staged, "artifact_paths": outputs, "profile": profile,
                     "model": PORTAL_MODEL, "config_hash": self.config_hash,
+                    "auth_selector_hash": None if selected_auth is None else _digest(selected_auth),
                 }
                 now = time.time()
                 meta = {
@@ -658,6 +708,9 @@ class PortalTaskStore:
             _fail("approval_changed", "The task identity, owner, content, or approval lifetime changed.")
         if meta["spec_hash"] != _digest(meta["spec"]) or meta["spec"]["config_hash"] != self.config_hash:
             _fail("approval_changed", "Task or local permission policy changed. Submit a new task for approval.")
+        selected_auth = self._auth_metadata()
+        if (None if selected_auth is None else _digest(selected_auth)) != meta["spec"].get("auth_selector_hash"):
+            _fail("approval_changed", "The selected Copilot OAuth account changed. Submit a new task for approval.")
         with _open_file(directory / "task.txt") as fd:
             prompt = os.read(fd, 131073)
         if hashlib.sha256(prompt).hexdigest() != meta["spec"]["prompt_sha256"]:
@@ -891,14 +944,23 @@ class PortalTaskStore:
         argv.extend("--allow-url=" + url for url in profile["allow_urls"])
         return argv
 
-    @staticmethod
-    def _environment(directory):
+    def _environment(self, directory):
         allowed = {
             "PATH", "HOME", "USER", "LOGNAME", "LANG", "LC_ALL", "LC_CTYPE",
             "COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN", "GH_HOST", "COPILOT_GH_HOST",
             "SSL_CERT_FILE", "SSL_CERT_DIR", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY",
         }
         env = {key: value for key, value in os.environ.items() if key in allowed}
+        auth_vars = ("COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN")
+        if self.auth_mode == "copilot_oauth":
+            for key in (*auth_vars, "GH_HOST", "COPILOT_GH_HOST"):
+                env.pop(key, None)
+        else:
+            for key in auth_vars:
+                if env.get(key):
+                    if env[key].startswith("ghp_"):
+                        _fail("auth_unsupported", "Classic GitHub PATs are not supported by Copilot. Use the auth-only copilot_oauth selector or a supported OAuth credential.")
+                    break
         env.update(
             COPILOT_HOME=str(directory / "copilot-state"), COPILOT_ALLOW_ALL="false",
             COPILOT_AUTO_UPDATE="false", COPILOT_ASSISTED_APPROVAL="false",
@@ -975,6 +1037,7 @@ class PortalTaskStore:
                 prompt = self._verify_inputs(directory, meta)
                 if not Path(self.binary).is_file() or not os.access(self.binary, os.X_OK):
                     _fail("worker_unavailable", "The configured Copilot executable is unavailable. Repair it locally and submit a new task; permissions were not widened.")
+                self._prepare_auth(directory, meta)
                 meta.update(status="running", started_at=time.time(), pid=os.getpid(), worker_pid=os.getpid())
                 meta.pop("worker_token_hash", None)
                 self._event(meta, "started")
