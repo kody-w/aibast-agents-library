@@ -206,6 +206,7 @@ def test_same_event_is_idempotent_and_changed_payload_is_rejected(config):
     assert first["job"]["job_id"] == second["job"]["job_id"]
     assert first["approval"] == second["approval"]
     assert second["duplicate"]
+    assert second["job"]["request_id"] == "same-event"
     changed = submit(store, prompt="different", request_id="same-event")
     assert changed["error"]["code"] == "idempotency_conflict"
     assert len(request(store, "list")["jobs"]) == 1
@@ -378,6 +379,24 @@ def test_missing_cli_after_approval_is_failed_not_success(config):
     assert result["result"]["exit_code"] is None
     assert result["result"]["error"]["code"] == "worker_failed"
     assert "FileNotFoundError" in (directory / "worker.log").read_text()
+
+
+def test_results_and_failure_recovery_work_when_cli_or_staging_is_unavailable(config):
+    store = tasks.PortalTaskStore(config)
+    completed = submit(store)
+    assert approve(store, completed)["ok"]
+    wait_for(store, completed["job"]["job_id"])
+    pending = submit(store)
+    Path(store.binary).unlink()
+    store.staging.rmdir()
+    restarted = tasks.PortalTaskStore(config)
+    assert request(restarted, "result", job_id=completed["job"]["job_id"])["job"]["status"] == "succeeded"
+    assert approve(restarted, pending)["ok"]
+    failed = wait_for(restarted, pending["job"]["job_id"])
+    assert failed["job"]["status"] == "failed"
+    assert failed["result"]["error"]["code"] == "worker_unavailable"
+    assert failed["result"]["exit_code"] is None
+    assert approve(restarted, pending)["error"]["code"] == "approval_used"
 
 
 def test_worker_error_commits_terminal_state_before_releasing_lease(config, monkeypatch):
@@ -575,6 +594,7 @@ def test_only_predeclared_regular_artifacts_are_published(config):
     assert result["job"]["status"] == "succeeded"
     artifacts = result["result"]["artifacts"]
     assert len(artifacts) == 1 and artifacts[0]["name"] == "report.txt"
+    assert artifacts[0]["mime"] == "text/plain"
     artifact = Path(artifacts[0]["path"])
     assert artifact.parent == store.root / submission["job"]["job_id"] / "artifacts"
     assert artifact.name.startswith(submission["job"]["job_id"])
@@ -592,7 +612,8 @@ def test_bad_or_missing_declared_artifact_is_an_explicit_failure(config, prompt)
     assert approve(store, submission)["ok"]
     result = wait_for(store, submission["job"]["job_id"])
     assert result["job"]["status"] == "failed"
-    assert result["result"]["error"]["code"] == "artifact_rejected"
+    expected = "artifact_missing" if prompt == "success" else "artifact_rejected"
+    assert result["result"]["error"]["code"] == expected
     assert result["result"]["artifacts"] == []
     assert not any(event["type"] == "artifact" for event in result["events"])
 
@@ -614,6 +635,7 @@ def test_partial_artifact_batch_is_not_published(config):
     assert approve(store, submission)["ok"]
     result = wait_for(store, submission["job"]["job_id"])
     assert result["job"]["status"] == "failed"
+    assert result["result"]["error"]["code"] == "artifact_missing"
     assert not result["result"]["artifacts"]
     assert not any(event["type"] == "artifact" for event in result["events"])
     assert list((store.root / submission["job"]["job_id"] / "artifacts").iterdir()) == []

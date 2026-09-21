@@ -134,6 +134,8 @@ Operations:
 | `recover` | optional `job_id` | reconcile this thread's job(s); never rerun a task or signal a stored PID |
 
 `request_id` is a transport event/idempotency identifier, not a task instruction.
+It is preserved in the private metadata and returned in `job.request_id` for
+ingress reconciliation. `job.job_id` and `job.status` are stable field names.
 Concurrent identical submissions return the same job and still-live approval.
 Reusing it for different content is an explicit `idempotency_conflict`.
 `submit` is always inert. Its approval expires in 1–3600 seconds, according to
@@ -175,6 +177,8 @@ Only these files can be emitted. The worker never mines generated text for
 paths. Outputs undergo the same regular-file, confinement and size checks,
 then are copied to private `artifacts/` using unique job-prefixed basenames.
 Returned records include stable ID, path, name, byte count and SHA-256.
+They also include `mime` (filename-derived, or `application/octet-stream`);
+this is descriptive metadata, not a reason to skip transport validation.
 One missing/unsafe requested artifact makes the task fail explicitly; partial
 artifact batches are not published.
 
@@ -210,6 +214,32 @@ exit code and `execution_may_continue` when appropriate. No unsafe PID-based
 cleanup or automatic execution replay is attempted. A queued launch that loses
 its supervisor is reconciled after a 10-second startup allowance. Run `recover`
 on watcher restart and periodically while awaiting completions.
+
+The runtime has no implicit permission profile. Configure the existing
+transport's local default profile to a key in `profiles` (for example
+`read-only`), and configure its default `artifact_paths` list locally (`[]` is
+valid). Neither value should be selected by arbitrary remote message fields.
+`staging_root` is an independent absolute directory chosen by the transport,
+not a requirement to stage inside the job store. Task history remains readable
+if that staging directory or the Copilot executable is later unavailable.
+
+Useful error codes are:
+
+* `forbidden`: the verified sender/chat pair is not configured.
+* `not_found`: unknown task or a task belonging to another configured thread.
+* `approval_required`, `approval_expired`, `approval_used`, `approval_changed`:
+  missing/wrong token, finite expiry, consumed token, or changed bound inputs.
+* `policy_denied`: an unconfigured permission profile.
+* `worker_launch_failed`: the supervisor could not be launched (operation error).
+* `worker_unavailable`: the Copilot executable is unavailable (terminal result).
+* `worker_lost`: ownership disappeared; terminal `interrupted`, never replayed.
+* `cli_failed`, `timeout`, `output_limit`, `empty_result`: explicit CLI outcomes.
+* `artifact_missing`: a declared file was not created.
+* `artifact_rejected`: a declared file failed confinement/type/size validation.
+
+Operation errors have `{ok:false,error:{code,message}}`. Terminal task errors
+appear in `job.error` and `result.error`, even when querying the result itself
+returns `ok:true`.
 
 ## Hermetic validation
 

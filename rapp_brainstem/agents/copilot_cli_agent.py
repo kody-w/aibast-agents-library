@@ -169,6 +169,7 @@ except ImportError:
 import hashlib
 import hmac
 import math
+import mimetypes
 import re
 import secrets
 import signal
@@ -438,11 +439,7 @@ class PortalTaskStore:
         self.root = _absolute(self.config.get("jobs_dir", JOBS), "jobs_dir")
         self.staging = _absolute(self.config.get("staging_root"), "staging_root")
         _check_directories(self.staging)
-        if not self.staging.is_dir():
-            _fail("invalid_config", "Create the private inbound staging directory first.")
-        binary = _absolute(self.config.get("copilot_path"), "copilot_path").resolve(strict=True)
-        if not binary.is_file() or not os.access(binary, os.X_OK):
-            _fail("invalid_config", "copilot_path must name an installed executable.")
+        binary = _absolute(self.config.get("copilot_path"), "copilot_path").resolve(strict=False)
         self.binary = str(binary)
         self.authorized = self.config.get("authorized")
         if not isinstance(self.authorized, list):
@@ -533,7 +530,7 @@ class PortalTaskStore:
 
     @staticmethod
     def _public(meta):
-        keys = ("job_id", "status", "created_at", "updated_at", "started_at",
+        keys = ("job_id", "request_id", "status", "created_at", "updated_at", "started_at",
                 "finished_at", "exit_code", "error", "artifacts", "execution_may_continue")
         result = {key: meta[key] for key in keys if key in meta}
         result["model"] = PORTAL_MODEL
@@ -631,7 +628,7 @@ class PortalTaskStore:
                 now = time.time()
                 meta = {
                     "schema": PORTAL_SCHEMA, "job_id": job_id, "owner": owner,
-                    "request_key": request_key, "request_fingerprint": fingerprint,
+                    "request_id": request_id, "request_key": request_key, "request_fingerprint": fingerprint,
                     "task": prompt[:300], "created_at": now, "updated_at": now,
                     "status": "pending_approval", "pid": 0, "exit_code": None,
                     "spec": spec, "spec_hash": _digest(spec), "events": [], "artifacts": [],
@@ -939,8 +936,11 @@ class PortalTaskStore:
                 info = _copy_reference(directory / "workspace", relative, target,
                                        min(self.artifact_limit, self.total_limit - total))
                 total += info["size_bytes"]
-                artifacts.append({"id": f"{meta['job_id']}:artifact:{index}", "name": Path(relative).name,
-                                  "path": str(target), **info})
+                artifacts.append({
+                    "id": f"{meta['job_id']}:artifact:{index}", "name": Path(relative).name,
+                    "mime": mimetypes.guess_type(Path(relative).name)[0] or "application/octet-stream",
+                    "path": str(target), **info,
+                })
         except Exception:
             for artifact in artifacts:
                 Path(artifact["path"]).unlink(missing_ok=True)
@@ -973,6 +973,8 @@ class PortalTaskStore:
                 if time.time() >= meta["approval"]["expires_at"]:
                     _fail("approval_expired", "The approval expired before the worker could start.")
                 prompt = self._verify_inputs(directory, meta)
+                if not Path(self.binary).is_file() or not os.access(self.binary, os.X_OK):
+                    _fail("worker_unavailable", "The configured Copilot executable is unavailable. Repair it locally and submit a new task; permissions were not widened.")
                 meta.update(status="running", started_at=time.time(), pid=os.getpid(), worker_pid=os.getpid())
                 meta.pop("worker_token_hash", None)
                 self._event(meta, "started")
@@ -1027,6 +1029,8 @@ class PortalTaskStore:
                         artifacts = self._artifacts(directory, meta)
                         if not text and not artifacts:
                             status, error = "failed", {"code": "empty_result", "message": "Copilot returned neither a final response nor a declared artifact."}
+                    except FileNotFoundError:
+                        status, error = "failed", {"code": "artifact_missing", "message": "A declared output was not created. No partial artifact batch was published."}
                     except (PortalError, OSError):
                         status, error = "failed", {"code": "artifact_rejected", "message": "A declared artifact is missing, unsafe, changed, or oversized. No arbitrary generated path was followed."}
                 self._finish(directory, meta, status, code, error, text, artifacts)
