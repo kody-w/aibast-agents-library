@@ -180,6 +180,7 @@ def test_submit_is_inert_private_and_legacy_records_stay_unmodified(config):
     before = (legacy / "meta.json").read_bytes()
     result = submit(store)
     assert result["ok"] and result["job"]["status"] == "pending_approval"
+    assert result["job"]["artifact_paths"] == []
     job = store.root / result["job"]["job_id"]
     assert not (job / "workspace" / "starts.txt").exists()
     for path in [job, job / "inputs", job / "workspace", store.root]:
@@ -300,7 +301,7 @@ def test_expired_approval_never_starts_cli(config, monkeypatch):
     assert status["result"]["exit_code"] is None
 
 
-@pytest.mark.parametrize("mutation", ["prompt", "lifetime", "policy", "attachment"])
+@pytest.mark.parametrize("mutation", ["prompt", "lifetime", "policy", "attachment", "outputs"])
 def test_approval_binds_exact_inputs_lifetime_and_policy(config, mutation):
     store = tasks.PortalTaskStore(config)
     staged = store.staging / "note.txt"
@@ -315,6 +316,9 @@ def test_approval_binds_exact_inputs_lifetime_and_policy(config, mutation):
         save_json(directory / "meta.json", meta)
     elif mutation == "attachment":
         (directory / meta["spec"]["attachments"][0]["path"]).write_text("changed attachment")
+    elif mutation == "outputs":
+        meta["spec"]["artifact_paths"] = ["unapproved-output.txt"]
+        save_json(directory / "meta.json", meta)
     else:
         update_config(config, max_runtime_seconds=10)
         store = tasks.PortalTaskStore(config)
@@ -595,6 +599,7 @@ def test_unsafe_attachment_references_are_inert(config, tmp_path, kind):
 def test_only_predeclared_regular_artifacts_are_published(config):
     store = tasks.PortalTaskStore(config)
     submission = submit(store, prompt="artifact", artifact_paths=["report.txt"])
+    assert submission["job"]["artifact_paths"] == ["report.txt"]
     assert approve(store, submission)["ok"]
     result = wait_for(store, submission["job"]["job_id"])
     assert result["job"]["status"] == "succeeded"
@@ -608,6 +613,10 @@ def test_only_predeclared_regular_artifacts_are_published(config):
     assert stat.S_IMODE(artifact.stat().st_mode) == 0o600
     assert any(event["type"] == "artifact" for event in result["events"])
     assert "not-declared.txt" not in json.dumps(artifacts)
+    observed = json.loads((store.root / submission["job"]["job_id"] / "workspace" / "observed.json").read_text())
+    prompt = observed["argv"][observed["argv"].index("-p") + 1]
+    assert "exact approved filename relative to the current isolated workspace" in prompt
+    assert '"artifact_paths":["report.txt"]' in prompt
 
 
 @pytest.mark.parametrize("prompt", ["symlink-artifact", "hardlink-artifact", "executable-artifact", "large-artifact", "success"])
@@ -633,6 +642,14 @@ def test_generated_paths_are_never_followed_and_unsafe_declarations_rejected(con
     result = wait_for(store, submission["job"]["job_id"])
     assert result["job"]["status"] == "succeeded"
     assert result["result"]["artifacts"] == []
+
+
+@pytest.mark.parametrize("name", ["run.sh", "open.command", "install.pkg", "run.exe", "link.url"])
+def test_active_output_declarations_are_rejected_before_task_acceptance(config, name):
+    store = tasks.PortalTaskStore(config)
+    result = submit(store, artifact_paths=[name])
+    assert result["error"]["code"] == "unsafe_file"
+    assert request(store, "list")["jobs"] == []
 
 
 def test_partial_artifact_batch_is_not_published(config):

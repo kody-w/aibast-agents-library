@@ -229,6 +229,7 @@ an attachment was accepted.
 
 `artifact_paths` is an explicit list of at most 16 relative paths inside the
 job's `workspace/`, included in the approval. For example `["report.txt"]`.
+It is also returned as `job.artifact_paths` for the transport's approval preview.
 Only these files can be emitted. The worker never mines generated text for
 paths. Outputs undergo the same regular-file, confinement and size checks,
 then are copied to private `artifacts/` using unique job-prefixed basenames.
@@ -249,6 +250,35 @@ post-send window. A caption's GUID is not the attachment's delivery receipt.
 Keep unresolved sends `unknown`; never blindly resend. Native media processing
 may change byte counts or encoding, so the manifest hash attests the emitted
 pre-send file, not byte-identical delivery of the native attachment.
+
+### Explicit per-task output requests
+
+The existing transport, not this runtime, owns command parsing. The minimal
+command-room convention is:
+
+```text
+RAPP <task>                         → artifact_paths: []
+RAPP file report.txt | <task>       → artifact_paths: ["report.txt"]
+```
+
+The file command accepts one explicit safe basename from the user, not a path
+invented by a model. The transport checks its bounded basename and passive
+media/document extension allowlist, rejects absolute paths, traversal,
+executables, destinations and CLI/profile flags, and shows the filename in
+the task's normal one-use approval preview. There is no fixed mandatory report
+file for ordinary text tasks.
+
+The permission profile stays locally configured: declaring a filename does not
+grant new tools or paths. The worker is explicitly instructed to create every
+declared file at that exact name inside its current isolated workspace. A missing
+capability must be reported for a new, explicitly approved task under an already
+configured suitable profile; no automatic escalation or invented output path
+is allowed.
+
+Screenshots and short clips can be returned as attachments when explicitly
+requested, approved, and produced by actually available permitted tools.
+iMessage is not a continuous interactive desktop livestream, and accepting an
+output filename does not make a capture or media-generation tool available.
 
 ### Progress, recovery, and cancellation
 
