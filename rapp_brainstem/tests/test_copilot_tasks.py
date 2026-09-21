@@ -22,7 +22,7 @@ SAME_SENDER_OTHER_CHAT = {"sender": ACTOR["sender"], "chat": "synthetic-second-c
 SCRIPT = Path(tasks.__file__).resolve()
 
 FAKE_CLI = r'''
-import json, os, signal, sys, time
+import json, os, signal, subprocess, sys, time
 from pathlib import Path
 
 args = sys.argv[1:]
@@ -57,6 +57,18 @@ if mode in ("sleep", "stubborn"):
     if mode == "stubborn":
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
     print("waiting", flush=True)
+    time.sleep(30)
+if mode == "grandchild":
+    descendant = (
+        "import os,signal,time; from pathlib import Path; "
+        "signal.signal(signal.SIGTERM,signal.SIG_IGN); "
+        "Path('grandchild.pid').write_text(str(os.getpid())); time.sleep(8)"
+    )
+    subprocess.Popen([sys.executable, "-c", descendant], stdin=subprocess.DEVNULL,
+                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    while not Path("grandchild.pid").exists():
+        time.sleep(0.01)
+    print("grandchild ready", flush=True)
     time.sleep(30)
 if mode == "crash-worker":
     # This executable's direct parent is the test's dedicated worker, never a service.
@@ -192,6 +204,134 @@ def test_submit_is_inert_private_and_legacy_records_stay_unmodified(config):
     assert len(listed["jobs"]) == 1
     assert listed["jobs"][0]["job_id"] == result["job"]["job_id"]
     assert "approval" not in listed["jobs"][0]
+
+
+def test_full_id_legacy_0644_metadata_does_not_block_portal_operations(config):
+    store = tasks.PortalTaskStore(config)
+    committed = submit(store)
+    legacy = store.root / ("20260101-120000-" + "a" * 32)
+    legacy.mkdir()
+    path = legacy / "meta.json"
+    path.write_text('{"pid":0,"task":"synthetic legacy task","started":1}')
+    path.chmod(0o644)
+    original = path.read_bytes()
+    accepted = submit(store)
+    assert accepted["ok"]
+    expected = {committed["job"]["job_id"], accepted["job"]["job_id"]}
+    for operation in ("list", "recover"):
+        result = request(store, operation)
+        assert result["ok"] and result["errors"] == []
+        assert {job["job_id"] for job in result["jobs"]} == expected
+    assert path.read_bytes() == original
+    assert stat.S_IMODE(path.stat().st_mode) == 0o644
+
+
+def test_nonprivate_real_portal_record_is_not_accepted_as_legacy(config):
+    store = tasks.PortalTaskStore(config)
+    committed = submit(store)
+    path = store.root / committed["job"]["job_id"] / "meta.json"
+    path.chmod(0o644)
+    assert submit(store)["error"]["code"] == "unsafe_permissions"
+    assert request(store, "status", job_id=committed["job"]["job_id"])["error"]["code"] == "unsafe_permissions"
+    result = request(store, "list")
+    assert result["ok"] and result["jobs"] == [] and result["errors"]
+    assert stat.S_IMODE(path.stat().st_mode) == 0o644
+
+
+def test_incomplete_public_record_does_not_break_unrelated_history(config):
+    store = tasks.PortalTaskStore(config)
+    committed = submit(store)
+    incomplete = store.root / ("20260101-120000-" + "b" * 32)
+    incomplete.mkdir()
+    for operation in ("list", "recover"):
+        result = request(store, operation)
+        assert result["ok"]
+        assert [job["job_id"] for job in result["jobs"]] == [committed["job"]["job_id"]]
+        assert result["errors"]
+    assert submit(store)["ok"]
+
+
+def spawn_paused_initializer(config, marker, release, crash=False):
+    code = """
+import json, os, sys, time
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+from copilot_cli_agent import PortalTaskStore
+store = PortalTaskStore(sys.argv[2])
+original = store._save
+def pause(directory, meta):
+    Path(sys.argv[3]).write_text(directory.name)
+    if sys.argv[5] == 'crash':
+        os._exit(29)
+    deadline = time.monotonic() + 15
+    while not Path(sys.argv[4]).exists():
+        if time.monotonic() > deadline:
+            raise RuntimeError('synthetic test release was not signalled')
+        time.sleep(0.01)
+    original(directory, meta)
+store._save = pause
+print(json.dumps(store.handle({
+    'op':'submit', 'actor':json.loads(sys.argv[6]), 'request_id':'paused-init',
+    'prompt':'success', 'profile':'read-only'
+})))
+"""
+    return subprocess.Popen(
+        [sys.executable, "-B", "-c", code, str(SCRIPT.parent), str(config), str(marker),
+         str(release), "crash" if crash else "pause", json.dumps(ACTOR)],
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+    )
+
+
+def wait_for_file(path, timeout=5):
+    deadline = time.monotonic() + timeout
+    while not path.exists() and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert path.exists(), "synthetic initialization did not reach the expected checkpoint"
+
+
+def test_concurrent_enumeration_cannot_observe_unpublished_initialization(config, tmp_path):
+    store = tasks.PortalTaskStore(config)
+    committed = submit(store)
+    marker, release = tmp_path / "init-marker", tmp_path / "init-release"
+    child = spawn_paused_initializer(config, marker, release)
+    try:
+        wait_for_file(marker)
+        staging = marker.read_text()
+        assert staging.startswith(".initializing-")
+        assert not (store.root / staging / "meta.json").exists()
+        for _ in range(5):
+            for operation in ("list", "recover"):
+                result = request(store, operation)
+                assert result["ok"] and result["errors"] == []
+                assert [job["job_id"] for job in result["jobs"]] == [committed["job"]["job_id"]]
+        release.write_text("continue")
+        output, errors = child.communicate(timeout=5)
+        assert child.returncode == 0, errors
+        accepted = json.loads(output)
+        assert accepted["ok"]
+        assert not (store.root / staging).exists()
+        published = store.root / accepted["job"]["job_id"]
+        assert all((published / name).exists() for name in ("meta.json", "task.txt", "out.log", "stderr.log", "worker.log", "workspace"))
+    finally:
+        release.write_text("continue")
+        if child.returncode is None:
+            child.communicate(timeout=16)
+
+
+def test_real_interrupted_initialization_does_not_poison_history_or_retries(config, tmp_path):
+    store = tasks.PortalTaskStore(config)
+    committed = submit(store)
+    marker, release = tmp_path / "crash-marker", tmp_path / "unused-release"
+    child = spawn_paused_initializer(config, marker, release, crash=True)
+    child.communicate(timeout=5)
+    assert child.returncode == 29
+    assert marker.read_text().startswith(".initializing-")
+    for operation in ("list", "recover"):
+        result = request(store, operation)
+        assert result["ok"] and result["errors"] == []
+        assert [job["job_id"] for job in result["jobs"]] == [committed["job"]["job_id"]]
+    retried = submit(store, request_id="paused-init")
+    assert retried["ok"] and not retried["duplicate"]
 
 
 def test_concurrent_process_submissions_have_unique_ids(config):
@@ -446,6 +586,108 @@ def test_cancellation_is_supervised_and_never_signals_persisted_pids(config, pro
     assert request(store, "cancel", job_id=job_id)["already_terminal"]
 
 
+def same_group_member_exists(pid, group):
+    try:
+        return os.getpgid(pid) == group
+    except ProcessLookupError:
+        return False
+
+
+@pytest.mark.parametrize("operation", ["cancel", "timeout"])
+def test_owned_group_cleanup_kills_term_ignoring_grandchild(config, operation):
+    if operation == "timeout":
+        update_config(config, max_runtime_seconds=0.7)
+    store = tasks.PortalTaskStore(config)
+    submission = submit(store, prompt="grandchild")
+    job_id = submission["job"]["job_id"]
+    assert approve(store, submission)["ok"]
+    wait_for(store, job_id, lambda r: "grandchild ready" in r["stdout"]["text"])
+    grandchild = int((store.root / job_id / "workspace" / "grandchild.pid").read_text())
+    group = os.getpgid(grandchild)
+    started = time.monotonic()
+    try:
+        if operation == "cancel":
+            assert request(store, "cancel", job_id=job_id)["ok"]
+        result = wait_for(store, job_id)
+        assert result["job"]["status"] == ("cancelled" if operation == "cancel" else "failed")
+        assert result["result"]["error"]["code"] == ("cancelled" if operation == "cancel" else "timeout")
+        assert result["result"]["exit_code"] == -signal.SIGTERM
+        assert result["result"]["execution_may_continue"] is False
+        assert not same_group_member_exists(grandchild, group)
+        assert time.monotonic() - started < 6, "must kill, not merely await the child's 8-second safety exit"
+    finally:
+        request(store, "cancel", job_id=job_id)
+        # The harmless grandchild self-exits even if a future regression breaks
+        # cleanup. Never signal a PID after the tested leader has been reaped.
+        deadline = time.monotonic() + 10
+        while same_group_member_exists(grandchild, group) and time.monotonic() < deadline:
+            time.sleep(0.02)
+        assert not same_group_member_exists(grandchild, group), "test must leave no running descendant"
+
+
+def test_reaped_leader_is_never_used_to_signal_a_potentially_reused_group(monkeypatch):
+    child = type("ReapedChild", (), {"pid": os.getpid(), "returncode": 0})()
+    monkeypatch.setattr(tasks.os, "killpg", lambda *args: pytest.fail("a reaped leader cannot anchor a safe group signal"))
+    report = tasks.PortalTaskStore._stop_child(child)
+    assert report == {"exit_code": 0, "cleanup_confirmed": False}
+
+
+def test_group_ownership_is_rechecked_before_kill_escalation(monkeypatch):
+    child = type("OwnedChild", (), {"pid": os.getpid(), "returncode": None})()
+    checks = []
+    signals = []
+    def check_child(value):
+        checks.append(value.pid)
+        if len(checks) > 1:
+            raise tasks.PortalError("child_identity_lost", "synthetic unexpected reap")
+        return False
+    monkeypatch.setattr(tasks.PortalTaskStore, "_child_exited", staticmethod(check_child))
+    monkeypatch.setattr(tasks.os, "killpg", lambda pid, sig: signals.append((pid, sig)))
+    monkeypatch.setattr(tasks.time, "sleep", lambda _: None)
+    report = tasks.PortalTaskStore._stop_child(child)
+    assert signals == [(child.pid, signal.SIGTERM)]
+    assert not report["cleanup_confirmed"]
+
+
+def test_exited_leader_eperm_is_verified_after_reap_not_mistaken_for_live_work(monkeypatch):
+    child = subprocess.Popen(
+        [sys.executable, "-c", "pass"], start_new_session=True,
+        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    original = os.killpg
+    try:
+        while not tasks.PortalTaskStore._child_exited(child):
+            time.sleep(0.01)
+        def darwin_zombie_group(group, sig):
+            if sig == signal.SIGKILL:
+                raise PermissionError("synthetic Darwin zombie-only group")
+            return original(group, sig)
+        monkeypatch.setattr(tasks.os, "killpg", darwin_zombie_group)
+        report = tasks.PortalTaskStore._stop_child(child, graceful=False)
+        assert report == {"exit_code": 0, "cleanup_confirmed": True}
+    finally:
+        child.wait(timeout=2)
+
+
+def test_unconfirmed_cleanup_is_explicit_and_never_publishes_artifacts(config, monkeypatch):
+    store = tasks.PortalTaskStore(config)
+    submission = submit(store, prompt="artifact", artifact_paths=["report.txt"])
+    directory = store.root / submission["job"]["job_id"]
+    meta = tasks._read_json(directory / "meta.json")
+    token = "synthetic-worker-token"
+    meta["status"] = "queued"
+    meta["worker_token_hash"] = hashlib.sha256(token.encode()).hexdigest()
+    meta["approval"].update(token=None, consumed_at=time.time())
+    save_json(directory / "meta.json", meta)
+    monkeypatch.setattr(tasks.PortalTaskStore, "_group_exists", staticmethod(lambda group: True))
+    assert store.run_worker(directory.name, token) == 0
+    result = request(store, "result", job_id=directory.name)
+    assert result["job"]["status"] == "failed"
+    assert result["result"]["error"]["code"] == "process_cleanup_incomplete"
+    assert result["result"]["execution_may_continue"] is True
+    assert result["result"]["artifacts"] == []
+
+
 def test_pending_cancellation_and_unapproved_worker_stay_inert(config):
     store = tasks.PortalTaskStore(config)
     submission = submit(store)
@@ -494,7 +736,8 @@ def test_reused_or_stale_pid_is_not_liveness_and_is_never_killed(config, monkeyp
     assert request(store, "cancel", job_id=directory.name)["already_terminal"]
 
 
-def test_recovery_reconciles_result_committed_before_metadata(config):
+@pytest.mark.parametrize("uncertain", [False, True])
+def test_recovery_reconciles_result_committed_before_metadata(config, uncertain):
     store = tasks.PortalTaskStore(config)
     submission = submit(store)
     directory = store.root / submission["job"]["job_id"]
@@ -504,11 +747,14 @@ def test_recovery_reconciles_result_committed_before_metadata(config):
     save_json(directory / "meta.json", meta)
     save_json(directory / "result.json", {
         "schema": tasks.PORTAL_SCHEMA, "job_id": directory.name, "spec_hash": meta["spec_hash"],
-        "status": "succeeded", "exit_code": 0, "error": None, "response": "committed result",
+        "status": "failed" if uncertain else "succeeded", "exit_code": 0,
+        "error": {"code": "process_cleanup_incomplete", "message": "synthetic uncertain cleanup"} if uncertain else None,
+        "execution_may_continue": uncertain, "response": "committed result",
         "artifacts": [],
     })
     result = request(store, "result", job_id=directory.name)
-    assert result["job"]["status"] == "succeeded"
+    assert result["job"]["status"] == ("failed" if uncertain else "succeeded")
+    assert result["result"]["execution_may_continue"] == uncertain
     assert result["result"]["response"] == "committed result"
 
 
@@ -797,9 +1043,9 @@ def test_pinned_oauth_never_reads_parent_config_or_inherits_secrets_or_permissio
     original = source.read_bytes()
     monkeypatch.setenv("HOME", str(parent_home))
     read_json = tasks._read_json
-    def guarded_read(path):
+    def guarded_read(path, **kwargs):
         assert Path(path) != source, "must not read the parent Copilot configuration"
-        return read_json(path)
+        return read_json(path, **kwargs)
     monkeypatch.setattr(tasks, "_read_json", guarded_read)
     for key in ("COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"):
         monkeypatch.setenv(key, "ghp_SYNTHETIC_CLASSIC_MUST_NOT_PROPAGATE")

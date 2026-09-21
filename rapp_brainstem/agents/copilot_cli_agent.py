@@ -296,18 +296,24 @@ def _open_file(path, flags=os.O_RDONLY, private=True):
         os.close(fd)
 
 
-def _read_json(path):
-    with _open_file(path) as fd:
+def _read_json(path, portal_candidate=False):
+    with _open_file(path, private=not portal_candidate) as fd:
         if os.fstat(fd).st_size > _STATE_BYTES:
             _fail("state_corrupt", "A private JSON record exceeds its size bound.")
         raw = os.read(fd, _STATE_BYTES + 1)
-    try:
-        value = json.loads(raw)
-    except (ValueError, UnicodeError):
-        _fail("state_corrupt", "A private JSON record is invalid; it was not overwritten.")
-    if not isinstance(value, dict):
-        _fail("state_corrupt", "A private JSON record must be an object.")
-    return value
+        try:
+            value = json.loads(raw)
+        except (ValueError, UnicodeError):
+            _fail("state_corrupt", "A private JSON record is invalid; it was not overwritten.")
+        if not isinstance(value, dict):
+            _fail("state_corrupt", "A private JSON record must be an object.")
+        if portal_candidate:
+            if value.get("schema") != PORTAL_SCHEMA:
+                return None
+            # Classify bounded legacy JSON without accepting its permissions for
+            # a portal record. Check the SAME open descriptor before returning it.
+            _regular(os.fstat(fd), private=True)
+        return value
 
 
 def _atomic_bytes(path, content):
@@ -577,6 +583,12 @@ class PortalTaskStore:
         return sorted((p for p in self.root.iterdir() if _JOB_ID.fullmatch(p.name)
                        and p.is_dir() and not p.is_symlink()), reverse=True)
 
+    def _catalog_job(self, directory):
+        meta = _read_json(directory / "meta.json", portal_candidate=True)
+        if meta is not None and meta.get("job_id") != directory.name:
+            _fail("state_corrupt", "The task metadata identifier does not match its directory.")
+        return meta
+
     @staticmethod
     def _approval_binding(meta):
         return _digest({"job_id": meta["job_id"], "owner": meta["owner"],
@@ -610,17 +622,21 @@ class PortalTaskStore:
         request_key = _digest({"owner": owner, "request_id": request_id})
         with _locked(self.root / ".portal.lock"):
             for directory in self._directories():
-                if not (directory / "meta.json").exists():
+                try:
+                    meta = self._catalog_job(directory)
+                except FileNotFoundError:
+                    # Old interrupted initializations and concurrent removals
+                    # are not published idempotency records.
                     continue
-                meta = _read_json(directory / "meta.json")
-                if meta.get("schema") != PORTAL_SCHEMA:
+                if meta is None:
                     continue
                 if meta.get("request_key") == request_key:
                     if meta.get("request_fingerprint") != fingerprint:
                         _fail("idempotency_conflict", "This request_id already names a different task. Use a new verified event.")
                     return self._submitted(meta, duplicate=True)
             job_id = time.strftime("%Y%m%d-%H%M%S") + "-" + uuid.uuid4().hex
-            directory = self.root / job_id
+            published = self.root / job_id
+            directory = self.root / f".initializing-{job_id}"
             directory.mkdir(mode=0o700)
             try:
                 for name in ("inputs", "workspace", "artifacts", "copilot-state", "scratch"):
@@ -678,9 +694,18 @@ class PortalTaskStore:
                 for name in ("out.log", "stderr.log", "worker.log"):
                     _atomic_bytes(directory / name, b"")
                 self._save(directory, meta)
+                if published.exists() or published.is_symlink():
+                    _fail("job_id_conflict", "The generated job identifier already exists; retry with the same event.")
+                os.rename(directory, published)
+                root_fd = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                try:
+                    os.fsync(root_fd)
+                finally:
+                    os.close(root_fd)
                 return self._submitted(meta)
             except Exception:
-                shutil.rmtree(directory)
+                if directory.exists():
+                    shutil.rmtree(directory)
                 raise
 
     def _submitted(self, meta, duplicate=False):
@@ -716,6 +741,7 @@ class PortalTaskStore:
         result = {"schema": PORTAL_SCHEMA, "job_id": meta["job_id"], "spec_hash": meta["spec_hash"],
                   "status": status, "exit_code": exit_code, "error": error,
                   "response": response[-65536:], "response_truncated": len(response) > 65536 or bool(meta.get("output_truncated")),
+                  "execution_may_continue": bool(meta.get("execution_may_continue")),
                   "artifacts": meta["artifacts"], "finished_at": meta["finished_at"]}
         _atomic_json(directory / "result.json", result)
         self._event(meta, "completed", status=status, exit_code=exit_code)
@@ -777,6 +803,10 @@ class PortalTaskStore:
                     if (result.get("schema") != PORTAL_SCHEMA or result.get("job_id") != meta["job_id"]
                             or result.get("spec_hash") != meta["spec_hash"] or result.get("status") not in _TERMINAL):
                         _fail("state_corrupt", "The committed result does not match the task.")
+                    meta["execution_may_continue"] = bool(result.get(
+                        "execution_may_continue",
+                        result["status"] == "interrupted" and meta.get("started_at"),
+                    ))
                     self._finish(directory, meta, result["status"], result.get("exit_code"),
                                  result.get("error"), result.get("response", ""), result.get("artifacts"))
                 else:
@@ -872,8 +902,8 @@ class PortalTaskStore:
                 if before is not None and directory.name >= before:
                     continue
                 try:
-                    meta = _read_json(directory / "meta.json")
-                    if meta.get("schema") != PORTAL_SCHEMA:
+                    meta = self._catalog_job(directory)
+                    if meta is None:
                         continue
                     if meta.get("owner") != owner:
                         continue
@@ -881,7 +911,7 @@ class PortalTaskStore:
                     recovered_count += 1
                     if len(jobs) < limit:
                         jobs.append(self._public(meta))
-                except PortalError:
+                except (PortalError, OSError, ValueError, TypeError, KeyError):
                     errors.append({"code": "unreadable_job", "message": "A portal record requires local repair."})
                 if len(jobs) >= limit and operation == "list":
                     break
@@ -961,23 +991,66 @@ class PortalTaskStore:
         return env
 
     @staticmethod
-    def _stop_child(child):
-        # Only the supervising parent signals its own unreaped Popen child.
-        # A remote cancel/recover operation never signals a persisted PID.
-        if child.poll() is not None:
-            return child.returncode
+    def _child_exited(child):
+        if child.returncode is not None:
+            _fail("child_identity_lost", "The child was reaped before process-group cleanup; no group signal is safe.")
         try:
-            os.killpg(child.pid, signal.SIGTERM)
+            event = os.waitid(os.P_PID, child.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT)
+            return event is not None and event.si_pid == child.pid
+        except ChildProcessError:
+            _fail("child_identity_lost", "The child identity is no longer owned; no stored PID will be signalled.")
+
+    @staticmethod
+    def _group_exists(group):
+        try:
+            os.killpg(group, 0)
+            return True
         except ProcessLookupError:
-            pass
+            return False
+        except PermissionError:
+            return True
+
+    @classmethod
+    def _stop_child(cls, child, graceful=True):
+        cached = getattr(child, "_portal_cleanup", None)
+        if cached is not None:
+            return cached
+        report = {"exit_code": child.returncode, "cleanup_confirmed": False}
         try:
-            return child.wait(timeout=2)
-        except subprocess.TimeoutExpired:
+            # WNOWAIT preserves the leader's PID, even after it exits, until all
+            # group signals are finished. poll()/wait() here would permit reuse.
+            cls._child_exited(child)
+            if graceful:
+                try:
+                    os.killpg(child.pid, signal.SIGTERM)
+                except OSError:
+                    pass
+                time.sleep(2)
+            cls._child_exited(child)
             try:
                 os.killpg(child.pid, signal.SIGKILL)
-            except ProcessLookupError:
+            except OSError:
+                # Darwin returns EPERM for a group containing only an exited,
+                # unreaped leader. Reap only after all signals, then verify the
+                # group vanished; a genuinely surviving group stays uncertain.
                 pass
-            return child.wait(timeout=5)
+            deadline = time.monotonic() + 5
+            while not cls._child_exited(child):
+                if time.monotonic() >= deadline:
+                    child._portal_cleanup = report
+                    return report
+                time.sleep(0.02)
+            report["exit_code"] = child.wait()
+            # No destructive signals after reaping. A lingering or reused group
+            # remains explicitly unconfirmed, never a target for another kill.
+            deadline = time.monotonic() + 2
+            while cls._group_exists(child.pid) and time.monotonic() < deadline:
+                time.sleep(0.02)
+            report["cleanup_confirmed"] = not cls._group_exists(child.pid)
+        except (PortalError, OSError):
+            pass
+        child._portal_cleanup = report
+        return report
 
     def _artifacts(self, directory, meta):
         artifacts = []
@@ -1012,6 +1085,7 @@ class PortalTaskStore:
 
     def _run_owned_worker(self, directory, worker_token):
         child = None
+        cleanup = None
         claimed = False
         try:
             with _locked(directory / ".lock"):
@@ -1025,6 +1099,10 @@ class PortalTaskStore:
                     _fail("authorization_revoked", "The authorized sender/chat binding was removed before execution.")
                 if time.time() >= meta["approval"]["expires_at"]:
                     _fail("approval_expired", "The approval expired before the worker could start.")
+                if not all(hasattr(os, name) for name in ("waitid", "P_PID", "WEXITED", "WNOHANG", "WNOWAIT")):
+                    _fail("unsupported_platform", "Safe worker cleanup requires non-reaping POSIX waitid support.")
+                if signal.getsignal(signal.SIGCHLD) != signal.SIG_DFL:
+                    _fail("unsupported_process_policy", "The dedicated worker must retain waitable children with the default SIGCHLD policy.")
                 prompt = self._verify_inputs(directory, meta)
                 if not Path(self.binary).is_file() or not os.access(self.binary, os.X_OK):
                     _fail("worker_unavailable", "The configured Copilot executable is unavailable. Repair it locally and submit a new task; permissions were not widened.")
@@ -1046,7 +1124,7 @@ class PortalTaskStore:
                 self._save(directory, current)
             deadline = time.monotonic() + self.runtime
             reason = None
-            while child.poll() is None:
+            while not self._child_exited(child):
                 with _locked(directory / ".lock"):
                     current = self._read_job(directory)
                 if current["status"] == "cancelling":
@@ -1056,12 +1134,15 @@ class PortalTaskStore:
                 elif sum((directory / name).stat().st_size for name in ("out.log", "stderr.log")) > self.output_limit:
                     reason = ("failed", "output_limit", "CLI output exceeded the configured byte bound.")
                 if reason:
-                    self._stop_child(child)
+                    cleanup = self._stop_child(child)
                     break
                 time.sleep(0.1)
-            code = child.wait()
+            if cleanup is None:
+                cleanup = self._stop_child(child, graceful=False)
+            code = cleanup["exit_code"]
             with _locked(directory / ".lock"):
                 meta = self._read_job(directory)
+                meta["execution_may_continue"] = not cleanup["cleanup_confirmed"]
                 with _open_file(directory / "out.log") as fd:
                     size = os.fstat(fd).st_size
                     os.lseek(fd, max(0, size - 262144), os.SEEK_SET)
@@ -1071,7 +1152,12 @@ class PortalTaskStore:
                 artifacts = []
                 if meta["status"] == "cancelling" and not reason:
                     reason = ("cancelled", "cancelled", "Cancellation was requested before completion was committed.")
-                if reason:
+                if not cleanup["cleanup_confirmed"]:
+                    status, error = "failed", {
+                        "code": "process_cleanup_incomplete",
+                        "message": "Owned process-group cleanup could not be confirmed. Execution may continue; no reused PID was signalled. Inspect locally before retrying.",
+                    }
+                elif reason:
                     status, error_code, message = reason
                     error = {"code": error_code, "message": message}
                 elif code != 0:
@@ -1091,7 +1177,7 @@ class PortalTaskStore:
             return 0
         except Exception as error:
             if child is not None:
-                self._stop_child(child)
+                cleanup = self._stop_child(child)
             if claimed:
                 with _open_file(directory / "worker.log", os.O_WRONLY | os.O_APPEND) as output:
                     os.write(output, (f"{type(error).__name__}: {error}\n")[:2000].encode("utf-8", "replace"))
@@ -1099,11 +1185,16 @@ class PortalTaskStore:
                 with _locked(directory / ".lock"):
                     meta = self._read_job(directory)
                     if meta["status"] not in _TERMINAL:
+                        if cleanup is not None:
+                            meta["execution_may_continue"] = not cleanup["cleanup_confirmed"]
                         status = "expired" if isinstance(error, PortalError) and error.code == "approval_expired" else "failed"
-                        self._finish(directory, meta, status, child.returncode if child else None, {
+                        failure = {
                             "code": error.code if isinstance(error, PortalError) else "worker_failed",
                             "message": str(error) if isinstance(error, PortalError) else "The worker or CLI could not complete. Inspect worker.log locally.",
-                        })
+                        }
+                        if cleanup is not None and not cleanup["cleanup_confirmed"]:
+                            failure = {"code": "process_cleanup_incomplete", "message": "Owned process-group cleanup could not be confirmed; execution may continue. Inspect locally before retrying."}
+                        self._finish(directory, meta, status, cleanup["exit_code"] if cleanup else None, failure)
             return 1
 
 
@@ -1115,6 +1206,8 @@ def _portal_main(argv=None):
     try:
         if arguments.worker:
             os.umask(0o077)
+            if hasattr(signal, "SIGCHLD"):
+                signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         store = PortalTaskStore(arguments.portal_config)
         if arguments.worker:
             return store.run_worker(arguments.worker, os.environ.pop("RAPP_COPILOT_WORKER_TOKEN", ""))

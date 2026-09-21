@@ -13,6 +13,10 @@
 The adapter reuses `~/.brainstem/copilot_jobs`. Old jobs are left unchanged and are
 not remotely enumerable: without a recorded owner/thread binding, ownership
 cannot safely be inferred.
+Catalog scans may inspect bounded current-user regular legacy JSON to identify
+its schema, including old mode-0644 metadata. Such nonportal records are skipped
+without rewriting them. Actual portal metadata must still be private mode-0600;
+a record is never treated as legacy merely to bypass that validation.
 
 ## Authority and deployment
 
@@ -290,6 +294,12 @@ Logs remain `out.log` and `stderr.log`; supervisor diagnostics are `worker.log`.
 Process-safe `flock` locks serialize mutations. A held `.worker.lock`, not PID
 existence, establishes worker ownership. Each JSON invocation can exit while
 the separately supervised worker continues.
+New jobs are fully initialized under a private `.initializing-<job_id>` name
+before atomic directory publication. Catalogs ignore that uncommitted namespace.
+A killed initializer can leave a private uncommitted directory for local
+inspection/cleanup, but cannot expose a half-created task or poison other
+history. Older incomplete or unreadable records are handled individually during
+list/recovery rather than making every thread's history unavailable.
 
 Progress cursors count **bytes**; event cursors count sequence numbers. Stable
 event IDs are `<job_id>:<sequence>`. Feed these to the transport's existing
@@ -299,9 +309,20 @@ full bounded/retained logs can be paged. CLI output exceeding its configured
 bound fails the task; retained diagnostic files may exceed the threshold by
 the final in-flight write before the worker stops it.
 
-Cancellation is a durable request. Only the supervising worker signals its own
-unreaped child process group; remote operations never kill persisted PIDs.
-Cancellation is not rollback of effects already performed. A missing worker
+Cancellation is a durable request. Only the dedicated supervising worker
+signals its owned CLI child process group; remote operations never kill persisted PIDs.
+The worker retains the leader's identity using `waitid(..., WNOWAIT)` and the
+default `SIGCHLD` policy. It does not reap the leader when TERM makes it exit:
+after a bounded grace period it still escalates KILL to TERM-ignoring members
+of the same owned group, and only then reaps the leader. A normally exited CLI
+also has leftover owned-group members stopped before committing its result.
+After reaping, the worker only probes for group disappearance; it never sends
+another destructive signal to a possibly reused group.
+
+If cleanup cannot be established, the task is an explicit failed
+`process_cleanup_incomplete`, `execution_may_continue` is true, and no artifact
+batch is published. Neither cancellation nor confirmed group cleanup rolls
+back earlier effects or constitutes a full-machine sandbox. A missing worker
 is reconciled from a committed result or marked `interrupted`, with unknown
 exit code and `execution_may_continue` when appropriate. No unsafe PID-based
 cleanup or automatic execution replay is attempted. A queued launch that loses
@@ -328,6 +349,8 @@ Useful error codes are:
 * `worker_launch_failed`: the supervisor could not be launched (operation error).
 * `worker_unavailable`: the Copilot executable is unavailable (terminal result).
 * `worker_lost`: ownership disappeared; terminal `interrupted`, never replayed.
+* `process_cleanup_incomplete`: owned-group cleanup is unconfirmed; execution
+  may continue and requires local inspection rather than an automatic retry.
 * `cli_failed`, `timeout`, `output_limit`, `empty_result`: explicit CLI outcomes.
 * `artifact_missing`: a declared file was not created.
 * `artifact_rejected`: a declared file failed confinement/type/size validation.
