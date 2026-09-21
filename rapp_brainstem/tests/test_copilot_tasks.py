@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import signal
 import stat
 import subprocess
@@ -158,9 +159,9 @@ def wait_for(store, job_id, predicate=None, timeout=10):
     pytest.fail(f"worker did not reach expected state: {last}")
 
 
-def invoke(config, body):
+def invoke(config, body, interpreter=None):
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), "--portal-config", str(config)],
+        [interpreter or sys.executable, str(SCRIPT), "--portal-config", str(config)],
         input=json.dumps(body), capture_output=True, text=True, timeout=10,
         env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
     )
@@ -667,6 +668,77 @@ def test_exited_leader_eperm_is_verified_after_reap_not_mistaken_for_live_work(m
         assert report == {"exit_code": 0, "cleanup_confirmed": True}
     finally:
         child.wait(timeout=2)
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="public Darwin waitid ABI fallback")
+def test_darwin_native_wait_fallback_preserves_the_unreaped_leader(monkeypatch):
+    monkeypatch.delattr(tasks.os, "waitid", raising=False)
+    assert tasks._require_nonreaping_wait() is False
+    child = subprocess.Popen(
+        [sys.executable, "-c", "import time; time.sleep(0.05)"],
+        start_new_session=True, stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    try:
+        deadline = time.monotonic() + 3
+        while not tasks.PortalTaskStore._child_exited(child) and time.monotonic() < deadline:
+            time.sleep(0.01)
+        for _ in range(3):
+            assert tasks.PortalTaskStore._child_exited(child)
+            assert child.returncode is None
+        report = tasks.PortalTaskStore._stop_child(child, graceful=False)
+        assert report == {"exit_code": 0, "cleanup_confirmed": True}
+    finally:
+        child.wait(timeout=3)
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="public Darwin waitid ABI fallback")
+def test_darwin_native_wait_fallback_refuses_a_nonchild_pid(monkeypatch):
+    monkeypatch.delattr(tasks.os, "waitid", raising=False)
+    child = type("NotAnOwnedChild", (), {"pid": os.getpid(), "returncode": None})()
+    monkeypatch.setattr(tasks.os, "killpg", lambda *args: pytest.fail("a nonchild PID must never be signalled"))
+    report = tasks.PortalTaskStore._stop_child(child)
+    assert report == {"exit_code": None, "cleanup_confirmed": False}
+
+
+@pytest.mark.skipif(shutil.which("python3.12") is None, reason="optional actual Python 3.12 CLI compatibility")
+def test_actual_python312_adapter_artifact_and_group_cleanup(config):
+    interpreter = shutil.which("python3.12")
+    settings = json.loads(config.read_text())
+    Path(settings["copilot_path"]).write_text(f"#!{interpreter}\n" + FAKE_CLI)
+    def call(operation, **fields):
+        process, reply = invoke(config, {"op": operation, "actor": ACTOR, **fields}, interpreter=interpreter)
+        assert process.returncode == 0 and reply["ok"], (process.stderr, reply)
+        return reply
+    def accepted(prompt, event, paths=None):
+        submitted = call("submit", request_id=event, prompt=prompt, profile="read-only",
+                         artifact_paths=paths or [])
+        job_id = submitted["job"]["job_id"]
+        call("approve", job_id=job_id, approval_token=submitted["approval"]["token"])
+        return job_id
+    store = tasks.PortalTaskStore(config)
+    completed_id = accepted("artifact", "python312-artifact", ["report.txt"])
+    artifact_result = wait_for(store, completed_id)
+    assert artifact_result["job"]["status"] == "succeeded"
+    assert artifact_result["result"]["artifacts"][0]["name"] == "report.txt"
+    confirmed = call("result", job_id=completed_id)
+    assert confirmed["result"]["execution_may_continue"] is False
+    cancelled_id = accepted("grandchild", "python312-cancel")
+    wait_for(store, cancelled_id, lambda r: "grandchild ready" in r["stdout"]["text"])
+    grandchild = int((store.root / cancelled_id / "workspace" / "grandchild.pid").read_text())
+    group = os.getpgid(grandchild)
+    try:
+        call("cancel", job_id=cancelled_id)
+        result = wait_for(store, cancelled_id)
+        assert result["job"]["status"] == "cancelled"
+        assert result["result"]["execution_may_continue"] is False
+        assert not same_group_member_exists(grandchild, group)
+    finally:
+        request(store, "cancel", job_id=cancelled_id)
+        deadline = time.monotonic() + 10
+        while same_group_member_exists(grandchild, group) and time.monotonic() < deadline:
+            time.sleep(0.02)
+        assert not same_group_member_exists(grandchild, group)
 
 
 def test_unconfirmed_cleanup_is_explicit_and_never_publishes_artifacts(config, monkeypatch):

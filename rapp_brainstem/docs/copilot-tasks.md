@@ -312,7 +312,13 @@ the final in-flight write before the worker stops it.
 Cancellation is a durable request. Only the dedicated supervising worker
 signals its owned CLI child process group; remote operations never kill persisted PIDs.
 The worker retains the leader's identity using `waitid(..., WNOWAIT)` and the
-default `SIGCHLD` policy. It does not reap the leader when TERM makes it exit:
+default `SIGCHLD` policy. Some macOS Python builds (including Homebrew 3.12)
+omit the Python `os.waitid` wrapper despite the OS supporting it. On 64-bit
+Darwin, the adapter then binds the public libSystem `waitid` API using the
+documented `siginfo_t` layout and the same non-reaping flags. No SDK installation,
+helper daemon, PID-existence approximation, or early reaping is used. Unsupported
+ABIs fail closed before launching the CLI.
+It does not reap the leader when TERM makes it exit:
 after a bounded grace period it still escalates KILL to TERM-ignoring members
 of the same owned group, and only then reaps the leader. A normally exited CLI
 also has leftover owned-group members stopped before committing its result.

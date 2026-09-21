@@ -162,6 +162,7 @@ class CopilotCLIAgent(BasicAgent):
 import argparse
 import codecs
 import contextlib
+import errno
 try:
     import fcntl
 except ImportError:
@@ -192,6 +193,7 @@ _EXECUTABLE_MAGIC = (
     b"\x7fELF", b"MZ", b"#!", b"\xfe\xed\xfa\xce", b"\xce\xfa\xed\xfe",
     b"\xfe\xed\xfa\xcf", b"\xcf\xfa\xed\xfe", b"\xca\xfe\xba\xbe",
 )
+_DARWIN_WAITID = None
 
 
 class PortalError(Exception):
@@ -251,6 +253,66 @@ def _integer(value, name, minimum, maximum):
     if isinstance(value, bool) or not isinstance(value, int) or not minimum <= value <= maximum:
         _fail("invalid_request", f"{name} must be an integer between {minimum} and {maximum}.")
     return value
+
+
+def _darwin_waitid():
+    global _DARWIN_WAITID
+    if _DARWIN_WAITID is not None:
+        return _DARWIN_WAITID
+    if sys.platform != "darwin":
+        _fail("unsupported_platform", "Safe cleanup requires a non-reaping waitid implementation.")
+    import ctypes
+
+    class _Sigval(ctypes.Union):
+        _fields_ = [("integer", ctypes.c_int), ("pointer", ctypes.c_void_p)]
+
+    class _Siginfo(ctypes.Structure):
+        # Public 64-bit Darwin siginfo_t ABI from sys/signal.h.
+        _fields_ = [
+            ("si_signo", ctypes.c_int), ("si_errno", ctypes.c_int), ("si_code", ctypes.c_int),
+            ("si_pid", ctypes.c_int32), ("si_uid", ctypes.c_uint32), ("si_status", ctypes.c_int),
+            ("si_addr", ctypes.c_void_p), ("si_value", _Sigval), ("si_band", ctypes.c_long),
+            ("reserved", ctypes.c_ulong * 7),
+        ]
+
+    if ctypes.sizeof(ctypes.c_void_p) != 8 or ctypes.sizeof(_Siginfo) != 104 or _Siginfo.si_pid.offset != 12:
+        _fail("unsupported_platform", "The native non-reaping wait ABI is not supported on this platform.")
+    library = ctypes.CDLL(None, use_errno=True)
+    try:
+        native = library.waitid
+    except AttributeError:
+        _fail("unsupported_platform", "The public native waitid function is unavailable.")
+    native.argtypes = [ctypes.c_int, ctypes.c_uint32, ctypes.POINTER(_Siginfo), ctypes.c_int]
+    native.restype = ctypes.c_int
+    _DARWIN_WAITID = (native, _Siginfo)
+    return _DARWIN_WAITID
+
+
+def _require_nonreaping_wait():
+    if callable(getattr(os, "waitid", None)) and all(
+        hasattr(os, name) for name in ("P_PID", "WEXITED", "WNOHANG", "WNOWAIT")
+    ):
+        return True
+    _darwin_waitid()
+    return False
+
+
+def _wait_child_exited(pid):
+    if _require_nonreaping_wait():
+        event = os.waitid(os.P_PID, pid, os.WEXITED | os.WNOHANG | os.WNOWAIT)
+        return event is not None and event.si_pid == pid
+    import ctypes
+    native, info_type = _darwin_waitid()
+    info = info_type()
+    # Public Darwin sys/wait.h: P_PID=1, WEXITED=4, WNOHANG=1, WNOWAIT=32.
+    while native(1, pid, ctypes.byref(info), 4 | 1 | 32) != 0:
+        code = ctypes.get_errno()
+        if code == errno.EINTR:
+            continue
+        if code == errno.ECHILD:
+            raise ChildProcessError(code, "The owned child is no longer waitable.")
+        raise OSError(code, "Native non-reaping wait failed for the owned child.")
+    return info.si_pid == pid
 
 
 def _absolute(value, name):
@@ -995,8 +1057,7 @@ class PortalTaskStore:
         if child.returncode is not None:
             _fail("child_identity_lost", "The child was reaped before process-group cleanup; no group signal is safe.")
         try:
-            event = os.waitid(os.P_PID, child.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT)
-            return event is not None and event.si_pid == child.pid
+            return _wait_child_exited(child.pid)
         except ChildProcessError:
             _fail("child_identity_lost", "The child identity is no longer owned; no stored PID will be signalled.")
 
@@ -1099,8 +1160,7 @@ class PortalTaskStore:
                     _fail("authorization_revoked", "The authorized sender/chat binding was removed before execution.")
                 if time.time() >= meta["approval"]["expires_at"]:
                     _fail("approval_expired", "The approval expired before the worker could start.")
-                if not all(hasattr(os, name) for name in ("waitid", "P_PID", "WEXITED", "WNOHANG", "WNOWAIT")):
-                    _fail("unsupported_platform", "Safe worker cleanup requires non-reaping POSIX waitid support.")
+                _require_nonreaping_wait()
                 if signal.getsignal(signal.SIGCHLD) != signal.SIG_DFL:
                     _fail("unsupported_process_policy", "The dedicated worker must retain waitable children with the default SIGCHLD policy.")
                 prompt = self._verify_inputs(directory, meta)
