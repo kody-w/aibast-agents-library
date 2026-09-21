@@ -170,6 +170,12 @@ Missing/incomplete files are errors for the transport to stage/retry before
 submission. Symlinks (including parent components), traversal, hardlinks,
 executable modes/content, and active executable/installer/link types are refused.
 No media conversion, automatic extraction, or interpretation occurs.
+Photo, audio and video **file transport is not content understanding**. Audio is
+not automatically transcribed; video is not automatically decoded, summarized,
+or streamed continuously. Any transcription, frame extraction, or media analysis
+needs an actually available tool, an explicitly approved capability profile,
+and a separate verified result. Do not advertise those abilities merely because
+an attachment was accepted.
 
 `artifact_paths` is an explicit list of at most 16 relative paths inside the
 job's `workspace/`, included in the approval. For example `["report.txt"]`.
@@ -186,6 +192,13 @@ The transport must verify the record/hash before sending, bind the send to the
 original approved chat, and maintain its own existing durable delivery/outbox
 state. Adapter artifact existence is not proof of native submission, delivered
 status, or actual receipt/opening on a phone.
+Native transports can report an exception after accepting an attachment that
+subsequently delivers. Reconcile after exceptions as well as successful calls,
+using the authorized chat, unique artifact basename/part identity, and bounded
+post-send window. A caption's GUID is not the attachment's delivery receipt.
+Keep unresolved sends `unknown`; never blindly resend. Native media processing
+may change byte counts or encoding, so the manifest hash attests the emitted
+pre-send file, not byte-identical delivery of the native attachment.
 
 ### Progress, recovery, and cancellation
 
