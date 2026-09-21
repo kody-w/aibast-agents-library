@@ -48,6 +48,11 @@ If `gh` is not installed, the web UI at `localhost:7071` walks you through GitHu
 
 ## API Reference
 
+For disconnect-safe execution through an existing trusted local transport, see
+the optional [private Copilot task adapter](docs/copilot-tasks.md). It provides
+thread-bound approval, durable jobs, progress and declared artifacts without
+changing the chat wire or starting another channel listener.
+
 ### `POST /chat`
 
 The main conversation endpoint. Sends user input through the LLM with tool-calling support. Up to 3 rounds of agent calls per request.
