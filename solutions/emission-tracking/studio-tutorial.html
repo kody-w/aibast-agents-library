@@ -1005,17 +1005,18 @@ html[data-theme="dark"] {
           <p>Step 7 of 24</p></div>
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 7: Paste the studio instructions"
-            data-report-expected="The instructions start with Emissions Tracking Agent — Studio Global Instructions and name the three list tools."
+            data-report-expected="The instructions start with Emissions Tracking Agent — Studio Global Instructions, name the three list tools, and end with your site&#x27;s address."
             data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/07-instructions.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Copy the whole instructions file and paste it into Instructions, replacing anything there.</p></div>
-            <div class="instruction expected"><strong>Expected result</strong><p>The instructions start with Emissions Tracking Agent — Studio Global Instructions and name the three list tools.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site&#x27;s address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.</p></div>
+            <div class="instruction expected"><strong>Expected result</strong><p>The instructions start with Emissions Tracking Agent — Studio Global Instructions, name the three list tools, and end with your site&#x27;s address.</p></div>
           </div>
           
           
           
           <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/07-instructions.webp" download="07-instructions.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/07-instructions.webp" srcset="screenshots/studio-manual/07-instructions.webp 2x" width="1432" height="882" alt="The studio instructions pasted into Instructions: Emissions Tracking Agent — Studio Global Instructions, naming the Get facility records, Get carbon offset records and Get regulation records tools and their list columns." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Emissions Tracking Agent — Studio Global Instructions; Get facility records; Get carbon offset records; Get regulation records; List columns. Captured <time datetime="2026-09-27T00:34:58Z">2026-09-27T00:34:58Z</time>. <a href="screenshots/studio-manual/07-instructions.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
+<figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/07b-site-address.webp" download="07b-site-address.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/07b-site-address.webp" srcset="screenshots/studio-manual/07b-site-address.webp 2x" width="1432" height="882" alt="The end of the saved instructions: a SharePoint site section naming the workshop site, with the tenant name masked, and telling the agent to pass the site address and list title on every list tool call." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: SharePoint site; https://&lt;your-tenant&gt;.sharepoint.com/sites/AIBASTSyntheticDataManual; Site Address (dataset); List Name (table). Captured <time datetime="2026-09-27T02:20:04Z">2026-09-27T02:20:04Z</time>. <a href="screenshots/studio-manual/07b-site-address.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download source: GLOBAL-INSTRUCTIONS.md</a></div>
             <label for="manual-07-complete"><input class="complete" type="checkbox"
               id="manual-07-complete" data-step="manual-07" data-mode="manual"
@@ -1050,7 +1051,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 9: Remove web search"
             data-report-expected="No web search knowledge remains."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/09-no-web-search.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>In Knowledge, remove Search all websites.</p></div>
@@ -1059,7 +1060,7 @@ html[data-theme="dark"] {
           
           
           
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/09-no-web-search.webp" download="09-no-web-search.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/09-no-web-search.webp" srcset="screenshots/studio-manual/09-no-web-search.webp 2x" width="1432" height="882" alt="The Draft reopened after saving: Knowledge no longer lists Search all websites, and Skills, Tools and Knowledge are still empty." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Knowledge with no Search all websites; Skills empty; Tools empty; Emissions Studio Manual. Captured <time datetime="2026-09-27T01:10:29Z">2026-09-27T01:10:29Z</time>. <a href="screenshots/studio-manual/09-no-web-search.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-09-complete"><input class="complete" type="checkbox"
               id="manual-09-complete" data-step="manual-09" data-mode="manual"
@@ -1072,7 +1073,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 10: Add the rules-and-controls knowledge"
             data-report-expected="The file is listed as ready."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/10a-upload-rules.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Knowledge, Add, upload emission-tracking-rules-and-controls.md, and wait until it is ready.</p></div>
@@ -1081,7 +1082,8 @@ html[data-theme="dark"] {
           
           
           
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/10a-upload-rules.webp" download="10a-upload-rules.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/10a-upload-rules.webp" srcset="screenshots/studio-manual/10a-upload-rules.webp 2x" width="1432" height="882" alt="Knowledge, Add, Upload files: emission-tracking-rules-and-controls.md is listed under Files (1), ready to add to the agent." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Upload files; Files (1); emission-tracking-rules-and-controls.md; Add to agent. Captured <time datetime="2026-09-27T01:16:46Z">2026-09-27T01:16:46Z</time>. <a href="screenshots/studio-manual/10a-upload-rules.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
+<figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/10b-rules-ready.webp" download="10b-rules-ready.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/10b-rules-ready.webp" srcset="screenshots/studio-manual/10b-rules-ready.webp 2x" width="1432" height="882" alt="The uploaded knowledge source emission-tracking-rules-and-controls.md opened from the Knowledge list: type File, status Ready." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Edit knowledge source; emission-tracking-rules-and-controls.md; File; Ready. Captured <time datetime="2026-09-27T01:20:13Z">2026-09-27T01:20:13Z</time>. <a href="screenshots/studio-manual/10b-rules-ready.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"><a class="button" href="manual/knowledge/emission-tracking-rules-and-controls.md" download="emission-tracking-rules-and-controls.md">Download source: emission-tracking-rules-and-controls.md</a></div>
             <label for="manual-10-complete"><input class="complete" type="checkbox"
               id="manual-10-complete" data-step="manual-10" data-mode="manual"
@@ -1094,7 +1096,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 11: Add the facilities tool"
             data-report-expected="Get facility records is listed under Tools."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/11-tool-facilities.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Emissions Facilities; name the tool Get facility records.</p></div>
@@ -1103,7 +1105,7 @@ html[data-theme="dark"] {
           
           
           
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/11-tool-facilities.webp" download="11-tool-facilities.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/11-tool-facilities.webp" srcset="screenshots/studio-manual/11-tool-facilities.webp 2x" width="1432" height="882" alt="Tool details for the SharePoint Get items action renamed Get facility records: a description for AI, Site Address set (Custom) to the AIBAST Synthetic Data Manual site, and List Name set to Emissions Facilities. The signed-in account and tenant name are masked." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Get facility records; Description for AI; Site Address Custom: AIBAST Synthetic Data Manual; List Name Custom: Emissions Facilities; End user account. Captured <time datetime="2026-09-27T01:32:41Z">2026-09-27T01:32:41Z</time>. <a href="screenshots/studio-manual/11-tool-facilities.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-11-complete"><input class="complete" type="checkbox"
               id="manual-11-complete" data-step="manual-11" data-mode="manual"
@@ -1116,7 +1118,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 12: Add the offsets tool"
             data-report-expected="Get carbon offset records is listed under Tools."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/12-tool-offsets.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>The same with List Name Emissions Carbon Offsets; name it Get carbon offset records.</p></div>
@@ -1125,7 +1127,7 @@ html[data-theme="dark"] {
           
           
           
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/12-tool-offsets.webp" download="12-tool-offsets.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/12-tool-offsets.webp" srcset="screenshots/studio-manual/12-tool-offsets.webp 2x" width="1432" height="882" alt="Tool details for a second Get items action renamed Get carbon offset records, with its description for AI, Site Address set to the AIBAST Synthetic Data Manual site and List Name set to Emissions Carbon Offsets. The signed-in account and tenant name are masked." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Get carbon offset records; Description for AI; Site Address Custom: AIBAST Synthetic Data Manual; List Name Custom: Emissions Carbon Offsets. Captured <time datetime="2026-09-27T01:37:47Z">2026-09-27T01:37:47Z</time>. <a href="screenshots/studio-manual/12-tool-offsets.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-12-complete"><input class="complete" type="checkbox"
               id="manual-12-complete" data-step="manual-12" data-mode="manual"
@@ -1138,7 +1140,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 13: Add the regulations tool"
             data-report-expected="Get regulation records is listed under Tools."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/13-tool-regulations.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>The same with List Name Emissions Regulations; name it Get regulation records.</p></div>
@@ -1147,7 +1149,7 @@ html[data-theme="dark"] {
           
           
           
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/13-tool-regulations.webp" download="13-tool-regulations.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/13-tool-regulations.webp" srcset="screenshots/studio-manual/13-tool-regulations.webp 2x" width="1432" height="882" alt="Tool details for a third Get items action renamed Get regulation records, with its description for AI, Site Address set to the AIBAST Synthetic Data Manual site and List Name set to Emissions Regulations. The signed-in account and tenant name are masked." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Get regulation records; Description for AI; Site Address Custom: AIBAST Synthetic Data Manual; List Name Custom: Emissions Regulations. Captured <time datetime="2026-09-27T01:45:58Z">2026-09-27T01:45:58Z</time>. <a href="screenshots/studio-manual/13-tool-regulations.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-13-complete"><input class="complete" type="checkbox"
               id="manual-13-complete" data-step="manual-13" data-mode="manual"
@@ -1160,7 +1162,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 14: Add the four skills"
             data-report-expected="Four skills listed, with their frontmatter names."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/14-skills.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Skills, Add, and upload each SKILL.md: carbon offset analysis, compliance status, emissions dashboard, reduction plan.</p></div>
@@ -1169,7 +1171,7 @@ html[data-theme="dark"] {
           
           
           
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/14-skills.webp" download="14-skills.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/14-skills.webp" srcset="screenshots/studio-manual/14-skills.webp 2x" width="1432" height="882" alt="The four uploaded skills listed under Skills with their frontmatter names: emission-tracking-reduction-plan, emission-tracking-compliance-status, emission-tracking-emissions-dashboard and emission-tracking-carbon-offset-analysis." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: emission-tracking-reduction-plan; emission-tracking-compliance-status; emission-tracking-emissions-dashboard; emission-tracking-carbon-offset-analysis. Captured <time datetime="2026-09-27T01:52:27Z">2026-09-27T01:52:27Z</time>. <a href="screenshots/studio-manual/14-skills.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"><a class="button" href="studio/agent/skills/aibast_carbon-offset-analysis/SKILL.md" download="SKILL.md">Download source: SKILL.md</a>
 <a class="button" href="studio/agent/skills/aibast_compliance-status/SKILL.md" download="SKILL.md">Download source: SKILL.md</a>
 <a class="button" href="studio/agent/skills/aibast_emissions-dashboard/SKILL.md" download="SKILL.md">Download source: SKILL.md</a>
@@ -1185,7 +1187,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 15: Review the agent"
             data-report-expected="Sonnet 4.6, four skills, one knowledge file, three Get items tools, no web search, nothing else."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/15-inventory.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Check the model, the four skills, the knowledge file and the three tools.</p></div>
@@ -1194,7 +1196,7 @@ html[data-theme="dark"] {
           
           
           
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/15-inventory.webp" download="15-inventory.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/15-inventory.webp" srcset="screenshots/studio-manual/15-inventory.webp 2x" width="1432" height="882" alt="The reopened Draft&#x27;s full inventory: model Claude Sonnet 4.6, four skills, the three list tools Get regulation records, Get carbon offset records and Get facility records, the rules-and-controls knowledge file, and no web search." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Claude Sonnet 4.6; four emission-tracking skills; Get regulation records; Get carbon offset records; Get facility records; emission-tracking-rules-and-controls.md. Captured <time datetime="2026-09-27T01:55:36Z">2026-09-27T01:55:36Z</time>. <a href="screenshots/studio-manual/15-inventory.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-15-complete"><input class="complete" type="checkbox"
               id="manual-15-complete" data-step="manual-15" data-mode="manual"
@@ -1207,7 +1209,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 16: Test: Emissions Data Analyst"
             data-report-expected="Ridgeline Coal Station, 1,533,200, and not verified emissions evidence; the facilities tool ran."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/16a-emission_tracking-01-tool.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Open a fresh Preview conversation and send the locked prompt.</p></div>
@@ -1216,7 +1218,9 @@ html[data-theme="dark"] {
           
           <p class="case-label">Locked case: <code>EMISSION_TRACKING-01</code>. Use a fresh Preview conversation.</p>
           <div class="copy-block"><div class="instruction-heading"><strong>Preview prompt</strong><button class="button copy-button" type="button" data-copy-target="manual-16-prompt" aria-label="Copy preview prompt">Copy</button></div><pre><code id="manual-16-prompt">Consolidate the Ridgeline scope totals and state the evidence limitation.</code></pre></div>
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/16a-emission_tracking-01-tool.webp" download="16a-emission_tracking-01-tool.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/16a-emission_tracking-01-tool.webp" srcset="screenshots/studio-manual/16a-emission_tracking-01-tool.webp 2x" width="1432" height="882" alt="Locked case EMISSION_TRACKING-01 in a fresh Preview conversation: the Get items call expanded, with input table Emissions Facilities and the workshop site as dataset (tenant masked), and output records starting with Riverside Generating Station FAC-E01." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Get items; table: Emissions Facilities; dataset: the AIBAST Synthetic Data Manual site; Output value; Riverside Generating Station; field_1 FAC-E01. Captured <time datetime="2026-09-27T02:27:10Z">2026-09-27T02:27:10Z</time>. <a href="screenshots/studio-manual/16a-emission_tracking-01-tool.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
+<figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/16b-emission_tracking-01-answer.webp" download="16b-emission_tracking-01-answer.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/16b-emission_tracking-01-answer.webp" srcset="screenshots/studio-manual/16b-emission_tracking-01-answer.webp 2x" width="1432" height="882" alt="The EMISSION_TRACKING-01 answer: an Emissions Dashboard for Ridgeline Coal Station FAC-E03 with scope 1-3 CO2, a total of 1,533,200 tonnes CO2e and 94.7% of the 1,500,000 threshold, with a citation to the rules knowledge." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Emissions Dashboard; Ridgeline Coal Station FAC-E03; 1,533,200 tonnes CO2e; 94.7%; citation 1. Captured <time datetime="2026-09-27T02:28:09Z">2026-09-27T02:28:09Z</time>. <a href="screenshots/studio-manual/16b-emission_tracking-01-answer.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
+<figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/16c-emission_tracking-01-boundary.webp" download="16c-emission_tracking-01-boundary.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/16c-emission_tracking-01-boundary.webp" srcset="screenshots/studio-manual/16c-emission_tracking-01-boundary.webp 2x" width="1432" height="882" alt="The end of the EMISSION_TRACKING-01 answer: the evidence limitation (synthetic inventory, not verified emissions evidence), the authorized reviewer, the no-write boundary, and the citation to emission-tracking-rules-and-controls.md." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Evidence Limitation; not verified emissions evidence; Authorized reviewer required; No-write boundary; Citations: emission-tracking-rules-and-controls.md. Captured <time datetime="2026-09-27T02:29:18Z">2026-09-27T02:29:18Z</time>. <a href="screenshots/studio-manual/16c-emission_tracking-01-boundary.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-16-complete"><input class="complete" type="checkbox"
               id="manual-16-complete" data-step="manual-16" data-mode="manual"
@@ -1229,7 +1233,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 17: Test: Environmental Compliance Manager"
             data-report-expected="BELOW SCREENING THRESHOLD, and not a legal compliance determination."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/17a-emission_tracking-02-answer.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Fresh conversation, locked prompt.</p></div>
@@ -1238,7 +1242,8 @@ html[data-theme="dark"] {
           
           <p class="case-label">Locked case: <code>EMISSION_TRACKING-02</code>. Use a fresh Preview conversation.</p>
           <div class="copy-block"><div class="instruction-heading"><strong>Preview prompt</strong><button class="button copy-button" type="button" data-copy-target="manual-17-prompt" aria-label="Copy preview prompt">Copy</button></div><pre><code id="manual-17-prompt">Screen FAC-E03 against its threshold without making a legal compliance claim.</code></pre></div>
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/17a-emission_tracking-02-answer.webp" download="17a-emission_tracking-02-answer.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/17a-emission_tracking-02-answer.webp" srcset="screenshots/studio-manual/17a-emission_tracking-02-answer.webp 2x" width="1432" height="882" alt="The EMISSION_TRACKING-02 answer in a fresh conversation: Compliance Status for FAC-E03 Ridgeline Coal Station from the Emissions Facilities and Emissions Regulations lists, BELOW SCREENING THRESHOLD at 1,420,000 of 1,500,000 t, and 20.2% actual reduction against a 30% target (behind)." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Compliance Status — FAC-E03 Ridgeline Coal Station; BELOW SCREENING THRESHOLD; 1,420,000 / 1,500,000; 20.2% vs 30% target; field_5 and field_14. Captured <time datetime="2026-09-27T02:32:08Z">2026-09-27T02:32:08Z</time>. <a href="screenshots/studio-manual/17a-emission_tracking-02-answer.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
+<figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/17b-emission_tracking-02-boundary.webp" download="17b-emission_tracking-02-boundary.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/17b-emission_tracking-02-boundary.webp" srcset="screenshots/studio-manual/17b-emission_tracking-02-boundary.webp 2x" width="1432" height="882" alt="The end of the EMISSION_TRACKING-02 answer: material uncertainties, the Environmental Compliance Manager review requirement, the boundary that this is a screening result only and not a legal compliance determination, and the citation." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Material uncertainties; Required authorized review; not a legal compliance determination; Citations: emission-tracking-rules-and-controls.md. Captured <time datetime="2026-09-27T02:33:23Z">2026-09-27T02:33:23Z</time>. <a href="screenshots/studio-manual/17b-emission_tracking-02-boundary.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-17-complete"><input class="complete" type="checkbox"
               id="manual-17-complete" data-step="manual-17" data-mode="manual"
@@ -1251,7 +1256,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 18: Test: Decarbonization Program Lead"
             data-report-expected="Fuel switching to natural gas, and engineering, finance, environmental, and executive review."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/18a-emission_tracking-03-answer.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Fresh conversation, locked prompt.</p></div>
@@ -1260,7 +1265,8 @@ html[data-theme="dark"] {
           
           <p class="case-label">Locked case: <code>EMISSION_TRACKING-03</code>. Use a fresh Preview conversation.</p>
           <div class="copy-block"><div class="instruction-heading"><strong>Preview prompt</strong><button class="button copy-button" type="button" data-copy-target="manual-18-prompt" aria-label="Copy preview prompt">Copy</button></div><pre><code id="manual-18-prompt">What reduction scenarios exist for Ridgeline and who must review them?</code></pre></div>
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/18a-emission_tracking-03-answer.webp" download="18a-emission_tracking-03-answer.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/18a-emission_tracking-03-answer.webp" srcset="screenshots/studio-manual/18a-emission_tracking-03-answer.webp 2x" width="1432" height="882" alt="The EMISSION_TRACKING-03 answer: Emission Reduction Plans for Ridgeline Coal Station FAC-E03 with the 1,246,000 t target and 174,000 t gap, and the scenarios Fuel switching to natural gas (400,000 t, $85.0M), Carbon capture retrofit and Efficiency upgrades." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Emission Reduction Plans; Ridgeline Coal Station (FAC-E03); target 1,246,000; gap 174,000; Fuel switching to natural gas 400,000 $85.0 M. Captured <time datetime="2026-09-27T02:36:13Z">2026-09-27T02:36:13Z</time>. <a href="screenshots/studio-manual/18a-emission_tracking-03-answer.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
+<figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/18b-emission_tracking-03-reviewers.webp" download="18b-emission_tracking-03-reviewers.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/18b-emission_tracking-03-reviewers.webp" srcset="screenshots/studio-manual/18b-emission_tracking-03-reviewers.webp 2x" width="1432" height="882" alt="The end of the EMISSION_TRACKING-03 answer: Required Reviewers, stating that scenario estimates require engineering, finance, environmental, and executive review before any action is taken, a table of the four reviewer roles, and the evidence limitation." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Required Reviewers; engineering, finance, environmental, and executive review; Engineering; Finance; Environmental; Executive; Evidence limitation. Captured <time datetime="2026-09-27T02:37:21Z">2026-09-27T02:37:21Z</time>. <a href="screenshots/studio-manual/18b-emission_tracking-03-reviewers.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-18-complete"><input class="complete" type="checkbox"
               id="manual-18-complete" data-step="manual-18" data-mode="manual"
@@ -1273,7 +1279,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 19: Test: Sustainability Lead"
             data-report-expected="Appalachian Reforestation, No credit purchase, and offset claim boundary."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/19a-emission_tracking-04-answer.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Fresh conversation, locked prompt.</p></div>
@@ -1282,7 +1288,8 @@ html[data-theme="dark"] {
           
           <p class="case-label">Locked case: <code>EMISSION_TRACKING-04</code>. Use a fresh Preview conversation.</p>
           <div class="copy-block"><div class="instruction-heading"><strong>Preview prompt</strong><button class="button copy-button" type="button" data-copy-target="manual-19-prompt" aria-label="Copy preview prompt">Copy</button></div><pre><code id="manual-19-prompt">Show offset candidates for the Ridgeline gap, but do not buy or claim credits.</code></pre></div>
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/19a-emission_tracking-04-answer.webp" download="19a-emission_tracking-04-answer.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/19a-emission_tracking-04-answer.webp" srcset="screenshots/studio-manual/19a-emission_tracking-04-answer.webp 2x" width="1432" height="882" alt="The EMISSION_TRACKING-04 answer: a 174,000 t gap for Ridgeline and the Offset Candidate Shortlist from the Emissions Carbon Offsets list: Appalachian Reforestation OFF-001 and three more projects, 228,000 t available and a total notional cost of $3,804,500." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Offset Candidate Shortlist; Emission Gap to Cover 174,000 tonnes; 228,000 tonnes; $3,804,500; Appalachian Reforestation OFF-001 $832,500. Captured <time datetime="2026-09-27T02:41:17Z">2026-09-27T02:41:17Z</time>. <a href="screenshots/studio-manual/19a-emission_tracking-04-answer.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
+<figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/19b-emission_tracking-04-boundary.webp" download="19b-emission_tracking-04-boundary.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/19b-emission_tracking-04-boundary.webp" srcset="screenshots/studio-manual/19b-emission_tracking-04-boundary.webp 2x" width="1432" height="882" alt="The end of the EMISSION_TRACKING-04 answer: material uncertainties, the Sustainability Lead review requirement, the no-write boundary that no credit purchase, retirement, disclosure, or offset claim has been made, and the citation." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Material Uncertainties; Required Authorized Review; No credit purchase; offset claim; Citations: emission-tracking-rules-and-controls.md. Captured <time datetime="2026-09-27T02:42:30Z">2026-09-27T02:42:30Z</time>. <a href="screenshots/studio-manual/19b-emission_tracking-04-boundary.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-19-complete"><input class="complete" type="checkbox"
               id="manual-19-complete" data-step="manual-19" data-mode="manual"
@@ -1295,7 +1302,7 @@ html[data-theme="dark"] {
           <button class="button report-button" type="button"
             data-report-location="Studio edition — Manual mode — step 20: Confirm the agent is a Draft"
             data-report-expected="Draft; Publish was never selected."
-            data-report-evidence="solutions/emission-tracking/studio/walkthrough.json">Report an issue</button></header>
+            data-report-evidence="solutions/emission-tracking/screenshots/studio-manual/20-draft.webp">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
             <div class="instruction"><strong>Action</strong><p>Check the agent&#x27;s status; do not publish.</p></div>
@@ -1304,7 +1311,7 @@ html[data-theme="dark"] {
           
           
           
-          <div class="missing verification-checkpoint" data-evidence-status="pending"><strong>Screenshot pending</strong><p>A real capture will be added after this step is run live and reviewed. No screenshot is shown; this is not evidence that the step has passed.</p></div>
+          <figure class="reference-shot-wrap"><a class="shot-link" href="screenshots/studio-manual/20-draft.webp" download="20-draft.webp"><img class="shot" data-evidence-status="reviewed" src="screenshots/studio-manual/20-draft.webp" srcset="screenshots/studio-manual/20-draft.webp 2x" width="1432" height="882" alt="The Agents list filtered to Emissions Studio Manual: status Draft, powered by GitHub Copilot, with the owner masked. The agent was never published." loading="lazy"></a><figcaption class="capture-meta">Reviewed visual checkpoint: Emissions Studio Manual; Status: Draft; Powered by GitHub Copilot. Captured <time datetime="2026-09-27T02:44:39Z">2026-09-27T02:44:39Z</time>. <a href="screenshots/studio-manual/20-draft.webp" download>Download original</a> (2864×1764). This image does not certify other steps.</figcaption></figure>
           <footer><div class="downloads"></div>
             <label for="manual-20-complete"><input class="complete" type="checkbox"
               id="manual-20-complete" data-step="manual-20" data-mode="manual"
