@@ -806,13 +806,14 @@ class FullRepositoryArtifactTests(unittest.TestCase):
                     )
                 for mode in document["modes"].values():
                     for step in mode["steps"]:
-                        shot = step["screenshot"]
-                        if shot and shot["status"] == "reviewed":
-                            relative_shot = relative / shot["file"]
-                            self.assertEqual(
-                                (self.site / relative_shot).read_bytes(),
-                                (ROOT / relative_shot).read_bytes(),
-                            )
+                        screenshots = step["screenshot"]
+                        for shot in screenshots if isinstance(screenshots, list) else [screenshots]:
+                            if shot and shot["status"] == "reviewed":
+                                relative_shot = relative / shot["file"]
+                                self.assertEqual(
+                                    (self.site / relative_shot).read_bytes(),
+                                    (ROOT / relative_shot).read_bytes(),
+                                )
 
     def test_served_installers_match_the_manifest_ring(self):
         manifest = json.loads((self.site / pages.MANIFEST_NAME).read_text(encoding="utf-8"))
