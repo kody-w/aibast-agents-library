@@ -1,0 +1,16 @@
+{
+  "knowledge_tables": {
+    "Synthetic quality measures [table 1]": {
+      "literal_fields": {
+        "Records requiring evidence review": {"op": "subtract", "fields": ["source_population", "source_closed"]},
+        "Source-recorded closed rate": {"op": "percent", "fields": ["source_closed", "source_population"], "round": 1}
+      }
+    },
+    "Synthetic operational cohorts [table 1]": {
+      "literal_fields": {
+        "Display heading": {"field": "$key", "transform": "humanize"},
+        "Exact draft handling route": "draft_channel"
+      }
+    }
+  }
+}

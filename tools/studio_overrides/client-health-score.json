@@ -1,0 +1,17 @@
+{
+  "knowledge_tables": {
+    "At-Risk Client Report [table 1]": {
+      "keep_in_knowledge": "Curated score-denominator and churn-indicator presentation; the complete client-record table is listed instead."
+    },
+    "Complete client records [table 1]": {
+      "literal_fields": {
+        "Margin": "project_margin_pct",
+        "Q1": {"field": "satisfaction_scores", "index": 0},
+        "Q2": {"field": "satisfaction_scores", "index": 1},
+        "Q3": {"field": "satisfaction_scores", "index": 2},
+        "Q4": {"field": "satisfaction_scores", "index": 3},
+        "Segment": "risk_label"
+      }
+    }
+  }
+}

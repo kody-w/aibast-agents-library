@@ -1,0 +1,141 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Procurement Workspace",
+  "title": "Procurement",
+  "description": "Listed synthetic entity records for Procurement. Unlisted facts, rule tables and calculated outputs remain in the agent's retained knowledge.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "purchase-requests",
+      "list": "Procurement Purchase Requests",
+      "title": "Purchase Requests",
+      "key": "PurchaseRequestId",
+      "fields": {
+        "PurchaseRequestId": "field_1",
+        "Requester": "field_2",
+        "Department": "field_3",
+        "Category": "field_4",
+        "Amount": "field_5",
+        "Priority": "field_6",
+        "Status": "field_7",
+        "PreferredVendor": "field_8",
+        "Justification": "field_9",
+        "BudgetCode": "field_10"
+      },
+      "columns": [
+        "PurchaseRequestId",
+        "Title",
+        "Requester",
+        "Department",
+        "Category",
+        "Amount",
+        "Priority",
+        "Status",
+        "PreferredVendor",
+        "Justification"
+      ],
+      "labels": {
+        "Title": "Title",
+        "PurchaseRequestId": "Purchase Request ID",
+        "Requester": "Requester",
+        "Department": "Department",
+        "Category": "Category",
+        "Amount": "Amount",
+        "Priority": "Priority",
+        "Status": "Status",
+        "PreferredVendor": "Preferred vendor",
+        "Justification": "Justification",
+        "BudgetCode": "Budget code"
+      },
+      "formats": {
+        "Title": "text",
+        "PurchaseRequestId": "text",
+        "Requester": "text",
+        "Department": "text",
+        "Category": "text",
+        "Amount": "currency",
+        "Priority": "text",
+        "Status": "text",
+        "PreferredVendor": "text",
+        "Justification": "text",
+        "BudgetCode": "text"
+      },
+      "metrics": [
+        {
+          "label": "Purchase Requests",
+          "op": "count"
+        },
+        {
+          "label": "Amount",
+          "op": "sum",
+          "column": "Amount"
+        }
+      ],
+      "groupBy": "Requester",
+      "sortBy": "PurchaseRequestId"
+    },
+    {
+      "id": "vendor-catalog",
+      "list": "Procurement Vendor Catalog",
+      "title": "Vendor Catalog",
+      "key": "VendorCatalogId",
+      "fields": {
+        "VendorCatalogId": "field_1",
+        "Category": "field_2",
+        "ContractStatus": "field_3",
+        "Tier": "field_4",
+        "Rating": "field_5",
+        "AnnualSpend": "field_6",
+        "PaymentTerms": "field_7",
+        "ContactRole": "field_8"
+      },
+      "columns": [
+        "VendorCatalogId",
+        "Title",
+        "Category",
+        "ContractStatus",
+        "Tier",
+        "Rating",
+        "AnnualSpend",
+        "PaymentTerms",
+        "ContactRole"
+      ],
+      "labels": {
+        "Title": "Vendor",
+        "VendorCatalogId": "Vendor Catalog ID",
+        "Category": "Category",
+        "ContractStatus": "Contract status",
+        "Tier": "Tier",
+        "Rating": "Rating",
+        "AnnualSpend": "Annual spend",
+        "PaymentTerms": "Payment terms",
+        "ContactRole": "Contact role"
+      },
+      "formats": {
+        "Title": "text",
+        "VendorCatalogId": "text",
+        "Category": "text",
+        "ContractStatus": "text",
+        "Tier": "text",
+        "Rating": "text",
+        "AnnualSpend": "currency",
+        "PaymentTerms": "text",
+        "ContactRole": "text"
+      },
+      "metrics": [
+        {
+          "label": "Vendor Catalog",
+          "op": "count"
+        },
+        {
+          "label": "Annual spend",
+          "op": "sum",
+          "column": "AnnualSpend"
+        }
+      ],
+      "groupBy": "Category",
+      "sortBy": "VendorCatalogId"
+    }
+  ]
+}

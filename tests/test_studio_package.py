@@ -206,10 +206,13 @@ def test_unadvertised_slug_is_rejected():
         package.load_inputs("grid-outage-response")
 
 
-def test_blocked_inputs_are_not_fabricated_or_written(tmp_path, capsys):
-    assert package.main(["account-intelligence", "--out", str(tmp_path)]) == 1
+def test_blocked_inputs_are_not_fabricated_or_written(source_root, tmp_path, capsys):
+    inputs = package.load_inputs(SAMPLE, source_root)
+    inputs.records_path.write_text("# Synthetic rules\n\nNo structured entity records are supplied.\n")
+    out = tmp_path / "blocked-output"
+    assert package.main([SAMPLE, "--out", str(out)], root=source_root) == 1
     assert "BLOCKED" in capsys.readouterr().err
-    assert not list(tmp_path.iterdir())
+    assert not out.exists()
 
 
 def test_order_status_reserved_email_records_are_preserved():
@@ -219,9 +222,10 @@ def test_order_status_reserved_email_records_are_preserved():
     assert len(emails) == 4 and all(reserved_email(value) for value in emails)
 
 
-def test_no_complete_literals_is_an_explicit_blocker():
-    with pytest.raises(package.BlockedWorkshop, match="no named literal JSON record sets"):
-        package.load_inputs("account-intelligence")
+def test_clean_tables_do_not_require_a_full_json_record_export():
+    inputs = package.load_inputs("account-intelligence")
+    assert inputs.tables
+    assert inputs.knowledge_sources
 
 
 @pytest.mark.parametrize("as_array", [False, True])
@@ -426,6 +430,7 @@ def test_catalog_checks_reject_controlled_mutations(mutation, message):
     elif mutation == "length":
         first[1]["agent"]["names"]["easy"] = "X" * 31
     else:
+        first = next(entry for entry in packages if len(entry[2]) >= 2)
         keys = list(first[2])
         first[2][keys[1]] = first[2][keys[0]]
     with pytest.raises(package.StudioPackageError, match=message):
@@ -463,7 +468,8 @@ def test_generated_agent_inputs_use_lists_instead_of_the_removed_knowledge():
         instructions = (base / "studio/agent/GLOBAL-INSTRUCTIONS.md").read_text()
         for path in [base / "studio/agent/GLOBAL-INSTRUCTIONS.md", *base.glob("studio/agent/skills/*/SKILL.md")]:
             text = path.read_text()
-            assert inputs.records_path.name not in text, path
+            if not inputs.tables:
+                assert inputs.records_path.name not in text, path
             assert "two uploaded knowledge files" not in text, path
             assert "both uploaded files" not in text, path
             assert "query external systems" not in text, path
@@ -471,6 +477,9 @@ def test_generated_agent_inputs_use_lists_instead_of_the_removed_knowledge():
             if path.name == "SKILL.md":
                 assert "SharePoint list tools" in text, path
         assert package.ROUTING in instructions, slug
+        if inputs.tables:
+            assert "## Evidence locations" in instructions
+            assert "Read unlisted records" in instructions
 
 
 def assert_site_contract(instructions, schema, counts):
@@ -547,7 +556,10 @@ def test_every_walkthrough_has_all_locked_cases_and_valid_assets():
             assert [step["case"] for step in mode["steps"] if "case" in step] == ids, slug
         schema = package.read_json(walk.package / walk.document["data"])
         package.validate_package_contract(schema, walk.app, walk.document, walk.tools)
-        assert all("synthetic" not in Path(p).name for p in walk.document["agent"]["knowledge"])
+        if schema.get("source_of_truth") == "knowledge-table":
+            assert all(p.startswith("studio/agent/knowledge/") for p in walk.document["agent"]["knowledge"])
+        else:
+            assert all("synthetic" not in Path(p).name for p in walk.document["agent"]["knowledge"])
         assert len(walk.tools) == len(schema["lists"])
 
 

@@ -1,7 +1,7 @@
 # Generating a studio edition
 
 `tools/build_studio_package.py` turns a workshop's existing portable-agent
-literals, complete synthetic-records Markdown, rules knowledge, operation
+literals or authoritative Markdown entity records, retained rules knowledge, operation
 skills, and locked demo cases into a SharePoint-backed studio edition. It does
 not execute the agent, use a browser, contact a tenant, deploy, or publish.
 
@@ -15,14 +15,16 @@ python3 tools/render_studio_walkthrough.py --check
 
 `--all` attempts every **advertised** workshop except the hand-authored
 `emission-tracking` reference. The unfinished `grid-outage-response` is not
-advertised and is always rejected. A workshop without complete, matching
-literal JSON records is reported as **BLOCKED**, with a reason, and is not
-written. Other workshops continue; any blocked or failed workshop makes that
-invocation return a nonzero exit status. Narrative/table-only knowledge is not
-silently treated as a complete record export. Synthetic email addresses may use
+advertised and is always rejected. A workshop without matching literal JSON or
+clean entity tables/uniform record headings is reported as **BLOCKED**, with a
+reason, and is not written. Other workshops continue; any blocked or failed
+workshop makes that invocation return a nonzero exit status. Unlisted knowledge
+is retained rather than silently treated as a complete record export. Synthetic email addresses may use
 `example.com` (including its subdomains), `.test`, or `.invalid` only. Other email
-domains and non-placeholder tenant identities remain privacy errors; they are
-never silently rewritten into apparently equivalent source data.
+domains are explicitly omitted at the column boundary with `omitted_columns`
+and an `email privacy gate` reason; the source file is never changed. Non-placeholder
+tenant identities remain errors. Retained knowledge marks excluded contacts
+explicitly rather than inventing replacement addresses.
 
 `--check` without slugs compares all existing generated editions, excluding the
 hand-authored reference. It does not claim that blocked workshops have packages.
@@ -59,7 +61,45 @@ Dates, years/vintages, identifiers, postal codes, and phone numbers stay text.
 The Manual list steps name the text columns on SharePoint's Customize screen.
 Both the app and the agent map CSV column order to **`Title`, `field_1`, ...**;
 CSV headers are display names, not the imported SharePoint internal names.
-The agent uploads only the separate rules knowledge, not the records file.
+In literal mode, the agent uploads only the separate rules knowledge, not the
+records file. Table-backed editions upload generated retained-knowledge copies:
+listed entity rows become pointers to their lists, while every unlisted record,
+rule, policy, calculation and response contract remains available as knowledge.
+
+## Markdown authority and literal corroboration
+
+`tools/studio_knowledge_tables.py` reads actual pipe-table headers, separators
+and rows, trims cells, and handles escaped pipes. Entity keys may be structured
+IDs or natural entity names; repeated keys retain their source row order instead
+of overwriting one another. Whole-cell code/bold formatting is presentation,
+not part of an ID. Currency cells become numbers; an entirely percentage-valued
+column becomes numeric with `percent1` app formatting. Mixed percentages, ISO
+dates, plain numeric text and all other text remain text.
+
+Record-per-heading sections are accepted only when all records have the same
+field set. Inline field labels ignore Markdown emphasis and the purely
+presentational phrase "in source order"; nested bullet structures and genuinely
+different field sets remain knowledge. Standalone narrative bullets are not
+silently converted into records.
+
+Each listed section records `source_of_truth: knowledge-table`, its original
+file, heading, selector and record form in `schema.json`. Fresh parsing, literal
+corroboration and byte-for-byte CSV comparison happen again in
+`build_studio_data.py --check`. The schema records how many rows have matching
+agent literals and which literal containers corroborate them.
+
+When matching literal entity records exist, every imported value must agree.
+Small reviewed `knowledge_tables` overrides can map human labels to source
+fields or reproduce documented display/arithmetic transformations from those
+literal fields. They do not supply replacement data: cells still come from the
+Markdown. A mismatch fails; a presentation that cannot be corroborated stays in
+knowledge and is named in `retained_knowledge`. A previously listed table that
+stops corroborating fails regeneration rather than disappearing silently.
+
+Rule, policy, threshold, rate and locked-response tables never become lists.
+The generated **Evidence locations** section and each studio skill distinguish
+listed entity facts from retained knowledge. This includes partially listed
+workshops; an app is not presented as the complete original evidence inventory.
 
 The app uses conservative scalar columns, a row count, and at most two
 meaningful additive metrics. It does not sum prices, rates, years, identifiers,

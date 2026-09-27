@@ -6,8 +6,9 @@
     python3 tools/build_studio_package.py --check
 
 --all attempts every advertised workshop except the hand-authored emission-tracking
-reference. Workshops without complete, matching literal JSON records are reported
-as blocked, not fabricated. --check checks existing generated packages without
+reference. Records come from matching literal JSON or clean authoritative Markdown
+entity tables/uniform headings. Unsupported records stay in knowledge; workshops
+with no eligible record sets are blocked, not fabricated. --check checks existing generated packages without
 writing. Pass emission-tracking explicitly to generate it, preferably with --out
 pointing at a temporary repository root. Existing screenshot objects/lists are
 preserved by step id. No browser, network, agent execution or tenant API is used.
@@ -27,7 +28,7 @@ import re
 import shutil
 import sys
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
@@ -38,6 +39,8 @@ if str(ROOT) not in sys.path:
 from tools import build_studio_data as data  # noqa: E402
 from tools import render_studio_walkthrough as renderer  # noqa: E402
 from tools import scaffold_solution_journey as journey  # noqa: E402
+from tools import studio_knowledge_tables as knowledge_tables  # noqa: E402
+from tools.studio_privacy import has_unapproved_email, redact_unapproved_emails  # noqa: E402
 
 REFERENCE = "emission-tracking"
 SITE = "https://contoso.sharepoint.com/sites/aibast-synthetic-data"
@@ -55,7 +58,7 @@ ROUTING = ("If the correct skill, a list tool or the rules knowledge cannot be l
            "instructions or from general knowledge -- every record value must come from a list tool result "
            "or the rules knowledge in this turn.")
 READ_RECORDS = "Read the records with the SharePoint list tools, and the rules and controls knowledge."
-OVERRIDE_KEYS = {"prefix", "agent_names", "opening", "record_sources", "lists", "app"}
+OVERRIDE_KEYS = {"prefix", "agent_names", "opening", "record_sources", "lists", "app", "knowledge_tables"}
 FORMATS = {"integer", "number", "percent1", "currency", "text"}
 FORBIDDEN_IDENTITY = (
     "github.com/kody-w/", "raw.githubusercontent.com/kody-w/", "kody-w.github.io", "kodyw.com",
@@ -82,6 +85,9 @@ class Inputs:
     overrides: dict[str, Any]
     cases: list[dict[str, Any]]
     skills: list[Path]
+    tables: dict[str, tuple[Path, knowledge_tables.KnowledgeRecords]] = field(default_factory=dict)
+    knowledge_sources: list[Path] = field(default_factory=list)
+    retained: list[dict[str, str]] = field(default_factory=list)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -137,10 +143,9 @@ def load_inputs(slug: str, root: Path = ROOT) -> Inputs:
                               + ", ".join(p.relative_to(package).as_posix() for p in record_files))
     records_path = record_files[0]
     written = data.markdown_record_sets(records_path)
-    if not written:
-        raise BlockedWorkshop(f"{records_path.relative_to(root)} has no named literal JSON record sets "
-                              "(narrative/table snapshots cannot prove complete source equality)")
     overrides = overrides_for(slug, root)
+    if not written:
+        return load_table_inputs(slug, deployment, source, records_path, knowledge, overrides, root)
     literals = data.record_sets(source, overrides.get("record_sources"))
     records = {}
     for name, expected in written.items():
@@ -151,7 +156,7 @@ def load_inputs(slug: str, root: Path = ROOT) -> Inputs:
             raise StudioPackageError(f"{name} in {records_path.relative_to(root)} differs from the agent's source")
         data.record_rows(actual)
         try:
-            renderer.check_privacy(actual, name)
+            renderer.check_privacy(privacy_projection(actual), name)
         except renderer.WalkthroughError as error:
             raise BlockedWorkshop(f"{error}; cannot publish a lossless CSV under the email/tenant-id privacy policy") from error
         records[name] = actual
@@ -165,6 +170,62 @@ def load_inputs(slug: str, root: Path = ROOT) -> Inputs:
     title = re.sub(r"\s+Agent$", "", deployment["display_name"])
     return Inputs(slug, title, source, records_path, rules, records, overrides, cases, skills)
 
+
+def privacy_projection(value: Any) -> Any:
+    if isinstance(value, dict):
+        for key in value:
+            renderer.check_privacy(key)
+        return {key: privacy_projection(child) for key, child in value.items()}
+    if isinstance(value, list):
+        return [privacy_projection(child) for child in value]
+    return redact_unapproved_emails(value) if isinstance(value, str) else value
+
+
+def load_table_inputs(slug: str, deployment: dict, source: Path, records_path: Path,
+                      knowledge: list[Path], overrides: dict, root: Path) -> Inputs:
+    base = root / "solutions" / slug
+    tables, records, retained = {}, {}, []
+    options = overrides.get("knowledge_tables", {})
+    previous = base / "studio/data/schema.json"
+    selected_before = set()
+    if previous.is_file():
+        selected_before = {item.get("knowledge_table", {}).get("selector")
+                           for item in read_json(previous)["lists"]}
+    for path in knowledge:
+        parsed = knowledge_tables.parse_knowledge(path)
+        relative = path.relative_to(root).as_posix()
+        retained.extend({"file": relative, **item} for item in parsed.retained)
+        for table in parsed.records:
+            option = options.get(table.selector, {})
+            if option.get("keep_in_knowledge"):
+                retained.append({"file": relative, "section": table.section, "reason": option["keep_in_knowledge"]})
+                continue
+            try:
+                knowledge_tables.cross_check(table, source, option.get("literal_fields"))
+                knowledge_tables.omit_private_columns(table)
+            except knowledge_tables.UnverifiableTable as error:
+                if table.selector in selected_before:
+                    raise StudioPackageError(f"previously listed table no longer corroborates: {error}") from error
+                retained.append({"file": relative, "section": table.section, "reason": str(error)})
+                continue
+            label = re.sub(r"\([^)]*\)", "", table.section)
+            label = re.sub(r"^(?:Complete |Synthetic |Canonical )+", "", label, flags=re.I).strip()
+            name = "_".join(words(short(label, 32))).upper()
+            if name in records:
+                name += "_" + hashlib.sha256((relative + table.selector).encode()).hexdigest()[:6].upper()
+            tables[name] = (path, table)
+            records[name] = table.rows
+    if not tables:
+        reasons = "; ".join(item["reason"] for item in retained) or "no entity pipe tables or record-per-heading groups"
+        raise BlockedWorkshop(f"no clean entity tables or uniform heading records in the knowledge: {reasons}")
+    rules = [base / "studio/agent/knowledge" / path.name for path in knowledge]
+    skills = sorted((base / "manual/skills").rglob("SKILL.md"))
+    if not skills:
+        raise BlockedWorkshop("manual/skills contains no SKILL.md")
+    cases = read_json(root / "tests/demo_cases" / f"{slug}.json")["cases"]
+    title = re.sub(r"\s+Agent$", "", deployment["display_name"])
+    return Inputs(slug, title, source, records_path, rules, records, overrides, cases, skills,
+                  tables, knowledge, retained)
 
 def words(value: str) -> list[str]:
     return re.findall(r"[A-Za-z]+[0-9]*|[0-9]+", value.strip("_"))
@@ -288,8 +349,8 @@ def columns_for(name: str, records: Any, override: dict[str, Any]) -> list[dict[
     if not title:
         title = "$key" if isinstance(records, dict) else (
             "$value" if paths == ["$value"] and scalar("$value") else "$key")
-    key_path = "$key"
-    if isinstance(records, list) and record_dicts:
+    key_path = override.get("key_from", "$key")
+    if "key_from" not in override and isinstance(records, list) and record_dicts:
         key_path = next((p for p in paths if (p == "id" or p.endswith("_id"))
                          and scalar(p) and all(v is not MISSING and v is not None for v in values[p])
                          and len({str(v) for v in values[p]}) == len(rows)), "$key")
@@ -338,22 +399,67 @@ def make_schema(inputs: Inputs, root: Path) -> dict[str, Any]:
     prefix = inputs.overrides.get("prefix", inputs.title)
     lists = []
     for name, records in inputs.records.items():
-        override = inputs.overrides.get("lists", {}).get(name, {})
+        override = copy.deepcopy(inputs.overrides.get("lists", {}).get(name, {}))
+        table_source = inputs.tables.get(name)
+        if table_source:
+            _, table = table_source
+            override["labels"] = {**dict(zip(table.fields, table.headers)), **override.get("labels", {})}
+            first = table.fields[0]
+            if len({str(row[first]) for row in table.rows}) == len(table.rows):
+                override.setdefault("key_from", first)
+            override.setdefault("title_from", next((path for path in ("name", "title", "client", "customer",
+                "vendor", "supplier", "consultant", "applicant", "patient_label", "display_label", "description")
+                if path in table.fields), first))
+            if "title" in table.fields and override["title_from"] != "title":
+                override["column_names"] = {"title": "JobTitle", **override.get("column_names", {})}
         label = human(name)
         title = override.get("title", short(prefix, 59 - len(label)) + " " + label)
-        lists.append({
+        item = {
             "id": override.get("id", "-".join(words(name.lower()))),
             "title": title,
             "description": override.get("description", f"Synthetic {label.lower()} "
                                         f"(AIBAST {inputs.title} workshop; fictional)."),
             "record_set": name,
             "columns": columns_for(name, records, override),
-        })
+        }
+        if table_source:
+            path, table = table_source
+            item["source_of_truth"] = "knowledge-table"
+            item["knowledge_table"] = {"file": path.relative_to(root).as_posix(), "section": table.section,
+                                       "selector": table.selector, "form": table.form}
+            checks = inputs.overrides.get("knowledge_tables", {}).get(table.selector, {}).get("literal_fields")
+            if checks:
+                item["knowledge_table"]["literal_fields"] = checks
+            item["literal_cross_check"] = {"rows": table.literal_rows, "sources": table.literal_sources}
+            if table.omitted_columns:
+                item["omitted_columns"] = table.omitted_columns
+            for column in item["columns"]:
+                if column["from"] in table.formats:
+                    column["format"] = table.formats[column["from"]]
+        else:
+            private = [column for column in item["columns"] if any(
+                has_unapproved_email(data._cell(rid if column["from"] == "$key" else
+                    value_at(record, column["from"]) if value_at(record, column["from"]) is not MISSING else None, "text"))
+                for rid, record in data.record_rows(records))]
+            if any(column["name"] in {item["columns"][0]["name"], item["columns"][1]["name"]} for column in private):
+                raise BlockedWorkshop(f"{name}: identity columns cannot be omitted by the email privacy gate")
+            if private:
+                item["omitted_columns"] = [{"name": c["name"], "from": c["from"], "reason": "email privacy gate"}
+                                           for c in private]
+                item["columns"] = [column for column in item["columns"] if column not in private]
+        lists.append(item)
     schema = {"schema": data.SCHEMA, "solution": inputs.slug, "description": DESCRIPTION,
               "source": inputs.source.relative_to(root).as_posix(),
               "records_markdown": inputs.records_path.relative_to(root).as_posix(), "lists": lists}
     if inputs.overrides.get("record_sources"):
         schema["record_sources"] = inputs.overrides["record_sources"]
+    if inputs.tables:
+        schema["source_of_truth"] = "knowledge-table"
+        schema["description"] = ("Selected entity records parsed from the workshop's authoritative synthetic "
+                                 "knowledge. Unlisted facts, rules and calculations remain in retained knowledge.")
+        schema["retained_knowledge"] = inputs.retained
+    elif any(item.get("omitted_columns") for item in lists):
+        schema["description"] += " Columns explicitly listed as omitted are unavailable in the lists."
     data.check_schema(schema)
     return schema
 
@@ -417,7 +523,8 @@ def rewrite_source_references(text: str, inputs: Inputs) -> str:
     text = text.replace("Use only the two uploaded knowledge files in this package.",
                         "Use only the workshop's SharePoint list tools and the uploaded rules knowledge.")
     text = text.replace("Use both uploaded files together:", "Use the SharePoint list tools and the rules file together:")
-    text = text.replace(f"`{inputs.records_path.name}`", "the SharePoint list tools")
+    if not inputs.tables:
+        text = text.replace(f"`{inputs.records_path.name}`", "the SharePoint list tools")
     text = text.replace("synthetic-records knowledge file", "SharePoint list tools")
     text = re.sub(r"\bpackaged\s+knowledge(?: files)?", "SharePoint list tools and uploaded rules knowledge", text)
     text = text.replace("uploaded synthetic", "list-backed synthetic")
@@ -438,6 +545,52 @@ def rewrite_source_references(text: str, inputs: Inputs) -> str:
     return text
 
 
+def evidence_locations(inputs: Inputs, schema: dict[str, Any]) -> str:
+    lines = ["## Evidence locations", "",
+             "Read the following listed entity facts from the list tools. Read unlisted records, rule tables, "
+             "policies, thresholds, calculations and response contracts from the retained knowledge, not from "
+             "an invented list. A list result is not evidence for an unlisted field.", ""]
+    for item in schema["lists"]:
+        origin = item.get("knowledge_table", {})
+        section = origin.get("section", item["record_set"])
+        lines.append(f"- *{item['title']}*: {section}; listed fields: "
+                     + ", ".join(c["name"] for c in item["columns"]) + ".")
+        for omission in item.get("omitted_columns", []):
+            lines.append(f"  {omission['name']} is not in this list (email privacy gate); do not guess it.")
+    if inputs.tables:
+        lines += ["", "The retained knowledge files are " + ", ".join(f"`{path.name}`" for path in inputs.rules)
+                  + ". They keep the original unlisted source facts and rules. Non-reserved email addresses "
+                  "are explicitly omitted, not substituted with invented contacts."]
+    return "\n".join(lines)
+
+
+def retained_knowledge_files(inputs: Inputs, schema: dict[str, Any], root: Path) -> dict[Path, str]:
+    result = {}
+    by_name = {item["record_set"]: item for item in schema["lists"]}
+    for source in inputs.knowledge_sources:
+        lines = source.read_text(encoding="utf-8").splitlines()
+        spans = []
+        for name, (path, table) in inputs.tables.items():
+            if path != source:
+                continue
+            item = by_name[name]
+            for index, (start, end) in enumerate(table.spans):
+                notice = (f"Entity rows from this section are now read with the SharePoint list tools from "
+                          f"**{item['title']}**. Other context below remains knowledge.") if index == 0 else ""
+                spans.append((start, end, notice))
+        for start, end, notice in sorted(spans, reverse=True):
+            lines[start:end] = [notice] if notice else []
+        text = ("\n".join(lines).rstrip() + "\n")
+        text = redact_unapproved_emails(text)
+        text = ("<!-- Generated from the original workshop knowledge; edit the source and regenerate. -->\n"
+                "> Retained synthetic knowledge. Listed entity fields come from the SharePoint list tools; "
+                "unlisted records and rules below remain authoritative knowledge. Email omissions are explicit.\n\n"
+                + text)
+        target = Path("solutions") / inputs.slug / "studio/agent/knowledge" / source.name
+        result[target] = text
+    return result
+
+
 def instructions_for(inputs: Inputs, schema: dict[str, Any], tools: dict[str, str], root: Path) -> str:
     original = (root / "solutions" / inputs.slug / "manual/GLOBAL-INSTRUCTIONS.md").read_text(encoding="utf-8")
     first, rest = original.split("\n", 1)
@@ -447,7 +600,14 @@ def instructions_for(inputs: Inputs, schema: dict[str, Any], tools: dict[str, st
         refs = "; ".join(f"**{tools[item['id']]}** (*{item['title']}*)" for item in schema["lists"])
         opening = ("Use only the synthetic records in the workshop's SharePoint lists, the uploaded rules-and-controls "
                    f"knowledge, and the operation skills. Read records with these list tools: {refs}.")
+    split_sources = bool(inputs.tables or any(item.get("omitted_columns") for item in schema["lists"]))
+    if split_sources:
+        opening = ("Use the list tools for the listed entity fields, and retained knowledge for all other "
+                   "source facts, calculations, rules and operation controls. The evidence locations below "
+                   "define the boundary; do not claim unlisted or omitted fields are in a list.")
     mapping = column_instructions(schema, tools)
+    if split_sources:
+        mapping += "\n\n" + evidence_locations(inputs, schema)
     if OLD_OPENING in rest:
         rest = rest.replace(OLD_OPENING, opening, 1)
         start, remaining = rest.lstrip("\n").split("\n\n", 1)
@@ -472,8 +632,18 @@ def instructions_for(inputs: Inputs, schema: dict[str, Any], tools: dict[str, st
     return text
 
 
-def skill_for(path: Path, inputs: Inputs) -> str:
+def skill_for(path: Path, inputs: Inputs, schema: dict[str, Any] | None = None) -> str:
     text = path.read_text(encoding="utf-8")
+    if inputs.tables or (schema and any(item.get("omitted_columns") for item in schema["lists"])):
+        text = rewrite_source_references(text, inputs)
+        statement = ("Read listed entity facts with the SharePoint list tools, using the global instructions' "
+                     "Evidence locations and List columns. Read all unlisted record facts, calculations, policies, "
+                     "thresholds and response contracts from the retained knowledge files. Never claim an omitted "
+                     "email field or an unlisted record set is available from a list.")
+        match = re.search(r"(?m)^# [^\n]+\n", text)
+        if not match:
+            raise StudioPackageError(f"{path.name}: skill needs a title")
+        return text[:match.end()] + "\n" + statement + "\n" + text[match.end():]
     if "1. Read the synthetic knowledge records and controls." in text:
         return text.replace("1. Read the synthetic knowledge records and controls.", "1. " + READ_RECORDS)
     text = rewrite_source_references(text, inputs)
@@ -487,6 +657,8 @@ def skill_for(path: Path, inputs: Inputs) -> str:
 
 
 def numeric_format(column: dict[str, Any], rows: list[dict[str, str]]) -> str:
+    if column.get("format"):
+        return column["format"]
     if column["type"] == "text":
         return "text"
     tokens = set(words(column["from"].lower()))
@@ -549,6 +721,9 @@ def make_app(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str]) -> di
         "tables": tables,
     }
     app.update({key: value for key, value in inputs.overrides.get("app", {}).items() if key != "tables"})
+    if inputs.tables:
+        app["description"] = (f"Listed synthetic entity records for {inputs.title}. Unlisted facts, rule tables "
+                              "and calculated outputs remain in the agent's retained knowledge.")
     return app
 
 
@@ -641,6 +816,9 @@ def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str
         if numbers:
             action += f"Keep {numbers} as Number. "
         action += f"Name the list {item['title']}. Preserve the CSV column order."
+        if item.get("omitted_columns"):
+            action += " Deliberately absent for email privacy: " + ", ".join(
+                column["name"] for column in item["omitted_columns"]) + ". Do not recreate or guess these values."
         add(f"Create {item['title']} from its CSV", action, example(item, csvs[item["id"]]),
             "list-" + item["id"], downloads=[f"studio/data/{item['id']}.csv"])
     add("Create a blank agent", "In Copilot Studio, create a new agent and skip the description flow.",
@@ -660,8 +838,12 @@ def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str
     add("Save, and check the instructions stayed", "Save, go back to the agents list, and reopen the agent.",
         "The same instructions are there after reopening.", "instructions-saved")
     add("Remove web search", "In Knowledge, remove Search all websites.", "No web search knowledge remains.", "no-web-search")
+    knowledge_note = (", and wait until ready. These generated files retain unlisted records and rules; "
+                      "the listed entity fields come from the list tools. Do not replace them with the original "
+                      "unfiltered knowledge files.") if inputs.tables else (
+                      ", and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.")
     add("Add the rules-and-controls knowledge", "Knowledge, Add, upload " + ", ".join(p.name for p in inputs.rules)
-        + ", and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+        + knowledge_note,
         f"{len(rules)} rules knowledge file(s) listed as ready.", "rules-knowledge", downloads=rules)
     for item in lists:
         add(f"Add the {human(item['record_set']).lower()} tool",
@@ -707,6 +889,17 @@ def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str
         "app": {"spec": "studio/managed-app/app.json", "names": app_names},
         "cases": f"tests/demo_cases/{inputs.slug}.json", "modes": modes,
     }
+    if inputs.tables:
+        document["summary"] = (f"The {inputs.title} workshop's clean entity tables on SharePoint, with a managed app. "
+                               "Unlisted records, rules and calculations remain in retained knowledge. Easy and "
+                               "Manual use the same listed fields and do not fabricate missing records.")
+    omitted = [f"{item['title']}: {column['name']}" for item in lists for column in item.get("omitted_columns", [])]
+    if omitted:
+        document["summary"] += " Email privacy omissions (not present in lists): " + "; ".join(omitted) + "."
+        for mode in modes.values():
+            for step in mode["steps"]:
+                if step["title"] in {"See the synthetic records in SharePoint", "Review the agent"}:
+                    step["expected"] += " Not in the lists (email privacy gate): " + "; ".join(omitted) + "."
     existing = (existing_root or root) / "solutions" / inputs.slug / "studio/walkthrough.json"
     if existing.is_file():
         preserve_screenshots(document, read_json(existing))
@@ -824,11 +1017,12 @@ def package_files(slug: str, *, root: Path = ROOT, names: dict[str, str] | None 
         base / "studio/data/schema.json": schema_text(schema),
         **{base / "studio/data" / f"{key}.csv": value for key, value in csvs.items()},
         base / "studio/agent/GLOBAL-INSTRUCTIONS.md": instructions_for(inputs, schema, tools, root),
-        **{base / "studio/agent/skills" / p.relative_to(root / base / "manual/skills"): skill_for(p, inputs)
+        **{base / "studio/agent/skills" / p.relative_to(root / base / "manual/skills"): skill_for(p, inputs, schema)
            for p in inputs.skills},
         base / "studio/managed-app/app.json": json_text(app),
         base / "studio/walkthrough.json": json_text(document),
     }
+    files.update(retained_knowledge_files(inputs, schema, root))
     for relative, text in files.items():
         renderer.check_privacy(text, relative.as_posix())
         if any(forbidden in text.lower() for forbidden in FORBIDDEN_IDENTITY):
@@ -842,6 +1036,8 @@ def package_files(slug: str, *, root: Path = ROOT, names: dict[str, str] | None 
                 dependencies += [(existing_root / base / shot["file"], base / shot["file"])
                                  for shot in renderer.screenshot_list(step["screenshot"]) if shot["status"] == "reviewed"]
         for source, relative in dependencies:
+            if relative in files:
+                continue
             target = stage / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)

@@ -1,0 +1,75 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "account-intelligence",
+  "description": "Selected entity records parsed from the workshop's authoritative synthetic knowledge. Unlisted facts, rules and calculations remain in retained knowledge.",
+  "source": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack/account_intelligence_agent.py",
+  "records_markdown": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-synthetic-records.md",
+  "lists": [
+    {
+      "id": "acme-stakeholder-map",
+      "title": "Account Intelligence Acme Stakeholder Map",
+      "description": "Synthetic acme stakeholder map (AIBAST Account Intelligence workshop; fictional).",
+      "record_set": "ACME_STAKEHOLDER_MAP",
+      "columns": [
+        {"name": "Title", "label": "Name", "from": "name", "type": "text"},
+        {"name": "AcmeStakeholderMapId", "label": "Acme Stakeholder Map ID", "from": "name", "type": "text"},
+        {"name": "Role", "label": "Role", "from": "role", "type": "text"},
+        {"name": "Influence", "label": "Influence", "from": "influence", "type": "text"},
+        {"name": "Sentiment", "label": "Sentiment", "from": "sentiment", "type": "text"},
+        {"name": "Meetings", "label": "Meetings", "from": "meetings", "type": "text"},
+        {"name": "ExactSyntheticNotes", "label": "Exact synthetic notes", "from": "exact_synthetic_notes", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-synthetic-records.md",
+        "section": "Acme stakeholder map",
+        "selector": "Acme stakeholder map [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 8,
+        "sources": [
+          "_STAKEHOLDERS"
+        ]
+      }
+    }
+  ],
+  "source_of_truth": "knowledge-table",
+  "retained_knowledge": [
+    {
+      "file": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-operating-rules.md",
+      "section": "Deterministic routing",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-operating-rules.md",
+      "section": "Competitive output contract",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-operating-rules.md",
+      "section": "Risk calculation and output contract",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-synthetic-records.md",
+      "section": "Account record",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-synthetic-records.md",
+      "section": "Recent activity",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-synthetic-records.md",
+      "section": "Our synthetic comparison profile",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/account-intelligence/manual/knowledge/aibast_account-intelligence-synthetic-records.md",
+      "section": "Competitor records",
+      "reason": "Competitor records: CompetitorA.Implementation has no unambiguous literal field"
+    }
+  ]
+}

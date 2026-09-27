@@ -58,6 +58,7 @@ staging deployment never substitute for live native evidence.
 | Copilot-only Easy-mode comparison | `solutions/procurement-agent/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/procurement-agent/quest.html` |
 | Literal browser tutorial | `solutions/procurement-agent/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/procurement-agent/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/procurement-agent/export-manifest.json` |
 | Source bundle | `solutions/procurement-agent/exports/procurement-agent-source.zip` |
 | Manual evidence | `solutions/procurement-agent/evals/manual-build-evidence.json` |

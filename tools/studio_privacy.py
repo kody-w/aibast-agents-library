@@ -21,3 +21,8 @@ def reserved_email(address: str) -> bool:
 def has_unapproved_email(text: str) -> bool:
     decoded = unquote(html.unescape(text))
     return any(not reserved_email(match[0]) for match in EMAIL_RE.finditer(decoded))
+
+
+def redact_unapproved_emails(text: str) -> str:
+    return EMAIL_RE.sub(lambda match: match[0] if reserved_email(match[0])
+                        else "[email omitted: privacy gate]", text)

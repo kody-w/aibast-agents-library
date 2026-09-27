@@ -4,11 +4,13 @@
     python3 tools/build_studio_data.py emission-tracking          # write solutions/<slug>/studio/data/*.csv
     python3 tools/build_studio_data.py --check                    # every studio package: CSVs current, records intact
 
-The records come from the portable agent itself: the module-level record sets named in
+Literal-mode records come from the portable agent itself: the module-level record sets named in
 solutions/<slug>/studio/data/schema.json, read with ast.literal_eval (the agent is never imported or run). They must
 equal the JSON blocks of the workshop's synthetic-records knowledge file, so the lists, the knowledge the manual
 workshop uploads and the agent's own answers all rest on the same records. Every field of every record must land in
-a column; a field the schema leaves out is an error, not a silent omission.
+a column; a field the schema leaves out is an error unless it has a checked email-privacy omission.
+Knowledge-table mode reparses the named Markdown entity section on every build, corroborates available literal
+records without executing the agent, and compares emitted CSV bytes exactly in --check mode.
 """
 
 import argparse
@@ -22,6 +24,12 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools import studio_knowledge_tables as knowledge_tables
+from tools.studio_privacy import has_unapproved_email
+
 SCHEMA = "aibast-studio-data/1.0"
 TYPES = {"text", "number", "date"}
 COLUMN = re.compile(r"[A-Za-z][A-Za-z0-9]{0,31}")
@@ -176,6 +184,11 @@ def check_schema(schema):
             raise StudioDataError(f"duplicate list {lst['id']} / {lst['title']}")
         ids.add(lst["id"])
         titles.add(lst["title"])
+        if lst.get("source_of_truth") == "knowledge-table":
+            provenance = lst.get("knowledge_table")
+            if not isinstance(provenance, dict) or any(not isinstance(provenance.get(key), str)
+                    or not provenance[key] for key in ("file", "section", "selector", "form")):
+                raise StudioDataError(f"{lst['id']}: knowledge-table provenance needs file, section, selector and form")
         names = [c.get("name") for c in lst["columns"]]
         if names[:1] != ["Title"]:
             raise StudioDataError(f"{lst['id']}: the first column must be Title (SharePoint's own)")
@@ -230,16 +243,50 @@ def build_schema(schema, root=ROOT):
     out = {}
     for lst in schema["lists"]:
         name = lst["record_set"]
-        if name not in source:
-            raise StudioDataError(f"the agent defines no literal record set {name}")
-        records = json_records(source[name])
-        if not matching_records(records, written.get(name)):
-            raise StudioDataError(f"{name} in {schema['records_markdown']} differs from the agent's source")
+        if lst.get("source_of_truth") == "knowledge-table":
+            provenance = lst.get("knowledge_table") or {}
+            try:
+                path = Path(root) / provenance["file"]
+                if not path.resolve().is_relative_to(Path(root).resolve()):
+                    raise StudioDataError(f"{name}: knowledge-table path escapes the repository")
+                parsed = knowledge_tables.parse_knowledge(path)
+                matches = [table for table in parsed.records if table.selector == provenance["selector"]]
+                if len(matches) != 1:
+                    raise StudioDataError(f"{name}: the authoritative Markdown entity section is missing or no longer clean")
+                table = matches[0]
+                knowledge_tables.cross_check(table, Path(root) / schema["source"], provenance.get("literal_fields"))
+                knowledge_tables.omit_private_columns(table)
+                expected_proof = {"rows": table.literal_rows, "sources": table.literal_sources}
+                if lst.get("literal_cross_check") != expected_proof:
+                    raise StudioDataError(f"{name}: literal corroboration provenance is stale; regenerate the package")
+                declared = {item["from"] for item in lst.get("omitted_columns", [])}
+                actual = {item["from"] for item in table.omitted_columns}
+                if actual != declared:
+                    raise StudioDataError(f"{name}: email omissions differ from the freshly parsed Markdown")
+                records = table.rows
+            except knowledge_tables.KnowledgeTableError as error:
+                raise StudioDataError(str(error)) from error
+        else:
+            if name not in source:
+                raise StudioDataError(f"the agent defines no literal record set {name}")
+            records = json_records(source[name])
+            if not matching_records(records, written.get(name)):
+                raise StudioDataError(f"{name} in {schema['records_markdown']} differs from the agent's source")
         rows = record_rows(records)
         paths = {c["from"] for c in lst["columns"]}
+        omitted = set()
+        for item in lst.get("omitted_columns", []):
+            if item.get("reason") != "email privacy gate" or not item.get("from"):
+                raise StudioDataError(f"{name}: omissions require an explicit email privacy reason and source field")
+            path = item["from"]
+            if lst.get("source_of_truth") != "knowledge-table" and not any(
+                has_unapproved_email(_cell(_get(record, path, optional=True), "text")) for _, record in rows
+            ):
+                raise StudioDataError(f"{name}: {path} is not justified by the email privacy gate")
+            omitted.add(path)
         for rid, record in rows:
             missing = sorted(p or "$value" for p, _ in _leaves(record)
-                             if p not in paths and "$value" not in paths)
+                             if p not in paths and (p or "$value") not in omitted and "$value" not in paths)
             if missing:
                 raise StudioDataError(f"{name}.{rid}: fields with no column: {', '.join(missing)}")
         buf = io.StringIO()
@@ -260,24 +307,24 @@ def studio_slugs(root=ROOT):
     return sorted(p.parent.parent.parent.name for p in (Path(root) / "solutions").glob("*/studio/data/schema.json"))
 
 
-def main(argv=None):
+def main(argv=None, *, root=ROOT):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("slugs", nargs="*", help="workshops to build (default: every one with studio/data)")
     parser.add_argument("--check", action="store_true", help="fail if a CSV is missing or out of date")
     args = parser.parse_args(argv)
     stale = []
-    for slug in args.slugs or studio_slugs():
-        base = ROOT / "solutions" / slug / "studio" / "data"
+    for slug in args.slugs or studio_slugs(root):
+        base = Path(root) / "solutions" / slug / "studio" / "data"
         try:
-            files = build(slug)
+            files = build(slug, root=root)
         except (StudioDataError, OSError, ValueError) as e:
             print(f"{slug}: {e}", file=sys.stderr)
             return 1
         for list_id, text in files.items():
             target = base / f"{list_id}.csv"
             if args.check:
-                if not target.exists() or target.read_text(encoding="utf-8") != text:
-                    stale.append(str(target.relative_to(ROOT)))
+                if not target.exists() or target.read_bytes() != text.encode("utf-8"):
+                    stale.append(str(target.relative_to(root)))
             else:
                 target.write_text(text, encoding="utf-8")
         print(f"{slug}: {len(files)} list(s) {'checked' if args.check else 'written'}")

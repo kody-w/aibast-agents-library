@@ -1,0 +1,99 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "ai-customer-assistant",
+  "description": "Selected entity records parsed from the workshop's authoritative synthetic knowledge. Unlisted facts, rules and calculations remain in retained knowledge.",
+  "source": "agents/@aibast-agents-library/general_stacks/ai_customer_assistant_stack/ai_customer_assistant_agent.py",
+  "records_markdown": "solutions/ai-customer-assistant/manual/knowledge/aibast_ai-customer-assistant-synthetic-records.md",
+  "lists": [
+    {
+      "id": "inquiry-records",
+      "title": "Customer Escalations Inquiry Records",
+      "description": "Synthetic inquiry records (AIBAST Customer Escalations workshop; fictional).",
+      "record_set": "INQUIRY_RECORDS",
+      "columns": [
+        {"name": "Title", "label": "Customer", "from": "customer", "type": "text"},
+        {"name": "InquiryRecordId", "label": "Inquiry Record ID", "from": "id", "type": "text"},
+        {"name": "Contact", "label": "Contact", "from": "contact", "type": "text"},
+        {"name": "Channel", "label": "Channel", "from": "channel", "type": "text"},
+        {"name": "Subject", "label": "Subject", "from": "subject", "type": "text"},
+        {"name": "Description", "label": "Description", "from": "description", "type": "text"},
+        {"name": "Category", "label": "Category", "from": "category", "type": "text"},
+        {"name": "Priority", "label": "Priority", "from": "priority", "type": "text"},
+        {"name": "CreatedAt", "label": "Created at", "from": "created_at", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "AccountTier", "label": "Account tier", "from": "account_tier", "type": "text"},
+        {"name": "Sentiment", "label": "Sentiment", "from": "sentiment", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/ai-customer-assistant/manual/knowledge/aibast_ai-customer-assistant-synthetic-records.md",
+        "section": "Inquiry records",
+        "selector": "Inquiry records [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 4,
+        "sources": [
+          "_INQUIRIES"
+        ]
+      },
+      "omitted_columns": [
+        {"name": "Email", "from": "email", "reason": "email privacy gate"}
+      ]
+    },
+    {
+      "id": "recent-fictional-surveys",
+      "title": "Customer Escalations Recent Fictional Surveys",
+      "description": "Synthetic recent fictional surveys (AIBAST Customer Escalations workshop; fictional).",
+      "record_set": "RECENT_FICTIONAL_SURVEYS",
+      "columns": [
+        {"name": "Title", "label": "Inquiry", "from": "inquiry", "type": "text"},
+        {"name": "RecentFictionalSurveyId", "label": "Recent Fictional Survey ID", "from": "inquiry", "type": "text"},
+        {"name": "Score", "label": "Score", "from": "score", "type": "text"},
+        {"name": "Comment", "label": "Comment", "from": "comment", "type": "text"},
+        {"name": "Date", "label": "Date", "from": "date", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/ai-customer-assistant/manual/knowledge/aibast_ai-customer-assistant-synthetic-records.md",
+        "section": "Recent fictional surveys",
+        "selector": "Satisfaction snapshot / Recent fictional surveys [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 6,
+        "sources": [
+          "_SATISFACTION_DATA"
+        ]
+      }
+    }
+  ],
+  "source_of_truth": "knowledge-table",
+  "retained_knowledge": [
+    {
+      "file": "solutions/ai-customer-assistant/manual/knowledge/aibast_ai-customer-assistant-synthetic-records.md",
+      "section": "Routing matrix",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/ai-customer-assistant/manual/knowledge/aibast_ai-customer-assistant-synthetic-records.md",
+      "section": "Satisfaction snapshot",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/ai-customer-assistant/manual/knowledge/aibast_ai-customer-assistant-synthetic-records.md",
+      "section": "Score distribution",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/ai-customer-assistant/manual/knowledge/aibast_ai-customer-assistant-synthetic-records.md",
+      "section": "Locked-case evidence contract",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/ai-customer-assistant/manual/knowledge/aibast_ai-customer-assistant-synthetic-records.md",
+      "section": "Knowledge-base records",
+      "reason": "heading records are nested or have unequal field sets"
+    }
+  ]
+}
