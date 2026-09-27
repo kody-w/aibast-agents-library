@@ -232,10 +232,13 @@ legacy routes have explicit source-backed `skill_evidence` mappings. Multi-case
 skills scope each phrase set to its matching prompt, rather than requiring
 unrelated case facts in every answer.
 
-The emission skill oracle is pinned to lead commit `3c5f9159` through
+The emission skill oracle is pinned to lead commit `6a988a88` through
 `tests/fixtures/studio/emission-tracking-evidence-contract.json`. It verifies all
 four generated skills byte-for-byte against that immutable reference; the
 protected emission package itself is not overwritten.
+The current conclusion guard permits only explicitly labeled simple arithmetic
+on source figures and forbids independent coverage/sufficiency claims, rankings
+or recommendations beyond the operation's canonical output.
 
 Regenerate the existing journey surfaces and source bundle for each new edition:
 

@@ -33,6 +33,7 @@ def test_every_generated_skill_has_exact_evidence_and_no_added_claims():
             text = path.read_text()
             assert "## Required evidence\n\n" + CONTRACT["intro"] + "\n\n" in text, path
             assert text.count(CONTRACT["conclusions"]) == 1, path
+            assert package.LEGACY_EVIDENCE_CONCLUSIONS not in text, path
             assert re.search(r"(?m)^- .+", text.split("## Required evidence\n\n", 1)[1]), path
             checked += 1
     assert checked > 200
@@ -55,6 +56,17 @@ def test_evidence_guard_is_idempotent_for_an_existing_evidence_section():
     path = inputs.skills[0]
     text = package.skill_for(path, inputs)
     assert package.exact_skill_evidence(text, path, inputs) == text
+
+
+def test_prior_conclusion_guard_is_replaced_not_duplicated():
+    inputs = package.load_inputs("emission-tracking")
+    path = inputs.skills[0]
+    current = package.skill_for(path, inputs)
+    previous = current.replace(CONTRACT["conclusions"], package.LEGACY_EVIDENCE_CONCLUSIONS)
+    assert package.exact_skill_evidence(previous, path, inputs) == current
+    assert "simple arithmetic on those figures that you label as computed" in current
+    assert "covers, closes, exceeds, offsets or is sufficient for another" in current
+    assert "do not rank or recommend options" in current
 
 
 @pytest.mark.parametrize("missing", ["intro", "conclusions"])

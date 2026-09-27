@@ -25,6 +25,6 @@ Include each phrase below in the answer exactly as written (same words, same ord
 - Substation Transformer B-12
 - 2026-05-01
 
-Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output, or simple arithmetic on those figures that you label as computed. Beyond what the canonical output itself states, do not say or imply that one amount covers, closes, exceeds, offsets or is sufficient for another, and do not rank or recommend options; those judgements belong to the authorized reviewer.
 
 Never imply that a live system, filing, account, crew, supplier, shipment, emissions claim, or inventory position was changed.
