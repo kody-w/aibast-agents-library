@@ -228,6 +228,12 @@ def test_literal_email_omission_is_checked_and_cannot_hide_an_unrelated_field(tm
     ]
     csv_text = data.build_schema(schema, root=tmp_path)["records"]
     assert "ContactEmail" not in csv_text and "unapproved.example.net" not in csv_text
+    unsafe = copy.deepcopy(schema)
+    unsafe["lists"][0]["omitted_columns"] = []
+    unsafe["lists"][0]["columns"].append(
+        {"name": "ContactEmail", "label": "Contact email", "from": "contact_email", "type": "text"})
+    with pytest.raises(data.StudioDataError, match="unapproved email in a listed column"):
+        data.build_schema(unsafe, root=tmp_path)
     item["omitted_columns"].append({"name": "Amount", "from": "amount", "reason": "email privacy gate"})
     with pytest.raises(data.StudioDataError, match="not justified"):
         data.build_schema(schema, root=tmp_path)

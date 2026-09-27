@@ -294,9 +294,12 @@ def build_schema(schema, root=ROOT):
         writer.writerow([c["name"] for c in lst["columns"]])
         for rid, record in rows:
             try:
-                writer.writerow([_cell(rid if c["from"] == "$key"
-                                       else _get(record, c["from"], optional=c.get("optional", False)), c["type"])
-                                 for c in lst["columns"]])
+                cells = [_cell(rid if c["from"] == "$key"
+                               else _get(record, c["from"], optional=c.get("optional", False)), c["type"])
+                         for c in lst["columns"]]
+                if any(has_unapproved_email(cell) for cell in cells):
+                    raise StudioDataError("unapproved email in a listed column; an explicit privacy omission is required")
+                writer.writerow(cells)
             except StudioDataError as e:
                 raise StudioDataError(f"{name}.{rid}: {e}") from None
         out[lst["id"]] = buf.getvalue()
