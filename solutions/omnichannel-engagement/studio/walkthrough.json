@@ -147,10 +147,61 @@
           "case": "OCE-04",
           "prompt": "As Digital Engagement Manager, summarize the synthetic attribution view and avoid causal claims.",
           "expected": "The relevant list tool ran. Required evidence: Synthetic Campaign Attribution Report; Overall Campaign ROI; Recommendations only. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
-          "screenshot": {
-            "file": "screenshots/studio-easy/08-oce-04.webp",
-            "status": "pending"
-          }
+          "screenshot": [
+            {
+              "file": "screenshots/studio-easy/08a-omnichannel-engagement-04-tool.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "Locked case OCE-04 on the Easy Draft in a fresh Preview conversation, with the 5a482c4a skills (the passing retry): its Get items call, with table Omnichannel Engagement Campaign Results and the Easy workshop site as dataset (tenant masked), and its output starting with Spring Collection Launch, CAMP-301, email, 250000 sent.",
+              "anchors": [
+                "Input",
+                "table: Omnichannel Engagement Campaign Results",
+                "dataset: https://<your-tenant>.sharepoint.com/sites/AIBASTSyntheticData",
+                "Output",
+                "Spring Collection Launch",
+                "field_1 CAMP-301"
+              ],
+              "captured_at": "2026-09-27T11:41:20Z"
+            },
+            {
+              "file": "screenshots/studio-easy/08b-omnichannel-engagement-04-answer.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The OCE-04 answer on the Easy Draft with the 5a482c4a skills: the Synthetic Campaign Attribution Report from the Campaign Results list, five campaigns CAMP-301 to CAMP-305 with conversions, revenue, cost and ROI exactly as in the canonical output, then Total Campaign Revenue $2,635,000, Total Campaign Cost $90,000 and Overall Campaign ROI 2,827.8%, and the start of the campaign detail.",
+              "anchors": [
+                "Synthetic Campaign Attribution Report",
+                "Spring Collection Launch (CAMP-301)",
+                "App Push — Loyalty Members (CAMP-305)",
+                "38,150.0%",
+                "Total Campaign Revenue: $2,635,000",
+                "Total Campaign Cost: $90,000",
+                "Overall Campaign ROI: 2,827.8%"
+              ],
+              "captured_at": "2026-09-27T11:42:55Z"
+            },
+            {
+              "file": "screenshots/studio-easy/08c-omnichannel-engagement-04-boundary.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The end of the OCE-04 answer on the Easy Draft: the CAMP-305 detail, the attribution limitations (last-touch attribution from fixed synthetic records; observed associations that do not establish that any campaign caused revenue outcomes; descriptive, not causal), the controls stating Recommendations only with no message, offer, reward, or purchase action and no identity stitching, and the citation of the rules and safety knowledge.",
+              "anchors": [
+                "App Push — Loyalty Members (CAMP-305)",
+                "Attribution Limitations",
+                "they do not establish that any campaign caused revenue outcomes",
+                "All conclusions are descriptive, not causal",
+                "Recommendations only",
+                "No individual identities have been stitched, contacted, or profiled",
+                "aibast_omnichannel-rules-and-safety.md"
+              ],
+              "captured_at": "2026-09-27T11:44:10Z"
+            }
+          ]
         },
         {
           "id": "easy-09",
