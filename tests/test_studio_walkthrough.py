@@ -103,6 +103,11 @@ def source(tmp_path):
     package = seed_package(tmp_path)
     path = package / "studio/walkthrough.json"
     document = json.loads(path.read_text(encoding="utf-8"))
+    # The tests below edit easy-03 as a single pending capture; pin that state so they do not depend on how
+    # far the live reference package's captures have progressed.
+    document["modes"]["easy"]["steps"][2]["screenshot"] = {"file": "screenshots/studio-easy/03-lists.webp",
+                                                           "status": "pending"}
+    path.write_text(json.dumps(document, indent=1) + "\n", encoding="utf-8")
     return tmp_path, package, path, document
 
 
