@@ -166,7 +166,7 @@
         {
           "id": "manual-03",
           "title": "Create Utility Billing and Assistance Usage History from its CSV",
-          "action": "On the site: New, List, From CSV. Upload usage-history.csv. On Customize, keep Title mapped to the Title column. Set UsageHistoryId, Value to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Utility Billing and Assistance Usage History. Preserve the CSV column order.",
+          "action": "On the site: New, List, From CSV. Upload usage-history.csv. On Customize, keep Title mapped to the Title column. Set UsageHistoryId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Use Multiple lines of text for Value (up to 477 characters). If the import screen cannot create these long-text columns losslessly, stop and report the import limitation; do not continue with truncated records. Compare their full values with the downloaded CSV. Name the list Utility Billing and Assistance Usage History. Preserve the CSV column order.",
           "downloads": [
             "studio/data/usage-history.csv"
           ],

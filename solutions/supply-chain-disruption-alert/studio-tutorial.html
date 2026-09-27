@@ -992,7 +992,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/supply-chain-disruption-alert/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>On the site: New, List, From CSV. Upload alternative-suppliers.csv. On Customize, keep Title mapped to the Title column. Set AlternativeSupplierId, Value to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Supply Chain Disruption Alert Alternative Suppliers. Preserve the CSV column order.</p></div>
+            <div class="instruction"><strong>Action</strong><p>On the site: New, List, From CSV. Upload alternative-suppliers.csv. On Customize, keep Title mapped to the Title column. Set AlternativeSupplierId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Use Multiple lines of text for Value (up to 441 characters). If the import screen cannot create these long-text columns losslessly, stop and report the import limitation; do not continue with truncated records. Compare their full values with the downloaded CSV. Name the list Supply Chain Disruption Alert Alternative Suppliers. Preserve the CSV column order.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>5 fictional records, including Electronics (AlternativeSupplierId Electronics).</p></div>
           </div>
           

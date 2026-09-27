@@ -166,7 +166,7 @@
         {
           "id": "manual-03",
           "title": "Create Customer Onboarding KYC Documents from its CSV",
-          "action": "On the site: New, List, From CSV. Upload kyc-documents.csv. On Customize, keep Title mapped to the Title column. Set KYCDocumentId, Value to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Customer Onboarding KYC Documents. Preserve the CSV column order.",
+          "action": "On the site: New, List, From CSV. Upload kyc-documents.csv. On Customize, keep Title mapped to the Title column. Set KYCDocumentId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Use Multiple lines of text for Value (up to 511 characters). If the import screen cannot create these long-text columns losslessly, stop and report the import limitation; do not continue with truncated records. Compare their full values with the downloaded CSV. Name the list Customer Onboarding KYC Documents. Preserve the CSV column order.",
           "downloads": [
             "studio/data/kyc-documents.csv"
           ],

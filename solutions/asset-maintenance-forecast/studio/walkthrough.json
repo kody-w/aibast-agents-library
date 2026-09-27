@@ -153,7 +153,7 @@
         {
           "id": "manual-02",
           "title": "Create Asset Maintenance Forecast Assets from its CSV",
-          "action": "On the site: New, List, From CSV. Upload assets.csv. On Customize, keep Title mapped to the Title column. Set AssetId, Type, Location, InstalledYear, LastMajorService, MaintenanceHistory, PredictedNextFailure to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep AgeYears, CapacityMW, ConditionScore, OperatingHours, FailureRateAnnualPct, ReplacementCost as Number. Name the list Asset Maintenance Forecast Assets. Preserve the CSV column order.",
+          "action": "On the site: New, List, From CSV. Upload assets.csv. On Customize, keep Title mapped to the Title column. Set AssetId, Type, Location, InstalledYear, LastMajorService, PredictedNextFailure to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Use Multiple lines of text for MaintenanceHistory (up to 311 characters). If the import screen cannot create these long-text columns losslessly, stop and report the import limitation; do not continue with truncated records. Compare their full values with the downloaded CSV. Keep AgeYears, CapacityMW, ConditionScore, OperatingHours, FailureRateAnnualPct, ReplacementCost as Number. Name the list Asset Maintenance Forecast Assets. Preserve the CSV column order.",
           "downloads": [
             "studio/data/assets.csv"
           ],

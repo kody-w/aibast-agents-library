@@ -274,6 +274,15 @@ def test_scalar_controls_are_not_summed(tmp_path):
     assert app["tables"][0]["metrics"] == [{"label": "RECORDS".capitalize(), "op": "count"}]
 
 
+def test_boolean_to_number_knowledge_drift_is_rejected(tmp_path):
+    inputs, schema, _csvs = dataset(tmp_path, {"x": {"name": "Example", "enabled": True}})
+    inputs.records_path.write_text(inputs.records_path.read_text().replace('"enabled": true', '"enabled": 1'))
+    with pytest.raises(data.StudioDataError, match="differs from the agent's source"):
+        data.build_schema(schema, root=tmp_path)
+    assert not data.matching_records({"flags": [False]}, {"flags": [0]})
+    assert data.matching_records({"amount": 1}, {"amount": 1.0})
+
+
 def test_column_name_collisions_are_deterministic():
     records = {"x": {"name": "Example", "same_name": 1, "same-name": 2}}
     first = package.columns_for("RECORDS", records, {})
@@ -390,9 +399,19 @@ def test_generated_agent_inputs_use_lists_instead_of_the_removed_knowledge():
             assert inputs.records_path.name not in text, path
             assert "two uploaded knowledge files" not in text, path
             assert "both uploaded files" not in text, path
+            assert "query external systems" not in text, path
+            assert "do not imply live access" not in text, path
             if path.name == "SKILL.md":
                 assert "SharePoint list tools" in text, path
         assert package.ROUTING in instructions, slug
+
+
+def test_list_access_exception_preserves_other_system_boundaries():
+    original = "Do not browse the web, query external systems, or invent facts. Never update CRM or send a message."
+    rewritten = package.rewrite_source_references(original, package.load_inputs(SAMPLE))
+    assert "query systems other than the workshop's synthetic SharePoint lists" in rewritten
+    assert "Do not browse the web" in rewritten
+    assert "Never update CRM or send a message." in rewritten
 
 
 def test_every_walkthrough_has_all_locked_cases_and_valid_assets():
@@ -421,6 +440,26 @@ def test_import_guidance_names_every_numeric_looking_text_column():
                 if column["type"] == "text" and any(re.match(r"^[+-]?\d", row[column["name"]]) for row in rows):
                     assert column["name"] in step["action"], (slug, column["name"])
                     assert "Single line of text" in step["action"], slug
+
+
+def test_import_guidance_protects_every_long_text_value():
+    checked = 0
+    for slug in data.studio_slugs():
+        walk = renderer.load_walkthrough(slug)
+        schema = package.read_json(walk.package / walk.document["data"])
+        for item in schema["lists"]:
+            download = f"studio/data/{item['id']}.csv"
+            step = next(s for s in walk.document["modes"]["manual"]["steps"] if download in s.get("downloads", []))
+            with (walk.package / download).open(newline="") as stream:
+                rows = list(csv.DictReader(stream))
+            for column in item["columns"]:
+                maximum = max(len(row[column["name"]]) for row in rows)
+                if column["type"] == "text" and maximum > 255:
+                    checked += 1
+                    assert f"{column['name']} (up to {maximum} characters)" in step["action"], slug
+                    assert "Multiple lines of text" in step["action"], slug
+                    assert "stop and report the import limitation" in step["action"], slug
+    assert checked > 0
 
 
 @pytest.fixture

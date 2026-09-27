@@ -144,7 +144,7 @@ def load_inputs(slug: str, root: Path = ROOT) -> Inputs:
         if name not in literals:
             raise BlockedWorkshop(f"{name} has no matching literal assignment in {source.relative_to(root)}")
         actual = data.json_records(literals[name])
-        if actual != expected:
+        if not data.matching_records(actual, expected):
             raise StudioPackageError(f"{name} in {records_path.relative_to(root)} differs from the agent's source")
         data.record_rows(actual)
         try:
@@ -399,6 +399,11 @@ def rewrite_source_references(text: str, inputs: Inputs) -> str:
     text = text.replace("relevant attached source", "relevant list tool result or rules source")
     text = text.replace("Retrieve the paired synthetic records and controls.", READ_RECORDS)
     text = text.replace("retrieve attached knowledge", "retrieve the list records and uploaded rules knowledge")
+    text = text.replace("query external systems", "query systems other than the workshop's synthetic SharePoint lists")
+    text = text.replace("do not imply live access", "do not imply access to live business-system data")
+    text = text.replace("Use only the fixed synthetic snapshot; do not browse, enrich, infer, invent, or use external data.",
+                        "Use only the fixed synthetic snapshot from the workshop's list tools and rules knowledge; "
+                        "do not browse, enrich, infer, invent, or use other data.")
     return text
 
 
@@ -579,11 +584,23 @@ def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str
         "named AIBAST Synthetic Data Manual.",
         "The site's home page opens and you can create lists on it.", "site")
     for item in lists:
-        text_columns = ", ".join(c["name"] for c in item["columns"][1:] if c["type"] == "text")
+        rows = list(csv.DictReader(io.StringIO(csvs[item["id"]])))
+        long_text = {c["name"]: max(len(row[c["name"]]) for row in rows)
+                     for c in item["columns"] if c["type"] == "text"
+                     and any(len(row[c["name"]]) > 255 for row in rows)}
+        if "Title" in long_text:
+            raise BlockedWorkshop(f"{item['id']}.Title exceeds SharePoint's 255-character Title limit")
+        text_columns = ", ".join(c["name"] for c in item["columns"][1:]
+                                 if c["type"] == "text" and c["name"] not in long_text)
         numbers = ", ".join(c["name"] for c in item["columns"] if c["type"] == "number")
         action = (f"On the site: New, List, From CSV. Upload {item['id']}.csv. On Customize, keep Title mapped "
                   f"to the Title column. Set {text_columns} to Single line of text. Keep dates as ISO text, "
                   "not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). ")
+        if long_text:
+            long_columns = ", ".join(f"{name} (up to {size} characters)" for name, size in long_text.items())
+            action += (f"Use Multiple lines of text for {long_columns}. If the import screen cannot create "
+                       "these long-text columns losslessly, stop and report the import limitation; do not "
+                       "continue with truncated records. Compare their full values with the downloaded CSV. ")
         if numbers:
             action += f"Keep {numbers} as Number. "
         action += f"Name the list {item['title']}. Preserve the CSV column order."

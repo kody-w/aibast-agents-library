@@ -65,9 +65,12 @@ meaningful additive metrics. It does not sum prices, rates, years, identifiers,
 percentages, or mixed key/value controls. All screenshots start **pending**.
 Regeneration preserves existing screenshot objects or arrays, including reviewed
 captures and their metadata, by surviving step ID. Nothing generated is proof
-of a live run. Long text/JSON fields still require live confirmation that the
-chosen SharePoint storage preserves the full cell; local CSV fidelity does not
-establish tenant-side import fidelity.
+of a live run. Text/JSON values over 255 characters are named explicitly in the
+Manual import step with their maximum source length and require **Multiple lines
+of text**, not a single-line column. If the import screen cannot create those
+columns losslessly, the learner must stop and report the limitation rather than
+continue with truncated records. Full-cell comparison remains required; local
+CSV fidelity does not establish tenant-side import fidelity.
 
 ## Overrides and the reference oracle
 

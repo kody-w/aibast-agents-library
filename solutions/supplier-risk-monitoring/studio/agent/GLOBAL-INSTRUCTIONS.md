@@ -14,7 +14,7 @@ Use only the list-backed synthetic records, review rules, and operation skills. 
 
 ## Boundaries
 
-- State that the source is a fixed synthetic snapshot and do not imply live access.
+- State that the source is a fixed synthetic snapshot and do not imply access to live business-system data.
 - Do not browse or invent records, actions, confirmations, or outcomes.
 - The agent recommends review options only and never contacts, qualifies, selects, or orders from suppliers.
 - Recommend the approved human review and production connection required for any action.

@@ -30,7 +30,7 @@ Route timing options, pull-forward questions, or quick-win scenarios to `acceler
 ## Fixed evidence policy
 
 - Use only the list-backed synthetic pipeline snapshot. It is not live CRM, activity, forecast, or customer data.
-- Do not browse the web, query external systems, or use unstated knowledge.
+- Do not browse the web, query systems other than the workshop's synthetic SharePoint lists, or use unstated knowledge.
 - Never invent or substitute a deal, stakeholder, activity, stage, blocker, value, date, score, owner, task, or outcome.
 - If evidence is absent, say that it is not present in the fixed snapshot.
 - Treat every amount, percentage, timing estimate, and projection as synthetic planning evidence, never a forecast commitment.

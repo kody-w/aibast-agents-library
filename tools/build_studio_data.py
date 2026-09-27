@@ -128,6 +128,19 @@ def record_rows(records):
     raise StudioDataError("a record set must be a non-empty mapping or sequence")
 
 
+def matching_records(source, written):
+    """Compare JSON values without Python's True == 1 / False == 0 coercion."""
+    if isinstance(source, bool) or isinstance(written, bool):
+        return type(source) is type(written) and source == written
+    if isinstance(source, dict):
+        return (isinstance(written, dict) and source.keys() == written.keys()
+                and all(matching_records(value, written[key]) for key, value in source.items()))
+    if isinstance(source, list):
+        return (isinstance(written, list) and len(source) == len(written)
+                and all(matching_records(a, b) for a, b in zip(source, written)))
+    return source == written
+
+
 def _leaves(value, prefix=""):
     if isinstance(value, dict) and value:
         for key, inner in value.items():
@@ -220,7 +233,7 @@ def build_schema(schema, root=ROOT):
         if name not in source:
             raise StudioDataError(f"the agent defines no literal record set {name}")
         records = json_records(source[name])
-        if written.get(name) != records:
+        if not matching_records(records, written.get(name)):
             raise StudioDataError(f"{name} in {schema['records_markdown']} differs from the agent's source")
         rows = record_rows(records)
         paths = {c["from"] for c in lst["columns"]}
