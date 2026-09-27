@@ -118,7 +118,15 @@ def test_check_detects_obsolete_csvs_without_deleting_them(source_root):
 def test_all_excludes_reference_and_unadvertised_workshops(monkeypatch, tmp_path):
     called = []
     monkeypatch.setattr(package, "agent_names", lambda root: {})
-    monkeypatch.setattr(package, "package_files", lambda slug, **kwargs: called.append(slug) or {})
+    monkeypatch.setattr(package, "existing_catalog", lambda root, exclude: [])
+    monkeypatch.setattr(package, "validate_catalog", lambda entries: None)
+    monkeypatch.setattr(package, "tool_names", lambda schema, overrides: {})
+    monkeypatch.setattr(package, "write_package", lambda files, root, check: [])
+    def generated(slug, **kwargs):
+        called.append(slug)
+        base = Path("solutions") / slug / "studio"
+        return {base / "data/schema.json": "{}", base / "walkthrough.json": "{}"}
+    monkeypatch.setattr(package, "package_files", generated)
     assert package.main(["--all", "--out", str(tmp_path)]) == 0
     assert len(called) == 50
     assert "emission-tracking" not in called
@@ -340,6 +348,39 @@ def test_every_generated_package_is_current():
     for slug in data.studio_slugs():
         if slug != package.REFERENCE:
             assert package.write_package(package.package_files(slug), ROOT, check=True) == [], slug
+
+
+def test_every_advertised_workshop_is_generated_or_explicitly_blocked():
+    ready, blocked = set(), set()
+    for slug in package.advertised_slugs():
+        try:
+            package.load_inputs(slug)
+        except package.BlockedWorkshop as error:
+            assert str(error)
+            blocked.add(slug)
+        else:
+            ready.add(slug)
+    assert ready and blocked
+    assert ready == set(data.studio_slugs()), "Generate every source-verifiable edition; never invent blocked records"
+    assert len(ready | blocked) == 51
+    assert "grid-outage-response" not in ready | blocked
+    for slug in blocked:
+        assert not (ROOT / "solutions" / slug / "studio").exists(), slug
+
+
+def test_generated_agent_inputs_use_lists_instead_of_the_removed_knowledge():
+    for slug in data.studio_slugs():
+        inputs = package.load_inputs(slug)
+        base = ROOT / "solutions" / slug
+        instructions = (base / "studio/agent/GLOBAL-INSTRUCTIONS.md").read_text()
+        for path in [base / "studio/agent/GLOBAL-INSTRUCTIONS.md", *base.glob("studio/agent/skills/*/SKILL.md")]:
+            text = path.read_text()
+            assert inputs.records_path.name not in text, path
+            assert "two uploaded knowledge files" not in text, path
+            assert "both uploaded files" not in text, path
+            if path.name == "SKILL.md":
+                assert "SharePoint list tools" in text, path
+        assert package.ROUTING in instructions, slug
 
 
 def test_every_walkthrough_has_all_locked_cases_and_valid_assets():

@@ -713,6 +713,15 @@ def validate_catalog(packages: list[tuple[dict, dict, dict[str, str]]]) -> None:
             raise StudioPackageError(f"{slug}: duplicate tool name within an agent")
 
 
+def existing_catalog(root: Path, exclude: list[str]) -> list[tuple[dict, dict, dict[str, str]]]:
+    result = []
+    for slug in data.studio_slugs(root):
+        if slug not in exclude:
+            walk = renderer.load_walkthrough(slug, root=root)
+            result.append((read_json(walk.package / walk.document["data"]), walk.document, walk.tools))
+    return result
+
+
 def managed_app_validator(path: Path | None = None) -> Callable[[dict], dict]:
     if path is not None:
         if not (path / "brainfreeze_studio/managed_app.py").is_file():
@@ -822,13 +831,20 @@ def main(argv: list[str] | None = None, *, root: Path = ROOT) -> int:
     try:
         names = agent_names(root)
         validator = managed_app_validator(args.brainfreeze_root) if args.brainfreeze_root else None
+        catalog = existing_catalog(root, slugs)
         for slug in slugs:
             try:
                 files = package_files(slug, root=root, names=names.get(slug), validator=validator, existing_root=args.out)
+                base = Path("solutions") / slug / "studio"
+                schema = json.loads(files[base / "data/schema.json"])
+                document = json.loads(files[base / "walkthrough.json"])
+                entry = (schema, document, tool_names(schema, overrides_for(slug, root)))
+                validate_catalog([*catalog, entry])
+                changed = write_package(files, args.out or root, check=args.check)
             except (StudioPackageError, data.StudioDataError, renderer.WalkthroughError, OSError, ValueError) as error:
                 failures.append(f"{slug}: {'BLOCKED: ' if isinstance(error, BlockedWorkshop) else ''}{error}")
                 continue
-            changed = write_package(files, args.out or root, check=args.check)
+            catalog.append(entry)
             stale.extend(changed if args.check else [])
             completed += 1
             print(f"{slug}: {len(files)} files {'checked' if args.check else 'generated'}")
