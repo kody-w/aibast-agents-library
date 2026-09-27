@@ -650,6 +650,9 @@ def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str
     existing = (existing_root or root) / "solutions" / inputs.slug / "studio/walkthrough.json"
     if existing.is_file():
         preserve_screenshots(document, read_json(existing))
+    for mode, lane in document["modes"].items():
+        for step in lane["steps"]:
+            renderer.validate_screenshot(existing.parent.parent, step["screenshot"], f"{step['id']}.screenshot", mode)
     return document
 
 

@@ -193,6 +193,18 @@ def test_out_directory_screenshots_take_precedence(source_root, tmp_path):
     assert package.read_json(path)["modes"]["easy"]["steps"][0]["screenshot"] == shot
 
 
+@pytest.mark.parametrize("screenshot", [None, [], {"file": "screenshots/studio-easy/test.webp", "status": "invalid"}])
+def test_invalid_preserved_screenshots_fail_before_writing(source_root, capsys, screenshot):
+    path = source_root / "solutions" / SAMPLE / "studio/walkthrough.json"
+    document = package.read_json(path)
+    document["modes"]["easy"]["steps"][0]["screenshot"] = screenshot
+    write_json(path, document)
+    before = {p: p.read_bytes() for p in path.parent.rglob("*") if p.is_file()}
+    assert package.main([SAMPLE], root=source_root) == 1
+    assert "screenshot" in capsys.readouterr().err
+    assert {p: p.read_bytes() for p in before} == before
+
+
 def dataset(tmp_path, records):
     source = tmp_path / "agent.py"
     source.write_text("raise RuntimeError('Never execute the agent')\nRECORDS = " + repr(records) + "\n")
