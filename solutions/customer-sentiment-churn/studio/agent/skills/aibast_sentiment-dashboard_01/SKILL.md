@@ -25,3 +25,16 @@ Persona: Customer Success Lead
 Prompt: What are customers telling us across channels, and which relationship needs attention first?
 
 Expected synthetic evidence: CUST-8002, Negative.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: What are customers telling us across channels, and which relationship needs attention first?
+
+- CUST-8002
+- Negative
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

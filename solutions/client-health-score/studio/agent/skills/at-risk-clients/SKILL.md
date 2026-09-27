@@ -9,3 +9,17 @@ Read listed entity facts with the SharePoint list tools, using the global instru
 Cover all critical and at-risk accounts. Show health, scenario churn indicator,
 NPS, trend, escalations, executive contact, and recommended actions. Describe
 indicators as uncertain and require account-owner approval.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Give me the accounts that need intervention now, the risk drivers, and the first recovery actions.
+
+- TechCorp Industries
+- Global Finance Corp
+- Healthcare Solutions Inc
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

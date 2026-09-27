@@ -76,3 +76,17 @@ options; otherwise cover all three lines.
 If the user requests a valuation or scenario outside the packaged records,
 say which evidence is missing and offer the three known lines and their
 precomputed options; do not calculate or invent a new scenario.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Give me the practical options to improve throughput without hiding the quality tradeoffs.
+
+- Option 1
+- Option 2
+- Quality improvement
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

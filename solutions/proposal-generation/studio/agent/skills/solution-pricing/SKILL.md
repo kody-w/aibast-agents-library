@@ -33,3 +33,17 @@ Compare the synthetic solution and pricing assumptions for Meridian Healthcare w
 
 ## Expected evidence marker
 The response must include `Solution & Pricing`, `Budget Analysis`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Compare the synthetic solution and pricing assumptions for Meridian Healthcare without approving a price, discount, or concession.
+
+- Solution & Pricing
+- Budget Analysis
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

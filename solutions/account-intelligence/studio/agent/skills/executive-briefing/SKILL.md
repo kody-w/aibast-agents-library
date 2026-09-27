@@ -36,3 +36,17 @@ Prepare a concise synthetic Acme pre-meeting briefing and review checklist.
 
 ## Expected evidence marker
 The response must include the exact headings `Account Intelligence Briefing`, `Pre-Meeting Checklist`, and `Evidence boundary`.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare a concise synthetic Acme pre-meeting briefing and review checklist.
+
+- Account Intelligence Briefing
+- Pre-Meeting Checklist
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

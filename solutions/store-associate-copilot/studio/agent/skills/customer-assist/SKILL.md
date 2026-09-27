@@ -10,3 +10,17 @@ Select the matching synthetic scenario, give short draft language, a respectful
 follow-up, and practical tips. Never infer sensitive traits, pressure a shopper,
 send anything, apply a promotion, process a return, or transact. Escalate policy
 or payment decisions to an authorized associate.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: As Store Associate, draft respectful language for acknowledging a complaint while keeping the decision with an authorized reviewer.
+
+- Draft Customer Assistance Guide
+- Suggested Draft Language
+- authorized associate
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

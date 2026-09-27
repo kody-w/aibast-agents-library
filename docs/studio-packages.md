@@ -213,12 +213,29 @@ The generator rejects an over-budget result rather than truncating it.
 When the full instructions exceed that template budget, the generator preserves
 the complete source-adapted instruction contract in
 `studio/agent/knowledge/<slug>-instruction-controls.md` and adds it to the agent's
-required knowledge and Manual uploads. The shorter global instructions retain
-every list-column mapping, the exact site section, routing sections, mandatory
-review/footer sections and safety boundaries. They require retrieving and
-following the complete control file before each answer; no policy is silently
-dropped. Data, extraction provenance, skill files and app definitions do not
-change as a result of this compaction.
+required knowledge and Manual uploads. The shorter global instructions retain the exact site section, routing
+sections, mandatory review/footer sections and safety boundaries. Long
+list-column mappings move intact to the uploaded controls knowledge under
+`List columns`; GLOBAL keeps the list/tool inventory and an explicit instruction
+to load that mapping before filtering or interpreting records. No mappings,
+policies or source facts are cut. Tests check the 8,000-character bound after
+both 100-character and 1,000-character site-URL substitution. Data, extraction
+provenance and app definitions do not change as a result of this compaction.
+
+## Exact operation evidence
+
+Every generated skill has a required-evidence section with the exact-phrase
+instruction and the lead's source-only conclusions guard. Existing evidence
+bullets and existing no-action text remain unchanged. Skills using other manual
+formats obtain their required phrases from their locked cases; exceptional
+legacy routes have explicit source-backed `skill_evidence` mappings. Multi-case
+skills scope each phrase set to its matching prompt, rather than requiring
+unrelated case facts in every answer.
+
+The emission skill oracle is pinned to lead commit `3c5f9159` through
+`tests/fixtures/studio/emission-tracking-evidence-contract.json`. It verifies all
+four generated skills byte-for-byte against that immutable reference; the
+protected emission package itself is not overwritten.
 
 Regenerate the existing journey surfaces and source bundle for each new edition:
 

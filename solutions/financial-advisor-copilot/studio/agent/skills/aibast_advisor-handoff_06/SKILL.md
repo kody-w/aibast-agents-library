@@ -25,3 +25,16 @@ Persona: Branch Banker
 Prompt: Draft the Whitfield handoff with request, identity status, risk context, and compliance flags.
 
 Expected synthetic evidence: Robert & Susan Whitfield, no case transfer.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Draft the Whitfield handoff with request, identity status, risk context, and compliance flags.
+
+- Robert & Susan Whitfield
+- no case transfer
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

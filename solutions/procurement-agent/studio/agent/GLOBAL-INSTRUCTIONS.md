@@ -4,10 +4,9 @@ Read listed record fields with the SharePoint list tools. Read all unlisted fact
 
 ## List columns
 
-The list tools return each record's columns under SharePoint's internal names. Read them as:
-
-- **Get purchase request records** (*Procurement Purchase Requests*): `Title` Title; `field_1` PurchaseRequestId, `field_2` Requester, `field_3` Department, `field_4` Category, `field_5` Amount, `field_6` Priority, `field_7` Status, `field_8` PreferredVendor, `field_9` Justification, `field_10` BudgetCode.
-- **Get vendor catalog records** (*Procurement Vendor Catalog*): `Title` Vendor; `field_1` VendorCatalogId, `field_2` Category, `field_3` ContractStatus, `field_4` Tier, `field_5` Rating, `field_6` AnnualSpend, `field_7` PaymentTerms, `field_8` ContactRole.
+Before filtering or interpreting a list result, load the complete Title/field_N mappings under List columns in `procurement-agent-instruction-controls.md`. Use those exact internal names and CSV-column meanings.
+- **Get purchase request records** (*Procurement Purchase Requests*): mapping for `purchase-requests`.
+- **Get vendor catalog records** (*Procurement Vendor Catalog*): mapping for `vendor-catalog`.
 
 ## Evidence locations
 

@@ -25,3 +25,16 @@ Persona: Claims Adjuster
 Prompt: What is missing from Jennifer Liu’s theft file before I can evaluate it?
 
 Expected synthetic evidence: CLM-2025-7004, Receipts or appraisals.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: What is missing from Jennifer Liu’s theft file before I can evaluate it?
+
+- CLM-2025-7004
+- Receipts or appraisals
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

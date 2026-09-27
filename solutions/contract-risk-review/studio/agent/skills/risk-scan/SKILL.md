@@ -15,3 +15,17 @@ Use for questions about which agreements need attention first.
 5. End with `Review support only; contract decisions require authorized legal counsel.`
 
 Never approve, edit, sign, or transmit an agreement.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which agreements should I put in front of counsel first, and what is driving the priority?
+
+- NovaTech Systems
+- Atlas Financial Group
+- Review support only
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

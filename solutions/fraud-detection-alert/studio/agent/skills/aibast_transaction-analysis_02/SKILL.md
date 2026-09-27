@@ -25,3 +25,16 @@ Persona: Fraud Analyst
 Prompt: Show me the account activity behind the Dubai alert so I can investigate the sequence.
 
 Expected synthetic evidence: 4532-XXXX-8891, TXN-90002.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Show me the account activity behind the Dubai alert so I can investigate the sequence.
+
+- 4532-XXXX-8891
+- TXN-90002
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

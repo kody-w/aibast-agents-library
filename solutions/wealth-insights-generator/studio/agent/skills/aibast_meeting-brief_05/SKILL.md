@@ -25,3 +25,16 @@ Persona: Wealth Advisor
 Prompt: Prepare my review brief for the Kensington household without turning it into advice or outreach.
 
 Expected synthetic evidence: George & Martha Kensington, preparation material.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare my review brief for the Kensington household without turning it into advice or outreach.
+
+- George & Martha Kensington
+- preparation material
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

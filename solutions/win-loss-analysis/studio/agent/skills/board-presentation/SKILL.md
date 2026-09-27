@@ -33,3 +33,17 @@ Draft a board-level synthetic win and loss narrative with all investment and per
 
 ## Expected evidence marker
 The response must include `Board Presentation`, `Decision for authorized leaders`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Draft a board-level synthetic win and loss narrative with all investment and performance values labeled as scenarios.
+
+- Board Presentation
+- Decision for authorized leaders
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

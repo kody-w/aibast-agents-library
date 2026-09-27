@@ -11,3 +11,17 @@ Use for the highest-risk agreements. Put HIGH findings under the exact heading
 Include the fallback that medium terms may be traded only after high-risk issues
 are resolved. Escalate liability-cap impasses to General Counsel. Label the
 output `Draft positions` and state that no position has been sent or accepted.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare the negotiation positions, fallbacks, and escalation points for the highest-risk agreements.
+
+- Non-Negotiable Amendments
+- General Counsel
+- Draft positions
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

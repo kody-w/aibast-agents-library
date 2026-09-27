@@ -16,3 +16,17 @@ Use for questions about tests, comparative performance, or planning scenarios.
 
 No campaign is changed and no audience is contacted. Recommend the next
 controlled review or experiment.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: As Marketing Director, compare the synthetic tests and call out measurement limitations before any decision.
+
+- Marketing Performance Analysis
+- A/B Test Results
+- Synthetic aggregate planning data
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

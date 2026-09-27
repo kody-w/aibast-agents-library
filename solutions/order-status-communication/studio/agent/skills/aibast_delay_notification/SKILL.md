@@ -35,3 +35,16 @@ Do not browse, substitute live-looking facts, or invent missing records.
 ## Authorization boundary
 
 Never change an order, production schedule, shipment, sourcing decision, logistics action, or recovery plan. Never send email, EDI, portal, Teams, or any other customer communication. An approved communication tool and authorized sender are required.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare the internal delay and recovery review for the at-risk customer order without changing any schedule.
+
+- ORD-7813
+- Recorded synthetic recovery options
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

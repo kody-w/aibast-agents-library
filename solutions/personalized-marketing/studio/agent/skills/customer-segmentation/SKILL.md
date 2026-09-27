@@ -16,3 +16,17 @@ Use for portfolio questions about customer groups, engagement, or contribution.
 
 Output a compact table and review priorities. State that no individual was
 profiled and no campaign, message, offer, reward, or purchase action occurred.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: As Marketing Director, summarize the aggregate customer groups without demographic traits and identify portfolio review priorities.
+
+- Prepared for:** Marketing Director
+- Total Addressable Customers
+- no audience is profiled with sensitive attributes
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

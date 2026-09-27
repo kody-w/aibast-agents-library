@@ -39,3 +39,16 @@ For the exact prompt `Give me the business onboarding document list for Blackwoo
 `Synthetic onboarding evidence only; no identity verification, approval, account opening, provisioning, outreach, or record change occurred. Authorized human review required.`
 
 Do not add a status table, icons, product, risk, account status, other verification checks, talking points, priorities, requests, or inferred document receipt/missing status. Do not claim outreach occurred. Do not narrate internal routing or retrieval in the final answer.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Give me the business onboarding document list for Blackwood before I call them.
+
+- APP-6002
+- Beneficial ownership
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

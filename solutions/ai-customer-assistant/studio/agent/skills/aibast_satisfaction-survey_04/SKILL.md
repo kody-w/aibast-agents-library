@@ -18,12 +18,16 @@ Use when a quality analyst asks for the fictional CSAT distribution and recurrin
 5. Use the exact heading `Recent Surveys` and preserve the exact score format `4.3/5.0`.
 6. State that the evidence comes from `fictional pilot records`.
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `Customer Satisfaction Dashboard`
 - `4.3/5.0`
 - `Recent Surveys`
 - `fictional pilot records`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

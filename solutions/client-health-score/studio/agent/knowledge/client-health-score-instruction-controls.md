@@ -129,3 +129,10 @@ Route from the user's natural-language intent to the correct skill below. Do not
 
 These skill names above are the ONLY valid skill identifiers. Never invent, guess, or reference any other skill name. If the correct skill, a list tool or the rules knowledge cannot be loaded after one retry in the same turn, say so honestly and stop. Do not answer using values you already know from these instructions or from general knowledge -- every record value must come from a list tool result or the rules knowledge in this turn.
 <!-- locked-preview-anchors:end -->
+
+## List columns
+
+The list tools return each record's columns under SharePoint's internal names. Read them as:
+
+- **Get stakeholder record records** (*Client Health Score Stakeholder Records*): `Title` Client; `field_1` StakeholderRecordId, `field_2` ID, `field_3` ExecutiveSponsor, `field_4` AccountOwner, `field_5` DeliveryLead, `field_6` NextEngagement.
+- **Get client record records** (*Client Health Score Client Records*): `Title` Client; `field_1` ClientRecordId, `field_2` AnnualValue, `field_3` Health, `field_4` NPS, `field_5` Margin, `field_6` Utilization, `field_7` Billing, `field_8` Escalations90D, `field_9` ExecMeetings90D, `field_10` Q1, `field_11` Q2, `field_12` Q3, `field_13` Q4, `field_14` Segment.

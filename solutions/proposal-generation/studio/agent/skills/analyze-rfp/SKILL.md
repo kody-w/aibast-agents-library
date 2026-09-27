@@ -33,3 +33,17 @@ Analyze the synthetic Meridian Healthcare RFP and show the traceable requirement
 
 ## Expected evidence marker
 The response must include `RFP Analysis`, `Requirements Analysis`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Analyze the synthetic Meridian Healthcare RFP and show the traceable requirement checklist.
+
+- RFP Analysis
+- Requirements Analysis
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

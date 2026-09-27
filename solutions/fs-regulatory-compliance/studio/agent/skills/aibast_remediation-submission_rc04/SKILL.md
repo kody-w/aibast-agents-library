@@ -27,3 +27,15 @@ Read listed entity facts with the SharePoint list tools, using the global instru
    authenticated ARM connector can transmit it.
 
 Never claim that a correction was applied or a filing was sent.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Every correction or submission preparation
+
+- synthetic dry run
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

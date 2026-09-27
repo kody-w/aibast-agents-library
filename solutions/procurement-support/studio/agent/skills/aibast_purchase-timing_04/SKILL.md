@@ -16,11 +16,15 @@ Use when a category buyer asks how to sequence review of renewals, volume tiers,
 3. Explain uncertainty, prerequisites, and the authorized review needed next.
 4. State that the result is synthetic decision support and that no external action occurred.
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `Northstar Imaging`
 - `MedSupply Cooperative`
 - `CareTech Devices`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

@@ -16,11 +16,15 @@ Use when a finance director asks whether fragmented facility demand may qualify 
 3. Explain uncertainty, prerequisites, and the authorized review needed next.
 4. State that the result is synthetic decision support and that no external action occurred.
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `Clinical consumables`
 - `4`
 - `does not recommend a supplier award`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

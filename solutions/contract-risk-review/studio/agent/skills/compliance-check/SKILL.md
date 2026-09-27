@@ -11,3 +11,17 @@ Use for internal-policy comparison. Start with the exact heading
 gaps. For CTR-5002 and CTR-5004 return `REVIEW REQUIRED` because clause evidence
 is absent. Never convert missing evidence into PASS and never describe the
 screen as legal or regulatory compliance advice.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Compare the available contract evidence with our internal policy and tell me where the file is incomplete.
+
+- Internal Policy Requirements
+- REVIEW REQUIRED
+- CTR-5002
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

@@ -25,3 +25,16 @@ Persona: Risk Leader
 Prompt: Prepare the critical wire case for SIU review and tell me what actions actually occurred.
 
 Expected synthetic evidence: INV-2025-302, no external action.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare the critical wire case for SIU review and tell me what actions actually occurred.
+
+- INV-2025-302
+- no external action
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

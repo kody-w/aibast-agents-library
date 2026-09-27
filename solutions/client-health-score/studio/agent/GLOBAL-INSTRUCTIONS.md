@@ -4,10 +4,9 @@ Read listed record fields with the SharePoint list tools. Read all unlisted fact
 
 ## List columns
 
-The list tools return each record's columns under SharePoint's internal names. Read them as:
-
-- **Get stakeholder record records** (*Client Health Score Stakeholder Records*): `Title` Client; `field_1` StakeholderRecordId, `field_2` ID, `field_3` ExecutiveSponsor, `field_4` AccountOwner, `field_5` DeliveryLead, `field_6` NextEngagement.
-- **Get client record records** (*Client Health Score Client Records*): `Title` Client; `field_1` ClientRecordId, `field_2` AnnualValue, `field_3` Health, `field_4` NPS, `field_5` Margin, `field_6` Utilization, `field_7` Billing, `field_8` Escalations90D, `field_9` ExecMeetings90D, `field_10` Q1, `field_11` Q2, `field_12` Q3, `field_13` Q4, `field_14` Segment.
+Before filtering or interpreting a list result, load the complete Title/field_N mappings under List columns in `client-health-score-instruction-controls.md`. Use those exact internal names and CSV-column meanings.
+- **Get stakeholder record records** (*Client Health Score Stakeholder Records*): mapping for `stakeholder-records`.
+- **Get client record records** (*Client Health Score Client Records*): mapping for `client-records`.
 
 ## Evidence locations
 

@@ -9,3 +9,17 @@ Read listed entity facts with the SharePoint list tools, using the global instru
 Rank clients by health, show segment, NPS, margin, utilization, value, and
 scenario churn indicator. Prioritize TechCorp Industries, Global Finance Corp,
 and Healthcare Solutions Inc. Label indicators synthetic and unvalidated.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which relationships are healthy, at risk, or critical, and where should my team focus first?
+
+- TechCorp Industries
+- Churn Indicator
+- CRITICAL
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

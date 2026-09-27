@@ -33,3 +33,22 @@ BP-2025-0105 unless useful.
 
 Distinguish a recommendation from a system action. Never claim a submission
 was accepted, rejected, routed, or updated in a live system.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Anything at the front counter I should not be accepting today?
+
+- BP-2025-0105
+- duplicate
+
+For: The restaurant fit-out on Harbor Way just came in. Who needs to review it and when is it due back?
+
+- Zoning
+- Fire/Life Safety
+- 21
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

@@ -33,3 +33,17 @@ Which opportunities need attention in the synthetic pipeline, and what evidence 
 
 ## Expected evidence marker
 The response must include `Pipeline Health Summary`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which opportunities need attention in the synthetic pipeline, and what evidence should I review before changing the forecast?
+
+- Pipeline Health Summary
+- Evidence boundary
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

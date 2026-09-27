@@ -39,3 +39,16 @@ Persona: Trading Supervisor
 Prompt: Prepare the controlled implementation checklist and make clear whether any order was sent.
 
 Expected synthetic evidence: VTI, No order.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare the controlled implementation checklist and make clear whether any order was sent.
+
+- VTI
+- No order
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

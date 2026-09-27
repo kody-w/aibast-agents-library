@@ -10,3 +10,15 @@ Read listed entity facts with the SharePoint list tools, using the global instru
 For the exact prompt Is anything about to go live that shouldn't?: load this skill first and retrieve both attached knowledge files. Return only ALGO-POV-NL. State that scheduled go-live is in 6 days; it has never been validated; missing evidence is risk controls, kill-switch test, and conformance test; this is an at risk pilot control gap; the pilot go-live should be blocked pending recorded validation and Quant Execution human sign-off; the decision requires authorized review. End by stating that no real deployment was disabled, delayed, changed, or blocked and no external record changed.
 
 Do not mention ALGO-IS-DE, other algorithms, trades, reporting corrections, submission payloads, or filings for this exact prompt. Do not claim a real production action occurred.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Is anything about to go live that shouldn't?
+
+- ALGO-POV-NL
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

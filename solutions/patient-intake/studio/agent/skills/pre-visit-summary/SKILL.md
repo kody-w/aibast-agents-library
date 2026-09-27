@@ -30,3 +30,16 @@ This is read-only synthetic evidence. Do not diagnose, recommend treatment, deci
 ## Fallback
 
 If the identifier or evidence is absent, say what is missing and list the known synthetic identifiers. Do not substitute another record.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare a pre-visit readiness summary for Synthetic Patient Alpha.
+
+- SYN-PT-001
+- Required reviewer
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

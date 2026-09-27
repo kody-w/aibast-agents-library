@@ -55,12 +55,16 @@ each section from the retrieved source.
 - Before the final footer, include exactly:
   `Ratings and terms are comparison evidence only; this is not a supplier award.`
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `AWS`
 - `Azure`
 - `Ratings and terms are comparison evidence`
 - `not a supplier award`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

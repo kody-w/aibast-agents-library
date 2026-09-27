@@ -60,11 +60,15 @@ For `PR-5001`, the title is exactly `Purchase Request Review: PR-5001`.
 - Before sending, check the literal heading is `Approval gate` (lowercase `g`),
   not `Approval Gate`. Do not title-case or rename it.
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `PR-5001`
 - `$125,000`
 - `CFO`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

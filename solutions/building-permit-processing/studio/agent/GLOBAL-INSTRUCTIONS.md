@@ -4,12 +4,11 @@ Read listed record fields with the SharePoint list tools. Read all unlisted fact
 
 ## List columns
 
-The list tools return each record's columns under SharePoint's internal names. Read them as:
-
-- **Get permit application records** (*Building Permit Processing Permit Applications*): `Title` Applicant; `field_1` PermitApplicationId, `field_2` Address, `field_3` Parcel, `field_4` Type, `field_5` Description, `field_6` Submitted, `field_7` Age, `field_8` Valuation, `field_9` Zoning, `field_10` Status, `field_11` Reviewer, `field_12` Cycle.
-- **Get fixed review clock state records** (*Building Permit Processing Fixed Review Clock State*): `Title` Permit; `field_1` FixedReviewClockStateId, `field_2` Target, `field_3` SnapshotState, `field_4` DaysOver, `field_5` ComplaintRisk.
-- **Get inspector roster records** (*Building Permit Processing Inspector Roster*): `Title` Inspector; `field_1` InspectorRosterId, `field_2` Specialty, `field_3` AvailableSlots, `field_4` ServiceZone.
-- **Get inspection board records** (*Building Permit Processing Inspection Board*): `Title` Inspection; `field_1` InspectionBoardId, `field_2` Inspector, `field_3` Date, `field_4` Status.
+Before filtering or interpreting a list result, load the complete Title/field_N mappings under List columns in `building-permit-processing-instruction-controls.md`. Use those exact internal names and CSV-column meanings.
+- **Get permit application records** (*Building Permit Processing Permit Applications*): mapping for `permit-applications`.
+- **Get fixed review clock state records** (*Building Permit Processing Fixed Review Clock State*): mapping for `fixed-review-clock-state`.
+- **Get inspector roster records** (*Building Permit Processing Inspector Roster*): mapping for `inspector-roster`.
+- **Get inspection board records** (*Building Permit Processing Inspection Board*): mapping for `inspection-board`.
 
 ## Evidence locations
 

@@ -25,3 +25,16 @@ Persona: Claims Operations Leader
 Prompt: Which incoming claim needs specialized handling first, and where should it be reviewed?
 
 Expected synthetic evidence: CLM-2025-7003, Investigation.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which incoming claim needs specialized handling first, and where should it be reviewed?
+
+- CLM-2025-7003
+- Investigation
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

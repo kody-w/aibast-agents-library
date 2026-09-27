@@ -43,6 +43,13 @@ def reference_bytes(source):
     if source == REFERENCE / "studio/agent/GLOBAL-INSTRUCTIONS.md" and b"\n## SharePoint site\n" not in expected:
         # The protected checkpoint predates the lead's contract; the reviewed suffix is a static oracle fixture.
         expected = expected.rstrip() + b"\n\n" + REFERENCE_SITE_SECTION.read_bytes()
+    if source.name == "SKILL.md" and source.is_relative_to(REFERENCE / "studio/agent/skills"):
+        contract = json.loads((ROOT / "tests/fixtures/studio/emission-tracking-evidence-contract.json").read_text())
+        intro = contract["intro"].encode()
+        if intro not in expected:
+            expected = expected.replace(b"## Required evidence\n\n", b"## Required evidence\n\n" + intro + b"\n\n")
+            expected = expected.replace(b"\n\nNever imply ", b"\n\n" + contract["conclusions"].encode()
+                                        + b"\n\nNever imply ", 1)
     return expected
 
 

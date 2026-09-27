@@ -27,3 +27,16 @@ Persona: Pricing Analyst
 Prompt: Walk me through the rating factors and loss evidence for Riverside without issuing a quote.
 
 Expected synthetic evidence: UW-2025-101, Indicated Premium.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Walk me through the rating factors and loss evidence for Riverside without issuing a quote.
+
+- UW-2025-101
+- Indicated Premium
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

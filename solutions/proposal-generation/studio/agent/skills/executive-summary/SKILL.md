@@ -33,3 +33,17 @@ Draft an executive summary for the synthetic Meridian Healthcare opportunity tha
 
 ## Expected evidence marker
 The response must include `Executive Summary`, `Personalization Applied`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Draft an executive summary for the synthetic Meridian Healthcare opportunity that reflects the buyer priorities and remains subject to review.
+
+- Executive Summary
+- Personalization Applied
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

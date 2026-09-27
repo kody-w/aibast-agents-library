@@ -33,3 +33,17 @@ Summarize the synthetic qualified pipeline and clearly label every conversion an
 
 ## Expected evidence marker
 The response must include `Qualification Report`, `Synthetic Conversion Assumptions`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Summarize the synthetic qualified pipeline and clearly label every conversion and value assumption.
+
+- Qualification Report
+- Synthetic Conversion Assumptions
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

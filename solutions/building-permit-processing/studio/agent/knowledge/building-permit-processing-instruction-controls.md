@@ -110,3 +110,12 @@ notifications or field coordination with Microsoft Teams-backed tools. These
 are future integration seams only; no live connector is configured. Start any
 approved production connection in read-only mode. Keep external writes disabled
 until they pass separate governance review and require explicit human approval.
+
+## List columns
+
+The list tools return each record's columns under SharePoint's internal names. Read them as:
+
+- **Get permit application records** (*Building Permit Processing Permit Applications*): `Title` Applicant; `field_1` PermitApplicationId, `field_2` Address, `field_3` Parcel, `field_4` Type, `field_5` Description, `field_6` Submitted, `field_7` Age, `field_8` Valuation, `field_9` Zoning, `field_10` Status, `field_11` Reviewer, `field_12` Cycle.
+- **Get fixed review clock state records** (*Building Permit Processing Fixed Review Clock State*): `Title` Permit; `field_1` FixedReviewClockStateId, `field_2` Target, `field_3` SnapshotState, `field_4` DaysOver, `field_5` ComplaintRisk.
+- **Get inspector roster records** (*Building Permit Processing Inspector Roster*): `Title` Inspector; `field_1` InspectorRosterId, `field_2` Specialty, `field_3` AvailableSlots, `field_4` ServiceZone.
+- **Get inspection board records** (*Building Permit Processing Inspection Board*): `Title` Inspection; `field_1` InspectionBoardId, `field_2` Inspector, `field_3` Date, `field_4` Status.

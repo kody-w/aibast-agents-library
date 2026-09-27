@@ -4,12 +4,11 @@ Read listed record fields with the SharePoint list tools. Read all unlisted fact
 
 ## List columns
 
-The list tools return each record's columns under SharePoint's internal names. Read them as:
-
-- **Get customer application records** (*Customer Onboarding Customer Applications*): `Title` Customer Application; `field_1` CustomerApplicationId, `field_2` Applicant, `field_3` ApplicationType, `field_4` AccountRequested, `field_5` Submitted, `field_6` Status, `field_7` RiskRating, `field_8` RelationshipManager, `field_9` EstimatedAssets.
-- **Get kyc document records** (*Customer Onboarding KYC Documents*): `Title` KYC Document; `field_1` KYCDocumentId, `field_2` Value.
-- **Get verification status records** (*Customer Onboarding Verification Status*): `Title` Verification Status; `field_1` VerificationStatusId, `field_2` IDVerification, `field_3` SsnVerification, `field_4` AddressVerification, `field_5` OfacScreening, `field_6` PepScreening, `field_7` AdverseMedia, `field_8` EinVerification, `field_9` BeneficialOwnership, `field_10` SourceOfWealth.
-- **Get account type records** (*Customer Onboarding Account Types*): `Title` Account Type; `field_1` AccountTypeId, `field_2` MinDeposit, `field_3` MonthlyFee, `field_4` Apy, `field_5` Features.
+Before filtering or interpreting a list result, load the complete Title/field_N mappings under List columns in `fs-customer-onboarding-instruction-controls.md`. Use those exact internal names and CSV-column meanings.
+- **Get customer application records** (*Customer Onboarding Customer Applications*): mapping for `customer-applications`.
+- **Get kyc document records** (*Customer Onboarding KYC Documents*): mapping for `kyc-documents`.
+- **Get verification status records** (*Customer Onboarding Verification Status*): mapping for `verification-status`.
+- **Get account type records** (*Customer Onboarding Account Types*): mapping for `account-types`.
 
 ## Required controls
 

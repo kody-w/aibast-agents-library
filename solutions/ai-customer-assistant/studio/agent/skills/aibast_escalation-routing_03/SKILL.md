@@ -17,12 +17,16 @@ Use when an escalation manager asks which team and SLA rule apply, without execu
 4. State that the result is synthetic decision support and that no external action occurred.
 5. Include the exact sentence `This agent does not execute the escalation.`
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `INQ-4003`
 - `Tier 2 Engineering`
 - `2 hours`
 - `does not execute`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

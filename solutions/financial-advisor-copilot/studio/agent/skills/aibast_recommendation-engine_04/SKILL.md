@@ -25,3 +25,16 @@ Persona: Financial Advisor
 Prompt: Prepare discussion candidates for Angela without giving advice or creating an order.
 
 Expected synthetic evidence: Angela Martinez, not recommendations.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare discussion candidates for Angela without giving advice or creating an order.
+
+- Angela Martinez
+- not recommendations
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

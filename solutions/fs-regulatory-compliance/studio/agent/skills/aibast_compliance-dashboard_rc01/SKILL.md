@@ -14,3 +14,20 @@ Audit outcome cannot be predicted from this synthetic pilot. Snapshot 2026-08-07
 
 ## RC-05
 The assertion that reporting is fine is not supported by the fixed synthetic evidence. Use these exact reporting findings: TRD-88133 field 59, Execution within firm, is missing with source T-2107; field 7, Buyer identification code, is missing with source 549300XKQZ2P4NLK7T18; zero ARM submission record. TRD-88117 field 57, Investment decision within firm, is missing with source T-2041. TRD-88129 field 36 venue mismatch, reported XETR and verified XPAR. TRD-88150 field 36 venue mismatch, reported TQEX and verified XLON; execution outlier is separate. Exactly four reporting-defective trades. TRD-88162 has a complete report and is not a reporting defect. Two lapsed credentials are records, not proof of active traders or legal incapacity; proposed stand-down requires authorized review and was not performed. ALGO-IS-DE is 37 days overdue. ALGO-POV-NL is unvalidated and 6 days from go-live. Owner is Quant Execution. Proposed corrections and one new submission are synthetic dry runs only. Use at risk, control gap, and requires authorized review. No correction, ARM transmission, stand-down, enrollment, notification, deployment change, or external record change occurred. Never relabel field 59 as trader ID, field 7 as LEI, or field 57 as executing broker. Say missing, not incorrect. Never claim knowledge of other reporting channels. Never invent Head of Algo Risk, active traders, execution during a lapsed period, completed action, or five reporting defects.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Are we going to fail our next MiFID audit? What's actually broken on the desk right now?
+
+- T-2041
+- T-2233
+
+For: My head of trading says the reporting is fine. Prove him wrong with specifics I can take to the board.
+
+- TRD-88133
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

@@ -69,3 +69,12 @@ For each exact locked prompt, load its named uploaded skill before any generic h
 - FCO-04 must return all four applications and `$8,465,000` total estimated assets, preserving exact recorded status and owner pairs. Open checks are observations only. Estimated assets are not balances. Add no ranking, elapsed time, SLA, approval, or transition.
 
 End every substantive case with exactly: `Synthetic onboarding evidence only; no identity verification, approval, account opening, provisioning, outreach, or record change occurred. Authorized human review required.`
+
+## List columns
+
+The list tools return each record's columns under SharePoint's internal names. Read them as:
+
+- **Get customer application records** (*Customer Onboarding Customer Applications*): `Title` Customer Application; `field_1` CustomerApplicationId, `field_2` Applicant, `field_3` ApplicationType, `field_4` AccountRequested, `field_5` Submitted, `field_6` Status, `field_7` RiskRating, `field_8` RelationshipManager, `field_9` EstimatedAssets.
+- **Get kyc document records** (*Customer Onboarding KYC Documents*): `Title` KYC Document; `field_1` KYCDocumentId, `field_2` Value.
+- **Get verification status records** (*Customer Onboarding Verification Status*): `Title` Verification Status; `field_1` VerificationStatusId, `field_2` IDVerification, `field_3` SsnVerification, `field_4` AddressVerification, `field_5` OfacScreening, `field_6` PepScreening, `field_7` AdverseMedia, `field_8` EinVerification, `field_9` BeneficialOwnership, `field_10` SourceOfWealth.
+- **Get account type records** (*Customer Onboarding Account Types*): `Title` Account Type; `field_1` AccountTypeId, `field_2` MinDeposit, `field_3` MonthlyFee, `field_4` Apy, `field_5` Features.

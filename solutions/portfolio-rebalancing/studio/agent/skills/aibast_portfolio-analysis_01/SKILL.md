@@ -25,3 +25,16 @@ Persona: Portfolio Manager
 Prompt: Which portfolio is outside its drift guardrails, and where is the largest gap?
 
 Expected synthetic evidence: PORT-5001, VTI.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which portfolio is outside its drift guardrails, and where is the largest gap?
+
+- PORT-5001
+- VTI
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

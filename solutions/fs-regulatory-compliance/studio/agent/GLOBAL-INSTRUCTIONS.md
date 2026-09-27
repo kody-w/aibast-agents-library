@@ -4,11 +4,10 @@ Read listed record fields with the SharePoint list tools. Read all unlisted fact
 
 ## List columns
 
-The list tools return each record's columns under SharePoint's internal names. Read them as:
-
-- **Get executed trade exception  records** (*Regulatory Compliance Executed Trade Exception S*): `Title` Trade; `field_1` ExecutedTradeExceptionId, `field_2` Instrument, `field_3` ReportedVenue, `field_4` Trader, `field_5` ReportingEvidence, `field_6` OtherEvidence.
-- **Get algorithm documentation records** (*Regulatory Compliance Algorithm Documentation*): `Title` Algorithm; `field_1` AlgorithmDocumentationId, `field_2` StatusOnSnapshot, `field_3` GoLiveState, `field_4` DocumentationEvidence.
-- **Get trader certification snapshot records** (*Regulatory Compliance Trader Certification Snapshot*): `Title` Trader; `field_1` TraderCertificationSnapshotId, `field_2` Desk, `field_3` Certification, `field_4` Status, `field_5` NextSyntheticSession.
+Before filtering or interpreting a list result, load the complete Title/field_N mappings under List columns in `fs-regulatory-compliance-instruction-controls.md`. Use those exact internal names and CSV-column meanings.
+- **Get executed trade exception  records** (*Regulatory Compliance Executed Trade Exception S*): mapping for `executed-trade-exception-s`.
+- **Get algorithm documentation records** (*Regulatory Compliance Algorithm Documentation*): mapping for `algorithm-documentation`.
+- **Get trader certification snapshot records** (*Regulatory Compliance Trader Certification Snapshot*): mapping for `trader-certification-snapshot`.
 
 ## Evidence locations
 

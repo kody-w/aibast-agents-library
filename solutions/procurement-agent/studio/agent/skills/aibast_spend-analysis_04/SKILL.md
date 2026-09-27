@@ -63,11 +63,15 @@ each section from the retrieved source; do not replace the tables with prose.
   human-review set.
 - Before the final footer, include exactly `No purchase order is created.`
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `Software`
 - `$60,000`
 - `No purchase order is created`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

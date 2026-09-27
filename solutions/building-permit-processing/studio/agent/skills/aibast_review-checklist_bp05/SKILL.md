@@ -24,3 +24,15 @@ or permit type.
 
 Never mark an item complete, passed, waived, or compliant. For an unknown
 permit ID, list the six known IDs rather than defaulting to another permit.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Only when the source reviewer is unassigned
+
+- Unassigned
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

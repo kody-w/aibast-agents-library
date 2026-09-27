@@ -42,3 +42,16 @@ Persona: Tax-Aware Portfolio Manager
 Prompt: Which positions are loss candidates, and what controls stop us from treating that as tax advice?
 
 Expected synthetic evidence: VEA, wash-sale.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which positions are loss candidates, and what controls stop us from treating that as tax advice?
+
+- VEA
+- wash-sale
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

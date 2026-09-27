@@ -33,3 +33,17 @@ Review the list-backed synthetic renewal pipeline, risk bands, and preparation c
 
 ## Expected evidence marker
 The response must include `Renewal Pipeline`, `Draft Renewal Preparation Checklist`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Review the bundled synthetic renewal pipeline, risk bands, and preparation checklist without changing CRM or forecast records.
+
+- Renewal Pipeline
+- Draft Renewal Preparation Checklist
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

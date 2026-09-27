@@ -68,3 +68,16 @@ system owner and an approved production tool.
 - The ±200-unit material-delta tolerance and the fixed portfolio
   classification are pilot conventions from the synthetic knowledge source,
   not live business rules.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Where do we have forecast-relative shortages or excess that deserve a rebalancing review?
+
+- SKU-4402
+- SLOW-MOVING
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

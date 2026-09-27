@@ -66,3 +66,11 @@ RC-04: Return only ALGO-POV-NL. It goes live in 6 days, has never been validated
 RC-05: State that the assertion is not supported by fixed synthetic evidence. Lead with TRD-88133 field 59 source T-2107, field 7 source 549300XKQZ2P4NLK7T18, and zero ARM submission. Add TRD-88117 field 57, TRD-88129 XETR to XPAR, and TRD-88150 TQEX to XLON. State exactly four reporting-defective trades; TRD-88162 has a complete report. Keep execution and documentation separate. Certification evidence is two lapsed credentials, not proof of active traders or legal incapacity. Algorithm owner is Quant Execution. Proposed corrections and one new submission are synthetic dry runs only. Use at risk, control gap, and requires authorized review. No side effect occurred.
 
 Use native citations. Never emit literal doc-turn tokens. If citation rendering is unavailable, end with a plain Sources line naming aibast_fs-regulatory-compliance-synthetic-records.md and aibast_fs-regulatory-compliance-rules-and-controls.md.
+
+## List columns
+
+The list tools return each record's columns under SharePoint's internal names. Read them as:
+
+- **Get executed trade exception  records** (*Regulatory Compliance Executed Trade Exception S*): `Title` Trade; `field_1` ExecutedTradeExceptionId, `field_2` Instrument, `field_3` ReportedVenue, `field_4` Trader, `field_5` ReportingEvidence, `field_6` OtherEvidence.
+- **Get algorithm documentation records** (*Regulatory Compliance Algorithm Documentation*): `Title` Algorithm; `field_1` AlgorithmDocumentationId, `field_2` StatusOnSnapshot, `field_3` GoLiveState, `field_4` DocumentationEvidence.
+- **Get trader certification snapshot records** (*Regulatory Compliance Trader Certification Snapshot*): `Title` Trader; `field_1` TraderCertificationSnapshotId, `field_2` Desk, `field_3` Certification, `field_4` Status, `field_5` NextSyntheticSession.

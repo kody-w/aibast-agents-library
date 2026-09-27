@@ -25,3 +25,16 @@ Persona: Onboarding Specialist
 Prompt: Which approved-looking file is ready for account setup review, and what product is being prepared?
 
 Expected synthetic evidence: APP-6004, Basic Savings.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which approved-looking file is ready for account setup review, and what product is being prepared?
+
+- APP-6004
+- Basic Savings
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

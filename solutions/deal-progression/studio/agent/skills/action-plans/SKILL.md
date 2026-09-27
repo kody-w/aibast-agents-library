@@ -33,3 +33,17 @@ Draft reviewable intervention plans for the stalled synthetic deals, but do not 
 
 ## Expected evidence marker
 The response must include `Action Plans`, `Planning Objective`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Draft reviewable intervention plans for the stalled synthetic deals, but do not assign work or contact anyone.
+
+- Action Plans
+- Planning Objective
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

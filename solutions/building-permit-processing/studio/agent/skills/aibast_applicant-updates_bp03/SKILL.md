@@ -30,3 +30,16 @@ outreach, or applicant communication. Produce drafts only.
 Lead with the concrete send list, not a communications lecture. Name all
 five permits when the request is department-wide. Never say a message was
 sent, delivered, or acknowledged.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: My front desk is drowning in status calls. What can we send out today so people stop calling?
+
+- BP-2025-0104
+- Greenfield
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

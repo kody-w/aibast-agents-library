@@ -38,3 +38,17 @@ active, unresolved, or completed work. Never claim packaged fields are missing
 when they are present, and never claim a task, meeting, or message was created.
 Do not add health scores, NPS, satisfaction history, stakeholder maps, healthy
 account comparisons, superlatives, or a full portfolio table to this case.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: What engagement signals are weakening across the portfolio, especially executive contact and escalations?
+
+- No executive contact in 90 days
+- Declining billing trend
+- TechCorp Industries
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

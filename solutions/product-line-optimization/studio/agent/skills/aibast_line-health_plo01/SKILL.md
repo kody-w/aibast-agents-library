@@ -61,3 +61,16 @@ Use a table if listing all three lines.
 
 If the user names a line not in the synthetic set, say it is not in the pilot
 and list the three known lines rather than inventing data.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which production line needs attention today, and what is driving the loss?
+
+- Polymer Molding Line C
+- Electronics Assembly Line A
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

@@ -17,11 +17,15 @@ Use when a product trio wants a non-binding impact view with explicit validation
 4. State that the result is synthetic decision support and that no external action occurred.
 5. End with the exact sentence `No roadmap commitment was made.`
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `Review Candidates`
 - `RBAC`
 - `No roadmap commitment`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

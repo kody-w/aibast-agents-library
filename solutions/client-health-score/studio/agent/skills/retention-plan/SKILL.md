@@ -37,3 +37,17 @@ issues. Do not invent issue counts for preparation, causal links, commitments,
 templates, checklists, additional deliverables, account metrics, value totals,
 cross-account summaries, or urgency rankings. Never create or claim outreach,
 concessions, renewals, meetings, messages, or CRM changes.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Build the stakeholder map and executive engagement plan for each account that needs a turnaround.
+
+- Morgan Lee
+- Value realization workshop
+- Approval gate
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

@@ -64,3 +64,16 @@ ERP/WMS system owner and an approved production tool.
   synthetic pilot values, not current market or contract rates.
 - "Trade-offs" means comparing estimated costs to inform a human decision,
   not an automated recommendation to execute any action.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Where is inventory exposure concentrated, and what trade-offs should I take to the planning meeting?
+
+- Total annual holding cost
+- synthetic planning estimates
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

@@ -65,3 +65,16 @@ tool — state this whenever the summary implies next steps.
 - The synthetic snapshot is fixed and does not reflect real-time conditions.
 - "Tight on space" means utilization approaching or above the facility's
   synthetic capacity, not a live available-to-promise signal.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which distribution centers are tight on space, and which SKU positions should my team review first?
+
+- Dallas Fulfillment Center
+- SKU-4406
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

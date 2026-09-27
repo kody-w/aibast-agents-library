@@ -24,6 +24,7 @@ def test_every_committed_global_has_runtime_and_site_substitution_headroom():
             text += (ROOT / "tests/fixtures/studio/emission-tracking-site-section.md").read_text()
         assert text.count("YOUR_SITE_ADDRESS") == 1, slug
         assert len(text) <= 7000, (slug, len(text))
+        assert len(text.replace("YOUR_SITE_ADDRESS", long_site_url()[:100])) <= 8000, slug
         assert len(text.replace("YOUR_SITE_ADDRESS", long_site_url())) <= 8000, slug
 
 
@@ -39,10 +40,13 @@ def test_compaction_preserves_full_controls_and_exact_runtime_mappings(slug):
     files = package.package_files(slug)
     base = Path("solutions") / slug
     control = base / "studio/agent/knowledge" / f"{slug}-instruction-controls.md"
-    assert files[control] == expected
+    mapping = package.column_instructions(schema, tools)
+    assert files[control] == expected.rstrip() + "\n\n" + mapping + "\n"
     assert "YOUR_SITE_ADDRESS" not in files[control]
     instructions = files[base / "studio/agent/GLOBAL-INSTRUCTIONS.md"]
-    assert package.column_instructions(schema, tools) in instructions
+    assert mapping not in instructions
+    assert control.name in instructions
+    assert "Before filtering or interpreting a list result" in instructions
     assert instructions.endswith(package.sharepoint_site_section(inputs, schema) + "\n")
     assert "Before every answer, retrieve" in instructions
     assert "mandatory human-review paragraph" in instructions

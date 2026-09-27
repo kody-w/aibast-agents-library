@@ -33,3 +33,17 @@ Prepare synthetic reference and competitive positioning options for Meridian Hea
 
 ## Expected evidence marker
 The response must include `References & Competitive Positioning`, `Win Theme`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare synthetic reference and competitive positioning options for Meridian Healthcare, with availability checks before use.
+
+- References & Competitive Positioning
+- Win Theme
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

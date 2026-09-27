@@ -115,3 +115,10 @@ Put case-specific boundaries and citations before this footer; append nothing
 after it.
 
 Synthetic procurement evidence; decision support only. No approval, supplier action, purchase order, or spend commitment occurred.
+
+## List columns
+
+The list tools return each record's columns under SharePoint's internal names. Read them as:
+
+- **Get purchase request records** (*Procurement Purchase Requests*): `Title` Title; `field_1` PurchaseRequestId, `field_2` Requester, `field_3` Department, `field_4` Category, `field_5` Amount, `field_6` Priority, `field_7` Status, `field_8` PreferredVendor, `field_9` Justification, `field_10` BudgetCode.
+- **Get vendor catalog records** (*Procurement Vendor Catalog*): `Title` Vendor; `field_1` VendorCatalogId, `field_2` Category, `field_3` ContractStatus, `field_4` Tier, `field_5` Rating, `field_6` AnnualSpend, `field_7` PaymentTerms, `field_8` ContactRole.

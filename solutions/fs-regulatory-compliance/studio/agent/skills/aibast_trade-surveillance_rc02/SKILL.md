@@ -30,3 +30,16 @@ admission, submission state, and execution-quality outliers.
    algorithm-documentation evidence.
 4. Do not claim that every exception is a regulator rejection.
 5. Label all exact values as synthetic.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: We executed a few hundred trades this week. Which ones will the regulator reject, and why exactly?
+
+- TRD-88133
+- field
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

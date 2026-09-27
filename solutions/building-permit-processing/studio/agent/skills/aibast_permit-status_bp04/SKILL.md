@@ -42,3 +42,18 @@ applicant, type, valuation, status, and reviewer. State:
 
 For an unknown ID, say it is not in the synthetic file and list
 BP-2025-0101 through BP-2025-0106. Never substitute another record.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: A full dashboard request, not a named-permit detail request
+
+- Total applications: 6
+- Total declared valuation: $16,245,000
+- Open applications: 5
+- Approved applications: 1
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

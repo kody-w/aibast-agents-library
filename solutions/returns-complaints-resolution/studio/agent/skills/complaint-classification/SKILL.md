@@ -17,3 +17,17 @@ the user to provide more detail.
 Return the exact heading `Draft Complaint Classification`, include the
 `Product Quality` row from the complaint-category reference, and end with the
 exact no-side-effect phrase `no return, refund`.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: As Customer Service Agent, classify this product concern without echoing personal information or sending a response.
+
+- Draft Complaint Classification
+- Product Quality
+- no return, refund
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

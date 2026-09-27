@@ -1,0 +1,5 @@
+{
+  "source_commit": "3c5f9159",
+  "intro": "Include each phrase below in the answer exactly as written (same words, same order):",
+  "conclusions": "Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own."
+}

@@ -70,3 +70,16 @@ approved, connected production tool.
 - Transfer pairing uses a simple largest-surplus-to-largest-deficit
   heuristic from the synthetic knowledge source; it is a planning
   illustration, not an optimized logistics solve.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Show me the proposed warehouse moves, but do not move or reserve anything.
+
+- SKU-4401
+- No inventory has been reserved
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

@@ -32,3 +32,16 @@ For the exact prompt `What is holding up the enhanced due diligence case, and wh
 `Synthetic onboarding evidence only; no identity verification, approval, account opening, provisioning, outreach, or record change occurred. Authorized human review required.`
 
 Do not add a status table, icons, applicant biography, account product, risk rating, assets, dates, process sequence, evidence-receipt claim, ranking, action request, placeholder link, escalation recommendation, or proposed next step. Do not claim that source-of-wealth evidence is missing or received. Do not narrate internal routing or retrieval in the final answer.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: What is holding up the enhanced due diligence case, and which checks need my review?
+
+- APP-6003
+- PEP
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

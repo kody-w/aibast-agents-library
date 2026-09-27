@@ -25,3 +25,16 @@ Persona: Retention Specialist
 Prompt: Who should my team review first today, and what evidence drove the priority?
 
 Expected synthetic evidence: CUST-8004, prioritize review.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Who should my team review first today, and what evidence drove the priority?
+
+- CUST-8004
+- prioritize review
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

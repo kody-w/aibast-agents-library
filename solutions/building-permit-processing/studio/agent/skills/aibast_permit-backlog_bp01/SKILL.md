@@ -48,3 +48,17 @@ summarize, or supplement it.
 
 End with:
 `> Synthetic pilot data as of 2026-08-07; no live municipal system was accessed or changed.`
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which permit applications have been sitting too long, and which resident is going to complain first?
+
+- BP-2025-0104
+- Metro School District
+- overdue
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

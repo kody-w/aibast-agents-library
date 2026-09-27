@@ -35,3 +35,17 @@ Prepare a synthetic Acme Corporation account overview and show the evidence that
 
 ## Expected evidence marker
 The response must include `Account Overview`, `Account Health Score`, and an explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare a synthetic Acme Corporation account overview and show the evidence that deserves seller attention.
+
+- Account Overview
+- Account Health Score
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

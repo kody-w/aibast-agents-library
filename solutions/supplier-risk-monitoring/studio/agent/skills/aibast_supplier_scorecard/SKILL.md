@@ -35,3 +35,16 @@ Do not browse, substitute live-looking facts, or invent missing records.
 ## Authorization boundary
 
 Never contact a supplier, change an allocation, qualify or disqualify a supplier, select or award a supplier, execute a contract, place an order, or approve sourcing. Authorized procurement owners must use approved procurement and supplier-management tools for any action.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Explain why TechnoCore is elevated and show me the evidence by risk dimension.
+
+- SUP-101
+- Geopolitical
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

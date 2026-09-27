@@ -25,3 +25,16 @@ Persona: SIU Investigator
 Prompt: Which claim crosses the SIU review threshold, and does that prove fraud?
 
 Expected synthetic evidence: CLM-2025-7003, SIU Referrals.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Which claim crosses the SIU review threshold, and does that prove fraud?
+
+- CLM-2025-7003
+- SIU Referrals
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

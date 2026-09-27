@@ -52,3 +52,17 @@ cross-plant "address first" recommendation.
 
 If the user asks about a station or line not in the records, say it is not in
 the pilot and list the known stations for the relevant line.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Where is the bottleneck on each line, and which station should the plant team address first?
+
+- Functional Test
+- Robotic Welding
+- Injection Molding
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

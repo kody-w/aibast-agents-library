@@ -17,11 +17,15 @@ Use when an engineering lead wants review candidates sorted by the supplied synt
 4. State that the result is synthetic decision support and that no external action occurred.
 5. End with the exact sentence `No roadmap commitment was made.`
 
-## Deterministic pilot evidence
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
 
 - `Workflow Automation Builder`
 - `candidate_for_review`
 - `No roadmap commitment`
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
 
 ## Safety gate
 

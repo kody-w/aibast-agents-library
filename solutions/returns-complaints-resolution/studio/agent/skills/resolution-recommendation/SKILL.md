@@ -10,3 +10,17 @@ Compare the synthetic reason, condition, window, cost impact, and service impact
 against packaged playbooks. Present an option for authorized review. Never
 approve or create a refund, credit, exchange, replacement, label, shipment, or
 customer message.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: As Customer Service Agent, draft a policy-grounded option and keep all actions behind authorization.
+
+- Draft Resolution Options
+- Option for authorized review
+- no return
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

@@ -33,3 +33,17 @@ Scan synthetic customer CUST-001 for product gaps, usage signals, buying signals
 
 ## Expected evidence marker
 The response must include `Cross-Sell Opportunity Scan`, `Synthetic Usage Signals`, `Evidence boundary` and preserve the explicit synthetic evidence boundary.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Scan synthetic customer CUST-001 for product gaps, usage signals, buying signals, and budget timing.
+
+- Cross-Sell Opportunity Scan
+- Synthetic Usage Signals
+- Evidence boundary
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

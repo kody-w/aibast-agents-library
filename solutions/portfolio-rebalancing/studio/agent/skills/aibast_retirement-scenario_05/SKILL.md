@@ -39,3 +39,16 @@ Persona: Retirement Planning Specialist
 Prompt: Frame the retirement scenarios we need to model without inventing a success probability.
 
 Expected synthetic evidence: 25 years, No success probability.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Frame the retirement scenarios we need to model without inventing a success probability.
+
+- 25 years
+- No success probability
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.

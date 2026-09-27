@@ -59,7 +59,8 @@ ROUTING = ("If the correct skill, a list tool or the rules knowledge cannot be l
            "instructions or from general knowledge -- every record value must come from a list tool result "
            "or the rules knowledge in this turn.")
 READ_RECORDS = "Read the records with the SharePoint list tools, and the rules and controls knowledge."
-OVERRIDE_KEYS = {"prefix", "agent_names", "opening", "record_sources", "lists", "app", "knowledge_tables"}
+OVERRIDE_KEYS = {"prefix", "agent_names", "opening", "record_sources", "lists", "app", "knowledge_tables",
+                 "skill_evidence"}
 FORMATS = {"integer", "number", "percent1", "currency", "text"}
 FORBIDDEN_IDENTITY = (
     "github.com/kody-w/", "raw.githubusercontent.com/kody-w/", "kody-w.github.io", "kodyw.com",
@@ -70,6 +71,10 @@ TRAILING_NAME_JOINERS = {"and", "or", "&", "of", "for", "the", "to"}
 MAX_RUNTIME_INSTRUCTIONS = 8000
 MAX_TEMPLATE_INSTRUCTIONS = 7000
 SITE_URL_HEADROOM = 1000
+EXACT_EVIDENCE_INTRO = "Include each phrase below in the answer exactly as written (same words, same order):"
+EVIDENCE_CONCLUSIONS = ("Report only figures and conclusions found in the list records, the rules knowledge or "
+                        "this operation's canonical output; do not add comparisons, rankings or coverage claims "
+                        "of your own.")
 
 
 class StudioPackageError(ValueError):
@@ -738,12 +743,20 @@ def runtime_instructions(inputs: Inputs, schema: dict[str, Any], tools: dict[str
         raise StudioPackageError("source controls must not introduce another site token")
     controls_path = Path("solutions") / inputs.slug / "studio/agent/knowledge" / f"{inputs.slug}-instruction-controls.md"
     inputs.rules.append(root / controls_path)
+    mapping = column_instructions(schema, tools)
+    controls = controls.rstrip() + "\n\n" + mapping + "\n"
+    mapping_pointer = [
+        "## List columns", "",
+        f"Before filtering or interpreting a list result, load the complete Title/field_N mappings under "
+        f"List columns in `{controls_path.name}`. Use those exact internal names and CSV-column meanings.",
+        *[f"- **{tools[item['id']]}** (*{item['title']}*): mapping for `{item['id']}`." for item in schema["lists"]],
+    ]
     parts = [
         studio_instructions_heading(first),
         "Read listed record fields with the SharePoint list tools. Read all unlisted facts and controls from "
         "the required knowledge. Every value is synthetic; do not browse, invent missing facts, perform writes "
         "or claim a completed approval, communication or external action.",
-        column_instructions(schema, tools),
+        "\n".join(mapping_pointer),
     ]
     if inputs.tables or any(item.get("omitted_columns") for item in schema["lists"]):
         locations = ["## Evidence locations", "",
@@ -777,6 +790,64 @@ def runtime_instructions(inputs: Inputs, schema: dict[str, Any], tools: dict[str
     return compact, {controls_path: controls}
 
 
+def skill_case_evidence(path: Path, inputs: Inputs, text: str) -> list[dict[str, Any]]:
+    name_match = re.search(r"(?m)^name:\s*([^\n]+)", text)
+    if not name_match:
+        raise StudioPackageError(f"{path}: missing skill name")
+    name = name_match[1].strip().strip("\"'")
+    configured = inputs.overrides.get("skill_evidence", {}).get(name)
+    by_id = {case["id"]: case for case in inputs.cases}
+    if configured:
+        if "cases" in configured:
+            return [{"when": by_id[case_id]["prompt"], "phrases": by_id[case_id]["must_include"]}
+                    for case_id in configured["cases"]]
+        flat = " ".join(text.split())
+        if any(" ".join(phrase.split()) not in flat for phrase in configured["phrases"]):
+            raise StudioPackageError(f"{path}: evidence override is not present in the source skill")
+        return [configured]
+    flat = " ".join(text.split())
+    result = []
+    for case in inputs.cases:
+        operation = case.get("operation") or case.get("arguments", {}).get("operation")
+        op_slug = operation.replace("_", "-") if operation else None
+        if (" ".join(case["prompt"].split()) in flat
+                or re.search(r"(?<![\w-])" + re.escape(case["id"]) + r"(?![\w-])", text)
+                or (operation and (f"`{operation}`" in text or name == op_slug or name.endswith("-" + op_slug)
+                                   or path.parent.name == op_slug))):
+            result.append({"when": case["prompt"], "phrases": case["must_include"]})
+    if not result:
+        raise StudioPackageError(f"{path}: no source-backed required evidence; add an explicit skill_evidence mapping")
+    return result
+
+
+def exact_skill_evidence(text: str, path: Path, inputs: Inputs) -> str:
+    header = re.search(r"(?m)^## (?:Required evidence|Deterministic pilot evidence)\n\n", text)
+    if header:
+        following = re.search(r"(?m)^## ", text[header.end():])
+        end = header.end() + following.start() if following else len(text)
+        section = text[header.end():end]
+        if EXACT_EVIDENCE_INTRO not in section:
+            section = EXACT_EVIDENCE_INTRO + "\n\n" + section
+        if EVIDENCE_CONCLUSIONS not in section:
+            if "\n\nNever imply " in section:
+                section = section.replace("\n\nNever imply ", "\n\n" + EVIDENCE_CONCLUSIONS + "\n\nNever imply ", 1)
+            else:
+                section = section.rstrip() + "\n\n" + EVIDENCE_CONCLUSIONS + "\n\n"
+        return text[:header.start()] + "## Required evidence\n\n" + section + text[end:]
+    groups = skill_case_evidence(path, inputs, text)
+    evidence = [
+        "Apply the following phrase requirements only to the matching request below; do not include evidence "
+        "from unrelated cases.", "", "## Required evidence", "", EXACT_EVIDENCE_INTRO, "",
+    ]
+    for group in groups:
+        evidence.append("For: " + group["when"])
+        evidence.append("")
+        evidence.extend("- " + phrase for phrase in group["phrases"])
+        evidence.append("")
+    evidence += [EVIDENCE_CONCLUSIONS, ""]
+    return text.rstrip() + "\n\n" + "\n".join(evidence)
+
+
 def skill_for(path: Path, inputs: Inputs, schema: dict[str, Any] | None = None) -> str:
     text = path.read_text(encoding="utf-8")
     if inputs.tables or (schema and any(item.get("omitted_columns") for item in schema["lists"])):
@@ -788,9 +859,11 @@ def skill_for(path: Path, inputs: Inputs, schema: dict[str, Any] | None = None) 
         match = re.search(r"(?m)^# [^\n]+\n", text)
         if not match:
             raise StudioPackageError(f"{path.name}: skill needs a title")
-        return text[:match.end()] + "\n" + statement + "\n" + text[match.end():]
+        text = text[:match.end()] + "\n" + statement + "\n" + text[match.end():]
+        return exact_skill_evidence(text, path, inputs)
     if "1. Read the synthetic knowledge records and controls." in text:
-        return text.replace("1. Read the synthetic knowledge records and controls.", "1. " + READ_RECORDS)
+        text = text.replace("1. Read the synthetic knowledge records and controls.", "1. " + READ_RECORDS)
+        return exact_skill_evidence(text, path, inputs)
     text = rewrite_source_references(text, inputs)
     text = text.replace("Read the synthetic records and operating rules before analyzing.", READ_RECORDS)
     if READ_RECORDS not in text:
@@ -798,7 +871,7 @@ def skill_for(path: Path, inputs: Inputs, schema: dict[str, Any] | None = None) 
         if not match:
             raise StudioPackageError(f"{path.name}: skill needs a title")
         text = text[:match.end()] + "\n" + READ_RECORDS + "\n" + text[match.end():]
-    return text
+    return exact_skill_evidence(text, path, inputs)
 
 
 def numeric_format(column: dict[str, Any], rows: list[dict[str, str]]) -> str:

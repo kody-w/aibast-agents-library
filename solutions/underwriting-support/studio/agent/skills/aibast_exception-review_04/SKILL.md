@@ -25,3 +25,16 @@ Persona: Senior Underwriter
 Prompt: Prepare the exception file I need to review and state whether any coverage decision was made.
 
 Expected synthetic evidence: UW-2025-103, No approval.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare the exception file I need to review and state whether any coverage decision was made.
+
+- UW-2025-103
+- No approval
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output; do not add comparisons, rankings or coverage claims of your own.
