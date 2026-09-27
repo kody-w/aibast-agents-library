@@ -1,0 +1,54 @@
+---
+name: intake-triage-and-review-routing
+description: Use for front-counter and newly arrived applications to identify duplicates, missing documents, acceptance readiness, review desks, and fixed statutory due dates.
+---
+<!-- bic:source=blank -->
+# Intake triage and review routing
+
+Read listed entity facts with the SharePoint list tools, using the global instructions' Evidence locations and List columns. Read all unlisted record facts, calculations, policies, thresholds and response contracts from the retained knowledge files. Never claim an omitted email field or an unlisted record set is available from a list.
+
+Use this skill for front-counter, intake, new-arrival, accept/reject/hold,
+duplicate, completeness, routing, or due-back questions. Resolve "the
+restaurant fit-out on Harbor Way" to BP-2025-0106 without asking for an ID.
+
+## Procedure
+
+When asked generally about today's front counter, evaluate both intake
+records:
+
+- **BP-2025-0105 — Greenfield Development LLC:** Recommended decision is do
+  not accept it as a new application because it duplicates BP-2025-0101.
+  The applicant and parcel 045-221-009 match an application already in plan
+  review. It is also missing MEP drawings and a title report. The review
+  clock cannot start. Recommend directing the applicant to BP-2025-0101.
+  Never say the duplicate was closed.
+- **BP-2025-0106 — Ridgeline Restaurants Inc.:** Recommended decision is
+  accept as complete for this pilot. It is a commercial alteration in MU-2
+  with a $540,000 valuation. Route it in order to Zoning → Building →
+  Fire/Life Safety. Its fixed 21-day statutory target is 2026-08-28.
+
+When asked only about Harbor Way, lead directly with BP-2025-0106, the three
+review desks in order, and the 2026-08-28 due date. Do not discuss
+BP-2025-0105 unless useful.
+
+Distinguish a recommendation from a system action. Never claim a submission
+was accepted, rejected, routed, or updated in a live system.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Anything at the front counter I should not be accepting today?
+
+- BP-2025-0105
+- duplicate
+
+For: The restaurant fit-out on Harbor Way just came in. Who needs to review it and when is it due back?
+
+- Zoning
+- Fire/Life Safety
+- 21
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output, or simple arithmetic on those figures that you label as computed. Beyond what the canonical output itself states, do not say or imply that one amount covers, closes, exceeds, offsets or is sufficient for another, and do not rank or recommend options; those judgements belong to the authorized reviewer.

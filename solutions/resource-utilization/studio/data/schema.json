@@ -1,0 +1,88 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "resource-utilization",
+  "description": "Selected entity records parsed from the workshop's authoritative synthetic knowledge. Unlisted facts, rules and calculations remain in retained knowledge.",
+  "source": "agents/@aibast-agents-library/professional_services_stacks/resource_utilization_stack/resource_utilization_agent.py",
+  "records_markdown": "solutions/resource-utilization/manual/knowledge/aibast_resource-synthetic-roster.md",
+  "lists": [
+    {
+      "id": "consultant-roster",
+      "title": "Resource Utilization Consultant Roster",
+      "description": "Synthetic consultant roster (AIBAST Resource Utilization workshop; fictional).",
+      "record_set": "CONSULTANT_ROSTER",
+      "columns": [
+        {"name": "Title", "label": "Consultant", "from": "consultant", "type": "text"},
+        {"name": "ConsultantRosterId", "label": "Consultant Roster ID", "from": "id", "type": "text"},
+        {"name": "Level", "label": "Level", "from": "level", "type": "text"},
+        {"name": "CompleteSkills", "label": "Complete skills", "from": "complete_skills", "type": "text"},
+        {"name": "RateHR", "label": "Rate/hr", "from": "rate_hr", "type": "number", "format": "currency"},
+        {"name": "Utilization", "label": "Utilization", "from": "utilization", "type": "number", "format": "percent1"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "CurrentProject", "label": "Current project", "from": "current_project", "type": "text"},
+        {"name": "ProjectEnd", "label": "Project end", "from": "project_end", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-synthetic-roster.md",
+        "section": "Complete consultant roster",
+        "selector": "Complete consultant roster [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 10,
+        "sources": [
+          "CONSULTANTS",
+          "WORKFORCE_PATHS"
+        ]
+      }
+    }
+  ],
+  "source_of_truth": "knowledge-table",
+  "retained_knowledge": [
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-pipeline-and-workforce-rules.md",
+      "section": "Complete Pipeline Demand",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-pipeline-and-workforce-rules.md",
+      "section": "Upcoming Project Endings",
+      "reason": "Upcoming Project Endings: Lisa Tanaka.Project has no unambiguous literal field"
+    },
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-pipeline-and-workforce-rules.md",
+      "section": "Bench-to-Pipeline Matches",
+      "reason": "Bench-to-Pipeline Matches: David Okafor.Consultant ID has no unambiguous literal field"
+    },
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-pipeline-and-workforce-rules.md",
+      "section": "Unmatched Bench Resources",
+      "reason": "Unmatched Bench Resources: Sarah Kim.Skills shown is a curated composite, not a literal field"
+    },
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-pipeline-and-workforce-rules.md",
+      "section": "Upskilling Pathways",
+      "reason": "Upskilling Pathways: Robert Garcia.Monthly scenario value has no unambiguous literal field"
+    },
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-synthetic-roster.md",
+      "section": "Utilization targets",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-synthetic-roster.md",
+      "section": "Utilization by Level",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-synthetic-roster.md",
+      "section": "Bench carrying-cost rules and exact records",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/resource-utilization/manual/knowledge/aibast_resource-synthetic-roster.md",
+      "section": "Bench carrying-cost rules and exact records",
+      "reason": "rule/policy/contract table"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "fs-customer-onboarding",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/financial_services_stacks/customer_onboarding_fs_stack/customer_onboarding_fs_agent.py",
+  "records_markdown": "solutions/fs-customer-onboarding/manual/knowledge/aibast_fs-customer-onboarding-synthetic-records.md",
+  "lists": [
+    {
+      "id": "customer-applications",
+      "title": "Customer Onboarding Customer Applications",
+      "description": "Synthetic customer applications (AIBAST Customer Onboarding workshop; fictional).",
+      "record_set": "CUSTOMER_APPLICATIONS",
+      "columns": [
+        {"name": "Title", "label": "Customer Application", "from": "$key", "type": "text"},
+        {"name": "CustomerApplicationId", "label": "Customer Application ID", "from": "$key", "type": "text"},
+        {"name": "Applicant", "label": "Applicant", "from": "applicant", "type": "text"},
+        {"name": "ApplicationType", "label": "Application Type", "from": "application_type", "type": "text"},
+        {"name": "AccountRequested", "label": "Account Requested", "from": "account_requested", "type": "text"},
+        {"name": "Submitted", "label": "Submitted", "from": "submitted", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "RiskRating", "label": "Risk Rating", "from": "risk_rating", "type": "text"},
+        {"name": "RelationshipManager", "label": "Relationship Manager", "from": "relationship_manager", "type": "text"},
+        {"name": "EstimatedAssets", "label": "Estimated Assets", "from": "estimated_assets", "type": "number"}
+      ]
+    },
+    {
+      "id": "kyc-documents",
+      "title": "Customer Onboarding KYC Documents",
+      "description": "Synthetic kyc documents (AIBAST Customer Onboarding workshop; fictional).",
+      "record_set": "KYC_DOCUMENTS",
+      "columns": [
+        {"name": "Title", "label": "KYC Document", "from": "$key", "type": "text"},
+        {"name": "KYCDocumentId", "label": "KYC Document ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "text", "encoding": "json"}
+      ]
+    },
+    {
+      "id": "verification-status",
+      "title": "Customer Onboarding Verification Status",
+      "description": "Synthetic verification status (AIBAST Customer Onboarding workshop; fictional).",
+      "record_set": "VERIFICATION_STATUS",
+      "columns": [
+        {"name": "Title", "label": "Verification Status", "from": "$key", "type": "text"},
+        {"name": "VerificationStatusId", "label": "Verification Status ID", "from": "$key", "type": "text"},
+        {"name": "IDVerification", "label": "ID Verification", "from": "id_verification", "type": "text"},
+        {"name": "SsnVerification", "label": "Ssn Verification", "from": "ssn_verification", "type": "text", "optional": true},
+        {"name": "AddressVerification", "label": "Address Verification", "from": "address_verification", "type": "text", "optional": true},
+        {"name": "OfacScreening", "label": "Ofac Screening", "from": "ofac_screening", "type": "text"},
+        {"name": "PepScreening", "label": "Pep Screening", "from": "pep_screening", "type": "text"},
+        {"name": "AdverseMedia", "label": "Adverse Media", "from": "adverse_media", "type": "text"},
+        {"name": "EinVerification", "label": "Ein Verification", "from": "ein_verification", "type": "text", "optional": true},
+        {"name": "BeneficialOwnership", "label": "Beneficial Ownership", "from": "beneficial_ownership", "type": "text", "optional": true},
+        {"name": "SourceOfWealth", "label": "Source Of Wealth", "from": "source_of_wealth", "type": "text", "optional": true}
+      ]
+    },
+    {
+      "id": "account-types",
+      "title": "Customer Onboarding Account Types",
+      "description": "Synthetic account types (AIBAST Customer Onboarding workshop; fictional).",
+      "record_set": "ACCOUNT_TYPES",
+      "columns": [
+        {"name": "Title", "label": "Account Type", "from": "$key", "type": "text"},
+        {"name": "AccountTypeId", "label": "Account Type ID", "from": "$key", "type": "text"},
+        {"name": "MinDeposit", "label": "Min Deposit", "from": "min_deposit", "type": "number"},
+        {"name": "MonthlyFee", "label": "Monthly Fee", "from": "monthly_fee", "type": "number"},
+        {"name": "Apy", "label": "Apy", "from": "apy", "type": "number"},
+        {"name": "Features", "label": "Features", "from": "features", "type": "text", "encoding": "joined"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Ask HR Workspace",
+  "title": "Ask HR",
+  "description": "Listed synthetic entity records for Ask HR. Unlisted facts, rule tables and calculated outputs remain in the agent's retained knowledge.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "fictional-employee-profiles",
+      "list": "Ask HR Fictional Employee Profiles",
+      "title": "Fictional Employee Profiles",
+      "key": "FictionalEmployeeProfileId",
+      "fields": {
+        "FictionalEmployeeProfileId": "field_1",
+        "Alias": "field_2",
+        "JobTitle": "field_3",
+        "Department": "field_4",
+        "Manager": "field_5",
+        "Tenure": "field_6",
+        "LeaveBalance": "field_7",
+        "HealthPlan": "field_8",
+        "MonthlyPremium": "field_9",
+        "IndividualDeductible": "field_10",
+        "FamilyDeductible": "field_11",
+        "IndividualOutOfPocketMaximum": "field_12",
+        "FamilyOutOfPocketMaximum": "field_13",
+        "DependentsInFictionalProfile": "field_14"
+      },
+      "columns": [
+        "FictionalEmployeeProfileId",
+        "Title",
+        "Alias",
+        "JobTitle",
+        "Department",
+        "Manager",
+        "Tenure",
+        "LeaveBalance",
+        "HealthPlan",
+        "MonthlyPremium"
+      ],
+      "labels": {
+        "Title": "Name",
+        "FictionalEmployeeProfileId": "Fictional Employee Profile ID",
+        "Alias": "Alias",
+        "JobTitle": "Title",
+        "Department": "Department",
+        "Manager": "Manager",
+        "Tenure": "Tenure",
+        "LeaveBalance": "Leave balance",
+        "HealthPlan": "Health plan",
+        "MonthlyPremium": "Monthly premium",
+        "IndividualDeductible": "Individual deductible",
+        "FamilyDeductible": "Family deductible",
+        "IndividualOutOfPocketMaximum": "Individual out-of-pocket maximum",
+        "FamilyOutOfPocketMaximum": "Family out-of-pocket maximum",
+        "DependentsInFictionalProfile": "Dependents in fictional profile"
+      },
+      "formats": {
+        "Title": "text",
+        "FictionalEmployeeProfileId": "text",
+        "Alias": "text",
+        "JobTitle": "text",
+        "Department": "text",
+        "Manager": "text",
+        "Tenure": "text",
+        "LeaveBalance": "text",
+        "HealthPlan": "text",
+        "MonthlyPremium": "currency",
+        "IndividualDeductible": "currency",
+        "FamilyDeductible": "currency",
+        "IndividualOutOfPocketMaximum": "currency",
+        "FamilyOutOfPocketMaximum": "currency",
+        "DependentsInFictionalProfile": "text"
+      },
+      "metrics": [
+        {
+          "label": "Fictional Employee Profiles",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Alias",
+      "sortBy": "FictionalEmployeeProfileId"
+    },
+    {
+      "id": "company-holidays",
+      "list": "Ask HR Company Holidays",
+      "title": "Company Holidays",
+      "key": "CompanyHolidayId",
+      "fields": {
+        "CompanyHolidayId": "field_1",
+        "FixedDateText": "field_2"
+      },
+      "columns": [
+        "CompanyHolidayId",
+        "Title",
+        "FixedDateText"
+      ],
+      "labels": {
+        "Title": "Holiday",
+        "CompanyHolidayId": "Company Holiday ID",
+        "FixedDateText": "Fixed date text"
+      },
+      "formats": {
+        "Title": "text",
+        "CompanyHolidayId": "text",
+        "FixedDateText": "text"
+      },
+      "metrics": [
+        {
+          "label": "Company Holidays",
+          "op": "count"
+        }
+      ],
+      "groupBy": "FixedDateText",
+      "sortBy": "CompanyHolidayId"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+Title,FictionalEmployeeProfileId,Alias,JobTitle,Department,Manager,Tenure,LeaveBalance,HealthPlan,MonthlyPremium,IndividualDeductible,FamilyDeductible,IndividualOutOfPocketMaximum,FamilyOutOfPocketMaximum,DependentsInFictionalProfile
+Jordan Chen,emp-1001,jordan,Senior Product Manager,Product,Sarah Johnson,3.5 years,vacation 15.5 days; sick 8.0 days; personal 3.0 days; accrual 1.25 days/month,PPO Family Plan,450,500,1500,3000,6000,Spouse
+Michael Torres,emp-1002,michael,Account Executive,Sales,David Kim,1.2 years,vacation 10.0 days; sick 6.0 days; personal 2.0 days; accrual 1.0 days/month,HMO Individual,220,750,Not applicable,4000,Not applicable,None
+Sarah Williams,emp-1003,sarah,Engineering Lead,Engineering,Alex Rivera,5.0 years,vacation 22.0 days; sick 10.0 days; personal 3.0 days; accrual 1.5 days/month,PPO Family Plan,450,500,1500,3000,6000,"Spouse, Child (age 4)"

@@ -1,0 +1,200 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Customer Sentiment and Churn Workspace",
+  "title": "Customer Sentiment and Churn Prediction",
+  "description": "The Customer Sentiment and Churn Prediction workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "customer-interactions",
+      "list": "Cust Sentiment Churn Pred Customer Interactions",
+      "title": "Customer Interactions",
+      "key": "CustomerInteractionId",
+      "fields": {
+        "CustomerInteractionId": "field_1",
+        "Segment": "field_2",
+        "TenureYears": "field_3",
+        "Products": "field_4",
+        "NPSScore": "field_5",
+        "LastSurvey": "field_6",
+        "RecentInteractions": "field_7",
+        "MonthlyTransactions": "field_8",
+        "DigitalEngagementScore": "field_9",
+        "ComplaintCount12M": "field_10"
+      },
+      "columns": [
+        "CustomerInteractionId",
+        "Title",
+        "Segment",
+        "TenureYears",
+        "Products",
+        "NPSScore",
+        "LastSurvey",
+        "MonthlyTransactions",
+        "DigitalEngagementScore",
+        "ComplaintCount12M"
+      ],
+      "labels": {
+        "Title": "Customer Interaction",
+        "CustomerInteractionId": "Customer Interaction ID",
+        "Segment": "Segment",
+        "TenureYears": "Tenure Years",
+        "Products": "Products",
+        "NPSScore": "NPS Score",
+        "LastSurvey": "Last Survey",
+        "RecentInteractions": "Recent Interactions",
+        "MonthlyTransactions": "Monthly Transactions",
+        "DigitalEngagementScore": "Digital Engagement Score",
+        "ComplaintCount12M": "Complaint Count 12 M"
+      },
+      "formats": {
+        "Title": "text",
+        "CustomerInteractionId": "text",
+        "Segment": "text",
+        "TenureYears": "integer",
+        "Products": "text",
+        "NPSScore": "integer",
+        "LastSurvey": "text",
+        "RecentInteractions": "text",
+        "MonthlyTransactions": "integer",
+        "DigitalEngagementScore": "integer",
+        "ComplaintCount12M": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Customer Interactions",
+          "op": "count"
+        },
+        {
+          "label": "Complaint Count 12 M",
+          "op": "sum",
+          "column": "ComplaintCount12M"
+        }
+      ],
+      "groupBy": "Segment",
+      "sortBy": "CustomerInteractionId"
+    },
+    {
+      "id": "churn-indicators",
+      "list": "Customer Sentiment and Churn Prediction Churn Indicators",
+      "title": "Churn Indicators",
+      "key": "ChurnIndicatorId",
+      "fields": {
+        "ChurnIndicatorId": "field_1",
+        "Threshold": "field_2",
+        "Weight": "field_3"
+      },
+      "columns": [
+        "ChurnIndicatorId",
+        "Title",
+        "Threshold",
+        "Weight"
+      ],
+      "labels": {
+        "Title": "Churn Indicator",
+        "ChurnIndicatorId": "Churn Indicator ID",
+        "Threshold": "Threshold",
+        "Weight": "Weight"
+      },
+      "formats": {
+        "Title": "text",
+        "ChurnIndicatorId": "text",
+        "Threshold": "integer",
+        "Weight": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Churn Indicators",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ChurnIndicatorId"
+    },
+    {
+      "id": "retention-actions",
+      "list": "Customer Sentiment and Churn Prediction Retention Actions",
+      "title": "Retention Actions",
+      "key": "RetentionActionId",
+      "fields": {
+        "RetentionActionId": "field_1",
+        "Cost": "field_2",
+        "SuccessRate": "field_3"
+      },
+      "columns": [
+        "RetentionActionId",
+        "Title",
+        "Cost",
+        "SuccessRate"
+      ],
+      "labels": {
+        "Title": "Retention Action",
+        "RetentionActionId": "Retention Action ID",
+        "Cost": "Cost",
+        "SuccessRate": "Success Rate"
+      },
+      "formats": {
+        "Title": "text",
+        "RetentionActionId": "text",
+        "Cost": "currency",
+        "SuccessRate": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Retention Actions",
+          "op": "count"
+        },
+        {
+          "label": "Cost",
+          "op": "sum",
+          "column": "Cost"
+        }
+      ],
+      "sortBy": "RetentionActionId"
+    },
+    {
+      "id": "segment-benchmarks",
+      "list": "Customer Sentiment and Churn Prediction Segment Benchmarks",
+      "title": "Segment Benchmarks",
+      "key": "SegmentBenchmarkId",
+      "fields": {
+        "SegmentBenchmarkId": "field_1",
+        "AvgNPS": "field_2",
+        "AvgProducts": "field_3",
+        "AvgTenure": "field_4",
+        "AvgTransactions": "field_5"
+      },
+      "columns": [
+        "SegmentBenchmarkId",
+        "Title",
+        "AvgNPS",
+        "AvgProducts",
+        "AvgTenure",
+        "AvgTransactions"
+      ],
+      "labels": {
+        "Title": "Segment Benchmark",
+        "SegmentBenchmarkId": "Segment Benchmark ID",
+        "AvgNPS": "Avg NPS",
+        "AvgProducts": "Avg Products",
+        "AvgTenure": "Avg Tenure",
+        "AvgTransactions": "Avg Transactions"
+      },
+      "formats": {
+        "Title": "text",
+        "SegmentBenchmarkId": "text",
+        "AvgNPS": "number",
+        "AvgProducts": "number",
+        "AvgTenure": "integer",
+        "AvgTransactions": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Segment Benchmarks",
+          "op": "count"
+        }
+      ],
+      "sortBy": "SegmentBenchmarkId"
+    }
+  ]
+}

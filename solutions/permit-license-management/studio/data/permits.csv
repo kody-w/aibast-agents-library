@@ -1,0 +1,7 @@
+Title,PermitId,Facility,IssuingAuthority,PermitNumber,IssuedDate,ExpirationDate,Status,Type,RenewalLeadDays,Conditions,LastInspection
+Title V Air Operating Permit,PRM-6001,Riverside Generating Station,CA Air Resources Board,AOP-CA-2024-1847,2024-06-15,2029-06-15,active,air_quality,365,24,2025-09-22
+NPDES Stormwater Discharge Permit,PRM-6002,Riverside Generating Station,CA State Water Board,NPDES-CA-0052841,2023-03-01,2026-03-01,expired,water_discharge,180,18,2025-07-14
+RCRA Hazardous Waste Generator,PRM-6003,Bayshore Refinery,EPA Region 6,TXD-0489-2215,2022-01-10,2027-01-10,active,waste_management,270,32,2025-11-05
+Pipeline Operating License,PRM-6004,Northeast Corridor Pipeline,PHMSA,PHMSA-NE-7742,2021-08-20,2026-08-20,active,pipeline_operation,365,28,2025-10-30
+Coal Combustion Residuals Permit,PRM-6005,Ridgeline Coal Station,CO Dept of Public Health,CCR-CO-2023-0091,2023-04-01,2026-04-01,active,waste_management,180,21,2025-08-18
+Spill Prevention Control Plan,PRM-6006,Bayshore Refinery,EPA Region 6,SPCC-TX-2024-3340,2024-02-15,2029-02-15,active,spill_prevention,365,15,2025-06-02

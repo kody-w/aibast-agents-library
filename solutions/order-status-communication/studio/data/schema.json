@@ -1,0 +1,77 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "order-status-communication",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/manufacturing_stacks/order_status_communication_stack/order_status_communication_agent.py",
+  "records_markdown": "solutions/order-status-communication/manual/knowledge/aibast_order-status-communication-synthetic-records.md",
+  "lists": [
+    {
+      "id": "orders",
+      "title": "Order Status Communications Orders",
+      "description": "Synthetic orders (AIBAST Order Status Communications workshop; fictional).",
+      "record_set": "ORDERS",
+      "columns": [
+        {"name": "Title", "label": "Order", "from": "contact_name", "type": "text"},
+        {"name": "OrderId", "label": "Order ID", "from": "$key", "type": "text"},
+        {"name": "Customer", "label": "Customer", "from": "customer", "type": "text"},
+        {"name": "ContactEmail", "label": "Contact Email", "from": "contact_email", "type": "text"},
+        {"name": "Product", "label": "Product", "from": "product", "type": "text"},
+        {"name": "Quantity", "label": "Quantity", "from": "quantity", "type": "number"},
+        {"name": "UnitPrice", "label": "Unit Price", "from": "unit_price", "type": "number"},
+        {"name": "OrderDate", "label": "Order Date", "from": "order_date", "type": "text"},
+        {"name": "PromisedDate", "label": "Promised Date", "from": "promised_date", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "PctComplete", "label": "Pct Complete", "from": "pct_complete", "type": "number"}
+      ]
+    },
+    {
+      "id": "shipments",
+      "title": "Order Status Communications Shipments",
+      "description": "Synthetic shipments (AIBAST Order Status Communications workshop; fictional).",
+      "record_set": "SHIPMENTS",
+      "columns": [
+        {"name": "Title", "label": "Shipment", "from": "$key", "type": "text"},
+        {"name": "ShipmentId", "label": "Shipment ID", "from": "$key", "type": "text"},
+        {"name": "Carrier", "label": "Carrier", "from": "carrier", "type": "text"},
+        {"name": "TrackingNumber", "label": "Tracking Number", "from": "tracking_number", "type": "text"},
+        {"name": "ShipDate", "label": "Ship Date", "from": "ship_date", "type": "text"},
+        {"name": "EstDelivery", "label": "Est Delivery", "from": "est_delivery", "type": "text"},
+        {"name": "Origin", "label": "Origin", "from": "origin", "type": "text"},
+        {"name": "Destination", "label": "Destination", "from": "destination", "type": "text"},
+        {"name": "WeightKg", "label": "Weight Kg", "from": "weight_kg", "type": "number"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"}
+      ]
+    },
+    {
+      "id": "delay-reasons",
+      "title": "Order Status Communications Delay Reasons",
+      "description": "Synthetic delay reasons (AIBAST Order Status Communications workshop; fictional).",
+      "record_set": "DELAY_REASONS",
+      "columns": [
+        {"name": "Title", "label": "Delay Reason", "from": "$key", "type": "text"},
+        {"name": "DelayReasonId", "label": "Delay Reason ID", "from": "$key", "type": "text"},
+        {"name": "Reason", "label": "Reason", "from": "reason", "type": "text"},
+        {"name": "OriginalDate", "label": "Original Date", "from": "original_date", "type": "text"},
+        {"name": "RevisedDate", "label": "Revised Date", "from": "revised_date", "type": "text"},
+        {"name": "DaysDelayed", "label": "Days Delayed", "from": "days_delayed", "type": "number"},
+        {"name": "RecoveryActions", "label": "Recovery Actions", "from": "recovery_actions", "type": "text", "encoding": "joined"},
+        {"name": "CostImpact", "label": "Cost Impact", "from": "cost_impact", "type": "number"}
+      ]
+    },
+    {
+      "id": "customer-contacts",
+      "title": "Order Status Communications Customer Contacts",
+      "description": "Synthetic customer contacts (AIBAST Order Status Communications workshop; fictional).",
+      "record_set": "CUSTOMER_CONTACTS",
+      "columns": [
+        {"name": "Title", "label": "Customer Contact", "from": "$key", "type": "text"},
+        {"name": "CustomerContactId", "label": "Customer Contact ID", "from": "$key", "type": "text"},
+        {"name": "AccountManager", "label": "Account Manager", "from": "account_manager", "type": "text"},
+        {"name": "EscalationContact", "label": "Escalation Contact", "from": "escalation_contact", "type": "text"},
+        {"name": "PreferredChannel", "label": "Preferred Channel", "from": "preferred_channel", "type": "text"},
+        {"name": "CustomerTier", "label": "Customer Tier", "from": "customer_tier", "type": "text"},
+        {"name": "SLAResponseHours", "label": "SLA Response Hours", "from": "sla_response_hours", "type": "number"}
+      ]
+    }
+  ]
+}

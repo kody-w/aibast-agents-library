@@ -1,0 +1,94 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "procurement-agent",
+  "description": "Selected entity records parsed from the workshop's authoritative synthetic knowledge. Unlisted facts, rules and calculations remain in retained knowledge.",
+  "source": "agents/@aibast-agents-library/general_stacks/procurement_agent_stack/procurement_agent.py",
+  "records_markdown": "solutions/procurement-agent/manual/knowledge/aibast_procurement-agent-synthetic-records.md",
+  "lists": [
+    {
+      "id": "purchase-requests",
+      "title": "Procurement Purchase Requests",
+      "description": "Synthetic purchase requests (AIBAST Procurement workshop; fictional).",
+      "record_set": "PURCHASE_REQUESTS",
+      "columns": [
+        {"name": "Title", "label": "Title", "from": "title", "type": "text"},
+        {"name": "PurchaseRequestId", "label": "Purchase Request ID", "from": "id", "type": "text"},
+        {"name": "Requester", "label": "Requester", "from": "requester", "type": "text"},
+        {"name": "Department", "label": "Department", "from": "department", "type": "text"},
+        {"name": "Category", "label": "Category", "from": "category", "type": "text"},
+        {"name": "Amount", "label": "Amount", "from": "amount", "type": "number", "format": "currency"},
+        {"name": "Priority", "label": "Priority", "from": "priority", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "PreferredVendor", "label": "Preferred vendor", "from": "preferred_vendor", "type": "text"},
+        {"name": "Justification", "label": "Justification", "from": "justification", "type": "text"},
+        {"name": "BudgetCode", "label": "Budget code", "from": "budget_code", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/procurement-agent/manual/knowledge/aibast_procurement-agent-synthetic-records.md",
+        "section": "Purchase requests",
+        "selector": "Purchase requests [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 4,
+        "sources": [
+          "_PURCHASE_REQUESTS"
+        ]
+      }
+    },
+    {
+      "id": "vendor-catalog",
+      "title": "Procurement Vendor Catalog",
+      "description": "Synthetic vendor catalog (AIBAST Procurement workshop; fictional).",
+      "record_set": "VENDOR_CATALOG",
+      "columns": [
+        {"name": "Title", "label": "Vendor", "from": "vendor", "type": "text"},
+        {"name": "VendorCatalogId", "label": "Vendor Catalog ID", "from": "id", "type": "text"},
+        {"name": "Category", "label": "Category", "from": "category", "type": "text"},
+        {"name": "ContractStatus", "label": "Contract status", "from": "contract_status", "type": "text"},
+        {"name": "Tier", "label": "Tier", "from": "tier", "type": "text"},
+        {"name": "Rating", "label": "Rating", "from": "rating", "type": "text"},
+        {"name": "AnnualSpend", "label": "Annual spend", "from": "annual_spend", "type": "number", "format": "currency"},
+        {"name": "PaymentTerms", "label": "Payment terms", "from": "payment_terms", "type": "text"},
+        {"name": "ContactRole", "label": "Contact role", "from": "contact_role", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/procurement-agent/manual/knowledge/aibast_procurement-agent-synthetic-records.md",
+        "section": "Vendor catalog",
+        "selector": "Vendor catalog [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 6,
+        "sources": [
+          "_VENDOR_CATALOG"
+        ]
+      }
+    }
+  ],
+  "source_of_truth": "knowledge-table",
+  "retained_knowledge": [
+    {
+      "file": "solutions/procurement-agent/manual/knowledge/aibast_procurement-agent-synthetic-records.md",
+      "section": "Approval thresholds",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/procurement-agent/manual/knowledge/aibast_procurement-agent-synthetic-records.md",
+      "section": "Spend categories",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/procurement-agent/manual/knowledge/aibast_procurement-agent-synthetic-records.md",
+      "section": "Portfolio totals",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/procurement-agent/manual/knowledge/aibast_procurement-agent-synthetic-records.md",
+      "section": "Locked-case evidence contract",
+      "reason": "rule/policy/contract table"
+    }
+  ]
+}

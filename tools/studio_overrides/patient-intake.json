@@ -1,0 +1,13 @@
+{
+  "knowledge_tables": {
+    "Synthetic patient record [headings]": {
+      "literal_fields": {
+        "Items for staff confirmation": "missing",
+        "Coverage human follow-up": "coverage.follow_up",
+        "Source-recorded visit provider": "visit.provider",
+        "Source-recorded visit service": "visit.service",
+        "Source-recorded visit date": "visit.date"
+      }
+    }
+  }
+}

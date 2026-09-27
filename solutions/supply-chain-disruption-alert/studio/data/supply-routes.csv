@@ -1,0 +1,6 @@
+Title,SupplyRouteId,Origin,Destination,TransportMode,TransitDays,Carriers,AnnualVolumeTeu,AnnualValueUSD,Categories,CurrentStatus,ReliabilityScore
+Asia-Pacific Primary,RT-APAC-01,"Shenzhen, China","Los Angeles, CA",ocean_freight,18,COSCO Shipping; Evergreen Marine,4800,28500000.0,Electronics; Accessories,disrupted,0.82
+European Apparel Route,RT-EURO-01,"Porto, Portugal","Newark, NJ",ocean_freight,12,Maersk Line; MSC,2200,15800000.0,Apparel,at_risk,0.91
+West Coast to Midwest,RT-DOMESTIC-01,"Los Angeles, CA","Chicago, IL",intermodal_rail,4,Union Pacific; BNSF Railway,6500,42000000.0,Electronics; Accessories; Apparel; Footwear,normal,0.95
+Central America Footwear,RT-LATAM-01,"Leon, Mexico","Dallas, TX",trucking,3,J.B. Hunt; Werner Enterprises,1800,12400000.0,Footwear,normal,0.93
+Southeast Asia Textiles,RT-SEASIA-01,"Ho Chi Minh City, Vietnam","Savannah, GA",ocean_freight,22,Yang Ming; ONE Line,3100,19200000.0,Apparel; Home,disrupted,0.78

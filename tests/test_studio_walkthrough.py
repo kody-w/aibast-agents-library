@@ -379,9 +379,9 @@ def test_reviewed_capture_file_must_exist(source):
 
 
 PRIVATE_VALUES = [
-    ("email address", "reviewer@example.com"),
-    ("email address", "reviewer&#64;example.com"),
-    ("email address", "reviewer%40example.com"),
+    ("email address", "reviewer@unapproved.example.net"),
+    ("email address", "reviewer&#64;unapproved.example.net"),
+    ("email address", "reviewer%40unapproved.example.net"),
     ("tenant host", "https://real-customer.sharepoint.com/sites/team"),
     ("tenant host", "REAL-CUSTOMER.crm4.dynamics.com"),
     ("tenant host", "https://real-customer.powerapps.com"),
@@ -511,7 +511,9 @@ def test_one_x_capture_displays_at_its_own_size(source):
     root, package, path, document = source
     shot = reviewed_fixture(package, document, width=90, height=40, density=1)
     write_json(path, document)
-    img = PageParser(studio.render_walkthrough(SLUG, root=root)).find("img")[0]
+    page = studio.render_walkthrough(SLUG, root=root)
+    card = re.search(r'<article class="step" id="easy-03".*?</article>', page, re.DOTALL)[0]
+    img = PageParser(card).find("img")[0]
     assert (img["srcset"], img["width"], img["height"]) == (f'{shot["file"]} 1x', "90", "40")
 
 

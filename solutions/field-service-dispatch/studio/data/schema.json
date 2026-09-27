@@ -1,0 +1,58 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "field-service-dispatch",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/energy_stacks/field_service_dispatch_stack/field_service_dispatch_agent.py",
+  "records_markdown": "solutions/field-service-dispatch/manual/knowledge/field-service-dispatch-synthetic-records.md",
+  "lists": [
+    {
+      "id": "technicians",
+      "title": "Field Service Dispatch Technicians",
+      "description": "Synthetic technicians (AIBAST Field Service Dispatch workshop; fictional).",
+      "record_set": "TECHNICIANS",
+      "columns": [
+        {"name": "Title", "label": "Technician", "from": "name", "type": "text"},
+        {"name": "TechnicianId", "label": "Technician ID", "from": "$key", "type": "text"},
+        {"name": "Certifications", "label": "Certifications", "from": "certifications", "type": "text", "encoding": "joined"},
+        {"name": "Zone", "label": "Zone", "from": "zone", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "CurrentLocation", "label": "Current Location", "from": "current_location", "type": "text"},
+        {"name": "JobsToday", "label": "Jobs Today", "from": "jobs_today", "type": "number"},
+        {"name": "MaxJobs", "label": "Max Jobs", "from": "max_jobs", "type": "number"},
+        {"name": "EfficiencyRating", "label": "Efficiency Rating", "from": "efficiency_rating", "type": "number"},
+        {"name": "YearsExperience", "label": "Years Experience", "from": "years_experience", "type": "number"}
+      ]
+    },
+    {
+      "id": "service-requests",
+      "title": "Field Service Dispatch Service Requests",
+      "description": "Synthetic service requests (AIBAST Field Service Dispatch workshop; fictional).",
+      "record_set": "SERVICE_REQUESTS",
+      "columns": [
+        {"name": "Title", "label": "Service Request", "from": "title", "type": "text"},
+        {"name": "ServiceRequestId", "label": "Service Request ID", "from": "$key", "type": "text"},
+        {"name": "Priority", "label": "Priority", "from": "priority", "type": "text"},
+        {"name": "Type", "label": "Type", "from": "type", "type": "text"},
+        {"name": "RequiredCerts", "label": "Required Certs", "from": "required_certs", "type": "text", "encoding": "joined"},
+        {"name": "Zone", "label": "Zone", "from": "zone", "type": "text"},
+        {"name": "Location", "label": "Location", "from": "location", "type": "text"},
+        {"name": "Equipment", "label": "Equipment", "from": "equipment", "type": "text"},
+        {"name": "EstimatedHours", "label": "Estimated Hours", "from": "estimated_hours", "type": "number"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"}
+      ]
+    },
+    {
+      "id": "geographic-zones",
+      "title": "Field Service Dispatch Geographic Zones",
+      "description": "Synthetic geographic zones (AIBAST Field Service Dispatch workshop; fictional).",
+      "record_set": "GEOGRAPHIC_ZONES",
+      "columns": [
+        {"name": "Title", "label": "Geographic Zone", "from": "$key", "type": "text"},
+        {"name": "GeographicZoneId", "label": "Geographic Zone ID", "from": "$key", "type": "text"},
+        {"name": "States", "label": "States", "from": "states", "type": "text", "encoding": "joined"},
+        {"name": "Technicians", "label": "Technicians", "from": "technicians", "type": "number"},
+        {"name": "OpenRequests", "label": "Open Requests", "from": "open_requests", "type": "number"}
+      ]
+    }
+  ]
+}

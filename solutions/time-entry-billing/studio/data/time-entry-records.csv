@@ -1,0 +1,13 @@
+Title,TimeEntryRecordId,Project,Date,Hours,Rate,Category,ExactDescription,Approved
+Elena Vasquez,TE-9001,TechCorp Transformation,2026-03-10,8.0,275,billable,Cloud architecture design workshop,yes
+Elena Vasquez,TE-9002,TechCorp Transformation,2026-03-11,9.5,275,billable,Azure landing zone implementation,yes
+Michael Chen,TE-9003,Apex Analytics Platform,2026-03-10,7.5,260,billable,Data pipeline development,yes
+Michael Chen,TE-9004,Apex Analytics Platform,2026-03-11,8.0,260,billable,empty / Missing description,no
+Priya Sharma,TE-9005,Pinnacle Energy ERP,2026-03-10,10.0,310,billable,Program status review and steering committee,yes
+Priya Sharma,TE-9006,Pinnacle Energy ERP,2026-03-11,8.0,310,billable,Sprint planning and backlog grooming,yes
+Lisa Tanaka,TE-9007,Atlas Security Audit,2026-03-10,6.0,290,billable,Identity and access management review,yes
+Lisa Tanaka,TE-9008,Atlas Security Audit,2026-03-11,8.5,290,billable,Penetration test coordination,yes
+Amanda Foster,TE-9009,Metro Transit Portal,2026-03-10,8.0,165,billable,User research session facilitation,yes
+Amanda Foster,TE-9010,Metro Transit Portal,2026-03-11,4.0,165,non_billable,Internal design review,yes
+Elena Vasquez,TE-9011,TechCorp Transformation,2026-03-12,11.0,412,billable,Weekend migration cutover,no
+David Okafor,TE-9012,Internal Training,2026-03-10,8.0,0,non_billable,Power BI certification prep,yes

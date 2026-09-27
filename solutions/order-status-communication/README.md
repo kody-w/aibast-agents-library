@@ -39,6 +39,7 @@ Upload both Markdown files in `manual/knowledge/`, then upload one `SKILL.md` fi
 | Copilot-only Easy-mode comparison | `solutions/order-status-communication/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/order-status-communication/quest.html` |
 | Literal browser tutorial | `solutions/order-status-communication/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/order-status-communication/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/order-status-communication/export-manifest.json` |
 | Source bundle | `solutions/order-status-communication/exports/order-status-communication-source.zip` |
 | Manual evidence | `solutions/order-status-communication/evals/manual-build-evidence.json` |

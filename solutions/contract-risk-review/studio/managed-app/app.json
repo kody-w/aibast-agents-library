@@ -1,0 +1,51 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Contract Risk Review Workspace",
+  "title": "Contract Risk Review",
+  "description": "Listed synthetic entity records for Contract Risk Review. Unlisted facts, rule tables and calculated outputs remain in the agent's retained knowledge.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "upcoming-renewals",
+      "list": "Contract Risk Review Upcoming Renewals",
+      "title": "Upcoming Renewals",
+      "key": "UpcomingRenewalId",
+      "fields": {
+        "UpcomingRenewalId": "field_1",
+        "RenewalDate": "field_2",
+        "DaysOut": "field_3",
+        "ExactAction": "field_4"
+      },
+      "columns": [
+        "UpcomingRenewalId",
+        "Title",
+        "RenewalDate",
+        "DaysOut",
+        "ExactAction"
+      ],
+      "labels": {
+        "Title": "Client",
+        "UpcomingRenewalId": "Upcoming Renewal ID",
+        "RenewalDate": "Renewal Date",
+        "DaysOut": "Days Out",
+        "ExactAction": "Exact action"
+      },
+      "formats": {
+        "Title": "text",
+        "UpcomingRenewalId": "text",
+        "RenewalDate": "text",
+        "DaysOut": "text",
+        "ExactAction": "text"
+      },
+      "metrics": [
+        {
+          "label": "Upcoming Renewals",
+          "op": "count"
+        }
+      ],
+      "groupBy": "DaysOut",
+      "sortBy": "UpcomingRenewalId"
+    }
+  ]
+}

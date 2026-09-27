@@ -1,0 +1,77 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "deal-progression",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_progression_agent.py",
+  "records_markdown": "solutions/deal-progression/manual/knowledge/aibast_deal-progression-synthetic-records.md",
+  "lists": [
+    {
+      "id": "stage-benchmarks",
+      "title": "Deal Progression Stage Benchmarks",
+      "description": "Synthetic stage benchmarks (AIBAST Deal Progression workshop; fictional).",
+      "record_set": "_STAGE_BENCHMARKS",
+      "columns": [
+        {"name": "Title", "label": "Stage Benchmark", "from": "$key", "type": "text"},
+        {"name": "StageBenchmarkId", "label": "Stage Benchmark ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "number"}
+      ]
+    },
+    {
+      "id": "reps",
+      "title": "Deal Progression Reps",
+      "description": "Synthetic reps (AIBAST Deal Progression workshop; fictional).",
+      "record_set": "_REPS",
+      "columns": [
+        {"name": "Title", "label": "Rep", "from": "name", "type": "text"},
+        {"name": "RepId", "label": "Rep ID", "from": "$key", "type": "text"},
+        {"name": "Titleaaf2320", "label": "Title", "from": "title", "type": "text"},
+        {"name": "ActiveDeals", "label": "Active Deals", "from": "active_deals", "type": "number"},
+        {"name": "Capacity", "label": "Capacity", "from": "capacity", "type": "number"},
+        {"name": "Specialty", "label": "Specialty", "from": "specialty", "type": "text"}
+      ]
+    },
+    {
+      "id": "pipeline",
+      "title": "Deal Progression Pipeline",
+      "description": "Synthetic pipeline (AIBAST Deal Progression workshop; fictional).",
+      "record_set": "_PIPELINE",
+      "columns": [
+        {"name": "Title", "label": "Pipeline", "from": "name", "type": "text"},
+        {"name": "PipelineId", "label": "Pipeline ID", "from": "id", "type": "text"},
+        {"name": "Account", "label": "Account", "from": "account", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "value", "type": "number"},
+        {"name": "Stage", "label": "Stage", "from": "stage", "type": "text"},
+        {"name": "DaysInStage", "label": "Days In Stage", "from": "days_in_stage", "type": "number"},
+        {"name": "Owner", "label": "Owner", "from": "owner", "type": "text"},
+        {"name": "LastContactDays", "label": "Last Contact Days", "from": "last_contact_days", "type": "number"},
+        {"name": "ChampionName", "label": "Champion Name", "from": "champion_name", "type": "text"},
+        {"name": "ChampionStatus", "label": "Champion Status", "from": "champion_status", "type": "text"},
+        {"name": "Blocker", "label": "Blocker", "from": "blocker", "type": "text"}
+      ]
+    },
+    {
+      "id": "blocker-playbook",
+      "title": "Deal Progression Blocker Playbook",
+      "description": "Synthetic blocker playbook (AIBAST Deal Progression workshop; fictional).",
+      "record_set": "_BLOCKER_PLAYBOOK",
+      "columns": [
+        {"name": "Title", "label": "Blocker Playbook", "from": "$key", "type": "text"},
+        {"name": "BlockerPlaybookId", "label": "Blocker Playbook ID", "from": "$key", "type": "text"},
+        {"name": "Diagnosis", "label": "Diagnosis", "from": "diagnosis", "type": "text"},
+        {"name": "Week1", "label": "Week1", "from": "week1", "type": "text", "encoding": "joined"},
+        {"name": "Week2", "label": "Week2", "from": "week2", "type": "text", "encoding": "joined"},
+        {"name": "Resource", "label": "Resource", "from": "resource", "type": "text"}
+      ]
+    },
+    {
+      "id": "active-stages",
+      "title": "Deal Progression Active Stages",
+      "description": "Synthetic active stages (AIBAST Deal Progression workshop; fictional).",
+      "record_set": "_ACTIVE_STAGES",
+      "columns": [
+        {"name": "Title", "label": "Active Stage", "from": "$value", "type": "text"},
+        {"name": "ActiveStageId", "label": "Active Stage ID", "from": "$key", "type": "text"}
+      ]
+    }
+  ]
+}

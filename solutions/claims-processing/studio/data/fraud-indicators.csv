@@ -1,0 +1,9 @@
+Title,FraudIndicatorId,Weight
+Claimant shows signs of recent financial distress,financial_stress,15
+Claim filed shortly after policy inception or increase in coverage,claim_timing,12
+Claimed amount significantly exceeds typical loss for category,excessive_amount,20
+Inconsistencies between claimant statement and evidence,inconsistent_narrative,18
+Multiple prior claims on same or similar policies,prior_claims_history,10
+Significant delay between loss event and claim filing,delayed_reporting,8
+Lack of independent witnesses or corroborating evidence,witness_issues,12
+Missing or incomplete supporting documentation,documentation_gaps,15

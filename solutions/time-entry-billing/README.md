@@ -34,6 +34,7 @@ accounting system, contacts clients, or sends invoices.
 | Copilot-only Easy-mode comparison | `solutions/time-entry-billing/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/time-entry-billing/quest.html` |
 | Literal browser tutorial | `solutions/time-entry-billing/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/time-entry-billing/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/time-entry-billing/export-manifest.json` |
 | Source bundle | `solutions/time-entry-billing/exports/time-entry-billing-source.zip` |
 | Manual evidence | `solutions/time-entry-billing/evals/manual-build-evidence.json` |

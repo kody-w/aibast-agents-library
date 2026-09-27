@@ -1,0 +1,456 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "returns-complaints-resolution",
+  "title": "Returns and Complaints Resolution, built with brainfreeze studio",
+  "summary": "The Returns and Complaints Resolution agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_returns-complaints-rules-and-safety.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Returns and Complaints Studio",
+      "manual": "Returns and Complaints Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Returns and Complaints Workspace",
+      "manual": "Returns and Complaints Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/returns-complaints-resolution.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast returns-complaints-resolution --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Returns and Complaints Resolution Return Requests list.",
+          "expected": "6 fictional records, including Synthetic size-mismatch case (ReturnRequestId RET-4001), with OrderID ORD-88712.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Returns and Complaints Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Customer Service Agent",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "RCR-01",
+          "prompt": "As Customer Service Agent, summarize the anonymous return review evidence and approval boundary.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Customer Service Agent; Draft Return Review Queue; Synthetic size-mismatch case. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-rcr-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Customer Service Agent",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "RCR-02",
+          "prompt": "As Customer Service Agent, classify this product concern without echoing personal information or sending a response.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Complaint Classification; Product Quality; no return, refund. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-rcr-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Customer Service Agent",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "RCR-03",
+          "prompt": "As Customer Service Agent, draft a policy-grounded option and keep all actions behind authorization.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Resolution Options; Option for authorized review; no return. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-rcr-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Quality Team",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "RCR-04",
+          "prompt": "As Quality Team, summarize aggregate defect and return patterns without accusing any person.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Quality Team; Synthetic Returns & Complaints Trend Analysis; Key Insights. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-rcr-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Returns and Complaints Resolution: 4 read-only tabs from the same lists. 6 fictional records, including Synthetic size-mismatch case (ReturnRequestId RET-4001), with OrderID ORD-88712.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Returns and Complaints Resolution Return Requests from its CSV",
+          "action": "On the site: New, List, From CSV. Upload return-requests.csv. On Customize, keep Title mapped to the Title column. Set ReturnRequestId, OrderID, Product, SKU, PurchaseDate, RequestDate, Reason, Condition, Channel, Status, Notes to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep PurchasePrice as Number. Name the list Returns and Complaints Resolution Return Requests. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/return-requests.csv"
+          ],
+          "expected": "6 fictional records, including Synthetic size-mismatch case (ReturnRequestId RET-4001), with OrderID ORD-88712.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-return-requests.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Returns and Complaints Resolution Complaint Categories from its CSV",
+          "action": "On the site: New, List, From CSV. Upload complaint-categories.csv. On Customize, keep Title mapped to the Title column. Set ComplaintCategoryId, Keywords to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep SeverityWeight, AvgResolutionHours, EscalationRate, MonthlyVolume as Number. Name the list Returns and Complaints Resolution Complaint Categories. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/complaint-categories.csv"
+          ],
+          "expected": "4 fictional records, including Product Quality (ComplaintCategoryId product_quality), with SeverityWeight 0.85.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-complaint-categories.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Returns and Complaints Resolution Resolution Playbooks from its CSV",
+          "action": "On the site: New, List, From CSV. Upload resolution-playbooks.csv. On Customize, keep Title mapped to the Title column. Set ResolutionPlaybookId, ApplicableReasons, ApplicableConditions, CostImpact, CsatImpact to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Use Multiple lines of text for Steps (up to 308 characters). If the import screen cannot create these long-text columns losslessly, stop and report the import limitation; do not continue with truncated records. Compare their full values with the downloaded CSV. Keep MaxDaysSincePurchase as Number. Name the list Returns and Complaints Resolution Resolution Playbooks. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/resolution-playbooks.csv"
+          ],
+          "expected": "5 fictional records, including Full Refund (ResolutionPlaybookId full_refund), with MaxDaysSincePurchase 90.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-resolution-playbooks.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Returns and Complaints Resolution Trend Data from its CSV",
+          "action": "On the site: New, List, From CSV. Upload trend-data.csv. On Customize, keep Title mapped to the Title column. Set TrendDataId, Value to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Returns and Complaints Resolution Trend Data. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/trend-data.csv"
+          ],
+          "expected": "7 fictional records, including months (TrendDataId months).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-trend-data.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Returns and Complaints Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Returns and Complaints Resolution Agent — Studio Global Instructions, name the four list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_returns-complaints-rules-and-safety.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_returns-complaints-rules-and-safety.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the return requests tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Returns and Complaints Resolution Return Requests; name the tool Get return request records.",
+          "expected": "Get return request records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-return-requests.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the complaint categories tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Returns and Complaints Resolution Complaint Categories; name the tool Get complaint category records.",
+          "expected": "Get complaint category records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-complaint-categories.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the resolution playbooks tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Returns and Complaints Resolution Resolution Playbooks; name the tool Get resolution playbook records.",
+          "expected": "Get resolution playbook records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-resolution-playbooks.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the trend data tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Returns and Complaints Resolution Trend Data; name the tool Get trend data records.",
+          "expected": "Get trend data records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-trend-data.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/complaint-classification/SKILL.md",
+            "studio/agent/skills/resolution-recommendation/SKILL.md",
+            "studio/agent/skills/return-processing/SKILL.md",
+            "studio/agent/skills/trend-analysis/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Customer Service Agent",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "RCR-01",
+          "prompt": "As Customer Service Agent, summarize the anonymous return review evidence and approval boundary.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Customer Service Agent; Draft Return Review Queue; Synthetic size-mismatch case. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-rcr-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Customer Service Agent",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "RCR-02",
+          "prompt": "As Customer Service Agent, classify this product concern without echoing personal information or sending a response.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Complaint Classification; Product Quality; no return, refund. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-rcr-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Customer Service Agent",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "RCR-03",
+          "prompt": "As Customer Service Agent, draft a policy-grounded option and keep all actions behind authorization.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Resolution Options; Option for authorized review; no return. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-rcr-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Quality Team",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "RCR-04",
+          "prompt": "As Quality Team, summarize aggregate defect and return patterns without accusing any person.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Quality Team; Synthetic Returns & Complaints Trend Analysis; Key Insights. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-rcr-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/returns-complaints-resolution/studio/managed-app/app.json --out returns-complaints-resolution-app"
+          ],
+          "expected": "returns-complaints-resolution-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd returns-complaints-resolution-app/managed-app",
+            "ms app init --display-name \"Returns and Complaints Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Returns and Complaints Resolution Return Requests\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Returns and Complaints Resolution Complaint Categories\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Returns and Complaints Resolution Resolution Playbooks\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Returns and Complaints Resolution Trend Data\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Returns and Complaints Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Returns and Complaints Resolution Return Requests tab.",
+          "expected": "The app and the agent read the same synthetic records. 6 fictional records, including Synthetic size-mismatch case (ReturnRequestId RET-4001), with OrderID ORD-88712.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

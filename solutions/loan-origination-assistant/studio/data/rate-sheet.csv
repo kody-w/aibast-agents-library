@@ -1,0 +1,5 @@
+Title,RateSheetId,Rate,Apr,Points,MipUpfront,MipAnnual,FundingFee
+conventional_30yr,conventional_30yr,6.875,7.012,0.5,,,
+fha_30yr,fha_30yr,6.5,7.25,0.0,1.75,0.55,
+va_30yr,va_30yr,6.25,6.485,0.0,,,2.15
+commercial_5yr,commercial_5yr,7.5,7.75,1.0,,,

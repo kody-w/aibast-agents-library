@@ -47,6 +47,7 @@ Upload both Markdown files in `manual/knowledge/`, then upload the 4 `SKILL.md` 
 | Copilot-only Easy-mode comparison | `solutions/ai-customer-assistant/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/ai-customer-assistant/quest.html` |
 | Literal browser tutorial | `solutions/ai-customer-assistant/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/ai-customer-assistant/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/ai-customer-assistant/export-manifest.json` |
 | Source bundle | `solutions/ai-customer-assistant/exports/ai-customer-assistant-source.zip` |
 | Manual evidence | `solutions/ai-customer-assistant/evals/manual-build-evidence.json` |

@@ -1,0 +1,5 @@
+Title,CustomerContactId,AccountManager,EscalationContact,PreferredChannel,CustomerTier,SLAResponseHours
+Ford Motor Company,Ford Motor Company,Sarah Lin,"Tom Bradley, Plant Manager",email,Strategic,4
+Caterpillar Inc.,Caterpillar Inc.,Robert Kim,VP Supply Chain,EDI,Strategic,8
+Tesla Inc.,Tesla Inc.,Sarah Lin,Logistics Director,portal,Priority,2
+John Deere,John Deere,Robert Kim,Procurement Director,email,Priority,4

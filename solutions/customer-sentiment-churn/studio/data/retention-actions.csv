@@ -1,0 +1,7 @@
+Title,RetentionActionId,Cost,SuccessRate
+Waive monthly maintenance fees for 6 months,fee_waiver,72,45
+Offer premium savings rate for 12 months,rate_upgrade,150,35
+Schedule call with relationship manager,personal_outreach,25,55
+Offer discounted product bundle with waived fees,product_bundle,200,60
+Credit loyalty bonus to account,loyalty_bonus,100,50
+Escalate to service recovery team,complaint_resolution,50,65

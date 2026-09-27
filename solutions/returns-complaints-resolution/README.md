@@ -31,6 +31,7 @@ refund, credit, replacement, shipment, reservation, or customer message.
 | Copilot-only Easy-mode comparison | `solutions/returns-complaints-resolution/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/returns-complaints-resolution/quest.html` |
 | Literal browser tutorial | `solutions/returns-complaints-resolution/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/returns-complaints-resolution/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/returns-complaints-resolution/export-manifest.json` |
 | Source bundle | `solutions/returns-complaints-resolution/exports/returns-complaints-resolution-source.zip` |
 | Manual evidence | `solutions/returns-complaints-resolution/evals/manual-build-evidence.json` |

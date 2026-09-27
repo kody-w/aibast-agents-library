@@ -1,0 +1,458 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "inventory-rebalancing",
+  "title": "Inventory Rebalancing, built with brainfreeze studio",
+  "summary": "The Inventory Rebalancing workshop's clean entity tables on SharePoint, with a managed app. Unlisted records, rules and calculations remain in retained knowledge. Easy and Manual use the same listed fields and do not fabricate missing records.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "studio/agent/knowledge/aibast_inventory-rebalancing-review-rules.md",
+      "studio/agent/knowledge/aibast_inventory-rebalancing-synthetic-records.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Inventory Rebalancing Studio",
+      "manual": "Inventory Rebalancing Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Inventory Rebalancing Workspace",
+      "manual": "Inventory Rebalancing Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/inventory-rebalancing.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast inventory-rebalancing --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Inventory Rebalancing SKU Unit Cost And Weight list.",
+          "expected": "6 fictional records, including SKU-4401 (SKUUnitCostAndWeightId SKU-4401), with UnitCost 87.5.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Inventory Rebalancing Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 2 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Supply Chain Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IR-01",
+          "prompt": "Which distribution centers are tight on space, and which SKU positions should my team review first?",
+          "expected": "The relevant list tool ran. Required evidence: Dallas Fulfillment Center; SKU-4406. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-ir-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Inventory Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IR-02",
+          "prompt": "Where do we have forecast-relative shortages or excess that deserve a rebalancing review?",
+          "expected": "The relevant list tool ran. Required evidence: SKU-4402; SLOW-MOVING. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-ir-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Supply Chain Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IR-03",
+          "prompt": "Show me the proposed warehouse moves, but do not move or reserve anything.",
+          "expected": "The relevant list tool ran. Required evidence: SKU-4401; No inventory has been reserved. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-ir-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Procurement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IR-04",
+          "prompt": "Where is inventory exposure concentrated, and what trade-offs should I take to the planning meeting?",
+          "expected": "The relevant list tool ran. Required evidence: Total annual holding cost; synthetic planning estimates. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-ir-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Inventory Rebalancing: 4 read-only tabs from the same lists. 6 fictional records, including SKU-4401 (SKUUnitCostAndWeightId SKU-4401), with UnitCost 87.5.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Inventory Rebalancing SKU Unit Cost And Weight from its CSV",
+          "action": "On the site: New, List, From CSV. Upload sku-unit-cost-and-weight.csv. On Customize, keep Title mapped to the Title column. Set SKUUnitCostAndWeightId, WeightKg to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep UnitCost as Number. Name the list Inventory Rebalancing SKU Unit Cost And Weight. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/sku-unit-cost-and-weight.csv"
+          ],
+          "expected": "6 fictional records, including SKU-4401 (SKUUnitCostAndWeightId SKU-4401), with UnitCost 87.5.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-sku-unit-cost-and-weight.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Inventory Rebalancing SKU On Hand Levels By Facility from its CSV",
+          "action": "On the site: New, List, From CSV. Upload sku-on-hand-levels-by-facility.csv. On Customize, keep Title mapped to the Title column. Set SKUOnHandLevelsByFacilityId, WhAtl, WhOrd, WhDfw, WhSea, ReorderPoint to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Inventory Rebalancing SKU On Hand Levels By Facility. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/sku-on-hand-levels-by-facility.csv"
+          ],
+          "expected": "6 fictional records, including Brushless DC Motor 48V (SKUOnHandLevelsByFacilityId SKU-4401), with WhAtl 3,200.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-sku-on-hand-levels-by-facility.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Inventory Rebalancing Demand Forecast By Facility from its CSV",
+          "action": "On the site: New, List, From CSV. Upload demand-forecast-by-facility.csv. On Customize, keep Title mapped to the Title column. Set DemandForecastByFacilityId, WhAtl, WhOrd, WhDfw, WhSea to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Inventory Rebalancing Demand Forecast By Facility. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/demand-forecast-by-facility.csv"
+          ],
+          "expected": "6 fictional records, including SKU-4401 (DemandForecastByFacilityId SKU-4401), with WhAtl 2,800.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-demand-forecast-by-facility.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Inventory Rebalancing Portfolio Classification from its CSV",
+          "action": "On the site: New, List, From CSV. Upload portfolio-classification.csv. On Customize, keep Title mapped to the Title column. Set PortfolioClassificationId, Velocity, StrategicValue, LifecycleRisk to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Inventory Rebalancing Portfolio Classification. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/portfolio-classification.csv"
+          ],
+          "expected": "6 fictional records, including SKU-4401 (PortfolioClassificationId SKU-4401), with Velocity MEDIUM.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-portfolio-classification.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Inventory Rebalancing Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Inventory Rebalancing Agent — Studio Global Instructions, name the four list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_inventory-rebalancing-review-rules.md, aibast_inventory-rebalancing-synthetic-records.md, and wait until ready. These generated files retain unlisted records and rules; the listed entity fields come from the list tools. Do not replace them with the original unfiltered knowledge files.",
+          "downloads": [
+            "studio/agent/knowledge/aibast_inventory-rebalancing-review-rules.md",
+            "studio/agent/knowledge/aibast_inventory-rebalancing-synthetic-records.md"
+          ],
+          "expected": "2 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the sku unit cost and weight tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Rebalancing SKU Unit Cost And Weight; name the tool Get sku unit cost and weight records.",
+          "expected": "Get sku unit cost and weight records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-sku-unit-cost-and-weight.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the sku on hand levels by facility tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Rebalancing SKU On Hand Levels By Facility; name the tool Get sku on hand levels by facility records.",
+          "expected": "Get sku on hand levels by facility records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-sku-on-hand-levels-by-facility.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the demand forecast by facility tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Rebalancing Demand Forecast By Facility; name the tool Get demand forecast by facility records.",
+          "expected": "Get demand forecast by facility records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-demand-forecast-by-facility.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the portfolio classification tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Rebalancing Portfolio Classification; name the tool Get portfolio classification records.",
+          "expected": "Get portfolio classification records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-portfolio-classification.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_cost_analysis/SKILL.md",
+            "studio/agent/skills/aibast_inventory_snapshot/SKILL.md",
+            "studio/agent/skills/aibast_rebalance_recommendation/SKILL.md",
+            "studio/agent/skills/aibast_transfer_plan/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 2 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Supply Chain Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IR-01",
+          "prompt": "Which distribution centers are tight on space, and which SKU positions should my team review first?",
+          "expected": "The relevant list tool ran. Required evidence: Dallas Fulfillment Center; SKU-4406. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-ir-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Inventory Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IR-02",
+          "prompt": "Where do we have forecast-relative shortages or excess that deserve a rebalancing review?",
+          "expected": "The relevant list tool ran. Required evidence: SKU-4402; SLOW-MOVING. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-ir-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Supply Chain Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IR-03",
+          "prompt": "Show me the proposed warehouse moves, but do not move or reserve anything.",
+          "expected": "The relevant list tool ran. Required evidence: SKU-4401; No inventory has been reserved. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-ir-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Procurement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IR-04",
+          "prompt": "Where is inventory exposure concentrated, and what trade-offs should I take to the planning meeting?",
+          "expected": "The relevant list tool ran. Required evidence: Total annual holding cost; synthetic planning estimates. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-ir-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/inventory-rebalancing/studio/managed-app/app.json --out inventory-rebalancing-app"
+          ],
+          "expected": "inventory-rebalancing-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd inventory-rebalancing-app/managed-app",
+            "ms app init --display-name \"Inventory Rebalancing Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Rebalancing SKU Unit Cost And Weight\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Rebalancing SKU On Hand Levels By Facility\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Rebalancing Demand Forecast By Facility\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Rebalancing Portfolio Classification\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Inventory Rebalancing Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Inventory Rebalancing SKU Unit Cost And Weight tab.",
+          "expected": "The app and the agent read the same synthetic records. 6 fictional records, including SKU-4401 (SKUUnitCostAndWeightId SKU-4401), with UnitCost 87.5.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

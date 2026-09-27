@@ -1,0 +1,5 @@
+Title,UtilityAccountId,Address,AccountType,Services,Status,BalanceCurrent,BalancePastDue,Autopay,LastPaymentDate,LastPaymentAmount
+Patricia Hernandez,ACCT-90001,1245 Cedar Lane,residential,water; sewer; stormwater,active,127.45,0.0,Yes,2025-02-15,118.9
+Green Valley Shopping Center,ACCT-90002,5600 Commerce Blvd,commercial,water; sewer; stormwater; fire_line,active,2845.6,1420.3,No,2025-01-20,2650.0
+Robert & Linda Thompson,ACCT-90003,887 Willow Creek Dr,residential,water; sewer; stormwater; trash,delinquent,245.8,489.2,No,2024-11-18,135.0
+Sunnyvale Elementary School,ACCT-90004,300 Education Way,institutional,water; sewer; stormwater; irrigation,active,1890.25,0.0,Yes,2025-02-28,1756.0

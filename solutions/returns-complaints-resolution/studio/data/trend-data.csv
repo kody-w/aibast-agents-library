@@ -1,0 +1,8 @@
+Title,TrendDataId,Value
+months,months,2025-10; 2025-11; 2025-12; 2026-01; 2026-02; 2026-03
+total_returns,total_returns,312; 345; 498; 387; 328; 360
+return_rate_pct,return_rate_pct,4.1; 4.5; 6.2; 5.0; 4.3; 4.7
+top_return_reasons,top_return_reasons,"{""wrong_size"":[98,112,160,125,105,115],""defective"":[72,68,95,82,71,78],""changed_mind"":[65,78,130,88,70,80],""not_as_described"":[45,52,68,55,48,52],""wrong_item"":[32,35,45,37,34,35]}"
+avg_resolution_hours,avg_resolution_hours,28.5; 30.2; 38.7; 32.1; 27.8; 29.4
+csat_score,csat_score,4.1; 4.0; 3.6; 3.9; 4.2; 4.1
+refund_total_usd,refund_total_usd,18720.0; 21450.0; 34200.0; 24800.0; 19650.0; 22100.0

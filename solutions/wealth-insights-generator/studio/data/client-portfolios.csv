@@ -1,0 +1,5 @@
+Title,ClientPortfolioId,Aum,Strategy,YtdReturn,BenchmarkReturn,Alpha,RiskProfile,LastContact,NextReview,LifeEvents,HeldAwayAssets
+Harrison Family Trust,WM-001,8500000,balanced_growth,5.2,4.1,1.1,moderate,2025-02-20,2025-04-15,Daughter starting college Fall 2025,620000
+Dr. Anita Rao,WM-002,3200000,aggressive_growth,7.8,6.2,1.6,aggressive,2025-03-01,2025-06-01,Planning practice sale in 2-3 years,1100000
+George & Martha Kensington,WM-003,12400000,capital_preservation,2.1,1.8,0.3,conservative,2025-01-15,2025-04-01,Estate plan revision needed; RMD optimization,1850000
+Tidewater Ventures LLC,WM-004,5700000,alternative_focused,3.9,4.1,-0.2,moderate_aggressive,2025-02-10,2025-05-15,Considering real estate exit strategy,900000

@@ -1,0 +1,12 @@
+Title,ICPId,Value
+size_weight,size_weight,0.2
+industry_weight,industry_weight,0.25
+tech_fit_weight,tech_fit_weight,0.2
+budget_weight,budget_weight,0.2
+authority_weight,authority_weight,0.15
+ideal_employees_min,ideal_employees_min,200
+ideal_employees_max,ideal_employees_max,10000
+ideal_industries,ideal_industries,Technology; Financial Services; Healthcare; Manufacturing; SaaS
+ideal_tech,ideal_tech,Salesforce; AWS; Snowflake; Kubernetes; Databricks; Azure
+budget_tiers,budget_tiers,"{""confirmed"":1.0,""planned"":0.7,""exploring"":0.4,""tbd"":0.2}"
+authority_tiers,authority_tiers,"{""C-Level"":1.0,""VP"":0.85,""Director"":0.7,""Manager"":0.5,""Individual"":0.3}"

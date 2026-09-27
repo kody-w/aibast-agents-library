@@ -1,0 +1,154 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Supply Risk Monitoring Workspace",
+  "title": "Supply Risk Monitoring",
+  "description": "The Supply Risk Monitoring workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "suppliers",
+      "list": "Supply Risk Monitoring Suppliers",
+      "title": "Suppliers",
+      "key": "SupplierId",
+      "fields": {
+        "SupplierId": "field_1",
+        "Category": "field_2",
+        "Region": "field_3",
+        "Country": "field_4",
+        "AnnualSpend": "field_5",
+        "QualityScore": "field_6",
+        "DeliveryScore": "field_7",
+        "FinancialScore": "field_8",
+        "GeopoliticalScore": "field_9",
+        "OverallRisk": "field_10",
+        "Tier": "field_11"
+      },
+      "columns": [
+        "SupplierId",
+        "Title",
+        "Category",
+        "Region",
+        "Country",
+        "AnnualSpend",
+        "QualityScore",
+        "DeliveryScore",
+        "FinancialScore",
+        "GeopoliticalScore"
+      ],
+      "labels": {
+        "Title": "Supplier",
+        "SupplierId": "Supplier ID",
+        "Category": "Category",
+        "Region": "Region",
+        "Country": "Country",
+        "AnnualSpend": "Annual Spend",
+        "QualityScore": "Quality Score",
+        "DeliveryScore": "Delivery Score",
+        "FinancialScore": "Financial Score",
+        "GeopoliticalScore": "Geopolitical Score",
+        "OverallRisk": "Overall Risk",
+        "Tier": "Tier"
+      },
+      "formats": {
+        "Title": "text",
+        "SupplierId": "text",
+        "Category": "text",
+        "Region": "text",
+        "Country": "text",
+        "AnnualSpend": "currency",
+        "QualityScore": "integer",
+        "DeliveryScore": "integer",
+        "FinancialScore": "integer",
+        "GeopoliticalScore": "integer",
+        "OverallRisk": "number",
+        "Tier": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Suppliers",
+          "op": "count"
+        },
+        {
+          "label": "Annual Spend",
+          "op": "sum",
+          "column": "AnnualSpend"
+        }
+      ],
+      "groupBy": "Category",
+      "sortBy": "SupplierId"
+    },
+    {
+      "id": "recent-incidents",
+      "list": "Supply Risk Monitoring Recent Incidents",
+      "title": "Recent Incidents",
+      "key": "RecentIncidentId",
+      "fields": {
+        "RecentIncidentId": "field_1",
+        "SupplierID": "field_2",
+        "Date": "field_3",
+        "Severity": "field_4"
+      },
+      "columns": [
+        "RecentIncidentId",
+        "Title",
+        "SupplierID",
+        "Date",
+        "Severity"
+      ],
+      "labels": {
+        "Title": "Recent Incident",
+        "RecentIncidentId": "Recent Incident ID",
+        "SupplierID": "Supplier ID",
+        "Date": "Date",
+        "Severity": "Severity"
+      },
+      "formats": {
+        "Title": "text",
+        "RecentIncidentId": "text",
+        "SupplierID": "text",
+        "Date": "text",
+        "Severity": "text"
+      },
+      "metrics": [
+        {
+          "label": "Recent Incidents",
+          "op": "count"
+        }
+      ],
+      "groupBy": "SupplierID",
+      "sortBy": "RecentIncidentId"
+    },
+    {
+      "id": "backup-suppliers",
+      "list": "Supply Risk Monitoring Backup Suppliers",
+      "title": "Backup Suppliers",
+      "key": "BackupSupplierId",
+      "fields": {
+        "BackupSupplierId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "BackupSupplierId",
+        "Title"
+      ],
+      "labels": {
+        "Title": "Backup Supplier",
+        "BackupSupplierId": "Backup Supplier ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "BackupSupplierId": "text",
+        "Value": "text"
+      },
+      "metrics": [
+        {
+          "label": "Backup Suppliers",
+          "op": "count"
+        }
+      ],
+      "sortBy": "BackupSupplierId"
+    }
+  ]
+}

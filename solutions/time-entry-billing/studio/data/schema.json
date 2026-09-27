@@ -1,0 +1,106 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "time-entry-billing",
+  "description": "Selected entity records parsed from the workshop's authoritative synthetic knowledge. Unlisted facts, rules and calculations remain in retained knowledge.",
+  "source": "agents/@aibast-agents-library/professional_services_stacks/time_entry_billing_stack/time_entry_billing_agent.py",
+  "records_markdown": "solutions/time-entry-billing/manual/knowledge/aibast_billing-synthetic-ledger.md",
+  "lists": [
+    {
+      "id": "time-entry-records",
+      "title": "Time Entry and Billing Time Entry Records",
+      "description": "Synthetic time entry records (AIBAST Time Entry and Billing workshop; fictional).",
+      "record_set": "TIME_ENTRY_RECORDS",
+      "columns": [
+        {"name": "Title", "label": "Consultant", "from": "consultant", "type": "text"},
+        {"name": "TimeEntryRecordId", "label": "Time Entry Record ID", "from": "entry", "type": "text"},
+        {"name": "Project", "label": "Project", "from": "project", "type": "text"},
+        {"name": "Date", "label": "Date", "from": "date", "type": "text"},
+        {"name": "Hours", "label": "Hours", "from": "hours", "type": "text"},
+        {"name": "Rate", "label": "Rate", "from": "rate", "type": "number", "format": "currency"},
+        {"name": "Category", "label": "Category", "from": "category", "type": "text"},
+        {"name": "ExactDescription", "label": "Exact description", "from": "exact_description", "type": "text"},
+        {"name": "Approved", "label": "Approved", "from": "approved", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/time-entry-billing/manual/knowledge/aibast_billing-synthetic-ledger.md",
+        "section": "Complete time-entry records",
+        "selector": "Complete time-entry records [table 1]",
+        "form": "pipe-table",
+        "literal_fields": {
+          "Exact description": {
+            "field": "description",
+            "empty": "empty / Missing description"
+          }
+        }
+      },
+      "literal_cross_check": {
+        "rows": 12,
+        "sources": [
+          "DISPUTES",
+          "TIME_ENTRIES"
+        ]
+      }
+    },
+    {
+      "id": "invoice-history",
+      "title": "Time Entry and Billing Invoice History",
+      "description": "Synthetic invoice history (AIBAST Time Entry and Billing workshop; fictional).",
+      "record_set": "INVOICE_HISTORY",
+      "columns": [
+        {"name": "Title", "label": "Client", "from": "client", "type": "text"},
+        {"name": "InvoiceHistoryId", "label": "Invoice History ID", "from": "invoice", "type": "text"},
+        {"name": "Amount", "label": "Amount", "from": "amount", "type": "number", "format": "currency"},
+        {"name": "Date", "label": "Date", "from": "date", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "DaysOutstanding", "label": "Days outstanding", "from": "days_outstanding", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/time-entry-billing/manual/knowledge/aibast_billing-synthetic-ledger.md",
+        "section": "Complete invoice history",
+        "selector": "Complete invoice history [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 5,
+        "sources": [
+          "INVOICE_HISTORY"
+        ]
+      }
+    }
+  ],
+  "source_of_truth": "knowledge-table",
+  "retained_knowledge": [
+    {
+      "file": "solutions/time-entry-billing/manual/knowledge/aibast_billing-rules-and-disputes.md",
+      "section": "Invoice Preparation rules",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/time-entry-billing/manual/knowledge/aibast_billing-rules-and-disputes.md",
+      "section": "Complete disputes",
+      "reason": "heading records are nested or have unequal field sets"
+    },
+    {
+      "file": "solutions/time-entry-billing/manual/knowledge/aibast_billing-rules-and-disputes.md",
+      "section": "By Project",
+      "reason": "By Project: TechCorp Transformation.Hours has no unambiguous literal field"
+    },
+    {
+      "file": "solutions/time-entry-billing/manual/knowledge/aibast_billing-rules-and-disputes.md",
+      "section": "By Consultant",
+      "reason": "By Consultant: Elena Vasquez.Hours has no unambiguous literal field"
+    },
+    {
+      "file": "solutions/time-entry-billing/manual/knowledge/aibast_billing-synthetic-ledger.md",
+      "section": "Configured billing rates",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/time-entry-billing/manual/knowledge/aibast_billing-synthetic-ledger.md",
+      "section": "Complete project budget records",
+      "reason": "Complete project budget records: TechCorp Transformation.Budget used has no unambiguous literal field"
+    }
+  ]
+}

@@ -109,6 +109,7 @@ copied verbatim into the generated tutorial and quest.
 | Copilot-only Easy-mode comparison | `solutions/building-permit-processing/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/building-permit-processing/quest.html` |
 | Literal browser tutorial | `solutions/building-permit-processing/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/building-permit-processing/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/building-permit-processing/export-manifest.json` |
 | Source bundle | `solutions/building-permit-processing/exports/building-permit-processing-source.zip` |
 | Manual evidence | `solutions/building-permit-processing/evals/manual-build-evidence.json` |

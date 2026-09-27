@@ -1,0 +1,33 @@
+---
+name: compliance-dashboard-and-audit-readiness
+description: Exact first route for RC-01 MiFID audit readiness and RC-05 board evidence; preserve field labels, missing status, and four-trade scope.
+---
+
+# Compliance dashboard and audit readiness
+
+Read listed entity facts with the SharePoint list tools, using the global instructions' Evidence locations and List columns. Read all unlisted record facts, calculations, policies, thresholds and response contracts from the retained knowledge files. Never claim an omitted email field or an unlisted record set is available from a list.
+
+Retrieve both attached knowledge files and use native citations.
+
+## RC-01
+Audit outcome cannot be predicted from this synthetic pilot. Snapshot 2026-08-07. Report credential records T-2041 lapsed 12 days and T-2233 lapsed 3 days; a proposed pilot stand-down requires supervisor review and no active status, legal incapacity, notification, enrollment, or completed stand-down is established. Report exactly four reporting-defective trades with exact labels: TRD-88117 field 57, Investment decision within firm, is missing; source T-2041. TRD-88129 field 36 venue mismatch, reported XETR and verified XPAR. TRD-88133 field 59, Execution within firm, is missing with source T-2107; field 7, Buyer identification code, is missing with source 549300XKQZ2P4NLK7T18; zero ARM submission record. TRD-88150 field 36 venue mismatch, reported TQEX and verified XLON. TRD-88162 has a complete report and only an algorithm-documentation gap. Execution outliers are TRD-88133 and TRD-88150. ALGO-IS-DE is 37 days overdue. ALGO-POV-NL goes live in 6 days, was never validated, and lacks risk controls, kill-switch test, and conformance test. Use at risk, control gap, and requires authorized review. No side effect occurred. Never relabel field 57 as executing broker, field 59 as trader ID, or field 7 as counterparty LEI. Never say immediate stand-down required, must be stood down, active traders, five reporting defects, or four additional reporting exceptions.
+
+## RC-05
+The assertion that reporting is fine is not supported by the fixed synthetic evidence. Use these exact reporting findings: TRD-88133 field 59, Execution within firm, is missing with source T-2107; field 7, Buyer identification code, is missing with source 549300XKQZ2P4NLK7T18; zero ARM submission record. TRD-88117 field 57, Investment decision within firm, is missing with source T-2041. TRD-88129 field 36 venue mismatch, reported XETR and verified XPAR. TRD-88150 field 36 venue mismatch, reported TQEX and verified XLON; execution outlier is separate. Exactly four reporting-defective trades. TRD-88162 has a complete report and is not a reporting defect. Two lapsed credentials are records, not proof of active traders or legal incapacity; proposed stand-down requires authorized review and was not performed. ALGO-IS-DE is 37 days overdue. ALGO-POV-NL is unvalidated and 6 days from go-live. Owner is Quant Execution. Proposed corrections and one new submission are synthetic dry runs only. Use at risk, control gap, and requires authorized review. No correction, ARM transmission, stand-down, enrollment, notification, deployment change, or external record change occurred. Never relabel field 59 as trader ID, field 7 as LEI, or field 57 as executing broker. Say missing, not incorrect. Never claim knowledge of other reporting channels. Never invent Head of Algo Risk, active traders, execution during a lapsed period, completed action, or five reporting defects.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Are we going to fail our next MiFID audit? What's actually broken on the desk right now?
+
+- T-2041
+- T-2233
+
+For: My head of trading says the reporting is fine. Prove him wrong with specifics I can take to the board.
+
+- TRD-88133
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output, or simple arithmetic on those figures that you label as computed. Beyond what the canonical output itself states, do not say or imply that one amount covers, closes, exceeds, offsets or is sufficient for another, and do not rank or recommend options; those judgements belong to the authorized reviewer.

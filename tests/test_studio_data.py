@@ -89,6 +89,12 @@ class StudioDataTests(unittest.TestCase):
         """The list tools return field_N keys; the studio instructions must name each one exactly as the lists do."""
         for slug in bsd.studio_slugs():
             text = (ROOT / "solutions" / slug / "studio" / "agent" / "GLOBAL-INSTRUCTIONS.md").read_text()
+            controls = ROOT / "solutions" / slug / "studio/agent/knowledge" / f"{slug}-instruction-controls.md"
+            if controls.name in text:
+                document = json.loads((ROOT / "solutions" / slug / "studio/walkthrough.json").read_text())
+                self.assertIn(controls.relative_to(ROOT / "solutions" / slug).as_posix(),
+                              document["agent"]["knowledge"])
+                text += "\n" + controls.read_text()
             schema = json.loads((ROOT / "solutions" / slug / "studio" / "data" / "schema.json").read_text())
             for lst in schema["lists"]:
                 names = [c["name"] for c in lst["columns"] if c["name"] != "Title"]

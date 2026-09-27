@@ -1,0 +1,53 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "supplier-risk-monitoring",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/manufacturing_stacks/supplier_risk_monitoring_stack/supplier_risk_monitoring_agent.py",
+  "records_markdown": "solutions/supplier-risk-monitoring/manual/knowledge/aibast_supplier-risk-monitoring-synthetic-records.md",
+  "lists": [
+    {
+      "id": "suppliers",
+      "title": "Supply Risk Monitoring Suppliers",
+      "description": "Synthetic suppliers (AIBAST Supply Risk Monitoring workshop; fictional).",
+      "record_set": "SUPPLIERS",
+      "columns": [
+        {"name": "Title", "label": "Supplier", "from": "name", "type": "text"},
+        {"name": "SupplierId", "label": "Supplier ID", "from": "$key", "type": "text"},
+        {"name": "Category", "label": "Category", "from": "category", "type": "text"},
+        {"name": "Region", "label": "Region", "from": "region", "type": "text"},
+        {"name": "Country", "label": "Country", "from": "country", "type": "text"},
+        {"name": "AnnualSpend", "label": "Annual Spend", "from": "annual_spend", "type": "number"},
+        {"name": "QualityScore", "label": "Quality Score", "from": "quality_score", "type": "number"},
+        {"name": "DeliveryScore", "label": "Delivery Score", "from": "delivery_score", "type": "number"},
+        {"name": "FinancialScore", "label": "Financial Score", "from": "financial_score", "type": "number"},
+        {"name": "GeopoliticalScore", "label": "Geopolitical Score", "from": "geopolitical_score", "type": "number"},
+        {"name": "OverallRisk", "label": "Overall Risk", "from": "overall_risk", "type": "number"},
+        {"name": "Tier", "label": "Tier", "from": "tier", "type": "number"}
+      ]
+    },
+    {
+      "id": "recent-incidents",
+      "title": "Supply Risk Monitoring Recent Incidents",
+      "description": "Synthetic recent incidents (AIBAST Supply Risk Monitoring workshop; fictional).",
+      "record_set": "RECENT_INCIDENTS",
+      "columns": [
+        {"name": "Title", "label": "Recent Incident", "from": "description", "type": "text"},
+        {"name": "RecentIncidentId", "label": "Recent Incident ID", "from": "$key", "type": "text"},
+        {"name": "SupplierID", "label": "Supplier ID", "from": "supplier_id", "type": "text"},
+        {"name": "Date", "label": "Date", "from": "date", "type": "text"},
+        {"name": "Severity", "label": "Severity", "from": "severity", "type": "text"}
+      ]
+    },
+    {
+      "id": "backup-suppliers",
+      "title": "Supply Risk Monitoring Backup Suppliers",
+      "description": "Synthetic backup suppliers (AIBAST Supply Risk Monitoring workshop; fictional).",
+      "record_set": "BACKUP_SUPPLIERS",
+      "columns": [
+        {"name": "Title", "label": "Backup Supplier", "from": "$key", "type": "text"},
+        {"name": "BackupSupplierId", "label": "Backup Supplier ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "text", "encoding": "json"}
+      ]
+    }
+  ]
+}

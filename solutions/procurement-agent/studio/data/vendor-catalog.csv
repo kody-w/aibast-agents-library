@@ -1,0 +1,7 @@
+Title,VendorCatalogId,Category,ContractStatus,Tier,Rating,AnnualSpend,PaymentTerms,ContactRole
+AWS,VND-001,Cloud Infrastructure,Active,Strategic,4.7,890000,Net 30,Enterprise Account Manager
+Salesforce,VND-002,CRM Software,Active,Strategic,4.5,430000,Annual Prepay,Customer Success Manager
+Steelcase,VND-003,Office Furniture,Active,Preferred,4.3,125000,Net 45,Account Representative
+Herman Miller,VND-004,Office Furniture,Active,Approved,4.6,85000,Net 30,Regional Sales
+Azure,VND-005,Cloud Infrastructure,Active,Strategic,4.6,650000,Net 30,Technical Account Manager
+FranklinCovey,VND-006,Training Services,Active,Approved,4.2,45000,Net 30,Program Director

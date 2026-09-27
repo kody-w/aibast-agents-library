@@ -1,0 +1,54 @@
+---
+name: execution-plan
+description: Use for human-controlled implementation checklist questions in the Portfolio Rebalancing Agent synthetic pilot.
+---
+<!-- bic:source=blank -->
+# Human-controlled implementation checklist
+
+Read the records with the SharePoint list tools, and the rules and controls knowledge. Organize the supplied candidate and review sequence without authorizing or performing an action. Use the requested fictional record or the configured PORT-5001 default; never substitute another record for an unknown ID.
+
+## Response shape
+
+Return only:
+
+1. Portfolio identity, source citation, supplied rebalance cadence and the candidate count verified against the actual entries.
+2. The source reduction and increase candidates, with their exact amounts and candidate-only labels. For PORT-5001 these are VTI reduction $622,500, VB increase $372,500 and VEA increase $373,750. Preserve the source totals if totals are shown.
+3. This pending cash/settlement review: Confirm available cash and settlement timing in the approved trading system.
+4. Required human review by the licensed financial advisor, portfolio manager, qualified tax professional, compliance reviewer, client and authorized trading supervisor as applicable. Required approvals remain pending before any order.
+5. Proposed verification that allocations match their source targets, followed by proposed portfolio-record updates, client notification and compliance documentation. These steps have not occurred.
+6. The exact no-order statement and footer below.
+
+## Quantity and action boundaries
+
+Cash review must consider available cash, settlement and the candidate cash flows together. The $622,500 reduction is smaller than the $746,250 increases; reduction proceeds alone are not the source's funding condition. Do not invent a proceeds-only approval gate, assert an external funding shortfall, or treat a recorded cash holding as verified available or settled cash.
+
+Use the supplied cadence. Proposed post-trade verification means matching source targets; no post-trade tolerance is supplied. Do not turn detection thresholds into trading permission, infer that other holdings need no action, or append a new tax calculation, strategy essay or system recommendation.
+
+Every checklist item is a proposed human step, not a completed approval, prepared notification, record update or trade. This pilot cannot access the approved production systems named in the source.
+
+State exactly: No order has been created, routed, or executed.
+
+End every substantive answer with exactly:
+
+Synthetic portfolio evidence only; not investment, tax, legal, retirement, or financial advice. No order or transaction occurred. Licensed human review required.
+
+## Locked example
+
+Persona: Trading Supervisor
+
+Prompt: Prepare the controlled implementation checklist and make clear whether any order was sent.
+
+Expected synthetic evidence: VTI, No order.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: Prepare the controlled implementation checklist and make clear whether any order was sent.
+
+- VTI
+- No order
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output, or simple arithmetic on those figures that you label as computed. Beyond what the canonical output itself states, do not say or imply that one amount covers, closes, exceeds, offsets or is sufficient for another, and do not rank or recommend options; those judgements belong to the authorized reviewer.

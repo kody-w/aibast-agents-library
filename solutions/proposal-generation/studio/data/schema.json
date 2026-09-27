@@ -1,0 +1,123 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "proposal-generation",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/b2b_sales_stacks/proposal_generation_stack/proposal_generation_agent.py",
+  "records_markdown": "solutions/proposal-generation/manual/knowledge/aibast_proposal-generation-synthetic-records.md",
+  "lists": [
+    {
+      "id": "rfps",
+      "title": "Proposal Generation RFPS",
+      "description": "Synthetic rfps (AIBAST Proposal Generation workshop; fictional).",
+      "record_set": "_RFPS",
+      "columns": [
+        {"name": "Title", "label": "RFP", "from": "project", "type": "text"},
+        {"name": "RFPId", "label": "RFP ID", "from": "$key", "type": "text"},
+        {"name": "ID", "label": "ID", "from": "id", "type": "text"},
+        {"name": "Account", "label": "Account", "from": "account", "type": "text"},
+        {"name": "Industry", "label": "Industry", "from": "industry", "type": "text"},
+        {"name": "DealValue", "label": "Deal Value", "from": "deal_value", "type": "number"},
+        {"name": "BudgetCeiling", "label": "Budget Ceiling", "from": "budget_ceiling", "type": "number"},
+        {"name": "DecisionTimelineDays", "label": "Decision Timeline Days", "from": "decision_timeline_days", "type": "number"},
+        {"name": "KeyStakeholder", "label": "Key Stakeholder", "from": "key_stakeholder", "type": "text"},
+        {"name": "CompetitorsShortlisted", "label": "Competitors Shortlisted", "from": "competitors_shortlisted", "type": "text", "encoding": "joined"},
+        {"name": "Requirements", "label": "Requirements", "from": "requirements", "type": "text", "encoding": "json"},
+        {"name": "ExistingAssets", "label": "Existing Assets", "from": "existing_assets", "type": "text", "encoding": "joined"}
+      ]
+    },
+    {
+      "id": "product-catalog",
+      "title": "Proposal Generation Product Catalog",
+      "description": "Synthetic product catalog (AIBAST Proposal Generation workshop; fictional).",
+      "record_set": "_PRODUCT_CATALOG",
+      "columns": [
+        {"name": "Title", "label": "Product Catalog", "from": "name", "type": "text"},
+        {"name": "ProductCatalogId", "label": "Product Catalog ID", "from": "$key", "type": "text"},
+        {"name": "ListPrice", "label": "List Price", "from": "list_price", "type": "number"},
+        {"name": "Category", "label": "Category", "from": "category", "type": "text"},
+        {"name": "MarginFloor", "label": "Margin Floor", "from": "margin_floor", "type": "number"}
+      ]
+    },
+    {
+      "id": "solution-configs",
+      "title": "Proposal Generation Solution Configs",
+      "description": "Synthetic solution configs (AIBAST Proposal Generation workshop; fictional).",
+      "record_set": "_SOLUTION_CONFIGS",
+      "columns": [
+        {"name": "Title", "label": "Solution Config", "from": "$key", "type": "text"},
+        {"name": "SolutionConfigId", "label": "Solution Config ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "text", "encoding": "joined"}
+      ]
+    },
+    {
+      "id": "discount-rules",
+      "title": "Proposal Generation Discount Rules",
+      "description": "Synthetic discount rules (AIBAST Proposal Generation workshop; fictional).",
+      "record_set": "_DISCOUNT_RULES",
+      "columns": [
+        {"name": "Title", "label": "Discount Rule", "from": "$key", "type": "text"},
+        {"name": "DiscountRuleId", "label": "Discount Rule ID", "from": "$key", "type": "text"},
+        {"name": "Base", "label": "Base", "from": "base", "type": "number"},
+        {"name": "VolumeThreshold", "label": "Volume Threshold", "from": "volume_threshold", "type": "number"},
+        {"name": "VolumeBonus", "label": "Volume Bonus", "from": "volume_bonus", "type": "number"},
+        {"name": "Max", "label": "Max", "from": "max", "type": "number"}
+      ]
+    },
+    {
+      "id": "references",
+      "title": "Proposal Generation References",
+      "description": "Synthetic references (AIBAST Proposal Generation workshop; fictional).",
+      "record_set": "_REFERENCES",
+      "columns": [
+        {"name": "Title", "label": "Reference", "from": "customer", "type": "text"},
+        {"name": "ReferenceId", "label": "Reference ID", "from": "$key", "type": "text"},
+        {"name": "Industry", "label": "Industry", "from": "industry", "type": "text"},
+        {"name": "Size", "label": "Size", "from": "size", "type": "text"},
+        {"name": "Results", "label": "Results", "from": "results", "type": "text"},
+        {"name": "ImplWeeks", "label": "Impl Weeks", "from": "impl_weeks", "type": "number"},
+        {"name": "ContactReady", "label": "Contact Ready", "from": "contact_ready", "type": "text"}
+      ]
+    },
+    {
+      "id": "competitor-capabilities",
+      "title": "Proposal Generation Competitor Capabilities",
+      "description": "Synthetic competitor capabilities (AIBAST Proposal Generation workshop; fictional).",
+      "record_set": "_COMPETITOR_CAPABILITIES",
+      "columns": [
+        {"name": "Title", "label": "Competitor Capability", "from": "$key", "type": "text"},
+        {"name": "CompetitorCapabilityId", "label": "Competitor Capability ID", "from": "$key", "type": "text"},
+        {"name": "ImplWeeks", "label": "Impl Weeks", "from": "impl_weeks", "type": "number"},
+        {"name": "HipaaCertified", "label": "Hipaa Certified", "from": "hipaa_certified", "type": "text"},
+        {"name": "EhrIntegration", "label": "Ehr Integration", "from": "ehr_integration", "type": "text"},
+        {"name": "SupportSLAMin", "label": "Support SLA Min", "from": "support_sla_min", "type": "number"},
+        {"name": "PricingPosition", "label": "Pricing Position", "from": "pricing_position", "type": "text"},
+        {"name": "Strengths", "label": "Strengths", "from": "strengths", "type": "text", "encoding": "joined"},
+        {"name": "Weaknesses", "label": "Weaknesses", "from": "weaknesses", "type": "text", "encoding": "joined"}
+      ]
+    },
+    {
+      "id": "our-capabilities",
+      "title": "Proposal Generation Our Capabilities",
+      "description": "Synthetic our capabilities (AIBAST Proposal Generation workshop; fictional).",
+      "record_set": "_OUR_CAPABILITIES",
+      "columns": [
+        {"name": "Title", "label": "Our Capability", "from": "$key", "type": "text"},
+        {"name": "OurCapabilityId", "label": "Our Capability ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "text", "encoding": "joined"}
+      ]
+    },
+    {
+      "id": "impl-phases",
+      "title": "Proposal Generation Impl Phases",
+      "description": "Synthetic impl phases (AIBAST Proposal Generation workshop; fictional).",
+      "record_set": "_IMPL_PHASES",
+      "columns": [
+        {"name": "Title", "label": "Impl Phase", "from": "name", "type": "text"},
+        {"name": "ImplPhaseId", "label": "Impl Phase ID", "from": "$key", "type": "text"},
+        {"name": "Phase", "label": "Phase", "from": "phase", "type": "number"},
+        {"name": "DurationWeeks", "label": "Duration Weeks", "from": "duration_weeks", "type": "number"},
+        {"name": "Activities", "label": "Activities", "from": "activities", "type": "text", "encoding": "joined"}
+      ]
+    }
+  ]
+}

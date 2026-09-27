@@ -1,0 +1,9 @@
+Title,ProductCatalogId,Category,Subcategory,Price,Brand,Sizes,Colors,StyleTags,Rating,StockS,StockM,StockL,StockXl,Stock30,Stock32,Stock34,Stock36,Stock8,Stock9,Stock10,Stock11,Stock12,StockOs
+Classic Oxford Shirt — White,SKU-1001,tops,shirts,68.0,Heritage Co.,S; M; L; XL,white; blue; pink,classic; business; smart_casual,4.7,12,25,18,8,,,,,,,,,,
+Slim Fit Chinos — Navy,SKU-1002,bottoms,pants,79.0,Heritage Co.,30; 32; 34; 36,navy; khaki; olive,classic; smart_casual; weekend,4.5,,,,,6,15,20,10,,,,,,
+Merino Wool Crew Sweater,SKU-1003,tops,sweaters,125.0,Alpine Knits,S; M; L; XL,charcoal; burgundy; forest,classic; smart_casual; layering,4.8,4,10,8,3,,,,,,,,,,
+Leather Chelsea Boots,SKU-1004,footwear,boots,195.0,Cobblestone,8; 9; 10; 11; 12,brown; black,classic; smart_casual; evening,4.6,,,,,,,,,5,8,12,7,3,
+Quilted Vest,SKU-1005,outerwear,vests,110.0,Northfield,S; M; L; XL,navy; olive; black,casual; outdoor; layering,4.4,2,7,5,9,,,,,,,,,,
+Silk Pocket Square,SKU-1006,accessories,pocket_squares,35.0,Heritage Co.,OS,navy_paisley; burgundy_dot; green_stripe,classic; business; evening,4.9,,,,,,,,,,,,,,30
+Performance Running Shoe,SKU-1007,footwear,athletic,145.0,Stride Labs,8; 9; 10; 11; 12,white_grey; black_red,athletic; casual; performance,4.7,,,,,,,,,10,15,20,12,6,
+Linen Blazer — Unstructured,SKU-1008,outerwear,blazers,225.0,Riviera Style,S; M; L; XL,tan; light_blue,smart_casual; evening; summer,4.3,3,6,4,2,,,,,,,,,,

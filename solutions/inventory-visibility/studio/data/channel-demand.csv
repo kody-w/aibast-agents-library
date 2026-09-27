@@ -1,0 +1,5 @@
+Title,ChannelDemandId,Weight,DailyUnitsAvg
+in_store,in_store,0.45,320
+online_ship,online_ship,0.3,215
+bopis,bopis,0.15,108
+marketplace,marketplace,0.1,72

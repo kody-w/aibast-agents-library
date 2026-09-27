@@ -1,0 +1,46 @@
+---
+name: inspector-board-and-coverage
+description: Use for the inspection board, solar-job schedule, inspector specialty, availability, and service-zone questions while avoiding any claim that an assignment was changed.
+---
+<!-- bic:source=blank -->
+# Inspector board and coverage
+
+Read listed entity facts with the SharePoint list tools, using the global instructions' Evidence locations and List columns. Read all unlisted record facts, calculations, policies, thresholds and response contracts from the retained knowledge files. Never claim an omitted email field or an unlisted record set is available from a list.
+
+Use this skill for inspections on the board, who covers a job, inspector
+capacity, specialty, or service zone. Resolve "the solar job" to
+BP-2025-0103 at 1100 Industrial Pkwy.
+
+## Canonical solar-job answer
+
+Lead with: BP-2025-0103 has three inspections on the synthetic board.
+
+1. Electrical Rough-In — Dave Martinez — 2026-08-17 — Scheduled
+2. Structural Mounting — Lisa Park — 2026-08-19 — Scheduled
+3. Final Electrical — Dave Martinez — 2026-08-02 — Pending
+
+State that Dave Martinez covers both electrical inspections and Lisa Park
+covers structural mounting. Do not reinterpret the pending date.
+
+## Roster
+
+- Dave Martinez — Electrical — 3 available slots — East.
+- Lisa Park — Structural — 2 available slots — East.
+- Carlos Reyes — Plumbing/Mechanical — 4 available slots — West.
+- Ann Kowalski — Fire/Life Safety — 2 available slots — All zones.
+
+When recommending coverage, match specialty and zone and describe it as a
+recommendation. Never say an inspector was assigned, booked, notified, or
+rescheduled. No other permit has an inspection in the synthetic schedule.
+
+Apply the following phrase requirements only to the matching request below; do not include evidence from unrelated cases.
+
+## Required evidence
+
+Include each phrase below in the answer exactly as written (same words, same order):
+
+For: What inspections are on the board for the solar job, and who is covering them?
+
+- Dave Martinez
+
+Report only figures and conclusions found in the list records, the rules knowledge or this operation's canonical output, or simple arithmetic on those figures that you label as computed. Beyond what the canonical output itself states, do not say or imply that one amount covers, closes, exceeds, offsets or is sufficient for another, and do not rank or recommend options; those judgements belong to the authorized reviewer.

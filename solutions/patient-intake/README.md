@@ -45,6 +45,7 @@ This customer package is synthetic and read-only. It provides evidence or drafts
 | Copilot-only Easy-mode comparison | `solutions/patient-intake/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/patient-intake/quest.html` |
 | Literal browser tutorial | `solutions/patient-intake/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/patient-intake/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/patient-intake/export-manifest.json` |
 | Source bundle | `solutions/patient-intake/exports/patient-intake-source.zip` |
 | Manual evidence | `solutions/patient-intake/evals/manual-build-evidence.json` |

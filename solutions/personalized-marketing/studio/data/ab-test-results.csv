@@ -1,0 +1,4 @@
+Title,ABTestResultId,Campaign,VariantASubject,VariantAOpenRate,VariantAClickRate,VariantAConversions,VariantBSubject,VariantBOpenRate,VariantBClickRate,VariantBConversions,Winner,Confidence,SampleSize
+ABT-001,ABT-001,CAMP-WINBACK,We miss you — here is 20% off,0.18,0.04,82,Come back for something special,0.21,0.05,107,B,0.94,8500
+ABT-002,ABT-002,CAMP-LOYALTY,You are almost Gold status!,0.42,0.15,341,Unlock Gold rewards today,0.39,0.13,298,A,0.91,6200
+ABT-003,ABT-003,CAMP-VIP,VIP Only: private sale starts now,0.58,0.24,215,Your private collection awaits,0.61,0.27,248,B,0.88,3400

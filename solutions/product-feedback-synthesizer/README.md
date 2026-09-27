@@ -37,6 +37,7 @@ Upload both Markdown files in `manual/knowledge/`, then upload the 4 `SKILL.md` 
 | Copilot-only Easy-mode comparison | `solutions/product-feedback-synthesizer/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/product-feedback-synthesizer/quest.html` |
 | Literal browser tutorial | `solutions/product-feedback-synthesizer/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/product-feedback-synthesizer/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/product-feedback-synthesizer/export-manifest.json` |
 | Source bundle | `solutions/product-feedback-synthesizer/exports/product-feedback-synthesizer-source.zip` |
 | Manual evidence | `solutions/product-feedback-synthesizer/evals/manual-build-evidence.json` |
