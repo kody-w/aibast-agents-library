@@ -72,6 +72,23 @@ columns losslessly, the learner must stop and report the limitation rather than
 continue with truncated records. Full-cell comparison remains required; local
 CSV fidelity does not establish tenant-side import fidelity.
 
+## Explicit SharePoint arguments
+
+Every generated global-instructions file ends with a **SharePoint site** section,
+after the routing block, containing exactly one `YOUR_SITE_ADDRESS` token and
+every list title. Keep that token in the repository. The Manual paste step tells
+the learner to replace it with their site's address; the Easy workspace builder
+must substitute its `--site` value and reject a missing or duplicated token.
+
+The agent must supply the exact site as `dataset` and the list **title** as
+`table` on every call. The new runtime can ignore Custom preset inputs and expose
+schema-generated tool names and platform descriptions instead of display names,
+so those presets and names are not sufficient routing evidence. The section
+forbids Get datasets and guessing another site. It says to read all items without
+a filter only when **every list has at most 50 items**; otherwise it requires a
+filter using the mapped internal column names. The preset site and list-GUID
+bindings may remain in the runtime workspace as a compatibility fallback.
+
 ## Overrides and the reference oracle
 
 Small overrides may live in `solutions/<slug>/studio/overrides.json` or
@@ -88,6 +105,14 @@ schema, all CSVs, global instructions, skills, and app spec **byte-for-byte** wi
 the hand-authored files. Its controlled-mutation test proves a changed output
 fails that comparison. The hand-authored walkthrough wording and screenshot
 reviews are not the oracle's generated-content contract.
+
+The protected checkpoint predates the lead's explicit-site change. Until that
+reference update is merged, the oracle combines its unchanged instructions with
+the independently copied, reviewed suffix in
+`tests/fixtures/studio/emission-tracking-site-section.md`. Once the committed
+reference has that section, the oracle compares its complete bytes directly.
+The generator's complete emission-tracking output is also checked against the
+lead's updated read-only reference during the handoff.
 
 For a reference comparison without changing its files:
 

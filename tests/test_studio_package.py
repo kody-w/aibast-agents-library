@@ -20,6 +20,7 @@ from tools import render_studio_walkthrough as renderer
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCE = ROOT / "solutions/emission-tracking"
 SAMPLE = "asset-maintenance-forecast"
+REFERENCE_SITE_SECTION = ROOT / "tests/fixtures/studio/emission-tracking-site-section.md"
 
 
 def write_json(path, value):
@@ -37,10 +38,18 @@ def reference_files():
     ])
 
 
+def reference_bytes(source):
+    expected = source.read_bytes()
+    if source == REFERENCE / "studio/agent/GLOBAL-INSTRUCTIONS.md" and b"\n## SharePoint site\n" not in expected:
+        # The protected checkpoint predates the lead's contract; the reviewed suffix is a static oracle fixture.
+        expected = expected.rstrip() + b"\n\n" + REFERENCE_SITE_SECTION.read_bytes()
+    return expected
+
+
 def assert_reference_matches(output):
     for source in reference_files():
         relative = source.relative_to(ROOT)
-        assert (output / relative).read_bytes() == source.read_bytes(), str(relative)
+        assert (output / relative).read_bytes() == reference_bytes(source), str(relative)
 
 
 @pytest.fixture
@@ -68,6 +77,42 @@ def test_generation_keeps_the_reference_read_only():
     before = {p: hashlib.sha256(p.read_bytes()).digest() for p in reference_files()}
     package.package_files("emission-tracking")
     assert {p: hashlib.sha256(p.read_bytes()).digest() for p in before} == before
+
+
+def test_emission_site_section_matches_the_reviewed_fixture(reference_output):
+    instructions = (reference_output / "solutions/emission-tracking/studio/agent/GLOBAL-INSTRUCTIONS.md").read_text()
+    assert instructions.count("YOUR_SITE_ADDRESS") == 1
+    assert instructions.endswith("<!-- locked-preview-anchors:end -->\n\n" + REFERENCE_SITE_SECTION.read_text())
+
+
+@pytest.mark.parametrize(("counts", "word", "titles", "small"), [
+    ([50], "one", "*First Records*", True),
+    ([50, 50], "two", "*First Records* or *Second Records*", True),
+    ([50, 51], "two", "*First Records* or *Second Records*", False),
+    ([51, 1], "two", "*First Records* or *Second Records*", False),
+    ([1, 50, 2], "three", "*First Records*, *Second Records* or *Third Records*", True),
+])
+def test_site_section_uses_each_list_count_and_the_exact_fifty_item_boundary(counts, word, titles, small):
+    inputs = copy.deepcopy(package.load_inputs(SAMPLE))
+    inputs.records = {f"RECORDS_{i}": [{"name": f"Record {n}"} for n in range(count)]
+                      for i, count in enumerate(counts)}
+    names = ("First Records", "Second Records", "Third Records")
+    schema = {"lists": [{"title": names[i], "record_set": f"RECORDS_{i}"} for i in range(len(counts))]}
+    section = package.sharepoint_site_section(inputs, schema)
+    assert section.count("YOUR_SITE_ADDRESS") == 1
+    assert f"The {word} " in section
+    assert f"List Name (`table`): {titles}." in section
+    assert "Site Address (`dataset`)" in section
+    assert "Never call Get datasets and never guess another site." in section
+    assert ("Read all items with no filter; each list is small." in section) is small
+    assert ("Use a filter on the list's internal names (above) to read only the records you need." in section) is not small
+
+
+@pytest.mark.parametrize(("count", "word"), [
+    (1, "one"), (2, "two"), (3, "three"), (4, "four"), (5, "five"), (6, "six"), (7, "seven"), (8, "eight"),
+])
+def test_list_counts_are_spelled_out(count, word):
+    assert package.list_count_word(count) == word
 
 
 @pytest.fixture
@@ -103,6 +148,26 @@ def test_generation_and_check_are_deterministic_and_non_writing(source_root, cap
     assert package.main([SAMPLE], root=source_root) == 0
     assert path.read_bytes() == before
     assert package.main(["--check"], root=source_root) == 0
+
+
+def test_duplicate_site_token_in_manual_input_is_rejected_without_writing(source_root, capsys):
+    manual = source_root / "solutions" / SAMPLE / "manual/GLOBAL-INSTRUCTIONS.md"
+    manual.write_text(manual.read_text().replace("## Boundaries", "YOUR_SITE_ADDRESS\n\n## Boundaries", 1))
+    base = source_root / "solutions" / SAMPLE / "studio"
+    before = {p: p.read_bytes() for p in base.rglob("*") if p.is_file()}
+    assert package.main([SAMPLE], root=source_root) == 1
+    assert "YOUR_SITE_ADDRESS exactly once" in capsys.readouterr().err
+    assert {p: p.read_bytes() for p in before} == before
+
+
+def test_custom_manual_postscript_is_preserved_before_the_site_section(source_root):
+    source = source_root / "solutions" / SAMPLE / "manual/GLOBAL-INSTRUCTIONS.md"
+    postscript = "## Additional review boundary\n\nNever change external records."
+    source.write_text(source.read_text().rstrip() + "\n\n" + postscript + "\n")
+    files = package.package_files(SAMPLE, root=source_root)
+    instructions = files[Path("solutions") / SAMPLE / "studio/agent/GLOBAL-INSTRUCTIONS.md"]
+    assert postscript + "\n<!-- locked-preview-anchors:end -->\n\n## SharePoint site\n" in instructions
+    assert instructions.count("YOUR_SITE_ADDRESS") == 1
 
 
 def test_check_detects_obsolete_csvs_without_deleting_them(source_root):
@@ -404,6 +469,64 @@ def test_generated_agent_inputs_use_lists_instead_of_the_removed_knowledge():
             if path.name == "SKILL.md":
                 assert "SharePoint list tools" in text, path
         assert package.ROUTING in instructions, slug
+
+
+def assert_site_contract(instructions, schema, counts):
+    assert instructions.count("YOUR_SITE_ADDRESS") == 1, schema["solution"]
+    assert instructions.count("\n## SharePoint site\n") == 1, schema["solution"]
+    before, section = instructions.rsplit("\n\n## SharePoint site\n\n", 1)
+    assert before.endswith("<!-- locked-preview-anchors:end -->"), schema["solution"]
+    for item in schema["lists"]:
+        assert f"*{item['title']}*" in section, (schema["solution"], item["title"])
+    assert "Site Address (`dataset`)" in section
+    assert "List Name (`table`)" in section
+    assert section.rstrip().endswith("Never call Get datasets and never guess another site.")
+    small = all(count <= 50 for count in counts)
+    assert ("Read all items with no filter; each list is small." in section) is small
+    assert ("Use a filter on the list's internal names (above) to read only the records you need." in section) is not small
+
+
+def test_every_studio_site_contract_has_one_token_and_all_list_titles():
+    for slug in data.studio_slugs():
+        base = ROOT / "solutions" / slug
+        source = base / "studio/agent/GLOBAL-INSTRUCTIONS.md"
+        instructions = reference_bytes(source).decode("utf-8") if slug == package.REFERENCE else source.read_text()
+        schema = package.read_json(base / "studio/data/schema.json")
+        counts = []
+        for item in schema["lists"]:
+            with (base / "studio/data" / f"{item['id']}.csv").open(newline="") as stream:
+                counts.append(sum(1 for _ in csv.DictReader(stream)))
+        assert_site_contract(instructions, schema, counts)
+
+
+@pytest.mark.parametrize("mutation", ["missing-token", "duplicate-token", "missing-title"])
+def test_site_contract_gate_rejects_controlled_mutations(mutation):
+    schema = package.read_json(REFERENCE / "studio/data/schema.json")
+    instructions = reference_bytes(REFERENCE / "studio/agent/GLOBAL-INSTRUCTIONS.md").decode("utf-8")
+    if mutation == "missing-token":
+        instructions = instructions.replace("YOUR_SITE_ADDRESS", "MISSING_SITE")
+    elif mutation == "duplicate-token":
+        instructions = instructions.replace("YOUR_SITE_ADDRESS", "YOUR_SITE_ADDRESS YOUR_SITE_ADDRESS")
+    else:
+        before, section = instructions.rsplit("\n\n## SharePoint site\n\n", 1)
+        instructions = before + "\n\n## SharePoint site\n\n" + section.replace("*Emissions Facilities*, ", "")
+    with pytest.raises(AssertionError):
+        assert_site_contract(instructions, schema, [4, 4, 3])
+
+
+def test_manual_paste_step_explains_site_replacement_for_every_generated_edition():
+    for slug in data.studio_slugs():
+        if slug == package.REFERENCE:
+            continue
+        base = ROOT / "solutions" / slug
+        document = package.read_json(base / "studio/walkthrough.json")
+        step = next(s for s in document["modes"]["manual"]["steps"] if s["title"] == "Paste the studio instructions")
+        assert "in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address" in step["action"]
+        assert "https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual" in step["action"]
+        assert "Copilot Studio still asks the model for the site and list on every call." in step["action"]
+        heading = (base / "studio/agent/GLOBAL-INSTRUCTIONS.md").read_text().splitlines()[0].removeprefix("# ")
+        assert step["expected"].startswith(f"The instructions start with {heading}, name the ")
+        assert step["expected"].endswith("and end with your site's address.")
 
 
 def test_list_access_exception_preserves_other_system_boundaries():

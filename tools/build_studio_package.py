@@ -41,6 +41,9 @@ from tools import scaffold_solution_journey as journey  # noqa: E402
 
 REFERENCE = "emission-tracking"
 SITE = "https://contoso.sharepoint.com/sites/aibast-synthetic-data"
+SITE_TOKEN = "YOUR_SITE_ADDRESS"
+ROUTING_END = "<!-- locked-preview-anchors:end -->"
+LIST_COUNT_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight"}
 DESCRIPTION = ("The workshop's synthetic records as SharePoint lists: the same records the portable agent "
                "and the knowledge file hold, one list per record set. Every value is fictional.")
 OLD_OPENING = "Use only the uploaded synthetic knowledge and operation skills."
@@ -382,6 +385,34 @@ def column_instructions(schema: dict[str, Any], tools: dict[str, str]) -> str:
     return "\n".join(lines)
 
 
+def list_count_word(count: int) -> str:
+    if count not in LIST_COUNT_WORDS:
+        raise StudioPackageError("scenario-workspace accepts from one to eight lists")
+    return LIST_COUNT_WORDS[count]
+
+
+def sharepoint_site_section(inputs: Inputs, schema: dict[str, Any]) -> str:
+    lists = schema["lists"]
+    titles = [f"*{item['title']}*" for item in lists]
+    joined = ", ".join(titles[:-1]) + " or " + titles[-1] if len(titles) > 1 else titles[0]
+    small = all(len(data.record_rows(inputs.records[item["record_set"]])) <= 50 for item in lists)
+    retrieval = ("Read all items with no filter; each list is small." if small else
+                 "Use a filter on the list's internal names (above) to read only the records you need.")
+    noun = "list is" if len(lists) == 1 else "lists are"
+    return ("## SharePoint site\n\n"
+            f"The {list_count_word(len(lists))} {noun} on the SharePoint site {SITE_TOKEN}. Whenever you call "
+            "a list tool, pass that exact address as Site Address (`dataset`) and the list's title as List Name "
+            f"(`table`): {joined}. {retrieval} Never call Get datasets and never guess another site.")
+
+
+def studio_instructions_heading(first_line: str) -> str:
+    if "Manual" in first_line:
+        return first_line.replace("Manual", "Studio")
+    if "Global Instructions" in first_line:
+        return first_line.replace("Global Instructions", "Studio Global Instructions")
+    return first_line + " - Studio Global Instructions"
+
+
 def rewrite_source_references(text: str, inputs: Inputs) -> str:
     text = text.replace("Use only the two uploaded knowledge files in this package.",
                         "Use only the workshop's SharePoint list tools and the uploaded rules knowledge.")
@@ -410,12 +441,7 @@ def rewrite_source_references(text: str, inputs: Inputs) -> str:
 def instructions_for(inputs: Inputs, schema: dict[str, Any], tools: dict[str, str], root: Path) -> str:
     original = (root / "solutions" / inputs.slug / "manual/GLOBAL-INSTRUCTIONS.md").read_text(encoding="utf-8")
     first, rest = original.split("\n", 1)
-    if "Manual" in first:
-        first = first.replace("Manual", "Studio")
-    elif "Global Instructions" in first:
-        first = first.replace("Global Instructions", "Studio Global Instructions")
-    else:
-        first += " - Studio Global Instructions"
+    first = studio_instructions_heading(first)
     opening = inputs.overrides.get("opening")
     if not opening:
         refs = "; ".join(f"**{tools[item['id']]}** (*{item['title']}*)" for item in schema["lists"])
@@ -430,9 +456,20 @@ def instructions_for(inputs: Inputs, schema: dict[str, Any], tools: dict[str, st
         text = first + "\n\n" + opening + "\n\n" + mapping + "\n\n" + rest.lstrip("\n")
     if OLD_ROUTING in text:
         text = text.replace(OLD_ROUTING, ROUTING)
-    else:
+    elif ROUTING_END in text:
         text = text.rstrip() + "\n\n" + ROUTING + "\n"
-    return rewrite_source_references(text, inputs)
+    else:
+        text = text.rstrip() + "\n\n<!-- locked-preview-anchors:start -->\n" + ROUTING + "\n" + ROUTING_END + "\n"
+    text = rewrite_source_references(text, inputs).rstrip()
+    if not text.endswith(ROUTING_END):
+        if ROUTING_END not in text:
+            raise StudioPackageError("studio instructions need a routing end marker before the SharePoint site section")
+        before, after = text.rsplit(ROUTING_END, 1)
+        text = before.rstrip() + "\n\n" + after.strip() + "\n" + ROUTING_END
+    text += "\n\n" + sharepoint_site_section(inputs, schema) + "\n"
+    if text.count(SITE_TOKEN) != 1:
+        raise StudioPackageError(f"studio instructions must contain {SITE_TOKEN} exactly once")
+    return text
 
 
 def skill_for(path: Path, inputs: Inputs) -> str:
@@ -610,9 +647,15 @@ def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str
         "A new, empty agent opens on its Build page.", "blank-agent")
     add("Name the agent", f"Rename it {names['manual']}. (Agent names can be at most 30 characters.)",
         "The name shows at the top of the Build page.", "name")
+    heading = studio_instructions_heading((package / "manual/GLOBAL-INSTRUCTIONS.md").read_text(
+        encoding="utf-8").splitlines()[0]).removeprefix("# ")
     add("Paste the studio instructions",
-        "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
-        f"The studio instructions name the {count} list tools and map every Title and field_N column.",
+        "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the "
+        f"last section (SharePoint site), replace {SITE_TOKEN} with your site's address, for example "
+        "https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio "
+        "still asks the model for the site and list on every call.",
+        f"The instructions start with {heading}, name the {list_count_word(count)} list tools, "
+        "and end with your site's address.",
         "instructions", downloads=["studio/agent/GLOBAL-INSTRUCTIONS.md"])
     add("Save, and check the instructions stayed", "Save, go back to the agents list, and reopen the agent.",
         "The same instructions are there after reopening.", "instructions-saved")

@@ -33,3 +33,7 @@ Route from the user's natural-language intent to the correct skill below. Do not
 
 These skill names above are the ONLY valid skill identifiers. Never invent, guess, or reference any other skill name. If the correct skill, a list tool or the rules knowledge cannot be loaded after one retry in the same turn, say so honestly and stop. Do not answer using values you already know from these instructions or from general knowledge -- every record value must come from a list tool result or the rules knowledge in this turn.
 <!-- locked-preview-anchors:end -->
+
+## SharePoint site
+
+The three lists are on the SharePoint site YOUR_SITE_ADDRESS. Whenever you call a list tool, pass that exact address as Site Address (`dataset`) and the list's title as List Name (`table`): *Personalized Shopping Product Catalog*, *Personalized Shopping Customer Preferences* or *Personalized Shopping Outfit Templates*. Read all items with no filter; each list is small. Never call Get datasets and never guess another site.

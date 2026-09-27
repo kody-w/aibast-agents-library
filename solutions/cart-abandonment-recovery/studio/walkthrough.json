@@ -225,11 +225,11 @@
         {
           "id": "manual-08",
           "title": "Paste the studio instructions",
-          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
           "downloads": [
             "studio/agent/GLOBAL-INSTRUCTIONS.md"
           ],
-          "expected": "The studio instructions name the 4 list tools and map every Title and field_N column.",
+          "expected": "The instructions start with Cart Abandonment Recovery Agent — Studio Global Instructions, name the four list tools, and end with your site's address.",
           "screenshot": {
             "file": "screenshots/studio-manual/08-instructions.webp",
             "status": "pending"
