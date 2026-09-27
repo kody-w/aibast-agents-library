@@ -49,7 +49,6 @@ All exact names, dates, counts, values, scores, percentages, pricing, ARR, margi
 | Copilot-only Easy-mode comparison | `solutions/deal-progression/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/deal-progression/quest.html` |
 | Literal browser tutorial | `solutions/deal-progression/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/deal-progression/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/deal-progression/export-manifest.json` |
 | Source bundle | `solutions/deal-progression/exports/deal-progression-source.zip` |
 | Manual evidence | `solutions/deal-progression/evals/manual-build-evidence.json` |

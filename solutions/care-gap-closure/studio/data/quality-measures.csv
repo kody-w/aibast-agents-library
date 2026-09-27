@@ -1,4 +1,0 @@
-Title,QualityMeasureId,SourcePopulation,SourceRecordedClosed,RecordsRequiringEvidenceReview,SourceRecordedClosedRate,EvidenceAsOf,ExactLimitation
-Synthetic Breast Screening Measure,SYN-BCS,400,292,108,73,2026-07-31,Eligibility and exclusions are unvalidated synthetic source fields.
-Synthetic Colorectal Screening Measure,SYN-COL,520,338,182,65,2026-07-31,Clinical exclusions and external claims may be incomplete.
-Synthetic Diabetes Monitoring Measure,SYN-CDC,310,257,53,82.9,2026-07-31,Recent labs and measure-year attribution require reviewer validation.

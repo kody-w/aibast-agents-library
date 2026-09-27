@@ -1,5 +1,0 @@
-Title,FraudPatternId,Indicators,Frequency
-Physical card duplicated; used at multiple locations simultaneously,card_cloning,Transactions in geographically distant locations within short timeframe; Card-present transactions after reported card-not-present use,common
-Unauthorized access to account via compromised credentials,account_takeover,Login from new device/IP; Immediate password and contact info change; Large transfer or purchase within hours,increasing
-Deliberate credit line exhaustion before default,bust_out,Rapid utilization increase to near-limit; Cash advance activity; Payments stop after utilization spike,moderate
-Fictitious identity created using mixed real and fake data,synthetic_identity,SSN with no credit history prior to 2 years ago; Authorized user on multiple unrelated accounts; Address inconsistencies,increasing

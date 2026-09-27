@@ -1,5 +1,0 @@
-Title,SLARuleId,ResponseHours,Escalation,Sequence
-Hot,Hot,4,Manager alert + Slack DM,Immediate call + personalized email
-Warm,Warm,24,Team channel alert,"Personalized email day 0, call day 1"
-Nurture,Nurture,48,Weekly digest flag,3-email drip over 10 days
-Disqualified,Disqualified,0,None — routed to marketing,Marketing nurture list

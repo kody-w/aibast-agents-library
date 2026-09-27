@@ -1,4 +1,0 @@
-Title,CompetitorCapabilityId,ImplWeeks,HipaaCertified,EhrIntegration,SupportSLAMin,PricingPosition,Strengths,Weaknesses
-CompetitorA,CompetitorA,20,Yes,Third-party,240,Market rate,Large install base; Brand recognition,Slow implementation; Middleware dependency
-CompetitorB,CompetitorB,16,No,Native,60,+5% above market,Native integrations; Modern UI,HIPAA pending; Limited references
-CompetitorC,CompetitorC,24,Yes,Third-party,120,-10% below market,Low price; Long track record,Legacy architecture; High customization cost

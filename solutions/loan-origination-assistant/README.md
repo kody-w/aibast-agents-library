@@ -42,7 +42,6 @@ Upload the two Markdown files in `manual/knowledge/`, then upload one `SKILL.md`
 | Copilot-only Easy-mode comparison | `solutions/loan-origination-assistant/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/loan-origination-assistant/quest.html` |
 | Literal browser tutorial | `solutions/loan-origination-assistant/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/loan-origination-assistant/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/loan-origination-assistant/export-manifest.json` |
 | Source bundle | `solutions/loan-origination-assistant/exports/loan-origination-assistant-source.zip` |
 | Manual evidence | `solutions/loan-origination-assistant/evals/manual-build-evidence.json` |

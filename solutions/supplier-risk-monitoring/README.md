@@ -39,7 +39,6 @@ Upload both Markdown files in `manual/knowledge/`, then upload one `SKILL.md` fi
 | Copilot-only Easy-mode comparison | `solutions/supplier-risk-monitoring/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/supplier-risk-monitoring/quest.html` |
 | Literal browser tutorial | `solutions/supplier-risk-monitoring/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/supplier-risk-monitoring/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/supplier-risk-monitoring/export-manifest.json` |
 | Source bundle | `solutions/supplier-risk-monitoring/exports/supplier-risk-monitoring-source.zip` |
 | Manual evidence | `solutions/supplier-risk-monitoring/evals/manual-build-evidence.json` |

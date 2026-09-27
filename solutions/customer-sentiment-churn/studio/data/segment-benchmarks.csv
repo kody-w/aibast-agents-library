@@ -1,5 +1,0 @@
-Title,SegmentBenchmarkId,AvgNPS,AvgProducts,AvgTenure,AvgTransactions
-affluent,affluent,8.2,4.1,10,55
-emerging_affluent,emerging_affluent,7.0,3.2,5,35
-mass_market,mass_market,6.5,2.0,4,20
-small_business,small_business,6.8,3.0,5,90

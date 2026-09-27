@@ -47,7 +47,6 @@ All exact names, dates, counts, values, scores, percentages, pricing, ARR, margi
 | Copilot-only Easy-mode comparison | `solutions/license-renewal-expansion/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/license-renewal-expansion/quest.html` |
 | Literal browser tutorial | `solutions/license-renewal-expansion/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/license-renewal-expansion/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/license-renewal-expansion/export-manifest.json` |
 | Source bundle | `solutions/license-renewal-expansion/exports/license-renewal-expansion-source.zip` |
 | Manual evidence | `solutions/license-renewal-expansion/evals/manual-build-evidence.json` |

@@ -1,4 +1,0 @@
-Title,BackupSupplierId,Value
-SUP-101,SUP-101,"[{""name"":""Samsung Foundry (Korea)"",""lead_time_weeks"":12,""qual_status"":""In Progress"",""est_cost_premium_pct"":8},{""name"":""GlobalFoundries (USA)"",""lead_time_weeks"":16,""qual_status"":""Not Started"",""est_cost_premium_pct"":15}]"
-SUP-102,SUP-102,"[{""name"":""Murata Electronics (Japan)"",""lead_time_weeks"":6,""qual_status"":""Qualified"",""est_cost_premium_pct"":5},{""name"":""Vishay Intertechnology (USA)"",""lead_time_weeks"":4,""qual_status"":""Qualified"",""est_cost_premium_pct"":12}]"
-SUP-104,SUP-104,"[{""name"":""Alcoa Precision Castings (USA)"",""lead_time_weeks"":8,""qual_status"":""In Progress"",""est_cost_premium_pct"":6}]"

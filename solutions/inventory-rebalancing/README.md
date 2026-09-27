@@ -59,7 +59,6 @@ side effect.
 | Copilot-only Easy-mode comparison | `solutions/inventory-rebalancing/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/inventory-rebalancing/quest.html` |
 | Literal browser tutorial | `solutions/inventory-rebalancing/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/inventory-rebalancing/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/inventory-rebalancing/export-manifest.json` |
 | Source bundle | `solutions/inventory-rebalancing/exports/inventory-rebalancing-source.zip` |
 | Manual evidence | `solutions/inventory-rebalancing/evals/manual-build-evidence.json` |

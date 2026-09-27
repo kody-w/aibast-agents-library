@@ -35,7 +35,6 @@ offer, launches a campaign, issues a reward, or completes a purchase.
 | Copilot-only Easy-mode comparison | `solutions/personalized-marketing/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/personalized-marketing/quest.html` |
 | Literal browser tutorial | `solutions/personalized-marketing/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/personalized-marketing/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/personalized-marketing/export-manifest.json` |
 | Source bundle | `solutions/personalized-marketing/exports/personalized-marketing-source.zip` |
 | Manual evidence | `solutions/personalized-marketing/evals/manual-build-evidence.json` |

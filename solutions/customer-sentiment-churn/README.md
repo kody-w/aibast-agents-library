@@ -41,7 +41,6 @@ Upload the two Markdown files in `manual/knowledge/`, then upload one `SKILL.md`
 | Copilot-only Easy-mode comparison | `solutions/customer-sentiment-churn/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/customer-sentiment-churn/quest.html` |
 | Literal browser tutorial | `solutions/customer-sentiment-churn/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/customer-sentiment-churn/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/customer-sentiment-churn/export-manifest.json` |
 | Source bundle | `solutions/customer-sentiment-churn/exports/customer-sentiment-churn-source.zip` |
 | Manual evidence | `solutions/customer-sentiment-churn/evals/manual-build-evidence.json` |

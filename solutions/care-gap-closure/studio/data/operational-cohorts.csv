@@ -1,4 +1,0 @@
-Title,OperationalCohortId,DisplayHeading,SyntheticCount,ExactEvidenceBarrier,ExactDraftHandlingRoute
-multiple_source_gaps,multiple_source_gaps,Multiple Source Gaps,42,mixed evidence completeness,staff review queue
-single_source_gap,single_source_gap,Single Source Gap,117,recent evidence may be missing,portal draft
-contact_data_review,contact_data_review,Contact Data Review,19,contact preference not confirmed,privacy review queue

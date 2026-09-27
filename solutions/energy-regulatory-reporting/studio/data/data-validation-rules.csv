@@ -1,4 +1,0 @@
-Title,DataValidationRuleId,Rules,SourceSystems
-emissions_data,emissions_data,Non-negative values; Year-over-year variance < 25%; Mass balance check; Unit conversion validation,CEMS; Fuel metering; Production logs
-financial_data,financial_data,Reconciliation to GL; Rate base validation; Depreciation schedule check; Intercompany elimination,SAP; PowerPlan; Hyperion
-safety_data,safety_data,Incident classification verification; Mileage data reconciliation; Leak survey completeness,PIMS; GIS; Inspection database

@@ -1,5 +1,0 @@
-Title,AlgorithmDocumentationId,StatusOnSnapshot,GoLiveState,DocumentationEvidence
-ALGO-VWAP-EU,ALGO-VWAP-EU,current,live,complete pack; validated 95 days ago
-ALGO-IS-DE,ALGO-IS-DE,expired,live,validated 402 days ago against a 365-day cycle
-ALGO-POV-NL,ALGO-POV-NL,never validated,goes live in 6 days,"missing risk controls, kill-switch test, and conformance test"
-ALGO-DARK-EU,ALGO-DARK-EU,current,live,complete pack; validated 310 days ago

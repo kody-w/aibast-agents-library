@@ -1,6 +1,0 @@
-Title,ExecutedTradeExceptionId,Instrument,ReportedVenue,Trader,ReportingEvidence,OtherEvidence
-TRD-88117,TRD-88117,SAP SE,XETR,T-2041,field 57 Investment decision within firm is missing; source value is `T-2041`,ALGO-IS-DE documentation is expired
-TRD-88129,TRD-88129,TotalEnergies SE,XETR,T-2107,reported venue conflicts with reference data; verified execution venue is `XPAR`,none
-TRD-88133,TRD-88133,Koninklijke Ahold Delhaize,XAMS,T-2107,field 59 source value is `T-2107`; field 7 buyer LEI source value is `549300XKQZ2P4NLK7T18`; no ARM submission is recorded,execution-quality outlier; ALGO-IS-DE documentation is expired
-TRD-88150,TRD-88150,Vodafone Group PLC,TQEX,T-2233,reported venue conflicts with reference data; verified execution venue is `XLON`,execution-quality outlier
-TRD-88162,TRD-88162,SAP SE,CHIX,T-2041,report is complete,ALGO-IS-DE documentation is expired

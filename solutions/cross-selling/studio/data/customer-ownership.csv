@@ -1,6 +1,0 @@
-Title,CustomerOwnershipId,Segment,Arr,Products,TenureMonths,HealthScore,Contact,UsageSignals,BuyingSignals,BudgetWindow
-Meridian Corp,CUST-001,Enterprise,84000,PLAT-200; ANLYT-100; SUPRT-100,24,92,Sandra Lee,Analytics export volume rising; Security admin workflow used weekly,Requested advanced analytics comparison,Annual planning review next quarter
-Atlas Digital,CUST-002,Mid-Market,42000,PLAT-100; INTGR-100,18,78,Marco Torres,Integration jobs approaching synthetic capacity threshold,Asked about support coverage,Department planning review this quarter
-Pinnacle Health,CUST-003,Enterprise,60000,PLAT-200,6,85,Dr. Amy Patel,Core workflow adoption broadening across teams,Feature request references analytics and security,Post-implementation value review
-Greenleaf Retail,CUST-004,Mid-Market,24000,PLAT-100,12,65,Kevin O'Neill,Reporting exports remain manual; Support usage increasing,Requested integration roadmap,Retail planning cycle later this year
-Beacon Financial,CUST-005,Enterprise,113000,PLAT-200; ANLYT-200; INTGR-100; SECUR-100,36,96,Rachel Kim,Broad adoption across owned products,Asked about premium support coverage,Enterprise agreement review

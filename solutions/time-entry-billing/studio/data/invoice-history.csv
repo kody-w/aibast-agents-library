@@ -1,6 +1,0 @@
-Title,InvoiceHistoryId,Amount,Date,Status,DaysOutstanding
-TechCorp Industries,INV-2026-201,142500,2026-02-28,paid,0
-Apex Manufacturing,INV-2026-202,98800,2026-02-28,paid,0
-Pinnacle Energy,INV-2026-203,186000,2026-02-28,outstanding,17
-Atlas Financial Group,INV-2026-204,52200,2026-02-28,outstanding,17
-Metro Transit Authority,INV-2026-205,46200,2026-02-28,overdue,45

@@ -1,5 +1,0 @@
-Title,VerificationStatusId,IDVerification,SsnVerification,AddressVerification,OfacScreening,PepScreening,AdverseMedia,EinVerification,BeneficialOwnership,SourceOfWealth
-APP-6001,APP-6001,complete,complete,pending,clear,clear,clear,,,
-APP-6002,APP-6002,complete,,,clear,clear,clear,complete,in_progress,
-APP-6003,APP-6003,complete,complete,complete,clear,flagged,review_needed,,,pending
-APP-6004,APP-6004,complete,complete,complete,clear,clear,clear,,,

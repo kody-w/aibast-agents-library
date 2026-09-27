@@ -90,7 +90,6 @@ reproduce this manual build.
 | Copilot-only Easy-mode comparison | `solutions/fs-regulatory-compliance/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/fs-regulatory-compliance/quest.html` |
 | Literal browser tutorial | `solutions/fs-regulatory-compliance/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/fs-regulatory-compliance/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/fs-regulatory-compliance/export-manifest.json` |
 | Source bundle | `solutions/fs-regulatory-compliance/exports/fs-regulatory-compliance-source.zip` |
 | Manual evidence | `solutions/fs-regulatory-compliance/evals/manual-build-evidence.json` |

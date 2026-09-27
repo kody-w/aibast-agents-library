@@ -1,2 +1,0 @@
-Title,ShipmentId,Carrier,TrackingNumber,ShipDate,EstDelivery,Origin,Destination,WeightKg,Status
-ORD-7812,ORD-7812,XPO Logistics,XPO-884291047,2026-03-12,2026-03-15,"Detroit, MI","Fremont, CA",4200,in_transit

@@ -1,6 +1,0 @@
-Title,CustomerSegmentId,Size,AvgAnnualSpend,AvgOrdersPerYear,AvgBasketSize,PreferredChannels,TopCategories,ChurnRisk,LifetimeValue,EngagementScore
-Loyal Advocates,SEG-LOYAL,42850,1875.0,18.3,102.46,in_store; mobile_app,Apparel; Footwear; Accessories,0.04,11250.0,92
-At-Risk Churners,SEG-ATRISK,18420,620.0,5.1,121.57,email; desktop_web,Electronics; Home,0.38,3720.0,31
-New Explorers,SEG-NEW,27600,340.0,3.8,89.47,social_media; mobile_app,Apparel; Beauty; Accessories,0.22,2040.0,58
-High-Engagement Members,SEG-HIGHVAL,8750,4200.0,24.6,170.73,in_store; mobile_app; email,Premium Apparel; Footwear; Jewelry,0.06,33600.0,97
-Dormant Lapsed,SEG-DORMANT,34200,85.0,0.8,106.25,email,Home; Electronics,0.72,510.0,9

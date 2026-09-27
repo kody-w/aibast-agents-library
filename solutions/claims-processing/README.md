@@ -41,7 +41,6 @@ Upload the two Markdown files in `manual/knowledge/`, then upload one `SKILL.md`
 | Copilot-only Easy-mode comparison | `solutions/claims-processing/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/claims-processing/quest.html` |
 | Literal browser tutorial | `solutions/claims-processing/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/claims-processing/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/claims-processing/export-manifest.json` |
 | Source bundle | `solutions/claims-processing/exports/claims-processing-source.zip` |
 | Manual evidence | `solutions/claims-processing/evals/manual-build-evidence.json` |

@@ -132,7 +132,6 @@ No credentials, tokens, customer data, or patient information included: yes/no
 | Copilot-only Easy-mode comparison | `solutions/care-gap-closure/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/care-gap-closure/quest.html` |
 | Literal browser tutorial | `solutions/care-gap-closure/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/care-gap-closure/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/care-gap-closure/export-manifest.json` |
 | Source bundle | `solutions/care-gap-closure/exports/care-gap-closure-source.zip` |
 | Manual evidence | `solutions/care-gap-closure/evals/manual-build-evidence.json` |

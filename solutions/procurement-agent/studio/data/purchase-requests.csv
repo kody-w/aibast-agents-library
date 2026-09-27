@@ -1,5 +1,0 @@
-Title,PurchaseRequestId,Requester,Department,Category,Amount,Priority,Status,PreferredVendor,Justification,BudgetCode
-Cloud Infrastructure Upgrade,PR-5001,Sarah Chen,IT,Technology,125000,High,Pending Approval,AWS,"Current infrastructure at 92% capacity, scaling needed for Q1 growth",IT-INFRA-2025
-Office Furniture - New Floor Build-Out,PR-5002,Tom Rivera,Facilities,Office Supplies,48500,Medium,Vendor Selection,Steelcase,5th floor build-out for 30 new employees starting Q2,FAC-CAPEX-2025
-Annual Software License Renewal - Salesforce,PR-5003,Mike Torres,Sales,Software,215000,High,Approved,Salesforce,"Annual enterprise license renewal, 200 seats",SALES-SW-2025
-Employee Training Program - Leadership Development,PR-5004,Lisa Park,HR,Professional Services,35000,Low,Draft,FranklinCovey,Q2 leadership development program for 25 managers,HR-TRAIN-2025

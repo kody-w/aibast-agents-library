@@ -1,5 +1,0 @@
-Title,PricingModelId,BaseRatePer100,ConstructionFactorFireResistive,ConstructionFactorMasonry,ConstructionFactorFrame,ProtectionClassFactor1,ProtectionClassFactor2,ProtectionClassFactor3,ProtectionClassFactor4,ProtectionClassFactor5,BasePremium,AgeFactor16,AgeFactor25,AgeFactor30,AgeFactor50,AgeFactor65,CreditFactor800,CreditFactor700,CreditFactor600,CreditFactor500,BaseRatePerPractitioner,SpecialtyFactorFamilyMedicine,SpecialtyFactorOrthopedicSurgery,SpecialtyFactorNeurosurgery,SpecialtyFactorObstetrics,BaseRatePer1000Revenue,IndustryFactorRestaurantChain,IndustryFactorOffice,IndustryFactorRetail,IndustryFactorConstruction
-commercial_property,commercial_property,0.85,0.8,1.0,1.35,0.75,0.8,0.9,1.0,1.1,,,,,,,,,,,,,,,,,,,,
-personal_auto,personal_auto,,,,,,,,,,1200,2.5,1.3,1.0,0.95,1.05,0.85,1.0,1.25,1.6,,,,,,,,,,
-professional_liability,professional_liability,,,,,,,,,,,,,,,,,,,,8500,0.6,2.1,2.8,2.4,,,,,
-general_liability,general_liability,,,,,,,,,,,,,,,,,,,,,,,,,2.15,1.35,0.7,1.1,1.8

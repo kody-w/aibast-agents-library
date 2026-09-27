@@ -46,7 +46,6 @@ Upload both Markdown files in `manual/knowledge/`, then upload the 6 `SKILL.md` 
 | Copilot-only Easy-mode comparison | `solutions/ask-hr/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/ask-hr/quest.html` |
 | Literal browser tutorial | `solutions/ask-hr/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/ask-hr/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/ask-hr/export-manifest.json` |
 | Source bundle | `solutions/ask-hr/exports/ask-hr-source.zip` |
 | Manual evidence | `solutions/ask-hr/evals/manual-build-evidence.json` |

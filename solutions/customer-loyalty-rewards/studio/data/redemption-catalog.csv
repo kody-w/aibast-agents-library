@@ -1,7 +1,0 @@
-Title,RedemptionCatalogId,PointsCost,Category,Value
-$500 Travel Voucher,travel_voucher_500,25000,travel,500
-$100 Dining Gift Card,dining_card_100,5000,dining,100
-Premium Wireless Headphones,merch_headphones,15000,merchandise,249
-$50 Store Gift Card,gift_card_50,2500,gift_cards,50
-20% Off Next Purchase,discount_20pct,3000,discounts,0
-Free Shipping for 3 Months,free_shipping_3mo,1500,free_shipping,30
