@@ -19,9 +19,10 @@ advertised and is always rejected. A workshop without complete, matching
 literal JSON records is reported as **BLOCKED**, with a reason, and is not
 written. Other workshops continue; any blocked or failed workshop makes that
 invocation return a nonzero exit status. Narrative/table-only knowledge is not
-silently treated as a complete record export. The generator also refuses records
-containing email addresses or non-placeholder tenant identities rather than
-redacting them and falsely claiming lossless source equality.
+silently treated as a complete record export. Synthetic email addresses may use
+`example.com` (including its subdomains), `.test`, or `.invalid` only. Other email
+domains and non-placeholder tenant identities remain privacy errors; they are
+never silently rewritten into apparently equivalent source data.
 
 `--check` without slugs compares all existing generated editions, excluding the
 hand-authored reference. It does not claim that blocked workshops have packages.

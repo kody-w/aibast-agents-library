@@ -374,9 +374,9 @@ def test_reviewed_capture_file_must_exist(source):
 
 
 PRIVATE_VALUES = [
-    ("email address", "reviewer@example.com"),
-    ("email address", "reviewer&#64;example.com"),
-    ("email address", "reviewer%40example.com"),
+    ("email address", "reviewer@unapproved.example.net"),
+    ("email address", "reviewer&#64;unapproved.example.net"),
+    ("email address", "reviewer%40unapproved.example.net"),
     ("tenant host", "https://real-customer.sharepoint.com/sites/team"),
     ("tenant host", "REAL-CUSTOMER.crm4.dynamics.com"),
     ("tenant host", "https://real-customer.powerapps.com"),

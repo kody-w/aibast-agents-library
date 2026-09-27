@@ -153,7 +153,7 @@ def load_inputs(slug: str, root: Path = ROOT) -> Inputs:
         try:
             renderer.check_privacy(actual, name)
         except renderer.WalkthroughError as error:
-            raise BlockedWorkshop(f"{error}; cannot publish a lossless CSV under the no-email/tenant-id policy") from error
+            raise BlockedWorkshop(f"{error}; cannot publish a lossless CSV under the email/tenant-id privacy policy") from error
         records[name] = actual
     rules = [p for p in knowledge if p != records_path]
     if not rules:

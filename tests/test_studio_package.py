@@ -212,9 +212,11 @@ def test_blocked_inputs_are_not_fabricated_or_written(tmp_path, capsys):
     assert not list(tmp_path.iterdir())
 
 
-def test_no_email_policy_blocks_lossless_order_records():
-    with pytest.raises(package.BlockedWorkshop, match="email address"):
-        package.load_inputs("order-status-communication")
+def test_order_status_reserved_email_records_are_preserved():
+    from tools.studio_privacy import reserved_email
+    inputs = package.load_inputs("order-status-communication")
+    emails = [record["contact_email"] for record in inputs.records["ORDERS"].values()]
+    assert len(emails) == 4 and all(reserved_email(value) for value in emails)
 
 
 def test_no_complete_literals_is_an_explicit_blocker():
@@ -647,7 +649,7 @@ def test_walkthrough_checks_reject_controlled_mutations(source_root, mutation, m
     elif mutation == "screenshot":
         document["modes"]["easy"]["steps"][0].pop("screenshot")
     else:
-        document["summary"] = "An invalid contact: fixture@example.invalid"
+        document["summary"] = "An invalid contact: fixture@unapproved.example.net"
     write_json(path, document)
     with pytest.raises(renderer.WalkthroughError, match=message):
         renderer.load_walkthrough(SAMPLE, root=source_root)
