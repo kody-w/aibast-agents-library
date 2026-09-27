@@ -64,7 +64,21 @@
           "expected": "7 fictional records, including TXN-90001 (TransactionId TXN-90001), with Account 4532-XXXX-8891.",
           "screenshot": {
             "file": "screenshots/studio-easy/03-lists.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Fraud Detection and Alert Transactions list that brainfreeze studio created and filled on the Easy workshop site AIBAST Synthetic Data: seven fictional card transactions with already-masked account numbers, including TXN-90001 (account 4532-XXXX-8891, 4,850 at ElectroMax Dubai) and TXN-90006 (a wire transfer to NG).",
+            "anchors": [
+              "AIBAST Synthetic Data",
+              "Fraud Detection and Alert Transactions",
+              "TXN-90001",
+              "4532-XXXX-8891",
+              "ElectroMax Dubai",
+              "TXN-90006",
+              "wire_transfer"
+            ],
+            "captured_at": "2026-09-27T07:50:25Z"
           }
         },
         {
@@ -74,7 +88,23 @@
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Draft agent Fraud Detection Studio that brainfreeze studio deployed: the studio instructions with the list-column map and the read-only boundary, Claude Sonnet 4.6, four skills (transaction analysis, pattern detection, investigation summary, alert triage), the four list tools (transaction, investigation case, fraud pattern and alert rule records) and the controls-and-review knowledge file.",
+            "anchors": [
+              "Fraud Detection Studio",
+              "Claude Sonnet 4.6",
+              "transaction-analysis",
+              "alert-triage",
+              "Get transaction records",
+              "Get investigation case records",
+              "Get fraud pattern records",
+              "Get alert rule records",
+              "aibast_fraud-detection-alert-controls-and-revie"
+            ],
+            "captured_at": "2026-09-27T07:57:49Z"
           }
         },
         {
