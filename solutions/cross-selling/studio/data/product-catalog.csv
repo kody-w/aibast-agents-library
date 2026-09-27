@@ -1,0 +1,9 @@
+Title,ProductCatalogId,Category,AnnualPrice,MarginPct
+Core Platform,PLAT-100,Platform,24000,72
+Enterprise Platform,PLAT-200,Platform,60000,75
+Analytics Standard,ANLYT-100,Analytics,12000,82
+Analytics Pro,ANLYT-200,Analytics,28000,85
+Integration Hub,INTGR-100,Integration,18000,78
+Security Suite,SECUR-100,Security,15000,80
+Premium Support,SUPRT-100,Support,8000,90
+Training Package,TRAIN-100,Services,5000,65

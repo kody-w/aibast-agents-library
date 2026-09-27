@@ -1,0 +1,456 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "cart-abandonment-recovery",
+  "title": "Cart Abandonment Recovery, built with brainfreeze studio",
+  "summary": "The Cart Abandonment Recovery agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_cart-recovery-rules-and-safety.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Cart Abandon Recovery Studio",
+      "manual": "Cart Abandon R Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Cart Abandonment Recovery Workspace",
+      "manual": "Cart Abandonment Recovery Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/cart-abandonment-recovery.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast cart-abandonment-recovery --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Cart Abandonment Recovery Abandoned Carts list.",
+          "expected": "4 fictional records, including Synthetic returning-shopper cart (AbandonedCartId CART-20001), with Contactable Yes.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Cart Abandon Recovery Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Marketing Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CAR-01",
+          "prompt": "As Marketing Manager, show where the anonymous synthetic cart journey is breaking down and what needs review.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Marketing Manager; Synthetic Cart Abandonment Analysis; no shopper is contacted. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-car-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Digital Marketing Lead",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CAR-02",
+          "prompt": "As Digital Marketing Lead, outline a consent-aware draft sequence without sending or scheduling anything.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Digital Marketing Lead; Draft Recovery Campaign Dashboard; not deployed. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-car-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Growth Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CAR-03",
+          "prompt": "As Growth Manager, compare margin-aware value scenarios and keep every concept behind approval.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Growth Manager; Draft Incentive Scenario Comparison; Scenario for approval. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-car-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Growth Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CAR-04",
+          "prompt": "As Growth Manager, summarize the fixed recovery metrics and separate benchmarks from planning estimates.",
+          "expected": "The relevant list tool ran. Required evidence: Synthetic Conversion Tracking; Recovery Rate; no cart or purchase is changed. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-car-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Cart Abandonment Recovery: 4 read-only tabs from the same lists. 4 fictional records, including Synthetic returning-shopper cart (AbandonedCartId CART-20001), with Contactable Yes.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Cart Abandonment Recovery Abandoned Carts from its CSV",
+          "action": "On the site: New, List, From CSV. Upload abandoned-carts.csv. On Customize, keep Title mapped to the Title column. Set AbandonedCartId, Contactable, Segment, Items, AbandonedAt, PageExit, Device, RecoveryStatus to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep CartValue, PriorPurchases as Number. Name the list Cart Abandonment Recovery Abandoned Carts. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/abandoned-carts.csv"
+          ],
+          "expected": "4 fictional records, including Synthetic returning-shopper cart (AbandonedCartId CART-20001), with Contactable Yes.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-abandoned-carts.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Cart Abandonment Recovery Recovery Campaigns from its CSV",
+          "action": "On the site: New, List, From CSV. Upload recovery-campaigns.csv. On Customize, keep Title mapped to the Title column. Set RecoveryCampaignId, Subject, Incentive to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep DelayHours, AvgOpenRate, AvgConversion as Number. Name the list Cart Abandonment Recovery Recovery Campaigns. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/recovery-campaigns.csv"
+          ],
+          "expected": "5 fictional records, including Draft Email Reminder (RecoveryCampaignId email_1), with DelayHours 1.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-recovery-campaigns.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Cart Abandonment Recovery Incentive Options from its CSV",
+          "action": "On the site: New, List, From CSV. Upload incentive-options.csv. On Customize, keep Title mapped to the Title column. Set IncentiveOptionId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep CostMarginImpact, ConversionLift as Number. Name the list Cart Abandonment Recovery Incentive Options. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/incentive-options.csv"
+          ],
+          "expected": "5 fictional records, including 10% off cart total (IncentiveOptionId percent_off_10), with CostMarginImpact 10.0.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-incentive-options.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Cart Abandonment Recovery Conversion Metrics from its CSV",
+          "action": "On the site: New, List, From CSV. Upload conversion-metrics.csv. On Customize, keep Title mapped to the Title column. Set ConversionMetricId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value as Number. Name the list Cart Abandonment Recovery Conversion Metrics. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/conversion-metrics.csv"
+          ],
+          "expected": "6 fictional records, including overall_abandonment_rate (ConversionMetricId overall_abandonment_rate), with Value 71.4.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-conversion-metrics.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Cart Abandon R Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 4 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_cart-recovery-rules-and-safety.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_cart-recovery-rules-and-safety.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the abandoned carts tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cart Abandonment Recovery Abandoned Carts; name the tool Get abandoned cart records.",
+          "expected": "Get abandoned cart records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-abandoned-carts.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the recovery campaigns tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cart Abandonment Recovery Recovery Campaigns; name the tool Get recovery campaign records.",
+          "expected": "Get recovery campaign records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-recovery-campaigns.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the incentive options tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cart Abandonment Recovery Incentive Options; name the tool Get incentive option records.",
+          "expected": "Get incentive option records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-incentive-options.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the conversion metrics tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cart Abandonment Recovery Conversion Metrics; name the tool Get conversion metric records.",
+          "expected": "Get conversion metric records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-conversion-metrics.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/abandonment-analysis/SKILL.md",
+            "studio/agent/skills/conversion-tracking/SKILL.md",
+            "studio/agent/skills/incentive-optimization/SKILL.md",
+            "studio/agent/skills/recovery-campaign/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Marketing Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CAR-01",
+          "prompt": "As Marketing Manager, show where the anonymous synthetic cart journey is breaking down and what needs review.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Marketing Manager; Synthetic Cart Abandonment Analysis; no shopper is contacted. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-car-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Digital Marketing Lead",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CAR-02",
+          "prompt": "As Digital Marketing Lead, outline a consent-aware draft sequence without sending or scheduling anything.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Digital Marketing Lead; Draft Recovery Campaign Dashboard; not deployed. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-car-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Growth Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CAR-03",
+          "prompt": "As Growth Manager, compare margin-aware value scenarios and keep every concept behind approval.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Growth Manager; Draft Incentive Scenario Comparison; Scenario for approval. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-car-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Growth Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CAR-04",
+          "prompt": "As Growth Manager, summarize the fixed recovery metrics and separate benchmarks from planning estimates.",
+          "expected": "The relevant list tool ran. Required evidence: Synthetic Conversion Tracking; Recovery Rate; no cart or purchase is changed. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-car-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/cart-abandonment-recovery/studio/managed-app/app.json --out cart-abandonment-recovery-app"
+          ],
+          "expected": "cart-abandonment-recovery-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd cart-abandonment-recovery-app/managed-app",
+            "ms app init --display-name \"Cart Abandonment Recovery Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cart Abandonment Recovery Abandoned Carts\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cart Abandonment Recovery Recovery Campaigns\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cart Abandonment Recovery Incentive Options\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cart Abandonment Recovery Conversion Metrics\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Cart Abandonment Recovery Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Cart Abandonment Recovery Abandoned Carts tab.",
+          "expected": "The app and the agent read the same synthetic records. 4 fictional records, including Synthetic returning-shopper cart (AbandonedCartId CART-20001), with Contactable Yes.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -30,6 +30,7 @@ concepts, and incentive scenarios only; it contacts nobody and changes no cart.
 | Copilot-only Easy-mode comparison | `solutions/cart-abandonment-recovery/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/cart-abandonment-recovery/quest.html` |
 | Literal browser tutorial | `solutions/cart-abandonment-recovery/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/cart-abandonment-recovery/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/cart-abandonment-recovery/export-manifest.json` |
 | Source bundle | `solutions/cart-abandonment-recovery/exports/cart-abandonment-recovery-source.zip` |
 | Manual evidence | `solutions/cart-abandonment-recovery/evals/manual-build-evidence.json` |

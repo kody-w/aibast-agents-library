@@ -1,0 +1,67 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "claims-processing",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/financial_services_stacks/claims_processing_stack/claims_processing_agent.py",
+  "records_markdown": "solutions/claims-processing/manual/knowledge/aibast_claims-processing-synthetic-records.md",
+  "lists": [
+    {
+      "id": "claims",
+      "title": "Claims Processing Claims",
+      "description": "Synthetic claims (AIBAST Claims Processing workshop; fictional).",
+      "record_set": "CLAIMS",
+      "columns": [
+        {"name": "Title", "label": "Claim", "from": "description", "type": "text"},
+        {"name": "ClaimId", "label": "Claim ID", "from": "$key", "type": "text"},
+        {"name": "Claimant", "label": "Claimant", "from": "claimant", "type": "text"},
+        {"name": "PolicyNumber", "label": "Policy Number", "from": "policy_number", "type": "text"},
+        {"name": "PolicyType", "label": "Policy Type", "from": "policy_type", "type": "text"},
+        {"name": "DateOfLoss", "label": "Date Of Loss", "from": "date_of_loss", "type": "text"},
+        {"name": "DateFiled", "label": "Date Filed", "from": "date_filed", "type": "text"},
+        {"name": "LossType", "label": "Loss Type", "from": "loss_type", "type": "text"},
+        {"name": "ClaimedAmount", "label": "Claimed Amount", "from": "claimed_amount", "type": "number"},
+        {"name": "Adjuster", "label": "Adjuster", "from": "adjuster", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "FraudScore", "label": "Fraud Score", "from": "fraud_score", "type": "number"},
+        {"name": "SupportingDocs", "label": "Supporting Docs", "from": "supporting_docs", "type": "text", "encoding": "joined"}
+      ]
+    },
+    {
+      "id": "policy-details",
+      "title": "Claims Processing Policy Details",
+      "description": "Synthetic policy details (AIBAST Claims Processing workshop; fictional).",
+      "record_set": "POLICY_DETAILS",
+      "columns": [
+        {"name": "Title", "label": "Policy Detail", "from": "$key", "type": "text"},
+        {"name": "PolicyDetailId", "label": "Policy Detail ID", "from": "$key", "type": "text"},
+        {"name": "CoverageLimit", "label": "Coverage Limit", "from": "coverage_limit", "type": "number"},
+        {"name": "Deductible", "label": "Deductible", "from": "deductible", "type": "number"},
+        {"name": "PremiumAnnual", "label": "Premium Annual", "from": "premium_annual", "type": "number"},
+        {"name": "Effective", "label": "Effective", "from": "effective", "type": "text"},
+        {"name": "Expiry", "label": "Expiry", "from": "expiry", "type": "text"}
+      ]
+    },
+    {
+      "id": "fraud-indicators",
+      "title": "Claims Processing Fraud Indicators",
+      "description": "Synthetic fraud indicators (AIBAST Claims Processing workshop; fictional).",
+      "record_set": "FRAUD_INDICATORS",
+      "columns": [
+        {"name": "Title", "label": "Fraud Indicator", "from": "description", "type": "text"},
+        {"name": "FraudIndicatorId", "label": "Fraud Indicator ID", "from": "$key", "type": "text"},
+        {"name": "Weight", "label": "Weight", "from": "weight", "type": "number"}
+      ]
+    },
+    {
+      "id": "adjuster-notes",
+      "title": "Claims Processing Adjuster Notes",
+      "description": "Synthetic adjuster notes (AIBAST Claims Processing workshop; fictional).",
+      "record_set": "ADJUSTER_NOTES",
+      "columns": [
+        {"name": "Title", "label": "Adjuster Note", "from": "$key", "type": "text"},
+        {"name": "AdjusterNoteId", "label": "Adjuster Note ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "text", "encoding": "joined"}
+      ]
+    }
+  ]
+}

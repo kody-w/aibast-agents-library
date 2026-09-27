@@ -1,0 +1,5 @@
+Title,AuditFindingId,Report,Finding,Severity,Status,DueDate
+AUD-001,AUD-001,RPT-9001,Missing CEMS calibration records for Q3,medium,open,2026-03-25
+AUD-002,AUD-002,RPT-9002,Depreciation schedule mismatch with PowerPlan,high,remediated,2026-03-15
+AUD-003,AUD-003,RPT-9005,Threshold calculation methodology not documented,low,open,2026-05-01
+AUD-004,AUD-004,RPT-9006,Pipeline mileage discrepancy between GIS and PIMS,high,open,2026-03-20

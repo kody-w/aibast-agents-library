@@ -1,0 +1,4 @@
+Title,CrossSellSuccessRateId,AvgSuccessRate,AvgDealCycleDays,AvgExpansionPct
+Enterprise,Enterprise,0.52,28,35
+Mid-Market,Mid-Market,0.38,42,25
+SMB,SMB,0.28,55,18

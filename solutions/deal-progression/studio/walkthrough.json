@@ -1,0 +1,530 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "deal-progression",
+  "title": "Deal Progression, built with brainfreeze studio",
+  "summary": "The Deal Progression agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_deal-progression-operating-rules.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Deal Progression Studio",
+      "manual": "Deal Progression Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Deal Progression Workspace",
+      "manual": "Deal Progression Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/deal-progression.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast deal-progression --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 5 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Deal Progression Stage Benchmarks list.",
+          "expected": "5 fictional records, including Qualification (StageBenchmarkId Qualification), with Value 14.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Deal Progression Studio and review its inventory.",
+          "expected": "The studio instructions, 6 skills, 1 rules knowledge file(s) and 5 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Sales Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-01",
+          "prompt": "Which opportunities need attention in the synthetic pipeline, and what evidence should I review before changing the forecast?",
+          "expected": "The relevant list tool ran. Required evidence: Pipeline Health Summary; Evidence boundary; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-dp-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Account Executive",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-02",
+          "prompt": "Which synthetic deals have genuinely stalled, and what blocker evidence explains the loss of momentum?",
+          "expected": "The relevant list tool ran. Required evidence: Stalled Deal Deep-Dive; Diagnosis; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-dp-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Account Executive",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-03",
+          "prompt": "Draft reviewable intervention plans for the stalled synthetic deals, but do not assign work or contact anyone.",
+          "expected": "The relevant list tool ran. Required evidence: Action Plans; Planning Objective; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-dp-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Sales Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-04",
+          "prompt": "Which synthetic timing options could move pipeline review forward without turning scenario value into a forecast commitment?",
+          "expected": "The relevant list tool ran. Required evidence: Pipeline Acceleration Strategy; Synthetic Scenario; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-dp-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Test: Sales Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-05",
+          "prompt": "Map candidate follow-up work to the synthetic rep capacity for my review; do not create tasks or alerts.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Task Assignment Plan; candidate tasks; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-dp-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-10",
+          "title": "Test: Sales Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-06",
+          "prompt": "Give me a leadership-ready summary of the synthetic pipeline findings and the decisions that still require human review.",
+          "expected": "The relevant list tool ran. Required evidence: Executive Summary; Synthetic Planning Targets; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/10-dp-06.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-11",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Deal Progression: 5 read-only tabs from the same lists. 5 fictional records, including Qualification (StageBenchmarkId Qualification), with Value 14.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/11-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Deal Progression Stage Benchmarks from its CSV",
+          "action": "On the site: New, List, From CSV. Upload stage-benchmarks.csv. On Customize, keep Title mapped to the Title column. Set StageBenchmarkId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value as Number. Name the list Deal Progression Stage Benchmarks. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/stage-benchmarks.csv"
+          ],
+          "expected": "5 fictional records, including Qualification (StageBenchmarkId Qualification), with Value 14.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-stage-benchmarks.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Deal Progression Reps from its CSV",
+          "action": "On the site: New, List, From CSV. Upload reps.csv. On Customize, keep Title mapped to the Title column. Set RepId, Titleaaf2320, Specialty to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep ActiveDeals, Capacity as Number. Name the list Deal Progression Reps. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/reps.csv"
+          ],
+          "expected": "5 fictional records, including Mike Chen (RepId 1), with Titleaaf2320 Sr. Account Executive.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-reps.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Deal Progression Pipeline from its CSV",
+          "action": "On the site: New, List, From CSV. Upload pipeline.csv. On Customize, keep Title mapped to the Title column. Set PipelineId, Account, Stage, Owner, ChampionName, ChampionStatus, Blocker to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value, DaysInStage, LastContactDays as Number. Name the list Deal Progression Pipeline. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/pipeline.csv"
+          ],
+          "expected": "47 fictional records, including TechCorp Industries (PipelineId OPP-001), with Account TechCorp Industries.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-pipeline.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Deal Progression Blocker Playbook from its CSV",
+          "action": "On the site: New, List, From CSV. Upload blocker-playbook.csv. On Customize, keep Title mapped to the Title column. Set BlockerPlaybookId, Diagnosis, Week1, Week2, Resource to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Deal Progression Blocker Playbook. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/blocker-playbook.csv"
+          ],
+          "expected": "5 fictional records, including executive_change (BlockerPlaybookId executive_change), with Diagnosis Champion disengaged, economic buyer changed.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-blocker-playbook.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create Deal Progression Active Stages from its CSV",
+          "action": "On the site: New, List, From CSV. Upload active-stages.csv. On Customize, keep Title mapped to the Title column. Set ActiveStageId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Deal Progression Active Stages. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/active-stages.csv"
+          ],
+          "expected": "5 fictional records, including Contract (ActiveStageId 1).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-list-active-stages.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Name the agent",
+          "action": "Rename it Deal Progression Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 5 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_deal-progression-operating-rules.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_deal-progression-operating-rules.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the stage benchmarks tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Deal Progression Stage Benchmarks; name the tool Get stage benchmark records.",
+          "expected": "Get stage benchmark records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-stage-benchmarks.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the reps tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Deal Progression Reps; name the tool Get rep records.",
+          "expected": "Get rep records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-reps.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the pipeline tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Deal Progression Pipeline; name the tool Get pipeline records.",
+          "expected": "Get pipeline records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-pipeline.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the blocker playbook tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Deal Progression Blocker Playbook; name the tool Get blocker playbook records.",
+          "expected": "Get blocker playbook records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-tool-blocker-playbook.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Add the active stages tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Deal Progression Active Stages; name the tool Get active stage records.",
+          "expected": "Get active stage records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-tool-active-stages.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Add the 6 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/acceleration/SKILL.md",
+            "studio/agent/skills/action-plans/SKILL.md",
+            "studio/agent/skills/assign-tasks/SKILL.md",
+            "studio/agent/skills/executive-summary/SKILL.md",
+            "studio/agent/skills/pipeline-health/SKILL.md",
+            "studio/agent/skills/stalled-deals/SKILL.md"
+          ],
+          "expected": "6 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Review the agent",
+          "action": "Check the model, 6 skills, the rules knowledge and 5 tools.",
+          "expected": "Sonnet 4.6, 6 skills, 1 knowledge file(s), 5 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Sales Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-01",
+          "prompt": "Which opportunities need attention in the synthetic pipeline, and what evidence should I review before changing the forecast?",
+          "expected": "The relevant list tool ran. Required evidence: Pipeline Health Summary; Evidence boundary; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-dp-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Account Executive",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-02",
+          "prompt": "Which synthetic deals have genuinely stalled, and what blocker evidence explains the loss of momentum?",
+          "expected": "The relevant list tool ran. Required evidence: Stalled Deal Deep-Dive; Diagnosis; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-dp-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Test: Account Executive",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-03",
+          "prompt": "Draft reviewable intervention plans for the stalled synthetic deals, but do not assign work or contact anyone.",
+          "expected": "The relevant list tool ran. Required evidence: Action Plans; Planning Objective; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-dp-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Test: Sales Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-04",
+          "prompt": "Which synthetic timing options could move pipeline review forward without turning scenario value into a forecast commitment?",
+          "expected": "The relevant list tool ran. Required evidence: Pipeline Acceleration Strategy; Synthetic Scenario; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-dp-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Test: Sales Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-05",
+          "prompt": "Map candidate follow-up work to the synthetic rep capacity for my review; do not create tasks or alerts.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Task Assignment Plan; candidate tasks; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-dp-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Test: Sales Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "DP-06",
+          "prompt": "Give me a leadership-ready summary of the synthetic pipeline findings and the decisions that still require human review.",
+          "expected": "The relevant list tool ran. Required evidence: Executive Summary; Synthetic Planning Targets; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-dp-06.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-27",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/deal-progression/studio/managed-app/app.json --out deal-progression-app"
+          ],
+          "expected": "deal-progression-app/managed-app holds a React + Vite managed app whose config names your site and the 5 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/27-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-28",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd deal-progression-app/managed-app",
+            "ms app init --display-name \"Deal Progression Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Deal Progression Stage Benchmarks\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Deal Progression Reps\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Deal Progression Pipeline\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Deal Progression Blocker Playbook\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Deal Progression Active Stages\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 5 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/28-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-29",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Deal Progression Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/29-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-30",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Deal Progression Stage Benchmarks tab.",
+          "expected": "The app and the agent read the same synthetic records. 5 fictional records, including Qualification (StageBenchmarkId Qualification), with Value 14.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/30-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

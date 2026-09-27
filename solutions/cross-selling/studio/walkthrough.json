@@ -1,0 +1,456 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "cross-selling",
+  "title": "Cross-Selling Opportunities, built with brainfreeze studio",
+  "summary": "The Cross-Selling Opportunities agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_cross-selling-operating-rules.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Cross Selling Opps Studio",
+      "manual": "Cross Selling O Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Cross-Selling Opportunities Workspace",
+      "manual": "Cross-Selling Opportunities Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/cross-selling.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast cross-selling --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Cross Selling Opportunities Product Catalog list.",
+          "expected": "8 fictional records, including Core Platform (ProductCatalogId PLAT-100), with Category Platform.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Cross Selling Opps Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Sales Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CS-01",
+          "prompt": "Scan synthetic customer CUST-001 for product gaps, usage signals, buying signals, and budget timing.",
+          "expected": "The relevant list tool ran. Required evidence: Cross-Sell Opportunity Scan; Synthetic Usage Signals; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-cs-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Enablement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CS-02",
+          "prompt": "Explain the synthetic product-affinity and benchmark assumptions without treating them as observed conversion performance.",
+          "expected": "The relevant list tool ran. Required evidence: Product Affinity Matrix; Response Assumption; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-cs-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Enablement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CS-03",
+          "prompt": "Draft prioritized product recommendations and a reviewable engagement plan for synthetic customer CUST-001 without sending outreach.",
+          "expected": "The relevant list tool ran. Required evidence: Prioritized Recommendations; Draft Engagement Plan; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-cs-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Sales Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CS-04",
+          "prompt": "Compare the bundled portfolio synthetic value scenarios without making conversion, revenue, or margin claims.",
+          "expected": "The relevant list tool ran. Required evidence: Synthetic Cross-Sell Value Scenario; Portfolio Totals; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-cs-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Cross-Selling Opportunities: 4 read-only tabs from the same lists. 8 fictional records, including Core Platform (ProductCatalogId PLAT-100), with Category Platform.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Cross Selling Opportunities Product Catalog from its CSV",
+          "action": "On the site: New, List, From CSV. Upload product-catalog.csv. On Customize, keep Title mapped to the Title column. Set ProductCatalogId, Category to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep AnnualPrice, MarginPct as Number. Name the list Cross Selling Opportunities Product Catalog. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/product-catalog.csv"
+          ],
+          "expected": "8 fictional records, including Core Platform (ProductCatalogId PLAT-100), with Category Platform.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-product-catalog.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Cross Selling Opportunities Customer Ownership from its CSV",
+          "action": "On the site: New, List, From CSV. Upload customer-ownership.csv. On Customize, keep Title mapped to the Title column. Set CustomerOwnershipId, Segment, Products, Contact, UsageSignals, BuyingSignals, BudgetWindow to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Arr, TenureMonths, HealthScore as Number. Name the list Cross Selling Opportunities Customer Ownership. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/customer-ownership.csv"
+          ],
+          "expected": "5 fictional records, including Meridian Corp (CustomerOwnershipId CUST-001), with Segment Enterprise.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-customer-ownership.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Cross Selling Opportunities Affinity Rules from its CSV",
+          "action": "On the site: New, List, From CSV. Upload affinity-rules.csv. On Customize, keep Title mapped to the Title column. Set AffinityRuleId, IfOwns, Recommend to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep AffinityScore, SuccessRate, AvgTimeToCloseDays as Number. Name the list Cross Selling Opportunities Affinity Rules. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/affinity-rules.csv"
+          ],
+          "expected": "8 fictional records, including 1 (AffinityRuleId 1), with IfOwns PLAT-100.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-affinity-rules.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Cross Selling Opportunities Cross Sell Success Rates from its CSV",
+          "action": "On the site: New, List, From CSV. Upload cross-sell-success-rates.csv. On Customize, keep Title mapped to the Title column. Set CrossSellSuccessRateId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep AvgSuccessRate, AvgDealCycleDays, AvgExpansionPct as Number. Name the list Cross Selling Opportunities Cross Sell Success Rates. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/cross-sell-success-rates.csv"
+          ],
+          "expected": "3 fictional records, including Enterprise (CrossSellSuccessRateId Enterprise), with AvgSuccessRate 0.52.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-cross-sell-success-rates.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Cross Selling O Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 4 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_cross-selling-operating-rules.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_cross-selling-operating-rules.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the product catalog tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cross Selling Opportunities Product Catalog; name the tool Get product catalog records.",
+          "expected": "Get product catalog records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-product-catalog.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the customer ownership tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cross Selling Opportunities Customer Ownership; name the tool Get customer ownership records.",
+          "expected": "Get customer ownership records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-customer-ownership.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the affinity rules tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cross Selling Opportunities Affinity Rules; name the tool Get affinity rule records.",
+          "expected": "Get affinity rule records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-affinity-rules.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the cross sell success rates tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cross Selling Opportunities Cross Sell Success Rates; name the tool Get cross sell success rate records.",
+          "expected": "Get cross sell success rate records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-cross-sell-success-rates.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/opportunity-scan/SKILL.md",
+            "studio/agent/skills/product-affinity/SKILL.md",
+            "studio/agent/skills/recommendation-engine/SKILL.md",
+            "studio/agent/skills/revenue-impact/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Sales Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CS-01",
+          "prompt": "Scan synthetic customer CUST-001 for product gaps, usage signals, buying signals, and budget timing.",
+          "expected": "The relevant list tool ran. Required evidence: Cross-Sell Opportunity Scan; Synthetic Usage Signals; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-cs-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Enablement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CS-02",
+          "prompt": "Explain the synthetic product-affinity and benchmark assumptions without treating them as observed conversion performance.",
+          "expected": "The relevant list tool ran. Required evidence: Product Affinity Matrix; Response Assumption; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-cs-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Enablement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CS-03",
+          "prompt": "Draft prioritized product recommendations and a reviewable engagement plan for synthetic customer CUST-001 without sending outreach.",
+          "expected": "The relevant list tool ran. Required evidence: Prioritized Recommendations; Draft Engagement Plan; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-cs-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Sales Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CS-04",
+          "prompt": "Compare the bundled portfolio synthetic value scenarios without making conversion, revenue, or margin claims.",
+          "expected": "The relevant list tool ran. Required evidence: Synthetic Cross-Sell Value Scenario; Portfolio Totals; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-cs-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/cross-selling/studio/managed-app/app.json --out cross-selling-app"
+          ],
+          "expected": "cross-selling-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd cross-selling-app/managed-app",
+            "ms app init --display-name \"Cross-Selling Opportunities Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cross Selling Opportunities Product Catalog\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cross Selling Opportunities Customer Ownership\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cross Selling Opportunities Affinity Rules\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cross Selling Opportunities Cross Sell Success Rates\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Cross-Selling Opportunities Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Cross Selling Opportunities Product Catalog tab.",
+          "expected": "The app and the agent read the same synthetic records. 8 fictional records, including Core Platform (ProductCatalogId PLAT-100), with Category Platform.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

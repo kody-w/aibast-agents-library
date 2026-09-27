@@ -1,0 +1,5 @@
+Title,TierStructureId,MinSpend,PointsMultiplier,Perks,NextTier,SpendToNext
+bronze,bronze,0,1.0,Birthday bonus points; Member-only sales access,silver,1000
+silver,silver,1000,1.25,Bronze perks; Free standard shipping; Early access to new products,gold,3000
+gold,gold,3000,1.5,Silver perks; Free express shipping; Exclusive gold events; Annual gift,platinum,6000
+platinum,platinum,6000,2.0,Gold perks; Personal shopping advisor; Free returns; VIP lounge access; Quarterly bonus,,0
