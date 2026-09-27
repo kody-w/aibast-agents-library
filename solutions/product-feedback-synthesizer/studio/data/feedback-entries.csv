@@ -1,7 +1,0 @@
-Title,FeedbackEntryId,FictionalCustomer,Channel,Date,Category,Sentiment,Score,ExactFeedbackText,ArrImpact
-FB-5001,FB-5001,Meridian Healthcare Systems,support_ticket,2026-02-14,usability,negative,2,The dashboard takes too many clicks to get to key metrics. We need a customizable home view.,186000
-FB-5002,FB-5002,Apex Financial Group,nps_survey,2026-02-20,feature_gap,neutral,6,Product is solid but missing real-time alerting capabilities that competitors offer.,240000
-FB-5003,FB-5003,Skyline Hospitality Group,qbr,2026-03-01,praise,positive,9,Integration with our POS system has been seamless. Would love to see mobile app improvements.,360000
-FB-5004,FB-5004,Vanguard Logistics,support_ticket,2026-01-28,bug_report,negative,1,Data export fails consistently for reports over 10K rows. This is blocking our migration.,84000
-FB-5005,FB-5005,BrightPath Education,in_app,2026-03-05,feature_gap,neutral,5,Need role-based access controls for student data. Currently everyone sees everything.,96000
-FB-5006,FB-5006,Orion Manufacturing,sales_call,2026-03-10,feature_gap,positive,8,Great product overall. If you add workflow automation we would double our seat count.,312000

@@ -1,7 +1,0 @@
-Title,FeatureRequestId,Votes,ArrWeight,Status,Effort,Category,LinkedFeedback
-Customizable Dashboard Home View,FR-001,87,612000,under_review,medium,usability,FB-5001
-Real-Time Alerting Engine,FR-002,134,780000,candidate_for_review,high,feature_gap,FB-5002
-Mobile App Enhancements,FR-003,62,420000,evidence_under_review,medium,usability,FB-5003
-Large Dataset Export Fix,FR-004,41,264000,evidence_under_review,low,bug_fix,FB-5004
-Role-Based Access Controls (RBAC),FR-005,156,960000,candidate_for_review,high,security,FB-5005
-Workflow Automation Builder,FR-006,203,1140000,candidate_for_review,high,feature_gap,FB-5006

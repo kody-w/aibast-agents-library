@@ -1,4 +1,0 @@
-Title,InvestigationCaseId,AlertTxns,RulesTriggered,Pattern,Status,Analyst,Opened,Priority,Notes
-INV-2025-301,INV-2025-301,TXN-90001; TXN-90002,RULE-001; RULE-002,card_cloning,open,Karen Wright,2025-03-05,high,Synthetic contact evidence indicates no travel. Card block and replacement are proposed protective actions pending authorization.
-INV-2025-302,INV-2025-302,TXN-90006,RULE-004,account_takeover,escalated,David Chen,2025-03-05,critical,Synthetic wire followed a password reset by 90 minutes. Escalation and SAR review are proposed; no filing or account action occurred.
-INV-2025-303,INV-2025-303,TXN-90003; TXN-90004,RULE-003,,under_review,Karen Wright,2025-03-04,medium,Customer confirmed crypto purchases. Monitoring for additional activity.

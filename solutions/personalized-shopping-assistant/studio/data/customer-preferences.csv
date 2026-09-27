@@ -1,3 +1,0 @@
-Title,CustomerPreferenceId,SizeTop,SizeBottom,SizeShoe,StylePreference,BrandAffinity,ColorPreference,BudgetRangeMin,BudgetRangeMax,PurchaseHistory
-Synthetic Shopper A,SHOP-001,L,34,10,classic; smart_casual,Heritage Co.; Alpine Knits,navy; charcoal; white,50,250,SKU-1001; SKU-1002; SKU-1006
-Synthetic Shopper B,SHOP-002,S,30,8,casual; outdoor; athletic,Northfield; Stride Labs,olive; black; white_grey,30,175,SKU-1005; SKU-1007

@@ -38,7 +38,6 @@ passing.
 | Copilot-only Easy-mode comparison | `solutions/client-health-score/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/client-health-score/quest.html` |
 | Literal browser tutorial | `solutions/client-health-score/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/client-health-score/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/client-health-score/export-manifest.json` |
 | Source bundle | `solutions/client-health-score/exports/client-health-score-source.zip` |
 | Manual evidence | `solutions/client-health-score/evals/manual-build-evidence.json` |

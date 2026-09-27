@@ -1,7 +1,0 @@
-Title,EngagementActivityId,Activity,Points,Frequency
-1,1,Purchase,2 per $1 spent,per_transaction
-2,2,Product Review,100 bonus,per_review
-3,3,Referral Signup,500 bonus,per_referral
-4,4,Birthday,Double points for birthday month,annual
-5,5,Social Share,50 bonus,per_share
-6,6,App Download,250 one-time bonus,once

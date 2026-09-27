@@ -45,7 +45,6 @@ This customer package is synthetic and read-only. It provides evidence or drafts
 | Copilot-only Easy-mode comparison | `solutions/clinical-notes-summarizer/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/clinical-notes-summarizer/quest.html` |
 | Literal browser tutorial | `solutions/clinical-notes-summarizer/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/clinical-notes-summarizer/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/clinical-notes-summarizer/export-manifest.json` |
 | Source bundle | `solutions/clinical-notes-summarizer/exports/clinical-notes-summarizer-source.zip` |
 | Manual evidence | `solutions/clinical-notes-summarizer/evals/manual-build-evidence.json` |

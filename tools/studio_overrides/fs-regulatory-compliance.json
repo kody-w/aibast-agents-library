@@ -1,9 +1,0 @@
-{
-  "skill_evidence": {
-    "trade-reporting-and-execution-surveillance": {"cases": ["RC-03"]},
-    "regulatory-correction-and-submission-preparation": {
-      "when": "Every correction or submission preparation",
-      "phrases": ["synthetic dry run"]
-    }
-  }
-}

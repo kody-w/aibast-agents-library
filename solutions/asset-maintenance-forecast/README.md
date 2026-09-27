@@ -38,7 +38,6 @@ The local agent uses fictional records and produces decision support only. It do
 | Copilot-only Easy-mode comparison | `solutions/asset-maintenance-forecast/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/asset-maintenance-forecast/quest.html` |
 | Literal browser tutorial | `solutions/asset-maintenance-forecast/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/asset-maintenance-forecast/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/asset-maintenance-forecast/export-manifest.json` |
 | Source bundle | `solutions/asset-maintenance-forecast/exports/asset-maintenance-forecast-source.zip` |
 | Manual evidence | `solutions/asset-maintenance-forecast/evals/manual-build-evidence.json` |

@@ -31,7 +31,6 @@ redemption, refund, order, or purchase is issued or changed.
 | Copilot-only Easy-mode comparison | `solutions/customer-loyalty-rewards/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/customer-loyalty-rewards/quest.html` |
 | Literal browser tutorial | `solutions/customer-loyalty-rewards/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/customer-loyalty-rewards/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/customer-loyalty-rewards/export-manifest.json` |
 | Source bundle | `solutions/customer-loyalty-rewards/exports/customer-loyalty-rewards-source.zip` |
 | Manual evidence | `solutions/customer-loyalty-rewards/evals/manual-build-evidence.json` |

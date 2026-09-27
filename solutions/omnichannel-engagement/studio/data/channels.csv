@@ -1,8 +1,0 @@
-Title,ChannelId,Sessions30D,Conversions30D,Revenue30D,Cost30D,AvgOrderValue,BounceRate
-email,email,145000,4350,870000,12500,200.0,18.5
-sms,sms,62000,1860,325500,8200,175.0,5.2
-social_media,social_media,230000,2760,552000,45000,200.0,42.0
-web_organic,web_organic,480000,9600,1920000,18000,200.0,35.0
-web_paid,web_paid,185000,5550,1110000,95000,200.0,28.0
-mobile_app,mobile_app,310000,12400,2480000,22000,200.0,12.0
-in_store,in_store,95000,28500,5700000,180000,200.0,0

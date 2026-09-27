@@ -47,7 +47,6 @@ All exact names, dates, counts, values, scores, percentages, pricing, ARR, margi
 | Copilot-only Easy-mode comparison | `solutions/cross-selling/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/cross-selling/quest.html` |
 | Literal browser tutorial | `solutions/cross-selling/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/cross-selling/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/cross-selling/export-manifest.json` |
 | Source bundle | `solutions/cross-selling/exports/cross-selling-source.zip` |
 | Manual evidence | `solutions/cross-selling/evals/manual-build-evidence.json` |

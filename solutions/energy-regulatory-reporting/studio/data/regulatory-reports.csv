@@ -1,7 +1,0 @@
-Title,RegulatoryReportId,Authority,Facility,ReportingPeriod,Deadline,Status,DataQualityScore,CompletenessPct,Assignee,LastUpdated
-EPA GHG Reporting Program (Subpart C),RPT-9001,EPA,Riverside Generating Station,CY 2025,2026-03-31,in_progress,87,78,Environmental Compliance Team,2026-03-10
-FERC Form 1 Annual Report,RPT-9002,FERC,Corporate (All Facilities),CY 2025,2026-04-18,in_progress,92,65,Regulatory Affairs,2026-03-12
-TCEQ Annual Emissions Inventory,RPT-9003,State - Texas,Bayshore Refinery,CY 2025,2026-03-31,submitted,95,100,Environmental Compliance Team,2026-03-05
-Colorado Air Quality Control Division Report,RPT-9004,State - Colorado,Ridgeline Coal Station,CY 2025,2026-04-30,not_started,0,0,Environmental Compliance Team,
-EPA Toxics Release Inventory (TRI),RPT-9005,EPA,Bayshore Refinery,CY 2025,2026-07-01,in_progress,74,42,Health & Safety Team,2026-02-28
-PHMSA Annual Pipeline Safety Report,RPT-9006,PHMSA,Northeast Corridor Pipeline,CY 2025,2026-03-15,overdue,81,90,Pipeline Operations,2026-03-14

@@ -38,7 +38,6 @@ The local agent uses fictional records and produces decision support only. It do
 | Copilot-only Easy-mode comparison | `solutions/supply-chain-disruption-alert/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/supply-chain-disruption-alert/quest.html` |
 | Literal browser tutorial | `solutions/supply-chain-disruption-alert/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/supply-chain-disruption-alert/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/supply-chain-disruption-alert/export-manifest.json` |
 | Source bundle | `solutions/supply-chain-disruption-alert/exports/supply-chain-disruption-alert-source.zip` |
 | Manual evidence | `solutions/supply-chain-disruption-alert/evals/manual-build-evidence.json` |

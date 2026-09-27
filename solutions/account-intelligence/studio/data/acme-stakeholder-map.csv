@@ -1,9 +1,0 @@
-Title,AcmeStakeholderMapId,Role,Influence,Sentiment,Meetings,ExactSyntheticNotes
-Sarah Chen,Sarah Chen,CTO,Decision Maker,Unknown,0,"New hire from AWS, 6 weeks ago. Controls tech budget."
-James Miller,James Miller,VP Operations,Champion,Positive,14,Promoted to VP last quarter. Advocated for 3 vendor decisions.
-Lisa Park,Lisa Park,CFO,Economic Buyer,Neutral,2,Requested business case and ROI validation.
-David Wong,David Wong,IT Director,Influencer,Positive,8,Technical evaluator. Likes our API-first approach.
-Rachel Torres,Rachel Torres,Procurement,Gatekeeper,Neutral,1,"Standard procurement process, 4-6 week cycle."
-Kevin Park,Kevin Park,VP Engineering,Influencer,Positive,5,Attended 2 product demos.
-Maria Lopez,Maria Lopez,Director of Strategy,Influencer,Unknown,0,No contact yet.
-Tom Bradley,Tom Bradley,CEO,Executive Sponsor,Unknown,0,Mentioned digital transformation in earnings call.

@@ -1,4 +1,0 @@
-Title,ShiftScheduleId,Hours,Operators,Premium,Start,End
-Day,Day,8,24,1.0x,06:00,14:00
-Swing,Swing,8,22,1.0x,14:00,22:00
-Night,Night,8,18,1.15x,22:00,06:00

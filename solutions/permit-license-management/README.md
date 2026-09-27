@@ -38,7 +38,6 @@ The local agent uses fictional records and produces decision support only. It do
 | Copilot-only Easy-mode comparison | `solutions/permit-license-management/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/permit-license-management/quest.html` |
 | Literal browser tutorial | `solutions/permit-license-management/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/permit-license-management/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/permit-license-management/export-manifest.json` |
 | Source bundle | `solutions/permit-license-management/exports/permit-license-management-source.zip` |
 | Manual evidence | `solutions/permit-license-management/evals/manual-build-evidence.json` |

@@ -1,5 +1,0 @@
-Title,OrderId,Customer,ContactEmail,Product,Quantity,UnitPrice,OrderDate,PromisedDate,Status,PctComplete
-James Mitchell,ORD-7810,Ford Motor Company,j.mitchell@ford.example.com,6R140 Transmission Housing,2500,168.0,2026-02-01,2026-03-20,in_production,74
-Rita Vasquez,ORD-7811,Caterpillar Inc.,r.vasquez@cat.example.com,D11 Track Frame Weldment,40,12450.0,2026-01-15,2026-04-10,in_production,45
-Derek Chung,ORD-7812,Tesla Inc.,d.chung@tesla.example.com,Model Y Rocker Panel Stamping,8000,42.5,2026-02-10,2026-03-15,shipped,100
-Angela Torres,ORD-7813,John Deere,a.torres@deere.example.com,Hydraulic Cylinder Barrel,600,385.0,2026-02-18,2026-03-28,delayed,30

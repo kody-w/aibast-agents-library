@@ -1,7 +1,0 @@
-Title,AlertRuleId,Description,Threshold,Severity
-Velocity Check,RULE-001,Multiple high-value transactions within 1 hour,"2+ transactions over $1,000 within 60 minutes",high
-Geographic Anomaly,RULE-002,Transaction in country with no prior history,First transaction in high-risk country,high
-Crypto Purchase Spike,RULE-003,Unusual crypto exchange activity,Crypto transactions exceeding 3x normal volume,medium
-Wire to High-Risk Country,RULE-004,Wire transfer to FATF grey/black list country,Any wire to listed jurisdiction,critical
-Card-Not-Present Velocity,RULE-005,Rapid online purchases across merchants,5+ online transactions within 30 minutes,medium
-Account Takeover Pattern,RULE-006,Password change followed by high-value transaction,Transaction within 2 hours of credential change,critical

@@ -31,7 +31,6 @@ inventory, apply promotions, send messages, process returns, or transact.
 | Copilot-only Easy-mode comparison | `solutions/store-associate-copilot/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/store-associate-copilot/quest.html` |
 | Literal browser tutorial | `solutions/store-associate-copilot/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/store-associate-copilot/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/store-associate-copilot/export-manifest.json` |
 | Source bundle | `solutions/store-associate-copilot/exports/store-associate-copilot-source.zip` |
 | Manual evidence | `solutions/store-associate-copilot/evals/manual-build-evidence.json` |

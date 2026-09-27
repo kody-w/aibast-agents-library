@@ -1,5 +1,0 @@
-Title,SwitchingCostAssumptionId,Value
-data_migration,data_migration,45000
-reimplementation,reimplementation,60000
-user_retraining,user_retraining,18000
-parallel_run,parallel_run,24000

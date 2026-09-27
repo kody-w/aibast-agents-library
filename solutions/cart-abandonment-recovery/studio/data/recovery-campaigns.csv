@@ -1,6 +1,0 @@
-Title,RecoveryCampaignId,DelayHours,Subject,Incentive,AvgOpenRate,AvgConversion
-Draft Email Reminder,email_1,1,Draft: neutral cart reminder,,45.2,8.5
-Draft Follow-Up,email_2,24,Draft: availability-neutral follow-up,,38.1,5.2
-Draft Value Option,email_3,72,"Draft: approved value option, if eligible",Optional incentive concept,42.8,12.1
-Draft SMS Reminder,sms_1,2,Draft: concise cart reminder,,98.0,4.8
-Draft Retargeting Concept,retargeting_ad,6,Draft: consented product reminder concept,,0,2.1

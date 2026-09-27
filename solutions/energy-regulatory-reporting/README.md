@@ -38,7 +38,6 @@ The local agent uses fictional records and produces decision support only. It do
 | Copilot-only Easy-mode comparison | `solutions/energy-regulatory-reporting/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/energy-regulatory-reporting/quest.html` |
 | Literal browser tutorial | `solutions/energy-regulatory-reporting/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/energy-regulatory-reporting/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/energy-regulatory-reporting/export-manifest.json` |
 | Source bundle | `solutions/energy-regulatory-reporting/exports/energy-regulatory-reporting-source.zip` |
 | Manual evidence | `solutions/energy-regulatory-reporting/evals/manual-build-evidence.json` |

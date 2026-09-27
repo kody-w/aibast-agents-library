@@ -38,7 +38,6 @@ Upload both Markdown files in `manual/knowledge/`, then upload the 4 `SKILL.md` 
 | Copilot-only Easy-mode comparison | `solutions/procurement-support/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/procurement-support/quest.html` |
 | Literal browser tutorial | `solutions/procurement-support/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/procurement-support/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/procurement-support/export-manifest.json` |
 | Source bundle | `solutions/procurement-support/exports/procurement-support-source.zip` |
 | Manual evidence | `solutions/procurement-support/evals/manual-build-evidence.json` |

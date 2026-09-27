@@ -1,5 +1,0 @@
-Title,AccountTypeId,MinDeposit,MonthlyFee,Apy,Features
-basic_savings,basic_savings,25,0,0.5,Online banking; Mobile deposit; ATM access
-premium_checking,premium_checking,1000,12,0.15,No ATM fees; Overdraft protection; Bill pay; Cashback rewards
-commercial_checking,commercial_checking,5000,25,0.1,Treasury management; ACH origination; Wire transfers; Merchant services
-wealth_management,wealth_management,250000,0,1.25,Dedicated advisor; Investment management; Trust services; Concierge banking

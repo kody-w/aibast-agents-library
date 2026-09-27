@@ -1,5 +1,0 @@
-Title,LoanApplicationId,Applicant,LoanType,Purpose,PropertyAddress,PropertyValue,LoanAmount,CreditScore,AnnualIncome,MonthlyDebt,EmploymentYears,DownPaymentPct,Status,LoanOfficer,Dscr
-LA-2025-4001,LA-2025-4001,Thomas & Rebecca Harper,conventional_30yr,purchase,"742 Evergreen Terrace, Springfield",485000,388000,762,142000,1850,8,20.0,underwriting,Diana Cruz,
-LA-2025-4002,LA-2025-4002,Kevin Nguyen,fha_30yr,purchase,"1200 Oak Park Ave, Unit 4B",275000,265375,648,68000,890,3,3.5,document_review,Mark Peterson,
-LA-2025-4003,LA-2025-4003,Westfield Properties LLC,commercial_5yr,refinance,8800 Industrial Blvd,2400000,1680000,0,580000,22000,0,30.0,credit_review,Diana Cruz,1.42
-LA-2025-4004,LA-2025-4004,Sandra Blake,va_30yr,purchase,555 Freedom Way,340000,340000,710,95000,650,12,0.0,ready_for_human_decision,Mark Peterson,

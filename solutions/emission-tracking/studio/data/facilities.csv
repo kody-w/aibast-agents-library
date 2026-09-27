@@ -1,5 +1,0 @@
-Title,FacilityId,Location,FacilityType,CapacityMW,Scope1CO2,Scope1CH4,Scope1N2O,Scope2CO2,Scope2CH4,Scope2N2O,Scope3CO2,Scope3CH4,Scope3N2O,ThresholdCO2,ReductionTargetPct,BaselineYear,BaselineCO2
-Riverside Generating Station,FAC-E01,"Sacramento, CA",natural_gas_plant,340,482000,1240,85,12400,0,0,38500,280,15,500000,15,2022,545000
-Sweetwater Wind Farm,FAC-E02,"Nolan County, TX",wind_farm,180,0,0,0,3200,0,0,8400,12,2,25000,5,2022,14200
-Ridgeline Coal Station,FAC-E03,"Moffat County, CO",coal_plant,520,1420000,3800,420,18200,0,0,95000,1200,85,1500000,30,2022,1780000
-Bayshore Refinery,FAC-E04,"Beaumont, TX",refinery,0,890000,5600,210,42000,0,0,2100000,8400,320,1000000,20,2022,1050000

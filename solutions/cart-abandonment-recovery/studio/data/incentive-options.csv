@@ -1,6 +1,0 @@
-Title,IncentiveOptionId,CostMarginImpact,ConversionLift
-10% off cart total,percent_off_10,10.0,35.0
-15% off cart total,percent_off_15,15.0,48.0
-Free standard shipping,free_shipping,5.5,28.0
-$20 off orders over $150,dollar_off_20,8.0,22.0
-Free accessory with order,gift_with_purchase,6.0,18.0

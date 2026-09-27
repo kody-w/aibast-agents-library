@@ -31,7 +31,6 @@ items, refunds funds, creates orders, or completes purchases.
 | Copilot-only Easy-mode comparison | `solutions/personalized-shopping-assistant/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/personalized-shopping-assistant/quest.html` |
 | Literal browser tutorial | `solutions/personalized-shopping-assistant/manual-tutorial.html` |
-| Studio edition tutorial | [`solutions/personalized-shopping-assistant/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/personalized-shopping-assistant/export-manifest.json` |
 | Source bundle | `solutions/personalized-shopping-assistant/exports/personalized-shopping-assistant-source.zip` |
 | Manual evidence | `solutions/personalized-shopping-assistant/evals/manual-build-evidence.json` |
