@@ -72,9 +72,14 @@ MAX_RUNTIME_INSTRUCTIONS = 8000
 MAX_TEMPLATE_INSTRUCTIONS = 7000
 SITE_URL_HEADROOM = 1000
 EXACT_EVIDENCE_INTRO = "Include each phrase below in the answer exactly as written (same words, same order):"
+LEGACY_EVIDENCE_CONCLUSIONS = ("Report only figures and conclusions found in the list records, the rules knowledge or "
+                               "this operation's canonical output; do not add comparisons, rankings or coverage claims "
+                               "of your own.")
 EVIDENCE_CONCLUSIONS = ("Report only figures and conclusions found in the list records, the rules knowledge or "
-                        "this operation's canonical output; do not add comparisons, rankings or coverage claims "
-                        "of your own.")
+                        "this operation's canonical output, or simple arithmetic on those figures that you label "
+                        "as computed. Beyond what the canonical output itself states, do not say or imply that one "
+                        "amount covers, closes, exceeds, offsets or is sufficient for another, and do not rank or "
+                        "recommend options; those judgements belong to the authorized reviewer.")
 
 
 class StudioPackageError(ValueError):
@@ -821,6 +826,7 @@ def skill_case_evidence(path: Path, inputs: Inputs, text: str) -> list[dict[str,
 
 
 def exact_skill_evidence(text: str, path: Path, inputs: Inputs) -> str:
+    text = text.replace(LEGACY_EVIDENCE_CONCLUSIONS, EVIDENCE_CONCLUSIONS)
     header = re.search(r"(?m)^## (?:Required evidence|Deterministic pilot evidence)\n\n", text)
     if header:
         following = re.search(r"(?m)^## ", text[header.end():])
