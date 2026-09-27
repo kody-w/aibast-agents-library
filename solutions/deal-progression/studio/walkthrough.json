@@ -13,7 +13,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Deal Progression Studio",
-      "manual": "Deal Progression Studio Manual"
+      "manual": "Deal Progression Manual"
     }
   },
   "app": {
@@ -252,7 +252,7 @@
         {
           "id": "manual-08",
           "title": "Name the agent",
-          "action": "Rename it Deal Progression Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Deal Progression Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/08-name.webp",

@@ -1,6 +1,6 @@
 {
   "kind": "scenario-workspace",
-  "name": "Returns and Complaints Resolution Workspace",
+  "name": "Returns and Complaints Workspace",
   "title": "Returns and Complaints Resolution",
   "description": "The Returns and Complaints Resolution workshop's synthetic records, read from its SharePoint lists.",
   "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",

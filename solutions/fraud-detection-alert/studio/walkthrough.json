@@ -12,15 +12,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Fraud Detection Alert Studio",
-      "manual": "Fraud D A Studio Manual"
+      "easy": "Fraud Detection Studio",
+      "manual": "Fraud Detection Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
       "easy": "Fraud Detection and Alert Workspace",
-      "manual": "Fraud Detection and Alert Workspace Manual"
+      "manual": "Fraud Detection Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/fraud-detection-alert.json",
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Fraud Detection Alert Studio and review its inventory.",
+          "action": "Open Fraud Detection Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -215,7 +215,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Fraud D A Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Fraud Detection Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",
@@ -411,7 +411,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd fraud-detection-alert-app/managed-app",
-            "ms app init --display-name \"Fraud Detection and Alert Workspace Manual\" --repo native",
+            "ms app init --display-name \"Fraud Detection Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Fraud Detection and Alert Transactions\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Fraud Detection and Alert Alert Rules\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Fraud Detection and Alert Fraud Patterns\" --use-sso",

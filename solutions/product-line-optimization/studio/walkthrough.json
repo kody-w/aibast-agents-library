@@ -13,15 +13,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Product Line Opt Studio",
-      "manual": "Product Line Opt Studio Manual"
+      "easy": "Product Line Studio",
+      "manual": "Product Line Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
       "easy": "Product Line Optimization Workspace",
-      "manual": "Product Line Optimization Workspace Manual"
+      "manual": "Product Line Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/product-line-optimization.json",
@@ -71,7 +71,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Product Line Opt Studio and review its inventory.",
+          "action": "Open Product Line Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 2 rules knowledge file(s) and 1 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -177,7 +177,7 @@
         {
           "id": "manual-04",
           "title": "Name the agent",
-          "action": "Rename it Product Line Opt Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Product Line Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/04-name.webp",
@@ -344,7 +344,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd product-line-optimization-app/managed-app",
-            "ms app init --display-name \"Product Line Optimization Workspace Manual\" --repo native",
+            "ms app init --display-name \"Product Line Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Product Line Optimization Shift Schedule\" --use-sso"
           ],
           "expected": "ms.config.json lists one SharePoint connection with the 1 tables, and generated/services has a service for each list.",

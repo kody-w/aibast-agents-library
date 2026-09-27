@@ -13,7 +13,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Claims Processing Studio",
-      "manual": "Claims Process Studio Manual"
+      "manual": "Claims Processing Manual"
     }
   },
   "app": {
@@ -215,7 +215,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Claims Process Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Claims Processing Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",

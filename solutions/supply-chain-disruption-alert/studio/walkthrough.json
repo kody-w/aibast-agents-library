@@ -12,15 +12,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Supply Chain Disrupt A Studio",
-      "manual": "Supply Chain D A Studio Manual"
+      "easy": "Supply Chain Disruption Studio",
+      "manual": "Supply Chain Disruption Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
       "easy": "Supply Chain Disruption Alert Workspace",
-      "manual": "Supply Chain Disruption Alert Workspace Manual"
+      "manual": "Supply Chain Disruption Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/supply-chain-disruption-alert.json",
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Supply Chain Disrupt A Studio and review its inventory.",
+          "action": "Open Supply Chain Disruption Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 5 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -228,7 +228,7 @@
         {
           "id": "manual-08",
           "title": "Name the agent",
-          "action": "Rename it Supply Chain D A Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Supply Chain Disruption Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/08-name.webp",
@@ -434,7 +434,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd supply-chain-disruption-alert-app/managed-app",
-            "ms app init --display-name \"Supply Chain Disruption Alert Workspace Manual\" --repo native",
+            "ms app init --display-name \"Supply Chain Disruption Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Supply Chain Disruption Alert Supply Routes\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Supply Chain Disruption Alert Disruption Events\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Supply Chain Disruption Alert Risk Scores\" --use-sso",

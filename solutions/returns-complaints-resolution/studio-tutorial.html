@@ -631,8 +631,8 @@ html[data-theme="dark"] {
 <li><strong>Returns and Complaints Resolution Trend Data</strong> — 7 synthetic records <a class="button" href="studio/data/trend-data.csv" download="trend-data.csv">Download trend-data.csv</a></li></ul>
         <p><a class="button" href="studio/data/schema.json" download="schema.json">Download data schema</a></p>
         <h3>Copilot Studio agent</h3>
-        <p><strong>Easy:</strong> Returns Complaints R Studio<br>
-        <strong>Manual:</strong> Returns C R Studio Manual<br>
+        <p><strong>Easy:</strong> Returns and Complaints Studio<br>
+        <strong>Manual:</strong> Returns and Complaints Manual<br>
         <strong>Model:</strong> Sonnet 4.6</p>
         <p><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download agent instructions</a></p>
         <details><summary>Skills (4)</summary><ul><li><a class="button" href="studio/agent/skills/complaint-classification/SKILL.md" download="SKILL.md">privacy-safe-complaint-classification</a></li>
@@ -644,9 +644,9 @@ html[data-theme="dark"] {
 <li>Get complaint category records — SharePoint Get items: Returns and Complaints Resolution Complaint Categories</li>
 <li>Get resolution playbook records — SharePoint Get items: Returns and Complaints Resolution Resolution Playbooks</li>
 <li>Get trend data records — SharePoint Get items: Returns and Complaints Resolution Trend Data</li></ul></details>
-        <h3>Managed app: Returns and Complaints Resolution Workspace</h3>
-        <p><strong>Easy:</strong> Returns and Complaints Resolution Workspace<br>
-        <strong>Manual:</strong> Returns and Complaints Resolution Workspace Manual</p>
+        <h3>Managed app: Returns and Complaints Workspace</h3>
+        <p><strong>Easy:</strong> Returns and Complaints Workspace<br>
+        <strong>Manual:</strong> Returns and Complaints Workspace Manual</p>
         <ul><li><strong>Return Requests</strong> — Returns and Complaints Resolution Return Requests</li>
 <li><strong>Complaint Categories</strong> — Returns and Complaints Resolution Complaint Categories</li>
 <li><strong>Resolution Playbooks</strong> — Returns and Complaints Resolution Resolution Playbooks</li>
@@ -738,7 +738,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/returns-complaints-resolution/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Open Returns Complaints R Studio and review its inventory.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Open Returns and Complaints Studio and review its inventory.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.</p></div>
           </div>
           
@@ -1009,7 +1009,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/returns-complaints-resolution/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Rename it Returns C R Studio Manual. (Agent names can be at most 30 characters.)</p></div>
+            <div class="instruction"><strong>Action</strong><p>Rename it Returns and Complaints Manual. (Agent names can be at most 30 characters.)</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The name shows at the top of the Build page.</p></div>
           </div>
           
@@ -1390,7 +1390,7 @@ html[data-theme="dark"] {
             <div class="instruction expected"><strong>Expected result</strong><p>ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.</p></div>
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-24-command-1">cd returns-complaints-resolution-app/managed-app</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-24-command-2">ms app init --display-name &quot;Returns and Complaints Resolution Workspace Manual&quot; --repo native</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-24-command-2">ms app init --display-name &quot;Returns and Complaints Workspace Manual&quot; --repo native</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-24-command-3">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Returns and Complaints Resolution Return Requests&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 4</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-4" aria-label="Copy command 4">Copy</button></div><pre><code id="manual-24-command-4">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Returns and Complaints Resolution Complaint Categories&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 5</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-5" aria-label="Copy command 5">Copy</button></div><pre><code id="manual-24-command-5">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Returns and Complaints Resolution Resolution Playbooks&quot; --use-sso</code></pre></div>
@@ -1418,7 +1418,7 @@ html[data-theme="dark"] {
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-25-command-1">npm install</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-25-command-2">npm run build</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-25-command-3">git add -A &amp;&amp; git commit -m &quot;Returns and Complaints Resolution Workspace&quot;</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-25-command-3">git add -A &amp;&amp; git commit -m &quot;Returns and Complaints Workspace&quot;</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 4</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-4" aria-label="Copy command 4">Copy</button></div><pre><code id="manual-25-command-4">git push -u origin HEAD:main</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 5</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-5" aria-label="Copy command 5">Copy</button></div><pre><code id="manual-25-command-5">ms app deploy</code></pre></div>
           

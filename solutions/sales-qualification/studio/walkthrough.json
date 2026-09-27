@@ -13,7 +13,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Sales Qualification Studio",
-      "manual": "Sales Qual Studio Manual"
+      "manual": "Sales Qualification Manual"
     }
   },
   "app": {
@@ -239,7 +239,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Sales Qual Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Sales Qualification Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",

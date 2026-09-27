@@ -182,6 +182,27 @@ still runs local data, mapping, privacy, and walkthrough checks; the external
 validator tests are explicitly skipped if brainfreeze studio is not installed.
 That is not a substitute for running the lifecycle validator before handoff.
 
+## Readable agent and app names
+
+Except for emission-tracking's fixed live names, names use the deployment
+display name with a trailing ` Agent` removed. Agents end in ` Studio` or
+` Manual` and are at most 30 characters. Apps end in ` Workspace` or
+` Workspace Manual` and are at most 40 characters. Whole trailing words are
+dropped only as needed; generic trailing words are removed first, and dangling
+`and`/`&`-style joiners are not left at the end. No initials, abbreviations,
+partial words or hash suffixes are invented.
+
+Names are allocated across all 51 advertised workshops, including those with
+record-source blockers. If truncation creates a collision, both colliding names
+recover a distinguishing title word, dropping a different whole word when
+necessary. Original word order and spelling are preserved. An impossible
+whole-word allocation fails explicitly instead of creating an unreadable name.
+For example, asset-maintenance-forecast is **Asset Maintenance Studio** /
+**Asset Maintenance Manual**, with **Asset Maintenance Forecast Workspace** /
+**Asset Maintenance Workspace Manual** as its app names.
+Non-reference agent-name overrides are rejected; emission-tracking alone keeps
+its fixed live agent and app names.
+
 Regenerate the existing journey surfaces and source bundle for each new edition:
 
 ```sh

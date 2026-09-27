@@ -636,8 +636,8 @@ html[data-theme="dark"] {
 <li><strong>Loan Origination Assistant Conditions</strong> — 4 synthetic records <a class="button" href="studio/data/conditions.csv" download="conditions.csv">Download conditions.csv</a></li></ul>
         <p><a class="button" href="studio/data/schema.json" download="schema.json">Download data schema</a></p>
         <h3>Copilot Studio agent</h3>
-        <p><strong>Easy:</strong> Loan Orig Asst Studio<br>
-        <strong>Manual:</strong> Loan Orig Asst Studio Manual<br>
+        <p><strong>Easy:</strong> Loan Origination Studio<br>
+        <strong>Manual:</strong> Loan Origination Manual<br>
         <strong>Model:</strong> Sonnet 4.6</p>
         <p><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download agent instructions</a></p>
         <details><summary>Skills (5)</summary><ul><li><a class="button" href="studio/agent/skills/aibast_application-review_01/SKILL.md" download="SKILL.md">application-review</a></li>
@@ -653,7 +653,7 @@ html[data-theme="dark"] {
 <li>Get condition records — SharePoint Get items: Loan Origination Assistant Conditions</li></ul></details>
         <h3>Managed app: Loan Origination Assistant Workspace</h3>
         <p><strong>Easy:</strong> Loan Origination Assistant Workspace<br>
-        <strong>Manual:</strong> Loan Origination Assistant Workspace Manual</p>
+        <strong>Manual:</strong> Loan Origination Workspace Manual</p>
         <ul><li><strong>Loan Applications</strong> — Loan Origination Assistant Loan Applications</li>
 <li><strong>Approval Criteria</strong> — Loan Origination Assistant Approval Criteria</li>
 <li><strong>Document Requirements</strong> — Loan Origination Assistant Document Requirements</li>
@@ -746,7 +746,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/loan-origination-assistant/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Open Loan Orig Asst Studio and review its inventory.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Open Loan Origination Studio and review its inventory.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The studio instructions, 5 skills, 1 rules knowledge file(s) and 5 SharePoint Get items tools; no web search; Draft, not published.</p></div>
           </div>
           
@@ -1061,7 +1061,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/loan-origination-assistant/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Rename it Loan Orig Asst Studio Manual. (Agent names can be at most 30 characters.)</p></div>
+            <div class="instruction"><strong>Action</strong><p>Rename it Loan Origination Manual. (Agent names can be at most 30 characters.)</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The name shows at the top of the Build page.</p></div>
           </div>
           
@@ -1487,7 +1487,7 @@ html[data-theme="dark"] {
             <div class="instruction expected"><strong>Expected result</strong><p>ms.config.json lists one SharePoint connection with the 5 tables, and generated/services has a service for each list.</p></div>
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-27-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-27-command-1">cd loan-origination-assistant-app/managed-app</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-27-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-27-command-2">ms app init --display-name &quot;Loan Origination Assistant Workspace Manual&quot; --repo native</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-27-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-27-command-2">ms app init --display-name &quot;Loan Origination Workspace Manual&quot; --repo native</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-27-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-27-command-3">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Loan Origination Assistant Loan Applications&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 4</strong><button class="button copy-button" type="button" data-copy-target="manual-27-command-4" aria-label="Copy command 4">Copy</button></div><pre><code id="manual-27-command-4">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Loan Origination Assistant Approval Criteria&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 5</strong><button class="button copy-button" type="button" data-copy-target="manual-27-command-5" aria-label="Copy command 5">Copy</button></div><pre><code id="manual-27-command-5">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Loan Origination Assistant Document Requirements&quot; --use-sso</code></pre></div>

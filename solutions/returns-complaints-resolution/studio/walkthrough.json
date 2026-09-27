@@ -12,15 +12,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Returns Complaints R Studio",
-      "manual": "Returns C R Studio Manual"
+      "easy": "Returns and Complaints Studio",
+      "manual": "Returns and Complaints Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
-      "easy": "Returns and Complaints Resolution Workspace",
-      "manual": "Returns and Complaints Resolution Workspace Manual"
+      "easy": "Returns and Complaints Workspace",
+      "manual": "Returns and Complaints Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/returns-complaints-resolution.json",
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Returns Complaints R Studio and review its inventory.",
+          "action": "Open Returns and Complaints Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -215,7 +215,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Returns C R Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Returns and Complaints Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",
@@ -411,7 +411,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd returns-complaints-resolution-app/managed-app",
-            "ms app init --display-name \"Returns and Complaints Resolution Workspace Manual\" --repo native",
+            "ms app init --display-name \"Returns and Complaints Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Returns and Complaints Resolution Return Requests\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Returns and Complaints Resolution Complaint Categories\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Returns and Complaints Resolution Resolution Playbooks\" --use-sso",
@@ -430,7 +430,7 @@
           "commands": [
             "npm install",
             "npm run build",
-            "git add -A && git commit -m \"Returns and Complaints Resolution Workspace\"",
+            "git add -A && git commit -m \"Returns and Complaints Workspace\"",
             "git push -u origin HEAD:main",
             "ms app deploy"
           ],

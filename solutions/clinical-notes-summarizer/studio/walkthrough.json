@@ -13,15 +13,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Clinical Notes S Studio",
-      "manual": "Clinical Notes S Studio Manual"
+      "easy": "Clinical Notes Studio",
+      "manual": "Clinical Notes Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
       "easy": "Clinical Notes Summarizer Workspace",
-      "manual": "Clinical Notes Summarizer Workspace Manual"
+      "manual": "Clinical Notes Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/clinical-notes-summarizer.json",
@@ -71,7 +71,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Clinical Notes S Studio and review its inventory.",
+          "action": "Open Clinical Notes Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 2 rules knowledge file(s) and 1 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -177,7 +177,7 @@
         {
           "id": "manual-04",
           "title": "Name the agent",
-          "action": "Rename it Clinical Notes S Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Clinical Notes Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/04-name.webp",
@@ -344,7 +344,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd clinical-notes-summarizer-app/managed-app",
-            "ms app init --display-name \"Clinical Notes Summarizer Workspace Manual\" --repo native",
+            "ms app init --display-name \"Clinical Notes Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Clinical Notes Summarizer Encounter\" --use-sso"
           ],
           "expected": "ms.config.json lists one SharePoint connection with the 1 tables, and generated/services has a service for each list.",

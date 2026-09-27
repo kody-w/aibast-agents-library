@@ -22,6 +22,7 @@ import csv
 import hashlib
 import importlib
 import io
+import itertools
 import json
 import os
 import re
@@ -64,6 +65,8 @@ FORBIDDEN_IDENTITY = (
     "github.com/kody-w/", "raw.githubusercontent.com/kody-w/", "kody-w.github.io", "kodyw.com",
 )
 MISSING = object()
+GENERIC_NAME_WORDS = {"assistant", "copilot", "generator", "agent", "support", "analysis"}
+TRAILING_NAME_JOINERS = {"and", "or", "&", "of", "for", "the", "to"}
 
 
 class StudioPackageError(ValueError):
@@ -275,24 +278,98 @@ def short(value: str, limit: int) -> str:
     return parts[0][:limit - len(suffix)] + suffix
 
 
-def agent_names(root: Path = ROOT) -> dict[str, dict[str, str]]:
-    result = {}
-    for slug in advertised_slugs(root):
-        title = re.sub(r"\s+Agent$", "", read_json(root / "solutions" / slug / "deployment.json")["display_name"])
-        override = overrides_for(slug, root).get("agent_names", {})
-        result[slug] = {mode: override.get(mode, short(title, 30 - len(suffix)) + suffix)
-                        for mode, suffix in (("easy", " Studio"), ("manual", " Studio Manual"))}
+def whole_word_name(title: str, suffix: str, limit: int) -> str:
+    parts = title.split()
+    while parts and len(" ".join(parts) + suffix) > limit and parts[-1].lower() in GENERIC_NAME_WORDS:
+        parts.pop()
+    while parts and len(" ".join(parts) + suffix) > limit:
+        parts.pop()
+    while parts and parts[-1].lower() in TRAILING_NAME_JOINERS:
+        parts.pop()
+    if not parts:
+        raise StudioPackageError(f"cannot fit a whole word from {title!r} within the {limit}-character name limit")
+    return " ".join(parts) + suffix
+
+
+def whole_word_catalog_names(titles: dict[str, str], suffixes: dict[str, str], limit: int,
+                             fixed: dict[str, dict[str, str]] | None = None) -> dict[str, dict[str, str]]:
+    fixed = fixed or {}
+    result = {slug: {mode: fixed.get(slug, {}).get(mode) or whole_word_name(title, suffix, limit)
+                     for mode, suffix in suffixes.items()} for slug, title in sorted(titles.items())}
     owners: dict[str, list[tuple[str, str]]] = {}
     for slug, names in result.items():
         for mode, name in names.items():
+            if len(name) > limit:
+                raise StudioPackageError(f"{slug}: fixed name exceeds {limit} characters")
             owners.setdefault(name.casefold(), []).append((slug, mode))
-    for entries in owners.values():
-        if len(entries) > 1:
-            for slug, mode in entries:
-                suffix = " Studio" if mode == "easy" else " Studio Manual"
-                digest = hashlib.sha256(slug.encode()).hexdigest()[:4]
-                result[slug][mode] = short(result[slug][mode][:-len(suffix)], 25 - len(suffix)) + " " + digest + suffix
+    collisions = {key for entries in owners.values() if len(entries) > 1 for key in entries
+                  if key[1] not in fixed.get(key[0], {})}
+    used = {name.casefold() for slug, names in result.items() for mode, name in names.items()
+            if (slug, mode) not in collisions}
+    candidates = {}
+    for slug, mode in sorted(collisions):
+        suffix = suffixes[mode]
+        parts = titles[slug].split()
+        original = result[slug][mode]
+        kept = len(original[:-len(suffix)].split())
+        dropped = set(range(kept, len(parts)))
+        choices = []
+        for size in range(len(parts), 0, -1):
+            for indexes in itertools.combinations(range(len(parts)), size):
+                selected = [parts[index] for index in indexes]
+                name = " ".join(selected) + suffix
+                if (len(name) > limit or name.casefold() == original.casefold()
+                        or selected[-1].lower() in TRAILING_NAME_JOINERS
+                        or (dropped and not dropped.intersection(indexes))):
+                    continue
+                meaningful = sum(word.lower() not in GENERIC_NAME_WORDS | TRAILING_NAME_JOINERS for word in selected)
+                rank = (-(0 in indexes), -meaningful, -size, indexes)
+                choices.append((rank, name))
+        candidates[slug, mode] = [name for _, name in sorted(choices)]
+
+    pending = sorted(collisions, key=lambda key: (len(candidates[key]), key))
+
+    def assign(index: int) -> bool:
+        if index == len(pending):
+            return True
+        slug, mode = pending[index]
+        for name in candidates[slug, mode]:
+            if name.casefold() in used:
+                continue
+            result[slug][mode] = name
+            used.add(name.casefold())
+            if assign(index + 1):
+                return True
+            used.remove(name.casefold())
+        return False
+
+    if not assign(0) or len({name.casefold() for names in result.values() for name in names.values()}) != sum(
+        len(names) for names in result.values()
+    ):
+        raise StudioPackageError("cannot make unique names using only whole title words; no initials or hashes were added")
     return result
+
+
+def workshop_titles(root: Path = ROOT) -> dict[str, str]:
+    return {slug: re.sub(r"\s+Agent$", "", read_json(root / "solutions" / slug / "deployment.json")["display_name"])
+            for slug in advertised_slugs(root)}
+
+
+def agent_names(root: Path = ROOT) -> dict[str, dict[str, str]]:
+    titles = workshop_titles(root)
+    for slug in titles:
+        if slug != REFERENCE and overrides_for(slug, root).get("agent_names"):
+            raise StudioPackageError(f"{slug}: agent names must follow the whole-word naming contract")
+    fixed = {REFERENCE: overrides_for(REFERENCE, root)["agent_names"]} if REFERENCE in titles else {}
+    return whole_word_catalog_names(titles, {"easy": " Studio", "manual": " Manual"}, 30, fixed)
+
+
+def app_names(root: Path = ROOT) -> dict[str, dict[str, str]]:
+    titles = workshop_titles(root)
+    fixed = {}
+    if REFERENCE in titles:
+        fixed[REFERENCE] = read_json(root / "solutions" / REFERENCE / "studio/walkthrough.json")["app"]["names"]
+    return whole_word_catalog_names(titles, {"easy": " Workspace", "manual": " Workspace Manual"}, 40, fixed)
 
 
 def column_name(path: str, used: set[str]) -> str:
@@ -683,7 +760,8 @@ def summable(column: dict[str, Any]) -> bool:
     })
 
 
-def make_app(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str]) -> dict[str, Any]:
+def make_app(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str],
+             names: dict[str, str] | None = None) -> dict[str, Any]:
     tables = []
     for item in schema["lists"]:
         columns = item["columns"]
@@ -713,7 +791,8 @@ def make_app(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str]) -> di
                      "computed", "formats", "metrics", "groupBy", "sortBy") if name in table}
         tables.append(table)
     app = {
-        "kind": "scenario-workspace", "name": inputs.title + " Workspace", "title": inputs.title,
+        "kind": "scenario-workspace", "name": (names or {}).get("easy") or whole_word_name(
+            inputs.title, " Workspace", 40), "title": inputs.title,
         "description": f"The {inputs.title} workshop's synthetic records, read from its SharePoint lists.",
         "site": SITE,
         "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace "
@@ -738,13 +817,15 @@ def example(item: dict[str, Any], csv_text: str) -> str:
 
 
 def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str], tools: dict[str, str],
-                     names: dict[str, str], root: Path, existing_root: Path | None = None) -> dict[str, Any]:
+                     names: dict[str, str], root: Path, existing_root: Path | None = None,
+                     workspace_names: dict[str, str] | None = None) -> dict[str, Any]:
     package = root / "solutions" / inputs.slug
     lists = schema["lists"]
     count, skill_count = len(lists), len(inputs.skills)
     rules = [p.relative_to(package).as_posix() for p in inputs.rules]
     skills = ["studio/agent/skills/" + p.relative_to(package / "manual/skills").as_posix() for p in inputs.skills]
-    app_names = {"easy": inputs.title + " Workspace", "manual": inputs.title + " Workspace Manual"}
+    workspace_names = workspace_names or {mode: whole_word_name(inputs.title, suffix, 40)
+                                          for mode, suffix in (("easy", " Workspace"), ("manual", " Workspace Manual"))}
     modes: dict[str, dict[str, Any]] = {}
 
     def lane(mode: str, title: str) -> Callable[..., None]:
@@ -868,12 +949,12 @@ def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str
         "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
         f"ms.config.json lists one SharePoint connection with the {count} tables, and generated/services has a "
         "service for each list.", "app-register", commands=[
-            f"cd {out}/managed-app", f'ms app init --display-name "{app_names["manual"]}" --repo native',
+            f"cd {out}/managed-app", f'ms app init --display-name "{workspace_names["manual"]}" --repo native',
             *(f'ms app add data-source --connector sharepointonline --as table --dataset <your-site> '
               f'--table "{item["title"]}" --use-sso' for item in lists)])
     add("Build, push and deploy", "Build it, commit it, push it to the app's repository and deploy it.",
         "ms app deploy prints the app's play link.", "app-deploy", commands=[
-            "npm install", "npm run build", f'git add -A && git commit -m "{app_names["easy"]}"',
+            "npm install", "npm run build", f'git add -A && git commit -m "{workspace_names["easy"]}"',
             "git push -u origin HEAD:main", "ms app deploy"])
     add("Open the app and compare it with the agent",
         f"Open the play link, allow the SharePoint connection the first time, and open the {lists[0]['title']} tab.",
@@ -886,7 +967,7 @@ def make_walkthrough(inputs: Inputs, schema: dict[str, Any], csvs: dict[str, str
         "data": "studio/data/schema.json",
         "agent": {"instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md", "skills": "studio/agent/skills",
                   "knowledge": rules, "model": "Sonnet 4.6", "names": names},
-        "app": {"spec": "studio/managed-app/app.json", "names": app_names},
+        "app": {"spec": "studio/managed-app/app.json", "names": workspace_names},
         "cases": f"tests/demo_cases/{inputs.slug}.json", "modes": modes,
     }
     if inputs.tables:
@@ -928,6 +1009,12 @@ def validate_package_contract(schema: dict, app: dict, document: dict, tools: di
     names = document["agent"]["names"]
     if any(not name or len(name) > 30 for name in names.values()) or len(set(names.values())) != 2:
         raise StudioPackageError("Easy and Manual agent names must differ and be at most 30 characters")
+    workspace_names = document.get("app", {}).get("names", {})
+    if any(not isinstance(name, str) or not name or len(name) > 40
+           for name in [app.get("name"), *workspace_names.values()]):
+        raise StudioPackageError("managed app names must be at most 40 characters")
+    if workspace_names and workspace_names.get("easy") != app["name"]:
+        raise StudioPackageError("the app spec name must match its Easy workspace name")
     if len(tools) != len(lists) or len({name.casefold() for name in tools.values()}) != len(tools):
         raise StudioPackageError("tool names must be unique within an agent")
     if {t["id"] for t in app["tables"]} != {item["id"] for item in lists}:
@@ -950,7 +1037,7 @@ def validate_package_contract(schema: dict, app: dict, document: dict, tools: di
 
 
 def validate_catalog(packages: list[tuple[dict, dict, dict[str, str]]]) -> None:
-    titles, names = {}, {}
+    titles, names, workspace_names = {}, {}, {}
     for schema, document, tools in packages:
         slug = schema["solution"]
         for item in schema["lists"]:
@@ -967,6 +1054,13 @@ def validate_catalog(packages: list[tuple[dict, dict, dict[str, str]]]) -> None:
             names[key] = slug
         if len({name.casefold() for name in tools.values()}) != len(tools):
             raise StudioPackageError(f"{slug}: duplicate tool name within an agent")
+        for name in document.get("app", {}).get("names", {}).values():
+            if len(name) > 40:
+                raise StudioPackageError(f"{slug}: managed app name exceeds 40 characters")
+            key = name.casefold()
+            if key in workspace_names:
+                raise StudioPackageError(f"duplicate managed app name across workshops: {name}")
+            workspace_names[key] = slug
 
 
 def existing_catalog(root: Path, exclude: list[str]) -> list[tuple[dict, dict, dict[str, str]]]:
@@ -1000,15 +1094,20 @@ def managed_app_validator(path: Path | None = None) -> Callable[[dict], dict]:
 
 def package_files(slug: str, *, root: Path = ROOT, names: dict[str, str] | None = None,
                   validator: Callable[[dict], dict] | None = None,
-                  existing_root: Path | None = None) -> dict[Path, str]:
+                  existing_root: Path | None = None,
+                  workspace_names: dict[str, str] | None = None) -> dict[Path, str]:
     inputs = load_inputs(slug, root)
     schema = make_schema(inputs, root)
     csvs = data.build_schema(schema, root=root)
     tools = tool_names(schema, inputs.overrides)
-    app = make_app(inputs, schema, csvs)
+    workspace_names = workspace_names or app_names(root)[slug]
+    app = make_app(inputs, schema, csvs, workspace_names)
+    if app["name"] != workspace_names["easy"]:
+        raise StudioPackageError(f"{slug}: app name override conflicts with the whole-word naming contract")
     if existing_root is None or not (existing_root / "solutions" / slug / "studio/walkthrough.json").is_file():
         existing_root = root
-    document = make_walkthrough(inputs, schema, csvs, tools, names or agent_names(root)[slug], root, existing_root)
+    document = make_walkthrough(inputs, schema, csvs, tools, names or agent_names(root)[slug], root, existing_root,
+                                workspace_names)
     validate_package_contract(schema, app, document, tools)
     if validator is not None:
         validator(app)
@@ -1089,11 +1188,13 @@ def main(argv: list[str] | None = None, *, root: Path = ROOT) -> int:
     failures, stale, completed = [], [], 0
     try:
         names = agent_names(root)
+        workspace_names = app_names(root)
         validator = managed_app_validator(args.brainfreeze_root) if args.brainfreeze_root else None
         catalog = existing_catalog(root, slugs)
         for slug in slugs:
             try:
-                files = package_files(slug, root=root, names=names.get(slug), validator=validator, existing_root=args.out)
+                files = package_files(slug, root=root, names=names.get(slug), validator=validator,
+                                      existing_root=args.out, workspace_names=workspace_names.get(slug))
                 base = Path("solutions") / slug / "studio"
                 schema = json.loads(files[base / "data/schema.json"])
                 document = json.loads(files[base / "walkthrough.json"])

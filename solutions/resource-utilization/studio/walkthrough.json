@@ -14,7 +14,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Resource Utilization Studio",
-      "manual": "Resource Util Studio Manual"
+      "manual": "Resource Utilization Manual"
     }
   },
   "app": {
@@ -189,7 +189,7 @@
         {
           "id": "manual-04",
           "title": "Name the agent",
-          "action": "Rename it Resource Util Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Resource Utilization Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/04-name.webp",

@@ -622,8 +622,8 @@ html[data-theme="dark"] {
         <ul class="inventory-list"><li><strong>Patient Intake and Scheduling Patient Record</strong> — 2 synthetic records <a class="button" href="studio/data/patient-record.csv" download="patient-record.csv">Download patient-record.csv</a></li></ul>
         <p><a class="button" href="studio/data/schema.json" download="schema.json">Download data schema</a></p>
         <h3>Copilot Studio agent</h3>
-        <p><strong>Easy:</strong> Patient Intake S Studio<br>
-        <strong>Manual:</strong> Patient Intake S Studio Manual<br>
+        <p><strong>Easy:</strong> Patient Intake Studio<br>
+        <strong>Manual:</strong> Patient Intake Manual<br>
         <strong>Model:</strong> Sonnet 4.6</p>
         <p><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download agent instructions</a></p>
         <details><summary>Skills (4)</summary><ul><li><a class="button" href="studio/agent/skills/appointment-availability/SKILL.md" download="SKILL.md">patient-intake-appointment-availability</a></li>
@@ -635,7 +635,7 @@ html[data-theme="dark"] {
         <details open><summary>Tools (1)</summary><ul><li>Get patient record records — SharePoint Get items: Patient Intake and Scheduling Patient Record</li></ul></details>
         <h3>Managed app: Patient Intake and Scheduling Workspace</h3>
         <p><strong>Easy:</strong> Patient Intake and Scheduling Workspace<br>
-        <strong>Manual:</strong> Patient Intake and Scheduling Workspace Manual</p>
+        <strong>Manual:</strong> Patient Intake Workspace Manual</p>
         <ul><li><strong>Patient Record</strong> — Patient Intake and Scheduling Patient Record</li></ul>
         <p><a class="button" href="studio/managed-app/app.json" download="app.json">Download managed app spec</a></p>
       </section>
@@ -724,7 +724,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/patient-intake/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Open Patient Intake S Studio and review its inventory.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Open Patient Intake Studio and review its inventory.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The studio instructions, 4 skills, 2 rules knowledge file(s) and 1 SharePoint Get items tools; no web search; Draft, not published.</p></div>
           </div>
           
@@ -929,7 +929,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/patient-intake/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Rename it Patient Intake S Studio Manual. (Agent names can be at most 30 characters.)</p></div>
+            <div class="instruction"><strong>Action</strong><p>Rename it Patient Intake Manual. (Agent names can be at most 30 characters.)</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The name shows at the top of the Build page.</p></div>
           </div>
           
@@ -1245,7 +1245,7 @@ html[data-theme="dark"] {
             <div class="instruction expected"><strong>Expected result</strong><p>ms.config.json lists one SharePoint connection with the 1 tables, and generated/services has a service for each list.</p></div>
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-18-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-18-command-1">cd patient-intake-app/managed-app</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-18-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-18-command-2">ms app init --display-name &quot;Patient Intake and Scheduling Workspace Manual&quot; --repo native</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-18-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-18-command-2">ms app init --display-name &quot;Patient Intake Workspace Manual&quot; --repo native</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-18-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-18-command-3">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Patient Intake and Scheduling Patient Record&quot; --use-sso</code></pre></div>
           
           

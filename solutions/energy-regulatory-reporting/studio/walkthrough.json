@@ -13,7 +13,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Regulatory Reporting Studio",
-      "manual": "Reg Reporting Studio Manual"
+      "manual": "Regulatory Reporting Manual"
     }
   },
   "app": {
@@ -202,7 +202,7 @@
         {
           "id": "manual-06",
           "title": "Name the agent",
-          "action": "Rename it Reg Reporting Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Regulatory Reporting Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/06-name.webp",

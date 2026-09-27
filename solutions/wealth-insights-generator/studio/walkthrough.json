@@ -12,15 +12,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Wealth Insights G Studio",
-      "manual": "Wealth I G Studio Manual"
+      "easy": "Wealth Insights Studio",
+      "manual": "Wealth Insights Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
       "easy": "Wealth Insights Generator Workspace",
-      "manual": "Wealth Insights Generator Workspace Manual"
+      "manual": "Wealth Insights Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/wealth-insights-generator.json",
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Wealth Insights G Studio and review its inventory.",
+          "action": "Open Wealth Insights Studio and review its inventory.",
           "expected": "The studio instructions, 5 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -227,7 +227,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Wealth I G Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Wealth Insights Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",
@@ -436,7 +436,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd wealth-insights-generator-app/managed-app",
-            "ms app init --display-name \"Wealth Insights Generator Workspace Manual\" --repo native",
+            "ms app init --display-name \"Wealth Insights Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Wealth Insights Generator Market Data\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Wealth Insights Generator Client Portfolios\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Wealth Insights Generator Performance Benchmarks\" --use-sso",

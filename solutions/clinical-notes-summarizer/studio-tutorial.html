@@ -622,8 +622,8 @@ html[data-theme="dark"] {
         <ul class="inventory-list"><li><strong>Clinical Notes Summarizer Encounter</strong> — 2 synthetic records <a class="button" href="studio/data/encounter.csv" download="encounter.csv">Download encounter.csv</a></li></ul>
         <p><a class="button" href="studio/data/schema.json" download="schema.json">Download data schema</a></p>
         <h3>Copilot Studio agent</h3>
-        <p><strong>Easy:</strong> Clinical Notes S Studio<br>
-        <strong>Manual:</strong> Clinical Notes S Studio Manual<br>
+        <p><strong>Easy:</strong> Clinical Notes Studio<br>
+        <strong>Manual:</strong> Clinical Notes Manual<br>
         <strong>Model:</strong> Sonnet 4.6</p>
         <p><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download agent instructions</a></p>
         <details><summary>Skills (4)</summary><ul><li><a class="button" href="studio/agent/skills/encounter-summary/SKILL.md" download="SKILL.md">clinical-notes-summarizer-encounter-summary</a></li>
@@ -635,7 +635,7 @@ html[data-theme="dark"] {
         <details open><summary>Tools (1)</summary><ul><li>Get encounter records — SharePoint Get items: Clinical Notes Summarizer Encounter</li></ul></details>
         <h3>Managed app: Clinical Notes Summarizer Workspace</h3>
         <p><strong>Easy:</strong> Clinical Notes Summarizer Workspace<br>
-        <strong>Manual:</strong> Clinical Notes Summarizer Workspace Manual</p>
+        <strong>Manual:</strong> Clinical Notes Workspace Manual</p>
         <ul><li><strong>Encounter</strong> — Clinical Notes Summarizer Encounter</li></ul>
         <p><a class="button" href="studio/managed-app/app.json" download="app.json">Download managed app spec</a></p>
       </section>
@@ -724,7 +724,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/clinical-notes-summarizer/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Open Clinical Notes S Studio and review its inventory.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Open Clinical Notes Studio and review its inventory.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The studio instructions, 4 skills, 2 rules knowledge file(s) and 1 SharePoint Get items tools; no web search; Draft, not published.</p></div>
           </div>
           
@@ -929,7 +929,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/clinical-notes-summarizer/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Rename it Clinical Notes S Studio Manual. (Agent names can be at most 30 characters.)</p></div>
+            <div class="instruction"><strong>Action</strong><p>Rename it Clinical Notes Manual. (Agent names can be at most 30 characters.)</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The name shows at the top of the Build page.</p></div>
           </div>
           
@@ -1245,7 +1245,7 @@ html[data-theme="dark"] {
             <div class="instruction expected"><strong>Expected result</strong><p>ms.config.json lists one SharePoint connection with the 1 tables, and generated/services has a service for each list.</p></div>
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-18-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-18-command-1">cd clinical-notes-summarizer-app/managed-app</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-18-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-18-command-2">ms app init --display-name &quot;Clinical Notes Summarizer Workspace Manual&quot; --repo native</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-18-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-18-command-2">ms app init --display-name &quot;Clinical Notes Workspace Manual&quot; --repo native</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-18-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-18-command-3">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Clinical Notes Summarizer Encounter&quot; --use-sso</code></pre></div>
           
           

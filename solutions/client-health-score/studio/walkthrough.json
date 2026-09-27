@@ -14,7 +14,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Client Health Score Studio",
-      "manual": "Client Health S Studio Manual"
+      "manual": "Client Health Score Manual"
     }
   },
   "app": {
@@ -202,7 +202,7 @@
         {
           "id": "manual-05",
           "title": "Name the agent",
-          "action": "Rename it Client Health S Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Client Health Score Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/05-name.webp",

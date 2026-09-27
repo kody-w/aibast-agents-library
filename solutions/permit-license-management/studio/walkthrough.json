@@ -13,7 +13,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Permit Management Studio",
-      "manual": "Permit Mgmt Studio Manual"
+      "manual": "Permit Management Manual"
     }
   },
   "app": {
@@ -202,7 +202,7 @@
         {
           "id": "manual-06",
           "title": "Name the agent",
-          "action": "Rename it Permit Mgmt Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Permit Management Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/06-name.webp",

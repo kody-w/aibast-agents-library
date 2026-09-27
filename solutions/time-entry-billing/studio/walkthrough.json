@@ -14,7 +14,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Time Entry and Billing Studio",
-      "manual": "Time Entry B Studio Manual"
+      "manual": "Time Entry and Billing Manual"
     }
   },
   "app": {
@@ -202,7 +202,7 @@
         {
           "id": "manual-05",
           "title": "Name the agent",
-          "action": "Rename it Time Entry B Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Time Entry and Billing Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/05-name.webp",

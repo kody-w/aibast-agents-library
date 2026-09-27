@@ -12,15 +12,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Cust Sentiment Churn P Studio",
-      "manual": "Cust S C P Studio Manual"
+      "easy": "Customer Sentiment Studio",
+      "manual": "Customer Sentiment Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
-      "easy": "Customer Sentiment and Churn Prediction Workspace",
-      "manual": "Customer Sentiment and Churn Prediction Workspace Manual"
+      "easy": "Customer Sentiment and Churn Workspace",
+      "manual": "Customer Sentiment Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/customer-sentiment-churn.json",
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Cust Sentiment Churn P Studio and review its inventory.",
+          "action": "Open Customer Sentiment Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -215,7 +215,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Cust S C P Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Customer Sentiment Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",
@@ -411,7 +411,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd customer-sentiment-churn-app/managed-app",
-            "ms app init --display-name \"Customer Sentiment and Churn Prediction Workspace Manual\" --repo native",
+            "ms app init --display-name \"Customer Sentiment Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cust Sentiment Churn Pred Customer Interactions\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Sentiment and Churn Prediction Churn Indicators\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Sentiment and Churn Prediction Retention Actions\" --use-sso",
@@ -430,7 +430,7 @@
           "commands": [
             "npm install",
             "npm run build",
-            "git add -A && git commit -m \"Customer Sentiment and Churn Prediction Workspace\"",
+            "git add -A && git commit -m \"Customer Sentiment and Churn Workspace\"",
             "git push -u origin HEAD:main",
             "ms app deploy"
           ],

@@ -631,8 +631,8 @@ html[data-theme="dark"] {
 <li><strong>Cart Abandonment Recovery Conversion Metrics</strong> — 6 synthetic records <a class="button" href="studio/data/conversion-metrics.csv" download="conversion-metrics.csv">Download conversion-metrics.csv</a></li></ul>
         <p><a class="button" href="studio/data/schema.json" download="schema.json">Download data schema</a></p>
         <h3>Copilot Studio agent</h3>
-        <p><strong>Easy:</strong> Cart Abandon Recovery Studio<br>
-        <strong>Manual:</strong> Cart Abandon R Studio Manual<br>
+        <p><strong>Easy:</strong> Cart Abandonment Studio<br>
+        <strong>Manual:</strong> Cart Abandonment Manual<br>
         <strong>Model:</strong> Sonnet 4.6</p>
         <p><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download agent instructions</a></p>
         <details><summary>Skills (4)</summary><ul><li><a class="button" href="studio/agent/skills/abandonment-analysis/SKILL.md" download="SKILL.md">anonymous-cart-abandonment-analysis</a></li>
@@ -646,7 +646,7 @@ html[data-theme="dark"] {
 <li>Get conversion metric records — SharePoint Get items: Cart Abandonment Recovery Conversion Metrics</li></ul></details>
         <h3>Managed app: Cart Abandonment Recovery Workspace</h3>
         <p><strong>Easy:</strong> Cart Abandonment Recovery Workspace<br>
-        <strong>Manual:</strong> Cart Abandonment Recovery Workspace Manual</p>
+        <strong>Manual:</strong> Cart Abandonment Workspace Manual</p>
         <ul><li><strong>Abandoned Carts</strong> — Cart Abandonment Recovery Abandoned Carts</li>
 <li><strong>Recovery Campaigns</strong> — Cart Abandonment Recovery Recovery Campaigns</li>
 <li><strong>Incentive Options</strong> — Cart Abandonment Recovery Incentive Options</li>
@@ -738,7 +738,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/cart-abandonment-recovery/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Open Cart Abandon Recovery Studio and review its inventory.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Open Cart Abandonment Studio and review its inventory.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.</p></div>
           </div>
           
@@ -1009,7 +1009,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/cart-abandonment-recovery/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Rename it Cart Abandon R Studio Manual. (Agent names can be at most 30 characters.)</p></div>
+            <div class="instruction"><strong>Action</strong><p>Rename it Cart Abandonment Manual. (Agent names can be at most 30 characters.)</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The name shows at the top of the Build page.</p></div>
           </div>
           
@@ -1390,7 +1390,7 @@ html[data-theme="dark"] {
             <div class="instruction expected"><strong>Expected result</strong><p>ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.</p></div>
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-24-command-1">cd cart-abandonment-recovery-app/managed-app</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-24-command-2">ms app init --display-name &quot;Cart Abandonment Recovery Workspace Manual&quot; --repo native</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-24-command-2">ms app init --display-name &quot;Cart Abandonment Workspace Manual&quot; --repo native</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-24-command-3">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Cart Abandonment Recovery Abandoned Carts&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 4</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-4" aria-label="Copy command 4">Copy</button></div><pre><code id="manual-24-command-4">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Cart Abandonment Recovery Recovery Campaigns&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 5</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-5" aria-label="Copy command 5">Copy</button></div><pre><code id="manual-24-command-5">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Cart Abandonment Recovery Incentive Options&quot; --use-sso</code></pre></div>

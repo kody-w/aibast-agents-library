@@ -631,8 +631,8 @@ html[data-theme="dark"] {
 <li><strong>Customer Sentiment and Churn Prediction Segment Benchmarks</strong> — 4 synthetic records <a class="button" href="studio/data/segment-benchmarks.csv" download="segment-benchmarks.csv">Download segment-benchmarks.csv</a></li></ul>
         <p><a class="button" href="studio/data/schema.json" download="schema.json">Download data schema</a></p>
         <h3>Copilot Studio agent</h3>
-        <p><strong>Easy:</strong> Cust Sentiment Churn P Studio<br>
-        <strong>Manual:</strong> Cust S C P Studio Manual<br>
+        <p><strong>Easy:</strong> Customer Sentiment Studio<br>
+        <strong>Manual:</strong> Customer Sentiment Manual<br>
         <strong>Model:</strong> Sonnet 4.6</p>
         <p><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download agent instructions</a></p>
         <details><summary>Skills (4)</summary><ul><li><a class="button" href="studio/agent/skills/aibast_churn-prediction_02/SKILL.md" download="SKILL.md">churn-prediction</a></li>
@@ -644,9 +644,9 @@ html[data-theme="dark"] {
 <li>Get churn indicator records — SharePoint Get items: Customer Sentiment and Churn Prediction Churn Indicators</li>
 <li>Get retention action records — SharePoint Get items: Customer Sentiment and Churn Prediction Retention Actions</li>
 <li>Get segment benchmark records — SharePoint Get items: Customer Sentiment and Churn Prediction Segment Benchmarks</li></ul></details>
-        <h3>Managed app: Customer Sentiment and Churn Prediction Workspace</h3>
-        <p><strong>Easy:</strong> Customer Sentiment and Churn Prediction Workspace<br>
-        <strong>Manual:</strong> Customer Sentiment and Churn Prediction Workspace Manual</p>
+        <h3>Managed app: Customer Sentiment and Churn Workspace</h3>
+        <p><strong>Easy:</strong> Customer Sentiment and Churn Workspace<br>
+        <strong>Manual:</strong> Customer Sentiment Workspace Manual</p>
         <ul><li><strong>Customer Interactions</strong> — Cust Sentiment Churn Pred Customer Interactions</li>
 <li><strong>Churn Indicators</strong> — Customer Sentiment and Churn Prediction Churn Indicators</li>
 <li><strong>Retention Actions</strong> — Customer Sentiment and Churn Prediction Retention Actions</li>
@@ -738,7 +738,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/customer-sentiment-churn/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Open Cust Sentiment Churn P Studio and review its inventory.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Open Customer Sentiment Studio and review its inventory.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.</p></div>
           </div>
           
@@ -1009,7 +1009,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/customer-sentiment-churn/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Rename it Cust S C P Studio Manual. (Agent names can be at most 30 characters.)</p></div>
+            <div class="instruction"><strong>Action</strong><p>Rename it Customer Sentiment Manual. (Agent names can be at most 30 characters.)</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The name shows at the top of the Build page.</p></div>
           </div>
           
@@ -1390,7 +1390,7 @@ html[data-theme="dark"] {
             <div class="instruction expected"><strong>Expected result</strong><p>ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.</p></div>
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-24-command-1">cd customer-sentiment-churn-app/managed-app</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-24-command-2">ms app init --display-name &quot;Customer Sentiment and Churn Prediction Workspace Manual&quot; --repo native</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-24-command-2">ms app init --display-name &quot;Customer Sentiment Workspace Manual&quot; --repo native</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-24-command-3">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Cust Sentiment Churn Pred Customer Interactions&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 4</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-4" aria-label="Copy command 4">Copy</button></div><pre><code id="manual-24-command-4">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Customer Sentiment and Churn Prediction Churn Indicators&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 5</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-5" aria-label="Copy command 5">Copy</button></div><pre><code id="manual-24-command-5">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Customer Sentiment and Churn Prediction Retention Actions&quot; --use-sso</code></pre></div>
@@ -1418,7 +1418,7 @@ html[data-theme="dark"] {
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-25-command-1">npm install</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-25-command-2">npm run build</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-25-command-3">git add -A &amp;&amp; git commit -m &quot;Customer Sentiment and Churn Prediction Workspace&quot;</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-25-command-3">git add -A &amp;&amp; git commit -m &quot;Customer Sentiment and Churn Workspace&quot;</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 4</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-4" aria-label="Copy command 4">Copy</button></div><pre><code id="manual-25-command-4">git push -u origin HEAD:main</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 5</strong><button class="button copy-button" type="button" data-copy-target="manual-25-command-5" aria-label="Copy command 5">Copy</button></div><pre><code id="manual-25-command-5">ms app deploy</code></pre></div>
           

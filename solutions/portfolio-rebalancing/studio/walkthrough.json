@@ -13,7 +13,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Portfolio Rebalancing Studio",
-      "manual": "Portfolio Rebal Studio Manual"
+      "manual": "Portfolio Rebalancing Manual"
     }
   },
   "app": {
@@ -213,7 +213,7 @@
         {
           "id": "manual-05",
           "title": "Name the agent",
-          "action": "Rename it Portfolio Rebal Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Portfolio Rebalancing Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/05-name.webp",

@@ -14,7 +14,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Regulatory Compliance Studio",
-      "manual": "Reg Compliance Studio Manual"
+      "manual": "Regulatory Compliance Manual"
     }
   },
   "app": {
@@ -215,7 +215,7 @@
         {
           "id": "manual-06",
           "title": "Name the agent",
-          "action": "Rename it Reg Compliance Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Regulatory Compliance Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/06-name.webp",

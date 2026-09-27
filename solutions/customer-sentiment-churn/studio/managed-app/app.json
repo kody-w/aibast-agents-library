@@ -1,6 +1,6 @@
 {
   "kind": "scenario-workspace",
-  "name": "Customer Sentiment and Churn Prediction Workspace",
+  "name": "Customer Sentiment and Churn Workspace",
   "title": "Customer Sentiment and Churn Prediction",
   "description": "The Customer Sentiment and Churn Prediction workshop's synthetic records, read from its SharePoint lists.",
   "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",

@@ -13,7 +13,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Field Service Dispatch Studio",
-      "manual": "Field Service D Studio Manual"
+      "manual": "Field Service Dispatch Manual"
     }
   },
   "app": {
@@ -202,7 +202,7 @@
         {
           "id": "manual-06",
           "title": "Name the agent",
-          "action": "Rename it Field Service D Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Field Service Dispatch Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/06-name.webp",

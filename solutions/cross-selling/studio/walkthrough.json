@@ -12,15 +12,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Cross Selling Opps Studio",
-      "manual": "Cross Selling O Studio Manual"
+      "easy": "Cross-Selling Studio",
+      "manual": "Cross-Selling Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
       "easy": "Cross-Selling Opportunities Workspace",
-      "manual": "Cross-Selling Opportunities Workspace Manual"
+      "manual": "Cross-Selling Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/cross-selling.json",
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Cross Selling Opps Studio and review its inventory.",
+          "action": "Open Cross-Selling Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -215,7 +215,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Cross Selling O Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Cross-Selling Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",
@@ -411,7 +411,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd cross-selling-app/managed-app",
-            "ms app init --display-name \"Cross-Selling Opportunities Workspace Manual\" --repo native",
+            "ms app init --display-name \"Cross-Selling Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cross Selling Opportunities Product Catalog\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cross Selling Opportunities Customer Ownership\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cross Selling Opportunities Affinity Rules\" --use-sso",

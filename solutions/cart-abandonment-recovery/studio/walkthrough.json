@@ -12,15 +12,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Cart Abandon Recovery Studio",
-      "manual": "Cart Abandon R Studio Manual"
+      "easy": "Cart Abandonment Studio",
+      "manual": "Cart Abandonment Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
       "easy": "Cart Abandonment Recovery Workspace",
-      "manual": "Cart Abandonment Recovery Workspace Manual"
+      "manual": "Cart Abandonment Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/cart-abandonment-recovery.json",
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Cart Abandon Recovery Studio and review its inventory.",
+          "action": "Open Cart Abandonment Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -215,7 +215,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Cart Abandon R Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Cart Abandonment Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",
@@ -411,7 +411,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd cart-abandonment-recovery-app/managed-app",
-            "ms app init --display-name \"Cart Abandonment Recovery Workspace Manual\" --repo native",
+            "ms app init --display-name \"Cart Abandonment Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cart Abandonment Recovery Abandoned Carts\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cart Abandonment Recovery Recovery Campaigns\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cart Abandonment Recovery Incentive Options\" --use-sso",

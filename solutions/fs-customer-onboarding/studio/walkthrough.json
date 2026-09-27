@@ -13,7 +13,7 @@
     "model": "Sonnet 4.6",
     "names": {
       "easy": "Customer Onboarding Studio",
-      "manual": "Cust Onboarding Studio Manual"
+      "manual": "Customer Onboarding Manual"
     }
   },
   "app": {
@@ -215,7 +215,7 @@
         {
           "id": "manual-07",
           "title": "Name the agent",
-          "action": "Rename it Cust Onboarding Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Customer Onboarding Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/07-name.webp",

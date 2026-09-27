@@ -625,8 +625,8 @@ html[data-theme="dark"] {
 <li><strong>Asset Maintenance Forecast Budget Rates</strong> — 3 synthetic records <a class="button" href="studio/data/budget-rates.csv" download="budget-rates.csv">Download budget-rates.csv</a></li></ul>
         <p><a class="button" href="studio/data/schema.json" download="schema.json">Download data schema</a></p>
         <h3>Copilot Studio agent</h3>
-        <p><strong>Easy:</strong> Asset Maint Fcst Studio<br>
-        <strong>Manual:</strong> Asset Maint Fcst Studio Manual<br>
+        <p><strong>Easy:</strong> Asset Maintenance Studio<br>
+        <strong>Manual:</strong> Asset Maintenance Manual<br>
         <strong>Model:</strong> Sonnet 4.6</p>
         <p><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download agent instructions</a></p>
         <details><summary>Skills (4)</summary><ul><li><a class="button" href="studio/agent/skills/aibast_asset-health/SKILL.md" download="SKILL.md">asset-maintenance-forecast-asset-health</a></li>
@@ -638,7 +638,7 @@ html[data-theme="dark"] {
 <li>Get budget rate records — SharePoint Get items: Asset Maintenance Forecast Budget Rates</li></ul></details>
         <h3>Managed app: Asset Maintenance Forecast Workspace</h3>
         <p><strong>Easy:</strong> Asset Maintenance Forecast Workspace<br>
-        <strong>Manual:</strong> Asset Maintenance Forecast Workspace Manual</p>
+        <strong>Manual:</strong> Asset Maintenance Workspace Manual</p>
         <ul><li><strong>Assets</strong> — Asset Maintenance Forecast Assets</li>
 <li><strong>Budget Rates</strong> — Asset Maintenance Forecast Budget Rates</li></ul>
         <p><a class="button" href="studio/managed-app/app.json" download="app.json">Download managed app spec</a></p>
@@ -728,7 +728,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/asset-maintenance-forecast/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Open Asset Maint Fcst Studio and review its inventory.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Open Asset Maintenance Studio and review its inventory.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The studio instructions, 4 skills, 1 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.</p></div>
           </div>
           
@@ -955,7 +955,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/asset-maintenance-forecast/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Rename it Asset Maint Fcst Studio Manual. (Agent names can be at most 30 characters.)</p></div>
+            <div class="instruction"><strong>Action</strong><p>Rename it Asset Maintenance Manual. (Agent names can be at most 30 characters.)</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The name shows at the top of the Build page.</p></div>
           </div>
           
@@ -1292,7 +1292,7 @@ html[data-theme="dark"] {
             <div class="instruction expected"><strong>Expected result</strong><p>ms.config.json lists one SharePoint connection with the 2 tables, and generated/services has a service for each list.</p></div>
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-20-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-20-command-1">cd asset-maintenance-forecast-app/managed-app</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-20-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-20-command-2">ms app init --display-name &quot;Asset Maintenance Forecast Workspace Manual&quot; --repo native</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-20-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-20-command-2">ms app init --display-name &quot;Asset Maintenance Workspace Manual&quot; --repo native</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-20-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-20-command-3">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Asset Maintenance Forecast Assets&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 4</strong><button class="button copy-button" type="button" data-copy-target="manual-20-command-4" aria-label="Copy command 4">Copy</button></div><pre><code id="manual-20-command-4">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Asset Maintenance Forecast Budget Rates&quot; --use-sso</code></pre></div>
           

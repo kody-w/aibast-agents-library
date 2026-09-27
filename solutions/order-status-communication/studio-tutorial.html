@@ -631,8 +631,8 @@ html[data-theme="dark"] {
 <li><strong>Order Status Communications Customer Contacts</strong> — 4 synthetic records <a class="button" href="studio/data/customer-contacts.csv" download="customer-contacts.csv">Download customer-contacts.csv</a></li></ul>
         <p><a class="button" href="studio/data/schema.json" download="schema.json">Download data schema</a></p>
         <h3>Copilot Studio agent</h3>
-        <p><strong>Easy:</strong> Order Status Comms Studio<br>
-        <strong>Manual:</strong> Order Status C Studio Manual<br>
+        <p><strong>Easy:</strong> Order Status Studio<br>
+        <strong>Manual:</strong> Order Status Manual<br>
         <strong>Model:</strong> Sonnet 4.6</p>
         <p><a class="button" href="studio/agent/GLOBAL-INSTRUCTIONS.md" download="GLOBAL-INSTRUCTIONS.md">Download agent instructions</a></p>
         <details><summary>Skills (4)</summary><ul><li><a class="button" href="studio/agent/skills/aibast_customer_update/SKILL.md" download="SKILL.md">customer-update</a></li>
@@ -646,7 +646,7 @@ html[data-theme="dark"] {
 <li>Get customer contact records — SharePoint Get items: Order Status Communications Customer Contacts</li></ul></details>
         <h3>Managed app: Order Status Communications Workspace</h3>
         <p><strong>Easy:</strong> Order Status Communications Workspace<br>
-        <strong>Manual:</strong> Order Status Communications Workspace Manual</p>
+        <strong>Manual:</strong> Order Status Workspace Manual</p>
         <ul><li><strong>Orders</strong> — Order Status Communications Orders</li>
 <li><strong>Shipments</strong> — Order Status Communications Shipments</li>
 <li><strong>Delay Reasons</strong> — Order Status Communications Delay Reasons</li>
@@ -738,7 +738,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/order-status-communication/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Open Order Status Comms Studio and review its inventory.</p></div>
+            <div class="instruction"><strong>Action</strong><p>Open Order Status Studio and review its inventory.</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.</p></div>
           </div>
           
@@ -1009,7 +1009,7 @@ html[data-theme="dark"] {
             data-report-evidence="solutions/order-status-communication/studio/walkthrough.json">Report an issue</button></header>
         <div class="step-body">
           <div class="instruction-grid">
-            <div class="instruction"><strong>Action</strong><p>Rename it Order Status C Studio Manual. (Agent names can be at most 30 characters.)</p></div>
+            <div class="instruction"><strong>Action</strong><p>Rename it Order Status Manual. (Agent names can be at most 30 characters.)</p></div>
             <div class="instruction expected"><strong>Expected result</strong><p>The name shows at the top of the Build page.</p></div>
           </div>
           
@@ -1390,7 +1390,7 @@ html[data-theme="dark"] {
             <div class="instruction expected"><strong>Expected result</strong><p>ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.</p></div>
           </div>
           <div class="copy-block"><div class="instruction-heading"><strong>Command 1</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-1" aria-label="Copy command 1">Copy</button></div><pre><code id="manual-24-command-1">cd order-status-communication-app/managed-app</code></pre></div>
-<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-24-command-2">ms app init --display-name &quot;Order Status Communications Workspace Manual&quot; --repo native</code></pre></div>
+<div class="copy-block"><div class="instruction-heading"><strong>Command 2</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-2" aria-label="Copy command 2">Copy</button></div><pre><code id="manual-24-command-2">ms app init --display-name &quot;Order Status Workspace Manual&quot; --repo native</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 3</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-3" aria-label="Copy command 3">Copy</button></div><pre><code id="manual-24-command-3">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Order Status Communications Orders&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 4</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-4" aria-label="Copy command 4">Copy</button></div><pre><code id="manual-24-command-4">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Order Status Communications Shipments&quot; --use-sso</code></pre></div>
 <div class="copy-block"><div class="instruction-heading"><strong>Command 5</strong><button class="button copy-button" type="button" data-copy-target="manual-24-command-5" aria-label="Copy command 5">Copy</button></div><pre><code id="manual-24-command-5">ms app add data-source --connector sharepointonline --as table --dataset &lt;your-site&gt; --table &quot;Order Status Communications Delay Reasons&quot; --use-sso</code></pre></div>

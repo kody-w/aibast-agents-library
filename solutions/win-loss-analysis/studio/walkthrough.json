@@ -12,8 +12,8 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Win Loss Analysis Studio",
-      "manual": "Win Loss A Studio Manual"
+      "easy": "Win/Loss Analysis Studio",
+      "manual": "Win/Loss Analysis Manual"
     }
   },
   "app": {
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Win Loss Analysis Studio and review its inventory.",
+          "action": "Open Win/Loss Analysis Studio and review its inventory.",
           "expected": "The studio instructions, 6 skills, 1 rules knowledge file(s) and 5 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -252,7 +252,7 @@
         {
           "id": "manual-08",
           "title": "Name the agent",
-          "action": "Rename it Win Loss A Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Win/Loss Analysis Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/08-name.webp",

@@ -12,15 +12,15 @@
     ],
     "model": "Sonnet 4.6",
     "names": {
-      "easy": "Asset Maint Fcst Studio",
-      "manual": "Asset Maint Fcst Studio Manual"
+      "easy": "Asset Maintenance Studio",
+      "manual": "Asset Maintenance Manual"
     }
   },
   "app": {
     "spec": "studio/managed-app/app.json",
     "names": {
       "easy": "Asset Maintenance Forecast Workspace",
-      "manual": "Asset Maintenance Forecast Workspace Manual"
+      "manual": "Asset Maintenance Workspace Manual"
     }
   },
   "cases": "tests/demo_cases/asset-maintenance-forecast.json",
@@ -70,7 +70,7 @@
         {
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
-          "action": "Open Asset Maint Fcst Studio and review its inventory.",
+          "action": "Open Asset Maintenance Studio and review its inventory.",
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
@@ -189,7 +189,7 @@
         {
           "id": "manual-05",
           "title": "Name the agent",
-          "action": "Rename it Asset Maint Fcst Studio Manual. (Agent names can be at most 30 characters.)",
+          "action": "Rename it Asset Maintenance Manual. (Agent names can be at most 30 characters.)",
           "expected": "The name shows at the top of the Build page.",
           "screenshot": {
             "file": "screenshots/studio-manual/05-name.webp",
@@ -365,7 +365,7 @@
           "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
           "commands": [
             "cd asset-maintenance-forecast-app/managed-app",
-            "ms app init --display-name \"Asset Maintenance Forecast Workspace Manual\" --repo native",
+            "ms app init --display-name \"Asset Maintenance Workspace Manual\" --repo native",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Asset Maintenance Forecast Assets\" --use-sso",
             "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Asset Maintenance Forecast Budget Rates\" --use-sso"
           ],
