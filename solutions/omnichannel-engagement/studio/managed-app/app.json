@@ -1,0 +1,183 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Omnichannel Engagement Workspace",
+  "title": "Omnichannel Engagement",
+  "description": "The Omnichannel Engagement workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "channels",
+      "list": "Omnichannel Engagement Channels",
+      "title": "Channels",
+      "key": "ChannelId",
+      "fields": {
+        "ChannelId": "field_1",
+        "Sessions30D": "field_2",
+        "Conversions30D": "field_3",
+        "Revenue30D": "field_4",
+        "Cost30D": "field_5",
+        "AvgOrderValue": "field_6",
+        "BounceRate": "field_7"
+      },
+      "columns": [
+        "ChannelId",
+        "Title",
+        "Sessions30D",
+        "Conversions30D",
+        "Revenue30D",
+        "Cost30D",
+        "AvgOrderValue",
+        "BounceRate"
+      ],
+      "labels": {
+        "Title": "Channel",
+        "ChannelId": "Channel ID",
+        "Sessions30D": "Sessions 30 D",
+        "Conversions30D": "Conversions 30 D",
+        "Revenue30D": "Revenue 30 D",
+        "Cost30D": "Cost 30 D",
+        "AvgOrderValue": "Avg Order Value",
+        "BounceRate": "Bounce Rate"
+      },
+      "formats": {
+        "Title": "text",
+        "ChannelId": "text",
+        "Sessions30D": "integer",
+        "Conversions30D": "integer",
+        "Revenue30D": "currency",
+        "Cost30D": "currency",
+        "AvgOrderValue": "currency",
+        "BounceRate": "number"
+      },
+      "metrics": [
+        {
+          "label": "Channels",
+          "op": "count"
+        },
+        {
+          "label": "Revenue 30 D",
+          "op": "sum",
+          "column": "Revenue30D"
+        },
+        {
+          "label": "Cost 30 D",
+          "op": "sum",
+          "column": "Cost30D"
+        }
+      ],
+      "sortBy": "ChannelId"
+    },
+    {
+      "id": "customer-journeys",
+      "list": "Omnichannel Engagement Customer Journeys",
+      "title": "Customer Journeys",
+      "key": "CustomerJourneyId",
+      "fields": {
+        "CustomerJourneyId": "field_1",
+        "Touchpoints": "field_2",
+        "AvgDays": "field_3",
+        "ConversionRate": "field_4",
+        "AvgTouchpoints": "field_5"
+      },
+      "columns": [
+        "CustomerJourneyId",
+        "Title",
+        "Touchpoints",
+        "AvgDays",
+        "ConversionRate",
+        "AvgTouchpoints"
+      ],
+      "labels": {
+        "Title": "Customer Journey",
+        "CustomerJourneyId": "Customer Journey ID",
+        "Touchpoints": "Touchpoints",
+        "AvgDays": "Avg Days",
+        "ConversionRate": "Conversion Rate",
+        "AvgTouchpoints": "Avg Touchpoints"
+      },
+      "formats": {
+        "Title": "text",
+        "CustomerJourneyId": "text",
+        "Touchpoints": "text",
+        "AvgDays": "integer",
+        "ConversionRate": "number",
+        "AvgTouchpoints": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Customer Journeys",
+          "op": "count"
+        }
+      ],
+      "sortBy": "CustomerJourneyId"
+    },
+    {
+      "id": "campaign-results",
+      "list": "Omnichannel Engagement Campaign Results",
+      "title": "Campaign Results",
+      "key": "CampaignResultId",
+      "fields": {
+        "CampaignResultId": "field_1",
+        "Channel": "field_2",
+        "Sent": "field_3",
+        "Opens": "field_4",
+        "Clicks": "field_5",
+        "Conversions": "field_6",
+        "Revenue": "field_7",
+        "Cost": "field_8"
+      },
+      "columns": [
+        "CampaignResultId",
+        "Title",
+        "Channel",
+        "Sent",
+        "Opens",
+        "Clicks",
+        "Conversions",
+        "Revenue",
+        "Cost"
+      ],
+      "labels": {
+        "Title": "Campaign Result",
+        "CampaignResultId": "Campaign Result ID",
+        "Channel": "Channel",
+        "Sent": "Sent",
+        "Opens": "Opens",
+        "Clicks": "Clicks",
+        "Conversions": "Conversions",
+        "Revenue": "Revenue",
+        "Cost": "Cost"
+      },
+      "formats": {
+        "Title": "text",
+        "CampaignResultId": "text",
+        "Channel": "text",
+        "Sent": "integer",
+        "Opens": "integer",
+        "Clicks": "integer",
+        "Conversions": "integer",
+        "Revenue": "currency",
+        "Cost": "currency"
+      },
+      "metrics": [
+        {
+          "label": "Campaign Results",
+          "op": "count"
+        },
+        {
+          "label": "Revenue",
+          "op": "sum",
+          "column": "Revenue"
+        },
+        {
+          "label": "Cost",
+          "op": "sum",
+          "column": "Cost"
+        }
+      ],
+      "groupBy": "Channel",
+      "sortBy": "CampaignResultId"
+    }
+  ]
+}

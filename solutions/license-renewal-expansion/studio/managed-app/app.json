@@ -1,0 +1,163 @@
+{
+  "kind": "scenario-workspace",
+  "name": "License Renewal and Expansion Workspace",
+  "title": "License Renewal and Expansion",
+  "description": "The License Renewal and Expansion workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "license-agreements",
+      "list": "License Renewal and Expansion License Agreements",
+      "title": "License Agreements",
+      "key": "LicenseAgreementId",
+      "fields": {
+        "LicenseAgreementId": "field_1",
+        "Plan": "field_2",
+        "Arr": "field_3",
+        "Seats": "field_4",
+        "SeatsUsed": "field_5",
+        "RenewalDate": "field_6",
+        "ContractStart": "field_7",
+        "UsageTrend": "field_8",
+        "NPSScore": "field_9",
+        "SupportTickets90D": "field_10",
+        "ExpansionSignals": "field_11",
+        "ChurnSignals": "field_12",
+        "Csm": "field_13",
+        "HealthScore": "field_14"
+      },
+      "columns": [
+        "LicenseAgreementId",
+        "Title",
+        "Plan",
+        "Arr",
+        "Seats",
+        "SeatsUsed",
+        "RenewalDate",
+        "ContractStart",
+        "UsageTrend",
+        "NPSScore"
+      ],
+      "labels": {
+        "Title": "License Agreement",
+        "LicenseAgreementId": "License Agreement ID",
+        "Plan": "Plan",
+        "Arr": "Arr",
+        "Seats": "Seats",
+        "SeatsUsed": "Seats Used",
+        "RenewalDate": "Renewal Date",
+        "ContractStart": "Contract Start",
+        "UsageTrend": "Usage Trend",
+        "NPSScore": "NPS Score",
+        "SupportTickets90D": "Support Tickets 90 D",
+        "ExpansionSignals": "Expansion Signals",
+        "ChurnSignals": "Churn Signals",
+        "Csm": "Csm",
+        "HealthScore": "Health Score"
+      },
+      "formats": {
+        "Title": "text",
+        "LicenseAgreementId": "text",
+        "Plan": "text",
+        "Arr": "integer",
+        "Seats": "integer",
+        "SeatsUsed": "integer",
+        "RenewalDate": "text",
+        "ContractStart": "text",
+        "UsageTrend": "text",
+        "NPSScore": "integer",
+        "SupportTickets90D": "integer",
+        "ExpansionSignals": "text",
+        "ChurnSignals": "text",
+        "Csm": "text",
+        "HealthScore": "integer"
+      },
+      "metrics": [
+        {
+          "label": "License Agreements",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Plan",
+      "sortBy": "LicenseAgreementId"
+    },
+    {
+      "id": "expansion-pricing",
+      "list": "License Renewal and Expansion Expansion Pricing",
+      "title": "Expansion Pricing",
+      "key": "ExpansionPricingId",
+      "fields": {
+        "ExpansionPricingId": "field_1",
+        "UnitPrice": "field_2",
+        "MinQty": "field_3",
+        "Price": "field_4",
+        "Description": "field_5"
+      },
+      "columns": [
+        "ExpansionPricingId",
+        "Title",
+        "UnitPrice",
+        "MinQty",
+        "Price",
+        "Description"
+      ],
+      "labels": {
+        "Title": "Expansion Pricing",
+        "ExpansionPricingId": "Expansion Pricing ID",
+        "UnitPrice": "Unit Price",
+        "MinQty": "Min Qty",
+        "Price": "Price",
+        "Description": "Description"
+      },
+      "formats": {
+        "Title": "text",
+        "ExpansionPricingId": "text",
+        "UnitPrice": "currency",
+        "MinQty": "integer",
+        "Price": "currency",
+        "Description": "text"
+      },
+      "metrics": [
+        {
+          "label": "Expansion Pricing",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Description",
+      "sortBy": "ExpansionPricingId"
+    },
+    {
+      "id": "switching-cost-assumptions",
+      "list": "License Renewal and Expansion Switching Cost Assumptions",
+      "title": "Switching Cost Assumptions",
+      "key": "SwitchingCostAssumptionId",
+      "fields": {
+        "SwitchingCostAssumptionId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "SwitchingCostAssumptionId",
+        "Title",
+        "Value"
+      ],
+      "labels": {
+        "Title": "Switching Cost Assumption",
+        "SwitchingCostAssumptionId": "Switching Cost Assumption ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "SwitchingCostAssumptionId": "text",
+        "Value": "currency"
+      },
+      "metrics": [
+        {
+          "label": "Switching Cost Assumptions",
+          "op": "count"
+        }
+      ],
+      "sortBy": "SwitchingCostAssumptionId"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+Title,DocumentRequirementId,Value
+income,income,W-2 forms (last 2 years); Pay stubs (last 30 days); Tax returns (last 2 years); Employment verification letter
+assets,assets,Bank statements (last 2 months); Investment account statements; Gift letter (if applicable)
+property,property,Purchase agreement; Appraisal report; Title search; Homeowners insurance quote
+identity,identity,Government-issued photo ID; Social Security verification
+fha_specific,fha_specific,FHA case number assignment; HUD-1 settlement statement
+va_specific,va_specific,Certificate of Eligibility (COE); DD-214 or active duty proof
+commercial_specific,commercial_specific,Business tax returns (3 years); Profit & loss statement; Rent roll; Environmental Phase I

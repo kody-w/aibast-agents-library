@@ -31,6 +31,7 @@ replenishes, allocates, promises, or purchases inventory.
 | Copilot-only Easy-mode comparison | `solutions/inventory-visibility/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/inventory-visibility/quest.html` |
 | Literal browser tutorial | `solutions/inventory-visibility/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/inventory-visibility/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/inventory-visibility/export-manifest.json` |
 | Source bundle | `solutions/inventory-visibility/exports/inventory-visibility-source.zip` |
 | Manual evidence | `solutions/inventory-visibility/evals/manual-build-evidence.json` |

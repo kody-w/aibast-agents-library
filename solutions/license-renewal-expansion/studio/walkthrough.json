@@ -1,0 +1,432 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "license-renewal-expansion",
+  "title": "License Renewal and Expansion, built with brainfreeze studio",
+  "summary": "The License Renewal and Expansion agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_license-renewal-expansion-operating-rules.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "License Renewal E Studio",
+      "manual": "License R E Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "License Renewal and Expansion Workspace",
+      "manual": "License Renewal and Expansion Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/license-renewal-expansion.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast license-renewal-expansion --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 3 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the License Renewal and Expansion License Agreements list.",
+          "expected": "5 fictional records, including Pinnacle Insurance Corp (LicenseAgreementId LIC-3001), with Plan Enterprise.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open License Renewal E Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Sales Leadership",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LRE-01",
+          "prompt": "Review the bundled synthetic renewal pipeline, risk bands, and preparation checklist without changing CRM or forecast records.",
+          "expected": "The relevant list tool ran. Required evidence: Renewal Pipeline; Draft Renewal Preparation Checklist; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-lre-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Account Executive",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LRE-02",
+          "prompt": "Identify synthetic demand signals and draft packaging options that still require authorized pricing review.",
+          "expected": "The relevant list tool ran. Required evidence: Expansion Opportunities; Draft Packaging Options; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-lre-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Customer Success Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LRE-03",
+          "prompt": "Which synthetic accounts show churn or competitor risk, and what switching-cost assumptions require validation?",
+          "expected": "The relevant list tool ran. Required evidence: Churn Risk Assessment; Synthetic Switching-Cost Review; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-lre-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Sales Leadership",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LRE-04",
+          "prompt": "Compare the bundled synthetic renewal, expansion, and churn scenarios without making revenue commitments.",
+          "expected": "The relevant list tool ran. Required evidence: Synthetic Revenue Scenario; Illustrative midpoint assumption; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-lre-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "License Renewal and Expansion: 3 read-only tabs from the same lists. 5 fictional records, including Pinnacle Insurance Corp (LicenseAgreementId LIC-3001), with Plan Enterprise.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create License Renewal and Expansion License Agreements from its CSV",
+          "action": "On the site: New, List, From CSV. Upload license-agreements.csv. On Customize, keep Title mapped to the Title column. Set LicenseAgreementId, Plan, RenewalDate, ContractStart, UsageTrend, ExpansionSignals, ChurnSignals, Csm to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Arr, Seats, SeatsUsed, NPSScore, SupportTickets90D, HealthScore as Number. Name the list License Renewal and Expansion License Agreements. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/license-agreements.csv"
+          ],
+          "expected": "5 fictional records, including Pinnacle Insurance Corp (LicenseAgreementId LIC-3001), with Plan Enterprise.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-license-agreements.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create License Renewal and Expansion Expansion Pricing from its CSV",
+          "action": "On the site: New, List, From CSV. Upload expansion-pricing.csv. On Customize, keep Title mapped to the Title column. Set ExpansionPricingId, Description to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep UnitPrice, MinQty, Price as Number. Name the list License Renewal and Expansion Expansion Pricing. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/expansion-pricing.csv"
+          ],
+          "expected": "5 fictional records, including additional_seats (ExpansionPricingId additional_seats), with UnitPrice 120.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-expansion-pricing.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create License Renewal and Expansion Switching Cost Assumptions from its CSV",
+          "action": "On the site: New, List, From CSV. Upload switching-cost-assumptions.csv. On Customize, keep Title mapped to the Title column. Set SwitchingCostAssumptionId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value as Number. Name the list License Renewal and Expansion Switching Cost Assumptions. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/switching-cost-assumptions.csv"
+          ],
+          "expected": "4 fictional records, including data_migration (SwitchingCostAssumptionId data_migration), with Value 45000.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-switching-cost-assumptions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Name the agent",
+          "action": "Rename it License R E Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 3 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_license-renewal-expansion-operating-rules.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_license-renewal-expansion-operating-rules.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the license agreements tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to License Renewal and Expansion License Agreements; name the tool Get license agreement records.",
+          "expected": "Get license agreement records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-tool-license-agreements.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the expansion pricing tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to License Renewal and Expansion Expansion Pricing; name the tool Get expansion pricing records.",
+          "expected": "Get expansion pricing records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-expansion-pricing.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the switching cost assumptions tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to License Renewal and Expansion Switching Cost Assumptions; name the tool Get switching cost assumption records.",
+          "expected": "Get switching cost assumption records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-switching-cost-assumptions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/churn-risk/SKILL.md",
+            "studio/agent/skills/expansion-opportunities/SKILL.md",
+            "studio/agent/skills/renewal-pipeline/SKILL.md",
+            "studio/agent/skills/revenue-impact/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 3 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 3 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Test: Sales Leadership",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LRE-01",
+          "prompt": "Review the bundled synthetic renewal pipeline, risk bands, and preparation checklist without changing CRM or forecast records.",
+          "expected": "The relevant list tool ran. Required evidence: Renewal Pipeline; Draft Renewal Preparation Checklist; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-lre-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Test: Account Executive",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LRE-02",
+          "prompt": "Identify synthetic demand signals and draft packaging options that still require authorized pricing review.",
+          "expected": "The relevant list tool ran. Required evidence: Expansion Opportunities; Draft Packaging Options; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-lre-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Customer Success Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LRE-03",
+          "prompt": "Which synthetic accounts show churn or competitor risk, and what switching-cost assumptions require validation?",
+          "expected": "The relevant list tool ran. Required evidence: Churn Risk Assessment; Synthetic Switching-Cost Review; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-lre-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Sales Leadership",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LRE-04",
+          "prompt": "Compare the bundled synthetic renewal, expansion, and churn scenarios without making revenue commitments.",
+          "expected": "The relevant list tool ran. Required evidence: Synthetic Revenue Scenario; Illustrative midpoint assumption; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-lre-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/license-renewal-expansion/studio/managed-app/app.json --out license-renewal-expansion-app"
+          ],
+          "expected": "license-renewal-expansion-app/managed-app holds a React + Vite managed app whose config names your site and the 3 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd license-renewal-expansion-app/managed-app",
+            "ms app init --display-name \"License Renewal and Expansion Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"License Renewal and Expansion License Agreements\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"License Renewal and Expansion Expansion Pricing\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"License Renewal and Expansion Switching Cost Assumptions\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 3 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"License Renewal and Expansion Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the License Renewal and Expansion License Agreements tab.",
+          "expected": "The app and the agent read the same synthetic records. 5 fictional records, including Pinnacle Insurance Corp (LicenseAgreementId LIC-3001), with Plan Enterprise.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

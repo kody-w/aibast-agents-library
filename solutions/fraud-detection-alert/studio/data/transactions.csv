@@ -1,0 +1,8 @@
+Title,TransactionId,Account,Cardholder,Amount,Merchant,Category,Country,Timestamp,Channel,RiskScore
+TXN-90001,TXN-90001,4532-XXXX-8891,James Peterson,4850.0,ElectroMax Dubai,electronics,AE,2025-03-05T02:15:00,card_present,88
+TXN-90002,TXN-90002,4532-XXXX-8891,James Peterson,2100.0,Gold Souq Trading,jewelry,AE,2025-03-05T02:42:00,card_present,92
+TXN-90003,TXN-90003,4716-XXXX-3304,Lisa Wang,12500.0,CryptoSwap Exchange,crypto,US,2025-03-04T18:30:00,online,75
+TXN-90004,TXN-90004,4716-XXXX-3304,Lisa Wang,9800.0,CryptoSwap Exchange,crypto,US,2025-03-04T18:35:00,online,82
+TXN-90005,TXN-90005,5412-XXXX-6678,Robert Miles,189.99,Amazon.com,retail,US,2025-03-05T10:20:00,online,12
+TXN-90006,TXN-90006,5412-XXXX-6678,Robert Miles,3200.0,WireTransfer-NG,wire_transfer,NG,2025-03-05T11:05:00,online,95
+TXN-90007,TXN-90007,4024-XXXX-1190,Elena Vasquez,67.5,Whole Foods Market,grocery,US,2025-03-05T09:15:00,contactless,5

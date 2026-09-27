@@ -1,0 +1,456 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "fraud-detection-alert",
+  "title": "Fraud Detection and Alert, built with brainfreeze studio",
+  "summary": "The Fraud Detection and Alert agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_fraud-detection-alert-controls-and-review.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Fraud Detection Alert Studio",
+      "manual": "Fraud D A Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Fraud Detection and Alert Workspace",
+      "manual": "Fraud Detection and Alert Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/fraud-detection-alert.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast fraud-detection-alert --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Fraud Detection and Alert Transactions list.",
+          "expected": "7 fictional records, including TXN-90001 (TransactionId TXN-90001), with Account 4532-XXXX-8891.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Fraud Detection Alert Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Fraud Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FDA-01",
+          "prompt": "What is the most urgent alert in the overnight queue, and what evidence makes it urgent?",
+          "expected": "The relevant list tool ran. Required evidence: TXN-90006; Critical. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-fda-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Fraud Analyst",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FDA-02",
+          "prompt": "Show me the account activity behind the Dubai alert so I can investigate the sequence.",
+          "expected": "The relevant list tool ran. Required evidence: 4532-XXXX-8891; TXN-90002. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-fda-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: SIU Investigator",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FDA-03",
+          "prompt": "Which active case resembles a coordinated fraud pattern, and what makes that only a hypothesis?",
+          "expected": "The relevant list tool ran. Required evidence: INV-2025-301; Card Cloning. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-fda-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Risk Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FDA-04",
+          "prompt": "Prepare the critical wire case for SIU review and tell me what actions actually occurred.",
+          "expected": "The relevant list tool ran. Required evidence: INV-2025-302; no external action. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-fda-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Fraud Detection and Alert: 4 read-only tabs from the same lists. 7 fictional records, including TXN-90001 (TransactionId TXN-90001), with Account 4532-XXXX-8891.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Fraud Detection and Alert Transactions from its CSV",
+          "action": "On the site: New, List, From CSV. Upload transactions.csv. On Customize, keep Title mapped to the Title column. Set TransactionId, Account, Cardholder, Merchant, Category, Country, Timestamp, Channel to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Amount, RiskScore as Number. Name the list Fraud Detection and Alert Transactions. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/transactions.csv"
+          ],
+          "expected": "7 fictional records, including TXN-90001 (TransactionId TXN-90001), with Account 4532-XXXX-8891.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-transactions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Fraud Detection and Alert Alert Rules from its CSV",
+          "action": "On the site: New, List, From CSV. Upload alert-rules.csv. On Customize, keep Title mapped to the Title column. Set AlertRuleId, Description, Threshold, Severity to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Fraud Detection and Alert Alert Rules. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/alert-rules.csv"
+          ],
+          "expected": "6 fictional records, including Velocity Check (AlertRuleId RULE-001), with Description Multiple high-value transactions within 1 hour.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-alert-rules.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Fraud Detection and Alert Fraud Patterns from its CSV",
+          "action": "On the site: New, List, From CSV. Upload fraud-patterns.csv. On Customize, keep Title mapped to the Title column. Set FraudPatternId, Indicators, Frequency to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Fraud Detection and Alert Fraud Patterns. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/fraud-patterns.csv"
+          ],
+          "expected": "4 fictional records, including Physical card duplicated; used at multiple locations simultaneously (FraudPatternId card_cloning), with Frequency common.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-fraud-patterns.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Fraud Detection and Alert Investigation Cases from its CSV",
+          "action": "On the site: New, List, From CSV. Upload investigation-cases.csv. On Customize, keep Title mapped to the Title column. Set InvestigationCaseId, AlertTxns, RulesTriggered, Pattern, Status, Analyst, Opened, Priority, Notes to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Fraud Detection and Alert Investigation Cases. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/investigation-cases.csv"
+          ],
+          "expected": "3 fictional records, including INV-2025-301 (InvestigationCaseId INV-2025-301), with Pattern card_cloning.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-investigation-cases.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Fraud D A Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 4 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_fraud-detection-alert-controls-and-review.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_fraud-detection-alert-controls-and-review.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the transactions tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Fraud Detection and Alert Transactions; name the tool Get transaction records.",
+          "expected": "Get transaction records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-transactions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the alert rules tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Fraud Detection and Alert Alert Rules; name the tool Get alert rule records.",
+          "expected": "Get alert rule records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-alert-rules.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the fraud patterns tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Fraud Detection and Alert Fraud Patterns; name the tool Get fraud pattern records.",
+          "expected": "Get fraud pattern records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-fraud-patterns.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the investigation cases tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Fraud Detection and Alert Investigation Cases; name the tool Get investigation case records.",
+          "expected": "Get investigation case records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-investigation-cases.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_alert-triage_01/SKILL.md",
+            "studio/agent/skills/aibast_investigation-summary_04/SKILL.md",
+            "studio/agent/skills/aibast_pattern-detection_03/SKILL.md",
+            "studio/agent/skills/aibast_transaction-analysis_02/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Fraud Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FDA-01",
+          "prompt": "What is the most urgent alert in the overnight queue, and what evidence makes it urgent?",
+          "expected": "The relevant list tool ran. Required evidence: TXN-90006; Critical. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-fda-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Fraud Analyst",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FDA-02",
+          "prompt": "Show me the account activity behind the Dubai alert so I can investigate the sequence.",
+          "expected": "The relevant list tool ran. Required evidence: 4532-XXXX-8891; TXN-90002. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-fda-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: SIU Investigator",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FDA-03",
+          "prompt": "Which active case resembles a coordinated fraud pattern, and what makes that only a hypothesis?",
+          "expected": "The relevant list tool ran. Required evidence: INV-2025-301; Card Cloning. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-fda-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Risk Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FDA-04",
+          "prompt": "Prepare the critical wire case for SIU review and tell me what actions actually occurred.",
+          "expected": "The relevant list tool ran. Required evidence: INV-2025-302; no external action. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-fda-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/fraud-detection-alert/studio/managed-app/app.json --out fraud-detection-alert-app"
+          ],
+          "expected": "fraud-detection-alert-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd fraud-detection-alert-app/managed-app",
+            "ms app init --display-name \"Fraud Detection and Alert Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Fraud Detection and Alert Transactions\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Fraud Detection and Alert Alert Rules\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Fraud Detection and Alert Fraud Patterns\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Fraud Detection and Alert Investigation Cases\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Fraud Detection and Alert Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Fraud Detection and Alert Transactions tab.",
+          "expected": "The app and the agent read the same synthetic records. 7 fictional records, including TXN-90001 (TransactionId TXN-90001), with Account 4532-XXXX-8891.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

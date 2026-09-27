@@ -1,0 +1,94 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "personalized-marketing",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/retail_cpg_stacks/personalized_marketing_stack/personalized_marketing_agent.py",
+  "records_markdown": "solutions/personalized-marketing/manual/knowledge/aibast_personalized-marketing-synthetic-records.md",
+  "lists": [
+    {
+      "id": "customer-segments",
+      "title": "Personalized Marketing Customer Segments",
+      "description": "Synthetic customer segments (AIBAST Personalized Marketing workshop; fictional).",
+      "record_set": "CUSTOMER_SEGMENTS",
+      "columns": [
+        {"name": "Title", "label": "Customer Segment", "from": "name", "type": "text"},
+        {"name": "CustomerSegmentId", "label": "Customer Segment ID", "from": "$key", "type": "text"},
+        {"name": "Size", "label": "Size", "from": "size", "type": "number"},
+        {"name": "AvgAnnualSpend", "label": "Avg Annual Spend", "from": "avg_annual_spend", "type": "number"},
+        {"name": "AvgOrdersPerYear", "label": "Avg Orders Per Year", "from": "avg_orders_per_year", "type": "text"},
+        {"name": "AvgBasketSize", "label": "Avg Basket Size", "from": "avg_basket_size", "type": "number"},
+        {"name": "PreferredChannels", "label": "Preferred Channels", "from": "preferred_channels", "type": "text", "encoding": "joined"},
+        {"name": "TopCategories", "label": "Top Categories", "from": "top_categories", "type": "text", "encoding": "joined"},
+        {"name": "ChurnRisk", "label": "Churn Risk", "from": "churn_risk", "type": "number"},
+        {"name": "LifetimeValue", "label": "Lifetime Value", "from": "lifetime_value", "type": "number"},
+        {"name": "EngagementScore", "label": "Engagement Score", "from": "engagement_score", "type": "number"}
+      ]
+    },
+    {
+      "id": "campaign-templates",
+      "title": "Personalized Marketing Campaign Templates",
+      "description": "Synthetic campaign templates (AIBAST Personalized Marketing workshop; fictional).",
+      "record_set": "CAMPAIGN_TEMPLATES",
+      "columns": [
+        {"name": "Title", "label": "Campaign Template", "from": "name", "type": "text"},
+        {"name": "CampaignTemplateId", "label": "Campaign Template ID", "from": "$key", "type": "text"},
+        {"name": "Type", "label": "Type", "from": "type", "type": "text"},
+        {"name": "TargetSegment", "label": "Target Segment", "from": "target_segment", "type": "text"},
+        {"name": "Stages", "label": "Stages", "from": "stages", "type": "number"},
+        {"name": "DurationDays", "label": "Duration Days", "from": "duration_days", "type": "number"},
+        {"name": "OfferConcept", "label": "Offer Concept", "from": "offer_concept", "type": "text"},
+        {"name": "SubjectLines", "label": "Subject Lines", "from": "subject_lines", "type": "text", "encoding": "joined"},
+        {"name": "HistoricalOpenRate", "label": "Historical Open Rate", "from": "historical_open_rate", "type": "number"},
+        {"name": "HistoricalClickRate", "label": "Historical Click Rate", "from": "historical_click_rate", "type": "number"},
+        {"name": "HistoricalConversionRate", "label": "Historical Conversion Rate", "from": "historical_conversion_rate", "type": "number"}
+      ]
+    },
+    {
+      "id": "ab-test-results",
+      "title": "Personalized Marketing AB Test Results",
+      "description": "Synthetic ab test results (AIBAST Personalized Marketing workshop; fictional).",
+      "record_set": "AB_TEST_RESULTS",
+      "columns": [
+        {"name": "Title", "label": "AB Test Result", "from": "$key", "type": "text"},
+        {"name": "ABTestResultId", "label": "AB Test Result ID", "from": "$key", "type": "text"},
+        {"name": "Campaign", "label": "Campaign", "from": "campaign", "type": "text"},
+        {"name": "VariantASubject", "label": "Variant A Subject", "from": "variant_a.subject", "type": "text"},
+        {"name": "VariantAOpenRate", "label": "Variant A Open Rate", "from": "variant_a.open_rate", "type": "number"},
+        {"name": "VariantAClickRate", "label": "Variant A Click Rate", "from": "variant_a.click_rate", "type": "number"},
+        {"name": "VariantAConversions", "label": "Variant A Conversions", "from": "variant_a.conversions", "type": "number"},
+        {"name": "VariantBSubject", "label": "Variant B Subject", "from": "variant_b.subject", "type": "text"},
+        {"name": "VariantBOpenRate", "label": "Variant B Open Rate", "from": "variant_b.open_rate", "type": "number"},
+        {"name": "VariantBClickRate", "label": "Variant B Click Rate", "from": "variant_b.click_rate", "type": "number"},
+        {"name": "VariantBConversions", "label": "Variant B Conversions", "from": "variant_b.conversions", "type": "number"},
+        {"name": "Winner", "label": "Winner", "from": "winner", "type": "text"},
+        {"name": "Confidence", "label": "Confidence", "from": "confidence", "type": "number"},
+        {"name": "SampleSize", "label": "Sample Size", "from": "sample_size", "type": "number"}
+      ]
+    },
+    {
+      "id": "content-blocks",
+      "title": "Personalized Marketing Content Blocks",
+      "description": "Synthetic content blocks (AIBAST Personalized Marketing workshop; fictional).",
+      "record_set": "CONTENT_BLOCKS",
+      "columns": [
+        {"name": "Title", "label": "Content Block", "from": "$key", "type": "text"},
+        {"name": "ContentBlockId", "label": "Content Block ID", "from": "$key", "type": "text"},
+        {"name": "SegLoyalHeadline", "label": "Seg Loyal Headline", "from": "SEG-LOYAL.headline", "type": "text", "optional": true},
+        {"name": "SegLoyalCta", "label": "Seg Loyal Cta", "from": "SEG-LOYAL.cta", "type": "text", "optional": true},
+        {"name": "SegAtriskHeadline", "label": "Seg Atrisk Headline", "from": "SEG-ATRISK.headline", "type": "text", "optional": true},
+        {"name": "SegAtriskCta", "label": "Seg Atrisk Cta", "from": "SEG-ATRISK.cta", "type": "text", "optional": true},
+        {"name": "SegNewHeadline", "label": "Seg New Headline", "from": "SEG-NEW.headline", "type": "text", "optional": true},
+        {"name": "SegNewCta", "label": "Seg New Cta", "from": "SEG-NEW.cta", "type": "text", "optional": true},
+        {"name": "SegHighvalHeadline", "label": "Seg Highval Headline", "from": "SEG-HIGHVAL.headline", "type": "text", "optional": true},
+        {"name": "SegHighvalCta", "label": "Seg Highval Cta", "from": "SEG-HIGHVAL.cta", "type": "text", "optional": true},
+        {"name": "SegDormantHeadline", "label": "Seg Dormant Headline", "from": "SEG-DORMANT.headline", "type": "text", "optional": true},
+        {"name": "SegDormantCta", "label": "Seg Dormant Cta", "from": "SEG-DORMANT.cta", "type": "text", "optional": true},
+        {"name": "SegLoyal", "label": "Seg Loyal", "from": "SEG-LOYAL", "type": "text", "encoding": "json"},
+        {"name": "SegAtrisk", "label": "Seg Atrisk", "from": "SEG-ATRISK", "type": "text", "encoding": "json"},
+        {"name": "SegNew", "label": "Seg New", "from": "SEG-NEW", "type": "text", "encoding": "json"},
+        {"name": "SegHighval", "label": "Seg Highval", "from": "SEG-HIGHVAL", "type": "text", "encoding": "json"},
+        {"name": "SegDormant", "label": "Seg Dormant", "from": "SEG-DORMANT", "type": "text", "encoding": "json"}
+      ]
+    }
+  ]
+}

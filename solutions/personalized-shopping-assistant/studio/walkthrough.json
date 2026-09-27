@@ -1,0 +1,432 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "personalized-shopping-assistant",
+  "title": "Personalized Shopping, built with brainfreeze studio",
+  "summary": "The Personalized Shopping agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_shopping-assistant-rules-and-safety.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Personalized Shopping Studio",
+      "manual": "Personal S Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Personalized Shopping Workspace",
+      "manual": "Personalized Shopping Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/personalized-shopping-assistant.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast personalized-shopping-assistant --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 3 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Personalized Shopping Product Catalog list.",
+          "expected": "8 fictional records, including Classic Oxford Shirt — White (ProductCatalogId SKU-1001), with Category tops.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Personalized Shopping Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Personal Shopper",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PSA-01",
+          "prompt": "As Personal Shopper, suggest transparent options for Synthetic Shopper A using only stated preferences.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Personal Shopper; Draft Product Recommendations; no sensitive traits are inferred. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-psa-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Clienteling Specialist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PSA-02",
+          "prompt": "As Clienteling Specialist, summarize Synthetic Shopper B's opt-in preferences without inferring anything else.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Clienteling Specialist; Opt-In Style Profile; Synthetic Shopper B. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-psa-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Retail Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PSA-03",
+          "prompt": "As Retail Manager, show the synthetic size-level availability and verification gate for SKU-1003.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Retail Manager; Inventory Snapshot; inventory is not reserved. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-psa-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Personal Shopper",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PSA-04",
+          "prompt": "As Personal Shopper, draft coordinated outfit options and transparent totals without ordering anything.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Outfit Builder; Business Casual; no return, refund, order, or purchase. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-psa-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Personalized Shopping: 3 read-only tabs from the same lists. 8 fictional records, including Classic Oxford Shirt — White (ProductCatalogId SKU-1001), with Category tops.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Personalized Shopping Product Catalog from its CSV",
+          "action": "On the site: New, List, From CSV. Upload product-catalog.csv. On Customize, keep Title mapped to the Title column. Set ProductCatalogId, Category, Subcategory, Brand, Sizes, Colors, StyleTags to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Price, Rating, StockS, StockM, StockL, StockXl, Stock30, Stock32, Stock34, Stock36, Stock8, Stock9, Stock10, Stock11, Stock12, StockOs as Number. Name the list Personalized Shopping Product Catalog. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/product-catalog.csv"
+          ],
+          "expected": "8 fictional records, including Classic Oxford Shirt — White (ProductCatalogId SKU-1001), with Category tops.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-product-catalog.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Personalized Shopping Customer Preferences from its CSV",
+          "action": "On the site: New, List, From CSV. Upload customer-preferences.csv. On Customize, keep Title mapped to the Title column. Set CustomerPreferenceId, SizeTop, SizeBottom, SizeShoe, StylePreference, BrandAffinity, ColorPreference, PurchaseHistory to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep BudgetRangeMin, BudgetRangeMax as Number. Name the list Personalized Shopping Customer Preferences. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/customer-preferences.csv"
+          ],
+          "expected": "2 fictional records, including Synthetic Shopper A (CustomerPreferenceId SHOP-001), with SizeTop L.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-customer-preferences.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Personalized Shopping Outfit Templates from its CSV",
+          "action": "On the site: New, List, From CSV. Upload outfit-templates.csv. On Customize, keep Title mapped to the Title column. Set OutfitTemplateId, Pieces to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Personalized Shopping Outfit Templates. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/outfit-templates.csv"
+          ],
+          "expected": "4 fictional records, including Business Casual (OutfitTemplateId business_casual).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-outfit-templates.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Name the agent",
+          "action": "Rename it Personal S Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 3 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_shopping-assistant-rules-and-safety.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_shopping-assistant-rules-and-safety.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the product catalog tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Personalized Shopping Product Catalog; name the tool Get product catalog records.",
+          "expected": "Get product catalog records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-tool-product-catalog.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the customer preferences tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Personalized Shopping Customer Preferences; name the tool Get customer preference records.",
+          "expected": "Get customer preference records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-customer-preferences.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the outfit templates tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Personalized Shopping Outfit Templates; name the tool Get outfit template records.",
+          "expected": "Get outfit template records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-outfit-templates.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/inventory-check/SKILL.md",
+            "studio/agent/skills/outfit-builder/SKILL.md",
+            "studio/agent/skills/product-recommendations/SKILL.md",
+            "studio/agent/skills/style-profile/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 3 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 3 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Test: Personal Shopper",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PSA-01",
+          "prompt": "As Personal Shopper, suggest transparent options for Synthetic Shopper A using only stated preferences.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Personal Shopper; Draft Product Recommendations; no sensitive traits are inferred. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-psa-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Test: Clienteling Specialist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PSA-02",
+          "prompt": "As Clienteling Specialist, summarize Synthetic Shopper B's opt-in preferences without inferring anything else.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Clienteling Specialist; Opt-In Style Profile; Synthetic Shopper B. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-psa-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Retail Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PSA-03",
+          "prompt": "As Retail Manager, show the synthetic size-level availability and verification gate for SKU-1003.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Retail Manager; Inventory Snapshot; inventory is not reserved. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-psa-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Personal Shopper",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PSA-04",
+          "prompt": "As Personal Shopper, draft coordinated outfit options and transparent totals without ordering anything.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Outfit Builder; Business Casual; no return, refund, order, or purchase. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-psa-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/personalized-shopping-assistant/studio/managed-app/app.json --out personalized-shopping-assistant-app"
+          ],
+          "expected": "personalized-shopping-assistant-app/managed-app holds a React + Vite managed app whose config names your site and the 3 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd personalized-shopping-assistant-app/managed-app",
+            "ms app init --display-name \"Personalized Shopping Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Personalized Shopping Product Catalog\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Personalized Shopping Customer Preferences\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Personalized Shopping Outfit Templates\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 3 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Personalized Shopping Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Personalized Shopping Product Catalog tab.",
+          "expected": "The app and the agent read the same synthetic records. 8 fictional records, including Classic Oxford Shirt — White (ProductCatalogId SKU-1001), with Category tops.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

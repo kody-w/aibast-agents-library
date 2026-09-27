@@ -115,6 +115,7 @@ local file availability alone is not public-delivery evidence.
 | Copilot-only Easy-mode comparison | `solutions/portfolio-rebalancing/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/portfolio-rebalancing/quest.html` |
 | Literal browser tutorial | `solutions/portfolio-rebalancing/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/portfolio-rebalancing/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/portfolio-rebalancing/export-manifest.json` |
 | Source bundle | `solutions/portfolio-rebalancing/exports/portfolio-rebalancing-source.zip` |
 | Manual evidence | `solutions/portfolio-rebalancing/evals/manual-build-evidence.json` |

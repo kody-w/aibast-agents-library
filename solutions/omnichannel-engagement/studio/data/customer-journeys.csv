@@ -1,0 +1,5 @@
+Title,CustomerJourneyId,Touchpoints,AvgDays,ConversionRate,AvgTouchpoints
+Discovery to Purchase,journey_discovery,social_media_ad; website_browse; email_signup; email_promo; website_purchase,14,3.2,5
+Repeat Purchase,journey_repeat,email_promo; mobile_app_browse; mobile_app_purchase,3,18.5,3
+Win-Back,journey_winback,email_winback; sms_offer; website_browse; website_purchase,21,8.4,4
+Impulse Purchase,journey_impulse,social_media_ad; website_purchase,0,1.8,2

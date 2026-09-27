@@ -30,6 +30,7 @@ message, offer, reward, or purchase action occurs.
 | Copilot-only Easy-mode comparison | `solutions/omnichannel-engagement/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/omnichannel-engagement/quest.html` |
 | Literal browser tutorial | `solutions/omnichannel-engagement/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/omnichannel-engagement/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/omnichannel-engagement/export-manifest.json` |
 | Source bundle | `solutions/omnichannel-engagement/exports/omnichannel-engagement-source.zip` |
 | Manual evidence | `solutions/omnichannel-engagement/evals/manual-build-evidence.json` |

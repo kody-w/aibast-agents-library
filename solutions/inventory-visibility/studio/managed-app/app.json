@@ -1,0 +1,384 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Inventory Visibility Workspace",
+  "title": "Inventory Visibility",
+  "description": "The Inventory Visibility workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "stores",
+      "list": "Inventory Visibility Stores",
+      "title": "Stores",
+      "key": "StoreId",
+      "fields": {
+        "StoreId": "field_1",
+        "City": "field_2",
+        "State": "field_3",
+        "Type": "field_4",
+        "CapacitySqft": "field_5"
+      },
+      "columns": [
+        "StoreId",
+        "Title",
+        "City",
+        "State",
+        "Type",
+        "CapacitySqft"
+      ],
+      "labels": {
+        "Title": "Store",
+        "StoreId": "Store ID",
+        "City": "City",
+        "State": "State",
+        "Type": "Type",
+        "CapacitySqft": "Capacity Sqft"
+      },
+      "formats": {
+        "Title": "text",
+        "StoreId": "text",
+        "City": "text",
+        "State": "text",
+        "Type": "text",
+        "CapacitySqft": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Stores",
+          "op": "count"
+        },
+        {
+          "label": "Capacity Sqft",
+          "op": "sum",
+          "column": "CapacitySqft"
+        }
+      ],
+      "groupBy": "City",
+      "sortBy": "StoreId"
+    },
+    {
+      "id": "warehouses",
+      "list": "Inventory Visibility Warehouses",
+      "title": "Warehouses",
+      "key": "WarehouseId",
+      "fields": {
+        "WarehouseId": "field_1",
+        "City": "field_2",
+        "State": "field_3",
+        "CapacityPallets": "field_4"
+      },
+      "columns": [
+        "WarehouseId",
+        "Title",
+        "City",
+        "State",
+        "CapacityPallets"
+      ],
+      "labels": {
+        "Title": "Warehouse",
+        "WarehouseId": "Warehouse ID",
+        "City": "City",
+        "State": "State",
+        "CapacityPallets": "Capacity Pallets"
+      },
+      "formats": {
+        "Title": "text",
+        "WarehouseId": "text",
+        "City": "text",
+        "State": "text",
+        "CapacityPallets": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Warehouses",
+          "op": "count"
+        },
+        {
+          "label": "Capacity Pallets",
+          "op": "sum",
+          "column": "CapacityPallets"
+        }
+      ],
+      "groupBy": "City",
+      "sortBy": "WarehouseId"
+    },
+    {
+      "id": "skus",
+      "list": "Inventory Visibility SKUS",
+      "title": "SKUS",
+      "key": "SKUId",
+      "fields": {
+        "SKUId": "field_1",
+        "Category": "field_2",
+        "UnitCost": "field_3",
+        "RetailPrice": "field_4"
+      },
+      "columns": [
+        "SKUId",
+        "Title",
+        "Category",
+        "UnitCost",
+        "RetailPrice"
+      ],
+      "labels": {
+        "Title": "SKU",
+        "SKUId": "SKU ID",
+        "Category": "Category",
+        "UnitCost": "Unit Cost",
+        "RetailPrice": "Retail Price"
+      },
+      "formats": {
+        "Title": "text",
+        "SKUId": "text",
+        "Category": "text",
+        "UnitCost": "currency",
+        "RetailPrice": "currency"
+      },
+      "metrics": [
+        {
+          "label": "SKUS",
+          "op": "count"
+        },
+        {
+          "label": "Unit Cost",
+          "op": "sum",
+          "column": "UnitCost"
+        }
+      ],
+      "groupBy": "Category",
+      "sortBy": "SKUId"
+    },
+    {
+      "id": "inventory",
+      "list": "Inventory Visibility Inventory",
+      "title": "Inventory",
+      "key": "InventoryId",
+      "fields": {
+        "InventoryId": "field_1",
+        "SKU1001": "field_2",
+        "SKU1002": "field_3",
+        "SKU1003": "field_4",
+        "SKU1004": "field_5",
+        "SKU1005": "field_6",
+        "SKU1006": "field_7",
+        "SKU1007": "field_8",
+        "SKU1008": "field_9"
+      },
+      "columns": [
+        "InventoryId",
+        "Title",
+        "SKU1001",
+        "SKU1002",
+        "SKU1003",
+        "SKU1004",
+        "SKU1005",
+        "SKU1006",
+        "SKU1007",
+        "SKU1008"
+      ],
+      "labels": {
+        "Title": "Inventory",
+        "InventoryId": "Inventory ID",
+        "SKU1001": "SKU 1001",
+        "SKU1002": "SKU 1002",
+        "SKU1003": "SKU 1003",
+        "SKU1004": "SKU 1004",
+        "SKU1005": "SKU 1005",
+        "SKU1006": "SKU 1006",
+        "SKU1007": "SKU 1007",
+        "SKU1008": "SKU 1008"
+      },
+      "formats": {
+        "Title": "text",
+        "InventoryId": "text",
+        "SKU1001": "integer",
+        "SKU1002": "integer",
+        "SKU1003": "integer",
+        "SKU1004": "integer",
+        "SKU1005": "integer",
+        "SKU1006": "integer",
+        "SKU1007": "integer",
+        "SKU1008": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Inventory",
+          "op": "count"
+        }
+      ],
+      "sortBy": "InventoryId"
+    },
+    {
+      "id": "safety-stock",
+      "list": "Inventory Visibility Safety Stock",
+      "title": "Safety Stock",
+      "key": "SafetyStockId",
+      "fields": {
+        "SafetyStockId": "field_1",
+        "SKU1001": "field_2",
+        "SKU1002": "field_3",
+        "SKU1003": "field_4",
+        "SKU1004": "field_5",
+        "SKU1005": "field_6",
+        "SKU1006": "field_7",
+        "SKU1007": "field_8",
+        "SKU1008": "field_9"
+      },
+      "columns": [
+        "SafetyStockId",
+        "Title",
+        "SKU1001",
+        "SKU1002",
+        "SKU1003",
+        "SKU1004",
+        "SKU1005",
+        "SKU1006",
+        "SKU1007",
+        "SKU1008"
+      ],
+      "labels": {
+        "Title": "Safety Stock",
+        "SafetyStockId": "Safety Stock ID",
+        "SKU1001": "SKU 1001",
+        "SKU1002": "SKU 1002",
+        "SKU1003": "SKU 1003",
+        "SKU1004": "SKU 1004",
+        "SKU1005": "SKU 1005",
+        "SKU1006": "SKU 1006",
+        "SKU1007": "SKU 1007",
+        "SKU1008": "SKU 1008"
+      },
+      "formats": {
+        "Title": "text",
+        "SafetyStockId": "text",
+        "SKU1001": "integer",
+        "SKU1002": "integer",
+        "SKU1003": "integer",
+        "SKU1004": "integer",
+        "SKU1005": "integer",
+        "SKU1006": "integer",
+        "SKU1007": "integer",
+        "SKU1008": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Safety Stock",
+          "op": "count"
+        }
+      ],
+      "sortBy": "SafetyStockId"
+    },
+    {
+      "id": "lead-times-days",
+      "list": "Inventory Visibility Lead Times Days",
+      "title": "Lead Times Days",
+      "key": "LeadTimesDayId",
+      "fields": {
+        "LeadTimesDayId": "field_1",
+        "Str001": "field_2",
+        "Str002": "field_3",
+        "Str003": "field_4",
+        "Str004": "field_5"
+      },
+      "columns": [
+        "LeadTimesDayId",
+        "Title",
+        "Str001",
+        "Str002",
+        "Str003",
+        "Str004"
+      ],
+      "labels": {
+        "Title": "Lead Times Day",
+        "LeadTimesDayId": "Lead Times Day ID",
+        "Str001": "Str 001",
+        "Str002": "Str 002",
+        "Str003": "Str 003",
+        "Str004": "Str 004"
+      },
+      "formats": {
+        "Title": "text",
+        "LeadTimesDayId": "text",
+        "Str001": "integer",
+        "Str002": "integer",
+        "Str003": "integer",
+        "Str004": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Lead Times Days",
+          "op": "count"
+        }
+      ],
+      "sortBy": "LeadTimesDayId"
+    },
+    {
+      "id": "channel-demand",
+      "list": "Inventory Visibility Channel Demand",
+      "title": "Channel Demand",
+      "key": "ChannelDemandId",
+      "fields": {
+        "ChannelDemandId": "field_1",
+        "Weight": "field_2",
+        "DailyUnitsAvg": "field_3"
+      },
+      "columns": [
+        "ChannelDemandId",
+        "Title",
+        "Weight",
+        "DailyUnitsAvg"
+      ],
+      "labels": {
+        "Title": "Channel Demand",
+        "ChannelDemandId": "Channel Demand ID",
+        "Weight": "Weight",
+        "DailyUnitsAvg": "Daily Units Avg"
+      },
+      "formats": {
+        "Title": "text",
+        "ChannelDemandId": "text",
+        "Weight": "number",
+        "DailyUnitsAvg": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Channel Demand",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ChannelDemandId"
+    },
+    {
+      "id": "daily-sell-through",
+      "list": "Inventory Visibility Daily Sell Through",
+      "title": "Daily Sell Through",
+      "key": "DailySellThroughId",
+      "fields": {
+        "DailySellThroughId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "DailySellThroughId",
+        "Title",
+        "Value"
+      ],
+      "labels": {
+        "Title": "Daily Sell Through",
+        "DailySellThroughId": "Daily Sell Through ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "DailySellThroughId": "text",
+        "Value": "currency"
+      },
+      "metrics": [
+        {
+          "label": "Daily Sell Through",
+          "op": "count"
+        }
+      ],
+      "sortBy": "DailySellThroughId"
+    }
+  ]
+}

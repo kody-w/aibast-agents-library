@@ -1,0 +1,505 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "loan-origination-assistant",
+  "title": "Loan Origination Assistant, built with brainfreeze studio",
+  "summary": "The Loan Origination Assistant agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_loan-origination-assistant-controls-and-review.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Loan Orig Asst Studio",
+      "manual": "Loan Orig Asst Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Loan Origination Assistant Workspace",
+      "manual": "Loan Origination Assistant Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/loan-origination-assistant.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast loan-origination-assistant --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 5 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Loan Origination Assistant Loan Applications list.",
+          "expected": "4 fictional records, including LA-2025-4001 (LoanApplicationId LA-2025-4001), with Applicant Thomas & Rebecca Harper.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Loan Orig Asst Studio and review its inventory.",
+          "expected": "The studio instructions, 5 skills, 1 rules knowledge file(s) and 5 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Loan Officer",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-01",
+          "prompt": "What is in my mortgage pipeline, and which application is still in document review?",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4002; Document Review. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-loa-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Underwriter",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-02",
+          "prompt": "Pre-analyze Kevin Nguyen’s ratios and show every stated eligibility exception.",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4002; DTI. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-loa-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Processor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-03",
+          "prompt": "Build the VA document checklist for Sandra so I can verify the file.",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4004; Certificate of Eligibility. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-loa-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Senior Underwriter",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-04",
+          "prompt": "Which files meet the limited criteria, and did the assistant approve any loan?",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4001; No lending decision. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-loa-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Test: Closing Coordinator",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-05",
+          "prompt": "Which conditions are still open on the commercial refinance, and is a closing date promised?",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4003; Environmental Phase I. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-loa-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-10",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Loan Origination Assistant: 5 read-only tabs from the same lists. 4 fictional records, including LA-2025-4001 (LoanApplicationId LA-2025-4001), with Applicant Thomas & Rebecca Harper.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/10-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Loan Origination Assistant Loan Applications from its CSV",
+          "action": "On the site: New, List, From CSV. Upload loan-applications.csv. On Customize, keep Title mapped to the Title column. Set LoanApplicationId, Applicant, LoanType, Purpose, PropertyAddress, Status, LoanOfficer to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep PropertyValue, LoanAmount, CreditScore, AnnualIncome, MonthlyDebt, EmploymentYears, DownPaymentPct, Dscr as Number. Name the list Loan Origination Assistant Loan Applications. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/loan-applications.csv"
+          ],
+          "expected": "4 fictional records, including LA-2025-4001 (LoanApplicationId LA-2025-4001), with Applicant Thomas & Rebecca Harper.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-loan-applications.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Loan Origination Assistant Approval Criteria from its CSV",
+          "action": "On the site: New, List, From CSV. Upload approval-criteria.csv. On Customize, keep Title mapped to the Title column. Set ApprovalCriteriaId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep MinCredit, MaxDti, MinDownPct, MaxLtv, MinDscr as Number. Name the list Loan Origination Assistant Approval Criteria. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/approval-criteria.csv"
+          ],
+          "expected": "4 fictional records, including conventional_30yr (ApprovalCriteriaId conventional_30yr), with MinCredit 620.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-approval-criteria.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Loan Origination Assistant Document Requirements from its CSV",
+          "action": "On the site: New, List, From CSV. Upload document-requirements.csv. On Customize, keep Title mapped to the Title column. Set DocumentRequirementId, Value to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Loan Origination Assistant Document Requirements. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/document-requirements.csv"
+          ],
+          "expected": "7 fictional records, including income (DocumentRequirementId income).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-document-requirements.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Loan Origination Assistant Rate Sheet from its CSV",
+          "action": "On the site: New, List, From CSV. Upload rate-sheet.csv. On Customize, keep Title mapped to the Title column. Set RateSheetId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Rate, Apr, Points, MipUpfront, MipAnnual, FundingFee as Number. Name the list Loan Origination Assistant Rate Sheet. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/rate-sheet.csv"
+          ],
+          "expected": "4 fictional records, including conventional_30yr (RateSheetId conventional_30yr), with Rate 6.875.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-rate-sheet.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create Loan Origination Assistant Conditions from its CSV",
+          "action": "On the site: New, List, From CSV. Upload conditions.csv. On Customize, keep Title mapped to the Title column. Set ConditionId, Value to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Loan Origination Assistant Conditions. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/conditions.csv"
+          ],
+          "expected": "4 fictional records, including LA-2025-4001 (ConditionId LA-2025-4001).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-list-conditions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Name the agent",
+          "action": "Rename it Loan Orig Asst Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 5 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_loan-origination-assistant-controls-and-review.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_loan-origination-assistant-controls-and-review.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the loan applications tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Loan Origination Assistant Loan Applications; name the tool Get loan application records.",
+          "expected": "Get loan application records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-loan-applications.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the approval criteria tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Loan Origination Assistant Approval Criteria; name the tool Get approval criteria records.",
+          "expected": "Get approval criteria records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-approval-criteria.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the document requirements tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Loan Origination Assistant Document Requirements; name the tool Get document requirement records.",
+          "expected": "Get document requirement records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-document-requirements.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the rate sheet tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Loan Origination Assistant Rate Sheet; name the tool Get rate sheet records.",
+          "expected": "Get rate sheet records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-tool-rate-sheet.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Add the conditions tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Loan Origination Assistant Conditions; name the tool Get condition records.",
+          "expected": "Get condition records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-tool-conditions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Add the 5 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_application-review_01/SKILL.md",
+            "studio/agent/skills/aibast_condition-tracking_05/SKILL.md",
+            "studio/agent/skills/aibast_credit-analysis_02/SKILL.md",
+            "studio/agent/skills/aibast_decision-recommendation_04/SKILL.md",
+            "studio/agent/skills/aibast_document-verification_03/SKILL.md"
+          ],
+          "expected": "5 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Review the agent",
+          "action": "Check the model, 5 skills, the rules knowledge and 5 tools.",
+          "expected": "Sonnet 4.6, 5 skills, 1 knowledge file(s), 5 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Loan Officer",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-01",
+          "prompt": "What is in my mortgage pipeline, and which application is still in document review?",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4002; Document Review. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-loa-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Underwriter",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-02",
+          "prompt": "Pre-analyze Kevin Nguyen’s ratios and show every stated eligibility exception.",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4002; DTI. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-loa-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Test: Processor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-03",
+          "prompt": "Build the VA document checklist for Sandra so I can verify the file.",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4004; Certificate of Eligibility. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-loa-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Test: Senior Underwriter",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-04",
+          "prompt": "Which files meet the limited criteria, and did the assistant approve any loan?",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4001; No lending decision. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-loa-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Test: Closing Coordinator",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "LOA-05",
+          "prompt": "Which conditions are still open on the commercial refinance, and is a closing date promised?",
+          "expected": "The relevant list tool ran. Required evidence: LA-2025-4003; Environmental Phase I. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-loa-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/loan-origination-assistant/studio/managed-app/app.json --out loan-origination-assistant-app"
+          ],
+          "expected": "loan-origination-assistant-app/managed-app holds a React + Vite managed app whose config names your site and the 5 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-27",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd loan-origination-assistant-app/managed-app",
+            "ms app init --display-name \"Loan Origination Assistant Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Loan Origination Assistant Loan Applications\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Loan Origination Assistant Approval Criteria\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Loan Origination Assistant Document Requirements\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Loan Origination Assistant Rate Sheet\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Loan Origination Assistant Conditions\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 5 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/27-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-28",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Loan Origination Assistant Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/28-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-29",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Loan Origination Assistant Loan Applications tab.",
+          "expected": "The app and the agent read the same synthetic records. 4 fictional records, including LA-2025-4001 (LoanApplicationId LA-2025-4001), with Applicant Thomas & Rebecca Harper.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/29-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

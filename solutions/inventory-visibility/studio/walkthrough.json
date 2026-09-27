@@ -1,0 +1,552 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "inventory-visibility",
+  "title": "Inventory Visibility, built with brainfreeze studio",
+  "summary": "The Inventory Visibility agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_inventory-visibility-rules-and-safety.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Inventory Visibility Studio",
+      "manual": "Inventory V Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Inventory Visibility Workspace",
+      "manual": "Inventory Visibility Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/inventory-visibility.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast inventory-visibility --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 8 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Inventory Visibility Stores list.",
+          "expected": "4 fictional records, including Downtown Flagship (StoreId STR-001), with City Chicago.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Inventory Visibility Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 8 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Inventory Planner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IV-01",
+          "prompt": "As Inventory Planner, summarize the store snapshot and verification boundary.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Inventory Planner; Inventory Visibility Snapshot; no stock is reserved. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-iv-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Store Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IV-02",
+          "prompt": "As Store Manager, identify urgent review candidates without issuing transfer or replenishment commands.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Store Manager; Draft Stock Review; Review transfer candidate. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-iv-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Inventory Planner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IV-03",
+          "prompt": "As Inventory Planner, show the fourteen-day replenishment scenario and its assumptions.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Replenishment Plan; 14-day supply; Estimated Total Replenishment Cost. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-iv-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Category Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IV-04",
+          "prompt": "As Category Manager, compare the channel planning scenario without reserving any stock.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Category Manager; Channel Allocation Scenario; do not reserve units. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-iv-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Inventory Visibility: 8 read-only tabs from the same lists. 4 fictional records, including Downtown Flagship (StoreId STR-001), with City Chicago.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Inventory Visibility Stores from its CSV",
+          "action": "On the site: New, List, From CSV. Upload stores.csv. On Customize, keep Title mapped to the Title column. Set StoreId, City, State, Type to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep CapacitySqft as Number. Name the list Inventory Visibility Stores. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/stores.csv"
+          ],
+          "expected": "4 fictional records, including Downtown Flagship (StoreId STR-001), with City Chicago.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-stores.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Inventory Visibility Warehouses from its CSV",
+          "action": "On the site: New, List, From CSV. Upload warehouses.csv. On Customize, keep Title mapped to the Title column. Set WarehouseId, City, State to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep CapacityPallets as Number. Name the list Inventory Visibility Warehouses. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/warehouses.csv"
+          ],
+          "expected": "2 fictional records, including Central Distribution Center (WarehouseId WH-CENTRAL), with City Romeoville.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-warehouses.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Inventory Visibility SKUS from its CSV",
+          "action": "On the site: New, List, From CSV. Upload skus.csv. On Customize, keep Title mapped to the Title column. Set SKUId, Category to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep UnitCost, RetailPrice as Number. Name the list Inventory Visibility SKUS. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/skus.csv"
+          ],
+          "expected": "8 fictional records, including Classic Denim Jacket (SKUId SKU-1001), with Category Apparel.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-skus.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Inventory Visibility Inventory from its CSV",
+          "action": "On the site: New, List, From CSV. Upload inventory.csv. On Customize, keep Title mapped to the Title column. Set InventoryId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep SKU1001, SKU1002, SKU1003, SKU1004, SKU1005, SKU1006, SKU1007, SKU1008 as Number. Name the list Inventory Visibility Inventory. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/inventory.csv"
+          ],
+          "expected": "6 fictional records, including STR-001 (InventoryId STR-001), with SKU1001 74.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create Inventory Visibility Safety Stock from its CSV",
+          "action": "On the site: New, List, From CSV. Upload safety-stock.csv. On Customize, keep Title mapped to the Title column. Set SafetyStockId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep SKU1001, SKU1002, SKU1003, SKU1004, SKU1005, SKU1006, SKU1007, SKU1008 as Number. Name the list Inventory Visibility Safety Stock. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/safety-stock.csv"
+          ],
+          "expected": "4 fictional records, including STR-001 (SafetyStockId STR-001), with SKU1001 30.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-list-safety-stock.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Create Inventory Visibility Lead Times Days from its CSV",
+          "action": "On the site: New, List, From CSV. Upload lead-times-days.csv. On Customize, keep Title mapped to the Title column. Set LeadTimesDayId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Str001, Str002, Str003, Str004 as Number. Name the list Inventory Visibility Lead Times Days. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/lead-times-days.csv"
+          ],
+          "expected": "2 fictional records, including WH-CENTRAL (LeadTimesDayId WH-CENTRAL), with Str001 1.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-list-lead-times-days.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Create Inventory Visibility Channel Demand from its CSV",
+          "action": "On the site: New, List, From CSV. Upload channel-demand.csv. On Customize, keep Title mapped to the Title column. Set ChannelDemandId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Weight, DailyUnitsAvg as Number. Name the list Inventory Visibility Channel Demand. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/channel-demand.csv"
+          ],
+          "expected": "4 fictional records, including in_store (ChannelDemandId in_store), with Weight 0.45.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-list-channel-demand.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Create Inventory Visibility Daily Sell Through from its CSV",
+          "action": "On the site: New, List, From CSV. Upload daily-sell-through.csv. On Customize, keep Title mapped to the Title column. Set DailySellThroughId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value as Number. Name the list Inventory Visibility Daily Sell Through. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/daily-sell-through.csv"
+          ],
+          "expected": "8 fictional records, including SKU-1001 (DailySellThroughId SKU-1001), with Value 6.2.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-list-daily-sell-through.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Name the agent",
+          "action": "Rename it Inventory V Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 8 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_inventory-visibility-rules-and-safety.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_inventory-visibility-rules-and-safety.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the stores tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Visibility Stores; name the tool Get store records.",
+          "expected": "Get store records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-tool-stores.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Add the warehouses tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Visibility Warehouses; name the tool Get warehouse records.",
+          "expected": "Get warehouse records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-tool-warehouses.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Add the skus tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Visibility SKUS; name the tool Get sku records.",
+          "expected": "Get sku records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-tool-skus.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Add the inventory tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Visibility Inventory; name the tool Get inventory records.",
+          "expected": "Get inventory records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-tool-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Add the safety stock tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Visibility Safety Stock; name the tool Get safety stock records.",
+          "expected": "Get safety stock records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-tool-safety-stock.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Add the lead times days tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Visibility Lead Times Days; name the tool Get lead times day records.",
+          "expected": "Get lead times day records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-tool-lead-times-days.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Add the channel demand tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Visibility Channel Demand; name the tool Get channel demand records.",
+          "expected": "Get channel demand records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-tool-channel-demand.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Add the daily sell through tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Inventory Visibility Daily Sell Through; name the tool Get daily sell through records.",
+          "expected": "Get daily sell through records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-tool-daily-sell-through.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/channel-allocation/SKILL.md",
+            "studio/agent/skills/inventory-dashboard/SKILL.md",
+            "studio/agent/skills/replenishment-plan/SKILL.md",
+            "studio/agent/skills/stock-alerts/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 8 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 8 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Test: Inventory Planner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IV-01",
+          "prompt": "As Inventory Planner, summarize the store snapshot and verification boundary.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Inventory Planner; Inventory Visibility Snapshot; no stock is reserved. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-iv-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-27",
+          "title": "Test: Store Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IV-02",
+          "prompt": "As Store Manager, identify urgent review candidates without issuing transfer or replenishment commands.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Store Manager; Draft Stock Review; Review transfer candidate. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/27-iv-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-28",
+          "title": "Test: Inventory Planner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IV-03",
+          "prompt": "As Inventory Planner, show the fourteen-day replenishment scenario and its assumptions.",
+          "expected": "The relevant list tool ran. Required evidence: Draft Replenishment Plan; 14-day supply; Estimated Total Replenishment Cost. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/28-iv-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-29",
+          "title": "Test: Category Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "IV-04",
+          "prompt": "As Category Manager, compare the channel planning scenario without reserving any stock.",
+          "expected": "The relevant list tool ran. Required evidence: Prepared for:** Category Manager; Channel Allocation Scenario; do not reserve units. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/29-iv-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-30",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/30-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-31",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/inventory-visibility/studio/managed-app/app.json --out inventory-visibility-app"
+          ],
+          "expected": "inventory-visibility-app/managed-app holds a React + Vite managed app whose config names your site and the 8 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/31-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-32",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd inventory-visibility-app/managed-app",
+            "ms app init --display-name \"Inventory Visibility Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Visibility Stores\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Visibility Warehouses\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Visibility SKUS\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Visibility Inventory\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Visibility Safety Stock\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Visibility Lead Times Days\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Visibility Channel Demand\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Inventory Visibility Daily Sell Through\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 8 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/32-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-33",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Inventory Visibility Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/33-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-34",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Inventory Visibility Stores tab.",
+          "expected": "The app and the agent read the same synthetic records. 4 fictional records, including Downtown Flagship (StoreId STR-001), with City Chicago.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/34-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

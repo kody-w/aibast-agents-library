@@ -1,0 +1,6 @@
+Title,LicenseAgreementId,Plan,Arr,Seats,SeatsUsed,RenewalDate,ContractStart,UsageTrend,NPSScore,SupportTickets90D,ExpansionSignals,ChurnSignals,Csm,HealthScore
+Pinnacle Insurance Corp,LIC-3001,Enterprise,288000,150,142,2026-04-30,2025-04-30,increasing,72,4,API usage +45% QoQ; Requested SSO for 3 subsidiaries,,Dana Reeves,88
+ClearView Analytics,LIC-3002,Professional,72000,30,18,2026-05-15,2025-05-15,declining,34,18,,Usage down 32%; Executive sponsor departed; Competitor eval detected,James Okafor,29
+Redwood Supply Chain,LIC-3003,Enterprise,192000,80,79,2026-06-01,2025-06-01,stable,65,7,Inquired about analytics add-on,Budget freeze mentioned in QBR,Dana Reeves,62
+Skyline Hospitality Group,LIC-3004,Enterprise,360000,250,248,2026-04-15,2025-04-15,increasing,85,2,Opening 12 new locations; Requested bulk seat pricing; Custom integration POC,,James Okafor,94
+Granite Construction Co,LIC-3005,Professional,54000,20,12,2026-07-01,2025-07-01,declining,41,11,,Primary admin inactive 45 days; Missed last 2 QBRs,Dana Reeves,35

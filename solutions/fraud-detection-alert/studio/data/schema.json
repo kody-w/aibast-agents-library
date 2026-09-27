@@ -1,0 +1,71 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "fraud-detection-alert",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/financial_services_stacks/fraud_detection_alert_stack/fraud_detection_alert_agent.py",
+  "records_markdown": "solutions/fraud-detection-alert/manual/knowledge/aibast_fraud-detection-alert-synthetic-records.md",
+  "lists": [
+    {
+      "id": "transactions",
+      "title": "Fraud Detection and Alert Transactions",
+      "description": "Synthetic transactions (AIBAST Fraud Detection and Alert workshop; fictional).",
+      "record_set": "TRANSACTIONS",
+      "columns": [
+        {"name": "Title", "label": "Transaction", "from": "$key", "type": "text"},
+        {"name": "TransactionId", "label": "Transaction ID", "from": "$key", "type": "text"},
+        {"name": "Account", "label": "Account", "from": "account", "type": "text"},
+        {"name": "Cardholder", "label": "Cardholder", "from": "cardholder", "type": "text"},
+        {"name": "Amount", "label": "Amount", "from": "amount", "type": "number"},
+        {"name": "Merchant", "label": "Merchant", "from": "merchant", "type": "text"},
+        {"name": "Category", "label": "Category", "from": "category", "type": "text"},
+        {"name": "Country", "label": "Country", "from": "country", "type": "text"},
+        {"name": "Timestamp", "label": "Timestamp", "from": "timestamp", "type": "text"},
+        {"name": "Channel", "label": "Channel", "from": "channel", "type": "text"},
+        {"name": "RiskScore", "label": "Risk Score", "from": "risk_score", "type": "number"}
+      ]
+    },
+    {
+      "id": "alert-rules",
+      "title": "Fraud Detection and Alert Alert Rules",
+      "description": "Synthetic alert rules (AIBAST Fraud Detection and Alert workshop; fictional).",
+      "record_set": "ALERT_RULES",
+      "columns": [
+        {"name": "Title", "label": "Alert Rule", "from": "name", "type": "text"},
+        {"name": "AlertRuleId", "label": "Alert Rule ID", "from": "$key", "type": "text"},
+        {"name": "Description", "label": "Description", "from": "description", "type": "text"},
+        {"name": "Threshold", "label": "Threshold", "from": "threshold", "type": "text"},
+        {"name": "Severity", "label": "Severity", "from": "severity", "type": "text"}
+      ]
+    },
+    {
+      "id": "fraud-patterns",
+      "title": "Fraud Detection and Alert Fraud Patterns",
+      "description": "Synthetic fraud patterns (AIBAST Fraud Detection and Alert workshop; fictional).",
+      "record_set": "FRAUD_PATTERNS",
+      "columns": [
+        {"name": "Title", "label": "Fraud Pattern", "from": "description", "type": "text"},
+        {"name": "FraudPatternId", "label": "Fraud Pattern ID", "from": "$key", "type": "text"},
+        {"name": "Indicators", "label": "Indicators", "from": "indicators", "type": "text", "encoding": "joined"},
+        {"name": "Frequency", "label": "Frequency", "from": "frequency", "type": "text"}
+      ]
+    },
+    {
+      "id": "investigation-cases",
+      "title": "Fraud Detection and Alert Investigation Cases",
+      "description": "Synthetic investigation cases (AIBAST Fraud Detection and Alert workshop; fictional).",
+      "record_set": "INVESTIGATION_CASES",
+      "columns": [
+        {"name": "Title", "label": "Investigation Case", "from": "$key", "type": "text"},
+        {"name": "InvestigationCaseId", "label": "Investigation Case ID", "from": "$key", "type": "text"},
+        {"name": "AlertTxns", "label": "Alert Txns", "from": "alert_txns", "type": "text", "encoding": "joined"},
+        {"name": "RulesTriggered", "label": "Rules Triggered", "from": "rules_triggered", "type": "text", "encoding": "joined"},
+        {"name": "Pattern", "label": "Pattern", "from": "pattern", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "Analyst", "label": "Analyst", "from": "analyst", "type": "text"},
+        {"name": "Opened", "label": "Opened", "from": "opened", "type": "text"},
+        {"name": "Priority", "label": "Priority", "from": "priority", "type": "text"},
+        {"name": "Notes", "label": "Notes", "from": "notes", "type": "text"}
+      ]
+    }
+  ]
+}

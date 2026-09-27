@@ -1,0 +1,458 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "portfolio-rebalancing",
+  "title": "Portfolio Rebalancing, built with brainfreeze studio",
+  "summary": "The Portfolio Rebalancing agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_portfolio-rebalancing-controls-and-review.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Portfolio Rebalancing Studio",
+      "manual": "Portfolio Rebal Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Portfolio Rebalancing Workspace",
+      "manual": "Portfolio Rebalancing Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/portfolio-rebalancing.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast portfolio-rebalancing --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 2 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Portfolio Rebalancing Portfolios list.",
+          "expected": "2 fictional records, including Growth Allocation Fund (PortfolioId PORT-5001), with Manager Victoria Reeves, CFA.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Portfolio Rebalancing Studio and review its inventory.",
+          "expected": "The studio instructions, 6 skills, 1 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Portfolio Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-01",
+          "prompt": "Which portfolio is outside its drift guardrails, and where is the largest gap?",
+          "expected": "The relevant list tool ran. Required evidence: PORT-5001; VTI. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-prb-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Financial Advisor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-02",
+          "prompt": "Show me the allocation changes I should review with the client before anyone trades.",
+          "expected": "The relevant list tool ran. Required evidence: VTI; candidate. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-prb-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Paraplanner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-03",
+          "prompt": "What tax assumptions should the advisor validate for the rebalance candidate?",
+          "expected": "The relevant list tool ran. Required evidence: Illustrative Tax Estimate; VTI. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-prb-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Tax-Aware Portfolio Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-04",
+          "prompt": "Which positions are loss candidates, and what controls stop us from treating that as tax advice?",
+          "expected": "The relevant list tool ran. Required evidence: VEA; wash-sale. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-prb-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Test: Retirement Planning Specialist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-05",
+          "prompt": "Frame the retirement scenarios we need to model without inventing a success probability.",
+          "expected": "The relevant list tool ran. Required evidence: 25 years; No success probability. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-prb-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-10",
+          "title": "Test: Trading Supervisor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-06",
+          "prompt": "Prepare the controlled implementation checklist and make clear whether any order was sent.",
+          "expected": "The relevant list tool ran. Required evidence: VTI; No order. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/10-prb-06.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-11",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Portfolio Rebalancing: 2 read-only tabs from the same lists. 2 fictional records, including Growth Allocation Fund (PortfolioId PORT-5001), with Manager Victoria Reeves, CFA.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/11-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Portfolio Rebalancing Portfolios from its CSV",
+          "action": "On the site: New, List, From CSV. Upload portfolios.csv. On Customize, keep Title mapped to the Title column. Set PortfolioId, Manager, Strategy, Benchmark, RebalanceFrequency, HoldingsUsLargeCapTicker, HoldingsUsSmallCapTicker, HoldingsIntlDevelopedTicker, HoldingsEmergingMarketsTicker, HoldingsUsAggregateBondTicker, HoldingsTipsTicker, HoldingsReitsTicker, HoldingsCashTicker, HoldingsUsLargeCapDividendTicker, HoldingsIntlDividendTicker, HoldingsUsInvestmentGradeTicker, HoldingsUsTreasuryTicker, HoldingsMunicipalBondsTicker, HoldingsHighYieldTicker, HoldingsPreferredStockTicker to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep TotalValue, DriftThreshold, HoldingsUsLargeCapValue, HoldingsUsLargeCapCurrentPct, HoldingsUsLargeCapTargetPct, HoldingsUsLargeCapCostBasis, HoldingsUsSmallCapValue, HoldingsUsSmallCapCurrentPct, HoldingsUsSmallCapTargetPct, HoldingsUsSmallCapCostBasis, HoldingsIntlDevelopedValue, HoldingsIntlDevelopedCurrentPct, HoldingsIntlDevelopedTargetPct, HoldingsIntlDevelopedCostBasis, HoldingsEmergingMarketsValue, HoldingsEmergingMarketsCu1798463, HoldingsEmergingMarketsTargetPct, HoldingsEmergingMarketsCostBasis, HoldingsUsAggregateBondValue, HoldingsUsAggregateBondCuc0b22e2, HoldingsUsAggregateBondTargetPct, HoldingsUsAggregateBondCostBasis, HoldingsTipsValue, HoldingsTipsCurrentPct, HoldingsTipsTargetPct, HoldingsTipsCostBasis, HoldingsReitsValue, HoldingsReitsCurrentPct, HoldingsReitsTargetPct, HoldingsReitsCostBasis, HoldingsCashValue, HoldingsCashCurrentPct, HoldingsCashTargetPct, HoldingsCashCostBasis, HoldingsUsLargeCapDividendValue, HoldingsUsLargeCapDividen6cbefad, HoldingsUsLargeCapDividen4f8c66a, HoldingsUsLargeCapDividenbd0f5f9, HoldingsIntlDividendValue, HoldingsIntlDividendCurrentPct, HoldingsIntlDividendTargetPct, HoldingsIntlDividendCostBasis, HoldingsUsInvestmentGradeValue, HoldingsUsInvestmentGradef3e6cde, HoldingsUsInvestmentGradee1d29ba, HoldingsUsInvestmentGrade9537bcc, HoldingsUsTreasuryValue, HoldingsUsTreasuryCurrentPct, HoldingsUsTreasuryTargetPct, HoldingsUsTreasuryCostBasis, HoldingsMunicipalBondsValue, HoldingsMunicipalBondsCurrentPct, HoldingsMunicipalBondsTargetPct, HoldingsMunicipalBondsCostBasis, HoldingsHighYieldValue, HoldingsHighYieldCurrentPct, HoldingsHighYieldTargetPct, HoldingsHighYieldCostBasis, HoldingsPreferredStockValue, HoldingsPreferredStockCurrentPct, HoldingsPreferredStockTargetPct, HoldingsPreferredStockCostBasis as Number. Name the list Portfolio Rebalancing Portfolios. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/portfolios.csv"
+          ],
+          "expected": "2 fictional records, including Growth Allocation Fund (PortfolioId PORT-5001), with Manager Victoria Reeves, CFA.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-portfolios.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Portfolio Rebalancing Tax Rates from its CSV",
+          "action": "On the site: New, List, From CSV. Upload tax-rates.csv. On Customize, keep Title mapped to the Title column. Set TaxRateId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value as Number. Name the list Portfolio Rebalancing Tax Rates. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/tax-rates.csv"
+          ],
+          "expected": "5 fictional records, including short_term_capital_gains (TaxRateId short_term_capital_gains), with Value 0.37.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-tax-rates.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Name the agent",
+          "action": "Rename it Portfolio Rebal Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 2 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_portfolio-rebalancing-controls-and-review.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_portfolio-rebalancing-controls-and-review.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Add the portfolios tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Portfolio Rebalancing Portfolios; name the tool Get portfolio records.",
+          "expected": "Get portfolio records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-tool-portfolios.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the tax rates tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Portfolio Rebalancing Tax Rates; name the tool Get tax rate records.",
+          "expected": "Get tax rate records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-tool-tax-rates.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the 6 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_execution-plan_06/SKILL.md",
+            "studio/agent/skills/aibast_portfolio-analysis_01/SKILL.md",
+            "studio/agent/skills/aibast_rebalance-recommendation_02/SKILL.md",
+            "studio/agent/skills/aibast_retirement-scenario_05/SKILL.md",
+            "studio/agent/skills/aibast_tax-impact_03/SKILL.md",
+            "studio/agent/skills/aibast_tax-loss-harvest_04/SKILL.md"
+          ],
+          "expected": "6 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Review the agent",
+          "action": "Check the model, 6 skills, the rules knowledge and 2 tools.",
+          "expected": "Sonnet 4.6, 6 skills, 1 knowledge file(s), 2 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Test: Portfolio Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-01",
+          "prompt": "Which portfolio is outside its drift guardrails, and where is the largest gap?",
+          "expected": "The relevant list tool ran. Required evidence: PORT-5001; VTI. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-prb-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Test: Financial Advisor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-02",
+          "prompt": "Show me the allocation changes I should review with the client before anyone trades.",
+          "expected": "The relevant list tool ran. Required evidence: VTI; candidate. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-prb-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Test: Paraplanner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-03",
+          "prompt": "What tax assumptions should the advisor validate for the rebalance candidate?",
+          "expected": "The relevant list tool ran. Required evidence: Illustrative Tax Estimate; VTI. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-prb-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Test: Tax-Aware Portfolio Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-04",
+          "prompt": "Which positions are loss candidates, and what controls stop us from treating that as tax advice?",
+          "expected": "The relevant list tool ran. Required evidence: VEA; wash-sale. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-prb-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Retirement Planning Specialist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-05",
+          "prompt": "Frame the retirement scenarios we need to model without inventing a success probability.",
+          "expected": "The relevant list tool ran. Required evidence: 25 years; No success probability. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-prb-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Trading Supervisor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "PRB-06",
+          "prompt": "Prepare the controlled implementation checklist and make clear whether any order was sent.",
+          "expected": "The relevant list tool ran. Required evidence: VTI; No order. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-prb-06.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/portfolio-rebalancing/studio/managed-app/app.json --out portfolio-rebalancing-app"
+          ],
+          "expected": "portfolio-rebalancing-app/managed-app holds a React + Vite managed app whose config names your site and the 2 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd portfolio-rebalancing-app/managed-app",
+            "ms app init --display-name \"Portfolio Rebalancing Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Portfolio Rebalancing Portfolios\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Portfolio Rebalancing Tax Rates\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 2 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Portfolio Rebalancing Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Portfolio Rebalancing Portfolios tab.",
+          "expected": "The app and the agent read the same synthetic records. 2 fictional records, including Growth Allocation Fund (PortfolioId PORT-5001), with Manager Victoria Reeves, CFA.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

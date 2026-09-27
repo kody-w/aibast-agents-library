@@ -1,0 +1,5 @@
+Title,OutfitTemplateId,Pieces
+Business Casual,business_casual,tops:shirts; bottoms:pants; footwear:boots; accessories:pocket_squares
+Weekend Smart,weekend_smart,tops:sweaters; bottoms:pants; footwear:boots
+Active Weekend,active_weekend,outerwear:vests; footwear:athletic
+Evening Out,evening_out,outerwear:blazers; tops:shirts; bottoms:pants; footwear:boots
