@@ -64,7 +64,21 @@
           "expected": "5 fictional records, including Carlos Rivera (TechnicianId TECH-201), with Zone West.",
           "screenshot": {
             "file": "screenshots/studio-easy/03-lists.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Field Service Dispatch Technicians list that brainfreeze studio created and filled on the Easy workshop site AIBAST Synthetic Data: five fictional technicians with certifications, zone, status and today's job count, including Carlos Rivera (TECH-201, zone West, available) and Marcus Thompson (TECH-205, zone Central).",
+            "anchors": [
+              "AIBAST Synthetic Data",
+              "Field Service Dispatch Technicians",
+              "Carlos Rivera",
+              "TECH-201",
+              "West",
+              "Marcus Thompson",
+              "TECH-205"
+            ],
+            "captured_at": "2026-09-27T07:48:37Z"
           }
         },
         {
@@ -74,7 +88,22 @@
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Draft agent Field Service Dispatch Studio that brainfreeze studio deployed: the studio instructions with the list-column map (field_3 Type among the service request columns) and the never-dispatch boundary, Claude Sonnet 4.6, four skills, the three list tools (technician, service request and geographic zone records) and the rules-and-controls knowledge file.",
+            "anchors": [
+              "Field Service Dispatch Studio",
+              "Claude Sonnet 4.6",
+              "field-service-dispatch-technician-assignment",
+              "Get technician records",
+              "Get service request records",
+              "Get geographic zone records",
+              "field_3 Type",
+              "field-service-dispatch-rules-and-controls.md"
+            ],
+            "captured_at": "2026-09-27T07:56:09Z"
           }
         },
         {

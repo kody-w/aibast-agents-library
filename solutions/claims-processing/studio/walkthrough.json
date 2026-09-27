@@ -64,7 +64,21 @@
           "expected": "4 fictional records, including Burst pipe in upstairs bathroom caused water damage to ceiling, walls, and flooring in two rooms (ClaimId CLM-2025-7001), with Claimant Margaret Sullivan.",
           "screenshot": {
             "file": "screenshots/studio-easy/03-lists.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Claims Processing Claims list that brainfreeze studio created and filled on the Easy workshop site AIBAST Synthetic Data: four fictional claims, including the burst-pipe water-damage claim CLM-2025-7001 filed by Margaret Sullivan (policy HO-445892), with the long claim descriptions shortened by the list view.",
+            "anchors": [
+              "AIBAST Synthetic Data",
+              "Claims Processing Claims",
+              "Burst pipe in upstairs bathroom",
+              "CLM-2025-7001",
+              "Margaret Sullivan",
+              "HO-445892",
+              "water_damage"
+            ],
+            "captured_at": "2026-09-27T07:14:06Z"
           }
         },
         {
@@ -74,7 +88,23 @@
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Draft agent Claims Processing Studio that brainfreeze studio deployed: the studio instructions with the list-column map and the read-only boundary, Claude Sonnet 4.6, four skills (settlement recommendation, fraud flag, claim intake, adjudication review), the four list tools (policy detail, fraud indicator, claim and adjuster note records) and the controls-and-review knowledge file.",
+            "anchors": [
+              "Claims Processing Studio",
+              "Claude Sonnet 4.6",
+              "claim-intake",
+              "fraud-flag",
+              "Get claim records",
+              "Get policy detail records",
+              "Get fraud indicator records",
+              "Get adjuster note records",
+              "aibast_claims-processing-controls-and-review"
+            ],
+            "captured_at": "2026-09-27T07:18:14Z"
           }
         },
         {

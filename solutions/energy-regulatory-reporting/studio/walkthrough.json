@@ -64,7 +64,21 @@
           "expected": "6 fictional records, including EPA GHG Reporting Program (Subpart C) (RegulatoryReportId RPT-9001), with Authority EPA.",
           "screenshot": {
             "file": "screenshots/studio-easy/03-lists.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Regulatory Reporting Regulatory Reports list that brainfreeze studio created and filled on the Easy workshop site AIBAST Synthetic Data: six fictional filings, including EPA GHG Reporting Program (Subpart C) (RPT-9001, authority EPA) and PHMSA Annual Pipeline Safety Report (RPT-9006, overdue).",
+            "anchors": [
+              "AIBAST Synthetic Data",
+              "Regulatory Reporting Regulatory Reports",
+              "EPA GHG Reporting Program (Subpart C)",
+              "RPT-9001",
+              "EPA",
+              "PHMSA Annual Pipeline Safety Report",
+              "overdue"
+            ],
+            "captured_at": "2026-09-27T07:04:03Z"
           }
         },
         {
@@ -74,7 +88,21 @@
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Draft agent Regulatory Reporting Studio that brainfreeze studio deployed: the studio instructions with the list-column map, Claude Sonnet 4.6, the four energy-regulatory-reporting skills, the three list tools (regulatory report, data validation rule and audit finding records) and the rules-and-controls knowledge file.",
+            "anchors": [
+              "Regulatory Reporting Studio",
+              "Claude Sonnet 4.6",
+              "energy-regulatory-reporting-report-status",
+              "Get regulatory report records",
+              "Get data validation rule records",
+              "Get audit finding records",
+              "energy-regulatory-reporting-rules-and-controls"
+            ],
+            "captured_at": "2026-09-27T07:06:10Z"
           }
         },
         {
@@ -84,10 +112,62 @@
           "case": "ENERGY_REGULATORY_REPORTING-01",
           "prompt": "Which filing is overdue and who owns it?",
           "expected": "The relevant list tool ran. Required evidence: PHMSA Annual Pipeline Safety Report; OVERDUE; Pipeline Operations. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
-          "screenshot": {
-            "file": "screenshots/studio-easy/05-energy-regulatory-reporting-01.webp",
-            "status": "pending"
-          }
+          "screenshot": [
+            {
+              "file": "screenshots/studio-easy/05a-energy-regulatory-reporting-01-tool.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "Locked case ENERGY_REGULATORY_REPORTING-01 on the Easy Draft in a fresh Preview conversation, with the 5a482c4a skills: the Get items call with table Regulatory Reporting Regulatory Reports and the Easy workshop site as dataset (tenant masked), and its output starting with EPA GHG Reporting Program (Subpart C), RPT-9001.",
+              "anchors": [
+                "Input",
+                "dataset: https://<your-tenant>.sharepoint.com/sites/AIBASTSyntheticData",
+                "table: Regulatory Reporting Regulatory Reports",
+                "Output",
+                "EPA GHG Reporting Program (Subpart C)",
+                "field_1 RPT-9001"
+              ],
+              "captured_at": "2026-09-27T08:08:44Z"
+            },
+            {
+              "file": "screenshots/studio-easy/05b-energy-regulatory-reporting-01-answer.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The ENERGY_REGULATORY_REPORTING-01 answer on the Easy Draft with the 5a482c4a skills: Overdue Filing Identified, the PHMSA Annual Pipeline Safety Report (RPT-9006) is the only filing with status OVERDUE, and its record from the Regulatory Reports list: authority PHMSA, Northeast Corridor Pipeline, CY 2025, deadline 2026-03-15, last updated 2026-03-14.",
+              "anchors": [
+                "Overdue Filing Identified",
+                "PHMSA Annual Pipeline Safety Report",
+                "RPT-9006",
+                "OVERDUE",
+                "PHMSA",
+                "Northeast Corridor Pipeline",
+                "Deadline 2026-03-15"
+              ],
+              "captured_at": "2026-09-27T08:13:35Z"
+            },
+            {
+              "file": "screenshots/studio-easy/05c-energy-regulatory-reporting-01-boundary.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The end of the ENERGY_REGULATORY_REPORTING-01 answer on the Easy Draft: context and uncertainty (the filing missed its 2026-03-15 deadline; the days overdue are labelled as computed; no other filing is overdue), the required next step naming Pipeline Operations as the owner and authorized reviewer, the no-write boundary that no filing was transmitted and no record changed, and the citation.",
+              "anchors": [
+                "Context & Uncertainty",
+                "2026-03-15",
+                "(computed)",
+                "Required Next Step",
+                "Pipeline Operations",
+                "No-write boundary",
+                "No filing was transmitted",
+                "Citations: energy-regulatory-reporting-rules-and-controls.md"
+              ],
+              "captured_at": "2026-09-27T08:13:35Z"
+            }
+          ]
         },
         {
           "id": "easy-06",
@@ -96,10 +176,62 @@
           "case": "ENERGY_REGULATORY_REPORTING-02",
           "prompt": "Which report data is incomplete or below quality threshold?",
           "expected": "The relevant list tool ran. Required evidence: Data collection incomplete; Data quality score below threshold; authorized report owner. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
-          "screenshot": {
-            "file": "screenshots/studio-easy/06-energy-regulatory-reporting-02.webp",
-            "status": "pending"
-          }
+          "screenshot": [
+            {
+              "file": "screenshots/studio-easy/06a-energy-regulatory-reporting-02-tool.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "Locked case ENERGY_REGULATORY_REPORTING-02 on the Easy Draft in a fresh Preview conversation, with the 5a482c4a skills (the passing retry): the first of its Get items calls, with table Regulatory Reporting Regulatory Reports and the Easy workshop site as dataset (tenant masked), and its output starting with EPA GHG Reporting Program (Subpart C), RPT-9001.",
+              "anchors": [
+                "Input",
+                "table: Regulatory Reporting Regulatory Reports",
+                "dataset: https://<your-tenant>.sharepoint.com/sites/AIBASTSyntheticData",
+                "Output",
+                "EPA GHG Reporting Program (Subpart C)",
+                "field_1 RPT-9001"
+              ],
+              "captured_at": "2026-09-27T08:25:33Z"
+            },
+            {
+              "file": "screenshots/studio-easy/06b-energy-regulatory-reporting-02-answer.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The ENERGY_REGULATORY_REPORTING-02 answer on the Easy Draft with the 5a482c4a skills: Data Validation Results with the 20.0% pass rate from the canonical output (its arithmetic labelled as computed), RPT-9004 excluded as not started, and the five evaluated reports with quality score, completeness and issues, e.g. EPA Toxics Release Inventory (TRI) RPT-9005 at 74/100 and 42%.",
+              "anchors": [
+                "Data Validation Results",
+                "Validation Pass Rate: 20.0%",
+                "(computed: 1 passing ÷ 5 evaluated × 100",
+                "RPT-9004 is omitted",
+                "RPT-9001 87/100 78% Data collection incomplete (78%)",
+                "RPT-9005 74/100 42% Data quality score below threshold",
+                "RPT-9003 None"
+              ],
+              "captured_at": "2026-09-27T08:29:38Z"
+            },
+            {
+              "file": "screenshots/studio-easy/06c-energy-regulatory-reporting-02-boundary.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The end of the ENERGY_REGULATORY_REPORTING-02 answer on the Easy Draft: the flagged reports with their owners (RPT-9005 also fails the quality threshold; RPT-9006 is also overdue), the applicable validation rules from the Data Validation Rules list, the boundary that an authorized report owner must resolve and attest source evidence and nothing has been changed, and the citation.",
+              "anchors": [
+                "Applicable validation rules",
+                "emissions_data",
+                "financial_data",
+                "safety_data",
+                "Validation screening only.",
+                "authorized report owner",
+                "No record, system, filing, or inventory position has been changed",
+                "Citations: energy-regulatory-reporting-rules-and-controls.md"
+              ],
+              "captured_at": "2026-09-27T08:31:04Z"
+            }
+          ]
         },
         {
           "id": "easy-07",
@@ -108,10 +240,61 @@
           "case": "ENERGY_REGULATORY_REPORTING-03",
           "prompt": "Show filing state and confirm you did not transmit anything.",
           "expected": "The relevant list tool ran. Required evidence: PHMSA Annual Pipeline Safety Report; OVERDUE; No regulator filing. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
-          "screenshot": {
-            "file": "screenshots/studio-easy/07-energy-regulatory-reporting-03.webp",
-            "status": "pending"
-          }
+          "screenshot": [
+            {
+              "file": "screenshots/studio-easy/07a-energy-regulatory-reporting-03-tool.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "Locked case ENERGY_REGULATORY_REPORTING-03 on the Easy Draft in a fresh Preview conversation, with the 5a482c4a skills: the first of its Get items calls, with table Regulatory Reporting Regulatory Reports and the Easy workshop site as dataset (tenant masked), and its output starting with EPA GHG Reporting Program (Subpart C), RPT-9001.",
+              "anchors": [
+                "Input",
+                "table: Regulatory Reporting Regulatory Reports",
+                "dataset: https://<your-tenant>.sharepoint.com/sites/AIBASTSyntheticData",
+                "Output",
+                "EPA GHG Reporting Program (Subpart C)",
+                "field_1 RPT-9001"
+              ],
+              "captured_at": "2026-09-27T08:36:02Z"
+            },
+            {
+              "file": "screenshots/studio-easy/07b-energy-regulatory-reporting-03-answer.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The ENERGY_REGULATORY_REPORTING-03 answer on the Easy Draft with the 5a482c4a skills: the Submission Tracker sorted by deadline, led by the PHMSA Annual Pipeline Safety Report (PHMSA, Pipeline Operations, 2026-03-15, OVERDUE), with the other five filings' authority, owner, deadline and status as recorded in the Regulatory Reports list. The table continues to the right.",
+              "anchors": [
+                "Submission Tracker",
+                "PHMSA Annual Pipeline Safety Report",
+                "PHMSA",
+                "Pipeline Operations",
+                "2026-03-15",
+                "OVERDUE",
+                "Source evidence: 6 records read from Regulatory Reporting Regulatory Reports"
+              ],
+              "captured_at": "2026-09-27T08:38:10Z"
+            },
+            {
+              "file": "screenshots/studio-easy/07c-energy-regulatory-reporting-03-boundary.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The end of the ENERGY_REGULATORY_REPORTING-03 answer on the Easy Draft: the source evidence (6 records from the Regulatory Reports list, reproduced as recorded), the material uncertainty about the overdue PHMSA filing and the not-started Colorado report, the authorized reviewer requirement, the transmission confirmation that no regulator filing, certification, signature, or transmission has occurred, and the citation.",
+              "anchors": [
+                "Source evidence",
+                "Material uncertainty",
+                "RPT-9006",
+                "Authorized reviewer needed",
+                "Transmission confirmation",
+                "No regulator filing, certification, signature, or transmission has occurred",
+                "Citations: energy-regulatory-reporting-rules-and-controls.md"
+              ],
+              "captured_at": "2026-09-27T08:39:54Z"
+            }
+          ]
         },
         {
           "id": "easy-08",
@@ -120,10 +303,62 @@
           "case": "ENERGY_REGULATORY_REPORTING-04",
           "prompt": "What high-severity reporting evidence is still open?",
           "expected": "The relevant list tool ran. Required evidence: Pipeline mileage discrepancy; HIGH; cannot predict an audit outcome. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
-          "screenshot": {
-            "file": "screenshots/studio-easy/08-energy-regulatory-reporting-04.webp",
-            "status": "pending"
-          }
+          "screenshot": [
+            {
+              "file": "screenshots/studio-easy/08a-energy-regulatory-reporting-04-tool.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "Locked case ENERGY_REGULATORY_REPORTING-04 on the Easy Draft in a fresh Preview conversation, with the 5a482c4a skills: the Get items call with table Regulatory Reporting Audit Findings and the Easy workshop site as dataset (tenant masked), and its output starting with AUD-001 for RPT-9001, Missing CEMS calibration records for Q3.",
+              "anchors": [
+                "Input",
+                "table: Regulatory Reporting Audit Findings",
+                "dataset: https://<your-tenant>.sharepoint.com/sites/AIBASTSyntheticData",
+                "Output",
+                "AUD-001",
+                "field_2 RPT-9001",
+                "Missing CEMS calibration records for Q3"
+              ],
+              "captured_at": "2026-09-27T08:44:24Z"
+            },
+            {
+              "file": "screenshots/studio-easy/08b-energy-regulatory-reporting-04-answer.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The ENERGY_REGULATORY_REPORTING-04 answer on the Easy Draft with the 5a482c4a skills: Audit Readiness Assessment with 4 findings, 3 open and 1 high-severity open (as in the rules knowledge), grouped by report from the Audit Findings list: EPA GHG Reporting Program (Subpart C) RPT-9001 (Missing CEMS calibration records for Q3, MEDIUM, OPEN) and FERC Form 1 Annual Report RPT-9002 (Depreciation schedule mismatch with PowerPlan, HIGH, REMEDIATED).",
+              "anchors": [
+                "Audit Readiness Assessment",
+                "Total Findings: 4 | Open: 3 | High Severity Open: 1",
+                "RPT-9001",
+                "Missing CEMS calibration records for Q3 MEDIUM OPEN 2026-03-25",
+                "RPT-9002",
+                "Depreciation schedule mismatch with PowerPlan HIGH REMEDIATED"
+              ],
+              "captured_at": "2026-09-27T08:46:12Z"
+            },
+            {
+              "file": "screenshots/studio-easy/08c-energy-regulatory-reporting-04-boundary.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The end of the ENERGY_REGULATORY_REPORTING-04 answer on the Easy Draft: AUD-004, the Pipeline mileage discrepancy between the GIS and PIMS systems on RPT-9006, is the only HIGH finding still open (AUD-002 is HIGH but remediated); the material uncertainty and the Pipeline Operations review; the boundary that this triage is not legal advice and cannot predict an audit outcome; and the citation.",
+              "anchors": [
+                "Key evidence summary",
+                "AUD-004",
+                "Pipeline mileage discrepancy",
+                "HIGH",
+                "REMEDIATED",
+                "Pipeline Operations",
+                "not legal advice and cannot predict an audit outcome",
+                "Citations: energy-regulatory-reporting-rules-and-controls.md"
+              ],
+              "captured_at": "2026-09-27T08:47:47Z"
+            }
+          ]
         },
         {
           "id": "easy-09",

@@ -64,7 +64,21 @@
           "expected": "4 fictional records, including Wind Turbine Alpha-7 (AssetId AST-T001), with Type wind_turbine.",
           "screenshot": {
             "file": "screenshots/studio-easy/03-lists.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Asset Maintenance Forecast Assets list that brainfreeze studio created and filled on the Easy workshop site AIBAST Synthetic Data. The first two of its four fictional assets are in view: Wind Turbine Alpha-7 (AST-T001, Type wind_turbine, Sweetwater Wind Farm, TX) and Substation Transformer B-12 (AST-X002, transformer). Rows are tall because the long maintenance-history column further right is stored as multiline text.",
+            "anchors": [
+              "AIBAST Synthetic Data",
+              "Asset Maintenance Forecast Assets",
+              "Wind Turbine Alpha-7",
+              "AST-T001",
+              "Type wind_turbine",
+              "Substation Transformer B-12",
+              "AST-X002"
+            ],
+            "captured_at": "2026-09-27T07:44:44Z"
           }
         },
         {
@@ -74,7 +88,21 @@
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Draft agent Asset Maintenance Studio that brainfreeze studio deployed: the studio instructions with the list-column map (field_2 Type, field_11 MaintenanceHistory) and the no-work-order boundary, Claude Sonnet 4.6, four skills, the two list tools (budget rate and asset records) and the rules-and-controls knowledge file.",
+            "anchors": [
+              "Asset Maintenance Studio",
+              "Claude Sonnet 4.6",
+              "asset-maintenance-forecast-asset-health",
+              "Get asset records",
+              "Get budget rate records",
+              "field_2 Type",
+              "asset-maintenance-forecast-rules-and-controls"
+            ],
+            "captured_at": "2026-09-27T07:52:20Z"
           }
         },
         {

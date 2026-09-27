@@ -64,7 +64,20 @@
           "expected": "7 fictional records, including email (ChannelId email), with Sessions30D 145000.",
           "screenshot": {
             "file": "screenshots/studio-easy/03-lists.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Omnichannel Engagement Channels list that brainfreeze studio created and filled on the Easy workshop site AIBAST Synthetic Data: seven fictional channels (email, sms, social_media, web_organic, web_paid, mobile_app and in_store) with 30-day sessions, conversions, revenue and cost; email has ChannelId email and 145,000 sessions.",
+            "anchors": [
+              "AIBAST Synthetic Data",
+              "Omnichannel Engagement Channels",
+              "email",
+              "ChannelId email",
+              "Sessions30D 145,000",
+              "in_store 5,700,000"
+            ],
+            "captured_at": "2026-09-27T07:11:30Z"
           }
         },
         {
@@ -74,7 +87,21 @@
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Draft agent Omnichannel Engagement Studio that brainfreeze studio deployed: the studio instructions with the list-column map and the aggregate-only, no-identity-graph boundary, Claude Sonnet 4.6, four skills, the three list tools (customer journey, channel and campaign result records) and the rules-and-safety knowledge file.",
+            "anchors": [
+              "Omnichannel Engagement Studio",
+              "Claude Sonnet 4.6",
+              "aggregate-channel-performance-review",
+              "Get customer journey records",
+              "Get channel records",
+              "Get campaign result records",
+              "aibast_omnichannel-rules-and-safety.md"
+            ],
+            "captured_at": "2026-09-27T07:16:25Z"
           }
         },
         {

@@ -64,7 +64,21 @@
           "expected": "6 fictional records, including Title V Air Operating Permit (PermitId PRM-6001), with Facility Riverside Generating Station.",
           "screenshot": {
             "file": "screenshots/studio-easy/03-lists.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Permit Management Permits list that brainfreeze studio created and filled on the Easy workshop site AIBAST Synthetic Data: six fictional permits, including Title V Air Operating Permit (PRM-6001, Riverside Generating Station, CA Air Resources Board) and the expired NPDES Stormwater Discharge Permit (PRM-6002).",
+            "anchors": [
+              "AIBAST Synthetic Data",
+              "Permit Management Permits",
+              "Title V Air Operating Permit",
+              "PRM-6001",
+              "Riverside Generating Station",
+              "NPDES Stormwater Discharge Permit",
+              "expired"
+            ],
+            "captured_at": "2026-09-27T07:46:55Z"
           }
         },
         {
@@ -74,7 +88,22 @@
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Draft agent Permit Management Studio that brainfreeze studio deployed: the studio instructions with the list-column map (field_8 Type among the permit columns) and the never-submit boundary, Claude Sonnet 4.6, four skills, the three list tools (regulatory requirement, permit and application records) and the rules-and-controls knowledge file.",
+            "anchors": [
+              "Permit Management Studio",
+              "Claude Sonnet 4.6",
+              "permit-license-management-permit-inventory",
+              "Get permit records",
+              "Get application records",
+              "Get regulatory requirement records",
+              "field_8 Type",
+              "permit-license-management-rules-and-controls"
+            ],
+            "captured_at": "2026-09-27T07:54:17Z"
           }
         },
         {
