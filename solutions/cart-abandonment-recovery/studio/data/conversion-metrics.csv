@@ -1,0 +1,7 @@
+Title,ConversionMetricId,Value
+overall_abandonment_rate,overall_abandonment_rate,71.4
+recovery_rate,recovery_rate,12.8
+avg_recovered_value,avg_recovered_value,187.5
+total_abandoned_30d,total_abandoned_30d,4250
+total_recovered_30d,total_recovered_30d,544
+total_recovered_revenue_30d,total_recovered_revenue_30d,102000

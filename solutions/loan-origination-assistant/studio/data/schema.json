@@ -1,0 +1,86 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "loan-origination-assistant",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/financial_services_stacks/loan_origination_assistant_stack/loan_origination_assistant_agent.py",
+  "records_markdown": "solutions/loan-origination-assistant/manual/knowledge/aibast_loan-origination-assistant-synthetic-records.md",
+  "lists": [
+    {
+      "id": "loan-applications",
+      "title": "Loan Origination Assistant Loan Applications",
+      "description": "Synthetic loan applications (AIBAST Loan Origination Assistant workshop; fictional).",
+      "record_set": "LOAN_APPLICATIONS",
+      "columns": [
+        {"name": "Title", "label": "Loan Application", "from": "$key", "type": "text"},
+        {"name": "LoanApplicationId", "label": "Loan Application ID", "from": "$key", "type": "text"},
+        {"name": "Applicant", "label": "Applicant", "from": "applicant", "type": "text"},
+        {"name": "LoanType", "label": "Loan Type", "from": "loan_type", "type": "text"},
+        {"name": "Purpose", "label": "Purpose", "from": "purpose", "type": "text"},
+        {"name": "PropertyAddress", "label": "Property Address", "from": "property_address", "type": "text"},
+        {"name": "PropertyValue", "label": "Property Value", "from": "property_value", "type": "number"},
+        {"name": "LoanAmount", "label": "Loan Amount", "from": "loan_amount", "type": "number"},
+        {"name": "CreditScore", "label": "Credit Score", "from": "credit_score", "type": "number"},
+        {"name": "AnnualIncome", "label": "Annual Income", "from": "annual_income", "type": "number"},
+        {"name": "MonthlyDebt", "label": "Monthly Debt", "from": "monthly_debt", "type": "number"},
+        {"name": "EmploymentYears", "label": "Employment Years", "from": "employment_years", "type": "number"},
+        {"name": "DownPaymentPct", "label": "Down Payment Pct", "from": "down_payment_pct", "type": "number"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "LoanOfficer", "label": "Loan Officer", "from": "loan_officer", "type": "text"},
+        {"name": "Dscr", "label": "Dscr", "from": "dscr", "type": "number", "optional": true}
+      ]
+    },
+    {
+      "id": "approval-criteria",
+      "title": "Loan Origination Assistant Approval Criteria",
+      "description": "Synthetic approval criteria (AIBAST Loan Origination Assistant workshop; fictional).",
+      "record_set": "APPROVAL_CRITERIA",
+      "columns": [
+        {"name": "Title", "label": "Approval Criteria", "from": "$key", "type": "text"},
+        {"name": "ApprovalCriteriaId", "label": "Approval Criteria ID", "from": "$key", "type": "text"},
+        {"name": "MinCredit", "label": "Min Credit", "from": "min_credit", "type": "number"},
+        {"name": "MaxDti", "label": "Max Dti", "from": "max_dti", "type": "number"},
+        {"name": "MinDownPct", "label": "Min Down Pct", "from": "min_down_pct", "type": "number"},
+        {"name": "MaxLtv", "label": "Max Ltv", "from": "max_ltv", "type": "number"},
+        {"name": "MinDscr", "label": "Min Dscr", "from": "min_dscr", "type": "number", "optional": true}
+      ]
+    },
+    {
+      "id": "document-requirements",
+      "title": "Loan Origination Assistant Document Requirements",
+      "description": "Synthetic document requirements (AIBAST Loan Origination Assistant workshop; fictional).",
+      "record_set": "DOCUMENT_REQUIREMENTS",
+      "columns": [
+        {"name": "Title", "label": "Document Requirement", "from": "$key", "type": "text"},
+        {"name": "DocumentRequirementId", "label": "Document Requirement ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "text", "encoding": "joined"}
+      ]
+    },
+    {
+      "id": "rate-sheet",
+      "title": "Loan Origination Assistant Rate Sheet",
+      "description": "Synthetic rate sheet (AIBAST Loan Origination Assistant workshop; fictional).",
+      "record_set": "RATE_SHEET",
+      "columns": [
+        {"name": "Title", "label": "Rate Sheet", "from": "$key", "type": "text"},
+        {"name": "RateSheetId", "label": "Rate Sheet ID", "from": "$key", "type": "text"},
+        {"name": "Rate", "label": "Rate", "from": "rate", "type": "number"},
+        {"name": "Apr", "label": "Apr", "from": "apr", "type": "number"},
+        {"name": "Points", "label": "Points", "from": "points", "type": "number"},
+        {"name": "MipUpfront", "label": "Mip Upfront", "from": "mip_upfront", "type": "number", "optional": true},
+        {"name": "MipAnnual", "label": "Mip Annual", "from": "mip_annual", "type": "number", "optional": true},
+        {"name": "FundingFee", "label": "Funding Fee", "from": "funding_fee", "type": "number", "optional": true}
+      ]
+    },
+    {
+      "id": "conditions",
+      "title": "Loan Origination Assistant Conditions",
+      "description": "Synthetic conditions (AIBAST Loan Origination Assistant workshop; fictional).",
+      "record_set": "CONDITIONS",
+      "columns": [
+        {"name": "Title", "label": "Condition", "from": "$key", "type": "text"},
+        {"name": "ConditionId", "label": "Condition ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "text", "encoding": "joined"}
+      ]
+    }
+  ]
+}

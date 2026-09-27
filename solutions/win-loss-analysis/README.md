@@ -49,6 +49,7 @@ All exact names, dates, counts, values, scores, percentages, pricing, ARR, margi
 | Copilot-only Easy-mode comparison | `solutions/win-loss-analysis/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/win-loss-analysis/quest.html` |
 | Literal browser tutorial | `solutions/win-loss-analysis/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/win-loss-analysis/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/win-loss-analysis/export-manifest.json` |
 | Source bundle | `solutions/win-loss-analysis/exports/win-loss-analysis-source.zip` |
 | Manual evidence | `solutions/win-loss-analysis/evals/manual-build-evidence.json` |

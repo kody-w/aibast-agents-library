@@ -1,0 +1,206 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Cart Abandonment Recovery Workspace",
+  "title": "Cart Abandonment Recovery",
+  "description": "The Cart Abandonment Recovery workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "abandoned-carts",
+      "list": "Cart Abandonment Recovery Abandoned Carts",
+      "title": "Abandoned Carts",
+      "key": "AbandonedCartId",
+      "fields": {
+        "AbandonedCartId": "field_1",
+        "Contactable": "field_2",
+        "Segment": "field_3",
+        "Items": "field_4",
+        "CartValue": "field_5",
+        "AbandonedAt": "field_6",
+        "PageExit": "field_7",
+        "Device": "field_8",
+        "PriorPurchases": "field_9",
+        "RecoveryStatus": "field_10"
+      },
+      "columns": [
+        "AbandonedCartId",
+        "Title",
+        "Contactable",
+        "Segment",
+        "CartValue",
+        "AbandonedAt",
+        "PageExit",
+        "Device",
+        "PriorPurchases",
+        "RecoveryStatus"
+      ],
+      "labels": {
+        "Title": "Abandoned Cart",
+        "AbandonedCartId": "Abandoned Cart ID",
+        "Contactable": "Contactable",
+        "Segment": "Segment",
+        "Items": "Items",
+        "CartValue": "Cart Value",
+        "AbandonedAt": "Abandoned At",
+        "PageExit": "Page Exit",
+        "Device": "Device",
+        "PriorPurchases": "Prior Purchases",
+        "RecoveryStatus": "Recovery Status"
+      },
+      "formats": {
+        "Title": "text",
+        "AbandonedCartId": "text",
+        "Contactable": "text",
+        "Segment": "text",
+        "Items": "text",
+        "CartValue": "currency",
+        "AbandonedAt": "text",
+        "PageExit": "text",
+        "Device": "text",
+        "PriorPurchases": "integer",
+        "RecoveryStatus": "text"
+      },
+      "metrics": [
+        {
+          "label": "Abandoned Carts",
+          "op": "count"
+        },
+        {
+          "label": "Cart Value",
+          "op": "sum",
+          "column": "CartValue"
+        }
+      ],
+      "groupBy": "Contactable",
+      "sortBy": "AbandonedCartId"
+    },
+    {
+      "id": "recovery-campaigns",
+      "list": "Cart Abandonment Recovery Recovery Campaigns",
+      "title": "Recovery Campaigns",
+      "key": "RecoveryCampaignId",
+      "fields": {
+        "RecoveryCampaignId": "field_1",
+        "DelayHours": "field_2",
+        "Subject": "field_3",
+        "Incentive": "field_4",
+        "AvgOpenRate": "field_5",
+        "AvgConversion": "field_6"
+      },
+      "columns": [
+        "RecoveryCampaignId",
+        "Title",
+        "DelayHours",
+        "Subject",
+        "Incentive",
+        "AvgOpenRate",
+        "AvgConversion"
+      ],
+      "labels": {
+        "Title": "Recovery Campaign",
+        "RecoveryCampaignId": "Recovery Campaign ID",
+        "DelayHours": "Delay Hours",
+        "Subject": "Subject",
+        "Incentive": "Incentive",
+        "AvgOpenRate": "Avg Open Rate",
+        "AvgConversion": "Avg Conversion"
+      },
+      "formats": {
+        "Title": "text",
+        "RecoveryCampaignId": "text",
+        "DelayHours": "integer",
+        "Subject": "text",
+        "Incentive": "text",
+        "AvgOpenRate": "number",
+        "AvgConversion": "number"
+      },
+      "metrics": [
+        {
+          "label": "Recovery Campaigns",
+          "op": "count"
+        },
+        {
+          "label": "Delay Hours",
+          "op": "sum",
+          "column": "DelayHours"
+        }
+      ],
+      "groupBy": "Subject",
+      "sortBy": "RecoveryCampaignId"
+    },
+    {
+      "id": "incentive-options",
+      "list": "Cart Abandonment Recovery Incentive Options",
+      "title": "Incentive Options",
+      "key": "IncentiveOptionId",
+      "fields": {
+        "IncentiveOptionId": "field_1",
+        "CostMarginImpact": "field_2",
+        "ConversionLift": "field_3"
+      },
+      "columns": [
+        "IncentiveOptionId",
+        "Title",
+        "CostMarginImpact",
+        "ConversionLift"
+      ],
+      "labels": {
+        "Title": "Incentive Option",
+        "IncentiveOptionId": "Incentive Option ID",
+        "CostMarginImpact": "Cost Margin Impact",
+        "ConversionLift": "Conversion Lift"
+      },
+      "formats": {
+        "Title": "text",
+        "IncentiveOptionId": "text",
+        "CostMarginImpact": "currency",
+        "ConversionLift": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Incentive Options",
+          "op": "count"
+        },
+        {
+          "label": "Cost Margin Impact",
+          "op": "sum",
+          "column": "CostMarginImpact"
+        }
+      ],
+      "sortBy": "IncentiveOptionId"
+    },
+    {
+      "id": "conversion-metrics",
+      "list": "Cart Abandonment Recovery Conversion Metrics",
+      "title": "Conversion Metrics",
+      "key": "ConversionMetricId",
+      "fields": {
+        "ConversionMetricId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "ConversionMetricId",
+        "Title",
+        "Value"
+      ],
+      "labels": {
+        "Title": "Conversion Metric",
+        "ConversionMetricId": "Conversion Metric ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "ConversionMetricId": "text",
+        "Value": "currency"
+      },
+      "metrics": [
+        {
+          "label": "Conversion Metrics",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ConversionMetricId"
+    }
+  ]
+}

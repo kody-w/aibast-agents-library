@@ -1,0 +1,458 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "fs-customer-onboarding",
+  "title": "Customer Onboarding, built with brainfreeze studio",
+  "summary": "The Customer Onboarding agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_fs-customer-onboarding-controls-and-review.md",
+      "studio/agent/knowledge/fs-customer-onboarding-instruction-controls.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Customer Onboarding Studio",
+      "manual": "Customer Onboarding Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Customer Onboarding Workspace",
+      "manual": "Customer Onboarding Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/fs-customer-onboarding.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast fs-customer-onboarding --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Customer Onboarding Customer Applications list.",
+          "expected": "4 fictional records, including APP-6001 (CustomerApplicationId APP-6001), with Applicant Sarah Chen.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Customer Onboarding Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 2 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Compliance Officer",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FCO-01",
+          "prompt": "What is holding up the enhanced due diligence case, and which checks need my review?",
+          "expected": "The relevant list tool ran. Required evidence: APP-6003; PEP. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-fco-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Onboarding Specialist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FCO-02",
+          "prompt": "Which approved-looking file is ready for account setup review, and what product is being prepared?",
+          "expected": "The relevant list tool ran. Required evidence: APP-6004; Basic Savings. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-fco-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Relationship Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FCO-03",
+          "prompt": "Give me the business onboarding document list for Blackwood before I call them.",
+          "expected": "The relevant list tool ran. Required evidence: APP-6002; Beneficial ownership. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-fco-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Head of Onboarding",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FCO-04",
+          "prompt": "Where is the onboarding queue stuck, and who owns each application?",
+          "expected": "The relevant list tool ran. Required evidence: APP-6001; APP-6003. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-fco-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Customer Onboarding: 4 read-only tabs from the same lists. 4 fictional records, including APP-6001 (CustomerApplicationId APP-6001), with Applicant Sarah Chen.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Customer Onboarding Customer Applications from its CSV",
+          "action": "On the site: New, List, From CSV. Upload customer-applications.csv. On Customize, keep Title mapped to the Title column. Set CustomerApplicationId, Applicant, ApplicationType, AccountRequested, Submitted, Status, RiskRating, RelationshipManager to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep EstimatedAssets as Number. Name the list Customer Onboarding Customer Applications. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/customer-applications.csv"
+          ],
+          "expected": "4 fictional records, including APP-6001 (CustomerApplicationId APP-6001), with Applicant Sarah Chen.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-customer-applications.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Customer Onboarding KYC Documents from its CSV",
+          "action": "On the site: New, List, From CSV. Upload kyc-documents.csv. On Customize, keep Title mapped to the Title column. Set KYCDocumentId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Use Multiple lines of text for Value (up to 511 characters). If the import screen cannot create these long-text columns losslessly, stop and report the import limitation; do not continue with truncated records. Compare their full values with the downloaded CSV. Name the list Customer Onboarding KYC Documents. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/kyc-documents.csv"
+          ],
+          "expected": "2 fictional records, including individual (KYCDocumentId individual).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-kyc-documents.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Customer Onboarding Verification Status from its CSV",
+          "action": "On the site: New, List, From CSV. Upload verification-status.csv. On Customize, keep Title mapped to the Title column. Set VerificationStatusId, IDVerification, SsnVerification, AddressVerification, OfacScreening, PepScreening, AdverseMedia, EinVerification, BeneficialOwnership, SourceOfWealth to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Customer Onboarding Verification Status. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/verification-status.csv"
+          ],
+          "expected": "4 fictional records, including APP-6001 (VerificationStatusId APP-6001), with IDVerification complete.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-verification-status.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Customer Onboarding Account Types from its CSV",
+          "action": "On the site: New, List, From CSV. Upload account-types.csv. On Customize, keep Title mapped to the Title column. Set AccountTypeId, Features to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep MinDeposit, MonthlyFee, Apy as Number. Name the list Customer Onboarding Account Types. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/account-types.csv"
+          ],
+          "expected": "4 fictional records, including basic_savings (AccountTypeId basic_savings), with MinDeposit 25.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-account-types.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Customer Onboarding Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Customer Onboarding Agent — Studio Global Instructions, name the four list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_fs-customer-onboarding-controls-and-review.md, fs-customer-onboarding-instruction-controls.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_fs-customer-onboarding-controls-and-review.md",
+            "studio/agent/knowledge/fs-customer-onboarding-instruction-controls.md"
+          ],
+          "expected": "2 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the customer applications tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Customer Onboarding Customer Applications; name the tool Get customer application records.",
+          "expected": "Get customer application records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-customer-applications.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the kyc documents tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Customer Onboarding KYC Documents; name the tool Get kyc document records.",
+          "expected": "Get kyc document records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-kyc-documents.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the verification status tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Customer Onboarding Verification Status; name the tool Get verification status records.",
+          "expected": "Get verification status records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-verification-status.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the account types tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Customer Onboarding Account Types; name the tool Get account type records.",
+          "expected": "Get account type records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-account-types.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_account-setup_02/SKILL.md",
+            "studio/agent/skills/aibast_document-checklist_03/SKILL.md",
+            "studio/agent/skills/aibast_kyc-verification_01/SKILL.md",
+            "studio/agent/skills/aibast_onboarding-status_04/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 2 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Compliance Officer",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FCO-01",
+          "prompt": "What is holding up the enhanced due diligence case, and which checks need my review?",
+          "expected": "The relevant list tool ran. Required evidence: APP-6003; PEP. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-fco-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Onboarding Specialist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FCO-02",
+          "prompt": "Which approved-looking file is ready for account setup review, and what product is being prepared?",
+          "expected": "The relevant list tool ran. Required evidence: APP-6004; Basic Savings. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-fco-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Relationship Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FCO-03",
+          "prompt": "Give me the business onboarding document list for Blackwood before I call them.",
+          "expected": "The relevant list tool ran. Required evidence: APP-6002; Beneficial ownership. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-fco-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Head of Onboarding",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FCO-04",
+          "prompt": "Where is the onboarding queue stuck, and who owns each application?",
+          "expected": "The relevant list tool ran. Required evidence: APP-6001; APP-6003. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-fco-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/fs-customer-onboarding/studio/managed-app/app.json --out fs-customer-onboarding-app"
+          ],
+          "expected": "fs-customer-onboarding-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd fs-customer-onboarding-app/managed-app",
+            "ms app init --display-name \"Customer Onboarding Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Onboarding Customer Applications\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Onboarding KYC Documents\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Onboarding Verification Status\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Onboarding Account Types\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Customer Onboarding Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Customer Onboarding Customer Applications tab.",
+          "expected": "The app and the agent read the same synthetic records. 4 fictional records, including APP-6001 (CustomerApplicationId APP-6001), with Applicant Sarah Chen.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+Title,SupplierId,Category,Region,Country,AnnualSpend,QualityScore,DeliveryScore,FinancialScore,GeopoliticalScore,OverallRisk,Tier
+TechnoCore Semiconductor (Taiwan),SUP-101,Microcontrollers,Asia-Pacific,Taiwan,4800000,82,74,68,42,8.2,1
+Shenzhen Electronics Co.,SUP-102,Passive Components,Asia-Pacific,China,3200000,71,78,55,58,6.5,1
+Malaysia Semicon Pte Ltd,SUP-103,Power ICs,Asia-Pacific,Malaysia,2100000,91,88,84,82,3.8,1
+Midwest Casting & Forge,SUP-104,Aluminum Castings,North America,USA,5600000,88,65,72,95,4.9,1
+Rheinmetall Precision GmbH,SUP-105,CNC Machined Parts,Europe,Germany,3800000,95,91,89,88,2.4,2

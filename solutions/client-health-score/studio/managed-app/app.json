@@ -1,0 +1,140 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Client Health Score Workspace",
+  "title": "Client Health Score",
+  "description": "Listed synthetic entity records for Client Health Score. Unlisted facts, rule tables and calculated outputs remain in the agent's retained knowledge.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "stakeholder-records",
+      "list": "Client Health Score Stakeholder Records",
+      "title": "Stakeholder Records",
+      "key": "StakeholderRecordId",
+      "fields": {
+        "StakeholderRecordId": "field_1",
+        "ID": "field_2",
+        "ExecutiveSponsor": "field_3",
+        "AccountOwner": "field_4",
+        "DeliveryLead": "field_5",
+        "NextEngagement": "field_6"
+      },
+      "columns": [
+        "StakeholderRecordId",
+        "Title",
+        "ID",
+        "ExecutiveSponsor",
+        "AccountOwner",
+        "DeliveryLead",
+        "NextEngagement"
+      ],
+      "labels": {
+        "Title": "Client",
+        "StakeholderRecordId": "Stakeholder Record ID",
+        "ID": "ID",
+        "ExecutiveSponsor": "Executive sponsor",
+        "AccountOwner": "Account owner",
+        "DeliveryLead": "Delivery lead",
+        "NextEngagement": "Next engagement"
+      },
+      "formats": {
+        "Title": "text",
+        "StakeholderRecordId": "text",
+        "ID": "text",
+        "ExecutiveSponsor": "text",
+        "AccountOwner": "text",
+        "DeliveryLead": "text",
+        "NextEngagement": "text"
+      },
+      "metrics": [
+        {
+          "label": "Stakeholder Records",
+          "op": "count"
+        }
+      ],
+      "groupBy": "ID",
+      "sortBy": "StakeholderRecordId"
+    },
+    {
+      "id": "client-records",
+      "list": "Client Health Score Client Records",
+      "title": "Client Records",
+      "key": "ClientRecordId",
+      "fields": {
+        "ClientRecordId": "field_1",
+        "AnnualValue": "field_2",
+        "Health": "field_3",
+        "NPS": "field_4",
+        "Margin": "field_5",
+        "Utilization": "field_6",
+        "Billing": "field_7",
+        "Escalations90D": "field_8",
+        "ExecMeetings90D": "field_9",
+        "Q1": "field_10",
+        "Q2": "field_11",
+        "Q3": "field_12",
+        "Q4": "field_13",
+        "Segment": "field_14"
+      },
+      "columns": [
+        "ClientRecordId",
+        "Title",
+        "AnnualValue",
+        "Health",
+        "NPS",
+        "Margin",
+        "Utilization",
+        "Billing",
+        "Escalations90D",
+        "ExecMeetings90D"
+      ],
+      "labels": {
+        "Title": "Client",
+        "ClientRecordId": "Client Record ID",
+        "AnnualValue": "Annual value",
+        "Health": "Health",
+        "NPS": "NPS",
+        "Margin": "Margin",
+        "Utilization": "Utilization",
+        "Billing": "Billing",
+        "Escalations90D": "Escalations 90d",
+        "ExecMeetings90D": "Exec meetings 90d",
+        "Q1": "Q1",
+        "Q2": "Q2",
+        "Q3": "Q3",
+        "Q4": "Q4",
+        "Segment": "Segment"
+      },
+      "formats": {
+        "Title": "text",
+        "ClientRecordId": "text",
+        "AnnualValue": "currency",
+        "Health": "text",
+        "NPS": "text",
+        "Margin": "percent1",
+        "Utilization": "percent1",
+        "Billing": "text",
+        "Escalations90D": "text",
+        "ExecMeetings90D": "text",
+        "Q1": "text",
+        "Q2": "text",
+        "Q3": "text",
+        "Q4": "text",
+        "Segment": "text"
+      },
+      "metrics": [
+        {
+          "label": "Client Records",
+          "op": "count"
+        },
+        {
+          "label": "Annual value",
+          "op": "sum",
+          "column": "AnnualValue"
+        }
+      ],
+      "groupBy": "Billing",
+      "sortBy": "ClientRecordId"
+    }
+  ]
+}

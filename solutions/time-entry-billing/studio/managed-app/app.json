@@ -1,0 +1,117 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Time Entry and Billing Workspace",
+  "title": "Time Entry and Billing",
+  "description": "Listed synthetic entity records for Time Entry and Billing. Unlisted facts, rule tables and calculated outputs remain in the agent's retained knowledge.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "time-entry-records",
+      "list": "Time Entry and Billing Time Entry Records",
+      "title": "Time Entry Records",
+      "key": "TimeEntryRecordId",
+      "fields": {
+        "TimeEntryRecordId": "field_1",
+        "Project": "field_2",
+        "Date": "field_3",
+        "Hours": "field_4",
+        "Rate": "field_5",
+        "Category": "field_6",
+        "ExactDescription": "field_7",
+        "Approved": "field_8"
+      },
+      "columns": [
+        "TimeEntryRecordId",
+        "Title",
+        "Project",
+        "Date",
+        "Hours",
+        "Rate",
+        "Category",
+        "ExactDescription",
+        "Approved"
+      ],
+      "labels": {
+        "Title": "Consultant",
+        "TimeEntryRecordId": "Time Entry Record ID",
+        "Project": "Project",
+        "Date": "Date",
+        "Hours": "Hours",
+        "Rate": "Rate",
+        "Category": "Category",
+        "ExactDescription": "Exact description",
+        "Approved": "Approved"
+      },
+      "formats": {
+        "Title": "text",
+        "TimeEntryRecordId": "text",
+        "Project": "text",
+        "Date": "text",
+        "Hours": "text",
+        "Rate": "currency",
+        "Category": "text",
+        "ExactDescription": "text",
+        "Approved": "text"
+      },
+      "metrics": [
+        {
+          "label": "Time Entry Records",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Project",
+      "sortBy": "TimeEntryRecordId"
+    },
+    {
+      "id": "invoice-history",
+      "list": "Time Entry and Billing Invoice History",
+      "title": "Invoice History",
+      "key": "InvoiceHistoryId",
+      "fields": {
+        "InvoiceHistoryId": "field_1",
+        "Amount": "field_2",
+        "Date": "field_3",
+        "Status": "field_4",
+        "DaysOutstanding": "field_5"
+      },
+      "columns": [
+        "InvoiceHistoryId",
+        "Title",
+        "Amount",
+        "Date",
+        "Status",
+        "DaysOutstanding"
+      ],
+      "labels": {
+        "Title": "Client",
+        "InvoiceHistoryId": "Invoice History ID",
+        "Amount": "Amount",
+        "Date": "Date",
+        "Status": "Status",
+        "DaysOutstanding": "Days outstanding"
+      },
+      "formats": {
+        "Title": "text",
+        "InvoiceHistoryId": "text",
+        "Amount": "currency",
+        "Date": "text",
+        "Status": "text",
+        "DaysOutstanding": "text"
+      },
+      "metrics": [
+        {
+          "label": "Invoice History",
+          "op": "count"
+        },
+        {
+          "label": "Amount",
+          "op": "sum",
+          "column": "Amount"
+        }
+      ],
+      "groupBy": "Status",
+      "sortBy": "InvoiceHistoryId"
+    }
+  ]
+}

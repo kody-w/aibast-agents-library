@@ -1,0 +1,262 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Financial Advisor Workspace",
+  "title": "Financial Advisor",
+  "description": "The Financial Advisor workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "client-portfolios",
+      "list": "Financial Advisor Client Portfolios",
+      "title": "Client Portfolios",
+      "key": "ClientPortfolioId",
+      "fields": {
+        "ClientPortfolioId": "field_1",
+        "Advisor": "field_2",
+        "RiskProfile": "field_3",
+        "Age": "field_4",
+        "RetirementTarget": "field_5",
+        "TotalAssets": "field_6",
+        "HoldingsUsEquitiesValue": "field_7",
+        "HoldingsUsEquitiesAllocation": "field_8",
+        "HoldingsUsEquitiesTarget": "field_9",
+        "HoldingsInternationalEqui5b27968": "field_10",
+        "HoldingsInternationalEqui1195a93": "field_11",
+        "HoldingsInternationalEquid1a09d2": "field_12",
+        "HoldingsFixedIncomeValue": "field_13",
+        "HoldingsFixedIncomeAllocation": "field_14",
+        "HoldingsFixedIncomeTarget": "field_15",
+        "HoldingsRealEstateReitsValue": "field_16",
+        "HoldingsRealEstateReitsAl223b61b": "field_17",
+        "HoldingsRealEstateReitsTarget": "field_18",
+        "HoldingsAlternativesValue": "field_19",
+        "HoldingsAlternativesAllocation": "field_20",
+        "HoldingsAlternativesTarget": "field_21",
+        "HoldingsCashEquivalentsValue": "field_22",
+        "HoldingsCashEquivalentsAl50dc5ca": "field_23",
+        "HoldingsCashEquivalentsTarget": "field_24",
+        "AnnualIncome": "field_25",
+        "AnnualContributions": "field_26",
+        "LastReview": "field_27",
+        "HoldingsEmergingMarketsValue": "field_28",
+        "HoldingsEmergingMarketsAl6e9d949": "field_29",
+        "HoldingsEmergingMarketsTarget": "field_30",
+        "HoldingsMunicipalBondsValue": "field_31",
+        "HoldingsMunicipalBondsAllocation": "field_32",
+        "HoldingsMunicipalBondsTarget": "field_33"
+      },
+      "columns": [
+        "ClientPortfolioId",
+        "Title",
+        "Advisor",
+        "RiskProfile",
+        "Age",
+        "RetirementTarget",
+        "TotalAssets",
+        "HoldingsUsEquitiesValue",
+        "HoldingsUsEquitiesAllocation",
+        "HoldingsUsEquitiesTarget"
+      ],
+      "labels": {
+        "Title": "Client Portfolio",
+        "ClientPortfolioId": "Client Portfolio ID",
+        "Advisor": "Advisor",
+        "RiskProfile": "Risk Profile",
+        "Age": "Age",
+        "RetirementTarget": "Retirement Target",
+        "TotalAssets": "Total Assets",
+        "HoldingsUsEquitiesValue": "Holdings Us Equities Value",
+        "HoldingsUsEquitiesAllocation": "Holdings Us Equities Allocation",
+        "HoldingsUsEquitiesTarget": "Holdings Us Equities Target",
+        "HoldingsInternationalEqui5b27968": "Holdings International Equities Value",
+        "HoldingsInternationalEqui1195a93": "Holdings International Equities Allocation",
+        "HoldingsInternationalEquid1a09d2": "Holdings International Equities Target",
+        "HoldingsFixedIncomeValue": "Holdings Fixed Income Value",
+        "HoldingsFixedIncomeAllocation": "Holdings Fixed Income Allocation",
+        "HoldingsFixedIncomeTarget": "Holdings Fixed Income Target",
+        "HoldingsRealEstateReitsValue": "Holdings Real Estate Reits Value",
+        "HoldingsRealEstateReitsAl223b61b": "Holdings Real Estate Reits Allocation",
+        "HoldingsRealEstateReitsTarget": "Holdings Real Estate Reits Target",
+        "HoldingsAlternativesValue": "Holdings Alternatives Value",
+        "HoldingsAlternativesAllocation": "Holdings Alternatives Allocation",
+        "HoldingsAlternativesTarget": "Holdings Alternatives Target",
+        "HoldingsCashEquivalentsValue": "Holdings Cash Equivalents Value",
+        "HoldingsCashEquivalentsAl50dc5ca": "Holdings Cash Equivalents Allocation",
+        "HoldingsCashEquivalentsTarget": "Holdings Cash Equivalents Target",
+        "AnnualIncome": "Annual Income",
+        "AnnualContributions": "Annual Contributions",
+        "LastReview": "Last Review",
+        "HoldingsEmergingMarketsValue": "Holdings Emerging Markets Value",
+        "HoldingsEmergingMarketsAl6e9d949": "Holdings Emerging Markets Allocation",
+        "HoldingsEmergingMarketsTarget": "Holdings Emerging Markets Target",
+        "HoldingsMunicipalBondsValue": "Holdings Municipal Bonds Value",
+        "HoldingsMunicipalBondsAllocation": "Holdings Municipal Bonds Allocation",
+        "HoldingsMunicipalBondsTarget": "Holdings Municipal Bonds Target"
+      },
+      "formats": {
+        "Title": "text",
+        "ClientPortfolioId": "text",
+        "Advisor": "text",
+        "RiskProfile": "text",
+        "Age": "integer",
+        "RetirementTarget": "integer",
+        "TotalAssets": "integer",
+        "HoldingsUsEquitiesValue": "currency",
+        "HoldingsUsEquitiesAllocation": "integer",
+        "HoldingsUsEquitiesTarget": "integer",
+        "HoldingsInternationalEqui5b27968": "currency",
+        "HoldingsInternationalEqui1195a93": "integer",
+        "HoldingsInternationalEquid1a09d2": "integer",
+        "HoldingsFixedIncomeValue": "currency",
+        "HoldingsFixedIncomeAllocation": "integer",
+        "HoldingsFixedIncomeTarget": "integer",
+        "HoldingsRealEstateReitsValue": "currency",
+        "HoldingsRealEstateReitsAl223b61b": "integer",
+        "HoldingsRealEstateReitsTarget": "integer",
+        "HoldingsAlternativesValue": "currency",
+        "HoldingsAlternativesAllocation": "integer",
+        "HoldingsAlternativesTarget": "integer",
+        "HoldingsCashEquivalentsValue": "currency",
+        "HoldingsCashEquivalentsAl50dc5ca": "integer",
+        "HoldingsCashEquivalentsTarget": "integer",
+        "AnnualIncome": "integer",
+        "AnnualContributions": "integer",
+        "LastReview": "text",
+        "HoldingsEmergingMarketsValue": "currency",
+        "HoldingsEmergingMarketsAl6e9d949": "integer",
+        "HoldingsEmergingMarketsTarget": "integer",
+        "HoldingsMunicipalBondsValue": "currency",
+        "HoldingsMunicipalBondsAllocation": "integer",
+        "HoldingsMunicipalBondsTarget": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Client Portfolios",
+          "op": "count"
+        },
+        {
+          "label": "Holdings Us Equities Value",
+          "op": "sum",
+          "column": "HoldingsUsEquitiesValue"
+        },
+        {
+          "label": "Holdings International Equities Value",
+          "op": "sum",
+          "column": "HoldingsInternationalEqui5b27968"
+        }
+      ],
+      "groupBy": "Advisor",
+      "sortBy": "ClientPortfolioId"
+    },
+    {
+      "id": "investment-recommendations",
+      "list": "Financial Advisor Investment Recommendations",
+      "title": "Investment Recommendations",
+      "key": "InvestmentRecommendationId",
+      "fields": {
+        "InvestmentRecommendationId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "InvestmentRecommendationId",
+        "Title"
+      ],
+      "labels": {
+        "Title": "Investment Recommendation",
+        "InvestmentRecommendationId": "Investment Recommendation ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "InvestmentRecommendationId": "text",
+        "Value": "text"
+      },
+      "metrics": [
+        {
+          "label": "Investment Recommendations",
+          "op": "count"
+        }
+      ],
+      "sortBy": "InvestmentRecommendationId"
+    },
+    {
+      "id": "compliance-rules",
+      "list": "Financial Advisor Compliance Rules",
+      "title": "Compliance Rules",
+      "key": "ComplianceRuleId",
+      "fields": {
+        "ComplianceRuleId": "field_1",
+        "Description": "field_2",
+        "AppliesTo": "field_3"
+      },
+      "columns": [
+        "ComplianceRuleId",
+        "Title",
+        "Description",
+        "AppliesTo"
+      ],
+      "labels": {
+        "Title": "Compliance Rule",
+        "ComplianceRuleId": "Compliance Rule ID",
+        "Description": "Description",
+        "AppliesTo": "Applies To"
+      },
+      "formats": {
+        "Title": "text",
+        "ComplianceRuleId": "text",
+        "Description": "text",
+        "AppliesTo": "text"
+      },
+      "metrics": [
+        {
+          "label": "Compliance Rules",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Description",
+      "sortBy": "ComplianceRuleId"
+    },
+    {
+      "id": "service-requests",
+      "list": "Financial Advisor Service Requests",
+      "title": "Service Requests",
+      "key": "ServiceRequestId",
+      "fields": {
+        "ServiceRequestId": "field_1",
+        "Request": "field_2",
+        "Verification": "field_3",
+        "Route": "field_4"
+      },
+      "columns": [
+        "ServiceRequestId",
+        "Title",
+        "Request",
+        "Verification",
+        "Route"
+      ],
+      "labels": {
+        "Title": "Service Request",
+        "ServiceRequestId": "Service Request ID",
+        "Request": "Request",
+        "Verification": "Verification",
+        "Route": "Route"
+      },
+      "formats": {
+        "Title": "text",
+        "ServiceRequestId": "text",
+        "Request": "text",
+        "Verification": "text",
+        "Route": "text"
+      },
+      "metrics": [
+        {
+          "label": "Service Requests",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Request",
+      "sortBy": "ServiceRequestId"
+    }
+  ]
+}

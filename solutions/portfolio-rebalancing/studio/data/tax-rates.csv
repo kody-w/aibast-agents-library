@@ -1,0 +1,6 @@
+Title,TaxRateId,Value
+short_term_capital_gains,short_term_capital_gains,0.37
+long_term_capital_gains,long_term_capital_gains,0.2
+qualified_dividends,qualified_dividends,0.2
+ordinary_income,ordinary_income,0.37
+net_investment_income_tax,net_investment_income_tax,0.038

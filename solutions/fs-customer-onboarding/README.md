@@ -60,6 +60,7 @@ and knowledge and does not reproduce the manual build.
 | Copilot-only Easy-mode comparison | `solutions/fs-customer-onboarding/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/fs-customer-onboarding/quest.html` |
 | Literal browser tutorial | `solutions/fs-customer-onboarding/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/fs-customer-onboarding/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/fs-customer-onboarding/export-manifest.json` |
 | Source bundle | `solutions/fs-customer-onboarding/exports/fs-customer-onboarding-source.zip` |
 | Manual evidence | `solutions/fs-customer-onboarding/evals/manual-build-evidence.json` |

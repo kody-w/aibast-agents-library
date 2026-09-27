@@ -1,0 +1,432 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "energy-regulatory-reporting",
+  "title": "Regulatory Reporting, built with brainfreeze studio",
+  "summary": "The Regulatory Reporting agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/energy-regulatory-reporting-rules-and-controls.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Regulatory Reporting Studio",
+      "manual": "Regulatory Reporting Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Regulatory Reporting Workspace",
+      "manual": "Regulatory Reporting Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/energy-regulatory-reporting.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast energy-regulatory-reporting --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 3 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Regulatory Reporting Regulatory Reports list.",
+          "expected": "6 fictional records, including EPA GHG Reporting Program (Subpart C) (RegulatoryReportId RPT-9001), with Authority EPA.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Regulatory Reporting Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Regulatory Reporting Lead",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ENERGY_REGULATORY_REPORTING-01",
+          "prompt": "Which filing is overdue and who owns it?",
+          "expected": "The relevant list tool ran. Required evidence: PHMSA Annual Pipeline Safety Report; OVERDUE; Pipeline Operations. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-energy-regulatory-reporting-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Data Analyst",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ENERGY_REGULATORY_REPORTING-02",
+          "prompt": "Which report data is incomplete or below quality threshold?",
+          "expected": "The relevant list tool ran. Required evidence: Data collection incomplete; Data quality score below threshold; authorized report owner. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-energy-regulatory-reporting-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Compliance Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ENERGY_REGULATORY_REPORTING-03",
+          "prompt": "Show filing state and confirm you did not transmit anything.",
+          "expected": "The relevant list tool ran. Required evidence: PHMSA Annual Pipeline Safety Report; OVERDUE; No regulator filing. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-energy-regulatory-reporting-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Internal Auditor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ENERGY_REGULATORY_REPORTING-04",
+          "prompt": "What high-severity reporting evidence is still open?",
+          "expected": "The relevant list tool ran. Required evidence: Pipeline mileage discrepancy; HIGH; cannot predict an audit outcome. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-energy-regulatory-reporting-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Regulatory Reporting: 3 read-only tabs from the same lists. 6 fictional records, including EPA GHG Reporting Program (Subpart C) (RegulatoryReportId RPT-9001), with Authority EPA.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Regulatory Reporting Regulatory Reports from its CSV",
+          "action": "On the site: New, List, From CSV. Upload regulatory-reports.csv. On Customize, keep Title mapped to the Title column. Set RegulatoryReportId, Authority, Facility, ReportingPeriod, Deadline, Status, Assignee, LastUpdated to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep DataQualityScore, CompletenessPct as Number. Name the list Regulatory Reporting Regulatory Reports. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/regulatory-reports.csv"
+          ],
+          "expected": "6 fictional records, including EPA GHG Reporting Program (Subpart C) (RegulatoryReportId RPT-9001), with Authority EPA.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-regulatory-reports.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Regulatory Reporting Data Validation Rules from its CSV",
+          "action": "On the site: New, List, From CSV. Upload data-validation-rules.csv. On Customize, keep Title mapped to the Title column. Set DataValidationRuleId, Rules, SourceSystems to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Regulatory Reporting Data Validation Rules. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/data-validation-rules.csv"
+          ],
+          "expected": "3 fictional records, including emissions_data (DataValidationRuleId emissions_data).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-data-validation-rules.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Regulatory Reporting Audit Findings from its CSV",
+          "action": "On the site: New, List, From CSV. Upload audit-findings.csv. On Customize, keep Title mapped to the Title column. Set AuditFindingId, Report, Finding, Severity, Status, DueDate to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Regulatory Reporting Audit Findings. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/audit-findings.csv"
+          ],
+          "expected": "4 fictional records, including AUD-001 (AuditFindingId AUD-001), with Report RPT-9001.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-audit-findings.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Name the agent",
+          "action": "Rename it Regulatory Reporting Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Regulatory Reporting Agent — Studio Global Instructions, name the three list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload energy-regulatory-reporting-rules-and-controls.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/energy-regulatory-reporting-rules-and-controls.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the regulatory reports tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Regulatory Reporting Regulatory Reports; name the tool Get regulatory report records.",
+          "expected": "Get regulatory report records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-tool-regulatory-reports.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the data validation rules tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Regulatory Reporting Data Validation Rules; name the tool Get data validation rule records.",
+          "expected": "Get data validation rule records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-data-validation-rules.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the audit findings tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Regulatory Reporting Audit Findings; name the tool Get audit finding records.",
+          "expected": "Get audit finding records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-audit-findings.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_audit-readiness/SKILL.md",
+            "studio/agent/skills/aibast_data-validation/SKILL.md",
+            "studio/agent/skills/aibast_report-status/SKILL.md",
+            "studio/agent/skills/aibast_submission-tracker/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 3 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 3 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Test: Regulatory Reporting Lead",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ENERGY_REGULATORY_REPORTING-01",
+          "prompt": "Which filing is overdue and who owns it?",
+          "expected": "The relevant list tool ran. Required evidence: PHMSA Annual Pipeline Safety Report; OVERDUE; Pipeline Operations. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-energy-regulatory-reporting-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Test: Data Analyst",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ENERGY_REGULATORY_REPORTING-02",
+          "prompt": "Which report data is incomplete or below quality threshold?",
+          "expected": "The relevant list tool ran. Required evidence: Data collection incomplete; Data quality score below threshold; authorized report owner. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-energy-regulatory-reporting-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Compliance Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ENERGY_REGULATORY_REPORTING-03",
+          "prompt": "Show filing state and confirm you did not transmit anything.",
+          "expected": "The relevant list tool ran. Required evidence: PHMSA Annual Pipeline Safety Report; OVERDUE; No regulator filing. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-energy-regulatory-reporting-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Internal Auditor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ENERGY_REGULATORY_REPORTING-04",
+          "prompt": "What high-severity reporting evidence is still open?",
+          "expected": "The relevant list tool ran. Required evidence: Pipeline mileage discrepancy; HIGH; cannot predict an audit outcome. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-energy-regulatory-reporting-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/energy-regulatory-reporting/studio/managed-app/app.json --out energy-regulatory-reporting-app"
+          ],
+          "expected": "energy-regulatory-reporting-app/managed-app holds a React + Vite managed app whose config names your site and the 3 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd energy-regulatory-reporting-app/managed-app",
+            "ms app init --display-name \"Regulatory Reporting Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Regulatory Reporting Regulatory Reports\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Regulatory Reporting Data Validation Rules\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Regulatory Reporting Audit Findings\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 3 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Regulatory Reporting Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Regulatory Reporting Regulatory Reports tab.",
+          "expected": "The app and the agent read the same synthetic records. 6 fictional records, including EPA GHG Reporting Program (Subpart C) (RegulatoryReportId RPT-9001), with Authority EPA.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

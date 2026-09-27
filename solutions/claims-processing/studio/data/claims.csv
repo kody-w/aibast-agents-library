@@ -1,0 +1,5 @@
+Title,ClaimId,Claimant,PolicyNumber,PolicyType,DateOfLoss,DateFiled,LossType,ClaimedAmount,Adjuster,Status,FraudScore,SupportingDocs
+"Burst pipe in upstairs bathroom caused water damage to ceiling, walls, and flooring in two rooms",CLM-2025-7001,Margaret Sullivan,HO-445892,homeowners,2025-01-15,2025-01-18,water_damage,28500,Brian Keller,under_review,12,photos; plumber_invoice; repair_estimate
+"Rear-end collision at intersection of 5th Ave and Main St, other driver cited",CLM-2025-7002,David Park,AU-331205,auto,2025-02-08,2025-02-09,collision,14200,Sandra Ortiz,ready_for_adjuster_review,5,police_report; photos; body_shop_estimate; medical_records
+"Electrical fire in warehouse section B, significant inventory and structural damage",CLM-2025-7003,Apex Commercial Properties,CP-778341,commercial_property,2025-02-22,2025-02-24,fire_damage,485000,Brian Keller,investigation,68,fire_report; photos; inventory_list; financial_statements
+"Home burglary — electronics, jewelry, and collectibles stolen",CLM-2025-7004,Jennifer Liu,HO-557210,homeowners,2025-03-01,2025-03-02,theft,42000,Sandra Ortiz,pending_documentation,45,police_report; photos

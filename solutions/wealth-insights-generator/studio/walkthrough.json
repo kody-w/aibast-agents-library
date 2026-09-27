@@ -1,0 +1,481 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "wealth-insights-generator",
+  "title": "Wealth Insights Generator, built with brainfreeze studio",
+  "summary": "The Wealth Insights Generator agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_wealth-insights-generator-controls-and-review.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Wealth Insights Studio",
+      "manual": "Wealth Insights Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Wealth Insights Generator Workspace",
+      "manual": "Wealth Insights Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/wealth-insights-generator.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast wealth-insights-generator --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Wealth Insights Generator Market Data list.",
+          "expected": "7 fictional records, including S&P 500 (MarketDataId S&P 500), with Current 5285.42.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Wealth Insights Studio and review its inventory.",
+          "expected": "The studio instructions, 5 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Advisory Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-01",
+          "prompt": "Give me the fixed market snapshot for the morning huddle and label whether it is current data.",
+          "expected": "The relevant list tool ran. Required evidence: NASDAQ Composite; Fixed Synthetic. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-wig-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Wealth Advisor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-02",
+          "prompt": "Which household has the largest held-away opportunity and what life event needs validation?",
+          "expected": "The relevant list tool ran. Required evidence: WM-003; Held Away. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-wig-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Relationship Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-03",
+          "prompt": "Which clients have high-priority planning signals for advisor review?",
+          "expected": "The relevant list tool ran. Required evidence: Harrison Family Trust; Dr. Anita Rao. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-wig-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Portfolio Strategist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-04",
+          "prompt": "Which synthetic client is below its benchmark, and what does the attribution label say?",
+          "expected": "The relevant list tool ran. Required evidence: Tidewater Ventures; Underperformance. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-wig-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Test: Wealth Advisor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-05",
+          "prompt": "Prepare my review brief for the Kensington household without turning it into advice or outreach.",
+          "expected": "The relevant list tool ran. Required evidence: George & Martha Kensington; preparation material. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-wig-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-10",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Wealth Insights Generator: 4 read-only tabs from the same lists. 7 fictional records, including S&P 500 (MarketDataId S&P 500), with Current 5285.42.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/10-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Wealth Insights Generator Market Data from its CSV",
+          "action": "On the site: New, List, From CSV. Upload market-data.csv. On Customize, keep Title mapped to the Title column. Set MarketDataId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Current, YtdReturn, PeRatio, DividendYield as Number. Name the list Wealth Insights Generator Market Data. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/market-data.csv"
+          ],
+          "expected": "7 fictional records, including S&P 500 (MarketDataId S&P 500), with Current 5285.42.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-market-data.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Wealth Insights Generator Client Portfolios from its CSV",
+          "action": "On the site: New, List, From CSV. Upload client-portfolios.csv. On Customize, keep Title mapped to the Title column. Set ClientPortfolioId, Strategy, RiskProfile, LastContact, NextReview, LifeEvents to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Aum, YtdReturn, BenchmarkReturn, Alpha, HeldAwayAssets as Number. Name the list Wealth Insights Generator Client Portfolios. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/client-portfolios.csv"
+          ],
+          "expected": "4 fictional records, including Harrison Family Trust (ClientPortfolioId WM-001), with Aum 8500000.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-client-portfolios.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Wealth Insights Generator Performance Benchmarks from its CSV",
+          "action": "On the site: New, List, From CSV. Upload performance-benchmarks.csv. On Customize, keep Title mapped to the Title column. Set PerformanceBenchmarkId, Benchmark to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value1Yr, Value3Yr, Value5Yr as Number. Name the list Wealth Insights Generator Performance Benchmarks. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/performance-benchmarks.csv"
+          ],
+          "expected": "4 fictional records, including balanced_growth (PerformanceBenchmarkId balanced_growth), with Benchmark 60/40 Balanced.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-performance-benchmarks.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Wealth Insights Generator Opportunity Signals from its CSV",
+          "action": "On the site: New, List, From CSV. Upload opportunity-signals.csv. On Customize, keep Title mapped to the Title column. Set OpportunitySignalId, Type, Description, Priority, Action to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Wealth Insights Generator Opportunity Signals. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/opportunity-signals.csv"
+          ],
+          "expected": "5 fictional records, including WM-001 (OpportunitySignalId 1), with Type education_funding.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-opportunity-signals.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Wealth Insights Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Wealth Insights Generator Agent — Studio Global Instructions, name the four list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_wealth-insights-generator-controls-and-review.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_wealth-insights-generator-controls-and-review.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the market data tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Wealth Insights Generator Market Data; name the tool Get market data records.",
+          "expected": "Get market data records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-market-data.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the client portfolios tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Wealth Insights Generator Client Portfolios; name the tool Get client portfolio records.",
+          "expected": "Get client portfolio records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-client-portfolios.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the performance benchmarks tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Wealth Insights Generator Performance Benchmarks; name the tool Get performance benchmark records.",
+          "expected": "Get performance benchmark records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-performance-benchmarks.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the opportunity signals tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Wealth Insights Generator Opportunity Signals; name the tool Get opportunity signal records.",
+          "expected": "Get opportunity signal records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-opportunity-signals.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 5 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_client-insights_02/SKILL.md",
+            "studio/agent/skills/aibast_market-brief_01/SKILL.md",
+            "studio/agent/skills/aibast_meeting-brief_05/SKILL.md",
+            "studio/agent/skills/aibast_opportunity-alerts_03/SKILL.md",
+            "studio/agent/skills/aibast_performance-attribution_04/SKILL.md"
+          ],
+          "expected": "5 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 5 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 5 skills, 1 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Advisory Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-01",
+          "prompt": "Give me the fixed market snapshot for the morning huddle and label whether it is current data.",
+          "expected": "The relevant list tool ran. Required evidence: NASDAQ Composite; Fixed Synthetic. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-wig-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Wealth Advisor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-02",
+          "prompt": "Which household has the largest held-away opportunity and what life event needs validation?",
+          "expected": "The relevant list tool ran. Required evidence: WM-003; Held Away. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-wig-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Relationship Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-03",
+          "prompt": "Which clients have high-priority planning signals for advisor review?",
+          "expected": "The relevant list tool ran. Required evidence: Harrison Family Trust; Dr. Anita Rao. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-wig-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Portfolio Strategist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-04",
+          "prompt": "Which synthetic client is below its benchmark, and what does the attribution label say?",
+          "expected": "The relevant list tool ran. Required evidence: Tidewater Ventures; Underperformance. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-wig-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Test: Wealth Advisor",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WIG-05",
+          "prompt": "Prepare my review brief for the Kensington household without turning it into advice or outreach.",
+          "expected": "The relevant list tool ran. Required evidence: George & Martha Kensington; preparation material. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-wig-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/wealth-insights-generator/studio/managed-app/app.json --out wealth-insights-generator-app"
+          ],
+          "expected": "wealth-insights-generator-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd wealth-insights-generator-app/managed-app",
+            "ms app init --display-name \"Wealth Insights Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Wealth Insights Generator Market Data\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Wealth Insights Generator Client Portfolios\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Wealth Insights Generator Performance Benchmarks\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Wealth Insights Generator Opportunity Signals\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Wealth Insights Generator Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-27",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Wealth Insights Generator Market Data tab.",
+          "expected": "The app and the agent read the same synthetic records. 7 fictional records, including S&P 500 (MarketDataId S&P 500), with Current 5285.42.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/27-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

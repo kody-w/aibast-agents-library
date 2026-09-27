@@ -1,0 +1,8 @@
+Title,OurCapabilityId,Value
+impl_weeks,impl_weeks,12
+hipaa_certified,hipaa_certified,Yes
+ehr_integration,ehr_integration,Native
+support_sla_min,support_sla_min,15
+pricing_position,pricing_position,Market rate
+certifications,certifications,SOC 2 Type II; HIPAA; ISO 27001; PCI-DSS Level 1
+differentiators,differentiators,Pre-built healthcare accelerators cut implementation by 40%; Native EHR integration eliminates middleware costs; 15-minute support SLA is fastest in industry; API-first architecture for seamless ecosystem integration

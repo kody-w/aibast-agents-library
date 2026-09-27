@@ -38,6 +38,7 @@ The local agent uses fictional records and produces decision support only. It do
 | Copilot-only Easy-mode comparison | `solutions/field-service-dispatch/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/field-service-dispatch/quest.html` |
 | Literal browser tutorial | `solutions/field-service-dispatch/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/field-service-dispatch/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/field-service-dispatch/export-manifest.json` |
 | Source bundle | `solutions/field-service-dispatch/exports/field-service-dispatch-source.zip` |
 | Manual evidence | `solutions/field-service-dispatch/evals/manual-build-evidence.json` |

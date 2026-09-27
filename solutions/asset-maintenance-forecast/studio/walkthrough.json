@@ -1,0 +1,408 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "asset-maintenance-forecast",
+  "title": "Asset Maintenance Forecast, built with brainfreeze studio",
+  "summary": "The Asset Maintenance Forecast agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/asset-maintenance-forecast-rules-and-controls.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Asset Maintenance Studio",
+      "manual": "Asset Maintenance Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Asset Maintenance Forecast Workspace",
+      "manual": "Asset Maintenance Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/asset-maintenance-forecast.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast asset-maintenance-forecast --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 2 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Asset Maintenance Forecast Assets list.",
+          "expected": "4 fictional records, including Wind Turbine Alpha-7 (AssetId AST-T001), with Type wind_turbine.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Asset Maintenance Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Plant Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ASSET_MAINTENANCE_FORECAST-01",
+          "prompt": "Which asset is most likely to interrupt operations next, and what evidence supports that?",
+          "expected": "The relevant list tool ran. Required evidence: Substation Transformer B-12; 2026-05-01. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-asset-maintenance-forecast-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Reliability Engineer",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ASSET_MAINTENANCE_FORECAST-02",
+          "prompt": "Show me the weakest asset condition and whether this is an operating authorization.",
+          "expected": "The relevant list tool ran. Required evidence: Substation Transformer B-12; CRITICAL; not a safety determination. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-asset-maintenance-forecast-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Finance Business Partner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ASSET_MAINTENANCE_FORECAST-03",
+          "prompt": "What maintenance funding should I reserve for the transformer risk?",
+          "expected": "The relevant list tool ran. Required evidence: Substation Transformer B-12; $273,000; Synthetic planning estimate. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-asset-maintenance-forecast-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Maintenance Planner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ASSET_MAINTENANCE_FORECAST-04",
+          "prompt": "Draft the maintenance queue for AST-X002, but do not create any work orders.",
+          "expected": "The relevant list tool ran. Required evidence: Substation Transformer B-12; Draft approval queue; No work order. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-asset-maintenance-forecast-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Asset Maintenance Forecast: 2 read-only tabs from the same lists. 4 fictional records, including Wind Turbine Alpha-7 (AssetId AST-T001), with Type wind_turbine.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Asset Maintenance Forecast Assets from its CSV",
+          "action": "On the site: New, List, From CSV. Upload assets.csv. On Customize, keep Title mapped to the Title column. Set AssetId, Type, Location, InstalledYear, LastMajorService, PredictedNextFailure to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Use Multiple lines of text for MaintenanceHistory (up to 311 characters). If the import screen cannot create these long-text columns losslessly, stop and report the import limitation; do not continue with truncated records. Compare their full values with the downloaded CSV. Keep AgeYears, CapacityMW, ConditionScore, OperatingHours, FailureRateAnnualPct, ReplacementCost as Number. Name the list Asset Maintenance Forecast Assets. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/assets.csv"
+          ],
+          "expected": "4 fictional records, including Wind Turbine Alpha-7 (AssetId AST-T001), with Type wind_turbine.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-assets.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Asset Maintenance Forecast Budget Rates from its CSV",
+          "action": "On the site: New, List, From CSV. Upload budget-rates.csv. On Customize, keep Title mapped to the Title column. Set BudgetRateId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep WindTurbine, Transformer, Pipeline, GasTurbine as Number. Name the list Asset Maintenance Forecast Budget Rates. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/budget-rates.csv"
+          ],
+          "expected": "3 fictional records, including major (BudgetRateId major), with WindTurbine 52000.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-budget-rates.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Name the agent",
+          "action": "Rename it Asset Maintenance Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Asset Maintenance Forecast Agent — Studio Global Instructions, name the two list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload asset-maintenance-forecast-rules-and-controls.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/asset-maintenance-forecast-rules-and-controls.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Add the assets tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Asset Maintenance Forecast Assets; name the tool Get asset records.",
+          "expected": "Get asset records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-tool-assets.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the budget rates tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Asset Maintenance Forecast Budget Rates; name the tool Get budget rate records.",
+          "expected": "Get budget rate records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-tool-budget-rates.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_asset-health/SKILL.md",
+            "studio/agent/skills/aibast_budget-projection/SKILL.md",
+            "studio/agent/skills/aibast_maintenance-forecast/SKILL.md",
+            "studio/agent/skills/aibast_work-order-plan/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 2 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 2 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Test: Plant Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ASSET_MAINTENANCE_FORECAST-01",
+          "prompt": "Which asset is most likely to interrupt operations next, and what evidence supports that?",
+          "expected": "The relevant list tool ran. Required evidence: Substation Transformer B-12; 2026-05-01. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-asset-maintenance-forecast-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Test: Reliability Engineer",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ASSET_MAINTENANCE_FORECAST-02",
+          "prompt": "Show me the weakest asset condition and whether this is an operating authorization.",
+          "expected": "The relevant list tool ran. Required evidence: Substation Transformer B-12; CRITICAL; not a safety determination. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-asset-maintenance-forecast-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Test: Finance Business Partner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ASSET_MAINTENANCE_FORECAST-03",
+          "prompt": "What maintenance funding should I reserve for the transformer risk?",
+          "expected": "The relevant list tool ran. Required evidence: Substation Transformer B-12; $273,000; Synthetic planning estimate. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-asset-maintenance-forecast-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Test: Maintenance Planner",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "ASSET_MAINTENANCE_FORECAST-04",
+          "prompt": "Draft the maintenance queue for AST-X002, but do not create any work orders.",
+          "expected": "The relevant list tool ran. Required evidence: Substation Transformer B-12; Draft approval queue; No work order. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-asset-maintenance-forecast-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/asset-maintenance-forecast/studio/managed-app/app.json --out asset-maintenance-forecast-app"
+          ],
+          "expected": "asset-maintenance-forecast-app/managed-app holds a React + Vite managed app whose config names your site and the 2 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd asset-maintenance-forecast-app/managed-app",
+            "ms app init --display-name \"Asset Maintenance Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Asset Maintenance Forecast Assets\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Asset Maintenance Forecast Budget Rates\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 2 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Asset Maintenance Forecast Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Asset Maintenance Forecast Assets tab.",
+          "expected": "The app and the agent read the same synthetic records. 4 fictional records, including Wind Turbine Alpha-7 (AssetId AST-T001), with Type wind_turbine.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,456 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "customer-sentiment-churn",
+  "title": "Customer Sentiment and Churn Prediction, built with brainfreeze studio",
+  "summary": "The Customer Sentiment and Churn Prediction agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_customer-sentiment-churn-controls-and-review.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Customer Sentiment Studio",
+      "manual": "Customer Sentiment Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Customer Sentiment and Churn Workspace",
+      "manual": "Customer Sentiment Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/customer-sentiment-churn.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast customer-sentiment-churn --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Cust Sentiment Churn Pred Customer Interactions list.",
+          "expected": "5 fictional records, including Elizabeth Warren-Hayes (CustomerInteractionId CUST-8001), with Segment affluent.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Customer Sentiment Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Customer Success Lead",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CSC-01",
+          "prompt": "What are customers telling us across channels, and which relationship needs attention first?",
+          "expected": "The relevant list tool ran. Required evidence: CUST-8002; Negative. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-csc-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Retention Specialist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CSC-02",
+          "prompt": "Who should my team review first today, and what evidence drove the priority?",
+          "expected": "The relevant list tool ran. Required evidence: CUST-8004; prioritize review. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-csc-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Relationship Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CSC-03",
+          "prompt": "Prepare options for Marcus that I can review before anyone contacts him or changes a fee.",
+          "expected": "The relevant list tool ran. Required evidence: Marcus Johnson; No customer was contacted. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-csc-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Head of Customer Experience",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CSC-04",
+          "prompt": "Which segment is under its experience benchmark, and what should we investigate?",
+          "expected": "The relevant list tool ran. Required evidence: Mass Market; benchmark. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-csc-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Customer Sentiment and Churn Prediction: 4 read-only tabs from the same lists. 5 fictional records, including Elizabeth Warren-Hayes (CustomerInteractionId CUST-8001), with Segment affluent.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Cust Sentiment Churn Pred Customer Interactions from its CSV",
+          "action": "On the site: New, List, From CSV. Upload customer-interactions.csv. On Customize, keep Title mapped to the Title column. Set CustomerInteractionId, Segment, Products, LastSurvey, RecentInteractions to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep TenureYears, NPSScore, MonthlyTransactions, DigitalEngagementScore, ComplaintCount12M as Number. Name the list Cust Sentiment Churn Pred Customer Interactions. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/customer-interactions.csv"
+          ],
+          "expected": "5 fictional records, including Elizabeth Warren-Hayes (CustomerInteractionId CUST-8001), with Segment affluent.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-customer-interactions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Customer Sentiment and Churn Prediction Churn Indicators from its CSV",
+          "action": "On the site: New, List, From CSV. Upload churn-indicators.csv. On Customize, keep Title mapped to the Title column. Set ChurnIndicatorId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Threshold, Weight as Number. Name the list Customer Sentiment and Churn Prediction Churn Indicators. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/churn-indicators.csv"
+          ],
+          "expected": "6 fictional records, including NPS score below 5 indicates detractor status (ChurnIndicatorId low_nps), with Threshold 5.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-churn-indicators.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Customer Sentiment and Churn Prediction Retention Actions from its CSV",
+          "action": "On the site: New, List, From CSV. Upload retention-actions.csv. On Customize, keep Title mapped to the Title column. Set RetentionActionId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Cost, SuccessRate as Number. Name the list Customer Sentiment and Churn Prediction Retention Actions. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/retention-actions.csv"
+          ],
+          "expected": "6 fictional records, including Waive monthly maintenance fees for 6 months (RetentionActionId fee_waiver), with Cost 72.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-retention-actions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Customer Sentiment and Churn Prediction Segment Benchmarks from its CSV",
+          "action": "On the site: New, List, From CSV. Upload segment-benchmarks.csv. On Customize, keep Title mapped to the Title column. Set SegmentBenchmarkId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep AvgNPS, AvgProducts, AvgTenure, AvgTransactions as Number. Name the list Customer Sentiment and Churn Prediction Segment Benchmarks. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/segment-benchmarks.csv"
+          ],
+          "expected": "4 fictional records, including affluent (SegmentBenchmarkId affluent), with AvgNPS 8.2.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-segment-benchmarks.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Customer Sentiment Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Customer Sentiment and Churn Prediction Agent — Studio Global Instructions, name the four list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_customer-sentiment-churn-controls-and-review.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_customer-sentiment-churn-controls-and-review.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the customer interactions tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Cust Sentiment Churn Pred Customer Interactions; name the tool Get customer interaction records.",
+          "expected": "Get customer interaction records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-customer-interactions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the churn indicators tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Customer Sentiment and Churn Prediction Churn Indicators; name the tool Get churn indicator records.",
+          "expected": "Get churn indicator records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-churn-indicators.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the retention actions tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Customer Sentiment and Churn Prediction Retention Actions; name the tool Get retention action records.",
+          "expected": "Get retention action records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-retention-actions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the segment benchmarks tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Customer Sentiment and Churn Prediction Segment Benchmarks; name the tool Get segment benchmark records.",
+          "expected": "Get segment benchmark records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-segment-benchmarks.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_churn-prediction_02/SKILL.md",
+            "studio/agent/skills/aibast_retention-actions_03/SKILL.md",
+            "studio/agent/skills/aibast_segment-analysis_04/SKILL.md",
+            "studio/agent/skills/aibast_sentiment-dashboard_01/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Customer Success Lead",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CSC-01",
+          "prompt": "What are customers telling us across channels, and which relationship needs attention first?",
+          "expected": "The relevant list tool ran. Required evidence: CUST-8002; Negative. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-csc-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Retention Specialist",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CSC-02",
+          "prompt": "Who should my team review first today, and what evidence drove the priority?",
+          "expected": "The relevant list tool ran. Required evidence: CUST-8004; prioritize review. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-csc-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Relationship Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CSC-03",
+          "prompt": "Prepare options for Marcus that I can review before anyone contacts him or changes a fee.",
+          "expected": "The relevant list tool ran. Required evidence: Marcus Johnson; No customer was contacted. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-csc-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Head of Customer Experience",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "CSC-04",
+          "prompt": "Which segment is under its experience benchmark, and what should we investigate?",
+          "expected": "The relevant list tool ran. Required evidence: Mass Market; benchmark. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-csc-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/customer-sentiment-churn/studio/managed-app/app.json --out customer-sentiment-churn-app"
+          ],
+          "expected": "customer-sentiment-churn-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd customer-sentiment-churn-app/managed-app",
+            "ms app init --display-name \"Customer Sentiment Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Cust Sentiment Churn Pred Customer Interactions\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Sentiment and Churn Prediction Churn Indicators\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Sentiment and Churn Prediction Retention Actions\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Customer Sentiment and Churn Prediction Segment Benchmarks\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Customer Sentiment and Churn Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Cust Sentiment Churn Pred Customer Interactions tab.",
+          "expected": "The app and the agent read the same synthetic records. 5 fictional records, including Elizabeth Warren-Hayes (CustomerInteractionId CUST-8001), with Segment affluent.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "financial-advisor-copilot",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/financial_services_stacks/financial_advisor_copilot_stack/financial_advisor_copilot_agent.py",
+  "records_markdown": "solutions/financial-advisor-copilot/manual/knowledge/aibast_financial-advisor-copilot-synthetic-records.md",
+  "lists": [
+    {
+      "id": "client-portfolios",
+      "title": "Financial Advisor Client Portfolios",
+      "description": "Synthetic client portfolios (AIBAST Financial Advisor workshop; fictional).",
+      "record_set": "CLIENT_PORTFOLIOS",
+      "columns": [
+        {"name": "Title", "label": "Client Portfolio", "from": "name", "type": "text"},
+        {"name": "ClientPortfolioId", "label": "Client Portfolio ID", "from": "$key", "type": "text"},
+        {"name": "Advisor", "label": "Advisor", "from": "advisor", "type": "text"},
+        {"name": "RiskProfile", "label": "Risk Profile", "from": "risk_profile", "type": "text"},
+        {"name": "Age", "label": "Age", "from": "age", "type": "number"},
+        {"name": "RetirementTarget", "label": "Retirement Target", "from": "retirement_target", "type": "number"},
+        {"name": "TotalAssets", "label": "Total Assets", "from": "total_assets", "type": "number"},
+        {"name": "HoldingsUsEquitiesValue", "label": "Holdings Us Equities Value", "from": "holdings.US Equities.value", "type": "number"},
+        {"name": "HoldingsUsEquitiesAllocation", "label": "Holdings Us Equities Allocation", "from": "holdings.US Equities.allocation", "type": "number"},
+        {"name": "HoldingsUsEquitiesTarget", "label": "Holdings Us Equities Target", "from": "holdings.US Equities.target", "type": "number"},
+        {"name": "HoldingsInternationalEqui5b27968", "label": "Holdings International Equities Value", "from": "holdings.International Equities.value", "type": "number"},
+        {"name": "HoldingsInternationalEqui1195a93", "label": "Holdings International Equities Allocation", "from": "holdings.International Equities.allocation", "type": "number"},
+        {"name": "HoldingsInternationalEquid1a09d2", "label": "Holdings International Equities Target", "from": "holdings.International Equities.target", "type": "number"},
+        {"name": "HoldingsFixedIncomeValue", "label": "Holdings Fixed Income Value", "from": "holdings.Fixed Income.value", "type": "number"},
+        {"name": "HoldingsFixedIncomeAllocation", "label": "Holdings Fixed Income Allocation", "from": "holdings.Fixed Income.allocation", "type": "number"},
+        {"name": "HoldingsFixedIncomeTarget", "label": "Holdings Fixed Income Target", "from": "holdings.Fixed Income.target", "type": "number"},
+        {"name": "HoldingsRealEstateReitsValue", "label": "Holdings Real Estate Reits Value", "from": "holdings.Real Estate (REITs).value", "type": "number", "optional": true},
+        {"name": "HoldingsRealEstateReitsAl223b61b", "label": "Holdings Real Estate Reits Allocation", "from": "holdings.Real Estate (REITs).allocation", "type": "number", "optional": true},
+        {"name": "HoldingsRealEstateReitsTarget", "label": "Holdings Real Estate Reits Target", "from": "holdings.Real Estate (REITs).target", "type": "number", "optional": true},
+        {"name": "HoldingsAlternativesValue", "label": "Holdings Alternatives Value", "from": "holdings.Alternatives.value", "type": "number", "optional": true},
+        {"name": "HoldingsAlternativesAllocation", "label": "Holdings Alternatives Allocation", "from": "holdings.Alternatives.allocation", "type": "number", "optional": true},
+        {"name": "HoldingsAlternativesTarget", "label": "Holdings Alternatives Target", "from": "holdings.Alternatives.target", "type": "number", "optional": true},
+        {"name": "HoldingsCashEquivalentsValue", "label": "Holdings Cash Equivalents Value", "from": "holdings.Cash & Equivalents.value", "type": "number"},
+        {"name": "HoldingsCashEquivalentsAl50dc5ca", "label": "Holdings Cash Equivalents Allocation", "from": "holdings.Cash & Equivalents.allocation", "type": "number"},
+        {"name": "HoldingsCashEquivalentsTarget", "label": "Holdings Cash Equivalents Target", "from": "holdings.Cash & Equivalents.target", "type": "number"},
+        {"name": "AnnualIncome", "label": "Annual Income", "from": "annual_income", "type": "number"},
+        {"name": "AnnualContributions", "label": "Annual Contributions", "from": "annual_contributions", "type": "number"},
+        {"name": "LastReview", "label": "Last Review", "from": "last_review", "type": "text"},
+        {"name": "HoldingsEmergingMarketsValue", "label": "Holdings Emerging Markets Value", "from": "holdings.Emerging Markets.value", "type": "number", "optional": true},
+        {"name": "HoldingsEmergingMarketsAl6e9d949", "label": "Holdings Emerging Markets Allocation", "from": "holdings.Emerging Markets.allocation", "type": "number", "optional": true},
+        {"name": "HoldingsEmergingMarketsTarget", "label": "Holdings Emerging Markets Target", "from": "holdings.Emerging Markets.target", "type": "number", "optional": true},
+        {"name": "HoldingsMunicipalBondsValue", "label": "Holdings Municipal Bonds Value", "from": "holdings.Municipal Bonds.value", "type": "number", "optional": true},
+        {"name": "HoldingsMunicipalBondsAllocation", "label": "Holdings Municipal Bonds Allocation", "from": "holdings.Municipal Bonds.allocation", "type": "number", "optional": true},
+        {"name": "HoldingsMunicipalBondsTarget", "label": "Holdings Municipal Bonds Target", "from": "holdings.Municipal Bonds.target", "type": "number", "optional": true}
+      ]
+    },
+    {
+      "id": "investment-recommendations",
+      "title": "Financial Advisor Investment Recommendations",
+      "description": "Synthetic investment recommendations (AIBAST Financial Advisor workshop; fictional).",
+      "record_set": "INVESTMENT_RECOMMENDATIONS",
+      "columns": [
+        {"name": "Title", "label": "Investment Recommendation", "from": "$key", "type": "text"},
+        {"name": "InvestmentRecommendationId", "label": "Investment Recommendation ID", "from": "$key", "type": "text"},
+        {"name": "Value", "label": "Value", "from": "$value", "type": "text", "encoding": "json"}
+      ]
+    },
+    {
+      "id": "compliance-rules",
+      "title": "Financial Advisor Compliance Rules",
+      "description": "Synthetic compliance rules (AIBAST Financial Advisor workshop; fictional).",
+      "record_set": "COMPLIANCE_RULES",
+      "columns": [
+        {"name": "Title", "label": "Compliance Rule", "from": "name", "type": "text"},
+        {"name": "ComplianceRuleId", "label": "Compliance Rule ID", "from": "$key", "type": "text"},
+        {"name": "Description", "label": "Description", "from": "description", "type": "text"},
+        {"name": "AppliesTo", "label": "Applies To", "from": "applies_to", "type": "text"}
+      ]
+    },
+    {
+      "id": "service-requests",
+      "title": "Financial Advisor Service Requests",
+      "description": "Synthetic service requests (AIBAST Financial Advisor workshop; fictional).",
+      "record_set": "SERVICE_REQUESTS",
+      "columns": [
+        {"name": "Title", "label": "Service Request", "from": "$key", "type": "text"},
+        {"name": "ServiceRequestId", "label": "Service Request ID", "from": "$key", "type": "text"},
+        {"name": "Request", "label": "Request", "from": "request", "type": "text"},
+        {"name": "Verification", "label": "Verification", "from": "verification", "type": "text"},
+        {"name": "Route", "label": "Route", "from": "route", "type": "text"}
+      ]
+    }
+  ]
+}

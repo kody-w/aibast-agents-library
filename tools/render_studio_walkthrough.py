@@ -31,6 +31,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.design_tokens import render_tokens, stamp  # noqa: E402
+from tools.studio_privacy import EMAIL_RE, has_unapproved_email  # noqa: E402
 from tools.scaffold_solution_journey import (  # noqa: E402
     COMMON_CSS,
     THEME_PREFERENCE_SCRIPT,
@@ -45,10 +46,6 @@ AGENT_NAME_MAX = 30  # the Build page name field has maxlength="30"
 SLUG_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 GUID_RE = re.compile(
     r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-    re.IGNORECASE,
-)
-EMAIL_RE = re.compile(
-    r"[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[a-z0-9-]+\.)+[a-z]{2,}",
     re.IGNORECASE,
 )
 TENANT_HOST_RE = re.compile(
@@ -103,9 +100,10 @@ def check_privacy(value: Any, label: str = "walkthrough") -> None:
             check_privacy(child, f"{label}[{index}]")
     elif isinstance(value, str):
         text = unquote(html.unescape(value))
-        for pattern, kind in ((EMAIL_RE, "email address"), (GUID_RE, "GUID-shaped id")):
-            if pattern.search(text):
-                raise WalkthroughError(f"Privacy check failed in {label}: {kind}")
+        if has_unapproved_email(text):
+            raise WalkthroughError(f"Privacy check failed in {label}: email address")
+        if GUID_RE.search(text):
+            raise WalkthroughError(f"Privacy check failed in {label}: GUID-shaped id")
         for match in TENANT_HOST_RE.finditer(text):
             prefix = match["prefix"]
             allowed = r"(?:contoso|<[^<>\s.]+>)"

@@ -1,0 +1,7 @@
+Title,ReturnRequestId,OrderID,Product,SKU,PurchasePrice,PurchaseDate,RequestDate,Reason,Condition,Channel,Status,Notes
+Synthetic size-mismatch case,RET-4001,ORD-88712,Classic Denim Jacket,SKU-1001,89.99,2026-02-14,2026-03-02,wrong_size,unworn_tags_attached,online,pending_review,"Ordered size M, needs size L. Willing to exchange."
+Synthetic device-defect case,RET-4002,ORD-89234,Smart Fitness Tracker,SKU-1004,129.99,2026-01-20,2026-03-10,defective,non_functional,in_store,policy_match_candidate,Heart rate sensor stopped working after 3 weeks. Under warranty.
+Synthetic description-mismatch case,RET-4003,ORD-87455,Premium Running Shoes,SKU-1005,149.99,2026-02-28,2026-03-08,not_as_described,lightly_used,online,pending_review,Color shown online was navy but received was dark grey.
+Synthetic changed-mind case,RET-4004,ORD-90100,Wireless Earbuds Pro,SKU-1002,59.99,2026-03-01,2026-03-12,changed_mind,opened_unused,online,pending_review,Found a better deal elsewhere. Wants full refund.
+Synthetic warranty-escalation case,RET-4005,ORD-86321,Leather Crossbody Bag,SKU-1007,79.99,2025-12-18,2026-03-14,defective,damaged,in_store,escalated,Strap broke after normal use. Outside 60-day window but claims manufacturing defect.
+Synthetic wrong-item case,RET-4006,ORD-91005,UV Protection Sunglasses,SKU-1008,44.99,2026-03-05,2026-03-15,wrong_item,unopened,online,policy_match_candidate,Received aviator style instead of ordered wayfarer style.

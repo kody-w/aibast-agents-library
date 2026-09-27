@@ -1,0 +1,145 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "inventory-rebalancing",
+  "description": "Selected entity records parsed from the workshop's authoritative synthetic knowledge. Unlisted facts, rules and calculations remain in retained knowledge.",
+  "source": "agents/@aibast-agents-library/manufacturing_stacks/inventory_rebalancing_stack/inventory_rebalancing_agent.py",
+  "records_markdown": "solutions/inventory-rebalancing/manual/knowledge/aibast_inventory-rebalancing-synthetic-records.md",
+  "lists": [
+    {
+      "id": "sku-unit-cost-and-weight",
+      "title": "Inventory Rebalancing SKU Unit Cost And Weight",
+      "description": "Synthetic sku unit cost and weight (AIBAST Inventory Rebalancing workshop; fictional).",
+      "record_set": "SKU_UNIT_COST_AND_WEIGHT",
+      "columns": [
+        {"name": "Title", "label": "SKU", "from": "sku", "type": "text"},
+        {"name": "SKUUnitCostAndWeightId", "label": "SKU Unit Cost And Weight ID", "from": "sku", "type": "text"},
+        {"name": "UnitCost", "label": "Unit cost", "from": "unit_cost", "type": "number", "format": "currency"},
+        {"name": "WeightKg", "label": "Weight (kg)", "from": "weight_kg", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/inventory-rebalancing/manual/knowledge/aibast_inventory-rebalancing-review-rules.md",
+        "section": "SKU unit cost and weight (for transfer-cost and value-at-risk estimates)",
+        "selector": "SKU unit cost and weight (for transfer-cost and value-at-risk estimates) [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 6,
+        "sources": [
+          "DEMAND_FORECASTS",
+          "PORTFOLIO_CLASSIFICATIONS",
+          "REORDER_POINTS",
+          "SKU_INVENTORY"
+        ]
+      }
+    },
+    {
+      "id": "sku-on-hand-levels-by-facility",
+      "title": "Inventory Rebalancing SKU On Hand Levels By Facility",
+      "description": "Synthetic sku on hand levels by facility (AIBAST Inventory Rebalancing workshop; fictional).",
+      "record_set": "SKU_ON_HAND_LEVELS_BY_FACILITY",
+      "columns": [
+        {"name": "Title", "label": "Description", "from": "description", "type": "text"},
+        {"name": "SKUOnHandLevelsByFacilityId", "label": "SKU On Hand Levels By Facility ID", "from": "sku", "type": "text"},
+        {"name": "WhAtl", "label": "WH-ATL", "from": "wh_atl", "type": "text"},
+        {"name": "WhOrd", "label": "WH-ORD", "from": "wh_ord", "type": "text"},
+        {"name": "WhDfw", "label": "WH-DFW", "from": "wh_dfw", "type": "text"},
+        {"name": "WhSea", "label": "WH-SEA", "from": "wh_sea", "type": "text"},
+        {"name": "ReorderPoint", "label": "Reorder point", "from": "reorder_point", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/inventory-rebalancing/manual/knowledge/aibast_inventory-rebalancing-synthetic-records.md",
+        "section": "SKU on-hand levels by facility",
+        "selector": "SKU on-hand levels by facility [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 6,
+        "sources": [
+          "DEMAND_FORECASTS",
+          "PORTFOLIO_CLASSIFICATIONS",
+          "REORDER_POINTS",
+          "SKU_INVENTORY"
+        ]
+      }
+    },
+    {
+      "id": "demand-forecast-by-facility",
+      "title": "Inventory Rebalancing Demand Forecast By Facility",
+      "description": "Synthetic demand forecast by facility (AIBAST Inventory Rebalancing workshop; fictional).",
+      "record_set": "DEMAND_FORECAST_BY_FACILITY",
+      "columns": [
+        {"name": "Title", "label": "SKU", "from": "sku", "type": "text"},
+        {"name": "DemandForecastByFacilityId", "label": "Demand Forecast By Facility ID", "from": "sku", "type": "text"},
+        {"name": "WhAtl", "label": "WH-ATL", "from": "wh_atl", "type": "text"},
+        {"name": "WhOrd", "label": "WH-ORD", "from": "wh_ord", "type": "text"},
+        {"name": "WhDfw", "label": "WH-DFW", "from": "wh_dfw", "type": "text"},
+        {"name": "WhSea", "label": "WH-SEA", "from": "wh_sea", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/inventory-rebalancing/manual/knowledge/aibast_inventory-rebalancing-synthetic-records.md",
+        "section": "Demand forecast by facility (synthetic, forecast period unspecified)",
+        "selector": "Demand forecast by facility (synthetic, forecast period unspecified) [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 6,
+        "sources": [
+          "DEMAND_FORECASTS",
+          "PORTFOLIO_CLASSIFICATIONS",
+          "REORDER_POINTS",
+          "SKU_INVENTORY"
+        ]
+      }
+    },
+    {
+      "id": "portfolio-classification",
+      "title": "Inventory Rebalancing Portfolio Classification",
+      "description": "Synthetic portfolio classification (AIBAST Inventory Rebalancing workshop; fictional).",
+      "record_set": "PORTFOLIO_CLASSIFICATION",
+      "columns": [
+        {"name": "Title", "label": "SKU", "from": "sku", "type": "text"},
+        {"name": "PortfolioClassificationId", "label": "Portfolio Classification ID", "from": "sku", "type": "text"},
+        {"name": "Velocity", "label": "Velocity", "from": "velocity", "type": "text"},
+        {"name": "StrategicValue", "label": "Strategic value", "from": "strategic_value", "type": "text"},
+        {"name": "LifecycleRisk", "label": "Lifecycle risk", "from": "lifecycle_risk", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/inventory-rebalancing/manual/knowledge/aibast_inventory-rebalancing-synthetic-records.md",
+        "section": "Synthetic portfolio classification",
+        "selector": "Synthetic portfolio classification [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 6,
+        "sources": [
+          "DEMAND_FORECASTS",
+          "PORTFOLIO_CLASSIFICATIONS",
+          "REORDER_POINTS",
+          "SKU_INVENTORY"
+        ]
+      }
+    }
+  ],
+  "source_of_truth": "knowledge-table",
+  "retained_knowledge": [
+    {
+      "file": "solutions/inventory-rebalancing/manual/knowledge/aibast_inventory-rebalancing-review-rules.md",
+      "section": "Annual holding cost rate per pallet",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/inventory-rebalancing/manual/knowledge/aibast_inventory-rebalancing-review-rules.md",
+      "section": "Inter-facility transfer cost per kilogram (synthetic ground-freight rate)",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/inventory-rebalancing/manual/knowledge/aibast_inventory-rebalancing-synthetic-records.md",
+      "section": "Facility snapshot",
+      "reason": "Facility snapshot: WH-ATL.Utilization has no unambiguous literal field"
+    }
+  ]
+}

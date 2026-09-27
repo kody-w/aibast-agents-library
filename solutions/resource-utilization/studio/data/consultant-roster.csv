@@ -1,0 +1,11 @@
+Title,ConsultantRosterId,Level,CompleteSkills,RateHR,Utilization,Status,CurrentProject,ProjectEnd
+Elena Vasquez,CON-401,Senior,Cloud Architecture; Azure; DevOps,275,92,billable,TechCorp Transformation,2026-06-30
+Michael Chen,CON-402,Senior,Data Engineering; Databricks; Python,260,88,billable,Apex Analytics Platform,2026-05-15
+Priya Sharma,CON-403,Manager,Program Management; Agile; Change Mgmt,310,95,billable,Pinnacle Energy ERP,2026-08-31
+David Okafor,CON-404,Mid,Data Analytics; Power BI; SQL,175,0,bench,none,none
+Sarah Kim,CON-405,Mid,Cloud Architecture; AWS; Terraform,185,0,bench,none,none
+James Wright,CON-406,Junior,Business Analysis; Requirements; Jira,125,0,bench,none,none
+Lisa Tanaka,CON-407,Senior,Cybersecurity; Identity; Compliance,290,78,billable,Atlas Security Audit,2026-04-10
+Robert Garcia,CON-408,Mid,ERP; D365; Integration,195,0,bench,none,none
+Amanda Foster,CON-409,Mid,UX Design; Research; Figma,165,85,billable,Metro Transit Portal,2026-05-01
+Chen Wei,CON-410,Senior,AI/ML; Python; Azure ML,295,0,bench,none,none

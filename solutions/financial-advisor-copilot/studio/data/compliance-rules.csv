@@ -1,0 +1,6 @@
+Title,ComplianceRuleId,Description,AppliesTo
+Regulation Best Interest,reg_bi,Ensure recommendations are in client's best interest,all
+Form CRS Delivery,form_crs,Relationship summary delivered at account opening and annually,all
+Suitability Obligation,suitability,Investment recommendations suitable for client profile,all
+Concentration Limit,concentration_limit,No single position exceeds 10% of portfolio,all
+Senior Investor Protection,senior_investor,Enhanced protections for clients age 65+,seniors

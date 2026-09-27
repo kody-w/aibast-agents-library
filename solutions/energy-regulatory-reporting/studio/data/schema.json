@@ -1,0 +1,55 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "energy-regulatory-reporting",
+  "description": "The workshop's synthetic records as SharePoint lists: the same records the portable agent and the knowledge file hold, one list per record set. Every value is fictional.",
+  "source": "agents/@aibast-agents-library/energy_stacks/regulatory_reporting_stack/regulatory_reporting_agent.py",
+  "records_markdown": "solutions/energy-regulatory-reporting/manual/knowledge/energy-regulatory-reporting-synthetic-records.md",
+  "lists": [
+    {
+      "id": "regulatory-reports",
+      "title": "Regulatory Reporting Regulatory Reports",
+      "description": "Synthetic regulatory reports (AIBAST Regulatory Reporting workshop; fictional).",
+      "record_set": "REGULATORY_REPORTS",
+      "columns": [
+        {"name": "Title", "label": "Regulatory Report", "from": "name", "type": "text"},
+        {"name": "RegulatoryReportId", "label": "Regulatory Report ID", "from": "$key", "type": "text"},
+        {"name": "Authority", "label": "Authority", "from": "authority", "type": "text"},
+        {"name": "Facility", "label": "Facility", "from": "facility", "type": "text"},
+        {"name": "ReportingPeriod", "label": "Reporting Period", "from": "reporting_period", "type": "text"},
+        {"name": "Deadline", "label": "Deadline", "from": "deadline", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "DataQualityScore", "label": "Data Quality Score", "from": "data_quality_score", "type": "number"},
+        {"name": "CompletenessPct", "label": "Completeness Pct", "from": "completeness_pct", "type": "number"},
+        {"name": "Assignee", "label": "Assignee", "from": "assignee", "type": "text"},
+        {"name": "LastUpdated", "label": "Last Updated", "from": "last_updated", "type": "text"}
+      ]
+    },
+    {
+      "id": "data-validation-rules",
+      "title": "Regulatory Reporting Data Validation Rules",
+      "description": "Synthetic data validation rules (AIBAST Regulatory Reporting workshop; fictional).",
+      "record_set": "DATA_VALIDATION_RULES",
+      "columns": [
+        {"name": "Title", "label": "Data Validation Rule", "from": "$key", "type": "text"},
+        {"name": "DataValidationRuleId", "label": "Data Validation Rule ID", "from": "$key", "type": "text"},
+        {"name": "Rules", "label": "Rules", "from": "rules", "type": "text", "encoding": "joined"},
+        {"name": "SourceSystems", "label": "Source Systems", "from": "source_systems", "type": "text", "encoding": "joined"}
+      ]
+    },
+    {
+      "id": "audit-findings",
+      "title": "Regulatory Reporting Audit Findings",
+      "description": "Synthetic audit findings (AIBAST Regulatory Reporting workshop; fictional).",
+      "record_set": "AUDIT_FINDINGS",
+      "columns": [
+        {"name": "Title", "label": "Audit Finding", "from": "$key", "type": "text"},
+        {"name": "AuditFindingId", "label": "Audit Finding ID", "from": "$key", "type": "text"},
+        {"name": "Report", "label": "Report", "from": "report", "type": "text"},
+        {"name": "Finding", "label": "Finding", "from": "finding", "type": "text"},
+        {"name": "Severity", "label": "Severity", "from": "severity", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "DueDate", "label": "Due Date", "from": "due_date", "type": "text"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,263 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Loan Origination Assistant Workspace",
+  "title": "Loan Origination Assistant",
+  "description": "The Loan Origination Assistant workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "loan-applications",
+      "list": "Loan Origination Assistant Loan Applications",
+      "title": "Loan Applications",
+      "key": "LoanApplicationId",
+      "fields": {
+        "LoanApplicationId": "field_1",
+        "Applicant": "field_2",
+        "LoanType": "field_3",
+        "Purpose": "field_4",
+        "PropertyAddress": "field_5",
+        "PropertyValue": "field_6",
+        "LoanAmount": "field_7",
+        "CreditScore": "field_8",
+        "AnnualIncome": "field_9",
+        "MonthlyDebt": "field_10",
+        "EmploymentYears": "field_11",
+        "DownPaymentPct": "field_12",
+        "Status": "field_13",
+        "LoanOfficer": "field_14",
+        "Dscr": "field_15"
+      },
+      "columns": [
+        "LoanApplicationId",
+        "Title",
+        "Applicant",
+        "LoanType",
+        "Purpose",
+        "PropertyAddress",
+        "PropertyValue",
+        "LoanAmount",
+        "CreditScore",
+        "AnnualIncome"
+      ],
+      "labels": {
+        "Title": "Loan Application",
+        "LoanApplicationId": "Loan Application ID",
+        "Applicant": "Applicant",
+        "LoanType": "Loan Type",
+        "Purpose": "Purpose",
+        "PropertyAddress": "Property Address",
+        "PropertyValue": "Property Value",
+        "LoanAmount": "Loan Amount",
+        "CreditScore": "Credit Score",
+        "AnnualIncome": "Annual Income",
+        "MonthlyDebt": "Monthly Debt",
+        "EmploymentYears": "Employment Years",
+        "DownPaymentPct": "Down Payment Pct",
+        "Status": "Status",
+        "LoanOfficer": "Loan Officer",
+        "Dscr": "Dscr"
+      },
+      "formats": {
+        "Title": "text",
+        "LoanApplicationId": "text",
+        "Applicant": "text",
+        "LoanType": "text",
+        "Purpose": "text",
+        "PropertyAddress": "text",
+        "PropertyValue": "currency",
+        "LoanAmount": "currency",
+        "CreditScore": "integer",
+        "AnnualIncome": "integer",
+        "MonthlyDebt": "integer",
+        "EmploymentYears": "integer",
+        "DownPaymentPct": "percent1",
+        "Status": "text",
+        "LoanOfficer": "text",
+        "Dscr": "number"
+      },
+      "metrics": [
+        {
+          "label": "Loan Applications",
+          "op": "count"
+        },
+        {
+          "label": "Property Value",
+          "op": "sum",
+          "column": "PropertyValue"
+        },
+        {
+          "label": "Loan Amount",
+          "op": "sum",
+          "column": "LoanAmount"
+        }
+      ],
+      "groupBy": "Applicant",
+      "sortBy": "LoanApplicationId"
+    },
+    {
+      "id": "approval-criteria",
+      "list": "Loan Origination Assistant Approval Criteria",
+      "title": "Approval Criteria",
+      "key": "ApprovalCriteriaId",
+      "fields": {
+        "ApprovalCriteriaId": "field_1",
+        "MinCredit": "field_2",
+        "MaxDti": "field_3",
+        "MinDownPct": "field_4",
+        "MaxLtv": "field_5",
+        "MinDscr": "field_6"
+      },
+      "columns": [
+        "ApprovalCriteriaId",
+        "Title",
+        "MinCredit",
+        "MaxDti",
+        "MinDownPct",
+        "MaxLtv",
+        "MinDscr"
+      ],
+      "labels": {
+        "Title": "Approval Criteria",
+        "ApprovalCriteriaId": "Approval Criteria ID",
+        "MinCredit": "Min Credit",
+        "MaxDti": "Max Dti",
+        "MinDownPct": "Min Down Pct",
+        "MaxLtv": "Max Ltv",
+        "MinDscr": "Min Dscr"
+      },
+      "formats": {
+        "Title": "text",
+        "ApprovalCriteriaId": "text",
+        "MinCredit": "integer",
+        "MaxDti": "integer",
+        "MinDownPct": "percent1",
+        "MaxLtv": "number",
+        "MinDscr": "number"
+      },
+      "metrics": [
+        {
+          "label": "Approval Criteria",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ApprovalCriteriaId"
+    },
+    {
+      "id": "document-requirements",
+      "list": "Loan Origination Assistant Document Requirements",
+      "title": "Document Requirements",
+      "key": "DocumentRequirementId",
+      "fields": {
+        "DocumentRequirementId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "DocumentRequirementId",
+        "Title",
+        "Value"
+      ],
+      "labels": {
+        "Title": "Document Requirement",
+        "DocumentRequirementId": "Document Requirement ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "DocumentRequirementId": "text",
+        "Value": "text"
+      },
+      "metrics": [
+        {
+          "label": "Document Requirements",
+          "op": "count"
+        }
+      ],
+      "sortBy": "DocumentRequirementId"
+    },
+    {
+      "id": "rate-sheet",
+      "list": "Loan Origination Assistant Rate Sheet",
+      "title": "Rate Sheet",
+      "key": "RateSheetId",
+      "fields": {
+        "RateSheetId": "field_1",
+        "Rate": "field_2",
+        "Apr": "field_3",
+        "Points": "field_4",
+        "MipUpfront": "field_5",
+        "MipAnnual": "field_6",
+        "FundingFee": "field_7"
+      },
+      "columns": [
+        "RateSheetId",
+        "Title",
+        "Rate",
+        "Apr",
+        "Points",
+        "MipUpfront",
+        "MipAnnual",
+        "FundingFee"
+      ],
+      "labels": {
+        "Title": "Rate Sheet",
+        "RateSheetId": "Rate Sheet ID",
+        "Rate": "Rate",
+        "Apr": "Apr",
+        "Points": "Points",
+        "MipUpfront": "Mip Upfront",
+        "MipAnnual": "Mip Annual",
+        "FundingFee": "Funding Fee"
+      },
+      "formats": {
+        "Title": "text",
+        "RateSheetId": "text",
+        "Rate": "number",
+        "Apr": "number",
+        "Points": "number",
+        "MipUpfront": "number",
+        "MipAnnual": "number",
+        "FundingFee": "number"
+      },
+      "metrics": [
+        {
+          "label": "Rate Sheet",
+          "op": "count"
+        }
+      ],
+      "sortBy": "RateSheetId"
+    },
+    {
+      "id": "conditions",
+      "list": "Loan Origination Assistant Conditions",
+      "title": "Conditions",
+      "key": "ConditionId",
+      "fields": {
+        "ConditionId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "ConditionId",
+        "Title",
+        "Value"
+      ],
+      "labels": {
+        "Title": "Condition",
+        "ConditionId": "Condition ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "ConditionId": "text",
+        "Value": "text"
+      },
+      "metrics": [
+        {
+          "label": "Conditions",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ConditionId"
+    }
+  ]
+}

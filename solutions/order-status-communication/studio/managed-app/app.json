@@ -1,0 +1,250 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Order Status Communications Workspace",
+  "title": "Order Status Communications",
+  "description": "The Order Status Communications workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "orders",
+      "list": "Order Status Communications Orders",
+      "title": "Orders",
+      "key": "OrderId",
+      "fields": {
+        "OrderId": "field_1",
+        "Customer": "field_2",
+        "ContactEmail": "field_3",
+        "Product": "field_4",
+        "Quantity": "field_5",
+        "UnitPrice": "field_6",
+        "OrderDate": "field_7",
+        "PromisedDate": "field_8",
+        "Status": "field_9",
+        "PctComplete": "field_10"
+      },
+      "columns": [
+        "OrderId",
+        "Title",
+        "Customer",
+        "ContactEmail",
+        "Product",
+        "Quantity",
+        "UnitPrice",
+        "OrderDate",
+        "PromisedDate",
+        "Status"
+      ],
+      "labels": {
+        "Title": "Order",
+        "OrderId": "Order ID",
+        "Customer": "Customer",
+        "ContactEmail": "Contact Email",
+        "Product": "Product",
+        "Quantity": "Quantity",
+        "UnitPrice": "Unit Price",
+        "OrderDate": "Order Date",
+        "PromisedDate": "Promised Date",
+        "Status": "Status",
+        "PctComplete": "Pct Complete"
+      },
+      "formats": {
+        "Title": "text",
+        "OrderId": "text",
+        "Customer": "text",
+        "ContactEmail": "text",
+        "Product": "text",
+        "Quantity": "integer",
+        "UnitPrice": "currency",
+        "OrderDate": "text",
+        "PromisedDate": "text",
+        "Status": "text",
+        "PctComplete": "percent1"
+      },
+      "metrics": [
+        {
+          "label": "Orders",
+          "op": "count"
+        },
+        {
+          "label": "Quantity",
+          "op": "sum",
+          "column": "Quantity"
+        }
+      ],
+      "groupBy": "Customer",
+      "sortBy": "OrderId"
+    },
+    {
+      "id": "shipments",
+      "list": "Order Status Communications Shipments",
+      "title": "Shipments",
+      "key": "ShipmentId",
+      "fields": {
+        "ShipmentId": "field_1",
+        "Carrier": "field_2",
+        "TrackingNumber": "field_3",
+        "ShipDate": "field_4",
+        "EstDelivery": "field_5",
+        "Origin": "field_6",
+        "Destination": "field_7",
+        "WeightKg": "field_8",
+        "Status": "field_9"
+      },
+      "columns": [
+        "ShipmentId",
+        "Title",
+        "Carrier",
+        "TrackingNumber",
+        "ShipDate",
+        "EstDelivery",
+        "Origin",
+        "Destination",
+        "WeightKg",
+        "Status"
+      ],
+      "labels": {
+        "Title": "Shipment",
+        "ShipmentId": "Shipment ID",
+        "Carrier": "Carrier",
+        "TrackingNumber": "Tracking Number",
+        "ShipDate": "Ship Date",
+        "EstDelivery": "Est Delivery",
+        "Origin": "Origin",
+        "Destination": "Destination",
+        "WeightKg": "Weight Kg",
+        "Status": "Status"
+      },
+      "formats": {
+        "Title": "text",
+        "ShipmentId": "text",
+        "Carrier": "text",
+        "TrackingNumber": "text",
+        "ShipDate": "text",
+        "EstDelivery": "text",
+        "Origin": "text",
+        "Destination": "text",
+        "WeightKg": "integer",
+        "Status": "text"
+      },
+      "metrics": [
+        {
+          "label": "Shipments",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ShipmentId"
+    },
+    {
+      "id": "delay-reasons",
+      "list": "Order Status Communications Delay Reasons",
+      "title": "Delay Reasons",
+      "key": "DelayReasonId",
+      "fields": {
+        "DelayReasonId": "field_1",
+        "Reason": "field_2",
+        "OriginalDate": "field_3",
+        "RevisedDate": "field_4",
+        "DaysDelayed": "field_5",
+        "RecoveryActions": "field_6",
+        "CostImpact": "field_7"
+      },
+      "columns": [
+        "DelayReasonId",
+        "Title",
+        "Reason",
+        "OriginalDate",
+        "RevisedDate",
+        "DaysDelayed",
+        "RecoveryActions",
+        "CostImpact"
+      ],
+      "labels": {
+        "Title": "Delay Reason",
+        "DelayReasonId": "Delay Reason ID",
+        "Reason": "Reason",
+        "OriginalDate": "Original Date",
+        "RevisedDate": "Revised Date",
+        "DaysDelayed": "Days Delayed",
+        "RecoveryActions": "Recovery Actions",
+        "CostImpact": "Cost Impact"
+      },
+      "formats": {
+        "Title": "text",
+        "DelayReasonId": "text",
+        "Reason": "text",
+        "OriginalDate": "text",
+        "RevisedDate": "text",
+        "DaysDelayed": "integer",
+        "RecoveryActions": "text",
+        "CostImpact": "currency"
+      },
+      "metrics": [
+        {
+          "label": "Delay Reasons",
+          "op": "count"
+        },
+        {
+          "label": "Cost Impact",
+          "op": "sum",
+          "column": "CostImpact"
+        }
+      ],
+      "sortBy": "DelayReasonId"
+    },
+    {
+      "id": "customer-contacts",
+      "list": "Order Status Communications Customer Contacts",
+      "title": "Customer Contacts",
+      "key": "CustomerContactId",
+      "fields": {
+        "CustomerContactId": "field_1",
+        "AccountManager": "field_2",
+        "EscalationContact": "field_3",
+        "PreferredChannel": "field_4",
+        "CustomerTier": "field_5",
+        "SLAResponseHours": "field_6"
+      },
+      "columns": [
+        "CustomerContactId",
+        "Title",
+        "AccountManager",
+        "EscalationContact",
+        "PreferredChannel",
+        "CustomerTier",
+        "SLAResponseHours"
+      ],
+      "labels": {
+        "Title": "Customer Contact",
+        "CustomerContactId": "Customer Contact ID",
+        "AccountManager": "Account Manager",
+        "EscalationContact": "Escalation Contact",
+        "PreferredChannel": "Preferred Channel",
+        "CustomerTier": "Customer Tier",
+        "SLAResponseHours": "SLA Response Hours"
+      },
+      "formats": {
+        "Title": "text",
+        "CustomerContactId": "text",
+        "AccountManager": "text",
+        "EscalationContact": "text",
+        "PreferredChannel": "text",
+        "CustomerTier": "text",
+        "SLAResponseHours": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Customer Contacts",
+          "op": "count"
+        },
+        {
+          "label": "SLA Response Hours",
+          "op": "sum",
+          "column": "SLAResponseHours"
+        }
+      ],
+      "groupBy": "AccountManager",
+      "sortBy": "CustomerContactId"
+    }
+  ]
+}

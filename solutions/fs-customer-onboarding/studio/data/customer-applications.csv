@@ -1,0 +1,5 @@
+Title,CustomerApplicationId,Applicant,ApplicationType,AccountRequested,Submitted,Status,RiskRating,RelationshipManager,EstimatedAssets
+APP-6001,APP-6001,Sarah Chen,individual,premium_checking,2025-02-20,kyc_in_progress,low,Michael Torres,250000
+APP-6002,APP-6002,Blackwood Capital Partners LLC,business,commercial_checking,2025-02-25,document_review,medium,Jessica Nguyen,2400000
+APP-6003,APP-6003,Ahmed Al-Rashid,individual,wealth_management,2025-03-01,enhanced_due_diligence,high,Jessica Nguyen,5800000
+APP-6004,APP-6004,Maria Fontaine,individual,basic_savings,2025-03-05,setup_review_ready,low,Michael Torres,15000

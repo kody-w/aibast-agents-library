@@ -1,0 +1,297 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Personalized Marketing Workspace",
+  "title": "Personalized Marketing",
+  "description": "The Personalized Marketing workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "customer-segments",
+      "list": "Personalized Marketing Customer Segments",
+      "title": "Customer Segments",
+      "key": "CustomerSegmentId",
+      "fields": {
+        "CustomerSegmentId": "field_1",
+        "Size": "field_2",
+        "AvgAnnualSpend": "field_3",
+        "AvgOrdersPerYear": "field_4",
+        "AvgBasketSize": "field_5",
+        "PreferredChannels": "field_6",
+        "TopCategories": "field_7",
+        "ChurnRisk": "field_8",
+        "LifetimeValue": "field_9",
+        "EngagementScore": "field_10"
+      },
+      "columns": [
+        "CustomerSegmentId",
+        "Title",
+        "Size",
+        "AvgAnnualSpend",
+        "AvgOrdersPerYear",
+        "AvgBasketSize",
+        "PreferredChannels",
+        "TopCategories",
+        "ChurnRisk",
+        "LifetimeValue"
+      ],
+      "labels": {
+        "Title": "Customer Segment",
+        "CustomerSegmentId": "Customer Segment ID",
+        "Size": "Size",
+        "AvgAnnualSpend": "Avg Annual Spend",
+        "AvgOrdersPerYear": "Avg Orders Per Year",
+        "AvgBasketSize": "Avg Basket Size",
+        "PreferredChannels": "Preferred Channels",
+        "TopCategories": "Top Categories",
+        "ChurnRisk": "Churn Risk",
+        "LifetimeValue": "Lifetime Value",
+        "EngagementScore": "Engagement Score"
+      },
+      "formats": {
+        "Title": "text",
+        "CustomerSegmentId": "text",
+        "Size": "integer",
+        "AvgAnnualSpend": "currency",
+        "AvgOrdersPerYear": "text",
+        "AvgBasketSize": "number",
+        "PreferredChannels": "text",
+        "TopCategories": "text",
+        "ChurnRisk": "number",
+        "LifetimeValue": "currency",
+        "EngagementScore": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Customer Segments",
+          "op": "count"
+        },
+        {
+          "label": "Lifetime Value",
+          "op": "sum",
+          "column": "LifetimeValue"
+        }
+      ],
+      "groupBy": "AvgOrdersPerYear",
+      "sortBy": "CustomerSegmentId"
+    },
+    {
+      "id": "campaign-templates",
+      "list": "Personalized Marketing Campaign Templates",
+      "title": "Campaign Templates",
+      "key": "CampaignTemplateId",
+      "fields": {
+        "CampaignTemplateId": "field_1",
+        "Type": "field_2",
+        "TargetSegment": "field_3",
+        "Stages": "field_4",
+        "DurationDays": "field_5",
+        "OfferConcept": "field_6",
+        "SubjectLines": "field_7",
+        "HistoricalOpenRate": "field_8",
+        "HistoricalClickRate": "field_9",
+        "HistoricalConversionRate": "field_10"
+      },
+      "columns": [
+        "CampaignTemplateId",
+        "Title",
+        "Type",
+        "TargetSegment",
+        "Stages",
+        "DurationDays",
+        "OfferConcept",
+        "SubjectLines",
+        "HistoricalOpenRate",
+        "HistoricalClickRate"
+      ],
+      "labels": {
+        "Title": "Campaign Template",
+        "CampaignTemplateId": "Campaign Template ID",
+        "Type": "Type",
+        "TargetSegment": "Target Segment",
+        "Stages": "Stages",
+        "DurationDays": "Duration Days",
+        "OfferConcept": "Offer Concept",
+        "SubjectLines": "Subject Lines",
+        "HistoricalOpenRate": "Historical Open Rate",
+        "HistoricalClickRate": "Historical Click Rate",
+        "HistoricalConversionRate": "Historical Conversion Rate"
+      },
+      "formats": {
+        "Title": "text",
+        "CampaignTemplateId": "text",
+        "Type": "text",
+        "TargetSegment": "text",
+        "Stages": "integer",
+        "DurationDays": "integer",
+        "OfferConcept": "text",
+        "SubjectLines": "text",
+        "HistoricalOpenRate": "number",
+        "HistoricalClickRate": "number",
+        "HistoricalConversionRate": "number"
+      },
+      "metrics": [
+        {
+          "label": "Campaign Templates",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Type",
+      "sortBy": "CampaignTemplateId"
+    },
+    {
+      "id": "ab-test-results",
+      "list": "Personalized Marketing AB Test Results",
+      "title": "AB Test Results",
+      "key": "ABTestResultId",
+      "fields": {
+        "ABTestResultId": "field_1",
+        "Campaign": "field_2",
+        "VariantASubject": "field_3",
+        "VariantAOpenRate": "field_4",
+        "VariantAClickRate": "field_5",
+        "VariantAConversions": "field_6",
+        "VariantBSubject": "field_7",
+        "VariantBOpenRate": "field_8",
+        "VariantBClickRate": "field_9",
+        "VariantBConversions": "field_10",
+        "Winner": "field_11",
+        "Confidence": "field_12",
+        "SampleSize": "field_13"
+      },
+      "columns": [
+        "ABTestResultId",
+        "Title",
+        "Campaign",
+        "VariantASubject",
+        "VariantAOpenRate",
+        "VariantAClickRate",
+        "VariantAConversions",
+        "VariantBSubject",
+        "VariantBOpenRate",
+        "VariantBClickRate"
+      ],
+      "labels": {
+        "Title": "AB Test Result",
+        "ABTestResultId": "AB Test Result ID",
+        "Campaign": "Campaign",
+        "VariantASubject": "Variant A Subject",
+        "VariantAOpenRate": "Variant A Open Rate",
+        "VariantAClickRate": "Variant A Click Rate",
+        "VariantAConversions": "Variant A Conversions",
+        "VariantBSubject": "Variant B Subject",
+        "VariantBOpenRate": "Variant B Open Rate",
+        "VariantBClickRate": "Variant B Click Rate",
+        "VariantBConversions": "Variant B Conversions",
+        "Winner": "Winner",
+        "Confidence": "Confidence",
+        "SampleSize": "Sample Size"
+      },
+      "formats": {
+        "Title": "text",
+        "ABTestResultId": "text",
+        "Campaign": "text",
+        "VariantASubject": "text",
+        "VariantAOpenRate": "number",
+        "VariantAClickRate": "number",
+        "VariantAConversions": "integer",
+        "VariantBSubject": "text",
+        "VariantBOpenRate": "number",
+        "VariantBClickRate": "number",
+        "VariantBConversions": "integer",
+        "Winner": "text",
+        "Confidence": "number",
+        "SampleSize": "integer"
+      },
+      "metrics": [
+        {
+          "label": "AB Test Results",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Campaign",
+      "sortBy": "ABTestResultId"
+    },
+    {
+      "id": "content-blocks",
+      "list": "Personalized Marketing Content Blocks",
+      "title": "Content Blocks",
+      "key": "ContentBlockId",
+      "fields": {
+        "ContentBlockId": "field_1",
+        "SegLoyalHeadline": "field_2",
+        "SegLoyalCta": "field_3",
+        "SegAtriskHeadline": "field_4",
+        "SegAtriskCta": "field_5",
+        "SegNewHeadline": "field_6",
+        "SegNewCta": "field_7",
+        "SegHighvalHeadline": "field_8",
+        "SegHighvalCta": "field_9",
+        "SegDormantHeadline": "field_10",
+        "SegDormantCta": "field_11",
+        "SegLoyal": "field_12",
+        "SegAtrisk": "field_13",
+        "SegNew": "field_14",
+        "SegHighval": "field_15",
+        "SegDormant": "field_16"
+      },
+      "columns": [
+        "ContentBlockId",
+        "Title",
+        "SegLoyalHeadline",
+        "SegLoyalCta",
+        "SegAtriskHeadline",
+        "SegAtriskCta",
+        "SegNewHeadline",
+        "SegNewCta",
+        "SegHighvalHeadline",
+        "SegHighvalCta"
+      ],
+      "labels": {
+        "Title": "Content Block",
+        "ContentBlockId": "Content Block ID",
+        "SegLoyalHeadline": "Seg Loyal Headline",
+        "SegLoyalCta": "Seg Loyal Cta",
+        "SegAtriskHeadline": "Seg Atrisk Headline",
+        "SegAtriskCta": "Seg Atrisk Cta",
+        "SegNewHeadline": "Seg New Headline",
+        "SegNewCta": "Seg New Cta",
+        "SegHighvalHeadline": "Seg Highval Headline",
+        "SegHighvalCta": "Seg Highval Cta",
+        "SegDormantHeadline": "Seg Dormant Headline",
+        "SegDormantCta": "Seg Dormant Cta",
+        "SegLoyal": "Seg Loyal",
+        "SegAtrisk": "Seg Atrisk",
+        "SegNew": "Seg New",
+        "SegHighval": "Seg Highval",
+        "SegDormant": "Seg Dormant"
+      },
+      "formats": {
+        "Title": "text",
+        "ContentBlockId": "text",
+        "SegLoyalHeadline": "text",
+        "SegLoyalCta": "text",
+        "SegAtriskHeadline": "text",
+        "SegAtriskCta": "text",
+        "SegNewHeadline": "text",
+        "SegNewCta": "text",
+        "SegHighvalHeadline": "text",
+        "SegHighvalCta": "text",
+        "SegDormantHeadline": "text",
+        "SegDormantCta": "text",
+        "SegLoyal": "text",
+        "SegAtrisk": "text",
+        "SegNew": "text",
+        "SegHighval": "text",
+        "SegDormant": "text"
+      },
+      "metrics": [
+        {
+          "label": "Content Blocks",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ContentBlockId"
+    }
+  ]
+}

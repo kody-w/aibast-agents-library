@@ -1,0 +1,63 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Clinical Notes Summarizer Workspace",
+  "title": "Clinical Notes Summarizer",
+  "description": "Listed synthetic entity records for Clinical Notes Summarizer. Unlisted facts, rule tables and calculated outputs remain in the agent's retained knowledge.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "encounter",
+      "list": "Clinical Notes Summarizer Encounter",
+      "title": "Encounter",
+      "key": "EncounterId",
+      "fields": {
+        "EncounterId": "field_1",
+        "EncounterDate": "field_2",
+        "ExactSourceNote": "field_3",
+        "SourceCodedProblems": "field_4",
+        "SourceObservations": "field_5",
+        "SourceRecordedMedications": "field_6",
+        "ExactReferralContext": "field_7"
+      },
+      "columns": [
+        "EncounterId",
+        "Title",
+        "EncounterDate",
+        "ExactSourceNote",
+        "SourceCodedProblems",
+        "SourceObservations",
+        "SourceRecordedMedications",
+        "ExactReferralContext"
+      ],
+      "labels": {
+        "Title": "Patient label",
+        "EncounterId": "Encounter ID",
+        "EncounterDate": "Encounter date",
+        "ExactSourceNote": "Exact source note",
+        "SourceCodedProblems": "Source-coded problems, in order",
+        "SourceObservations": "Source observations, in order",
+        "SourceRecordedMedications": "Source-recorded medications, in order",
+        "ExactReferralContext": "Exact referral context"
+      },
+      "formats": {
+        "Title": "text",
+        "EncounterId": "text",
+        "EncounterDate": "text",
+        "ExactSourceNote": "text",
+        "SourceCodedProblems": "text",
+        "SourceObservations": "text",
+        "SourceRecordedMedications": "text",
+        "ExactReferralContext": "text"
+      },
+      "metrics": [
+        {
+          "label": "Encounter",
+          "op": "count"
+        }
+      ],
+      "groupBy": "ExactSourceNote",
+      "sortBy": "EncounterId"
+    }
+  ]
+}

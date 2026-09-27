@@ -1,0 +1,5 @@
+Title,AssociatePerformanceId,Role,Shift,UnitsSoldToday,RevenueToday,TransactionsToday,AvgBasket,UpsellRate,CsatScore,TasksCompleted,TasksTotal,HoursThisWeek
+Opening Senior Associate Cohort,ASC-101,Senior Associate,opening,23,1847.5,14,131.96,0.35,4.8,11,12,32.5
+Midday Associate Cohort,ASC-102,Associate,midday,17,1295.8,11,117.8,0.22,4.5,8,10,28.0
+Closing Associate Cohort,ASC-103,Associate,closing,12,985.4,9,109.49,0.18,4.3,7,9,24.0
+Opening Lead Associate Cohort,ASC-104,Lead Associate,opening,29,2410.3,18,133.91,0.4,4.9,12,12,36.0

@@ -1,0 +1,154 @@
+{
+  "schema": "aibast-studio-data/1.0",
+  "solution": "building-permit-processing",
+  "description": "Selected entity records parsed from the workshop's authoritative synthetic knowledge. Unlisted facts, rules and calculations remain in retained knowledge.",
+  "source": "agents/@aibast-agents-library/slg_government_stacks/building_permit_processing_stack/building_permit_processing_agent.py",
+  "records_markdown": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_building-permit-synthetic-records.md",
+  "lists": [
+    {
+      "id": "permit-applications",
+      "title": "Building Permit Processing Permit Applications",
+      "description": "Synthetic permit applications (AIBAST Building Permit Processing workshop; fictional).",
+      "record_set": "PERMIT_APPLICATIONS",
+      "columns": [
+        {"name": "Title", "label": "Applicant", "from": "applicant", "type": "text"},
+        {"name": "PermitApplicationId", "label": "Permit Application ID", "from": "permit_id", "type": "text"},
+        {"name": "Address", "label": "Address", "from": "address", "type": "text"},
+        {"name": "Parcel", "label": "Parcel", "from": "parcel", "type": "text"},
+        {"name": "Type", "label": "Type", "from": "type", "type": "text"},
+        {"name": "Description", "label": "Description", "from": "description", "type": "text"},
+        {"name": "Submitted", "label": "Submitted", "from": "submitted", "type": "text"},
+        {"name": "Age", "label": "Age", "from": "age", "type": "text"},
+        {"name": "Valuation", "label": "Valuation", "from": "valuation", "type": "number", "format": "currency"},
+        {"name": "Zoning", "label": "Zoning", "from": "zoning", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"},
+        {"name": "Reviewer", "label": "Reviewer", "from": "reviewer", "type": "text"},
+        {"name": "Cycle", "label": "Cycle", "from": "cycle", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_building-permit-synthetic-records.md",
+        "section": "Permit applications",
+        "selector": "Permit applications [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 0,
+        "sources": []
+      }
+    },
+    {
+      "id": "fixed-review-clock-state",
+      "title": "Building Permit Processing Fixed Review Clock State",
+      "description": "Synthetic fixed review clock state (AIBAST Building Permit Processing workshop; fictional).",
+      "record_set": "FIXED_REVIEW_CLOCK_STATE",
+      "columns": [
+        {"name": "Title", "label": "Permit", "from": "permit", "type": "text"},
+        {"name": "FixedReviewClockStateId", "label": "Fixed Review Clock State ID", "from": "permit", "type": "text"},
+        {"name": "Target", "label": "Target", "from": "target", "type": "text"},
+        {"name": "SnapshotState", "label": "Snapshot state", "from": "snapshot_state", "type": "text"},
+        {"name": "DaysOver", "label": "Days over", "from": "days_over", "type": "text"},
+        {"name": "ComplaintRisk", "label": "Complaint risk", "from": "complaint_risk", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_building-permit-synthetic-records.md",
+        "section": "Fixed review-clock state",
+        "selector": "Fixed review-clock state [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 0,
+        "sources": []
+      }
+    },
+    {
+      "id": "inspector-roster",
+      "title": "Building Permit Processing Inspector Roster",
+      "description": "Synthetic inspector roster (AIBAST Building Permit Processing workshop; fictional).",
+      "record_set": "INSPECTOR_ROSTER",
+      "columns": [
+        {"name": "Title", "label": "Inspector", "from": "inspector", "type": "text"},
+        {"name": "InspectorRosterId", "label": "Inspector Roster ID", "from": "inspector", "type": "text"},
+        {"name": "Specialty", "label": "Specialty", "from": "specialty", "type": "text"},
+        {"name": "AvailableSlots", "label": "Available slots", "from": "available_slots", "type": "text"},
+        {"name": "ServiceZone", "label": "Service zone", "from": "service_zone", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_building-permit-synthetic-records.md",
+        "section": "Inspector roster",
+        "selector": "Inspector roster [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 4,
+        "sources": [
+          "INSPECTORS"
+        ]
+      }
+    },
+    {
+      "id": "inspection-board",
+      "title": "Building Permit Processing Inspection Board",
+      "description": "Synthetic inspection board (AIBAST Building Permit Processing workshop; fictional).",
+      "record_set": "INSPECTION_BOARD",
+      "columns": [
+        {"name": "Title", "label": "Inspection", "from": "inspection", "type": "text"},
+        {"name": "InspectionBoardId", "label": "Inspection Board ID", "from": "inspection", "type": "text"},
+        {"name": "Inspector", "label": "Inspector", "from": "inspector", "type": "text"},
+        {"name": "Date", "label": "Date", "from": "date", "type": "text"},
+        {"name": "Status", "label": "Status", "from": "status", "type": "text"}
+      ],
+      "source_of_truth": "knowledge-table",
+      "knowledge_table": {
+        "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_building-permit-synthetic-records.md",
+        "section": "Inspection board",
+        "selector": "Inspection board [table 1]",
+        "form": "pipe-table"
+      },
+      "literal_cross_check": {
+        "rows": 0,
+        "sources": []
+      }
+    }
+  ],
+  "source_of_truth": "knowledge-table",
+  "retained_knowledge": [
+    {
+      "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_building-permit-synthetic-records.md",
+      "section": "Permit Backlog and Complaint Risk",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md",
+      "section": "Statutory review targets",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md",
+      "section": "Review routing",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md",
+      "section": "Required intake documents",
+      "reason": "not an entity-keyed table"
+    },
+    {
+      "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md",
+      "section": "Zoning reference standards",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md",
+      "section": "Synthetic fee schedule",
+      "reason": "rule/policy/contract table"
+    },
+    {
+      "file": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md",
+      "section": "Precomputed permit totals",
+      "reason": "rule/policy/contract table"
+    }
+  ]
+}

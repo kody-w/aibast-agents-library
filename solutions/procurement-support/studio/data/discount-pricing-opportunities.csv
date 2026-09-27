@@ -1,0 +1,4 @@
+Title,DiscountPricingOpportunityId,Category,ExactSignal,CurrentSpend,Threshold,Gap,ReviewByExpires,EvidenceSource
+MedSupply Cooperative,DISC-101,Clinical consumables,"4% volume tier above $150,000 aggregated quarterly spend",138000,150000,12000,2026-09-30,Synthetic master agreement section 7.2
+Northstar Imaging,DISC-102,Imaging service renewals,3% early-renewal credit when reviewed 60 days before renewal,240000,Dated condition,0,2026-08-31,Synthetic renewal notice RN-204
+CareTech Devices,DISC-103,Patient monitoring devices,Price increase of 5% announced after current quote window,185000,Dated condition,0,2026-10-15,Synthetic pricing bulletin PB-88

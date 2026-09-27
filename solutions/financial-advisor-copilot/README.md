@@ -43,6 +43,7 @@ Upload the two Markdown files in `manual/knowledge/`, then upload one `SKILL.md`
 | Copilot-only Easy-mode comparison | `solutions/financial-advisor-copilot/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/financial-advisor-copilot/quest.html` |
 | Literal browser tutorial | `solutions/financial-advisor-copilot/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/financial-advisor-copilot/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/financial-advisor-copilot/export-manifest.json` |
 | Source bundle | `solutions/financial-advisor-copilot/exports/financial-advisor-copilot-source.zip` |
 | Manual evidence | `solutions/financial-advisor-copilot/evals/manual-build-evidence.json` |

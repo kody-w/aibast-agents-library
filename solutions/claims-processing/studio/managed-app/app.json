@@ -1,0 +1,197 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Claims Processing Workspace",
+  "title": "Claims Processing",
+  "description": "The Claims Processing workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "claims",
+      "list": "Claims Processing Claims",
+      "title": "Claims",
+      "key": "ClaimId",
+      "fields": {
+        "ClaimId": "field_1",
+        "Claimant": "field_2",
+        "PolicyNumber": "field_3",
+        "PolicyType": "field_4",
+        "DateOfLoss": "field_5",
+        "DateFiled": "field_6",
+        "LossType": "field_7",
+        "ClaimedAmount": "field_8",
+        "Adjuster": "field_9",
+        "Status": "field_10",
+        "FraudScore": "field_11",
+        "SupportingDocs": "field_12"
+      },
+      "columns": [
+        "ClaimId",
+        "Title",
+        "Claimant",
+        "PolicyNumber",
+        "PolicyType",
+        "DateOfLoss",
+        "DateFiled",
+        "LossType",
+        "ClaimedAmount",
+        "Adjuster"
+      ],
+      "labels": {
+        "Title": "Claim",
+        "ClaimId": "Claim ID",
+        "Claimant": "Claimant",
+        "PolicyNumber": "Policy Number",
+        "PolicyType": "Policy Type",
+        "DateOfLoss": "Date Of Loss",
+        "DateFiled": "Date Filed",
+        "LossType": "Loss Type",
+        "ClaimedAmount": "Claimed Amount",
+        "Adjuster": "Adjuster",
+        "Status": "Status",
+        "FraudScore": "Fraud Score",
+        "SupportingDocs": "Supporting Docs"
+      },
+      "formats": {
+        "Title": "text",
+        "ClaimId": "text",
+        "Claimant": "text",
+        "PolicyNumber": "text",
+        "PolicyType": "text",
+        "DateOfLoss": "text",
+        "DateFiled": "text",
+        "LossType": "text",
+        "ClaimedAmount": "currency",
+        "Adjuster": "text",
+        "Status": "text",
+        "FraudScore": "integer",
+        "SupportingDocs": "text"
+      },
+      "metrics": [
+        {
+          "label": "Claims",
+          "op": "count"
+        },
+        {
+          "label": "Claimed Amount",
+          "op": "sum",
+          "column": "ClaimedAmount"
+        }
+      ],
+      "groupBy": "Claimant",
+      "sortBy": "ClaimId"
+    },
+    {
+      "id": "policy-details",
+      "list": "Claims Processing Policy Details",
+      "title": "Policy Details",
+      "key": "PolicyDetailId",
+      "fields": {
+        "PolicyDetailId": "field_1",
+        "CoverageLimit": "field_2",
+        "Deductible": "field_3",
+        "PremiumAnnual": "field_4",
+        "Effective": "field_5",
+        "Expiry": "field_6"
+      },
+      "columns": [
+        "PolicyDetailId",
+        "Title",
+        "CoverageLimit",
+        "Deductible",
+        "PremiumAnnual",
+        "Effective",
+        "Expiry"
+      ],
+      "labels": {
+        "Title": "Policy Detail",
+        "PolicyDetailId": "Policy Detail ID",
+        "CoverageLimit": "Coverage Limit",
+        "Deductible": "Deductible",
+        "PremiumAnnual": "Premium Annual",
+        "Effective": "Effective",
+        "Expiry": "Expiry"
+      },
+      "formats": {
+        "Title": "text",
+        "PolicyDetailId": "text",
+        "CoverageLimit": "integer",
+        "Deductible": "integer",
+        "PremiumAnnual": "currency",
+        "Effective": "text",
+        "Expiry": "text"
+      },
+      "metrics": [
+        {
+          "label": "Policy Details",
+          "op": "count"
+        }
+      ],
+      "sortBy": "PolicyDetailId"
+    },
+    {
+      "id": "fraud-indicators",
+      "list": "Claims Processing Fraud Indicators",
+      "title": "Fraud Indicators",
+      "key": "FraudIndicatorId",
+      "fields": {
+        "FraudIndicatorId": "field_1",
+        "Weight": "field_2"
+      },
+      "columns": [
+        "FraudIndicatorId",
+        "Title",
+        "Weight"
+      ],
+      "labels": {
+        "Title": "Fraud Indicator",
+        "FraudIndicatorId": "Fraud Indicator ID",
+        "Weight": "Weight"
+      },
+      "formats": {
+        "Title": "text",
+        "FraudIndicatorId": "text",
+        "Weight": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Fraud Indicators",
+          "op": "count"
+        }
+      ],
+      "sortBy": "FraudIndicatorId"
+    },
+    {
+      "id": "adjuster-notes",
+      "list": "Claims Processing Adjuster Notes",
+      "title": "Adjuster Notes",
+      "key": "AdjusterNoteId",
+      "fields": {
+        "AdjusterNoteId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "AdjusterNoteId",
+        "Title",
+        "Value"
+      ],
+      "labels": {
+        "Title": "Adjuster Note",
+        "AdjusterNoteId": "Adjuster Note ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "AdjusterNoteId": "text",
+        "Value": "text"
+      },
+      "metrics": [
+        {
+          "label": "Adjuster Notes",
+          "op": "count"
+        }
+      ],
+      "sortBy": "AdjusterNoteId"
+    }
+  ]
+}

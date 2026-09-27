@@ -1,0 +1,234 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Deal Progression Workspace",
+  "title": "Deal Progression",
+  "description": "The Deal Progression workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "stage-benchmarks",
+      "list": "Deal Progression Stage Benchmarks",
+      "title": "Stage Benchmarks",
+      "key": "StageBenchmarkId",
+      "fields": {
+        "StageBenchmarkId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "StageBenchmarkId",
+        "Title",
+        "Value"
+      ],
+      "labels": {
+        "Title": "Stage Benchmark",
+        "StageBenchmarkId": "Stage Benchmark ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "StageBenchmarkId": "text",
+        "Value": "currency"
+      },
+      "metrics": [
+        {
+          "label": "Stage Benchmarks",
+          "op": "count"
+        }
+      ],
+      "sortBy": "StageBenchmarkId"
+    },
+    {
+      "id": "reps",
+      "list": "Deal Progression Reps",
+      "title": "Reps",
+      "key": "RepId",
+      "fields": {
+        "RepId": "field_1",
+        "Titleaaf2320": "field_2",
+        "ActiveDeals": "field_3",
+        "Capacity": "field_4",
+        "Specialty": "field_5"
+      },
+      "columns": [
+        "RepId",
+        "Title",
+        "Titleaaf2320",
+        "ActiveDeals",
+        "Capacity",
+        "Specialty"
+      ],
+      "labels": {
+        "Title": "Rep",
+        "RepId": "Rep ID",
+        "Titleaaf2320": "Title",
+        "ActiveDeals": "Active Deals",
+        "Capacity": "Capacity",
+        "Specialty": "Specialty"
+      },
+      "formats": {
+        "Title": "text",
+        "RepId": "text",
+        "Titleaaf2320": "text",
+        "ActiveDeals": "integer",
+        "Capacity": "integer",
+        "Specialty": "text"
+      },
+      "metrics": [
+        {
+          "label": "Reps",
+          "op": "count"
+        },
+        {
+          "label": "Capacity",
+          "op": "sum",
+          "column": "Capacity"
+        }
+      ],
+      "groupBy": "Titleaaf2320",
+      "sortBy": "RepId"
+    },
+    {
+      "id": "pipeline",
+      "list": "Deal Progression Pipeline",
+      "title": "Pipeline",
+      "key": "PipelineId",
+      "fields": {
+        "PipelineId": "field_1",
+        "Account": "field_2",
+        "Value": "field_3",
+        "Stage": "field_4",
+        "DaysInStage": "field_5",
+        "Owner": "field_6",
+        "LastContactDays": "field_7",
+        "ChampionName": "field_8",
+        "ChampionStatus": "field_9",
+        "Blocker": "field_10"
+      },
+      "columns": [
+        "PipelineId",
+        "Title",
+        "Account",
+        "Value",
+        "Stage",
+        "DaysInStage",
+        "Owner",
+        "LastContactDays",
+        "ChampionName",
+        "ChampionStatus"
+      ],
+      "labels": {
+        "Title": "Pipeline",
+        "PipelineId": "Pipeline ID",
+        "Account": "Account",
+        "Value": "Value",
+        "Stage": "Stage",
+        "DaysInStage": "Days In Stage",
+        "Owner": "Owner",
+        "LastContactDays": "Last Contact Days",
+        "ChampionName": "Champion Name",
+        "ChampionStatus": "Champion Status",
+        "Blocker": "Blocker"
+      },
+      "formats": {
+        "Title": "text",
+        "PipelineId": "text",
+        "Account": "text",
+        "Value": "currency",
+        "Stage": "text",
+        "DaysInStage": "integer",
+        "Owner": "text",
+        "LastContactDays": "integer",
+        "ChampionName": "text",
+        "ChampionStatus": "text",
+        "Blocker": "text"
+      },
+      "metrics": [
+        {
+          "label": "Pipeline",
+          "op": "count"
+        },
+        {
+          "label": "Value",
+          "op": "sum",
+          "column": "Value"
+        }
+      ],
+      "groupBy": "Owner",
+      "sortBy": "PipelineId"
+    },
+    {
+      "id": "blocker-playbook",
+      "list": "Deal Progression Blocker Playbook",
+      "title": "Blocker Playbook",
+      "key": "BlockerPlaybookId",
+      "fields": {
+        "BlockerPlaybookId": "field_1",
+        "Diagnosis": "field_2",
+        "Week1": "field_3",
+        "Week2": "field_4",
+        "Resource": "field_5"
+      },
+      "columns": [
+        "BlockerPlaybookId",
+        "Title",
+        "Diagnosis",
+        "Week1",
+        "Week2",
+        "Resource"
+      ],
+      "labels": {
+        "Title": "Blocker Playbook",
+        "BlockerPlaybookId": "Blocker Playbook ID",
+        "Diagnosis": "Diagnosis",
+        "Week1": "Week1",
+        "Week2": "Week2",
+        "Resource": "Resource"
+      },
+      "formats": {
+        "Title": "text",
+        "BlockerPlaybookId": "text",
+        "Diagnosis": "text",
+        "Week1": "text",
+        "Week2": "text",
+        "Resource": "text"
+      },
+      "metrics": [
+        {
+          "label": "Blocker Playbook",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Diagnosis",
+      "sortBy": "BlockerPlaybookId"
+    },
+    {
+      "id": "active-stages",
+      "list": "Deal Progression Active Stages",
+      "title": "Active Stages",
+      "key": "ActiveStageId",
+      "fields": {
+        "ActiveStageId": "field_1"
+      },
+      "columns": [
+        "ActiveStageId",
+        "Title"
+      ],
+      "labels": {
+        "Title": "Active Stage",
+        "ActiveStageId": "Active Stage ID"
+      },
+      "formats": {
+        "Title": "text",
+        "ActiveStageId": "text"
+      },
+      "metrics": [
+        {
+          "label": "Active Stages",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ActiveStageId"
+    }
+  ]
+}

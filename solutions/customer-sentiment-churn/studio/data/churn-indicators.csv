@@ -1,0 +1,7 @@
+Title,ChurnIndicatorId,Threshold,Weight
+NPS score below 5 indicates detractor status,low_nps,5,25
+Monthly transactions below segment average,declining_transactions,10,20
+3+ complaints in last 12 months,high_complaints,3,20
+Digital engagement score below 30,low_engagement,30,15
+Only one active product,single_product,1,10
+Last survey response over 90 days ago,stale_survey,90,10

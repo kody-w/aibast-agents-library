@@ -1,0 +1,9 @@
+Title,ReferenceId,Industry,Size,Results,ImplWeeks,ContactReady
+Memorial Health System,1,Healthcare,8 facilities,"34% efficiency gain, $2.4M annual savings",11,Yes
+Pacific Medical Group,2,Healthcare,15 facilities,"$2.4M savings/year, 99.9% uptime",14,Yes
+Summit Healthcare Network,3,Healthcare,6 facilities,"12-week go-live, 28% cost reduction",12,Yes
+Atlas Cloud Services,4,Technology,800 employees,"Zero-downtime migration, 40% infra cost reduction",10,Yes
+Nexus Software Corp,5,Technology,"2,400 employees","3x deployment velocity, 99.95% uptime",8,No
+Atlantic Credit Union,6,Financial Services,120 branches,"Sub-30ms latency, zero audit findings",16,Yes
+Sentinel Insurance,7,Financial Services,$4B AUM,"PCI-DSS compliant in 90 days, 22% ops savings",14,Yes
+Vanguard Logistics,8,Manufacturing,"3,200 employees",18% throughput improvement,12,No

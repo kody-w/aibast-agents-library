@@ -41,6 +41,7 @@ Upload the two Markdown files in `manual/knowledge/`, then upload one `SKILL.md`
 | Copilot-only Easy-mode comparison | `solutions/fraud-detection-alert/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/fraud-detection-alert/quest.html` |
 | Literal browser tutorial | `solutions/fraud-detection-alert/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/fraud-detection-alert/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/fraud-detection-alert/export-manifest.json` |
 | Source bundle | `solutions/fraud-detection-alert/exports/fraud-detection-alert-source.zip` |
 | Manual evidence | `solutions/fraud-detection-alert/evals/manual-build-evidence.json` |

@@ -1,0 +1,108 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Care Gap Closure Workspace",
+  "title": "Care Gap Closure",
+  "description": "Listed synthetic entity records for Care Gap Closure. Unlisted facts, rule tables and calculated outputs remain in the agent's retained knowledge.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "quality-measures",
+      "list": "Care Gap Closure Quality Measures",
+      "title": "Quality Measures",
+      "key": "QualityMeasureId",
+      "fields": {
+        "QualityMeasureId": "field_1",
+        "SourcePopulation": "field_2",
+        "SourceRecordedClosed": "field_3",
+        "RecordsRequiringEvidenceReview": "field_4",
+        "SourceRecordedClosedRate": "field_5",
+        "EvidenceAsOf": "field_6",
+        "ExactLimitation": "field_7"
+      },
+      "columns": [
+        "QualityMeasureId",
+        "Title",
+        "SourcePopulation",
+        "SourceRecordedClosed",
+        "RecordsRequiringEvidenceReview",
+        "SourceRecordedClosedRate",
+        "EvidenceAsOf",
+        "ExactLimitation"
+      ],
+      "labels": {
+        "Title": "Name",
+        "QualityMeasureId": "Quality Measure ID",
+        "SourcePopulation": "Source population",
+        "SourceRecordedClosed": "Source-recorded closed",
+        "RecordsRequiringEvidenceReview": "Records requiring evidence review",
+        "SourceRecordedClosedRate": "Source-recorded closed rate",
+        "EvidenceAsOf": "Evidence as of",
+        "ExactLimitation": "Exact limitation"
+      },
+      "formats": {
+        "Title": "text",
+        "QualityMeasureId": "text",
+        "SourcePopulation": "text",
+        "SourceRecordedClosed": "text",
+        "RecordsRequiringEvidenceReview": "text",
+        "SourceRecordedClosedRate": "percent1",
+        "EvidenceAsOf": "text",
+        "ExactLimitation": "text"
+      },
+      "metrics": [
+        {
+          "label": "Quality Measures",
+          "op": "count"
+        }
+      ],
+      "groupBy": "SourcePopulation",
+      "sortBy": "QualityMeasureId"
+    },
+    {
+      "id": "operational-cohorts",
+      "list": "Care Gap Closure Operational Cohorts",
+      "title": "Operational Cohorts",
+      "key": "OperationalCohortId",
+      "fields": {
+        "OperationalCohortId": "field_1",
+        "DisplayHeading": "field_2",
+        "SyntheticCount": "field_3",
+        "ExactEvidenceBarrier": "field_4",
+        "ExactDraftHandlingRoute": "field_5"
+      },
+      "columns": [
+        "OperationalCohortId",
+        "Title",
+        "DisplayHeading",
+        "SyntheticCount",
+        "ExactEvidenceBarrier",
+        "ExactDraftHandlingRoute"
+      ],
+      "labels": {
+        "Title": "Source key",
+        "OperationalCohortId": "Operational Cohort ID",
+        "DisplayHeading": "Display heading",
+        "SyntheticCount": "Synthetic count",
+        "ExactEvidenceBarrier": "Exact evidence barrier",
+        "ExactDraftHandlingRoute": "Exact draft handling route"
+      },
+      "formats": {
+        "Title": "text",
+        "OperationalCohortId": "text",
+        "DisplayHeading": "text",
+        "SyntheticCount": "text",
+        "ExactEvidenceBarrier": "text",
+        "ExactDraftHandlingRoute": "text"
+      },
+      "metrics": [
+        {
+          "label": "Operational Cohorts",
+          "op": "count"
+        }
+      ],
+      "groupBy": "DisplayHeading",
+      "sortBy": "OperationalCohortId"
+    }
+  ]
+}

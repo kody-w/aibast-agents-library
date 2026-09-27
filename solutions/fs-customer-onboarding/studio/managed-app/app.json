@@ -1,0 +1,210 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Customer Onboarding Workspace",
+  "title": "Customer Onboarding",
+  "description": "The Customer Onboarding workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "customer-applications",
+      "list": "Customer Onboarding Customer Applications",
+      "title": "Customer Applications",
+      "key": "CustomerApplicationId",
+      "fields": {
+        "CustomerApplicationId": "field_1",
+        "Applicant": "field_2",
+        "ApplicationType": "field_3",
+        "AccountRequested": "field_4",
+        "Submitted": "field_5",
+        "Status": "field_6",
+        "RiskRating": "field_7",
+        "RelationshipManager": "field_8",
+        "EstimatedAssets": "field_9"
+      },
+      "columns": [
+        "CustomerApplicationId",
+        "Title",
+        "Applicant",
+        "ApplicationType",
+        "AccountRequested",
+        "Submitted",
+        "Status",
+        "RiskRating",
+        "RelationshipManager",
+        "EstimatedAssets"
+      ],
+      "labels": {
+        "Title": "Customer Application",
+        "CustomerApplicationId": "Customer Application ID",
+        "Applicant": "Applicant",
+        "ApplicationType": "Application Type",
+        "AccountRequested": "Account Requested",
+        "Submitted": "Submitted",
+        "Status": "Status",
+        "RiskRating": "Risk Rating",
+        "RelationshipManager": "Relationship Manager",
+        "EstimatedAssets": "Estimated Assets"
+      },
+      "formats": {
+        "Title": "text",
+        "CustomerApplicationId": "text",
+        "Applicant": "text",
+        "ApplicationType": "text",
+        "AccountRequested": "text",
+        "Submitted": "text",
+        "Status": "text",
+        "RiskRating": "text",
+        "RelationshipManager": "text",
+        "EstimatedAssets": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Customer Applications",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Applicant",
+      "sortBy": "CustomerApplicationId"
+    },
+    {
+      "id": "kyc-documents",
+      "list": "Customer Onboarding KYC Documents",
+      "title": "KYC Documents",
+      "key": "KYCDocumentId",
+      "fields": {
+        "KYCDocumentId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "KYCDocumentId",
+        "Title"
+      ],
+      "labels": {
+        "Title": "KYC Document",
+        "KYCDocumentId": "KYC Document ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "KYCDocumentId": "text",
+        "Value": "text"
+      },
+      "metrics": [
+        {
+          "label": "KYC Documents",
+          "op": "count"
+        }
+      ],
+      "sortBy": "KYCDocumentId"
+    },
+    {
+      "id": "verification-status",
+      "list": "Customer Onboarding Verification Status",
+      "title": "Verification Status",
+      "key": "VerificationStatusId",
+      "fields": {
+        "VerificationStatusId": "field_1",
+        "IDVerification": "field_2",
+        "SsnVerification": "field_3",
+        "AddressVerification": "field_4",
+        "OfacScreening": "field_5",
+        "PepScreening": "field_6",
+        "AdverseMedia": "field_7",
+        "EinVerification": "field_8",
+        "BeneficialOwnership": "field_9",
+        "SourceOfWealth": "field_10"
+      },
+      "columns": [
+        "VerificationStatusId",
+        "Title",
+        "IDVerification",
+        "SsnVerification",
+        "AddressVerification",
+        "OfacScreening",
+        "PepScreening",
+        "AdverseMedia",
+        "EinVerification",
+        "BeneficialOwnership"
+      ],
+      "labels": {
+        "Title": "Verification Status",
+        "VerificationStatusId": "Verification Status ID",
+        "IDVerification": "ID Verification",
+        "SsnVerification": "Ssn Verification",
+        "AddressVerification": "Address Verification",
+        "OfacScreening": "Ofac Screening",
+        "PepScreening": "Pep Screening",
+        "AdverseMedia": "Adverse Media",
+        "EinVerification": "Ein Verification",
+        "BeneficialOwnership": "Beneficial Ownership",
+        "SourceOfWealth": "Source Of Wealth"
+      },
+      "formats": {
+        "Title": "text",
+        "VerificationStatusId": "text",
+        "IDVerification": "text",
+        "SsnVerification": "text",
+        "AddressVerification": "text",
+        "OfacScreening": "text",
+        "PepScreening": "text",
+        "AdverseMedia": "text",
+        "EinVerification": "text",
+        "BeneficialOwnership": "text",
+        "SourceOfWealth": "text"
+      },
+      "metrics": [
+        {
+          "label": "Verification Status",
+          "op": "count"
+        }
+      ],
+      "groupBy": "AddressVerification",
+      "sortBy": "VerificationStatusId"
+    },
+    {
+      "id": "account-types",
+      "list": "Customer Onboarding Account Types",
+      "title": "Account Types",
+      "key": "AccountTypeId",
+      "fields": {
+        "AccountTypeId": "field_1",
+        "MinDeposit": "field_2",
+        "MonthlyFee": "field_3",
+        "Apy": "field_4",
+        "Features": "field_5"
+      },
+      "columns": [
+        "AccountTypeId",
+        "Title",
+        "MinDeposit",
+        "MonthlyFee",
+        "Apy",
+        "Features"
+      ],
+      "labels": {
+        "Title": "Account Type",
+        "AccountTypeId": "Account Type ID",
+        "MinDeposit": "Min Deposit",
+        "MonthlyFee": "Monthly Fee",
+        "Apy": "Apy",
+        "Features": "Features"
+      },
+      "formats": {
+        "Title": "text",
+        "AccountTypeId": "text",
+        "MinDeposit": "integer",
+        "MonthlyFee": "integer",
+        "Apy": "number",
+        "Features": "text"
+      },
+      "metrics": [
+        {
+          "label": "Account Types",
+          "op": "count"
+        }
+      ],
+      "sortBy": "AccountTypeId"
+    }
+  ]
+}

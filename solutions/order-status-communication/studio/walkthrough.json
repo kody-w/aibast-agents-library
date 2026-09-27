@@ -1,0 +1,456 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "order-status-communication",
+  "title": "Order Status Communications, built with brainfreeze studio",
+  "summary": "The Order Status Communications agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_order-status-communication-review-rules.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Order Status Studio",
+      "manual": "Order Status Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Order Status Communications Workspace",
+      "manual": "Order Status Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/order-status-communication.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast order-status-communication --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 4 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Order Status Communications Orders list.",
+          "expected": "4 fictional records, including James Mitchell (OrderId ORD-7810), with Customer Ford Motor Company.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Order Status Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Customer Service Representative",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "OS-01",
+          "prompt": "Which orders are on track or delayed, and where should customer service focus its review?",
+          "expected": "The relevant list tool ran. Required evidence: ORD-7813; DELAYED. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-os-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Account Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "OS-02",
+          "prompt": "What shipment evidence is recorded for the shipped order, and what still needs carrier validation?",
+          "expected": "The relevant list tool ran. Required evidence: ORD-7812; XPO-884291047. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-os-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Operations Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "OS-03",
+          "prompt": "Prepare the internal delay and recovery review for the at-risk customer order without changing any schedule.",
+          "expected": "The relevant list tool ran. Required evidence: ORD-7813; Recorded synthetic recovery options. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-os-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Account Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "OS-04",
+          "prompt": "Draft the customer updates for approval, but do not send an email, portal update, EDI message, or Teams message.",
+          "expected": "The relevant list tool ran. Required evidence: Customer Update Drafts; No email, EDI message. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-os-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Order Status Communications: 4 read-only tabs from the same lists. 4 fictional records, including James Mitchell (OrderId ORD-7810), with Customer Ford Motor Company.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Order Status Communications Orders from its CSV",
+          "action": "On the site: New, List, From CSV. Upload orders.csv. On Customize, keep Title mapped to the Title column. Set OrderId, Customer, ContactEmail, Product, OrderDate, PromisedDate, Status to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Quantity, UnitPrice, PctComplete as Number. Name the list Order Status Communications Orders. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/orders.csv"
+          ],
+          "expected": "4 fictional records, including James Mitchell (OrderId ORD-7810), with Customer Ford Motor Company.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-orders.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Order Status Communications Shipments from its CSV",
+          "action": "On the site: New, List, From CSV. Upload shipments.csv. On Customize, keep Title mapped to the Title column. Set ShipmentId, Carrier, TrackingNumber, ShipDate, EstDelivery, Origin, Destination, Status to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep WeightKg as Number. Name the list Order Status Communications Shipments. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/shipments.csv"
+          ],
+          "expected": "1 fictional records, including ORD-7812 (ShipmentId ORD-7812), with Carrier XPO Logistics.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-shipments.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Order Status Communications Delay Reasons from its CSV",
+          "action": "On the site: New, List, From CSV. Upload delay-reasons.csv. On Customize, keep Title mapped to the Title column. Set DelayReasonId, Reason, OriginalDate, RevisedDate, RecoveryActions to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep DaysDelayed, CostImpact as Number. Name the list Order Status Communications Delay Reasons. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/delay-reasons.csv"
+          ],
+          "expected": "1 fictional records, including ORD-7813 (DelayReasonId ORD-7813), with Reason Raw material shortage -- alloy steel bar stock delayed from supplier.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-delay-reasons.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Order Status Communications Customer Contacts from its CSV",
+          "action": "On the site: New, List, From CSV. Upload customer-contacts.csv. On Customize, keep Title mapped to the Title column. Set CustomerContactId, AccountManager, EscalationContact, PreferredChannel, CustomerTier to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep SLAResponseHours as Number. Name the list Order Status Communications Customer Contacts. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/customer-contacts.csv"
+          ],
+          "expected": "4 fictional records, including Ford Motor Company (CustomerContactId Ford Motor Company), with AccountManager Sarah Lin.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-customer-contacts.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Name the agent",
+          "action": "Rename it Order Status Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Order Status Communications Agent — Studio Global Instructions, name the four list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_order-status-communication-review-rules.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_order-status-communication-review-rules.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the orders tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Order Status Communications Orders; name the tool Get order records.",
+          "expected": "Get order records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-orders.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the shipments tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Order Status Communications Shipments; name the tool Get shipment records.",
+          "expected": "Get shipment records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-shipments.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the delay reasons tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Order Status Communications Delay Reasons; name the tool Get delay reason records.",
+          "expected": "Get delay reason records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-delay-reasons.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the customer contacts tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Order Status Communications Customer Contacts; name the tool Get customer contact records.",
+          "expected": "Get customer contact records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-customer-contacts.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_customer_update/SKILL.md",
+            "studio/agent/skills/aibast_delay_notification/SKILL.md",
+            "studio/agent/skills/aibast_order_lookup/SKILL.md",
+            "studio/agent/skills/aibast_shipment_tracking/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 4 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Customer Service Representative",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "OS-01",
+          "prompt": "Which orders are on track or delayed, and where should customer service focus its review?",
+          "expected": "The relevant list tool ran. Required evidence: ORD-7813; DELAYED. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-os-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Account Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "OS-02",
+          "prompt": "What shipment evidence is recorded for the shipped order, and what still needs carrier validation?",
+          "expected": "The relevant list tool ran. Required evidence: ORD-7812; XPO-884291047. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-os-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Operations Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "OS-03",
+          "prompt": "Prepare the internal delay and recovery review for the at-risk customer order without changing any schedule.",
+          "expected": "The relevant list tool ran. Required evidence: ORD-7813; Recorded synthetic recovery options. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-os-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Account Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "OS-04",
+          "prompt": "Draft the customer updates for approval, but do not send an email, portal update, EDI message, or Teams message.",
+          "expected": "The relevant list tool ran. Required evidence: Customer Update Drafts; No email, EDI message. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-os-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/order-status-communication/studio/managed-app/app.json --out order-status-communication-app"
+          ],
+          "expected": "order-status-communication-app/managed-app holds a React + Vite managed app whose config names your site and the 4 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd order-status-communication-app/managed-app",
+            "ms app init --display-name \"Order Status Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Order Status Communications Orders\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Order Status Communications Shipments\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Order Status Communications Delay Reasons\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Order Status Communications Customer Contacts\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 4 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Order Status Communications Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Order Status Communications Orders tab.",
+          "expected": "The app and the agent read the same synthetic records. 4 fictional records, including James Mitchell (OrderId ORD-7810), with Customer Ford Motor Company.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+Title,ExpansionPricingId,UnitPrice,MinQty,Price,Description
+additional_seats,additional_seats,120,10,,
+analytics_addon,analytics_addon,,,24000,Advanced analytics module
+api_premium,api_premium,,,18000,Premium API tier with higher rate limits
+sso_subsidiary,sso_subsidiary,,,12000,SSO extension per subsidiary
+custom_integration,custom_integration,,,36000,Custom integration package

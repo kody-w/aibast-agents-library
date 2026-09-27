@@ -1,0 +1,6 @@
+Title,InterventionId,Cost,RecoveryRate,Timeline,Actions
+Security Positioning Refresh,security_positioning,25000,0.35,Immediate,"Lead with SOC 2 Type II (currently underutilized in sales materials); Create Security Architecture one-pager for enterprise buyers; Offer security team direct access during evaluation period; Bridge messaging: FedRAMP in progress, SOC 2 + ISO active now"
+FedRAMP Certification,fedramp_certification,85000,0.55,6 months,Engage FedRAMP 3PAO for readiness assessment; Assign dedicated compliance engineering team; Target FedRAMP Moderate authorization
+Enterprise Reference Program,reference_program,30000,0.4,30 days,"Activate 3 enterprise customers for reference calls; Produce 2 video testimonials from Fortune 1000 logos; Offer reference incentives (extended support, discounts); Build enterprise customer advisory board"
+Pricing & Packaging Adjustment,pricing_flexibility,15000,0.3,Immediate,Enterprise tier: bundle security features at no extra cost; Offer 90-day pilot with success-based conversion; Match competitor payment terms flexibility; Introduce volume discount for multi-year commits
+ISO 27001 Certification,iso_certification,25000,0.2,4 months,Engage certification body for gap assessment; Implement required ISMS controls; Complete Stage 1 and Stage 2 audits

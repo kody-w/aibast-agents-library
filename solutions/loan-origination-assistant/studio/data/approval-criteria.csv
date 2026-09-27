@@ -1,0 +1,5 @@
+Title,ApprovalCriteriaId,MinCredit,MaxDti,MinDownPct,MaxLtv,MinDscr
+conventional_30yr,conventional_30yr,620,45,5,95,
+fha_30yr,fha_30yr,580,50,3.5,96.5,
+va_30yr,va_30yr,580,60,0,100,
+commercial_5yr,commercial_5yr,0,0,20,80,1.25

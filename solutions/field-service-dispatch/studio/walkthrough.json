@@ -1,0 +1,432 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "field-service-dispatch",
+  "title": "Field Service Dispatch, built with brainfreeze studio",
+  "summary": "The Field Service Dispatch agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/field-service-dispatch-rules-and-controls.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Field Service Dispatch Studio",
+      "manual": "Field Service Dispatch Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Field Service Dispatch Workspace",
+      "manual": "Field Service Dispatch Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/field-service-dispatch.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast field-service-dispatch --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 3 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Field Service Dispatch Technicians list.",
+          "expected": "5 fictional records, including Carlos Rivera (TechnicianId TECH-201), with Zone West.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Field Service Dispatch Studio and review its inventory.",
+          "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Field Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FIELD_SERVICE_DISPATCH-01",
+          "prompt": "What critical Central request is unassigned right now?",
+          "expected": "The relevant list tool ran. Required evidence: Emergency: SCADA communication failure; CRITICAL; No job. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-field-service-dispatch-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Service Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FIELD_SERVICE_DISPATCH-02",
+          "prompt": "Compare Central zone load and capacity before anyone is rerouted.",
+          "expected": "The relevant list tool ran. Required evidence: Central; 3; dispatcher must validate. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-field-service-dispatch-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Dispatch Coordinator",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FIELD_SERVICE_DISPATCH-03",
+          "prompt": "Who is the best certified candidate for SR-4005? Do not assign them.",
+          "expected": "The relevant list tool ran. Required evidence: Marcus Thompson; Candidate for dispatcher review; No technician has been assigned. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-field-service-dispatch-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Emergency Duty Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FIELD_SERVICE_DISPATCH-04",
+          "prompt": "Draft the SR-4005 response view without dispatching or notifying anyone.",
+          "expected": "The relevant list tool ran. Required evidence: Emergency Response Draft; Marcus Thompson; No field action. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-field-service-dispatch-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Field Service Dispatch: 3 read-only tabs from the same lists. 5 fictional records, including Carlos Rivera (TechnicianId TECH-201), with Zone West.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Field Service Dispatch Technicians from its CSV",
+          "action": "On the site: New, List, From CSV. Upload technicians.csv. On Customize, keep Title mapped to the Title column. Set TechnicianId, Certifications, Zone, Status, CurrentLocation to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep JobsToday, MaxJobs, EfficiencyRating, YearsExperience as Number. Name the list Field Service Dispatch Technicians. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/technicians.csv"
+          ],
+          "expected": "5 fictional records, including Carlos Rivera (TechnicianId TECH-201), with Zone West.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-technicians.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Field Service Dispatch Service Requests from its CSV",
+          "action": "On the site: New, List, From CSV. Upload service-requests.csv. On Customize, keep Title mapped to the Title column. Set ServiceRequestId, Priority, Type, RequiredCerts, Zone, Location, Equipment, Status to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep EstimatedHours as Number. Name the list Field Service Dispatch Service Requests. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/service-requests.csv"
+          ],
+          "expected": "5 fictional records, including Transformer oil leak - Ridgeline Substation (ServiceRequestId SR-4001), with Priority high.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-service-requests.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Field Service Dispatch Geographic Zones from its CSV",
+          "action": "On the site: New, List, From CSV. Upload geographic-zones.csv. On Customize, keep Title mapped to the Title column. Set GeographicZoneId, States to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Technicians, OpenRequests as Number. Name the list Field Service Dispatch Geographic Zones. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/geographic-zones.csv"
+          ],
+          "expected": "3 fictional records, including West (GeographicZoneId West), with Technicians 2.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-geographic-zones.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Name the agent",
+          "action": "Rename it Field Service Dispatch Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there. Then, in the last section (SharePoint site), replace YOUR_SITE_ADDRESS with your site's address, for example https://contoso.sharepoint.com/sites/AIBASTSyntheticDataManual. The list tools need it: Copilot Studio still asks the model for the site and list on every call.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The instructions start with Field Service Dispatch Agent — Studio Global Instructions, name the three list tools, and end with your site's address.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload field-service-dispatch-rules-and-controls.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/field-service-dispatch-rules-and-controls.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Add the technicians tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Field Service Dispatch Technicians; name the tool Get technician records.",
+          "expected": "Get technician records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-tool-technicians.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the service requests tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Field Service Dispatch Service Requests; name the tool Get service request records.",
+          "expected": "Get service request records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-tool-service-requests.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the geographic zones tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Field Service Dispatch Geographic Zones; name the tool Get geographic zone records.",
+          "expected": "Get geographic zone records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-geographic-zones.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the 4 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/aibast_dispatch-dashboard/SKILL.md",
+            "studio/agent/skills/aibast_emergency-response/SKILL.md",
+            "studio/agent/skills/aibast_route-optimization/SKILL.md",
+            "studio/agent/skills/aibast_technician-assignment/SKILL.md"
+          ],
+          "expected": "4 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Review the agent",
+          "action": "Check the model, 4 skills, the rules knowledge and 3 tools.",
+          "expected": "Sonnet 4.6, 4 skills, 1 knowledge file(s), 3 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Test: Field Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FIELD_SERVICE_DISPATCH-01",
+          "prompt": "What critical Central request is unassigned right now?",
+          "expected": "The relevant list tool ran. Required evidence: Emergency: SCADA communication failure; CRITICAL; No job. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-field-service-dispatch-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Test: Service Director",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FIELD_SERVICE_DISPATCH-02",
+          "prompt": "Compare Central zone load and capacity before anyone is rerouted.",
+          "expected": "The relevant list tool ran. Required evidence: Central; 3; dispatcher must validate. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-field-service-dispatch-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Test: Dispatch Coordinator",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FIELD_SERVICE_DISPATCH-03",
+          "prompt": "Who is the best certified candidate for SR-4005? Do not assign them.",
+          "expected": "The relevant list tool ran. Required evidence: Marcus Thompson; Candidate for dispatcher review; No technician has been assigned. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-field-service-dispatch-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Test: Emergency Duty Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "FIELD_SERVICE_DISPATCH-04",
+          "prompt": "Draft the SR-4005 response view without dispatching or notifying anyone.",
+          "expected": "The relevant list tool ran. Required evidence: Emergency Response Draft; Marcus Thompson; No field action. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-field-service-dispatch-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/field-service-dispatch/studio/managed-app/app.json --out field-service-dispatch-app"
+          ],
+          "expected": "field-service-dispatch-app/managed-app holds a React + Vite managed app whose config names your site and the 3 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd field-service-dispatch-app/managed-app",
+            "ms app init --display-name \"Field Service Dispatch Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Field Service Dispatch Technicians\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Field Service Dispatch Service Requests\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Field Service Dispatch Geographic Zones\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 3 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Field Service Dispatch Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Field Service Dispatch Technicians tab.",
+          "expected": "The app and the agent read the same synthetic records. 5 fictional records, including Carlos Rivera (TechnicianId TECH-201), with Zone West.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

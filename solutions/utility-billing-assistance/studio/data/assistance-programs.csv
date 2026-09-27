@@ -1,0 +1,5 @@
+Title,AssistanceProgramId,IncomeLimitPctFPL,MaxBenefit,Eligibility,DocumentsRequired,Status,DiscountPct,MaxInstallments
+Low-Income Household Water Assistance Program,LIHWAP,150,1500,Household income at or below 150% FPL,Proof of income; Utility bill; ID; Household size verification,accepting_applications,,
+Senior Citizen Rate Discount,senior_discount,200,0,Age 65+ and income at or below 200% FPL,Proof of age; Proof of income; Utility account number,accepting_applications,25,
+COVID-19 Arrearage Forgiveness Program,arrearage_forgiveness,200,3000,Past-due balance accrued during March 2020 - December 2023,Utility account statement; Income verification,limited_funds,,
+Extended Payment Arrangement,payment_plan,0,0,Any customer with past-due balance over $100,Signed payment agreement,always_available,,12
