@@ -3928,6 +3928,11 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
     visual_audit_link = (
         '<a class="button" href="evidence-report.html">Evidence report</a>'
     )
+    studio_tutorial_link = (
+        '<a class="button" href="studio-tutorial.html">Studio edition</a>'
+        if (ctx.package / "studio" / "walkthrough.json").is_file()
+        else ""
+    )
     solution_downloads = copilot_solution_download_links(ctx)
     manual_intro = (
         "Follow the Manual actions and their explicit evidence boundaries to "
@@ -4093,7 +4098,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
       <div class="brand"><span class="brand-mark">A</span><span>AIBAST guided workshop</span></div>
       <a class="academy-breadcrumb" href="../../academy.html#course/{html.escape(ctx.slug)}">Academy / {html.escape(ctx.title)}</a>
     </div>
-    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button" href="../_shared/workshop-settings.html?return=../{html.escape(ctx.slug)}/quest.html">Workshop settings</a><a class="button primary" href="field-guide.html">Open field guide</a></div>
+    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button><a class="button" href="../_shared/workshop-settings.html?return=../{html.escape(ctx.slug)}/quest.html">Workshop settings</a><a class="button primary" href="field-guide.html">Open field guide</a>{studio_tutorial_link}</div>
   </header>
   <main class="page" id="course-content" tabindex="-1">
     <section class="hero">
@@ -4921,6 +4926,14 @@ def readme_block(ctx: JourneyContext, resources: list[Resource]) -> str:
             f"`{ctx.rel(ctx.manual_browserfilm_path)}`",
         ),
     ]
+    if (ctx.package / "studio" / "walkthrough.json").is_file():
+        rows.insert(
+            8,
+            (
+                "Studio edition tutorial",
+                f"[`solutions/{ctx.slug}/studio-tutorial.html`](studio-tutorial.html)",
+            ),
+        )
     solution_artifacts = copilot_solution_artifacts(ctx)
     if solution_artifacts:
         rows.extend(

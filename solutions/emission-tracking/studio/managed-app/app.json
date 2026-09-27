@@ -1,0 +1,188 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Emissions Tracking Workspace",
+  "title": "Emissions Tracking",
+  "description": "The Emissions Tracking workshop's synthetic facilities, carbon offset projects and reporting programs, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every facility, figure and program is fictional. Nothing here is verified emissions evidence, a compliance determination or a credit purchase.",
+  "tables": [
+    {
+      "id": "facilities",
+      "list": "Emissions Facilities",
+      "title": "Facilities",
+      "key": "FacilityId",
+      "fields": {
+        "FacilityId": "field_1",
+        "Location": "field_2",
+        "FacilityType": "field_3",
+        "CapacityMW": "field_4",
+        "Scope1CO2": "field_5",
+        "Scope1CH4": "field_6",
+        "Scope1N2O": "field_7",
+        "Scope2CO2": "field_8",
+        "Scope2CH4": "field_9",
+        "Scope2N2O": "field_10",
+        "Scope3CO2": "field_11",
+        "Scope3CH4": "field_12",
+        "Scope3N2O": "field_13",
+        "ThresholdCO2": "field_14",
+        "ReductionTargetPct": "field_15",
+        "BaselineYear": "field_16",
+        "BaselineCO2": "field_17"
+      },
+      "columns": [
+        "FacilityId",
+        "Title",
+        "FacilityType",
+        "Location",
+        "Scope1CO2",
+        "Scope2CO2",
+        "Scope3CO2",
+        "TotalCO2",
+        "ThresholdCO2",
+        "PctOfThreshold"
+      ],
+      "labels": {
+        "FacilityId": "ID",
+        "Title": "Facility",
+        "FacilityType": "Type",
+        "Scope1CO2": "Scope 1 CO2 (t)",
+        "Scope2CO2": "Scope 2 CO2 (t)",
+        "Scope3CO2": "Scope 3 CO2 (t)",
+        "TotalCO2": "Total CO2 (t)",
+        "ThresholdCO2": "Threshold CO2 (t)",
+        "PctOfThreshold": "Scope 1 % of threshold",
+        "CapacityMW": "Capacity (MW)",
+        "ReductionTargetPct": "Reduction target (%)",
+        "BaselineYear": "Baseline year",
+        "BaselineCO2": "Baseline CO2 (t)"
+      },
+      "computed": [
+        {
+          "name": "TotalCO2",
+          "sum": [
+            "Scope1CO2",
+            "Scope2CO2",
+            "Scope3CO2"
+          ]
+        },
+        {
+          "name": "PctOfThreshold",
+          "percent": [
+            "Scope1CO2",
+            "ThresholdCO2"
+          ]
+        }
+      ],
+      "formats": {
+        "CapacityMW": "integer",
+        "Scope1CO2": "integer",
+        "Scope2CO2": "integer",
+        "Scope3CO2": "integer",
+        "TotalCO2": "integer",
+        "ThresholdCO2": "integer",
+        "BaselineCO2": "integer",
+        "PctOfThreshold": "percent1"
+      },
+      "metrics": [
+        {
+          "label": "Facilities",
+          "op": "count"
+        },
+        {
+          "label": "Scope 1 CO2 (t)",
+          "op": "sum",
+          "column": "Scope1CO2"
+        },
+        {
+          "label": "Total CO2 (t)",
+          "op": "sum",
+          "column": "TotalCO2"
+        }
+      ],
+      "groupBy": "FacilityType",
+      "sortBy": "FacilityId"
+    },
+    {
+      "id": "carbon-offsets",
+      "list": "Emissions Carbon Offsets",
+      "title": "Carbon offsets",
+      "key": "OffsetId",
+      "fields": {
+        "OffsetId": "field_1",
+        "OffsetType": "field_2",
+        "CreditsAvailable": "field_3",
+        "PricePerTonne": "field_4",
+        "Vintage": "field_5",
+        "VerifiedBy": "field_6"
+      },
+      "columns": [
+        "OffsetId",
+        "Title",
+        "OffsetType",
+        "CreditsAvailable",
+        "PricePerTonne",
+        "Vintage",
+        "VerifiedBy"
+      ],
+      "labels": {
+        "OffsetId": "ID",
+        "Title": "Project",
+        "OffsetType": "Type",
+        "CreditsAvailable": "Credits available (t)",
+        "PricePerTonne": "Price per tonne",
+        "VerifiedBy": "Verified by"
+      },
+      "formats": {
+        "CreditsAvailable": "integer",
+        "PricePerTonne": "currency",
+        "Vintage": "text"
+      },
+      "metrics": [
+        {
+          "label": "Projects",
+          "op": "count"
+        },
+        {
+          "label": "Credits available (t)",
+          "op": "sum",
+          "column": "CreditsAvailable"
+        }
+      ],
+      "groupBy": "OffsetType",
+      "sortBy": "OffsetId"
+    },
+    {
+      "id": "regulations",
+      "list": "Emissions Regulations",
+      "title": "Reporting programs",
+      "key": "RegulationId",
+      "fields": {
+        "RegulationId": "field_1",
+        "ThresholdCO2": "field_2",
+        "Deadline": "field_3"
+      },
+      "columns": [
+        "RegulationId",
+        "Title",
+        "ThresholdCO2",
+        "Deadline"
+      ],
+      "labels": {
+        "RegulationId": "ID",
+        "Title": "Program",
+        "ThresholdCO2": "Reporting threshold CO2 (t)"
+      },
+      "formats": {
+        "ThresholdCO2": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Programs",
+          "op": "count"
+        }
+      ],
+      "sortBy": "Deadline"
+    }
+  ]
+}

@@ -147,6 +147,64 @@ def build_fixture(root: Path) -> tuple[Path, dict[str, object]]:
 
 
 class PagesBuilderFixtureTests(unittest.TestCase):
+    def test_studio_tutorial_data_and_nested_screenshots_are_published_locally(self):
+        with fixture_root() as root:
+            base = "solutions/course-01"
+            assets = {
+                "studio/walkthrough.json": b'{"schema":"fixture"}\n',
+                "studio/data/schema.json": b'{"lists":[]}\n',
+                "studio/data/facilities.csv": b"Title,FacilityId\nFictional site,FAC-01\n",
+                "studio/agent/GLOBAL-INSTRUCTIONS.md": b"# Synthetic workshop instructions\n",
+                "studio/agent/skills/main/SKILL.md": b"# Workshop skill\n",
+                "studio/managed-app/app.json": b'{"tables":[]}\n',
+                "screenshots/studio-easy/reviewed/agent.jpg": b"reviewed-jpeg-fixture",
+                "screenshots/studio-manual/reviewed/app.png": b"reviewed-png-fixture",
+            }
+            for relative, content in assets.items():
+                write_bytes(root, f"{base}/{relative}", content)
+                self.assertEqual(
+                    pages.classify_source_path(PurePosixPath(f"{base}/{relative}")),
+                    pages.INCLUDE,
+                )
+            tutorial = (
+                '<a href="quest.html">Workshop</a>'
+                '<a href="#easy">Easy</a><a href="#manual">Manual</a>'
+                '<section id="easy"></section><section id="manual"></section>'
+                + "".join(f'<a href="{relative}" download>Download</a>' for relative in assets)
+                + '<img src="screenshots/studio-easy/reviewed/agent.jpg" alt="Reviewed agent" loading="lazy">'
+                '<img src="screenshots/studio-manual/reviewed/app.png" alt="Reviewed app" loading="lazy">'
+            )
+            write_text(root, f"{base}/studio-tutorial.html", tutorial)
+            quest = root / base / "quest.html"
+            quest.write_text(
+                quest.read_text(encoding="utf-8")
+                + '<a href="studio-tutorial.html">Studio edition</a>',
+                encoding="utf-8",
+            )
+            output, manifest = build_fixture(root)
+            self.assertEqual(
+                (output / base / "studio-tutorial.html").read_text(encoding="utf-8"),
+                tutorial,
+            )
+            for relative, content in assets.items():
+                self.assertEqual((output / base / relative).read_bytes(), content)
+            self.assertEqual(manifest["rewritten_link_count"], 4)
+            self.assertEqual(pages.validate_html_links(output), [])
+
+    def test_missing_studio_download_or_reviewed_screenshot_fails_closed(self):
+        for relative in (
+            "studio/data/missing.csv",
+            "screenshots/studio-manual/reviewed/missing.jpg",
+        ):
+            with self.subTest(relative=relative), fixture_root() as root:
+                write_text(
+                    root,
+                    "solutions/course-01/studio-tutorial.html",
+                    f'<a href="{relative}" download>Missing studio asset</a>',
+                )
+                with self.assertRaisesRegex(pages.BuildError, "Broken or unclassified Pages links"):
+                    build_fixture(root)
+
     def test_download_center_module_is_served_with_its_page(self):
         with fixture_root() as root:
             module = "export const DEFAULT_REPOSITORY = 'microsoft/aibast-agents-library';\n"
@@ -728,6 +786,33 @@ class FullRepositoryArtifactTests(unittest.TestCase):
 
     def test_complete_artifact_has_no_broken_relative_links(self):
         self.assertEqual(pages.validate_html_links(self.site), [])
+
+    def test_artifact_contains_every_studio_tutorial_and_dataset(self):
+        for source in sorted((ROOT / "solutions").glob("*/studio/walkthrough.json")):
+            with self.subTest(package=source.parent.parent.name):
+                package = source.parent.parent
+                relative = package.relative_to(ROOT)
+                tutorial = relative / "studio-tutorial.html"
+                self.assertEqual(
+                    (self.site / tutorial).read_bytes(),
+                    (ROOT / tutorial).read_bytes(),
+                )
+                document = json.loads(source.read_text(encoding="utf-8"))
+                schema = package / document["data"]
+                for csv_path in sorted(schema.parent.glob("*.csv")):
+                    self.assertEqual(
+                        (self.site / csv_path.relative_to(ROOT)).read_bytes(),
+                        csv_path.read_bytes(),
+                    )
+                for mode in document["modes"].values():
+                    for step in mode["steps"]:
+                        shot = step["screenshot"]
+                        if shot and shot["status"] == "reviewed":
+                            relative_shot = relative / shot["file"]
+                            self.assertEqual(
+                                (self.site / relative_shot).read_bytes(),
+                                (ROOT / relative_shot).read_bytes(),
+                            )
 
     def test_served_installers_match_the_manifest_ring(self):
         manifest = json.loads((self.site / pages.MANIFEST_NAME).read_text(encoding="utf-8"))
