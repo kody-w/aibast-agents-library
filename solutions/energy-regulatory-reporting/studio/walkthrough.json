@@ -64,7 +64,21 @@
           "expected": "6 fictional records, including EPA GHG Reporting Program (Subpart C) (RegulatoryReportId RPT-9001), with Authority EPA.",
           "screenshot": {
             "file": "screenshots/studio-easy/03-lists.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Regulatory Reporting Regulatory Reports list that brainfreeze studio created and filled on the Easy workshop site AIBAST Synthetic Data: six fictional filings, including EPA GHG Reporting Program (Subpart C) (RPT-9001, authority EPA) and PHMSA Annual Pipeline Safety Report (RPT-9006, overdue).",
+            "anchors": [
+              "AIBAST Synthetic Data",
+              "Regulatory Reporting Regulatory Reports",
+              "EPA GHG Reporting Program (Subpart C)",
+              "RPT-9001",
+              "EPA",
+              "PHMSA Annual Pipeline Safety Report",
+              "overdue"
+            ],
+            "captured_at": "2026-09-27T07:04:03Z"
           }
         },
         {
@@ -74,7 +88,21 @@
           "expected": "The studio instructions, 4 skills, 1 rules knowledge file(s) and 3 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
-            "status": "pending"
+            "status": "reviewed",
+            "width": 2864,
+            "height": 1764,
+            "density": 2,
+            "alt": "The Draft agent Regulatory Reporting Studio that brainfreeze studio deployed: the studio instructions with the list-column map, Claude Sonnet 4.6, the four energy-regulatory-reporting skills, the three list tools (regulatory report, data validation rule and audit finding records) and the rules-and-controls knowledge file.",
+            "anchors": [
+              "Regulatory Reporting Studio",
+              "Claude Sonnet 4.6",
+              "energy-regulatory-reporting-report-status",
+              "Get regulatory report records",
+              "Get data validation rule records",
+              "Get audit finding records",
+              "energy-regulatory-reporting-rules-and-controls"
+            ],
+            "captured_at": "2026-09-27T07:06:10Z"
           }
         },
         {
