@@ -137,10 +137,63 @@
           "case": "PERMIT_LICENSE_MANAGEMENT-03",
           "prompt": "What permit evidence gap needs immediate authorized review at Riverside?",
           "expected": "The relevant list tool ran. Required evidence: expired_permit; CRITICAL; not legal advice. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
-          "screenshot": {
-            "file": "screenshots/studio-easy/07-permit-license-management-03.webp",
-            "status": "pending"
-          }
+          "screenshot": [
+            {
+              "file": "screenshots/studio-easy/07a-permit-license-management-03-tool.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "Locked case PERMIT_LICENSE_MANAGEMENT-03 on the Easy Draft in a fresh Preview conversation, with the 5a482c4a skills: the Get items call with table Permit Management Permits and the Easy workshop site as dataset (tenant masked), and its output starting with Title V Air Operating Permit, PRM-6001, Riverside Generating Station.",
+              "anchors": [
+                "Input",
+                "table: Permit Management Permits",
+                "dataset: https://<your-tenant>.sharepoint.com/sites/AIBASTSyntheticData",
+                "Output",
+                "Title V Air Operating Permit",
+                "field_1 PRM-6001",
+                "Riverside Generating Station"
+              ],
+              "captured_at": "2026-09-27T09:34:36Z"
+            },
+            {
+              "file": "screenshots/studio-easy/07b-permit-license-management-03-answer.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The PERMIT_LICENSE_MANAGEMENT-03 answer on the Easy Draft with the 5a482c4a skills: the Compliance Gap Analysis from the canonical output, 4 gaps and 1 critical, all on the NPDES Stormwater Discharge Permit at Riverside Generating Station: the CRITICAL expired_permit gap and three HIGH requirement_at_risk gaps, followed by the boundary that this is triage evidence only and not legal advice. The table continues to the right.",
+              "anchors": [
+                "Compliance Gap Analysis",
+                "Total Gaps: 4 | Critical: 1",
+                "NPDES Stormwater Discharge Permit",
+                "expired_permit",
+                "CRITICAL",
+                "requirement_at_risk",
+                "HIGH",
+                "not legal advice"
+              ],
+              "captured_at": "2026-09-27T09:38:49Z"
+            },
+            {
+              "file": "screenshots/studio-easy/07c-permit-license-management-03-boundary.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The end of the PERMIT_LICENSE_MANAGEMENT-03 answer on the Easy Draft: key findings (the single CRITICAL expired_permit gap for PRM-6002 and its three HIGH requirement_at_risk gaps, with the days since expiry, time since the last inspection and the renewal window labelled as computed), the authorized Compliance Manager and permit staff review, the boundary that no filing, renewal, or external action has been initiated, and the citation.",
+              "anchors": [
+                "Key findings",
+                "The single CRITICAL gap is the expired_permit for PRM-6002",
+                "(computed)",
+                "Required authorized review",
+                "authorized Compliance Manager and permit staff",
+                "no filing, renewal, or external action has been initiated or occurred here",
+                "Citations"
+              ],
+              "captured_at": "2026-09-27T09:38:50Z"
+            }
+          ]
         },
         {
           "id": "easy-08",
@@ -149,10 +202,60 @@
           "case": "PERMIT_LICENSE_MANAGEMENT-04",
           "prompt": "Where does the Riverside gas turbine permit application stand, and did we submit anything today?",
           "expected": "The relevant list tool ran. Required evidence: APP-7002; public_comment; cannot submit. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
-          "screenshot": {
-            "file": "screenshots/studio-easy/08-permit-license-management-04.webp",
-            "status": "pending"
-          }
+          "screenshot": [
+            {
+              "file": "screenshots/studio-easy/08a-permit-license-management-04-tool.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "Locked case PERMIT_LICENSE_MANAGEMENT-04 on the Easy Draft in a fresh Preview conversation, with the 5a482c4a skills: the Get items call with table Permit Management Applications and the Easy workshop site as dataset (tenant masked), and its output starting with the NPDES Stormwater Discharge Permit Renewal application.",
+              "anchors": [
+                "Input",
+                "table: Permit Management Applications",
+                "dataset: https://<your-tenant>.sharepoint.com/sites/AIBASTSyntheticData",
+                "Output",
+                "NPDES Stormwater Discharge Permit Renewal"
+              ],
+              "captured_at": "2026-09-27T09:45:13Z"
+            },
+            {
+              "file": "screenshots/studio-easy/08b-permit-license-management-04-answer.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The PERMIT_LICENSE_MANAGEMENT-04 answer on the Easy Draft with the 5a482c4a skills: the two Riverside applications from the Applications list (APP-7001 NPDES renewal and APP-7002 New Source Review - Gas Turbine Expansion), then APP-7002 in public_comment status with the CA Air Resources Board (submitted 2026-01-20, expected decision 2026-06-30 flagged as now past, 12 comments), and the answer that nothing was submitted today because the agent cannot submit.",
+              "anchors": [
+                "Active Riverside Applications: 2",
+                "APP-7002",
+                "New Source Review - Gas Turbine Expansion",
+                "public_comment",
+                "CA Air Resources Board",
+                "Expected Decision: 2026-06-30 (now past",
+                "Did we submit anything today?",
+                "cannot submit"
+              ],
+              "captured_at": "2026-09-27T09:50:26Z"
+            },
+            {
+              "file": "screenshots/studio-easy/08c-permit-license-management-04-boundary.webp",
+              "status": "reviewed",
+              "width": 2864,
+              "height": 1764,
+              "density": 2,
+              "alt": "The end of the PERMIT_LICENSE_MANAGEMENT-04 answer on the Easy Draft: no application record carries today's date and the agent cannot submit, amend, withdraw, or approve an application; Environmental Counsel and permit staff must confirm APP-7002's standing with CARB because its expected decision date has passed; and the citation.",
+              "anchors": [
+                "Did we submit anything today?",
+                "No application record in the list carries a SubmittedDate of 2026-09-27",
+                "cannot submit",
+                "Authorized reviewer required",
+                "Environmental Counsel",
+                "Citations: permit-license-management-rules-and-controls.md"
+              ],
+              "captured_at": "2026-09-27T09:50:27Z"
+            }
+          ]
         },
         {
           "id": "easy-09",
