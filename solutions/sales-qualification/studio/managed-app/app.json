@@ -1,0 +1,210 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Sales Qualification Workspace",
+  "title": "Sales Qualification",
+  "description": "The Sales Qualification workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "icp",
+      "list": "Sales Qualification ICP",
+      "title": "ICP",
+      "key": "ICPId",
+      "fields": {
+        "ICPId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "ICPId",
+        "Title"
+      ],
+      "labels": {
+        "Title": "ICP",
+        "ICPId": "ICP ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "ICPId": "text",
+        "Value": "text"
+      },
+      "metrics": [
+        {
+          "label": "ICP",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ICPId"
+    },
+    {
+      "id": "ae-team",
+      "list": "Sales Qualification AE Team",
+      "title": "AE Team",
+      "key": "AETeamId",
+      "fields": {
+        "AETeamId": "field_1",
+        "Territory": "field_2",
+        "Specialty": "field_3",
+        "CurrentCapacityPct": "field_4",
+        "MaxLeads": "field_5"
+      },
+      "columns": [
+        "AETeamId",
+        "Title",
+        "Territory",
+        "Specialty",
+        "CurrentCapacityPct",
+        "MaxLeads"
+      ],
+      "labels": {
+        "Title": "AE Team",
+        "AETeamId": "AE Team ID",
+        "Territory": "Territory",
+        "Specialty": "Specialty",
+        "CurrentCapacityPct": "Current Capacity Pct",
+        "MaxLeads": "Max Leads"
+      },
+      "formats": {
+        "Title": "text",
+        "AETeamId": "text",
+        "Territory": "text",
+        "Specialty": "text",
+        "CurrentCapacityPct": "percent1",
+        "MaxLeads": "integer"
+      },
+      "metrics": [
+        {
+          "label": "AE Team",
+          "op": "count"
+        }
+      ],
+      "groupBy": "Territory",
+      "sortBy": "AETeamId"
+    },
+    {
+      "id": "sla-rules",
+      "list": "Sales Qualification SLA Rules",
+      "title": "SLA Rules",
+      "key": "SLARuleId",
+      "fields": {
+        "SLARuleId": "field_1",
+        "ResponseHours": "field_2",
+        "Escalation": "field_3",
+        "Sequence": "field_4"
+      },
+      "columns": [
+        "SLARuleId",
+        "Title",
+        "ResponseHours",
+        "Escalation",
+        "Sequence"
+      ],
+      "labels": {
+        "Title": "SLA Rule",
+        "SLARuleId": "SLA Rule ID",
+        "ResponseHours": "Response Hours",
+        "Escalation": "Escalation",
+        "Sequence": "Sequence"
+      },
+      "formats": {
+        "Title": "text",
+        "SLARuleId": "text",
+        "ResponseHours": "integer",
+        "Escalation": "text",
+        "Sequence": "text"
+      },
+      "metrics": [
+        {
+          "label": "SLA Rules",
+          "op": "count"
+        },
+        {
+          "label": "Response Hours",
+          "op": "sum",
+          "column": "ResponseHours"
+        }
+      ],
+      "groupBy": "Escalation",
+      "sortBy": "SLARuleId"
+    },
+    {
+      "id": "leads",
+      "list": "Sales Qualification Leads",
+      "title": "Leads",
+      "key": "LeadId",
+      "fields": {
+        "LeadId": "field_1",
+        "Company": "field_2",
+        "Titleaaf2320": "field_3",
+        "Employees": "field_4",
+        "Industry": "field_5",
+        "Revenue": "field_6",
+        "Source": "field_7",
+        "Budget": "field_8",
+        "AuthorityLevel": "field_9",
+        "Need": "field_10",
+        "Timeline": "field_11",
+        "EngagementSignals": "field_12",
+        "TechStack": "field_13"
+      },
+      "columns": [
+        "LeadId",
+        "Title",
+        "Company",
+        "Titleaaf2320",
+        "Employees",
+        "Industry",
+        "Revenue",
+        "Source",
+        "Budget",
+        "AuthorityLevel"
+      ],
+      "labels": {
+        "Title": "Lead",
+        "LeadId": "Lead ID",
+        "Company": "Company",
+        "Titleaaf2320": "Title",
+        "Employees": "Employees",
+        "Industry": "Industry",
+        "Revenue": "Revenue",
+        "Source": "Source",
+        "Budget": "Budget",
+        "AuthorityLevel": "Authority Level",
+        "Need": "Need",
+        "Timeline": "Timeline",
+        "EngagementSignals": "Engagement Signals",
+        "TechStack": "Tech Stack"
+      },
+      "formats": {
+        "Title": "text",
+        "LeadId": "text",
+        "Company": "text",
+        "Titleaaf2320": "text",
+        "Employees": "integer",
+        "Industry": "text",
+        "Revenue": "currency",
+        "Source": "text",
+        "Budget": "text",
+        "AuthorityLevel": "text",
+        "Need": "text",
+        "Timeline": "text",
+        "EngagementSignals": "text",
+        "TechStack": "text"
+      },
+      "metrics": [
+        {
+          "label": "Leads",
+          "op": "count"
+        },
+        {
+          "label": "Revenue",
+          "op": "sum",
+          "column": "Revenue"
+        }
+      ],
+      "groupBy": "Source",
+      "sortBy": "LeadId"
+    }
+  ]
+}

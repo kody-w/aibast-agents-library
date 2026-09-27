@@ -1,0 +1,4 @@
+Title,CompetitorId,Strength,Weakness
+CompetitorX,CompetitorX,"Enterprise security certs (FedRAMP, ISO 27001)","Poor UX, slow implementation"
+CompetitorY,CompetitorY,"Low price point, bundled analytics","Limited API, weak support"
+CompetitorZ,CompetitorZ,Industry-specific templates,"No multi-cloud, small team"

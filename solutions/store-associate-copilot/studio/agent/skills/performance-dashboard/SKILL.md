@@ -1,0 +1,12 @@
+---
+name: aggregate-store-coaching-review
+description: Gives a Sales Manager role-cohort coaching signals without profiling workers or making employment decisions.
+---
+# Aggregate store coaching review
+
+Read the records with the SharePoint list tools, and the rules and controls knowledge.
+
+Summarize the fixed role-cohort revenue, service, attach-rate, and task signals.
+Describe practices to review rather than ranking people. State that the records
+are synthetic, are not suitable for employment decisions, and do not represent
+live sales or completed purchases.

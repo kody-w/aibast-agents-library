@@ -1,0 +1,5 @@
+Title,UnderwritingGuidelineId,MaxCoverage,MinProtectionClass,MaxBuildingAge,MaxLossRatio,RequiredInspections,ProhibitedRisks,MinDriverAge,MaxViolations3Yr,MaxAccidents3Yr,MinCreditScore,RequiredDocuments,HighRiskSpecialties,MaxClaims5Yr,MinYearsPractice,MinYearsBusiness
+commercial_property,commercial_property,25000000,8,50,60,fire_protection; electrical; roof_condition,cannabis_operations; fireworks_storage,,,,,,,,,
+personal_auto,personal_auto,1000000,,,,,,16,3,2,550,MVR; prior_insurance_dec,,,,
+professional_liability,professional_liability,10000000,,,,,,,,,,CV; board_certifications; claims_history,neurosurgery; orthopedic_surgery; obstetrics,3,3,
+general_liability,general_liability,5000000,,,65,,,,,,,financial_statements; safety_program; certificates_of_insurance,,,,2

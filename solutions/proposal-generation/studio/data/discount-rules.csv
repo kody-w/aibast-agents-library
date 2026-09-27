@@ -1,0 +1,4 @@
+Title,DiscountRuleId,Base,VolumeThreshold,VolumeBonus,Max
+Software,Software,0.08,600000,0.03,0.15
+Services,Services,0.1,400000,0.04,0.18
+Support,Support,0.25,150000,0.05,0.35

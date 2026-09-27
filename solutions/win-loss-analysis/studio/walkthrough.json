@@ -1,0 +1,530 @@
+{
+  "schema": "aibast-studio-walkthrough/1.0",
+  "solution": "win-loss-analysis",
+  "title": "Win/Loss Analysis, built with brainfreeze studio",
+  "summary": "The Win/Loss Analysis agent on real SharePoint lists that hold the workshop's synthetic records, with its own managed app. Easy mode has brainfreeze studio build all of it; Manual mode builds the same thing by hand.",
+  "data": "studio/data/schema.json",
+  "agent": {
+    "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
+    "skills": "studio/agent/skills",
+    "knowledge": [
+      "manual/knowledge/aibast_win-loss-analysis-operating-rules.md"
+    ],
+    "model": "Sonnet 4.6",
+    "names": {
+      "easy": "Win Loss Analysis Studio",
+      "manual": "Win Loss A Studio Manual"
+    }
+  },
+  "app": {
+    "spec": "studio/managed-app/app.json",
+    "names": {
+      "easy": "Win/Loss Analysis Workspace",
+      "manual": "Win/Loss Analysis Workspace Manual"
+    }
+  },
+  "cases": "tests/demo_cases/win-loss-analysis.json",
+  "modes": {
+    "easy": {
+      "title": "Easy mode: brainfreeze studio builds it",
+      "steps": [
+        {
+          "id": "easy-01",
+          "title": "Get the tools and sign in once",
+          "action": "Clone the library, get brainfreeze studio from your workshop host (it has no public download yet), install Microsoft's managed apps CLI, and sign in with the account that can make agents and apps in your environment.",
+          "commands": [
+            "git clone https://github.com/microsoft/aibast-agents-library.git",
+            "npm install -g @microsoft/managed-apps-cli",
+            "ms auth login",
+            "az login"
+          ],
+          "expected": "The library is cloned, `python3 -m brainfreeze_studio --help` lists its commands, `ms auth status` shows your account, and `az account show` shows your tenant.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/01-sign-in.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-02",
+          "title": "Build and deploy everything with one command",
+          "action": "Run brainfreeze studio's AIBAST command for this workshop, with your SharePoint site and your environment.",
+          "commands": [
+            "python3 -m brainfreeze_studio aibast win-loss-analysis --library ./aibast-agents-library --site https://<your-tenant>.sharepoint.com/sites/<your-site> --environment https://<your-org>.crm.dynamics.com --deploy"
+          ],
+          "expected": "It prints the 5 lists it made and filled, the Draft agent it deployed, and the managed app's play link. The first run opens one browser sign-in for the app's repository.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/02-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-03",
+          "title": "See the synthetic records in SharePoint",
+          "action": "Open the site and the Win Loss Analysis Loss Reasons list.",
+          "expected": "6 fictional records, including security_certs (LossReasonId 1).",
+          "screenshot": {
+            "file": "screenshots/studio-easy/03-lists.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-04",
+          "title": "Open the Draft agent in Copilot Studio",
+          "action": "Open Win Loss Analysis Studio and review its inventory.",
+          "expected": "The studio instructions, 6 skills, 1 rules knowledge file(s) and 5 SharePoint Get items tools; no web search; Draft, not published.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/04-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-05",
+          "title": "Test: Sales Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-01",
+          "prompt": "Compare the bundled synthetic Q3 and Q2 win and loss patterns and show where the decline is concentrated.",
+          "expected": "The relevant list tool ran. Required evidence: Q3 Win/Loss Overview; Loss Analysis by Competitor; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/05-wl-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-06",
+          "title": "Test: Enablement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-02",
+          "prompt": "Identify the evidence-backed synthetic loss drivers and buyer feedback themes that enablement should review.",
+          "expected": "The relevant list tool ran. Required evidence: Root Cause Analysis; Deep Dive; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/06-wl-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-07",
+          "title": "Test: Enablement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-03",
+          "prompt": "Draft counter-strategy and talk-track options from the synthetic loss evidence for enablement review.",
+          "expected": "The relevant list tool ran. Required evidence: Counter-Strategies; Updated Talk Track; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/07-wl-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-08",
+          "title": "Test: Sales Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-04",
+          "prompt": "Model synthetic intervention scenarios without presenting them as realized or committed revenue.",
+          "expected": "The relevant list tool ran. Required evidence: Synthetic Revenue Scenario Model; Illustrative scenario value; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/08-wl-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-09",
+          "title": "Test: Sales Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-05",
+          "prompt": "Draft a board-level synthetic win and loss narrative with all investment and performance values labeled as scenarios.",
+          "expected": "The relevant list tool ran. Required evidence: Board Presentation; Decision for authorized leaders; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/09-wl-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-10",
+          "title": "Test: Sales Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-06",
+          "prompt": "Summarize the synthetic findings and candidate next steps without activating programs or approvals.",
+          "expected": "The relevant list tool ran. Required evidence: Complete Summary; Draft Next-Step Options; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-easy/10-wl-06.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "easy-11",
+          "title": "Open the managed app",
+          "action": "Open the play link brainfreeze studio printed, and allow the app to use your SharePoint connection the first time.",
+          "expected": "Win/Loss Analysis: 5 read-only tabs from the same lists. 6 fictional records, including security_certs (LossReasonId 1).",
+          "screenshot": {
+            "file": "screenshots/studio-easy/11-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    "manual": {
+      "title": "Manual mode: build it yourself",
+      "steps": [
+        {
+          "id": "manual-01",
+          "title": "Open a SharePoint site for the workshop data",
+          "action": "Use a SharePoint site you can edit, or create one (SharePoint start page, Create site, Communication site) named AIBAST Synthetic Data Manual.",
+          "expected": "The site's home page opens and you can create lists on it.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/01-site.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-02",
+          "title": "Create Win Loss Analysis Loss Reasons from its CSV",
+          "action": "On the site: New, List, From CSV. Upload loss-reasons.csv. On Customize, keep Title mapped to the Title column. Set LossReasonId to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Win Loss Analysis Loss Reasons. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/loss-reasons.csv"
+          ],
+          "expected": "6 fictional records, including security_certs (LossReasonId 1).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/02-list-loss-reasons.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-03",
+          "title": "Create Win Loss Analysis Competitors from its CSV",
+          "action": "On the site: New, List, From CSV. Upload competitors.csv. On Customize, keep Title mapped to the Title column. Set CompetitorId, Strength, Weakness to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Name the list Win Loss Analysis Competitors. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/competitors.csv"
+          ],
+          "expected": "3 fictional records, including CompetitorX (CompetitorId CompetitorX), with Strength Enterprise security certs (FedRAMP, ISO 27001).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/03-list-competitors.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-04",
+          "title": "Create Win Loss Analysis Q3 Opportunities from its CSV",
+          "action": "On the site: New, List, From CSV. Upload q3-opportunities.csv. On Customize, keep Title mapped to the Title column. Set Q3OpportunityId, Account, Outcome, CompetitorLostTo, LossReason, Segment, DealSizeBucket to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value as Number. Name the list Win Loss Analysis Q3 Opportunities. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/q3-opportunities.csv"
+          ],
+          "expected": "127 fictional records, including Apex Financial Platform (Q3OpportunityId 1), with Account Apex Financial.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/04-list-q3-opportunities.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-05",
+          "title": "Create Win Loss Analysis Q2 Opportunities from its CSV",
+          "action": "On the site: New, List, From CSV. Upload q2-opportunities.csv. On Customize, keep Title mapped to the Title column. Set Q2OpportunityId, Account, Outcome, CompetitorLostTo, LossReason, Segment, DealSizeBucket to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Value as Number. Name the list Win Loss Analysis Q2 Opportunities. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/q2-opportunities.csv"
+          ],
+          "expected": "118 fictional records, including Q2-Apex Expansion (Q2OpportunityId 1), with Account Apex Financial.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/05-list-q2-opportunities.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-06",
+          "title": "Create Win Loss Analysis Interventions from its CSV",
+          "action": "On the site: New, List, From CSV. Upload interventions.csv. On Customize, keep Title mapped to the Title column. Set InterventionId, Timeline, Actions to Single line of text. Keep dates as ISO text, not Date and time; years and numeric-looking identifiers stay text (2022, not 2,022). Keep Cost, RecoveryRate as Number. Name the list Win Loss Analysis Interventions. Preserve the CSV column order.",
+          "downloads": [
+            "studio/data/interventions.csv"
+          ],
+          "expected": "5 fictional records, including Security Positioning Refresh (InterventionId security_positioning), with Cost 25000.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/06-list-interventions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-07",
+          "title": "Create a blank agent",
+          "action": "In Copilot Studio, create a new agent and skip the description flow.",
+          "expected": "A new, empty agent opens on its Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/07-blank-agent.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-08",
+          "title": "Name the agent",
+          "action": "Rename it Win Loss A Studio Manual. (Agent names can be at most 30 characters.)",
+          "expected": "The name shows at the top of the Build page.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/08-name.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-09",
+          "title": "Paste the studio instructions",
+          "action": "Copy the whole instructions file and paste it into Instructions, replacing anything there.",
+          "downloads": [
+            "studio/agent/GLOBAL-INSTRUCTIONS.md"
+          ],
+          "expected": "The studio instructions name the 5 list tools and map every Title and field_N column.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/09-instructions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-10",
+          "title": "Save, and check the instructions stayed",
+          "action": "Save, go back to the agents list, and reopen the agent.",
+          "expected": "The same instructions are there after reopening.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/10-instructions-saved.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-11",
+          "title": "Remove web search",
+          "action": "In Knowledge, remove Search all websites.",
+          "expected": "No web search knowledge remains.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/11-no-web-search.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-12",
+          "title": "Add the rules-and-controls knowledge",
+          "action": "Knowledge, Add, upload aibast_win-loss-analysis-operating-rules.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "downloads": [
+            "manual/knowledge/aibast_win-loss-analysis-operating-rules.md"
+          ],
+          "expected": "1 rules knowledge file(s) listed as ready.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/12-rules-knowledge.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-13",
+          "title": "Add the loss reasons tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Win Loss Analysis Loss Reasons; name the tool Get loss reason records.",
+          "expected": "Get loss reason records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/13-tool-loss-reasons.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-14",
+          "title": "Add the competitors tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Win Loss Analysis Competitors; name the tool Get competitor records.",
+          "expected": "Get competitor records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/14-tool-competitors.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-15",
+          "title": "Add the q3 opportunities tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Win Loss Analysis Q3 Opportunities; name the tool Get q3 opportunity records.",
+          "expected": "Get q3 opportunity records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/15-tool-q3-opportunities.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-16",
+          "title": "Add the q2 opportunities tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Win Loss Analysis Q2 Opportunities; name the tool Get q2 opportunity records.",
+          "expected": "Get q2 opportunity records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/16-tool-q2-opportunities.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-17",
+          "title": "Add the interventions tool",
+          "action": "Tools, Add a tool, SharePoint, Get items. Set Site Address to your site and List Name to Win Loss Analysis Interventions; name the tool Get intervention records.",
+          "expected": "Get intervention records is listed under Tools.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/17-tool-interventions.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-18",
+          "title": "Add the 6 skills",
+          "action": "Skills, Add, and upload each studio SKILL.md from the downloads.",
+          "downloads": [
+            "studio/agent/skills/action-summary/SKILL.md",
+            "studio/agent/skills/board-presentation/SKILL.md",
+            "studio/agent/skills/counter-strategies/SKILL.md",
+            "studio/agent/skills/revenue-impact/SKILL.md",
+            "studio/agent/skills/root-cause-analysis/SKILL.md",
+            "studio/agent/skills/win-loss-overview/SKILL.md"
+          ],
+          "expected": "6 skills listed, with their frontmatter names.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/18-skills.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-19",
+          "title": "Review the agent",
+          "action": "Check the model, 6 skills, the rules knowledge and 5 tools.",
+          "expected": "Sonnet 4.6, 6 skills, 1 knowledge file(s), 5 Get items tools, no web search, nothing else.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/19-inventory.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-20",
+          "title": "Test: Sales Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-01",
+          "prompt": "Compare the bundled synthetic Q3 and Q2 win and loss patterns and show where the decline is concentrated.",
+          "expected": "The relevant list tool ran. Required evidence: Q3 Win/Loss Overview; Loss Analysis by Competitor; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/20-wl-01.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-21",
+          "title": "Test: Enablement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-02",
+          "prompt": "Identify the evidence-backed synthetic loss drivers and buyer feedback themes that enablement should review.",
+          "expected": "The relevant list tool ran. Required evidence: Root Cause Analysis; Deep Dive; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/21-wl-02.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-22",
+          "title": "Test: Enablement Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-03",
+          "prompt": "Draft counter-strategy and talk-track options from the synthetic loss evidence for enablement review.",
+          "expected": "The relevant list tool ran. Required evidence: Counter-Strategies; Updated Talk Track; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/22-wl-03.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-23",
+          "title": "Test: Sales Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-04",
+          "prompt": "Model synthetic intervention scenarios without presenting them as realized or committed revenue.",
+          "expected": "The relevant list tool ran. Required evidence: Synthetic Revenue Scenario Model; Illustrative scenario value; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/23-wl-04.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-24",
+          "title": "Test: Sales Leader",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-05",
+          "prompt": "Draft a board-level synthetic win and loss narrative with all investment and performance values labeled as scenarios.",
+          "expected": "The relevant list tool ran. Required evidence: Board Presentation; Decision for authorized leaders; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/24-wl-05.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-25",
+          "title": "Test: Sales Operations Manager",
+          "action": "In a fresh Preview conversation, send the locked prompt.",
+          "case": "WL-06",
+          "prompt": "Summarize the synthetic findings and candidate next steps without activating programs or approvals.",
+          "expected": "The relevant list tool ran. Required evidence: Complete Summary; Draft Next-Step Options; Evidence boundary. Preserve the synthetic-data and authorized-review boundaries; no external action occurred.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/25-wl-06.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-26",
+          "title": "Confirm the agent is a Draft",
+          "action": "Check the agent's status; do not publish.",
+          "expected": "Draft; Publish was never selected.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/26-draft.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-27",
+          "title": "Get the app's source and set your site",
+          "action": "Generate the workshop's app folder, and set site in its src/config.ts to your SharePoint site.",
+          "commands": [
+            "python3 -m brainfreeze_studio managed-app aibast-agents-library/solutions/win-loss-analysis/studio/managed-app/app.json --out win-loss-analysis-app"
+          ],
+          "expected": "win-loss-analysis-app/managed-app holds a React + Vite managed app whose config names your site and the 5 lists.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/27-app-source.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-28",
+          "title": "Register the app and connect the lists",
+          "action": "In that folder, register the app with Microsoft's CLI and bind each list with your SharePoint connection.",
+          "commands": [
+            "cd win-loss-analysis-app/managed-app",
+            "ms app init --display-name \"Win/Loss Analysis Workspace Manual\" --repo native",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Win Loss Analysis Loss Reasons\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Win Loss Analysis Competitors\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Win Loss Analysis Q3 Opportunities\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Win Loss Analysis Q2 Opportunities\" --use-sso",
+            "ms app add data-source --connector sharepointonline --as table --dataset <your-site> --table \"Win Loss Analysis Interventions\" --use-sso"
+          ],
+          "expected": "ms.config.json lists one SharePoint connection with the 5 tables, and generated/services has a service for each list.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/28-app-register.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-29",
+          "title": "Build, push and deploy",
+          "action": "Build it, commit it, push it to the app's repository and deploy it.",
+          "commands": [
+            "npm install",
+            "npm run build",
+            "git add -A && git commit -m \"Win/Loss Analysis Workspace\"",
+            "git push -u origin HEAD:main",
+            "ms app deploy"
+          ],
+          "expected": "ms app deploy prints the app's play link.",
+          "screenshot": {
+            "file": "screenshots/studio-manual/29-app-deploy.webp",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "manual-30",
+          "title": "Open the app and compare it with the agent",
+          "action": "Open the play link, allow the SharePoint connection the first time, and open the Win Loss Analysis Loss Reasons tab.",
+          "expected": "The app and the agent read the same synthetic records. 6 fictional records, including security_certs (LossReasonId 1).",
+          "screenshot": {
+            "file": "screenshots/studio-manual/30-app.webp",
+            "status": "pending"
+          }
+        }
+      ]
+    }
+  }
+}

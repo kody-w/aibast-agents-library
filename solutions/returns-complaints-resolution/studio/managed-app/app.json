@@ -1,0 +1,212 @@
+{
+  "kind": "scenario-workspace",
+  "name": "Returns and Complaints Resolution Workspace",
+  "title": "Returns and Complaints Resolution",
+  "description": "The Returns and Complaints Resolution workshop's synthetic records, read from its SharePoint lists.",
+  "site": "https://contoso.sharepoint.com/sites/aibast-synthetic-data",
+  "notice": "Synthetic demonstration data: every record and figure is fictional. This read-only workspace does not verify evidence, make an approval or determination, or perform an external action.",
+  "tables": [
+    {
+      "id": "return-requests",
+      "list": "Returns and Complaints Resolution Return Requests",
+      "title": "Return Requests",
+      "key": "ReturnRequestId",
+      "fields": {
+        "ReturnRequestId": "field_1",
+        "OrderID": "field_2",
+        "Product": "field_3",
+        "SKU": "field_4",
+        "PurchasePrice": "field_5",
+        "PurchaseDate": "field_6",
+        "RequestDate": "field_7",
+        "Reason": "field_8",
+        "Condition": "field_9",
+        "Channel": "field_10",
+        "Status": "field_11",
+        "Notes": "field_12"
+      },
+      "columns": [
+        "ReturnRequestId",
+        "Title",
+        "OrderID",
+        "Product",
+        "SKU",
+        "PurchasePrice",
+        "PurchaseDate",
+        "RequestDate",
+        "Reason",
+        "Condition"
+      ],
+      "labels": {
+        "Title": "Return Request",
+        "ReturnRequestId": "Return Request ID",
+        "OrderID": "Order ID",
+        "Product": "Product",
+        "SKU": "SKU",
+        "PurchasePrice": "Purchase Price",
+        "PurchaseDate": "Purchase Date",
+        "RequestDate": "Request Date",
+        "Reason": "Reason",
+        "Condition": "Condition",
+        "Channel": "Channel",
+        "Status": "Status",
+        "Notes": "Notes"
+      },
+      "formats": {
+        "Title": "text",
+        "ReturnRequestId": "text",
+        "OrderID": "text",
+        "Product": "text",
+        "SKU": "text",
+        "PurchasePrice": "currency",
+        "PurchaseDate": "text",
+        "RequestDate": "text",
+        "Reason": "text",
+        "Condition": "text",
+        "Channel": "text",
+        "Status": "text",
+        "Notes": "text"
+      },
+      "metrics": [
+        {
+          "label": "Return Requests",
+          "op": "count"
+        }
+      ],
+      "groupBy": "OrderID",
+      "sortBy": "ReturnRequestId"
+    },
+    {
+      "id": "complaint-categories",
+      "list": "Returns and Complaints Resolution Complaint Categories",
+      "title": "Complaint Categories",
+      "key": "ComplaintCategoryId",
+      "fields": {
+        "ComplaintCategoryId": "field_1",
+        "SeverityWeight": "field_2",
+        "AvgResolutionHours": "field_3",
+        "EscalationRate": "field_4",
+        "Keywords": "field_5",
+        "MonthlyVolume": "field_6"
+      },
+      "columns": [
+        "ComplaintCategoryId",
+        "Title",
+        "SeverityWeight",
+        "AvgResolutionHours",
+        "EscalationRate",
+        "Keywords",
+        "MonthlyVolume"
+      ],
+      "labels": {
+        "Title": "Complaint Category",
+        "ComplaintCategoryId": "Complaint Category ID",
+        "SeverityWeight": "Severity Weight",
+        "AvgResolutionHours": "Avg Resolution Hours",
+        "EscalationRate": "Escalation Rate",
+        "Keywords": "Keywords",
+        "MonthlyVolume": "Monthly Volume"
+      },
+      "formats": {
+        "Title": "text",
+        "ComplaintCategoryId": "text",
+        "SeverityWeight": "number",
+        "AvgResolutionHours": "integer",
+        "EscalationRate": "number",
+        "Keywords": "text",
+        "MonthlyVolume": "integer"
+      },
+      "metrics": [
+        {
+          "label": "Complaint Categories",
+          "op": "count"
+        }
+      ],
+      "sortBy": "ComplaintCategoryId"
+    },
+    {
+      "id": "resolution-playbooks",
+      "list": "Returns and Complaints Resolution Resolution Playbooks",
+      "title": "Resolution Playbooks",
+      "key": "ResolutionPlaybookId",
+      "fields": {
+        "ResolutionPlaybookId": "field_1",
+        "ApplicableReasons": "field_2",
+        "ApplicableConditions": "field_3",
+        "MaxDaysSincePurchase": "field_4",
+        "CostImpact": "field_5",
+        "CsatImpact": "field_6",
+        "Steps": "field_7"
+      },
+      "columns": [
+        "ResolutionPlaybookId",
+        "Title",
+        "ApplicableReasons",
+        "ApplicableConditions",
+        "MaxDaysSincePurchase",
+        "CostImpact",
+        "CsatImpact",
+        "Steps"
+      ],
+      "labels": {
+        "Title": "Resolution Playbook",
+        "ResolutionPlaybookId": "Resolution Playbook ID",
+        "ApplicableReasons": "Applicable Reasons",
+        "ApplicableConditions": "Applicable Conditions",
+        "MaxDaysSincePurchase": "Max Days Since Purchase",
+        "CostImpact": "Cost Impact",
+        "CsatImpact": "Csat Impact",
+        "Steps": "Steps"
+      },
+      "formats": {
+        "Title": "text",
+        "ResolutionPlaybookId": "text",
+        "ApplicableReasons": "text",
+        "ApplicableConditions": "text",
+        "MaxDaysSincePurchase": "integer",
+        "CostImpact": "text",
+        "CsatImpact": "text",
+        "Steps": "text"
+      },
+      "metrics": [
+        {
+          "label": "Resolution Playbooks",
+          "op": "count"
+        }
+      ],
+      "groupBy": "CostImpact",
+      "sortBy": "ResolutionPlaybookId"
+    },
+    {
+      "id": "trend-data",
+      "list": "Returns and Complaints Resolution Trend Data",
+      "title": "Trend Data",
+      "key": "TrendDataId",
+      "fields": {
+        "TrendDataId": "field_1",
+        "Value": "field_2"
+      },
+      "columns": [
+        "TrendDataId",
+        "Title"
+      ],
+      "labels": {
+        "Title": "Trend Data",
+        "TrendDataId": "Trend Data ID",
+        "Value": "Value"
+      },
+      "formats": {
+        "Title": "text",
+        "TrendDataId": "text",
+        "Value": "text"
+      },
+      "metrics": [
+        {
+          "label": "Trend Data",
+          "op": "count"
+        }
+      ],
+      "sortBy": "TrendDataId"
+    }
+  ]
+}

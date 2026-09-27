@@ -42,6 +42,7 @@ Upload the two Markdown files in `manual/knowledge/`, then upload one `SKILL.md`
 | Copilot-only Easy-mode comparison | `solutions/wealth-insights-generator/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/wealth-insights-generator/quest.html` |
 | Literal browser tutorial | `solutions/wealth-insights-generator/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/wealth-insights-generator/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/wealth-insights-generator/export-manifest.json` |
 | Source bundle | `solutions/wealth-insights-generator/exports/wealth-insights-generator-source.zip` |
 | Manual evidence | `solutions/wealth-insights-generator/evals/manual-build-evidence.json` |

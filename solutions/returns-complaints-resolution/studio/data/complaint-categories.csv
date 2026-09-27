@@ -1,0 +1,5 @@
+Title,ComplaintCategoryId,SeverityWeight,AvgResolutionHours,EscalationRate,Keywords,MonthlyVolume
+Product Quality,product_quality,0.85,36,0.15,defective; broken; poor quality; fell apart; not durable,142
+Order Fulfillment,order_fulfillment,0.7,24,0.08,wrong item; missing; late delivery; not received; damaged in shipping,98
+Pricing & Billing,pricing_billing,0.65,18,0.05,overcharged; wrong price; coupon not applied; double charged,67
+Service Experience,service_experience,0.6,48,0.22,rude staff; long wait; unhelpful; no response; poor communication,53
