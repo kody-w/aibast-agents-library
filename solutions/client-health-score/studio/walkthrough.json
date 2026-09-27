@@ -9,7 +9,8 @@
     "skills": "studio/agent/skills",
     "knowledge": [
       "studio/agent/knowledge/aibast_client-health-retention-playbook.md",
-      "studio/agent/knowledge/aibast_client-health-synthetic-portfolio.md"
+      "studio/agent/knowledge/aibast_client-health-synthetic-portfolio.md",
+      "studio/agent/knowledge/client-health-score-instruction-controls.md"
     ],
     "model": "Sonnet 4.6",
     "names": {
@@ -72,7 +73,7 @@
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
           "action": "Open Client Health Score Studio and review its inventory.",
-          "expected": "The studio instructions, 5 skills, 2 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.",
+          "expected": "The studio instructions, 5 skills, 3 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
             "status": "pending"
@@ -245,12 +246,13 @@
         {
           "id": "manual-09",
           "title": "Add the rules-and-controls knowledge",
-          "action": "Knowledge, Add, upload aibast_client-health-retention-playbook.md, aibast_client-health-synthetic-portfolio.md, and wait until ready. These generated files retain unlisted records and rules; the listed entity fields come from the list tools. Do not replace them with the original unfiltered knowledge files.",
+          "action": "Knowledge, Add, upload aibast_client-health-retention-playbook.md, aibast_client-health-synthetic-portfolio.md, client-health-score-instruction-controls.md, and wait until ready. These generated files retain unlisted records and rules; the listed entity fields come from the list tools. Do not replace them with the original unfiltered knowledge files.",
           "downloads": [
             "studio/agent/knowledge/aibast_client-health-retention-playbook.md",
-            "studio/agent/knowledge/aibast_client-health-synthetic-portfolio.md"
+            "studio/agent/knowledge/aibast_client-health-synthetic-portfolio.md",
+            "studio/agent/knowledge/client-health-score-instruction-controls.md"
           ],
-          "expected": "2 rules knowledge file(s) listed as ready.",
+          "expected": "3 rules knowledge file(s) listed as ready.",
           "screenshot": {
             "file": "screenshots/studio-manual/09-rules-knowledge.webp",
             "status": "pending"
@@ -297,7 +299,7 @@
           "id": "manual-13",
           "title": "Review the agent",
           "action": "Check the model, 5 skills, the rules knowledge and 2 tools.",
-          "expected": "Sonnet 4.6, 5 skills, 2 knowledge file(s), 2 Get items tools, no web search, nothing else.",
+          "expected": "Sonnet 4.6, 5 skills, 3 knowledge file(s), 2 Get items tools, no web search, nothing else.",
           "screenshot": {
             "file": "screenshots/studio-manual/13-inventory.webp",
             "status": "pending"

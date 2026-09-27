@@ -67,6 +67,9 @@ FORBIDDEN_IDENTITY = (
 MISSING = object()
 GENERIC_NAME_WORDS = {"assistant", "copilot", "generator", "agent", "support", "analysis"}
 TRAILING_NAME_JOINERS = {"and", "or", "&", "of", "for", "the", "to"}
+MAX_RUNTIME_INSTRUCTIONS = 8000
+MAX_TEMPLATE_INSTRUCTIONS = 7000
+SITE_URL_HEADROOM = 1000
 
 
 class StudioPackageError(ValueError):
@@ -709,6 +712,71 @@ def instructions_for(inputs: Inputs, schema: dict[str, Any], tools: dict[str, st
     return text
 
 
+def check_instruction_budget(text: str) -> None:
+    if text.count(SITE_TOKEN) != 1:
+        raise StudioPackageError(f"studio instructions must contain {SITE_TOKEN} exactly once")
+    if len(text) > MAX_TEMPLATE_INSTRUCTIONS:
+        raise StudioPackageError(f"studio instruction template has {len(text)} characters; maximum "
+                                 f"{MAX_TEMPLATE_INSTRUCTIONS} reserves site-URL headroom")
+    if len(text) - len(SITE_TOKEN) + SITE_URL_HEADROOM > MAX_RUNTIME_INSTRUCTIONS:
+        raise StudioPackageError("studio instructions exceed the runtime limit after site-URL substitution")
+
+
+def runtime_instructions(inputs: Inputs, schema: dict[str, Any], tools: dict[str, str],
+                         root: Path) -> tuple[str, dict[Path, str]]:
+    text = instructions_for(inputs, schema, tools, root)
+    if len(text) <= MAX_TEMPLATE_INSTRUCTIONS:
+        check_instruction_budget(text)
+        return text, {}
+    if inputs.slug == REFERENCE:
+        raise StudioPackageError("the protected reference instruction budget requires its owner's review")
+    original = (root / "solutions" / inputs.slug / "manual/GLOBAL-INSTRUCTIONS.md").read_text(encoding="utf-8")
+    first, body = original.split("\n", 1)
+    controls = studio_instructions_heading(first) + "\n" + rewrite_source_references(body, inputs)
+    controls = controls.replace(OLD_ROUTING, ROUTING)
+    if SITE_TOKEN in controls:
+        raise StudioPackageError("source controls must not introduce another site token")
+    controls_path = Path("solutions") / inputs.slug / "studio/agent/knowledge" / f"{inputs.slug}-instruction-controls.md"
+    inputs.rules.append(root / controls_path)
+    parts = [
+        studio_instructions_heading(first),
+        "Read listed record fields with the SharePoint list tools. Read all unlisted facts and controls from "
+        "the required knowledge. Every value is synthetic; do not browse, invent missing facts, perform writes "
+        "or claim a completed approval, communication or external action.",
+        column_instructions(schema, tools),
+    ]
+    if inputs.tables or any(item.get("omitted_columns") for item in schema["lists"]):
+        locations = ["## Evidence locations", "",
+                     "The fields above are listed entity facts. Read unlisted records, rule tables, policies, "
+                     "thresholds, calculations and response contracts from retained knowledge."]
+        for item in schema["lists"]:
+            locations.append(f"- *{item['title']}*: "
+                             + item.get("knowledge_table", {}).get("section", item["record_set"]) + ".")
+            for omitted in item.get("omitted_columns", []):
+                locations.append(f"  {omitted['name']} is omitted by the email privacy gate; never guess it.")
+        parts.append("\n".join(locations))
+    parts.append(
+        "## Required controls\n\n"
+        f"Before every answer, retrieve `{controls_path.name}` and the matching uploaded skill, plus the "
+        "record/rules sources that control file requires. Follow its complete routing, evidence limits, "
+        "response templates, approval gates and no-action rules. Copy every mandatory human-review paragraph "
+        "and final safety footer exactly as that file specifies. This file is the full workshop instruction "
+        "contract, not optional background; no rule was waived to shorten these runtime instructions.")
+    sections = re.split(r"(?m)^(## [^\n]+)\n", controls)
+    for index in range(1, len(sections), 2):
+        heading = sections[index]
+        if (re.search(r"\brouting\b|\bboundar(?:y|ies)\b|\bsafety\b|\bauthorization gates\b", heading, re.I)
+                or heading in {"## Mandatory human-review paragraph", "## Shared final footer"}):
+            content = sections[index + 1]
+            content = re.sub(r"<!-- locked-preview-anchors:(?:start|end) -->", "", content).strip()
+            parts.append(heading + "\n\n" + content)
+    parts.append("<!-- locked-preview-anchors:start -->\n" + ROUTING + "\n" + ROUTING_END)
+    parts.append(sharepoint_site_section(inputs, schema))
+    compact = "\n\n".join(parts) + "\n"
+    check_instruction_budget(compact)
+    return compact, {controls_path: controls}
+
+
 def skill_for(path: Path, inputs: Inputs, schema: dict[str, Any] | None = None) -> str:
     text = path.read_text(encoding="utf-8")
     if inputs.tables or (schema and any(item.get("omitted_columns") for item in schema["lists"])):
@@ -1106,6 +1174,7 @@ def package_files(slug: str, *, root: Path = ROOT, names: dict[str, str] | None 
         raise StudioPackageError(f"{slug}: app name override conflicts with the whole-word naming contract")
     if existing_root is None or not (existing_root / "solutions" / slug / "studio/walkthrough.json").is_file():
         existing_root = root
+    instructions, control_files = runtime_instructions(inputs, schema, tools, root)
     document = make_walkthrough(inputs, schema, csvs, tools, names or agent_names(root)[slug], root, existing_root,
                                 workspace_names)
     validate_package_contract(schema, app, document, tools)
@@ -1115,13 +1184,14 @@ def package_files(slug: str, *, root: Path = ROOT, names: dict[str, str] | None 
     files = {
         base / "studio/data/schema.json": schema_text(schema),
         **{base / "studio/data" / f"{key}.csv": value for key, value in csvs.items()},
-        base / "studio/agent/GLOBAL-INSTRUCTIONS.md": instructions_for(inputs, schema, tools, root),
+        base / "studio/agent/GLOBAL-INSTRUCTIONS.md": instructions,
         **{base / "studio/agent/skills" / p.relative_to(root / base / "manual/skills"): skill_for(p, inputs, schema)
            for p in inputs.skills},
         base / "studio/managed-app/app.json": json_text(app),
         base / "studio/walkthrough.json": json_text(document),
     }
     files.update(retained_knowledge_files(inputs, schema, root))
+    files.update(control_files)
     for relative, text in files.items():
         renderer.check_privacy(text, relative.as_posix())
         if any(forbidden in text.lower() for forbidden in FORBIDDEN_IDENTITY):

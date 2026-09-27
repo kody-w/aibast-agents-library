@@ -9,7 +9,8 @@
     "skills": "studio/agent/skills",
     "knowledge": [
       "studio/agent/knowledge/aibast_building-permit-synthetic-records.md",
-      "studio/agent/knowledge/aibast_permit-rules-and-schedules.md"
+      "studio/agent/knowledge/aibast_permit-rules-and-schedules.md",
+      "studio/agent/knowledge/building-permit-processing-instruction-controls.md"
     ],
     "model": "Sonnet 4.6",
     "names": {
@@ -72,7 +73,7 @@
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
           "action": "Open Building Permit Studio and review its inventory.",
-          "expected": "The studio instructions, 7 skills, 2 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
+          "expected": "The studio instructions, 7 skills, 3 rules knowledge file(s) and 4 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
             "status": "pending"
@@ -271,12 +272,13 @@
         {
           "id": "manual-11",
           "title": "Add the rules-and-controls knowledge",
-          "action": "Knowledge, Add, upload aibast_building-permit-synthetic-records.md, aibast_permit-rules-and-schedules.md, and wait until ready. These generated files retain unlisted records and rules; the listed entity fields come from the list tools. Do not replace them with the original unfiltered knowledge files.",
+          "action": "Knowledge, Add, upload aibast_building-permit-synthetic-records.md, aibast_permit-rules-and-schedules.md, building-permit-processing-instruction-controls.md, and wait until ready. These generated files retain unlisted records and rules; the listed entity fields come from the list tools. Do not replace them with the original unfiltered knowledge files.",
           "downloads": [
             "studio/agent/knowledge/aibast_building-permit-synthetic-records.md",
-            "studio/agent/knowledge/aibast_permit-rules-and-schedules.md"
+            "studio/agent/knowledge/aibast_permit-rules-and-schedules.md",
+            "studio/agent/knowledge/building-permit-processing-instruction-controls.md"
           ],
-          "expected": "2 rules knowledge file(s) listed as ready.",
+          "expected": "3 rules knowledge file(s) listed as ready.",
           "screenshot": {
             "file": "screenshots/studio-manual/11-rules-knowledge.webp",
             "status": "pending"
@@ -345,7 +347,7 @@
           "id": "manual-17",
           "title": "Review the agent",
           "action": "Check the model, 7 skills, the rules knowledge and 4 tools.",
-          "expected": "Sonnet 4.6, 7 skills, 2 knowledge file(s), 4 Get items tools, no web search, nothing else.",
+          "expected": "Sonnet 4.6, 7 skills, 3 knowledge file(s), 4 Get items tools, no web search, nothing else.",
           "screenshot": {
             "file": "screenshots/studio-manual/17-inventory.webp",
             "status": "pending"

@@ -8,7 +8,8 @@
     "instructions": "studio/agent/GLOBAL-INSTRUCTIONS.md",
     "skills": "studio/agent/skills",
     "knowledge": [
-      "manual/knowledge/aibast_portfolio-rebalancing-controls-and-review.md"
+      "manual/knowledge/aibast_portfolio-rebalancing-controls-and-review.md",
+      "studio/agent/knowledge/portfolio-rebalancing-instruction-controls.md"
     ],
     "model": "Sonnet 4.6",
     "names": {
@@ -71,7 +72,7 @@
           "id": "easy-04",
           "title": "Open the Draft agent in Copilot Studio",
           "action": "Open Portfolio Rebalancing Studio and review its inventory.",
-          "expected": "The studio instructions, 6 skills, 1 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.",
+          "expected": "The studio instructions, 6 skills, 2 rules knowledge file(s) and 2 SharePoint Get items tools; no web search; Draft, not published.",
           "screenshot": {
             "file": "screenshots/studio-easy/04-agent.webp",
             "status": "pending"
@@ -256,11 +257,12 @@
         {
           "id": "manual-09",
           "title": "Add the rules-and-controls knowledge",
-          "action": "Knowledge, Add, upload aibast_portfolio-rebalancing-controls-and-review.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
+          "action": "Knowledge, Add, upload aibast_portfolio-rebalancing-controls-and-review.md, portfolio-rebalancing-instruction-controls.md, and wait until ready. Do not upload the synthetic-records file: those records come from the list tools.",
           "downloads": [
-            "manual/knowledge/aibast_portfolio-rebalancing-controls-and-review.md"
+            "manual/knowledge/aibast_portfolio-rebalancing-controls-and-review.md",
+            "studio/agent/knowledge/portfolio-rebalancing-instruction-controls.md"
           ],
-          "expected": "1 rules knowledge file(s) listed as ready.",
+          "expected": "2 rules knowledge file(s) listed as ready.",
           "screenshot": {
             "file": "screenshots/studio-manual/09-rules-knowledge.webp",
             "status": "pending"
@@ -308,7 +310,7 @@
           "id": "manual-13",
           "title": "Review the agent",
           "action": "Check the model, 6 skills, the rules knowledge and 2 tools.",
-          "expected": "Sonnet 4.6, 6 skills, 1 knowledge file(s), 2 Get items tools, no web search, nothing else.",
+          "expected": "Sonnet 4.6, 6 skills, 2 knowledge file(s), 2 Get items tools, no web search, nothing else.",
           "screenshot": {
             "file": "screenshots/studio-manual/13-inventory.webp",
             "status": "pending"

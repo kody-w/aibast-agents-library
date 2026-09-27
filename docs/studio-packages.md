@@ -203,6 +203,23 @@ For example, asset-maintenance-forecast is **Asset Maintenance Studio** /
 Non-reference agent-name overrides are rejected; emission-tracking alone keeps
 its fixed live agent and app names.
 
+## Runtime instruction budget
+
+Repository GLOBAL-INSTRUCTIONS templates are capped at 7,000 characters. This
+reserves room for a 1,000-character site URL while staying below the runtime's
+8,000-character limit after replacing the single `YOUR_SITE_ADDRESS` token.
+The generator rejects an over-budget result rather than truncating it.
+
+When the full instructions exceed that template budget, the generator preserves
+the complete source-adapted instruction contract in
+`studio/agent/knowledge/<slug>-instruction-controls.md` and adds it to the agent's
+required knowledge and Manual uploads. The shorter global instructions retain
+every list-column mapping, the exact site section, routing sections, mandatory
+review/footer sections and safety boundaries. They require retrieving and
+following the complete control file before each answer; no policy is silently
+dropped. Data, extraction provenance, skill files and app definitions do not
+change as a result of this compaction.
+
 Regenerate the existing journey surfaces and source bundle for each new edition:
 
 ```sh
