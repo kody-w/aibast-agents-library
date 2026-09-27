@@ -32,6 +32,7 @@ employment records, book revenue, approve training, or contact anyone.
 | Copilot-only Easy-mode comparison | `solutions/resource-utilization/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/resource-utilization/quest.html` |
 | Literal browser tutorial | `solutions/resource-utilization/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/resource-utilization/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/resource-utilization/export-manifest.json` |
 | Source bundle | `solutions/resource-utilization/exports/resource-utilization-source.zip` |
 | Manual evidence | `solutions/resource-utilization/evals/manual-build-evidence.json` |

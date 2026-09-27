@@ -58,6 +58,7 @@ customer KPIs, measured operational results, or commitments.
 | Copilot-only Easy-mode comparison | `solutions/product-line-optimization/EASY-MODE-COPILOT-CHAT.md` |
 | Guided Easy/Manual quest | `solutions/product-line-optimization/quest.html` |
 | Literal browser tutorial | `solutions/product-line-optimization/manual-tutorial.html` |
+| Studio edition tutorial | [`solutions/product-line-optimization/studio-tutorial.html`](studio-tutorial.html) |
 | Raw export manifest | `solutions/product-line-optimization/export-manifest.json` |
 | Source bundle | `solutions/product-line-optimization/exports/product-line-optimization-source.zip` |
 | Manual evidence | `solutions/product-line-optimization/evals/manual-build-evidence.json` |
