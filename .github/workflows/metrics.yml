@@ -39,12 +39,20 @@ jobs:
           python-version: '3.11'
 
       - name: Synchronize AIBAST agent Discussions
+        id: sync_discussions
+        # Discussion sync is best-effort: a permission error on one Discussion must
+        # never skip metrics collection (GitHub keeps only 14 days of traffic).
+        continue-on-error: true
         env:
           DISCUSSIONS_TOKEN: ${{ secrets.DISCUSSIONS_TOKEN || secrets.GITHUB_TOKEN }}
           METRICS_OWNER: ${{ github.repository_owner }}
           METRICS_REPO: ${{ github.event.repository.name }}
           METRICS_REF: ${{ github.ref_name }}
         run: python scripts/sync_agent_discussions.py
+
+      - name: Report Discussion sync failure
+        if: steps.sync_discussions.outcome == 'failure'
+        run: echo "::warning title=Discussion sync failed::Metrics collection continued; see the 'Synchronize AIBAST agent Discussions' step log."
 
       - name: Collect public metrics
         # GitHub's traffic endpoints (clones, views, popular paths) require a
