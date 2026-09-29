@@ -195,6 +195,9 @@ example, "4–6 weeks end to end, of which the agent build is a few days" (Emplo
 - Whether T3-only tests (those that need real data) count toward the T3 exit. **Proposed: yes**, disclosed per
   engagement.
 - A fallback name if review reserves "Frontier". **Ranked options exist.**
+- The disclaimer's subject. The descriptor calls AIBAST Frontier a "learning lane", while the mandated disclaimer calls
+  it "an open-source learning library". **Proposed:** "The AIBAST Agents Library, including AIBAST Frontier
+  (experimental), is an open-source learning library…", decided in the same Brand/CELA review as the name.
 - A home for the Clock Trials' public results. **Proposed:** the ledger plus the quarterly report.
 
 ---
