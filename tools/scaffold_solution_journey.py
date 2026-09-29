@@ -117,9 +117,9 @@ WORKSHOP_STORAGE_SCRIPT = """(() => {
       try {
         backend = globalThis.localStorage;
         const storedEngine =
-          localStorage.getItem("aibast:workshop-engine") === "copilot"
-            ? "copilot"
-            : "brainstem";
+          localStorage.getItem("aibast:workshop-engine") === "brainstem"
+            ? "brainstem"
+            : "copilot";
         memory.set(engineKey, storedEngine);
         const probeKey = "aibast:workshop-storage-probe";
         backend.setItem(probeKey, "1");
@@ -176,7 +176,7 @@ WORKSHOP_ENGINE_SCRIPT = """(() => {
       const storedEngine =
         globalThis.aibastWorkshopStorage.getItem("aibast:workshop-engine");
       const engine =
-        storedEngine === "copilot" ? "copilot" : "brainstem";
+        storedEngine === "brainstem" ? "brainstem" : "copilot";
       document.documentElement.setAttribute("data-workshop-engine", engine);
     })();"""
 
@@ -1587,9 +1587,9 @@ def collect_resources(ctx: JourneyContext) -> list[Resource]:
         seen,
         ctx,
         "easy-personless-guide",
-        "Personless Easy-mode guide",
+        "Optional Brainstem Easy-mode guide",
         ctx.package / "EASY-MODE-PERSONLESS.md",
-        "Brainstem lane skill attachment, two-message workshop, and engine loop",
+        "Optional Brainstem lane skill attachment, two-message workshop, and engine loop",
         generated=True,
     )
     add_resource(
@@ -1597,21 +1597,21 @@ def collect_resources(ctx: JourneyContext) -> list[Resource]:
         seen,
         ctx,
         "easy-copilot-chat-prompts",
-        "Copilot-only Easy-mode comparison",
+        "GitHub Copilot Easy-mode guide (default)",
         ctx.package / "EASY-MODE-COPILOT-CHAT.md",
-        "Copilot-only lane skill attachment and the same two workshop messages",
+        "Default Copilot-only lane skill attachment and the same two workshop messages; no Brainstem install",
         generated=True,
     )
     for mode, label, use in (
         (
             "brainstem",
-            "Brainstem Easy Mode skill",
-            "Download-and-drag harness that defaults workshop execution to Brainstem",
+            "Optional Brainstem Easy Mode skill",
+            "Download-and-drag harness for the optional Brainstem lane, used only when selected in Workshop settings",
         ),
         (
             "copilot",
-            "Copilot-only Easy Mode skill",
-            "Download-and-drag harness that runs the workshop directly in GitHub Copilot",
+            "Copilot-only Easy Mode skill (default)",
+            "Default download-and-drag harness that runs the workshop directly in GitHub Copilot; no Brainstem install",
         ),
     ):
         easy_skill = easy_mode_skill_path(ctx, mode)
@@ -1635,7 +1635,7 @@ def collect_resources(ctx: JourneyContext) -> list[Resource]:
             "generic-workshop-agent",
             "Generic AIBAST Workshop agent",
             workshop_agent,
-            "Registry-driven Brainstem engine shared by every packaged solution",
+            "Registry-driven engine for the optional Brainstem lane, shared by every packaged solution",
         )
     add_resource(resources, seen, ctx, "manual-instructions", "Manual global instructions", ctx.package / "manual" / "GLOBAL-INSTRUCTIONS.md", "Reviewed instructions for literal browser construction")
     locked_cases = resolve_repo_path(
@@ -2194,8 +2194,13 @@ def render_personless_easy_markdown(ctx: JourneyContext) -> str:
         f"## {title}\n\n```text\n{prompt}\n```"
         for title, prompt in personless_prompts(ctx)
     )
-    return f"""# {ctx.title} — personless Easy mode
+    return f"""# {ctx.title} — personless Easy mode (optional Brainstem lane)
 {lane_evidence_markdown(ctx)}
+> **Optional lane.** Use this guide only if you selected **GitHub Copilot +
+> Brainstem (optional)** in Workshop settings. The default GitHub Copilot lane
+> needs no Brainstem install; see
+> [EASY-MODE-COPILOT-CHAT.md](EASY-MODE-COPILOT-CHAT.md).
+
 ## 1. Attach the Brainstem skill
 
 Download [{skill.name if skill else "SKILL.md"}]({skill_link}), open GitHub
@@ -2241,13 +2246,14 @@ def render_easy_copilot_chat_markdown(ctx: JourneyContext) -> str:
         f"## {title}\n\n```text\n{prompt}\n```"
         for title, prompt in easy_copilot_chat_prompts(ctx)
     )
-    return f"""# {ctx.title} — GitHub Copilot Easy mode
+    return f"""# {ctx.title} — GitHub Copilot Easy mode (default)
 {lane_evidence_markdown(ctx)}
 ## 1. Attach the Copilot-only skill
 
 Download [{skill.name if skill else "SKILL.md"}]({skill_link}), open GitHub
 Copilot Chat in VS Code, select **Agent mode**, and drag `SKILL.md` into the
-chat.
+chat. This is the default lane: it runs the whole workshop in GitHub Copilot
+and Copilot Studio, with no Brainstem install.
 
 The attached skill carries the discovery, testing, deployment, and validation
 harness directly in GitHub Copilot, so the attendee still uses the same short
@@ -2464,6 +2470,11 @@ def facilitator_certification_html(ctx: JourneyContext) -> str:
 def brainstem_facilitator_markdown() -> str:
     return f"""## Facilitator crash course — optional Brainstem track
 
+> **Optional.** Skip this section unless participants choose **GitHub Copilot +
+> Brainstem (optional)** in Workshop settings. Every workshop is fully
+> completable with GitHub Copilot and Copilot Studio; the default lane needs no
+> Brainstem install.
+
 Brainstem is the learner's local-first, inspectable agent runtime. GitHub
 Copilot remains the familiar work surface; Brainstem adds persistent local
 workshop context, hot-loaded Python agents, and a visible tool-calling loop.
@@ -2474,7 +2485,7 @@ This preparation guide uses the canonical
 [AIBAST Brainstem installer]({BRAINSTEM_REPO_URL}). The former upstream Grail
 installer is not used by this Microsoft/AIBAST workshop path.
 
-### Pre-work: every Brainstem-track participant installs it themselves
+### Optional pre-work: only Brainstem-track participants install it
 
 **macOS / Linux**
 
@@ -2496,9 +2507,9 @@ not run `gh auth login` or `brainstem` separately. Before the session, verify:
 curl -s localhost:7071/health | python3 -m json.tool
 ```
 
-The facilitator should complete this setup first, then ask participants to run
-the one-liner themselves before workshop day. Do not collect GitHub tokens or
-run a shared installation on their behalf.
+The facilitator should complete this setup first, then ask Brainstem-track
+participants to run the one-liner themselves before workshop day. Do not
+collect GitHub tokens or run a shared installation on their behalf.
 
 ### Run the built-in five-minute interview loop
 
@@ -2559,10 +2570,11 @@ def brainstem_facilitator_html() -> str:
     <details class="card brainstem-crash-course">
       <summary>Facilitator crash course: optional Brainstem track</summary>
       <div class="certification-content">
+        <div class="notice"><strong>Optional:</strong> skip this crash course unless participants choose <strong>GitHub Copilot + Brainstem (optional)</strong> in Workshop settings. Every workshop is fully completable with GitHub Copilot and Copilot Studio; the default lane needs no Brainstem install.</div>
         <p>Brainstem is the learner's local-first, inspectable agent runtime. GitHub Copilot remains the familiar work surface; Brainstem adds persistent local workshop context, hot-loaded Python agents, and a visible tool-calling loop. Core setup uses the learner's GitHub account with Copilot access and requires no separate model API key.</p>
         <div class="notice"><strong>Canonical preparation source:</strong> this guide uses the <a href="{html.escape(BRAINSTEM_REPO_URL)}" target="_blank" rel="noopener">Microsoft AIBAST Brainstem installer</a>. The former upstream Grail installer is not used by this Microsoft/AIBAST workshop path.</div>
 
-        <h3>Pre-work: participants install it themselves</h3>
+        <h3>Optional pre-work: only Brainstem-track participants install it</h3>
         <div class="certification-grid">
           <section>
             <h3>macOS / Linux</h3>
@@ -2670,6 +2682,9 @@ blueprint, and decide what production integration would require.
 
 ## Easy mode — GitHub Copilot (default)
 
+This default lane runs the whole workshop in GitHub Copilot and Copilot Studio;
+no Brainstem install is required.
+
 1. Open GitHub Copilot Chat in VS Code and select **Agent mode**.
 2. Download `skills/aibast-easy-mode-copilot/SKILL.md` and drag it into the
    chat.
@@ -2682,6 +2697,9 @@ blueprint, and decide what production integration would require.
 6. Stop at **Draft**. Publishing remains a separate human approval gate.
 
 ## Easy mode — GitHub Copilot + Brainstem (optional)
+
+Use this lane only when a learner selects **GitHub Copilot + Brainstem
+(optional)** in Workshop settings; no workshop step depends on it.
 
 Brainstem is the learner's personal, on-device training AI working alongside
 GitHub Copilot. Copilot stays the familiar work surface; Brainstem remembers
@@ -2833,15 +2851,15 @@ def render_field_guide_html(ctx: JourneyContext) -> str:
 
     <h2>Use your configured Easy-mode harness</h2>
     <section class="engine-panel copilot card">
-      <h3>GitHub Copilot only</h3>
-      <p>Attach the Copilot-only skill. It carries discovery, local testing, Draft deployment, and Preview validation directly in the active Copilot session.</p>
+      <h3>GitHub Copilot only (default)</h3>
+      <p>Attach the Copilot-only skill. It carries discovery, local testing, Draft deployment, and Preview validation directly in the active Copilot session. No Brainstem install is needed.</p>
       <p><a class="button primary" href="../../{html.escape(ctx.rel(copilot_skill))}" download="SKILL.md">Download Copilot-only SKILL.md</a></p>
       <div class="prompt">{html.escape(build_prompt)}</div>
       <div class="prompt">{html.escape(deploy_prompt)}</div>
     </section>
     <section class="engine-panel brainstem card">
-      <h3>GitHub Copilot + Brainstem</h3>
-      <p>Attach the Brainstem skill. Copilot remains the work surface while the personal, on-device training AI persists the workshop and executes the generic engine handoffs.</p>
+      <h3>GitHub Copilot + Brainstem (optional)</h3>
+      <p>Optional lane for learners who select it in Workshop settings. Attach the Brainstem skill. Copilot remains the work surface while the personal, on-device training AI persists the workshop and executes the generic engine handoffs.</p>
       <p><a class="button primary" href="../../{html.escape(ctx.rel(brainstem_skill))}" download="SKILL.md">Download Brainstem SKILL.md</a></p>
       <div class="prompt">{html.escape(build_prompt)}</div>
       <div class="prompt">{html.escape(deploy_prompt)}</div>
@@ -3723,12 +3741,14 @@ def render_lane_learning_steps(
       </article>"""
 
 
-def render_brainstem_install_step(ctx: JourneyContext) -> str:
+def render_workshop_setup_step(ctx: JourneyContext) -> str:
+    # "brainstem-installed" is a legacy progress key kept so saved step-one
+    # progress survives; the step itself only opens GitHub Copilot Chat.
     return f"""
     <section class="learn-step" id="workshop-step-1">
       <header class="learn-step-header"><span>1</span><div><p>Workshop setup</p><h3>Open GitHub Copilot Chat</h3></div>{report_button(ctx, location="Workshop setup — step 1: open GitHub Copilot Chat", expected="GitHub Copilot Chat is open in VS Code Agent mode, signed in with Copilot access.")}</header>
       <div class="learn-step-body">
-        <p>Start in GitHub Copilot Chat. No Frontier desktop app is required; the selected lane's skill handles any additional setup.</p>
+        <p>Start in GitHub Copilot Chat. No RAPP Brainstem or Frontier desktop app is needed: the default GitHub Copilot lane runs the whole workshop here, and the optional Brainstem lane's skill handles its own setup only if you choose it in Workshop settings.</p>
         <div class="action-panel">
           <strong>Get ready</strong>
           <ol>
@@ -4146,7 +4166,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
     </section>
     <div class="achievements-toast" id="achievements-badge-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-    {render_brainstem_install_step(ctx)}
+    {render_workshop_setup_step(ctx)}
 
     <section class="path" data-path="easy" id="mode-panel-easy" role="tabpanel" aria-labelledby="mode-tab-easy">
       <div class="module-summary">
@@ -4166,22 +4186,23 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
             <li>Use VS Code with GitHub Copilot Chat in Agent mode.</li>
             <li>Sign in to GitHub with Copilot access.</li>
             <li>Have access to a Copilot Studio environment.</li>
+            <li>No Brainstem install is needed: GitHub Copilot is the default harness, and the RAPP Brainstem is an optional track.</li>
             <li>Your workshop preference is saved globally; use <strong>Workshop settings</strong> to change it.</li>
             <li>Do not publish. This module ends with a validated Draft.</li>
           </ul>
         </article>
       </div>
 
-      <h2>Easy mode <span class="engine-label copilot">— GitHub Copilot only</span><span class="engine-label brainstem">— GitHub Copilot + Brainstem</span></h2>
-
-      <div class="easy-lane" data-easy-lane="brainstem">
-        <div class="notice"><strong>Brainstem lane:</strong> Brainstem is the learner’s personal, on-device training AI working alongside Copilot. It persists the workshop, loads the generic engine, and continues every handoff.</div>
-        {render_lane_learning_steps(ctx, "brainstem", brainstem_skill_download)}
-      </div>
+      <h2>Easy mode <span class="engine-label copilot">— GitHub Copilot only</span><span class="engine-label brainstem">— GitHub Copilot + Brainstem (optional)</span></h2>
 
       <div class="easy-lane" data-easy-lane="copilot">
-        <div class="comparison-note"><strong>Skeptic comparison — Copilot-only lane:</strong> GitHub Copilot carries the same harness directly in the active session. The skill still discovers every asset and runs every gate; there is no persistent Brainstem engine between turns.</div>
+        <div class="notice"><strong>Default lane — GitHub Copilot only:</strong> no Brainstem install is needed. GitHub Copilot carries the complete harness directly in the active session; the skill discovers every asset and runs every gate.</div>
         {render_lane_learning_steps(ctx, "copilot", copilot_skill_download)}
+      </div>
+
+      <div class="easy-lane" data-easy-lane="brainstem">
+        <div class="comparison-note"><strong>Optional Brainstem lane:</strong> for learners who choose GitHub Copilot + Brainstem (optional) in Workshop settings. Brainstem is the learner’s personal, on-device training AI working alongside Copilot. It persists the workshop, loads the generic engine, and continues every handoff.</div>
+        {render_lane_learning_steps(ctx, "brainstem", brainstem_skill_download)}
       </div>
 
       <section class="learn-step" id="easy-step-5">
@@ -4348,9 +4369,9 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
       }});
 
       function currentEasyPath() {{
-        return localStorage.getItem(globalEngineKey) === "copilot"
-          ? "copilot"
-          : "brainstem";
+        return localStorage.getItem(globalEngineKey) === "brainstem"
+          ? "brainstem"
+          : "copilot";
       }}
 
       function requiredEasyBoxes() {{
@@ -4907,20 +4928,20 @@ def readme_block(ctx: JourneyContext, resources: list[Resource]) -> str:
         ("Customer field guide", f"`solutions/{ctx.slug}/field-guide.html`"),
         ("Evidence report", f"`solutions/{ctx.slug}/evidence-report.html`"),
         (
-            "Brainstem Easy Mode skill",
-            "`skills/aibast-easy-mode-brainstem/SKILL.md`",
-        ),
-        (
-            "Copilot-only Easy Mode skill",
+            "Copilot-only Easy Mode skill (default)",
             "`skills/aibast-easy-mode-copilot/SKILL.md`",
         ),
         (
-            "Personless Easy-mode guide",
-            f"`solutions/{ctx.slug}/EASY-MODE-PERSONLESS.md`",
+            "Optional Brainstem Easy Mode skill",
+            "`skills/aibast-easy-mode-brainstem/SKILL.md`",
         ),
         (
-            "Copilot-only Easy-mode comparison",
+            "GitHub Copilot Easy-mode guide (default)",
             f"`solutions/{ctx.slug}/EASY-MODE-COPILOT-CHAT.md`",
+        ),
+        (
+            "Optional Brainstem Easy-mode guide",
+            f"`solutions/{ctx.slug}/EASY-MODE-PERSONLESS.md`",
         ),
         ("Guided Easy/Manual quest", f"`solutions/{ctx.slug}/quest.html`"),
         ("Literal browser tutorial", f"`solutions/{ctx.slug}/manual-tutorial.html`"),

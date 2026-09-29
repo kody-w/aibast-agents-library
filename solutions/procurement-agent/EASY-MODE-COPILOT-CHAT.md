@@ -1,4 +1,4 @@
-# Procurement Agent — GitHub Copilot Easy mode
+# Procurement Agent — GitHub Copilot Easy mode (default)
 
 ## Evidence lane boundary
 
@@ -10,7 +10,8 @@ The steps below describe the Easy workflow, not a newly accepted run. For the cu
 
 Download [SKILL.md](https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/skills/aibast-easy-mode-copilot/SKILL.md), open GitHub
 Copilot Chat in VS Code, select **Agent mode**, and drag `SKILL.md` into the
-chat.
+chat. This is the default lane: it runs the whole workshop in GitHub Copilot
+and Copilot Studio, with no Brainstem install.
 
 The attached skill carries the discovery, testing, deployment, and validation
 harness directly in GitHub Copilot, so the attendee still uses the same short

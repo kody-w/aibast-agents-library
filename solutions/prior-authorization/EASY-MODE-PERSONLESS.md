@@ -1,10 +1,15 @@
-# Prior Authorization Agent — personless Easy mode
+# Prior Authorization Agent — personless Easy mode (optional Brainstem lane)
 
 ## Evidence lane boundary
 
 Historical assisted/Easy and source-agent transcripts remain separate from current native Manual r4 acceptance. Their old pass flags and the incomplete Prior Authorization Pilot import archive do not reproduce or certify this Manual build. No current Easy-lane regression or native import is accepted.
 
 The steps below describe the Easy workflow, not a newly accepted run. For the current Manual build and its open gates, use [the Manual tutorial](manual-tutorial.html) and [the dated review](evals/manual-pilot-review.json).
+
+> **Optional lane.** Use this guide only if you selected **GitHub Copilot +
+> Brainstem (optional)** in Workshop settings. The default GitHub Copilot lane
+> needs no Brainstem install; see
+> [EASY-MODE-COPILOT-CHAT.md](EASY-MODE-COPILOT-CHAT.md).
 
 ## 1. Attach the Brainstem skill
 

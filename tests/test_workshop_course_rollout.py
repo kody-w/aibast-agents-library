@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -78,8 +79,8 @@ def valid_pages() -> dict[str, str]:
     <script>
     (() => {{
     {storage}
-    const engine = readWorkshopStorage("aibast:workshop-engine") === "copilot"
-      ? "copilot" : "brainstem";
+    const engine = readWorkshopStorage("aibast:workshop-engine") === "brainstem"
+      ? "brainstem" : "copilot";
     document.documentElement.setAttribute("data-workshop-engine", engine);
     }})();
     </script>
@@ -112,9 +113,9 @@ def valid_pages() -> dict[str, str]:
 <section data-easy-lane="brainstem">Brainstem lane</section>
 <section data-easy-lane="copilot">GitHub Copilot only lane</section>
 <label><input type="checkbox" data-checkpoint="local"
- data-achievements-group="local-proof" data-achievements-path="brainstem">Local</label>
+ data-achievements-group="local-proof" data-achievements-path="copilot">Local</label>
 <label><input type="checkbox" data-checkpoint="draft"
- data-achievements-group="draft-builder" data-achievements-path="brainstem">Draft</label>
+ data-achievements-group="draft-builder" data-achievements-path="copilot">Draft</label>
 {reports}
 <article class="preview-case">
 <button data-copy-target="preview-prompt-case-01">Copy Preview prompt</button>
@@ -155,8 +156,8 @@ function announcePersistenceFailure() {{
     "Storage unavailable; progress is not saved, but remains usable in memory for this session.";
 }}
 function currentEasyPath() {{
-  return readWorkshopStorage(globalEngineKey) === "copilot"
-    ? "copilot" : "brainstem";
+  return readWorkshopStorage(globalEngineKey) === "brainstem"
+    ? "brainstem" : "copilot";
 }}
 function requiredEasyBoxes() {{
   const path = currentEasyPath();
@@ -878,21 +879,43 @@ def test_mutation_catches_removed_overflow_containment(tmp_path):
     )
 
 
-def test_mutation_catches_copilot_default_engine(tmp_path):
+def test_mutation_catches_brainstem_default_engine(tmp_path):
     package = create_fixture(tmp_path)
     path = package / "quest.html"
-    path.write_text(
-        path.read_text(encoding="utf-8").replace(
-            '? "copilot" : "brainstem"',
-            '? "brainstem" : "copilot"',
-        ),
-        encoding="utf-8",
+    legacy, replaced = re.subn(
+        r'=== "brainstem"(\s*)\? "brainstem" : "copilot"',
+        r'=== "copilot"\1? "copilot" : "brainstem"',
+        path.read_text(encoding="utf-8"),
     )
+    assert replaced == 2
+    path.write_text(legacy, encoding="utf-8")
     build_zip(tmp_path)
 
+    result = audit_fixture(tmp_path)
     assert_failure(
-        audit_fixture(tmp_path),
-        "visual and achievement engines must both default to brainstem",
+        result,
+        "visual and achievement engines must both default to copilot",
+    )
+    assert_failure(result, "legacy Brainstem-default engine selection remains")
+
+
+def test_mutation_catches_brainstem_default_field_guide_engine(tmp_path):
+    package = create_fixture(tmp_path)
+    path = package / "field-guide.html"
+    legacy, replaced = re.subn(
+        r'=== "brainstem"(\s*)\? "brainstem" : "copilot"',
+        r'=== "copilot"\1? "copilot" : "brainstem"',
+        path.read_text(encoding="utf-8"),
+    )
+    assert replaced == 1
+    path.write_text(legacy, encoding="utf-8")
+    build_zip(tmp_path)
+
+    result = audit_fixture(tmp_path)
+    assert_failure(result, "field-guide.html: visual engine does not default to copilot")
+    assert_failure(
+        result,
+        "field-guide.html: legacy Brainstem-default engine selection remains",
     )
 
 

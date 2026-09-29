@@ -2923,9 +2923,9 @@ function architectureHTML(architecture, solution, agentName) {
   const fieldGuideUrl = packageInfo.slug
     ? `solutions/${packageInfo.slug}/field-guide.html`
     : "";
-  const configuredEngine = localStorage.getItem("aibast:workshop-engine") === "copilot"
-    ? "GitHub Copilot"
-    : "GitHub Copilot + Brainstem";
+  const configuredEngine = localStorage.getItem("aibast:workshop-engine") === "brainstem"
+    ? "GitHub Copilot + Brainstem (optional)"
+    : "GitHub Copilot";
   return `
     <div class="architecture-body">
       <h3>Solution architecture</h3>
@@ -2949,12 +2949,12 @@ function architectureHTML(architecture, solution, agentName) {
         `).join("")}
       </div>
       <h3>Learn and build</h3>
-      <p>The workshop is the single entry point. Step one lets GitHub Copilot in VS Code install the stable RAPP Brainstem from its canonical onboarding skill; the remaining steps teach the use case, run the globally configured Easy harness, and keep the complete Manual mode inline on the same page.</p>
+      <p>The workshop is the single entry point, and it is fully completable with GitHub Copilot and Copilot Studio; no RAPP Brainstem install is required. Step one opens GitHub Copilot Chat in VS Code; the remaining steps teach the use case, run the globally configured Easy harness, and keep the complete Manual mode inline on the same page.</p>
       <div class="capability-grid">
         <article class="capability-card">
           <code>Step 1</code>
-          <strong>Install RAPP Brainstem with Copilot</strong>
-          <p>Paste one setup prompt into GitHub Copilot Agent mode. Copilot runs the stable installer, pauses only for authentication or approval, verifies the health endpoint, and opens the chat.</p>
+          <strong>Open the workshop</strong>
+          <p>Select Open workshop below, then open GitHub Copilot Chat in VS Code and choose Agent mode. The lane skill carries discovery, testing, and Draft deployment; no RAPP Brainstem install is needed.</p>
         </article>
         <article class="capability-card">
           <code>Guided Easy mode</code>
@@ -2965,6 +2965,11 @@ function architectureHTML(architecture, solution, agentName) {
           <code>Build it yourself</code>
           <strong>Manual mode — inline manual tutorial</strong>
           <p>Use the Manual tab inside the same workshop to reproduce every reviewed Copilot Studio action and Preview gate. No separate prompt or PAC command block is required here.</p>
+        </article>
+        <article class="capability-card">
+          <code>Optional</code>
+          <strong>RAPP Brainstem (optional)</strong>
+          <p>Not needed for any workshop. To add a personal, on-device training AI alongside Copilot, <a href="docs/installer.html">set up the RAPP Brainstem</a>, then choose GitHub Copilot + Brainstem (optional) in Workshop settings.</p>
         </article>
       </div>
       <div class="detail-actions">
