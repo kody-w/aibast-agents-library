@@ -17,10 +17,9 @@ Assets stay in the canonical package; this folder links to them without copying 
 | [EASY-MODE-PERSONLESS.md](../../../solutions/building-permit-processing/EASY-MODE-PERSONLESS.md) | Optional Brainstem lane |
 | [copilot-studio](../../../solutions/building-permit-processing/copilot-studio) | Source-controlled Copilot Studio project |
 | [manual/GLOBAL-INSTRUCTIONS.md](../../../solutions/building-permit-processing/manual/GLOBAL-INSTRUCTIONS.md) | Reviewed manual agent policy |
-| manual/knowledge — missing source `solutions/building-permit-processing/manual/knowledge` | Synthetic knowledge uploads |
 | [manual/skills](../../../solutions/building-permit-processing/manual/skills) | Operation-specific skill uploads |
 | [Portable agent](../../../agents/@aibast-agents-library/slg_government_stacks/building_permit_processing_stack/building_permit_processing_agent.py) | Runtime implementation |
-| [Demo case contract](../../../tests/demo_cases/building-permit-processing.json) | Executable persona-language routing and boundary checks |
+| [Demo case contract](../../../tests/demo_cases/building-permit-processing.json) | Locked persona-language routing and wording assertions |
 | [Level-2 architecture source](../../../state/architecture_level2_sources/building-permit-processing.json) | Domains, tools, and supporting features |
 | [copilot-studio/capabilities/knowledge/files/aibast_building-permit-synthetic-records.md](../../../solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_building-permit-synthetic-records.md) | Manual knowledge upload (export-manifest.json) |
 | [copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md](../../../solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md) | Manual knowledge upload (export-manifest.json) |

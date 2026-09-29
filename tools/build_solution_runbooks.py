@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+import errno
 import fnmatch
 import json
 import math
+import os
 from pathlib import Path, PurePosixPath
 import posixpath
 import re
@@ -45,7 +47,7 @@ REQUIRED_SECTIONS = {
         "Package Resources", "Workshop Pages", "Evidence and Exports", "Sources",
     ),
     "1.Overview.md": (
-        "Scenario Overview", "Problem Statement", "Solution Summary",
+        "Scenario Overview", "Problem Statement", "Solution Summary", "Delivery Lanes",
         "Business Outcomes", "Target Users", "In Scope / Out of Scope",
         "Qualification Checklist", "What Actually Goes Wrong",
         "Related Patterns", "Sources", "Next",
@@ -82,6 +84,13 @@ TAXONOMY_BEGIN = "<!-- BEGIN GENERATED: solution-taxonomy (tools/build_solution_
 TAXONOMY_END = "<!-- END GENERATED: solution-taxonomy -->"
 
 PAGES = "https://microsoft.github.io/aibast-agents-library/"
+HARNESS_DOC = "https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview"
+SKILLS_DOC = "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/skills-overview"
+FRONTIER_DISCLAIMER = (
+    "AIBAST Frontier is an open-source learning library published in the Microsoft GitHub organization. "
+    "It is not a Microsoft product, is not part of the Microsoft Frontier program, "
+    "and does not confer Microsoft AI Cloud Partner Program badges or designations."
+)
 CATALOG = "solutions/catalog.json"
 REGISTRY = "registry.json"
 NOTES = "solutions/runbook-notes.json"
@@ -98,8 +107,8 @@ VERTICAL_NAMES = {
     "human_resources": "Human Resources",
     "manufacturing": "Manufacturing",
     "professional_services": "Professional Services",
-    "retail_cpg": "Retail & Consumer Goods",
-    "slg_government": "State & Local Government",
+    "retail_cpg": "Retail & CPG",
+    "slg_government": "SLG Government",
     "software_digital_products": "Software & Digital Products",
 }
 _HEADING = re.compile(r"^ {0,3}(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$")
@@ -110,6 +119,86 @@ _IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif"}
 
 class RunbookSourceError(Exception):
     """A canonical identity or source contract cannot be resolved safely."""
+
+
+def _learn_source(value: str) -> bool:
+    if any(character.isspace() for character in value):
+        return False
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return False
+    return parsed.scheme == "https" and parsed.netloc == "learn.microsoft.com" and bool(parsed.path.strip("/"))
+
+
+def _note_text(value, location: str) -> None:
+    if not isinstance(value, str) or not value.strip():
+        raise RunbookSourceError(f"{NOTES}: {location} must be a non-empty string")
+    if value.strip().casefold() in {"none", "null", "nan", "{}", "[]"}:
+        raise RunbookSourceError(f"{NOTES}: {location} contains a sentinel string")
+
+
+def _validate_notes(name: str, entry: dict, files: frozenset[str], patterns: dict) -> None:
+    string_lists = {
+        "sources", "scope_in", "scope_out", "qualification_checklist", "related_patterns", "never_do",
+    }
+    record_lists = {
+        "target_users": {"role", "need"}, "what_goes_wrong": {"issue", "response"},
+        "delivery_roles": {"role", "responsibility"}, "prerequisites": {"item", "detail"},
+        "go_no_go": {"criterion", "threshold"}, "boundary_tests": {"prompt", "expected"},
+        "design_decisions": {"decision", "reason"}, "production_hardening": {"area", "action"},
+    }
+    allowed = string_lists | record_lists.keys() | {"phase_exit_criteria"}
+    unknown = set(entry) - allowed
+    if unknown:
+        raise RunbookSourceError(f"{NOTES}: {name} has unknown fields: {', '.join(sorted(unknown))}")
+    if set(entry) - {"sources"} and not entry.get("sources"):
+        raise RunbookSourceError(f"{NOTES}: {name} requires a non-empty sources array")
+    for field, value in entry.items():
+        if field == "phase_exit_criteria":
+            phases = {f"phase_{index}" for index in range(1, 6)}
+            if not isinstance(value, dict) or set(value) - phases:
+                raise RunbookSourceError(f"{NOTES}: {name}.{field} must map phase_1 through phase_5 to arrays")
+            for phase, criteria in value.items():
+                if not isinstance(criteria, list):
+                    raise RunbookSourceError(f"{NOTES}: {name}.{field}.{phase} must be an array")
+                for item in criteria:
+                    _note_text(item, f"{name}.{field}.{phase}")
+            continue
+        if not isinstance(value, list):
+            raise RunbookSourceError(f"{NOTES}: {name}.{field} must be an array")
+        for item in value:
+            if field in record_lists:
+                if not isinstance(item, dict) or set(item) != record_lists[field]:
+                    keys = ", ".join(sorted(record_lists[field]))
+                    raise RunbookSourceError(f"{NOTES}: {name}.{field} entries require exactly {keys}")
+                for key, text in item.items():
+                    _note_text(text, f"{name}.{field}.{key}")
+            else:
+                _note_text(item, f"{name}.{field}")
+    for source in entry.get("sources", []):
+        if source not in files and not _learn_source(source):
+            raise RunbookSourceError(f"{NOTES}: {name} has missing source {source!r}")
+    for identifier in entry.get("related_patterns", []):
+        if identifier not in patterns:
+            raise RunbookSourceError(f"{NOTES}: {name} has unknown related pattern {identifier!r}")
+
+
+def _validate_vertical_names(root: Path, files: frozenset[str]) -> None:
+    source = "index.html"
+    if source not in files:
+        raise RunbookSourceError("Missing vertical-label source: index.html CATEGORY_NAMES")
+    text = (root / source).read_text(encoding="utf-8")
+    match = re.search(r"\bconst\s+CATEGORY_NAMES\s*=\s*(\{.*?\});", text, re.S)
+    if not match:
+        raise RunbookSourceError("index.html: CATEGORY_NAMES object is missing")
+    data = re.sub(r"(?m)^(\s*)([a-z][a-z0-9_]*):", r'\1"\2":', match[1])
+    try:
+        labels = json.loads(data)
+    except ValueError as exc:
+        raise RunbookSourceError(f"index.html: cannot parse CATEGORY_NAMES: {exc}") from exc
+    if labels != VERTICAL_NAMES:
+        raise RunbookSourceError("VERTICAL_NAMES must agree exactly with index.html CATEGORY_NAMES")
 
 
 def normalize_journey_stage(value: str) -> tuple[str, str | None]:
@@ -237,10 +326,6 @@ def load_library(root: Path = ROOT) -> Library:
         if name.startswith("solutions/") and name.count("/") >= 2
         and name.split("/")[1] != "_shared"
     }
-    package_dirs.update(
-        path.name for path in (root / "solutions").iterdir()
-        if path.is_dir() and path.name != "_shared"
-    )
     for slug, reason in DRAFT_PACKAGES.items():
         if not isinstance(reason, str) or not reason.strip():
             raise RunbookSourceError(f"Draft package {slug} needs a non-empty reason")
@@ -319,27 +404,18 @@ def load_library(root: Path = ROOT) -> Library:
             raise RunbookSourceError(f"{PATTERNS}: missing default related pattern {identifier}")
 
     note_data = _json(root, NOTES, files)
+    if note_data and note_data.get("schema") != "aibast-solution-runbook-notes/1.0":
+        raise RunbookSourceError(f"{NOTES}: unsupported schema")
+    if note_data:
+        _note_text(note_data.get("source"), "source")
     notes = note_data.get("solutions", {})
     if not isinstance(notes, dict):
         raise RunbookSourceError(f"{NOTES}: solutions must be an object")
     for name, entry in notes.items():
         if name not in catalog or not isinstance(entry, dict):
             raise RunbookSourceError(f"{NOTES}: invalid solution notes for {name}")
-        sources = entry.get("sources", [])
-        if not isinstance(sources, list) or (set(entry) - {"sources"} and not sources):
-            raise RunbookSourceError(f"{NOTES}: {name} requires a non-empty sources array")
-        for source in sources:
-            if not isinstance(source, str) or source not in files:
-                raise RunbookSourceError(f"{NOTES}: {name} has missing source {source!r}")
-        for field in (
-            "target_users", "scope_in", "scope_out", "qualification_checklist",
-            "what_goes_wrong", "related_patterns",
-        ):
-            if field in entry and not isinstance(entry[field], list):
-                raise RunbookSourceError(f"{NOTES}: {name}.{field} must be an array")
-        for identifier in entry.get("related_patterns", []):
-            if not isinstance(identifier, str) or identifier not in patterns:
-                raise RunbookSourceError(f"{NOTES}: {name} has unknown related pattern {identifier!r}")
+        _validate_notes(name, entry, files, patterns)
+    _validate_vertical_names(root, files)
     return Library(root, files, catalog, solutions, patterns, notes)
 
 
@@ -393,7 +469,7 @@ def _table(headers, rows, missing: str) -> str:
     if not rows:
         return missing
     lines = [
-        "| " + " | ".join(_cell(header) for header in headers) + " |",
+        "|" + "".join(" " + _cell(header) + " |" if header != "" else " |" for header in headers),
         "| " + " | ".join("---" for _ in headers) + " |",
     ]
     lines.extend("| " + " | ".join(_cell(value) for value in row) + " |" for row in rows)
@@ -587,7 +663,7 @@ class Document:
         self.sections: dict[str, str] = {}
 
     def source(self, relative: str) -> None:
-        if relative in self.library.files:
+        if relative in self.library.files or _learn_source(relative):
             self.sources.add(relative)
 
     def data(self, relative: str) -> dict:
@@ -595,6 +671,8 @@ class Document:
         return self.library.json(relative)
 
     def link(self, relative: str, label: str | None = None, fragment: str = "") -> str:
+        if _learn_source(relative):
+            return f"[{label or relative}]({relative})"
         relative = relative.rstrip("/")
         if not self.library.exists(relative):
             return f"{label or relative} — missing source `{relative}`"
@@ -613,23 +691,32 @@ class Document:
             return f"Not provided — `{field}` is absent from {self.link(source)}."
         return f"Not available — source `{source}` is missing."
 
+    def notes(self) -> dict:
+        entry = self.library.notes.get(self.solution.name, {})
+        if entry:
+            self.source(NOTES)
+            self.sources.update(entry.get("sources", []))
+        return entry
+
+    def missing_note(self, field: str) -> str:
+        return f"Not yet authored — add `{field}` to `{NOTES}` for this solution."
+
     def copy(self, relative: str, title: str | None = None, alternatives: tuple[str, ...] = ()) -> str:
         if relative not in self.library.files:
             return self.missing(relative)
         self.source(relative)
         text = (self.library.root / relative).read_text(encoding="utf-8")
-        prefix = ""
         if title is not None:
             body = _section(text, title)
             if not body:
-                prefix = f"Source section “{title}” is not present in {self.link(relative)}."
+                missing = f"Source section “{title}” is not present in {self.link(relative)}."
                 for alternative in alternatives:
                     body = _section(text, alternative)
                     if body:
                         title = alternative
                         break
                 if not body:
-                    return prefix
+                    return missing
             text = body
         content = _copy_markdown(self.library, text, relative, self.path)
         if not content:
@@ -639,7 +726,7 @@ class Document:
             _slug_heading(title) if title else "",
         )
         attribution = f"From {source_link}:"
-        return "\n\n".join(part for part in (prefix, attribution, content) if part)
+        return attribution + "\n\n" + content
 
     def inventory(self, pattern: str, description: str) -> str:
         paths = self.library.matching(pattern)
@@ -656,7 +743,12 @@ class Document:
 
     def render(self, title: str, next_line: str) -> str:
         self.sections["Sources"] = "\n".join(
-            "- " + self.link(path) for path in sorted(self.sources)
+            "- " + self.link(
+                path,
+                "Microsoft Learn — " + _label(PurePosixPath(urlsplit(path).path).name.replace("-", " "))
+                if _learn_source(path) else None,
+            )
+            for path in sorted(self.sources)
         )
         if "Next" in REQUIRED_SECTIONS[self.artifact]:
             self.sections["Next"] = next_line
@@ -674,6 +766,223 @@ def _nav(next_file: str, next_title: str) -> str:
     return f"→ [{next_title}]({next_file}) | [Solution index](../README.md)"
 
 
+def _yaml_scalar(text: str, keys: tuple[str, ...], source: str) -> str | None:
+    """Read a mapping scalar without mistaking embedded instructions for YAML."""
+    parents: list[tuple[int, str]] = []
+    block_indent = None
+    matches = []
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        if block_indent is not None:
+            if indent > block_indent:
+                continue
+            block_indent = None
+        while parents and indent <= parents[-1][0]:
+            parents.pop()
+        match = re.match(r"^[ ]*([A-Za-z_][\w.-]*):(?:[ \t]+(.*))?$", line)
+        if not match:
+            continue
+        key, value = match[1], (match[2] or "").strip()
+        path = tuple(parent[1] for parent in parents) + (key,)
+        if not value or value.startswith("#"):
+            parents.append((indent, key))
+            continue
+        if value.startswith(("|", ">")):
+            block_indent = indent
+            continue
+        if path != keys:
+            continue
+        try:
+            if value.startswith('"'):
+                decoded, end = json.JSONDecoder().raw_decode(value)
+                if not isinstance(decoded, str) or not re.fullmatch(r"\s*(?:#.*)?", value[end:]):
+                    raise ValueError("expected a quoted string")
+                value = decoded
+            elif value.startswith("'"):
+                quoted = re.fullmatch(r"'((?:[^']|'')*)'\s*(?:#.*)?", value)
+                if not quoted:
+                    raise ValueError("invalid single-quoted string")
+                value = quoted[1].replace("''", "'")
+            else:
+                value = re.split(r"\s+#", value, maxsplit=1)[0].strip()
+                if value in {"null", "Null", "NULL", "~"}:
+                    value = ""
+        except ValueError as exc:
+            raise RunbookSourceError(f"{source}: invalid scalar {'.'.join(keys)}: {exc}") from exc
+        matches.append(value)
+    if len(matches) > 1:
+        raise RunbookSourceError(f"{source}: duplicate scalar {'.'.join(keys)}")
+    return matches[0] if matches and matches[0] else None
+
+
+def _native_settings(library: Library, solution: Solution) -> dict[str, str | None]:
+    source = solution.path("copilot-studio/settings.mcs.yml")
+    if source not in library.files:
+        return {}
+    text = (library.root / source).read_text(encoding="utf-8")
+    fields = {
+        "template": ("template",),
+        "recognizer": ("configuration", "recognizer", "kind"),
+        "authoring_model": ("configuration", "authoringModel"),
+        "model": ("configuration", "agentSettings", "model", "series"),
+    }
+    return {name: _yaml_scalar(text, keys, source) for name, keys in fields.items()}
+
+
+def _lane_counts(library: Library, solution: Solution) -> dict[str, int | None]:
+    files = {name for name in library.files if name.startswith(solution.package + "/")}
+    manual_knowledge = {
+        name for name in files
+        if posixpath.dirname(name) == solution.path("manual/knowledge") and name.endswith(".md")
+    }
+    knowledge = manual_knowledge or {
+        name for name in files
+        if posixpath.dirname(name) == solution.path("copilot-studio/capabilities/knowledge/files")
+        and not name.endswith(".mcs.yml")
+    }
+    agent_file = solution.agent.get("_file")
+    agent_lines = (
+        len((library.root / agent_file).read_text(encoding="utf-8").splitlines())
+        if isinstance(agent_file, str) and agent_file in library.files else None
+    )
+    browserfilm = solution.path("screenshots/manual/browserfilm.json")
+    manual_steps = None
+    if browserfilm in library.files:
+        frames = library.json(browserfilm).get("frames")
+        if not isinstance(frames, list):
+            raise RunbookSourceError(f"{browserfilm}: frames must be an array to count manual build steps")
+        manual_steps = len(frames)
+    skills = sum(
+        posixpath.dirname(posixpath.dirname(name)) == solution.path("manual/skills")
+        and name.endswith("/SKILL.md") for name in files
+    )
+    component_files = sorted(
+        name for name in files
+        if posixpath.dirname(name) == solution.path("copilot-studio/behaviors")
+        and name.endswith(".mcs.yml")
+    )
+    for name in component_files:
+        kind = _yaml_scalar((library.root / name).read_text(encoding="utf-8"), ("kind",), name)
+        if kind != "InlineAgentSkill":
+            raise RunbookSourceError(
+                f"{name}: expected kind InlineAgentSkill, found {_text(kind, 'missing kind')}"
+            )
+    skill_components = len(component_files)
+    if skill_components != skills:
+        raise RunbookSourceError(
+            f"{solution.package}: {skill_components} InlineAgentSkill components "
+            f"do not match {skills} manual SKILL.md skills"
+        )
+    return {
+        "agent_lines": agent_lines,
+        "runbook_docs": len(ARTIFACTS) + (len(OPTIONAL_ARTIFACTS) if _evidence_files(library, solution) else 0),
+        "instruction_sets": int(solution.path("manual/GLOBAL-INSTRUCTIONS.md") in files),
+        "knowledge_files": len(knowledge),
+        "skills": skills,
+        "skill_components": skill_components,
+        "manual_steps": manual_steps,
+    }
+
+
+def _delivery_lanes(doc: Document) -> str:
+    solution = doc.solution
+    counts = _lane_counts(doc.library, solution)
+    recipe = solution.path("deployment.json")
+    deployment = doc.data(recipe)
+    smoke = _object(deployment.get("smoke_test"))
+    architecture = _object(solution.copy.get("architecture"))
+    native = _native_settings(doc.library, solution)
+    settings_source = solution.path("copilot-studio/settings.mcs.yml")
+    agent_file = _text(solution.agent.get("_file"), "missing-agent-source")
+    for source in (
+        agent_file, "CLAUDE.md", "solutions/README.md", solution.path("FIELD-GUIDE.md"),
+        solution.path("manual/GLOBAL-INSTRUCTIONS.md"),
+        solution.path("screenshots/manual/browserfilm.json"),
+        solution.path("copilot-studio/settings.mcs.yml"),
+    ):
+        doc.source(source)
+    for source in doc.library.matching(solution.path("copilot-studio/behaviors/*.mcs.yml")):
+        doc.source(source)
+    agent_size = (
+        f"1 file, {counts['agent_lines']} lines"
+        if counts["agent_lines"] is not None else doc.missing(agent_file)
+    )
+    runbook_size = [f"{counts['runbook_docs']} runbook documents"]
+    for key, label in (
+        ("instruction_sets", "instruction set"), ("knowledge_files", "knowledge file"),
+        ("skills", "skill"),
+    ):
+        count = counts[key]
+        runbook_size.append(f"{count} {label}" + ("" if count == 1 else "s"))
+    manual_build = (
+        "Manual build steps not captured (no screenshots/manual/browserfilm.json)"
+        if counts["manual_steps"] is None else
+        doc.link(
+            solution.path("manual-tutorial.html"),
+            f"{counts['manual_steps']} manual build steps (captured frames)",
+        )
+    )
+    agent_verify = "Smoke prompt: " + _text(
+        smoke.get("prompt"), "Not provided in deployment.json smoke_test.prompt",
+    )
+    agent_verify += "\nMust call `" + _text(
+        smoke.get("must_call"), "Not provided in deployment.json smoke_test.must_call",
+    ) + "`; must include: " + _text(
+        smoke.get("must_include"), "Not provided in deployment.json smoke_test.must_include",
+    ) + "."
+    acceptance_count = len(_items(architecture.get("acceptance_checks")))
+    acceptance_link = (
+        "[acceptance evidence](5.Acceptance-Evidence.md)"
+        if _evidence_files(doc.library, solution) else
+        doc.link("solutions/README.md", "release gate", "release-gate")
+    )
+    native_form = (
+        "Copilot Studio agent on the " + doc.link(HARNESS_DOC, "GitHub Copilot harness")
+        + f" (template `{native['template']}`) with those {counts['skills']} skills, built by hand"
+        if native.get("template") else doc.missing(settings_source, "template")
+    )
+    doc.source(HARNESS_DOC)
+    doc.source(SKILLS_DOC)
+    rows = (
+        (
+            "What you build",
+            doc.link(agent_file, posixpath.basename(agent_file))
+            + " · tool `" + _text(deployment.get("expected_tool"), "Not recorded in deployment.json expected_tool") + "`",
+            "a Copilot Studio agent assembled in the browser",
+        ),
+        ("Size", agent_size, " · ".join(runbook_size)),
+        (
+            "Build steps",
+            "Install `" + _text(deployment.get("target_filename"), "Not recorded in deployment.json target_filename")
+            + "` into the Brainstem `agents/` folder using " + doc.link(recipe, "deployment.json") + ".",
+            manual_build,
+        ),
+        ("Verify", agent_verify, f"{acceptance_count} acceptance checks · {acceptance_link}"),
+        (
+            "Microsoft-native form",
+            "Each operation is one Copilot Studio skill (`SKILL.md` upload = `InlineAgentSkill` component)",
+            native_form,
+        ),
+        (
+            "Choose it when",
+            "You want to learn or teach the behavior and change it immediately.",
+            "The customer's makers build, review, and own the agent step by step in Copilot Studio.",
+        ),
+    )
+    return "\n\n".join((
+        "AIBAST Frontier is an early, experimental learning lane: one portable agent file holds the behavior "
+        "and synthetic data so you can learn, teach, and change it immediately. The Runbook lane builds "
+        "the same agent by hand in Copilot Studio and needs no Python or local tooling.",
+        _table(("", "AIBAST Frontier (experimental)", "Runbook lane"), rows, doc.missing(recipe)),
+        "[Phase 1 — Easy mode](3.Runbook.md#phase-1--easy-mode-with-github-copilot) is the assisted middle path: "
+        "GitHub Copilot authors the same Copilot Studio project; "
+        "[Phase 3 — Manual build](3.Runbook.md#phase-3--manual-build-in-copilot-studio) is the manual build counted above.",
+        "*" + FRONTIER_DISCLAIMER + "*",
+    ))
+
+
 def _overview(library: Library, solution: Solution) -> str:
     doc = Document(library, solution, "1.Overview.md")
     copy = solution.copy
@@ -682,6 +991,7 @@ def _overview(library: Library, solution: Solution) -> str:
     architecture = _object(copy.get("architecture"))
     notes = _object(library.notes.get(solution.name))
     doc.source(REGISTRY)
+    doc.source("index.html")
     if notes:
         doc.source(NOTES)
         doc.sources.update(notes.get("sources", []))
@@ -720,6 +1030,7 @@ def _overview(library: Library, solution: Solution) -> str:
         "The blueprint describes integration targets, not live connections in the packaged synthetic demo; "
         "see the " + doc.link(solution.path("FIELD-GUIDE.md"), "evidence boundary", "evidence-boundary") + ".",
     )))
+    doc.add("Delivery Lanes", _delivery_lanes(doc))
     doc.source(solution.path("FIELD-GUIDE.md"))
     doc.source("solutions/README.md")
     doc.add("Business Outcomes", _bullets(copy.get("business_value"), doc.missing(CATALOG, "business_value"))
@@ -799,7 +1110,9 @@ def _architecture(library: Library, solution: Solution) -> str:
         diagram = _code("\n".join(lines), "mermaid")
     else:
         diagram = doc.missing(CATALOG, "architecture.business_flow")
-    doc.add("Solution Architecture", diagram + "\n\n"
+    doc.add("Solution Architecture",
+            "Level-1 business flow (catalog architecture.business_flow): the order in which people and systems "
+            "appear in the scenario, not a component or data-flow topology.\n\n" + diagram + "\n\n"
             + doc.link(solution.path("FLOW.md"), "Package case-flow diagram")
             + "\n\nThis catalog flow includes production integration targets; it is not proof of live connectivity. "
             + "Use the data and evidence boundary below when demonstrating the package.")
@@ -839,9 +1152,29 @@ def _architecture(library: Library, solution: Solution) -> str:
         _table(("Feature", "Responsibility"), _named_rows(level2.get("supporting_features")),
                doc.missing(solution.architecture_source, "supporting_features")),
     )))
+    settings_source = solution.path("copilot-studio/settings.mcs.yml")
+    native = _native_settings(library, solution)
+    doc.source(settings_source)
+    doc.source(HARNESS_DOC)
+    doc.source(SKILLS_DOC)
+    native_table = _table(("Setting", "Recorded value"), (
+        (label, _text(native.get(key), f"Not provided in settings.mcs.yml: {field}"))
+        for label, key, field in (
+            ("Template", "template", "template"),
+            ("Recognizer", "recognizer", "configuration.recognizer.kind"),
+            ("Authoring model", "authoring_model", "configuration.authoringModel"),
+            ("Model", "model", "configuration.agentSettings.model.series"),
+        )
+    ), doc.missing(settings_source))
     doc.add("Copilot Studio Components", "\n\n".join((
-        "### Source-controlled behaviors",
-        doc.inventory(solution.path("copilot-studio/behaviors/*.mcs.yml"), "Copilot Studio behavior definition"),
+        "These Microsoft-native agents run on the " + doc.link(HARNESS_DOC, "GitHub Copilot harness")
+        + "; " + doc.link(SKILLS_DOC, "skills") + " package the reviewed instructions and logic.",
+        "Agent metadata from " + doc.link(settings_source, "settings.mcs.yml") + ":",
+        native_table,
+        "### Skills (source-controlled `InlineAgentSkill` components)",
+        "Each component is the source form of the matching `manual/skills/*/SKILL.md`; "
+        "these are the same skills, not separate items to count.",
+        doc.inventory(solution.path("copilot-studio/behaviors/*.mcs.yml"), "Source form of the matching manual SKILL.md"),
         "### Source-controlled knowledge",
         doc.inventory(solution.path("copilot-studio/capabilities/knowledge/files/*"), "Knowledge content or its component metadata"),
         "### Manual upload skills",
@@ -872,7 +1205,15 @@ def _architecture(library: Library, solution: Solution) -> str:
          "Publication is a separate approval gate, not a generated-runbook deliverable.",
          doc.link(field_guide, "Evidence gates", "evidence-gates")),
     )
-    doc.add("Design Decisions", _table(("Decision", "Reason / boundary", "Source"), decisions, doc.missing(field_guide)))
+    notes = doc.notes()
+    specific = _table(
+        ("Decision", "Reason", "Source"),
+        ((item["decision"], item["reason"], doc.link(NOTES, "Sourced delivery notes"))
+         for item in notes.get("design_decisions", [])),
+        doc.missing_note("design_decisions"),
+    )
+    doc.add("Design Decisions", specific + "\n\n### Delivery principles (all packages)\n\n"
+            + _table(("Principle", "Reason / boundary", "Source"), decisions, doc.missing(field_guide)))
     return doc.render("Architecture", _nav("3.Runbook.md", "Delivery runbook"))
 
 
@@ -899,41 +1240,83 @@ def _release_checklist(doc: Document) -> str:
             items[-1] += " " + line.strip()
         else:
             active = False
-    content = _bullets(items, f"No numbered release checks are present in {doc.link(relative, 'Release gate', 'release-gate')}.", checklist=True)
+    if not items:
+        return f"No numbered release checks are present in {doc.link(relative, 'Release gate', 'release-gate')}."
+    content = _bullets(items, "", checklist=True)
     return _copy_markdown(doc.library, content, relative, doc.path)
+
+
+def _note_table(doc: Document, notes: dict, field: str, keys, headers) -> str:
+    return _table(
+        headers, (tuple(item[key] for key in keys) for item in notes.get(field, [])),
+        doc.missing_note(field),
+    )
+
+
+def _exit_criteria(doc: Document, notes: dict, phase: str) -> str:
+    criteria = notes.get("phase_exit_criteria", {}).get(phase)
+    return "**Exit criteria**\n\n" + _bullets(
+        criteria, doc.missing_note("phase_exit_criteria." + phase), checklist=True,
+    )
+
+
+def _optional_copy(doc: Document, source: str, title: str) -> str:
+    if source not in doc.library.files:
+        return ""
+    text = (doc.library.root / source).read_text(encoding="utf-8")
+    return doc.copy(source, title) if _section(text, title) else ""
 
 
 def _runbook(library: Library, solution: Solution) -> str:
     doc = Document(library, solution, "3.Runbook.md")
+    notes = doc.notes()
     architecture = _object(solution.copy.get("architecture"))
     deployment = doc.data(solution.path("deployment.json"))
     studio = _object(deployment.get("copilot_studio"))
     guide = solution.path("FIELD-GUIDE.md")
     doc.source(guide)
+    counts = _lane_counts(library, solution)
+    cases = doc.data(solution.demo_source)
+    doc.source(solution.path("screenshots/manual/browserfilm.json"))
+    steps = (
+        f"{counts['manual_steps']} captured manual build steps"
+        if counts["manual_steps"] is not None else "Manual build steps not captured"
+    )
+    workload = (
+        f"{steps} · {counts['skills']} skills · {counts['knowledge_files']} knowledge files · "
+        f"{len(_items(architecture.get('acceptance_checks')))} acceptance checks · "
+        f"{len(_items(cases.get('cases')))} locked cases"
+    )
     prerequisites = _table(("Recipe prerequisite", "Recorded requirement"), (
         ("Copilot Studio plugin", _text(studio.get("plugin"), "Not provided in deployment.json copilot_studio.plugin")),
         ("Minimum PAC CLI version", _text(studio.get("minimum_pac_version"), "Not provided in deployment.json copilot_studio.minimum_pac_version")),
         ("Authoring mode", _text(studio.get("authoring_mode"), "Not provided in deployment.json copilot_studio.authoring_mode")),
         ("Portable tool to verify", _text(deployment.get("expected_tool"), "Not provided in deployment.json expected_tool")),
+        ("Build workload", workload),
     ), doc.missing(solution.path("deployment.json")))
     doc.add("Prerequisites", "\n\n".join((
         prerequisites,
-        "### Catalog preparation checklist",
-        "The catalog includes production connection work. Apply those steps only after the package's "
-        + doc.link(guide, "approval and evidence gates", "evidence-gates")
-        + "; the workshop remains a synthetic, unpublished Draft.",
-        _bullets(architecture.get("easy_mode"), doc.missing(CATALOG, "architecture.easy_mode"), checklist=True),
+        "### Delivery prerequisites",
+        _note_table(doc, notes, "prerequisites", ("item", "detail"), ("Requirement", "Confirm before building")),
+        "### Delivery roles",
+        _note_table(doc, notes, "delivery_roles", ("role", "responsibility"), ("Role", "Responsibility")),
         "### Connections to qualify, not assumed live",
         _bullets(architecture.get("required_connections"), doc.missing(CATALOG, "architecture.required_connections")),
     )))
     phase1 = doc.copy(solution.path("EASY-MODE-COPILOT-CHAT.md"))
+    phase1 += "\n\n### Source-controlled lane checklist (catalog easy_mode)\n\n"
+    phase1 += (
+        "This catalog checklist describes source-controlled delivery, including future connection work. "
+        "The package's synthetic-data and Draft-only boundaries still apply.\n\n"
+        + _bullets(architecture.get("easy_mode"), doc.missing(CATALOG, "architecture.easy_mode"), checklist=True)
+    )
     prompt = architecture.get("copilot_studio_prompt")
     phase1 += "\n\n### Recipe-specific authoring prompt\n\n"
     phase1 += (
         "Catalog reference for the source-controlled lane; retain the Draft-only completion boundary above.\n\n" + _code(prompt)
         if _present(prompt) else doc.missing(CATALOG, "architecture.copilot_studio_prompt")
     )
-    doc.add("Phase 1 — Easy Mode with GitHub Copilot", phase1)
+    doc.add("Phase 1 — Easy Mode with GitHub Copilot", phase1 + "\n\n" + _exit_criteria(doc, notes, "phase_1"))
     phase2 = doc.copy(solution.path("EASY-MODE-PERSONLESS.md"))
     brainstem = _object(deployment.get("brainstem"))
     phase2 += "\n\n### Optional runtime endpoints\n\n" + _table(
@@ -946,7 +1329,7 @@ def _runbook(library: Library, solution: Solution) -> str:
         "Catalog reference for the optional local lane:\n\n" + _code(install_prompt)
         if _present(install_prompt) else doc.missing(CATALOG, "architecture.local_install_prompt")
     )
-    doc.add("Phase 2 — Optional Brainstem Track", phase2)
+    doc.add("Phase 2 — Optional Brainstem Track", phase2 + "\n\n" + _exit_criteria(doc, notes, "phase_2"))
     manual = doc.copy(guide, "Manual mode — literal browser construction")
     manual += "\n\n" + doc.link(solution.path("manual-tutorial.html"), "Open the step-by-step manual tutorial") + "."
     instructions = solution.path("manual/GLOBAL-INSTRUCTIONS.md")
@@ -954,10 +1337,10 @@ def _runbook(library: Library, solution: Solution) -> str:
     manual += "\n\n### Instructions and upload inventory\n\n"
     manual += "- " + doc.link(instructions, "Copy the reviewed global instructions") + "\n\n"
     knowledge = _manual_knowledge(doc)
-    if not library.exists(solution.path("manual/knowledge")):
+    if not library.exists(solution.path("manual/knowledge")) and knowledge:
         manual += (
-            "The package has no `manual/knowledge/` directory. "
-            "Use the manual knowledge uploads explicitly declared by its export manifest below.\n\n"
+            "Use the manual knowledge uploads declared by the export manifest below; "
+            "this package reuses its source-controlled knowledge files for the browser build.\n\n"
         )
     manual += _table(
         ("File", "Role"),
@@ -965,6 +1348,11 @@ def _runbook(library: Library, solution: Solution) -> str:
         doc.missing(solution.path("export-manifest.json"), "manual knowledge uploads"),
     )
     manual += "\n\n" + doc.inventory(solution.path("manual/skills/*/SKILL.md"), "Upload the reviewed SKILL.md unchanged")
+    manual += "\n\n### CLI build checklist (catalog hard_mode)\n\n"
+    manual += (
+        "This is the source-controlled CLI alternative, not a prerequisite for the manual browser build.\n\n"
+        + _bullets(architecture.get("hard_mode"), doc.missing(CATALOG, "architecture.hard_mode"), checklist=True)
+    )
     commands = [_text(command) for command in _items(architecture.get("manual_commands"))]
     routine = [command for command in commands if not re.search(r"\bpublish\b", command, re.I)]
     publication = [command for command in commands if re.search(r"\bpublish\b", command, re.I)]
@@ -979,7 +1367,7 @@ def _runbook(library: Library, solution: Solution) -> str:
         manual += "\n\n### Publication reference — outside this workshop\n\n"
         manual += "These catalog commands require separate human approval; they are not build or acceptance steps.\n\n"
         manual += _code("\n".join(publication))
-    doc.add("Phase 3 — Manual Build in Copilot Studio", manual)
+    doc.add("Phase 3 — Manual Build in Copilot Studio", manual + "\n\n" + _exit_criteria(doc, notes, "phase_3"))
     smoke = _object(deployment.get("smoke_test"))
     smoke_rows = [
         ("Prompt", _text(smoke.get("prompt"), "Not provided in deployment.json smoke_test.prompt")),
@@ -995,12 +1383,25 @@ def _runbook(library: Library, solution: Solution) -> str:
         _table(("Check", "Expected value"), smoke_rows, doc.missing(solution.path("deployment.json"), "smoke_test")),
         "### Package evidence gates",
         doc.copy(guide, "Evidence gates"),
+        "### Go / no-go",
+        _note_table(doc, notes, "go_no_go", ("criterion", "threshold"), ("Criterion", "Required threshold")),
+        _exit_criteria(doc, notes, "phase_4"),
     )))
-    doc.add("Phase 5 — Production Hardening", _bullets(
-        architecture.get("hard_mode"), doc.missing(CATALOG, "architecture.hard_mode"), checklist=True,
-    ) + "\n\nReview the [production replacement seams](2.Architecture.md#production-replacement-seams) "
-            "and the package's customer gate before changing data sources or enabling writes; "
-            "this generated checklist does not establish production readiness.")
+    hardening = [
+        _note_table(doc, notes, "production_hardening", ("area", "action"), ("Area", "Owner and action")),
+        "### Production replacement seams",
+        doc.copy(guide, "Production replacement seams"),
+    ]
+    production_policy = _optional_copy(doc, instructions, "Production seams")
+    if production_policy:
+        hardening += ["### Package production policy", production_policy]
+    hardening += [
+        "Review the [architecture seams](2.Architecture.md#production-replacement-seams) and the "
+        + doc.link(guide, "customer gate", "evidence-gates")
+        + " before changing data sources or enabling writes; workshop acceptance is not production approval.",
+        _exit_criteria(doc, notes, "phase_5"),
+    ]
+    doc.add("Phase 5 — Production Hardening", "\n\n".join(hardening))
     doc.add("Failure Recovery", doc.copy(guide, "Failure recovery"))
     doc.add("Deliverables Checklist", _release_checklist(doc) + "\n\nSource: "
             + doc.link("solutions/README.md", "seven-step release gate", "release-gate")
@@ -1012,107 +1413,199 @@ def _case_id(record: dict) -> str:
     return _text(record.get("id") or record.get("case_id"), "Case identifier not recorded")
 
 
+def _catalog_demos(doc: Document) -> list[dict]:
+    demos = []
+    for raw in _items(doc.solution.copy.get("sample_prompts")):
+        item = _object(raw)
+        url = item.get("demo_url")
+        link = "No demo_url provided in catalog sample_prompts"
+        if isinstance(url, str) and url:
+            target = urlsplit(url)
+            path = unquote(target.path).lstrip("/")
+            if target.scheme or target.netloc:
+                raise RunbookSourceError(f"{CATALOG}: {doc.solution.name} demo_url must be repo-relative: {url}")
+            if path not in doc.library.files:
+                raise RunbookSourceError(f"{CATALOG}: {doc.solution.name} demo_url target is missing: {path}")
+            href = PAGES + quote(path, safe="/@-._~")
+            href += ("?" + target.query if target.query else "") + ("#" + target.fragment if target.fragment else "")
+            link = f"[Open captured demo]({href})"
+        demos.append({"label": item.get("label"), "prompt": item.get("prompt"), "link": link})
+    return demos
+
+
+def _case_records(value, source: str) -> dict[str, dict]:
+    records = {}
+    for raw in _items(value):
+        item = _object(raw)
+        identifier = item.get("id") or item.get("case_id")
+        if not isinstance(identifier, str) or not identifier:
+            raise RunbookSourceError(f"{source}: every case needs an id or case_id")
+        if identifier in records:
+            raise RunbookSourceError(f"{source}: duplicate case identifier {identifier}")
+        records[identifier] = item
+    return records
+
+
+def _prohibition_excerpt(doc: Document, source: str) -> str:
+    if source not in doc.library.files:
+        return doc.missing(source)
+    doc.source(source)
+    text = (doc.library.root / source).read_text(encoding="utf-8")
+    units, current = [], []
+    for line, visible in _visible_lines(text):
+        heading = _HEADING.match(line) if visible else None
+        new_item = visible and re.match(r"^\s*(?:[-*+]|\d+[.)])\s+", line)
+        if not visible or heading or not line.strip() or (new_item and current):
+            if current:
+                units.append("\n".join(current))
+                current = []
+        if visible and not heading and line.strip() and not line.lstrip().startswith("<!--"):
+            current.append(line)
+    if current:
+        units.append("\n".join(current))
+    prohibition = re.compile(
+        r"\b(?:never|do not|don['’]t|must not|no|cannot|read-only|draft-only|human approval|human review)\b",
+        re.I,
+    )
+    selected = [unit for unit in units if prohibition.search(unit)]
+    if not selected:
+        return f"No explicit prohibition or human-review rule was found in {doc.link(source)}."
+    content = _copy_markdown(doc.library, "\n\n".join(selected), source, doc.path)
+    return "Prohibition and human-review excerpts from " + doc.link(source, "the global instructions") + ":\n\n" + content
+
+
 def _sample_prompts(library: Library, solution: Solution) -> str:
     doc = Document(library, solution, "4.Sample-prompts.md")
+    notes = doc.notes()
     instructions = solution.path("manual/GLOBAL-INSTRUCTIONS.md")
     cases = doc.data(solution.demo_source)
-    transcripts = doc.data(solution.path("evals/transcripts.json"))
-    promise_map = doc.data(solution.path("evals/onepager-map.json"))
-    case_rows = [item for item in _items(cases.get("cases")) if isinstance(item, dict)]
-    transcript_rows = [item for item in _items(transcripts.get("transcripts")) if isinstance(item, dict)]
-    by_id = {_case_id(item): item for item in transcript_rows}
-    by_id.update({_case_id(item): item for item in case_rows})
+    transcript_source = solution.path("evals/transcripts.json")
+    promise_source = solution.path("evals/onepager-map.json")
+    transcripts = doc.data(transcript_source)
+    promise_map = doc.data(promise_source)
+    locked = _case_records(cases.get("cases"), solution.demo_source)
+    recorded = _case_records(transcripts.get("transcripts"), transcript_source)
     doc.add("Suggested Agent Instructions",
             "Use " + doc.link(instructions, "the complete reviewed global instructions")
             + ", not the excerpts alone.\n\n" + doc.copy(
                 instructions, "Skill routing map", ("Natural-language routing", "Routing", "Locked Preview routing"),
             ))
-    demos = []
-    for item in _items(solution.copy.get("sample_prompts")):
-        item = _object(item)
-        url = item.get("demo_url")
-        if isinstance(url, str) and url:
-            target = urlsplit(url)
-            path = unquote(target.path).lstrip("/")
-            if target.scheme or target.netloc:
-                raise RunbookSourceError(f"{CATALOG}: {solution.name} demo_url must be repo-relative: {url}")
-            if path not in library.files:
-                raise RunbookSourceError(f"{CATALOG}: {solution.name} demo_url target is missing: {path}")
-            link = PAGES + quote(path, safe="/@-._~")
-            link += ("?" + target.query if target.query else "") + ("#" + target.fragment if target.fragment else "")
-            demo = f"[Open captured demo]({link})"
-        else:
-            demo = "No demo_url provided in catalog sample_prompts"
-        demos.append((item.get("label"), item.get("prompt"), demo))
+    demos = _catalog_demos(doc)
+    used_demos = set()
+    matrix = []
+    guards_seen = []
+    for identifier in dict.fromkeys(list(locked) + list(recorded)):
+        case, transcript = locked.get(identifier, {}), recorded.get(identifier, {})
+        prompt = case.get("prompt") or transcript.get("prompt")
+        prompt_cell = _text(prompt, "No prompt recorded for this case")
+        transcript_prompt = transcript.get("prompt")
+        if transcript_prompt and prompt and transcript_prompt != prompt:
+            prompt_cell = "Locked prompt: " + prompt_cell + "\nRecorded prompt: " + transcript_prompt
+        matching = [
+            (index, item) for index, item in enumerate(demos)
+            if index not in used_demos and item["prompt"] and item["prompt"] in (prompt, transcript_prompt)
+        ]
+        used_demos.update(index for index, _ in matching)
+        if matching:
+            prompt_cell += "\n" + "\n".join(item["link"] for _, item in matching)
+        persona = _text(case.get("persona") or transcript.get("persona"), "Persona not recorded")
+        labels = list(dict.fromkeys(_text(item["label"]) for _, item in matching if item["label"]))
+        if labels:
+            if any(label.casefold().startswith(persona.casefold() + ":") for label in labels):
+                persona = "\n".join(labels)
+            else:
+                persona += "\n" + "\n".join(labels)
+        arguments = _object(case.get("arguments") or case.get("kwargs"))
+        operation = case.get("operation") or arguments.get("operation")
+        route = _text(
+            case.get("expects_agent") or transcript.get("expected_agent") or transcript.get("must_call"),
+            "Expected tool not recorded",
+        )
+        if operation:
+            route += "\nOperation: " + _text(operation)
+        expected = case.get("must_include") or transcript.get("must_include")
+        evidence = _text(expected, "No must_include markers recorded")
+        if case.get("must_include") and transcript.get("must_include") and case["must_include"] != transcript["must_include"]:
+            evidence = "Locked case: " + _text(case["must_include"]) + "\nRecorded transcript: " + _text(transcript["must_include"])
+        forbidden = case.get("must_not_include") or transcript.get("must_not_include")
+        guards_seen.extend(_items(forbidden))
+        guard = "Must not include: " + _text(forbidden) if forbidden else "No must_not_include markers recorded"
+        if _present(case.get("min_words")):
+            guard += "\nMinimum words: " + _text(case["min_words"])
+        if case.get("assertion_note"):
+            guard += "\n" + _text(case["assertion_note"])
+        verdict = (
+            "passed: " + _text(transcript["passed"]) if "passed" in transcript
+            else _text(transcript.get("status") or transcript.get("verdict"), "No transcript verdict recorded")
+        )
+        matrix.append((identifier, persona, prompt_cell, route, evidence, guard, verdict))
+    for index, item in enumerate(demos):
+        if index not in used_demos:
+            matrix.append((
+                "Catalog demo — no matching locked case", item["label"],
+                _text(item["prompt"]) + "\n" + item["link"], "Not recorded for this demo",
+                "Not recorded for this demo", "Not recorded for this demo", "No matching transcript verdict",
+            ))
+    refusal_only = bool(guards_seen) and all(
+        re.match(r"^I (?:do not|don't|cannot|can't|don’t|can’t)\b", _text(value), re.I) for value in guards_seen
+    )
+    guard_header = "Refusal guards" if refusal_only else "Wording guards (must_not_include)"
     synthetic = (
         "**Synthetic demo evidence:** all example records, names, identifiers, and figures in these cases "
         "are fictional; prompts and recorded expectations are not customer outcomes."
     )
     doc.source(solution.path("FIELD-GUIDE.md"))
-    doc.add("Demo Prompts", synthetic + "\n\n" + _table(
-        ("Scenario", "Prompt", "Demo"), demos, doc.missing(CATALOG, "sample_prompts"),
-    ))
+    doc.add("Demo Prompts", "\n\n".join((
+        synthetic,
+        "### Per-case acceptance matrix",
+        "Replay each locked prompt unchanged in a fresh conversation. Routes and wording guards come from "
+        + doc.link(solution.demo_source, "the case contract") + "; recorded verdicts come from "
+        + doc.link(transcript_source, "canonical transcripts") + ", not a new run by this generator. "
+        "Expected evidence must appear; forbidden wording must not.",
+        _table(
+            ("Case", "Persona / scenario", "Prompt and demo", "Expected route", "Expected evidence", guard_header, "Recorded result"),
+            matrix, doc.missing(solution.demo_source, "cases and catalog sample_prompts"),
+        ),
+    )))
     promises = []
     for item in _items(promise_map.get("promises")):
         item = _object(item)
-        prompts = []
+        references = []
         for identifier in _items(item.get("demo_cases")):
-            case = by_id.get(str(identifier), {})
-            prompt = _text(case.get("prompt"), f"No prompt for {identifier} in demo cases or transcripts")
-            prompts.append(f"**{identifier}:** {prompt}")
+            if str(identifier) in locked or str(identifier) in recorded:
+                references.append(f"[{identifier}](#per-case-acceptance-matrix)")
+            else:
+                references.append(f"{identifier} — missing from case and transcript sources")
         promises.append((
             item.get("advertised_promise") or item.get("promise"),
             _text(item.get("operations"), "No operations provided in onepager-map.json"),
-            "\n".join(prompts) or "No demo_cases provided in onepager-map.json",
+            "\n".join(references) or "No demo_cases provided in onepager-map.json",
+            _text(item.get("synthetic_evidence"), "No synthetic_evidence provided in onepager-map.json"),
         ))
+    boundary = _object(promise_map.get("source_audit")).get("boundary")
+    boundary_text = (
+        "**Source audit boundary:** " + _text(boundary)
+        if _present(boundary) else doc.missing(promise_source, "source_audit.boundary")
+    )
     doc.add("Promise-to-Prompt Map",
             "Advertised promises are traced to synthetic cases below; mapping a promise does not prove a production capability.\n\n"
-            + _table(("Advertised promise", "Operation", "Persona prompt"), promises,
-                     doc.missing(solution.path("evals/onepager-map.json"), "promises")))
-    expected = []
-    for item in transcript_rows:
-        recorded = (
-            "passed: " + _text(item["passed"]) if "passed" in item
-            else _text(item.get("status") or item.get("verdict"), "No verdict field recorded")
-        )
-        expected.append((
-            _case_id(item), item.get("prompt"),
-            item.get("expected_agent") or item.get("tool") or item.get("must_call"),
-            _text(item.get("must_include"), "No must_include provided in transcript"),
-            recorded,
-        ))
-    doc.add("Expected Results", "The following fields are recorded in "
-            + doc.link(solution.path("evals/transcripts.json"), "canonical transcripts")
-            + "; this generator has not replayed or revalidated them.\n\n"
-            + _table(("Case", "Prompt", "Expected tool", "Must include", "Recorded result"), expected,
-                     doc.missing(solution.path("evals/transcripts.json"), "transcripts")))
-    routing = []
-    for case in case_rows:
-        arguments = _object(case.get("arguments") or case.get("kwargs"))
-        operation = case.get("operation") or arguments.get("operation")
-        route = _text(case.get("expects_agent"), "No expects_agent provided in demo case")
-        if operation:
-            route += "\nOperation: " + _text(operation)
-        assertions = []
-        if case.get("must_not_include"):
-            assertions.append("Must not include: " + _text(case["must_not_include"]))
-        if _present(case.get("min_words")):
-            assertions.append("Minimum words: " + _text(case["min_words"]))
-        if case.get("assertion_note"):
-            assertions.append(_text(case["assertion_note"]))
-        routing.append((
-            _case_id(case), _text(case.get("persona")) + "\n" + _text(case.get("prompt")),
-            route, "\n".join(assertions) or "No negative assertions recorded in this demo case",
-        ))
-    doc.add("Routing and Boundary Cases", _table(
-        ("Case", "Persona / prompt", "Expected route", "Boundary assertions"), routing,
-        doc.missing(solution.demo_source, "cases"),
-    ))
-    doc.add("What This Agent Should Never Do", doc.copy(
-        instructions, "Privacy, human, and side-effect gates",
-        ("Decision and safety rules", "Human and side-effect gates", "Prohibited actions",
-         "Legal and authorization gates", "Boundaries", "Safety boundary"),
-    ))
+            + boundary_text + "\n\n"
+            + _table(("Advertised promise", "Operation", "Acceptance cases / prompts", "Synthetic evidence shown"),
+                     promises, doc.missing(promise_source, "promises")))
+    doc.add("Expected Results",
+            "Use the Expected evidence and Recorded result columns in the "
+            "[per-case acceptance matrix](#per-case-acceptance-matrix). The source is "
+            + doc.link(transcript_source, "canonical transcripts") + "; recorded results are not fresh acceptance. "
+            "Where current case markers differ from recorded transcript markers, both are identified in that matrix.")
+    doc.add("Routing and Boundary Cases",
+            "Happy-path routing and refusal guards are in the [acceptance matrix](#per-case-acceptance-matrix); "
+            "they are not substitutes for the refusal and escalation tests below.\n\n"
+            + _note_table(doc, notes, "boundary_tests", ("prompt", "expected"), ("Boundary prompt", "Required response")))
+    never_do = (
+        _bullets(notes["never_do"], doc.missing_note("never_do")) if notes.get("never_do")
+        else _prohibition_excerpt(doc, instructions)
+    )
+    doc.add("What This Agent Should Never Do", never_do)
     next_file = "5.Acceptance-Evidence.md" if _evidence_files(library, solution) else "0.Resources/README.md"
     return doc.render("Sample Prompts", _nav(next_file, "Acceptance evidence" if next_file.startswith("5.") else "Resources"))
 
@@ -1126,20 +1619,85 @@ def _evidence_files(library: Library, solution: Solution) -> list[str]:
     })
 
 
-def _recorded_fields(value, prefix: str = ""):
+def _recorded_value(value) -> str:
+    if value is None:
+        return "Unset"
+    if value == "":
+        return "Empty string"
+    if value == []:
+        return "Empty list"
+    if value == {}:
+        return "Empty object"
+    if isinstance(value, str) and value in {"None", "null", "nan"}:
+        return f"Literal text `{value}`"
+    return _text(value)
+
+
+def _recorded_fields(value, prefix: str = "", in_assertions: bool = False):
     if isinstance(value, dict):
+        if in_assertions and not value:
+            yield prefix, "Empty object"
         for key, item in sorted(value.items()):
             path = prefix + "." + key if prefix else key
+            assertion = in_assertions or key == "assertions"
             if (
-                key in {"status", "verdict", "published"}
-                or key.endswith("_status") or key.endswith("_verdict")
-            ) and _present(item) and not isinstance(item, (dict, list)):
-                yield path, _text(item)
+                key in {"status", "verdict", "published", "statuscode", "statecode", "publishedon", "passed"}
+                or key.endswith("_status") or key.endswith("_verdict") or assertion
+            ) and not isinstance(item, (dict, list)):
+                yield path, _recorded_value(item)
             if isinstance(item, (dict, list)):
-                yield from _recorded_fields(item, path)
+                yield from _recorded_fields(item, path, assertion)
+    elif isinstance(value, list):
+        if in_assertions and not value:
+            yield prefix, "Empty list"
+        for index, item in enumerate(value):
+            yield from _recorded_fields(item, f"{prefix}[{index}]", in_assertions)
+    elif in_assertions:
+        yield prefix, _recorded_value(value)
+
+
+def _field_contexts(value, prefix: str = "", case_id: str = "") -> dict[str, str]:
+    contexts = {}
+    if isinstance(value, dict):
+        case_id = _text(value.get("case_id") or value.get("id"), case_id)
+        for key, item in value.items():
+            path = prefix + "." + key if prefix else key
+            if isinstance(item, (dict, list)):
+                contexts.update(_field_contexts(item, path, case_id))
+                continue
+            details = [f"Record: {case_id}"] if case_id else []
+            approved = isinstance(item, str) and re.match(r"approved(?:\b|_)", item, re.I)
+            metadata = (
+                ("Reviewer", ("reviewer", "reviewed_by")),
+                ("Method", ("method",)),
+                ("Review date", ("reviewed_at", "review_date", "date")),
+            )
+            for label, candidates in metadata:
+                present = next((candidate for candidate in candidates if candidate in value), None)
+                if present is not None:
+                    details.append(label + ": " + _recorded_value(value[present]))
+                elif approved:
+                    details.append(label + ": Not recorded")
+            for name in ("captured_at", "notes", "note", "historical_reason"):
+                if _present(value.get(name)):
+                    details.append(_label(name) + ": " + _text(value[name]))
+            contexts[path] = "\n".join(details) or "—"
     elif isinstance(value, list):
         for index, item in enumerate(value):
-            yield from _recorded_fields(item, f"{prefix}[{index}]")
+            contexts.update(_field_contexts(item, f"{prefix}[{index}]", case_id))
+    return contexts
+
+
+def _capture_caveats(capture: dict) -> str:
+    parts = []
+    for key in sorted(capture):
+        if key.startswith("full_") and key.endswith("_not_visibly_proven"):
+            parts.extend("Not visibly proven: " + _text(item) for item in _items(capture[key]))
+    for key, label in (
+        ("reason", "Reason"), ("note", "Note"), ("notes", "Notes"), ("historical_reason", "Historical reason"),
+    ):
+        parts.extend(label + ": " + _text(item) for item in _items(capture.get(key)))
+    return "\n".join(parts) or "No caveat or reason recorded"
 
 
 def _manifest_references(doc: Document) -> list[dict]:
@@ -1197,6 +1755,7 @@ def _evidence(library: Library, solution: Solution) -> str:
     for path in paths:
         data = doc.data(path)
         fields = list(_recorded_fields(data))
+        contexts = _field_contexts(data)
         recorded = [
             (field, value) for field, value in fields
             if not (
@@ -1205,18 +1764,27 @@ def _evidence(library: Library, solution: Solution) -> str:
             )
         ]
         if recorded:
-            statuses.extend((doc.link(path, posixpath.basename(path)), f"`{field}`", value) for field, value in recorded)
+            statuses.extend(
+                (doc.link(path, posixpath.basename(path)), f"`{field}`", value, contexts.get(field, "—"))
+                for field, value in recorded
+            )
         elif fields:
-            statuses.append((doc.link(path, posixpath.basename(path)), "Capture statuses", "Listed in Visual Evidence below"))
+            statuses.append((doc.link(path, posixpath.basename(path)), "Capture statuses", "Listed in Visual Evidence below", "—"))
         else:
-            statuses.append((doc.link(path, posixpath.basename(path)), "Status / verdict", "No status or verdict fields recorded"))
+            statuses.append((
+                doc.link(path, posixpath.basename(path)), "Recorded result fields",
+                "No status, state, publication, assertion or case-result fields recorded", "—",
+            ))
     doc.source("solutions/README.md")
     doc.add("Release Gate Status",
             "The generator does not infer an overall pass. Compare these recorded fields with the "
             + doc.link("solutions/README.md", "release gate", "release-gate")
             + " and capture fresh evidence for the intended environment. "
-            "Per-capture statuses appear once in Visual Evidence, alongside the source image and reason.\n\n"
-            + _table(("Source file", "JSON field", "Recorded value"), statuses, "No status-bearing evidence files are present."))
+            "Per-capture statuses appear once in Visual Evidence, alongside the source image and caveats. "
+            "“Unset” means an explicitly empty recorded value, not a verdict. "
+            "Approval rows identify the reviewer, method and review date; missing provenance is stated.\n\n"
+            + _table(("Source file", "JSON field", "Recorded value", "Context / review provenance"),
+                     statuses, "No status-bearing evidence files are present."))
     images = [
         name for name in library.files
         if name.startswith(solution.path("screenshots/")) and PurePosixPath(name).suffix.lower() in _IMAGE_SUFFIXES
@@ -1243,10 +1811,16 @@ def _evidence(library: Library, solution: Solution) -> str:
         image_link = doc.link(source, posixpath.basename(source)) if source else "No source image recorded"
         captures.append((
             item.get("id"), item.get("mode"), item.get("status"), image_link,
-            _text(item.get("reason"), "No reason recorded"),
+            _capture_caveats(item),
         ))
-    visual += "\n\n### Checkpoint-by-checkpoint evidence\n\n" + _table(
-        ("Checkpoint", "Mode", "Recorded status", "Source image", "Recorded reason"), captures,
+    partial_rule = _object(checkpoints.get("policy")).get("partial_rule")
+    visual += "\n\n### Checkpoint-by-checkpoint evidence\n\n"
+    visual += (
+        "**Recorded partial-evidence rule:** " + _text(partial_rule)
+        if _present(partial_rule) else doc.missing(checkpoints_path, "policy.partial_rule")
+    )
+    visual += "\n\n" + _table(
+        ("Checkpoint", "Mode", "Recorded status", "Source image", "Recorded caveats and reasons"), captures,
         doc.missing(checkpoints_path, "captures"),
     )
     doc.add("Visual Evidence", visual)
@@ -1269,10 +1843,13 @@ def _resources(library: Library, solution: Solution) -> str:
         ("manual/knowledge", "Synthetic knowledge uploads"),
         ("manual/skills", "Operation-specific skill uploads"),
     )
-    rows = [(doc.link(solution.path(path), path), role) for path, role in resources]
+    rows = [
+        (doc.link(solution.path(path), path), role) for path, role in resources
+        if path != "manual/knowledge" or library.exists(solution.path(path))
+    ]
     rows += [
         (doc.link(_text(solution.agent.get("_file"), "missing-agent-source"), "Portable agent"), "Runtime implementation"),
-        (doc.link(solution.demo_source, "Demo case contract"), "Executable persona-language routing and boundary checks"),
+        (doc.link(solution.demo_source, "Demo case contract"), "Locked persona-language routing and wording assertions"),
         (doc.link(solution.architecture_source, "Level-2 architecture source"), "Domains, tools, and supporting features"),
     ]
     if not library.exists(solution.path("manual/knowledge")):
@@ -1366,8 +1943,10 @@ def _index(library: Library, selected: set[str]) -> str:
         f"{len(selected)} of {len(library.solutions)} catalog solutions have runbooks in this projection.",
         "",
         "Regenerate with `python tools/build_solution_runbooks.py`; verify without writing with "
-        "`python tools/build_solution_runbooks.py --check`. Use `--all` for every catalog solution "
-        "or repeat `--solution SLUG` for an explicit projection; use the same selection with `--check`.",
+        "`python tools/build_solution_runbooks.py --check`. As documented in [CLAUDE.md](../CLAUDE.md), "
+        "`--all` is reserved for the rollout phase 2. Repeat `--solution SLUG` only for an explicit projection "
+        "and use the same selection with `--check`. Returning to the default write removes stale files "
+        "carrying this generator's marker; unmarked files are preserved and reported by `--check`.",
         "",
         "## Artifact Anatomy", "",
         _table(("Artifact", "Delivery question"), anatomy, "No artifact contract recorded."),
@@ -1379,7 +1958,7 @@ def _index(library: Library, selected: set[str]) -> str:
             (
                 (
                     solution.display_name, _stage(solution),
-                    f"[Read runbook]({solution.slug}/1.Overview.md)" if solution.slug in selected else "Phase 2",
+                    f"[Read runbook]({solution.slug}/1.Overview.md)" if solution.slug in selected else "Planned (rollout phase 2)",
                     f"[Workshop]({PAGES}{solution.package}/quest.html)"
                     if solution.path("quest.html") in library.files else "Workshop page missing",
                     f"[Package](../{solution.package}/README.md)"
@@ -1388,6 +1967,37 @@ def _index(library: Library, selected: set[str]) -> str:
                 for solution in solutions
             ), "No catalog solutions are recorded for this vertical.",
         )]
+    lane_rows = []
+    for solution in sorted(library.solutions.values(), key=lambda item: (item.display_name.casefold(), item.slug)):
+        counts = _lane_counts(library, solution)
+        target = (
+            f"{solution.slug}/1.Overview.md" if solution.slug in selected
+            else f"../{solution.package}/README.md"
+        )
+        lane_rows.append((
+            f"[{solution.display_name}]({target})",
+            counts["agent_lines"] if counts["agent_lines"] is not None else "Agent source missing",
+            " · ".join(str(counts[key]) for key in ("instruction_sets", "knowledge_files", "skills")),
+            counts["manual_steps"] if counts["manual_steps"] is not None else "not captured",
+        ))
+    parts += [
+        "", "## Lane Complexity at a Glance", "",
+        "Compare the portable file in AIBAST Frontier (experimental) with the manual Copilot Studio build inventory and captured steps; "
+        "both delivery lanes remain available.",
+        "",
+        _table(
+            ("Solution", "AIBAST Frontier (experimental): agent.py lines", "Runbook lane: instructions · knowledge · skills", "Manual build steps"),
+            lane_rows, "No catalog solutions are recorded.",
+        ),
+        "",
+        "The [registry](../registry.json) identifies each agent file; line counts use the actual source text, "
+        "not registry `_lines`. Inventory counts use package files in Git's file universe: "
+        "`manual/GLOBAL-INSTRUCTIONS.md`, `manual/knowledge/*.md`, and `manual/skills/*/SKILL.md`. "
+        "The source-controlled `InlineAgentSkill` components represent the same skills and are not counted again. "
+        "When manual knowledge is absent, count the Copilot Studio knowledge "
+        "files excluding `.mcs.yml` metadata. Manual steps count frames in `screenshots/manual/browserfilm.json`, "
+        "not successful or accepted actions.",
+    ]
     parts += [
         "", "## Draft Packages", "",
         _table(("Package", "Reason"), (
@@ -1406,25 +2016,24 @@ def _index(library: Library, selected: set[str]) -> str:
 def _taxonomy(library: Library, selected: set[str]) -> str:
     rows = []
     for vertical, solutions in _groups(library):
-        links = []
         for solution in solutions:
             target = (
                 f"../01-solutions/{solution.slug}/1.Overview.md" if solution.slug in selected
                 else f"../{solution.package}/README.md"
             )
             if solution.slug not in selected and solution.path("README.md") not in library.files:
-                links.append(solution.display_name + " — package README missing")
+                link = solution.display_name + " — package README missing"
             else:
-                links.append(f"[{solution.display_name}]({target})")
-        rows.append((vertical, "\n".join(links), "\n".join(sorted({_stage(solution) for solution in solutions}))))
+                link = f"[{solution.display_name}]({target})"
+            rows.append((vertical, link, _stage(solution)))
     return _table(("Vertical", "Solutions", "Journey stages"), rows, "No catalog solutions are recorded.")
 
 
 def _taxonomy_bounds(text: str) -> tuple[int, int]:
     if text.count(TAXONOMY_BEGIN) != 1 or text.count(TAXONOMY_END) != 1:
         raise RunbookSourceError(f"{OVERVIEW}: taxonomy markers must each appear exactly once")
-    begin = re.search(r"(?m)^" + re.escape(TAXONOMY_BEGIN) + r"$", text)
-    end = re.search(r"(?m)^" + re.escape(TAXONOMY_END) + r"$", text)
+    begin = re.search(r"(?m)^" + re.escape(TAXONOMY_BEGIN) + r"(?=\r?$)", text)
+    end = re.search(r"(?m)^" + re.escape(TAXONOMY_END) + r"(?=\r?$)", text)
     if not begin or not end or begin.end() >= end.start():
         raise RunbookSourceError(f"{OVERVIEW}: taxonomy markers must be ordered, exact standalone lines")
     return begin.end(), end.start()
@@ -1432,7 +2041,9 @@ def _taxonomy_bounds(text: str) -> tuple[int, int]:
 
 def _replace_taxonomy(text: str, table: str) -> str:
     begin, end = _taxonomy_bounds(text)
-    return text[:begin] + "\n\n" + table.strip() + "\n\n" + text[end:]
+    newline = "\r\n" if text[begin:begin + 2] == "\r\n" else "\n"
+    body = table.strip().replace("\r\n", "\n").replace("\n", newline)
+    return text[:begin] + newline * 2 + body + newline * 2 + text[end:]
 
 
 def _selection(library: Library, solutions) -> tuple[str, ...]:
@@ -1456,24 +2067,96 @@ def build_outputs(root: Path = ROOT, solutions=None) -> dict[str, str]:
     outputs[INDEX] = _index(library, set(selected))
     if OVERVIEW not in library.files:
         raise RunbookSourceError(f"Missing taxonomy host: {OVERVIEW}")
-    current = (library.root / OVERVIEW).read_bytes().decode("utf-8")
+    current = (library.root / OVERVIEW).read_bytes().decode("utf-8").replace("\r\n", "\n")
     outputs[OVERVIEW] = _replace_taxonomy(current, _taxonomy(library, set(selected)))
     return dict(sorted(outputs.items()))
+
+
+def _component_name(parent: Path, expected: str) -> str | None:
+    try:
+        names = os.listdir(parent)
+    except (FileNotFoundError, NotADirectoryError):
+        return None
+    if expected in names:
+        return expected
+    variants = sorted(name for name in names if name.casefold() == expected.casefold())
+    if len(variants) > 1:
+        raise RunbookSourceError(
+            f"Ambiguous case variants for {expected}: {', '.join(variants)}"
+        )
+    return variants[0] if variants else None
+
+
+def _actual_case_path(root: Path, relative: str) -> Path | None:
+    current = root
+    for component in PurePosixPath(relative).parts:
+        actual = _component_name(current, component)
+        if actual is None:
+            return None
+        current /= actual
+    return current
+
+
+def _generated_disk_entries(root: Path) -> dict[str, str]:
+    directory = _actual_case_path(root, "01-solutions")
+    if directory is None or not directory.is_dir():
+        return {}
+    def visit(parent: Path) -> dict[str, str]:
+        entries = {}
+        names = sorted(os.listdir(parent))
+        for name in names:
+            if name.startswith("."):
+                continue
+            path = parent / name
+            is_directory = path.is_dir()
+            if is_directory and not path.is_symlink():
+                entries.update(visit(path))
+            else:
+                entries[path.relative_to(root).as_posix()] = "directory" if is_directory else "file"
+        # Finder-only subtrees do not create stale output; genuinely empty
+        # unrecognized directories remain visible to the checker.
+        if entries or not names:
+            entries[parent.relative_to(root).as_posix()] = "directory"
+        return entries
+
+    return visit(directory)
 
 
 def _check_outputs(root: Path, outputs: dict[str, str]) -> list[str]:
     messages = []
     for relative, expected in sorted(outputs.items()):
         path = root / relative
+        actual = _actual_case_path(root, relative)
+        if actual is None:
+            messages.append(f"missing: {relative}")
+            continue
+        actual_name = actual.relative_to(root).as_posix()
+        if actual_name != relative:
+            messages.append(f"case mismatch: expected {relative}, found {actual_name}")
         if not path.is_file():
             messages.append(f"missing: {relative}")
-        elif path.read_bytes() != expected.encode("utf-8"):
+        if actual.is_file() and actual.read_bytes().replace(b"\r\n", b"\n") != expected.encode("utf-8").replace(b"\r\n", b"\n"):
             messages.append(
                 f"changed: taxonomy block in {relative}" if relative == OVERVIEW else f"changed: {relative}"
             )
     expected_paths = {name for name in outputs if name.startswith("01-solutions/")}
-    actual_paths = {name for name in _file_universe(root) if name.startswith("01-solutions/")}
+    expected_directories = {
+        parent.as_posix() for name in expected_paths for parent in PurePosixPath(name).parents
+        if parent.as_posix() != "."
+    }
+    actual_paths = {
+        name for name in _file_universe(root)
+        if name.startswith("01-solutions/")
+        and not any(part.startswith(".") for part in PurePosixPath(name).parts)
+    }
+    disk_entries = _generated_disk_entries(root)
+    actual_paths.update(name for name, kind in disk_entries.items() if kind == "file")
     messages.extend(f"stale extra file: {name}" for name in sorted(actual_paths - expected_paths))
+    extra_directories = {
+        name for name, kind in disk_entries.items()
+        if kind == "directory" and name not in expected_directories
+    }
+    messages.extend(f"stale extra directory: {name}" for name in sorted(extra_directories))
     return messages
 
 
@@ -1485,28 +2168,96 @@ def check(root: Path = ROOT) -> list[str]:
         return [f"source error: {exc}"]
 
 
+def _repair_path_case(root: Path, relative: str) -> bool:
+    current = root
+    changed = False
+    for component in PurePosixPath(relative).parts:
+        actual = _component_name(current, component)
+        if actual is None:
+            break
+        target = current / component
+        if actual != component:
+            original = current / actual
+            intermediate = current / f".{component}.runbook-case-rename"
+            suffix = 0
+            while os.path.lexists(intermediate):
+                suffix += 1
+                intermediate = current / f".{component}.runbook-case-rename-{suffix}"
+            # A direct overwrite preserves the old spelling on case-insensitive
+            # filesystems; the intermediate name forces a fresh directory entry.
+            os.rename(original, intermediate)
+            try:
+                os.rename(intermediate, target)
+            except OSError:
+                os.rename(intermediate, original)
+                raise
+            changed = True
+        current = target
+    return changed
+
+
+def _prune_outputs(root: Path, outputs: dict[str, str]) -> int:
+    expected = {name for name in outputs if name.startswith("01-solutions/")}
+    expected_directories = {
+        parent.as_posix() for name in expected for parent in PurePosixPath(name).parents
+        if parent.as_posix() != "."
+    }
+    removed = 0
+    directories = set()
+    for relative, kind in sorted(_generated_disk_entries(root).items()):
+        if kind != "file" or relative in expected:
+            continue
+        path = root / relative
+        if path.is_symlink():
+            continue
+        lines = path.read_bytes().splitlines()
+        if not lines or lines[0] != GENERATED_MARKER.encode("utf-8"):
+            continue
+        path.unlink()
+        removed += 1
+        directories.update(
+            parent.as_posix() for parent in PurePosixPath(relative).parents
+            if parent.as_posix().startswith("01-solutions/") and parent.as_posix() not in expected_directories
+        )
+    for relative in sorted(directories, key=lambda name: (-name.count("/"), name)):
+        try:
+            (root / relative).rmdir()
+        except OSError as exc:
+            if exc.errno not in {errno.ENOENT, errno.ENOTEMPTY, errno.EEXIST}:
+                raise
+    return removed
+
+
 def _write_outputs(root: Path, outputs: dict[str, str]) -> int:
+    if (root / "01-solutions").is_symlink():
+        raise RunbookSourceError("Refusing to write or prune a symlinked 01-solutions directory")
     changed = 0
     for relative, content in sorted(outputs.items()):
         if relative == OVERVIEW:
             continue
+        renamed = _repair_path_case(root, relative)
         path = root / relative
         encoded = content.encode("utf-8")
         if path.is_file() and path.read_bytes() == encoded:
+            changed += int(renamed)
             continue
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(encoded)
         changed += 1
+    changed += _prune_outputs(root, outputs)
     expected = outputs[OVERVIEW]
     begin, end = _taxonomy_bounds(expected)
     table = expected[begin:end].strip()
     # Re-read immediately before updating: the surrounding narrative is authored
     # independently and must never be overwritten by an earlier render snapshot.
+    renamed = _repair_path_case(root, OVERVIEW)
     path = root / OVERVIEW
     current = path.read_bytes().decode("utf-8")
     updated = _replace_taxonomy(current, table)
     if updated != current:
         path.write_bytes(updated.encode("utf-8"))
+        changed += 1
+    elif renamed:
         changed += 1
     return changed
 

@@ -20,7 +20,7 @@ Assets stay in the canonical package; this folder links to them without copying 
 | [manual/knowledge](../../../solutions/ask-hr/manual/knowledge) | Synthetic knowledge uploads |
 | [manual/skills](../../../solutions/ask-hr/manual/skills) | Operation-specific skill uploads |
 | [Portable agent](../../../agents/@aibast-agents-library/human_resources_stacks/ask_hr_stack/ask_hr_agent.py) | Runtime implementation |
-| [Demo case contract](../../../tests/demo_cases/ask-hr.json) | Executable persona-language routing and boundary checks |
+| [Demo case contract](../../../tests/demo_cases/ask-hr.json) | Locked persona-language routing and wording assertions |
 | [Level-2 architecture source](../../../state/architecture_level2_sources/ask-hr.json) | Domains, tools, and supporting features |
 
 ## Workshop Pages

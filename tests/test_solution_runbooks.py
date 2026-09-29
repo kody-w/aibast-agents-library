@@ -2,10 +2,14 @@
 import copy
 import importlib.util
 import json
+import os
 import re
 import subprocess
 import sys
-from pathlib import Path, PurePosixPath
+from collections import Counter
+from pathlib import Path, PurePosixPath, PureWindowsPath
+from types import SimpleNamespace
+from urllib.parse import unquote, urlsplit
 
 import pytest
 
@@ -20,7 +24,7 @@ OPTIONAL = ("5.Acceptance-Evidence.md",)
 SECTIONS = {
     "0.Resources/README.md": ("Package Resources", "Workshop Pages", "Evidence and Exports", "Sources"),
     "1.Overview.md": (
-        "Scenario Overview", "Problem Statement", "Solution Summary", "Business Outcomes",
+        "Scenario Overview", "Problem Statement", "Solution Summary", "Delivery Lanes", "Business Outcomes",
         "Target Users", "In Scope / Out of Scope", "Qualification Checklist",
         "What Actually Goes Wrong", "Related Patterns", "Sources", "Next",
     ),
@@ -60,8 +64,43 @@ REFERENCE_URLS = {
     RUNBOOKS_URL + "03-references/Agent-Delivery-Reference-Library.md",
     RUNBOOKS_URL + "03-references/Known-Limitations-and-Workarounds.md",
 }
-LEAK = re.compile(r"\b(?:None|null|nan|TODO|TBD|FIXME|undefined)\b|\{\}|\[\]|Lorem ipsum|<no value>")
+LEAK = re.compile(r"\b(?:None(?!\s+of\b)|null|nan|TODO|TBD|FIXME|undefined)\b|\{\}|\[\]|Lorem ipsum|<no value>")
 HEADING = re.compile(r"^ {0,3}(#{1,6})[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$")
+LANE_HEADER = "| | AIBAST Frontier (experimental) | Runbook lane |"
+LANE_ROWS = ("What you build", "Size", "Build steps", "Verify", "Microsoft-native form", "Choose it when")
+LANE_INDEX_HEADER = (
+    "| Solution | AIBAST Frontier (experimental): agent.py lines | Runbook lane: instructions · knowledge · skills | Manual build steps |"
+)
+FRONTIER_LANE_DESCRIPTOR = (
+    "AIBAST Frontier is an early, experimental learning lane: one portable agent file holds the behavior "
+    "and synthetic data so you can learn, teach, and change it immediately."
+)
+FRONTIER_OVERVIEW_DESCRIPTOR = (
+    "AIBAST Frontier is an early, experimental learning lane: learn it now, prove it works, land it native."
+)
+NOT_CAPTURED = "Manual build steps not captured (no screenshots/manual/browserfilm.json)"
+SKILL_KIND = re.compile(
+    r"""^kind:[ \t]*(?:InlineAgentSkill|'InlineAgentSkill'|"InlineAgentSkill")[ \t]*(?:#.*)?$""", re.M,
+)
+FORBIDDEN_FRONTIER_POSITIONING = re.compile(r"\bcode[- ]first\b", re.I)
+FRONTIER_DISCLAIMER = (
+    "AIBAST Frontier is an open-source learning library published in the Microsoft GitHub organization. "
+    "It is not a Microsoft product, is not part of the Microsoft Frontier program, "
+    "and does not confer Microsoft AI Cloud Partner Program badges or designations."
+)
+FRONTIER_PROGRAM_WORDS = re.compile(
+    r"\bearly[ -]access\b|\bopt[ -]in\b|"
+    r"\b(?:preview|release|programs?|partners?|badges?|designations?|certified|accelerate|suite|tuning|engineer)\b",
+    re.I,
+)
+PAGES = "https://microsoft.github.io/aibast-agents-library/"
+SENTINELS = {"none", "null", "nan", "{}", "[]", "undefined", "todo", "tbd", "fixme"}
+NUMERIC_CLAIM = re.compile(r"%|[$£€]\s*\d|\b\d+(?:\.\d+)?[xX]\b")
+PHASE_KEYS = tuple(f"phase_{number}" for number in range(1, 6))
+DELIVERY_FIELDS = (
+    "delivery_roles", "prerequisites", "phase_exit_criteria", "go_no_go",
+    "boundary_tests", "design_decisions", "never_do", "production_hardening",
+)
 
 
 def load_module(name, filename):
@@ -147,27 +186,52 @@ def validate_notes(data, catalog, pattern_ids, files):
     notes = data.get("solutions")
     assert isinstance(notes, dict), "runbook-notes.json: solutions must be an object"
     assert set(notes) <= set(catalog), f"Unknown notes catalogue keys: {sorted(set(notes) - set(catalog))}"
-    string_lists = {"scope_in", "scope_out", "qualification_checklist", "related_patterns", "sources"}
-    object_lists = {"target_users": {"role", "need"}, "what_goes_wrong": {"issue", "response"}}
-    allowed = string_lists | set(object_lists)
+    string_lists = {"scope_in", "scope_out", "qualification_checklist", "related_patterns", "sources", "never_do"}
+    object_lists = {
+        "target_users": {"role", "need"}, "what_goes_wrong": {"issue", "response"},
+        "delivery_roles": {"role", "responsibility"}, "prerequisites": {"item", "detail"},
+        "go_no_go": {"criterion", "threshold"}, "boundary_tests": {"prompt", "expected"},
+        "design_decisions": {"decision", "reason"}, "production_hardening": {"area", "action"},
+    }
+    allowed = string_lists | set(object_lists) | {"phase_exit_criteria"}
+
+    def valid_text(value, context):
+        assert isinstance(value, str) and value.strip(), f"{context}: expected nonempty text"
+        assert value.strip().casefold() not in SENTINELS, f"{context}: sentinel string {value!r}"
+
     for key, entry in notes.items():
         assert isinstance(entry, dict), f"{key}: notes must be an object"
         assert not set(entry) - allowed, f"{key}: unknown notes fields {sorted(set(entry) - allowed)}"
         if set(entry) - {"sources"}:
             assert entry.get("sources"), f"{key}: sources required when another notes field is present"
         for field, values in entry.items():
+            if field == "phase_exit_criteria":
+                assert isinstance(values, dict) and set(values) == set(PHASE_KEYS), (
+                    f"{key}.{field}: expected phase_1 through phase_5"
+                )
+                for phase, criteria in values.items():
+                    assert isinstance(criteria, list) and criteria, f"{key}.{field}.{phase}: expected a nonempty list"
+                    for criterion in criteria:
+                        valid_text(criterion, f"{key}.{field}.{phase}")
+                continue
             assert isinstance(values, list), f"{key}.{field}: expected list"
             for value in values:
                 if field in string_lists:
-                    assert isinstance(value, str) and value.strip(), f"{key}.{field}: expected nonempty strings"
+                    valid_text(value, f"{key}.{field}")
                 else:
                     assert isinstance(value, dict) and set(value) == object_lists[field], (
                         f"{key}.{field}: expected objects with {sorted(object_lists[field])}"
                     )
-                    assert all(isinstance(text, str) and text.strip() for text in value.values()), (
-                        f"{key}.{field}: object values must be nonempty strings"
-                    )
+                    for text in value.values():
+                        valid_text(text, f"{key}.{field}")
         for source in entry.get("sources", []):
+            url = urlsplit(source)
+            if url.scheme or url.netloc:
+                assert (
+                    url.scheme == "https" and url.netloc == "learn.microsoft.com"
+                    and url.path not in ("", "/") and ".." not in url.path.split("/")
+                ), f"{key}: external notes source must be a specific Microsoft Learn HTTPS URL: {source}"
+                continue
             assert not PurePosixPath(source).is_absolute() and ".." not in PurePosixPath(source).parts, (
                 f"{key}: notes source must be repository-relative: {source}"
             )
@@ -199,8 +263,10 @@ def validate_projection(expected, actual):
     assert not actual_files - expected_files, f"Extra generated files: {sorted(actual_files - expected_files)}"
     assert not expected_files - actual_files, f"Missing generated files: {sorted(expected_files - actual_files)}"
     for path in sorted(expected_files):
-        assert actual[path] == expected[path], f"Changed generated content: {path}"
-    assert actual.get("00-overview/README.md") == expected.get("00-overview/README.md"), "Taxonomy content drift"
+        assert actual[path].replace("\r\n", "\n") == expected[path].replace("\r\n", "\n"), f"Changed generated content: {path}"
+    assert actual.get("00-overview/README.md", "").replace("\r\n", "\n") == expected.get(
+        "00-overview/README.md", ""
+    ).replace("\r\n", "\n"), "Taxonomy content drift"
 
 
 def validate_generated_document(path, text, links):
@@ -263,10 +329,10 @@ def sources(links):
     files = links.git_file_universe(ROOT)
     catalog = read_json("solutions/catalog.json")["solutions"]
     packages = {}
-    for path in sorted((ROOT / "solutions").iterdir()):
-        if path.is_dir() and path.name != "_shared":
-            relative = f"solutions/{path.name}/deployment.json"
-            packages[path.name] = read_json(relative).get("name") if relative in files else None
+    directories = {path.split("/")[1] for path in files if path.startswith("solutions/") and path.count("/") >= 2}
+    for slug in sorted(directories - {"_shared"}):
+        relative = f"solutions/{slug}/deployment.json"
+        packages[slug] = read_json(relative).get("name") if relative in files else None
     return {
         "files": files, "catalog": catalog, "packages": packages,
         "patterns": read_json("02-patterns/patterns.json"),
@@ -288,8 +354,33 @@ def library(generator):
 
 
 @pytest.fixture(scope="module")
-def all_outputs(generator, slugs):
-    return generator.build_outputs(ROOT, solutions=slugs)
+def all_render(generator, slugs):
+    copies, solutions = [], {}
+    original_copy = generator.Document.copy
+    original_render = generator.render_solution
+
+    def observed_copy(document, relative, title=None, alternatives=()):
+        copies.append((document.path, relative, title, tuple(alternatives)))
+        return original_copy(document, relative, title, alternatives)
+
+    def observed_render(library, slug):
+        result = original_render(library, slug)
+        assert isinstance(result, dict), f"{slug}: render_solution must return an artifact mapping"
+        if slug in solutions:
+            assert solutions[slug] == result, f"{slug}: repeated render_solution calls differ"
+        solutions[slug] = dict(result)
+        return result
+
+    with pytest.MonkeyPatch.context() as observer:
+        observer.setattr(generator.Document, "copy", observed_copy)
+        observer.setattr(generator, "render_solution", observed_render)
+        outputs = generator.build_outputs(ROOT, solutions=slugs)
+    return SimpleNamespace(outputs=outputs, copies=copies, solutions=solutions)
+
+
+@pytest.fixture(scope="module")
+def all_outputs(all_render):
+    return all_render.outputs
 
 
 @pytest.fixture(scope="module")
@@ -323,11 +414,225 @@ def allowed_runbooks(sources):
 
 def expected_artifacts(slug, files):
     evidence = any(
-        PurePosixPath(path).match(f"solutions/{slug}/evals/*evidence*.json")
-        or path == f"solutions/{slug}/evals/visual-checkpoints.json"
+        path.rpartition("/")[0] == f"solutions/{slug}/evals"
+        and (
+            ("evidence" in path.rpartition("/")[2] and path.endswith(".json"))
+            or path.rpartition("/")[2] == "visual-checkpoints.json"
+        )
         for path in files
     )
     return set(ARTIFACTS) | (set(OPTIONAL) if evidence else set())
+
+
+def count_delivery_lanes(slug, agent, files, read_document):
+    agent_file = agent.get("_file")
+    assert agent_file in files, f"{slug}: registry agent file missing from Git universe: {agent_file!r}"
+    package = f"solutions/{slug}"
+
+    def children(directory):
+        return {path for path in files if path.rpartition("/")[0] == directory}
+
+    knowledge = {path for path in children(package + "/manual/knowledge") if path.endswith(".md")}
+    if not knowledge:
+        knowledge = {
+            path for path in children(package + "/copilot-studio/capabilities/knowledge/files")
+            if not path.endswith(".mcs.yml")
+        }
+    skills_prefix = package + "/manual/skills/"
+    skills = {
+        path for path in files if path.startswith(skills_prefix)
+        and path[len(skills_prefix):].count("/") == 1 and path.endswith("/SKILL.md")
+    }
+    components = {
+        path for path in children(package + "/copilot-studio/behaviors")
+        if path.endswith(".mcs.yml") and SKILL_KIND.search(read_document(path))
+    }
+    film = package + "/screenshots/manual/browserfilm.json"
+    steps = None
+    if film in files:
+        frames = json.loads(read_document(film)).get("frames")
+        assert isinstance(frames, list), f"{slug}: captured browserfilm must contain a frames list"
+        steps = len(frames)
+    return {
+        "agent_lines": len(read_document(agent_file).splitlines()),
+        "runbook_docs": len(expected_artifacts(slug, files)),
+        "instruction_sets": int(package + "/manual/GLOBAL-INSTRUCTIONS.md" in files),
+        "knowledge_files": len(knowledge),
+        "skills": len(skills),
+        "skill_components": len(components),
+        "manual_steps": steps,
+    }
+
+
+@pytest.fixture(scope="module")
+def lane_facts(sources):
+    agents = read_json("registry.json")["agents"]
+    facts = {}
+    for key, entry in sources["catalog"].items():
+        packages = [slug for slug, identity in sources["packages"].items() if identity == key]
+        matches = [agent for agent in agents if agent.get("name") == key]
+        assert len(packages) == len(matches) == 1, f"{key}: lane facts require unique package and registry joins"
+        slug = packages[0]
+        counts = count_delivery_lanes(
+            slug, matches[0], sources["files"],
+            lambda path: (ROOT / path).read_text(encoding="utf-8"),
+        )
+        facts[slug] = {"slug": slug, "display_name": entry["display_name"], **counts}
+    assert len(facts) == 51, f"Lane counts must independently measure all 51 catalogue solutions, got {len(facts)}"
+    return facts
+
+
+def rendered_section(text, title, links, context):
+    visible = links.strip_code(text, inline=False).splitlines()
+    headings = [(i, len(match[1]), match[2]) for i, line in enumerate(visible) if (match := HEADING.match(line))]
+    matches = [index for index, level, name in headings if level == 2 and name == title]
+    assert len(matches) == 1, f"{context}: expected exactly one {title!r} H2, found {len(matches)}"
+    start = matches[0]
+    raw = text.splitlines()
+    end = next((i for i, level, _ in headings if i > start and level <= 2), len(raw))
+    return "\n".join(raw[start + 1:end])
+
+
+def rendered_table(section, header, columns, context, links):
+    lines = links.strip_code(section, inline=False).splitlines()
+    raw_lines = section.splitlines()
+    starts = [i for i, line in enumerate(lines) if line.strip() == header]
+    assert len(starts) == 1, f"{context}: missing or duplicated exact table header {header!r}"
+    start = starts[0]
+
+    def cells(line):
+        assert line.strip().startswith("|") and line.strip().endswith("|"), f"{context}: malformed table row {line!r}"
+        values = [value.strip() for value in re.split(r"(?<!\\)\|", line.strip())[1:-1]]
+        assert len(values) == columns, f"{context}: expected {columns} columns, got {values}"
+        return values
+
+    assert start + 1 < len(lines), f"{context}: table separator is absent"
+    separator = cells(lines[start + 1])
+    assert all(re.fullmatch(r":?-+:?", cell) for cell in separator), f"{context}: malformed table separator"
+    rows = []
+    for index, line in enumerate(lines[start + 2:], start + 2):
+        if not line.strip().startswith("|"):
+            break
+        values = cells(line)
+        assert all(values), f"{context}: table row contains an empty cell: {line}"
+        rows.append((raw_lines[index], values))
+    return rows
+
+
+def require_lane_count(cell, number, unit, context):
+    phrase = f"{number} {unit}"
+    assert re.search(r"\b" + re.escape(phrase) + r"\b", cell), (
+        f"{context}: expected count {phrase!r}, found {cell!r}"
+    )
+
+
+def visible_prose(text, links):
+    text = links.strip_code(text, inline=False)
+    text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)
+    text = re.sub(r"<[^>]*>", " ", text)
+    text = text.replace("`", "").replace("**", "")
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def validate_frontier_language(documents):
+    assert documents, "Frontier language validation needs rendered documents"
+    for path, text in documents.items():
+        match = FORBIDDEN_FRONTIER_POSITIONING.search(text)
+        assert match is None, f"{path}: forbidden RAPP positioning {match[0]!r}" if match else ""
+
+
+def validate_frontier_descriptor(text, descriptor, links, context, *, first_mention=False):
+    prose = visible_prose(text, links)
+    assert descriptor in prose, f"{context}: the experimental learning-lane descriptor is absent or changed"
+    if first_mention:
+        assert prose.index("AIBAST Frontier") == prose.index(descriptor), (
+            f"{context}: the descriptor must be the first mention of AIBAST Frontier"
+        )
+
+
+def validate_delivery_lanes(overview, facts, links):
+    context = f"01-solutions/{facts['slug']}/1.Overview.md Delivery Lanes"
+    section = rendered_section(overview, "Delivery Lanes", links, context)
+    rows = rendered_table(section, LANE_HEADER, 3, context, links)
+    labels = [re.sub(r"[*`]", "", row[0]).rstrip(":").strip() for _, row in rows]
+    assert tuple(labels) == LANE_ROWS, f"{context}: row labels/order {labels!r} != {LANE_ROWS!r}"
+    by_label = dict(zip(labels, [cells for _, cells in rows]))
+    assert facts["skills"] == facts["skill_components"], (
+        f"{context}: manual skills ({facts['skills']}) differ from InlineAgentSkill source components ({facts['skill_components']})"
+    )
+    agent_cell, runbook_cell = by_label["Size"][1:]
+    expected_agent = f"1 file, {facts['agent_lines']} lines"
+    assert re.search(r"\b" + re.escape(expected_agent) + r"\b", agent_cell), (
+        f"{context}: expected agent size {expected_agent!r}, found {agent_cell!r}"
+    )
+    assert agent_cell == expected_agent, f"{context}: agent size cell must contain exactly {expected_agent!r}"
+    parts = [f"{facts['runbook_docs']} runbook documents"]
+    require_lane_count(runbook_cell, facts["runbook_docs"], "runbook documents", context)
+    for field, singular in (
+        ("instruction_sets", "instruction set"), ("knowledge_files", "knowledge file"),
+        ("skills", "skill"),
+    ):
+        unit = singular if facts[field] == 1 else singular + "s"
+        require_lane_count(runbook_cell, facts[field], unit, context)
+        parts.append(f"{facts[field]} {unit}")
+    assert runbook_cell == " · ".join(parts), f"{context}: runbook size facts/order differ: {runbook_cell!r}"
+    manual_cell = by_label["Build steps"][2]
+    if facts["manual_steps"] is None:
+        assert manual_cell == NOT_CAPTURED, f"{context}: missing exact not-captured sentence: {manual_cell!r}"
+    else:
+        require_lane_count(manual_cell, facts["manual_steps"], "manual build steps", context)
+        assert f"{facts['manual_steps']} manual build steps (captured frames)" in manual_cell, (
+            f"{context}: manual build steps must describe captured frames"
+        )
+        tutorial = (
+            "https://microsoft.github.io/aibast-agents-library/solutions/"
+            + facts["slug"] + "/manual-tutorial.html"
+        )
+        assert tutorial in {target for _, target in links.extract_links(manual_cell)}, (
+            f"{context}: captured steps must link to that package's manual tutorial"
+        )
+    prose = visible_prose(section, links)
+    validate_frontier_descriptor(section, FRONTIER_LANE_DESCRIPTOR, links, context)
+    assert re.search(
+        r"The Runbook lane builds the same agent by hand in Copilot Studio and "
+        r"(?:needs no|does not require) Python or local tooling\.",
+        prose, re.I,
+    ), f"{context}: the manual build's independence from Python and local tooling is not stated"
+    frontier = visible_prose(by_label["Choose it when"][1], links)
+    for term in (r"\blearn(?:ing)?\b", r"\bteach(?:ing)?\b", r"\bchang(?:e|ing)\b", r"\bimmediately\b"):
+        assert re.search(term, frontier, re.I), f"{context}: Frontier choice must explain learning, teaching and changing: {frontier!r}"
+    native = by_label["Microsoft-native form"]
+    assert "operation" in native[1] and re.search(r"\bskill\b", native[1], re.I), f"{context}: portable operations must map to skills"
+    assert "GitHub Copilot harness" in native[2] and "cliagent-1.0.0" in native[2], (
+        f"{context}: native form must identify the Copilot Studio harness agent"
+    )
+    assert "https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview" in native[2], (
+        f"{context}: native form must cite the verified harness documentation"
+    )
+
+
+def validate_lane_index(index, facts, generated_slugs, links):
+    context = "01-solutions/README.md Lane Complexity at a Glance"
+    section = rendered_section(index, "Lane Complexity at a Glance", links, context)
+    rows = rendered_table(section, LANE_INDEX_HEADER, 4, context, links)
+    assert len(rows) == len(facts) == 51, f"{context}: expected 51 rows, found {len(rows)}"
+    expected = sorted(facts.values(), key=lambda row: row["display_name"])
+    for (_, cells), record in zip(rows, expected):
+        match = re.fullmatch(r"\[([^\]]+)\]\(([^)]+)\)", cells[0])
+        assert match is not None, f"{context}: solution name must be linked: {cells[0]!r}"
+        assert match[1] == record["display_name"], (
+            f"{context}: rows must be sorted, unique and complete; expected {record['display_name']!r}, got {match[1]!r}"
+        )
+        slug = record["slug"]
+        target = f"{slug}/1.Overview.md" if slug in generated_slugs else f"../solutions/{slug}/README.md"
+        assert match[2].removeprefix("./") == target, f"{context}: {slug} links to {match[2]!r}, expected {target!r}"
+        assert cells[1] == str(record["agent_lines"]), (
+            f"{context}: {slug} agent.py lines expected {record['agent_lines']}, found {cells[1]!r}"
+        )
+        complexity = " · ".join(str(record[field]) for field in ("instruction_sets", "knowledge_files", "skills"))
+        assert cells[2] == complexity, f"{context}: {slug} manual components expected {complexity!r}, found {cells[2]!r}"
+        manual = "not captured" if record["manual_steps"] is None else str(record["manual_steps"])
+        assert cells[3] == manual, f"{context}: {slug} manual steps expected {manual!r}, found {cells[3]!r}"
 
 
 def test_generator_public_contract(generator):
@@ -361,11 +666,11 @@ def test_joined_library_loads_with_registry_architecture_and_demo_sources(librar
         assert f"tests/demo_cases/{slug}.json" in sources["files"], f"{slug}: missing demo cases"
 
 
-def test_projection_on_disk_is_in_sync(generator, pilot_outputs):
+def test_projection_on_disk_is_in_sync(generator, pilot_outputs, sources):
     assert_clean(generator.check(ROOT), "Generator check() reports source/projection drift")
     actual = {
-        path.relative_to(ROOT).as_posix(): path.read_bytes().decode("utf-8")
-        for path in (ROOT / "01-solutions").rglob("*") if path.is_file()
+        path: (ROOT / path).read_bytes().decode("utf-8")
+        for path in sources["files"] if path.startswith("01-solutions/")
     }
     actual["00-overview/README.md"] = (ROOT / "00-overview/README.md").read_bytes().decode("utf-8")
     validate_projection(pilot_outputs, actual)
@@ -373,8 +678,7 @@ def test_projection_on_disk_is_in_sync(generator, pilot_outputs):
 
 def test_only_case_exact_pilot_artifacts_are_on_disk(generator, sources):
     actual = {
-        path.relative_to(ROOT).as_posix()
-        for path in (ROOT / "01-solutions").rglob("*") if path.is_file()
+        path for path in sources["files"] if path.startswith("01-solutions/")
     }
     expected = {"01-solutions/README.md"} | {
         f"01-solutions/{slug}/{artifact}"
@@ -384,11 +688,12 @@ def test_only_case_exact_pilot_artifacts_are_on_disk(generator, sources):
     assert actual == expected, f"Pilot file set: extra={sorted(actual - expected)}, missing={sorted(expected - actual)}"
 
 
-def test_all_51_solutions_render_every_artifact(generator, library, slugs, sources, all_outputs):
+def test_all_51_solutions_render_every_artifact(slugs, sources, all_outputs, all_render):
     assert len(slugs) == 51, f"All-solution render must measure 51 packages, got {len(slugs)}"
+    assert set(all_render.solutions) == set(slugs), "Every catalogue package must be measured through render_solution"
     expected = {"01-solutions/README.md", "00-overview/README.md"}
     for slug in slugs:
-        rendered = generator.render_solution(library, slug)
+        rendered = all_render.solutions[slug]
         artifacts = expected_artifacts(slug, sources["files"])
         assert set(rendered) == artifacts, f"{slug}: rendered artifacts {sorted(rendered)} != {sorted(artifacts)}"
         for artifact, text in rendered.items():
@@ -565,6 +870,75 @@ def test_negative_projection_drift(pilot_outputs, mutation, expected_error):
     validate_projection(pilot_outputs, dict(pilot_outputs))
 
 
+def memory_filesystem(monkeypatch, root, documents, *, case_insensitive=False):
+    original_is_file, original_is_dir = Path.is_file, Path.is_dir
+    original_read_bytes, original_is_symlink = Path.read_bytes, Path.is_symlink
+    original_listdir = os.listdir
+
+    def relative(path):
+        if isinstance(path, int):
+            return None
+        path = Path(os.fsdecode(path))
+        return path.relative_to(root).as_posix() if path.is_relative_to(root) else None
+
+    def directories():
+        return {"."} | {parent.as_posix() for name in documents for parent in PurePosixPath(name).parents}
+
+    def lookup(name, names):
+        if name in names:
+            return name
+        if case_insensitive:
+            return next((item for item in names if item.casefold() == name.casefold()), None)
+        return None
+
+    def is_file(path):
+        name = relative(path)
+        return lookup(name, documents) is not None if name is not None else original_is_file(path)
+
+    def is_dir(path):
+        name = relative(path)
+        return lookup(name, directories()) is not None if name is not None else original_is_dir(path)
+
+    def read_bytes(path):
+        name = relative(path)
+        if name is None:
+            return original_read_bytes(path)
+        found = lookup(name, documents)
+        if found is None:
+            raise FileNotFoundError(path)
+        return documents[found].encode("utf-8")
+
+    def listdir(path):
+        name = relative(path)
+        if name is None:
+            return original_listdir(path)
+        found = lookup(name, directories())
+        if found is None:
+            raise FileNotFoundError(path)
+        prefix = "" if found == "." else found + "/"
+        return sorted({
+            item[len(prefix):].split("/", 1)[0]
+            for item in set(documents) | directories()
+            if item.startswith(prefix) and item not in (".", found)
+        })
+
+    def refuse_write(*args, **kwargs):
+        raise AssertionError("Read-only test attempted a filesystem write")
+
+    monkeypatch.setattr(Path, "is_file", is_file)
+    monkeypatch.setattr(Path, "is_dir", is_dir)
+    monkeypatch.setattr(Path, "read_bytes", read_bytes)
+    monkeypatch.setattr(
+        Path, "is_symlink",
+        lambda path: False if relative(path) is not None else original_is_symlink(path),
+    )
+    monkeypatch.setattr(os, "listdir", listdir)
+    for method in ("write_bytes", "write_text", "mkdir", "unlink", "rename"):
+        monkeypatch.setattr(Path, method, refuse_write)
+    for method in ("rename", "replace", "mkdir", "unlink"):
+        monkeypatch.setattr(os, method, refuse_write)
+
+
 @pytest.mark.parametrize(
     "mutation, message",
     [
@@ -575,31 +949,13 @@ def test_negative_projection_drift(pilot_outputs, mutation, expected_error):
         ("taxonomy", "changed: taxonomy block in 00-overview/README.md"),
     ],
 )
-def test_negative_generator_check_on_memory_filesystem(generator, pilot_outputs, monkeypatch, mutation, message):
+def test_negative_generator_check_on_memory_filesystem(generator, case_projection, monkeypatch, mutation, message):
+    pilot_outputs = case_projection
     virtual_root = ROOT / "virtual-runbook-test"
     actual = dict(pilot_outputs)
-    original_is_file, original_read_bytes = Path.is_file, Path.read_bytes
-
-    def relative(path):
-        return path.relative_to(virtual_root).as_posix() if path.is_relative_to(virtual_root) else None
-
-    def is_file(path):
-        name = relative(path)
-        return name in actual if name is not None else original_is_file(path)
-
-    def read_bytes(path):
-        name = relative(path)
-        return actual[name].encode("utf-8") if name is not None else original_read_bytes(path)
-
-    def refuse_write(*args, **kwargs):
-        raise AssertionError("check() attempted a filesystem write")
-
+    memory_filesystem(monkeypatch, virtual_root, actual)
     monkeypatch.setattr(generator, "build_outputs", lambda root: dict(pilot_outputs))
     monkeypatch.setattr(generator, "_file_universe", lambda root: frozenset(actual))
-    monkeypatch.setattr(Path, "is_file", is_file)
-    monkeypatch.setattr(Path, "read_bytes", read_bytes)
-    for method in ("write_bytes", "write_text", "mkdir", "unlink", "rename"):
-        monkeypatch.setattr(Path, method, refuse_write)
     assert generator.check(virtual_root) == [], "Unmutated in-memory control must pass check()"
     actual.clear()
     actual.update(mutated_projection(pilot_outputs, mutation))
@@ -608,6 +964,53 @@ def test_negative_generator_check_on_memory_filesystem(generator, pilot_outputs,
     actual.clear()
     actual.update(pilot_outputs)
     assert generator.check(virtual_root) == [], f"{mutation}: in-memory revert must restore check() to green"
+
+
+def validate_case_drift_messages(problems, original, renamed):
+    assert f"case mismatch: expected {original}, found {renamed}" in problems, (
+        f"Case-only rename was not detected: {problems}"
+    )
+    assert f"stale extra file: {renamed}" in problems, f"On-disk renamed spelling was not measured: {problems}"
+
+
+@pytest.mark.parametrize("component", ["file", "directory"])
+def test_negative_case_drift_on_case_insensitive_filesystem(generator, case_projection, monkeypatch, component):
+    pilot_outputs = case_projection
+    virtual_root = ROOT / "virtual-runbook-test"
+    actual = dict(pilot_outputs)
+    cached_files = frozenset(actual)
+    memory_filesystem(monkeypatch, virtual_root, actual, case_insensitive=True)
+    monkeypatch.setattr(generator, "build_outputs", lambda root: dict(pilot_outputs))
+    monkeypatch.setattr(generator, "_file_universe", lambda root: cached_files)
+    assert generator.check(virtual_root) == [], "Case-insensitive control must pass before mutation"
+    original = "01-solutions/ask-hr/4.Sample-prompts.md"
+    if component == "file":
+        renamed = "01-solutions/ask-hr/4.Sample-Prompts.md"
+        actual[renamed] = actual.pop(original)
+    else:
+        renamed = original.replace("/ask-hr/", "/Ask-hr/")
+        replacements = {name.replace("/ask-hr/", "/Ask-hr/"): text for name, text in actual.items()}
+        actual.clear()
+        actual.update(replacements)
+    assert original in cached_files and renamed not in cached_files, "Git must retain the original indexed spelling"
+    assert (virtual_root / original).is_file(), "Simulation must reproduce case-insensitive stat success"
+    assert (virtual_root / original).read_bytes() == pilot_outputs[original].encode("utf-8"), (
+        "Simulation must reproduce unchanged bytes through the incorrectly cased path"
+    )
+    with monkeypatch.context() as legacy:
+        legacy.setattr(
+            generator, "_actual_case_path",
+            lambda root, relative: root / relative if (root / relative).is_file() else None,
+        )
+        legacy.setattr(generator, "_generated_disk_entries", lambda root: {})
+        old_problems = generator.check(virtual_root)
+        assert old_problems == [], f"The former index/stat lookup must reproduce its false green: {old_problems}"
+        with pytest.raises(AssertionError, match="Case-only rename was not detected"):
+            validate_case_drift_messages(old_problems, original, renamed)
+    validate_case_drift_messages(generator.check(virtual_root), original, renamed)
+    actual.clear()
+    actual.update(pilot_outputs)
+    assert generator.check(virtual_root) == [], "Restoring case must restore the control to green"
 
 
 def test_negative_owned_surface_declaration(disk_docs):
@@ -694,6 +1097,7 @@ def test_pages_github_and_allowlisted_runbooks_urls_resolve_offline(links):
             "[page](https://microsoft.github.io/aibast-agents-library/docs/)\n"
             "[blob](https://github.com/microsoft/aibast-agents-library/blob/main/docs/Target.md#hello)\n"
             "[tree](https://github.com/microsoft/aibast-agents-library/tree/main/docs)\n"
+            "[raw](https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/docs/Target.md#hello)\n"
             f"[runbooks]({reference})\n"
         ),
         "docs/Target.md": "# Hello\n", "docs/index.html": "<h1 id='hello'>Hello</h1>\n",
@@ -714,7 +1118,13 @@ def test_pages_github_and_allowlisted_runbooks_urls_resolve_offline(links):
         ("file:///home/example/README.md", "forbidden link"),
         ("/home/example/README.md", "forbidden link"),
         ("C:\\work\\README.md", "forbidden link"),
-        ("https://github.com/" + "-".join(("kody", "w")) + "/example", "forbidden link"),
+        ("https://github.com/contoso/aibast-agents-library/blob/main/README.md", "forbidden link"),
+        ("https://contoso.github.io/aibast-agents-library/README.md", "forbidden link"),
+        ("https://microsoft.github.io/aibast-agent-library/index.html", "unmapped URL"),
+        ("https://microsoft.github.io:444/aibast-agents-library/index.html", "unmapped URL"),
+        ("https://raw.githubusercontent.com/microsoft/aibast-agents-library/other/README.md", "unmapped URL"),
+        ("https://user@raw.githubusercontent.com/microsoft/aibast-agents-library/main/README.md", "unmapped URL"),
+        ("https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/missing.md", "missing target"),
     ],
 )
 def test_negative_external_mapping_and_forbidden_destinations(links, target, kind):
@@ -722,20 +1132,58 @@ def test_negative_external_mapping_and_forbidden_destinations(links, target, kin
     assert len(problems) == 1 and problems[0].kind == kind, f"{target}: expected {kind}, got {problems}"
 
 
+def test_prose_attributes_never_create_phantom_anchors_or_links(links):
+    text = (
+        "# Home\n\nVerify Group ID = `28b6` and retry. Jump to [phantom](#and).\n\n"
+        "Set the image src = hero.png and href = other.md.\n"
+    )
+    assert links.anchors_of(text) == {"home"}, "Prose id/name text created a phantom anchor"
+    assert links.extract_links(text) == [(3, "#and")], "Prose href/src text created a phantom link"
+    problems = links.check_links(ROOT, {"README.md": text}, files=set())
+    assert len(problems) == 1 and problems[0].kind == "missing anchor", problems
+
+
+def test_html_attribute_values_are_not_reparsed_as_attributes(links):
+    text = """<a title="id='ghost' src='ghost.png' >" id="real" href="Target.md">real link</a>"""
+    assert links.anchors_of(text) == {"real"}, "Quoted attribute data created phantom anchors"
+    assert links.extract_links(text) == [(1, "Target.md")], "Quoted attribute data created phantom links"
+
+
 def test_git_universe_includes_untracked_and_overlay_but_not_deleted_files(links, monkeypatch):
     root = Path("virtual-repository")
     calls = []
+    memory_filesystem(monkeypatch, root, {"Tracked.md": "# Tracked\n", "Untracked.md": "# Untracked\n"})
 
     def git_run(command, **kwargs):
         calls.append((command, kwargs))
         return subprocess.CompletedProcess(command, 0, "Tracked.md\0Untracked.md\0Deleted.md\0", "")
 
     monkeypatch.setattr(links.subprocess, "run", git_run)
-    monkeypatch.setattr(Path, "is_file", lambda path: path.name in {"Tracked.md", "Untracked.md"})
     files = links.git_file_universe(root, {"Generated.md": "# Generated\n"})
     assert files == {"Tracked.md", "Untracked.md", "Generated.md"}, f"Wrong Git universe: {files}"
     assert calls[0][0] == ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"]
     assert calls[0][1]["cwd"] == root and calls[0][1]["check"] is True, "Git failure/root handling changed"
+
+
+@pytest.mark.parametrize("renamed", ["Docs/target.md", "docs/Target.md"])
+def test_git_universe_rejects_stale_index_casing_on_case_insensitive_disks(links, monkeypatch, renamed):
+    root = ROOT / "virtual-link-test"
+    indexed = "Docs/Target.md"
+    actual = {indexed: "# Target\n"}
+    memory_filesystem(monkeypatch, root, actual, case_insensitive=True)
+    monkeypatch.setattr(
+        links.subprocess, "run",
+        lambda command, **kwargs: subprocess.CompletedProcess(command, 0, indexed + "\0", ""),
+    )
+    assert links.git_file_universe(root) == {indexed}, "Correctly cased indexed control must be measurable"
+    actual[renamed] = actual.pop(indexed)
+    assert (root / indexed).is_file(), "Simulation must reproduce the macOS stat false positive"
+    assert links.git_file_universe(root) == set(), "Stale Git casing must not invent an existing on-disk file"
+    assert links.git_file_universe(root, {indexed: "# In-memory replacement\n"}) == {indexed}, (
+        "Explicit in-memory documents must remain valid even when no exact disk file exists"
+    )
+    actual[indexed] = actual.pop(renamed)
+    assert links.git_file_universe(root) == {indexed}, "Restoring exact case must restore the file universe"
 
 
 @pytest.mark.parametrize("text, status", [("# Home\n", 0), ("[broken](missing.md)\n", 1)])
@@ -843,3 +1291,1050 @@ def test_heading_only_section_is_empty_even_when_later_sections_have_code(links)
     ).rstrip() + "\n"
     with pytest.raises(AssertionError, match="empty section 'Scenario Overview'"):
         validate_generated_document("01-solutions/example/1.Overview.md", text, links)
+
+
+def test_delivery_lanes_all_51_overviews_match_independent_repository_facts(all_outputs, lane_facts, links):
+    assert len(lane_facts) == 51, "Delivery Lanes validation must measure all catalogue solutions"
+    for slug, facts in sorted(lane_facts.items()):
+        path = f"01-solutions/{slug}/1.Overview.md"
+        assert path in all_outputs, f"{path}: overview missing from all-solution render"
+        validate_delivery_lanes(all_outputs[path], facts, links)
+
+
+def test_delivery_lane_indexes_have_51_sorted_correct_rows(all_outputs, pilot_outputs, lane_facts, links):
+    validate_lane_index(all_outputs["01-solutions/README.md"], lane_facts, set(lane_facts), links)
+    validate_lane_index(pilot_outputs["01-solutions/README.md"], lane_facts, set(PILOTS), links)
+
+
+def test_delivery_lane_counting_boundaries_fallback_and_actual_agent_lines():
+    documents = {
+        "agents/example.py": "first line\nsecond line\n",
+        "solutions/example/manual/GLOBAL-INSTRUCTIONS.md": "# Instructions\n",
+        "solutions/example/copilot-studio/capabilities/knowledge/files/one.md": "# Knowledge\n",
+        "solutions/example/copilot-studio/capabilities/knowledge/files/two.csv": "key,value\n",
+        "solutions/example/copilot-studio/capabilities/knowledge/files/one.md.mcs.yml": "metadata\n",
+        "solutions/example/copilot-studio/capabilities/knowledge/files/nested/ignored.md": "nested\n",
+        "solutions/example/manual/skills/one/SKILL.md": "# Skill\n",
+        "solutions/example/manual/skills/one/nested/SKILL.md": "# Nested\n",
+        "solutions/example/copilot-studio/behaviors/one.mcs.yml": "kind: InlineAgentSkill\n",
+        "solutions/example/copilot-studio/behaviors/two.mcs.yml": "kind: AdaptiveDialog\n",
+        "solutions/example/copilot-studio/behaviors/nested/ignored.mcs.yml": "nested\n",
+        "archive/solutions/example/manual/knowledge/ignored.md": "not the package\n",
+        "archive/solutions/example/evals/copied-evidence.json": "{}\n",
+    }
+    agent = {"_file": "agents/example.py", "_lines": 999}
+    expected = {
+        "agent_lines": 2, "runbook_docs": 5, "instruction_sets": 1, "knowledge_files": 2,
+        "skills": 1, "skill_components": 1, "manual_steps": None,
+    }
+    assert count_delivery_lanes("example", agent, set(documents), documents.__getitem__) == expected
+    documents.update({
+        "solutions/example/manual/knowledge/one.md": "# Manual knowledge takes precedence\n",
+        "solutions/example/manual/knowledge/nested/ignored.md": "# Nested\n",
+        "solutions/example/evals/release-evidence.json": "{}\n",
+        "solutions/example/screenshots/manual/browserfilm.json": '{"frames": [{}, {}, {}]}\n',
+    })
+    expected.update(knowledge_files=1, runbook_docs=6, manual_steps=3)
+    assert count_delivery_lanes("example", agent, set(documents), documents.__getitem__) == expected
+    del documents["solutions/example/manual/GLOBAL-INSTRUCTIONS.md"]
+    expected["instruction_sets"] = 0
+    assert count_delivery_lanes("example", agent, set(documents), documents.__getitem__) == expected
+
+
+def test_negative_delivery_lanes_tampered_rendered_count(all_outputs, lane_facts, links):
+    facts = lane_facts["ask-hr"]
+    overview = all_outputs["01-solutions/ask-hr/1.Overview.md"]
+    validate_delivery_lanes(overview, facts, links)
+    section = rendered_section(overview, "Delivery Lanes", links, "count mutation")
+    phrase = f"{facts['runbook_docs']} runbook documents"
+    bad_phrase = f"{facts['runbook_docs'] + 10} runbook documents"
+    changed_section = section.replace(phrase, bad_phrase, 1)
+    assert changed_section != section, "Count mutation must alter the rendered Delivery Lanes section"
+    changed = overview.replace(section, changed_section, 1)
+    with pytest.raises(AssertionError, match="expected count " + re.escape(repr(phrase))):
+        validate_delivery_lanes(changed, facts, links)
+    validate_delivery_lanes(overview, facts, links)
+
+
+def test_negative_lane_index_missing_row(all_outputs, lane_facts, links):
+    index = all_outputs["01-solutions/README.md"]
+    validate_lane_index(index, lane_facts, set(lane_facts), links)
+    section = rendered_section(index, "Lane Complexity at a Glance", links, "missing row mutation")
+    rows = rendered_table(section, LANE_INDEX_HEADER, 4, "missing row mutation", links)
+    changed = index.replace(rows[0][0] + "\n", "", 1)
+    assert changed != index, "Missing-row mutation made no change"
+    with pytest.raises(AssertionError, match="expected 51 rows, found 50"):
+        validate_lane_index(changed, lane_facts, set(lane_facts), links)
+    validate_lane_index(index, lane_facts, set(lane_facts), links)
+
+
+@pytest.mark.parametrize(
+    "column, message",
+    [(1, "agent.py lines expected"), (2, "manual components expected"), (3, "manual steps expected")],
+)
+def test_negative_lane_index_wrong_row_value(all_outputs, lane_facts, links, column, message):
+    index = all_outputs["01-solutions/README.md"]
+    validate_lane_index(index, lane_facts, set(lane_facts), links)
+    section = rendered_section(index, "Lane Complexity at a Glance", links, "wrong row value mutation")
+    row, original_cells = rendered_table(section, LANE_INDEX_HEADER, 4, "wrong row value mutation", links)[0]
+    cells = list(original_cells)
+    cells[column] += "0"
+    changed_row = "| " + " | ".join(cells) + " |"
+    changed = index.replace(row, changed_row, 1)
+    assert changed != index, "Row-value mutation made no change"
+    with pytest.raises(AssertionError, match=re.escape(message)):
+        validate_lane_index(changed, lane_facts, set(lane_facts), links)
+    validate_lane_index(index, lane_facts, set(lane_facts), links)
+
+
+def test_negative_lane_index_unsorted_rows(all_outputs, lane_facts, links):
+    index = all_outputs["01-solutions/README.md"]
+    section = rendered_section(index, "Lane Complexity at a Glance", links, "row order mutation")
+    rows = rendered_table(section, LANE_INDEX_HEADER, 4, "row order mutation", links)
+    first, second = rows[0][0], rows[1][0]
+    changed = index.replace(first + "\n" + second, second + "\n" + first, 1)
+    assert changed != index, "Row-order mutation made no change"
+    with pytest.raises(AssertionError, match="rows must be sorted, unique and complete"):
+        validate_lane_index(changed, lane_facts, set(lane_facts), links)
+
+
+def test_negative_delivery_lane_table_cannot_hide_in_code(all_outputs, lane_facts, links):
+    overview = all_outputs["01-solutions/ask-hr/1.Overview.md"]
+    section = rendered_section(overview, "Delivery Lanes", links, "fenced table mutation")
+    changed = overview.replace(section, "\n```markdown\n" + section + "\n```\n", 1)
+    assert changed != overview, "Fenced-table mutation made no change"
+    with pytest.raises(AssertionError, match="missing or duplicated exact table header"):
+        validate_delivery_lanes(changed, lane_facts["ask-hr"], links)
+
+
+def test_frontier_first_language_in_all_runbooks_spine_and_touched_docs(all_outputs, disk_docs):
+    validate_frontier_language({**disk_docs, **all_outputs})
+
+
+@pytest.mark.parametrize("phrase", ["code-first", "Code first"])
+def test_negative_frontier_first_language(phrase):
+    documents = {"01-solutions/example/1.Overview.md": f"RAPP is a {phrase} SDK.\n"}
+    with pytest.raises(AssertionError, match="forbidden RAPP positioning"):
+        validate_frontier_language(documents)
+
+
+def test_delivery_lane_missing_capture_is_explicit_in_rendered_output(generator, library, lane_facts, links):
+    slug = next(slug for slug in sorted(lane_facts) if slug not in PILOTS)
+    film = f"solutions/{slug}/screenshots/manual/browserfilm.json"
+    assert film in library.files, "Missing-capture mutation needs an initially captured source"
+    changed_library = copy.copy(library)
+    changed_library.files = library.files - {film}
+    facts = {**lane_facts[slug], "manual_steps": None}
+    overview = generator.render_solution(changed_library, slug)["1.Overview.md"]
+    validate_delivery_lanes(overview, facts, links)
+    assert NOT_CAPTURED in overview, "Rendered output did not acknowledge the absent capture"
+    changed = overview.replace(NOT_CAPTURED, "Manual build steps unavailable.", 1)
+    with pytest.raises(AssertionError, match="missing exact not-captured sentence"):
+        validate_delivery_lanes(changed, facts, links)
+    assert film in library.files, "In-memory missing-capture probe changed the shared source library"
+
+
+def validate_demo_urls(catalog, packages, outputs, links):
+    count = 0
+    for key, solution in catalog.items():
+        slugs = [slug for slug, identity in packages.items() if identity == key]
+        assert len(slugs) == 1, f"{key}: cannot join demo links to one package"
+        path = f"01-solutions/{slugs[0]}/4.Sample-prompts.md"
+        actual = Counter(target for _, target in links.extract_links(outputs[path]))
+        expected = Counter()
+        for prompt in solution["sample_prompts"]:
+            url = prompt.get("demo_url")
+            assert isinstance(url, str) and url, f"{key}: demo_url is missing"
+            expected[PAGES + url.lstrip("/")] += 1
+            count += 1
+        assert not expected - actual, f"{path}: missing exact demo URLs/query strings: {dict(expected - actual)}"
+    return count
+
+
+def test_canonical_pages_base_and_all_227_demo_queries(generator, links, sources, all_outputs):
+    assert generator.PAGES == links.PAGES == PAGES, "Generator/checker Pages base is not canonical"
+    assert validate_demo_urls(sources["catalog"], sources["packages"], all_outputs, links) == 227
+
+
+def test_negative_dropped_demo_query(sources, all_outputs, links):
+    changed = dict(all_outputs)
+    path = "01-solutions/ask-hr/4.Sample-prompts.md"
+    demo = sources["catalog"]["@aibast-agents-library/ask-hr"]["sample_prompts"][0]["demo_url"]
+    expected = PAGES + demo.lstrip("/")
+    assert "?" in expected and expected in changed[path], "Query mutation requires a rendered scenario URL"
+    changed[path] = changed[path].replace(expected, expected.split("?", 1)[0], 1)
+    with pytest.raises(AssertionError, match="missing exact demo URLs/query strings"):
+        validate_demo_urls(sources["catalog"], sources["packages"], changed, links)
+
+
+def validate_mermaid(text, context):
+    blocks = re.findall(r"^```mermaid[ \t]*\n(.*?)^```[ \t]*$", text, re.M | re.S)
+    assert blocks, f"{context}: no Mermaid diagram was measured"
+    for block in blocks:
+        lines = [line.strip() for line in block.splitlines() if line.strip()]
+        assert lines and lines[0] == "flowchart LR", f"{context}: Mermaid must start with flowchart LR"
+        nodes, edges = set(), []
+        for line in lines[1:]:
+            node = re.fullmatch(r'(n\d+)\["[^"\n]*"\]', line)
+            edge = re.fullmatch(r"(n\d+)\s*-->\s*(n\d+)", line)
+            assert node or edge, f"{context}: malformed Mermaid line: {line!r}"
+            if node:
+                assert node[1] not in nodes, f"{context}: duplicate Mermaid node {node[1]}"
+                nodes.add(node[1])
+            else:
+                edges.append((edge[1], edge[2]))
+        assert nodes, f"{context}: Mermaid diagram has no nodes"
+        for start, end in edges:
+            assert {start, end} <= nodes, f"{context}: Mermaid edge uses undefined node: {start} -> {end}"
+
+
+def test_all_51_architecture_diagrams_are_structurally_valid(all_outputs, slugs):
+    for slug in slugs:
+        path = f"01-solutions/{slug}/2.Architecture.md"
+        validate_mermaid(all_outputs[path], path)
+
+
+@pytest.mark.parametrize(
+    "body, message",
+    [
+        ('flowchart LR\nn0["Unclosed]\n', "malformed Mermaid line"),
+        ('flowchart LR\nn0["First"]\nn0["Again"]\n', "duplicate Mermaid node"),
+        ('flowchart LR\nn0["Only"]\nn0 --> n1\n', "undefined node"),
+        ('flowchart TD\nn0["First"]\n', "must start with flowchart LR"),
+    ],
+)
+def test_negative_mermaid_structure(body, message):
+    with pytest.raises(AssertionError, match=message):
+        validate_mermaid("```mermaid\n" + body + "```\n", "mutation")
+
+
+def note_texts(value, prefix="notes"):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key != "sources":
+                yield from note_texts(item, prefix + "." + key)
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from note_texts(item, f"{prefix}[{index}]")
+    elif isinstance(value, str):
+        yield prefix, value
+
+
+def validate_claims(texts):
+    for context, text in texts:
+        match = NUMERIC_CLAIM.search(text)
+        assert match is None, f"{context}: unsupported quantitative claim {match[0]!r}" if match else ""
+
+
+def validate_synthetic_labels(outputs, links):
+    measured = 0
+    for path, text in outputs.items():
+        title = (
+            "Demo Prompts" if path.endswith("/4.Sample-prompts.md")
+            else "Phase 4 — Acceptance" if path.endswith("/3.Runbook.md") else None
+        )
+        if title is None:
+            continue
+        body = rendered_section(text, title, links, path)
+        label = re.search(r"\*\*Synthetic (?:demo )?(?:evidence|acceptance):\*\*", body, re.I)
+        assert label, f"{path}: missing synthetic label before {title} evidence"
+        payload = re.search(r"(?m)^\s*(?:\||-\s+\[[ xX]\])", body)
+        assert payload and label.start() < payload.start(), f"{path}: synthetic label must precede evidence/checks"
+        measured += 1
+    return measured
+
+
+def test_notes_and_spine_claims_are_qualitative(sources, disk_docs, links):
+    validate_claims(note_texts(sources["notes"]["solutions"]))
+    prose = []
+    for path, text in disk_docs.items():
+        if path.startswith(("00-overview/", "02-patterns/", "03-references/")):
+            text = visible_prose(links.strip_code(text), links)
+            prose.append((path, re.sub(r"https?://\S+", "", text)))
+    assert prose, "No spine claims were measured"
+    validate_claims(prose)
+
+
+def test_synthetic_labels_precede_all_demo_and_acceptance_evidence(all_outputs, links):
+    assert validate_synthetic_labels(all_outputs, links) == 102, "Every solution needs both synthetic labels"
+
+
+@pytest.mark.parametrize("claim", ["Reduce volume by 40%.", "Save $2M.", "Deliver 3x impact."])
+def test_negative_quantified_notes_claims(sources, claim):
+    notes = copy.deepcopy(sources["notes"]["solutions"])
+    next(iter(notes.values()))["scope_in"] = [claim]
+    with pytest.raises(AssertionError, match="unsupported quantitative claim"):
+        validate_claims(note_texts(notes))
+
+
+def test_negative_removed_synthetic_label(all_outputs, links):
+    changed = dict(all_outputs)
+    path = "01-solutions/ask-hr/4.Sample-prompts.md"
+    before = changed[path]
+    changed[path] = before.replace("Synthetic demo evidence:", "Demo examples:", 1)
+    assert changed[path] != before, "Synthetic-label mutation made no change"
+    with pytest.raises(AssertionError, match="missing synthetic label"):
+        validate_synthetic_labels(changed, links)
+
+
+def validate_anatomy(text, links, context):
+    tables, current = [], []
+    for line in links.strip_code(text, inline=False).splitlines() + [""]:
+        if line.strip().startswith("|"):
+            current.append(line)
+        elif current:
+            tables.append(current)
+            current = []
+    candidates = []
+    for table in tables:
+        names = [visible_prose(line.split("|", 2)[1], links) for line in table[2:]]
+        if names and names[0].casefold() == "0.resources/readme.md":
+            candidates.append(names)
+    assert len(candidates) == 1, f"{context}: expected one artifact anatomy table, found {len(candidates)}"
+    assert candidates[0] == list(ARTIFACTS + OPTIONAL), f"{context}: case-exact anatomy names/order drifted: {candidates[0]}"
+
+
+def test_both_anatomy_tables_have_exact_artifact_names(disk_docs, all_outputs, links):
+    validate_anatomy(disk_docs["00-overview/README.md"], links, "overview")
+    validate_anatomy(all_outputs["01-solutions/README.md"], links, "generated index")
+
+
+@pytest.mark.parametrize("path", ["00-overview/README.md", "01-solutions/README.md"])
+def test_negative_anatomy_filename_case(path, disk_docs, all_outputs, links):
+    text = disk_docs[path] if path.startswith("00-") else all_outputs[path]
+    changed = text.replace("4.Sample-prompts.md", "4.Sample-Prompts.md")
+    assert changed != text, "Anatomy case mutation made no change"
+    with pytest.raises(AssertionError, match="case-exact anatomy names/order"):
+        validate_anatomy(changed, links, path)
+
+
+@pytest.mark.parametrize("sentinel", ["None", "null", "nan", "{}", "[]"])
+def test_negative_authored_notes_sentinels(sources, sentinel):
+    notes = copy.deepcopy(sources["notes"])
+    next(iter(notes["solutions"].values()))["scope_in"] = [sentinel]
+    with pytest.raises(AssertionError, match="sentinel string"):
+        validate_notes(notes, sources["catalog"], pattern_ids(sources), sources["files"])
+
+
+def test_legitimate_none_of_prose_is_not_a_sentinel(sources, links):
+    notes = copy.deepcopy(sources["notes"])
+    phrase = "None of the fictional profiles belong to a real employee."
+    next(iter(notes["solutions"].values()))["scope_out"] = [phrase]
+    validate_notes(notes, sources["catalog"], pattern_ids(sources), sources["files"])
+    text = MARKER + "\n# Example\n\n" + "".join(
+        f"## {section}\n\n{phrase}\n\n" for section in SECTIONS["1.Overview.md"]
+    ).rstrip() + "\n"
+    validate_generated_document("01-solutions/example/1.Overview.md", text, links)
+
+
+def validate_delivery_notes_rendered(notes, outputs, links):
+    locations = {
+        "delivery_roles": ("3.Runbook.md", "Prerequisites"),
+        "prerequisites": ("3.Runbook.md", "Prerequisites"),
+        "go_no_go": ("3.Runbook.md", "Phase 4 — Acceptance"),
+        "boundary_tests": ("4.Sample-prompts.md", "Routing and Boundary Cases"),
+        "design_decisions": ("2.Architecture.md", "Design Decisions"),
+        "never_do": ("4.Sample-prompts.md", "What This Agent Should Never Do"),
+        "production_hardening": ("3.Runbook.md", "Phase 5 — Production Hardening"),
+    }
+    for slug in PILOTS:
+        entry = notes["solutions"].get("@aibast-agents-library/" + slug, {})
+        for field in DELIVERY_FIELDS:
+            assert entry.get(field), f"{slug}: authored delivery field {field} is missing or empty"
+        for field, (artifact, title) in locations.items():
+            path = f"01-solutions/{slug}/{artifact}"
+            section = rendered_section(outputs[path], title, links, path)
+            body = visible_prose(section, links).replace("\\|", "|")
+            for context, value in note_texts(entry[field], f"{slug}.{field}"):
+                needle = visible_prose(value, links).replace("\\|", "|")
+                assert needle and needle in body, f"{context}: authored delivery text not rendered in {title}: {value!r}"
+        path = f"01-solutions/{slug}/3.Runbook.md"
+        for number, phase in enumerate(PHASE_KEYS, 1):
+            title = SECTIONS["3.Runbook.md"][number]
+            body = rendered_section(outputs[path], title, links, path)
+            assert "**Exit criteria**" in body, f"{slug}.{phase}: Exit criteria checklist is absent"
+            checklist = body.split("**Exit criteria**", 1)[1]
+            assert re.search(r"(?m)^\s*-\s+\[[ xX]\]", checklist), f"{slug}.{phase}: criteria are not a checklist"
+            for criterion in entry["phase_exit_criteria"][phase]:
+                assert visible_prose(criterion, links) in visible_prose(checklist, links), (
+                    f"{slug}.{phase}: exit criterion not rendered: {criterion!r}"
+                )
+
+
+def test_all_new_pilot_delivery_notes_render_in_their_required_sections(sources, pilot_outputs, links):
+    validate_delivery_notes_rendered(sources["notes"], pilot_outputs, links)
+
+
+@pytest.mark.parametrize("field", DELIVERY_FIELDS)
+def test_negative_new_delivery_note_field_types(sources, field):
+    notes = copy.deepcopy(sources["notes"])
+    next(iter(notes["solutions"].values()))[field] = "not the required collection"
+    with pytest.raises(AssertionError, match=field):
+        validate_notes(notes, sources["catalog"], pattern_ids(sources), sources["files"])
+
+
+def test_negative_delivery_notes_omitted_from_rendered_output(sources, pilot_outputs, links):
+    validate_delivery_notes_rendered(sources["notes"], pilot_outputs, links)
+    changed = dict(pilot_outputs)
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    body = rendered_section(changed[path], "Prerequisites", links, path)
+    changed[path] = changed[path].replace(body, "\nSource-backed prerequisites omitted by mutation.\n", 1)
+    with pytest.raises(AssertionError, match="authored delivery text not rendered"):
+        validate_delivery_notes_rendered(sources["notes"], changed, links)
+
+
+@pytest.mark.parametrize("source", ["https://example.com/policy", "http://learn.microsoft.com/policy"])
+def test_negative_unapproved_external_notes_source(sources, source):
+    notes = copy.deepcopy(sources["notes"])
+    next(iter(notes["solutions"].values()))["sources"].append(source)
+    with pytest.raises(AssertionError, match="specific Microsoft Learn HTTPS URL"):
+        validate_notes(notes, sources["catalog"], pattern_ids(sources), sources["files"])
+
+
+@pytest.mark.parametrize(
+    "mutation, message",
+    [
+        ("unknown-pattern", "aibast:unknown-negative"),
+        ("missing-source", "does-not-exist-negative"),
+        ("duplicate-pattern", "(?i)duplicate.*pattern"),
+        ("unknown-stage", "Zzznegative"),
+        ("orphan", "zz-orphan-negative"),
+        ("stale-alias", "zz-stale-negative"),
+        ("stale-draft", "zz-draft-negative"),
+        ("unknown-field", "unsupported_negative_field"),
+        ("bad-type", "target_users"),
+        ("sentinel", "scope_in"),
+        ("delivery-shape", "delivery_roles"),
+    ],
+)
+def test_production_load_library_rejects_mutated_sources(generator, library, monkeypatch, mutation, message):
+    assert library is not None, "The production source-validation control must load successfully"
+    original_json = generator._json
+    original_files = generator._file_universe
+
+    def mutated_json(root, relative, files, required=False):
+        data = original_json(root, relative, files, required=required)
+        if relative == "solutions/runbook-notes.json":
+            data = copy.deepcopy(data)
+            entry = data["solutions"][sorted(data["solutions"])[0]]
+            if mutation == "unknown-pattern":
+                entry["related_patterns"].append("aibast:unknown-negative")
+            elif mutation == "missing-source":
+                entry["sources"].append("solutions/does-not-exist-negative.md")
+            elif mutation == "unknown-field":
+                entry["unsupported_negative_field"] = ["This field cannot silently disappear."]
+            elif mutation == "bad-type":
+                entry["target_users"] = "not a list"
+            elif mutation == "sentinel":
+                entry["scope_in"] = ["null"]
+            elif mutation == "delivery-shape":
+                entry["delivery_roles"] = [{"role": "Owner"}]
+        elif relative == "02-patterns/patterns.json" and mutation == "duplicate-pattern":
+            data = copy.deepcopy(data)
+            data["aibast_patterns"].append(dict(data["aibast_patterns"][0]))
+        elif relative == "solutions/catalog.json" and mutation == "unknown-stage":
+            data = copy.deepcopy(data)
+            data["solutions"][sorted(data["solutions"])[0]]["journey_stage"] = "Zzznegative and secondary"
+        return data
+
+    monkeypatch.setattr(generator, "_json", mutated_json)
+    if mutation == "orphan":
+        monkeypatch.setattr(
+            generator, "_file_universe",
+            lambda root: original_files(root) | {"solutions/zz-orphan-negative/README.md"},
+        )
+    elif mutation == "stale-alias":
+        monkeypatch.setattr(generator, "PACKAGE_ALIASES", {**generator.PACKAGE_ALIASES, "zz-stale-negative": "zz-unused"})
+    elif mutation == "stale-draft":
+        monkeypatch.setattr(generator, "DRAFT_PACKAGES", {**generator.DRAFT_PACKAGES, "zz-draft-negative": "Missing draft."})
+    with pytest.raises(generator.RunbookSourceError, match=message):
+        generator.load_library(ROOT)
+
+
+def test_production_identity_ignores_directories_absent_from_git_universe(generator, monkeypatch):
+    ignored = ROOT / "solutions/zz-ignored-only"
+    original_iterdir, original_is_dir = Path.iterdir, Path.is_dir
+
+    def directories(path):
+        if path == ROOT / "solutions":
+            return iter([*original_iterdir(path), ignored])
+        if path == ignored:
+            return iter([ignored / ".DS_Store"])
+        return original_iterdir(path)
+
+    monkeypatch.setattr(Path, "iterdir", directories)
+    monkeypatch.setattr(Path, "is_dir", lambda path: True if path == ignored else original_is_dir(path))
+    assert generator.load_library(ROOT) is not None, "Ignored-only directories must not become orphan packages"
+
+
+def test_git_universe_ignores_unindexed_local_metadata(links, monkeypatch):
+    root = ROOT / "virtual-ignore-test"
+    documents = {
+        "README.md": "# Home\n", "01-solutions/example/1.Overview.md": "# Example\n",
+        "01-solutions/example/.DS_Store": "ignored metadata",
+        "solutions/ignored-only/.DS_Store": "ignored metadata",
+    }
+    memory_filesystem(monkeypatch, root, documents)
+    expected = {"README.md", "01-solutions/example/1.Overview.md"}
+    monkeypatch.setattr(
+        links.subprocess, "run",
+        lambda command, **kwargs: subprocess.CompletedProcess(command, 0, "\0".join(sorted(expected)) + "\0", ""),
+    )
+    assert links.git_file_universe(root) == expected, "Ignored local state must not enter the file universe"
+
+
+def test_checkout_crlf_does_not_create_false_projection_drift(generator, case_projection, monkeypatch):
+    pilot_outputs = case_projection
+    root = ROOT / "virtual-crlf-test"
+    actual = {path: text.replace("\r\n", "\n").replace("\n", "\r\n") for path, text in pilot_outputs.items()}
+    memory_filesystem(monkeypatch, root, actual)
+    monkeypatch.setattr(generator, "build_outputs", lambda root: dict(pilot_outputs))
+    monkeypatch.setattr(generator, "_file_universe", lambda root: frozenset(actual))
+    validate_projection(pilot_outputs, actual)
+    assert generator.check(root) == [], "A CRLF checkout must not fail production check()"
+    actual["01-solutions/ask-hr/3.Runbook.md"] += "\r\nActual content drift.\r\n"
+    with pytest.raises(AssertionError, match="Changed generated content"):
+        validate_projection(pilot_outputs, actual)
+    assert generator.check(root), "Normalizing line endings must not hide content drift"
+
+
+def miniature_copy_library():
+    files = {
+        "solutions/example/README.md", "solutions/example/Guide.md", "solutions/example/page.html",
+        "solutions/example/assets/plot.png", "solutions/example/assets/file.txt",
+    }
+    directories = {parent.as_posix() for path in files for parent in PurePosixPath(path).parents}
+    return SimpleNamespace(files=frozenset(files), exists=lambda path: path.rstrip("/") in files | directories)
+
+
+@pytest.mark.parametrize(
+    "target, expected",
+    [
+        ("Guide.md", "../../solutions/example/Guide.md"),
+        ("page.html?scenario=demo#step", PAGES + "solutions/example/page.html?scenario=demo#step"),
+        ("assets/", "../../solutions/example/assets/"),
+        ("#section", "../../solutions/example/README.md#section"),
+        ("assets/plot.png", "../../solutions/example/assets/plot.png"),
+        ("/solutions/example/Guide.md", "../../solutions/example/Guide.md"),
+    ],
+)
+def test_production_relative_url_rebases_each_destination_kind(generator, target, expected):
+    actual = generator._relative_url(
+        miniature_copy_library(), "solutions/example/README.md", target, "01-solutions/example/1.Overview.md",
+    )
+    assert actual == expected, f"{target!r}: copied URL must become {expected!r}, got {actual!r}"
+
+
+def test_production_markdown_copy_rebases_links_and_preserves_code(generator):
+    text = (
+        "# Source title\n\n## Details\n\n[Guide](Guide.md)\n![Chart](assets/plot.png)\n"
+        "[ref]: Guide.md \"Reference\"\n<a href='Guide.md'>Open</a><img src=\"assets/plot.png\">\n"
+        "[Page](page.html?scenario=demo#step)\n[Self](#section)\n[Directory](assets/)\n"
+        "`[code](Guide.md)`\n\n```text\n## Code heading\n[code](Guide.md)\n```\n"
+    )
+    actual = generator._copy_markdown(
+        miniature_copy_library(), text, "solutions/example/README.md", "01-solutions/example/1.Overview.md",
+    )
+    for expected in (
+        "### Details", "[Guide](../../solutions/example/Guide.md)",
+        "![Chart](../../solutions/example/assets/plot.png)",
+        '[ref]: ../../solutions/example/Guide.md "Reference"',
+        "href='../../solutions/example/Guide.md'", 'src="../../solutions/example/assets/plot.png"',
+        "[Page](" + PAGES + "solutions/example/page.html?scenario=demo#step)",
+        "[Self](../../solutions/example/README.md#section)", "[Directory](../../solutions/example/assets/)",
+        "`[code](Guide.md)`", "```text\n## Code heading\n[code](Guide.md)\n```",
+    ):
+        assert expected in actual, f"Copied Markdown lost/rebased incorrectly: {expected!r}"
+    assert "\n## Details" not in actual, "Copied H2 was not demoted below its receiving section"
+
+
+def independent_source_section(text, titles, links):
+    visible = links.strip_code(text, inline=False).splitlines()
+    raw = text.splitlines()
+    for title in titles:
+        for index, line in enumerate(visible):
+            heading = HEADING.match(line)
+            if heading and heading[2].casefold() == title.casefold():
+                stop = index + 1
+                while stop < len(raw):
+                    following = HEADING.match(visible[stop])
+                    if following and len(following[1]) <= len(heading[1]):
+                        break
+                    stop += 1
+                body = "\n".join(raw[index + 1:stop]).strip()
+                if body:
+                    return body
+    return None
+
+
+def copy_signature(text, links):
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
+    text = re.sub(r"(?m)^\s*#{1,6}\s+", "", text)
+    spans = [(start, end) for _, start, end in links._inline_destinations(text)]
+    for start, end in reversed(spans):
+        text = text[:start] + "LINK-TARGET" + text[end:]
+    text = re.sub(
+        r"""!?\[([^\]]*)\]\(\s*<?LINK-TARGET>?(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?\s*\)""",
+        r"\1", text,
+    )
+    # The separate notice inventory rejects every unapproved missing-link marker.
+    text = re.sub(r"\s*\(missing source:\s*`[^`]+`\)", "", text)
+    text = re.sub(r"(?m)^(\s*\[[^\]]+\]:\s*)(<[^>]+>|\S+)", r"\1LINK-TARGET", text)
+    text = re.sub(r"(\b(?:href|src)\s*=\s*)([\"']).*?\2", r'\1"LINK-TARGET"', text, flags=re.I)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def validate_copied_lines(body, rendered, links, context, *, normalized_rendered=None):
+    body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
+    visible = links.strip_code(body, inline=False).splitlines()
+    normalized = copy_signature(rendered, links) if normalized_rendered is None else normalized_rendered
+    checked = 0
+    for index, line in enumerate(body.splitlines()):
+        heading = HEADING.match(visible[index])
+        if heading and heading[1] == "#":
+            continue  # The receiving document already owns its single H1.
+        needle = copy_signature(line, links)
+        if not needle:
+            continue
+        assert needle in normalized, f"{context}: copied source line was lost: {line!r}"
+        checked += 1
+    return checked
+
+
+def test_all_51_copied_sections_preserve_source_lines(all_render, sources, links):
+    records, rendered = all_render.copies, all_render.outputs
+    assert len(records) >= 51, "Faithful-copy audit did not observe the catalogue's copy operations"
+    source_cache, output_cache, checked = {}, {}, 0
+    for destination, source, title, alternatives in records:
+        if source not in sources["files"]:
+            assert source in rendered[destination], f"{destination}: missing source {source} was not disclosed"
+            continue
+        if source not in source_cache:
+            source_cache[source] = (ROOT / source).read_text(encoding="utf-8")
+        body = source_cache[source] if title is None else independent_source_section(
+            source_cache[source], (title, *alternatives), links,
+        )
+        if body is None:
+            assert source in rendered[destination] and "not present" in rendered[destination], (
+                f"{destination}: unavailable copied section {source}:{title} was not disclosed"
+            )
+            continue
+        if destination not in output_cache:
+            output_cache[destination] = copy_signature(rendered[destination], links)
+        checked += validate_copied_lines(
+            body, rendered[destination], links, f"{destination} <- {source}:{title}",
+            normalized_rendered=output_cache[destination],
+        )
+    assert checked > 1000, f"Faithful-copy audit measured too little source content: {checked} lines"
+
+
+def test_negative_truncated_copy_cannot_pass_fidelity_validator(links):
+    source = "First source line.\nSecond source line with unique facts.\nThird source line.\n"
+    validate_copied_lines(source, source, links, "control")
+    with pytest.raises(AssertionError, match="copied source line was lost"):
+        validate_copied_lines(source, source.splitlines()[0], links, "truncation mutation")
+
+
+def validate_missing_copy_notices(outputs):
+    found = Counter(
+        (path, target)
+        for path, text in outputs.items()
+        for target in re.findall(r"\(missing source:\s*`([^`]+)`\)", text)
+    )
+    expected = Counter({
+        ("01-solutions/procurement-agent/3.Runbook.md", "solutions/procurement-agent/evals/manual-pilot-review.json"): 2,
+    })
+    assert found == expected, f"Unexpected missing-source copy notices: extra={dict(found - expected)}, missing={dict(expected - found)}"
+
+
+def test_missing_copy_links_are_limited_to_the_two_known_procurement_sources(all_outputs):
+    validate_missing_copy_notices(all_outputs)
+
+
+def test_negative_missing_copy_notice_catches_masked_rebase_failure(all_outputs):
+    changed = dict(all_outputs)
+    changed["01-solutions/ask-hr/3.Runbook.md"] += "\nBad copy (missing source: `01-solutions/ask-hr/manual-tutorial.html`)\n"
+    with pytest.raises(AssertionError, match="Unexpected missing-source copy notices"):
+        validate_missing_copy_notices(changed)
+
+
+def test_copy_fidelity_keeps_labels_while_normalizing_reviewed_missing_link_notices(links):
+    source = "Read [the dated review](evals/manual-pilot-review.json) before building.\n"
+    rendered = (
+        "Read the dated review "
+        "(missing source: `solutions/procurement-agent/evals/manual-pilot-review.json`) before building.\n"
+    )
+    validate_copied_lines(source, rendered, links, "reviewed missing source")
+    with pytest.raises(AssertionError, match="copied source line was lost"):
+        validate_copied_lines(source, "Read before building.\n", links, "lost label")
+
+
+@pytest.fixture(scope="module")
+def case_projection(sources):
+    paths = {"00-overview/README.md", "01-solutions/README.md"} | {
+        f"01-solutions/{slug}/{artifact}"
+        for slug in PILOTS for artifact in expected_artifacts(slug, sources["files"])
+    }
+    assert paths <= sources["files"], f"Cannot snapshot the real pilot bytes: {sorted(paths - sources['files'])}"
+    return {path: (ROOT / path).read_bytes().decode("utf-8") for path in sorted(paths)}
+
+
+def validate_skill_component_kinds(documents, expected_skills):
+    assert documents, "No Copilot Studio component sources were measured"
+    for path, text in documents.items():
+        assert SKILL_KIND.search(text), f"{path}: component kind must be InlineAgentSkill"
+    assert len(documents) == expected_skills, (
+        f"InlineAgentSkill components ({len(documents)}) must equal SKILL.md files ({expected_skills})"
+    )
+
+
+def test_every_catalog_component_is_the_same_inline_agent_skill_as_its_manual_upload(sources, lane_facts):
+    total = 0
+    for slug, facts in lane_facts.items():
+        directory = f"solutions/{slug}/copilot-studio/behaviors"
+        documents = {
+            path: (ROOT / path).read_text(encoding="utf-8")
+            for path in sources["files"] if path.rpartition("/")[0] == directory and path.endswith(".mcs.yml")
+        }
+        validate_skill_component_kinds(documents, facts["skills"])
+        total += len(documents)
+    assert total == 229, f"Expected to measure all 229 current skill components, found {total}"
+
+
+def test_negative_classic_topic_cannot_be_counted_as_a_harness_skill():
+    with pytest.raises(AssertionError, match="kind must be InlineAgentSkill"):
+        validate_skill_component_kinds({"example.mcs.yml": "kind: AdaptiveDialog\n"}, 1)
+
+
+def validate_skill_terminology(documents, links):
+    assert documents, "No rendered component terminology was measured"
+    for path, text in documents.items():
+        prose = visible_prose(links.strip_code(text), links)
+        prose = re.sub(r"https?://\S+", "", prose)
+        match = re.search(r"\btopics?\b", prose, re.I)
+        assert match is None, f"{path}: obsolete component terminology {match[0]!r}" if match else ""
+
+
+def test_all_rendered_runbooks_describe_components_as_skills_not_topics(all_outputs, links):
+    documents = {path: text for path, text in all_outputs.items() if path.startswith("01-solutions/")}
+    validate_skill_terminology(documents, links)
+
+
+@pytest.mark.parametrize("term", ["topic", "topics", "TOPIC"])
+def test_negative_classic_topic_terminology(term, links):
+    validate_skill_terminology({"control.md": "Topical grounding supports skill routing.\n"}, links)
+    with pytest.raises(AssertionError, match="obsolete component terminology"):
+        validate_skill_terminology({"example.md": f"This Copilot Studio component is a {term}.\n"}, links)
+
+
+def validate_no_personal_or_local_references(documents):
+    assert documents, "Personal/local reference guard received no files"
+    allowed_owners = {"microsoft", "microsoftdocs"}
+    owner_patterns = (
+        re.compile(
+            r"""(?<![\w.-])(?:(?:www\.)?github\.com|raw\.githubusercontent\.com)(?::\d+)?/"""
+            r"""([a-z0-9][a-z0-9-]*)(?=[/\s#?"'<>()]|$)""", re.I,
+        ),
+        re.compile(
+            r"""(?<![\w.-])([a-z0-9][a-z0-9-]*)\.github\.io(?=[/:\s#?"'<>()]|$)""", re.I,
+        ),
+    )
+    local_paths = re.compile(r"/(?:Users|home)/[^/\s]+/|C:[\\]Users[\\]|~/\.copilot|session[-]state")
+    for path, content in documents.items():
+        assert isinstance(content, (str, bytes)), f"{path}: file content could not be measured"
+        data = content.decode("utf-8", errors="replace") if isinstance(content, bytes) else content
+        measured = unquote(path + "\n" + data)
+        for pattern in owner_patterns:
+            for match in pattern.finditer(measured):
+                assert match[1].casefold() in allowed_owners, (
+                    f"{path}: personal or local reference: GitHub owner {match[1]!r}"
+                )
+        assert not local_paths.search(measured), f"{path}: personal or local reference: absolute path or local state"
+
+
+def test_runbook_layer_has_no_personal_or_local_references(sources, all_outputs):
+    explicit = set(TOUCHED) | {
+        "tools/build_solution_runbooks.py", "tools/markdown_links.py", "solutions/runbook-notes.json",
+    }
+    assert explicit <= sources["files"], f"Reference guard did not measure required files: {sorted(explicit - sources['files'])}"
+    scoped = {
+        path: (ROOT / path).read_bytes()
+        for path in sources["files"] if path.startswith(PREFIXES) or path in explicit
+    }
+    validate_no_personal_or_local_references(scoped)
+    validate_no_personal_or_local_references(all_outputs)
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        pytest.param("https://github.com/example-owner/some-sdk", id="github-owner"),
+        pytest.param("example-owner.github.io", id="pages-owner"),
+        pytest.param("raw.githubusercontent.com/example-owner/x", id="raw-owner"),
+        pytest.param("https://GITHUB.COM/EXAMPLE-OWNER/some-sdk", id="owner-case-insensitive"),
+        pytest.param("https://github.com/%65xample-owner/some-sdk", id="encoded-owner"),
+        pytest.param(str(PurePosixPath("/", "Users", "example", "project")), id="macos-home"),
+        pytest.param(str(PurePosixPath("/", "home", "example", "project")), id="linux-home"),
+        pytest.param(str(PureWindowsPath("C:/", "Users", "example")), id="windows-home"),
+        pytest.param(str(PurePosixPath("~", ".copilot", "x")), id="cli-home"),
+        pytest.param(str(PurePosixPath("workspace", "-".join(("session", "state")), "checkpoint.json")), id="local-state"),
+    ],
+)
+def test_negative_personal_or_local_reference_shapes(reference):
+    with pytest.raises(AssertionError, match="personal or local reference"):
+        validate_no_personal_or_local_references({"03-references/README.md": f"Reference: {reference}\n"})
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "https://github.com/microsoft/ai-agent-runbooks",
+        "https://github.com/MicrosoftDocs/azure-docs",
+        "https://github.com/MICROSOFT/ai-agent-runbooks",
+        "microsoft.github.io/aibast-agents-library/",
+        "raw.githubusercontent.com/MICROSOFTDOCS/azure-docs/main/README.md",
+        "/v1.0/users/{id}",
+    ],
+)
+def test_microsoft_owners_and_graph_users_paths_remain_legal(reference):
+    validate_no_personal_or_local_references({"control.md": reference})
+
+
+def validate_frontier_disclaimer(text, context, *, at_end=False):
+    normalized = re.sub(r"(?m)^\s*>\s?", "", text)
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    assert normalized.count(FRONTIER_DISCLAIMER) == 1, f"{context}: disclaimer must appear verbatim exactly once"
+    italic = re.search(
+        r"(?<!\*)\*" + re.escape(FRONTIER_DISCLAIMER) + r"\*(?!\*)"
+        r"|(?<!_)_" + re.escape(FRONTIER_DISCLAIMER) + r"_(?!_)",
+        normalized,
+    )
+    assert italic, f"{context}: disclaimer must be italicized"
+    if at_end:
+        assert italic.end() == len(normalized), f"{context}: disclaimer must end the Delivery Lanes section"
+
+
+def validate_frontier_naming(documents, display_names, links):
+    assert documents, "No authored/rendered naming surfaces were measured"
+    disclaimer = r"\s+".join(re.escape(word) for word in FRONTIER_DISCLAIMER.split())
+    suffixes = [
+        re.compile(re.escape(name) + r"\s+(?:\(\s*Frontier\s*\)|Frontier)(?!\w)", re.I)
+        for name in display_names
+    ]
+    for path, text in documents.items():
+        text = re.sub(disclaimer, "", text)
+        text = links.strip_code(text)
+        text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)
+        text = re.sub(r"<[^>]*>|https?://\S+", " ", text)
+        units = []
+        for block in re.split(r"\n\s*\n", text):
+            lines = block.splitlines()
+            if any(re.match(r"^\s*(?:#|\||[-*]\s|\d+\.\s)", line) for line in lines):
+                units.extend(lines)
+            else:
+                units.append(" ".join(lines))
+        for unit in units:
+            unit = re.sub(r"\s+", " ", unit).strip()
+            for suffix in suffixes:
+                assert not suffix.search(unit), f"{path}: Frontier must not suffix a solution display name: {unit!r}"
+            assert not re.search(r"(?<!AIBAST )\bFrontier\b", unit), f"{path}: bare Frontier name: {unit!r}"
+            for sentence in re.split(r"(?<=[.!?])\s+", unit):
+                if "AIBAST Frontier" in sentence:
+                    violation = FRONTIER_PROGRAM_WORDS.search(sentence)
+                    assert violation is None, (
+                        f"{path}: AIBAST Frontier paired with Microsoft program vocabulary: {sentence!r}"
+                    )
+
+
+def test_frontier_naming_and_disclaimers_cover_all_renders_and_selling_surfaces(all_outputs, disk_docs, sources, links):
+    documents = dict(all_outputs)
+    documents["00-overview/README.md"] = disk_docs["00-overview/README.md"]
+    library_section = independent_source_section(disk_docs["README.md"], ("Library structure",), links)
+    assert library_section, "README.md Library structure selling surface was not measured"
+    documents["README.md#library-structure"] = library_section
+    names = [entry["display_name"] for entry in sources["catalog"].values()]
+    validate_frontier_naming(documents, names, links)
+    validate_frontier_descriptor(
+        disk_docs["00-overview/README.md"], FRONTIER_OVERVIEW_DESCRIPTOR, links,
+        "00-overview/README.md", first_mention=True,
+    )
+    validate_frontier_disclaimer(disk_docs["00-overview/README.md"], "00-overview/README.md")
+    count = 0
+    for path, text in all_outputs.items():
+        if path.endswith("/1.Overview.md"):
+            section = rendered_section(text, "Delivery Lanes", links, path)
+            validate_frontier_disclaimer(section, path, at_end=True)
+            count += 1
+    assert count == 51, f"Disclaimer validation must measure all 51 solution overviews, found {count}"
+
+
+@pytest.mark.parametrize(
+    "text, message",
+    [
+        ("Frontier is a learning lane.", "bare Frontier name"),
+        ("Ask HR Agent (Frontier)", "must not suffix a solution display name"),
+        ("AIBAST Frontier provides early access to a suite.", "Microsoft program vocabulary"),
+        ("AIBAST Frontier preview is available.", "Microsoft program vocabulary"),
+    ],
+)
+def test_negative_frontier_naming_rules(text, message, links):
+    validate_frontier_naming(
+        {"control.md": "AIBAST Frontier is an early, experimental learning lane. Preview the native agent separately."},
+        ["Ask HR Agent"], links,
+    )
+    with pytest.raises(AssertionError, match=message):
+        validate_frontier_naming({"example.md": text}, ["Ask HR Agent"], links)
+
+
+@pytest.mark.parametrize("mutation", ["missing", "duplicate", "not-italic", "not-at-end"])
+def test_negative_frontier_disclaimer_requirements(mutation):
+    control = "Learning lane.\n\n*" + FRONTIER_DISCLAIMER + "*\n"
+    validate_frontier_disclaimer(control, "control", at_end=True)
+    changed = {
+        "missing": "Learning lane.\n",
+        "duplicate": control + control,
+        "not-italic": "Learning lane.\n\n" + FRONTIER_DISCLAIMER + "\n",
+        "not-at-end": control + "\nExtra content after the disclaimer.\n",
+    }[mutation]
+    with pytest.raises(AssertionError, match="disclaimer must"):
+        validate_frontier_disclaimer(changed, "mutation", at_end=True)
+
+
+@pytest.mark.parametrize("bad_header", ["| | Frontier | Runbook lane |", "| | AIBAST Frontier | Runbook lane |"])
+def test_negative_lane_header_requires_current_full_label(all_outputs, lane_facts, links, bad_header):
+    overview = all_outputs["01-solutions/ask-hr/1.Overview.md"]
+    validate_delivery_lanes(overview, lane_facts["ask-hr"], links)
+    changed = overview.replace(LANE_HEADER, bad_header, 1)
+    assert changed != overview, "Lane-header mutation made no change"
+    with pytest.raises(AssertionError, match="missing or duplicated exact table header"):
+        validate_delivery_lanes(changed, lane_facts["ask-hr"], links)
+
+
+def test_negative_runbook_lane_cannot_require_python_or_local_tooling(all_outputs, lane_facts, links):
+    overview = all_outputs["01-solutions/ask-hr/1.Overview.md"]
+    validate_delivery_lanes(overview, lane_facts["ask-hr"], links)
+    changed = overview.replace("needs no Python or local tooling", "needs Python and local tooling", 1)
+    assert changed != overview, "Manual-build independence mutation made no change"
+    with pytest.raises(AssertionError, match="independence from Python and local tooling"):
+        validate_delivery_lanes(changed, lane_facts["ask-hr"], links)
+
+
+def authored_rapp_prose(text, links):
+    prose = visible_prose(links.strip_code(text), links)
+    prose = re.sub(r"https?://\S+", "", prose)
+    prose = re.sub(r"(?:[\w.-]+[/\\])*[\w.-]+\.(?:md|py|html|json|ya?ml)\b", "", prose, flags=re.I)
+    return re.sub(r"\s+", " ", prose).strip()
+
+
+def validate_authored_rapp_usage(documents, links, *, copied=None, source_documents=None):
+    assert documents, "Authored-prose guard received no selling surfaces"
+    copied, source_documents = copied or {}, source_documents or {}
+    relationship = "AIBAST Frontier runs on RAPP"
+    for path, text in documents.items():
+        for source, fragment in copied.get(path, ()):
+            assert fragment and source in source_documents and fragment in source_documents[source], (
+                f"{path}: unverified copied-source exemption from {source}"
+            )
+            assert fragment in text, f"{path}: claimed source copy is absent from the rendered document"
+            text = text.replace(fragment, "", 1)
+        prose = authored_rapp_prose(text, links)
+        assert prose.count(relationship) <= 1, f"{path}: the RAPP relationship may be stated at most once"
+        assert not re.search(r"\bRAPP\b", prose.replace(relationship, ""), re.I), (
+            f"{path}: stray RAPP in authored selling prose"
+        )
+
+
+def test_selling_templates_use_only_the_single_rapp_relationship(all_outputs, disk_docs, links):
+    authored = {"00-overview/README.md": disk_docs["00-overview/README.md"]}
+    library_section = independent_source_section(disk_docs["README.md"], ("Library structure",), links)
+    assert library_section, "README.md selling surface was not measured"
+    authored["README.md#library-structure"] = library_section
+    index = all_outputs["01-solutions/README.md"]
+    authored["01-solutions/README.md"] = index.split("\n## ", 1)[0] + "\n" + rendered_section(
+        index, "Lane Complexity at a Glance", links, "index",
+    )
+    overviews = resources = 0
+    for path, text in all_outputs.items():
+        if path.endswith("/1.Overview.md"):
+            authored[path] = rendered_section(text, "Delivery Lanes", links, path)
+            overviews += 1
+        elif path.endswith("/0.Resources/README.md"):
+            authored[path] = text
+            resources += 1
+    assert overviews == resources == 51, "Authored selling-template audit must measure all 51 packages"
+    assert authored_rapp_prose(authored["00-overview/README.md"], links).count("AIBAST Frontier runs on RAPP") == 1
+    validate_authored_rapp_usage(authored, links)
+
+
+@pytest.mark.parametrize("text", ["Use the RAPP framework for learning.", "The learning lane requires rapp tooling."])
+def test_negative_stray_rapp_in_authored_prose(text, links):
+    with pytest.raises(AssertionError, match="stray RAPP in authored selling prose"):
+        validate_authored_rapp_usage({"00-overview/README.md": text}, links)
+
+
+def test_verbatim_source_copy_is_exempt_but_new_authored_rapp_is_not(links):
+    source = "solutions/example/FIELD-GUIDE.md"
+    destination = "01-solutions/example/3.Runbook.md"
+    fragment = "Legacy source text describes the RAPP runtime."
+    sources = {source: "# Existing source\n\n" + fragment + "\n"}
+    copies = {destination: [(source, fragment)]}
+    document = "New delivery instructions.\n\n" + fragment + "\n"
+    validate_authored_rapp_usage({destination: document}, links, copied=copies, source_documents=sources)
+    with pytest.raises(AssertionError, match="stray RAPP in authored selling prose"):
+        validate_authored_rapp_usage(
+            {destination: document + "\nNew RAPP platform instructions.\n"}, links,
+            copied=copies, source_documents=sources,
+        )
+
+
+def test_negative_copy_exemption_cannot_hide_unsourced_authored_text(links):
+    source = "solutions/example/FIELD-GUIDE.md"
+    destination = "01-solutions/example/3.Runbook.md"
+    fragment = "Invented RAPP platform wording."
+    with pytest.raises(AssertionError, match="unverified copied-source exemption"):
+        validate_authored_rapp_usage(
+            {destination: fragment}, links, copied={destination: [(source, fragment)]},
+            source_documents={source: "Existing source without that wording."},
+        )
+
+
+def test_rapp_paths_urls_and_code_are_not_selling_prose(links):
+    text = (
+        "AIBAST Frontier runs on RAPP.\n\n"
+        "Use `rapp_brainstem/` and `RAPP` in the code sample; see [guide](https://example.com/RAPP/guide).\n"
+        "The RAPP.md file is a reference.\n\n```python\nRAPP = 'technical identifier'\n```\n"
+    )
+    validate_authored_rapp_usage({"example.md": text}, links)
+
+
+def test_negative_repeated_rapp_relationship(links):
+    with pytest.raises(AssertionError, match="relationship may be stated at most once"):
+        validate_authored_rapp_usage(
+            {"example.md": "AIBAST Frontier runs on RAPP. AIBAST Frontier runs on RAPP."}, links,
+        )
+
+
+def test_negative_index_label_cannot_omit_experimental(all_outputs, lane_facts, links):
+    index = all_outputs["01-solutions/README.md"]
+    changed = index.replace(LANE_INDEX_HEADER, LANE_INDEX_HEADER.replace(" (experimental)", ""), 1)
+    assert changed != index, "Experimental index-label mutation made no change"
+    with pytest.raises(AssertionError, match="missing or duplicated exact table header"):
+        validate_lane_index(changed, lane_facts, set(lane_facts), links)
+
+
+@pytest.mark.parametrize("surface", ["lane", "overview"])
+def test_negative_experimental_descriptor_cannot_be_removed(surface, all_outputs, disk_docs, lane_facts, links):
+    if surface == "lane":
+        original = all_outputs["01-solutions/ask-hr/1.Overview.md"]
+        changed = original.replace(FRONTIER_LANE_DESCRIPTOR, "AIBAST Frontier is a learning lane.", 1)
+        assert changed != original, "Lane descriptor mutation made no change"
+        with pytest.raises(AssertionError, match="experimental learning-lane descriptor"):
+            validate_delivery_lanes(changed, lane_facts["ask-hr"], links)
+    else:
+        original = disk_docs["00-overview/README.md"]
+        changed = original.replace(FRONTIER_OVERVIEW_DESCRIPTOR, "AIBAST Frontier is a learning lane.", 1)
+        assert changed != original, "Overview descriptor mutation made no change"
+        with pytest.raises(AssertionError, match="experimental learning-lane descriptor"):
+            validate_frontier_descriptor(
+                changed, FRONTIER_OVERVIEW_DESCRIPTOR, links, "overview mutation", first_mention=True,
+            )

@@ -1,29 +1,45 @@
 # AIBAST Agents Library Overview
 
-Start here to choose a solution, inspect its implementation, reproduce its
-synthetic workflow, and identify what still needs approval before production.
-The package [field guides](../solutions/ask-hr/FIELD-GUIDE.md) support that
-delivery sequence. Unfamiliar terms are defined in the
-[Glossary](../03-references/Glossary.md).
+**AIBAST Frontier is an early, experimental learning lane: learn it now, prove it works, land it native.**
+
+Choose the path that fits your engagement: learn and teach in
+AIBAST Frontier (experimental), use assisted authoring, or build directly in Copilot Studio
+([Ask HR field guide example](../solutions/ask-hr/FIELD-GUIDE.md)).
+
+| Benefit | What You Do | Source |
+| --- | --- | --- |
+| Learn it now | Learn, teach, and change a workflow's behavior immediately in AIBAST Frontier (experimental). | [Product Golden Path](../CLAUDE.md#product-golden-path) |
+| Prove it | Replay locked cases and retain their evidence; distinguish synthetic workflow proof from customer results. | [Release gate and claims policy](../solutions/README.md) |
+| Land it native | Build and validate Microsoft-native Copilot Studio skills through Easy mode or the independent manual build. | [Ask HR delivery modes example](../solutions/ask-hr/FIELD-GUIDE.md) |
+| Keep it current | Update source files, regenerate the runbooks, and revalidate changed inputs rather than reusing old acceptance. | [Generated runbooks](../solutions/README.md), [source integrity](../docs/RELEASE-PROCESS.md#workshop-source-integrity) |
+
+Unfamiliar terms are defined in the [Glossary](../03-references/Glossary.md).
 
 ## What the AIBAST Agents Library Is
 
 AIBAST is the Artificial Intelligence Business Applications Specialist Team.
-The library publishes industry agent templates for RAPP, the Rapid Agent
-Prototype Pattern ([Constitution](../CONSTITUTION.md)). Its positioning is
+The library combines industry agent templates with **AIBAST Frontier (experimental)**, a
+learning tool
+([Constitution](../CONSTITUTION.md),
+[Product Golden Path](../CLAUDE.md#product-golden-path)). The library's positioning is
 **"engine, not experience"**: reusable infrastructure rather than a consumer
 product ([repository guidance](../CLAUDE.md)).
 
-The local Brainstem is a learning and prototyping environment. Prove a
-workflow there, then adapt it for the appropriate Microsoft deployment
-surface; the local prototype is not the product to ship
+In AIBAST Frontier (experimental), the local Brainstem is a learning and
+prototyping environment. Prove a workflow there, then adapt it for the
+appropriate Microsoft deployment surface; the local prototype is not the product to ship
 ([project introduction](../README.md)).
+
+Technical documentation: AIBAST Frontier runs on RAPP — see the
+[production guide](https://microsoft.github.io/aibast-agents-library/docs/rapp-guide.html)
+and the [Glossary](../03-references/Glossary.md).
 
 ### Three Tiers
 
 The tiers describe deployment choices, not agent quality ratings. Each tier
 is self-contained; using all three is not mandatory
-([architecture and tier definitions](../CLAUDE.md)).
+([architecture and tier definitions](../CLAUDE.md),
+[agent quality tiers](../CONSTITUTION.md#article-v--quality-tiers)).
 
 | Tier | Name | Runtime and Delivery Surface |
 | --- | --- | --- |
@@ -45,13 +61,44 @@ contract ([package structure](../solutions/README.md),
 | Workshop facilitator or learner | The field guide and guided workshop; choose the default Copilot-assisted lane or the optional Brainstem track. |
 | Reviewer or business owner | The synthetic evidence, manual reproduction steps, acceptance cases, and publication boundary. |
 
-These reading paths follow the [Ask HR field guide](../solutions/ask-hr/FIELD-GUIDE.md)
-and [Building Permit Processing package](../solutions/building-permit-processing/README.md).
+These reading paths follow the [Ask HR field guide example](../solutions/ask-hr/FIELD-GUIDE.md)
+and [Building Permit Processing package example](../solutions/building-permit-processing/README.md).
 
-The repository is an experimental project managed by an AIBAST v-team, not
-an officially supported Microsoft product. Its agent templates must be
-customized before production use ([Constitution](../CONSTITUTION.md),
+*AIBAST Frontier is an open-source learning library published in the Microsoft GitHub organization. It is not a Microsoft product, is not part of the Microsoft Frontier program, and does not confer Microsoft AI Cloud Partner Program badges or designations.*
+
+Agent templates must be customized before production use
+([Constitution](../CONSTITUTION.md),
 [contribution guidance](../CONTRIBUTING.md)).
+
+## Two Delivery Lanes
+
+AIBAST Frontier is an early, experimental learning lane: one portable agent file holds the behavior and synthetic data so you can learn, teach, and change it immediately.
+The Runbook lane builds the same agent by hand in Copilot Studio and needs no Python or local tooling.
+
+Both lanes are kept on purpose; neither replaces the other
+([source-of-truth boundaries](../solutions/README.md#source-of-truth-boundaries),
+[Product Golden Path](../CLAUDE.md#product-golden-path)).
+See the [Ask HR Manual mode example](../solutions/ask-hr/FIELD-GUIDE.md#manual-mode--literal-browser-construction).
+
+| Lane | How You Use It |
+| --- | --- |
+| AIBAST Frontier (experimental) | Learn, teach, and change behavior immediately in the Brainstem (Tier 1). One portable `agent.py` carries the solution's behavior and synthetic data. See the [Product Golden Path](../CLAUDE.md#product-golden-path), [Single File Principle](../CONSTITUTION.md#article-ii--the-single-file-principle), [runtime ownership](../solutions/README.md#source-of-truth-boundaries), and [tier definitions](../CLAUDE.md#architecture-three-tiers). |
+| Runbook lane | Build the Microsoft-native form from instructions, knowledge, and **Copilot Studio skills**. The AI Agent Runbooks-style documents guide manual browser construction, model selection, and Preview. See the [Ask HR Manual mode example](../solutions/ask-hr/FIELD-GUIDE.md#manual-mode--literal-browser-construction) and [Ask HR source-controlled skill example](../solutions/ask-hr/copilot-studio/behaviors/aibast_leave-balance.mcs.yml). |
+
+AIBAST Frontier (experimental) is a local learning tool that feeds Microsoft-native Copilot
+Studio skills, following the
+[Microsoft downstream path](../beta/GOLDEN_PATH.md#microsoft-downstream-path).
+
+**Easy mode is the assisted middle path:** GitHub Copilot authors, reviews,
+pushes, and validates the same Copilot Studio project
+([source-of-truth boundaries](../solutions/README.md#source-of-truth-boundaries),
+[Ask HR Easy mode example](../solutions/ask-hr/FIELD-GUIDE.md#easy-mode--github-copilot-default)).
+
+Each runbook's `1.Overview.md` includes a **Delivery Lanes** comparison with
+repository counts. See
+[Lane Complexity at a Glance](../01-solutions/README.md#lane-complexity-at-a-glance)
+for the library-wide table. Keep counts in these generated tables rather
+than duplicating them here.
 
 ## How the Library Is Organized
 
@@ -81,16 +128,18 @@ the [package sources](../solutions/README.md).
 
 Read artifacts 1 through 4 in order; use resources and acceptance evidence
 alongside them. The source links below show the package inputs behind each
-artifact, rather than a second place to maintain those facts.
+artifact, rather than a second place to maintain those facts. Package-specific
+links are labeled examples from Ask HR or Building Permit Processing; the
+catalog, registry, and release gate apply library-wide.
 
 | Artifact | Delivery Question and Source Mapping |
 | --- | --- |
-| `0.Resources/README.md` | Where are the inputs? Links to the package's source, manual kit, workshops, screenshots, and exports; see the [package map](../solutions/ask-hr/README.md). |
-| `1.Overview.md` | Why this solution, and for whom? Uses [catalog business copy](../solutions/catalog.json), [registry personas](../registry.json), and the package's [scope and approval boundary](../solutions/ask-hr/README.md). |
-| `2.Architecture.md` | How is it built? Uses [catalog architecture](../solutions/catalog.json), package components, and the field guide's [production replacement seams](../solutions/building-permit-processing/FIELD-GUIDE.md). |
-| `3.Runbook.md` | How do I reproduce and validate it? Uses the [deployment recipe](../solutions/ask-hr/deployment.json), [Easy and Manual delivery modes](../solutions/ask-hr/FIELD-GUIDE.md), and [release gate](../solutions/README.md). |
-| `4.Sample-prompts.md` | What should I test, and what must never happen? Uses catalog prompts, [locked cases](../tests/demo_cases/ask-hr.json), [canonical transcripts](../solutions/ask-hr/evals/transcripts.json), and [global instructions](../solutions/ask-hr/manual/GLOBAL-INSTRUCTIONS.md). |
-| `5.Acceptance-Evidence.md` | What evidence is recorded? Optional summary when the package contains evidence JSON or visual checkpoints; inspect the original [evaluation files](../solutions/ask-hr/evals/) and their [evidence boundary](../solutions/ask-hr/FIELD-GUIDE.md). |
+| `0.Resources/README.md` | Where are the inputs? Links to the package's source, manual kit, workshops, screenshots, and exports; see the [Ask HR package map example](../solutions/ask-hr/README.md). |
+| `1.Overview.md` | Why this solution, and for whom? Uses [catalog business copy](../solutions/catalog.json), [registry personas](../registry.json), and the [Ask HR scope and approval boundary example](../solutions/ask-hr/README.md). |
+| `2.Architecture.md` | How is it built? Uses [catalog architecture](../solutions/catalog.json), package components, and the [Building Permit Processing replacement seams example](../solutions/building-permit-processing/FIELD-GUIDE.md). |
+| `3.Runbook.md` | How do I reproduce and validate it? Uses the [Ask HR deployment recipe example](../solutions/ask-hr/deployment.json), [Ask HR Easy and Manual modes example](../solutions/ask-hr/FIELD-GUIDE.md), and [release gate](../solutions/README.md). |
+| `4.Sample-prompts.md` | What should I test, and what must never happen? Uses catalog prompts, [Ask HR locked cases example](../tests/demo_cases/ask-hr.json), [Ask HR canonical transcripts example](../solutions/ask-hr/evals/transcripts.json), and [Ask HR global instructions example](../solutions/ask-hr/manual/GLOBAL-INSTRUCTIONS.md). |
+| `5.Acceptance-Evidence.md` | What evidence is recorded? Optional summary when the package contains evidence JSON or visual checkpoints; inspect the [Ask HR evaluation files example](../solutions/ask-hr/evals/) and [Ask HR evidence boundary example](../solutions/ask-hr/FIELD-GUIDE.md). |
 
 ## Solution Taxonomy
 
@@ -102,18 +151,57 @@ normalized journey stage.
 
 | Vertical | Solutions | Journey stages |
 | --- | --- | --- |
-| B2B Sales | [Account Intelligence Agent](../solutions/account-intelligence/README.md)<br>[Deal Progression Agent](../solutions/deal-progression/README.md)<br>[Proposal Generation Agent](../solutions/proposal-generation/README.md)<br>[Sales Qualification Agent](../solutions/sales-qualification/README.md)<br>[Win/Loss Analysis Agent](../solutions/win-loss-analysis/README.md) | Create<br>Learn<br>Optimize<br>Prioritize<br>Understand |
-| B2C Sales | [Cart Abandonment Recovery Agent](../solutions/cart-abandonment-recovery/README.md)<br>[Customer Loyalty and Rewards Agent](../solutions/customer-loyalty-rewards/README.md)<br>[Omnichannel Engagement Agent](../solutions/omnichannel-engagement/README.md)<br>[Personalized Shopping Agent](../solutions/personalized-shopping-assistant/README.md) | Discover / Advise (secondary)<br>Recover / Learn (secondary)<br>Retain / Optimize (secondary)<br>Understand / Optimize (secondary) |
-| Cross-Industry | [Cross-Selling Opportunities Agent](../solutions/cross-selling/README.md)<br>[Customer Escalations Agent](../solutions/ai-customer-assistant/README.md)<br>[Discount Finder Agent](../solutions/procurement-support/README.md)<br>[Procurement Agent](../solutions/procurement-agent/README.md) | Expand<br>Optimize<br>Serve |
-| Energy | [Asset Maintenance Forecast Agent](../solutions/asset-maintenance-forecast/README.md)<br>[Emissions Tracking Agent](../solutions/emission-tracking/README.md)<br>[Field Service Dispatch Agent](../solutions/field-service-dispatch/README.md)<br>[Permit Management Agent](../solutions/permit-license-management/README.md)<br>[Regulatory Reporting Agent](../solutions/energy-regulatory-reporting/README.md) | Govern<br>Optimize<br>Serve |
-| Financial Services | [Claims Processing Agent](../solutions/claims-processing/README.md)<br>[Customer Onboarding Agent](../solutions/fs-customer-onboarding/README.md)<br>[Customer Sentiment and Churn Prediction Agent](../solutions/customer-sentiment-churn/README.md)<br>[Financial Advisor Agent](../solutions/financial-advisor-copilot/README.md)<br>[Fraud Detection and Alert Agent](../solutions/fraud-detection-alert/README.md)<br>[Loan Origination Assistant](../solutions/loan-origination-assistant/README.md)<br>[Portfolio Rebalancing Agent](../solutions/portfolio-rebalancing/README.md)<br>[Regulatory Compliance Agent](../solutions/fs-regulatory-compliance/README.md)<br>[Underwriting Support Agent](../solutions/underwriting-support/README.md)<br>[Wealth Insights Generator Agent](../solutions/wealth-insights-generator/README.md) | Decide<br>Engage<br>Govern<br>Optimize<br>Protect |
-| Healthcare | [Care Gap Closure Agent](../solutions/care-gap-closure/README.md)<br>[Clinical Notes Summarizer Agent](../solutions/clinical-notes-summarizer/README.md)<br>[Patient Intake and Scheduling Agent](../solutions/patient-intake/README.md)<br>[Prior Authorization Agent](../solutions/prior-authorization/README.md) | Activate<br>Govern |
+| B2B Sales | [Account Intelligence Agent](../solutions/account-intelligence/README.md) | Understand |
+| B2B Sales | [Deal Progression Agent](../solutions/deal-progression/README.md) | Optimize |
+| B2B Sales | [Proposal Generation Agent](../solutions/proposal-generation/README.md) | Create |
+| B2B Sales | [Sales Qualification Agent](../solutions/sales-qualification/README.md) | Prioritize |
+| B2B Sales | [Win/Loss Analysis Agent](../solutions/win-loss-analysis/README.md) | Learn |
+| B2C Sales | [Cart Abandonment Recovery Agent](../solutions/cart-abandonment-recovery/README.md) | Recover / Learn (secondary) |
+| B2C Sales | [Customer Loyalty and Rewards Agent](../solutions/customer-loyalty-rewards/README.md) | Retain / Optimize (secondary) |
+| B2C Sales | [Omnichannel Engagement Agent](../solutions/omnichannel-engagement/README.md) | Understand / Optimize (secondary) |
+| B2C Sales | [Personalized Shopping Agent](../solutions/personalized-shopping-assistant/README.md) | Discover / Advise (secondary) |
+| Cross-Industry | [Cross-Selling Opportunities Agent](../solutions/cross-selling/README.md) | Expand |
+| Cross-Industry | [Customer Escalations Agent](../solutions/ai-customer-assistant/README.md) | Serve |
+| Cross-Industry | [Discount Finder Agent](../solutions/procurement-support/README.md) | Optimize |
+| Cross-Industry | [Procurement Agent](../solutions/procurement-agent/README.md) | Optimize |
+| Energy | [Asset Maintenance Forecast Agent](../solutions/asset-maintenance-forecast/README.md) | Optimize |
+| Energy | [Emissions Tracking Agent](../solutions/emission-tracking/README.md) | Govern |
+| Energy | [Field Service Dispatch Agent](../solutions/field-service-dispatch/README.md) | Serve |
+| Energy | [Permit Management Agent](../solutions/permit-license-management/README.md) | Govern |
+| Energy | [Regulatory Reporting Agent](../solutions/energy-regulatory-reporting/README.md) | Govern |
+| Financial Services | [Claims Processing Agent](../solutions/claims-processing/README.md) | Decide |
+| Financial Services | [Customer Onboarding Agent](../solutions/fs-customer-onboarding/README.md) | Govern |
+| Financial Services | [Customer Sentiment and Churn Prediction Agent](../solutions/customer-sentiment-churn/README.md) | Engage |
+| Financial Services | [Financial Advisor Agent](../solutions/financial-advisor-copilot/README.md) | Engage |
+| Financial Services | [Fraud Detection and Alert Agent](../solutions/fraud-detection-alert/README.md) | Protect |
+| Financial Services | [Loan Origination Assistant](../solutions/loan-origination-assistant/README.md) | Decide |
+| Financial Services | [Portfolio Rebalancing Agent](../solutions/portfolio-rebalancing/README.md) | Optimize |
+| Financial Services | [Regulatory Compliance Agent](../solutions/fs-regulatory-compliance/README.md) | Govern |
+| Financial Services | [Underwriting Support Agent](../solutions/underwriting-support/README.md) | Decide |
+| Financial Services | [Wealth Insights Generator Agent](../solutions/wealth-insights-generator/README.md) | Engage |
+| Healthcare | [Care Gap Closure Agent](../solutions/care-gap-closure/README.md) | Govern |
+| Healthcare | [Clinical Notes Summarizer Agent](../solutions/clinical-notes-summarizer/README.md) | Activate |
+| Healthcare | [Patient Intake and Scheduling Agent](../solutions/patient-intake/README.md) | Activate |
+| Healthcare | [Prior Authorization Agent](../solutions/prior-authorization/README.md) | Govern |
 | Human Resources | [Ask HR Agent](../01-solutions/ask-hr/1.Overview.md) | Empower |
-| Manufacturing | [Inventory Rebalancing Agent](../solutions/inventory-rebalancing/README.md)<br>[Maintenance Scheduling Agent](../solutions/maintenance-scheduling/README.md)<br>[Order Status Communications Agent](../solutions/order-status-communication/README.md)<br>[Product Line Optimization Agent](../solutions/product-line-optimization/README.md)<br>[Supply Risk Monitoring Agent](../solutions/supplier-risk-monitoring/README.md) | Optimize<br>Protect<br>Serve |
-| Professional Services | [Client Health Score Agent](../solutions/client-health-score/README.md)<br>[Contract Risk Review Agent](../solutions/contract-risk-review/README.md)<br>[Resource Utilization Agent](../solutions/resource-utilization/README.md)<br>[Time Entry and Billing Agent](../solutions/time-entry-billing/README.md) | Govern<br>Operate<br>Optimize |
-| Retail & Consumer Goods | [Inventory Visibility Agent](../solutions/inventory-visibility/README.md)<br>[Personalized Marketing Agent](../solutions/personalized-marketing/README.md)<br>[Retail Store Associate Copilot](../solutions/store-associate-copilot/README.md)<br>[Returns and Complaints Resolution Agent](../solutions/returns-complaints-resolution/README.md)<br>[Supply Chain Disruption Alert Agent](../solutions/supply-chain-disruption-alert/README.md) | Optimize<br>Plan / Evaluate (secondary)<br>Plan / Fulfill (secondary)<br>Resolve / Learn (secondary)<br>Serve / Coordinate (secondary) |
-| Software & Digital Products | [License Renewal and Expansion Agent](../solutions/license-renewal-expansion/README.md)<br>[Product Feedback Synthesizer Agent](../solutions/product-feedback-synthesizer/README.md) | Innovate<br>Retain |
-| State & Local Government | [Building Permit Processing Agent](../01-solutions/building-permit-processing/1.Overview.md)<br>[Utility Billing and Assistance Agent](../solutions/utility-billing-assistance/README.md) | Govern<br>Serve |
+| Manufacturing | [Inventory Rebalancing Agent](../solutions/inventory-rebalancing/README.md) | Optimize |
+| Manufacturing | [Maintenance Scheduling Agent](../solutions/maintenance-scheduling/README.md) | Optimize |
+| Manufacturing | [Order Status Communications Agent](../solutions/order-status-communication/README.md) | Serve |
+| Manufacturing | [Product Line Optimization Agent](../solutions/product-line-optimization/README.md) | Optimize |
+| Manufacturing | [Supply Risk Monitoring Agent](../solutions/supplier-risk-monitoring/README.md) | Protect |
+| Professional Services | [Client Health Score Agent](../solutions/client-health-score/README.md) | Optimize |
+| Professional Services | [Contract Risk Review Agent](../solutions/contract-risk-review/README.md) | Govern |
+| Professional Services | [Resource Utilization Agent](../solutions/resource-utilization/README.md) | Optimize |
+| Professional Services | [Time Entry and Billing Agent](../solutions/time-entry-billing/README.md) | Operate |
+| Retail & CPG | [Inventory Visibility Agent](../solutions/inventory-visibility/README.md) | Plan / Fulfill (secondary) |
+| Retail & CPG | [Personalized Marketing Agent](../solutions/personalized-marketing/README.md) | Plan / Evaluate (secondary) |
+| Retail & CPG | [Retail Store Associate Copilot](../solutions/store-associate-copilot/README.md) | Serve / Coordinate (secondary) |
+| Retail & CPG | [Returns and Complaints Resolution Agent](../solutions/returns-complaints-resolution/README.md) | Resolve / Learn (secondary) |
+| Retail & CPG | [Supply Chain Disruption Alert Agent](../solutions/supply-chain-disruption-alert/README.md) | Optimize |
+| SLG Government | [Building Permit Processing Agent](../01-solutions/building-permit-processing/1.Overview.md) | Govern |
+| SLG Government | [Utility Billing and Assistance Agent](../solutions/utility-billing-assistance/README.md) | Serve |
+| Software & Digital Products | [License Renewal and Expansion Agent](../solutions/license-renewal-expansion/README.md) | Retain |
+| Software & Digital Products | [Product Feedback Synthesizer Agent](../solutions/product-feedback-synthesizer/README.md) | Innovate |
 
 <!-- END GENERATED: solution-taxonomy -->
 
@@ -136,13 +224,13 @@ workshop delivery:
   results or performance commitments.
 - Do not treat a recorded case as a customer KPI, a live-system result, or
   production-readiness evidence. A screenshot proves only its visible state
-  ([field-guide evidence boundary](../solutions/ask-hr/FIELD-GUIDE.md)).
+  ([Ask HR evidence boundary example](../solutions/ask-hr/FIELD-GUIDE.md)).
 - Keep real customer names, personal data, and credentials out of agent
   content ([Agent Constitution](../agents/@aibast-agents-library/AGENT_CONSTITUTION.md),
   [repository Constitution](../CONSTITUTION.md)).
 - Keep workshop agents in Draft. Publishing requires separate human approval;
   passing source checks is not native Copilot Studio acceptance
-  ([delivery gates](../solutions/ask-hr/FIELD-GUIDE.md),
+  ([Ask HR delivery gates example](../solutions/ask-hr/FIELD-GUIDE.md),
   [workshop source integrity](../docs/RELEASE-PROCESS.md)).
 
 ## Relationship to Microsoft AI Agent Runbooks

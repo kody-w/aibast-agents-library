@@ -26,6 +26,7 @@ from urllib.parse import unquote, urlsplit
 
 REPOSITORY = "microsoft/aibast-agents-library"
 PAGES = "https://microsoft.github.io/aibast-agents-library/"
+RAW = "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/"
 RUNBOOKS = "https://github.com/microsoft/ai-agent-runbooks/blob/main/"
 RUNBOOKS_REFERENCES = frozenset(
     RUNBOOKS + "03-references/" + name
@@ -34,8 +35,11 @@ RUNBOOKS_REFERENCES = frozenset(
 HEADING = re.compile(r"^ {0,3}(#{1,6})[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$")
 REFERENCE = re.compile(r"^ {0,3}\[[^\]\n]+\]:[ \t]*(<[^>\n]*>|(?:\\.|[^\s])+)", re.M)
 ATTRIBUTE = re.compile(
-    r"\b(href|src|id|name)\s*=\s*(?:\"([^\"]*)\"|'([^']*)'|([^\s\"'=<>`]+))",
+    r"\b([a-zA-Z_:][\w:.-]*)\s*=\s*(?:\"([^\"]*)\"|'([^']*)'|([^\s\"'=<>`]+))",
     re.I,
+)
+HTML_TAG = re.compile(
+    r"""<[a-zA-Z][a-zA-Z0-9:-]*(?=\s|/?>)(?:"[^"]*"|'[^']*'|[^'">])*>""", re.S,
 )
 CODE_SPAN = re.compile(r"(?<![\\`])(`+)(?!`)(.*?)(?<!`)\1(?!`)", re.S)
 LOCAL_PATH = re.compile(
@@ -58,12 +62,29 @@ class LinkProblem(NamedTuple):
 
 
 def git_file_universe(root: Path, documents: Mapping[str, str] | None = None) -> set[str]:
-    """Include existing indexed/unignored files and exact overlay keys."""
+    """Include exact existing Git paths, rejecting stale index casing on macOS."""
     result = subprocess.run(
         ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
         cwd=root, capture_output=True, text=True, check=True,
     )
-    files = {p for p in result.stdout.split("\0") if p and (root / p).is_file()}
+    directory_names = {}
+
+    def exists_exactly(relative):
+        if not (root / relative).is_file():
+            return False
+        parent = root
+        for component in relative.split("/"):
+            if parent not in directory_names:
+                try:
+                    directory_names[parent] = {entry.name for entry in parent.iterdir()}
+                except (FileNotFoundError, NotADirectoryError):
+                    directory_names[parent] = set()
+            if component not in directory_names[parent]:
+                return False
+            parent /= component
+        return True
+
+    files = {p for p in result.stdout.split("\0") if p and exists_exactly(p)}
     return files | set(documents or {})
 
 
@@ -151,15 +172,20 @@ def _inline_destinations(text: str):
             yield match.start(), start, end
 
 
+def _html_attributes(text: str, names: set[str]):
+    for tag in HTML_TAG.finditer(text):
+        for attribute in ATTRIBUTE.finditer(tag[0]):
+            if attribute[1].lower() in names:
+                value = next(value for value in attribute.groups()[1:] if value is not None)
+                yield tag.start() + attribute.start(), value
+
+
 def extract_links(text: str) -> list[tuple[int, str]]:
     """Extract inline/image destinations, reference definitions and href/src."""
     visible = strip_code(text)
     hits = [(offset, visible[start:end]) for offset, start, end in _inline_destinations(visible)]
     hits.extend((match.start(), match[1].strip("<>")) for match in REFERENCE.finditer(visible))
-    hits.extend(
-        (match.start(), next(value for value in match.groups()[1:] if value is not None))
-        for match in ATTRIBUTE.finditer(visible) if match[1].lower() in ("href", "src")
-    )
+    hits.extend(_html_attributes(visible, {"href", "src"}))
     return [
         (visible.count("\n", 0, offset) + 1, html.unescape(re.sub(r"\\([\\()[\]<>])", r"\1", target)))
         for offset, target in sorted(hits)
@@ -200,9 +226,7 @@ def anchors_of(text: str) -> set[str]:
                 slug = f"{base}-{suffix}"
             used.add(slug)
             anchors.add(slug)
-    for match in ATTRIBUTE.finditer(strip_code(text)):
-        if match[1].lower() in ("id", "name"):
-            anchors.add(html.unescape(next(v for v in match.groups()[1:] if v is not None)).lower())
+    anchors.update(html.unescape(value).lower() for _, value in _html_attributes(strip_code(text), {"id", "name"}))
     return anchors
 
 
@@ -227,8 +251,10 @@ def check_links(
 ) -> list[LinkProblem]:
     """Validate targets only against the Git universe plus in-memory documents.
 
-    Other external URLs are not fetched. Runbooks URLs require an explicit
-    allowlist (normally the pattern index and two documented references).
+    External URLs are not fetched. AIBAST audits reject foreign GitHub owners
+    and Pages hosts and fail closed on unmapped Pages/raw-content URLs.
+    Auditing another repository uses its own namespace instead. Runbooks URLs
+    require an explicit allowlist (the pattern index and documented references).
     """
     root = Path(root)
     known = set(files) if files is not None else git_file_universe(root)
@@ -244,6 +270,7 @@ def check_links(
     problems = []
     anchor_cache = {}
     local_repositories = {REPOSITORY, repository}
+    aibast_policy = repository.casefold() == REPOSITORY
 
     for source, text in sorted(documents.items()):
         for line, raw in extract_links(text):
@@ -255,24 +282,44 @@ def check_links(
                 continue
             host = (url.hostname or "").lower()
             github = host in ("github.com", "www.github.com")
+            owner = unquote(url.path).strip("/").split("/", 1)[0].casefold()
             if (
                 url.scheme.lower() == "file" or LOCAL_PATH.match(unquote(target))
-                or (github and re.match(r"^/kody[-]w(?:/|$)", unquote(url.path), re.I))
+                or (aibast_policy and github and owner != "microsoft")
+                or (aibast_policy and host.endswith(".github.io") and host != "microsoft.github.io")
             ):
-                problems.append(LinkProblem(source, line, raw, "forbidden link", "", "personal fork or local path"))
+                problems.append(LinkProblem(source, line, raw, "forbidden link", "", "unapproved GitHub owner/Pages host or local path"))
                 continue
 
             path, fragment = unquote(url.path), unquote(url.fragment).lower()
             absolute = False
-            pages = target.startswith(PAGES)
+            pages = (
+                host == "microsoft.github.io" and url.scheme.lower() == "https"
+                and url.netloc.lower() == "microsoft.github.io"
+                and url.path.startswith("/aibast-agents-library/")
+            )
+            raw_content = (
+                host == "raw.githubusercontent.com" and url.scheme.lower() == "https"
+                and url.netloc.lower() == "raw.githubusercontent.com"
+                and url.path.startswith("/microsoft/aibast-agents-library/main/")
+            )
+            if aibast_policy and (
+                (host == "microsoft.github.io" and not pages)
+                or (host == "raw.githubusercontent.com" and not raw_content)
+            ):
+                problems.append(LinkProblem(source, line, raw, "unmapped URL", "", "outside the canonical Pages/raw-content prefix"))
+                continue
             if pages:
                 path = unquote(url.path[len("/aibast-agents-library/"):])
                 if not path or path.endswith("/"):
                     path += "index.html"
                 absolute = True
+            elif raw_content:
+                path = unquote(url.path[len("/microsoft/aibast-agents-library/main/"):])
+                absolute = True
             elif github:
                 match = re.fullmatch(r"/([^/]+/[^/]+)/(?:blob|tree)/main(?:/(.*))?", url.path)
-                if match and match[1] in local_repositories:
+                if match and match[1].casefold() in local_repositories:
                     path, absolute = unquote(match[2] or ""), True
                 elif match and match[1] == "microsoft/ai-agent-runbooks":
                     if target not in allowed:

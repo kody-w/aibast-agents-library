@@ -8,7 +8,7 @@ the portable Python agents under `agents/@aibast-agents-library/`.
 ```text
 solutions/
 ├── catalog.json                         # Hand-authored business and architecture copy
-├── runbook-notes.json                    # Hand-authored delivery guidance for generated runbooks
+├── runbook-notes.json                   # Hand-authored delivery guidance for generated runbooks
 ├── _shared/
 │   ├── m365-copilot-demo.html           # Shared M365 Copilot-style transcript player
 │   └── workshop-settings.html           # Global persisted Easy-mode harness setting
