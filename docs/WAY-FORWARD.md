@@ -56,6 +56,7 @@ a governed, Microsoft-native agent.
 | D12 | **Hand off to native** | When Microsoft ships a native equivalent (evaluation, batch testing, authoring), adopt it, re-verify, and retire ours |
 | D13 | **The staging ring, synced first** | Nothing enters staging until the fork's `main` equals Microsoft `main` and staging contains it. Every change is compared against the Microsoft baseline, and a human opens and merges each promotion |
 | D14 | **Good neighbor upstream** | Defects found in AI Agent Runbooks are contributed back upstream, after the corresponding AIBAST work lands |
+| D15 | **Workshops need no local install** | Every workshop can be completed with GitHub Copilot and Copilot Studio alone, and GitHub Copilot is the default engine. The local Brainstem runtime is an optional track that learners choose in Workshop settings; it is never a required step |
 
 ## How the library stays relevant
 
