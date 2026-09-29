@@ -128,7 +128,20 @@ def _learn_source(value: str) -> bool:
         parsed = urlsplit(value)
     except ValueError:
         return False
-    return parsed.scheme == "https" and parsed.netloc == "learn.microsoft.com" and bool(parsed.path.strip("/"))
+    path = parsed.path
+    decoded_url = value
+    for _ in range(4):
+        decoded = unquote(path)
+        next_url = unquote(decoded_url)
+        if decoded == path and next_url == decoded_url:
+            break
+        path = decoded
+        decoded_url = next_url
+    return (
+        parsed.scheme == "https" and parsed.netloc == "learn.microsoft.com"
+        and path.startswith("/en-us/") and bool(path.removeprefix("/en-us/"))
+        and ".." not in decoded_url and "\\" not in path
+    )
 
 
 def _note_text(value, location: str) -> None:
@@ -136,6 +149,12 @@ def _note_text(value, location: str) -> None:
         raise RunbookSourceError(f"{NOTES}: {location} must be a non-empty string")
     if value.strip().casefold() in {"none", "null", "nan", "{}", "[]"}:
         raise RunbookSourceError(f"{NOTES}: {location} contains a sentinel string")
+
+
+def _note_source(value, location: str, files: frozenset[str]) -> None:
+    _note_text(value, location)
+    if value not in files and not _learn_source(value):
+        raise RunbookSourceError(f"{NOTES}: {location} has missing source or invalid source URL {value!r}")
 
 
 def _validate_notes(name: str, entry: dict, files: frozenset[str], patterns: dict) -> None:
@@ -146,7 +165,7 @@ def _validate_notes(name: str, entry: dict, files: frozenset[str], patterns: dic
         "target_users": {"role", "need"}, "what_goes_wrong": {"issue", "response"},
         "delivery_roles": {"role", "responsibility"}, "prerequisites": {"item", "detail"},
         "go_no_go": {"criterion", "threshold"}, "boundary_tests": {"prompt", "expected"},
-        "design_decisions": {"decision", "reason"}, "production_hardening": {"area", "action"},
+        "design_decisions": {"decision", "reason"}, "production_hardening": {"area", "action", "owner"},
     }
     allowed = string_lists | record_lists.keys() | {"phase_exit_criteria"}
     unknown = set(entry) - allowed
@@ -157,34 +176,54 @@ def _validate_notes(name: str, entry: dict, files: frozenset[str], patterns: dic
     for field, value in entry.items():
         if field == "phase_exit_criteria":
             phases = {f"phase_{index}" for index in range(1, 6)}
-            if not isinstance(value, dict) or set(value) - phases:
-                raise RunbookSourceError(f"{NOTES}: {name}.{field} must map phase_1 through phase_5 to arrays")
+            if not isinstance(value, dict) or set(value) != phases:
+                raise RunbookSourceError(f"{NOTES}: {name}.{field} must contain all five phases, phase_1 through phase_5")
             for phase, criteria in value.items():
                 if not isinstance(criteria, list):
                     raise RunbookSourceError(f"{NOTES}: {name}.{field}.{phase} must be an array")
                 for item in criteria:
-                    _note_text(item, f"{name}.{field}.{phase}")
+                    location = f"{name}.{field}.{phase}"
+                    if isinstance(item, dict):
+                        if set(item) != {"text", "source"}:
+                            raise RunbookSourceError(f"{NOTES}: {location} items require text and source")
+                        _note_text(item["text"], location + ".text")
+                        _note_source(item["source"], location + ".source", files)
+                    else:
+                        _note_text(item, location)
             continue
         if not isinstance(value, list):
             raise RunbookSourceError(f"{NOTES}: {name}.{field} must be an array")
         for item in value:
             if field in record_lists:
-                if not isinstance(item, dict) or set(item) != record_lists[field]:
+                optional = {"source"} if field in {
+                    "design_decisions", "go_no_go", "boundary_tests", "production_hardening",
+                } else set()
+                if (
+                    not isinstance(item, dict) or not record_lists[field] <= set(item)
+                    or set(item) - record_lists[field] - optional
+                ):
                     keys = ", ".join(sorted(record_lists[field]))
-                    raise RunbookSourceError(f"{NOTES}: {name}.{field} entries require exactly {keys}")
+                    suffix = "; source is optional" if optional else ""
+                    raise RunbookSourceError(f"{NOTES}: {name}.{field} entries require {keys}{suffix}")
                 for key, text in item.items():
-                    _note_text(text, f"{name}.{field}.{key}")
+                    if key == "source":
+                        _note_source(text, f"{name}.{field}.{key}", files)
+                    else:
+                        _note_text(text, f"{name}.{field}.{key}")
             else:
                 _note_text(item, f"{name}.{field}")
     for source in entry.get("sources", []):
-        if source not in files and not _learn_source(source):
-            raise RunbookSourceError(f"{NOTES}: {name} has missing source {source!r}")
+        _note_source(source, name, files)
+    roles = {item["role"] for item in entry.get("delivery_roles", [])}
+    for step in entry.get("production_hardening", []):
+        if step["owner"] not in roles:
+            raise RunbookSourceError(f"{NOTES}: {name}.production_hardening has unknown owner {step['owner']!r}")
     for identifier in entry.get("related_patterns", []):
         if identifier not in patterns:
             raise RunbookSourceError(f"{NOTES}: {name} has unknown related pattern {identifier!r}")
 
 
-def _validate_vertical_names(root: Path, files: frozenset[str]) -> None:
+def _validate_vertical_names(root: Path, files: frozenset[str], used_categories=None) -> None:
     source = "index.html"
     if source not in files:
         raise RunbookSourceError("Missing vertical-label source: index.html CATEGORY_NAMES")
@@ -197,8 +236,12 @@ def _validate_vertical_names(root: Path, files: frozenset[str]) -> None:
         labels = json.loads(data)
     except ValueError as exc:
         raise RunbookSourceError(f"index.html: cannot parse CATEGORY_NAMES: {exc}") from exc
-    if labels != VERTICAL_NAMES:
-        raise RunbookSourceError("VERTICAL_NAMES must agree exactly with index.html CATEGORY_NAMES")
+    used = set(VERTICAL_NAMES) if used_categories is None else set(used_categories)
+    mismatches = sorted(category for category in used if labels.get(category) != VERTICAL_NAMES.get(category))
+    if mismatches:
+        raise RunbookSourceError(
+            "VERTICAL_NAMES must agree with index.html CATEGORY_NAMES for used categories: " + ", ".join(mismatches)
+        )
 
 
 def normalize_journey_stage(value: str) -> tuple[str, str | None]:
@@ -415,7 +458,7 @@ def load_library(root: Path = ROOT) -> Library:
         if name not in catalog or not isinstance(entry, dict):
             raise RunbookSourceError(f"{NOTES}: invalid solution notes for {name}")
         _validate_notes(name, entry, files, patterns)
-    _validate_vertical_names(root, files)
+    _validate_vertical_names(root, files, {solution.agent["category"] for solution in solutions.values()})
     return Library(root, files, catalog, solutions, patterns, notes)
 
 
@@ -661,6 +704,7 @@ class Document:
         self.path = f"01-solutions/{solution.slug}/{artifact}"
         self.sources = {CATALOG}
         self.sections: dict[str, str] = {}
+        self.missing_notes: set[str] = set()
 
     def source(self, relative: str) -> None:
         if relative in self.library.files or _learn_source(relative):
@@ -695,11 +739,16 @@ class Document:
         entry = self.library.notes.get(self.solution.name, {})
         if entry:
             self.source(NOTES)
-            self.sources.update(entry.get("sources", []))
         return entry
 
     def missing_note(self, field: str) -> str:
-        return f"Not yet authored — add `{field}` to `{NOTES}` for this solution."
+        value = self.library.notes.get(self.solution.name, {})
+        for key in field.split("."):
+            value = value.get(key) if isinstance(value, dict) else None
+        if value:
+            return ""
+        self.missing_notes.add(field)
+        return "See the delivery-notes banner."
 
     def copy(self, relative: str, title: str | None = None, alternatives: tuple[str, ...] = ()) -> str:
         if relative not in self.library.files:
@@ -742,14 +791,41 @@ class Document:
         self.sections[title] = content.strip()
 
     def render(self, title: str, next_line: str) -> str:
+        full_sources = self.artifact == "0.Resources/README.md"
+        priority = [
+            NOTES, CATALOG, REGISTRY, self.solution.path("deployment.json"),
+            self.solution.path("copilot-studio/settings.mcs.yml"),
+            self.solution.path("manual/GLOBAL-INSTRUCTIONS.md"),
+            self.solution.path("FIELD-GUIDE.md"), self.solution.architecture_source,
+            self.solution.demo_source, self.solution.path("evals/transcripts.json"),
+        ]
+        paths = sorted(self.sources, key=lambda path: (
+            priority.index(path) if path in priority else len(priority), path,
+        ))
+        if not full_sources:
+            paths = paths[:12]
+        context = {
+            "1.Overview.md": "Scenario",
+            "2.Architecture.md": "Architecture",
+            "3.Runbook.md": "Delivery",
+            "4.Sample-prompts.md": "Acceptance",
+            "5.Acceptance-Evidence.md": "Evidence",
+        }.get(self.artifact, "")
         self.sections["Sources"] = "\n".join(
             "- " + self.link(
                 path,
-                "Microsoft Learn — " + _label(PurePosixPath(urlsplit(path).path).name.replace("-", " "))
-                if _learn_source(path) else None,
+                (
+                    "Microsoft Learn — " + _label(PurePosixPath(urlsplit(path).path).name.replace("-", " "))
+                    if _learn_source(path) else path
+                ) if full_sources else context + " input — " + (
+                    _label(PurePosixPath(urlsplit(path).path).name.replace("-", " "))
+                    if _learn_source(path) else PurePosixPath(path).name
+                ),
             )
-            for path in sorted(self.sources)
+            for path in paths
         )
+        if not full_sources:
+            self.sections["Sources"] += "\n\nFull source list: [Resources](0.Resources/README.md#sources)."
         if "Next" in REQUIRED_SECTIONS[self.artifact]:
             self.sections["Next"] = next_line
         else:
@@ -757,6 +833,9 @@ class Document:
         if set(self.sections) != set(REQUIRED_SECTIONS[self.artifact]):
             raise RunbookSourceError(f"{self.path}: renderer does not implement its H2 section contract")
         chunks = [GENERATED_MARKER, "", f"# {self.solution.display_name} — {title}"]
+        if self.missing_notes:
+            fields = ", ".join(f"`{field}`" for field in sorted(self.missing_notes))
+            chunks += ["", f"> **Delivery notes not yet authored:** {fields}. Add them to `{NOTES}`."]
         for heading in REQUIRED_SECTIONS[self.artifact]:
             chunks += ["", f"## {heading}", "", self.sections[heading]]
         return _finish("\n".join(chunks))
@@ -903,8 +982,6 @@ def _delivery_lanes(doc: Document) -> str:
         solution.path("copilot-studio/settings.mcs.yml"),
     ):
         doc.source(source)
-    for source in doc.library.matching(solution.path("copilot-studio/behaviors/*.mcs.yml")):
-        doc.source(source)
     agent_size = (
         f"1 file, {counts['agent_lines']} lines"
         if counts["agent_lines"] is not None else doc.missing(agent_file)
@@ -983,18 +1060,41 @@ def _delivery_lanes(doc: Document) -> str:
     ))
 
 
+def _grammar(text: str) -> str:
+    def article(match):
+        word = match[2]
+        if word.casefold().startswith(("uni", "user", "use", "euro", "one", "once")):
+            return match[0]
+        return ("An" if match[1] == "A" else "an") + " " + word
+    return re.sub(r"\b([Aa]) ([aeiouAEIOU][A-Za-z-]*)\b", article, text)
+
+
+def _quality_description(doc: Document) -> str:
+    tier = _text(doc.solution.agent.get("quality_tier"), "Unrecorded registry tier")
+    source = doc.solution.path("evals/copilot-studio-preview-evidence.json")
+    evidence = doc.data(source)
+    cases = [case for case in _items(evidence.get("cases")) if isinstance(case, dict)]
+    if not cases:
+        return tier + " (registry); no Copilot Studio replay evidence is recorded."
+    passed = sum(case.get("passed") is True for case in cases)
+    captured = _text(evidence.get("captured_at"), "")
+    date = captured[:10] if re.match(r"\d{4}-\d{2}-\d{2}", captured) else "date not recorded"
+    state = _text(evidence.get("status"), "state not recorded")
+    return (
+        f"{tier} (registry): recorded Copilot Studio Preview replay, {passed}/{len(cases)} synthetic cases passed, "
+        f"{state}, {date}; not a fresh validation. " + doc.link(source, "Replay record")
+    )
+
+
 def _overview(library: Library, solution: Solution) -> str:
     doc = Document(library, solution, "1.Overview.md")
     copy = solution.copy
     agent = solution.agent
     metadata = _object(agent.get("_solution"))
     architecture = _object(copy.get("architecture"))
-    notes = _object(library.notes.get(solution.name))
+    notes = doc.notes()
     doc.source(REGISTRY)
     doc.source("index.html")
-    if notes:
-        doc.source(NOTES)
-        doc.sources.update(notes.get("sources", []))
     properties = [
         ("Vertical", solution.vertical),
         ("Industries", _text(metadata.get("industries"), "Not recorded in registry _solution.industries")),
@@ -1005,7 +1105,7 @@ def _overview(library: Library, solution: Solution) -> str:
             _items(metadata.get("agent_requirements")) + _items(metadata.get("featured_tools")),
             "Not recorded in registry _solution",
         )),
-        ("Quality tier", _text(agent.get("quality_tier"), "Not recorded in registry quality_tier")),
+        ("Quality tier", _quality_description(doc)),
         ("Search terms", _text(copy.get("search_terms"), "Not recorded in catalog search_terms")),
         ("Agent file", doc.link(_text(agent.get("_file"), "missing-agent-source"))),
         ("Workshop", doc.link(solution.path("quest.html"), "Open the guided workshop")),
@@ -1014,21 +1114,16 @@ def _overview(library: Library, solution: Solution) -> str:
     scenario = _table(("Property", "Value"), properties, doc.missing(REGISTRY))
     scenario += "\n\n" + _text(copy.get("sales_headline"), doc.missing(CATALOG, "sales_headline"))
     scenario += "\n\n" + _text(copy.get("card_pitch"), doc.missing(CATALOG, "card_pitch"))
-    scenario += "\n\n**Why try it:** " + _text(copy.get("why_try"), doc.missing(CATALOG, "why_try"))
+    scenario += "\n\n**Why try it:** " + _grammar(_text(copy.get("why_try"), doc.missing(CATALOG, "why_try")))
     doc.add("Scenario Overview", scenario)
     doc.add("Problem Statement", _text(copy.get("customer_challenge"), doc.missing(CATALOG, "customer_challenge")))
     capabilities = _items(architecture.get("capabilities"))
-    capability_list = [
-        "**" + _text(_object(item).get("name"), "Capability") + "** — "
-        + _text(_object(item).get("purpose"), "Purpose not provided in catalog architecture.capabilities")
-        if isinstance(item, dict) else _text(item) for item in capabilities
-    ]
+    capability_list = [_text(_object(item).get("name"), "Capability not named") for item in capabilities]
     doc.add("Solution Summary", "\n\n".join((
         _text(copy.get("microsoft_ai_story"), doc.missing(CATALOG, "microsoft_ai_story")),
         "**Blueprint role:** " + _text(copy.get("blueprint_role"), doc.missing(CATALOG, "blueprint_role")),
-        _bullets(capability_list, doc.missing(CATALOG, "architecture.capabilities")),
-        "The blueprint describes integration targets, not live connections in the packaged synthetic demo; "
-        "see the " + doc.link(solution.path("FIELD-GUIDE.md"), "evidence boundary", "evidence-boundary") + ".",
+        "**Capabilities:** " + _text(capability_list, doc.missing(CATALOG, "architecture.capabilities"))
+        + ". See [responsibilities and trust boundaries](2.Architecture.md).",
     )))
     doc.add("Delivery Lanes", _delivery_lanes(doc))
     doc.source(solution.path("FIELD-GUIDE.md"))
@@ -1037,10 +1132,10 @@ def _overview(library: Library, solution: Solution) -> str:
             + "\n\nClaims are qualitative; synthetic demo figures are not customer results or performance commitments. "
             + "See the " + doc.link("solutions/README.md", "claims policy", "claims-policy") + ".")
     if notes.get("target_users"):
-        target_rows = [
-            (_object(item).get("role"), _object(item).get("need"))
-            for item in notes["target_users"]
-        ]
+        goals: dict[str, list[str]] = {}
+        for item in notes["target_users"]:
+            goals.setdefault(item["role"], []).append(item["need"])
+        target_rows = [(role, "\n".join(dict.fromkeys(needs))) for role, needs in goals.items()]
     else:
         target_rows = [
             (_text(persona), "Registry persona; a delivery-specific need is not yet authored in runbook-notes.json")
@@ -1058,17 +1153,14 @@ def _overview(library: Library, solution: Solution) -> str:
     doc.add("In Scope / Out of Scope", f"### In scope\n\n{scope_in}\n\n### Out of scope / approval boundary\n\n{scope_out}")
     doc.add("Qualification Checklist", _bullets(
         notes.get("qualification_checklist"),
-        "Not yet authored — add `qualification_checklist` to `solutions/runbook-notes.json`.",
+        doc.missing_note("qualification_checklist") if not notes.get("qualification_checklist") else "",
         checklist=True,
     ))
     if notes.get("what_goes_wrong"):
-        failures = _table(
-            ("Issue", "Response"),
-            ((_object(item).get("issue"), _object(item).get("response")) for item in notes["what_goes_wrong"]),
-            doc.missing(NOTES, "what_goes_wrong"),
-        )
+        failures = "\n".join(f"{index}. {item['issue']}" for index, item in enumerate(notes["what_goes_wrong"], 1))
+        failures += "\n\nUse the matching risk numbers in the [recovery actions](3.Runbook.md#failure-recovery)."
     else:
-        failures = doc.copy(solution.path("FIELD-GUIDE.md"), "Failure recovery")
+        failures = "Use the package's " + doc.link(solution.path("FIELD-GUIDE.md"), "failure guidance", "failure-recovery") + "."
     doc.add("What Actually Goes Wrong", failures)
     doc.source(PATTERNS)
     links = []
@@ -1093,6 +1185,92 @@ def _named_rows(value):
             yield _text(item), "No additional detail recorded"
 
 
+def _skill_assets(library: Library, solution: Solution) -> list[tuple[str, str, str]]:
+    normalize = lambda value: re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
+    source_files = library.matching(solution.path("copilot-studio/behaviors/*.mcs.yml"))
+    components = {}
+    for source in source_files:
+        text = (library.root / source).read_text(encoding="utf-8")
+        name = _yaml_scalar(text, ("mcs.metadata", "componentName"), source)
+        if not name:
+            raise RunbookSourceError(f"{source}: missing mcs.metadata.componentName")
+        components[source] = name
+    rows = []
+    for manual in library.matching(solution.path("manual/skills/*/SKILL.md")):
+        text = (library.root / manual).read_text(encoding="utf-8")
+        frontmatter = text.split("---", 2)[1] if text.startswith("---") else ""
+        name = _yaml_scalar(frontmatter, ("name",), manual)
+        if not name:
+            raise RunbookSourceError(f"{manual}: missing skill name")
+        matches = [source for source, title in components.items() if normalize(title) == normalize(name)]
+        if not matches:
+            stem = re.sub(r"_\d+$", "", PurePosixPath(manual).parent.name)
+            matches = [source for source in components if PurePosixPath(source).name.removesuffix(".mcs.yml") == stem]
+        if len(matches) != 1:
+            raise RunbookSourceError(f"{manual}: expected one matching InlineAgentSkill component, found {len(matches)}")
+        source = matches[0]
+        del components[source]
+        rows.append((name, manual, source))
+    if components:
+        raise RunbookSourceError("Source-controlled skills have no matching manual upload: " + ", ".join(sorted(components)))
+    return sorted(rows)
+
+
+def _knowledge_assets(library: Library, solution: Solution) -> list[tuple[str, str, str, str]]:
+    groups: dict[str, dict[str, str]] = {}
+    for path in library.matching(solution.path("manual/knowledge/*.md")):
+        groups.setdefault(PurePosixPath(path).name, {})["manual"] = path
+    for path in library.matching(solution.path("copilot-studio/capabilities/knowledge/files/*")):
+        name = PurePosixPath(path).name
+        if name.endswith(".mcs.yml"):
+            groups.setdefault(name.removesuffix(".mcs.yml"), {})["metadata"] = path
+        else:
+            groups.setdefault(name, {})["content"] = path
+    return [
+        (name, values.get("manual") or values.get("content", ""), values.get("content", ""), values.get("metadata", ""))
+        for name, values in sorted(groups.items())
+    ]
+
+
+def _production_targets(architecture: dict, level2: dict) -> list[str]:
+    connections = [_text(item) for item in _items(architecture.get("required_connections"))]
+    if any(re.match(r"^(?:Use only|Bind only)\b", item) for item in connections):
+        named = [
+            _text(item.get("name")) for item in _items(level2.get("tools")) if isinstance(item, dict)
+            and re.search(r"\b(?:production|future)\b.*\bseams?\b", _text(item.get("detail"), ""), re.I)
+        ]
+        if named:
+            return list(dict.fromkeys(named))
+    return connections
+
+
+def _logical_architecture(doc: Document, native: dict, knowledge, production_targets) -> str:
+    architecture = _object(doc.solution.copy.get("architecture"))
+    platforms = " ".join(_text(item) for item in _items(architecture.get("business_flow")))
+    channels = [
+        name for name in ("Microsoft Teams", "Microsoft 365 Copilot", "Copilot Studio")
+        if name.casefold() in platforms.casefold()
+    ]
+    lines = ["flowchart LR"]
+    def node(identifier: int, text: str, indent: str = "    ") -> None:
+        label = text.replace('"', "#quot;").replace("\n", "<br/>")
+        lines.append(f'{indent}n{identifier}["{label}"]')
+    node(0, "Declared channels (blueprint)\n" + _text(channels, "Channel not specified in catalog"))
+    lines.append('    subgraph synthetic["Synthetic demo boundary"]')
+    node(1, doc.solution.display_name + "\nGitHub Copilot harness\nTemplate: " + _text(native.get("template")), "        ")
+    skill_count = len(doc.library.matching(doc.solution.path("manual/skills/*/SKILL.md")))
+    node(2, f"{skill_count} skills\nSKILL.md / InlineAgentSkill", "        ")
+    lines.append("        n1 --> n2")
+    for identifier, (name, _, _, _) in enumerate(knowledge, 3):
+        node(identifier, name, "        ")
+        lines.append(f"        n2 --> n{identifier}")
+    lines += ["    end", "    n0 --> n1"]
+    for identifier, connection in enumerate(production_targets, len(knowledge) + 3):
+        node(identifier, _text(connection) + "\nNot connected")
+        lines.append(f"    n1 -.-> n{identifier}")
+    return _code("\n".join(lines), "mermaid")
+
+
 def _architecture(library: Library, solution: Solution) -> str:
     doc = Document(library, solution, "2.Architecture.md")
     architecture = _object(solution.copy.get("architecture"))
@@ -1100,6 +1278,11 @@ def _architecture(library: Library, solution: Solution) -> str:
     level2 = doc.data(solution.architecture_source)
     global_instructions = solution.path("manual/GLOBAL-INSTRUCTIONS.md")
     field_guide = solution.path("FIELD-GUIDE.md")
+    settings_source = solution.path("copilot-studio/settings.mcs.yml")
+    native = _native_settings(library, solution)
+    skills = _skill_assets(library, solution)
+    knowledge = _knowledge_assets(library, solution)
+    production_targets = _production_targets(architecture, level2)
     flow = _items(architecture.get("business_flow"))
     if flow:
         lines = ["flowchart LR"]
@@ -1111,11 +1294,14 @@ def _architecture(library: Library, solution: Solution) -> str:
     else:
         diagram = doc.missing(CATALOG, "architecture.business_flow")
     doc.add("Solution Architecture",
+            "### Logical architecture and trust boundary\n\n"
+            + _logical_architecture(doc, native, knowledge, production_targets)
+            + "\n\nThe solid paths describe the packaged design, not a live deployment. Dashed seams are not connected; "
+            "source-system authority remains outside the synthetic demo.\n\n### Catalog scenario flow\n\n"
             "Level-1 business flow (catalog architecture.business_flow): the order in which people and systems "
             "appear in the scenario, not a component or data-flow topology.\n\n" + diagram + "\n\n"
             + doc.link(solution.path("FLOW.md"), "Package case-flow diagram")
-            + "\n\nThis catalog flow includes production integration targets; it is not proof of live connectivity. "
-            + "Use the data and evidence boundary below when demonstrating the package.")
+            + ".")
     doc.source(solution.path("FLOW.md"))
     doc.source(REGISTRY)
     components = _table(
@@ -1125,35 +1311,30 @@ def _architecture(library: Library, solution: Solution) -> str:
         doc.missing(CATALOG, "architecture.capabilities"),
     )
     components += "\n\n" + _table(("Runtime reference", "Recorded value"), (
-        ("Agent file", doc.link(_text(solution.agent.get("_file"), "missing-agent-source"))),
+        ("Portable implementation", doc.link(
+            _text(solution.agent.get("_file"), "missing-agent-source"),
+            PurePosixPath(_text(solution.agent.get("_file"), "missing-agent-source")).name,
+        )),
         ("Expected tool", _text(deployment.get("expected_tool"), "Not recorded in deployment.json expected_tool")),
         ("Source SHA-256 (short)", _text(solution.agent.get("_sha256"), "Not recorded in registry _sha256")[:12]
          if solution.agent.get("_sha256") else "Not recorded in registry _sha256"),
     ), doc.missing(REGISTRY))
     doc.add("Component Responsibilities", components)
-    connections = _bullets(architecture.get("required_connections"), doc.missing(CATALOG, "architecture.required_connections"))
     domain_rows = []
     domains = level2.get("domains")
     if isinstance(domains, dict):
         for name, values in sorted(domains.items()):
-            domain_rows.extend((_label(name), component, detail) for component, detail in _named_rows(values))
+            domain_rows.append((_label(name), f"{len(_items(values))} source-defined components"))
     elif domains:
-        domain_rows.extend(("Domain", component, detail) for component, detail in _named_rows(domains))
+        domain_rows.extend(("Domain", component) for component, _ in _named_rows(domains))
     doc.add("Required Connections", "\n\n".join((
-        "### Connection requirements from the blueprint",
-        connections,
-        "These are integration requirements, not evidence that a connection is configured; "
-        "apply the package's production replacement and approval gates.",
+        "The synthetic build uses packaged knowledge, not customer-system connections. "
+        "Qualify live integration targets under [Production replacement seams](#production-replacement-seams).",
         "### Level-2 domains",
-        _table(("Domain", "Component", "Responsibility"), domain_rows, doc.missing(solution.architecture_source, "domains")),
-        "### Level-2 tools",
-        _table(("Tool", "Responsibility"), _named_rows(level2.get("tools")), doc.missing(solution.architecture_source, "tools")),
-        "### Supporting features",
-        _table(("Feature", "Responsibility"), _named_rows(level2.get("supporting_features")),
-               doc.missing(solution.architecture_source, "supporting_features")),
+        _table(("Domain", "Source inventory"), domain_rows, doc.missing(solution.architecture_source, "domains")),
+        "Detailed responsibilities, tools and supporting features remain in the "
+        + doc.link(solution.architecture_source, "Level-2 architecture source") + ".",
     )))
-    settings_source = solution.path("copilot-studio/settings.mcs.yml")
-    native = _native_settings(library, solution)
     doc.source(settings_source)
     doc.source(HARNESS_DOC)
     doc.source(SKILLS_DOC)
@@ -1171,49 +1352,51 @@ def _architecture(library: Library, solution: Solution) -> str:
         + "; " + doc.link(SKILLS_DOC, "skills") + " package the reviewed instructions and logic.",
         "Agent metadata from " + doc.link(settings_source, "settings.mcs.yml") + ":",
         native_table,
-        "### Skills (source-controlled `InlineAgentSkill` components)",
-        "Each component is the source form of the matching `manual/skills/*/SKILL.md`; "
-        "these are the same skills, not separate items to count.",
-        doc.inventory(solution.path("copilot-studio/behaviors/*.mcs.yml"), "Source form of the matching manual SKILL.md"),
-        "### Source-controlled knowledge",
-        doc.inventory(solution.path("copilot-studio/capabilities/knowledge/files/*"), "Knowledge content or its component metadata"),
-        "### Manual upload skills",
-        doc.inventory(solution.path("manual/skills/*/SKILL.md"), "Reviewed skill for the literal browser build"),
+        "### Skill inventory",
+        "Each row is one skill: a manual upload and its source-controlled `InlineAgentSkill` form.",
+        _table(
+            ("Skill", "Manual upload", "Source component"),
+            ((name, doc.link(manual, "SKILL.md"), doc.link(source, "InlineAgentSkill")) for name, manual, source in skills),
+            "No paired skills are recorded in the package.",
+        ),
+        "### Knowledge inventory",
+        _table(
+            ("Knowledge file", "Upload", "Source / metadata"),
+            (
+                (
+                    name, doc.link(upload, "Content") if upload else "Upload not provided",
+                    " · ".join(
+                        ([doc.link(content, "Source copy")] if content and content != upload else [])
+                        + ([doc.link(metadata, "Metadata")] if metadata else [])
+                    ) or "Upload is the source file",
+                )
+                for name, upload, content, metadata in knowledge
+            ),
+            "No knowledge files are recorded in the package.",
+        ),
     )))
-    doc.add("Data and Evidence Boundary", doc.copy(
-        global_instructions, "Fixed synthetic snapshot",
-        ("Pilot data boundary", "Fixed evidence policy", "Boundaries", "Grounding"),
-    ) + "\n\n" + doc.copy(field_guide, "Evidence boundary"))
-    doc.add("Production Replacement Seams", doc.copy(field_guide, "Production replacement seams"))
+    doc.add("Data and Evidence Boundary", doc.copy(field_guide, "Evidence boundary")
+            + "\n\nThe " + doc.link(global_instructions, "global policy")
+            + " defines the fixed dataset and permitted reasoning. Operational prohibitions are collected "
+            "once in [What this agent should never do](4.Sample-prompts.md#what-this-agent-should-never-do).")
+    seams = _table(
+        ("Blueprint integration target", "Qualification state"),
+        ((connection, "Not connected in this workshop") for connection in production_targets),
+        doc.missing(CATALOG, "architecture.required_connections"),
+    )
+    production_policy = _optional_copy(doc, global_instructions, "Production seams")
+    if production_policy:
+        seams += "\n\n" + production_policy
+    seams += "\n\nSee the " + doc.link(field_guide, "package's seam contract", "production-replacement-seams")
+    seams += " and the owned [production-hardening steps](3.Runbook.md#phase-5--production-hardening) before changing sources."
+    doc.add("Production Replacement Seams", seams)
     doc.source(global_instructions)
     doc.source(field_guide)
     doc.source(solution.path("evals/transcripts.json"))
-    decisions = (
-        ("Keep demo evidence separate from production results",
-         "The field guide limits packaged records and outcomes to synthetic workflow evidence.",
-         doc.link(field_guide, "Evidence boundary", "evidence-boundary")),
-        ("Preserve the package's instruction boundary",
-         "Use the reviewed global instructions rather than treating a blueprint platform as a live tool.",
-         doc.link(global_instructions, "Global instructions")),
-        ("Keep Easy and Manual construction distinct",
-         "The manual lane uses the browser and reviewed uploads, not CLI or YAML import.",
-         doc.link(field_guide, "Manual mode", "manual-mode--literal-browser-construction")),
-        ("Replay the recorded corpus before release",
-         "Compare exact case prompts and expected entities; file presence alone is not a new runtime pass.",
-         doc.link(solution.path("evals/transcripts.json"), "Canonical transcripts")),
-        ("Stop the workshop at Draft",
-         "Publication is a separate approval gate, not a generated-runbook deliverable.",
-         doc.link(field_guide, "Evidence gates", "evidence-gates")),
-    )
     notes = doc.notes()
-    specific = _table(
-        ("Decision", "Reason", "Source"),
-        ((item["decision"], item["reason"], doc.link(NOTES, "Sourced delivery notes"))
-         for item in notes.get("design_decisions", [])),
-        doc.missing_note("design_decisions"),
-    )
-    doc.add("Design Decisions", specific + "\n\n### Delivery principles (all packages)\n\n"
-            + _table(("Principle", "Reason / boundary", "Source"), decisions, doc.missing(field_guide)))
+    doc.add("Design Decisions", _note_table(
+        doc, notes, "design_decisions", ("decision", "reason"), ("Decision", "Reason"),
+    ))
     return doc.render("Architecture", _nav("3.Runbook.md", "Delivery runbook"))
 
 
@@ -1247,17 +1430,60 @@ def _release_checklist(doc: Document) -> str:
 
 
 def _note_table(doc: Document, notes: dict, field: str, keys, headers) -> str:
-    return _table(
-        headers, (tuple(item[key] for key in keys) for item in notes.get(field, [])),
-        doc.missing_note(field),
+    items = notes.get(field, [])
+    has_sources = any(item.get("source") for item in items)
+    rows, source_lines = [], []
+    for index, item in enumerate(items, 1):
+        row = tuple(item[key] for key in keys)
+        if has_sources:
+            source = item.get("source")
+            if source:
+                doc.source(source)
+                if any(part in source for part in (
+                    "/manual/skills/", "/copilot-studio/behaviors/",
+                    "/manual/knowledge/", "/copilot-studio/capabilities/knowledge/files/",
+                )):
+                    citation = f"Source {index} below"
+                    source_lines.append(f"{_label(field)} source {index}: " + doc.link(source, "Package source"))
+                else:
+                    citation = doc.link(source, "Learn" if _learn_source(source) else PurePosixPath(source).name)
+            else:
+                citation = doc.link(NOTES, "Delivery notes")
+            row += (citation,)
+        rows.append(row)
+    content = _table(
+        tuple(headers) + (("Source",) if has_sources else ()),
+        rows, doc.missing_note(field),
     )
+    return content + ("\n\n" + "\n\n".join(source_lines) if source_lines else "")
 
 
 def _exit_criteria(doc: Document, notes: dict, phase: str) -> str:
     criteria = notes.get("phase_exit_criteria", {}).get(phase)
-    return "**Exit criteria**\n\n" + _bullets(
-        criteria, doc.missing_note("phase_exit_criteria." + phase), checklist=True,
+    items = []
+    for item in criteria or []:
+        if isinstance(item, dict):
+            doc.source(item["source"])
+            items.append(item["text"] + " " + doc.link(item["source"], "Source"))
+        else:
+            items.append(item)
+    return "### Exit criteria\n\n" + _bullets(
+        items, doc.missing_note("phase_exit_criteria." + phase), checklist=True,
     )
+
+
+def _hardening_steps(doc: Document, notes: dict) -> str:
+    items = notes.get("production_hardening", [])
+    if not items:
+        return doc.missing_note("production_hardening")
+    steps = []
+    for index, item in enumerate(items, 1):
+        step = f"{index}. **{item['area']} — {item['owner']}.** {item['action']}"
+        if item.get("source"):
+            doc.source(item["source"])
+            step += " " + doc.link(item["source"], "Basis")
+        steps.append(step)
+    return "\n\n".join(steps)
 
 
 def _optional_copy(doc: Document, source: str, title: str) -> str:
@@ -1294,118 +1520,112 @@ def _runbook(library: Library, solution: Solution) -> str:
         ("Portable tool to verify", _text(deployment.get("expected_tool"), "Not provided in deployment.json expected_tool")),
         ("Build workload", workload),
     ), doc.missing(solution.path("deployment.json")))
-    doc.add("Prerequisites", "\n\n".join((
-        prerequisites,
-        "### Delivery prerequisites",
-        _note_table(doc, notes, "prerequisites", ("item", "detail"), ("Requirement", "Confirm before building")),
-        "### Delivery roles",
-        _note_table(doc, notes, "delivery_roles", ("role", "responsibility"), ("Role", "Responsibility")),
-        "### Connections to qualify, not assumed live",
-        _bullets(architecture.get("required_connections"), doc.missing(CATALOG, "architecture.required_connections")),
-    )))
-    phase1 = doc.copy(solution.path("EASY-MODE-COPILOT-CHAT.md"))
-    phase1 += "\n\n### Source-controlled lane checklist (catalog easy_mode)\n\n"
-    phase1 += (
-        "This catalog checklist describes source-controlled delivery, including future connection work. "
-        "The package's synthetic-data and Draft-only boundaries still apply.\n\n"
-        + _bullets(architecture.get("easy_mode"), doc.missing(CATALOG, "architecture.easy_mode"), checklist=True)
-    )
-    prompt = architecture.get("copilot_studio_prompt")
-    phase1 += "\n\n### Recipe-specific authoring prompt\n\n"
-    phase1 += (
-        "Catalog reference for the source-controlled lane; retain the Draft-only completion boundary above.\n\n" + _code(prompt)
-        if _present(prompt) else doc.missing(CATALOG, "architecture.copilot_studio_prompt")
-    )
-    doc.add("Phase 1 — Easy Mode with GitHub Copilot", phase1 + "\n\n" + _exit_criteria(doc, notes, "phase_1"))
-    phase2 = doc.copy(solution.path("EASY-MODE-PERSONLESS.md"))
+    prerequisite_parts = [prerequisites]
+    for field, heading, keys, headers in (
+        ("prerequisites", "Delivery prerequisites", ("item", "detail"), ("Requirement", "Confirm before building")),
+        ("delivery_roles", "Delivery roles", ("role", "responsibility"), ("Role", "Responsibility")),
+    ):
+        content = _note_table(doc, notes, field, keys, headers)
+        if notes.get(field):
+            prerequisite_parts += ["### " + heading, content]
+    doc.add("Prerequisites", "\n\n".join(prerequisite_parts))
+    easy_source = solution.path("EASY-MODE-COPILOT-CHAT.md")
+    doc.source(easy_source)
+    phase1 = [
+        "Choose one of three alternative build lanes: GitHub Copilot authors the source-controlled Draft here. "
+        "After this lane, continue to Phase 4.",
+        "1. Open GitHub Copilot Chat in VS Code, select Agent mode, and attach the "
+        + doc.link("skills/aibast-easy-mode-copilot/SKILL.md", "Copilot-only workshop skill") + ".",
+        "2. Send the reviewed messages below in order. The skill verifies the Microsoft Copilot Studio plugin "
+        "and PAC prerequisites; inspect its resulting project and evidence.",
+        "### Shared build messages",
+        doc.copy(easy_source, "2. Build and test the solution"),
+        doc.copy(easy_source, "3. Deploy the validated Draft"),
+        f"3. Check the Draft against the [single inventory](2.Architecture.md#skill-inventory): "
+        f"{counts['skills']} skills and {counts['knowledge_files']} knowledge files. "
+        "Use synthetic inputs only; neither publication nor live-system connections belong in this lane.",
+        _exit_criteria(doc, notes, "phase_1"),
+    ]
+    lane_boundary = _optional_copy(doc, easy_source, "Evidence lane boundary")
+    if lane_boundary:
+        phase1.insert(1, lane_boundary)
+    doc.add("Phase 1 — Easy Mode with GitHub Copilot", "\n\n".join(phase1))
+    optional_source = solution.path("EASY-MODE-PERSONLESS.md")
+    doc.source(optional_source)
     brainstem = _object(deployment.get("brainstem"))
-    phase2 += "\n\n### Optional runtime endpoints\n\n" + _table(
-        ("Recipe field", "Value"),
-        ((key, f"`{_text(brainstem[key])}`") for key in ("health_url", "chat_url", "ui_url") if _present(brainstem.get(key))),
-        doc.missing(solution.path("deployment.json"), "brainstem endpoints"),
-    )
-    install_prompt = architecture.get("local_install_prompt")
-    phase2 += "\n\n### Recipe-specific local installation prompt\n\n" + (
-        "Catalog reference for the optional local lane:\n\n" + _code(install_prompt)
-        if _present(install_prompt) else doc.missing(CATALOG, "architecture.local_install_prompt")
-    )
-    doc.add("Phase 2 — Optional Brainstem Track", phase2 + "\n\n" + _exit_criteria(doc, notes, "phase_2"))
-    manual = doc.copy(guide, "Manual mode — literal browser construction")
-    manual += "\n\n" + doc.link(solution.path("manual-tutorial.html"), "Open the step-by-step manual tutorial") + "."
+    phase2 = [
+        "Choose one of three alternative build lanes: this optional track adds local Brainstem validation. "
+        "It is not a prerequisite for the browser build; continue to Phase 4 when it is complete.",
+        "1. Attach the " + doc.link("skills/aibast-easy-mode-brainstem/SKILL.md", "Brainstem workshop skill")
+        + " instead of the Copilot-only skill.",
+        "2. Reuse the [shared build messages from Phase 1](#shared-build-messages); do not repeat that lane separately.",
+        "3. Follow " + doc.link(solution.path("deployment.json"), "the local installation recipe")
+        + f" for `{_text(deployment.get('target_filename'))}`. Verify `{_text(deployment.get('expected_tool'))}` "
+        + f"at `{_text(brainstem.get('health_url'), 'the recipe health endpoint')}` and run its smoke test.",
+        "4. Use the [locked acceptance matrix](4.Sample-prompts.md#per-case-acceptance-matrix) for isolated local runs. "
+        "Record the actual results, then complete target Draft validation. "
+        + doc.link(optional_source, "Full optional-track procedure") + ".",
+        _exit_criteria(doc, notes, "phase_2"),
+    ]
+    doc.add("Phase 2 — Optional Brainstem Track", "\n\n".join(phase2))
     instructions = solution.path("manual/GLOBAL-INSTRUCTIONS.md")
     doc.source(instructions)
-    manual += "\n\n### Instructions and upload inventory\n\n"
-    manual += "- " + doc.link(instructions, "Copy the reviewed global instructions") + "\n\n"
-    knowledge = _manual_knowledge(doc)
-    if not library.exists(solution.path("manual/knowledge")) and knowledge:
-        manual += (
-            "Use the manual knowledge uploads declared by the export manifest below; "
-            "this package reuses its source-controlled knowledge files for the browser build.\n\n"
-        )
-    manual += _table(
-        ("File", "Role"),
-        ((doc.link(path, path.removeprefix(solution.package + "/")), role) for path, role in knowledge),
-        doc.missing(solution.path("export-manifest.json"), "manual knowledge uploads"),
-    )
-    manual += "\n\n" + doc.inventory(solution.path("manual/skills/*/SKILL.md"), "Upload the reviewed SKILL.md unchanged")
-    manual += "\n\n### CLI build checklist (catalog hard_mode)\n\n"
-    manual += (
-        "This is the source-controlled CLI alternative, not a prerequisite for the manual browser build.\n\n"
-        + _bullets(architecture.get("hard_mode"), doc.missing(CATALOG, "architecture.hard_mode"), checklist=True)
-    )
-    commands = [_text(command) for command in _items(architecture.get("manual_commands"))]
-    routine = [command for command in commands if not re.search(r"\bpublish\b", command, re.I)]
-    publication = [command for command in commands if re.search(r"\bpublish\b", command, re.I)]
-    manual += "\n\n### CLI reference — not the manual browser lane\n\n"
-    manual += (
-        "The catalog also records these commands for source-controlled delivery. "
-        "Do not run them as substitutes for the literal browser steps above.\n\n"
-        + _code("\n".join(routine))
-        if routine else doc.missing(CATALOG, "architecture.manual_commands")
-    )
-    if publication:
-        manual += "\n\n### Publication reference — outside this workshop\n\n"
-        manual += "These catalog commands require separate human approval; they are not build or acceptance steps.\n\n"
-        manual += _code("\n".join(publication))
-    doc.add("Phase 3 — Manual Build in Copilot Studio", manual + "\n\n" + _exit_criteria(doc, notes, "phase_3"))
-    smoke = _object(deployment.get("smoke_test"))
-    smoke_rows = [
-        ("Prompt", _text(smoke.get("prompt"), "Not provided in deployment.json smoke_test.prompt")),
-        ("Must call", _text(smoke.get("must_call"), "Not provided in deployment.json smoke_test.must_call")),
-        ("Must include", _text(smoke.get("must_include"), "Not provided in deployment.json smoke_test.must_include")),
+    native = _native_settings(library, solution)
+    manual = [
+        "Choose one of three alternative build lanes: build the agent directly in the Copilot Studio browser. "
+        "No Python, local runtime, CLI import or earlier build lane is required.",
+        "1. Create a blank Draft in the approved environment and record the agent identity.",
+        "2. Copy and save the reviewed " + doc.link(instructions, "global instructions") + ", including all source and action limits.",
+        f"3. Upload the {counts['knowledge_files']} content files from the "
+        "[knowledge inventory](2.Architecture.md#knowledge-inventory); wait for ingestion to finish.",
+        f"4. Upload each of the {counts['skills']} files from the [skill inventory](2.Architecture.md#skill-inventory) "
+        "once. Correct only genuine validation errors; do not manufacture an error to reproduce an old screenshot.",
+        f"5. Match the recorded model `{_text(native.get('model'))}` and the reviewed input restrictions. "
+        "Confirm the saved state and complete inventory before Preview.",
+        "6. Run each [locked prompt](4.Sample-prompts.md#per-case-acceptance-matrix) in a fresh Preview conversation. "
+        "Capture current-agent results and keep the agent unpublished.",
+        "For the exact UI sequence and conditional checkpoints, use the "
+        + doc.link(solution.path("manual-tutorial.html"), "manual tutorial") + ".",
+        _exit_criteria(doc, notes, "phase_3"),
     ]
-    if smoke.get("arguments"):
-        smoke_rows.append(("Arguments", _text(smoke["arguments"])))
+    doc.add("Phase 3 — Manual Build in Copilot Studio", "\n\n".join(manual))
+    case_ids = [_case_id(case) for case in _items(cases.get("cases"))]
     doc.add("Phase 4 — Acceptance", "\n\n".join((
         "**Synthetic demo acceptance:** expected names, identifiers, and figures below are fictional test evidence, not customer results.",
-        _bullets(architecture.get("acceptance_checks"), doc.missing(CATALOG, "architecture.acceptance_checks"), checklist=True),
-        "### Deployment smoke test",
-        _table(("Check", "Expected value"), smoke_rows, doc.missing(solution.path("deployment.json"), "smoke_test")),
-        "### Package evidence gates",
-        doc.copy(guide, "Evidence gates"),
+        f"- [ ] Replay all {len(case_ids)} locked cases ({', '.join(case_ids)}) from the "
+        "[acceptance matrix](4.Sample-prompts.md#per-case-acceptance-matrix), then the "
+        "[refusal and escalation tests](4.Sample-prompts.md#routing-and-boundary-cases). "
+        "Compare the final responses, not approximate wording or an old recorded pass.",
         "### Go / no-go",
         _note_table(doc, notes, "go_no_go", ("criterion", "threshold"), ("Criterion", "Required threshold")),
         _exit_criteria(doc, notes, "phase_4"),
     )))
     hardening = [
-        _note_table(doc, notes, "production_hardening", ("area", "action"), ("Area", "Owner and action")),
-        "### Production replacement seams",
-        doc.copy(guide, "Production replacement seams"),
+        "This is a separately approved production workstream, not another synthetic build step. "
+        "Use the [qualified seams](2.Architecture.md#production-replacement-seams) as its integration boundary.",
+        _hardening_steps(doc, notes),
     ]
-    production_policy = _optional_copy(doc, instructions, "Production seams")
-    if production_policy:
-        hardening += ["### Package production policy", production_policy]
-    hardening += [
-        "Review the [architecture seams](2.Architecture.md#production-replacement-seams) and the "
-        + doc.link(guide, "customer gate", "evidence-gates")
-        + " before changing data sources or enabling writes; workshop acceptance is not production approval.",
-        _exit_criteria(doc, notes, "phase_5"),
-    ]
+    hardening.append(_exit_criteria(doc, notes, "phase_5"))
     doc.add("Phase 5 — Production Hardening", "\n\n".join(hardening))
-    doc.add("Failure Recovery", doc.copy(guide, "Failure recovery"))
-    doc.add("Deliverables Checklist", _release_checklist(doc) + "\n\nSource: "
-            + doc.link("solutions/README.md", "seven-step release gate", "release-gate")
-            + ". Record fresh evidence against each check; this list is not a claim that the checks passed.")
+    recovery = _table(
+        ("Risk", "Recovery action"),
+        (
+            (f"[{index}](1.Overview.md#what-actually-goes-wrong)", item["response"])
+            for index, item in enumerate(notes.get("what_goes_wrong", []), 1)
+        ),
+        "Use the " + doc.link(guide, "package recovery contract", "failure-recovery")
+        + " and retain the failing case's actual output.",
+    )
+    doc.add("Failure Recovery", recovery)
+    deliverables = [
+        f"The {solution.display_name} Draft identity, `{_text(native.get('model'))}` model and chosen lane are recorded.",
+        f"The {counts['skills']} skills and {counts['knowledge_files']} knowledge files match the Architecture inventory.",
+        "Fresh results are retained for " + (", ".join(case_ids) if case_ids else "every case in the package contract") + ".",
+        f"The {len(notes.get('boundary_tests', []))} authored boundary tests have reviewer-recorded outcomes."
+        if notes.get("boundary_tests") else "The instruction-policy prohibitions have recorded checks.",
+        "The solution's go/no-go decision identifies remaining risks, accountable owners and the publication boundary.",
+    ]
+    doc.add("Deliverables Checklist", _bullets(deliverables, "", checklist=True))
     return doc.render("Delivery Runbook", _nav("4.Sample-prompts.md", "Sample prompts and boundary cases"))
 
 
@@ -1463,15 +1683,17 @@ def _prohibition_excerpt(doc: Document, source: str) -> str:
             current.append(line)
     if current:
         units.append("\n".join(current))
-    prohibition = re.compile(
-        r"\b(?:never|do not|don['’]t|must not|no|cannot|read-only|draft-only|human approval|human review)\b",
-        re.I,
-    )
-    selected = [unit for unit in units if prohibition.search(unit)]
+    prohibition = re.compile(r"^(?:never\b|do not\b|don['’]t\b|must not\b|no\s+\w)", re.I)
+    selected = []
+    for unit in units:
+        text = re.sub(r"^\s*(?:[-*+]|\d+[.)])\s+", "", unit).strip()
+        probe = text.replace("**", "").replace("`", "").lstrip()
+        if prohibition.match(probe):
+            selected.append("- " + text.replace("\n", "\n  "))
     if not selected:
-        return f"No explicit prohibition or human-review rule was found in {doc.link(source)}."
+        return doc.missing_note("never_do")
     content = _copy_markdown(doc.library, "\n\n".join(selected), source, doc.path)
-    return "Prohibition and human-review excerpts from " + doc.link(source, "the global instructions") + ":\n\n" + content
+    return "Prohibitions from " + doc.link(source, "the global instructions") + ":\n\n" + content
 
 
 def _sample_prompts(library: Library, solution: Solution) -> str:
@@ -1485,11 +1707,20 @@ def _sample_prompts(library: Library, solution: Solution) -> str:
     promise_map = doc.data(promise_source)
     locked = _case_records(cases.get("cases"), solution.demo_source)
     recorded = _case_records(transcripts.get("transcripts"), transcript_source)
+    doc.source(instructions)
+    routing = ""
+    if instructions in library.files:
+        policy = (library.root / instructions).read_text(encoding="utf-8")
+        routing = next(
+            (title for title in ("Skill routing map", "Natural-language routing", "Routing", "Locked Preview routing")
+             if _section(policy, title)), "",
+        )
     doc.add("Suggested Agent Instructions",
-            "Use " + doc.link(instructions, "the complete reviewed global instructions")
-            + ", not the excerpts alone.\n\n" + doc.copy(
-                instructions, "Skill routing map", ("Natural-language routing", "Routing", "Locked Preview routing"),
-            ))
+            "Save " + doc.link(instructions, "the reviewed global instructions")
+            + " unchanged. They define routing, evidence and side-effect limits. "
+            + doc.link(instructions, "Source routing guidance", _slug_heading(routing) if routing else "")
+            + " pairs with the [single skill inventory](2.Architecture.md#skill-inventory); "
+            "the cases below test the resulting behavior.")
     demos = _catalog_demos(doc)
     used_demos = set()
     matrix = []
@@ -1678,7 +1909,7 @@ def _field_contexts(value, prefix: str = "", case_id: str = "") -> dict[str, str
                     details.append(label + ": " + _recorded_value(value[present]))
                 elif approved:
                     details.append(label + ": Not recorded")
-            for name in ("captured_at", "notes", "note", "historical_reason"):
+            for name in ("captured_at", "notes", "note", "historical_reason", "review_provenance"):
                 if _present(value.get(name)):
                     details.append(_label(name) + ": " + _text(value[name]))
             contexts[path] = "\n".join(details) or "—"
@@ -1695,6 +1926,8 @@ def _capture_caveats(capture: dict) -> str:
             parts.extend("Not visibly proven: " + _text(item) for item in _items(capture[key]))
     for key, label in (
         ("reason", "Reason"), ("note", "Note"), ("notes", "Notes"), ("historical_reason", "Historical reason"),
+        ("reviewer", "Reviewer"), ("method", "Method"), ("reviewed_at", "Review date"), ("review_date", "Review date"),
+        ("review_provenance", "Review provenance"),
     ):
         parts.extend(label + ": " + _text(item) for item in _items(capture.get(key)))
     return "\n".join(parts) or "No caveat or reason recorded"
@@ -1892,6 +2125,31 @@ def _resources(library: Library, solution: Solution) -> str:
     doc.add("Evidence and Exports",
             "This is a presence inventory, not a pass verdict. Review each artifact's synthetic-data and publication boundary.\n\n"
             + _table(("Kind", "Artifact", "Presence"), artifact_rows, doc.missing(solution.path("export-manifest.json"), "evidence and exports")))
+    doc.sources.update(
+        path for path in library.files
+        if path.startswith(solution.package + "/") and PurePosixPath(path).suffix in {".md", ".json", ".yml"}
+    )
+    for source in (
+        CATALOG, REGISTRY, NOTES, PATTERNS, "CLAUDE.md", "solutions/README.md", "index.html",
+        solution.architecture_source, solution.demo_source, solution.agent.get("_file"),
+        HARNESS_DOC, SKILLS_DOC,
+    ):
+        if isinstance(source, str):
+            doc.source(source)
+    entry = library.notes.get(solution.name, {})
+    for source in entry.get("sources", []):
+        doc.source(source)
+    def item_sources(value):
+        if isinstance(value, dict):
+            if isinstance(value.get("source"), str):
+                yield value["source"]
+            for item in value.values():
+                yield from item_sources(item)
+        elif isinstance(value, list):
+            for item in value:
+                yield from item_sources(item)
+    for source in item_sources(entry):
+        doc.source(source)
     return doc.render(
         "Resources",
         "→ [Overview](../1.Overview.md) | [Acceptance and delivery](../3.Runbook.md) | [Solution index](../../README.md)",

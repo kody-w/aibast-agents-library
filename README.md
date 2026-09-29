@@ -111,7 +111,7 @@ The files themselves live under [`agents/@aibast-agents-library/`](agents/@aibas
 | [`03-references/`](03-references/README.md) | Delivery references, glossary, and release-process pointers. |
 | [`solutions/`](solutions/README.md) | Existing workshop packages, source assets, and acceptance evidence; paths stay unchanged. |
 
-Compare **AIBAST Frontier (experimental)**—an early, experimental learning lane where one portable `agents/@aibast-agents-library/.../*_agent.py` file lets you learn, teach, and change behavior immediately in the Brainstem—with the **Runbook lane**, a manual Copilot Studio build in `01-solutions/` needing no Python or local tooling; see [Two Delivery Lanes](00-overview/README.md#two-delivery-lanes).
+Compare **AIBAST Frontier (experimental)**—an early, experimental learning lane where one portable `agents/@aibast-agents-library/.../*_agent.py` file lets you learn, teach, and change behavior immediately in the Brainstem—with the **Runbook lane**, a manual Copilot Studio build guided by the runbooks in `01-solutions/` and needing no Python or local tooling; see [Two Delivery Lanes](00-overview/README.md#two-delivery-lanes).
 
 Phase 1 generates two pilot runbooks: `ask-hr` and `building-permit-processing`.
 The remaining solutions are planned for Phase 2. Generated files in
