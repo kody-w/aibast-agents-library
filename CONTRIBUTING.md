@@ -125,6 +125,14 @@ python build_registry.py
 
 This validates your manifest and ensures the registry builds cleanly.
 
+## Solution runbooks and patterns
+
+Browse the [solution runbooks](01-solutions/README.md) and
+[pattern index](02-patterns/README.md). Files under `01-solutions/` are
+generated and must never be hand-edited; update the sources described in
+the [solution package guide](solutions/README.md#source-of-truth-boundaries)
+and regenerate with `python tools/build_solution_runbooks.py`.
+
 ## PR Checklist
 
 - [ ] `agents/@yourname/my-agent.py` file exists (single file!)

@@ -101,6 +101,20 @@ The files themselves live under [`agents/@aibast-agents-library/`](agents/@aibas
 
 [**Library metrics**](https://microsoft.github.io/aibast-agents-library/metrics.html) publishes AIBAST-only public downloads, every-file observations, per-agent rating Discussion upvotes, signed-in acquisition Discussion signals, workshop adoption, and opt-in achievement rollups. Each run also generates a shareable weekly/monthly PDF plus email-ready text under `reports/`. `scripts/build_metrics.py` builds the snapshot, and `scripts/build_impact_report.py` turns its dated history into the exportable impact report without converting unavailable coverage to zero. Visitor behavior on the published site (heatmaps, session recordings) comes from [Microsoft Clarity](https://clarity.microsoft.com/); the tag is stamped on every public page from `clarity.json` by `scripts/apply_clarity_tag.py` (setup in [docs/CLARITY.md](docs/CLARITY.md)).
 
+### Library structure
+
+| Path | Purpose |
+|------|---------|
+| [`00-overview/`](00-overview/README.md) | Start here: navigation, runbook anatomy, and solution taxonomy. |
+| [`01-solutions/`](01-solutions/README.md) | Generated solution overviews, architecture, runbooks, prompts, and evidence pointers. |
+| [`02-patterns/`](02-patterns/README.md) | Reusable-pattern index, with planned AIBAST patterns and links to AI Agent Runbooks. |
+| [`03-references/`](03-references/README.md) | Delivery references, glossary, and release-process pointers. |
+| [`solutions/`](solutions/README.md) | Existing workshop packages, source assets, and acceptance evidence; paths stay unchanged. |
+
+Phase 1 generates two pilot runbooks: `ask-hr` and `building-permit-processing`.
+The remaining solutions are planned for Phase 2. Generated files in
+`01-solutions/` are never hand-edited.
+
 ---
 
 ## The Stack: Brainstem → Azure → Copilot Studio

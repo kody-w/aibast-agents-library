@@ -1,0 +1,228 @@
+{
+  "schema": "aibast-solution-runbook-notes/1.0",
+  "source": "Hand-authored delivery guidance rendered into the generated 01-solutions runbooks. Every statement must be traceable to the files listed in the entry's sources.",
+  "solutions": {
+    "@aibast-agents-library/ask-hr": {
+      "target_users": [
+        {
+          "role": "Employees",
+          "need": "Understand the fictional leave balance and notice rules without treating the snapshot as a live entitlement."
+        },
+        {
+          "role": "Employees",
+          "need": "Preview vacation dates and projected balance before using the approved submission workflow; the pilot submits nothing."
+        },
+        {
+          "role": "Employees",
+          "need": "Understand the published parental-leave example without disclosing family details or receiving an eligibility decision."
+        },
+        {
+          "role": "Employees",
+          "need": "Understand the fictional health-plan snapshot and which plan rules the benefits administrator must verify."
+        },
+        {
+          "role": "Managers",
+          "need": "Explain the sample remote-work rules without inferring why an employee asked or making an individualized determination."
+        },
+        {
+          "role": "HR Operations Staff",
+          "need": "Explain the fictional benefits profile consistently without estimating compensation or deciding eligibility."
+        }
+      ],
+      "scope_in": [
+        "Explain fictional leave balances, holidays, accrual, rollover and notice rules from the fixed Ask HR snapshot.",
+        "Preview vacation dates and projected balances as `Not Submitted`, `Draft for employee review`, and `No notification was sent`.",
+        "Explain published parental-leave examples and identify HR verification needs without determining eligibility or asking for family details.",
+        "Summarize fictional health-plan and enrollment rules, naming checks for benefits staff rather than recommending a plan.",
+        "Explain published remote-work rules without inferring an employee's reasons or sensitive circumstances.",
+        "Summarize the fictional benefits profile without estimating salary, total compensation or eligibility."
+      ],
+      "scope_out": [
+        "No real employee records, live HRIS or benefits lookups, or access to Outlook, Teams or a manager workflow; only the uploaded synthetic snapshot is used.",
+        "No browsing or external policy, legal, medical, payroll or current-date facts; the packaged policy examples are not live guidance.",
+        "No eligibility or employment decisions, health-plan recommendations or approval of exceptions; individualized determinations belong to authorized HR staff.",
+        "No inference of pregnancy, disability, caregiver or family status, and no matching a fictional profile to a real employee.",
+        "No time-off submission, manager notification, HR record change or completed transaction; the time-off operation produces a reviewable draft only.",
+        "No salary or total-compensation estimates from the fictional benefits profile.",
+        "No workshop publishing: keep Ask HR in Draft until an authorized reviewer validates every operation and guardrail and separately approves publication."
+      ],
+      "qualification_checklist": [
+        "Is a Microsoft Copilot Studio target environment, with an approved publisher prefix, available for the Ask HR build?",
+        "Can the delivery team authenticate with PAC CLI 2.9.3 or newer, initialize `cli-copilot`, and preserve the generated agent identity?",
+        "Has the customer decided whether Outlook and Microsoft Teams belong in the production HR workflow, separately from the synthetic workshop?",
+        "Have security, privacy and the HR business owner approved the HRIS, benefits and policy sources that will replace the synthetic files?",
+        "Are dedicated connection references and least-privilege access approved for each selected HR system, with the reviewed input and output contract preserved?",
+        "Are authorized HR and benefits reviewers identified for individualized eligibility, exceptions and any proposed transaction?",
+        "Is publication held for separate approval after replaying every locked HR case against the reviewed instructions, knowledge, skills and model?",
+        "Have governance, telemetry, support and success measures been agreed for the production HR service?"
+      ],
+      "what_goes_wrong": [
+        {
+          "issue": "Manual skill-upload and inventory screenshots do not show every required HR skill.",
+          "response": "Restore Easy/Manual inventory parity, then recapture the missing skill chips and saved inventory with all six HR skills, both knowledge files, the reviewed model and no tools."
+        },
+        {
+          "issue": "HR instructions are visible, but the save checkpoint has no saved-state indicator.",
+          "response": "Reshoot the save step with a visible saved-state indicator; visible policy text alone does not prove the save completed."
+        },
+        {
+          "issue": "The assisted Draft screenshot shows unrelated agents, not the Ask HR agent under review.",
+          "response": "Withhold the frame and capture the named Ask HR agent row with its Draft badge; keep publication behind separate authorization."
+        },
+        {
+          "issue": "HR-02 screenshots omit exact draft-status phrases, so a plausible time-off preview is mistaken for a full pass.",
+          "response": "Check the final response against every locked marker, including `Not Submitted`, `Draft for employee review` and `No notification was sent`; replay the same corpus in Copilot Studio."
+        },
+        {
+          "issue": "An HR skill or its knowledge cannot be loaded, but the agent tries to answer from remembered policy values.",
+          "response": "Use the exact routing-map skill name. After one retry in the same turn, report the loading failure and stop; do not replace missing citations with general knowledge."
+        },
+        {
+          "issue": "Ask HR Preview runs while the synthetic policy and profile files are still processing.",
+          "response": "Wait for ingestion to finish before Preview; do not accept a partial answer as evidence."
+        },
+        {
+          "issue": "An employee asks the pilot to decide eligibility, infer family circumstances or notify a manager.",
+          "response": "Keep the answer within the synthetic policy snapshot, decline the decision or action, and route individualized determinations to authorized HR staff through the approved workflow."
+        },
+        {
+          "issue": "An HR case lacks required evidence or its recorded identifier, despite a working import or plausible demo answer.",
+          "response": "Stop and mark the case failed. Restore or capture real evidence, investigate missing identifiers, then replay unchanged cases after correction; never use mockups or retry until a case happens to pass."
+        }
+      ],
+      "related_patterns": [
+        "runbooks:Human-in-the-Loop-Review-and-Approval",
+        "runbooks:Copilot-Connector-Knowledge-Onboarding",
+        "runbooks:Grounding-and-Response-Quality-Remediation",
+        "runbooks:Agent-Publishing-and-Channel-Deployment",
+        "aibast:evidence-first-release-gate",
+        "aibast:synthetic-snapshot-demo-agent"
+      ],
+      "sources": [
+        "02-patterns/patterns.json",
+        "registry.json",
+        "solutions/README.md",
+        "solutions/catalog.json",
+        "solutions/ask-hr/README.md",
+        "solutions/ask-hr/FIELD-GUIDE.md",
+        "solutions/ask-hr/deployment.json",
+        "solutions/ask-hr/manual/GLOBAL-INSTRUCTIONS.md",
+        "solutions/ask-hr/copilot-studio/behaviors/aibast_submit-time-off.mcs.yml",
+        "solutions/ask-hr/manual/skills/aibast_submit-time-off_02/SKILL.md",
+        "solutions/ask-hr/manual/skills/aibast_health-insurance_04/SKILL.md",
+        "solutions/ask-hr/evals/manual-build-evidence.json",
+        "solutions/ask-hr/evals/visual-checkpoints.json"
+      ]
+    },
+    "@aibast-agents-library/building-permit-processing": {
+      "target_users": [
+        {
+          "role": "Permit Technicians",
+          "need": "Identify aging applications and complaint risk from the synthetic backlog before repeated status calls dominate the front desk."
+        },
+        {
+          "role": "Permit Technicians",
+          "need": "Spot duplicate or incomplete submissions and understand the recommended intake decision without changing an application."
+        },
+        {
+          "role": "Plan Reviewers",
+          "need": "Identify the review desks, due date and checklist scope for a synthetic permit without certifying compliance."
+        },
+        {
+          "role": "Permit Technicians",
+          "need": "Prepare reviewable applicant status-update drafts from the permit snapshot without sending messages."
+        },
+        {
+          "role": "Inspectors",
+          "need": "See the fictional inspection board, specialties, availability and job coverage without claiming an assignment has changed."
+        }
+      ],
+      "scope_in": [
+        "Rank synthetic permit backlog by fixed review clocks, correction cycles and complaint risk; present findings as recommendations.",
+        "Triage synthetic submissions for duplicates and missing documents, identify review desks, and report the fixed intake due date.",
+        "Prepare applicant status-update drafts from synthetic permit records for human review; no message is sent.",
+        "Show a named synthetic permit or dashboard, resolving identifiers and project context; quote zoning references without judging compliance.",
+        "Produce ordered common and permit-type review checklists with unchecked items; never mark a check complete, waived or compliant.",
+        "Explain the synthetic inspection board, inspector specialties, availability and zones; recommend coverage without changing assignments.",
+        "Estimate permit fees from declared valuation using the packaged synthetic schedule and line items; label the result as an estimate, not an invoice."
+      ],
+      "scope_out": [
+        "No real applicant or municipal records, live lookups or live connectors; all answers stay within the packaged synthetic snapshot.",
+        "No permit approval, denial, issue, modification, or submission acceptance or rejection in a system.",
+        "No applicant messages, notifications or other communications are sent.",
+        "No reviewer or inspector assignment, booking, rescheduling or cancellation of inspections.",
+        "No legal advice or code-compliance certification; zoning standards are synthetic references, not compliance findings.",
+        "No invoices, fee collection, waivers, reductions or refunds; fee outputs remain synthetic estimates.",
+        "No workshop publishing: the release agent stays in Draft. Historical published-pilot evidence is not approval for this build."
+      ],
+      "qualification_checklist": [
+        "Is a Microsoft Copilot Studio target environment, with an approved publisher prefix, available for the permit build?",
+        "Can the delivery team use the Copilot Studio plugin with PAC CLI 2.9.3 or newer, authenticate, and preserve the initialized `cli-copilot` project identity?",
+        "Are dedicated, connected references approved in the target environment for Dynamics 365 Customer Service, SharePoint and Microsoft Teams?",
+        "Has the customer mapped permit records to Dynamics 365 Customer Service, plan and policy documents to SharePoint, and coordination to Microsoft Teams?",
+        "Are production connections initially read-only, with security and governance review plus explicit human approval required before any write?",
+        "Have owners approved instructions for statutory clocks, intake, routing, applicant updates, approvals and safe escalation?",
+        "Is publication held for explicit human approval after component validation and replay of the locked permit corpus in the target environment?",
+        "Have telemetry, support and success measures been agreed for production permit processing, beyond the synthetic workshop evidence?"
+      ],
+      "what_goes_wrong": [
+        {
+          "issue": "The tutorial's historical inspector-skill failure is treated as a required error or a fresh accepted upload.",
+          "response": "Upload the reviewed skill unchanged. Capture the result; fix and retry only after a genuine error. Finish only when `inspector-board-and-coverage` is accepted and visible in Skills."
+        },
+        {
+          "issue": "Assisted evidence shows the historical published permit pilot, not the unpublished release agent.",
+          "response": "Withhold those captures and recapture the cases on Building Permit Manual Build; record the release agent's Draft state instead of treating the old publication as approval."
+        },
+        {
+          "issue": "The assisted Draft-confirmation image is blank, so the filename is mistaken for proof.",
+          "response": "Keep the frame withheld and capture the actual target UI and Draft state; a missing visible checkpoint cannot be replaced with a label or mockup."
+        },
+        {
+          "issue": "Backlog risk, overdue days or solar-job inspection dates drift when the agent uses today's date.",
+          "response": "Use the fixed synthetic snapshot of 2026-08-07. Preserve the locked backlog response and the inspection board's pending date; do not recalculate from the current date."
+        },
+        {
+          "issue": "BPP-01 grows extra instructions to issue a permit, send an update or assign an inspector.",
+          "response": "Return only `BPP-01 Locked Response` with its municipal-system footer. Validate the full final response against required and forbidden markers before accepting the case."
+        },
+        {
+          "issue": "An unknown permit ID or ambiguous project name is answered using a different application.",
+          "response": "State which record is missing, list known matches and ask one concise clarification; never substitute another permit or infer compliance from zoning references."
+        },
+        {
+          "issue": "Permit Preview produces partial answers while knowledge is processing or Easy and Manual inventories differ.",
+          "response": "Wait for ingestion, restore exact instruction, knowledge, skill and model parity, then run each unchanged locked prompt in a fresh conversation."
+        },
+        {
+          "issue": "A source import or historical Preview pass is treated as release proof without the current evidence files.",
+          "response": "Stop and capture or restore the real evidence. Replay the unchanged corpus in Copilot Studio; keep the workshop read-only and Draft, with publication requiring separate approval."
+        }
+      ],
+      "related_patterns": [
+        "runbooks:Human-in-the-Loop-Review-and-Approval",
+        "runbooks:Enterprise-RAG-Pattern",
+        "runbooks:Agent-Publishing-and-Channel-Deployment",
+        "aibast:evidence-first-release-gate",
+        "aibast:synthetic-snapshot-demo-agent",
+        "aibast:visual-evidence-and-browserfilm-capture"
+      ],
+      "sources": [
+        "02-patterns/patterns.json",
+        "registry.json",
+        "solutions/README.md",
+        "solutions/catalog.json",
+        "solutions/building-permit-processing/README.md",
+        "solutions/building-permit-processing/FIELD-GUIDE.md",
+        "solutions/building-permit-processing/deployment.json",
+        "solutions/building-permit-processing/manual/GLOBAL-INSTRUCTIONS.md",
+        "solutions/building-permit-processing/copilot-studio/behaviors/aibast_permit-status_bp04.mcs.yml",
+        "solutions/building-permit-processing/copilot-studio/behaviors/aibast_review-checklist_bp05.mcs.yml",
+        "solutions/building-permit-processing/manual/skills/aibast_inspector-assignment_bp06/SKILL.md",
+        "solutions/building-permit-processing/manual/skills/aibast_fee-calculation_bp07/SKILL.md",
+        "solutions/building-permit-processing/evals/manual-build-evidence.json",
+        "solutions/building-permit-processing/evals/visual-checkpoints.json"
+      ]
+    }
+  }
+}

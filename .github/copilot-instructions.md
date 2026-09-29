@@ -72,11 +72,21 @@ python -m pytest tests/test_local_agents.py::TestLocalStorage::test_write_and_re
 python build_registry.py
 python -m pytest tests -v
 
+# Generate and check the Phase 1 pilot runbooks (repository root)
+python tools/build_solution_runbooks.py
+python tools/build_solution_runbooks.py --check
+python -m pytest tests/test_solution_runbooks.py -q
+
 # Health check
 curl -s localhost:7071/health | python3 -m json.tool
 ```
 
 No linter or type-checker is configured.
+
+The runbook generator currently writes the `ask-hr` and
+`building-permit-processing` pilots. `--all` is reserved for the Phase 2
+rollout; change the sources and regenerate rather than hand-editing
+`01-solutions/`.
 
 ## API Endpoints
 
@@ -150,3 +160,13 @@ class MyAgent(BasicAgent):
 ## Downstream Sync Safety
 
 Never overwrite AIBAST-owned content with Grail equivalents: `agents/@aibast-agents-library/`, `registry.json`, `build_registry.py`, `rapp_ai/`, root `README.md`/`index.html`/`CLAUDE.md`, `docs/index.html`, `docs/tutorial.html`, `docs/rapp-guide.html`, `.github/`, legal/governance files, `.vscode/`, and `tools/`. Rewrite only Grail repository-identity URLs to `microsoft/aibast-agents-library`; review content-repository links such as CommunityRAPP individually.
+
+Also preserve these AIBAST-owned runbook surfaces during every kernel sync:
+
+- `00-overview/` — hand-authored narrative with a generated taxonomy block
+- `01-solutions/` — generated solution runbooks; never hand-edit
+- `02-patterns/` — reusable-pattern guidance and the `patterns.json` index
+- `03-references/` — delivery references and glossary
+- `solutions/runbook-notes.json` — hand-authored delivery guidance
+- `tools/build_solution_runbooks.py` and `tools/markdown_links.py` — generator and case-exact Markdown link checker
+- `tests/test_solution_runbooks.py` — repository-level runbook gate, not a vendored kernel test
