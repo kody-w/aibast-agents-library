@@ -2788,7 +2788,7 @@ def validate_capture_caveats(outputs, facts, links):
             assert len(matching) == 1, f"{path}: capture {identifier} must have exactly one evidence row"
             row = rendered_text(" ".join(matching[0]), links)
             for key, value in capture.items():
-                if key in {"reason", "note", "notes", "historical_reason"} or (
+                if key in {"reason", "note", "notes", "historical_reason", "review_provenance"} or (
                     key.startswith("full_") and key.endswith("_not_visibly_proven")
                 ):
                     for caveat in nested_strings(value):
@@ -2802,7 +2802,7 @@ def validate_capture_caveats(outputs, facts, links):
 
 def reviewed_status_fields(value, prefix=""):
     if isinstance(value, dict):
-        metadata = {key: value[key] for key in ("reviewer", "method", "reviewed_at") if value.get(key)}
+        metadata = {key: value[key] for key in ("reviewer", "method", "reviewed_at", "review_provenance") if value.get(key)}
         for key, item in value.items():
             path = prefix + "." + key if prefix else key
             status = key in {"status", "verdict", "published", "statuscode", "statecode", "publishedon", "passed"} or key.endswith(("_status", "_verdict"))
@@ -2817,7 +2817,7 @@ def reviewed_status_fields(value, prefix=""):
 
 def validate_review_provenance(outputs, facts, links):
     measured = 0
-    labels = {"reviewer": "Reviewer", "method": "Method", "reviewed_at": "Review date"}
+    labels = {"reviewer": "Reviewer", "method": "Method", "reviewed_at": "Review date", "review_provenance": "Review provenance"}
     for slug, record in facts.items():
         destination = f"01-solutions/{slug}/5.Acceptance-Evidence.md"
         rows = table_rows(outputs[destination], links)
@@ -2947,6 +2947,31 @@ def test_negative_round2_evidence_honesty_mutations(all_outputs, round2_sources,
     with pytest.raises(AssertionError, match=re.escape(error)):
         validator(changed)
     validator(all_outputs)
+
+
+@pytest.mark.parametrize("slug, expected_count", [("portfolio-rebalancing", 14), ("prior-authorization", 22)])
+def test_review_provenance_strings_cannot_disappear_from_capture_rows(all_outputs, round2_sources, links, slug, expected_count):
+    record = round2_sources[slug]
+    captures = [capture for capture in record["captures"] if capture.get("review_provenance")]
+    assert len(captures) == expected_count, f"{slug}: review-provenance source coverage changed"
+    affected = {slug: record}
+    validate_capture_caveats(all_outputs, affected, links)
+    validate_review_provenance(all_outputs, affected, links)
+    capture = captures[0]
+    path = f"01-solutions/{slug}/5.Acceptance-Evidence.md"
+    rows = [row for _, row, cells in table_rows(all_outputs[path], links)
+            if rendered_text(cells[0], links) == capture["id"]]
+    assert len(rows) == 1 and capture["review_provenance"] in rows[0], "Mutation must target the actual capture's provenance"
+    changed = dict(all_outputs)
+    changed_row = rows[0].replace(capture["review_provenance"], "Review provenance removed by mutation.", 1)
+    changed[path] = changed[path].replace(rows[0], changed_row, 1)
+    assert changed[path] != all_outputs[path], "Review-provenance mutation made no change"
+    with pytest.raises(AssertionError, match="lost review_provenance"):
+        validate_capture_caveats(changed, affected, links)
+    with pytest.raises(AssertionError, match="lost recorded review_provenance"):
+        validate_review_provenance(changed, affected, links)
+    validate_capture_caveats(all_outputs, affected, links)
+    validate_review_provenance(all_outputs, affected, links)
 
 
 def validate_workload_and_native_settings(outputs, facts, links):
