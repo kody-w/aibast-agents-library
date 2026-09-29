@@ -345,16 +345,22 @@ async function profileState(page, slug) {
   }, slug);
 }
 
-async function completeEasyCourse(page, baseUrl, slug) {
+// GitHub Copilot is the default Easy lane; the Brainstem lane is opt-in only.
+const DEFAULT_EASY_LANE = "copilot";
+
+function easyLaneSelector(lane, group = null) {
+  const scope = group ? `[data-achievements-group="${group}"]` : "";
+  return `[data-checkpoint]${scope}[data-achievements-path="${lane}"], `
+    + `[data-checkpoint]${scope}[data-achievements-path="shared"]`;
+}
+
+async function completeEasyCourse(page, baseUrl, slug, lane = DEFAULT_EASY_LANE) {
   await page.goto(
     `${baseUrl}/solutions/${slug}/quest.html`,
     { waitUntil: "domcontentloaded" },
   );
   await settle(page);
-  const required = page.locator(
-    '[data-checkpoint][data-achievements-path="brainstem"], '
-    + '[data-checkpoint][data-achievements-path="shared"]',
-  );
+  const required = page.locator(easyLaneSelector(lane));
   const total = await required.count();
   for (let index = 0; index < total; index += 1) {
     const checkbox = required.nth(index);
@@ -367,13 +373,8 @@ async function completeEasyCourse(page, baseUrl, slug) {
   };
 }
 
-async function checkGroup(page, group) {
-  const locator = page.locator(
-    `[data-checkpoint][data-achievements-group="${group}"]`
-    + '[data-achievements-path="brainstem"], '
-    + `[data-checkpoint][data-achievements-group="${group}"]`
-    + '[data-achievements-path="shared"]',
-  );
+async function checkGroup(page, group, lane = DEFAULT_EASY_LANE) {
+  const locator = page.locator(easyLaneSelector(lane, group));
   const count = await locator.count();
   for (let index = 0; index < count; index += 1) {
     const checkbox = locator.nth(index);
@@ -382,8 +383,15 @@ async function checkGroup(page, group) {
   return count;
 }
 
-async function auditAchievementRuntime(browser, baseUrl, slug) {
+async function auditAchievementRuntime(browser, baseUrl, slug, storedEngine = null) {
+  const lane = storedEngine === "brainstem" ? "brainstem" : DEFAULT_EASY_LANE;
+  const prefix = storedEngine === null ? "" : `${storedEngine} opt-in: `;
   const context = await browser.newContext({ viewport: { width: 1024, height: 900 } });
+  if (storedEngine !== null) {
+    await context.addInitScript((value) => {
+      localStorage.setItem("aibast:workshop-engine", value);
+    }, storedEngine);
+  }
   const page = await context.newPage();
   const errors = pageErrorCollector(page);
   await page.goto(
@@ -391,11 +399,12 @@ async function auditAchievementRuntime(browser, baseUrl, slug) {
     { waitUntil: "domcontentloaded" },
   );
   await settle(page);
-  const dataset = await page.evaluate(() => {
+  const dataset = await page.evaluate((easyLane) => {
     const checkpoints = [...document.querySelectorAll(
       "[data-checkpoint][data-achievements-path]",
     )];
     return {
+      engine: document.documentElement.dataset.workshopEngine || null,
       count: checkpoints.length,
       exact: checkpoints.every((checkpoint) => (
         checkpoint.dataset.achievementsPath
@@ -406,15 +415,20 @@ async function auditAchievementRuntime(browser, baseUrl, slug) {
         && !Object.hasOwn(checkpoint.dataset, "achievementGroup")
       )),
       required: checkpoints.filter((checkpoint) => (
-        ["brainstem", "shared"].includes(
+        [easyLane, "shared"].includes(
           checkpoint.getAttribute("data-achievements-path"),
         )
       )).length,
     };
-  });
-  record("achievement dataset mapping exists", dataset.count > 0, `${dataset.count} checkpoints`);
+  }, lane);
   record(
-    "achievement dataset mapping is exact",
+    `${prefix}achievement runtime renders the ${lane} lane`,
+    dataset.engine === lane,
+    String(dataset.engine),
+  );
+  record(`${prefix}achievement dataset mapping exists`, dataset.count > 0, `${dataset.count} checkpoints`);
+  record(
+    `${prefix}achievement dataset mapping is exact`,
     dataset.exact,
     "data-achievements-* must map to dataset.achievements*",
   );
@@ -424,20 +438,17 @@ async function auditAchievementRuntime(browser, baseUrl, slug) {
     ["draft-builder", "draft-builder"],
     ["preview-proven", "preview-proven"],
   ]) {
-    const groupCount = await checkGroup(page, group);
+    const groupCount = await checkGroup(page, group, lane);
     const state = await profileState(page, slug);
-    record(`${group} has required checkpoints`, groupCount > 0, `${groupCount} checkpoints`);
+    record(`${prefix}${group} has required checkpoints`, groupCount > 0, `${groupCount} checkpoints`);
     record(
-      `${badge} awarded by runtime`,
+      `${prefix}${badge} awarded by runtime`,
       state.achievements.includes(badge),
       state.achievements.join(", "),
     );
   }
 
-  const required = page.locator(
-    '[data-checkpoint][data-achievements-path="brainstem"], '
-    + '[data-checkpoint][data-achievements-path="shared"]',
-  );
+  const required = page.locator(easyLaneSelector(lane));
   for (let index = 0; index < await required.count(); index += 1) {
     const checkbox = required.nth(index);
     if (!(await checkbox.isChecked())) await checkbox.check();
@@ -451,27 +462,27 @@ async function auditAchievementRuntime(browser, baseUrl, slug) {
     "workshop-complete",
   ]) {
     record(
-      `completed Easy runtime awards ${badge}`,
+      `${prefix}completed Easy runtime awards ${badge}`,
       complete.achievements.includes(badge),
       complete.achievements.join(", "),
     );
   }
   record(
-    "completed Easy runtime writes easyChecked",
+    `${prefix}completed Easy runtime writes easyChecked`,
     progress.easyChecked === dataset.required,
     `${progress.easyChecked} of ${dataset.required}`,
   );
   record(
-    "completed Easy runtime writes easyTotal",
+    `${prefix}completed Easy runtime writes easyTotal`,
     progress.easyTotal === dataset.required,
     `${progress.easyTotal} expected ${dataset.required}`,
   );
   record(
-    "completed Easy runtime writes easyComplete",
+    `${prefix}completed Easy runtime writes easyComplete`,
     progress.easyComplete === true,
     JSON.stringify(progress),
   );
-  record("achievement runtime has no uncaught errors", errors.length === 0, errors.join(" | "));
+  record(`${prefix}achievement runtime has no uncaught errors`, errors.length === 0, errors.join(" | "));
   await context.close();
 }
 
@@ -513,8 +524,8 @@ async function auditStorageDenial(browser, baseUrl, slug) {
     };
   });
   record(
-    "storage denial defaults visual engine to brainstem",
-    before.engine === "brainstem",
+    "storage denial defaults visual engine to copilot",
+    before.engine === "copilot",
     String(before.engine),
   );
   record(
@@ -579,11 +590,8 @@ async function auditManualTransition(browser, baseUrl, slug) {
     `${baseUrl}/solutions/${slug}/quest.html`,
     { waitUntil: "domcontentloaded" },
   );
-  const seed = await page.evaluate((workshopSlug) => {
-    const checkpoints = [...document.querySelectorAll(
-      '[data-checkpoint][data-achievements-path="brainstem"], '
-      + '[data-checkpoint][data-achievements-path="shared"]',
-    )];
+  const seed = await page.evaluate(({ workshopSlug, selector }) => {
+    const checkpoints = [...document.querySelectorAll(selector)];
     const progress = Object.fromEntries(
       checkpoints.map((checkpoint) => [checkpoint.dataset.checkpoint, true]),
     );
@@ -596,7 +604,7 @@ async function auditManualTransition(browser, baseUrl, slug) {
         "workshop-complete",
       ].map((id) => [id, { earned: true, earnedAt: null }]),
     );
-    localStorage.setItem("aibast:workshop-engine", "brainstem");
+    localStorage.removeItem("aibast:workshop-engine");
     localStorage.setItem(
       `aibast:${workshopSlug}:quest-progress`,
       JSON.stringify(progress),
@@ -627,7 +635,7 @@ async function auditManualTransition(browser, baseUrl, slug) {
       }),
     );
     return { easyTotal: checkpoints.length };
-  }, slug);
+  }, { workshopSlug: slug, selector: easyLaneSelector(DEFAULT_EASY_LANE) });
   await page.reload({ waitUntil: "domcontentloaded" });
   await settle(page);
   const before = await page.evaluate((workshopSlug) => {
@@ -718,7 +726,7 @@ async function auditManualTransition(browser, baseUrl, slug) {
 async function auditAcademyManualResumeLifecycle(browser, baseUrl, slug) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   await context.addInitScript(() => {
-    localStorage.setItem("aibast:workshop-engine", "brainstem");
+    localStorage.removeItem("aibast:workshop-engine");
   });
   const questPage = await context.newPage();
   const questErrors = pageErrorCollector(questPage);
@@ -869,7 +877,7 @@ async function auditAcademyManualResumeLifecycle(browser, baseUrl, slug) {
 async function auditQuestStandaloneManualRefresh(browser, baseUrl, slug) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   await context.addInitScript(() => {
-    localStorage.setItem("aibast:workshop-engine", "brainstem");
+    localStorage.removeItem("aibast:workshop-engine");
   });
   const questPage = await context.newPage();
   const questErrors = pageErrorCollector(questPage);
@@ -1009,7 +1017,7 @@ async function auditQuestStandaloneManualRefresh(browser, baseUrl, slug) {
 async function auditResume(browser, baseUrl, slug) {
   const context = await browser.newContext({ viewport: { width: 1024, height: 900 } });
   await context.addInitScript((workshopSlug) => {
-    localStorage.setItem("aibast:workshop-engine", "brainstem");
+    localStorage.removeItem("aibast:workshop-engine");
     localStorage.removeItem("aibast:achievement-profile:v1");
     localStorage.removeItem(`aibast:${workshopSlug}:quest-progress`);
     localStorage.removeItem(`aibast:${workshopSlug}:manual-progress`);
@@ -1021,11 +1029,8 @@ async function auditResume(browser, baseUrl, slug) {
     { waitUntil: "domcontentloaded" },
   );
   await settle(page);
-  const state = await page.evaluate((workshopSlug) => {
-    const candidates = [...document.querySelectorAll(
-      '[data-checkpoint][data-achievements-path="brainstem"], '
-      + '[data-checkpoint][data-achievements-path="shared"]',
-    )];
+  const state = await page.evaluate(({ workshopSlug, selector }) => {
+    const candidates = [...document.querySelectorAll(selector)];
     const incomplete = candidates.find((checkbox) => !checkbox.checked) || null;
     const active = document.activeElement;
     const focused = Boolean(
@@ -1044,7 +1049,7 @@ async function auditResume(browser, baseUrl, slug) {
       incompleteChecked: incomplete?.checked ?? null,
       earned: Object.keys(achievements).filter((id) => achievements[id]?.earned),
     };
-  }, slug);
+  }, { workshopSlug: slug, selector: easyLaneSelector(DEFAULT_EASY_LANE) });
   record("#resume has an incomplete Easy target", state.candidateCount > 0, String(state.candidateCount));
   record("#resume focuses the incomplete target", state.focused, JSON.stringify(state));
   record(
@@ -1079,7 +1084,7 @@ async function selectedTabState(page) {
 async function auditTabs(browser, baseUrl, slug) {
   const context = await browser.newContext({ viewport: { width: 1024, height: 900 } });
   await context.addInitScript(() => {
-    localStorage.setItem("aibast:workshop-engine", "brainstem");
+    localStorage.removeItem("aibast:workshop-engine");
   });
   const page = await context.newPage();
   const errors = pageErrorCollector(page);
@@ -1123,9 +1128,9 @@ async function auditRepresentativeRuntime(browser, baseUrl, slugs) {
     ? "account-intelligence"
     : slugs[0];
   for (const [storedValue, expected] of [
-    [null, "brainstem"],
+    [null, "copilot"],
     ["brainstem", "brainstem"],
-    ["invalid", "brainstem"],
+    ["invalid", "copilot"],
     ["copilot", "copilot"],
   ]) {
     const state = await engineScenario(browser, baseUrl, slug, storedValue);
@@ -1143,6 +1148,7 @@ async function auditRepresentativeRuntime(browser, baseUrl, slugs) {
     );
   }
   await auditAchievementRuntime(browser, baseUrl, slug);
+  await auditAchievementRuntime(browser, baseUrl, slug, "brainstem");
   await auditStorageDenial(browser, baseUrl, slug);
   await auditManualTransition(browser, baseUrl, slug);
   await auditAcademyManualResumeLifecycle(browser, baseUrl, slug);

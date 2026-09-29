@@ -100,6 +100,11 @@ to badge-qualified reporting only after `badge-qualified`.
 
 ## Facilitator crash course — optional Brainstem track
 
+> **Optional.** Skip this section unless participants choose **GitHub Copilot +
+> Brainstem (optional)** in Workshop settings. Every workshop is fully
+> completable with GitHub Copilot and Copilot Studio; the default lane needs no
+> Brainstem install.
+
 Brainstem is the learner's local-first, inspectable agent runtime. GitHub
 Copilot remains the familiar work surface; Brainstem adds persistent local
 workshop context, hot-loaded Python agents, and a visible tool-calling loop.
@@ -110,7 +115,7 @@ This preparation guide uses the canonical
 [AIBAST Brainstem installer](https://github.com/microsoft/aibast-agents-library). The former upstream Grail
 installer is not used by this Microsoft/AIBAST workshop path.
 
-### Pre-work: every Brainstem-track participant installs it themselves
+### Optional pre-work: only Brainstem-track participants install it
 
 **macOS / Linux**
 
@@ -132,9 +137,9 @@ not run `gh auth login` or `brainstem` separately. Before the session, verify:
 curl -s localhost:7071/health | python3 -m json.tool
 ```
 
-The facilitator should complete this setup first, then ask participants to run
-the one-liner themselves before workshop day. Do not collect GitHub tokens or
-run a shared installation on their behalf.
+The facilitator should complete this setup first, then ask Brainstem-track
+participants to run the one-liner themselves before workshop day. Do not
+collect GitHub tokens or run a shared installation on their behalf.
 
 ### Run the built-in five-minute interview loop
 
@@ -191,6 +196,9 @@ tests, and Draft-only publication boundary apply to both lanes.
 
 ## Easy mode — GitHub Copilot (default)
 
+This default lane runs the whole workshop in GitHub Copilot and Copilot Studio;
+no Brainstem install is required.
+
 1. Open GitHub Copilot Chat in VS Code and select **Agent mode**.
 2. Download `skills/aibast-easy-mode-copilot/SKILL.md` and drag it into the
    chat.
@@ -203,6 +211,9 @@ tests, and Draft-only publication boundary apply to both lanes.
 6. Stop at **Draft**. Publishing remains a separate human approval gate.
 
 ## Easy mode — GitHub Copilot + Brainstem (optional)
+
+Use this lane only when a learner selects **GitHub Copilot + Brainstem
+(optional)** in Workshop settings; no workshop step depends on it.
 
 Brainstem is the learner's personal, on-device training AI working alongside
 GitHub Copilot. Copilot stays the familiar work surface; Brainstem remembers
