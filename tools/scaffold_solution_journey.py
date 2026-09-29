@@ -1883,16 +1883,27 @@ def markdown_list(values: Iterable[str], fallback: str) -> str:
     return "\n".join(items) if items else f"- {fallback}"
 
 
+POLICY_CONNECTION_VERBS = ("Bind", "Connect", "Keep", "Never", "Only", "Replace", "Use")
+
+
+def production_seam(value: str) -> str:
+    # Some packages record a binding policy instead of a system name; wrapping it
+    # as "an approved <value> connection" produced an unreadable sentence.
+    if value.split(" ", 1)[0] in POLICY_CONNECTION_VERBS:
+        policy = value.rstrip(". ")
+        return (
+            "Replace packaged synthetic inputs only through approved connections: "
+            f"{policy[0].lower()}{policy[1:]}; preserve the reviewed input and output contract."
+        )
+    return f"Replace packaged synthetic inputs with an approved {value} connection; preserve the reviewed input and output contract."
+
+
 def production_seams(ctx: JourneyContext) -> list[str]:
     copilot = ctx.deployment.get("copilot_studio", {})
     values = copilot.get(
         "production_replacement_connections", copilot.get("required_connections", [])
     ) if isinstance(copilot, dict) else []
-    seams = [
-        f"Replace packaged synthetic inputs with an approved {value} connection; preserve the reviewed input and output contract."
-        for value in values
-        if isinstance(value, str)
-    ]
+    seams = [production_seam(value) for value in values if isinstance(value, str)]
     if seams:
         return seams
     return [
