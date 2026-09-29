@@ -57,6 +57,7 @@ a governed, Microsoft-native agent.
 | D13 | **The staging ring, synced first** | Nothing enters staging until the fork's `main` equals Microsoft `main` and staging contains it. Every change is compared against the Microsoft baseline, and a human opens and merges each promotion |
 | D14 | **Good neighbor upstream** | Defects found in AI Agent Runbooks are contributed back upstream, after the corresponding AIBAST work lands |
 | D15 | **Workshops need no local install** | Every workshop can be completed with GitHub Copilot and Copilot Studio alone, and GitHub Copilot is the default engine. The local Brainstem runtime is an optional track that learners choose in Workshop settings; it is never a required step |
+| D16 | **Runbooks are end-to-end production templates** | Every solution runbook follows the same production path as AI Agent Runbooks, from qualification to operate. Each step names its owner: the **template** provides everything up to a production build (agent, skills, data contract, integration and identity design, evaluation suite, rollout playbooks); the **customer or partner** wires it into their environment (systems, identity, data, thresholds, approvals, governance). Every runbook states that the templates are examples that must be modified to meet each customer's specific requirements |
 
 ## How the library stays relevant
 
@@ -200,11 +201,6 @@ example, "4–6 weeks end to end, of which the agent build is a few days" (Emplo
   it "an open-source learning library". **Proposed:** "The AIBAST Agents Library, including AIBAST Frontier
   (experimental), is an open-source learning library…", decided in the same Brand/CELA review as the name.
 - A home for the Clock Trials' public results. **Proposed:** the ledger plus the quarterly report.
-- How the runbooks cover production delivery. Three blind comparisons found that AIBAST's runbooks take a team to a
-  verified Draft on synthetic data, while AI Agent Runbooks describe the production build in a customer's tenant.
-  **Proposed:** make the two complementary. AIBAST gets a team to a verified Draft fast, and Phase 5 links the matching
-  AI Agent Runbook for production where one exists (for example, Ask HR to Employee Self-Service). Production detail of
-  our own comes from real engagements (Frontier Clock T3).
 
 ---
 
