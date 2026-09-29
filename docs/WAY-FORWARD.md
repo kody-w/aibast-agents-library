@@ -200,6 +200,11 @@ example, "4–6 weeks end to end, of which the agent build is a few days" (Emplo
   it "an open-source learning library". **Proposed:** "The AIBAST Agents Library, including AIBAST Frontier
   (experimental), is an open-source learning library…", decided in the same Brand/CELA review as the name.
 - A home for the Clock Trials' public results. **Proposed:** the ledger plus the quarterly report.
+- How the runbooks cover production delivery. Three blind comparisons found that AIBAST's runbooks take a team to a
+  verified Draft on synthetic data, while AI Agent Runbooks describe the production build in a customer's tenant.
+  **Proposed:** make the two complementary. AIBAST gets a team to a verified Draft fast, and Phase 5 links the matching
+  AI Agent Runbook for production where one exists (for example, Ask HR to Employee Self-Service). Production detail of
+  our own comes from real engagements (Frontier Clock T3).
 
 ---
 
