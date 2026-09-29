@@ -235,7 +235,7 @@ Do not use PAC CLI, YAML import, or a plugin architect in Manual mode.
 
 ## Production replacement seams
 
-- Replace packaged synthetic inputs with an approved Bind only customer-approved systems after security, privacy, and business-owner review connection; preserve the reviewed input and output contract.
+- Replace packaged synthetic inputs only through approved connections: bind only customer-approved systems after security, privacy, and business-owner review; preserve the reviewed input and output contract.
 
 The pilot must never claim a side effect, live lookup, or system update unless
 an approved production tool returns evidence that it succeeded.
