@@ -212,17 +212,17 @@ normalized journey stage.
 | Cross-Industry | [Procurement Agent](../solutions/procurement-agent/README.md) | Optimize |
 | Energy | [Asset Maintenance Forecast Agent](../01-solutions/asset-maintenance-forecast/1.Overview.md) | Optimize |
 | Energy | [Emissions Tracking Agent](../01-solutions/emission-tracking/1.Overview.md) | Govern |
-| Energy | [Field Service Dispatch Agent](../solutions/field-service-dispatch/README.md) | Serve |
+| Energy | [Field Service Dispatch Agent](../01-solutions/field-service-dispatch/1.Overview.md) | Serve |
 | Energy | [Permit Management Agent](../solutions/permit-license-management/README.md) | Govern |
-| Energy | [Regulatory Reporting Agent](../solutions/energy-regulatory-reporting/README.md) | Govern |
+| Energy | [Regulatory Reporting Agent](../01-solutions/energy-regulatory-reporting/1.Overview.md) | Govern |
 | Financial Services | [Claims Processing Agent](../01-solutions/claims-processing/1.Overview.md) | Decide |
-| Financial Services | [Customer Onboarding Agent](../solutions/fs-customer-onboarding/README.md) | Govern |
+| Financial Services | [Customer Onboarding Agent](../01-solutions/fs-customer-onboarding/1.Overview.md) | Govern |
 | Financial Services | [Customer Sentiment and Churn Prediction Agent](../01-solutions/customer-sentiment-churn/1.Overview.md) | Engage |
-| Financial Services | [Financial Advisor Agent](../solutions/financial-advisor-copilot/README.md) | Engage |
-| Financial Services | [Fraud Detection and Alert Agent](../solutions/fraud-detection-alert/README.md) | Protect |
+| Financial Services | [Financial Advisor Agent](../01-solutions/financial-advisor-copilot/1.Overview.md) | Engage |
+| Financial Services | [Fraud Detection and Alert Agent](../01-solutions/fraud-detection-alert/1.Overview.md) | Protect |
 | Financial Services | [Loan Origination Assistant](../solutions/loan-origination-assistant/README.md) | Decide |
 | Financial Services | [Portfolio Rebalancing Agent](../solutions/portfolio-rebalancing/README.md) | Optimize |
-| Financial Services | [Regulatory Compliance Agent](../solutions/fs-regulatory-compliance/README.md) | Govern |
+| Financial Services | [Regulatory Compliance Agent](../01-solutions/fs-regulatory-compliance/1.Overview.md) | Govern |
 | Financial Services | [Underwriting Support Agent](../solutions/underwriting-support/README.md) | Decide |
 | Financial Services | [Wealth Insights Generator Agent](../solutions/wealth-insights-generator/README.md) | Engage |
 | Healthcare | [Care Gap Closure Agent](../01-solutions/care-gap-closure/1.Overview.md) | Govern |
@@ -230,7 +230,7 @@ normalized journey stage.
 | Healthcare | [Patient Intake and Scheduling Agent](../solutions/patient-intake/README.md) | Activate |
 | Healthcare | [Prior Authorization Agent](../solutions/prior-authorization/README.md) | Govern |
 | Human Resources | [Ask HR Agent](../01-solutions/ask-hr/1.Overview.md) | Empower |
-| Manufacturing | [Inventory Rebalancing Agent](../solutions/inventory-rebalancing/README.md) | Optimize |
+| Manufacturing | [Inventory Rebalancing Agent](../01-solutions/inventory-rebalancing/1.Overview.md) | Optimize |
 | Manufacturing | [Maintenance Scheduling Agent](../solutions/maintenance-scheduling/README.md) | Optimize |
 | Manufacturing | [Order Status Communications Agent](../solutions/order-status-communication/README.md) | Serve |
 | Manufacturing | [Product Line Optimization Agent](../solutions/product-line-optimization/README.md) | Optimize |
