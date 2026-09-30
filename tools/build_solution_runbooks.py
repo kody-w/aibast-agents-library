@@ -36,6 +36,13 @@ RUNBOOK_SOLUTIONS = (
     "cart-abandonment-recovery",
     "claims-processing",
     "client-health-score",
+    "clinical-notes-summarizer",
+    "contract-risk-review",
+    "cross-selling",
+    "customer-loyalty-rewards",
+    "customer-sentiment-churn",
+    "deal-progression",
+    "emission-tracking",
 )
 PACKAGE_ALIASES = {"production-line-optimization": "product-line-optimization"}
 DRAFT_PACKAGES = {
