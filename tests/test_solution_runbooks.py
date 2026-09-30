@@ -393,7 +393,7 @@ def validate_owned_surfaces(documents):
             assert token in documents[path], f"{path}: missing owned-surface declaration {token!r}"
 
 
-def validate_taxonomy(catalog, overview, index):
+def validate_taxonomy(catalog, overview, index, selected, package_slugs):
     assert overview.count(TAXONOMY_BEGIN) == 1, "Taxonomy begin marker must occur exactly once"
     assert overview.count(TAXONOMY_END) == 1, "Taxonomy end marker must occur exactly once"
     assert overview.index(TAXONOMY_BEGIN) < overview.index(TAXONOMY_END), "Taxonomy markers are reversed"
@@ -402,10 +402,13 @@ def validate_taxonomy(catalog, overview, index):
         name = entry["display_name"]
         assert name and name in block, f"Taxonomy missing {key}: {name}"
         assert name in index, f"Runbook index missing {key}: {name}"
-    for slug in PILOTS:
-        assert re.search(r"\((?:\./)?" + re.escape(slug) + r"/1\.Overview\.md\)", index), (
-            f"Runbook index missing pilot link: {slug}"
-        )
+    assert set(selected) <= set(package_slugs), "Runbook links can only be measured for catalog package-folder slugs"
+    for slug in package_slugs:
+        on_disk = slug in selected
+        state = "missing on-disk" if on_disk else "links off-disk"
+        linked = re.search(r"\((?:\./)?" + re.escape(slug) + r"/1\.Overview\.md\)", index) is not None
+        assert linked == on_disk, f"Runbook index {state} runbook: {slug}"
+        assert (f"(../01-solutions/{slug}/1.Overview.md)" in block) == on_disk, f"Taxonomy {state} runbook: {slug}"
     assert "grid-outage-response" in index, "Runbook index must explain the allowlisted draft"
 
 
@@ -423,15 +426,18 @@ def is_notes_path(path):
     return posixpath.dirname(path) == "solutions/runbook-notes" and path.endswith(".json")
 
 
-@pytest.fixture(scope="module", params=("all-notes", "pilots-only"), autouse=True)
+@pytest.fixture(scope="module", params=("all-notes", "on-disk-only"), autouse=True)
 def notes_profile(request, generator, links):
     original_files = generator._file_universe
     original_link_files = links.git_file_universe
     actual = frozenset(original_files(ROOT))
     notes = {path for path in actual if is_notes_path(path)}
-    pilots = {f"solutions/runbook-notes/{slug}.json" for slug in PILOTS}
-    assert pilots <= notes, "Both pilot notes files must exist before virtual-subset testing"
-    hidden = notes - pilots if request.param == "pilots-only" else set()
+    on_disk = {f"solutions/runbook-notes/{slug}.json" for slug in generator.RUNBOOK_SOLUTIONS}
+    assert on_disk <= notes, (
+        f"Every RUNBOOK_SOLUTIONS notes file must exist before virtual-subset testing: {sorted(on_disk - notes)}"
+    )
+    # Notes authored ahead of their rollout are hidden, so off-disk solutions keep exercising derivation.
+    hidden = notes - on_disk if request.param == "on-disk-only" else set()
 
     def generator_files(root):
         files = original_files(root)
@@ -843,8 +849,22 @@ def validate_lane_index(index, facts, generated_slugs, links):
         assert cells[3] == manual, f"{context}: {slug} manual steps expected {manual!r}, found {cells[3]!r}"
 
 
-def test_generator_public_contract(generator):
-    assert generator.RUNBOOK_SOLUTIONS == PILOTS, "Phase 1 must write exactly both pilots"
+def validate_rollout(selected, package_slugs, note_paths, notes, packages):
+    assert isinstance(selected, tuple) and selected, f"RUNBOOK_SOLUTIONS must be a nonempty tuple: {selected!r}"
+    assert selected == tuple(sorted(set(selected))), f"RUNBOOK_SOLUTIONS must be sorted and unique: {selected!r}"
+    unknown = sorted(set(selected) - set(package_slugs))
+    assert not unknown, f"RUNBOOK_SOLUTIONS must name catalog package-folder slugs: {unknown}"
+    assert set(PILOTS) <= set(selected), f"RUNBOOK_SOLUTIONS must keep both pilots: {sorted(set(PILOTS) - set(selected))}"
+    for slug in selected:
+        path = f"solutions/runbook-notes/{slug}.json"
+        entry = notes["solutions"].get(packages[slug], {})
+        assert path in note_paths and entry.get("schema") == "aibast-runbook-notes/2.0", (
+            f"{slug}: the on-disk rollout requires authored schema 2.0 notes at {path}"
+        )
+
+
+def test_generator_public_contract(generator, sources, slugs):
+    validate_rollout(generator.RUNBOOK_SOLUTIONS, slugs, sources["note_paths"], sources["notes"], sources["packages"])
     assert generator.ARTIFACTS == ARTIFACTS, "Required artifact names drifted"
     assert generator.OPTIONAL_ARTIFACTS == OPTIONAL, "Optional artifact names drifted"
     assert generator.REQUIRED_SECTIONS == SECTIONS, "Required H2 contract drifted"
@@ -853,6 +873,42 @@ def test_generator_public_contract(generator):
     assert generator.PACKAGE_ALIASES == {"production-line-optimization": "product-line-optimization"}
     assert set(generator.DRAFT_PACKAGES) == {"grid-outage-response"}
     assert generator.DEFAULT_RELATED_PATTERNS == DEFAULT_PATTERNS
+
+
+@pytest.mark.parametrize(
+    "mutation, error",
+    [
+        ("list", "must be a nonempty tuple"),
+        ("unsorted", "must be sorted and unique"),
+        ("duplicate", "must be sorted and unique"),
+        ("catalog-spelling", "must name catalog package-folder slugs"),
+        ("missing-pilot", "must keep both pilots"),
+        ("missing-notes-file", "requires authored schema 2.0 notes"),
+        ("old-notes-schema", "requires authored schema 2.0 notes"),
+    ],
+)
+def test_negative_rollout_list_invariants(generator, sources, slugs, mutation, error):
+    selected, note_paths, notes = generator.RUNBOOK_SOLUTIONS, set(sources["note_paths"]), copy.deepcopy(sources["notes"])
+    validate_rollout(selected, slugs, note_paths, notes, sources["packages"])
+    if mutation == "list":
+        selected = list(selected)
+    elif mutation == "unsorted":
+        selected = tuple(reversed(selected))
+    elif mutation == "duplicate":
+        selected = tuple(sorted(selected + selected[:1]))
+    elif mutation == "catalog-spelling":
+        selected = tuple(sorted(selected + ("production-line-optimization",)))
+    elif mutation == "missing-pilot":
+        selected = tuple(slug for slug in selected if slug != PILOTS[1])
+    elif mutation == "missing-notes-file":
+        note_paths.remove(f"solutions/runbook-notes/{selected[-1]}.json")
+    else:
+        notes["solutions"][sources["packages"][selected[-1]]]["schema"] = "aibast-runbook-notes/1.0"
+    assert (selected, note_paths, notes) != (
+        generator.RUNBOOK_SOLUTIONS, set(sources["note_paths"]), sources["notes"],
+    ), f"Rollout mutation {mutation} made no change"
+    with pytest.raises(AssertionError, match=error):
+        validate_rollout(selected, slugs, note_paths, notes, sources["packages"])
 
 
 def test_catalogue_identity_join_has_no_orphans_or_stale_exceptions(generator, sources):
@@ -893,7 +949,7 @@ def test_only_case_exact_pilot_artifacts_are_on_disk(generator, sources):
         for slug in generator.RUNBOOK_SOLUTIONS
         for artifact in expected_artifacts(slug, sources["files"])
     }
-    assert actual == expected, f"Pilot file set: extra={sorted(actual - expected)}, missing={sorted(expected - actual)}"
+    assert actual == expected, f"On-disk rollout file set: extra={sorted(actual - expected)}, missing={sorted(expected - actual)}"
 
 
 def test_all_51_solutions_render_every_artifact(slugs, sources, all_outputs, all_render):
@@ -951,17 +1007,66 @@ def test_notes_schema_keys_types_sources_and_patterns(sources):
     validate_notes(sources["notes"], sources["catalog"], pattern_ids(sources), sources["files"])
 
 
-def test_pilot_notes_are_complete_and_visible_in_rendered_overviews(sources, pilot_outputs):
-    for slug in PILOTS:
-        key = "@aibast-agents-library/" + slug
-        entry = sources["notes"]["solutions"].get(key)
-        assert entry, f"{slug}: pilot delivery notes are missing"
+# What Actually Goes Wrong lists delivery risks only: like the generator, leave out integrity rules
+# (rendered in State and Recovery) and workshop-hygiene items. Whole words and specific phrases only,
+# so "captured savings" stays a delivery risk while a "live capture" or a "screenshot" is hygiene.
+OVERVIEW_EXCLUDED_RISK = re.compile(
+    r"\b(?:screenshots?|tutorials?|(?:live|screen|visual|browser|preview|historical|staging) captures?"
+    r"|(?:browser|browserfilm|captured|tutorial) frames?|save checkpoints?|skill[- ]uploads?)\b",
+    re.I,
+)
+
+
+def test_pilot_notes_are_complete_and_visible_in_rendered_overviews(generator, sources, pilot_outputs):
+    for slug in generator.RUNBOOK_SOLUTIONS:
+        entry = sources["notes"]["solutions"].get(sources["packages"][slug])
+        assert entry, f"{slug}: on-disk delivery notes are missing"
         for field in ("target_users", "scope_in", "scope_out", "qualification_checklist", "what_goes_wrong", "related_patterns", "sources"):
-            assert entry.get(field), f"{slug}: pilot notes field {field} is empty"
+            assert entry.get(field), f"{slug}: on-disk notes field {field} is empty"
+        risks = [
+            row["issue"] for row in entry["what_goes_wrong"]
+            if row["id"] not in INTEGRITY_SYMPTOMS and not OVERVIEW_EXCLUDED_RISK.search(row["issue"])
+        ]
+        assert risks, f"{slug}: no authored delivery risk is measured in 1.Overview.md"
         overview = re.sub(r"\s+", " ", pilot_outputs[f"01-solutions/{slug}/1.Overview.md"])
-        for item in [row["text"] for row in entry["qualification_checklist"]] + [row["issue"] for row in entry["what_goes_wrong"]]:
+        for item in [row["text"] for row in entry["qualification_checklist"]] + risks:
             probe = re.sub(r"\s+", " ", item)
             assert probe in overview, f"{slug}: authored note is not visible in 1.Overview.md: {item!r}"
+
+
+@pytest.mark.parametrize(
+    "issue, kept",
+    [
+        pytest.param("A surfaced opportunity is reported as realized or captured savings.", True, id="captured-savings"),
+        pytest.param(
+            "Consolidation is framed as savings without quality, resilience or cash-flow tradeoffs.", True,
+            id="framed-as-savings",
+        ),
+        pytest.param(
+            "A screenshot shows the Draft agent answering before its knowledge finished processing.", False,
+            id="screenshot-hygiene",
+        ),
+        pytest.param(
+            "The controls knowledge file changed after the last live capture and has not been regressed.", False,
+            id="live-capture-hygiene",
+        ),
+    ],
+)
+def test_negative_workshop_hygiene_rule_matches_whole_phrases_only(generator, library, links, issue, kept):
+    slug = "ask-hr"
+    name = library.solutions[slug].name
+    entry = copy.deepcopy(library.notes[name])
+    entry["what_goes_wrong"].append({**entry["what_goes_wrong"][0], "id": "hygiene-rule-probe", "issue": issue})
+    changed = copy.copy(library)
+    changed.notes = {**library.notes, name: entry}
+    path = f"01-solutions/{slug}/1.Overview.md"
+    overview = generator.render_solution(changed, slug)["1.Overview.md"]
+    risks = rendered_text(rendered_section(overview, "What Actually Goes Wrong", links, path), links)
+    assert rendered_text(entry["what_goes_wrong"][0]["issue"], links) in risks, f"{path}: authored risks were not rendered"
+    verdict = "dropped a delivery risk" if kept else "listed a workshop-hygiene item"
+    assert (rendered_text(issue, links) in risks) is kept, f"{path}: the generator {verdict}: {issue!r}"
+    assert (OVERVIEW_EXCLUDED_RISK.search(issue) is None) is kept, f"The test copy of the hygiene rule disagrees: {issue!r}"
+    assert "hygiene-rule-probe" not in str(library.notes[name]), "The hygiene probe changed the shared source library"
 
 
 def test_controlled_journey_stages_are_sorted_exhaustive_and_in_use(generator, sources):
@@ -978,8 +1083,32 @@ def test_owned_surface_declarations_are_complete(disk_docs):
     validate_owned_surfaces(disk_docs)
 
 
-def test_taxonomy_and_index_cover_every_display_name_and_both_pilots(sources, disk_docs):
-    validate_taxonomy(sources["catalog"], disk_docs["00-overview/README.md"], disk_docs["01-solutions/README.md"])
+def test_taxonomy_and_index_cover_every_display_name_and_both_pilots(generator, sources, slugs, disk_docs):
+    validate_taxonomy(
+        sources["catalog"], disk_docs["00-overview/README.md"], disk_docs["01-solutions/README.md"],
+        generator.RUNBOOK_SOLUTIONS, slugs,
+    )
+
+
+@pytest.mark.parametrize("mutation", ["index-missing-runbook", "taxonomy-missing-runbook", "off-disk-runbook"])
+def test_negative_runbook_links_follow_the_rollout(generator, sources, slugs, disk_docs, mutation):
+    overview, index = disk_docs["00-overview/README.md"], disk_docs["01-solutions/README.md"]
+    selected = generator.RUNBOOK_SOLUTIONS
+    validate_taxonomy(sources["catalog"], overview, index, selected, slugs)
+    if mutation == "index-missing-runbook":
+        index = index.replace("(ask-hr/1.Overview.md)", "(../solutions/ask-hr/README.md)")
+        error = "Runbook index missing on-disk runbook: ask-hr"
+    elif mutation == "taxonomy-missing-runbook":
+        overview = overview.replace("(../01-solutions/ask-hr/1.Overview.md)", "(../solutions/ask-hr/README.md)")
+        error = "Taxonomy missing on-disk runbook: ask-hr"
+    else:
+        selected = tuple(slug for slug in selected if slug != PILOTS[1])
+        error = f"Runbook index links off-disk runbook: {PILOTS[1]}"
+    assert (overview, index, selected) != (
+        disk_docs["00-overview/README.md"], disk_docs["01-solutions/README.md"], generator.RUNBOOK_SOLUTIONS,
+    ), f"Runbook-link mutation {mutation} made no change"
+    with pytest.raises(AssertionError, match=re.escape(error)):
+        validate_taxonomy(sources["catalog"], overview, index, selected, slugs)
 
 
 def test_negative_unknown_pattern_id(sources):
@@ -1733,10 +1862,12 @@ def test_negative_owned_surface_declaration(disk_docs):
         validate_owned_surfaces(changed)
 
 
-def test_negative_duplicate_taxonomy_marker(sources, disk_docs):
+def test_negative_duplicate_taxonomy_marker(generator, sources, slugs, disk_docs):
     overview = disk_docs["00-overview/README.md"] + TAXONOMY_BEGIN
     with pytest.raises(AssertionError, match="Taxonomy begin marker must occur exactly once"):
-        validate_taxonomy(sources["catalog"], overview, disk_docs["01-solutions/README.md"])
+        validate_taxonomy(
+            sources["catalog"], overview, disk_docs["01-solutions/README.md"], generator.RUNBOOK_SOLUTIONS, slugs,
+        )
 
 
 @pytest.mark.parametrize(
@@ -2014,9 +2145,9 @@ def test_delivery_lanes_all_51_overviews_match_independent_repository_facts(all_
         validate_delivery_lanes(all_outputs[path], facts, links)
 
 
-def test_delivery_lane_indexes_have_51_sorted_correct_rows(all_outputs, pilot_outputs, lane_facts, links):
+def test_delivery_lane_indexes_have_51_sorted_correct_rows(generator, all_outputs, pilot_outputs, lane_facts, links):
     validate_lane_index(all_outputs["01-solutions/README.md"], lane_facts, set(lane_facts), links)
-    validate_lane_index(pilot_outputs["01-solutions/README.md"], lane_facts, set(PILOTS), links)
+    validate_lane_index(pilot_outputs["01-solutions/README.md"], lane_facts, set(generator.RUNBOOK_SOLUTIONS), links)
 
 
 def test_delivery_lane_counting_boundaries_fallback_and_actual_agent_lines():
@@ -2399,7 +2530,7 @@ def test_legitimate_none_of_prose_is_not_a_sentinel(sources, links):
     validate_generated_document("01-solutions/example/1.Overview.md", text, links)
 
 
-def validate_delivery_notes_rendered(notes, outputs, links):
+def validate_delivery_notes_rendered(notes, outputs, links, selected, packages):
     locations = {
         "delivery_roles": ("3.Runbook.md", PHASE_TITLES[0]),
         "prerequisites": ("3.Runbook.md", "Prerequisites"),
@@ -2409,8 +2540,9 @@ def validate_delivery_notes_rendered(notes, outputs, links):
         "never_do": ("4.Sample-prompts.md", "What This Agent Should Never Do"),
         "non_functional": ("2.Architecture.md", "Non-Functional Considerations"),
     }
-    for slug in PILOTS:
-        entry = notes["solutions"].get("@aibast-agents-library/" + slug, {})
+    assert selected, "Delivery-note rendering must measure the on-disk rollout"
+    for slug in selected:
+        entry = notes["solutions"].get(packages[slug], {})
         for field in DELIVERY_FIELDS:
             assert entry.get(field), f"{slug}: authored delivery field {field} is missing or empty"
         for field, (artifact, title) in locations.items():
@@ -2450,8 +2582,10 @@ def validate_delivery_notes_rendered(notes, outputs, links):
                     assert source_reference("", criterion["source"]) in targets, f"{slug}.{phase}: exit-criterion source not rendered"
 
 
-def test_all_new_pilot_delivery_notes_render_in_their_required_sections(sources, pilot_outputs, links):
-    validate_delivery_notes_rendered(sources["notes"], pilot_outputs, links)
+def test_all_new_pilot_delivery_notes_render_in_their_required_sections(generator, sources, pilot_outputs, links):
+    validate_delivery_notes_rendered(
+        sources["notes"], pilot_outputs, links, generator.RUNBOOK_SOLUTIONS, sources["packages"],
+    )
 
 
 @pytest.mark.parametrize("field", DELIVERY_FIELDS)
@@ -2462,14 +2596,15 @@ def test_negative_new_delivery_note_field_types(sources, field):
         validate_notes(notes, sources["catalog"], pattern_ids(sources), sources["files"])
 
 
-def test_negative_delivery_notes_omitted_from_rendered_output(sources, pilot_outputs, links):
-    validate_delivery_notes_rendered(sources["notes"], pilot_outputs, links)
+def test_negative_delivery_notes_omitted_from_rendered_output(generator, sources, pilot_outputs, links):
+    selected, packages = generator.RUNBOOK_SOLUTIONS, sources["packages"]
+    validate_delivery_notes_rendered(sources["notes"], pilot_outputs, links, selected, packages)
     changed = dict(pilot_outputs)
     path = "01-solutions/ask-hr/3.Runbook.md"
     body = rendered_section(changed[path], "Prerequisites", links, path)
     changed[path] = changed[path].replace(body, "\nSource-backed prerequisites omitted by mutation.\n", 1)
     with pytest.raises(AssertionError, match="authored delivery text not rendered"):
-        validate_delivery_notes_rendered(sources["notes"], changed, links)
+        validate_delivery_notes_rendered(sources["notes"], changed, links, selected, packages)
 
 
 @pytest.mark.parametrize("source", ["https://example.com/policy", "http://learn.microsoft.com/policy"])
@@ -5905,16 +6040,20 @@ def test_anchored_note_source_survives_rendering_and_section_ledger(generator, s
     validate_notes_source_ledgers(outputs, facts, links)
 
 
-def test_notes_profiles_hide_only_notes_in_memory(notes_profile, sources, library):
+def test_notes_profiles_hide_only_notes_in_memory(generator, notes_profile, sources, library):
     expected = notes_profile.notes - notes_profile.hidden
     assert set(sources["note_paths"]) == expected, "Public source inventory disagrees with the virtual notes profile"
     assert library.files == notes_profile.files - notes_profile.hidden, "Production inventory must hide only the selected notes"
     assert len(library.notes) == len(expected), "Production loader did not apply the virtual notes subset"
     assert all((ROOT / path).is_file() for path in notes_profile.notes), "Virtual notes removal must not delete real files"
-    if notes_profile.name == "pilots-only":
-        assert {entry["solution"].rsplit("/", 1)[-1] for entry in library.notes.values()} == set(PILOTS), (
-            "The pilots-only profile must not retain other authored notes"
+    if notes_profile.name == "on-disk-only":
+        on_disk = {library.solutions[slug].name for slug in generator.RUNBOOK_SOLUTIONS}
+        assert set(library.notes) == on_disk, (
+            "The on-disk-only profile must keep exactly the RUNBOOK_SOLUTIONS notes and hide all other authored notes: "
+            f"kept off-disk={sorted(set(library.notes) - on_disk)}, hid on-disk={sorted(on_disk - set(library.notes))}"
         )
+    else:
+        assert not notes_profile.hidden, "The all-notes profile must not hide authored notes"
 
 
 def test_all_51_identity_defaults_are_derived_without_notes(derived_render, derived_facts, links):

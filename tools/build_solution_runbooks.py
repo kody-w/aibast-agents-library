@@ -1639,12 +1639,26 @@ def _note_bullets(doc: Document, values, fallback: str, checklist: bool = False)
     return _bullets(items, fallback, checklist)
 
 
+# Workshop-hygiene items are not customer delivery risks. Whole words and specific phrases only:
+# "captured savings" or "framed as savings" are real risks, a "live capture" or a "screenshot" is hygiene.
+_WORKSHOP_HYGIENE_RISK = re.compile(
+    r"\b(?:screenshots?|tutorials?|(?:live|screen|visual|browser|preview|historical|staging) captures?"
+    r"|(?:browser|browserfilm|captured|tutorial) frames?|save checkpoints?|skill[- ]uploads?)\b",
+    re.I,
+)
+# Failure-guide rows about visual evidence, and the integrity rules that State and Recovery renders.
+_FAILURE_GUIDE_EXCLUDED_RISK = re.compile(
+    r"\b(?:screenshots?|(?:browser|browserfilm|captured|tutorial) frames?"
+    r"|evidence files?|recorded identifiers?|Publish is offered)\b",
+    re.I,
+)
+
+
 def _risk_items(doc: Document, notes: dict) -> list[dict]:
     integrity = {"evidence-no-mockups", "failed-case-no-cherry-picking", "draft-publication-stop"}
     authored = [
         item for item in notes.get("what_goes_wrong", [])
-        if item.get("id") not in integrity
-        and not re.search(r"screenshot|capture|frame|tutorial|save checkpoint|skill-upload", item["issue"], re.I)
+        if item.get("id") not in integrity and not _WORKSHOP_HYGIENE_RISK.search(item["issue"])
     ]
     if authored:
         return authored
@@ -1658,7 +1672,7 @@ def _risk_items(doc: Document, notes: dict) -> list[dict]:
         cells = _markdown_table_cells(line)
         if len(cells) != 2 or cells[0] in {"Symptom", "---"}:
             continue
-        if re.search(r"frame|screenshot|evidence file|recorded identifier|Publish is offered", cells[0], re.I):
+        if _FAILURE_GUIDE_EXCLUDED_RISK.search(cells[0]):
             continue
         if cells[0] and cells[1]:
             risks.append({
