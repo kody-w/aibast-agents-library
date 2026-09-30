@@ -419,8 +419,36 @@ def links():
     return markdown_checker()
 
 
+def is_notes_path(path):
+    return posixpath.dirname(path) == "solutions/runbook-notes" and path.endswith(".json")
+
+
+@pytest.fixture(scope="module", params=("all-notes", "pilots-only"), autouse=True)
+def notes_profile(request, generator, links):
+    original_files = generator._file_universe
+    original_link_files = links.git_file_universe
+    actual = frozenset(original_files(ROOT))
+    notes = {path for path in actual if is_notes_path(path)}
+    pilots = {f"solutions/runbook-notes/{slug}.json" for slug in PILOTS}
+    assert pilots <= notes, "Both pilot notes files must exist before virtual-subset testing"
+    hidden = notes - pilots if request.param == "pilots-only" else set()
+
+    def generator_files(root):
+        files = original_files(root)
+        return files - hidden if Path(root).resolve() == ROOT else files
+
+    def link_files(root, documents=None):
+        files = original_link_files(root, documents)
+        return (files - hidden) | set(documents or {}) if Path(root).resolve() == ROOT else files
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(generator, "_file_universe", generator_files)
+        patch.setattr(links, "git_file_universe", link_files)
+        yield SimpleNamespace(name=request.param, files=actual, notes=notes, hidden=hidden)
+
+
 @pytest.fixture(scope="module")
-def sources(links):
+def sources(links, notes_profile):
     files = links.git_file_universe(ROOT)
     catalog = read_json("solutions/catalog.json")["solutions"]
     packages = {}
@@ -454,13 +482,12 @@ def slugs(generator, sources):
 
 
 @pytest.fixture(scope="module")
-def library(generator):
+def library(generator, notes_profile):
     return generator.load_library(ROOT)
 
 
-@pytest.fixture(scope="module")
-def all_render(generator, slugs):
-    copies, solutions, fragments, page_sources = [], {}, {}, {}
+def observe_outputs(generator, slugs):
+    copies, solutions, fragments, page_sources, notes = [], {}, {}, {}, {}
     original_copy = generator.Document.copy
     original_render = generator.render_solution
     original_document_render = generator.Document.render
@@ -477,6 +504,7 @@ def all_render(generator, slugs):
         return original_document_render(document, *args, **kwargs)
 
     def observed_render(library, slug):
+        notes[slug] = copy.deepcopy(library.notes.get(library.solutions[slug].name, {}))
         result = original_render(library, slug)
         assert isinstance(result, dict), f"{slug}: render_solution must return an artifact mapping"
         if slug in solutions:
@@ -490,8 +518,30 @@ def all_render(generator, slugs):
         observer.setattr(generator, "render_solution", observed_render)
         outputs = generator.build_outputs(ROOT, solutions=slugs)
     return SimpleNamespace(
-        outputs=outputs, copies=copies, solutions=solutions, copied_fragments=fragments, page_sources=page_sources,
+        outputs=outputs, copies=copies, solutions=solutions, copied_fragments=fragments,
+        page_sources=page_sources, notes=notes,
     )
+
+
+@pytest.fixture(scope="module")
+def all_render(generator, slugs):
+    return observe_outputs(generator, slugs)
+
+
+@pytest.fixture(scope="module")
+def derived_render(generator):
+    original_files = generator._file_universe
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(generator, "_file_universe", lambda root: frozenset(
+            path for path in original_files(root) if not is_notes_path(path)
+        ))
+        library = generator.load_library(ROOT)
+        assert not library.notes, "Derived controls must exercise the production loader without authored notes"
+        observed = observe_outputs(generator, tuple(sorted(library.solutions)))
+    assert len(observed.solutions) == 51 and not any(observed.notes.values()), (
+        "Virtual notes removal must reach every actual render_solution call"
+    )
+    return observed
 
 
 @pytest.fixture(scope="module")
@@ -500,7 +550,7 @@ def all_outputs(all_render):
 
 
 @pytest.fixture(scope="module")
-def pilot_outputs(generator):
+def pilot_outputs(generator, notes_profile):
     return generator.build_outputs(ROOT)
 
 
@@ -1035,6 +1085,8 @@ def repeated_long_lines(parts):
                 if (
                     len(value) < 80 or value == MARKER or value.strip("*_") == FRONTIER_DISCLAIMER
                     or value.removeprefix("> ").strip() == TEMPLATE_DISCLAIMER
+                    # Step owner labels are structural and repeat whenever one role owns several steps.
+                    or re.match(r"\*\*Owner:\*\* (?:Template|Customer or partner)\b", value)
                 ):
                     continue
                 cells = table_cells(value)
@@ -2708,13 +2760,8 @@ def validate_copied_lines(body, rendered, links, context, *, normalized_rendered
     return checked
 
 
-def test_all_51_copy_operations_preserve_source_lines_or_disclose_absence(all_render, sources, links):
+def validate_observed_copies(all_render, sources, links):
     records, rendered = all_render.copies, all_render.outputs
-    assert records, "Faithful-copy audit did not observe any copy operations"
-    authored = {slug for slug, key in sources["packages"].items() if key in sources["notes"]["solutions"]}
-    assert {destination.split("/")[1] for destination, _, _, _ in records} | authored == set(all_render.solutions), (
-        "Every solution must be measured through source-copy operations or authored source-backed notes"
-    )
     source_cache, output_cache, checked, covered = {}, {}, 0, set()
     for destination, source, title, alternatives in records:
         if source not in sources["files"]:
@@ -2739,7 +2786,39 @@ def test_all_51_copy_operations_preserve_source_lines_or_disclose_absence(all_re
         checked += measured
         if measured:
             covered.add(destination.split("/")[1])
-    assert checked > 0 and covered, "Faithful-copy audit did not measure any real copied source lines"
+    return checked, covered
+
+
+def test_all_51_copy_operations_preserve_source_lines_or_disclose_absence(all_render, sources, links):
+    authored = {slug for slug, key in sources["packages"].items() if key in sources["notes"]["solutions"]}
+    observed = {destination.split("/")[1] for destination, _, _, _ in all_render.copies}
+    assert observed | authored == set(all_render.solutions), (
+        "Every solution must be measured through source-copy operations or authored source-backed notes"
+    )
+    validate_observed_copies(all_render, sources, links)
+
+
+def test_virtual_notes_removal_exercises_real_copying(derived_render, sources, links):
+    assert derived_render.copies, "Virtual notes removal must exercise actual Document.copy calls"
+    checked, covered = validate_observed_copies(derived_render, sources, links)
+    assert checked > 0 and covered, "Derived copy audit did not measure any real copied source lines"
+
+
+def test_negative_derived_render_cannot_drop_copied_source_content(derived_render, sources, links):
+    validate_observed_copies(derived_render, sources, links)
+    destination = next(
+        destination for destination, source, title, alternatives in derived_render.copies
+        if source in sources["files"] and (
+            title is None or independent_source_section(
+                (ROOT / source).read_text(encoding="utf-8"), (title, *alternatives), links,
+            )
+        )
+    )
+    changed = dict(derived_render.outputs)
+    changed[destination] = "Copied source content removed by mutation.\n"
+    observed = SimpleNamespace(**{**vars(derived_render), "outputs": changed})
+    with pytest.raises(AssertionError, match="copied source line was lost|was not disclosed"):
+        validate_observed_copies(observed, sources, links)
 
 
 def test_negative_truncated_copy_cannot_pass_fidelity_validator(links):
@@ -3671,10 +3750,16 @@ def final_round_facts(sources, lane_facts):
             deployment.get("copilot_studio", {}).get("required_connections", []),
         ):
             named.update([value] if isinstance(value, str) else value)
+        cases = read_json(f"tests/demo_cases/{slug}.json")["cases"]
+        flow_path = f"solutions/{slug}/FLOW.md"
+        transcript_path = f"solutions/{slug}/evals/transcripts.json"
+        assert {flow_path, transcript_path} <= sources["files"], f"{slug}: package persona sources cannot be measured"
+        persona_evidence = tuple(nested_strings(cases)) + tuple(nested_strings(read_json(transcript_path)))
+        persona_evidence += tuple((ROOT / flow_path).read_text(encoding="utf-8").splitlines())
         facts[slug] = {
             **lane_facts[slug], "catalog": catalog_entry, "blueprint": blueprint,
             "seam_candidates": named, "preview": read_json(preview_path), "preview_path": preview_path,
-            "cases": read_json(f"tests/demo_cases/{slug}.json")["cases"],
+            "cases": cases, "persona_evidence": persona_evidence,
             "notes": sources["notes"]["solutions"].get(key, {}),
         }
     assert len(facts) == 51, "Final-round truth checks must measure every catalog solution"
@@ -3895,6 +3980,11 @@ def template_facts(final_round_facts, sources, links):
     return measured
 
 
+@pytest.fixture(scope="module")
+def derived_facts(template_facts):
+    return {slug: {**source, "notes": {}} for slug, source in template_facts.items()}
+
+
 DATA_CONTRACT_HEADER = "| Entity | Fields the template uses | Used by | Customer system of record | Sensitivity |"
 INTEGRATION_HEADER = "| System | Purpose | Skills that need it | Access | Template provides | Customer or partner wires in |"
 
@@ -3962,9 +4052,12 @@ def validate_template_derivations(outputs, facts, links):
 
 def test_all_51_data_and_integration_contracts_match_source_facts(all_outputs, template_facts, links):
     measured = validate_template_derivations(all_outputs, template_facts, links)
-    assert sum(measured.values()) == 51 and measured["derived"] and measured["authored"], (
-        f"Both source derivation and authored contracts must be measured: {measured}"
-    )
+    expected = Counter("authored" if source["notes"].get("data_contract") else "derived" for source in template_facts.values())
+    assert sum(measured.values()) == 51 and measured == expected, f"Contract coverage differs from actual notes: {measured} != {expected}"
+
+
+def test_all_51_contracts_are_derived_when_notes_are_removed_in_memory(derived_render, derived_facts, links):
+    assert validate_template_derivations(derived_render.outputs, derived_facts, links) == {"derived": 51}
 
 
 def test_authored_data_field_names_are_verbatim_source_identifiers(sources, links):
@@ -3991,12 +4084,10 @@ def test_authored_data_field_names_are_verbatim_source_identifiers(sources, link
 
 
 @pytest.mark.parametrize("mutation", ["data-field", "integration-system", "missing-notes-banner"])
-def test_negative_production_template_derivations(all_outputs, template_facts, links, mutation):
-    slug = next(
-        slug for slug, facts in template_facts.items()
-        if not facts["notes"].get("data_contract") and facts["knowledge_tables"] and facts["seam_candidates"]
-    )
-    facts = {slug: template_facts[slug]}
+def test_negative_production_template_derivations(derived_render, derived_facts, links, mutation):
+    all_outputs = derived_render.outputs
+    slug = "inventory-rebalancing"
+    facts = {slug: derived_facts[slug]}
     validate_template_derivations(all_outputs, facts, links)
     path = f"01-solutions/{slug}/2.Architecture.md"
     changed = dict(all_outputs)
@@ -4490,15 +4581,20 @@ INTEGRITY_SYMPTOMS = {
     "draft-publication-stop": "Publish is offered",
 }
 ITEM_CITATION_LABEL = r"(?:Source|Basis|Learn|Package source|Delivery notes|Identity basis|Recovery basis)"
-INTERNAL_NOTE = re.compile(r"\bis\s+absent\s+from\b|\bNot provided\s*(?:—|–|--)", re.I)
+INTERNAL_NOTE = re.compile(
+    r"\bNot provided\s*(?:—|–|--)|`[A-Za-z_][\w.]*`\s+is\s+absent\s+from\s+\[|"
+    r"_solution\.|\b_sha256\b|\bregistry(?:\.json)?\s+`?[a-z_][\w]*\.[a-z_][\w]*|"
+    r"\bregistry\.(?!json\b)[a-z_][\w.]*|\bregistry\.json\.[a-z_][\w.]*",
+    re.I,
+)
 
 
-def generated_main_documents(outputs):
+def generated_main_documents(outputs, parts=MAIN_PARTS):
     documents = {
         path: text for path, text in outputs.items()
-        if path.startswith("01-solutions/") and path.count("/") >= 2 and path.split("/", 2)[2] in MAIN_PARTS
+        if path.startswith("01-solutions/") and path.count("/") >= 2 and path.split("/", 2)[2] in parts
     }
-    assert documents, "Readability validation did not receive any generated parts 1-4"
+    assert documents, f"Readability validation did not receive any generated artifacts from {parts}"
     return documents
 
 
@@ -4526,9 +4622,9 @@ def validate_no_inline_item_citations(outputs, links):
 
 
 def validate_no_internal_note_leaks(outputs, links):
-    documents = generated_main_documents(outputs)
+    documents = generated_main_documents(outputs, MAIN_PARTS + OPTIONAL)
     for path, text in documents.items():
-        match = INTERNAL_NOTE.search(links.strip_code(text))
+        match = INTERNAL_NOTE.search(links.strip_code(text, inline=False))
         assert match is None, f"{path}: internal-note leak {match[0]!r}" if match else ""
     return len(documents)
 
@@ -4602,19 +4698,36 @@ def validate_integrity_once(outputs, facts, links):
             (part, row, cells)
             for part, text in main_parts(outputs, slug).items() for _, row, cells in table_rows(text, links)
         ]
+        visible_parts = [rendered_text(text, links).casefold() for text in main_parts(outputs, slug).values()]
         for identifier, (condition, behavior) in source["integrity"].items():
             matched = [row for part, row, cells in all_rows if rendered_text(cells[0], links) == identifier]
             assert len(matched) == 1, f"{slug}: integrity rule {identifier} must render exactly once"
             row = recovery_row(section, identifier, links, architecture)
             assert rendered_text(condition, links) in rendered_text(row, links), f"{slug}: integrity rule condition changed"
             assert rendered_text(behavior, links) in rendered_text(row, links), f"{slug}: integrity rule behavior changed"
+            token = re.compile(r"(?<![\w-])" + re.escape(identifier.casefold()) + r"(?![\w-])")
+            assert sum(len(token.findall(text)) for text in visible_parts) == 1, (
+                f"{slug}: integrity rule id {identifier} must appear exactly once across parts 1-4"
+            )
+            assertion = rendered_text(behavior, links).casefold()
+            assert assertion and sum(text.count(assertion) for text in visible_parts) == 1, (
+                f"{slug}: integrity rule text {identifier} must appear exactly once across parts 1-4"
+            )
             measured += 1
         runbook = f"01-solutions/{slug}/3.Runbook.md"
-        phase = rendered_section(outputs[runbook], PHASE_TITLES[2], links, runbook)
+        enforcement = [
+            step for step in numbered_steps(outputs[runbook], 2, links, runbook)
+            if step.title == "Enforce workshop integrity"
+        ]
+        assert len(enforcement) == 1, f"{runbook}: the integrity-link step must occur exactly once"
+        body = enforcement[0].body
         assert any(
             source_target(runbook, target) == architecture and urlsplit(target).fragment == "state-and-recovery"
-            for _, target in links.extract_links(phase)
+            for _, target in links.extract_links(body)
         ), f"{runbook}: Phase 2 must link to the single Architecture integrity table"
+        assert not table_rows(body, links) and not re.search(r"(?m)^\s*(?:[-*+]\s+|\d+[.)]\s+)", body), (
+            f"{runbook}: the integrity step must link the rules, not repeat a table or checklist"
+        )
         assert rows, f"{architecture}: State and Recovery rows were not measured"
     return measured
 
@@ -4680,7 +4793,16 @@ def validate_captured_build_checklists(outputs, facts, links):
             f"{path}: manual checklist length/order differs from captured frames"
         )
         for index, (_, actual) in enumerate(entries):
-            assert rendered_text(actual, links) in {rendered_text(caption, links) for caption in expected[index]}, (
+            assert not re.match(rf"^\s*{index + 1}\s*·\s*", actual), (
+                f"{path}: manual checklist frame {index + 1} repeats its list number"
+            )
+            captions = {rendered_text(caption, links) for caption in expected[index]}
+            # The numbered list already preserves the same ordinal badge from a recorded frame label.
+            captions.update(
+                rendered_text(re.sub(rf"^\s*{index + 1}\s*·\s*", "", caption, count=1), links)
+                for caption in expected[index]
+            )
+            assert rendered_text(actual, links) in captions, (
                 f"{path}: manual checklist frame {index + 1} caption is not verbatim or in source order"
             )
         assert any(
@@ -4695,8 +4817,8 @@ def test_all_51_parts_1_to_4_have_no_inline_item_citations(all_outputs, links):
     assert validate_no_inline_item_citations(all_outputs, links) == 204
 
 
-def test_all_51_parts_1_to_4_have_no_internal_note_leaks(all_outputs, links):
-    assert validate_no_internal_note_leaks(all_outputs, links) == 204
+def test_all_51_parts_1_to_5_have_no_internal_note_leaks(all_outputs, links):
+    assert validate_no_internal_note_leaks(all_outputs, links) == 255
 
 
 def test_all_51_workshop_integrity_rules_render_once_in_architecture(all_outputs, readability_facts, links):
@@ -4734,7 +4856,10 @@ def test_negative_inline_item_citations_in_each_main_part(all_outputs, links, pa
         validate_no_inline_item_citations({path: original[path] + "\n" + addition + "\n"}, links)
 
 
-@pytest.mark.parametrize("leak", ["A record is absent from the source.", "Not provided — `source_audit.boundary` is absent."])
+@pytest.mark.parametrize(
+    "leak",
+    ["`source_audit.boundary` is absent from [file](source.json).", "Not provided — `source_audit.boundary` is absent."],
+)
 def test_negative_internal_note_leaks(all_outputs, links, leak):
     path = "01-solutions/ask-hr/4.Sample-prompts.md"
     validate_no_internal_note_leaks({path: all_outputs[path]}, links)
@@ -4907,40 +5032,106 @@ def wiring_parts(step, system, links, context):
     return blocks
 
 
+def shared_integration_controls(runbook, links, context):
+    phase = rendered_section(runbook, PHASE_TITLES[3], links, context)
+    first_step = re.search(r"(?m)^### Step 3-\d+\.", links.strip_code(phase, inline=False))
+    assert first_step, f"{context}: cannot locate the wiring steps"
+    prefix = phase[:first_step.start()]
+    assert "shared-integration-controls" in links.anchors_of(prefix), (
+        f"{context}: shared integration-controls anchor is missing before the wiring steps"
+    )
+    return prefix
+
+
+def wiring_control_context(block, runbook, path, links):
+    references = [
+        href for _, href in links.extract_links(block)
+        if source_target(path, href) == path and urlsplit(href).fragment == "shared-integration-controls"
+    ]
+    if not references:
+        return block
+    assert len(references) == 1, f"{path}: a wiring action must link its shared controls exactly once"
+    return shared_integration_controls(runbook, links, path) + "\n\n" + block
+
+
+def validate_hardening_step(step, item, links, context):
+    assert step.title == item["area"], f"{context}: unmapped hardening step or wrong authored order: {step.title}"
+    assert step.owner == "Customer or partner" and step.role == item["owner"], (
+        f"{context}: hardening step must retain its Customer or partner owner and recorded role"
+    )
+    assert authored_note_text(item["action"], links) in rendered_text(step.body, links), (
+        f"{context}: hardening step lost its recorded action: {step.title}"
+    )
+    return item
+
+
+def hardening_for_step(step, phase, notes, links, context):
+    matches = [
+        item for item in notes.get("production_hardening", [])
+        if item["phase"] == phase and item["area"] == step.title
+    ]
+    assert len(matches) == 1, f"{context}: unmapped hardening step in Phase {phase}: {step.title}"
+    return validate_hardening_step(step, matches[0], links, context)
+
+
+def phase_three_layout(outputs, slug, notes, links):
+    architecture = f"01-solutions/{slug}/2.Architecture.md"
+    section = rendered_section(outputs[architecture], "Integration Points", links, architecture)
+    points = {
+        rendered_text(cells[0], links): rendered_text(cells[3], links)
+        for _, cells in rendered_table(section, INTEGRATION_HEADER, 6, architecture, links)
+    } if INTEGRATION_HEADER in section else {}
+    path = f"01-solutions/{slug}/3.Runbook.md"
+    steps = numbered_steps(outputs[path], 3, links, path)
+    hardening = [item for item in notes.get("production_hardening", []) if item["phase"] == 3]
+    prefix_length = len(points) or 1
+    assert len(steps) == prefix_length + len(hardening), (
+        f"{path}: Phase 3 step count must equal its wiring prefix plus every authored hardening item"
+    )
+    wiring = steps[:prefix_length]
+    if points:
+        for step in wiring:
+            assert not TEMPLATE_INTERNAL_SYSTEM.search(step.title), (
+                f"{path}: customer wiring must not name template internals: {step.title}"
+            )
+        assert [step.title for step in wiring] == ["Integrate " + system for system in points], (
+            f"{path}: Phase 3 wiring prefix must match Integration Points order"
+        )
+    else:
+        assert wiring[0].title == "Define your integration boundary", f"{path}: missing no-integration boundary step"
+        assert "No integration system can be derived" in rendered_text(wiring[0].body, links), (
+            f"{path}: package without integrations must not invent a wiring procedure"
+        )
+    for step, item in zip(steps[prefix_length:], hardening):
+        validate_hardening_step(step, item, links, path)
+    return points, wiring
+
+
 def validate_wiring_procedures(outputs, facts, links):
     measured = 0
     for slug, source in facts.items():
-        architecture = f"01-solutions/{slug}/2.Architecture.md"
-        section = rendered_section(outputs[architecture], "Integration Points", links, architecture)
-        points = {
-            rendered_text(cells[0], links): rendered_text(cells[3], links)
-            for _, cells in rendered_table(section, INTEGRATION_HEADER, 6, architecture, links)
-        } if INTEGRATION_HEADER in section else {}
         path = f"01-solutions/{slug}/3.Runbook.md"
-        steps = numbered_steps(outputs[path], 3, links, path)
+        notes = source["notes"]
+        points, wiring = phase_three_layout(outputs, slug, notes, links)
         if not points:
-            assert len(steps) == 1 and "No integration system can be derived" in rendered_text(steps[0].body, links), (
-                f"{path}: package without integrations must not invent a wiring procedure"
-            )
             continue
         declared = {name.casefold() for name in source["seam_candidates"]}
         assert set(name.casefold() for name in points) <= declared, f"{path}: integration system is not declared by the package"
-        assert len(steps) == len(points), f"{path}: Phase 3 needs exactly one step per integration point"
         seen = set()
-        notes = source["notes"]
-        for step in steps:
+        for step in wiring:
             system = step.title.removeprefix("Integrate ")
             assert system in points and system not in seen, f"{path}: Phase 3 step names an undeclared or repeated system: {system}"
             seen.add(system)
             bind, identity, scope, exit_test = wiring_parts(step, system, links, path)
             access = points[system]
             assert f"Bind {system} — {access}:" in rendered_text(bind, links), f"{path}: {system} access differs from its integration contract"
-            identity_text = rendered_text(identity, links)
+            identity_context = wiring_control_context(identity, outputs[path], path, links)
+            identity_text = rendered_text(identity_context, links)
             assert re.search(r"\bDecide\b", identity_text, re.I) and "end-user" in identity_text and re.search(
                 r"\b(?:maker|service)\b", identity_text,
             ), f"{path}: {system} needs an end-user versus maker/service identity decision"
             guidance = [
-                href for _, href in links.extract_links(identity)
+                href for _, href in links.extract_links(identity_context)
                 if href.startswith("https://learn.microsoft.com/en-us/")
             ]
             assert len(guidance) == 1, f"{path}: {system} identity decision needs exactly one Learn action link"
@@ -4953,7 +5144,7 @@ def validate_wiring_procedures(outputs, facts, links):
                 if href.startswith("https://learn.microsoft.com/en-us/")
             ).items():
                 assert count == 1, f"{path}: platform-action Learn link repeated in the same step: {href}"
-            scoping = rendered_text(scope, links)
+            scoping = rendered_text(wiring_control_context(scope, outputs[path], path, links), links)
             if notes.get("identity"):
                 for restriction in notes["identity"]["least_privilege"]:
                     assert authored_note_text(restriction, links) in scoping, (
@@ -4989,7 +5180,7 @@ def test_all_51_phase_3_steps_are_sourced_wiring_procedures(all_outputs, readabi
 @pytest.mark.parametrize(
     "mutation, error",
     [
-        ("system", "undeclared or repeated system"), ("access", "access differs"),
+        ("system", "wiring prefix must match"), ("access", "access differs"),
         ("identity", "identity decision"), ("scope", "least-privilege restriction"),
         ("exit-test", "exit test is not assembled"), ("missing-action", "wiring needs"),
         ("duplicate-guidance", "exactly one Learn action link"),
@@ -5015,15 +5206,18 @@ def test_negative_phase_3_wiring_contract(all_outputs, readability_facts, links,
             replacement = replacement.replace(blocks[1], f"2. **Identity for {system}:** Use any identity.", 1)
         elif mutation == "scope":
             restriction = facts[slug]["notes"]["identity"]["least_privilege"][0]
-            replacement = replacement.replace(restriction, "No access restriction applies.", 1)
+            shared = shared_integration_controls(changed[path], links, path)
+            changed[path] = changed[path].replace(shared, shared.replace(restriction, "No access restriction applies.", 1), 1)
         elif mutation == "exit-test":
             replacement = replacement.replace(blocks[3], f"4. **Exit test for {system}:** Record expected and actual results. Declare success without evidence.", 1)
         elif mutation == "missing-action":
             replacement = replacement.replace(blocks[2], "", 1)
         else:
-            href = next(href for _, href in links.extract_links(blocks[1]) if href.startswith("https://learn.microsoft.com/en-us/"))
+            identity = wiring_control_context(blocks[1], all_outputs[path], path, links)
+            href = next(href for _, href in links.extract_links(identity) if href.startswith("https://learn.microsoft.com/en-us/"))
             replacement = replacement.replace(blocks[1], blocks[1] + f" [Configure authentication again]({href})", 1)
-        changed[path] = changed[path].replace(step.body, replacement, 1)
+        if mutation != "scope":
+            changed[path] = changed[path].replace(step.body, replacement, 1)
     assert changed[path] != all_outputs[path], f"{mutation}: wiring mutation made no change"
     with pytest.raises(AssertionError, match=error):
         validate_wiring_procedures(changed, facts, links)
@@ -5088,7 +5282,7 @@ def test_negative_native_form_ledger_cannot_lose_its_harness_reference(all_outpu
 OWNER_CONTRACT = {
     (0, "Qualify the outcome and baseline"): "Customer or partner",
     (0, "Adapt scope and name owners"): "Customer or partner",
-    (1, "Apply the identity design"): "Template",
+    (1, "Approve the identity and settings design"): "Customer or partner",
     (1, "Configure tenant controls"): "Customer or partner",
     (2, "Choose the build lane"): "Customer or partner",
     (2, "Build the selected implementation"): "Template",
@@ -5119,6 +5313,7 @@ def validate_owner_contract(outputs, facts, links):
     for slug, source in facts.items():
         path = f"01-solutions/{slug}/3.Runbook.md"
         runbook = outputs[path]
+        phase_three_layout(outputs, slug, source["notes"], links)
         seen = Counter()
         for phase in range(7):
             for step in numbered_steps(runbook, phase, links, path):
@@ -5126,22 +5321,16 @@ def validate_owner_contract(outputs, facts, links):
                 if key in OWNER_CONTRACT:
                     expected = OWNER_CONTRACT[key]
                     seen[key] += 1
-                elif phase == 3:
+                elif phase == 3 and (
+                    step.title == "Define your integration boundary" or step.title.startswith("Integrate ")
+                ):
                     expected = "Customer or partner"
-                    assert step.title == "Define your integration boundary" or step.title.startswith("Integrate "), (
-                        f"{path}: unmapped Phase 3 ownership: {step.title}"
-                    )
                     assert not TEMPLATE_INTERNAL_SYSTEM.search(step.title), (
                         f"{path}: customer wiring must not name template internals: {step.title}"
                     )
                 else:
-                    hardening = [
-                        item for item in source["notes"].get("production_hardening", [])
-                        if item["phase"] == phase and item["area"] == step.title
-                    ]
-                    assert len(hardening) == 1, f"{path}: step has no owner contract: Phase {phase} / {step.title}"
+                    hardening_for_step(step, phase, source["notes"], links, path)
                     expected = "Customer or partner"
-                    assert step.role == hardening[0]["owner"], f"{path}: hardening step lost its accountable role"
                 assert step.owner == expected, (
                     f"{path}: owner contract for Phase {phase} / {step.title} requires {expected}, got {step.owner}"
                 )
@@ -5221,6 +5410,20 @@ def validate_phase_order(runbook, links, context):
                 )
 
 
+def persona_words(text):
+    words = re.findall(r"[a-z0-9]+", html.unescape(re.sub(r"<[^>]*>", " ", text)).casefold())
+    result = []
+    for word in words:
+        if len(word) > 4 and word.endswith("ies"):
+            word = word[:-3] + "y"
+        elif len(word) > 5 and word.endswith(("ches", "shes", "xes", "sses")):
+            word = word[:-2]
+        elif len(word) > 3 and word.endswith("s") and not word.endswith(("ss", "us", "is")):
+            word = word[:-1]
+        result.append(word)
+    return " ".join(result)
+
+
 def validate_identity_defaults(outputs, facts, links):
     measured = 0
     for slug, source in facts.items():
@@ -5236,9 +5439,23 @@ def validate_identity_defaults(outputs, facts, links):
         assert auth[0] == authored_note_text(expected_auth, links) and "Microsoft Entra ID authentication" in auth[0], (
             f"{path}: authentication default differs from settings.mcs.yml / recorded identity"
         )
-        personas = source["registry_personas"] or ["Customer or partner defines the audience"]
-        expected_audience = "; ".join(personas) if isinstance(personas, list) else personas
-        assert audience[0] == expected_audience, f"{path}: audience default differs from registry personas / explicit fallback"
+        authored = source["notes"].get("identity", {}).get("audience")
+        if authored:
+            members = authored if isinstance(authored, list) else [part.strip() for part in authored.split(";")]
+            expected_audience = "; ".join(members)
+            assert audience[0] == authored_note_text(expected_audience, links), f"{path}: audience differs from authored identity"
+            registry = source["registry_personas"] or []
+            registry = registry if isinstance(registry, list) else [registry]
+            evidence = [persona_words(text) for text in [*registry, *source["persona_evidence"]]]
+            for persona in members:
+                normalized = persona_words(persona)
+                assert normalized and any(
+                    " " + normalized + " " in " " + text + " " for text in evidence
+                ), f"{path}: authored audience persona has no registry or package support: {persona!r}"
+        else:
+            personas = source["registry_personas"] or ["Customer or partner defines the audience"]
+            expected_audience = "; ".join(personas) if isinstance(personas, list) else personas
+            assert audience[0] == expected_audience, f"{path}: audience default differs from registry personas / explicit fallback"
         measured += 1
     assert measured, "No identity defaults were measured"
     return measured
@@ -5285,6 +5502,8 @@ def test_negative_owner_honesty_mutations(all_outputs, readability_facts, links,
             "template-customer-action": (6, "Retain the operational playbook"),
         }[mutation]
         steps = [step for step in numbered_steps(changed[path], phase, links, path) if title is None or step.title == title]
+        if mutation == "O1":
+            steps = [step for step in steps if step.title.startswith("Integrate ")]
         assert steps, f"{mutation}: required real step was not measured"
         for step in steps:
             if mutation == "template-customer-action":
@@ -5367,9 +5586,10 @@ def test_negative_C50_stop_at_draft_cannot_disappear(all_outputs, readability_fa
 
 
 @pytest.mark.parametrize("mutation", ["V4", "V5", "missing-authentication", "missing-audience"])
-def test_negative_identity_default_mutations(all_outputs, readability_facts, links, mutation):
-    slug = next(slug for slug, source in readability_facts.items() if not source["notes"].get("identity"))
-    facts = {slug: readability_facts[slug]}
+def test_negative_identity_default_mutations(derived_render, derived_facts, links, mutation):
+    all_outputs = derived_render.outputs
+    slug = "account-intelligence"
+    facts = {slug: derived_facts[slug]}
     validate_identity_defaults(all_outputs, facts, links)
     path = f"01-solutions/{slug}/2.Architecture.md"
     body = rendered_section(all_outputs[path], "Identity and Permissions", links, path)
@@ -5414,9 +5634,10 @@ def test_negative_template_internals_cannot_be_customer_integrations(all_outputs
         validate_owner_contract(changed, facts, links)
 
 
-def test_negative_consolidated_contract_keeps_each_knowledge_source(all_outputs, template_facts, links):
+def test_negative_consolidated_contract_keeps_each_knowledge_source(derived_render, derived_facts, links):
+    all_outputs = derived_render.outputs
     slug = "inventory-rebalancing"
-    facts = {slug: template_facts[slug]}
+    facts = {slug: derived_facts[slug]}
     signatures = Counter((item["entity"], tuple(item["fields"])) for item in facts[slug]["knowledge_tables"])
     duplicate = next(signature for signature, count in signatures.items() if count > 1)
     sources = {
@@ -5682,3 +5903,293 @@ def test_anchored_note_source_survives_rendering_and_section_ledger(generator, s
     with pytest.raises(AssertionError, match="source is missing from"):
         validate_notes_source_ledgers(changed, facts, links)
     validate_notes_source_ledgers(outputs, facts, links)
+
+
+def test_notes_profiles_hide_only_notes_in_memory(notes_profile, sources, library):
+    expected = notes_profile.notes - notes_profile.hidden
+    assert set(sources["note_paths"]) == expected, "Public source inventory disagrees with the virtual notes profile"
+    assert library.files == notes_profile.files - notes_profile.hidden, "Production inventory must hide only the selected notes"
+    assert len(library.notes) == len(expected), "Production loader did not apply the virtual notes subset"
+    assert all((ROOT / path).is_file() for path in notes_profile.notes), "Virtual notes removal must not delete real files"
+    if notes_profile.name == "pilots-only":
+        assert {entry["solution"].rsplit("/", 1)[-1] for entry in library.notes.values()} == set(PILOTS), (
+            "The pilots-only profile must not retain other authored notes"
+        )
+
+
+def test_all_51_identity_defaults_are_derived_without_notes(derived_render, derived_facts, links):
+    assert validate_identity_defaults(derived_render.outputs, derived_facts, links) == 51
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "The customer identifier is absent from the snapshot.",
+        "The requested record is absent from the approved customer source; report the limitation.",
+        "`customer_id` is absent from the synthetic record.",
+    ],
+)
+def test_legitimate_authored_absence_is_not_a_generator_note(text, links):
+    assert validate_no_internal_note_leaks({"01-solutions/example/3.Runbook.md": text}, links) == 1
+
+
+@pytest.mark.parametrize(
+    "left, right",
+    [
+        ("Chief Compliance Officers", "Chief Compliance Officer"),
+        ("Trading Desk Supervisors", "trading desk supervisor"),
+        ("Operations Leaders", "Operations Leader"),
+        ("Business Development Representatives", "Business Development Representative"),
+        ("Back-Office Agents", "Back Office Agent"),
+    ],
+)
+def test_persona_normalization_handles_plural_roles_without_losing_words(left, right):
+    assert persona_words(left) == persona_words(right)
+
+
+def test_authored_identity_cannot_invent_a_persona_even_if_the_row_matches(all_outputs, readability_facts, links):
+    slug = "ask-hr"
+    facts = {slug: copy.deepcopy(readability_facts[slug])}
+    validate_identity_defaults(all_outputs, facts, links)
+    identity = facts[slug]["notes"]["identity"]
+    identity["audience"] = "Unsupported Example Persona"
+    path = f"01-solutions/{slug}/2.Architecture.md"
+    body = rendered_section(all_outputs[path], "Identity and Permissions", links, path)
+    row, cells = next(
+        (row, cells) for row, cells in rendered_table(body, "| Template default | Customer or partner decision |", 2, path, links)
+        if rendered_text(cells[0], links).startswith("Audience:")
+    )
+    cells[0] = "Audience: " + identity["audience"]
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(row, "| " + " | ".join(cells) + " |", 1)
+    with pytest.raises(AssertionError, match="authored audience persona has no registry or package support"):
+        validate_identity_defaults(changed, facts, links)
+
+
+def test_authored_identity_can_use_a_locked_case_persona_beyond_the_registry(all_outputs, readability_facts, links):
+    slug = "fs-regulatory-compliance"
+    source = copy.deepcopy(readability_facts[slug])
+    persona = "Head of Quant Execution"
+    assert persona_words(persona) not in {persona_words(value) for value in source["registry_personas"]}
+    assert any(persona in value for value in source["persona_evidence"]), "Positive persona control needs actual package evidence"
+    source["notes"]["identity"] = {"auth": "Microsoft Entra ID authentication", "audience": persona}
+    path = f"01-solutions/{slug}/2.Architecture.md"
+    body = rendered_section(all_outputs[path], "Identity and Permissions", links, path)
+    changed_body = body
+    for row, cells in rendered_table(body, "| Template default | Customer or partner decision |", 2, path, links):
+        if rendered_text(cells[0], links).startswith("Audience:"):
+            cells[0] = "Audience: " + persona
+        elif rendered_text(cells[0], links).startswith("Authentication:"):
+            cells[0] = "Authentication: Microsoft Entra ID authentication"
+        changed_body = changed_body.replace(row, "| " + " | ".join(cells) + " |", 1)
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(body, changed_body, 1)
+    assert validate_identity_defaults(changed, {slug: source}, links) == 1
+
+
+@pytest.mark.parametrize(
+    "mutation", ["unmapped-step", "template-owner", "wrong-role", "missing-hardening", "hardening-order"],
+)
+def test_extra_phase_3_steps_require_recorded_customer_hardening(all_outputs, readability_facts, links, mutation):
+    slug = "ask-hr"
+    facts = {slug: copy.deepcopy(readability_facts[slug])}
+    path = f"01-solutions/{slug}/3.Runbook.md"
+    phase = rendered_section(all_outputs[path], PHASE_TITLES[3], links, path)
+    steps = numbered_steps(all_outputs[path], 3, links, path)
+    item = {
+        "area": "Additional write controls", "phase": 3,
+        "action": "Enforce an independently approved write boundary.",
+        "owner": facts[slug]["notes"]["delivery_roles"][0]["role"],
+        "source": f"solutions/{slug}/FIELD-GUIDE.md",
+    }
+    facts[slug]["notes"]["production_hardening"].append(item)
+    extra = (
+        f"### Step 3-{len(steps) + 1}. {item['area']}\n\n"
+        f"**Owner:** Customer or partner · **Role:** {item['owner']}\n\n{item['action']}\n\n"
+    )
+    control = dict(all_outputs)
+    control[path] = control[path].replace(phase, phase.replace("### Exit criteria", extra + "### Exit criteria", 1), 1)
+    validate_wiring_procedures(control, facts, links)
+    validate_owner_contract(control, facts, links)
+    if mutation == "unmapped-step":
+        mutated = extra.replace(item["area"], "Unmapped extra work", 1)
+        error = "unmapped hardening step"
+    elif mutation == "template-owner":
+        mutated = extra.replace("**Owner:** Customer or partner", "**Owner:** Template", 1)
+        error = "hardening step must retain"
+    elif mutation == "wrong-role":
+        mutated = extra.replace("**Role:** " + item["owner"], "**Role:** Unassigned role", 1)
+        error = "hardening step must retain"
+    elif mutation == "missing-hardening":
+        mutated = ""
+        error = "step count must equal"
+    else:
+        items = facts[slug]["notes"]["production_hardening"]
+        indices = [index for index, step in enumerate(items) if step["phase"] == 3]
+        assert len(indices) >= 2, "Hardening-order mutation needs two authored steps"
+        first, last = indices[0], indices[-1]
+        items[first], items[last] = items[last], items[first]
+        mutated = extra
+        error = "wrong authored order"
+    changed = dict(control)
+    changed[path] = changed[path].replace(extra, mutated, 1)
+    with pytest.raises(AssertionError, match=error):
+        validate_wiring_procedures(changed, facts, links)
+    with pytest.raises(AssertionError, match=error):
+        validate_owner_contract(changed, facts, links)
+
+
+def test_captured_caption_cannot_drop_a_number_other_than_its_list_ordinal(all_outputs, readability_facts, links):
+    slug = "building-permit-processing"
+    facts = {slug: copy.deepcopy(readability_facts[slug])}
+    validate_captured_build_checklists(all_outputs, facts, links)
+    caption = next(iter(facts[slug]["captions"][0]))
+    caption = re.sub(r"^\s*1\s*·\s*", "", caption, count=1)
+    facts[slug]["captions"][0] = {"999 · " + caption}
+    with pytest.raises(AssertionError, match="caption is not verbatim or in source order"):
+        validate_captured_build_checklists(all_outputs, facts, links)
+
+
+@pytest.mark.parametrize("artifact", MAIN_PARTS + OPTIONAL)
+@pytest.mark.parametrize(
+    "leak",
+    [
+        "Not recorded in registry _solution.personas",
+        "`_solution.industries`",
+        "Not recorded in registry _sha256",
+        "Not recorded in registry attributes.audience",
+        "Not recorded in registry.json properties.platform",
+        "registry.personas",
+        "registry.json._solution",
+    ],
+)
+def test_negative_F69_registry_field_paths_cannot_leak_into_reader_pages(all_outputs, links, artifact, leak):
+    path = "01-solutions/ask-hr/" + artifact
+    original = {path: all_outputs[path]}
+    validate_no_internal_note_leaks(original, links)
+    with pytest.raises(AssertionError, match="internal-note leak"):
+        validate_no_internal_note_leaks({path: original[path] + "\n" + leak + "\n"}, links)
+
+
+def test_registry_file_citations_are_not_internal_field_path_leaks(links):
+    text = (
+        "The [registry](../../registry.json) records the catalog facts. The registry.json source remains available. "
+        "Do not claim a carbon registry action."
+    )
+    assert validate_no_internal_note_leaks({"01-solutions/example/5.Acceptance-Evidence.md": text}, links) == 1
+
+
+def validate_restricted_publish_before_pilot(runbook, links, context):
+    steps = numbered_steps(runbook, 5, links, context)
+    publishing = [(index, step) for index, step in enumerate(steps) if step.title == "Publish and share deliberately"]
+    pilot = [(index, step) for index, step in enumerate(steps) if step.title == "Run the governed pilot"]
+    assert len(publishing) == len(pilot) == 1, f"{context}: restricted publishing and governed pilot steps must each occur once"
+    publish_index, publish_step = publishing[0]
+    pilot_index, pilot_step = pilot[0]
+    publish_body = rendered_text(publish_step.body, links)
+    assert re.search(r"\brestricted\s+(?:test\s+)?audience\b", publish_body, re.I), (
+        f"{context}: publication must first restrict its test audience"
+    )
+    assert re.search(r"\bpublish\b", publish_body, re.I) and re.search(r"\bshare\b", publish_body, re.I), (
+        f"{context}: the restricted publish step must publish and share the adapted agent"
+    )
+    gates = re.findall(r"(?m)^\*\*Pilot entry gate:\*\*\s*(.+)$", pilot_step.body)
+    assert len(gates) == 1, f"{context}: governed pilot must retain its identity-test entry gate"
+    gate = rendered_text(gates[0], links)
+    assert all(re.search(r"\b" + word + r"\b", gate, re.I) for word in ("allowed", "denied", "identities", "published", "shared")), (
+        f"{context}: pilot identity tests must target the published, shared agent"
+    )
+    assert re.search(r"\b(?:test|verify|check)\b", gate, re.I), f"{context}: pilot entry must perform the identity tests"
+    assert publish_index < pilot_index, (
+        f"{context}: restricted publication must precede the governed pilot's published-agent identity tests"
+    )
+    for index, step in enumerate(steps):
+        text = rendered_text(step.body, links)
+        if all(re.search(r"\b" + word + r"\b", text, re.I) for word in ("test", "allowed", "denied", "identities", "published")):
+            assert publish_index < index, f"{context}: published-agent identity tests occur before restricted publication"
+
+
+def test_all_51_governed_pilots_follow_restricted_publication(all_outputs, slugs, links):
+    for slug in slugs:
+        path = f"01-solutions/{slug}/3.Runbook.md"
+        validate_restricted_publish_before_pilot(all_outputs[path], links, path)
+
+
+def test_negative_N8_governed_identity_gate_cannot_precede_restricted_publish(all_outputs, links):
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    original = all_outputs[path]
+    validate_restricted_publish_before_pilot(original, links, path)
+    steps = numbered_steps(original, 5, links, path)
+    publish = next(step for step in steps if step.title == "Publish and share deliberately")
+    pilot = next(step for step in steps if step.title == "Run the governed pilot")
+    publish_block = f"### Step 5-{publish.number}. {publish.title}\n\n{publish.body}"
+    pilot_block = f"### Step 5-{pilot.number}. {pilot.title}\n\n{pilot.body}"
+    assert publish_block in original and pilot_block in original, "N8 must move actual rendered steps"
+    changed = original.replace(publish_block, f"### Step 5-{publish.number}. {pilot.title}\n\n{pilot.body}", 1)
+    changed = changed.replace(pilot_block, f"### Step 5-{pilot.number}. {publish.title}\n\n{publish.body}", 1)
+    assert changed != original, "N8 phase-order mutation made no change"
+    validate_phase_steps(changed, links, path)
+    with pytest.raises(AssertionError, match="restricted publication must precede"):
+        validate_restricted_publish_before_pilot(changed, links, path)
+
+
+@pytest.mark.parametrize("mutation", ["unrestricted-publish", "unpublished-identity-tests"])
+def test_negative_pilot_entry_requires_restricted_published_agent(all_outputs, links, mutation):
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    original = all_outputs[path]
+    validate_restricted_publish_before_pilot(original, links, path)
+    if mutation == "unrestricted-publish":
+        changed = original.replace("a restricted test audience", "everyone", 1)
+        error = "restrict its test audience"
+    else:
+        changed = original.replace("on the published, shared agent", "on the unpublished Draft", 1)
+        error = "must target the published, shared agent"
+    assert changed != original, "Pilot-entry mutation made no change"
+    with pytest.raises(AssertionError, match=error):
+        validate_restricted_publish_before_pilot(changed, links, path)
+
+
+@pytest.mark.parametrize("form", ["ids", "prose", "table"])
+def test_negative_N5_integrity_repeated_in_phase_2_fails_without_a_budget_violation(
+    all_outputs, readability_facts, links, form,
+):
+    slug = "ask-hr"
+    facts = {slug: readability_facts[slug]}
+    validate_integrity_once(all_outputs, facts, links)
+    path = f"01-solutions/{slug}/3.Runbook.md"
+    original = all_outputs[path]
+    step = next(step for step in numbered_steps(original, 2, links, path) if step.title == "Enforce workshop integrity")
+    rules = facts[slug]["integrity"]
+    if form == "ids":
+        duplicate = "\n\n".join(f"Remember {identifier}." for identifier in rules)
+        error = "integrity rule id .* must appear exactly once"
+    elif form == "prose":
+        duplicate = "\n\n".join(behavior for _, behavior in rules.values())
+        error = "integrity rule text .* must appear exactly once"
+    else:
+        duplicate = "| Rule | Handling |\n| --- | --- |\n" + "\n".join(
+            f"| {identifier} | {behavior} |" for identifier, (_, behavior) in rules.items()
+        )
+        error = "must render exactly once"
+    changed = dict(all_outputs)
+    changed[path] = original.replace(step.body, step.body + "\n\n" + duplicate, 1)
+    assert changed[path] != original, "N5 must duplicate the actual integrity rules in Phase 2"
+    validate_word_budget(main_parts(changed, slug), slug)
+    with pytest.raises(AssertionError, match=error):
+        validate_integrity_once(changed, facts, links)
+    validate_integrity_once(all_outputs, facts, links)
+
+
+def test_negative_build_checklist_cannot_repeat_a_captured_ordinal_badge(all_outputs, readability_facts, links):
+    slug = "building-permit-processing"
+    facts = {slug: readability_facts[slug]}
+    validate_captured_build_checklists(all_outputs, facts, links)
+    path = f"01-solutions/{slug}/3.Runbook.md"
+    body, entries = captured_checklist(all_outputs[path], links, path)
+    assert entries[0][0] == 1, "Ordinal-badge mutation requires the first recorded step"
+    changed_body = re.sub(r"(?m)^1[.)]\s+", "1. 1 · ", body, count=1)
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(body, changed_body, 1)
+    assert changed[path] != all_outputs[path], "Duplicate ordinal mutation made no change"
+    with pytest.raises(AssertionError, match="repeats its list number"):
+        validate_captured_build_checklists(changed, facts, links)

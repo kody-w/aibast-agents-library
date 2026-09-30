@@ -1306,13 +1306,13 @@ def _overview(library: Library, solution: Solution, page_ledger=None) -> str:
     doc.source("index.html")
     properties = [
         ("Vertical", solution.vertical),
-        ("Industries", _text(metadata.get("industries"), "Not recorded in registry _solution.industries")),
+        ("Industries", _text(metadata.get("industries"), "Industries are not recorded for this solution.")),
         ("Journey stage — primary", solution.stage),
         ("Journey stage — secondary", solution.secondary_stage or "No secondary stage recorded"),
-        ("Personas", _text(metadata.get("personas"), "Not recorded in registry _solution.personas")),
+        ("Personas", _text(metadata.get("personas"), "Personas are not recorded for this solution.")),
         ("Microsoft platforms", _text(
             _items(metadata.get("agent_requirements")) + _items(metadata.get("featured_tools")),
-            "Not recorded in registry _solution",
+            "Microsoft platforms are not recorded for this solution.",
         )),
         ("Quality tier", _quality_description(doc)),
         ("Agent file", doc.link(_text(agent.get("_file"), "missing-agent-source"))),
@@ -1715,8 +1715,8 @@ def _architecture(library: Library, solution: Solution, page_ledger=None) -> str
             PurePosixPath(_text(solution.agent.get("_file"), "missing-agent-source")).name,
         )),
         ("Expected tool", _text(deployment.get("expected_tool"), "Not recorded in deployment.json expected_tool")),
-        ("Source SHA-256 (short)", _text(solution.agent.get("_sha256"), "Not recorded in registry _sha256")[:12]
-         if solution.agent.get("_sha256") else "Not recorded in registry _sha256"),
+        ("Source SHA-256 (short)", _text(solution.agent["_sha256"])[:12]
+         if solution.agent.get("_sha256") else "A source fingerprint is not recorded."),
     ), doc.missing(REGISTRY))
     doc.add("Component Responsibilities", components)
     data_rows, contracts = [], set()
@@ -1969,7 +1969,10 @@ def _phase_notes(doc: Document, notes: dict, number: int, steps: list[str]) -> l
             continue
         action = _note_value(doc, item, "action")
         owner_line = "**Owner:** Customer or partner · **Role:** " + item["owner"]
-        matching_steps = [index for index, step in enumerate(steps) if owner_line in step.splitlines()]
+        # Phase 3 keeps shared hardening after all wiring steps, in authored order.
+        matching_steps = [] if number == 3 else [
+            index for index, step in enumerate(steps) if owner_line in step.splitlines()
+        ]
         # Evaluation hardening follows corpus adaptation rather than preceding it.
         matching = matching_steps[-1 if number == 4 else 0] if matching_steps else None
         if matching is not None:
@@ -2009,12 +2012,19 @@ def _manual_build_checklist(doc: Document) -> str:
         ), None)
         if label is None:
             raise RunbookSourceError(f"{source}: frame {index} has no title, caption or label")
+        label = re.sub(rf"^\s*{index}\s*·\s*", "", label, count=1)
+        if not label.strip():
+            raise RunbookSourceError(f"{source}: frame {index} has no caption after its number")
         labels.append(label)
     if not labels:
         return "The package has not recorded a manual build sequence."
+    warning = (
+        " Do not manufacture historical failures."
+        if any(re.search(r"\bhistorical\b.*\bfailure\b", label, re.I) for label in labels) else ""
+    )
     return (
         "**Manual build checklist** — " + doc.link(source, "captured sequence") + ". "
-        "Record real results, not manufactured historical failures.\n\n"
+        "Record current results." + warning + "\n\n"
         + "\n".join(f"{index}. {label}" for index, label in enumerate(labels, 1))
     )
 
@@ -2049,10 +2059,22 @@ def _matching_integration_items(point: dict, items: list[dict], limit: int = 1) 
     return [item for _, _, item in sorted(ranked)[:limit]]
 
 
-def _wiring_procedure(doc: Document, notes: dict, point: dict) -> str:
+def _integration_controls(doc: Document, notes: dict) -> str:
     identity = _identity_contract(doc, notes)
     doc.source(identity["source"])
     doc.source(AUTH_DOC)
+    return "\n\n".join((
+        '<a id="shared-integration-controls"></a>',
+        "**Shared identity and scope controls**",
+        "For each integration, decide end-user versus approved maker/service credentials. "
+        + doc.link(AUTH_DOC, "Configure authentication")
+        + " for the [authorized audience](2.Architecture.md#identity-and-permissions).",
+        "**Shared scope:** " + " ".join(_note_prose(doc, identity["least_privilege"]))
+        + " Enforce these restrictions at each connection.",
+    ))
+
+
+def _wiring_procedure(doc: Document, notes: dict, point: dict) -> str:
     system = point["system"]
     boundaries = _matching_integration_items(point, notes.get("boundary_tests", []))
     recovery = _matching_integration_items(point, [
@@ -2079,11 +2101,8 @@ def _wiring_procedure(doc: Document, notes: dict, point: dict) -> str:
     )
     return "\n\n".join((
         f"1. **Bind {system} — {access}:** " + _note_value(doc, point, "customer_wires") + writes,
-        f"2. **Identity for {system}:** Decide end-user versus approved maker/service credentials; "
-        + doc.link(AUTH_DOC, "Configure authentication")
-        + " for the [authorized audience](2.Architecture.md#identity-and-permissions).",
-        f"3. **Scope {system}:** " + " ".join(identity["least_privilege"])
-        + " Enforce restrictions at the connection.",
+        f"2. **Identity for {system}:** Follow the [shared controls](#shared-integration-controls); record the credential choice.",
+        f"3. **Scope {system}:** Apply the [shared restrictions](#shared-integration-controls); document system-specific limits.",
         f"4. **Exit test for {system}:** Record expected and actual results on approved fixtures. "
         + " ".join(tests),
     ))
@@ -2139,9 +2158,11 @@ def _runbook(library: Library, solution: Solution, page_ledger=None) -> str:
     }
     titles = [title for title in REQUIRED_SECTIONS["3.Runbook.md"] if title.startswith("Phase ")]
 
-    def phase(number: int, steps: list[str]) -> None:
+    def phase(number: int, steps: list[str], introduction: str = "") -> None:
         content = _phase_notes(doc, notes, number, steps)
         content.append(_exit_criteria(doc, notes, f"phase_{number}", defaults[number]))
+        if introduction:
+            content.insert(0, introduction)
         doc.add(titles[number], "\n\n".join(content))
 
     baseline = notes.get("baseline") or {
@@ -2165,12 +2186,14 @@ def _runbook(library: Library, solution: Solution, page_ledger=None) -> str:
               + _note_table(doc, notes, "delivery_roles", ("role", "responsibility"), ("Role", "Responsibility")), business_owner),
     ])
     phase(1, [
-        _step(1, 1, "Apply the identity design", "Template",
-              "Apply the [identity design](2.Architecture.md#identity-and-permissions) using "
-              + doc.link(solution.path("copilot-studio/settings.mcs.yml"), "settings") + ".", maker),
+        _step(1, 1, "Approve the identity and settings design", "Customer or partner",
+              "Review and approve the [identity design](2.Architecture.md#identity-and-permissions) and "
+              + doc.link(solution.path("copilot-studio/settings.mcs.yml"), "template settings")
+              + ". Apply agent-specific settings when the agent is built in [Phase 2](#phase-2--build-and-prove-the-agent).", administrator),
         _step(1, 2, "Configure tenant controls", "Customer or partner",
-              "Approve environment, audience, connection identities and denied-access tests. Configure "
-              + doc.link(AUTH_DOC, "authentication") + " and " + doc.link(DLP_DOC, "data policies") + ".", administrator),
+              "Approve the environment, audience and connection identities. Define the "
+              + doc.link(AUTH_DOC, "authentication plan") + "; configure environment "
+              + doc.link(DLP_DOC, "data policies") + ".", administrator),
     ])
     lane_table = _table(("Lane", "Suits", "Output"), (
         ("Easy mode with GitHub Copilot (default)", "Assisted authoring", "Synthetic Draft proof"),
@@ -2212,7 +2235,14 @@ def _runbook(library: Library, solution: Solution, page_ledger=None) -> str:
             "No integration system can be derived from the package. Identify the system of record, "
             "field mapping, access owner and approved connector or API before replacing synthetic knowledge.",
         ))
-    phase(3, wiring_steps)
+    phase(3, wiring_steps, _integration_controls(doc, notes) if integrations else "")
+    exact_assertions = " Keep exact assertions separate from General quality scores."
+    if any(
+        item["phase"] == 4
+        and re.search(r"\bexact\b[^.!?\n]*\bseparat(?:e|ely)\b[^.!?\n]*\bGeneral quality\b", item["action"], re.I)
+        for item in notes.get("production_hardening", [])
+    ):
+        exact_assertions = ""
     phase(4, [
         _step(4, 1, "Adapt the evaluation corpus", "Customer or partner",
               "Preserve [locked behaviors](4.Sample-prompts.md#per-case-acceptance-matrix) and "
@@ -2220,7 +2250,7 @@ def _runbook(library: Library, solution: Solution, page_ledger=None) -> str:
         _step(4, 2, "Set thresholds and evaluate your data", "Customer or partner",
               "Have the business owner approve thresholds. Run "
               + doc.link(EVALUATION_DOC, "adapted evaluations (preview)")
-              + " before publication under approved test user profiles. Keep exact assertions separate from General quality scores.", reviewer),
+              + " before publication under approved test user profiles." + exact_assertions, reviewer),
     ])
     phase(5, [
         _step(5, 1, "Review the template release prerequisites", "Template",
