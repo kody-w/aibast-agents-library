@@ -113,9 +113,13 @@ The files themselves live under [`agents/@aibast-agents-library/`](agents/@aibas
 
 Compare **AIBAST Frontier (experimental)**—an early, experimental learning lane where one portable `agents/@aibast-agents-library/.../*_agent.py` file lets you learn, teach, and change behavior immediately in the Brainstem—with the **Runbook lane**, a manual Copilot Studio build guided by the runbooks in `01-solutions/` and needing no Python or local tooling; see [Two Delivery Lanes](00-overview/README.md#two-delivery-lanes).
 
-Phase 1 generates two pilot runbooks: `ask-hr` and `building-permit-processing`.
-The remaining solutions are planned for Phase 2. Generated files in
-`01-solutions/` are never hand-edited.
+The runbooks are example templates covering the full path to a production
+build; the customer or partner must adapt them to specific requirements and
+connect their own systems, identity, data, and governance.
+
+The initial pilot runbooks are `ask-hr` and `building-permit-processing`.
+Further solutions are added one by one after their notes files are authored
+and validated; generated files in `01-solutions/` are never hand-edited.
 
 ---
 

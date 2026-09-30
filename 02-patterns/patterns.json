@@ -1,6 +1,6 @@
 {
   "schema": "aibast-pattern-index/1.0",
-  "source": "Hand-authored. Ids are stable identifiers referenced by solutions/runbook-notes.json and the generated 01-solutions runbooks; never rename an id.",
+  "source": "Hand-authored. Ids are stable identifiers referenced by solutions/runbook-notes/<slug>.json and the generated 01-solutions runbooks; never rename an id.",
   "aibast_patterns": [
     {
       "id": "aibast:evidence-first-release-gate",

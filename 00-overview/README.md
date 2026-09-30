@@ -2,6 +2,8 @@
 
 **AIBAST Frontier is an early, experimental learning lane: learn it now, prove it works, land it native.**
 
+> **Template.** These runbooks and agents are examples. They cover the full path to a production build and must be modified to meet each customer's specific requirements. The customer or their partner connects them to their own systems, identity, data and governance in their environment.
+
 Choose the path that fits your engagement: learn and teach in
 AIBAST Frontier (experimental), use assisted authoring, or build directly in Copilot Studio
 ([Ask HR field guide example](../solutions/ask-hr/FIELD-GUIDE.md)).
@@ -10,10 +12,21 @@ AIBAST Frontier (experimental), use assisted authoring, or build directly in Cop
 | --- | --- | --- |
 | Learn it now | Learn, teach, and change a workflow's behavior immediately in AIBAST Frontier (experimental). | [Product Golden Path](../CLAUDE.md#product-golden-path) |
 | Prove it | Replay locked cases and retain their evidence; distinguish synthetic workflow proof from customer results. | [Release gate and claims policy](../solutions/README.md) |
-| Land it native | Build and validate Microsoft-native Copilot Studio skills through Easy mode or the independent manual build. | [Ask HR delivery modes example](../solutions/ask-hr/FIELD-GUIDE.md) |
+| Land it native | Build and validate Microsoft-native Copilot Studio skills, then follow the integration, evaluation, rollout, and operating steps for the target environment. | [Production delivery spine](#production-delivery-spine), [Ask HR delivery modes example](../solutions/ask-hr/FIELD-GUIDE.md) |
 | Keep it current | Update source files, regenerate the runbooks, and revalidate changed inputs rather than reusing old acceptance. | [Generated runbooks](../solutions/README.md), [source integrity](../docs/RELEASE-PROCESS.md#workshop-source-integrity) |
 
 Unfamiliar terms are defined in the [Glossary](../03-references/Glossary.md).
+
+## Template Responsibilities
+
+Templates cover the full path to a production build: agent behavior, the
+synthetic data contract, integration and identity designs, an evaluation
+suite, and playbooks for pilot, rollout, and operation.
+The customer or partner adapts the template to specific requirements and
+wires their own systems, identity and access, data, thresholds, approvals,
+governance, and publishing in their environment
+([package contract](../solutions/README.md),
+[Ask HR customer gate example](../solutions/ask-hr/FIELD-GUIDE.md#evidence-gates)).
 
 ## What the AIBAST Agents Library Is
 
@@ -83,7 +96,7 @@ See the [Ask HR Manual mode example](../solutions/ask-hr/FIELD-GUIDE.md#manual-m
 | Lane | How You Use It |
 | --- | --- |
 | AIBAST Frontier (experimental) | Learn, teach, and change behavior immediately in the Brainstem (Tier 1). One portable `agent.py` carries the solution's behavior and synthetic data. See the [Product Golden Path](../CLAUDE.md#product-golden-path), [Single File Principle](../CONSTITUTION.md#article-ii--the-single-file-principle), [runtime ownership](../solutions/README.md#source-of-truth-boundaries), and [tier definitions](../CLAUDE.md#architecture-three-tiers). |
-| Runbook lane | Build the Microsoft-native form from instructions, knowledge, and **Copilot Studio skills**. The AI Agent Runbooks-style documents guide manual browser construction, model selection, and Preview. See the [Ask HR Manual mode example](../solutions/ask-hr/FIELD-GUIDE.md#manual-mode--literal-browser-construction) and [Ask HR source-controlled skill example](../solutions/ask-hr/copilot-studio/behaviors/aibast_leave-balance.mcs.yml). |
+| Runbook lane | In Phase 2, build the Microsoft-native form from instructions, knowledge, and **Copilot Studio skills**. The manual build includes browser construction, model selection, and Preview. See the [Ask HR Manual mode example](../solutions/ask-hr/FIELD-GUIDE.md#manual-mode--literal-browser-construction) and [Ask HR source-controlled skill example](../solutions/ask-hr/copilot-studio/behaviors/aibast_leave-balance.mcs.yml). |
 
 AIBAST Frontier (experimental) is a local learning tool that feeds Microsoft-native Copilot
 Studio skills, following the
@@ -93,6 +106,12 @@ Studio skills, following the
 pushes, and validates the same Copilot Studio project
 ([source-of-truth boundaries](../solutions/README.md#source-of-truth-boundaries),
 [Ask HR Easy mode example](../solutions/ask-hr/FIELD-GUIDE.md#easy-mode--github-copilot-default)).
+
+These are alternative build choices within **Phase 2 — Build and Prove the
+Agent**, not consecutive delivery phases. The full
+[Phase 0–6 spine](#production-delivery-spine) also covers qualification,
+environment preparation, customer integration, evaluation, rollout, and
+operation.
 
 Each runbook's `1.Overview.md` includes a **Delivery Lanes** comparison with
 repository counts. See
@@ -110,7 +129,7 @@ packages, runtime agents, Academy, and site remain their own surfaces
 | Location | Purpose | Start Here If… |
 | --- | --- | --- |
 | [00-overview/](README.md) | Purpose, navigation, runbook anatomy, and solution taxonomy. | You are new to the library. |
-| [01-solutions/](../01-solutions/README.md) | Generated delivery runbooks, organized by catalog solution. | You need the build and acceptance path for a particular solution. |
+| [01-solutions/](../01-solutions/README.md) | Generated production-template runbooks, organized by catalog solution. | You need the Phase 0–6 delivery path and its ownership boundaries. |
 | [02-patterns/](../02-patterns/README.md) | Reusable practices and links to complementary AI Agent Runbooks patterns. | You need to resolve a repeated architecture or delivery question. |
 | [03-references/](../03-references/README.md) | Glossary and process references. | You need a term, governing rule, or release procedure. |
 | [solutions/](../solutions/README.md) | Original solution packages: source, workshop materials, evidence, and exports. | You need the actual build inputs or recorded evidence. |
@@ -118,11 +137,12 @@ packages, runtime agents, Academy, and site remain their own surfaces
 | [Microsoft AI Academy](https://microsoft.github.io/aibast-agents-library/academy.html) | Workshop learning and reusable skills. | You want a guided learning path. |
 | [Library site](https://microsoft.github.io/aibast-agents-library/) | Searchable agent catalog with vertical filters and install commands. | You want to browse by industry or find a template. |
 
-Phase 1 provides runbooks for **Ask HR** and **Building Permit Processing**;
-the remaining catalog solutions follow in Phase 2. Use the
-[solution index](../01-solutions/README.md) to distinguish an available
+The initial runbooks are **Ask HR** and **Building Permit Processing**;
+additional solutions are added one by one after their per-solution notes
+are authored and validated ([package contract](../solutions/README.md)).
+Use the [solution index](../01-solutions/README.md) to distinguish an available
 runbook from its underlying package. The projection does not move or replace
-the [package sources](../solutions/README.md).
+the package sources.
 
 ## Anatomy of a Solution Runbook
 
@@ -130,16 +150,42 @@ Read artifacts 1 through 4 in order; use resources and acceptance evidence
 alongside them. The source links below show the package inputs behind each
 artifact, rather than a second place to maintain those facts. Package-specific
 links are labeled examples from Ask HR or Building Permit Processing; the
-catalog, registry, and release gate apply library-wide.
+catalog, registry, and package contract apply library-wide.
 
 | Artifact | Delivery Question and Source Mapping |
 | --- | --- |
-| `0.Resources/README.md` | Where are the inputs? Links to the package's source, manual kit, workshops, screenshots, and exports; see the [Ask HR package map example](../solutions/ask-hr/README.md). |
+| `0.Resources/README.md` | Where are the inputs and sources? The full source ledger and links to package assets, workshop pages, evidence, and exports; see the [Ask HR package map example](../solutions/ask-hr/README.md). |
 | `1.Overview.md` | Why this solution, and for whom? Uses [catalog business copy](../solutions/catalog.json), [registry personas](../registry.json), and the [Ask HR scope and approval boundary example](../solutions/ask-hr/README.md). |
-| `2.Architecture.md` | How is it built? Uses [catalog architecture](../solutions/catalog.json), package components, and the [Building Permit Processing replacement seams example](../solutions/building-permit-processing/FIELD-GUIDE.md). |
-| `3.Runbook.md` | How do I reproduce and validate it? Uses the [Ask HR deployment recipe example](../solutions/ask-hr/deployment.json), [Ask HR Easy and Manual modes example](../solutions/ask-hr/FIELD-GUIDE.md), and [release gate](../solutions/README.md). |
-| `4.Sample-prompts.md` | What should I test, and what must never happen? Uses catalog prompts, [Ask HR locked cases example](../tests/demo_cases/ask-hr.json), [Ask HR canonical transcripts example](../solutions/ask-hr/evals/transcripts.json), and [Ask HR global instructions example](../solutions/ask-hr/manual/GLOBAL-INSTRUCTIONS.md). |
+| `2.Architecture.md` | What is the design and who owns each part? Covers component responsibilities, the data contract, integration points, identity and permissions, the single component inventory, state and recovery, design decisions, and non-functional considerations; inputs include [catalog architecture](../solutions/catalog.json) and the [Ask HR deployment recipe example](../solutions/ask-hr/deployment.json). |
+| `3.Runbook.md` | How do I deliver and operate it? Prerequisites, owner-tagged numbered steps and exit criteria across [Phases 0–6](#production-delivery-spine), followed by separate Template and Customer or partner deliverables. Build-lane selection occurs in Phase 2. |
+| `4.Sample-prompts.md` | What should I test, and what must never happen? A per-case acceptance matrix and boundary tests, using catalog prompts, the [Ask HR locked cases example](../tests/demo_cases/ask-hr.json), [Ask HR canonical transcripts example](../solutions/ask-hr/evals/transcripts.json), and [Ask HR global instructions example](../solutions/ask-hr/manual/GLOBAL-INSTRUCTIONS.md). |
 | `5.Acceptance-Evidence.md` | What evidence is recorded? Optional summary when the package contains evidence JSON or visual checkpoints; inspect the [Ask HR evaluation files example](../solutions/ask-hr/evals/) and [Ask HR evidence boundary example](../solutions/ask-hr/FIELD-GUIDE.md). |
+
+Parts 1–5 cite sources inline; each `Next` section links to the full source
+ledger in `0.Resources/README.md`. They do not repeat a `Sources` section.
+
+## Production Delivery Spine
+
+`3.Runbook.md` follows the same end-to-end delivery shape as AI Agent
+Runbooks. Prerequisites name an owner, every numbered step belongs to
+**Template** or **Customer or partner**, and every phase ends with
+**Exit criteria** ([template model](../solutions/README.md)).
+
+| Delivery Phase | Purpose |
+| --- | --- |
+| Phase 0 — Qualify and Adapt the Template | Qualify the use case, record a problem baseline, adapt scope and the data contract, and name owners. |
+| Phase 1 — Environment, Identity and Access | Prepare the target environment and confirm identity, access, and policy requirements. |
+| Phase 2 — Build and Prove the Agent | Choose one alternative build lane and verify a Draft on synthetic data with the locked cases replayed. |
+| Phase 3 — Wire In Your Systems | Connect each declared integration read-only first; keep writes behind approval. |
+| Phase 4 — Evaluate on Your Data | Rerun locked cases and boundary tests on customer data using thresholds set by the customer's business owner. |
+| Phase 5 — Pilot and Rollout | Resolve go/no-go, publication, sharing, channels, audiences, and approvals. |
+| Phase 6 — Operate | Establish ALM, monitoring, content freshness, re-verification, and recovery. |
+
+The final **Deliverables Checklist** separates **Template provides** from
+**Customer or partner delivers**. Workshop integrity rules belong to Phase 2;
+operational recovery is covered by Architecture's **State and Recovery** and
+Phase 6, rather than a separate Runbook **Failure Recovery** section.
+Delivery phase numbers are not repository rollout milestones.
 
 ## Solution Taxonomy
 
@@ -225,11 +271,13 @@ workshop delivery:
 - Do not treat a recorded case as a customer KPI, a live-system result, or
   production-readiness evidence. A screenshot proves only its visible state
   ([Ask HR evidence boundary example](../solutions/ask-hr/FIELD-GUIDE.md)).
-- Keep real customer names, personal data, and credentials out of agent
-  content ([Agent Constitution](../agents/@aibast-agents-library/AGENT_CONSTITUTION.md),
+- Keep real customer names, personal data, and credentials out of published
+  template source and example evidence
+  ([Agent Constitution](../agents/@aibast-agents-library/AGENT_CONSTITUTION.md),
   [repository Constitution](../CONSTITUTION.md)).
-- Keep workshop agents in Draft. Publishing requires separate human approval;
-  passing source checks is not native Copilot Studio acceptance
+- Keep the Phase 2 synthetic build in Draft; publishing belongs to the
+  separately approved pilot and rollout in Phase 5. Passing source checks
+  is not native Copilot Studio acceptance
   ([Ask HR delivery gates example](../solutions/ask-hr/FIELD-GUIDE.md),
   [workshop source integrity](../docs/RELEASE-PROCESS.md)).
 

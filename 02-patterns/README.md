@@ -1,26 +1,32 @@
 # How to Use Patterns
 
-Use a solution runbook for an end-to-end business workflow. Use a pattern for
-a decision or implementation practice that recurs across workflows. The
-[package contract](../solutions/README.md) supplies the build inputs and
-evidence; this index makes the reusable practices easier to find.
+Use a solution runbook for the full Phase 0–6 path from qualification and
+adaptation to a production build, rollout, and operation. The
+[template model](../solutions/README.md) separates what the template provides
+from what the customer or partner adapts and connects in their environment.
+Use a pattern for a decision or implementation practice that recurs across
+that delivery path.
 
 ## Patterns Versus Solutions
 
 | Dimension | Solution | Pattern |
 | --- | --- | --- |
 | Starting Question | Which business workflow are we demonstrating or delivering? | Which repeated technical or delivery problem needs a consistent approach? |
-| Scope | A named use case, its build inputs, and its acceptance evidence. | A practice applied within one or more solutions. |
-| Reading Path | Overview, architecture, runbook, sample prompts, and recorded evidence. | Pattern overview followed by its implementation runbook. |
+| Scope | A named use case, its template and integration designs, delivery steps, and acceptance evidence. | A practice applied within one or more solutions. |
+| Reading Path | Overview, architecture, the Phase 0–6 production delivery runbook, sample prompts, and recorded evidence; the full source ledger is in `0.Resources/README.md`. | Pattern overview followed by its implementation runbook. |
 | Example | [Ask HR](../solutions/ask-hr/README.md): synthetic policy guidance and reviewable drafts. | Evidence-first acceptance: the shared [release gate](../solutions/README.md). |
 
 The [Glossary](../03-references/Glossary.md) defines package and runtime terms.
 The [pattern index](patterns.json) owns stable IDs, titles, status, links,
 summaries, and applicability text. Keep this README aligned with it.
 
+Use the [production delivery spine](../00-overview/README.md#production-delivery-spine)
+to place a pattern in the right phase. Easy, Manual, and the optional local
+build are alternatives within Phase 2, not the phases of the full runbook.
+
 ## AIBAST Patterns
 
-All eight standalone pattern pairs are **Planned** for Phase 3. The table
+All eight standalone pattern pairs are **Planned (rollout phase 3)**. The table
 points to existing evidence of each practice, not to unwritten pattern
 documents. Planned status comes from [patterns.json](patterns.json).
 
@@ -66,7 +72,7 @@ evidence ([workshop source integrity](../docs/RELEASE-PROCESS.md)).
 
 ## Pattern Folder Structure and Naming
 
-For Phase 3 AIBAST pattern documents, use **Title-Case-With-Hyphens** for the
+For AIBAST pattern documents in rollout phase 3, use **Title-Case-With-Hyphens** for the
 folder and matching document names:
 
 ```text
@@ -88,7 +94,7 @@ external filenames from their display titles.
 
 ## How to Add a Pattern
 
-This is the **Phase 3** contribution path; the planned pairs above are not
+This is the **rollout phase 3** contribution path; the planned pairs above are not
 yet available.
 
 1. Identify the repeated practice and cite the existing package or governing
@@ -102,7 +108,8 @@ yet available.
    complete; keep this README consistent. Never rename an ID already used
    by solution runbooks.
 5. Reference the pattern ID in the relevant solution's
-   [runbook notes](../solutions/runbook-notes.json), regenerate with
+   `solutions/runbook-notes/<slug>.json`
+   ([source ownership](../solutions/README.md#source-of-truth-boundaries)), regenerate with
    `python tools/build_solution_runbooks.py`, and validate the generated links.
 6. Follow [CONTRIBUTING.md](../CONTRIBUTING.md) and the
    [release process](../docs/RELEASE-PROCESS.md).

@@ -129,9 +129,14 @@ This validates your manifest and ensures the registry builds cleanly.
 
 Browse the [solution runbooks](01-solutions/README.md) and
 [pattern index](02-patterns/README.md). Files under `01-solutions/` are
-generated and must never be hand-edited; update the sources described in
-the [solution package guide](solutions/README.md#source-of-truth-boundaries)
+generated and must never be hand-edited; author delivery guidance in
+`solutions/runbook-notes/<slug>.json`, update the other sources described in
+the [solution package guide](solutions/README.md#source-of-truth-boundaries),
 and regenerate with `python tools/build_solution_runbooks.py`.
+
+The runbooks are example templates covering the full path to a production
+build; the customer or partner must adapt them to specific requirements and
+connect their own systems, identity, data, and governance.
 
 ## PR Checklist
 

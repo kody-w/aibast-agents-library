@@ -4,7 +4,7 @@
 
 This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 2 of 51 catalog solutions have runbooks in this projection.
 
-Regenerate with `python tools/build_solution_runbooks.py`; verify without writing with `python tools/build_solution_runbooks.py --check`. As documented in [CLAUDE.md](../CLAUDE.md), `--all` is reserved for the rollout phase 2. Repeat `--solution SLUG` only for an explicit projection and use the same selection with `--check`. Returning to the default write removes stale files carrying this generator's marker; unmarked files are preserved and reported by `--check`.
+Regenerate with `python tools/build_solution_runbooks.py`; verify without writing with `python tools/build_solution_runbooks.py --check`. Add solutions one by one after their `solutions/runbook-notes/<slug>.json` notes validate. Explicit `--solution SLUG` or `--all` writes require authored notes for every selected package; all catalog solutions can still render in memory. Returning to the default write removes stale marker-owned files, never unmarked content.
 
 ## Artifact Anatomy
 

@@ -72,7 +72,7 @@ python -m pytest tests/test_local_agents.py::TestLocalStorage::test_write_and_re
 python build_registry.py
 python -m pytest tests -v
 
-# Generate and check the Phase 1 pilot runbooks (repository root)
+# Generate and check the pilot runbooks (repository root)
 python tools/build_solution_runbooks.py
 python tools/build_solution_runbooks.py --check
 python -m pytest tests/test_solution_runbooks.py -q
@@ -84,9 +84,13 @@ curl -s localhost:7071/health | python3 -m json.tool
 No linter or type-checker is configured.
 
 The runbook generator currently writes the `ask-hr` and
-`building-permit-processing` pilots. `--all` is reserved for the Phase 2
-rollout; change the sources and regenerate rather than hand-editing
-`01-solutions/`.
+`building-permit-processing` pilots; add another solution to `RUNBOOK_SOLUTIONS`
+only after its notes file is authored and validates, then regenerate rather
+than hand-editing `01-solutions/`.
+
+The runbooks are example templates covering the full path to a production
+build; the customer or partner must adapt them to specific requirements and
+connect their own systems, identity, data, and governance.
 
 ## API Endpoints
 
@@ -167,6 +171,6 @@ Also preserve these AIBAST-owned runbook surfaces during every kernel sync:
 - `01-solutions/` — generated solution runbooks; never hand-edit
 - `02-patterns/` — reusable-pattern guidance and the `patterns.json` index
 - `03-references/` — delivery references and glossary
-- `solutions/runbook-notes.json` — hand-authored delivery guidance
+- `solutions/runbook-notes/<slug>.json` — hand-authored per-solution delivery guidance
 - `tools/build_solution_runbooks.py` and `tools/markdown_links.py` — generator and case-exact Markdown link checker
 - `tests/test_solution_runbooks.py` — repository-level runbook gate, not a vendored kernel test

@@ -1,18 +1,20 @@
 # AIBAST Delivery References
 
-Use this index for terminology, governing rules, and release procedures.
-For a build path, start with the [solution runbooks](../01-solutions/README.md);
+Use this index for terminology, template responsibilities, and release procedures.
+For the [Phase 0–6 production delivery spine](../00-overview/README.md#production-delivery-spine),
+start with the [solution runbooks](../01-solutions/README.md);
 for reusable implementation decisions, use the
 [pattern index](../02-patterns/README.md).
 
 ## Glossary
 
-[Glossary.md](Glossary.md) defines the package, runtime, workshop, evidence,
-and release terms used in AIBAST, with a repository source for every entry.
+[Glossary.md](Glossary.md) defines Template and Customer or partner ownership,
+plus the package, runtime, workshop, evidence, and release terms used in AIBAST,
+with a source for every entry.
 
 ## Planned References
 
-These documents are **Planned for Phase 3** and are intentionally unlinked.
+These documents are **Planned (rollout phase 3)** and are intentionally unlinked.
 Until they are authored, use the existing sources below.
 
 | Planned Document | Intended Scope | Current Starting Point |
@@ -28,7 +30,7 @@ Until they are authored, use the existing sources below.
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | Agent submission requirements, validation, and the staging contribution path. |
 | [Release Process](../docs/RELEASE-PROCESS.md) | Staging and production gates, human-approved promotion, kernel updates, and workshop source integrity. |
 | [Release Ledger](../docs/RELEASES.md) | What shipped, the evidence recorded at promotion, and post-release issues. |
-| [Solution Package Contract](../solutions/README.md) | Package structure, source-of-truth boundaries, the seven-step release gate, and qualitative claims policy. |
+| [Solution Package Contract](../solutions/README.md) | Template responsibilities, per-solution notes, package sources, the package release gate, and qualitative claims policy. |
 
 ## Complementary AI Agent Runbooks References
 
