@@ -57,6 +57,13 @@ RUNBOOK_SOLUTIONS = (
     "omnichannel-engagement",
     "order-status-communication",
     "patient-intake",
+    "permit-license-management",
+    "personalized-marketing",
+    "personalized-shopping-assistant",
+    "portfolio-rebalancing",
+    "prior-authorization",
+    "procurement-agent",
+    "procurement-support",
 )
 PACKAGE_ALIASES = {"production-line-optimization": "product-line-optimization"}
 DRAFT_PACKAGES = {
