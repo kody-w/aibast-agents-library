@@ -101,6 +101,26 @@ The files themselves live under [`agents/@aibast-agents-library/`](agents/@aibas
 
 [**Library metrics**](https://microsoft.github.io/aibast-agents-library/metrics.html) publishes AIBAST-only public downloads, every-file observations, per-agent rating Discussion upvotes, signed-in acquisition Discussion signals, workshop adoption, and opt-in achievement rollups. Each run also generates a shareable weekly/monthly PDF plus email-ready text under `reports/`. `scripts/build_metrics.py` builds the snapshot, and `scripts/build_impact_report.py` turns its dated history into the exportable impact report without converting unavailable coverage to zero. Visitor behavior on the published site (heatmaps, session recordings) comes from [Microsoft Clarity](https://clarity.microsoft.com/); the tag is stamped on every public page from `clarity.json` by `scripts/apply_clarity_tag.py` (setup in [docs/CLARITY.md](docs/CLARITY.md)).
 
+### Library structure
+
+| Path | Purpose |
+|------|---------|
+| [`00-overview/`](00-overview/README.md) | Start here: navigation, runbook anatomy, and solution taxonomy. |
+| [`01-solutions/`](01-solutions/README.md) | Generated solution overviews, architecture, runbooks, prompts, and evidence pointers. |
+| [`02-patterns/`](02-patterns/README.md) | Reusable-pattern index, with planned AIBAST patterns and links to AI Agent Runbooks. |
+| [`03-references/`](03-references/README.md) | Delivery references, glossary, and release-process pointers. |
+| [`solutions/`](solutions/README.md) | Existing workshop packages, source assets, and acceptance evidence; paths stay unchanged. |
+
+Compare **AIBAST Frontier (experimental)**—an early, experimental learning lane where one portable `agents/@aibast-agents-library/.../*_agent.py` file lets you learn, teach, and change behavior immediately in the Brainstem—with the **Runbook lane**, a manual Copilot Studio build guided by the runbooks in `01-solutions/` and needing no Python or local tooling; see [Two Delivery Lanes](00-overview/README.md#two-delivery-lanes).
+
+The runbooks are example templates covering the full path to a production
+build; the customer or partner must adapt them to specific requirements and
+connect their own systems, identity, data, and governance.
+
+The initial pilot runbooks are `ask-hr` and `building-permit-processing`.
+Further solutions are added one by one after their notes files are authored
+and validated; generated files in `01-solutions/` are never hand-edited.
+
 ---
 
 ## The Stack: Brainstem → Azure → Copilot Studio
