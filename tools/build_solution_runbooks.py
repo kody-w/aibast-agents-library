@@ -71,6 +71,13 @@ RUNBOOK_SOLUTIONS = (
     "returns-complaints-resolution",
     "sales-qualification",
     "store-associate-copilot",
+    "supplier-risk-monitoring",
+    "supply-chain-disruption-alert",
+    "time-entry-billing",
+    "underwriting-support",
+    "utility-billing-assistance",
+    "wealth-insights-generator",
+    "win-loss-analysis",
 )
 PACKAGE_ALIASES = {"production-line-optimization": "product-line-optimization"}
 DRAFT_PACKAGES = {
