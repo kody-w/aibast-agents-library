@@ -204,7 +204,7 @@ normalized journey stage.
 | B2B Sales | [Win/Loss Analysis Agent](../solutions/win-loss-analysis/README.md) | Learn |
 | B2C Sales | [Cart Abandonment Recovery Agent](../01-solutions/cart-abandonment-recovery/1.Overview.md) | Recover / Learn (secondary) |
 | B2C Sales | [Customer Loyalty and Rewards Agent](../01-solutions/customer-loyalty-rewards/1.Overview.md) | Retain / Optimize (secondary) |
-| B2C Sales | [Omnichannel Engagement Agent](../solutions/omnichannel-engagement/README.md) | Understand / Optimize (secondary) |
+| B2C Sales | [Omnichannel Engagement Agent](../01-solutions/omnichannel-engagement/1.Overview.md) | Understand / Optimize (secondary) |
 | B2C Sales | [Personalized Shopping Agent](../solutions/personalized-shopping-assistant/README.md) | Discover / Advise (secondary) |
 | Cross-Industry | [Cross-Selling Opportunities Agent](../01-solutions/cross-selling/1.Overview.md) | Expand |
 | Cross-Industry | [Customer Escalations Agent](../01-solutions/ai-customer-assistant/1.Overview.md) | Serve |
@@ -220,33 +220,33 @@ normalized journey stage.
 | Financial Services | [Customer Sentiment and Churn Prediction Agent](../01-solutions/customer-sentiment-churn/1.Overview.md) | Engage |
 | Financial Services | [Financial Advisor Agent](../01-solutions/financial-advisor-copilot/1.Overview.md) | Engage |
 | Financial Services | [Fraud Detection and Alert Agent](../01-solutions/fraud-detection-alert/1.Overview.md) | Protect |
-| Financial Services | [Loan Origination Assistant](../solutions/loan-origination-assistant/README.md) | Decide |
+| Financial Services | [Loan Origination Assistant](../01-solutions/loan-origination-assistant/1.Overview.md) | Decide |
 | Financial Services | [Portfolio Rebalancing Agent](../solutions/portfolio-rebalancing/README.md) | Optimize |
 | Financial Services | [Regulatory Compliance Agent](../01-solutions/fs-regulatory-compliance/1.Overview.md) | Govern |
 | Financial Services | [Underwriting Support Agent](../solutions/underwriting-support/README.md) | Decide |
 | Financial Services | [Wealth Insights Generator Agent](../solutions/wealth-insights-generator/README.md) | Engage |
 | Healthcare | [Care Gap Closure Agent](../01-solutions/care-gap-closure/1.Overview.md) | Govern |
 | Healthcare | [Clinical Notes Summarizer Agent](../01-solutions/clinical-notes-summarizer/1.Overview.md) | Activate |
-| Healthcare | [Patient Intake and Scheduling Agent](../solutions/patient-intake/README.md) | Activate |
+| Healthcare | [Patient Intake and Scheduling Agent](../01-solutions/patient-intake/1.Overview.md) | Activate |
 | Healthcare | [Prior Authorization Agent](../solutions/prior-authorization/README.md) | Govern |
 | Human Resources | [Ask HR Agent](../01-solutions/ask-hr/1.Overview.md) | Empower |
 | Manufacturing | [Inventory Rebalancing Agent](../01-solutions/inventory-rebalancing/1.Overview.md) | Optimize |
-| Manufacturing | [Maintenance Scheduling Agent](../solutions/maintenance-scheduling/README.md) | Optimize |
-| Manufacturing | [Order Status Communications Agent](../solutions/order-status-communication/README.md) | Serve |
+| Manufacturing | [Maintenance Scheduling Agent](../01-solutions/maintenance-scheduling/1.Overview.md) | Optimize |
+| Manufacturing | [Order Status Communications Agent](../01-solutions/order-status-communication/1.Overview.md) | Serve |
 | Manufacturing | [Product Line Optimization Agent](../solutions/product-line-optimization/README.md) | Optimize |
 | Manufacturing | [Supply Risk Monitoring Agent](../solutions/supplier-risk-monitoring/README.md) | Protect |
 | Professional Services | [Client Health Score Agent](../01-solutions/client-health-score/1.Overview.md) | Optimize |
 | Professional Services | [Contract Risk Review Agent](../01-solutions/contract-risk-review/1.Overview.md) | Govern |
 | Professional Services | [Resource Utilization Agent](../solutions/resource-utilization/README.md) | Optimize |
 | Professional Services | [Time Entry and Billing Agent](../solutions/time-entry-billing/README.md) | Operate |
-| Retail & CPG | [Inventory Visibility Agent](../solutions/inventory-visibility/README.md) | Plan / Fulfill (secondary) |
+| Retail & CPG | [Inventory Visibility Agent](../01-solutions/inventory-visibility/1.Overview.md) | Plan / Fulfill (secondary) |
 | Retail & CPG | [Personalized Marketing Agent](../solutions/personalized-marketing/README.md) | Plan / Evaluate (secondary) |
 | Retail & CPG | [Retail Store Associate Copilot](../solutions/store-associate-copilot/README.md) | Serve / Coordinate (secondary) |
 | Retail & CPG | [Returns and Complaints Resolution Agent](../solutions/returns-complaints-resolution/README.md) | Resolve / Learn (secondary) |
 | Retail & CPG | [Supply Chain Disruption Alert Agent](../solutions/supply-chain-disruption-alert/README.md) | Optimize |
 | SLG Government | [Building Permit Processing Agent](../01-solutions/building-permit-processing/1.Overview.md) | Govern |
 | SLG Government | [Utility Billing and Assistance Agent](../solutions/utility-billing-assistance/README.md) | Serve |
-| Software & Digital Products | [License Renewal and Expansion Agent](../solutions/license-renewal-expansion/README.md) | Retain |
+| Software & Digital Products | [License Renewal and Expansion Agent](../01-solutions/license-renewal-expansion/1.Overview.md) | Retain |
 | Software & Digital Products | [Product Feedback Synthesizer Agent](../solutions/product-feedback-synthesizer/README.md) | Innovate |
 
 <!-- END GENERATED: solution-taxonomy -->
