@@ -2,7 +2,7 @@
 
 # Solution Runbooks
 
-This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 37 of 51 catalog solutions have runbooks in this projection.
+This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 44 of 51 catalog solutions have runbooks in this projection.
 
 Regenerate with `python tools/build_solution_runbooks.py`; verify without writing with `python tools/build_solution_runbooks.py --check`. Add solutions one by one after their `solutions/runbook-notes/<slug>.json` notes validate. Explicit `--solution SLUG` or `--all` writes require authored notes for every selected package; all catalog solutions can still render in memory. Returning to the default write removes stale marker-owned files, never unmarked content.
 
@@ -29,8 +29,8 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | --- | --- | --- | --- | --- |
 | Account Intelligence Agent | Understand | [Read runbook](account-intelligence/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/account-intelligence/quest.html) | [Package](../solutions/account-intelligence/README.md) |
 | Deal Progression Agent | Optimize | [Read runbook](deal-progression/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/deal-progression/quest.html) | [Package](../solutions/deal-progression/README.md) |
-| Proposal Generation Agent | Create | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/proposal-generation/quest.html) | [Package](../solutions/proposal-generation/README.md) |
-| Sales Qualification Agent | Prioritize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/sales-qualification/quest.html) | [Package](../solutions/sales-qualification/README.md) |
+| Proposal Generation Agent | Create | [Read runbook](proposal-generation/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/proposal-generation/quest.html) | [Package](../solutions/proposal-generation/README.md) |
+| Sales Qualification Agent | Prioritize | [Read runbook](sales-qualification/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/sales-qualification/quest.html) | [Package](../solutions/sales-qualification/README.md) |
 | Win/Loss Analysis Agent | Learn | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/win-loss-analysis/quest.html) | [Package](../solutions/win-loss-analysis/README.md) |
 
 ### B2C Sales
@@ -98,7 +98,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | Inventory Rebalancing Agent | Optimize | [Read runbook](inventory-rebalancing/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/inventory-rebalancing/quest.html) | [Package](../solutions/inventory-rebalancing/README.md) |
 | Maintenance Scheduling Agent | Optimize | [Read runbook](maintenance-scheduling/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/maintenance-scheduling/quest.html) | [Package](../solutions/maintenance-scheduling/README.md) |
 | Order Status Communications Agent | Serve | [Read runbook](order-status-communication/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/order-status-communication/quest.html) | [Package](../solutions/order-status-communication/README.md) |
-| Product Line Optimization Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/product-line-optimization/quest.html) | [Package](../solutions/product-line-optimization/README.md) |
+| Product Line Optimization Agent | Optimize | [Read runbook](product-line-optimization/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/product-line-optimization/quest.html) | [Package](../solutions/product-line-optimization/README.md) |
 | Supply Risk Monitoring Agent | Protect | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/supplier-risk-monitoring/quest.html) | [Package](../solutions/supplier-risk-monitoring/README.md) |
 
 ### Professional Services
@@ -107,7 +107,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | --- | --- | --- | --- | --- |
 | Client Health Score Agent | Optimize | [Read runbook](client-health-score/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/client-health-score/quest.html) | [Package](../solutions/client-health-score/README.md) |
 | Contract Risk Review Agent | Govern | [Read runbook](contract-risk-review/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/contract-risk-review/quest.html) | [Package](../solutions/contract-risk-review/README.md) |
-| Resource Utilization Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/resource-utilization/quest.html) | [Package](../solutions/resource-utilization/README.md) |
+| Resource Utilization Agent | Optimize | [Read runbook](resource-utilization/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/resource-utilization/quest.html) | [Package](../solutions/resource-utilization/README.md) |
 | Time Entry and Billing Agent | Operate | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/time-entry-billing/quest.html) | [Package](../solutions/time-entry-billing/README.md) |
 
 ### Retail & CPG
@@ -116,8 +116,8 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | --- | --- | --- | --- | --- |
 | Inventory Visibility Agent | Plan / Fulfill (secondary) | [Read runbook](inventory-visibility/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/inventory-visibility/quest.html) | [Package](../solutions/inventory-visibility/README.md) |
 | Personalized Marketing Agent | Plan / Evaluate (secondary) | [Read runbook](personalized-marketing/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/personalized-marketing/quest.html) | [Package](../solutions/personalized-marketing/README.md) |
-| Retail Store Associate Copilot | Serve / Coordinate (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/store-associate-copilot/quest.html) | [Package](../solutions/store-associate-copilot/README.md) |
-| Returns and Complaints Resolution Agent | Resolve / Learn (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/returns-complaints-resolution/quest.html) | [Package](../solutions/returns-complaints-resolution/README.md) |
+| Retail Store Associate Copilot | Serve / Coordinate (secondary) | [Read runbook](store-associate-copilot/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/store-associate-copilot/quest.html) | [Package](../solutions/store-associate-copilot/README.md) |
+| Returns and Complaints Resolution Agent | Resolve / Learn (secondary) | [Read runbook](returns-complaints-resolution/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/returns-complaints-resolution/quest.html) | [Package](../solutions/returns-complaints-resolution/README.md) |
 | Supply Chain Disruption Alert Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/supply-chain-disruption-alert/quest.html) | [Package](../solutions/supply-chain-disruption-alert/README.md) |
 
 ### SLG Government
@@ -132,7 +132,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
 | License Renewal and Expansion Agent | Retain | [Read runbook](license-renewal-expansion/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/license-renewal-expansion/quest.html) | [Package](../solutions/license-renewal-expansion/README.md) |
-| Product Feedback Synthesizer Agent | Innovate | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/product-feedback-synthesizer/quest.html) | [Package](../solutions/product-feedback-synthesizer/README.md) |
+| Product Feedback Synthesizer Agent | Innovate | [Read runbook](product-feedback-synthesizer/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/product-feedback-synthesizer/quest.html) | [Package](../solutions/product-feedback-synthesizer/README.md) |
 
 ## Lane Complexity at a Glance
 
@@ -175,15 +175,15 @@ Compare the portable file in AIBAST Frontier (experimental) with the manual Copi
 | [Portfolio Rebalancing Agent](portfolio-rebalancing/1.Overview.md) | 385 | 1 · 2 · 6 | 22 |
 | [Prior Authorization Agent](prior-authorization/1.Overview.md) | 202 | 1 · 2 · 4 | 18 |
 | [Procurement Agent](procurement-agent/1.Overview.md) | 279 | 1 · 2 · 4 | 18 |
-| [Product Feedback Synthesizer Agent](../solutions/product-feedback-synthesizer/README.md) | 376 | 1 · 2 · 4 | 18 |
-| [Product Line Optimization Agent](../solutions/product-line-optimization/README.md) | 353 | 1 · 2 · 4 | 23 |
-| [Proposal Generation Agent](../solutions/proposal-generation/README.md) | 714 | 1 · 2 · 6 | 22 |
+| [Product Feedback Synthesizer Agent](product-feedback-synthesizer/1.Overview.md) | 376 | 1 · 2 · 4 | 18 |
+| [Product Line Optimization Agent](product-line-optimization/1.Overview.md) | 353 | 1 · 2 · 4 | 23 |
+| [Proposal Generation Agent](proposal-generation/1.Overview.md) | 714 | 1 · 2 · 6 | 22 |
 | [Regulatory Compliance Agent](fs-regulatory-compliance/1.Overview.md) | 729 | 1 · 2 · 5 | 26 |
 | [Regulatory Reporting Agent](energy-regulatory-reporting/1.Overview.md) | 343 | 1 · 2 · 4 | 18 |
-| [Resource Utilization Agent](../solutions/resource-utilization/README.md) | 413 | 1 · 2 · 5 | 20 |
-| [Retail Store Associate Copilot](../solutions/store-associate-copilot/README.md) | 575 | 1 · 2 · 4 | 18 |
-| [Returns and Complaints Resolution Agent](../solutions/returns-complaints-resolution/README.md) | 568 | 1 · 2 · 4 | 18 |
-| [Sales Qualification Agent](../solutions/sales-qualification/README.md) | 598 | 1 · 2 · 6 | 22 |
+| [Resource Utilization Agent](resource-utilization/1.Overview.md) | 413 | 1 · 2 · 5 | 20 |
+| [Retail Store Associate Copilot](store-associate-copilot/1.Overview.md) | 575 | 1 · 2 · 4 | 18 |
+| [Returns and Complaints Resolution Agent](returns-complaints-resolution/1.Overview.md) | 568 | 1 · 2 · 4 | 18 |
+| [Sales Qualification Agent](sales-qualification/1.Overview.md) | 598 | 1 · 2 · 6 | 22 |
 | [Supply Chain Disruption Alert Agent](../solutions/supply-chain-disruption-alert/README.md) | 635 | 1 · 2 · 4 | 18 |
 | [Supply Risk Monitoring Agent](../solutions/supplier-risk-monitoring/README.md) | 355 | 1 · 2 · 4 | 18 |
 | [Time Entry and Billing Agent](../solutions/time-entry-billing/README.md) | 459 | 1 · 2 · 5 | 20 |
