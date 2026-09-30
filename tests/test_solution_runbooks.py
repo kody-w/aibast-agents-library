@@ -10,6 +10,7 @@ import re
 import subprocess
 import sys
 from collections import Counter
+from functools import cache
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from types import SimpleNamespace
 from urllib.parse import unquote, urlsplit
@@ -96,7 +97,12 @@ TEMPLATE_DISCLAIMER = (
     "must be modified to meet each customer's specific requirements. The customer or their partner connects "
     "them to their own systems, identity, data and governance in their environment."
 )
+TEMPLATE_POINTER = (
+    "**Template:** an example to modify for your requirements; the customer or partner wires it into their "
+    "environment. See the [Overview](1.Overview.md)."
+)
 STEP_OWNERS = {"Template", "Customer or partner"}
+OWNER_LINE = re.compile(r"\*\*Owner:\*\* (Template|Customer or partner)(?: · \*\*Role:\*\* ([^\n]+))?\Z")
 PHASE_TITLES = SECTIONS["3.Runbook.md"][1:8]
 BUILD_LANE_HEADER = "| Lane | Suits | Output |"
 FRONTIER_PROGRAM_WORDS = re.compile(
@@ -153,6 +159,11 @@ def load_module(name, filename):
     finally:
         sys.dont_write_bytecode = old
     return module
+
+
+@cache
+def markdown_checker():
+    return load_module("markdown_links_under_test", "markdown_links.py")
 
 
 def read_json(relative):
@@ -230,10 +241,19 @@ def validate_note_source(source, files, context):
             and ".." not in decoded
         ), f"{context}: source must be a specific Microsoft Learn HTTPS URL under /en-us/ without '..': {source}"
     else:
-        assert not PurePosixPath(source).is_absolute() and ".." not in PurePosixPath(decoded).parts, (
+        path = unquote(url.path)
+        assert path and not PurePosixPath(path).is_absolute() and ".." not in PurePosixPath(path).parts, (
             f"{context}: notes source must be repository-relative: {source}"
         )
-        assert source in files, f"{context}: missing notes source: {source}"
+        assert not url.query, f"{context}: repository notes source must not contain a query: {source}"
+        assert path in files, f"{context}: missing notes source: {source}"
+        if "#" in source:
+            assert url.fragment, f"{context}: empty notes source anchor: {source}"
+            assert path.lower().endswith((".md", ".markdown", ".html", ".htm")), (
+                f"{context}: notes source anchors require Markdown or HTML: {source}"
+            )
+            anchors = markdown_checker().anchors_of((ROOT / path).read_text(encoding="utf-8"))
+            assert unquote(url.fragment).lower() in anchors, f"{context}: missing notes source anchor: {source}"
 
 
 def validate_notes(data, catalog, pattern_ids, files):
@@ -396,7 +416,7 @@ def generator():
 
 @pytest.fixture(scope="module")
 def links():
-    return load_module("markdown_links_under_test", "markdown_links.py")
+    return markdown_checker()
 
 
 @pytest.fixture(scope="module")
@@ -577,11 +597,14 @@ def lane_facts(sources):
         cases = read_json(f"tests/demo_cases/{slug}.json")["cases"]
         settings_path = f"solutions/{slug}/copilot-studio/settings.mcs.yml"
         assert settings_path in sources["files"], f"{slug}: native settings source is missing"
+        settings_text = (ROOT / settings_path).read_text(encoding="utf-8")
         facts[slug] = {
             "slug": slug, "display_name": entry["display_name"], "agent_file": matches[0]["_file"],
             "quality_tier": matches[0].get("quality_tier"),
+            "registry_personas": matches[0].get("_solution", {}).get("personas"),
+            "authentication_mode": settings_facts(settings_text, {("authenticationMode",): "mode"})["mode"],
             "deployment": deployment, "acceptance_checks": len(entry["architecture"]["acceptance_checks"]),
-            "locked_cases": len(cases), "settings": settings_facts((ROOT / settings_path).read_text(encoding="utf-8")),
+            "locked_cases": len(cases), "settings": settings_facts(settings_text),
             **counts,
         }
     assert len(facts) == 51, f"Lane counts must independently measure all 51 catalogue solutions, got {len(facts)}"
@@ -743,9 +766,6 @@ def validate_delivery_lanes(overview, facts, links):
     assert "operation" in native[1] and re.search(r"\bskill\b", native[1], re.I), f"{context}: portable operations must map to skills"
     assert "GitHub Copilot harness" in native[2] and "cliagent-1.0.0" in native[2], (
         f"{context}: native form must identify the Copilot Studio harness agent"
-    )
-    assert "https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview" in native[2], (
-        f"{context}: native form must cite the verified harness documentation"
     )
 
 
@@ -1035,7 +1055,87 @@ def validate_no_long_line_duplication(parts, context):
 
 def section_links(text, path, links):
     body = rendered_section(text, "Sources", links, path)
-    return body, {source_target(path, target) for _, target in links.extract_links(body)}
+    return body, source_references(body, path, links)
+
+
+def page_source_ledger(outputs, slug, artifact, links):
+    path = f"01-solutions/{slug}/0.Resources/README.md"
+    sources = rendered_section(outputs[path], "Sources", links, path)
+    title = "Sources: " + artifact
+    body = independent_source_section(sources, (title,), links)
+    assert body, f"{path}: missing per-page source ledger for {artifact}"
+    return path, body, links.github_slug(title)
+
+
+def section_source_ledger(outputs, slug, artifact, section, links):
+    path, body, _ = page_source_ledger(outputs, slug, artifact, links)
+    rows = [
+        row for _, row, cells in table_rows(body, links)
+        if rendered_text(cells[0], links) == section
+    ]
+    assert rows, f"{path}: missing source-ledger section {artifact} / {section}"
+    return source_references("\n".join(rows), path, links)
+
+
+def note_source_locations(entry):
+    locations = {
+        "target_users": ("1.Overview.md", "Target Users"),
+        "scope_in": ("1.Overview.md", "In Scope / Out of Scope"),
+        "scope_out": ("1.Overview.md", "In Scope / Out of Scope"),
+        "qualification_checklist": ("1.Overview.md", "Qualification Checklist"),
+        "what_goes_wrong": ("1.Overview.md", "What Actually Goes Wrong"),
+        "delivery_roles": ("3.Runbook.md", PHASE_TITLES[0]),
+        "prerequisites": ("3.Runbook.md", "Prerequisites"),
+        "go_no_go": ("3.Runbook.md", PHASE_TITLES[5]),
+        "boundary_tests": ("4.Sample-prompts.md", "Routing and Boundary Cases"),
+        "design_decisions": ("2.Architecture.md", "Design Decisions"),
+        "never_do": ("4.Sample-prompts.md", "What This Agent Should Never Do"),
+        "data_contract": ("2.Architecture.md", "Data Contract"),
+        "integration_points": ("2.Architecture.md", "Integration Points"),
+        "identity": ("2.Architecture.md", "Identity and Permissions"),
+        "non_functional": ("2.Architecture.md", "Non-Functional Considerations"),
+        "state_and_recovery": ("2.Architecture.md", "State and Recovery"),
+        "baseline": ("3.Runbook.md", PHASE_TITLES[0]),
+    }
+    for field, value in entry.items():
+        if field in {"schema", "solution", "related_patterns", "sources"}:
+            continue
+        if field == "phase_exit_criteria":
+            for number, phase in enumerate(PHASE_KEYS):
+                for item in value[phase]:
+                    yield "3.Runbook.md", PHASE_TITLES[number], item["source"], field + "." + phase
+        elif field == "production_hardening":
+            for item in value:
+                yield "3.Runbook.md", PHASE_TITLES[item["phase"]], item["source"], field
+        else:
+            assert field in locations, f"Notes field {field} has no measured source-ledger location"
+            artifact, section = locations[field]
+            items = [value] if field in NOTE_OBJECTS else value
+            for item in items:
+                yield artifact, section, item["source"], field
+
+
+def validate_notes_source_ledgers(outputs, facts, links):
+    measured = 0
+    for slug, source in facts.items():
+        notes = source["notes"]
+        resource = f"01-solutions/{slug}/0.Resources/README.md"
+        _, full = section_links(outputs[resource], resource, links)
+        assert {source_reference("", target) for target in notes.get("sources", [])} <= full, (
+            f"{resource}: notes sources are missing from the full ledger"
+        )
+        section_cache = {}
+        for artifact, section, target, field in note_source_locations(notes):
+            target = source_reference("", target)
+            key = artifact, section
+            if key not in section_cache:
+                section_cache[key] = section_source_ledger(outputs, slug, artifact, section, links)
+            assert target in full, f"{resource}: notes item {field} source is missing from the full ledger: {target}"
+            assert target in section_cache[key], (
+                f"{resource}: notes item {field} source is missing from {artifact} / {section}: {target}"
+            )
+            measured += 1
+    return measured
 
 
 def validate_resource_ledger(outputs, slug, page_sources, links, files):
@@ -1044,7 +1144,7 @@ def validate_resource_ledger(outputs, slug, page_sources, links, files):
     expected_full = set()
     for path, declared in page_sources.items():
             if path.startswith(f"01-solutions/{slug}/"):
-                expected_full.update(declared)
+                expected_full.update(source_reference("", target) for target in declared)
     assert expected_full, f"{slug}: source provenance was not recorded"
     assert expected_full <= full, f"{resource}: full resource source list is incomplete: {sorted(expected_full - full)}"
     for part in (*MAIN_PARTS, *OPTIONAL):
@@ -1055,11 +1155,12 @@ def validate_resource_ledger(outputs, slug, page_sources, links, files):
             visible = links.strip_code(outputs[path], inline=False)
             assert not re.search(r"(?m)^## Sources[ \t]*$", visible), f"{path}: Sources H2 belongs only in 0.Resources"
             next_body = rendered_section(outputs[path], "Next", links, path)
+            _, _, anchor = page_source_ledger(outputs, slug, part, links)
             assert any(
-                source_target(path, target) == resource and unquote(urlsplit(target).fragment) == "sources"
+                source_target(path, target) == resource and unquote(urlsplit(target).fragment) == anchor
                 for _, target in links.extract_links(next_body)
             ), (
-                f"{path}: Next must link to 0.Resources/README.md#sources"
+                f"{path}: Next must link to its page-specific 0.Resources ledger anchor"
             )
             targets = {source_target(path, target) for _, target in links.extract_links(outputs[path])}
             body_sources = {
@@ -1135,12 +1236,25 @@ def validate_build_lane_table(runbook, links, context):
     phase = rendered_section(runbook, PHASE_TITLES[2], links, context)
     assert BUILD_LANE_HEADER in phase, f"{context}: lane-choice table must be in Phase 2"
     rows = rendered_table(phase, BUILD_LANE_HEADER, 3, context, links)
+    assert len(rows) <= 3, f"{context}: Phase 2 lane table exceeds three rows"
     assert [rendered_text(cells[0], links) for _, cells in rows] == [
         "Easy mode with GitHub Copilot (default)", "Manual build in Copilot Studio", "AIBAST Frontier (experimental)",
     ], f"{context}: lane choices or their order changed"
-    assert re.search(r"\bBrainstem\b.*\boptional\b|\boptional\b.*\bBrainstem\b", rows[2][0], re.I), (
+    assert re.search(r"\bBrainstem\b.*\boptional\b|\boptional\b.*\bBrainstem\b", rendered_text(phase, links), re.I), (
         f"{context}: local Brainstem must remain optional in the experimental lane"
     )
+    manual = rendered_text(" ".join(rows[1][1][1:]), links)
+    assert re.search(r"browser[- ]only|no local tooling|does not (?:need|require) local", manual, re.I), (
+        f"{context}: Manual lane must remain browser-only without local tooling"
+    )
+    for tool in re.finditer(r"\b(?:PAC CLI|VS Code|Python|local (?:runtime|tooling)|YAML import)\b", manual, re.I):
+        assert re.search(r"\b(?:no|without|not require|not need)(?:\s+\w+){0,4}\s+$", manual[:tool.start()], re.I), (
+            f"{context}: Manual lane claims local tooling: {manual!r}"
+        )
+    assert any(
+        urlsplit(target).path == "1.Overview.md" and urlsplit(target).fragment == "delivery-lanes"
+        for _, target in links.extract_links(phase)
+    ), f"{context}: compact lane table must link to Overview Delivery Lanes"
 
 
 def validate_phase_exit_positions(runbook, links, context):
@@ -1166,7 +1280,7 @@ def validate_phase_steps(runbook, links, context):
             assert match and int(match[1]) == number, f"{context}: invalid numbered step in Phase {number}: {line!r}"
             steps.append(int(match[2]))
             first = next((item.strip() for item in lines[index + 1:] if item.strip()), "")
-            assert first in {f"**Owner:** {owner}" for owner in STEP_OWNERS}, (
+            assert OWNER_LINE.fullmatch(first), (
                 f"{context}: {line} must begin with a Template or Customer or partner owner line"
             )
         assert steps and steps == list(range(1, len(steps) + 1)), (
@@ -1177,9 +1291,17 @@ def validate_phase_steps(runbook, links, context):
 def validate_template_disclaimers(outputs, links):
     measured = Counter()
     for path, text in outputs.items():
-        if path != "00-overview/README.md" and not path.endswith(("/1.Overview.md", "/3.Runbook.md")):
-            continue
         normalized = re.sub(r"\s+", " ", re.sub(r"(?m)^\s*>\s?", "", text)).strip()
+        if path.endswith("/3.Runbook.md"):
+            assert TEMPLATE_DISCLAIMER not in normalized, f"{path}: full template disclaimer belongs only in Overview"
+            assert text.splitlines().count(TEMPLATE_POINTER) == 1, f"{path}: exact one-line template pointer must appear once"
+            header = links.strip_code(text, inline=False).split("\n## ", 1)[0]
+            assert TEMPLATE_POINTER in header.splitlines(), f"{path}: template pointer must be above the first H2"
+            measured["runbook"] += 1
+            continue
+        if path != "00-overview/README.md" and not path.endswith("/1.Overview.md"):
+            assert TEMPLATE_DISCLAIMER not in normalized, f"{path}: full template disclaimer belongs only in Overview"
+            continue
         assert normalized.count(TEMPLATE_DISCLAIMER) == 1, f"{path}: template disclaimer must appear verbatim exactly once"
         if path == "00-overview/README.md":
             measured["spine"] += 1
@@ -1188,7 +1310,7 @@ def validate_template_disclaimers(outputs, links):
         assert TEMPLATE_DISCLAIMER in re.sub(r"\s+", " ", re.sub(r"(?m)^\s*>\s?", "", header)), (
             f"{path}: template disclaimer must be above the first H2"
         )
-        measured["overview" if path.endswith("/1.Overview.md") else "runbook"] += 1
+        measured["overview"] += 1
     return measured
 
 
@@ -1260,7 +1382,9 @@ def test_negative_production_template_budget_and_structure_mutations(all_outputs
                 changed[path] = changed[path].replace("\n## Next\n", "\n## Sources\n\nRestored obsolete section.\n\n## Next\n", 1)
                 error = "Sources H2 belongs only"
             elif mutation == "source-pointer":
-                changed[path] = changed[path].replace("0.Resources/README.md#sources", "0.Resources/README.md", 1)
+                next_body = rendered_section(changed[path], "Next", links, path)
+                replacement = re.sub(r"0\.Resources/README\.md#[^)\s]+", "0.Resources/README.md", next_body, count=1)
+                changed[path] = changed[path].replace(next_body, replacement, 1)
                 error = "Next must link"
             else:
                 body = rendered_section(changed[path], "Sources", links, path)
@@ -2095,6 +2219,15 @@ def note_texts(value, prefix="notes"):
         yield prefix, value
 
 
+def authored_note_text(text, links):
+    text = re.sub(
+        r"\s*\(\[(?:Source|Basis|Learn)([^\]]*)\]\(https://learn\.microsoft\.com/en-us/[^)\s]+\)\)",
+        lambda match: " (preview)" if "preview" in match[1].casefold() else "", text,
+    )
+    text = re.sub(r"\[(?:Source|Basis|Learn)\]\(https://learn\.microsoft\.com/en-us/[^)\s]+\)", "", text)
+    return rendered_text(text, links)
+
+
 def validate_claims(texts):
     for context, text in texts:
         match = NUMERIC_CLAIM.search(text)
@@ -2118,7 +2251,8 @@ def validate_synthetic_labels(outputs, links):
             steps = list(re.finditer(r"(?m)^### Step 2-\d+\. .+\n", before))
             assert steps, f"{path}: synthetic acceptance must be inside a numbered Phase 2 step"
             before = before[steps[-1].end():].strip()
-            assert before == "**Owner:** Template", f"{path}: synthetic label must precede evidence/checks after the owner"
+            owner = OWNER_LINE.fullmatch(before)
+            assert owner and owner[1] == "Template", f"{path}: synthetic label must precede evidence/checks after the owner"
         else:
             assert not before.strip(), f"{path}: synthetic label must precede evidence/checks"
         assert body[label.end():].strip(), f"{path}: synthetic label has no acceptance content"
@@ -2232,24 +2366,22 @@ def validate_delivery_notes_rendered(notes, outputs, links):
             section = rendered_section(outputs[path], title, links, path)
             body = visible_prose(section, links).replace("\\|", "|")
             for context, value in note_texts(entry[field], f"{slug}.{field}"):
-                needle = visible_prose(value, links).replace("\\|", "|")
+                needle = authored_note_text(value, links)
                 assert needle and needle in body, f"{context}: authored delivery text not rendered in {title}: {value!r}"
-            targets = {source_target(path, target) for _, target in links.extract_links(section)}
+            targets = section_source_ledger(outputs, slug, artifact, title, links)
             for item in entry[field]:
                 if isinstance(item, dict) and "source" in item:
-                    assert item["source"] in targets, f"{slug}.{field}: per-item source not rendered: {item['source']}"
+                    assert source_reference("", item["source"]) in targets, f"{slug}.{field}: per-item source not rendered: {item['source']}"
         path = f"01-solutions/{slug}/3.Runbook.md"
         for item in entry["production_hardening"]:
             title = PHASE_TITLES[item["phase"]]
             body = rendered_section(outputs[path], title, links, path)
-            # Phase 3 names its steps after systems, not the generic Connect area.
-            fields = ("action", "owner") if item["phase"] == 3 else ("area", "action", "owner")
-            for field in fields:
-                assert visible_prose(item[field], links) in visible_prose(body, links), (
+            for field in ("action", "owner"):
+                assert authored_note_text(item[field], links) in visible_prose(body, links), (
                     f"{slug}.production_hardening.{field}: authored delivery text not rendered in {title}: {item[field]!r}"
                 )
-            targets = {source_target(path, target) for _, target in links.extract_links(body)}
-            assert item["source"] in targets, f"{slug}.production_hardening: per-item source not rendered"
+            targets = section_source_ledger(outputs, slug, "3.Runbook.md", title, links)
+            assert source_reference("", item["source"]) in targets, f"{slug}.production_hardening: per-item source not rendered"
         for number, phase in enumerate(PHASE_KEYS):
             title = PHASE_TITLES[number]
             body = rendered_section(outputs[path], title, links, path)
@@ -2258,12 +2390,12 @@ def validate_delivery_notes_rendered(notes, outputs, links):
             assert re.search(r"(?m)^\s*-\s+\[[ xX]\]", checklist), f"{slug}.{phase}: criteria are not a checklist"
             for criterion in entry["phase_exit_criteria"][phase]:
                 text = criterion["text"] if isinstance(criterion, dict) else criterion
-                assert visible_prose(text, links) in visible_prose(checklist, links), (
+                assert authored_note_text(text, links) in visible_prose(checklist, links), (
                     f"{slug}.{phase}: exit criterion not rendered: {criterion!r}"
                 )
                 if isinstance(criterion, dict):
-                    targets = {source_target(path, target) for _, target in links.extract_links(checklist)}
-                    assert criterion["source"] in targets, f"{slug}.{phase}: exit-criterion source not rendered"
+                    targets = section_source_ledger(outputs, slug, "3.Runbook.md", title, links)
+                    assert source_reference("", criterion["source"]) in targets, f"{slug}.{phase}: exit-criterion source not rendered"
 
 
 def test_all_new_pilot_delivery_notes_render_in_their_required_sections(sources, pilot_outputs, links):
@@ -2801,8 +2933,8 @@ def test_microsoft_owners_and_graph_users_paths_remain_legal(reference):
     validate_no_personal_or_local_references({"control.md": reference})
 
 
-def settings_facts(text):
-    wanted = {
+def settings_facts(text, wanted=None):
+    wanted = wanted if wanted is not None else {
         ("template",): "Template",
         ("configuration", "recognizer", "kind"): "Recognizer",
         ("configuration", "authoringModel"): "Authoring model",
@@ -2881,6 +3013,21 @@ def source_target(document, target):
     if not path:
         return document
     return posixpath.normpath(path.lstrip("/") if path.startswith("/") else posixpath.join(posixpath.dirname(document), path))
+
+
+def source_reference(document, href):
+    target = source_target(document, href)
+    fragment = urlsplit(href).fragment
+    return target + "#" + unquote(fragment).lower() if fragment and not urlsplit(target).scheme else target
+
+
+def source_references(text, document, links):
+    targets = set()
+    for _, href in links.extract_links(text):
+        target = source_target(document, href)
+        targets.add(target)
+        targets.add(source_reference(document, href))
+    return targets
 
 
 def rendered_text(text, links):
@@ -3008,8 +3155,8 @@ def validate_source_audit_boundaries(outputs, facts, links):
             )
             measured += 1
         else:
-            assert "source_audit.boundary" in before and "onepager-map.json" in before, (
-                f"{path}: absent source_audit.boundary must be disclosed before the promise table"
+            assert "audit boundary" in before and "not recorded" in before, (
+                f"{path}: missing audit boundary needs a reader-facing disclosure before the promise table"
             )
     assert measured, "No source-audit boundaries were measured"
     return measured
@@ -3124,9 +3271,13 @@ def validate_workload_and_native_settings(outputs, facts, links):
         ):
             require_lane_count(text, expected[key], label, f"{runbook} Build workload")
         if expected["manual_steps"] is None:
-            assert "Manual build steps not captured" in text, f"{runbook}: workload must disclose absent capture"
+            assert re.search(r"(?:Manual build steps|Build checkpoints) not captured", text), (
+                f"{runbook}: workload must disclose absent capture"
+            )
         else:
-            require_lane_count(text, expected["manual_steps"], "captured manual build steps", runbook)
+            assert re.search(
+                rf"\b{expected['manual_steps']} captured (?:manual build steps|build checkpoints)\b", text,
+            ), f"{runbook}: captured build count differs from browserfilm"
         architecture = f"01-solutions/{slug}/2.Architecture.md"
         components = rendered_section(outputs[architecture], "Copilot Studio Components", links, architecture)
         rows = table_rows(components, links)
@@ -3766,10 +3917,19 @@ def validate_template_derivations(outputs, facts, links):
                 (rendered_text(item["entity"], links), rendered_text("; ".join(item["fields"]), links))
                 for item in expected
             )
-            assert actual == wanted, (
+            faithful = actual == wanted if authored else (
+                actual.keys() == wanted.keys() and all(actual[key] <= wanted[key] for key in actual)
+            )
+            assert faithful, (
                 f"{path}: Data Contract fields differ from {'authored source contracts' if authored else 'knowledge-table headers'}; "
                 f"missing={wanted - actual}, extra={actual - wanted}"
             )
+            if not authored:
+                ledger = section_source_ledger(outputs, slug, "2.Architecture.md", "Data Contract", links)
+                expected_sources = {item["source"] for item in expected}
+                assert expected_sources <= ledger, (
+                    f"{path}: deduplicated contracts lost knowledge-table provenance: {sorted(expected_sources - ledger)}"
+                )
         else:
             assert DATA_CONTRACT_HEADER not in data and "no structured record table" in rendered_text(data, links), (
                 f"{path}: absence of knowledge-table headers must be explicit, not fabricated"
@@ -3814,12 +3974,13 @@ def test_authored_data_field_names_are_verbatim_source_identifiers(sources, link
             source = item["source"]
             validate_note_source(source, sources["files"], f"{key}.data_contract")
             assert not urlsplit(source).scheme, f"{key}: data field identifiers need a local canonical source"
-            text = (ROOT / source).read_text(encoding="utf-8")
-            if source.endswith(".md"):
-                headers = [fields for _, fields in markdown_record_headers(text, PurePosixPath(source).name, links)]
+            source_path = unquote(urlsplit(source).path)
+            text = (ROOT / source_path).read_text(encoding="utf-8")
+            if source_path.endswith(".md"):
+                headers = [fields for _, fields in markdown_record_headers(text, PurePosixPath(source_path).name, links)]
                 assert item["fields"] in headers, f"{key}: authored data fields are not a source table header: {item['entity']}"
             else:
-                assert source.endswith(".py"), f"{key}: unmeasured data identifier source type: {source}"
+                assert source_path.endswith(".py"), f"{key}: unmeasured data identifier source type: {source}"
                 literals = {
                     node.value for node in ast.walk(ast.parse(text))
                     if isinstance(node, ast.Constant) and isinstance(node.value, str)
@@ -3882,7 +4043,7 @@ def test_negative_production_h2_contracts(all_outputs, links, artifact, mutation
 
 @pytest.mark.parametrize(
     "path",
-    ["00-overview/README.md", "01-solutions/ask-hr/1.Overview.md", "01-solutions/ask-hr/3.Runbook.md"],
+    ["00-overview/README.md", "01-solutions/ask-hr/1.Overview.md"],
 )
 @pytest.mark.parametrize("mutation", ["wording", "duplicate", "position"])
 def test_negative_template_disclaimer_contract(all_outputs, links, path, mutation):
@@ -4031,12 +4192,22 @@ def validate_quality_tiers(outputs, facts, links):
         cases = evidence.get("cases")
         assert isinstance(cases, list) and cases, f"{path}: preview case count cannot be measured"
         assert all(isinstance(case, dict) for case in cases), f"{path}: preview case records cannot be measured"
-        scored = sum(type(case.get("passed")) is bool for case in cases)
-        passed = sum(case.get("passed") is True for case in cases)
-        unknown = len(cases) - scored
-        expression = r"\b(\d+)/(\d+) synthetic cases passed\b" if scored else r"\b(\d+)/(\d+) cases have a recorded pass\b"
-        count = re.search(expression, body)
-        assert count and tuple(map(int, count.groups())) == (passed, scored or len(cases)), (
+        recorded = {case.get("case_id", case.get("id")): case for case in cases}
+        locked = {case.get("case_id", case.get("id")) for case in source["cases"]}
+        assert len(recorded) == len(cases) and None not in recorded, f"{path}: preview case ids must be unique"
+        assert locked and len(locked) == len(source["cases"]) and None not in locked, f"{path}: locked case ids cannot be measured"
+        unknown = {identifier for identifier in locked if type(recorded.get(identifier, {}).get("passed")) is not bool}
+        reshoots = {
+            identifier for identifier in locked - unknown
+            if "reshoot" in str(recorded[identifier].get("status", "")).casefold()
+        }
+        passes = {
+            identifier for identifier in locked - unknown - reshoots
+            if recorded[identifier].get("passed") is True
+        }
+        failures = locked - passes - unknown - reshoots
+        count = re.search(r"\b(\d+)(?: of |/)(\d+) synthetic cases passed\b", body)
+        assert count and tuple(map(int, count.groups())) == (len(passes), len(locked)), (
             f"{path}: Quality tier passed/total differs from preview evidence: {body!r}"
         )
         status = evidence.get("status")
@@ -4046,27 +4217,38 @@ def validate_quality_tiers(outputs, facts, links):
             f"{path}: preview capture date cannot be measured"
         )
         date = captured[:10]
-        if scored:
-            assert f"cases passed, {status}, " in body, f"{path}: Quality tier status differs from preview evidence"
-            suffix = f"; {unknown} cases have no verdict" if unknown else ""
-            assert f", {date}{suffix}; not a fresh validation." in body, f"{path}: Quality tier date or historical caveat differs"
-        else:
-            assert "no scored replay evidence" in body and f"{unknown} have no verdict." in body, (
-                f"{path}: Quality tier must disclose every unscored case"
-            )
-            assert f"Recorded status: {status}, " in body, f"{path}: Quality tier status differs from preview evidence"
-            assert f", {date}." in body, f"{path}: Quality tier date or historical caveat differs"
+        assert body.startswith(status + ":"), f"{path}: Quality tier status differs from preview evidence"
+        assert re.search(r"\bRecorded " + re.escape(date) + r"\b", body) and "not a fresh validation" in body, (
+            f"{path}: Quality tier date or historical caveat differs"
+        )
+        for identifiers, label in (
+            (unknown, "without a verdict"), (failures, "failed"), (reshoots, "require a reshoot"),
+        ):
+            summary = re.search(r"\b(\d+) " + re.escape(label) + r"\b", body)
+            if identifiers:
+                assert summary and int(summary[1]) == len(identifiers), (
+                    f"{path}: Quality tier must disclose every {label} case"
+                )
+                for identifier in identifiers:
+                    assert identifier in body, f"{path}: Quality tier lost case {identifier} without a passing verdict"
+            else:
+                assert summary is None, f"{path}: Quality tier invented {label} cases"
         tier = source["quality_tier"]
-        assert isinstance(tier, str) and body.startswith(tier + " (registry)"), (
+        assert isinstance(tier, str) and f"registry tier: {tier};" in body, (
             f"{path}: Quality tier differs from registry"
         )
         state_words = r"\b(?:Draft|Published|Unpublished|Live|Approved|Verified|Failed|Passed|Ready)\b"
-        claim = body.removeprefix(tier + " (registry)").replace("synthetic cases passed", "")
+        claim = body.replace(f"registry tier: {tier};", "").replace("synthetic cases passed", "")
+        if failures:
+            claim = re.sub(r"\b\d+ failed\b", "", claim)
+        recorded_states = " ".join(
+            [status] + [str(case.get("status", "")) for identifier, case in recorded.items() if identifier in locked]
+        )
         unexpected = {word.casefold() for word in re.findall(state_words, claim, re.I)} - {
-            word.casefold() for word in re.findall(state_words, status, re.I)
+            word.casefold() for word in re.findall(state_words, recorded_states, re.I)
         }
         assert not unexpected, f"{path}: Quality tier invents status words not recorded by evidence: {sorted(unexpected)}"
-        assert source["preview_path"] in {source_target(path, target) for _, target in links.extract_links(rows[0][1])}, (
+        assert source["preview_path"] in section_source_ledger(outputs, slug, "1.Overview.md", "Scenario Overview", links), (
             f"{path}: Quality tier does not cite its preview evidence"
         )
         measured += 1
@@ -4086,13 +4268,13 @@ def test_negative_quality_tier_claims(all_outputs, final_round_facts, links, mut
     path = f"01-solutions/{slug}/1.Overview.md"
     row = next(row for _, row, cells in table_rows(all_outputs[path], links) if rendered_text(cells[0], links) == "Quality tier")
     if mutation in {"passed", "total"}:
-        match = re.search(r"(\d+)/(\d+) synthetic cases passed", row)
+        match = re.search(r"(\d+)(?: of |/)(\d+) synthetic cases passed", row)
         assert match, "Quality-count mutation requires a real count"
         passed, total = map(int, match.groups())
-        replacement = row.replace(match[0], f"{passed + (mutation == 'passed')}/{total + (mutation == 'total')} synthetic cases passed", 1)
+        replacement = row.replace(match[0], f"{passed + (mutation == 'passed')} of {total + (mutation == 'total')} synthetic cases passed", 1)
         error = "passed/total differs"
     elif mutation == "status":
-        replacement = row.replace("cases passed, " + facts[slug]["preview"]["status"] + ",", "cases passed, Published,", 1)
+        replacement = row.replace(facts[slug]["preview"]["status"] + ": recorded", "Published: recorded", 1)
         error = "status differs"
     elif mutation == "date":
         replacement = row.replace(facts[slug]["preview"]["captured_at"][:10], "2099-01-01", 1)
@@ -4101,7 +4283,7 @@ def test_negative_quality_tier_claims(all_outputs, final_round_facts, links, mut
         replacement = row[:-1] + " Published. |"
         error = "invents status words"
     else:
-        replacement = row.replace(facts[slug]["quality_tier"] + " (registry):", "unmeasured (registry):", 1)
+        replacement = row.replace("registry tier: " + facts[slug]["quality_tier"] + ";", "registry tier: unmeasured;", 1)
         error = "differs from registry"
     changed = dict(all_outputs)
     changed[path] = changed[path].replace(row, replacement, 1)
@@ -4117,11 +4299,14 @@ def recovery_row(section, identifier, links, context):
     return matches[0]
 
 
-def validate_recovery_id_mapping(outputs, notes, links):
+def validate_recovery_id_mapping(outputs, notes, links, packages):
     measured = 0
     for key, entry in notes["solutions"].items():
-        slug = key.rsplit("/", 1)[-1]
+        matches = [slug for slug, identity in packages.items() if identity == key]
+        assert len(matches) == 1, f"{key}: recovery validation requires one deployment-name/package-folder join"
+        slug = matches[0]
         path = f"01-solutions/{slug}/2.Architecture.md"
+        assert path in outputs, f"{key}: recovery page must use package-folder spelling: {path}"
         section = rendered_section(outputs[path], "State and Recovery", links, path)
         for item in entry["state_and_recovery"]:
             row = recovery_row(section, item["id"], links, path)
@@ -4129,14 +4314,8 @@ def validate_recovery_id_mapping(outputs, notes, links):
                 assert rendered_text(item[field], links) in rendered_text(row, links), (
                     f"{path}: recovery id {item['id']} has the wrong {field}"
                 )
-            targets = {source_target(path, target) for _, target in links.extract_links(row)}
-            if item["source"] not in targets:
-                reference = re.search(r"\bSource (\d+) below\b", row)
-                assert reference, f"{path}: recovery id {item['id']} lost its per-item source"
-                source_line = re.search(rf"(?m)^State and recovery source {reference[1]}: .+$", section)
-                assert source_line, f"{path}: recovery id {item['id']} has no matching source reference"
-                targets = {source_target(path, target) for _, target in links.extract_links(source_line[0])}
-            assert item["source"] in targets, f"{path}: recovery id {item['id']} points at the wrong source"
+            targets = section_source_ledger(outputs, slug, "2.Architecture.md", "State and Recovery", links)
+            assert source_reference("", item["source"]) in targets, f"{path}: recovery id {item['id']} points at the wrong source"
             measured += 1
     assert measured, "No ID-keyed recovery rows were measured"
     return measured
@@ -4144,13 +4323,13 @@ def validate_recovery_id_mapping(outputs, notes, links):
 
 def test_pilot_recovery_rows_preserve_id_to_action_owner_and_source_mapping(all_outputs, sources, links):
     expected = sum(len(entry["state_and_recovery"]) for entry in sources["notes"]["solutions"].values())
-    assert validate_recovery_id_mapping(all_outputs, sources["notes"], links) == expected
+    assert validate_recovery_id_mapping(all_outputs, sources["notes"], links, sources["packages"]) == expected
 
 
 @pytest.mark.parametrize("mutation", ["id", "behavior", "owner", "source"])
 def test_negative_recovery_id_mapping(all_outputs, sources, links, mutation):
     notes = {"solutions": {"@aibast-agents-library/ask-hr": sources["notes"]["solutions"]["@aibast-agents-library/ask-hr"]}}
-    validate_recovery_id_mapping(all_outputs, notes, links)
+    validate_recovery_id_mapping(all_outputs, notes, links, sources["packages"])
     item = notes["solutions"]["@aibast-agents-library/ask-hr"]["state_and_recovery"][0]
     path = "01-solutions/ask-hr/2.Architecture.md"
     section = rendered_section(all_outputs[path], "State and Recovery", links, path)
@@ -4162,15 +4341,21 @@ def test_negative_recovery_id_mapping(all_outputs, sources, links, mutation):
         replacement = row.replace(item[mutation], "Incorrect negative-test value", 1)
         error = "wrong " + mutation
     else:
-        target = next(target for _, target in links.extract_links(row) if source_target(path, target) == item["source"])
-        replacement = row.replace(target, "../../solutions/catalog.json", 1)
-        error = "lost its per-item source"
+        path = "01-solutions/ask-hr/0.Resources/README.md"
+        page = page_source_ledger(all_outputs, "ask-hr", "2.Architecture.md", links)[1]
+        row = next(row for _, row, cells in table_rows(page, links) if rendered_text(cells[0], links) == "State and Recovery")
+        target = next(
+            target for _, target in links.extract_links(row)
+            if source_reference(path, target) == source_reference("", item["source"])
+        )
+        replacement = row.replace(target, "../../../solutions/catalog.json")
+        error = "points at the wrong source"
     changed = dict(all_outputs)
     changed[path] = changed[path].replace(row, replacement, 1)
     assert changed[path] != all_outputs[path], "Recovery mapping mutation made no change"
     with pytest.raises(AssertionError, match=error):
-        validate_recovery_id_mapping(changed, notes, links)
-    validate_recovery_id_mapping(all_outputs, notes, links)
+        validate_recovery_id_mapping(changed, notes, links, sources["packages"])
+    validate_recovery_id_mapping(all_outputs, notes, links, sources["packages"])
 
 
 def validate_runbook_header_and_prerequisites(text, links, context):
@@ -4248,13 +4433,13 @@ def test_negative_unscored_preview_evidence_cannot_be_promoted(all_outputs, fina
     row = next(row for _, row, cells in table_rows(all_outputs[path], links) if rendered_text(cells[0], links) == "Quality tier")
     count = len(facts[slug]["preview"]["cases"])
     if mutation == "pass-count":
-        replacement = row.replace(f"0/{count} cases", f"{count}/{count} cases", 1)
+        replacement = row.replace(f"0 of {count} synthetic cases", f"{count} of {count} synthetic cases", 1)
         error = "passed/total differs"
     elif mutation == "unscored-caveat":
-        replacement = row.replace(f"{count} have no verdict.", "All cases are current proof.", 1)
-        error = "must disclose every unscored case"
+        replacement = row.replace(f"{count} without a verdict", "All cases are current proof", 1)
+        error = "must disclose every without a verdict case"
     else:
-        replacement = row.replace("Recorded status: " + facts[slug]["preview"]["status"], "Recorded status: Published", 1)
+        replacement = row.replace(facts[slug]["preview"]["status"] + ": recorded", "Published: recorded", 1)
         error = "status differs"
     changed = dict(all_outputs)
     changed[path] = changed[path].replace(row, replacement, 1)
@@ -4297,3 +4482,1203 @@ def test_negative_authored_data_fields_cannot_differ_from_the_notes(all_outputs,
     changed[path] = changed[path].replace(row, "| " + " | ".join(cells) + " |", 1)
     with pytest.raises(AssertionError, match="fields differ from authored source contracts"):
         validate_template_derivations(changed, facts, links)
+
+
+INTEGRITY_SYMPTOMS = {
+    "evidence-no-mockups": "A required evidence file is missing",
+    "failed-case-no-cherry-picking": "A recorded identifier is absent",
+    "draft-publication-stop": "Publish is offered",
+}
+ITEM_CITATION_LABEL = r"(?:Source|Basis|Learn|Package source|Delivery notes|Identity basis|Recovery basis)"
+INTERNAL_NOTE = re.compile(r"\bis\s+absent\s+from\b|\bNot provided\s*(?:—|–|--)", re.I)
+
+
+def generated_main_documents(outputs):
+    documents = {
+        path: text for path, text in outputs.items()
+        if path.startswith("01-solutions/") and path.count("/") >= 2 and path.split("/", 2)[2] in MAIN_PARTS
+    }
+    assert documents, "Readability validation did not receive any generated parts 1-4"
+    return documents
+
+
+def validate_no_inline_item_citations(outputs, links):
+    documents = generated_main_documents(outputs)
+    for path, text in documents.items():
+        visible = links.strip_code(text)
+        assert not re.search(r"\[" + ITEM_CITATION_LABEL + r"\]\s*(?:\(|\[)", visible, re.I), (
+            f"{path}: inline per-item citation link belongs in the resource ledger"
+        )
+        assert not re.search(r"<a\b[^>]*>\s*" + ITEM_CITATION_LABEL + r"\s*</a>", visible, re.I), (
+            f"{path}: inline per-item citation link belongs in the resource ledger"
+        )
+        assert not re.search(r"(?im)^.*\bsource\s+\d+\s*:", visible), (
+            f"{path}: numbered source footnote belongs in the resource ledger"
+        )
+        lines = visible.splitlines()
+        for index, line in enumerate(lines[:-1]):
+            cells, separator = table_cells(line), table_cells(lines[index + 1])
+            if cells and separator and all(re.fullmatch(r":?-+:?", cell) for cell in separator):
+                assert not {"source", "basis"} & {cell.casefold() for cell in cells}, (
+                    f"{path}: per-item Source column belongs in the resource ledger"
+                )
+    return len(documents)
+
+
+def validate_no_internal_note_leaks(outputs, links):
+    documents = generated_main_documents(outputs)
+    for path, text in documents.items():
+        match = INTERNAL_NOTE.search(links.strip_code(text))
+        assert match is None, f"{path}: internal-note leak {match[0]!r}" if match else ""
+    return len(documents)
+
+
+def numbered_steps(runbook, phase, links, context):
+    body = rendered_section(runbook, PHASE_TITLES[phase], links, context)
+    raw = body.splitlines()
+    visible = links.strip_code(body, inline=False).splitlines()
+    starts = [(i, match[1]) for i, line in enumerate(visible) if (match := re.match(r"^### (.+)$", line))]
+    result = []
+    for index, (start, heading) in enumerate(starts):
+        match = re.fullmatch(rf"Step {phase}-(\d+)\. (.+)", heading)
+        if not match:
+            continue
+        end = starts[index + 1][0] if index + 1 < len(starts) else len(raw)
+        content = "\n".join(raw[start + 1:end]).strip()
+        first = next((line.strip() for line in content.splitlines() if line.strip()), "")
+        owner = OWNER_LINE.fullmatch(first)
+        assert owner, f"{context}: step {phase}-{match[1]} does not begin with a valid owner line"
+        result.append(SimpleNamespace(
+            number=int(match[1]), title=match[2], body=content,
+            owner=owner[1], role=owner[2], owner_line=first,
+        ))
+    assert result, f"{context}: Phase {phase} steps were not measured"
+    return result
+
+
+@pytest.fixture(scope="module")
+def readability_facts(final_round_facts, sources, links):
+    facts = {}
+    for slug, source in final_round_facts.items():
+        film = f"solutions/{slug}/screenshots/manual/browserfilm.json"
+        captions = None
+        if film in sources["files"]:
+            frames = read_json(film).get("frames")
+            assert isinstance(frames, list) and frames, f"{film}: captured frames cannot be measured"
+            captions = []
+            for index, frame in enumerate(frames):
+                assert isinstance(frame, dict), f"{film}: frame {index} must be an object"
+                # Browserfilm 1.0 stores the visible title/caption in its label field.
+                choices = {frame[key] for key in ("title", "caption", "label") if isinstance(frame.get(key), str) and frame[key].strip()}
+                assert choices, f"{film}: frame {index} has no captured title or caption"
+                captions.append(choices)
+        guide = f"solutions/{slug}/FIELD-GUIDE.md"
+        assert guide in sources["files"], f"{slug}: integrity-rule source cannot be measured"
+        recovery = independent_source_section((ROOT / guide).read_text(encoding="utf-8"), ("Failure recovery",), links)
+        assert recovery, f"{guide}: failure-recovery section missing"
+        rows = table_rows(recovery, links)
+        rules = {}
+        authored = {item["id"]: item for item in source["notes"].get("state_and_recovery", [])}
+        for identifier, symptom in INTEGRITY_SYMPTOMS.items():
+            if identifier in authored:
+                item = authored[identifier]
+                rules[identifier] = (item["condition"], item["behavior"])
+            else:
+                matches = [cells for _, _, cells in rows if rendered_text(cells[0], links) == symptom]
+                assert len(matches) == 1, f"{guide}: integrity symptom {symptom!r} is not uniquely recorded"
+                rules[identifier] = (symptom, matches[0][1])
+        facts[slug] = {**source, "captions": captions, "film": film, "integrity": rules}
+    assert len(facts) == 51, "Readability facts must cover all 51 catalog solutions"
+    return facts
+
+
+def validate_integrity_once(outputs, facts, links):
+    measured = 0
+    for slug, source in facts.items():
+        architecture = f"01-solutions/{slug}/2.Architecture.md"
+        section = rendered_section(outputs[architecture], "State and Recovery", links, architecture)
+        rows = table_rows(section, links)
+        all_rows = [
+            (part, row, cells)
+            for part, text in main_parts(outputs, slug).items() for _, row, cells in table_rows(text, links)
+        ]
+        for identifier, (condition, behavior) in source["integrity"].items():
+            matched = [row for part, row, cells in all_rows if rendered_text(cells[0], links) == identifier]
+            assert len(matched) == 1, f"{slug}: integrity rule {identifier} must render exactly once"
+            row = recovery_row(section, identifier, links, architecture)
+            assert rendered_text(condition, links) in rendered_text(row, links), f"{slug}: integrity rule condition changed"
+            assert rendered_text(behavior, links) in rendered_text(row, links), f"{slug}: integrity rule behavior changed"
+            measured += 1
+        runbook = f"01-solutions/{slug}/3.Runbook.md"
+        phase = rendered_section(outputs[runbook], PHASE_TITLES[2], links, runbook)
+        assert any(
+            source_target(runbook, target) == architecture and urlsplit(target).fragment == "state-and-recovery"
+            for _, target in links.extract_links(phase)
+        ), f"{runbook}: Phase 2 must link to the single Architecture integrity table"
+        assert rows, f"{architecture}: State and Recovery rows were not measured"
+    return measured
+
+
+def validate_owner_roles(outputs, facts, links):
+    measured = 0
+    for slug, source in facts.items():
+        path = f"01-solutions/{slug}/3.Runbook.md"
+        notes = source["notes"]
+        roles = {item["role"] for item in notes.get("delivery_roles", [])}
+        steps = {number: numbered_steps(outputs[path], number, links, path) for number in range(7)}
+        if roles:
+            for phase_steps in steps.values():
+                for step in phase_steps:
+                    assert step.role in roles, f"{path}: step {step.number} owner line must name a valid delivery role"
+                    measured += 1
+        for item in notes.get("production_hardening", []):
+            matches = [
+                step for step in steps[item["phase"]]
+                if authored_note_text(item["action"], links) in rendered_text(step.body, links)
+            ]
+            assert matches, f"{path}: hardening action {item['area']} has no owning step"
+            assert any(step.role == item["owner"] for step in matches), (
+                f"{path}: hardening action {item['area']} owner line does not name its recorded role"
+            )
+    assert measured, "No authored delivery-role owner lines were measured"
+    return measured
+
+
+def captured_checklist(runbook, links, context):
+    phase = rendered_section(runbook, PHASE_TITLES[2], links, context)
+    lines = links.strip_code(phase, inline=False).splitlines()
+    starts = [
+        index for index, line in enumerate(lines)
+        if re.match(r"^(?:#{3,6}\s+|\*\*)(?:Captured )?Manual build (?:checklist|steps)", line, re.I)
+    ]
+    assert len(starts) == 1, f"{context}: expected one captured manual build checklist"
+    start, entries, end = starts[0], [], len(lines)
+    for index in range(start + 1, len(lines)):
+        line = lines[index]
+        match = re.match(r"^\s*(\d+)[.)]\s+(?:\[[ xX]\]\s+)?(.+)$", line)
+        if match:
+            entries.append((int(match[1]), match[2].strip()))
+        elif line.strip() and entries:
+            end = index
+            break
+    body = "\n".join(phase.splitlines()[start:end]).rstrip()
+    assert entries, f"{context}: manual build checklist must be numbered"
+    return body, entries
+
+
+def validate_captured_build_checklists(outputs, facts, links):
+    measured = 0
+    for slug, source in facts.items():
+        path = f"01-solutions/{slug}/3.Runbook.md"
+        phase = rendered_section(outputs[path], PHASE_TITLES[2], links, path)
+        if source["captions"] is None:
+            assert re.search(r"not captured|no captured", phase, re.I), f"{path}: missing capture must be reader-facing"
+            continue
+        _, entries = captured_checklist(outputs[path], links, path)
+        expected = source["captions"]
+        assert [number for number, _ in entries] == list(range(1, len(expected) + 1)), (
+            f"{path}: manual checklist length/order differs from captured frames"
+        )
+        for index, (_, actual) in enumerate(entries):
+            assert rendered_text(actual, links) in {rendered_text(caption, links) for caption in expected[index]}, (
+                f"{path}: manual checklist frame {index + 1} caption is not verbatim or in source order"
+            )
+        assert any(
+            source_target(path, target) in {source["film"], f"solutions/{slug}/manual-tutorial.html"}
+            for _, target in links.extract_links(phase)
+        ), f"{path}: captured build checklist needs its source/tutorial link"
+        measured += len(expected)
+    return measured
+
+
+def test_all_51_parts_1_to_4_have_no_inline_item_citations(all_outputs, links):
+    assert validate_no_inline_item_citations(all_outputs, links) == 204
+
+
+def test_all_51_parts_1_to_4_have_no_internal_note_leaks(all_outputs, links):
+    assert validate_no_internal_note_leaks(all_outputs, links) == 204
+
+
+def test_all_51_workshop_integrity_rules_render_once_in_architecture(all_outputs, readability_facts, links):
+    assert validate_integrity_once(all_outputs, readability_facts, links) == 153
+
+
+def test_owner_lines_name_the_authored_delivery_and_hardening_roles(all_outputs, readability_facts, links):
+    validate_owner_roles(all_outputs, readability_facts, links)
+
+
+def test_all_captured_build_checklists_are_verbatim_and_ordered(all_outputs, readability_facts, links):
+    expected = sum(len(source["captions"]) for source in readability_facts.values() if source["captions"] is not None)
+    assert expected > 0, "No captured build steps were measured"
+    assert validate_captured_build_checklists(all_outputs, readability_facts, links) == expected
+
+
+@pytest.mark.parametrize("part", MAIN_PARTS)
+@pytest.mark.parametrize(
+    "addition",
+    [
+        "- A supported instruction. [Source](../../solutions/catalog.json)",
+        "- A supported instruction. [Basis](../../solutions/catalog.json)",
+        "- A policy claim. [Learn](https://learn.microsoft.com/en-us/microsoft-copilot-studio/security-and-governance)",
+        "Design source 1: [Package source](../../solutions/catalog.json)",
+        "| Decision | Source |\n| --- | --- |\n| A decision | [catalog](../../solutions/catalog.json) |",
+        '- A claim. <a href="../../solutions/catalog.json">Source</a>',
+        "- A claim. [Source][reference]\n\n[reference]: ../../solutions/catalog.json",
+    ],
+)
+def test_negative_inline_item_citations_in_each_main_part(all_outputs, links, part, addition):
+    path = "01-solutions/ask-hr/" + part
+    original = {path: all_outputs[path]}
+    validate_no_inline_item_citations(original, links)
+    with pytest.raises(AssertionError, match="citation link|source footnote|Source column"):
+        validate_no_inline_item_citations({path: original[path] + "\n" + addition + "\n"}, links)
+
+
+@pytest.mark.parametrize("leak", ["A record is absent from the source.", "Not provided — `source_audit.boundary` is absent."])
+def test_negative_internal_note_leaks(all_outputs, links, leak):
+    path = "01-solutions/ask-hr/4.Sample-prompts.md"
+    validate_no_internal_note_leaks({path: all_outputs[path]}, links)
+    with pytest.raises(AssertionError, match="internal-note leak"):
+        validate_no_internal_note_leaks({path: all_outputs[path] + "\n" + leak + "\n"}, links)
+
+
+@pytest.mark.parametrize("mutation", ["missing", "changed", "duplicate", "below-header", "full-disclaimer"])
+def test_negative_runbook_template_pointer(all_outputs, links, mutation):
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    original = all_outputs[path]
+    validate_template_disclaimers({path: original}, links)
+    if mutation == "missing":
+        changed = original.replace(TEMPLATE_POINTER, "", 1)
+        error = "exact one-line template pointer"
+    elif mutation == "changed":
+        changed = original.replace(TEMPLATE_POINTER, TEMPLATE_POINTER.replace("an example", "a finished product"), 1)
+        error = "exact one-line template pointer"
+    elif mutation == "duplicate":
+        changed = original + "\n" + TEMPLATE_POINTER + "\n"
+        error = "exact one-line template pointer"
+    elif mutation == "below-header":
+        changed = original.replace(TEMPLATE_POINTER, "", 1) + "\n" + TEMPLATE_POINTER + "\n"
+        error = "above the first H2"
+    else:
+        changed = original + "\n" + TEMPLATE_DISCLAIMER + "\n"
+        error = "full template disclaimer belongs only"
+    assert changed != original, "Template pointer mutation made no change"
+    with pytest.raises(AssertionError, match=error):
+        validate_template_disclaimers({path: changed}, links)
+
+
+@pytest.mark.parametrize("mutation", ["missing", "duplicate", "broken-link"])
+def test_negative_integrity_rules_must_have_one_home(all_outputs, readability_facts, links, mutation):
+    facts = {"ask-hr": readability_facts["ask-hr"]}
+    validate_integrity_once(all_outputs, facts, links)
+    architecture = "01-solutions/ask-hr/2.Architecture.md"
+    runbook = "01-solutions/ask-hr/3.Runbook.md"
+    body = rendered_section(all_outputs[architecture], "State and Recovery", links, architecture)
+    row = recovery_row(body, "evidence-no-mockups", links, architecture)
+    changed = dict(all_outputs)
+    if mutation == "missing":
+        changed[architecture] = changed[architecture].replace(row, "", 1)
+        error = "must render exactly once"
+    elif mutation == "duplicate":
+        cells = table_cells(row)
+        table = "| " + " | ".join("Column" for _ in cells) + " |\n"
+        table += "| " + " | ".join("---" for _ in cells) + " |\n" + row + "\n"
+        changed[runbook] += "\n" + table
+        error = "must render exactly once"
+    else:
+        changed[runbook] = changed[runbook].replace("2.Architecture.md#state-and-recovery", "2.Architecture.md", 1)
+        error = "must link to the single Architecture integrity table"
+    assert changed != all_outputs, "Integrity mutation made no change"
+    with pytest.raises(AssertionError, match=error):
+        validate_integrity_once(changed, facts, links)
+
+
+@pytest.mark.parametrize("mutation", ["missing-role", "invalid-role", "wrong-hardening-role"])
+def test_negative_step_owner_roles(all_outputs, readability_facts, links, mutation):
+    facts = {"ask-hr": readability_facts["ask-hr"]}
+    validate_owner_roles(all_outputs, facts, links)
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    original = all_outputs[path]
+    steps = numbered_steps(original, 6 if mutation == "wrong-hardening-role" else 0, links, path)
+    if mutation == "wrong-hardening-role":
+        item = next(item for item in facts["ask-hr"]["notes"]["production_hardening"] if item["area"] == "Release: ALM")
+        step = next(step for step in steps if rendered_text(item["action"], links) in rendered_text(step.body, links))
+        other = next(role["role"] for role in facts["ask-hr"]["notes"]["delivery_roles"] if role["role"] != item["owner"])
+        replacement = step.owner_line.replace(step.role, other)
+        error = "does not name its recorded role"
+    else:
+        step = steps[0]
+        replacement = f"**Owner:** {step.owner}" + (" · **Role:** Invented role" if mutation == "invalid-role" else "")
+        error = "must name a valid delivery role"
+    changed = dict(all_outputs)
+    changed[path] = original.replace(step.body, step.body.replace(step.owner_line, replacement, 1), 1)
+    assert changed[path] != original, "Owner-role mutation made no change"
+    with pytest.raises(AssertionError, match=error):
+        validate_owner_roles(changed, facts, links)
+
+
+@pytest.mark.parametrize("mutation", ["removed-frame", "changed-caption", "reordered-frames", "duplicate-frame"])
+def test_negative_captured_build_checklist_fidelity(all_outputs, readability_facts, links, mutation):
+    facts = {"ask-hr": readability_facts["ask-hr"]}
+    validate_captured_build_checklists(all_outputs, facts, links)
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    body, entries = captured_checklist(all_outputs[path], links, path)
+    lines = body.splitlines()
+    indexes = [i for i, line in enumerate(lines) if re.match(r"^\s*\d+[.)]\s+", line)]
+    assert len(indexes) == len(entries) >= 2, "Checklist mutation requires at least two real captured frames"
+    if mutation == "removed-frame":
+        del lines[indexes[-1]]
+    elif mutation == "duplicate-frame":
+        lines.append(f"{len(entries) + 1}. {entries[0][1]}")
+    elif mutation == "changed-caption":
+        lines[indexes[0]] = "1. Invented capture step"
+    else:
+        lines[indexes[0]] = "1. " + entries[1][1]
+        lines[indexes[1]] = "2. " + entries[0][1]
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(body, "\n".join(lines), 1)
+    assert changed[path] != all_outputs[path], "Captured checklist mutation made no change"
+    with pytest.raises(AssertionError, match="manual checklist length/order|caption is not verbatim"):
+        validate_captured_build_checklists(changed, facts, links)
+
+
+def test_negative_fourth_lane_choice_is_rejected(all_outputs, links):
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    original = all_outputs[path]
+    validate_build_lane_table(original, links, path)
+    phase = rendered_section(original, PHASE_TITLES[2], links, path)
+    row = rendered_table(phase, BUILD_LANE_HEADER, 3, path, links)[-1][0]
+    changed = original.replace(row, row + "\n| Invented lane | Anyone | Unsupported output |", 1)
+    with pytest.raises(AssertionError, match="lane table exceeds three rows"):
+        validate_build_lane_table(changed, links, path)
+
+
+def test_every_notes_item_has_page_and_section_keyed_ledger_provenance(all_outputs, readability_facts, links):
+    expected = sum(sum(1 for _ in note_source_locations(source["notes"])) for source in readability_facts.values())
+    assert expected, "No authored notes-item sources were measured"
+    assert validate_notes_source_ledgers(all_outputs, readability_facts, links) == expected
+
+
+@pytest.mark.parametrize("mutation", ["missing-source", "wrong-section", "wrong-page", "wrong-next-anchor"])
+def test_negative_notes_ledger_traceability(all_outputs, all_render, sources, readability_facts, links, mutation):
+    slug = "ask-hr"
+    facts = {slug: readability_facts[slug]}
+    validate_notes_source_ledgers(all_outputs, facts, links)
+    artifact, title = "2.Architecture.md", "State and Recovery"
+    target = facts[slug]["notes"]["state_and_recovery"][0]["source"]
+    path, page, anchor = page_source_ledger(all_outputs, slug, artifact, links)
+    row = next(row for _, row, cells in table_rows(page, links) if rendered_text(cells[0], links) == title)
+    changed = dict(all_outputs)
+    if mutation == "missing-source":
+        href = next(href for _, href in links.extract_links(row) if source_target(path, href) == target)
+        replacement = row.replace(href, "../../../solutions/catalog.json")
+        changed[path] = changed[path].replace(row, replacement, 1)
+        error = "source is missing from"
+    elif mutation == "wrong-section":
+        changed[path] = changed[path].replace(row, row.replace(title, "Unrelated section", 1), 1)
+        error = "missing source-ledger section"
+    elif mutation == "wrong-page":
+        changed[path] = changed[path].replace("### Sources: " + artifact, "### Sources: Unrelated.md", 1)
+        error = "missing per-page source ledger"
+    else:
+        path = f"01-solutions/{slug}/{artifact}"
+        changed[path] = changed[path].replace("#" + anchor, "#" + links.github_slug("Sources: 1.Overview.md"), 1)
+        error = "page-specific"
+    assert changed[path] != all_outputs[path], "Ledger mutation made no change"
+    with pytest.raises(AssertionError, match=error):
+        if mutation == "wrong-next-anchor":
+            validate_resource_ledger(changed, slug, all_render.page_sources, links, sources["files"])
+        else:
+            validate_notes_source_ledgers(changed, facts, links)
+    validate_notes_source_ledgers(all_outputs, facts, links)
+
+
+def wiring_parts(step, system, links, context):
+    blocks = [
+        block.strip() for block in re.split(r"\n\s*\n", step.body)
+        if re.match(r"^\d+[.)]\s+", block.strip())
+    ]
+    expected = (f"Bind {system}", f"Identity for {system}", f"Scope {system}", f"Exit test for {system}")
+    assert len(blocks) == 4, f"{context}: {system} wiring needs bind, identity, scoping and exit-test actions"
+    for index, (block, label) in enumerate(zip(blocks, expected), 1):
+        assert re.match(rf"^{index}[.)]\s+", block) and label in rendered_text(block, links), (
+            f"{context}: {system} wiring lacks its {label} action"
+        )
+    return blocks
+
+
+def validate_wiring_procedures(outputs, facts, links):
+    measured = 0
+    for slug, source in facts.items():
+        architecture = f"01-solutions/{slug}/2.Architecture.md"
+        section = rendered_section(outputs[architecture], "Integration Points", links, architecture)
+        points = {
+            rendered_text(cells[0], links): rendered_text(cells[3], links)
+            for _, cells in rendered_table(section, INTEGRATION_HEADER, 6, architecture, links)
+        } if INTEGRATION_HEADER in section else {}
+        path = f"01-solutions/{slug}/3.Runbook.md"
+        steps = numbered_steps(outputs[path], 3, links, path)
+        if not points:
+            assert len(steps) == 1 and "No integration system can be derived" in rendered_text(steps[0].body, links), (
+                f"{path}: package without integrations must not invent a wiring procedure"
+            )
+            continue
+        declared = {name.casefold() for name in source["seam_candidates"]}
+        assert set(name.casefold() for name in points) <= declared, f"{path}: integration system is not declared by the package"
+        assert len(steps) == len(points), f"{path}: Phase 3 needs exactly one step per integration point"
+        seen = set()
+        notes = source["notes"]
+        for step in steps:
+            system = step.title.removeprefix("Integrate ")
+            assert system in points and system not in seen, f"{path}: Phase 3 step names an undeclared or repeated system: {system}"
+            seen.add(system)
+            bind, identity, scope, exit_test = wiring_parts(step, system, links, path)
+            access = points[system]
+            assert f"Bind {system} — {access}:" in rendered_text(bind, links), f"{path}: {system} access differs from its integration contract"
+            identity_text = rendered_text(identity, links)
+            assert re.search(r"\bDecide\b", identity_text, re.I) and "end-user" in identity_text and re.search(
+                r"\b(?:maker|service)\b", identity_text,
+            ), f"{path}: {system} needs an end-user versus maker/service identity decision"
+            guidance = [
+                href for _, href in links.extract_links(identity)
+                if href.startswith("https://learn.microsoft.com/en-us/")
+            ]
+            assert len(guidance) == 1, f"{path}: {system} identity decision needs exactly one Learn action link"
+            assert guidance[0] in {
+                "https://learn.microsoft.com/en-us/microsoft-copilot-studio/configuration-end-user-authentication",
+                notes.get("identity", {}).get("source"),
+            }, f"{path}: {system} identity guidance is not supported by the recorded identity source"
+            for href, count in Counter(
+                href for _, href in links.extract_links(step.body)
+                if href.startswith("https://learn.microsoft.com/en-us/")
+            ).items():
+                assert count == 1, f"{path}: platform-action Learn link repeated in the same step: {href}"
+            scoping = rendered_text(scope, links)
+            if notes.get("identity"):
+                for restriction in notes["identity"]["least_privilege"]:
+                    assert authored_note_text(restriction, links) in scoping, (
+                        f"{path}: {system} scoping lost a recorded least-privilege restriction"
+                    )
+            else:
+                assert "least-privilege" in scoping and re.search(r"allowed|denied|permissions", scoping), (
+                    f"{path}: {system} scoping is not an enforceable access decision"
+                )
+            outcome = rendered_text(exit_test, links)
+            assert "expected and actual" in outcome, f"{path}: {system} exit test must record expected and actual outcomes"
+            candidates = [item["expected"] for item in notes.get("boundary_tests", [])] + [
+                item["behavior"] for item in notes.get("state_and_recovery", [])
+                if item["id"] not in INTEGRITY_SYMPTOMS
+            ]
+            if candidates:
+                assert any(authored_note_text(value, links).casefold() in outcome.casefold() for value in candidates), (
+                    f"{path}: {system} exit test is not assembled from recorded boundary/recovery outcomes"
+                )
+            else:
+                assert all(word in outcome for word in ("allowed", "denied", "unavailable")), (
+                    f"{path}: {system} exit test must measure allowed, denied and unavailable-source outcomes"
+                )
+            measured += 1
+    assert measured, "No declared-system wiring procedures were measured"
+    return measured
+
+
+def test_all_51_phase_3_steps_are_sourced_wiring_procedures(all_outputs, readability_facts, links):
+    validate_wiring_procedures(all_outputs, readability_facts, links)
+
+
+@pytest.mark.parametrize(
+    "mutation, error",
+    [
+        ("system", "undeclared or repeated system"), ("access", "access differs"),
+        ("identity", "identity decision"), ("scope", "least-privilege restriction"),
+        ("exit-test", "exit test is not assembled"), ("missing-action", "wiring needs"),
+        ("duplicate-guidance", "exactly one Learn action link"),
+    ],
+)
+def test_negative_phase_3_wiring_contract(all_outputs, readability_facts, links, mutation, error):
+    slug = "ask-hr"
+    facts = {slug: readability_facts[slug]}
+    validate_wiring_procedures(all_outputs, facts, links)
+    path = f"01-solutions/{slug}/3.Runbook.md"
+    step = numbered_steps(all_outputs[path], 3, links, path)[0]
+    system = step.title.removeprefix("Integrate ")
+    blocks = wiring_parts(step, system, links, path)
+    changed = dict(all_outputs)
+    if mutation == "system":
+        changed[path] = changed[path].replace("### Step 3-1. " + step.title, "### Step 3-1. Integrate Invented system", 1)
+    else:
+        replacement = step.body
+        if mutation == "access":
+            point = next(point for point in facts[slug]["notes"]["integration_points"] if point["system"] == system)
+            replacement = replacement.replace(f"Bind {system} — {point['access']}:", f"Bind {system} — administrator:", 1)
+        elif mutation == "identity":
+            replacement = replacement.replace(blocks[1], f"2. **Identity for {system}:** Use any identity.", 1)
+        elif mutation == "scope":
+            restriction = facts[slug]["notes"]["identity"]["least_privilege"][0]
+            replacement = replacement.replace(restriction, "No access restriction applies.", 1)
+        elif mutation == "exit-test":
+            replacement = replacement.replace(blocks[3], f"4. **Exit test for {system}:** Record expected and actual results. Declare success without evidence.", 1)
+        elif mutation == "missing-action":
+            replacement = replacement.replace(blocks[2], "", 1)
+        else:
+            href = next(href for _, href in links.extract_links(blocks[1]) if href.startswith("https://learn.microsoft.com/en-us/"))
+            replacement = replacement.replace(blocks[1], blocks[1] + f" [Configure authentication again]({href})", 1)
+        changed[path] = changed[path].replace(step.body, replacement, 1)
+    assert changed[path] != all_outputs[path], f"{mutation}: wiring mutation made no change"
+    with pytest.raises(AssertionError, match=error):
+        validate_wiring_procedures(changed, facts, links)
+    validate_wiring_procedures(all_outputs, facts, links)
+
+
+def validate_baseline_labels(outputs, facts, links):
+    for slug, source in facts.items():
+        path = f"01-solutions/{slug}/3.Runbook.md"
+        body = rendered_section(outputs[path], PHASE_TITLES[0], links, path)
+        lines = [line for line in links.strip_code(body, inline=False).splitlines() if line.startswith("**Measure:** ")]
+        assert len(lines) == 1, f"{path}: baseline needs one explicit Measure label, not a bare fragment"
+        if source["notes"].get("baseline"):
+            assert authored_note_text(source["notes"]["baseline"]["measure"], links).rstrip(".") in rendered_text(lines[0], links), (
+                f"{path}: Measure label lost the recorded scenario measure"
+            )
+
+
+def test_all_51_baselines_are_labeled_for_the_reader(all_outputs, readability_facts, links):
+    validate_baseline_labels(all_outputs, readability_facts, links)
+
+
+def test_negative_bare_baseline_fragment(all_outputs, readability_facts, links):
+    facts = {"ask-hr": readability_facts["ask-hr"]}
+    validate_baseline_labels(all_outputs, facts, links)
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace("**Measure:** ", "", 1)
+    assert changed[path] != all_outputs[path], "Baseline-label mutation made no change"
+    with pytest.raises(AssertionError, match="baseline needs one explicit Measure label"):
+        validate_baseline_labels(changed, facts, links)
+
+
+def validate_native_harness_citation(outputs, slug, links):
+    targets = section_source_ledger(outputs, slug, "1.Overview.md", "Delivery Lanes", links)
+    assert "https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview" in targets, (
+        f"{slug}: native form must cite the verified harness documentation in its ledger section"
+    )
+
+
+def test_all_51_native_form_claims_retain_the_verified_harness_reference(all_outputs, slugs, links):
+    for slug in slugs:
+        validate_native_harness_citation(all_outputs, slug, links)
+
+
+def test_negative_native_form_ledger_cannot_lose_its_harness_reference(all_outputs, links):
+    slug = "ask-hr"
+    validate_native_harness_citation(all_outputs, slug, links)
+    path, page, _ = page_source_ledger(all_outputs, slug, "1.Overview.md", links)
+    row = next(row for _, row, cells in table_rows(page, links) if rendered_text(cells[0], links) == "Delivery Lanes")
+    replacement = row.replace(
+        "https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview",
+        "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/skills-overview",
+    )
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(row, replacement, 1)
+    assert changed[path] != all_outputs[path], "Harness provenance mutation made no change"
+    with pytest.raises(AssertionError, match="native form must cite the verified harness documentation"):
+        validate_native_harness_citation(changed, slug, links)
+
+
+OWNER_CONTRACT = {
+    (0, "Qualify the outcome and baseline"): "Customer or partner",
+    (0, "Adapt scope and name owners"): "Customer or partner",
+    (1, "Apply the identity design"): "Template",
+    (1, "Configure tenant controls"): "Customer or partner",
+    (2, "Choose the build lane"): "Customer or partner",
+    (2, "Build the selected implementation"): "Template",
+    (2, "Enforce workshop integrity"): "Template",
+    (2, "Replay the synthetic proof"): "Template",
+    (4, "Adapt the evaluation corpus"): "Customer or partner",
+    (4, "Set thresholds and evaluate your data"): "Customer or partner",
+    (5, "Review the template release prerequisites"): "Template",
+    (5, "Run the governed pilot"): "Customer or partner",
+    (5, "Publish and share deliberately"): "Customer or partner",
+    (6, "Retain the operational playbook"): "Template",
+    (6, "Own changes and ongoing verification"): "Customer or partner",
+}
+TEMPLATE_INTERNAL_SYSTEM = re.compile(
+    r"\b(?:synthetic knowledge|operation skills|knowledge package|knowledge files|skill package)\b", re.I,
+)
+CUSTOMER_ACTION = re.compile(
+    r"\b(?:replac(?:e|ing)|substitut(?:e|ing))\b[^.!?\n]*\bcustomer (?:fixtures|records|data|content)\b|"
+    r"\b(?:design|test)\b[^.!?\n]*\bcustomer-specific recovery\b|"
+    r"\b(?:bind|wire)\b[^.!?\n]*\b(?:customer systems|live connections|production systems)\b|"
+    r"\b(?:approve|publish|share)\b[^.!?\n]*\badapted production build\b",
+    re.I,
+)
+
+
+def validate_owner_contract(outputs, facts, links):
+    measured = 0
+    for slug, source in facts.items():
+        path = f"01-solutions/{slug}/3.Runbook.md"
+        runbook = outputs[path]
+        seen = Counter()
+        for phase in range(7):
+            for step in numbered_steps(runbook, phase, links, path):
+                key = phase, step.title
+                if key in OWNER_CONTRACT:
+                    expected = OWNER_CONTRACT[key]
+                    seen[key] += 1
+                elif phase == 3:
+                    expected = "Customer or partner"
+                    assert step.title == "Define your integration boundary" or step.title.startswith("Integrate "), (
+                        f"{path}: unmapped Phase 3 ownership: {step.title}"
+                    )
+                    assert not TEMPLATE_INTERNAL_SYSTEM.search(step.title), (
+                        f"{path}: customer wiring must not name template internals: {step.title}"
+                    )
+                else:
+                    hardening = [
+                        item for item in source["notes"].get("production_hardening", [])
+                        if item["phase"] == phase and item["area"] == step.title
+                    ]
+                    assert len(hardening) == 1, f"{path}: step has no owner contract: Phase {phase} / {step.title}"
+                    expected = "Customer or partner"
+                    assert step.role == hardening[0]["owner"], f"{path}: hardening step lost its accountable role"
+                assert step.owner == expected, (
+                    f"{path}: owner contract for Phase {phase} / {step.title} requires {expected}, got {step.owner}"
+                )
+                if step.owner == "Template":
+                    for line in step.body.splitlines()[1:]:
+                        prose = rendered_text(line, links)
+                        action = CUSTOMER_ACTION.search(prose)
+                        if action:
+                            prefix = prose[:action.start()]
+                            assert re.search(r"\b(?:never|do not|must not|without)\s*$", prefix, re.I), (
+                                f"{path}: Template step assigns customer action: {prose!r}"
+                            )
+                measured += 1
+        assert all(seen[key] == 1 for key in OWNER_CONTRACT), (
+            f"{path}: core owner-contract steps missing or duplicated: {[key for key in OWNER_CONTRACT if seen[key] != 1]}"
+        )
+        prerequisites = rendered_section(runbook, "Prerequisites", links, path)
+        rows = rendered_table(prerequisites, "| Requirement | Details | Owner |", 3, path, links)
+        authored = {item["item"] for item in source["notes"].get("prerequisites", [])}
+        seen_requirements = set()
+        for _, cells in rows:
+            requirement = rendered_text(cells[0], links)
+            expected = "Template" if requirement == "Build workload" else "Customer or partner"
+            assert rendered_text(cells[2], links) == expected, (
+                f"{path}: prerequisite owner contract for {requirement} requires {expected}"
+            )
+            seen_requirements.add(requirement)
+        assert authored <= seen_requirements, f"{path}: prerequisite ownership did not measure every authored requirement"
+    assert measured, "No semantic step owners were measured"
+    return measured
+
+
+EXIT_MILESTONES = (
+    (2, "build proof", re.compile(
+        r"\b(?:cli-copilot|Draft|Preview|smoke tests?)\b|\b(?:manual|source-controlled) (?:build|project|inventory)\b",
+        re.I,
+    )),
+    (3, "system wiring", re.compile(
+        r"\bcustomer-approved connections\b|\bconnections start read-only\b|"
+        r"\bmapped inputs and outputs are verified\b|\bread-only access (?:passes|is verified)\b",
+        re.I,
+    )),
+    (4, "customer evaluation", re.compile(
+        r"\badapted evaluations\b|\bcustomer[- ](?:data|defined).{0,70}\b(?:thresholds|acceptance measures)\b|"
+        r"\bcustomer-data success measures\b",
+        re.I,
+    )),
+    (5, "publication or pilot approval", re.compile(
+        r"\bproduction (?:publish|publication)\b|\bpublication,\s*channels\b|"
+        r"\bpublication (?:has|is).{0,60}\b(?:confirm|approv)|"
+        r"\bpilot go/no-go (?:is )?recorded\b",
+        re.I,
+    )),
+    (6, "operational recovery", re.compile(
+        r"\brecovery rehearsal\b|\boperator reviews\b.{0,140}\bafter rollout\b",
+        re.I,
+    )),
+)
+
+
+def validate_phase_order(runbook, links, context):
+    for phase, title in enumerate(PHASE_TITLES):
+        body = rendered_section(runbook, title, links, context)
+        assert "### Exit criteria" in body, f"{context}: Phase {phase} exit criteria cannot be measured"
+        tail = body.rsplit("### Exit criteria", 1)[1]
+        criteria = [
+            rendered_text(match[1], links) for line in links.strip_code(tail, inline=False).splitlines()
+            if (match := re.match(r"^\s*-\s+\[[ xX]\]\s+(.+)$", line))
+        ]
+        assert criteria, f"{context}: Phase {phase} exit criteria are empty"
+        for criterion in criteria:
+            for match in re.finditer(r"\b(?:complete|finish|pass)\s+Phase\s+(\d+)\b", criterion, re.I):
+                assert int(match[1]) <= phase, f"{context}: Phase {phase} exit requires later Phase {match[1]}"
+            for earliest, milestone, pattern in EXIT_MILESTONES:
+                assert earliest <= phase or not pattern.search(criterion), (
+                    f"{context}: Phase {phase} exit requires later-phase {milestone} (Phase {earliest}): {criterion}"
+                )
+
+
+def validate_identity_defaults(outputs, facts, links):
+    measured = 0
+    for slug, source in facts.items():
+        path = f"01-solutions/{slug}/2.Architecture.md"
+        body = rendered_section(outputs[path], "Identity and Permissions", links, path)
+        rows = rendered_table(body, "| Template default | Customer or partner decision |", 2, path, links)
+        values = [rendered_text(cells[0], links) for _, cells in rows]
+        auth = [value.removeprefix("Authentication: ") for value in values if value.startswith("Authentication: ")]
+        audience = [value.removeprefix("Audience: ") for value in values if value.startswith("Audience: ")]
+        assert len(auth) == len(audience) == 1, f"{path}: authentication and audience defaults must each appear once"
+        assert source["authentication_mode"] == "Integrated", f"{path}: unmeasured native authentication mode"
+        expected_auth = source["notes"].get("identity", {}).get("auth", "Microsoft Entra ID authentication")
+        assert auth[0] == authored_note_text(expected_auth, links) and "Microsoft Entra ID authentication" in auth[0], (
+            f"{path}: authentication default differs from settings.mcs.yml / recorded identity"
+        )
+        personas = source["registry_personas"] or ["Customer or partner defines the audience"]
+        expected_audience = "; ".join(personas) if isinstance(personas, list) else personas
+        assert audience[0] == expected_audience, f"{path}: audience default differs from registry personas / explicit fallback"
+        measured += 1
+    assert measured, "No identity defaults were measured"
+    return measured
+
+
+def test_all_51_steps_and_prerequisites_obey_semantic_owner_contracts(all_outputs, readability_facts, links):
+    validate_owner_contract(all_outputs, readability_facts, links)
+
+
+def test_all_51_phase_exits_never_require_later_phase_work(all_outputs, slugs, links):
+    for slug in slugs:
+        path = f"01-solutions/{slug}/3.Runbook.md"
+        validate_phase_order(all_outputs[path], links, path)
+
+
+def test_all_51_identity_defaults_match_native_authentication_and_registry_audience(all_outputs, readability_facts, links):
+    assert validate_identity_defaults(all_outputs, readability_facts, links) == 51
+
+
+@pytest.mark.parametrize("mutation", ["O1", "O2", "O3", "O4", "lane-choice", "customer-data", "publishing", "template-customer-action"])
+def test_negative_owner_honesty_mutations(all_outputs, readability_facts, links, mutation):
+    slug = "ask-hr"
+    facts = {slug: readability_facts[slug]}
+    validate_owner_contract(all_outputs, facts, links)
+    path = f"01-solutions/{slug}/3.Runbook.md"
+    changed = dict(all_outputs)
+    if mutation == "O4":
+        body = rendered_section(changed[path], "Prerequisites", links, path)
+        replacement = body
+        names = {item["item"] for item in facts[slug]["notes"]["prerequisites"]}
+        for row, cells in rendered_table(body, "| Requirement | Details | Owner |", 3, path, links):
+            if rendered_text(cells[0], links) in names:
+                cells[2] = "Template"
+                replacement = replacement.replace(row, "| " + " | ".join(cells) + " |", 1)
+        changed[path] = changed[path].replace(body, replacement, 1)
+    else:
+        phase, title = {
+            "O1": (3, None),
+            "O2": (4, "Set thresholds and evaluate your data"),
+            "O3": (2, "Build the selected implementation"),
+            "lane-choice": (2, "Choose the build lane"),
+            "customer-data": (4, "Adapt the evaluation corpus"),
+            "publishing": (5, "Publish and share deliberately"),
+            "template-customer-action": (6, "Retain the operational playbook"),
+        }[mutation]
+        steps = [step for step in numbered_steps(changed[path], phase, links, path) if title is None or step.title == title]
+        assert steps, f"{mutation}: required real step was not measured"
+        for step in steps:
+            if mutation == "template-customer-action":
+                replacement = step.body + "\n\nDesign and test customer-specific recovery now."
+            else:
+                owner = "Customer or partner" if mutation == "O3" else "Template"
+                replacement = step.body.replace(f"**Owner:** {step.owner}", f"**Owner:** {owner}", 1)
+            changed[path] = changed[path].replace(step.body, replacement, 1)
+    assert changed[path] != all_outputs[path], f"{mutation}: owner mutation made no change"
+    with pytest.raises(AssertionError, match="owner contract|Template step assigns customer action"):
+        validate_owner_contract(changed, facts, links)
+    validate_owner_contract(all_outputs, facts, links)
+
+
+@pytest.mark.parametrize(
+    "phase, criterion",
+    [
+        (0, "The completed agent remains Draft."),
+        (1, "The source-controlled build uses cli-copilot and has passed its smoke test."),
+        (2, "Customer-approved connections preserve the reviewed contract."),
+        (3, "Adapted evaluations record customer-data acceptance measures."),
+        (4, "Production publication has explicit confirmation."),
+        (5, "The recovery rehearsal uses a supported restore target."),
+        (1, "Complete Phase 4 before accepting this phase."),
+    ],
+)
+def test_negative_phase_exit_cannot_require_future_work(all_outputs, links, phase, criterion):
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    original = all_outputs[path]
+    validate_phase_order(original, links, path)
+    body = rendered_section(original, PHASE_TITLES[phase], links, path)
+    changed = original.replace(body, body + "\n- [ ] " + criterion + "\n", 1)
+    with pytest.raises(AssertionError, match="exit requires later"):
+        validate_phase_order(changed, links, path)
+
+
+def test_negative_E1_swapped_phase_4_and_5_exit_criteria(all_outputs, links):
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    original = all_outputs[path]
+    validate_phase_order(original, links, path)
+    fourth = rendered_section(original, PHASE_TITLES[4], links, path)
+    fifth = rendered_section(original, PHASE_TITLES[5], links, path)
+    fourth_head, fourth_exit = fourth.rsplit("### Exit criteria", 1)
+    fifth_head, fifth_exit = fifth.rsplit("### Exit criteria", 1)
+    changed = original.replace(fourth, fourth_head + "### Exit criteria" + fifth_exit, 1)
+    changed = changed.replace(fifth, fifth_head + "### Exit criteria" + fourth_exit, 1)
+    assert changed != original, "E1 must swap real, distinct phase criteria"
+    with pytest.raises(AssertionError, match="Phase 4 exit requires later-phase publication"):
+        validate_phase_order(changed, links, path)
+
+
+@pytest.mark.parametrize("claim", ["Makers building with PAC CLI and VS Code", "Browser-only makers; local tooling is required"])
+def test_negative_L1_manual_lane_cannot_claim_local_tooling(all_outputs, links, claim):
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    original = all_outputs[path]
+    validate_build_lane_table(original, links, path)
+    phase = rendered_section(original, PHASE_TITLES[2], links, path)
+    row, cells = rendered_table(phase, BUILD_LANE_HEADER, 3, path, links)[1]
+    cells[1] = claim
+    changed = original.replace(row, "| " + " | ".join(cells) + " |", 1)
+    with pytest.raises(AssertionError, match="Manual lane"):
+        validate_build_lane_table(changed, links, path)
+
+
+@pytest.mark.parametrize("mutation", ["row", "prohibition"])
+def test_negative_C50_stop_at_draft_cannot_disappear(all_outputs, readability_facts, links, mutation):
+    facts = {"ask-hr": readability_facts["ask-hr"]}
+    validate_integrity_once(all_outputs, facts, links)
+    path = "01-solutions/ask-hr/2.Architecture.md"
+    body = rendered_section(all_outputs[path], "State and Recovery", links, path)
+    row = recovery_row(body, "draft-publication-stop", links, path)
+    replacement = "" if mutation == "row" else row.replace(
+        facts["ask-hr"]["integrity"]["draft-publication-stop"][1], "Publish whenever convenient.", 1,
+    )
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(row, replacement, 1)
+    assert changed[path] != all_outputs[path], "C50 must remove the real Stop-at-Draft rule"
+    with pytest.raises(AssertionError, match="must render exactly once|integrity rule behavior changed"):
+        validate_integrity_once(changed, facts, links)
+
+
+@pytest.mark.parametrize("mutation", ["V4", "V5", "missing-authentication", "missing-audience"])
+def test_negative_identity_default_mutations(all_outputs, readability_facts, links, mutation):
+    slug = next(slug for slug, source in readability_facts.items() if not source["notes"].get("identity"))
+    facts = {slug: readability_facts[slug]}
+    validate_identity_defaults(all_outputs, facts, links)
+    path = f"01-solutions/{slug}/2.Architecture.md"
+    body = rendered_section(all_outputs[path], "Identity and Permissions", links, path)
+    key = "Authentication:" if mutation in {"V4", "missing-authentication"} else "Audience:"
+    row, cells = next(
+        (row, cells) for row, cells in rendered_table(body, "| Template default | Customer or partner decision |", 2, path, links)
+        if rendered_text(cells[0], links).startswith(key)
+    )
+    if mutation.startswith("missing"):
+        replacement = ""
+        error = "defaults must each appear once"
+    else:
+        cells[0] = key + (" No authentication required" if mutation == "V4" else " All employees")
+        replacement = "| " + " | ".join(cells) + " |"
+        error = "authentication default differs" if mutation == "V4" else "audience default differs"
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(row, replacement, 1)
+    assert changed[path] != all_outputs[path], "Identity mutation made no change"
+    with pytest.raises(AssertionError, match=error):
+        validate_identity_defaults(changed, facts, links)
+
+
+def test_negative_D2_architecture_cannot_repeat_the_full_disclaimer(all_outputs, links):
+    path = "01-solutions/ask-hr/2.Architecture.md"
+    original = {path: all_outputs[path]}
+    validate_template_disclaimers(original, links)
+    with pytest.raises(AssertionError, match="full template disclaimer belongs only"):
+        validate_template_disclaimers({path: original[path] + "\n" + TEMPLATE_DISCLAIMER + "\n"}, links)
+
+
+def test_negative_template_internals_cannot_be_customer_integrations(all_outputs, readability_facts, links):
+    facts = {"ask-hr": readability_facts["ask-hr"]}
+    validate_owner_contract(all_outputs, facts, links)
+    path = "01-solutions/ask-hr/3.Runbook.md"
+    step = numbered_steps(all_outputs[path], 3, links, path)[0]
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(
+        "### Step 3-1. " + step.title, "### Step 3-1. Integrate Synthetic knowledge and operation skills", 1,
+    )
+    assert changed[path] != all_outputs[path], "Template-internal integration mutation made no change"
+    with pytest.raises(AssertionError, match="customer wiring must not name template internals"):
+        validate_owner_contract(changed, facts, links)
+
+
+def test_negative_consolidated_contract_keeps_each_knowledge_source(all_outputs, template_facts, links):
+    slug = "inventory-rebalancing"
+    facts = {slug: template_facts[slug]}
+    signatures = Counter((item["entity"], tuple(item["fields"])) for item in facts[slug]["knowledge_tables"])
+    duplicate = next(signature for signature, count in signatures.items() if count > 1)
+    sources = {
+        item["source"] for item in facts[slug]["knowledge_tables"]
+        if (item["entity"], tuple(item["fields"])) == duplicate
+    }
+    assert len(sources) > 1, "Provenance mutation requires a contract recorded in multiple knowledge sources"
+    validate_template_derivations(all_outputs, facts, links)
+    path, page, _ = page_source_ledger(all_outputs, slug, "2.Architecture.md", links)
+    row = next(row for _, row, cells in table_rows(page, links) if rendered_text(cells[0], links) == "Data Contract")
+    source = sorted(sources)[0]
+    target = next(target for _, target in links.extract_links(row) if source_target(path, target) == source)
+    changed = dict(all_outputs)
+    changed[path] = changed[path].replace(row, row.replace(target, "../../../solutions/catalog.json"), 1)
+    assert changed[path] != all_outputs[path], "Consolidated-provenance mutation made no change"
+    with pytest.raises(AssertionError, match="deduplicated contracts lost knowledge-table provenance"):
+        validate_template_derivations(changed, facts, links)
+
+
+@pytest.mark.parametrize("mutation", ["missing-verdict", "historical-pass-needs-reshoot", "missing-replay"])
+def test_F67_partial_verdicts_never_become_all_passed(
+    generator, library, final_round_facts, monkeypatch, links, mutation,
+):
+    slug = "ask-hr"
+    facts = {slug: copy.deepcopy(final_round_facts[slug])}
+    evidence = facts[slug]["preview"]
+    assert all(case["passed"] is True for case in evidence["cases"]), "Partial-verdict probe needs a fully scored real control"
+    if mutation == "missing-replay":
+        evidence["cases"].pop()
+    else:
+        evidence["cases"][0]["passed"] = None if mutation == "missing-verdict" else True
+        evidence["cases"][0]["status"] = "reshoot_required"
+    original_json = generator.Library.json
+
+    def modified_evidence(instance, relative, required=False):
+        if relative == facts[slug]["preview_path"]:
+            return copy.deepcopy(evidence)
+        return original_json(instance, relative, required=required)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(generator.Library, "json", modified_evidence)
+        rendered = generator.render_solution(library, slug)
+    outputs = {f"01-solutions/{slug}/{artifact}": text for artifact, text in rendered.items()}
+    validate_quality_tiers(outputs, facts, links)
+    path = f"01-solutions/{slug}/1.Overview.md"
+    row = next(row for _, row, cells in table_rows(outputs[path], links) if rendered_text(cells[0], links) == "Quality tier")
+    count = len(facts[slug]["cases"])
+    assert f"{count - 1} of {count} synthetic cases passed" in row, "An unresolved locked case must stay in the denominator"
+    changed = dict(outputs)
+    changed[path] = changed[path].replace(row, row.replace(f"{count - 1} of {count}", f"{count} of {count}", 1), 1)
+    with pytest.raises(AssertionError, match="passed/total differs"):
+        validate_quality_tiers(changed, facts, links)
+
+
+@pytest.fixture
+def alias_notes():
+    source = "solutions/product-line-optimization/FIELD-GUIDE.md"
+
+    def record(**values):
+        return {**values, "source": source}
+
+    return {
+        "schema": "aibast-runbook-notes/2.0",
+        "solution": "@aibast-agents-library/production-line-optimization",
+        "target_users": [record(role="Plant Manager", need="Review the synthetic production-line plan.")],
+        "scope_in": [record(text="Analyze the supplied synthetic production-line records.")],
+        "scope_out": [record(text="Do not control equipment or change production schedules.")],
+        "qualification_checklist": [record(text="Identify the target environment and accountable plant owner.")],
+        "what_goes_wrong": [record(
+            id="missing-line-proof", issue="A production-line result has no supporting evidence.",
+            response="Stop and retain the missing-evidence result for review.",
+        )],
+        "delivery_roles": [
+            record(role="Copilot Studio maker", responsibility="Maintain the packaged agent and versioned build."),
+            record(role="Plant Manager", responsibility="Approve production use independently of the maker."),
+        ],
+        "prerequisites": [record(item="Target environment", detail="The customer approves the environment and access.")],
+        "phase_exit_criteria": {
+            phase: [record(text="Record this phase's outcome and accountable review.")] for phase in PHASE_KEYS
+        },
+        "go_no_go": [record(criterion="Independent approval", threshold="The plant owner records the decision.")],
+        "boundary_tests": [record(
+            prompt="Change the line schedule now.", expected="Refuse the side effect and retain the synthetic boundary.",
+        )],
+        "design_decisions": [record(
+            decision="Separate analysis from equipment control.", reason="The template provides synthetic planning evidence.",
+        )],
+        "never_do": [record(text="Never claim an equipment or schedule change from a synthetic result.")],
+        "production_hardening": [
+            record(area="Release: ALM", action="Record the version and reviewed deployment package.", owner="Copilot Studio maker", phase=6),
+            record(area="Release: approval", action="Obtain the independent publication decision.", owner="Plant Manager", phase=5),
+        ],
+        "state_and_recovery": [record(
+            id="missing-line-proof", condition="A required record cannot be verified.",
+            behavior="Stop and retain the missing-evidence result for review.", owner="Template",
+        )],
+        "related_patterns": list(DEFAULT_PATTERNS),
+        "sources": [source],
+    }
+
+
+def overlay_note_file(generator, monkeypatch, notes_path, entry, documents=None):
+    documents = dict(documents or {})
+    original_json = generator._json
+    original_files = generator._file_universe
+    original_read = Path.read_text
+    monkeypatch.setattr(
+        generator, "_file_universe",
+        lambda root: frozenset(original_files(root)) | {notes_path} | set(documents),
+    )
+
+    def read_json(root, relative, files, required=False):
+        if relative == notes_path:
+            return copy.deepcopy(entry)
+        return original_json(root, relative, files, required=required)
+
+    def read_text(path, *args, **kwargs):
+        if path.is_relative_to(ROOT):
+            relative = path.relative_to(ROOT).as_posix()
+            if relative in documents:
+                return documents[relative]
+        return original_read(path, *args, **kwargs)
+
+    monkeypatch.setattr(generator, "_json", read_json)
+    monkeypatch.setattr(Path, "read_text", read_text)
+
+
+@pytest.fixture
+def authored_alias_render(generator, sources, links, alias_notes, monkeypatch):
+    # Package-folder slugs identify files; deployment names identify catalog entries and note contents.
+    slug = "product-line-optimization"
+    canonical = "@aibast-agents-library/production-line-optimization"
+    notes_path = f"solutions/runbook-notes/{slug}.json"
+    assert generator.PACKAGE_ALIASES[canonical.rsplit("/", 1)[-1]] == slug
+    assert sources["packages"][slug] == canonical
+    validate_notes({"solutions": {canonical: alias_notes}}, sources["catalog"], pattern_ids(sources), sources["files"])
+    overlay_note_file(generator, monkeypatch, notes_path, alias_notes)
+    monkeypatch.setattr(generator, "RUNBOOK_SOLUTIONS", (slug,))
+    loaded = generator.load_library(ROOT)
+    assert loaded.notes[canonical] == alias_notes, "Alias fixture must reach the production schema-2 loader"
+    assert loaded.solutions[slug].notes_source == notes_path, "Notes filename must follow the package-folder spelling"
+    outputs = generator.build_outputs(ROOT)
+    expected = {f"01-solutions/{slug}/{artifact}" for artifact in expected_artifacts(slug, sources["files"])}
+    assert {path for path in outputs if path.startswith(f"01-solutions/{slug}/")} == expected
+    assert not any(path.startswith("01-solutions/production-line-optimization/") for path in outputs), (
+        "The canonical catalog spelling must not create a second on-disk solution directory"
+    )
+    return slug, canonical, notes_path, outputs
+
+
+def test_authored_alias_uses_package_slug_for_notes_outputs_selection_and_recovery(
+    authored_alias_render, alias_notes, sources, links,
+):
+    slug, canonical, notes_path, outputs = authored_alias_render
+    name = sources["catalog"][canonical]["display_name"]
+    index = outputs["01-solutions/README.md"]
+    assert f"[{name}]({slug}/1.Overview.md)" in index, "Alias index must retain the catalog display name and package-folder link"
+    resource = f"01-solutions/{slug}/0.Resources/README.md"
+    assert notes_path in section_links(outputs[resource], resource, links)[1], "Alias notes file is missing from its ledger"
+    assert validate_recovery_id_mapping(
+        outputs, {"solutions": {canonical: alias_notes}}, links, sources["packages"],
+    ) == len(alias_notes["state_and_recovery"])
+    for path, text in outputs.items():
+        if path.startswith(f"01-solutions/{slug}/"):
+            validate_generated_document(path, text, links)
+
+
+def test_negative_alias_recovery_cannot_use_catalog_slug_as_a_directory(
+    authored_alias_render, alias_notes, sources, links,
+):
+    slug, canonical, _, original = authored_alias_render
+    changed = dict(original)
+    path = f"01-solutions/{slug}/2.Architecture.md"
+    changed[f"01-solutions/{canonical.rsplit('/', 1)[-1]}/2.Architecture.md"] = changed.pop(path)
+    with pytest.raises(AssertionError, match="recovery page must use package-folder spelling"):
+        validate_recovery_id_mapping(changed, {"solutions": {canonical: alias_notes}}, links, sources["packages"])
+
+
+def test_negative_alias_notes_filename_cannot_silently_use_the_catalog_slug(generator, alias_notes, monkeypatch):
+    path = "solutions/runbook-notes/production-line-optimization.json"
+    overlay_note_file(generator, monkeypatch, path, alias_notes)
+    with pytest.raises(generator.RunbookSourceError, match="notes filenames use package-folder slugs"):
+        generator.load_library(ROOT)
+
+
+SOURCE_ANCHOR_DOCUMENT = (
+    "# Anchor fixture\n\n"
+    "## Phase 1: Deploy `Model_X`\n\nRecorded procedure.\n\n"
+    "## Repeat\n\nFirst occurrence.\n\n## Repeat\n\nSecond occurrence.\n\n"
+    "## 🏗️ Reference Composition\n\nRecorded composition.\n\n"
+    '<a id="ExactID"></a>\n\n'
+    "```markdown\n## Hidden heading\n```\n"
+)
+
+
+@pytest.mark.parametrize("validator", ["public", "production"])
+@pytest.mark.parametrize(
+    "anchor, accepted",
+    [
+        ("phase-1-deploy-model_x", True),
+        ("repeat-1", True),
+        ("\ufe0f-reference-composition", True),
+        ("%EF%B8%8F-reference-composition", True),
+        ("ExactID", True),
+        ("missing-source-anchor", False),
+        ("repeat-2", False),
+        ("hidden-heading", False),
+        ("missing-explicit-id", False),
+        ("", False),
+    ],
+)
+def test_note_source_anchors_use_the_shared_github_rules(generator, sources, monkeypatch, validator, anchor, accepted):
+    path = "solutions/source-anchor-fixture.md"
+    note_path = "solutions/runbook-notes/ask-hr.json"
+    entry = copy.deepcopy(sources["notes"]["solutions"]["@aibast-agents-library/ask-hr"])
+    reference = path + "#" + anchor
+    entry["design_decisions"][0]["source"] = reference
+    entry["sources"].append(reference)
+    overlay_note_file(generator, monkeypatch, note_path, entry, {path: SOURCE_ANCHOR_DOCUMENT})
+    if validator == "public":
+        validate = lambda: validate_note_source(reference, sources["files"] | {path}, "anchor fixture")
+        error = AssertionError
+    else:
+        validate = lambda: generator.load_library(ROOT)
+        error = generator.RunbookSourceError
+    if accepted:
+        validate()
+    else:
+        with pytest.raises(error, match="anchor"):
+            validate()
+
+
+@pytest.mark.parametrize("validator", ["public", "production"])
+def test_note_source_anchor_resolves_a_real_package_heading(generator, sources, monkeypatch, validator):
+    reference = "solutions/ask-hr/FIELD-GUIDE.md#failure-recovery"
+    if validator == "public":
+        validate_note_source(reference, sources["files"], "real source control")
+    else:
+        entry = copy.deepcopy(sources["notes"]["solutions"]["@aibast-agents-library/ask-hr"])
+        entry["go_no_go"][0]["source"] = reference
+        overlay_note_file(generator, monkeypatch, "solutions/runbook-notes/ask-hr.json", entry)
+        loaded = generator.load_library(ROOT)
+        assert loaded.notes[entry["solution"]]["go_no_go"][0]["source"] == reference
+
+
+def test_anchored_note_source_survives_rendering_and_section_ledger(generator, sources, links, monkeypatch):
+    slug = "ask-hr"
+    canonical = "@aibast-agents-library/" + slug
+    reference = f"solutions/{slug}/FIELD-GUIDE.md#failure-recovery"
+    entry = copy.deepcopy(sources["notes"]["solutions"][canonical])
+    entry["go_no_go"][0]["source"] = reference
+    overlay_note_file(generator, monkeypatch, f"solutions/runbook-notes/{slug}.json", entry)
+    outputs = generator.build_outputs(ROOT, solutions=(slug,))
+    facts = {slug: {"notes": entry}}
+    validate_notes_source_ledgers(outputs, facts, links)
+    ledger = section_source_ledger(outputs, slug, "3.Runbook.md", PHASE_TITLES[5], links)
+    assert reference in ledger, "Source anchors must not disappear while rendering a notes-item ledger citation"
+    resource, page, _ = page_source_ledger(outputs, slug, "3.Runbook.md", links)
+    row = next(row for _, row, cells in table_rows(page, links) if rendered_text(cells[0], links) == PHASE_TITLES[5])
+    href = next(href for _, href in links.extract_links(row) if source_reference(resource, href) == reference)
+    changed = dict(outputs)
+    changed[resource] = changed[resource].replace(row, row.replace(href, href.split("#", 1)[0]), 1)
+    with pytest.raises(AssertionError, match="source is missing from"):
+        validate_notes_source_ledgers(changed, facts, links)
+    validate_notes_source_ledgers(outputs, facts, links)

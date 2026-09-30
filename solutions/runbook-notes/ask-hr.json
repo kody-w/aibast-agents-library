@@ -106,6 +106,14 @@
     {
       "text": "Have governance, telemetry, support and success measures been agreed for the production HR service?",
       "source": "solutions/ask-hr/FIELD-GUIDE.md"
+    },
+    {
+      "text": "Has the HR data owner approved employee and benefits data locations, cross-region processing and external HR-system transfers?",
+      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/geo-data-residency"
+    },
+    {
+      "text": "Has HR approved which employee and benefits conversations are recorded, who can download them, and the applicable retention and deletion settings?",
+      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/admin-transcript-controls"
     }
   ],
   "what_goes_wrong": [
@@ -149,7 +157,7 @@
   "delivery_roles": [
     {
       "role": "HR business owner",
-      "responsibility": "Approve the policy sources, employee-facing scope and escalation workflow; agree production success measures without treating fictional balances as customer results.",
+      "responsibility": "Approve replacement connections and governance; agree support and success measures without presenting synthetic evidence as customer results.",
       "source": "solutions/ask-hr/FIELD-GUIDE.md"
     },
     {
@@ -174,7 +182,7 @@
     },
     {
       "role": "Acceptance reviewer",
-      "responsibility": "Check HR-01 through HR-06, the refusal tests and Easy/Manual parity; reject missing citations, incomplete inventory captures and Draft badges belonging to other agents.",
+      "responsibility": "Review locked HR cases, chosen-lane evidence and any Easy/Manual parity comparison; confirm the owned agent remains Draft.",
       "source": "solutions/ask-hr/FIELD-GUIDE.md"
     },
     {
@@ -215,8 +223,13 @@
       "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-share-agent"
     },
     {
-      "item": "Tooling by build lane",
-      "detail": "Manual lane: Copilot Studio browser and reviewed files. Easy mode: VS Code Agent mode, the Microsoft Copilot Studio plugin and PAC CLI 2.9.3 or newer.",
+      "item": "Easy-mode tooling",
+      "detail": "Use the Microsoft Copilot Studio plugin and PAC CLI 2.9.3 or newer for cli-copilot authoring.",
+      "source": "solutions/ask-hr/deployment.json"
+    },
+    {
+      "item": "Manual build tooling",
+      "detail": "Use the Copilot Studio browser and reviewed files; no PAC CLI, YAML import or plugin architect.",
       "source": "solutions/ask-hr/FIELD-GUIDE.md"
     },
     {
@@ -238,11 +251,11 @@
     ],
     "phase_1": [
       {
-        "text": "The source-controlled build uses cli-copilot in the approved environment and remains Draft.",
-        "source": "solutions/ask-hr/deployment.json"
+        "text": "The approved HR environment and publisher prefix are identified, and the delivery team can authenticate.",
+        "source": "solutions/catalog.json"
       },
       {
-        "text": "The customer confirms authenticated audience and least-privilege access for restricted HR information.",
+        "text": "The customer approves the intended authenticated audience and least-privilege HR access scopes.",
         "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/configuration-end-user-authentication"
       }
     ],
@@ -288,7 +301,7 @@
     ],
     "phase_4": [
       {
-        "text": "The business owner agrees customer-data success measures; fictional fixture values are not customer acceptance thresholds.",
+        "text": "The business owner agrees customer-data success measures; synthetic evidence is not a customer KPI or production result.",
         "source": "solutions/ask-hr/FIELD-GUIDE.md"
       },
       {
@@ -302,8 +315,8 @@
         "source": "solutions/ask-hr/deployment.json"
       },
       {
-        "text": "The approved HR audience and supported channels are configured, tested and confirmed before publication.",
-        "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/publication-publish-agent"
+        "text": "After restricted publication and sharing, approved HR test users gain access and unshared test identities are denied before pilot entry.",
+        "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-share-agent"
       }
     ],
     "phase_6": [
@@ -450,9 +463,9 @@
     },
     {
       "area": "Test",
-      "action": "Test an approved deployment as intended HR users and an unshared identity; maker access does not prove user connection access.",
+      "action": "Evaluate adapted HR cases before publication under approved test user profiles; keep exact assertion checks separate from General quality scoring.",
       "owner": "Acceptance reviewer",
-      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-share-agent",
+      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/analytics-agent-evaluation-intro",
       "phase": 4
     },
     {
@@ -711,12 +724,12 @@
     },
     {
       "area": "Data residency",
-      "consideration": "Approve the environment geography and any cross-region processing or external HR data movement before connecting sources.",
+      "consideration": "HR and privacy owners approve where employee and benefits data is stored and processed, including cross-region model processing and external HR-system transfers.",
       "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/geo-data-residency"
     },
     {
       "area": "Retention",
-      "consideration": "Decide whether HR transcripts are saved, who can view or download them, and the required Dataverse retention policy.",
+      "consideration": "HR approves transcript recording, viewing, download access and Dataverse retention for employee and benefits conversations; assess service storage separately.",
       "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/admin-transcript-controls"
     },
     {

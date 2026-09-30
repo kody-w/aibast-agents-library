@@ -11,6 +11,7 @@ import argparse
 from collections import Counter
 import errno
 import fnmatch
+import importlib.util
 import json
 import math
 import os
@@ -24,6 +25,7 @@ from urllib.parse import quote, unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parent.parent
+# Disk paths, notes filenames and selectors use package-folder slugs, not catalog aliases.
 RUNBOOK_SOLUTIONS = ("ask-hr", "building-permit-processing")
 PACKAGE_ALIASES = {"production-line-optimization": "product-line-optimization"}
 DRAFT_PACKAGES = {
@@ -98,9 +100,14 @@ TEMPLATE_DISCLAIMER = (
     "must be modified to meet each customer's specific requirements. The customer or their partner connects "
     "them to their own systems, identity, data and governance in their environment."
 )
+RUNBOOK_POINTER = (
+    "**Template:** an example to modify for your requirements; the customer or partner wires it into their "
+    "environment. See the [Overview](1.Overview.md)."
+)
 LEARN_BASE = "https://learn.microsoft.com/en-us/microsoft-copilot-studio/"
 AUTH_DOC = LEARN_BASE + "configuration-end-user-authentication"
 SHARE_DOC = LEARN_BASE + "agents-experience/authoring-share-agent"
+EVALUATION_DOC = LEARN_BASE + "agents-experience/analytics-agent-evaluation-intro"
 BILLING_DOC = LEARN_BASE + "agents-experience/billing-credit-overview"
 MONITOR_DOC = LEARN_BASE + "agents-experience/analytics-overview"
 DLP_DOC = LEARN_BASE + "admin-data-loss-prevention"
@@ -134,6 +141,17 @@ class RunbookSourceError(Exception):
     """A canonical identity or source contract cannot be resolved safely."""
 
 
+# Resolve the shared parser beside this file for CLI and spec-based imports alike.
+_LINKS_SPEC = importlib.util.spec_from_file_location(
+    __name__ + "._markdown_links", Path(__file__).with_name("markdown_links.py"),
+)
+if _LINKS_SPEC is None or _LINKS_SPEC.loader is None:
+    raise RunbookSourceError("Cannot load the shared Markdown anchor parser")
+_LINKS = importlib.util.module_from_spec(_LINKS_SPEC)
+sys.modules[_LINKS_SPEC.name] = _LINKS
+_LINKS_SPEC.loader.exec_module(_LINKS)
+
+
 def _learn_source(value: str) -> bool:
     if any(character.isspace() for character in value):
         return False
@@ -164,13 +182,34 @@ def _note_text(value, location: str) -> None:
         raise RunbookSourceError(f"{NOTES}: {location} contains a sentinel string")
 
 
-def _note_source(value, location: str, files: frozenset[str]) -> None:
+def _note_source(
+    value, location: str, files: frozenset[str], root: Path = ROOT,
+    anchor_cache: dict[str, set[str]] | None = None,
+) -> None:
     _note_text(value, location)
-    if value not in files and not _learn_source(value):
+    if value in files or _learn_source(value):
+        return
+    path, separator, fragment = value.partition("#")
+    if not separator or path not in files:
         raise RunbookSourceError(f"{NOTES}: {location} has missing source or invalid source URL {value!r}")
+    if not fragment:
+        raise RunbookSourceError(f"{NOTES}: {location} has an empty source anchor: {value!r}")
+    if not path.lower().endswith((".md", ".markdown", ".html", ".htm")):
+        raise RunbookSourceError(f"{NOTES}: {location} source anchors require Markdown or HTML: {value!r}")
+    cache = anchor_cache if anchor_cache is not None else {}
+    if path not in cache:
+        try:
+            body = (root / path).read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            raise RunbookSourceError(f"{NOTES}: cannot read source anchors in {path}: {exc}") from exc
+        cache[path] = _LINKS.anchors_of(body)
+    if unquote(fragment).lower() not in cache[path]:
+        raise RunbookSourceError(f"{NOTES}: {location} has missing source anchor {value!r}")
 
 
-def _validate_notes(name: str, entry: dict, files: frozenset[str], patterns: dict, declared_systems=()) -> None:
+def _validate_notes(
+    name: str, entry: dict, files: frozenset[str], patterns: dict, declared_systems=(), root: Path = ROOT,
+) -> None:
     if entry.get("schema") != "aibast-runbook-notes/2.0" or entry.get("solution") != name:
         raise RunbookSourceError(f"{NOTES}: schema 2.0 and canonical solution {name} are required")
     string_lists = {"sources", "related_patterns"}
@@ -205,6 +244,7 @@ def _validate_notes(name: str, entry: dict, files: frozenset[str], patterns: dic
     }
     if required - entry.keys():
         raise RunbookSourceError(f"{NOTES}: {name} has missing required notes fields: {', '.join(sorted(required - entry.keys()))}")
+    anchor_cache: dict[str, set[str]] = {}
 
     def text(value, location):
         _note_text(value, location)
@@ -218,7 +258,7 @@ def _validate_notes(name: str, entry: dict, files: frozenset[str], patterns: dic
         for key, value in item.items():
             field_location = location + "." + key
             if key == "source":
-                _note_source(value, field_location, files)
+                _note_source(value, field_location, files, root, anchor_cache)
             elif key == "phase":
                 if type(value) is not int or not 0 <= value <= 6:
                     raise RunbookSourceError(f"{NOTES}: {field_location} must be an integer from 0 to 6")
@@ -255,7 +295,7 @@ def _validate_notes(name: str, entry: dict, files: frozenset[str], patterns: dic
             if field in record_lists:
                 record(item, record_lists[field], f"{name}.{field}")
             elif field == "sources":
-                _note_source(item, f"{name}.{field}", files)
+                _note_source(item, f"{name}.{field}", files, root, anchor_cache)
             else:
                 _note_text(item, f"{name}.{field}")
     for field in ("what_goes_wrong", "state_and_recovery"):
@@ -511,12 +551,17 @@ def load_library(root: Path = ROOT) -> Library:
     for path in sorted(name for name in files if posixpath.dirname(name) == NOTES and name.endswith(".json")):
         slug = PurePosixPath(path).stem
         if slug not in solutions:
+            if slug in PACKAGE_ALIASES:
+                raise RunbookSourceError(
+                    f"{path}: notes filenames use package-folder slugs; "
+                    f"use {NOTES}/{PACKAGE_ALIASES[slug]}.json"
+                )
             raise RunbookSourceError(f"{path}: notes have no catalog package")
         solution = solutions[slug]
         entry = _json(root, path, files, required=True)
         level2 = _json(root, solution.architecture_source, files)
         declared = _declared_systems(solution, level2)
-        _validate_notes(solution.name, entry, files, patterns, declared)
+        _validate_notes(solution.name, entry, files, patterns, declared, root)
         notes[solution.name] = entry
     _validate_vertical_names(root, files, {solution.agent["category"] for solution in solutions.values()})
     return Library(root, files, catalog, solutions, patterns, notes)
@@ -839,18 +884,22 @@ def _source_label(path: str, package: str) -> str:
 
 
 class Document:
-    def __init__(self, library: Library, solution: Solution, artifact: str):
+    def __init__(self, library: Library, solution: Solution, artifact: str, page_ledger=None):
         self.library = library
         self.solution = solution
         self.artifact = artifact
         self.path = f"01-solutions/{solution.slug}/{artifact}"
         self.sources = {CATALOG}
         self.sections: dict[str, str] = {}
+        self.section_sources: dict[str, set[str]] = {}
+        self.pending_sources: set[str] = set()
+        self.page_ledger = page_ledger
         self.missing_notes: set[str] = set()
 
     def source(self, relative: str) -> None:
-        if relative in self.library.files or _learn_source(relative):
+        if relative in self.library.files or relative.partition("#")[0] in self.library.files or _learn_source(relative):
             self.sources.add(relative)
+            self.pending_sources.add(relative)
 
     def data(self, relative: str) -> dict:
         self.source(relative)
@@ -859,10 +908,14 @@ class Document:
     def link(self, relative: str, label: str | None = None, fragment: str = "") -> str:
         if _learn_source(relative):
             return f"[{label or relative}]({relative})"
+        original = relative
+        if relative not in self.library.files:
+            relative, _, source_fragment = relative.partition("#")
+            fragment = fragment or source_fragment
         relative = relative.rstrip("/")
         projected = relative.startswith("01-solutions/") and relative.endswith(".md")
         if not self.library.exists(relative) and not projected:
-            return f"{label or relative} — missing source `{relative}`"
+            return f"{label or original} — missing source `{original}`"
         if relative.endswith(".html"):
             target = PAGES + quote(relative, safe="/@-._~")
         else:
@@ -870,12 +923,13 @@ class Document:
                 posixpath.relpath("/" + relative, "/" + posixpath.dirname(self.path)), safe="/@-._~",
             )
         if fragment:
-            target += "#" + fragment
-        return f"[{label or relative}]({target})"
+            target += "#" + quote(unquote(fragment).lower(), safe="/@-._~:")
+        return f"[{label or original}]({target})"
 
     def missing(self, source: str, field: str | None = None) -> str:
         if field:
-            return f"Not provided — `{field}` is absent from {self.link(source)}."
+            label = field.rsplit(".", 1)[-1].replace("_", " ")
+            return f"The package does not specify {label}; confirm this before deployment."
         return f"Not available — source `{source}` is missing."
 
     def notes(self) -> dict:
@@ -931,7 +985,10 @@ class Document:
         if not content.strip():
             raise RunbookSourceError(f"{self.path}: empty generated section {title}")
         self.sections[title] = content.strip()
-        self.sources.update(_body_sources(self.library, self.path, content))
+        inputs = self.pending_sources | _body_sources(self.library, self.path, content)
+        self.section_sources[title] = inputs
+        self.sources.update(inputs)
+        self.pending_sources = set()
 
     def render(self, title: str, next_line: str, header: str = "") -> str:
         full_sources = self.artifact == "0.Resources/README.md"
@@ -939,16 +996,25 @@ class Document:
         linked = _body_sources(self.library, self.path, body)
         self.sources.update(linked)
         if full_sources:
-            self.sections["Sources"] = "\n".join(
+            inventory = "\n".join(
                 "- " + self.link(path, _source_label(path, self.solution.package) if _learn_source(path) else path)
                 for path in sorted(self.sources)
             )
+            self.sections["Sources"] = (
+                self.sections.get("Sources", "") + "\n\n### Complete source inventory\n\n" + inventory
+            ).strip()
         if "Next" in REQUIRED_SECTIONS[self.artifact]:
-            self.sections["Next"] = next_line + "\n\n[Full source ledger](0.Resources/README.md#sources)."
+            anchor = _slug_heading("Sources: " + self.artifact)
+            self.sections["Next"] = next_line + f"\n\n[Sources for this page](0.Resources/README.md#{anchor})."
         else:
             self.sections["Sources"] += "\n\n" + next_line
         if set(self.sections) != set(REQUIRED_SECTIONS[self.artifact]):
             raise RunbookSourceError(f"{self.path}: renderer does not implement its H2 section contract")
+        if self.page_ledger is not None:
+            self.page_ledger[self.artifact] = {
+                "sources": sorted(self.sources),
+                "sections": {heading: sorted(sources) for heading, sources in self.section_sources.items()},
+            }
         chunks = [GENERATED_MARKER, "", f"# {self.solution.display_name} — {title}"]
         if self.artifact == "1.Overview.md":
             chunks += ["", TEMPLATE_DISCLAIMER]
@@ -1135,7 +1201,7 @@ def _delivery_lanes(doc: Document) -> str:
         doc.link("solutions/README.md", "release gate", "release-gate")
     )
     native_form = (
-        "Copilot Studio agent on the " + doc.link(HARNESS_DOC, "GitHub Copilot harness")
+        "Copilot Studio agent on the GitHub Copilot harness"
         + f" (template `{native['template']}`) with those {counts['skills']} skills, built by hand"
         if native.get("template") else doc.missing(settings_source, "template")
     )
@@ -1197,27 +1263,40 @@ def _quality_description(doc: Document) -> str:
     evidence = doc.data(source)
     cases = [case for case in _items(evidence.get("cases")) if isinstance(case, dict)]
     if not cases:
-        return tier + " (registry); no Copilot Studio replay evidence is recorded."
-    scored = [case for case in cases if type(case.get("passed")) is bool]
-    passed = sum(case["passed"] for case in scored)
+        return "No Copilot Studio replay evidence is recorded; registry tier: " + tier + "."
+    recorded = _case_records(cases, source)
+    locked_source = doc.solution.demo_source
+    locked = _case_records(doc.data(locked_source).get("cases"), locked_source)
+    expected = locked or recorded
+    passed, unscored, failed, reshoots = 0, [], [], []
+    for identifier in expected:
+        case = recorded.get(identifier, {})
+        status = _text(case.get("status"), "no verdict" if case else "not replayed")
+        reshoot = "reshoot" in status.casefold()
+        verdict = case.get("passed")
+        if verdict is True and not reshoot:
+            passed += 1
+        elif type(verdict) is not bool:
+            unscored.append(f"{identifier}: {status}")
+        elif reshoot:
+            reshoots.append(f"{identifier}: {status}")
+        else:
+            failed.append(identifier)
     captured = _text(evidence.get("captured_at"), "")
     date = captured[:10] if re.match(r"\d{4}-\d{2}-\d{2}", captured) else "date not recorded"
     state = _text(evidence.get("status"), "state not recorded")
-    if not scored:
-        return (
-            f"{tier} (registry); no scored replay evidence: 0/{len(cases)} cases have a recorded pass "
-            f"and {len(cases)} have no verdict. Recorded status: {state}, {date}. Not a fresh validation. "
-            + doc.link(source, "Review the preserved record")
-        )
-    unscored = f"; {len(cases) - len(scored)} cases have no verdict" if len(scored) != len(cases) else ""
-    return (
-        f"{tier} (registry): recorded Copilot Studio Preview replay, {passed}/{len(scored)} synthetic cases passed, "
-        f"{state}, {date}{unscored}; not a fresh validation. " + doc.link(source, "Replay record")
-    )
+    summary = f"{state}: recorded Copilot Studio Preview replay; {passed} of {len(expected)} synthetic cases passed"
+    if unscored:
+        summary += f"; {len(unscored)} without a verdict (" + "; ".join(unscored) + ")"
+    if failed:
+        summary += f"; {len(failed)} failed (" + ", ".join(failed) + ")"
+    if reshoots:
+        summary += f"; {len(reshoots)} require a reshoot (" + "; ".join(reshoots) + ")"
+    return summary + f". Recorded {date}; registry tier: {tier}; not a fresh validation. " + doc.link(source, "Replay record")
 
 
-def _overview(library: Library, solution: Solution) -> str:
-    doc = Document(library, solution, "1.Overview.md")
+def _overview(library: Library, solution: Solution, page_ledger=None) -> str:
+    doc = Document(library, solution, "1.Overview.md", page_ledger)
     copy = solution.copy
     agent = solution.agent
     metadata = _object(agent.get("_solution"))
@@ -1245,9 +1324,11 @@ def _overview(library: Library, solution: Solution) -> str:
     scenario += "\n\n" + _text(copy.get("card_pitch"), doc.missing(CATALOG, "card_pitch"))
     scenario += "\n\n**Why try it:** " + _grammar(_text(copy.get("why_try"), doc.missing(CATALOG, "why_try")))
     doc.add("Scenario Overview", scenario)
+    doc.source(CATALOG)
     doc.add("Problem Statement", _text(copy.get("customer_challenge"), doc.missing(CATALOG, "customer_challenge")))
     capabilities = _items(architecture.get("capabilities"))
     capability_list = [_text(_object(item).get("name"), "Capability not named") for item in capabilities]
+    doc.source(CATALOG)
     doc.add("Solution Summary", "\n\n".join((
         _text(copy.get("microsoft_ai_story"), doc.missing(CATALOG, "microsoft_ai_story")),
         "**Blueprint role:** " + _text(copy.get("blueprint_role"), doc.missing(CATALOG, "blueprint_role")),
@@ -1257,13 +1338,14 @@ def _overview(library: Library, solution: Solution) -> str:
     doc.add("Delivery Lanes", _delivery_lanes(doc))
     doc.source(solution.path("FIELD-GUIDE.md"))
     doc.source("solutions/README.md")
+    doc.source(CATALOG)
     doc.add("Business Outcomes", _bullets(copy.get("business_value"), doc.missing(CATALOG, "business_value"))
             + "\n\nClaims are qualitative; synthetic demo figures are not customer results or performance commitments. "
             + "See the " + doc.link("solutions/README.md", "claims policy", "claims-policy") + ".")
     if notes.get("target_users"):
         goals: dict[str, list[str]] = {}
         for item in notes["target_users"]:
-            goals.setdefault(item["role"], []).append(item["need"] + " " + _source_reference(doc, item["source"]))
+            goals.setdefault(item["role"], []).append(_note_value(doc, item, "need"))
         target_rows = [(role, "\n".join(dict.fromkeys(needs))) for role, needs in goals.items()]
     else:
         target_rows = [
@@ -1289,10 +1371,12 @@ def _overview(library: Library, solution: Solution) -> str:
     risks = _risk_items(doc, notes)
     if risks:
         failures = "\n".join(
-            f"- **{item['id']}:** {item['issue']} " + _source_reference(doc, item["source"], "Risk basis")
+            f"- **{item['id']}:** " + _note_value(doc, item, "issue")
             for item in risks
         )
-        failures += "\n\nReview [state and recovery](2.Architecture.md#state-and-recovery) before applying this template."
+        if not notes.get("what_goes_wrong"):
+            failures = "Derived from the package's failure guidance:\n\n" + failures
+        failures += "\n\nSee [state and recovery](2.Architecture.md#state-and-recovery)."
     else:
         failures = "Use the package's " + doc.link(solution.path("FIELD-GUIDE.md"), "failure guidance", "failure-recovery") + "."
     doc.add("What Actually Goes Wrong", failures)
@@ -1412,7 +1496,13 @@ def _declared_systems(solution: Solution, level2: dict) -> list[str]:
         if solution.deployment.get("expected_tool") and solution.deployment["expected_tool"].casefold() in name.casefold():
             continue
         systems.extend(_production_targets({"required_connections": [name]}, {}))
-    return list(dict.fromkeys(systems))
+    return [
+        system for system in dict.fromkeys(systems)
+        if not re.search(
+            r"\b(?:synthetic knowledge|operation skills|knowledge package|knowledge files|skill package)\b",
+            system, re.I,
+        )
+    ]
 
 
 def _integration_contract(doc: Document, notes: dict, level2: dict, skills) -> list[dict]:
@@ -1485,9 +1575,34 @@ def _data_contract(doc: Document, notes: dict, knowledge, skills, integrations) 
     return result
 
 
-def _source_reference(doc: Document, source: str, label: str = "Source") -> str:
-    doc.source(source)
-    return doc.link(source, label)
+def _note_prose(doc: Document, value):
+    if isinstance(value, list):
+        return [_note_prose(doc, item) for item in value]
+    if not isinstance(value, str):
+        return value
+
+    def citation(match):
+        doc.source(match[2])
+        return " (preview)" if "preview" in match[1].casefold() else ""
+
+    text = re.sub(
+        r"\s*\(\[((?:Learn|Source|Basis)(?:,[^\]]+)?)\]\((https://learn\.microsoft\.com/en-us/[^)\s]+)\)\)",
+        citation, value,
+    )
+
+    def guidance(match):
+        doc.source(match[2])
+        return "" if match[1] in {"Source", "Basis", "Learn"} else match[1]
+
+    return re.sub(
+        r"\[([^\]]+)\]\((https://learn\.microsoft\.com/en-us/[^)\s]+)\)", guidance, text,
+    ).strip()
+
+
+def _note_value(doc: Document, item: dict, key: str):
+    doc.source(item["source"])
+    doc.source(doc.solution.notes_source)
+    return _note_prose(doc, item[key])
 
 
 def _identity_contract(doc: Document, notes: dict) -> dict:
@@ -1508,7 +1623,7 @@ def _note_bullets(doc: Document, values, fallback: str, checklist: bool = False)
     items = []
     for item in values or []:
         if isinstance(item, dict):
-            items.append(item["text"] + " " + _source_reference(doc, item["source"]))
+            items.append(_note_value(doc, item, "text"))
         else:
             items.append(_text(item))
     return _bullets(items, fallback, checklist)
@@ -1533,7 +1648,7 @@ def _risk_items(doc: Document, notes: dict) -> list[dict]:
         cells = _markdown_table_cells(line)
         if len(cells) != 2 or cells[0] in {"Symptom", "---"}:
             continue
-        if re.search(r"frame|screenshot|Publish is offered", cells[0], re.I):
+        if re.search(r"frame|screenshot|evidence file|recorded identifier|Publish is offered", cells[0], re.I):
             continue
         if cells[0] and cells[1]:
             risks.append({
@@ -1567,8 +1682,8 @@ def _logical_architecture(doc: Document, native: dict, knowledge, production_tar
     return _code("\n".join(lines), "mermaid")
 
 
-def _architecture(library: Library, solution: Solution) -> str:
-    doc = Document(library, solution, "2.Architecture.md")
+def _architecture(library: Library, solution: Solution, page_ledger=None) -> str:
+    doc = Document(library, solution, "2.Architecture.md", page_ledger)
     notes = doc.notes()
     architecture = _object(solution.copy.get("architecture"))
     deployment = doc.data(solution.path("deployment.json"))
@@ -1585,9 +1700,9 @@ def _architecture(library: Library, solution: Solution) -> str:
     doc.add("Solution Architecture",
             "### Logical architecture and trust boundary\n\n"
             + _logical_architecture(doc, native, knowledge, production_targets)
-            + "\n\nSolid paths describe the synthetic design; dashed systems need customer or partner wiring. Channels remain unpublished. "
-            + doc.link(solution.architecture_source, "Blueprint source") + ".")
+            + "\n\nSolid: synthetic design. Dashed: unwired customer systems; channels unpublished.")
     doc.source(REGISTRY)
+    doc.source(CATALOG)
     components = _table(
         ("Operation", "Capability", "Purpose", "Owner"),
         ((_object(item).get("operation"), _object(item).get("name"), _object(item).get("purpose"), "Template")
@@ -1604,56 +1719,48 @@ def _architecture(library: Library, solution: Solution) -> str:
          if solution.agent.get("_sha256") else "Not recorded in registry _sha256"),
     ), doc.missing(REGISTRY))
     doc.add("Component Responsibilities", components)
-    data_sources = list(dict.fromkeys(item["source"] for item in records))
+    data_rows, contracts = [], set()
+    for item in records:
+        entity = _note_value(doc, item, "entity")
+        key = (entity, tuple(item["fields"]), tuple(item["used_by"]), item["system_of_record"], item["sensitivity"])
+        if key in contracts:
+            continue
+        contracts.add(key)
+        data_rows.append((
+            entity, item["fields"],
+            _text(item["used_by"], "Customer or partner maps affected skills from the inventory below"),
+            item["system_of_record"], item["sensitivity"],
+        ))
     data_table = _table(
         ("Entity", "Fields the template uses", "Used by", "Customer system of record", "Sensitivity"),
-        (
-            (
-                item["entity"] + f" (source {data_sources.index(item['source']) + 1})",
-                item["fields"],
-                _text(item["used_by"], "Customer or partner maps affected skills from the inventory below"),
-                item["system_of_record"], item["sensitivity"],
-            )
-            for item in records
-        ),
+        data_rows,
         "Customer or partner documents the entity and field mappings; no structured record table is available in the package knowledge.",
     )
-    data_provenance = " ".join(
-        f"Data source {index}: " + _source_reference(doc, source, PurePosixPath(source).name) + "."
-        for index, source in enumerate(data_sources, 1)
-    )
     doc.add("Data Contract",
-            "Synthetic examples define this contract. Customer data owners approve field meaning, permitted use and retention before replacement.\n\n" + data_table
-            + ("\n\n" + data_provenance if data_provenance else ""))
-    point_sources = list(dict.fromkeys(item["source"] for item in integrations))
+            "Approve field meaning, usage and retention before replacing synthetic examples.\n\n" + data_table)
     point_table = _table(
         ("System", "Purpose", "Skills that need it", "Access", "Template provides", "Customer or partner wires in"),
         (
             (
-                item["system"], item["purpose"] + f" (source {point_sources.index(item['source']) + 1})",
+                item["system"], _note_value(doc, item, "purpose"),
                 _text(item["skills"], "Customer or partner maps applicable skills"),
-                item["access"], item["template_provides"], item["customer_wires"],
+                item["access"], item["template_provides"],
+                "[Wiring procedure](3.Runbook.md#"
+                + _slug_heading(f"Step 3-{index}. Integrate {item['system']}") + ")",
             )
-            for item in integrations
+            for index, item in enumerate(integrations, 1)
         ),
         "Customer or partner identifies the required integration; the package declares no live system binding.",
     )
-    point_provenance = " ".join(
-        f"Integration source {index}: " + _source_reference(doc, source, PurePosixPath(source).name) + "."
-        for index, source in enumerate(point_sources, 1)
-    )
-    doc.add("Integration Points", "**State: Not connected in the template.**\n\n" + point_table
-            + ("\n\n" + point_provenance if point_provenance else "")
-            + "\n\nImplementation sequence: [Wire in your systems](3.Runbook.md#phase-3--wire-in-your-systems).")
+    doc.add("Integration Points", "**State: Not connected in the template.**\n\n" + point_table)
     identity = _identity_contract(doc, notes)
+    doc.source(AUTH_DOC)
     doc.add("Identity and Permissions",
             _table(("Template default", "Customer or partner decision"), (
-                ("Authentication: " + _text(identity["auth"]), "Confirm tenant, permitted identities and authentication enforcement."),
+                ("Authentication: " + _note_value(doc, identity, "auth"), "Confirm tenant, permitted identities and authentication enforcement."),
                 ("Audience: " + _text(identity["audience"]), "Define authorized users, groups and least-privilege connection identities."),
             ), "Customer or partner defines authentication and audience.")
-            + "\n\n" + _bullets(identity["least_privilege"], "Customer or partner verifies allowed and denied access.")
-            + "\n\n" + _source_reference(doc, identity["source"], "Identity basis")
-            + " · " + doc.link(AUTH_DOC, "Authentication guidance") + ".")
+            + "\n\n" + _bullets(identity["least_privilege"], "Customer or partner verifies allowed and denied access."))
     doc.source(settings_source)
     doc.source(HARNESS_DOC)
     doc.source(SKILLS_DOC)
@@ -1667,12 +1774,11 @@ def _architecture(library: Library, solution: Solution) -> str:
         )
     ), doc.missing(settings_source))
     doc.add("Copilot Studio Components", "\n\n".join((
-        "These Microsoft-native agents run on the " + doc.link(HARNESS_DOC, "GitHub Copilot harness")
-        + "; " + doc.link(SKILLS_DOC, "skills") + " package the reviewed instructions and logic.",
+        "Copilot Studio uses the GitHub Copilot harness; skills hold reviewed behavior.",
         "Agent metadata from " + doc.link(settings_source, "settings.mcs.yml") + ":",
         native_table,
         "### Skill inventory",
-        "Each row is one skill: a manual upload and its source-controlled `InlineAgentSkill` form.",
+        "One skill per row: manual upload and source-controlled form.",
         _table(
             ("Skill", "Manual upload", "Source component"),
             ((name, doc.link(manual, "SKILL.md"), doc.link(source, "InlineAgentSkill")) for name, manual, source in skills),
@@ -1699,12 +1805,13 @@ def _architecture(library: Library, solution: Solution) -> str:
         for item in _risk_items(doc, notes)
     ]
     recovery = [{**item, "id": item.get("id") or _slug_heading(item["condition"])} for item in recovery]
+    existing_rules = {item["id"] for item in recovery}
+    recovery.extend(item for item in _integrity_rules(doc, notes) if item["id"] not in existing_rules)
     doc.add("State and Recovery", _note_table(
         doc, {"state_and_recovery": recovery}, "state_and_recovery",
         ("id", "condition", "behavior", "owner"), ("Recovery ID", "Condition", "Required behavior", "Owner"),
-    ) + "\n\nTemplate state stays synthetic and unpublished until the customer authorizes promotion. "
-            "See [workshop integrity](3.Runbook.md#step-2-3-enforce-workshop-integrity) and the "
-            + doc.link(field_guide, "source recovery rules", "failure-recovery") + ".")
+    ) + "\n\nPromotion requires separate approval. "
+            + doc.link(field_guide, "Package recovery guide", "failure-recovery") + ".")
     doc.source(global_instructions)
     doc.source(field_guide)
     doc.source(solution.path("evals/transcripts.json"))
@@ -1771,31 +1878,10 @@ def _release_checklist(doc: Document) -> str:
 
 def _note_table(doc: Document, notes: dict, field: str, keys, headers) -> str:
     items = notes.get(field, [])
-    has_sources = any(item.get("source") for item in items)
-    rows, source_lines = [], []
-    for index, item in enumerate(items, 1):
-        row = tuple(item[key] for key in keys)
-        if has_sources:
-            source = item.get("source")
-            if source:
-                doc.source(source)
-                if any(part in source for part in (
-                    "/manual/skills/", "/copilot-studio/behaviors/",
-                    "/manual/knowledge/", "/copilot-studio/capabilities/knowledge/files/",
-                )):
-                    citation = f"Source {index} below"
-                    source_lines.append(f"{_label(field)} source {index}: " + doc.link(source, "Package source"))
-                else:
-                    citation = doc.link(source, "Learn" if _learn_source(source) else PurePosixPath(source).name)
-            else:
-                citation = doc.link(doc.solution.notes_source, "Delivery notes")
-            row += (citation,)
-        rows.append(row)
-    content = _table(
-        tuple(headers) + (("Source",) if has_sources else ()),
-        rows, doc.missing_note(field),
+    return _table(
+        headers, (tuple(_note_value(doc, item, key) for key in keys) for item in items),
+        doc.missing_note(field),
     )
-    return content + ("\n\n" + "\n\n".join(source_lines) if source_lines else "")
 
 
 def _exit_criteria(doc: Document, notes: dict, phase: str, defaults=()) -> str:
@@ -1803,27 +1889,12 @@ def _exit_criteria(doc: Document, notes: dict, phase: str, defaults=()) -> str:
     items = []
     for item in criteria or []:
         if isinstance(item, dict):
-            doc.source(item["source"])
-            items.append(item["text"] + " " + doc.link(item["source"], "Source"))
+            items.append(_note_value(doc, item, "text"))
         else:
             items.append(item)
     return "### Exit criteria\n\n" + _bullets(
         items or defaults, "Customer or partner records the phase outcome and open conditions.", checklist=True,
     )
-
-
-def _hardening_steps(doc: Document, notes: dict) -> str:
-    items = notes.get("production_hardening", [])
-    if not items:
-        return doc.missing_note("production_hardening")
-    steps = []
-    for index, item in enumerate(items, 1):
-        step = f"{index}. **{item['area']} — {item['owner']}.** {item['action']}"
-        if item.get("source"):
-            doc.source(item["source"])
-            step += " " + doc.link(item["source"], "Basis")
-        steps.append(step)
-    return "\n\n".join(steps)
 
 
 def _optional_copy(doc: Document, source: str, title: str) -> str:
@@ -1854,20 +1925,14 @@ def _fixed_footer(doc: Document, source: str) -> str:
     if not match:
         return ""
     doc.source(source)
-    return "Required fixed footer from " + doc.link(source, "the global policy") + ":\n\n" + match[1]
+    return "Fixed footer (" + doc.link(source, "policy") + "):\n\n" + match[1]
 
 
-def _integrity_rules(doc: Document, notes: dict) -> str:
+def _integrity_rules(doc: Document, notes: dict) -> list[dict]:
     identifiers = {"evidence-no-mockups", "failed-case-no-cherry-picking", "draft-publication-stop"}
     rules = [
-        {"id": item["id"], "text": item["response"], "source": item["source"]}
-        for item in notes.get("what_goes_wrong", []) if item.get("id") in identifiers
+        item for item in notes.get("state_and_recovery", []) if item.get("id") in identifiers
     ]
-    if not rules:
-        rules = [
-            {"id": item["id"], "text": item["condition"] + ": " + item["behavior"], "source": item["source"]}
-            for item in notes.get("state_and_recovery", []) if item.get("id") in identifiers
-        ]
     if not rules:
         source = doc.solution.path("FIELD-GUIDE.md")
         if source in doc.library.files:
@@ -1881,39 +1946,151 @@ def _integrity_rules(doc: Document, notes: dict) -> str:
             for line in recovery.splitlines():
                 cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
                 if len(cells) == 2 and cells[0] in identifiers:
-                    rules.append({"id": identifiers[cells[0]], "text": cells[0] + ": " + cells[1], "source": source})
-        if not rules:
-            return doc.missing_note("recovery_rules")
+                    rules.append({
+                        "id": identifiers[cells[0]], "condition": cells[0], "behavior": cells[1],
+                        "owner": "Template", "source": source,
+                    })
     for rule in rules:
         doc.source(rule["source"])
-    return _table(
-        ("Rule ID", "Required handling", "Source"),
-        ((rule["id"], rule["text"], doc.link(rule["source"], "Package rule")) for rule in rules),
-        doc.missing_note("recovery_rules"),
-    )
+    return rules
 
 
-def _step(phase: int, number: int, title: str, owner: str, body: str) -> str:
+def _step(phase: int, number: int, title: str, owner: str, body: str, role: str = "") -> str:
     if owner not in {"Template", "Customer or partner"}:
         raise RunbookSourceError(f"Invalid runbook step owner: {owner}")
-    return f"### Step {phase}-{number}. {title}\n\n**Owner:** {owner}\n\n{body}"
+    role_line = f" · **Role:** {role}" if role else ""
+    return f"### Step {phase}-{number}. {title}\n\n**Owner:** {owner}{role_line}\n\n{body}"
 
 
-def _phase_notes(doc: Document, notes: dict, number: int, offset: int) -> list[str]:
-    steps = []
+def _phase_notes(doc: Document, notes: dict, number: int, steps: list[str]) -> list[str]:
+    steps = list(steps)
     for item in notes.get("production_hardening", []):
         if item["phase"] != number:
             continue
-        steps.append(_step(
-            number, offset + len(steps), item["area"], "Customer or partner",
-            f"Responsible role: **{item['owner']}**. {item['action']} "
-            + _source_reference(doc, item["source"], "Basis"),
-        ))
+        action = _note_value(doc, item, "action")
+        owner_line = "**Owner:** Customer or partner · **Role:** " + item["owner"]
+        matching_steps = [index for index, step in enumerate(steps) if owner_line in step.splitlines()]
+        # Evaluation hardening follows corpus adaptation rather than preceding it.
+        matching = matching_steps[-1 if number == 4 else 0] if matching_steps else None
+        if matching is not None:
+            steps[matching] += "\n\n" + action
+        else:
+            steps.append(_step(
+                number, len(steps) + 1, item["area"], "Customer or partner", action, item["owner"],
+            ))
     return steps
 
 
-def _runbook(library: Library, solution: Solution) -> str:
-    doc = Document(library, solution, "3.Runbook.md")
+def _delivery_role(notes: dict, phase: int | None = None, terms=()) -> str:
+    if phase is not None:
+        for item in notes.get("production_hardening", []):
+            if item["phase"] == phase:
+                return item["owner"]
+    for item in notes.get("delivery_roles", []):
+        if any(term in item["role"].casefold() for term in terms):
+            return item["role"]
+    return ""
+
+
+def _manual_build_checklist(doc: Document) -> str:
+    source = doc.solution.path("screenshots/manual/browserfilm.json")
+    if source not in doc.library.files:
+        return "No captured build checklist is available; follow the package's manual tutorial."
+    frames = doc.data(source).get("frames")
+    if not isinstance(frames, list):
+        raise RunbookSourceError(f"{source}: frames must be an array")
+    labels = []
+    for index, frame in enumerate(frames, 1):
+        if not isinstance(frame, dict):
+            raise RunbookSourceError(f"{source}: frame {index} must be an object")
+        label = next((
+            frame[key] for key in ("title", "caption", "label")
+            if isinstance(frame.get(key), str) and frame[key].strip()
+        ), None)
+        if label is None:
+            raise RunbookSourceError(f"{source}: frame {index} has no title, caption or label")
+        labels.append(label)
+    if not labels:
+        return "The package has not recorded a manual build sequence."
+    return (
+        "**Manual build checklist** — " + doc.link(source, "captured sequence") + ". "
+        "Record real results, not manufactured historical failures.\n\n"
+        + "\n".join(f"{index}. {label}" for index, label in enumerate(labels, 1))
+    )
+
+
+def _matching_integration_items(point: dict, items: list[dict], limit: int = 1) -> list[dict]:
+    ignored = {
+        "agent", "aibast", "approved", "customer", "instruction", "manual", "partner",
+        "read", "review", "skill", "source", "synthetic", "system", "template", "write",
+    }
+
+    def terms(value) -> set[str]:
+        words = re.findall(r"[a-z]{4,}", _text(value, "").casefold())
+        words = {word[:-3] + "y" if word.endswith("ies") else word.removesuffix("s") for word in words}
+        return words - ignored
+
+    purpose = terms(point["purpose"])
+    contract = terms(point["template_provides"])
+    skill_terms = terms(point["skills"])
+    ranked = []
+    for index, item in enumerate(items):
+        content = {key: value for key, value in item.items() if key not in {"source", "owner", "id"}}
+        words = terms(content)
+        if purpose & {"lookup", "retrieval"} and words & {"find", "unknown", "absent", "retrieve"}:
+            words.add("lookup")
+        # Prefer the declared purpose over skills shared with other integrations.
+        score = (
+            4 * len(purpose & words) + 2 * len(contract & words)
+            + len(skill_terms & words) + len(skill_terms & terms(item.get("source", "")))
+        )
+        if score:
+            ranked.append((-score, index, item))
+    return [item for _, _, item in sorted(ranked)[:limit]]
+
+
+def _wiring_procedure(doc: Document, notes: dict, point: dict) -> str:
+    identity = _identity_contract(doc, notes)
+    doc.source(identity["source"])
+    doc.source(AUTH_DOC)
+    system = point["system"]
+    boundaries = _matching_integration_items(point, notes.get("boundary_tests", []))
+    recovery = _matching_integration_items(point, [
+        item for item in notes.get("state_and_recovery", [])
+        if item.get("id") not in {"evidence-no-mockups", "failed-case-no-cherry-picking", "draft-publication-stop"}
+    ])
+    tests = []
+    for item in boundaries:
+        index = notes["boundary_tests"].index(item) + 1
+        tests.append(
+            f"[Boundary case {index}](4.Sample-prompts.md#routing-and-boundary-cases): "
+            + _note_value(doc, item, "expected")
+        )
+    for item in recovery:
+        tests.append(
+            "[Recovery](2.Architecture.md#state-and-recovery): " + _note_value(doc, item, "behavior")
+        )
+    if not tests:
+        tests.append("Map the package's boundary cases to this integration and record allowed, denied and unavailable-source outcomes.")
+    access = point["access"]
+    writes = (
+        " Require approval before writes." if access in {"write", "read-write"}
+        and not re.search(r"approv|gat(?:e|ing)", point["customer_wires"], re.I) else ""
+    )
+    return "\n\n".join((
+        f"1. **Bind {system} — {access}:** " + _note_value(doc, point, "customer_wires") + writes,
+        f"2. **Identity for {system}:** Decide end-user versus approved maker/service credentials; "
+        + doc.link(AUTH_DOC, "Configure authentication")
+        + " for the [authorized audience](2.Architecture.md#identity-and-permissions).",
+        f"3. **Scope {system}:** " + " ".join(identity["least_privilege"])
+        + " Enforce restrictions at the connection.",
+        f"4. **Exit test for {system}:** Record expected and actual results on approved fixtures. "
+        + " ".join(tests),
+    ))
+
+
+def _runbook(library: Library, solution: Solution, page_ledger=None) -> str:
+    doc = Document(library, solution, "3.Runbook.md", page_ledger)
     notes = doc.notes()
     deployment = doc.data(solution.path("deployment.json"))
     guide = solution.path("FIELD-GUIDE.md")
@@ -1922,14 +2099,13 @@ def _runbook(library: Library, solution: Solution) -> str:
     cases = doc.data(solution.demo_source)
     instructions = solution.path("manual/GLOBAL-INSTRUCTIONS.md")
     doc.source(instructions)
-    native = _native_settings(library, solution)
     level2 = doc.data(solution.architecture_source)
     skills = _skill_assets(library, solution)
     integrations = _integration_contract(doc, notes, level2, skills)
     case_ids = [_case_id(case) for case in _items(cases.get("cases"))]
     prerequisite_rows = [
         ("Build workload",
-         (f"{counts['manual_steps']} captured manual build steps; " if counts["manual_steps"] is not None else "Manual steps not captured; ")
+         (f"{counts['manual_steps']} captured build checkpoints; " if counts["manual_steps"] is not None else "Build checkpoints not captured; ")
          + f"{counts['skills']} skills; {counts['knowledge_files']} knowledge files; "
          + f"{len(_items(_object(solution.copy.get('architecture')).get('acceptance_checks')))} acceptance checks; {len(case_ids)} locked cases. "
          "[Inventory](2.Architecture.md#copilot-studio-components), [checks](0.Resources/README.md#template-acceptance-checks), "
@@ -1942,10 +2118,32 @@ def _runbook(library: Library, solution: Solution) -> str:
             "An approved tenant, maker access, licensing, data owners and a business approver.", "Customer or partner",
         ))
     prerequisite_rows.extend(
-        (item["item"], item["detail"] + " " + _source_reference(doc, item["source"]), "Customer or partner")
+        (item["item"], _note_value(doc, item, "detail"), "Customer or partner")
         for item in notes.get("prerequisites", [])
     )
     doc.add("Prerequisites", _table(("Requirement", "Details", "Owner"), prerequisite_rows, "Customer or partner confirms readiness."))
+    maker = _delivery_role(notes, terms=("maker", "engineer", "builder"))
+    reviewer = _delivery_role(notes, terms=("acceptance", "evaluation", "tester"))
+    business_owner = _delivery_role(notes, 0, ("business owner", "service owner"))
+    administrator = _delivery_role(notes, 1, ("administrator", "security"))
+    connection_owner = _delivery_role(notes, 3, ("connection", "integration"))
+    operator = _delivery_role(notes, terms=("operations", "operator"))
+    defaults = {
+        0: ["Scope, baseline, adaptations and accountable owners are recorded."],
+        1: ["Environment, authentication, data policy and access-test identities are approved."],
+        2: ["The recorded Draft passes locked synthetic cases and workshop integrity checks."],
+        3: ["System mappings and read-only access pass verification; writes have separate authorization."],
+        4: ["The business owner accepts results against customer-defined thresholds and failure cases."],
+        5: ["Publication, channels, audience, pilot decision and support handoff are approved."],
+        6: ["Operations, monitoring, content review, re-verification and tested recovery have owners."],
+    }
+    titles = [title for title in REQUIRED_SECTIONS["3.Runbook.md"] if title.startswith("Phase ")]
+
+    def phase(number: int, steps: list[str]) -> None:
+        content = _phase_notes(doc, notes, number, steps)
+        content.append(_exit_criteria(doc, notes, f"phase_{number}", defaults[number]))
+        doc.add(titles[number], "\n\n".join(content))
+
     baseline = notes.get("baseline") or {
         "measure": "Customer or partner selects a measure for " + solution.display_name,
         "record_columns": ["Measure", "Current result", "Period and population", "Evidence", "Owner"],
@@ -1956,141 +2154,109 @@ def _runbook(library: Library, solution: Solution) -> str:
         + "| " + " | ".join("---" for _ in baseline["record_columns"]) + " |\n"
         + "| " + " | ".join("" for _ in baseline["record_columns"]) + " |"
     )
-    phases = {
-        0: [
-            _step(0, 1, "Qualify the outcome and baseline", "Customer or partner",
-                  "Complete the [qualification checklist](1.Overview.md#qualification-checklist). "
-                  + baseline["measure"].rstrip(".") + ". " + baseline["why"] + " "
-                  + _source_reference(doc, baseline["source"]) + "\n\nRecord your baseline; no values are supplied:\n\n" + blank_table),
-            _step(0, 2, "Adapt scope and name owners", "Customer or partner",
-                  "Review [scope](1.Overview.md#in-scope--out-of-scope) and the [data contract](2.Architecture.md#data-contract). "
-                  "Record adaptations and approval boundaries; assign these roles before configuration.\n\n"
-                  + _note_table(doc, notes, "delivery_roles", ("role", "responsibility"), ("Role", "Responsibility"))),
-        ],
-        1: [
-            _step(1, 1, "Apply the identity design", "Template",
-                  "Use the [identity and permissions design](2.Architecture.md#identity-and-permissions) and supplied "
-                  + doc.link(solution.path("copilot-studio/settings.mcs.yml"), "settings") + " as the starting contract."),
-            _step(1, 2, "Configure tenant controls", "Customer or partner",
-                  "Approve environment, audience, connection identities and denied-access tests. "
-                  + doc.link(AUTH_DOC, "Authentication") + " · " + doc.link(DLP_DOC, "Data policies") + "."),
-        ],
-        2: [], 3: [],
-        4: [
-            _step(4, 1, "Adapt the evaluation corpus", "Template",
-                  "Use [locked cases and expected evidence](4.Sample-prompts.md#per-case-acceptance-matrix) and "
-                  "[boundary tests](4.Sample-prompts.md#routing-and-boundary-cases). Replace fictional records with approved "
-                  "customer fixtures while preserving the tested behavior."),
-            _step(4, 2, "Set thresholds and evaluate your data", "Customer or partner",
-                  "The business owner sets thresholds and representative populations. Re-run cases on authorized customer data, "
-                  "including denied identities and source failures. Record expected versus actual results; template counts are not production thresholds."),
-        ],
-        5: [
-            _step(5, 1, "Review the template release prerequisites", "Template",
-                  "These gates concern the synthetic reference build, not production thresholds. Its workshop copy stays Draft; "
-                  "the customer evaluates and publishes their adapted build separately.\n\n"
-                  + _note_table(doc, notes, "go_no_go", ("criterion", "threshold"), ("Template gate", "Required evidence"))),
-            _step(5, 2, "Run the governed pilot", "Customer or partner",
-                  "Approve a limited audience and compare outcomes with the baseline. Resolve safety and access failures, "
-                  "then record go/no-go against your thresholds."),
-            _step(5, 3, "Publish and share deliberately", "Customer or partner",
-                  "Approve the version, channels, audience and support handoff. Publish after the pilot decision and "
-                  "verify permitted and denied access. "
-                  + doc.link(SHARE_DOC, "Publish and share guidance") + "."),
-        ],
-        6: [
-            _step(6, 1, "Retain the operational playbook", "Template",
-                  "Use [state and recovery](2.Architecture.md#state-and-recovery), the regression cases and the "
-                  + doc.link(guide, "package failure guidance", "failure-recovery")
-                  + " as a starting playbook; design and test customer-specific recovery."),
-            _step(6, 2, "Own changes and ongoing verification", "Customer or partner",
-                  "Review content freshness and permissions; re-evaluate after source, model, skill or connector changes. "
-                  + doc.link(MONITOR_DOC, "Monitoring guidance") + "."),
-        ],
-    }
+    phase(0, [
+        _step(0, 1, "Qualify the outcome and baseline", "Customer or partner",
+              "Complete the [qualification checklist](1.Overview.md#qualification-checklist).\n\n"
+              "**Measure:** " + _note_value(doc, baseline, "measure") + " " + baseline["why"]
+              + "\n\nFill your baseline record:\n\n" + blank_table, business_owner),
+        _step(0, 2, "Adapt scope and name owners", "Customer or partner",
+              "Adapt [scope](1.Overview.md#in-scope--out-of-scope) and the [data contract](2.Architecture.md#data-contract); "
+              "assign approval roles.\n\n"
+              + _note_table(doc, notes, "delivery_roles", ("role", "responsibility"), ("Role", "Responsibility")), business_owner),
+    ])
+    phase(1, [
+        _step(1, 1, "Apply the identity design", "Template",
+              "Apply the [identity design](2.Architecture.md#identity-and-permissions) using "
+              + doc.link(solution.path("copilot-studio/settings.mcs.yml"), "settings") + ".", maker),
+        _step(1, 2, "Configure tenant controls", "Customer or partner",
+              "Approve environment, audience, connection identities and denied-access tests. Configure "
+              + doc.link(AUTH_DOC, "authentication") + " and " + doc.link(DLP_DOC, "data policies") + ".", administrator),
+    ])
     lane_table = _table(("Lane", "Suits", "Output"), (
-        ("Easy mode with GitHub Copilot (default)", "Assisted source-controlled authoring", "Verified Copilot Studio Draft on synthetic data"),
-        ("Manual build in Copilot Studio", "Makers building and reviewing in the browser; no local tooling", "The same verified Draft and replayed locked cases"),
-        ("AIBAST Frontier (experimental)", "Learning and changing portable behavior; local Brainstem is optional", "Synthetic behavior proof, followed by native Draft validation"),
+        ("Easy mode with GitHub Copilot (default)", "Assisted authoring", "Synthetic Draft proof"),
+        ("Manual build in Copilot Studio", "Browser-only makers", "Same Draft proof"),
+        ("AIBAST Frontier (experimental)", "Portable learning", "Behavior proof; native validation follows"),
     ), "Customer or partner selects a build lane.")
-    phases[2] = [
-        _step(2, 1, "Select one build lane", "Template", lane_table),
+    build_steps = [
+        _step(2, 1, "Choose the build lane", "Customer or partner",
+              lane_table + "\n\n[Compare lanes](1.Overview.md#delivery-lanes); local Brainstem remains optional.", maker),
         _step(2, 2, "Build the selected implementation", "Template",
-              "**Easy mode:** attach the " + doc.link("skills/aibast-easy-mode-copilot/SKILL.md", "Copilot authoring skill")
-              + " and follow the " + doc.link(solution.path("EASY-MODE-COPILOT-CHAT.md"), "reviewed build messages") + ".\n\n"
-              "**Manual:** create a Draft, save " + doc.link(instructions, "global instructions")
-              + f", upload the {counts['knowledge_files']} [knowledge files](2.Architecture.md#knowledge-inventory) and "
-              + f"{counts['skills']} [skills](2.Architecture.md#skill-inventory), wait for ingestion, and confirm model "
-              + f"`{_text(native.get('model'))}`. Use the " + doc.link(solution.path("manual-tutorial.html"), "manual tutorial") + ".\n\n"
-              "**Portable learning:** optionally install `" + _text(deployment.get("target_filename")) + "` with "
-              + doc.link(solution.path("deployment.json"), "the deployment recipe") + " and verify its expected tool "
-              + f"`{_text(deployment.get('expected_tool'))}`. This does not replace customer tenant configuration."),
-        _step(2, 3, "Enforce workshop integrity", "Template", _integrity_rules(doc, notes)
-              + "\n\nPackage rules: " + doc.link(guide, "failure recovery", "failure-recovery") + "."),
+              "**Easy mode:** use the " + doc.link("skills/aibast-easy-mode-copilot/SKILL.md", "authoring skill")
+              + " and " + doc.link(solution.path("EASY-MODE-COPILOT-CHAT.md"), "reviewed messages") + ". "
+              "**Manual:** use the [single inventory](2.Architecture.md#copilot-studio-components) and "
+              + doc.link(solution.path("manual-tutorial.html"), "tutorial") + " with the checklist below. "
+              "**Portable learning:** follow " + doc.link(solution.path("deployment.json"), "deployment.json")
+              + "; it does not replace native Draft validation.\n\n" + _manual_build_checklist(doc), maker),
+        _step(2, 3, "Enforce workshop integrity", "Template",
+              "Apply the [workshop integrity and recovery rules](2.Architecture.md#state-and-recovery) before replay.", reviewer or maker),
         _step(2, 4, "Replay the synthetic proof", "Template",
-              "**Synthetic demo acceptance:** retain a fresh result for every locked case: "
+              "**Synthetic demo acceptance:** record every locked case: "
               + (", ".join(case_ids) if case_ids else "use the package case contract")
               + ". Use the [acceptance matrix](4.Sample-prompts.md#per-case-acceptance-matrix) and "
-              "[template acceptance checks](0.Resources/README.md#template-acceptance-checks)."),
+              "[template acceptance checks](0.Resources/README.md#template-acceptance-checks).", reviewer),
     ]
     footer = _fixed_footer(doc, instructions)
     if footer:
-        phases[2][-1] += "\n\n" + footer
-    for index, point in enumerate(integrations, 1):
-        phases[3].append(_step(
+        build_steps[-1] += "\n\n" + footer
+    phase(2, build_steps)
+    wiring_steps = [
+        _step(
             3, index, "Integrate " + point["system"], "Customer or partner",
-            "**" + point["system"] + " contract:** " + point["template_provides"] + "\n\n"
-            "**Wire " + point["system"] + ":** " + point["customer_wires"] + " Verify "
-            "[field mapping](2.Architecture.md#data-contract) and access; writes require approval. "
-            + _source_reference(doc, point["source"]),
-        ))
-    if not phases[3]:
-        phases[3].append(_step(
+            _wiring_procedure(doc, notes, point), connection_owner,
+        )
+        for index, point in enumerate(integrations, 1)
+    ]
+    if not wiring_steps:
+        wiring_steps.append(_step(
             3, 1, "Define your integration boundary", "Customer or partner",
             "No integration system can be derived from the package. Identify the system of record, "
             "field mapping, access owner and approved connector or API before replacing synthetic knowledge.",
         ))
-    defaults = {
-        0: ["The customer has recorded the scope, baseline, adaptations and accountable owners."],
-        1: ["The target environment, authentication, data policy and access-test identities are approved."],
-        2: ["The selected build is a recorded Draft; locked synthetic cases and workshop integrity checks pass."],
-        3: ["Each chosen system has an approved mapping and verified read-only access; any writes have separate authorization."],
-        4: ["The business owner accepts the recorded results against customer-defined thresholds and known failure cases."],
-        5: ["Publication, channels and audience are approved; the pilot go/no-go and support handoff are recorded."],
-        6: ["Operations ownership, monitoring, content review, re-verification and tested recovery are in place."],
-    }
-    titles = [title for title in REQUIRED_SECTIONS["3.Runbook.md"] if title.startswith("Phase ")]
-    for number, title in enumerate(titles):
-        if number == 3:
-            for item in notes.get("production_hardening", []):
-                if item["phase"] == number:
-                    phases[number][0] += (
-                        f"\n\n**{item['area']} — {item['owner']}.** {item['action']} "
-                        + _source_reference(doc, item["source"], "Basis")
-                    )
-            phases[number].insert(0,
-                "Use the [integration contracts](2.Architecture.md#integration-points). Bind the approved connector, "
-                "flow or API read-only first; enable writes only after separate authorization and testing.")
-        else:
-            phases[number].extend(_phase_notes(doc, notes, number, len(phases[number]) + 1))
-        phases[number].append(_exit_criteria(doc, notes, f"phase_{number}", defaults[number]))
-        doc.add(title, "\n\n".join(phases[number]))
+    phase(3, wiring_steps)
+    phase(4, [
+        _step(4, 1, "Adapt the evaluation corpus", "Customer or partner",
+              "Preserve [locked behaviors](4.Sample-prompts.md#per-case-acceptance-matrix) and "
+              "[boundary tests](4.Sample-prompts.md#routing-and-boundary-cases) when substituting approved customer fixtures.", reviewer),
+        _step(4, 2, "Set thresholds and evaluate your data", "Customer or partner",
+              "Have the business owner approve thresholds. Run "
+              + doc.link(EVALUATION_DOC, "adapted evaluations (preview)")
+              + " before publication under approved test user profiles. Keep exact assertions separate from General quality scores.", reviewer),
+    ])
+    phase(5, [
+        _step(5, 1, "Review the template release prerequisites", "Template",
+              "These synthetic regression gates do not set production thresholds. The reference workshop stays Draft; "
+              "production approval belongs to the customer pilot.\n\n"
+              + _note_table(doc, notes, "go_no_go", ("criterion", "threshold"), ("Template gate", "Required evidence")), reviewer),
+        _step(5, 2, "Publish and share deliberately", "Customer or partner",
+              "With business approval, " + doc.link(SHARE_DOC, "publish and share")
+              + " the adapted build with a restricted test audience. Keep the reference workshop Draft.", business_owner),
+        _step(5, 3, "Run the governed pilot", "Customer or partner",
+              "**Pilot entry gate:** Test allowed and denied identities on the published, shared agent; resolve access failures before admitting pilot users. "
+              "Compare pilot results with the baseline and thresholds; broaden rollout only after go/no-go.", business_owner),
+    ])
+    phase(6, [
+        _step(6, 1, "Retain the operational playbook", "Template",
+              "The template provides the [state-and-recovery playbook](2.Architecture.md#state-and-recovery) and regression cases.", operator),
+        _step(6, 2, "Own changes and ongoing verification", "Customer or partner",
+              "Review content freshness and permissions; re-evaluate source, model, skill or connector changes. "
+              + doc.link(MONITOR_DOC, "Monitor the deployed agent") + ".", operator),
+    ])
     doc.add("Deliverables Checklist",
             "### Template provides\n\n" + _bullets([
-                "The agent behavior, synthetic data contract and a single skills/knowledge inventory.",
-                "Declared integration and identity designs, locked cases, boundary tests and integrity rules.",
-                "The build, pilot, rollout and operations playbooks linked throughout this runbook.",
+                "Agent, synthetic data and component inventory.",
+                "Integration/identity contracts and evaluation cases.",
+                "Build-to-operate playbooks and integrity rules.",
             ], "", checklist=True)
             + "\n\n### Customer or partner delivers\n\n" + _bullets([
-                "Adapted requirements, source mappings, tenant identities, data policies and approved connections.",
-                "Evaluation on customer data with business-owned thresholds and documented go/no-go.",
-                "Authorized publication, channels, audience, operations ownership and tested recovery.",
+                "Adapted mappings, identities, governance and connections.",
+                "Customer-data results, thresholds and go/no-go.",
+                "Approved publication, operations and recovery.",
             ], "", checklist=True))
     header = (
         f"> **Scenario**: {solution.display_name}\n"
         "> **Platform**: Microsoft Copilot Studio — GitHub Copilot harness\n"
         "> **Target readers**: Makers, delivery engineers, customer or partner operators\n\n"
-        "**Estimated effort**: Not yet measured; record actual effort on the Frontier Clock.\n\n" + TEMPLATE_DISCLAIMER
+        "**Estimated effort**: Not yet measured; record actual effort on the Frontier Clock.\n\n" + RUNBOOK_POINTER
     )
     return doc.render("Production Runbook", _nav("4.Sample-prompts.md", "Evaluation prompts"), header)
 
@@ -2162,8 +2328,8 @@ def _prohibition_excerpt(doc: Document, source: str) -> str:
     return "Prohibitions from " + doc.link(source, "the global instructions") + ":\n\n" + content
 
 
-def _sample_prompts(library: Library, solution: Solution) -> str:
-    doc = Document(library, solution, "4.Sample-prompts.md")
+def _sample_prompts(library: Library, solution: Solution, page_ledger=None) -> str:
+    doc = Document(library, solution, "4.Sample-prompts.md", page_ledger)
     notes = doc.notes()
     instructions = solution.path("manual/GLOBAL-INSTRUCTIONS.md")
     cases = doc.data(solution.demo_source)
@@ -2179,19 +2345,10 @@ def _sample_prompts(library: Library, solution: Solution) -> str:
         and all(guard == case_guards[0] for guard in case_guards) else None
     )
     doc.source(instructions)
-    routing = ""
-    if instructions in library.files:
-        policy = (library.root / instructions).read_text(encoding="utf-8")
-        routing = next(
-            (title for title in ("Skill routing map", "Natural-language routing", "Routing", "Locked Preview routing")
-             if _section(policy, title)), "",
-        )
     doc.add("Suggested Agent Instructions",
-            "Save " + doc.link(instructions, "the reviewed global instructions")
-            + " unchanged. They define routing, evidence and side-effect limits. "
-            + doc.link(instructions, "Source routing guidance", _slug_heading(routing) if routing else "")
-            + " pairs with the [single skill inventory](2.Architecture.md#skill-inventory); "
-            "the cases below test the resulting behavior.")
+            "Save " + doc.link(instructions, "global instructions")
+            + " unchanged for routing, evidence and side-effect limits; use the "
+            "[skill inventory](2.Architecture.md#skill-inventory).")
     demos = _catalog_demos(doc)
     used_demos = set()
     matrix = []
@@ -2226,9 +2383,12 @@ def _sample_prompts(library: Library, solution: Solution) -> str:
         if operation:
             route += "\nOperation: " + _text(operation)
         expected = case.get("must_include") or transcript.get("must_include")
-        evidence = _text(expected, "No must_include markers recorded")
+        evidence = "; ".join(json.dumps(_text(marker), ensure_ascii=False) for marker in _items(expected))
+        evidence = evidence or "No required text fragments recorded"
         if case.get("must_include") and transcript.get("must_include") and case["must_include"] != transcript["must_include"]:
-            evidence = "Locked case: " + _text(case["must_include"]) + "\nRecorded transcript: " + _text(transcript["must_include"])
+            evidence = "Locked case: " + evidence + "\nRecorded transcript: " + "; ".join(
+                json.dumps(_text(marker), ensure_ascii=False) for marker in _items(transcript["must_include"])
+            )
         forbidden = case.get("must_not_include") or transcript.get("must_not_include")
         guards_seen.extend(_items(forbidden))
         guard = (
@@ -2256,17 +2416,15 @@ def _sample_prompts(library: Library, solution: Solution) -> str:
     )
     guard_header = "Refusal guards" if refusal_only else "Wording guards (must_not_include)"
     synthetic = (
-        "**Synthetic demo evidence:** all example records, names, identifiers, and figures in these cases "
-        "are fictional; prompts and recorded expectations are not customer outcomes."
+        "**Synthetic demo evidence:** records and figures are fictional, not customer outcomes."
     )
     doc.source(solution.path("FIELD-GUIDE.md"))
     doc.add("Demo Prompts", "\n\n".join((
         synthetic,
         "### Per-case acceptance matrix",
-        "Replay each locked prompt unchanged in a fresh conversation. Routes and wording guards come from "
-        + doc.link(solution.demo_source, "the case contract") + "; recorded verdicts come from "
-        + doc.link(transcript_source, "canonical transcripts") + ", not a new run by this generator. "
-        "Expected evidence must appear; forbidden wording must not.",
+        "Replay unchanged prompts in fresh conversations. Text fragments and guards are literal "
+        + doc.link(solution.demo_source, "case assertions") + "; "
+        + doc.link(transcript_source, "recorded verdicts") + " are not a new run.",
         "**Guard shared by every locked case:** Must not include: " + _text(shared_guard)
         if shared_guard else "Case-specific wording guards are recorded in the matrix.",
         _table(
@@ -2292,21 +2450,19 @@ def _sample_prompts(library: Library, solution: Solution) -> str:
     boundary = _object(promise_map.get("source_audit")).get("boundary")
     boundary_text = (
         "**Source audit boundary:** " + _text(boundary)
-        if _present(boundary) else doc.missing(promise_source, "source_audit.boundary")
+        if _present(boundary) else
+        "A separate audit boundary is not recorded. These synthetic examples do not verify customer-system behavior."
     )
     doc.add("Promise-to-Prompt Map",
-            "Advertised promises are traced to synthetic cases below; mapping a promise does not prove a production capability.\n\n"
+            "Promise mappings show synthetic cases, not production capability.\n\n"
             + boundary_text + "\n\n"
             + _table(("Advertised promise", "Operation", "Acceptance cases / prompts", "Synthetic evidence shown"),
                      promises, doc.missing(promise_source, "promises")))
     doc.add("Expected Results",
-            "Use the Expected evidence and Recorded result columns in the "
-            "[per-case acceptance matrix](#per-case-acceptance-matrix). The source is "
-            + doc.link(transcript_source, "canonical transcripts") + "; recorded results are not fresh acceptance. "
-            "Where current case markers differ from recorded transcript markers, both are identified in that matrix.")
+            "Read required fragments and recorded verdicts in the "
+            "[acceptance matrix](#per-case-acceptance-matrix). Recorded results are not fresh acceptance.")
     doc.add("Routing and Boundary Cases",
-            "Happy-path routing and refusal guards are in the [acceptance matrix](#per-case-acceptance-matrix); "
-            "they are not substitutes for the refusal and escalation tests below.\n\n"
+            "The [acceptance matrix](#per-case-acceptance-matrix) covers happy-path routing; also run these refusal and escalation cases.\n\n"
             + _note_table(doc, notes, "boundary_tests", ("prompt", "expected"), ("Boundary prompt", "Required response")))
     never_do = (
         _note_bullets(doc, notes["never_do"], doc.missing_note("never_do")) if notes.get("never_do")
@@ -2437,8 +2593,8 @@ def _manual_knowledge(doc: Document) -> list[tuple[str, str]]:
     return sorted(paths.items())
 
 
-def _evidence(library: Library, solution: Solution) -> str:
-    doc = Document(library, solution, "5.Acceptance-Evidence.md")
+def _evidence(library: Library, solution: Solution, page_ledger=None) -> str:
+    doc = Document(library, solution, "5.Acceptance-Evidence.md", page_ledger)
     paths = _evidence_files(library, solution)
     references = _manifest_references(doc)
     expected = set(paths)
@@ -2536,7 +2692,7 @@ def _evidence(library: Library, solution: Solution) -> str:
     return doc.render("Acceptance Evidence", _nav("0.Resources/README.md", "Resources and exports"))
 
 
-def _resources(library: Library, solution: Solution, linked_sources=()) -> str:
+def _resources(library: Library, solution: Solution, linked_sources=(), page_ledger=None) -> str:
     doc = Document(library, solution, "0.Resources/README.md")
     doc.sources.update(linked_sources)
     doc.source(REGISTRY)
@@ -2635,6 +2791,23 @@ def _resources(library: Library, solution: Solution, linked_sources=()) -> str:
                 yield from item_sources(item)
     for source in item_sources(entry):
         doc.source(source)
+    ledger_sections = []
+    for artifact, page in (page_ledger or {}).items():
+        doc.sources.update(page["sources"])
+        rows = []
+        for heading, sources in page["sections"].items():
+            page_link = doc.link(
+                f"01-solutions/{solution.slug}/{artifact}", heading, _slug_heading(heading),
+            )
+            citations = " · ".join(
+                doc.link(source, _source_label(source, solution.package)) for source in sources
+            ) or "Template guidance; no additional source."
+            rows.append((page_link, citations))
+        ledger_sections.append(
+            "### Sources: " + artifact + "\n\n" + _table(("Section", "Sources"), rows, "No source sections recorded.")
+        )
+    if ledger_sections:
+        doc.add("Sources", "\n\n".join(ledger_sections))
     return doc.render(
         "Resources",
         "→ [Overview](../1.Overview.md) | [Acceptance and delivery](../3.Runbook.md) | [Solution index](../../README.md)",
@@ -2645,18 +2818,19 @@ def render_solution(library: Library, package_slug: str) -> dict[str, str]:
     if package_slug not in library.solutions:
         raise RunbookSourceError(f"Unknown catalog package slug: {package_slug}")
     solution = library.solutions[package_slug]
+    page_ledger = {}
     artifacts = {
-        "1.Overview.md": _overview(library, solution),
-        "2.Architecture.md": _architecture(library, solution),
-        "3.Runbook.md": _runbook(library, solution),
-        "4.Sample-prompts.md": _sample_prompts(library, solution),
+        "1.Overview.md": _overview(library, solution, page_ledger),
+        "2.Architecture.md": _architecture(library, solution, page_ledger),
+        "3.Runbook.md": _runbook(library, solution, page_ledger),
+        "4.Sample-prompts.md": _sample_prompts(library, solution, page_ledger),
     }
     if _evidence_files(library, solution):
-        artifacts["5.Acceptance-Evidence.md"] = _evidence(library, solution)
+        artifacts["5.Acceptance-Evidence.md"] = _evidence(library, solution, page_ledger)
     sources = set()
     for artifact, text in artifacts.items():
         sources.update(_body_sources(library, f"01-solutions/{solution.slug}/{artifact}", text))
-    resources = _resources(library, solution, sources)
+    resources = _resources(library, solution, sources, page_ledger)
     return {"0.Resources/README.md": resources, **artifacts}
 
 
@@ -2693,6 +2867,15 @@ def _index(library: Library, selected: set[str]) -> str:
         "`solutions/runbook-notes/<slug>.json` notes validate. Explicit `--solution SLUG` or `--all` writes "
         "require authored notes for every selected package; all catalog solutions can still render in memory. "
         "Returning to the default write removes stale marker-owned files, never unmarked content.",
+        "",
+        "**Package-folder rule:** `RUNBOOK_SOLUTIONS`, `--solution`, output folders and notes filenames use "
+        "the package-folder slug. The notes `solution` field keeps the canonical catalog identity, and the index "
+        "shows the catalog display name. For example, `production-line-optimization` uses "
+        "`01-solutions/product-line-optimization/` and `solutions/runbook-notes/product-line-optimization.json`, "
+        "with `\"solution\": \"@aibast-agents-library/production-line-optimization\"`.",
+        "",
+        "Repository sources may cite an existing Markdown or HTML section as `path#anchor`; headings and explicit "
+        "HTML anchors follow the shared GitHub-slug checker. Missing files or anchors fail validation.",
         "",
         "## Artifact Anatomy", "",
         _table(("Artifact", "Delivery question"), anatomy, "No artifact contract recorded."),
@@ -2799,7 +2982,9 @@ def _selection(library: Library, solutions) -> tuple[str, ...]:
     selected = tuple(sorted(set(selected)))
     unknown = set(selected) - library.solutions.keys()
     if unknown:
-        raise RunbookSourceError("Unknown catalog package slug(s): " + ", ".join(sorted(unknown)))
+        hints = [f"{slug} -> {PACKAGE_ALIASES[slug]}" for slug in sorted(unknown) if slug in PACKAGE_ALIASES]
+        detail = "; use package-folder slugs: " + ", ".join(hints) if hints else ""
+        raise RunbookSourceError("Unknown catalog package slug(s): " + ", ".join(sorted(unknown)) + detail)
     return selected
 
 

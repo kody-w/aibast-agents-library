@@ -6,6 +6,10 @@ This generated delivery layer projects the catalog without moving its packages: 
 
 Regenerate with `python tools/build_solution_runbooks.py`; verify without writing with `python tools/build_solution_runbooks.py --check`. Add solutions one by one after their `solutions/runbook-notes/<slug>.json` notes validate. Explicit `--solution SLUG` or `--all` writes require authored notes for every selected package; all catalog solutions can still render in memory. Returning to the default write removes stale marker-owned files, never unmarked content.
 
+**Package-folder rule:** `RUNBOOK_SOLUTIONS`, `--solution`, output folders and notes filenames use the package-folder slug. The notes `solution` field keeps the canonical catalog identity, and the index shows the catalog display name. For example, `production-line-optimization` uses `01-solutions/product-line-optimization/` and `solutions/runbook-notes/product-line-optimization.json`, with `"solution": "@aibast-agents-library/production-line-optimization"`.
+
+Repository sources may cite an existing Markdown or HTML section as `path#anchor`; headings and explicit HTML anchors follow the shared GitHub-slug checker. Missing files or anchors fail validation.
+
 ## Artifact Anatomy
 
 | Artifact | Delivery question |

@@ -110,6 +110,26 @@
     {
       "text": "Have telemetry, support and success measures been agreed for production permit processing, beyond the synthetic workshop evidence?",
       "source": "solutions/building-permit-processing/FIELD-GUIDE.md"
+    },
+    {
+      "text": "For a proposed GCC or GCC High deployment, has the customer or partner confirmed Copilot Studio eligibility and cloud-specific feature/channel limits?",
+      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-licensing-gcc"
+    },
+    {
+      "text": "If proposing GCC or GCC High, has the customer or partner confirmed GitHub Copilot harness and configured Claude Sonnet 4.6 availability?",
+      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-agent-model-availability"
+    },
+    {
+      "text": "Has the customer's records officer defined applicable public-records disclosure, retention and disposition duties for transcripts and applicant-update drafts?",
+      "source": "https://learn.microsoft.com/en-us/purview/records-management"
+    },
+    {
+      "text": "Has the customer or partner agreed channel-specific accessibility acceptance and verified keyboard and screen-reader use?",
+      "source": "https://learn.microsoft.com/en-us/power-platform/well-architected/experience-optimization/design-standards"
+    },
+    {
+      "text": "Has the customer or partner identified the governing statute/ordinance and approved each permit type's review clock, rather than adopting fictional targets?",
+      "source": "solutions/building-permit-processing/copilot-studio/capabilities/knowledge/files/aibast_permit-rules-and-schedules.md"
     }
   ],
   "what_goes_wrong": [
@@ -178,7 +198,7 @@
     },
     {
       "role": "Acceptance reviewer",
-      "responsibility": "Check BPP-01 through BPP-05 and refusal tests on the current Draft; reject historical published-pilot, blank and reshoot-required images as current proof.",
+      "responsibility": "Review locked permit cases and chosen-lane evidence; confirm any build comparison uses matching inputs/model and the target remains Draft.",
       "source": "solutions/building-permit-processing/FIELD-GUIDE.md"
     },
     {
@@ -219,8 +239,13 @@
       "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-share-agent"
     },
     {
-      "item": "Tooling by build lane",
-      "detail": "Manual lane uses the Copilot Studio browser and reviewed uploads. Easy mode requires VS Code Agent mode, the Microsoft Copilot Studio plugin and PAC CLI 2.9.3 or newer.",
+      "item": "Easy-mode tooling",
+      "detail": "Use the Microsoft Copilot Studio plugin and PAC CLI 2.9.3 or newer for cli-copilot authoring.",
+      "source": "solutions/building-permit-processing/deployment.json"
+    },
+    {
+      "item": "Manual build tooling",
+      "detail": "Use the Copilot Studio browser and reviewed uploads; no PAC CLI, YAML import or plugin architect.",
       "source": "solutions/building-permit-processing/FIELD-GUIDE.md"
     },
     {
@@ -242,11 +267,11 @@
     ],
     "phase_1": [
       {
-        "text": "The permit project uses cli-copilot in the approved environment; the release target remains unpublished.",
-        "source": "solutions/building-permit-processing/deployment.json"
+        "text": "The target permit environment and approved publisher prefix are confirmed; the delivery team can authenticate.",
+        "source": "solutions/catalog.json"
       },
       {
-        "text": "The customer validates authenticated staff access and only the necessary record and action scopes.",
+        "text": "The customer approves the staff audience, authentication approach and minimum record/action scopes.",
         "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/configuration-end-user-authentication"
       }
     ],
@@ -290,13 +315,13 @@
         "source": "solutions/building-permit-processing/manual/GLOBAL-INSTRUCTIONS.md"
       },
       {
-        "text": "Mapped inputs and outputs are verified against the customer systems; no system change is claimed without successful tool evidence.",
+        "text": "Approved replacement connections preserve the reviewed permit input/output contract; no system change is claimed without successful tool evidence.",
         "source": "solutions/building-permit-processing/FIELD-GUIDE.md"
       }
     ],
     "phase_4": [
       {
-        "text": "The business owner sets customer-data acceptance measures; fictional review clocks, scores and fees are not production thresholds.",
+        "text": "The business owner sets customer-data acceptance measures; synthetic records are not customer KPIs or measured production results.",
         "source": "solutions/building-permit-processing/FIELD-GUIDE.md"
       },
       {
@@ -310,8 +335,8 @@
         "source": "solutions/building-permit-processing/deployment.json"
       },
       {
-        "text": "The approved permit staff audience and supported channels are tested before confirming publication.",
-        "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/publication-publish-agent"
+        "text": "After restricted publication and sharing, approved permit staff can access the channel and unshared test identities are denied before pilot entry.",
+        "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-share-agent"
       }
     ],
     "phase_6": [
@@ -468,9 +493,9 @@
     },
     {
       "area": "Test",
-      "action": "Test staff and unshared identities in an approved test deployment; a maker's working connection does not prove other users' access.",
+      "action": "Run pre-publication evaluations of adapted permit cases with approved test user profiles; verify exact assertions separately from General quality scores.",
       "owner": "Acceptance reviewer",
-      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-share-agent",
+      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/analytics-agent-evaluation-intro",
       "phase": 4
     },
     {
@@ -742,13 +767,33 @@
     },
     {
       "area": "Retention",
-      "consideration": "Approve transcript recording, viewing, downloading and Dataverse retention with the municipal data owner.",
+      "consideration": "The municipal records officer approves transcript recording, export access and Dataverse retention; review service storage separately.",
       "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/admin-transcript-controls"
     },
     {
       "area": "Cost drivers",
       "consideration": "Measure model-token, knowledge/tool and harness usage by permit workload; synthetic evidence is not a production-cost estimate.",
       "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/billing-credit-overview"
+    },
+    {
+      "area": "Government cloud service",
+      "consideration": "Copilot Studio documents GCC and GCC High offerings for eligible customers; verify cloud-specific feature and channel limits.",
+      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-licensing-gcc"
+    },
+    {
+      "area": "Government harness and model",
+      "consideration": "For GCC or GCC High, has the customer or partner confirmed harness and configured-model support independently of commercial availability?",
+      "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-agent-model-availability"
+    },
+    {
+      "area": "Public-records handling",
+      "consideration": "Customer records officer: classify transcripts and applicant-update drafts and approve applicable disclosure, retention and disposition per store.",
+      "source": "https://learn.microsoft.com/en-us/purview/records-management"
+    },
+    {
+      "area": "Accessibility",
+      "consideration": "Customer or partner tests the published channel with keyboard and assistive technology against agreed requirements; template tests do not prove conformance.",
+      "source": "https://learn.microsoft.com/en-us/power-platform/well-architected/experience-optimization/design-standards"
     }
   ],
   "state_and_recovery": [
@@ -862,6 +907,10 @@
     "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/tools-add-workflow",
     "https://learn.microsoft.com/en-us/power-platform/admin/manage-copilot-studio-copilot-credits-capacity",
     "https://learn.microsoft.com/en-us/microsoft-copilot-studio/geo-data-residency",
-    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/admin-transcript-controls"
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/admin-transcript-controls",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-licensing-gcc",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-agent-model-availability",
+    "https://learn.microsoft.com/en-us/purview/records-management",
+    "https://learn.microsoft.com/en-us/power-platform/well-architected/experience-optimization/design-standards"
   ]
 }
