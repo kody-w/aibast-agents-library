@@ -197,25 +197,25 @@ normalized journey stage.
 
 | Vertical | Solutions | Journey stages |
 | --- | --- | --- |
-| B2B Sales | [Account Intelligence Agent](../solutions/account-intelligence/README.md) | Understand |
+| B2B Sales | [Account Intelligence Agent](../01-solutions/account-intelligence/1.Overview.md) | Understand |
 | B2B Sales | [Deal Progression Agent](../solutions/deal-progression/README.md) | Optimize |
 | B2B Sales | [Proposal Generation Agent](../solutions/proposal-generation/README.md) | Create |
 | B2B Sales | [Sales Qualification Agent](../solutions/sales-qualification/README.md) | Prioritize |
 | B2B Sales | [Win/Loss Analysis Agent](../solutions/win-loss-analysis/README.md) | Learn |
-| B2C Sales | [Cart Abandonment Recovery Agent](../solutions/cart-abandonment-recovery/README.md) | Recover / Learn (secondary) |
+| B2C Sales | [Cart Abandonment Recovery Agent](../01-solutions/cart-abandonment-recovery/1.Overview.md) | Recover / Learn (secondary) |
 | B2C Sales | [Customer Loyalty and Rewards Agent](../solutions/customer-loyalty-rewards/README.md) | Retain / Optimize (secondary) |
 | B2C Sales | [Omnichannel Engagement Agent](../solutions/omnichannel-engagement/README.md) | Understand / Optimize (secondary) |
 | B2C Sales | [Personalized Shopping Agent](../solutions/personalized-shopping-assistant/README.md) | Discover / Advise (secondary) |
 | Cross-Industry | [Cross-Selling Opportunities Agent](../solutions/cross-selling/README.md) | Expand |
-| Cross-Industry | [Customer Escalations Agent](../solutions/ai-customer-assistant/README.md) | Serve |
+| Cross-Industry | [Customer Escalations Agent](../01-solutions/ai-customer-assistant/1.Overview.md) | Serve |
 | Cross-Industry | [Discount Finder Agent](../solutions/procurement-support/README.md) | Optimize |
 | Cross-Industry | [Procurement Agent](../solutions/procurement-agent/README.md) | Optimize |
-| Energy | [Asset Maintenance Forecast Agent](../solutions/asset-maintenance-forecast/README.md) | Optimize |
+| Energy | [Asset Maintenance Forecast Agent](../01-solutions/asset-maintenance-forecast/1.Overview.md) | Optimize |
 | Energy | [Emissions Tracking Agent](../solutions/emission-tracking/README.md) | Govern |
 | Energy | [Field Service Dispatch Agent](../solutions/field-service-dispatch/README.md) | Serve |
 | Energy | [Permit Management Agent](../solutions/permit-license-management/README.md) | Govern |
 | Energy | [Regulatory Reporting Agent](../solutions/energy-regulatory-reporting/README.md) | Govern |
-| Financial Services | [Claims Processing Agent](../solutions/claims-processing/README.md) | Decide |
+| Financial Services | [Claims Processing Agent](../01-solutions/claims-processing/1.Overview.md) | Decide |
 | Financial Services | [Customer Onboarding Agent](../solutions/fs-customer-onboarding/README.md) | Govern |
 | Financial Services | [Customer Sentiment and Churn Prediction Agent](../solutions/customer-sentiment-churn/README.md) | Engage |
 | Financial Services | [Financial Advisor Agent](../solutions/financial-advisor-copilot/README.md) | Engage |
@@ -225,7 +225,7 @@ normalized journey stage.
 | Financial Services | [Regulatory Compliance Agent](../solutions/fs-regulatory-compliance/README.md) | Govern |
 | Financial Services | [Underwriting Support Agent](../solutions/underwriting-support/README.md) | Decide |
 | Financial Services | [Wealth Insights Generator Agent](../solutions/wealth-insights-generator/README.md) | Engage |
-| Healthcare | [Care Gap Closure Agent](../solutions/care-gap-closure/README.md) | Govern |
+| Healthcare | [Care Gap Closure Agent](../01-solutions/care-gap-closure/1.Overview.md) | Govern |
 | Healthcare | [Clinical Notes Summarizer Agent](../solutions/clinical-notes-summarizer/README.md) | Activate |
 | Healthcare | [Patient Intake and Scheduling Agent](../solutions/patient-intake/README.md) | Activate |
 | Healthcare | [Prior Authorization Agent](../solutions/prior-authorization/README.md) | Govern |
@@ -235,7 +235,7 @@ normalized journey stage.
 | Manufacturing | [Order Status Communications Agent](../solutions/order-status-communication/README.md) | Serve |
 | Manufacturing | [Product Line Optimization Agent](../solutions/product-line-optimization/README.md) | Optimize |
 | Manufacturing | [Supply Risk Monitoring Agent](../solutions/supplier-risk-monitoring/README.md) | Protect |
-| Professional Services | [Client Health Score Agent](../solutions/client-health-score/README.md) | Optimize |
+| Professional Services | [Client Health Score Agent](../01-solutions/client-health-score/1.Overview.md) | Optimize |
 | Professional Services | [Contract Risk Review Agent](../solutions/contract-risk-review/README.md) | Govern |
 | Professional Services | [Resource Utilization Agent](../solutions/resource-utilization/README.md) | Optimize |
 | Professional Services | [Time Entry and Billing Agent](../solutions/time-entry-billing/README.md) | Operate |
