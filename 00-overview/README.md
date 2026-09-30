@@ -199,8 +199,8 @@ normalized journey stage.
 | --- | --- | --- |
 | B2B Sales | [Account Intelligence Agent](../01-solutions/account-intelligence/1.Overview.md) | Understand |
 | B2B Sales | [Deal Progression Agent](../01-solutions/deal-progression/1.Overview.md) | Optimize |
-| B2B Sales | [Proposal Generation Agent](../solutions/proposal-generation/README.md) | Create |
-| B2B Sales | [Sales Qualification Agent](../solutions/sales-qualification/README.md) | Prioritize |
+| B2B Sales | [Proposal Generation Agent](../01-solutions/proposal-generation/1.Overview.md) | Create |
+| B2B Sales | [Sales Qualification Agent](../01-solutions/sales-qualification/1.Overview.md) | Prioritize |
 | B2B Sales | [Win/Loss Analysis Agent](../solutions/win-loss-analysis/README.md) | Learn |
 | B2C Sales | [Cart Abandonment Recovery Agent](../01-solutions/cart-abandonment-recovery/1.Overview.md) | Recover / Learn (secondary) |
 | B2C Sales | [Customer Loyalty and Rewards Agent](../01-solutions/customer-loyalty-rewards/1.Overview.md) | Retain / Optimize (secondary) |
@@ -233,21 +233,21 @@ normalized journey stage.
 | Manufacturing | [Inventory Rebalancing Agent](../01-solutions/inventory-rebalancing/1.Overview.md) | Optimize |
 | Manufacturing | [Maintenance Scheduling Agent](../01-solutions/maintenance-scheduling/1.Overview.md) | Optimize |
 | Manufacturing | [Order Status Communications Agent](../01-solutions/order-status-communication/1.Overview.md) | Serve |
-| Manufacturing | [Product Line Optimization Agent](../solutions/product-line-optimization/README.md) | Optimize |
+| Manufacturing | [Product Line Optimization Agent](../01-solutions/product-line-optimization/1.Overview.md) | Optimize |
 | Manufacturing | [Supply Risk Monitoring Agent](../solutions/supplier-risk-monitoring/README.md) | Protect |
 | Professional Services | [Client Health Score Agent](../01-solutions/client-health-score/1.Overview.md) | Optimize |
 | Professional Services | [Contract Risk Review Agent](../01-solutions/contract-risk-review/1.Overview.md) | Govern |
-| Professional Services | [Resource Utilization Agent](../solutions/resource-utilization/README.md) | Optimize |
+| Professional Services | [Resource Utilization Agent](../01-solutions/resource-utilization/1.Overview.md) | Optimize |
 | Professional Services | [Time Entry and Billing Agent](../solutions/time-entry-billing/README.md) | Operate |
 | Retail & CPG | [Inventory Visibility Agent](../01-solutions/inventory-visibility/1.Overview.md) | Plan / Fulfill (secondary) |
 | Retail & CPG | [Personalized Marketing Agent](../01-solutions/personalized-marketing/1.Overview.md) | Plan / Evaluate (secondary) |
-| Retail & CPG | [Retail Store Associate Copilot](../solutions/store-associate-copilot/README.md) | Serve / Coordinate (secondary) |
-| Retail & CPG | [Returns and Complaints Resolution Agent](../solutions/returns-complaints-resolution/README.md) | Resolve / Learn (secondary) |
+| Retail & CPG | [Retail Store Associate Copilot](../01-solutions/store-associate-copilot/1.Overview.md) | Serve / Coordinate (secondary) |
+| Retail & CPG | [Returns and Complaints Resolution Agent](../01-solutions/returns-complaints-resolution/1.Overview.md) | Resolve / Learn (secondary) |
 | Retail & CPG | [Supply Chain Disruption Alert Agent](../solutions/supply-chain-disruption-alert/README.md) | Optimize |
 | SLG Government | [Building Permit Processing Agent](../01-solutions/building-permit-processing/1.Overview.md) | Govern |
 | SLG Government | [Utility Billing and Assistance Agent](../solutions/utility-billing-assistance/README.md) | Serve |
 | Software & Digital Products | [License Renewal and Expansion Agent](../01-solutions/license-renewal-expansion/1.Overview.md) | Retain |
-| Software & Digital Products | [Product Feedback Synthesizer Agent](../solutions/product-feedback-synthesizer/README.md) | Innovate |
+| Software & Digital Products | [Product Feedback Synthesizer Agent](../01-solutions/product-feedback-synthesizer/1.Overview.md) | Innovate |
 
 <!-- END GENERATED: solution-taxonomy -->
 

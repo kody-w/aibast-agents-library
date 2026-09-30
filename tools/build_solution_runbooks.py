@@ -64,6 +64,13 @@ RUNBOOK_SOLUTIONS = (
     "prior-authorization",
     "procurement-agent",
     "procurement-support",
+    "product-feedback-synthesizer",
+    "product-line-optimization",
+    "proposal-generation",
+    "resource-utilization",
+    "returns-complaints-resolution",
+    "sales-qualification",
+    "store-associate-copilot",
 )
 PACKAGE_ALIASES = {"production-line-optimization": "product-line-optimization"}
 DRAFT_PACKAGES = {
