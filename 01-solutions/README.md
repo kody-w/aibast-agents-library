@@ -2,7 +2,7 @@
 
 # Solution Runbooks
 
-This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 2 of 51 catalog solutions have runbooks in this projection.
+This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 9 of 51 catalog solutions have runbooks in this projection.
 
 Regenerate with `python tools/build_solution_runbooks.py`; verify without writing with `python tools/build_solution_runbooks.py --check`. Add solutions one by one after their `solutions/runbook-notes/<slug>.json` notes validate. Explicit `--solution SLUG` or `--all` writes require authored notes for every selected package; all catalog solutions can still render in memory. Returning to the default write removes stale marker-owned files, never unmarked content.
 
@@ -27,7 +27,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| Account Intelligence Agent | Understand | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/account-intelligence/quest.html) | [Package](../solutions/account-intelligence/README.md) |
+| Account Intelligence Agent | Understand | [Read runbook](account-intelligence/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/account-intelligence/quest.html) | [Package](../solutions/account-intelligence/README.md) |
 | Deal Progression Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/deal-progression/quest.html) | [Package](../solutions/deal-progression/README.md) |
 | Proposal Generation Agent | Create | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/proposal-generation/quest.html) | [Package](../solutions/proposal-generation/README.md) |
 | Sales Qualification Agent | Prioritize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/sales-qualification/quest.html) | [Package](../solutions/sales-qualification/README.md) |
@@ -37,7 +37,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| Cart Abandonment Recovery Agent | Recover / Learn (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/cart-abandonment-recovery/quest.html) | [Package](../solutions/cart-abandonment-recovery/README.md) |
+| Cart Abandonment Recovery Agent | Recover / Learn (secondary) | [Read runbook](cart-abandonment-recovery/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/cart-abandonment-recovery/quest.html) | [Package](../solutions/cart-abandonment-recovery/README.md) |
 | Customer Loyalty and Rewards Agent | Retain / Optimize (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/customer-loyalty-rewards/quest.html) | [Package](../solutions/customer-loyalty-rewards/README.md) |
 | Omnichannel Engagement Agent | Understand / Optimize (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/omnichannel-engagement/quest.html) | [Package](../solutions/omnichannel-engagement/README.md) |
 | Personalized Shopping Agent | Discover / Advise (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/personalized-shopping-assistant/quest.html) | [Package](../solutions/personalized-shopping-assistant/README.md) |
@@ -47,7 +47,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
 | Cross-Selling Opportunities Agent | Expand | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/cross-selling/quest.html) | [Package](../solutions/cross-selling/README.md) |
-| Customer Escalations Agent | Serve | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/ai-customer-assistant/quest.html) | [Package](../solutions/ai-customer-assistant/README.md) |
+| Customer Escalations Agent | Serve | [Read runbook](ai-customer-assistant/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/ai-customer-assistant/quest.html) | [Package](../solutions/ai-customer-assistant/README.md) |
 | Discount Finder Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/procurement-support/quest.html) | [Package](../solutions/procurement-support/README.md) |
 | Procurement Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/procurement-agent/quest.html) | [Package](../solutions/procurement-agent/README.md) |
 
@@ -55,7 +55,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| Asset Maintenance Forecast Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/asset-maintenance-forecast/quest.html) | [Package](../solutions/asset-maintenance-forecast/README.md) |
+| Asset Maintenance Forecast Agent | Optimize | [Read runbook](asset-maintenance-forecast/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/asset-maintenance-forecast/quest.html) | [Package](../solutions/asset-maintenance-forecast/README.md) |
 | Emissions Tracking Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/emission-tracking/quest.html) | [Package](../solutions/emission-tracking/README.md) |
 | Field Service Dispatch Agent | Serve | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/field-service-dispatch/quest.html) | [Package](../solutions/field-service-dispatch/README.md) |
 | Permit Management Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/permit-license-management/quest.html) | [Package](../solutions/permit-license-management/README.md) |
@@ -65,7 +65,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| Claims Processing Agent | Decide | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/claims-processing/quest.html) | [Package](../solutions/claims-processing/README.md) |
+| Claims Processing Agent | Decide | [Read runbook](claims-processing/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/claims-processing/quest.html) | [Package](../solutions/claims-processing/README.md) |
 | Customer Onboarding Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fs-customer-onboarding/quest.html) | [Package](../solutions/fs-customer-onboarding/README.md) |
 | Customer Sentiment and Churn Prediction Agent | Engage | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/customer-sentiment-churn/quest.html) | [Package](../solutions/customer-sentiment-churn/README.md) |
 | Financial Advisor Agent | Engage | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/financial-advisor-copilot/quest.html) | [Package](../solutions/financial-advisor-copilot/README.md) |
@@ -80,7 +80,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| Care Gap Closure Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/care-gap-closure/quest.html) | [Package](../solutions/care-gap-closure/README.md) |
+| Care Gap Closure Agent | Govern | [Read runbook](care-gap-closure/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/care-gap-closure/quest.html) | [Package](../solutions/care-gap-closure/README.md) |
 | Clinical Notes Summarizer Agent | Activate | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/clinical-notes-summarizer/quest.html) | [Package](../solutions/clinical-notes-summarizer/README.md) |
 | Patient Intake and Scheduling Agent | Activate | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/patient-intake/quest.html) | [Package](../solutions/patient-intake/README.md) |
 | Prior Authorization Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/prior-authorization/quest.html) | [Package](../solutions/prior-authorization/README.md) |
@@ -105,7 +105,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| Client Health Score Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/client-health-score/quest.html) | [Package](../solutions/client-health-score/README.md) |
+| Client Health Score Agent | Optimize | [Read runbook](client-health-score/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/client-health-score/quest.html) | [Package](../solutions/client-health-score/README.md) |
 | Contract Risk Review Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/contract-risk-review/quest.html) | [Package](../solutions/contract-risk-review/README.md) |
 | Resource Utilization Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/resource-utilization/quest.html) | [Package](../solutions/resource-utilization/README.md) |
 | Time Entry and Billing Agent | Operate | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/time-entry-billing/quest.html) | [Package](../solutions/time-entry-billing/README.md) |
@@ -140,18 +140,18 @@ Compare the portable file in AIBAST Frontier (experimental) with the manual Copi
 
 | Solution | AIBAST Frontier (experimental): agent.py lines | Runbook lane: instructions · knowledge · skills | Manual build steps |
 | --- | --- | --- | --- |
-| [Account Intelligence Agent](../solutions/account-intelligence/README.md) | 499 | 1 · 2 · 6 | 22 |
+| [Account Intelligence Agent](account-intelligence/1.Overview.md) | 499 | 1 · 2 · 6 | 22 |
 | [Ask HR Agent](ask-hr/1.Overview.md) | 400 | 1 · 2 · 6 | 22 |
-| [Asset Maintenance Forecast Agent](../solutions/asset-maintenance-forecast/README.md) | 349 | 1 · 2 · 4 | 18 |
+| [Asset Maintenance Forecast Agent](asset-maintenance-forecast/1.Overview.md) | 349 | 1 · 2 · 4 | 18 |
 | [Building Permit Processing Agent](building-permit-processing/1.Overview.md) | 591 | 1 · 2 · 7 | 24 |
-| [Care Gap Closure Agent](../solutions/care-gap-closure/README.md) | 204 | 1 · 2 · 4 | 18 |
-| [Cart Abandonment Recovery Agent](../solutions/cart-abandonment-recovery/README.md) | 327 | 1 · 2 · 4 | 18 |
-| [Claims Processing Agent](../solutions/claims-processing/README.md) | 330 | 1 · 2 · 4 | 18 |
-| [Client Health Score Agent](../solutions/client-health-score/README.md) | 432 | 1 · 2 · 5 | 20 |
+| [Care Gap Closure Agent](care-gap-closure/1.Overview.md) | 204 | 1 · 2 · 4 | 18 |
+| [Cart Abandonment Recovery Agent](cart-abandonment-recovery/1.Overview.md) | 327 | 1 · 2 · 4 | 18 |
+| [Claims Processing Agent](claims-processing/1.Overview.md) | 330 | 1 · 2 · 4 | 18 |
+| [Client Health Score Agent](client-health-score/1.Overview.md) | 432 | 1 · 2 · 5 | 20 |
 | [Clinical Notes Summarizer Agent](../solutions/clinical-notes-summarizer/README.md) | 180 | 1 · 2 · 4 | 18 |
 | [Contract Risk Review Agent](../solutions/contract-risk-review/README.md) | 359 | 1 · 2 · 4 | 18 |
 | [Cross-Selling Opportunities Agent](../solutions/cross-selling/README.md) | 360 | 1 · 2 · 4 | 18 |
-| [Customer Escalations Agent](../solutions/ai-customer-assistant/README.md) | 402 | 1 · 2 · 4 | 18 |
+| [Customer Escalations Agent](ai-customer-assistant/1.Overview.md) | 402 | 1 · 2 · 4 | 18 |
 | [Customer Loyalty and Rewards Agent](../solutions/customer-loyalty-rewards/README.md) | 344 | 1 · 2 · 4 | 18 |
 | [Customer Onboarding Agent](../solutions/fs-customer-onboarding/README.md) | 352 | 1 · 2 · 4 | 18 |
 | [Customer Sentiment and Churn Prediction Agent](../solutions/customer-sentiment-churn/README.md) | 364 | 1 · 2 · 4 | 18 |

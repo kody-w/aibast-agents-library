@@ -26,7 +26,17 @@ from urllib.parse import quote, unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 # Disk paths, notes filenames and selectors use package-folder slugs, not catalog aliases.
-RUNBOOK_SOLUTIONS = ("ask-hr", "building-permit-processing")
+RUNBOOK_SOLUTIONS = (
+    "account-intelligence",
+    "ai-customer-assistant",
+    "ask-hr",
+    "asset-maintenance-forecast",
+    "building-permit-processing",
+    "care-gap-closure",
+    "cart-abandonment-recovery",
+    "claims-processing",
+    "client-health-score",
+)
 PACKAGE_ALIASES = {"production-line-optimization": "product-line-optimization"}
 DRAFT_PACKAGES = {
     "grid-outage-response": (
