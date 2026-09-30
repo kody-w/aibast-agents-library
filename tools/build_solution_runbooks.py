@@ -43,6 +43,13 @@ RUNBOOK_SOLUTIONS = (
     "customer-sentiment-churn",
     "deal-progression",
     "emission-tracking",
+    "energy-regulatory-reporting",
+    "field-service-dispatch",
+    "financial-advisor-copilot",
+    "fraud-detection-alert",
+    "fs-customer-onboarding",
+    "fs-regulatory-compliance",
+    "inventory-rebalancing",
 )
 PACKAGE_ALIASES = {"production-line-optimization": "product-line-optimization"}
 DRAFT_PACKAGES = {

@@ -2,7 +2,7 @@
 
 # Solution Runbooks
 
-This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 16 of 51 catalog solutions have runbooks in this projection.
+This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 23 of 51 catalog solutions have runbooks in this projection.
 
 Regenerate with `python tools/build_solution_runbooks.py`; verify without writing with `python tools/build_solution_runbooks.py --check`. Add solutions one by one after their `solutions/runbook-notes/<slug>.json` notes validate. Explicit `--solution SLUG` or `--all` writes require authored notes for every selected package; all catalog solutions can still render in memory. Returning to the default write removes stale marker-owned files, never unmarked content.
 
@@ -57,22 +57,22 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | --- | --- | --- | --- | --- |
 | Asset Maintenance Forecast Agent | Optimize | [Read runbook](asset-maintenance-forecast/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/asset-maintenance-forecast/quest.html) | [Package](../solutions/asset-maintenance-forecast/README.md) |
 | Emissions Tracking Agent | Govern | [Read runbook](emission-tracking/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/emission-tracking/quest.html) | [Package](../solutions/emission-tracking/README.md) |
-| Field Service Dispatch Agent | Serve | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/field-service-dispatch/quest.html) | [Package](../solutions/field-service-dispatch/README.md) |
+| Field Service Dispatch Agent | Serve | [Read runbook](field-service-dispatch/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/field-service-dispatch/quest.html) | [Package](../solutions/field-service-dispatch/README.md) |
 | Permit Management Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/permit-license-management/quest.html) | [Package](../solutions/permit-license-management/README.md) |
-| Regulatory Reporting Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/energy-regulatory-reporting/quest.html) | [Package](../solutions/energy-regulatory-reporting/README.md) |
+| Regulatory Reporting Agent | Govern | [Read runbook](energy-regulatory-reporting/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/energy-regulatory-reporting/quest.html) | [Package](../solutions/energy-regulatory-reporting/README.md) |
 
 ### Financial Services
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
 | Claims Processing Agent | Decide | [Read runbook](claims-processing/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/claims-processing/quest.html) | [Package](../solutions/claims-processing/README.md) |
-| Customer Onboarding Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fs-customer-onboarding/quest.html) | [Package](../solutions/fs-customer-onboarding/README.md) |
+| Customer Onboarding Agent | Govern | [Read runbook](fs-customer-onboarding/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fs-customer-onboarding/quest.html) | [Package](../solutions/fs-customer-onboarding/README.md) |
 | Customer Sentiment and Churn Prediction Agent | Engage | [Read runbook](customer-sentiment-churn/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/customer-sentiment-churn/quest.html) | [Package](../solutions/customer-sentiment-churn/README.md) |
-| Financial Advisor Agent | Engage | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/financial-advisor-copilot/quest.html) | [Package](../solutions/financial-advisor-copilot/README.md) |
-| Fraud Detection and Alert Agent | Protect | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fraud-detection-alert/quest.html) | [Package](../solutions/fraud-detection-alert/README.md) |
+| Financial Advisor Agent | Engage | [Read runbook](financial-advisor-copilot/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/financial-advisor-copilot/quest.html) | [Package](../solutions/financial-advisor-copilot/README.md) |
+| Fraud Detection and Alert Agent | Protect | [Read runbook](fraud-detection-alert/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fraud-detection-alert/quest.html) | [Package](../solutions/fraud-detection-alert/README.md) |
 | Loan Origination Assistant | Decide | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/loan-origination-assistant/quest.html) | [Package](../solutions/loan-origination-assistant/README.md) |
 | Portfolio Rebalancing Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/portfolio-rebalancing/quest.html) | [Package](../solutions/portfolio-rebalancing/README.md) |
-| Regulatory Compliance Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fs-regulatory-compliance/quest.html) | [Package](../solutions/fs-regulatory-compliance/README.md) |
+| Regulatory Compliance Agent | Govern | [Read runbook](fs-regulatory-compliance/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fs-regulatory-compliance/quest.html) | [Package](../solutions/fs-regulatory-compliance/README.md) |
 | Underwriting Support Agent | Decide | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/underwriting-support/quest.html) | [Package](../solutions/underwriting-support/README.md) |
 | Wealth Insights Generator Agent | Engage | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/wealth-insights-generator/quest.html) | [Package](../solutions/wealth-insights-generator/README.md) |
 
@@ -95,7 +95,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| Inventory Rebalancing Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/inventory-rebalancing/quest.html) | [Package](../solutions/inventory-rebalancing/README.md) |
+| Inventory Rebalancing Agent | Optimize | [Read runbook](inventory-rebalancing/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/inventory-rebalancing/quest.html) | [Package](../solutions/inventory-rebalancing/README.md) |
 | Maintenance Scheduling Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/maintenance-scheduling/quest.html) | [Package](../solutions/maintenance-scheduling/README.md) |
 | Order Status Communications Agent | Serve | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/order-status-communication/quest.html) | [Package](../solutions/order-status-communication/README.md) |
 | Product Line Optimization Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/product-line-optimization/quest.html) | [Package](../solutions/product-line-optimization/README.md) |
@@ -153,15 +153,15 @@ Compare the portable file in AIBAST Frontier (experimental) with the manual Copi
 | [Cross-Selling Opportunities Agent](cross-selling/1.Overview.md) | 360 | 1 · 2 · 4 | 18 |
 | [Customer Escalations Agent](ai-customer-assistant/1.Overview.md) | 402 | 1 · 2 · 4 | 18 |
 | [Customer Loyalty and Rewards Agent](customer-loyalty-rewards/1.Overview.md) | 344 | 1 · 2 · 4 | 18 |
-| [Customer Onboarding Agent](../solutions/fs-customer-onboarding/README.md) | 352 | 1 · 2 · 4 | 18 |
+| [Customer Onboarding Agent](fs-customer-onboarding/1.Overview.md) | 352 | 1 · 2 · 4 | 18 |
 | [Customer Sentiment and Churn Prediction Agent](customer-sentiment-churn/1.Overview.md) | 364 | 1 · 2 · 4 | 18 |
 | [Deal Progression Agent](deal-progression/1.Overview.md) | 677 | 1 · 2 · 6 | 22 |
 | [Discount Finder Agent](../solutions/procurement-support/README.md) | 384 | 1 · 2 · 4 | 18 |
 | [Emissions Tracking Agent](emission-tracking/1.Overview.md) | 346 | 1 · 2 · 4 | 18 |
-| [Field Service Dispatch Agent](../solutions/field-service-dispatch/README.md) | 398 | 1 · 2 · 4 | 18 |
-| [Financial Advisor Agent](../solutions/financial-advisor-copilot/README.md) | 375 | 1 · 2 · 6 | 22 |
-| [Fraud Detection and Alert Agent](../solutions/fraud-detection-alert/README.md) | 316 | 1 · 2 · 4 | 18 |
-| [Inventory Rebalancing Agent](../solutions/inventory-rebalancing/README.md) | 399 | 1 · 2 · 4 | 22 |
+| [Field Service Dispatch Agent](field-service-dispatch/1.Overview.md) | 398 | 1 · 2 · 4 | 18 |
+| [Financial Advisor Agent](financial-advisor-copilot/1.Overview.md) | 375 | 1 · 2 · 6 | 22 |
+| [Fraud Detection and Alert Agent](fraud-detection-alert/1.Overview.md) | 316 | 1 · 2 · 4 | 18 |
+| [Inventory Rebalancing Agent](inventory-rebalancing/1.Overview.md) | 399 | 1 · 2 · 4 | 22 |
 | [Inventory Visibility Agent](../solutions/inventory-visibility/README.md) | 409 | 1 · 2 · 4 | 18 |
 | [License Renewal and Expansion Agent](../solutions/license-renewal-expansion/README.md) | 435 | 1 · 2 · 4 | 18 |
 | [Loan Origination Assistant](../solutions/loan-origination-assistant/README.md) | 385 | 1 · 2 · 5 | 20 |
@@ -178,8 +178,8 @@ Compare the portable file in AIBAST Frontier (experimental) with the manual Copi
 | [Product Feedback Synthesizer Agent](../solutions/product-feedback-synthesizer/README.md) | 376 | 1 · 2 · 4 | 18 |
 | [Product Line Optimization Agent](../solutions/product-line-optimization/README.md) | 353 | 1 · 2 · 4 | 23 |
 | [Proposal Generation Agent](../solutions/proposal-generation/README.md) | 714 | 1 · 2 · 6 | 22 |
-| [Regulatory Compliance Agent](../solutions/fs-regulatory-compliance/README.md) | 729 | 1 · 2 · 5 | 26 |
-| [Regulatory Reporting Agent](../solutions/energy-regulatory-reporting/README.md) | 343 | 1 · 2 · 4 | 18 |
+| [Regulatory Compliance Agent](fs-regulatory-compliance/1.Overview.md) | 729 | 1 · 2 · 5 | 26 |
+| [Regulatory Reporting Agent](energy-regulatory-reporting/1.Overview.md) | 343 | 1 · 2 · 4 | 18 |
 | [Resource Utilization Agent](../solutions/resource-utilization/README.md) | 413 | 1 · 2 · 5 | 20 |
 | [Retail Store Associate Copilot](../solutions/store-associate-copilot/README.md) | 575 | 1 · 2 · 4 | 18 |
 | [Returns and Complaints Resolution Agent](../solutions/returns-complaints-resolution/README.md) | 568 | 1 · 2 · 4 | 18 |
