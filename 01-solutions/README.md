@@ -2,7 +2,7 @@
 
 # Solution Runbooks
 
-This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 23 of 51 catalog solutions have runbooks in this projection.
+This generated delivery layer projects the catalog without moving its packages: canonical assets remain in [solutions/](../solutions/README.md). 30 of 51 catalog solutions have runbooks in this projection.
 
 Regenerate with `python tools/build_solution_runbooks.py`; verify without writing with `python tools/build_solution_runbooks.py --check`. Add solutions one by one after their `solutions/runbook-notes/<slug>.json` notes validate. Explicit `--solution SLUG` or `--all` writes require authored notes for every selected package; all catalog solutions can still render in memory. Returning to the default write removes stale marker-owned files, never unmarked content.
 
@@ -39,7 +39,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | --- | --- | --- | --- | --- |
 | Cart Abandonment Recovery Agent | Recover / Learn (secondary) | [Read runbook](cart-abandonment-recovery/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/cart-abandonment-recovery/quest.html) | [Package](../solutions/cart-abandonment-recovery/README.md) |
 | Customer Loyalty and Rewards Agent | Retain / Optimize (secondary) | [Read runbook](customer-loyalty-rewards/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/customer-loyalty-rewards/quest.html) | [Package](../solutions/customer-loyalty-rewards/README.md) |
-| Omnichannel Engagement Agent | Understand / Optimize (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/omnichannel-engagement/quest.html) | [Package](../solutions/omnichannel-engagement/README.md) |
+| Omnichannel Engagement Agent | Understand / Optimize (secondary) | [Read runbook](omnichannel-engagement/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/omnichannel-engagement/quest.html) | [Package](../solutions/omnichannel-engagement/README.md) |
 | Personalized Shopping Agent | Discover / Advise (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/personalized-shopping-assistant/quest.html) | [Package](../solutions/personalized-shopping-assistant/README.md) |
 
 ### Cross-Industry
@@ -70,7 +70,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | Customer Sentiment and Churn Prediction Agent | Engage | [Read runbook](customer-sentiment-churn/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/customer-sentiment-churn/quest.html) | [Package](../solutions/customer-sentiment-churn/README.md) |
 | Financial Advisor Agent | Engage | [Read runbook](financial-advisor-copilot/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/financial-advisor-copilot/quest.html) | [Package](../solutions/financial-advisor-copilot/README.md) |
 | Fraud Detection and Alert Agent | Protect | [Read runbook](fraud-detection-alert/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fraud-detection-alert/quest.html) | [Package](../solutions/fraud-detection-alert/README.md) |
-| Loan Origination Assistant | Decide | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/loan-origination-assistant/quest.html) | [Package](../solutions/loan-origination-assistant/README.md) |
+| Loan Origination Assistant | Decide | [Read runbook](loan-origination-assistant/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/loan-origination-assistant/quest.html) | [Package](../solutions/loan-origination-assistant/README.md) |
 | Portfolio Rebalancing Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/portfolio-rebalancing/quest.html) | [Package](../solutions/portfolio-rebalancing/README.md) |
 | Regulatory Compliance Agent | Govern | [Read runbook](fs-regulatory-compliance/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/fs-regulatory-compliance/quest.html) | [Package](../solutions/fs-regulatory-compliance/README.md) |
 | Underwriting Support Agent | Decide | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/underwriting-support/quest.html) | [Package](../solutions/underwriting-support/README.md) |
@@ -82,7 +82,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | --- | --- | --- | --- | --- |
 | Care Gap Closure Agent | Govern | [Read runbook](care-gap-closure/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/care-gap-closure/quest.html) | [Package](../solutions/care-gap-closure/README.md) |
 | Clinical Notes Summarizer Agent | Activate | [Read runbook](clinical-notes-summarizer/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/clinical-notes-summarizer/quest.html) | [Package](../solutions/clinical-notes-summarizer/README.md) |
-| Patient Intake and Scheduling Agent | Activate | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/patient-intake/quest.html) | [Package](../solutions/patient-intake/README.md) |
+| Patient Intake and Scheduling Agent | Activate | [Read runbook](patient-intake/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/patient-intake/quest.html) | [Package](../solutions/patient-intake/README.md) |
 | Prior Authorization Agent | Govern | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/prior-authorization/quest.html) | [Package](../solutions/prior-authorization/README.md) |
 
 ### Human Resources
@@ -96,8 +96,8 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
 | Inventory Rebalancing Agent | Optimize | [Read runbook](inventory-rebalancing/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/inventory-rebalancing/quest.html) | [Package](../solutions/inventory-rebalancing/README.md) |
-| Maintenance Scheduling Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/maintenance-scheduling/quest.html) | [Package](../solutions/maintenance-scheduling/README.md) |
-| Order Status Communications Agent | Serve | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/order-status-communication/quest.html) | [Package](../solutions/order-status-communication/README.md) |
+| Maintenance Scheduling Agent | Optimize | [Read runbook](maintenance-scheduling/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/maintenance-scheduling/quest.html) | [Package](../solutions/maintenance-scheduling/README.md) |
+| Order Status Communications Agent | Serve | [Read runbook](order-status-communication/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/order-status-communication/quest.html) | [Package](../solutions/order-status-communication/README.md) |
 | Product Line Optimization Agent | Optimize | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/product-line-optimization/quest.html) | [Package](../solutions/product-line-optimization/README.md) |
 | Supply Risk Monitoring Agent | Protect | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/supplier-risk-monitoring/quest.html) | [Package](../solutions/supplier-risk-monitoring/README.md) |
 
@@ -114,7 +114,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| Inventory Visibility Agent | Plan / Fulfill (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/inventory-visibility/quest.html) | [Package](../solutions/inventory-visibility/README.md) |
+| Inventory Visibility Agent | Plan / Fulfill (secondary) | [Read runbook](inventory-visibility/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/inventory-visibility/quest.html) | [Package](../solutions/inventory-visibility/README.md) |
 | Personalized Marketing Agent | Plan / Evaluate (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/personalized-marketing/quest.html) | [Package](../solutions/personalized-marketing/README.md) |
 | Retail Store Associate Copilot | Serve / Coordinate (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/store-associate-copilot/quest.html) | [Package](../solutions/store-associate-copilot/README.md) |
 | Returns and Complaints Resolution Agent | Resolve / Learn (secondary) | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/returns-complaints-resolution/quest.html) | [Package](../solutions/returns-complaints-resolution/README.md) |
@@ -131,7 +131,7 @@ Repository sources may cite an existing Markdown or HTML section as `path#anchor
 
 | Solution | Journey stage | Runbook | Workshop | Package |
 | --- | --- | --- | --- | --- |
-| License Renewal and Expansion Agent | Retain | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/license-renewal-expansion/quest.html) | [Package](../solutions/license-renewal-expansion/README.md) |
+| License Renewal and Expansion Agent | Retain | [Read runbook](license-renewal-expansion/1.Overview.md) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/license-renewal-expansion/quest.html) | [Package](../solutions/license-renewal-expansion/README.md) |
 | Product Feedback Synthesizer Agent | Innovate | Planned (rollout phase 2) | [Workshop](https://microsoft.github.io/aibast-agents-library/solutions/product-feedback-synthesizer/quest.html) | [Package](../solutions/product-feedback-synthesizer/README.md) |
 
 ## Lane Complexity at a Glance
@@ -162,13 +162,13 @@ Compare the portable file in AIBAST Frontier (experimental) with the manual Copi
 | [Financial Advisor Agent](financial-advisor-copilot/1.Overview.md) | 375 | 1 · 2 · 6 | 22 |
 | [Fraud Detection and Alert Agent](fraud-detection-alert/1.Overview.md) | 316 | 1 · 2 · 4 | 18 |
 | [Inventory Rebalancing Agent](inventory-rebalancing/1.Overview.md) | 399 | 1 · 2 · 4 | 22 |
-| [Inventory Visibility Agent](../solutions/inventory-visibility/README.md) | 409 | 1 · 2 · 4 | 18 |
-| [License Renewal and Expansion Agent](../solutions/license-renewal-expansion/README.md) | 435 | 1 · 2 · 4 | 18 |
-| [Loan Origination Assistant](../solutions/loan-origination-assistant/README.md) | 385 | 1 · 2 · 5 | 20 |
-| [Maintenance Scheduling Agent](../solutions/maintenance-scheduling/README.md) | 405 | 1 · 2 · 4 | 18 |
-| [Omnichannel Engagement Agent](../solutions/omnichannel-engagement/README.md) | 319 | 1 · 2 · 4 | 18 |
-| [Order Status Communications Agent](../solutions/order-status-communication/README.md) | 353 | 1 · 2 · 4 | 18 |
-| [Patient Intake and Scheduling Agent](../solutions/patient-intake/README.md) | 208 | 1 · 2 · 4 | 18 |
+| [Inventory Visibility Agent](inventory-visibility/1.Overview.md) | 409 | 1 · 2 · 4 | 18 |
+| [License Renewal and Expansion Agent](license-renewal-expansion/1.Overview.md) | 435 | 1 · 2 · 4 | 18 |
+| [Loan Origination Assistant](loan-origination-assistant/1.Overview.md) | 385 | 1 · 2 · 5 | 20 |
+| [Maintenance Scheduling Agent](maintenance-scheduling/1.Overview.md) | 405 | 1 · 2 · 4 | 18 |
+| [Omnichannel Engagement Agent](omnichannel-engagement/1.Overview.md) | 319 | 1 · 2 · 4 | 18 |
+| [Order Status Communications Agent](order-status-communication/1.Overview.md) | 353 | 1 · 2 · 4 | 18 |
+| [Patient Intake and Scheduling Agent](patient-intake/1.Overview.md) | 208 | 1 · 2 · 4 | 18 |
 | [Permit Management Agent](../solutions/permit-license-management/README.md) | 360 | 1 · 2 · 4 | 18 |
 | [Personalized Marketing Agent](../solutions/personalized-marketing/README.md) | 465 | 1 · 2 · 4 | 18 |
 | [Personalized Shopping Agent](../solutions/personalized-shopping-assistant/README.md) | 333 | 1 · 2 · 4 | 18 |

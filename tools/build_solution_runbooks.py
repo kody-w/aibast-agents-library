@@ -50,6 +50,13 @@ RUNBOOK_SOLUTIONS = (
     "fs-customer-onboarding",
     "fs-regulatory-compliance",
     "inventory-rebalancing",
+    "inventory-visibility",
+    "license-renewal-expansion",
+    "loan-origination-assistant",
+    "maintenance-scheduling",
+    "omnichannel-engagement",
+    "order-status-communication",
+    "patient-intake",
 )
 PACKAGE_ALIASES = {"production-line-optimization": "product-line-optimization"}
 DRAFT_PACKAGES = {
