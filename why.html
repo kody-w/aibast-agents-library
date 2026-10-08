@@ -205,6 +205,19 @@ html[data-theme="dark"] {
   .footer { max-width: 760px; margin: 48px auto 0; color: var(--text-soft); font-size: 13px; }
   .footer a { color: var(--text-muted); }
   @media (max-width: 600px) { h1 { font-size: 30px; } body { padding-top: 28px; } }
+  details.card summary { cursor: pointer; }
+  ol.wow { list-style: none; margin: 0; padding: 0; counter-reset: wow; }
+  ol.wow > li { counter-increment: wow; background: var(--surface); border: 1px solid var(--border); border-radius: var(--cp-radius); padding: 18px 20px; margin: 0 0 14px; }
+  .wow-head { font-weight: 600; font-size: 17px; margin-bottom: 10px; }
+  .wow-head::before { content: counter(wow) ". "; color: var(--accent); }
+  .wow-where { display: inline-block; margin-left: 8px; padding: 1px 10px; border-radius: var(--cp-radius-pill); background: var(--cp-accent-soft); color: var(--accent); font-size: 12px; font-weight: 600; vertical-align: 2px; }
+  .wow-prompt { white-space: pre-wrap; font-family: var(--cp-font-mono); font-size: 14px; line-height: 1.5; background: var(--cp-surface-soft); border: 1px solid var(--border); border-radius: var(--cp-radius-sm); padding: 38px 14px 12px; margin: 0 0 12px; position: relative; }
+  .wow-copy { position: absolute; top: 6px; right: 6px; font: inherit; font-family: var(--cp-font); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: var(--cp-radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; }
+  .wow-copy:hover { color: var(--accent); border-color: var(--accent); }
+  ol.wow p { margin-bottom: 8px; }
+  code { font-family: var(--cp-font-mono); font-size: .9em; overflow-wrap: anywhere; }
+  table.compare td:first-child { white-space: normal; }
+  .deck .wow-copy { display: none; }
 
   /* ---- Presentation mode -------------------------------------------------
      Opt-in. The prose page is the default and is what a reader, a search engine
@@ -432,6 +445,97 @@ html[data-theme="dark"] {
     <li><strong>You can leave cleanly.</strong> The useful learning stays in the skill file rather than being trapped inside the Brainstem.</li>
   </ul>
 
+  <h2>How it compares</h2>
+  <p>Several projects share one piece of this idea. None combines all four: your existing GitHub Copilot as the model, a skill that is a small program you can read and run, a library of industry starting points with sample data, and a path into Copilot Studio and Microsoft 365.</p>
+  <table class="compare">
+    <thead><tr><th>If you want</th><th>The closest alternative</th><th>What the Brainstem adds</th></tr></thead>
+    <tbody>
+      <tr><td>An assistant with add-ons</td><td>OpenClaw and its ClawHub registry</td><td>Its skills are mostly written instructions the model follows. A Brainstem skill is a program that gives the same answer every run, and it graduates into Microsoft 365.</td></tr>
+      <tr><td>Agents in a folder, behind a chat</td><td>Databricks AppKit agents plugin</td><td>That plugin reads its agents folder when the app starts, inside a Databricks workspace. The Brainstem runs on a laptop and picks up a new skill on the next message.</td></tr>
+      <tr><td>A shared directory of agents</td><td>AGNTCY (OASF records and the Agent Directory Service)</td><td>It lists descriptions of agents. The library ships the agent itself, with sample data, tests and a Copilot Studio solution.</td></tr>
+      <tr><td>An agent you can save and move</td><td>Letta Agent File</td><td>A Letta agent moves between Letta servers. A Brainstem skill is one file that runs in any Brainstem and graduates to Copilot Studio.</td></tr>
+      <tr><td>A place to share skills</td><td>skills.sh and Docker Agent</td><td>Those share instruction folders and configuration files. The library shares working agents with a path into the tools your users already have.</td></tr>
+    </tbody>
+  </table>
+  <details class="card">
+    <summary><strong>Details and sources</strong></summary>
+    <ul style="margin-top:12px">
+      <li><strong>OpenClaw and ClawHub.</strong> OpenClaw runs its own agent runtime. ClawHub is its public registry for skills and plugins, with one-command install, versions and ranking by stars and downloads. Skills are versioned SKILL.md text bundles. <a href="https://docs.openclaw.ai/clawhub">ClawHub docs</a></li>
+      <li><strong>Databricks AppKit agents plugin</strong> (beta). It scans <code>server/agents/&lt;id&gt;/</code> at startup, and the folder name becomes the agent id. It serves a streaming <code>POST /chat</code> and a single-response <code>POST /invocations</code>, and keeps conversation threads on the server. <a href="https://developers.databricks.com/docs/appkit/v0/plugins/agents.md">Plugin docs</a></li>
+      <li><strong>AGNTCY.</strong> Agent records are addressed by their SHA-256 digest, packaged as OCI artifacts, optionally signed with Sigstore, and described with a shared skill vocabulary. The directory describes agents rather than running them, and it is an individual IETF draft. <a href="https://arxiv.org/html/2509.18787v1">Paper</a> · <a href="https://datatracker.ietf.org/doc/html/draft-mp-agntcy-ads-01">Draft</a></li>
+      <li><strong>Letta Agent File (.af).</strong> One file holds an agent's memory, tool code, system prompt, message history and model settings, with secrets removed on export. It is tied to the Letta runtime. <a href="https://docs.letta.com/guides/agents/agent-file">Agent File docs</a></li>
+      <li><strong>skills.sh and Docker Agent.</strong> <code>npx skills add</code> installs SKILL.md folders into many agent hosts, and skills.sh ranks them by installs. Docker Agent shares a YAML agent through any OCI registry. <a href="https://vercel.com/changelog/introducing-skills-the-open-agent-skills-ecosystem">skills</a> · <a href="https://docs.docker.com/ai/docker-agent/concepts/distribution/">Docker Agent</a></li>
+    </ul>
+    <p>Compiled October 2026 from each project's own documentation. These projects change quickly, so check the linked pages for current details.</p>
+  </details>
+
+  <h2>Ten prompts that show the difference</h2>
+  <p>Each prompt below uses something the alternatives above do not offer together. Run them in order: together they take one piece of real work from an idea to a skill your team can use. Prompts 1, 4 and 8 go to GitHub Copilot. The others go to the Brainstem chat.</p>
+  <ol class="wow">
+    <li>
+      <div class="wow-head">Turn your routine into a skill <span class="wow-where">GitHub Copilot</span></div>
+      <pre class="wow-prompt">In the Brainstem agents folder, write a skill named weekly_revenue_drop_agent.py. It takes last week's and this week's revenue per account as text like "Contoso 120000, Fabrikam 80000", works out the change for each account, and lists the accounts that dropped, largest percent drop first.</pre>
+      <p><strong>What you see:</strong> a new file appears in the agents folder, small enough to read in a minute.</p>
+      <p><strong>What it unlocks:</strong> a weekly chore becomes a program you own. <strong>Why elsewhere falls short:</strong> instruction-based skills ask the model to redo the arithmetic every time; this one calculates.</p>
+    </li>
+    <li>
+      <div class="wow-head">Use it immediately <span class="wow-where">Brainstem</span></div>
+      <pre class="wow-prompt">Use the weekly revenue drop skill on these numbers and show me exactly what you sent it and what it returned. Last week: Contoso 118000, Fabrikam 64000, Northwind 47000. This week: Contoso 99000, Fabrikam 66000, Northwind 30000.</pre>
+      <p><strong>What you see:</strong> Northwind down 36 percent, Contoso down 16 percent, Fabrikam left out because it grew, with the exact inputs and outputs.</p>
+      <p><strong>What it unlocks:</strong> no restart and no deploy between writing a skill and using it. <strong>Why elsewhere falls short:</strong> folder-based servers such as the Databricks plugin load agents when the app starts.</p>
+    </li>
+    <li>
+      <div class="wow-head">Catch a skill that only pretends <span class="wow-where">Brainstem</span></div>
+      <pre class="wow-prompt">Run the weekly revenue drop skill on Last week: Contoso 118000, Northwind 47000. This week: Contoso 99000, Northwind 30000. Then tell me: did the skill do the math, or did you? Quote its reply word for word.</pre>
+      <p><strong>What you see:</strong> the skill's reply quoted exactly, plus a check of its figures. If a skill only repeats its input, the answer says so plainly.</p>
+      <p><strong>What it unlocks:</strong> the learner checks the work instead of trusting a confident answer. <strong>Why elsewhere falls short:</strong> most hosts need a separate tracing service to show this. Here the record comes back with every answer, on your own machine.</p>
+    </li>
+    <li>
+      <div class="wow-head">Change it by asking <span class="wow-where">GitHub Copilot</span></div>
+      <pre class="wow-prompt">Change the weekly revenue drop skill so it also lists any account that grew more than 25 percent, under its own heading. Keep everything else the same.</pre>
+      <p><strong>What you see:</strong> a small, readable change to one file. Ask the Brainstem prompt 2 again and the new section appears.</p>
+      <p><strong>What it unlocks:</strong> improving a skill takes one sentence and one rerun. <strong>Why elsewhere falls short:</strong> a change to an agent built on a hosted platform usually means a redeploy.</p>
+    </li>
+    <li>
+      <div class="wow-head">Start from your industry <span class="wow-where">Brainstem</span></div>
+      <pre class="wow-prompt">Using the action prioritization agent and its sample pipeline, what are the three things this rep should do first today, and why?</pre>
+      <p><strong>What you see:</strong> a day plan for a sample sales rep, built from the agent's own synthetic data, with the reasoning behind the order.</p>
+      <p><strong>What it unlocks:</strong> a realistic starting point in one install command, with no customer data. <strong>Why elsewhere falls short:</strong> agent directories such as AGNTCY describe agents; the library ships one you can run.</p>
+    </li>
+    <li>
+      <div class="wow-head">Memory you can open <span class="wow-where">Brainstem</span></div>
+      <pre class="wow-prompt">Remember this for later: our fiscal year starts on July 1.</pre>
+      <p>Then, in a new conversation: <code>Which fiscal quarter does next March fall in for us?</code></p>
+      <p><strong>What you see:</strong> "fiscal Q3" in a conversation that never heard the fact. The fact sits in a plain file, <code>.brainstem_data/shared_memories/memory.json</code>, next to the Brainstem.</p>
+      <p><strong>What it unlocks:</strong> memory you can read, back up or delete like any document. <strong>Why elsewhere falls short:</strong> server-based agents such as Letta keep memory in the server's database.</p>
+    </li>
+    <li>
+      <div class="wow-head">Teach it back <span class="wow-where">Brainstem</span></div>
+      <pre class="wow-prompt">Explain to me, in plain words, what the weekly revenue drop skill does, what it needs from me, and when I should not trust its answer.</pre>
+      <p><strong>What you see:</strong> a plain explanation drawn from the skill's own description and what it needs.</p>
+      <p><strong>What it unlocks:</strong> the learner can explain the skill to a colleague the same day. <strong>Why elsewhere falls short:</strong> an agent spread across server settings, prompts and plugins is hard to explain in one sitting.</p>
+    </li>
+    <li>
+      <div class="wow-head">Hand it to a teammate <span class="wow-where">GitHub Copilot</span></div>
+      <pre class="wow-prompt">Write a short note for a teammate explaining how to drop weekly_revenue_drop_agent.py into their Brainstem's agents folder and which question to ask first.</pre>
+      <p><strong>What you see:</strong> a three-step note. The teammate copies one file and asks prompt 2 on their own machine.</p>
+      <p><strong>What it unlocks:</strong> sharing is copying one file, without a chat history or private workspace. <strong>Why elsewhere falls short:</strong> a Letta agent moves by export and import between Letta servers.</p>
+    </li>
+    <li>
+      <div class="wow-head">Graduate it <span class="wow-where">Copilot Studio · needs a Microsoft 365 tenant</span></div>
+      <pre class="wow-prompt">Which Academy workshop is closest to the weekly revenue drop skill, and walk me through importing its Copilot Studio solution so my team can use it in Teams.</pre>
+      <p><strong>What you see:</strong> the matching workshop and its ready-made Copilot Studio solution, then import steps.</p>
+      <p><strong>What it unlocks:</strong> the same learned workflow reaches people where they already work. <strong>Why elsewhere falls short:</strong> none of the alternatives above has a path into Copilot Studio or Microsoft 365.</p>
+    </li>
+    <li>
+      <div class="wow-head">Get unstuck, keep control <span class="wow-where">Frontier beta</span></div>
+      <pre class="wow-prompt">I'm stuck. Take over this chat, finish the skill, then give me back control and tell me what you changed.</pre>
+      <p><strong>What you see:</strong> another AI drives the same visible chat you were using, finishes the work, and hands it back with a summary.</p>
+      <p><strong>What it unlocks:</strong> help that teaches, because the learner watches every step. <strong>What is different:</strong> the help happens in the learner's own chat, in view, rather than in a hidden background job.</p>
+    </li>
+  </ol>
+  <p>Prompts 1 to 7 were checked on a fresh local Brainstem in October 2026. Prompt 9 needs a Microsoft 365 tenant, and prompt 10 needs the Frontier beta.</p>
+
   <h2>Who it is for</h2>
   <p>Sellers, architects, and partners who need to understand an agent pattern well enough to explain it and adapt it, and workshop learners who want to build one before they publish one. If you already know what you want to ship, go straight to the <a href="index.html">library</a> and take the Copilot Studio solution. If you want to understand it first, install the Brainstem.</p>
 
@@ -619,6 +723,20 @@ html[data-theme="dark"] {
     open(Number.isFinite(requested) ? requested - 1 : 0);
   }
 })();
+</script>
+<script>
+/* Copy buttons for the ten prompts. */
+document.querySelectorAll("main .wow-prompt").forEach((pre) => {
+  const text = pre.textContent;
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "wow-copy"; btn.textContent = "Copy";
+  btn.addEventListener("click", () => {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = "Copied"; setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+    }).catch(() => {});
+  });
+  pre.appendChild(btn);
+});
 </script>
 </body>
 </html>
