@@ -1,11 +1,5 @@
 # Procurement Agent — personless Easy mode (optional Brainstem lane)
 
-## Evidence lane boundary
-
-Historical assisted responses, identities and images are retained as history, not current grounding-r3 proof. No old pass transfers to the candidate; current native acceptance remains pending.
-
-The steps below describe the Easy workflow, not a newly accepted run. For the current Manual build and its open gates, use [the Manual tutorial](manual-tutorial.html) and [the dated review](evals/manual-pilot-review.json).
-
 > **Optional lane.** Use this guide only if you selected **GitHub Copilot +
 > Brainstem (optional)** in Workshop settings. The default GitHub Copilot lane
 > needs no Brainstem install; see

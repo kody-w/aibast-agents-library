@@ -1,11 +1,5 @@
 # Portfolio Rebalancing Agent — personless Easy mode (optional Brainstem lane)
 
-## Evidence lane boundary
-
-Historical assisted/Easy and deterministic Brainstem evidence is retained separately; it is not native Manual r5 final-answer acceptance. No current Easy-lane regression or fresh-from-empty Manual construction is certified.
-
-The steps below describe the Easy workflow, not a newly accepted run. For the current Manual build and its open gates, use [the Manual tutorial](manual-tutorial.html) and [the dated review](evals/manual-pilot-review.json).
-
 > **Optional lane.** Use this guide only if you selected **GitHub Copilot +
 > Brainstem (optional)** in Workshop settings. The default GitHub Copilot lane
 > needs no Brainstem install; see
