@@ -1,0 +1,42 @@
+# The library's static public API (api/public/): public content republished with its provenance.
+# Weekly, and on demand, scripts/build_public_api.py re-reads every source in api/public/sources.json and commits only
+# when a value or a source file actually changed. A source that stops yielding its value fails the run loudly and its
+# last published file stays as it was.
+name: Public API
+
+on:
+  schedule:
+    - cron: '15 7 * * 1'  # Mondays 07:15 UTC
+  workflow_dispatch:
+  push:
+    branches: [staging]
+    paths:
+      - 'api/public/sources.json'
+      - 'scripts/build_public_api.py'
+      - '.github/workflows/public-api.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: public-api
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.11'
+      - name: Re-read every public source
+        run: python scripts/build_public_api.py
+      - name: Commit changes
+        run: |
+          if git diff --quiet -- api/public; then echo "No source changed."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add api/public
+          git commit -m "chore(api): refresh public sources"
+          git push

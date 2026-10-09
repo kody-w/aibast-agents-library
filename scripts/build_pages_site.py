@@ -50,7 +50,7 @@ ROOT_PUBLIC_FILES = frozenset(
     }
 )
 PUBLIC_DIRECTORY_ROOTS = frozenset(
-    {"academy", "docs", "reports", "skills", "solutions", "state"}
+    {"academy", "api", "docs", "reports", "skills", "solutions", "state"}
 )
 BETA_PUBLIC_FILES = frozenset(
     {
